@@ -35,14 +35,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Launcher", "..\MTA
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Voice", "..\MTA10\Voice\Voice.vcproj", "{7FA1129B-28BD-4285-B8CE-AFAD77D22ED0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Voice", "..\MTA10_Server\Voice\VoiceServer.vcproj", "{B84B7703-7D39-4CAB-B4A8-617B29EF09B6}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared - XML Module", "XML\_XML.vcproj", "{E28A87BB-7417-4DD7-ADF4-88F918CF055C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
