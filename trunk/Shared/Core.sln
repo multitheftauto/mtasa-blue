@@ -15,15 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Multiplayer SA", "
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Network", "..\MTA10\net\_Network.vcproj", "{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Core", "..\MTA10_Server\core\_ServerCore.vcproj", "{0550C84E-8AC6-4C44-9686-241B0BB4BD7D}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Network", "..\MTA10_Server\net\_ServerNetwork.vcproj", "{990626CA-67A7-420D-B2E2-3F773465A1CA}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
