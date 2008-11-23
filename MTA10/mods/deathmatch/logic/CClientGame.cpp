@@ -542,24 +542,6 @@ bool CClientGame::StartLocalGame ( const char* szNick, const char* szConfig, con
     // Got a server?
     if ( m_bLocalPlay )
     {
-        // Check that the map editor resource is started
-        // TODO: Don't use this when map editor is final
-
-        char szMapEditorResource [MAX_PATH];
-        snprintf ( szMapEditorResource, MAX_PATH, "%smods/deathmatch/resources/editor.zip", m_Server.GetServerRoot () );
-        if ( !DoesFileExist ( szMapEditorResource ) )
-        {
-            snprintf ( szMapEditorResource, MAX_PATH, "%smods/deathmatch/resources/editor", m_Server.GetServerRoot ()  );
-            if ( !DoesFileExist ( szMapEditorResource ) )
-            {
-                m_bWaitingForLocalConnect = true;
-                m_bErrorStartingLocal = true;
-                g_pCore->ShowMessageBox ( "Error", "The map editor resource is not installed", MB_ICON_ERROR | MB_BUTTON_OK );
-                g_pCore->GetModManager ()->RequestUnload ();
-                return false;
-            }
-        }
-
         // Start the server locally
         if ( !m_Server.Start ( szTemp ) )
         {
