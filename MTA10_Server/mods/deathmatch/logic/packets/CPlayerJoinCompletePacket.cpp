@@ -1,0 +1,82 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/packets/CPlayerJoinCompletePacket.cpp
+*  PURPOSE:     Player join completion packet class
+*  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Chris McArthur <>
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
+
+#include "StdInc.h"
+
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( void )
+{
+    m_PlayerID = INVALID_ELEMENT_ID;
+    m_ucNumberOfPlayers = 0;
+    m_RootElementID = INVALID_ELEMENT_ID;
+    m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
+    m_usHTTPDownloadPort = 0;
+}
+
+
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL )
+{
+    m_PlayerID = PlayerID;
+    m_ucNumberOfPlayers = ucNumberOfPlayers;
+    m_RootElementID = RootElementID;
+    m_ucHTTPDownloadType = ucHTTPDownloadType;
+
+    switch ( m_ucHTTPDownloadType )
+    {
+    case HTTP_DOWNLOAD_ENABLED_PORT:
+        m_usHTTPDownloadPort = usHTTPDownloadPort;
+        break;
+    case HTTP_DOWNLOAD_ENABLED_URL:
+        m_usHTTPDownloadPort = 0;
+
+        strncpy ( m_szHTTPDownloadURL, szHTTPDownloadURL, MAX_HTTP_DOWNLOAD_URL );
+        m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL] = 0;
+        break;
+    default:
+        break;
+    }
+}
+
+
+bool CPlayerJoinCompletePacket::Write ( NetServerBitStreamInterface& BitStream ) const
+{
+    BitStream.Write ( m_PlayerID );
+    BitStream.Write ( m_ucNumberOfPlayers );
+    BitStream.Write ( m_RootElementID );
+    BitStream.Write ( static_cast < unsigned char > ( m_ucHTTPDownloadType ) );
+
+    switch ( m_ucHTTPDownloadType )
+    {
+    case HTTP_DOWNLOAD_ENABLED_PORT:
+        {
+            BitStream.Write ( m_usHTTPDownloadPort );
+        }
+
+        break;
+    case HTTP_DOWNLOAD_ENABLED_URL:
+        {
+            size_t sizeHTTPDownloadURL = strlen ( m_szHTTPDownloadURL );
+
+            BitStream.Write ( static_cast < unsigned short > ( sizeHTTPDownloadURL ) );
+            if ( sizeHTTPDownloadURL > 0 )
+            {
+                BitStream.Write ( const_cast < char* > ( m_szHTTPDownloadURL ), sizeHTTPDownloadURL );
+            }
+        }
+
+        break;
+    default:
+        break;
+    }
+
+    return true;
+}

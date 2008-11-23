@@ -1,0 +1,81 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*               (Shared logic for modifications)
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/shared_logic/CClientStreamer.h
+*  PURPOSE:     Streamer class header
+*  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Jax <>
+*               Ed Lyons <eai@opencoding.net>
+*               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Alberto Alonso <rydencillo@gmail.com>
+*
+*****************************************************************************/
+
+#ifndef __CClientStreamer_H
+#define __CClientStreamer_H
+
+#include "CClientCommon.h"
+#include <list>
+class CClientStreamSector;
+class CClientStreamSectorRow;
+class CClientStreamElement;
+typedef bool ( StreamerLimitReachedFunction ) ( void );
+
+class CClientStreamer
+{
+    friend CClientStreamElement;
+public:
+                                            CClientStreamer             ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance );
+                                            ~CClientStreamer            ( void );
+
+    
+    void                                    DoPulse                     ( CVector & vecPosition );
+    void                                    SetDimension                ( unsigned short usDimension );
+
+    static bool                             CompareExpDistance          ( CClientStreamElement* p1, CClientStreamElement* p2 );
+
+    unsigned int                            CountActiveElements         ( void )    { return ( unsigned int ) m_ActiveElements.size (); }
+    bool                                    IsActiveElement             ( CClientStreamElement * pElement );
+    list < CClientStreamElement * > ::iterator  ActiveElementsBegin     ( void )    { return m_ActiveElements.begin (); }
+    list < CClientStreamElement * > ::iterator  ActiveElementsEnd       ( void )    { return m_ActiveElements.end (); }
+
+private:
+    void                                    CreateSectors               ( list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );
+    void                                    ConnectSector               ( CClientStreamSector * pSector );
+    void                                    ConnectRow                  ( CClientStreamSectorRow * pRow );
+
+    CClientStreamSectorRow *                FindOrCreateRow             ( CVector & vecPosition, CClientStreamSectorRow * pSurrounding = NULL );
+    CClientStreamSectorRow *                FindRow                     ( float fY );
+    void                                    OnUpdateStreamPosition      ( CClientStreamElement * pElement );
+    
+    void                                    AddElement                  ( CClientStreamElement * pElement );
+    void                                    RemoveElement               ( CClientStreamElement * pElement );
+
+    void                                    SetExpDistances             ( list < CClientStreamElement * > * pList );
+    void                                    AddToSortedList             ( list < CClientStreamElement * > * pList, CClientStreamElement * pElement );
+    
+    void                                    Restream                    ( void );
+    bool                                    ReachedLimit                ( void )    { return m_pLimitReachedFunc (); }
+
+    void                                    OnEnterSector               ( CClientStreamSector * pSector );
+    void                                    OnElementEnterSector        ( CClientStreamElement * pElement, CClientStreamSector * pSector );
+    void                                    OnElementForceStreamIn      ( CClientStreamElement * pElement );
+    void                                    OnElementForceStreamOut     ( CClientStreamElement * pElement );
+    void                                    OnElementDimension          ( CClientStreamElement * pElement );
+
+    float                                   m_fMaxDistanceExp;
+    float                                   m_fMaxDistanceThreshold;
+    StreamerLimitReachedFunction*           m_pLimitReachedFunc;
+    list < CClientStreamSectorRow * >       m_WorldRows;
+    list < CClientStreamSectorRow * >       m_ExtraRows;
+    CClientStreamSectorRow *                m_pRow;
+    CClientStreamSector *                   m_pSector;
+    CVector                                 m_vecPosition;
+    unsigned short                          m_usDimension;
+    list < CClientStreamElement * >         m_ActiveElements;
+    list < CClientStreamElement * >         m_ToStreamOut;
+};
+
+#endif
