@@ -36,7 +36,6 @@
 #include "ClientCommands.h"
 #include "CClient.h"
 #include "HeapTrace.h"
-#include "VoiceAPI.h"
 #include "logic/CClientGame.h"
 #include "logic/Packets.h"
 #include "logic/CDeathmatchVehicle.h"
