@@ -1,0 +1,240 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/CPedSync.cpp
+*  PURPOSE:     Ped entity synchronization class
+*  DEVELOPERS:  lil_Toady <>
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
+
+#include "StdInc.h"
+
+extern CGame * g_pGame;
+
+#define MAX_PLAYER_SYNC_DISTANCE 100.0f
+
+CPedSync::CPedSync ( CPlayerManager* pPlayerManager, CPedManager* pPedManager )
+{
+    m_pPlayerManager = pPlayerManager;
+    m_pPedManager = pPedManager;
+    m_ulLastSweepTime = 0;
+}
+
+
+void CPedSync::DoPulse ( void )
+{
+    // Time to check for players that should no longer be syncing a vehicle or vehicles that should be synced?
+    unsigned long ulCurrentTime = GetTime ();
+    if ( ulCurrentTime >= m_ulLastSweepTime + 500 )
+    {
+        m_ulLastSweepTime = ulCurrentTime;
+        Update ( ulCurrentTime );
+    }
+}
+
+
+bool CPedSync::ProcessPacket ( CPacket& Packet )
+{
+    if ( Packet.GetPacketID () == PACKET_ID_PED_SYNC )
+    {
+        Packet_PedSync ( static_cast < CPedSyncPacket& > ( Packet ) );
+        return true;
+    }
+
+    return false;
+}
+
+
+void CPedSync::OverrideSyncer ( CPed* pPed, CPlayer* pPlayer )
+{
+    CPlayer* pSyncer = pPed->GetSyncer ();
+    if ( pSyncer )
+    {
+        if ( pSyncer == pPlayer )
+            return;
+
+        StopSync ( pPed );
+    }
+
+    if ( pPlayer )
+        StartSync ( pPlayer, pPed );
+}
+
+
+void CPedSync::Update ( unsigned long ulCurrentTime )
+{
+    // Update all the ped's sync states
+    list < CPed* > ::const_iterator iter = m_pPedManager->IterBegin ();
+    for ( ; iter != m_pPedManager->IterEnd (); iter++ )
+    {
+        // It is a ped, yet not a player
+        if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) && ( *iter )->IsSyncable() )
+            UpdatePed ( *iter );
+    }
+}
+
+
+void CPedSync::UpdatePed ( CPed* pPed )
+{
+    CPlayer* pSyncer = pPed->GetSyncer ();
+
+    // This vehicle got a syncer?
+    if ( pSyncer )
+    {
+        // He isn't close enough to the vehicle and in the right dimension?
+        if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pPed->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
+                ( pPed->GetDimension () != pSyncer->GetDimension () ) )
+        {
+            // Stop him from syncing it
+            StopSync ( pPed );
+
+            // Find a new syncer for it
+            FindSyncer ( pPed );
+        }
+    }
+    else
+    {
+        // Try to find a syncer for it
+        FindSyncer ( pPed );
+    }
+}
+
+
+void CPedSync::FindSyncer ( CPed* pPed )
+{
+    // Find a player close enough to him
+    CPlayer* pPlayer = FindPlayerCloseToPed ( pPed, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
+    if ( pPlayer )
+    {
+        // Tell him to start syncing it
+        StartSync ( pPlayer, pPed );
+    }
+}
+
+
+void CPedSync::StartSync ( CPlayer* pPlayer, CPed* pPed )
+{
+    // Tell the player
+    pPlayer->Send ( CPedStartSyncPacket ( pPed ) );
+
+    // Mark him as the syncing player
+    pPed->SetSyncer ( pPlayer );
+}
+
+
+void CPedSync::StopSync ( CPed* pPed )
+{
+    // Tell the player that used to sync it
+    pPed->GetSyncer ()->Send ( CPedStopSyncPacket ( pPed->GetID () ) );
+
+    // Unmark him as the syncing player
+    pPed->SetSyncer ( NULL );
+}
+
+
+CPlayer* CPedSync::FindPlayerCloseToPed ( CPed* pPed, float fMaxDistance )
+{
+    // Grab the ped position
+    CVector vecPedPosition = pPed->GetPosition ();
+
+    // See if any players are close enough
+    unsigned int uiLastPlayerSyncingCount = 0xFFFFFFFF;
+    CPlayer* pLastPlayerSyncing = NULL;
+    CPlayer* pPlayer = NULL;
+    list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    {
+        pPlayer = *iter;
+        // Is he joined?
+        if ( pPlayer->IsJoined () )
+        {
+            // He's near enough?
+            if ( IsPointNearPoint3D ( vecPedPosition, pPlayer->GetPosition (), fMaxDistance ) )
+            {
+                // Same dimension?
+                if ( pPlayer->GetDimension () == pPed->GetDimension () )
+                {
+                    // He syncs less peds than the previous player close enough?
+                    if ( !pLastPlayerSyncing || pPlayer->CountSyncingPeds () < pLastPlayerSyncing->CountSyncingPeds () )
+                    {
+                        pLastPlayerSyncing = pPlayer;
+                    }
+                }
+            }
+        }
+    }
+
+    // Return the player we found that syncs the least number of peds
+    return pLastPlayerSyncing;
+}
+
+
+void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
+{
+    // Grab the player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Apply the data for each ped in the packet
+        vector < CPedSyncPacket::SyncData* > ::const_iterator iter = Packet.IterBegin ();
+        for ( ; iter != Packet.IterEnd (); iter++ )
+        {
+            CPedSyncPacket::SyncData* pData = *iter;
+
+            // Grab the ped this packet is for
+            CElement* pPedElement = CElementIDs::GetElement ( pData->Model );
+            if ( pPedElement && IS_PED ( pPedElement ) )
+            {
+                // Convert to a CPed
+                CPed* pPed = static_cast < CPed* > ( pPedElement );
+
+                // Is the player syncing this ped?
+                // this packet if the time context matches.
+                if ( pPed->GetSyncer () == pPlayer &&
+                     pPed->CanUpdateSync ( pData->ucSyncTimeContext ) )
+                {
+                    // Apply the data to the ped
+                    if ( pData->ucFlags & 0x01 )
+                    {
+                        pPed->SetPosition ( pData->vecPosition );
+                        g_pGame->GetColManager()->DoHitDetection ( pPed->GetLastPosition (), pPed->GetPosition (), 0.0f, pPed );
+                    }
+                    if ( pData->ucFlags & 0x02 ) pPed->SetRotation ( pData->fRotation );
+                    if ( pData->ucFlags & 0x04 ) pPed->SetVelocity ( pData->vecVelocity );
+
+                    if ( pData->ucFlags & 0x08 )
+                    {
+                        // Less health than last time?
+                        float fPreviousHealth = pPed->GetHealth ();
+                        pPed->SetHealth ( pData->fHealth );
+
+                        if ( pData->fHealth < fPreviousHealth )
+                        {
+                            // Grab the delta health
+                            float fDeltaHealth = fPreviousHealth - pData->fHealth;
+
+					        if ( fDeltaHealth > 0.0f )
+					        {
+						        // Call the onPedDamage event
+						        CLuaArguments Arguments;
+						        Arguments.PushNumber ( fDeltaHealth );
+						        pPed->CallEvent ( "onPedDamage", Arguments );
+					        }
+                        }
+                    }
+
+                    if ( pData->ucFlags & 0x10 ) pPed->SetArmor ( pData->fArmor );
+
+                    // Send this sync
+                    pData->bSend = true;
+                }
+            }
+        }
+
+        // Tell everyone
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+    }
+}

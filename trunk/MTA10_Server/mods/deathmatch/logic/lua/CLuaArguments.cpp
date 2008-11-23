@@ -1,0 +1,658 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/lua/CLuaArguments.cpp
+*  PURPOSE:     Lua argument manager class
+*  DEVELOPERS:  Ed Lyons <>
+*               Christian Myhre Lundheim <>
+*               Jax <>
+*               Chris McArthur <>
+*               Cecill Etheredge <>
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
+
+#include "StdInc.h"
+
+extern CGame* g_pGame;
+
+#ifndef VERIFY_ELEMENT
+#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
+#endif
+
+CLuaArguments::CLuaArguments ( NetServerBitStreamInterface& bitStream )
+{
+    ReadFromBitStream ( bitStream );
+}
+
+
+CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments )
+{
+    // Copy all the arguments
+    vector < CLuaArgument* > ::const_iterator iter = Arguments.m_Arguments.begin ();
+    for ( ; iter != Arguments.m_Arguments.end (); iter++ )
+    {
+        CLuaArgument* pArgument = new CLuaArgument ( **iter );
+        m_Arguments.push_back ( pArgument );
+    }
+}
+
+
+CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
+{
+	if ( uiPosition < m_Arguments.size () )
+		return m_Arguments.at ( uiPosition );
+	return NULL;
+}
+
+
+const CLuaArguments& CLuaArguments::operator = ( const CLuaArguments& Arguments )
+{
+    // Clear our previous list if any
+    DeleteArguments ();
+
+    // Copy all the arguments
+    vector < CLuaArgument* > ::const_iterator iter = Arguments.m_Arguments.begin ();
+    for ( ; iter != Arguments.m_Arguments.end (); iter++ )
+    {
+        CLuaArgument* pArgument = new CLuaArgument ( **iter );
+        m_Arguments.push_back ( pArgument );
+    }
+
+    // Return the given reference allowing for chaining
+    return Arguments;
+}
+
+
+void CLuaArguments::ReadArguments ( lua_State* luaVM, signed int uiIndexBegin )
+{
+    // Delete the previous arguments if any
+    DeleteArguments ();
+
+    // Start reading arguments until there are none left
+    while ( lua_type ( luaVM, uiIndexBegin ) != LUA_TNONE )
+    {
+        // Create an argument, let it read out the argument and add it to our vector
+        CLuaArgument* pArgument = new CLuaArgument ( luaVM, uiIndexBegin++ );
+        m_Arguments.push_back ( pArgument );
+    }
+}
+
+void CLuaArguments::ReadTable ( lua_State* luaVM, signed int uiIndexBegin, unsigned int depth )
+{
+    // Delete the previous arguments if any
+    DeleteArguments ();
+    lua_pushnil(luaVM);  /* first key */
+    while (lua_next(luaVM, uiIndexBegin) != 0) {
+        /* uses 'key' (at index -2) and 'value' (at index -1) */
+        CLuaArgument* pArgument = new CLuaArgument ( luaVM, -2, depth );
+        m_Arguments.push_back ( pArgument ); // push the key first
+
+        pArgument = new CLuaArgument ( luaVM, -1, depth );
+        m_Arguments.push_back ( pArgument ); // then the value
+       
+        /* removes 'value'; keeps 'key' for next iteration */
+        lua_pop(luaVM, 1);
+    }
+}
+
+void CLuaArguments::ReadArgument ( lua_State* luaVM, signed int uiIndex )
+{
+    CLuaArgument* pArgument = new CLuaArgument ( luaVM, uiIndex );
+    m_Arguments.push_back ( pArgument );
+}
+
+void CLuaArguments::PushArguments ( lua_State* luaVM ) const
+{
+    // Push all our arguments
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end (); iter++ )
+    {
+        (*iter)->Push ( luaVM );
+    }
+}
+
+void CLuaArguments::PushAsTable ( lua_State* luaVM )
+{
+    lua_newtable ( luaVM );
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); iter ++ )
+    {
+        (*iter)->Push ( luaVM ); // index
+        iter++;
+        (*iter)->Push ( luaVM ); // value
+        lua_settable ( luaVM, -3 );
+    }
+}
+
+
+void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
+{
+    vector < CLuaArgument* > ::const_iterator iter = Arguments.IterBegin ();
+    for ( ; iter != Arguments.IterEnd (); iter++ )
+    {
+        CLuaArgument* pArgument = new CLuaArgument ( **iter );
+        m_Arguments.push_back ( pArgument );
+    }
+}
+
+
+bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments * returnValues ) const
+{
+    assert ( pLuaMain );
+
+    // Add the function name to the stack and get the event from the table
+    lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+    assert ( luaVM );
+    int luaStackPointer = lua_gettop ( luaVM );
+	lua_getref ( luaVM, iLuaFunction );
+
+    // Push our arguments onto the stack
+    PushArguments ( luaVM );
+
+    // Call the function with our arguments
+    pLuaMain->ResetInstructionCount ();
+
+    int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
+    if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
+    {
+        const char* szRes = lua_tostring( luaVM, -1 );		
+		g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
+
+        return false; // the function call failed
+    }
+    else if ( returnValues != NULL )
+    {
+        int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
+        for ( int i = - iReturns; i <= -1; i++ )
+        {
+            returnValues->ReadArgument ( luaVM, i );
+        }
+
+        for ( int h = 0; h < iReturns; h++)
+		{
+            lua_pop ( luaVM, 1 );
+		}
+    }
+        
+    return true;
+}
+
+
+bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLuaArguments * returnValues ) const
+{
+    assert ( pLuaMain );
+    assert ( szFunction );
+
+    // Add the function name to the stack and get the event from the table
+    lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+    assert ( luaVM );
+    int luaStackPointer = lua_gettop ( luaVM );
+    lua_pushstring ( luaVM, szFunction );
+    lua_gettable ( luaVM, LUA_GLOBALSINDEX );
+
+    // Push our arguments onto the stack
+    PushArguments ( luaVM );
+
+    // Call the function with our arguments
+    pLuaMain->ResetInstructionCount ();
+    int iret = 0;
+    try {
+        iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
+    }
+    catch ( ... )
+    {
+        return false;
+    }
+    if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
+    {
+        const char* szRes = lua_tostring( luaVM, -1 );
+        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
+
+        return false; // the function call failed
+    }
+    else if ( returnValues != NULL )
+    {
+        int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
+        for ( int i = - iReturns; i <= -1; i++ )
+        {
+            returnValues->ReadArgument ( luaVM, i );
+        }
+
+        for ( int h = 0; h < iReturns; h++)
+		{
+            lua_pop ( luaVM, 1 );
+		}
+    }
+        
+    return true;
+}
+
+
+vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * values )
+{
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () ; iter++ )
+    {
+        switch ( (*iter)->GetType() )
+        {
+        case LUA_TNUMBER:
+            {
+                char * szValue = new char [ 20 ];
+                itoa ( ( int ) (*iter)->GetNumber(), szValue, 10 );
+                values->push_back ( szValue );
+                break;
+            }
+        case LUA_TSTRING:
+            {
+                const char * szString = (*iter)->GetString().c_str ();
+                char * szValue = new char [ strlen ( szString ) + 1 ];
+                strcpy ( szValue, szString );
+                values->push_back ( szValue );
+                break;
+            }
+        case LUA_TBOOLEAN:
+            {
+                char * szValue = new char [ 6 ];
+                if ( (*iter)->GetBoolean() )
+                    values->push_back ( strcpy ( szValue, "true" ) );
+                else
+                    values->push_back ( strcpy ( szValue, "false" ) );
+                break;
+            }
+        case LUA_TLIGHTUSERDATA:
+            {
+                char * szValue = new char [10];
+                memset(szValue,0,10);
+                CElement* pElement = (*iter)->GetElement ();
+			    if ( VERIFY_ELEMENT(pElement) )
+			    {
+                    _snprintf ( szValue, 9, "E#%d", pElement->GetID() );
+			    }
+			    else
+			    {
+				    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
+			    }
+                values->push_back ( szValue );
+            }        
+        default:
+            {
+                char * szEmpty = new char [ 1 ];
+                szEmpty[0] = '\0';
+                values->push_back ( szEmpty );
+            }
+        }
+    }
+    return values;
+}
+
+
+
+CLuaArgument* CLuaArguments::PushNil ( void )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushBoolean ( bool bBool )
+{
+    CLuaArgument* pArgument = new CLuaArgument ( bBool );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushTable ( CLuaArguments * table )
+{
+    CLuaArgument* pArgument = new CLuaArgument (  );
+    pArgument->Read(table);
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+CLuaArgument* CLuaArguments::PushNumber ( double dNumber )
+{
+    CLuaArgument* pArgument = new CLuaArgument ( dNumber );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument & argument )
+{
+    CLuaArgument* pArgument = new CLuaArgument (argument); // create a copy
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+CLuaArgument* CLuaArguments::PushString ( const char* szString )
+{
+    CLuaArgument* pArgument = new CLuaArgument ( szString );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushUserData ( void* pUserData )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pUserData );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushElement ( CElement* pElement )
+{
+    CLuaArgument* pArgument = new CLuaArgument ( pElement );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushACL ( CAccessControlList* pACL )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pACL );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushACLGroup ( CAccessControlListGroup* pACLGroup )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pACLGroup );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushAccount ( CAccount* pAccount )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pAccount );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushResource ( CResource* pResource )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pResource );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushTextDisplay ( CTextDisplay* pTextDisplay )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pTextDisplay );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushTextItem ( CTextItem* pTextItem )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pTextItem );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushTimer ( CLuaTimer* pLuaTimer )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadUserData ( pLuaTimer );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+void CLuaArguments::DeleteArguments ( void )
+{
+    // Delete each item
+    vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end (); iter++ )
+    {
+        delete *iter;
+    }
+
+    // Clear the vector
+    m_Arguments.clear ();
+}
+
+
+bool CLuaArguments::ReadFromBitStream ( NetServerBitStreamInterface& bitStream )
+{
+    unsigned short usNumArgs;
+    if ( bitStream.Read ( usNumArgs ) )
+    {
+        for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
+        {
+		    CLuaArgument* pArgument = new CLuaArgument;
+            pArgument->ReadFromBitStream ( bitStream );
+            m_Arguments.push_back ( pArgument );
+        }
+	}
+    return true;
+}
+
+
+bool CLuaArguments::WriteToBitStream ( NetServerBitStreamInterface& bitStream ) const
+{
+    bool bSuccess = true;
+    bitStream.Write ( static_cast < unsigned short > ( m_Arguments.size () ) );
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () ; iter++ )
+    {
+        CLuaArgument* pArgument = *iter;
+        if ( !pArgument->WriteToBitStream ( bitStream ) )
+        {
+            bSuccess = false;
+        }
+    }
+	return bSuccess;
+}
+
+bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
+{
+    json_object * my_array = WriteToJSONArray ( bSerialize );
+    if ( my_array )
+    {
+        strJSON = json_object_get_string ( my_array );
+        // json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
+        return true;
+    }
+    return false;
+}
+
+json_object * CLuaArguments::WriteToJSONArray ( bool bSerialize )
+{
+    json_object * my_array = json_object_new_array();
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () ; iter++ )
+    {
+        CLuaArgument* pArgument = *iter;
+        json_object * object = pArgument->WriteToJSONObject ( bSerialize );
+        if ( object )
+        {
+            json_object_array_add(my_array, object);
+        }
+        else
+        {
+            break;
+        }
+    }
+	return my_array;
+}
+
+json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize )
+{
+    bool bIsArray = true;
+    unsigned int iArrayPos = 1; // lua arrays are 1 based
+    vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () ; iter+=2 )
+    {
+        CLuaArgument* pArgument = *iter;
+        if ( pArgument->GetType() == LUA_TNUMBER )
+        {
+            double num = pArgument->GetNumber();
+            int iNum = static_cast < unsigned int > ( num );
+            if ( num == iNum )
+            {
+                if ( iArrayPos != iNum ) // check if the value matches its index in the table
+                {
+                    bIsArray = false;
+                    break;
+                }
+            }
+            else
+            {
+                bIsArray = false;
+                break;
+            }
+        }
+        else
+        {
+            bIsArray = false;
+            break;
+        }
+        iArrayPos++;
+    }
+    
+    if ( bIsArray )
+    {
+        json_object * my_array = json_object_new_array();
+        vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
+        for ( ; iter != m_Arguments.end () ; iter++ ) 
+        {
+            iter++; // skip the key values
+            CLuaArgument* pArgument = *iter;
+            json_object * object = pArgument->WriteToJSONObject ( bSerialize );
+            if ( object )
+            {
+                json_object_array_add(my_array, object);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return my_array;
+    }
+    else
+    {
+        json_object * my_object = json_object_new_object();
+        iter = m_Arguments.begin ();
+        for ( ; iter != m_Arguments.end () ; iter++ )
+        {
+            char szKey[255];
+            szKey[0] = '\0';
+            CLuaArgument* pArgument = *iter;
+            if ( !pArgument->WriteToString(szKey, 255) ) // index
+                break;
+            iter++;
+            pArgument = *iter;
+            json_object * object = pArgument->WriteToJSONObject ( bSerialize ); // value
+
+            if ( object )
+            {
+                json_object_object_add(my_object, szKey, object);
+            }
+            else
+            {            
+                break;
+            }
+        }
+        return my_object;
+    }
+}
+
+bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
+{
+    json_object* object = json_tokener_parse ( const_cast < char* > ( szJSON ) );
+    if ( !is_error(object) )
+    {
+        if ( json_object_get_type ( object ) == json_type_array )
+        {
+            bool bSuccess = true;
+            
+            for(int i=0; i < json_object_array_length(object); i++) 
+            {
+                json_object *arrayObject = json_object_array_get_idx(object, i);
+		        CLuaArgument * pArgument = new CLuaArgument();
+                bSuccess = pArgument->ReadFromJSONObject ( arrayObject );
+                m_Arguments.push_back ( pArgument ); // then the valoue
+                if ( !bSuccess )
+                    break;
+            }
+            return bSuccess;
+        }
+    }
+//    else
+//        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
+ //   else
+//        g_pGame->GetScriptDebugging()->LogError ( "Could not parse HTTP POST request, ensure data uses JSON.");
+    return false;
+}
+
+bool CLuaArguments::ReadFromJSONObject ( json_object * object )
+{
+    if ( !is_error(object) )
+    {
+        if ( json_object_get_type ( object ) == json_type_object )
+        {
+            bool bSuccess = true;
+            json_object_object_foreach(object, key, val) 
+            {
+                CLuaArgument* pArgument = new CLuaArgument ( key );
+                m_Arguments.push_back ( pArgument ); // push the key first
+                pArgument = new CLuaArgument ( );
+                bSuccess = pArgument->ReadFromJSONObject ( val ); // then the value
+                m_Arguments.push_back ( pArgument );
+                if ( !bSuccess )
+                    break;
+            }
+            return bSuccess;
+        }
+    }
+ //   else
+//        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
+    return false;
+}
+
+bool CLuaArguments::ReadFromJSONArray ( json_object * object )
+{
+    if ( !is_error(object) )
+    {
+        if ( json_object_get_type ( object ) == json_type_array )
+        {
+            bool bSuccess = true;
+            for(int i=0; i < json_object_array_length(object); i++) 
+            {
+                json_object *arrayObject = json_object_array_get_idx(object, i);
+		        CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
+                m_Arguments.push_back ( pArgument );
+
+		        pArgument = new CLuaArgument();
+                bSuccess = pArgument->ReadFromJSONObject ( arrayObject );
+                m_Arguments.push_back ( pArgument ); // then the valoue
+                if ( !bSuccess )
+                    break;
+            }
+            return bSuccess;
+        }
+    }
+//    else
+//        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
+    return false;
+}
+
