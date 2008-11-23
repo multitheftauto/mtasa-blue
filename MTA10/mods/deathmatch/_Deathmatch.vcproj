@@ -258,9 +258,6 @@
 						PrecompiledHeaderThrough="StdInc.h"/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="..\..\Voice\VoiceAPI.cpp">
-			</File>
 			<Filter
 				Name="logic"
 				Filter="">
