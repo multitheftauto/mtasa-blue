@@ -11,6 +11,7 @@ SetCompressor /SOLID lzma
 !define TEMP2 $R1
 !define TEMP3 $R2
 Var GTA_DIR
+Var Install_Dir
 ; HM NIS Edit Wizard helper defines
 
 ; ###########################################################################################################
@@ -812,8 +813,8 @@ Section Uninstall
  
   !ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
   RmDir /r "$INSTDIR\development\module sdk\publicsdk"
-  RmDir /r "$INSTDIR\development\module sdk"
-  RmDir /r "$INSTDIR\development"
+  RmDir "$INSTDIR\development\module sdk"
+  RmDir "$INSTDIR\development"
   !endif ; end of fix for #3889
   
   preservemapsfolder:
