@@ -181,7 +181,7 @@ bool CPed::ReadSpecialData ( void )
 	GetCustomDataFloat ( "armor", m_fArmor, true );
 
 	if ( GetCustomDataInt ( "interior", iTemp, true ) )
-        m_usDimension = static_cast < unsigned short > ( iTemp );
+        m_ucInterior = static_cast < unsigned char > ( iTemp );
 
 	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
