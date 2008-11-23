@@ -443,7 +443,12 @@ UAC_Success:
     goto UAC_Elevate
 
 
-  strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas"
+  ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "" ; start of fix for #3743
+    ${If} $Install_Dir == '' 
+      strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas"
+    ${Else} 
+      strcpy $INSTDIR $Install_Dir
+    ${EndIf} ; end of fix for #3743
   
   !ifdef CLIENT_SETUP
   ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
@@ -747,13 +752,43 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-
 Function un.onUninstSuccess
   HideWindow
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer."
+  UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
+Function un.OnUnInstFailed
+  HideWindow
+  MessageBox MB_ICONSTOP|MB_OK "Uninstallation has failed!"
+  UAC::Unload ;Must call unload! ; #3017 fix
+FunctionEnd
+
+ 
 Function un.onInit
+ 
+UAC_Elevate: ; start of #3017 fix
+    UAC::RunElevated 
+    StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
+    StrCmp 0 $0 0 UAC_Err ; Error?
+    StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
+    Quit
+ 
+UAC_Err:
+    MessageBox mb_iconstop "Unable to elevate, error $0"
+    Abort
+ 
+UAC_ElevationAborted:
+    # elevation was aborted, run as normal?
+    MessageBox mb_iconstop "This uninstaller requires admin access, aborting!"
+    Abort
+ 
+UAC_Success:
+    StrCmp 1 $3 +4 ;Admin?
+    StrCmp 3 $1 0 UAC_ElevationAborted ;Try again?
+    MessageBox mb_iconstop "This uninstaller requires admin access, try again"
+    goto UAC_Elevate ; end of #3017 fix
+
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
   Abort
 FunctionEnd
@@ -774,7 +809,13 @@ Section Uninstall
   !ifdef INCLUDE_SERVER
   RmDir /r "$INSTDIR\server"
   !endif
-
+ 
+  !ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
+  RmDir /r "$INSTDIR\development\module sdk\publicsdk"
+  RmDir /r "$INSTDIR\development\module sdk"
+  RmDir /r "$INSTDIR\development"
+  !endif ; end of fix for #3889
+  
   preservemapsfolder:
   ; serve CORE FILES
 !ifdef INCLUDE_SERVER
@@ -819,5 +860,6 @@ Section Uninstall
   !else
   RmDir /r "$INSTDIR\server" ; for server only install
   !endif
+  RmDir "$INSTDIR" ; fix for #3898
   SetAutoClose true
 SectionEnd
