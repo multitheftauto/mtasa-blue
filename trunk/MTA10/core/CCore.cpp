@@ -1392,11 +1392,6 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "connectiontype",	"sets the connection type (type)",	CCommandFuncs::ConnectionType );
     m_pCommands->Add ( "saveconfig",	    "immediately saves the config",	    CCommandFuncs::SaveConfig );
     
-
-	//m_pCommands->Add ( "epacheck",			"epa anti-cheat check",				CCommandFuncs::EPACheck );
-	//m_pCommands->Add ( "debugcheck",		"debugger anti-cheat check",		CCommandFuncs::DebugCheck );
-	//m_pCommands->Add ( "memcheck",			"memory checksum check",			CCommandFuncs::MemoryCheck );
-
 #ifdef MTA_DEBUG
 	//m_pCommands->Add ( "pools",				"read out the pool values",			CCommandFuncs::PoolRelocations );
 #endif

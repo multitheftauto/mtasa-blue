@@ -41,7 +41,6 @@
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "tracking/CHTTPClient.h"
-#include "anticheat/CEPACheck.h"
 #include "UtilityMacros.h"
 
 // SDK includes
