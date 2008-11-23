@@ -428,7 +428,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Show the server header
 	CLogger::LogPrintfNoStamp ( "===========================================================\n" \
-								"= Multi Theft Auto: San Andreas Deathmatch v1.0-dp3       =\n" \
+								"= Multi Theft Auto: San Andreas Deathmatch v%s\n" \
 								"===========================================================\n" \
 								"= Server name		: %s\n" \
 								"= Server IP address	: %s\n" \
@@ -439,6 +439,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 								"= MTU packet size	: %u\n" \
 								"===========================================================\n",
 
+                                MTA_VERSION,
 								m_pMainConfig->GetServerName ().c_str (),
 								m_pMainConfig->GetServerIP ().c_str (),
 								m_pMainConfig->GetServerPort (),

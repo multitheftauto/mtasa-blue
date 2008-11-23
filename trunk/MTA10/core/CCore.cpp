@@ -1120,11 +1120,7 @@ void CCore::CreateNetwork ( )
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
     // Load approrpiate compilation-specific library.
-#ifdef MTA_DEBUG
-    m_NetModule.LoadModule ( "net_d.dll" );
-# else
     m_NetModule.LoadModule ( "net.dll" );
-#endif
 
     // Get client initializer function from DLL's routine.
     pfnNetInit = static_cast< pfnNetInitializer > 
