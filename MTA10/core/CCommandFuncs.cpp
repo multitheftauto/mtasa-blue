@@ -384,22 +384,3 @@ void CCommandFuncs::SaveConfig ( const char* szParameters )
     pConfig->Save ();
     g_pCore->GetConsole ()->Printf ( "Saved config to '%s'", pConfig->GetFileName () );
 }
-
-
-/*
-void CCommandFuncs::EPACheck ( const char* szParameters )
-{
-	if ( CEPACheck::CheckD3D9 ( CDirect3DHook9::GetSingletonPtr ()->m_pfnDirect3DCreate9 ) )
-		g_pCore->GetConsole ()->Printf ( "You are running a legimate version of MTA." );
-	else
-		g_pCore->GetConsole ()->Printf ( "You are running a hacked version of MTA." );
-}
-
-void CCommandFuncs::DebugCheck ( const char* szParameters )
-{
-	if ( CEPACheck::CheckDebugger () )
-		g_pCore->GetConsole ()->Printf ( "No debugger detected." );
-	else
-		g_pCore->GetConsole ()->Printf ( "Debugger detected." );
-}
-*/

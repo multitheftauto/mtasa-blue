@@ -47,11 +47,6 @@ public:
 	DECLARE_COMMAND_HANDLER ( ScreenShot );
 	DECLARE_COMMAND_HANDLER ( ConnectionType );
     DECLARE_COMMAND_HANDLER ( SaveConfig );
-
-    /*
-	DECLARE_COMMAND_HANDLER ( EPACheck );
-	DECLARE_COMMAND_HANDLER ( DebugCheck );
-    */
 };
 
 #endif
