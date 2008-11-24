@@ -645,13 +645,9 @@ SectionEnd
 Section "Deathmatch Mod" SEC05
 SectionIn 1 2 RO ; section is required
     SetOutPath "$INSTDIR\server\mods\deathmatch"
+    
     SetOverwrite on
     File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
-!ifndef LIGHTBUILD
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
     
     SetOverwrite off
     File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
@@ -659,6 +655,12 @@ SectionIn 1 2 RO ; section is required
     File "${SERVER_FILES_ROOT}\mods\deathmatch\banlist.xml"
     File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf"
     File "${SERVER_FILES_ROOT}\mods\deathmatch\vehiclecolors.conf"
+
+    !ifndef LIGHTBUILD
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
     
     !ifdef CLIENT_SETUP
     File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
