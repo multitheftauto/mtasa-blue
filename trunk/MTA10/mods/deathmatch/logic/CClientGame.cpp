@@ -257,8 +257,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Foo.Init ( this );
 
     // Load some stuff from the core config
-    CMainConfigInterface * pConfig = g_pCore->GetConfig ();
-    CClientTextDisplay::SetGlobalScale ( pConfig->GetTextScale () );
+    float fScale;
+    g_pCore->GetCVars ()->Get ( "text_scale", fScale );
+    CClientTextDisplay::SetGlobalScale ( fScale );
 }
 
 

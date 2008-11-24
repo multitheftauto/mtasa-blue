@@ -468,10 +468,11 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
                     return true;
                 }
                 // Get the nick from the config
-                const char* szNick = g_pCore->GetConfig ()->strNick.c_str ();
+                std::string strNick;
+                CVARS_GET ( "nick", strNick );
 
                 // Valid nick?
-                if ( !CCore::GetSingleton ().IsValidNick ( szNick ) )
+                if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
                 {
                     CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
                     return true;
@@ -484,7 +485,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
 
                 // Start the connect
                 std::string strIP = pServer->strHost.substr ( 0, pServer->strHost.find ( ':' ) );
-                CCore::GetSingleton ().GetConnectManager ()->Connect ( strIP.c_str (), pServer->usGamePort, szNick, szPassword );
+                CCore::GetSingleton ().GetConnectManager ()->Connect ( strIP.c_str (), pServer->usGamePort, strNick.c_str (), szPassword );
             }
         }
     }
@@ -697,5 +698,68 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     m_pFavouritesAddByIP.Reset ();
     m_pFavouritesAddByIP.SetVisible ( false );
 
+    return true;
+}
+
+bool CServerBrowser::LoadServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
+{
+    CXMLNode* pSubNode = NULL;
+    in_addr Address;
+    int iPort;
+
+    if ( !pNode ) return false;
+
+    // Loop through all subnodes looking for relevant nodes
+    unsigned int uiCount = pNode->GetSubNodeCount ();
+    for ( unsigned int i = 0; i < uiCount; i++ )
+    {
+        pSubNode = pNode->GetSubNode ( i );
+        if ( pSubNode && pSubNode->GetTagName ().compare ( strTagName ) == 0 )
+        {
+            // This node is relevant, so get the attributes we need and add it to the list
+            CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Find ( "host" );
+            CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Find ( "port" );
+            if ( pHostAttribute && pPortAttribute ) {
+                CServerListItem::Parse ( pHostAttribute->GetValue (), Address );
+                iPort = atoi ( pPortAttribute->GetValue ().c_str () ) + SERVER_LIST_QUERY_PORT_OFFSET;
+                if ( iPort > 0 )
+                    pList->Add ( CServerListItem ( Address, iPort ) );
+            }
+        }
+    }
+    return true;
+}
+
+
+bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
+{
+    if ( !pNode ) return false;
+
+    // Start by clearing out all previous nodes
+    pNode->DeleteAllSubNodes ();
+
+    // Iterate through the list, adding any items to our node
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+    int j = 0;
+    int k = pList->GetServerCount ();
+    if ( k > 0 ) {
+        for ( CServerListIterator i = i_b; i != i_e; i++ ) {
+            CServerListItem * pServer = *i;
+
+            // Add the (scanned) item to the node
+            if ( pServer->bScanned ) {
+                CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
+                if ( pSubNode )
+                {
+                    CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
+					pHostAttribute->SetValue ( pServer->strHost.c_str () );
+                    
+                    CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
+					pPortAttribute->SetValue ( pServer->usGamePort );
+                }
+            }
+            j++;
+        }
+    }
     return true;
 }

@@ -39,12 +39,15 @@ public:
 
 	inline void			SetRenderTarget			( IDirect3DSurface9 * pSurface )	{ m_pRenderTarget = pSurface; }
 
-	inline IDirect3DDevice9 *	GetDevice		( void )	{ return m_pDevice; }
+	inline IDirect3DDevice9 *	GetDevice		( void )            { return m_pDevice; };
 
 	void                BeginSingleDrawing      ( void );
     void                EndSingleDrawing        ( void );
 
-	// Transformation functions
+    void                SetCEGUIUsed            ( bool bCEGUI )     { m_bCEGUI = bCEGUI; };
+    bool                GetCEGUIUsed            ( void )            { return m_bCEGUI; };
+
+    // Transformation functions
 	void				CalcWorldCoors			( CVector * vecScreen, CVector * vecWorld );
 	void				CalcScreenCoors			( CVector * vecWorld, CVector * vecScreen );
 
@@ -128,6 +131,7 @@ private:
     CGUIFont*			m_pFont;
 
     bool                m_bIsDrawing;
+    bool                m_bCEGUI;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;

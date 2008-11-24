@@ -251,7 +251,7 @@ void CCommandFuncs::ConnectionType ( const char *szParameters )
         return;
 
     CCore::GetSingleton ().GetConnectManager ()->SetMTUSize ( usMTUSize );
-    g_pCore->GetConfig ()->usMTUSize = usMTUSize;
+    CVARS_SET ( "mtu_size", usMTUSize );
     CCore::GetSingleton ().GetConsole ()->Printf ( "MTU size was set to %u", usMTUSize );
 }
 
@@ -284,10 +284,12 @@ void CCommandFuncs::Connect ( const char* szParameters )
         char* szNick = strtok ( NULL, " " );
         char* szPass = strtok ( NULL, " " );
 
-        if ( !szNick ) szNick = const_cast < char * > ( g_pCore->GetConfig ()->strNick.c_str () );
+        std::string strNick;
+        if ( !szNick )  CVARS_GET ( "nick", strNick );
+        else            strNick = szNick;
         
         // Got all required arguments?
-        if ( !szHost || !szPort || !szNick )
+        if ( !szHost || !szPort || !strNick.empty () )
         {
             CCore::GetSingleton ().GetConsole ()->Print ( "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'" );
             return;
@@ -311,7 +313,7 @@ void CCommandFuncs::Connect ( const char* szParameters )
         }
 
         // Start the connect
-        if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( szHost, usPort, szNick, szPass ) )
+        if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( szHost, usPort, strNick.c_str (), szPass ) )
         {
             CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", szHost, usPort );
         }
@@ -330,10 +332,17 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
 {
     CModManager::GetSingleton ().Unload ();
 
-    CMainConfig* pConfig = g_pCore->GetConfig ();
+    std::string strHost, strNick, strPassword;
+    unsigned int uiPort;
+
+    CVARS_GET ( "host",         strHost );
+    CVARS_GET ( "nick",         strNick );
+    CVARS_GET ( "password",     strPassword );
+    CVARS_GET ( "port",         uiPort );
+
     // Restart the connection.
     char szTemp [ 256 ];
-    _snprintf ( szTemp, 256, "%s %u %s %s", pConfig->strHost.c_str (), pConfig->usPort, pConfig->strNick.c_str (), pConfig->strPassword.c_str () );
+    _snprintf ( szTemp, 256, "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
     szTemp [ 255 ] = 0;
 
     Connect ( szTemp );
@@ -380,7 +389,6 @@ void CCommandFuncs::HUD ( const char* szParameters )
 
 void CCommandFuncs::SaveConfig ( const char* szParameters )
 {
-    CMainConfig * pConfig = CCore::GetSingleton ().GetConfig ();
-    pConfig->Save ();
-    g_pCore->GetConsole ()->Printf ( "Saved config to '%s'", pConfig->GetFileName () );
+    CClientVariables::GetSingleton ().Save ();
+    g_pCore->GetConsole ()->Printf ( "Saved configuration file" );
 }

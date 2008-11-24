@@ -42,7 +42,7 @@ class CCore;
 #include "CDirect3DData.h"
 #include "CResManager.h"
 #include "tracking/CTCPManager.h"
-#include "CMainConfig.h"
+#include "CClientVariables.h"
 #include "CKeyBinds.h"
 #include "CScreenShot.h"
 #include "CVideoManager.h"
@@ -53,8 +53,11 @@ class CCore;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#define BLUE_VERSION_STRING     "Multi Theft Auto 2.0\n" \
+#define BLUE_VERSION_STRING     "Multi Theft Auto 1.0\n" \
                                 "Copyright (C) 2003 - 2008 Multi Theft Auto" \
+
+// Configuration file path (relative to Grand Theft Auto directory)
+#define MTA_CONFIG_PATH         "mta/coreconfig.xml"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -62,8 +65,8 @@ public:
                             CCore                           ( void );
                             ~CCore                          ( void );
 
+    // Subsystems (query)
     eCoreVersion            GetVersion                      ( void );
-
     CConsoleInterface*      GetConsole                      ( void );
     CCommandsInterface*     GetCommands                     ( void );
     inline CConnectManager* GetConnectManager               ( void )                { return m_pConnectManager; };
@@ -74,7 +77,7 @@ public:
     CMultiplayer*           GetMultiplayer                  ( void );
     CNet*                   GetNetwork                      ( void );
     CXML*                   GetXML                          ( void )                { return m_pXML; };
-    CMainConfig*            GetConfig                       ( void );
+    CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CLocalGUI*              GetLocalGUI                     ( void );
 	CVideoManager*			GetVMR9Manager					( void );
@@ -84,10 +87,7 @@ public:
     CResManager *           GetResManager                   ( void );
     #endif
 
-	void					OnModUnload						( void );
-
-    char*                   GetDebugFileName                ( char* szBuffer, size_t bufferSize );
-
+    // Debug
     void                    DebugEcho                       ( const char* szText );
     void                    DebugPrintf                     ( const char* szFormat, ... );
     void                    SetDebugVisible                 ( bool bVisible );
@@ -95,112 +95,102 @@ public:
     void                    DebugEchoColor                  ( const char* szText, unsigned char R, unsigned char G, unsigned char B );
     void                    DebugPrintfColor                ( const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ... );
     void                    DebugClear                      ( void );
+
+    // Chat
     void                    ChatEcho                        ( const char* szText, bool bColorCoded = false );
     void                    ChatEchoColor                   ( const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false );
     void                    ChatPrintf                      ( const char* szFormat, bool bColorCoded, ... );
     void                    ChatPrintfColor                 ( const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ... );
     void                    SetChatVisible                  ( bool bVisible );
     bool                    IsChatVisible                   ( void );
-	void					TakeScreenShot					( void );
-	void					SetScreenShotPath				( const char *szPath );
-    void                    SetChatInputBackgroundColor     ( DWORD dwColor );
     void                    EnableChatInput                 ( char* szCommand, DWORD dwColor );
     bool                    IsChatInputEnabled              ( void );
+
+    // Screenshots
+	void					TakeScreenShot					( void );
+
+    // GUI
     bool                    IsSettingsVisible               ( void );
     bool                    IsMenuVisible                   ( void );
     bool                    IsCursorForcedVisible           ( void );
-    void                    SetChatColor                    ( unsigned char R, unsigned char G, unsigned char B, unsigned char A );
-    void                    SetChatInputColor               ( unsigned char R, unsigned char G, unsigned char B, unsigned char A );
-    void                    SetChatInputPrefixColor         ( unsigned char R, unsigned char G, unsigned char B, unsigned char A );
-    void                    SetChatInputTextColor           ( unsigned char R, unsigned char G, unsigned char B, unsigned char A );
-    void                    SetChatLines                    ( unsigned int uiLines );
-    void                    SetChatFont                     ( eChatFont font );
-    void                    SetChatScale                    ( CVector2D& vecScale );
-    void                    SetChatWidth                    ( float fWidth );
-    void                    SetChatCssStyleText             ( bool bEnabled );
-    void                    SetChatCssStyleBackground       ( bool bEnabled );
-    void                    SetChatLineLife                 ( unsigned long ulTime );
-    void                    SetChatLineFadeOut              ( unsigned long ulTime );
-    void                    SetChatUseCEGUI                 ( bool bUseCEGUI );
+    void                    HideMainMenu                    ( void );
+	void			        SetCenterCursor                 ( bool bEnabled );
+
+    // Configuration
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyChatSettings               ( void );
     void                    ApplyGameSettings               ( void );
-	bool					IsUsingCEGUIForText				( void );
-    void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
 
+    // Net
     void                    SetConnected                    ( bool bConnected );
 	bool					IsConnected						( void );
 
+    // Mod
     void                    SetOfflineMod                   ( bool bOffline );
     void                    ForceCursorVisible              ( bool bVisible );
     void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor );
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
+    bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
+    char *                  GetModInstallRoot               ( char * szModName, char * szBuffer, size_t bufferSize );
+    const char *            GetInstallRoot                  ( void );
+    const char *            GetGTAInstallRoot               ( void );
 
+
+    // Subsystems
+    void                    CreateGame                      ( void );
+    void                    CreateMultiplayer               ( void );
+    void                    CreateNetwork                   ( void );
+    void                    CreateXML                       ( void );
+	void			        InitGUI							( IUnknown* pDevice );
+	void			        CreateGUI						( void );
+    void                    DestroyGame                     ( void );
+    void                    DestroyMultiplayer              ( void );
+    void                    DestroyNetwork                  ( void );
+    void                    DestroyXML                      ( void );
+	void			        DeinitGUI						( void );
+    void			        DestroyGUI                      ( void );
+
+    // Hooks
+    void                    ApplyHooks                      ( void );
     HWND                    GetHookedWindow                 ( void );
+	void			        SetRenderDevice                 ( IUnknown* pDevice );
+	void			        SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
+	bool			        GetResetNeeded                  ( void );
+    void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
+    void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
+    pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
+    void					ChangeResolution                ( long width, long height, long depth );
 
-    void                    HideMainMenu                    ( void );
+    // Pulse
+    void                    DoPreFramePulse                 ( void );
+    void                    DoPostFramePulse                ( void );
 
-    void                    ApplyHooks                      ( );
+	// Events
+	bool					OnMouseClick                    ( CGUIMouseEventArgs Args );
+	bool					OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
+	void					OnModUnload						( void );
 
-    void                    RegisterCommands                        ( );
- 
-	void			        SetCenterCursor							( bool bEnabled );
-
-    void                    CreateGame                              ( );
-    void                    CreateMultiplayer                       ( );
-    void                    CreateNetwork                           ( );
-    void                    CreateXML                               ( );
-	void			        InitGUI							        ( IUnknown* pDevice );
-	void			        CreateGUI						        ( void );
-
-	void			        SetRenderDevice							( IUnknown* pDevice );
-	void			        SwitchRenderWindow						( HWND hWnd, HWND hWndInput );
-	bool			        GetResetNeeded							( );
-
-    void                    DestroyGame                             ( );
-    void                    DestroyMultiplayer                      ( );
-    void                    DestroyNetwork                          ( );
-    void                    DestroyXML                              ( );
-	void			        DeinitGUI						        ( );
-
-    void                    DoPreFramePulse                         ( );
-    void                    DoPostFramePulse                        ( );
-
-    bool                    IsOfflineMod                            ( ) { return m_bIsOfflineMod; }
-    char *                  GetModInstallRoot                       ( char * szModName, char * szBuffer, size_t bufferSize );
-    const char *            GetInstallRoot                          ( void );
-    const char *            GetGTAInstallRoot                       ( void );
-    void                    SetClientMessageProcessor               ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
-    pfnProcessMessage       GetClientMessageProcessor           ( ) { return m_pfnMessageProcessor; }
-
-	// CGUI Callbacks
-	bool					OnMouseClick							( CGUIMouseEventArgs Args );
-	bool					OnMouseDoubleClick						( CGUIMouseEventArgs Args );
-
-    void					SaveNick                                ( const char* szNick );
-    bool					IsValidNick                             ( const char* szNick );     // Move somewhere else
-    void					ChangeResolution                        ( long width, long height, long depth );
-
-    void                    Quit                                    ( bool bInstantly = true );
-
-    const char *            GetConnectCommandFromURI                ( const char* szURI, char* szDest, size_t destLength );
-	
+    // Misc
+    void                    RegisterCommands                ( void );
+    bool					IsValidNick                     ( const char* szNick );     // Move somewhere else
+    void                    Quit                            ( bool bInstantly = true );
+    const char *            GetConnectCommandFromURI        ( const char* szURI, char* szDest, size_t destLength );	
 	bool					bScreenShot;
 
 private:
-    void			            DestroyGUI						        ( );
-
     // Core devices.
     CXML*                       m_pXML;
-    CClientVariables *          m_pClientVariables;
     CLocalGUI *                 m_pLocalGUI;
     CGraphics *                 m_pGraphics;
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
     IUnknown *					m_pRenderDevice;
+
+    // Instances (put new classes here!)
     CCommunity                  m_Community;
+    CClientVariables            m_ClientVariables;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;
@@ -235,7 +225,6 @@ private:
     // Logger utility interface.
     CLogger *                   m_pLogger;
 
-    CMainConfig*                m_pConfig;
     CKeyBinds*                  m_pKeyBinds;
 
 	bool						m_bResetNeeded;
@@ -253,7 +242,6 @@ private:
 
     bool                        m_bQuitOnPulse;
     eChatFont                   m_ChatFont;
-	bool						m_bUseCEGUI;
     bool                        m_bDestroyMessageBox;
 };
 

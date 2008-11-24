@@ -200,9 +200,6 @@ CSettings::CSettings ( void )
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
 	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
 
-	// Copy the config pointer
-	m_pConfig = g_pCore->GetConfig ();
-
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -234,7 +231,8 @@ void CSettings::Update ( void )
 	// Once each 30 frames
 	if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
 		// Check if any of the settings have been changed by core
-		int iMenuOptions = m_pConfig->iMenuOptions;
+        int iMenuOptions;
+        CVARS_GET ( "menu_options", iMenuOptions );
 		bool bCompare = false;
 
 		bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_DYNAMIC) > 0;
@@ -792,25 +790,28 @@ bool CSettings::OnCheckBoxClick ( CGUIElement* pElement )
 
 	eCheckBox CheckBoxId = (eCheckBox) reinterpret_cast < int > ( pElement->GetUserData () );
 
+    int iMenuOptions;
+    CVARS_GET ( "menu_options", iMenuOptions );
+
 	do {
 		// [Menu rendering options - Dynamic scene rendering]
 		if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_DYNAMIC ) {
 			DWORD dwSelect = (DWORD) m_pCheckBoxMenuDynamic->GetSelected ();
-			m_pConfig->iMenuOptions = ( m_pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC );
+			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
 			break;
 		}
 
 		// [Menu rendering options - Video surface rendering]
 		else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_VIDEO ) {
 			DWORD dwSelect = (DWORD) m_pCheckBoxMenuVideo->GetSelected ();
-			m_pConfig->iMenuOptions = ( m_pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED );
+			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED )) );
 			break;
 		}
 
 		// [Menu rendering options - PS2.0 post-effects]
 		else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_POSTEFFECTS ) {
 			DWORD dwSelect = (DWORD) m_pCheckBoxMenuPostEffects->GetSelected ();
-			m_pConfig->iMenuOptions = ( m_pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED );
+			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED )) );
 			break;
 		}
 
@@ -878,15 +879,17 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
             strPassword = std::string ( szPassword );
 
             // Check if we need to use the stored password
-            if ( m_pEditPass->GetText ().compare ( m_pConfig->strCommunityPassword ) == 0 )
-                strPassword = m_pConfig->strCommunityPassword;
+            std::string strCommunityPassword;
+            CVARS_GET ( "community_password", strCommunityPassword );
+            if ( m_pEditPass->GetText ().compare ( strCommunityPassword ) == 0 )
+                strPassword = strCommunityPassword;
 
             // Store the user/pass and log in using community
             CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
             pCommunity->SetUsername ( m_pEditUser->GetText () );
             pCommunity->SetPassword ( strPassword );
-	        m_pConfig->strCommunityUsername = m_pEditUser->GetText ();
-            m_pConfig->strCommunityPassword = strPassword;
+	        CVARS_SET ( "community_username", m_pEditUser->GetText () );
+            CVARS_SET ( "community_password", strPassword );
             pCommunity->Login ( OnLoginCallback, this );
         }
         return false;
@@ -918,50 +921,59 @@ void CSettings::OnLoginStateChange ( bool bResult )
 
 void CSettings::LoadData ( void )
 {
+    std::string strVar;
+    bool bVar;
+
     // Put the nick in the edit
-    const char* szNick = m_pConfig->strNick.c_str ();
-    if ( CCore::GetSingleton ().IsValidNick ( szNick ) )
+    CVARS_GET ( "nick", strVar );
+
+    if ( CCore::GetSingleton ().IsValidNick ( strVar.c_str () ) )
     {
-        m_pEditNick->SetText ( szNick );
+        m_pEditNick->SetText ( strVar.c_str () );
     }
     else
     {
         m_pEditNick->SetText ( "Player" );
     }
-    m_pInvertMouse->SetSelected ( m_pConfig->bInvertMouse );
-    m_pSteerWithMouse->SetSelected ( m_pConfig->bSteerWithMouse );
-    m_pFlyWithMouse->SetSelected ( m_pConfig->bFlyWithMouse );
+
+    CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
+    CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
+    CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
 
 	// Community
-	if ( !m_pConfig->strCommunityUsername.empty () ) m_pEditUser->SetText ( m_pConfig->strCommunityUsername.c_str () );
-	if ( !m_pConfig->strCommunityPassword.empty () ) m_pEditPass->SetText ( m_pConfig->strCommunityPassword.c_str () );
+    CVARS_GET ( "community_username", strVar );
+	if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
+    CVARS_GET ( "community_password", strVar );
+	if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 }
 
 
 void CSettings::SaveData ( void )
 {
+    std::string strVar;
+
 	// Set and save our settings
     if ( CModManager::GetSingleton ().GetCurrentMod () != NULL )
     {
-        if ( m_pEditNick->GetText () != m_pConfig->strNick )
-        {
+        CVARS_GET ( "nick", strVar );
+        if ( m_pEditNick->GetText ().compare ( strVar ) != 0 )
 	        CCore::GetSingleton ().GetCommands ()->Execute ( "nick", m_pEditNick->GetText ().c_str () );
-        }
     }
     else
     {
-        std::string strNick = m_pEditNick->GetText ();
-        CCore::GetSingleton ().SaveNick ( strNick.c_str () );
-        // TODO: SetNick won't change it, but the const word is left out. Lame... Will fix later.
+        CVARS_SET ( "nick", m_pEditNick->GetText () );
     }
 
     // Very hacky
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();    
-    pController->SetMouseInverted ( m_pConfig->bInvertMouse = m_pInvertMouse->GetSelected () );
-    pController->SetSteerWithMouse ( m_pConfig->bSteerWithMouse = m_pSteerWithMouse->GetSelected () );
-    pController->SetFlyWithMouse ( m_pConfig->bFlyWithMouse = m_pFlyWithMouse->GetSelected () );
-    
-    m_pConfig->Save ();
+    CVARS_SET ( "invert_mouse", m_pInvertMouse->GetSelected () );
+    pController->SetMouseInverted ( m_pInvertMouse->GetSelected () );
+    CVARS_SET ( "steer_with_mouse", m_pSteerWithMouse->GetSelected () );
+    pController->SetSteerWithMouse ( m_pSteerWithMouse->GetSelected () );
+    CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
+    pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
+
+    CClientVariables::GetSingleton ().Save ();
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )

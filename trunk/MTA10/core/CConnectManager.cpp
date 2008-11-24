@@ -86,7 +86,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 	}
 
     // Save the nick too
-    CCore::GetSingleton ().GetConfig ()->strNick = const_cast < char* > ( szNick );
+    CVARS_SET ( "nick", std::string ( szNick ) );
 
     // Reset the network
     pNet->Reset ();
@@ -284,9 +284,9 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     pQuickConnect->SetVisible ( false );
 
                 // Save the connection details into the config
-                CCore::GetSingleton ().GetConfig ()->strHost = g_pConnectManager->m_szHost;
-                CCore::GetSingleton ().GetConfig ()->usPort = g_pConnectManager->m_usPort;
-                CCore::GetSingleton ().GetConfig ()->strPassword = g_pConnectManager->m_szPassword;
+                CVARS_SET ( "host",     std::string ( g_pConnectManager->m_szHost ) );
+                CVARS_SET ( "port",     g_pConnectManager->m_usPort );
+                CVARS_SET ( "password", std::string ( g_pConnectManager->m_szPassword ) );
 
 
                 // Save the connection details into the recently played servers list
@@ -295,7 +295,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 //                CCore::GetSingleton ().GetConfig ()->GetRecentlyPlayedServers ().AddServer ( szName, g_pConnectManager->m_szHost, g_pConnectManager->m_usPort, true );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
-                CCore::GetSingleton ().GetConfig ()->Save ();
+                CClientVariables::GetSingleton ().Save ();
 
                 // Reset our variables
                 if ( g_pConnectManager->m_szHost )

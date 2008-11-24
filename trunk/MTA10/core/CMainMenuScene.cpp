@@ -598,8 +598,9 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 			}
 
 			// Update the config
-			CMainConfig *pConfig = g_pCore->GetConfig ();
-			pConfig->iMenuOptions = ( pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED );
+			int iMenuOptions;
+            CVARS_GET ( "menu_options", iMenuOptions );
+			CVARS_SET ( "menu_options", (unsigned int)( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) );
 		}
 
 		CCore::GetSingleton ().GetConsole ()->Printf ( "Creating textures" );
@@ -2219,7 +2220,7 @@ bool CMainMenuScene::SetVideoEnabled ( bool bEnabled )
 			}
 
 			// Fall back to a static texture (if it doesn't already exist)
-			if ( pFallbackTexture == NULL && D3DXCreateTextureFromFile ( m_pDevice, CORE_MTA_FALLBACK, &pFallbackTexture ) != S_OK ) {
+			if ( pFallbackTexture == NULL && D3DXCreateTextureFromFile ( m_pDevice, CORE_MTA_FALLBACK, &pFallbackTexture ) != D3D_OK ) {
 				// ACHTUNG: just for debugging purposes to see if the current path is incorrect, thus causing a failed texture load
 				char szCurDir [ MAX_PATH ];
 				GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
@@ -2238,9 +2239,10 @@ bool CMainMenuScene::SetVideoEnabled ( bool bEnabled )
 	} while ( false );
 
 	// Update the config
-	CMainConfig *pConfig = g_pCore->GetConfig ();
+    int iMenuOptions;
 	DWORD dwSelect = (DWORD) bEnableVideo;
-	pConfig->iMenuOptions = ( pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED );
+    CVARS_GET ( "menu_options", iMenuOptions );
+    CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED )) );
 
 	// Restore current directory
 	SetCurrentDirectory ( szCurDir );

@@ -349,9 +349,6 @@
 				RelativePath="CLogger.cpp">
 			</File>
 			<File
-				RelativePath=".\CMainConfig.cpp">
-			</File>
-			<File
 				RelativePath=".\CMainMenu.cpp">
 			</File>
 			<File
@@ -440,9 +437,6 @@
 			</File>
 			<File
 				RelativePath=".\CVideoRenderer.cpp">
-			</File>
-			<File
-				RelativePath=".\CXMLConfig.cpp">
 			</File>
 			<File
 				RelativePath=".\StdInc.cpp">
@@ -711,9 +705,6 @@
 			</File>
 			<File
 				RelativePath=".\CVideoUtils.h">
-			</File>
-			<File
-				RelativePath=".\CXMLConfig.h">
 			</File>
 			<File
 				RelativePath=".\StdInc.h">

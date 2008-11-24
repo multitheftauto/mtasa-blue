@@ -139,8 +139,6 @@ private:
 	unsigned char		m_ucFade;
 	float				m_fFader;
 
-	CMainConfig*		m_pConfig;
-
 	// Main menu items
 	enum eMenuItems {
 		MENU_ITEM_DISCONNECT,

@@ -450,7 +450,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         // Draw his name
         unsigned char ucR, ucG, ucB;
         pPlayer->GetNametagColor ( ucR, ucG, ucB );
-        if ( g_pCore->IsUsingCEGUIForText () )
+        if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
 		{
             // Draw shadow first
             g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );

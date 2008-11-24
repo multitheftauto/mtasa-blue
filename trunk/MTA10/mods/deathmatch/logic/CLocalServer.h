@@ -14,7 +14,6 @@
 #define __CLOCALSERVER_H
 
 #include <CClientGUIManager.h>
-#include "../../../core/CXMLConfig.h"
 #include <string>
 
 class CLocalServer

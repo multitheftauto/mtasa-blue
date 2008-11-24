@@ -989,7 +989,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
      */
     if ( pPlayer->IsLocalPlayer () )
     {
-        g_pCore->SaveNick ( szNewNick );
+        g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
     }
 
     /*
@@ -1171,10 +1171,10 @@ void CPacketHandler::Packet_DebugEcho ( NetBitStreamInterface& bitStream )
         g_pCore->DebugEchoColor ( szMessage, ucRed, ucGreen, ucBlue );
 
         // Output it to the file if need be
-        char szFileName[MAX_PATH+1];
-        g_pCore->GetDebugFileName ( szFileName, MAX_PATH );
+        std::string strFileName;
+        g_pCore->GetCVars ()->Get ( "debugfile", strFileName );
 
-        if ( szFileName [ 0 ] != 0 )
+        if ( !strFileName.empty () )
         {
             // get the date/time now
             struct tm *today;
@@ -1186,7 +1186,7 @@ void CPacketHandler::Packet_DebugEcho ( NetBitStreamInterface& bitStream )
             date[29] = '\0';
 
             // open the file for append access
-            FILE * pFile = fopen ( szFileName, "a" );
+            FILE * pFile = fopen ( strFileName.c_str (), "a" );
             if ( pFile )
             {
                 // write out the data
@@ -1820,14 +1820,17 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 	short sFPSLimit = 36;
 	bitStream.Read ( sFPSLimit );
 
-	if ( g_pCore->GetConfig()->GetFPSLimit() > sFPSLimit )
+    unsigned int iVal;
+    g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
+
+	if ( iVal > sFPSLimit )
     {
 		// For some reason it needs that kind of hacky precision
 		g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
     }
 	else
     {
-		g_pGame->SetFramelimiter ( (unsigned long) ( (float)g_pCore->GetConfig()->GetFPSLimit() * 1.3f ) );
+		g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
     }
 
 

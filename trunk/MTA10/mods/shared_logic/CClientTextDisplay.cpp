@@ -150,7 +150,7 @@ void CClientTextDisplay::Render ( bool bPulseEffects )
 			if ( m_ulFormat & DT_BOTTOM )
 				m_ulFormat |= DT_SINGLELINE;
 
-			if ( g_pCore->IsUsingCEGUIForText () )
+			if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
 			{
 			    g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17, uiY, uiX - 17, uiY, m_rgbaColor, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
 			}

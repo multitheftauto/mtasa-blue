@@ -155,8 +155,9 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     }
 
     // Valid nick?
-    const char* szNick = g_pCore->GetConfig ()->strNick.c_str ();
-    if ( !CCore::GetSingleton ().IsValidNick ( szNick ) )
+    std::string strNick;
+    CVARS_GET ( "nick", strNick );
+    if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
         CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
         return true;
@@ -167,12 +168,12 @@ bool CQuickConnect::OnConnectButtonClick ( CGUIElement* pElement )
     const std::string& strPassword = m_pEditPass->GetText ();
 
     // Save the connection details into the config
-    CCore::GetSingleton ().GetConfig ()->qc_strHost = strHost;
-    CCore::GetSingleton ().GetConfig ()->qc_usPort = usPort;
-    CCore::GetSingleton ().GetConfig ()->qc_strPassword = strPassword;
+    CVARS_SET ( "qc_host", strHost );
+    CVARS_SET ( "qc_port", usPort );
+    CVARS_SET ( "qc_password", strPassword );
 
     // Start the connect
-    CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, szNick, strPassword.c_str () );
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str () );
 
     return true;
 }
@@ -187,11 +188,15 @@ bool CQuickConnect::OnBackButtonClick ( CGUIElement* pElement )
 
 void CQuickConnect::LoadData ( void )
 {
-    m_pEditHost->SetText ( g_pCore->GetConfig ()->qc_strHost.c_str () );
+    std::string val;
+    unsigned int uval;
+
+    CVARS_GET ( "qc_host",      val );   m_pEditHost->SetText ( val.c_str () );
 
     char szTemp [ 256 ];
-    sprintf ( szTemp, "%u", g_pCore->GetConfig ()->qc_usPort );
+    CVARS_GET ( "qc_port",      uval );
+    sprintf ( szTemp, "%u", uval );
     m_pEditPort->SetText ( szTemp );
 
-    m_pEditPass->SetText ( g_pCore->GetConfig ()->qc_strPassword.c_str () );
+    CVARS_GET ( "qc_password",  val );  m_pEditPass->SetText ( val.c_str () );
 }

@@ -18,7 +18,7 @@
 #include "CGraphicsInterface.h"
 #include "CModManagerInterface.h"
 #include "CKeyBindsInterface.h"
-#include "CMainConfigInterface.h"
+#include "CCVarsInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -52,7 +52,7 @@ public:
     virtual CNet*                       GetNetwork                      ( void ) = 0;
     virtual CXML*                       GetXML                          ( void ) = 0;
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
-    virtual CMainConfigInterface*       GetConfig                       ( void ) = 0;
+    virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     
 
@@ -71,27 +71,11 @@ public:
     virtual void                    SetChatVisible                  ( bool bVisible ) = 0;
     virtual bool                    IsChatVisible                   ( void ) = 0;
 	virtual void					TakeScreenShot					( void ) = 0;
-	virtual void					SetScreenShotPath				( const char *szPath ) = 0;
-    virtual void                    SetChatInputBackgroundColor     ( DWORD dwColor ) = 0;
     virtual void                    EnableChatInput                 ( char* szCommand, DWORD dwColor ) = 0;
     virtual bool                    IsChatInputEnabled              ( void ) = 0;
     virtual bool                    IsSettingsVisible               ( void ) = 0;
     virtual bool                    IsMenuVisible                   ( void ) = 0;
     virtual bool                    IsCursorForcedVisible           ( void ) = 0;
-    virtual void                    SetChatColor                    ( unsigned char R, unsigned char G, unsigned char B, unsigned char A ) = 0;
-    virtual void                    SetChatInputColor               ( unsigned char R, unsigned char G, unsigned char B, unsigned char A ) = 0;
-    virtual void                    SetChatInputPrefixColor         ( unsigned char R, unsigned char G, unsigned char B, unsigned char A ) = 0;
-    virtual void                    SetChatInputTextColor           ( unsigned char R, unsigned char G, unsigned char B, unsigned char A ) = 0;
-    virtual void                    SetChatLines                    ( unsigned int uiLines ) = 0;
-    virtual void                    SetChatFont                     ( eChatFont font ) = 0;
-    virtual void                    SetChatScale                    ( CVector2D& vecScale ) = 0;
-    virtual void                    SetChatWidth                    ( float fWidth ) = 0;
-    virtual void                    SetChatCssStyleText             ( bool bEnabled ) = 0;
-    virtual void                    SetChatCssStyleBackground       ( bool bEnabled ) = 0;
-    virtual void                    SetChatLineLife                 ( unsigned long ulTime ) = 0;
-    virtual void                    SetChatLineFadeOut              ( unsigned long ulTime ) = 0;
-    virtual void                    SetChatUseCEGUI                 ( bool bUseCEGUI ) = 0;
-	virtual bool					IsUsingCEGUIForText				( void ) = 0;
     virtual void                    CallSetCursorPos                ( int X, int Y ) = 0;
 
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
@@ -108,12 +92,10 @@ public:
     virtual void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL ) = 0;
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
     virtual void                    HideMainMenu                    ( void ) = 0;
-    virtual void                    SaveNick                        ( const char* szNick )= 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
 
 	virtual void					SwitchRenderWindow				( HWND hWnd, HWND hWndInput ) = 0;
 	virtual void					SetCenterCursor					( bool bEnabled ) = 0;
-    virtual char*                   GetDebugFileName                ( char* szBuffer, size_t bufferSize ) = 0;
 
 	// CGUI Callbacks
 	virtual bool					OnMouseClick					( CGUIMouseEventArgs Args ) = 0;

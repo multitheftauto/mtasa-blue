@@ -43,6 +43,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 	m_pOriginalTarget = NULL;
 
     m_bIsDrawing = false;
+    m_bCEGUI = false;
 }
 
 
