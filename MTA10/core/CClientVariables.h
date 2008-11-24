@@ -24,6 +24,7 @@
 #include "CChat.h"
 
 // This call uses XML codes as internal storage for client variables
+#define CVARS_ROOT              "mainconfig"
 #define CVARS_NODE_CVARS        "settings"                  // cvars node
 #define CVARS_NODE_KEYBINDS     "binds"                     // keybinds node
 #define CVARS_NODE_SERVER_FAV   "favourite_servers"         // favourite servers list node
@@ -65,6 +66,8 @@ public:
     void            Set                     ( const std::string strVariable, CVector val );
     void            Set                     ( const std::string strVariable, CVector2D val );
     void            Set                     ( const std::string strVariable, CColor val );
+
+    bool            Exists                  ( const std::string strVariable );
 
     bool            Load                    ( const std::string strConfigFile );
     bool            Save                    ( void );

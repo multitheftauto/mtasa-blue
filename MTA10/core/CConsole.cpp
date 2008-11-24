@@ -229,7 +229,7 @@ bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
     m_iHistoryIndex = -1;
 
     // Add the text to the history buffer.
-    Echo ( strInput.c_str () );
+    //Echo ( strInput.c_str () );
 
     // Parse out the command name and command line.
     GetCommandInfo ( strInput.c_str (), strCmd, strCmdLine );
