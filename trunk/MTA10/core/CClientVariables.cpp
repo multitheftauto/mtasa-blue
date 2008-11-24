@@ -36,13 +36,12 @@ bool CClientVariables::Load ( const std::string strConfigFile )
 {
     CXMLNode *pRoot;
     CCore *pCore = CCore::GetSingletonPtr ();
-    bool bRet = false;
 
     // Load the XML file
     m_pFile = pCore->GetXML ()->CreateXML ( strConfigFile.c_str () );
-    if ( !m_pFile || !m_pFile->Parse () ) {
-        // File does not exist, create it
+    if ( !m_pFile ) {
         assert ( false );
+        return false;
     };
 
     // Get the root node
@@ -57,20 +56,22 @@ bool CClientVariables::Load ( const std::string strConfigFile )
             CVARS_FAVOURITE_LIST_TAG, pBrowser->GetFavouritesList () );
         pBrowser->LoadServerList ( pRoot->FindSubNode ( CVARS_NODE_SERVER_REC ),
             CVARS_RECENT_LIST_TAG, pBrowser->GetRecentList () );
-
-        // Load the cvars
-        m_pStorage = pRoot->FindSubNode ( CVARS_NODE_CVARS );
-        if ( !m_pStorage ) {
-            // Non-existant, create a new node
-            m_pStorage = pRoot->CreateSubNode ( CVARS_NODE_CVARS );
-        }
-
-        // Verify that at least all the defaults are in
-        LoadDefaults ();
-        bRet = true;
+    } else {
+        // New file, create root node
+        pRoot = m_pFile->CreateRootNode ( CVARS_ROOT );
     }
-    m_bLoaded = bRet;
-    return bRet;
+
+    // Load the cvars
+    m_pStorage = pRoot->FindSubNode ( CVARS_NODE_CVARS );
+    if ( !m_pStorage ) {
+        // Non-existant, create a new node
+        m_pStorage = pRoot->CreateSubNode ( CVARS_NODE_CVARS );
+    }
+
+    // Verify that at least all the defaults are in
+    LoadDefaults ();
+
+    return true;
 }
 
 
@@ -180,6 +181,14 @@ CXMLNode* CClientVariables::Node ( const std::string strVariable )
         pNode = m_pStorage->CreateSubNode ( strVariable.c_str () );
     }
     return pNode;
+}
+
+
+bool CClientVariables::Exists ( const std::string strVariable )
+{
+    // Check whether this node exists, thus if it is a valid cvar
+    if ( !m_pStorage ) return false;
+    return (m_pStorage->FindSubNode ( strVariable.c_str () ) != NULL);
 }
 
 

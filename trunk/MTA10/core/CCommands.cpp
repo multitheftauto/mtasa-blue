@@ -14,6 +14,17 @@
 
 #include "StdInc.h"
 
+void TrimWhiteSpace ( std::string & str )  
+{  
+    unsigned long k = str.find_first_not_of(" \t");
+    unsigned long l = str.find_last_not_of (" \t");
+
+    if ( (k == std::string::npos) || (l == std::string::npos) )
+        str = "";
+    else
+        str = str.substr ( k, l-k+1 );
+}
+
 template<> CCommands * CSingleton< CCommands >::m_pSingleton = NULL;
 
 CCommands::CCommands ( void )
@@ -74,8 +85,7 @@ bool CCommands::Execute ( const char* szCommandLine )
     string strCmdLine;
     CLocalGUI::GetSingleton ().GetConsole () ->GetCommandInfo ( szCommandLine, strCmd, strCmdLine );
 
-    // Try to execute it
-    return Execute ( strCmd.c_str (), strCmdLine.c_str ());
+    return Execute ( strCmd.c_str (), strCmdLine.c_str () );
 }
 
 
@@ -117,15 +127,44 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
         {
             // Execute it
             ExecuteHandler ( pEntry->pfnCmdFunc, szParameters );
+            return true;
         }
     }
 
+    // Try to execute the handler
     if ( m_pfnExecuteHandler )
     {
-        m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ) );
+        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ) ) )
+            return true;
     }
 
-    return ( pEntry != NULL );
+    // If it not a command, it may be a cvar (syntax: cvar[=value], whitespaces allowed)
+    std::string val = std::string ( szCommand ) + std::string ( szParameters );
+    unsigned int nOpIndex = val.find ( '=' );
+    std::string key = val.substr ( 0, nOpIndex );
+    if ( CClientVariables::GetSingleton ().Exists ( key ) ) {
+        std::stringstream ss;
+
+        // Determine whether this is an atomic get or set query
+        if ( nOpIndex != std::string::npos ) {
+            // (set) some_cvar=value
+            val = val.substr ( nOpIndex + 1 );
+            TrimWhiteSpace ( val );
+            CVARS_SET ( key, val );
+        } else {
+            // (get) some_cvar
+            CVARS_GET ( key, val );
+        }
+        ss << key << " = " << val;
+        val = ss.str ();
+        CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
+        return true;
+    }
+
+    // Unknown command
+    val = std::string ( "Unknown command or cvar: " ) + szCommand;
+    CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
+    return false;
 }
 
 
