@@ -300,12 +300,21 @@ int CLuaFileDefs::fileGetPos ( lua_State* luaVM )
     CScriptFile* pFile = lua_tofile ( luaVM, 1 );
     if ( pFile )
     {
-        // Return its position
-        lua_pushnumber ( luaVM, pFile->GetPointer () );
+        long lPosition = pFile->GetPointer ();
+        if ( lPosition != -1 )
+        {
+            // Return its position
+            lua_pushnumber ( luaVM, lPosition );
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
+            lua_pushnil ( luaVM );
+        }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileIsEOF", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -328,8 +337,17 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
             long lPosition = static_cast < long > ( lua_tonumber ( luaVM, 2 ) );
             if ( lPosition >= 0 )
             {
-                // Set the position and return where we actually got it put
-                lua_pushnumber ( luaVM, pFile->SetPointer ( static_cast < unsigned long > ( lPosition ) ) );
+                long lResultPosition = pFile->SetPointer ( static_cast < unsigned long > ( lPosition ) );
+                if ( lResultPosition != -1 )
+                {
+                    // Set the position and return where we actually got it put
+                    lua_pushnumber ( luaVM, lResultPosition );
+                }
+                else
+                {
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
+                    lua_pushnil ( luaVM );
+                }
                 return 1;
             }
             else
@@ -355,8 +373,17 @@ int CLuaFileDefs::fileGetSize ( lua_State* luaVM )
     CScriptFile* pFile = lua_tofile ( luaVM, 1 );
     if ( pFile )
     {
-        // Return its size
-        lua_pushnumber ( luaVM, pFile->GetSize () );
+        long lSize = pFile->GetSize ();
+        if ( lSize != -1 )
+        {
+            // Return its size
+            lua_pushnumber ( luaVM, lSize );
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
+            lua_pushnil ( luaVM );
+        }
         return 1;
     }
     else
@@ -385,12 +412,20 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
             {
                 // Allocate a buffer to read the stuff into and read some shit into it
                 char* pReadContent = new char [lCount + 1];
-                unsigned long lBytesRead = pFile->Read ( static_cast < unsigned long > ( lCount ),
+                long lBytesRead = pFile->Read ( static_cast < unsigned long > ( lCount ),
                                                             pReadContent );
 
-                // Push the string onto the lua stack. Use pushlstring so we are binary
-                // compatible. Normal push string takes zero terminated strings.
-                lua_pushlstring ( luaVM, pReadContent, lBytesRead );
+                if ( lBytesRead != -1 )
+                {
+                    // Push the string onto the lua stack. Use pushlstring so we are binary
+                    // compatible. Normal push string takes zero terminated strings.
+                    lua_pushlstring ( luaVM, pReadContent, lBytesRead );
+                }
+                else
+                {
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
+                    lua_pushnil ( luaVM );
+                }
 
                 // Delete our read content. Lua should've stored it
                 delete [] pReadContent;
@@ -425,7 +460,8 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
         if ( argtype ( 2, LUA_TSTRING ) )
         {
             // While we're not out of string arguments
-            unsigned long ulBytesWritten = 0;
+            long lBytesWritten = 0;
+            long lArgBytesWritten = 0;
             unsigned int uiCurrentArg = 2;
             do
             {
@@ -434,7 +470,14 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                 unsigned long ulDataLen = static_cast < unsigned long > ( lua_strlen ( luaVM, uiCurrentArg ) );
 
                 // Write it and add the bytes written to our total bytes written
-                ulBytesWritten += pFile->Write ( ulDataLen, pData );
+                lArgBytesWritten = pFile->Write ( ulDataLen, pData );
+                if ( lArgBytesWritten == -1 )
+                {
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
+                    lua_pushnil ( luaVM );
+                    return 1;
+                }
+                lBytesWritten += lArgBytesWritten;
 
                 // Increment current argument
                 ++uiCurrentArg;
@@ -442,7 +485,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
             while ( argtype ( uiCurrentArg, LUA_TSTRING ) );
 
             // Return the number of bytes we wrote
-            lua_pushnumber ( luaVM, ulBytesWritten );
+            lua_pushnumber ( luaVM, lBytesWritten );
             return 1;
         }
         else
@@ -483,7 +526,7 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
 
 int CLuaFileDefs::fileClose ( lua_State* luaVM )
 {
-    // string fileClose ( file, count )
+    // string fileClose ( file )
 
     // Grab the file pointer
     CScriptFile* pFile = lua_tofile ( luaVM, 1 );

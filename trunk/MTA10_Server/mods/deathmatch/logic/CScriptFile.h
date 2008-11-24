@@ -45,12 +45,12 @@ public:
     long                    GetPointer              ( void );
     long                    GetSize                 ( void );
 
-    unsigned long           SetPointer              ( unsigned long ulPosition );
+    long                    SetPointer              ( unsigned long ulPosition );
     void                    SetSize                 ( unsigned long ulNewSize );
 
     void                    Flush                   ( void );
-    unsigned long           Read                    ( unsigned long ulSize, char* pData );
-    unsigned long           Write                   ( unsigned long ulSize, const char* pData );
+    long                    Read                    ( unsigned long ulSize, char* pData );
+    long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:
     FILE*                   m_pFile;
