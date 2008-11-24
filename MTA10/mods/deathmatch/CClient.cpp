@@ -49,24 +49,8 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "shownametags",              "shows the nametags",                                   COMMAND_ShowNametags );
     g_pCore->GetCommands ()->Add ( "showchat",				    "shows the chatbox",								    COMMAND_ShowChat );
     g_pCore->GetCommands ()->Add ( "shownetstat",			    "shows the network statistics",						    COMMAND_ShowNetstat );
-    g_pCore->GetCommands ()->Add ( "showfps",				    "shows the framerate",								    COMMAND_ShowFPS );
-	g_pCore->GetCommands ()->Add ( "fpslimit",				    "sets the local fps limit (20-100)",					COMMAND_LimitFPS );
     
     // Key commands (registered as 'mod commands', can be disabled)
-    g_pCore->GetCommands ()->Add ( "chatbox",				    "defines the chatbox color (r g b)",				    COMMAND_ChatBox, true );
-    g_pCore->GetCommands ()->Add ( "chatfont",				    "defines the chat font (0-2)",						    COMMAND_ChatFont, true );
-    g_pCore->GetCommands ()->Add ( "chatlines",				    "defines the amount of chat lines",					    COMMAND_ChatLines, true );
-    g_pCore->GetCommands ()->Add ( "chatscale",				    "defines the chatbox scale (x y)",					    COMMAND_ChatScale, true );
-    g_pCore->GetCommands ()->Add ( "chatwidth",				    "defines the chatbox width",						    COMMAND_ChatWidth, true );
-    g_pCore->GetCommands ()->Add ( "chatcolor",				    "defines the chatbox bg color (r g b)",				    COMMAND_ChatColor, true );
-    g_pCore->GetCommands ()->Add ( "chatinputcolor",		    "defines the chatbox input bg color (r g b)",		    COMMAND_ChatInputColor, true );
-    g_pCore->GetCommands ()->Add ( "chatinputprefixcolor",	    "defines the chatbox input prefix color (r g b)",	    COMMAND_ChatInputPrefixColor, true );
-    g_pCore->GetCommands ()->Add ( "chatinputtextcolor",	    "defines the chatbox input text color (r g b)",		    COMMAND_ChatInputTextColor, true );
-    g_pCore->GetCommands ()->Add ( "chattextcss",               "defines the chatbox's text-style (0/1)",               COMMAND_ChatTextCss, true );
-    g_pCore->GetCommands ()->Add ( "chatbackgroundcss",         "defines the chatbox's background-style (0/1)",         COMMAND_ChatBackgroundCss, true );
-    g_pCore->GetCommands ()->Add ( "chatlinelife",              "defines the chatbox text's life length (ms)",          COMMAND_ChatLineLife, true );
-    g_pCore->GetCommands ()->Add ( "chatlinefadeout",           "defines the chatbox text's fade out length (ms)",      COMMAND_ChatLineFadeOut, true );
-    g_pCore->GetCommands ()->Add ( "ceguitext",                 "defines the text-rendering method",				    COMMAND_ChatUseCEGUI, true );
     g_pCore->GetCommands ()->Add ( "enter_passenger",		    "enters a car as passenger",						    COMMAND_EnterPassenger, true );
     g_pCore->GetCommands ()->Add ( "radio_next",		        "next radio channel",						            COMMAND_RadioNext, true );
     g_pCore->GetCommands ()->Add ( "radio_previous",		    "previous radio channel",						        COMMAND_RadioPrevious, true );
@@ -81,6 +65,8 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "msg_target",			    "sends a message to the targetted player",			    COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       "changes to the next weapon whilst in a vehicle",       COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   "changes to the previous weapon whilst in a vehicle",   COMMAND_VehiclePreviousWeapon, true );
+    
+    // ACHTUNG" Should this be handled by the atomic cvar setter?
     g_pCore->GetCommands ()->Add ( "textscale",				    "defines the scale multiplier of all text-displays",	COMMAND_TextScale, true );
     
     // Bind our radio commands to the radio keys

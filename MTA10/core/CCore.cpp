@@ -80,7 +80,7 @@ BOOL AC_RestrictAccess( VOID )
 
 template<> CCore * CSingleton< CCore >::m_pSingleton = NULL;
 
-CCore::CCore        ( )
+CCore::CCore ( void )
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -89,9 +89,6 @@ CCore::CCore        ( )
     AC_RestrictAccess ();
     #endif
     
-    // Clear unused pointers
-    m_pConfig = NULL;
-
     // Initialize critical sections
     CCriticalSection::Initialize ();
 
@@ -150,7 +147,6 @@ CCore::CCore        ( )
     m_pLogger                   = new CLogger ( );
 
     // Create interaction objects.
-    m_pClientVariables          = new CClientVariables;
     m_pCommands                 = new CCommands;
     m_pConnectManager           = new CConnectManager;
 
@@ -206,7 +202,7 @@ CCore::CCore        ( )
     m_ChatFont = CHAT_FONT_CLEAR;             
 }
 
-CCore::~CCore ( )
+CCore::~CCore ( void )
 {
     WriteDebugEvent ( "CCore::~CCore" );
 
@@ -226,35 +222,35 @@ CCore::~CCore ( )
     // Remove input hook
 	CMessageLoopHook::GetSingleton ( ).RemoveHook ( );
 
-    // Make sure the config is deleted before the objects it uses to save    
-    CConsole * pConsole = m_pLocalGUI->GetConsole ();
-    m_pConfig->vecConsolePosition = pConsole->GetPosition ();
-    m_pConfig->vecConsoleSize = pConsole->GetSize ();
-    CChat* pChat = m_pLocalGUI->GetChat ();
-    m_pConfig->ucChatFont = ( unsigned char ) m_ChatFont;
-    m_pConfig->ucChatLines = ( unsigned char ) pChat->GetNumLines ();
+    // Store core variables to cvars
+    CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
+    CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
+    CVARS_SET ( "chat_font",                    m_ChatFont );
+    
     CColor color;
+    CChat *pChat = m_pLocalGUI->GetChat ();
+    CVector2D vec;
+    CVARS_SET ( "chat_lines",                   pChat->GetNumLines () );
     pChat->GetColor ( color );
-    m_pConfig->SetChatColor ( color.R, color.G, color.B, color.A );
+    CVARS_SET ( "chat_color",                   color );
     pChat->GetInputColor ( color );
-    m_pConfig->SetChatInputColor ( color.R, color.G, color.B, color.A );
+    CVARS_SET ( "chat_input_color",             color );
     pChat->GetInputPrefixColor ( color );
-    m_pConfig->SetChatInputPrefixColor ( color.R, color.G, color.B, color.A );
-    pChat->GetInputTextColor ( color );
-    m_pConfig->SetChatInputTextColor ( color.R, color.G, color.B, color.A );
-    pChat->GetScale ( m_pConfig->vecChatScale );
-    m_pConfig->fChatWidth = pChat->GetWidth ();
-    m_pConfig->bChatCssStyleText = pChat->GetCssStyleText ();
-    m_pConfig->bChatCssStyleBackground = pChat->GetCssStyleBackground ();
-    m_pConfig->ulChatLineLife = pChat->GetChatLineLife ();
-    m_pConfig->ulChatLineFadeOut = pChat->GetChatLineFadeOut ();
-    m_pConfig->bChatUseCEGUI = pChat->GetUseCEGUI ();
-    delete m_pConfig;
+    CVARS_SET ( "chat_input_prefix_color",      color );
+    pChat->GetScale ( vec );
+    CVARS_SET ( "chat_scale",                   vec );
+    CVARS_SET ( "chat_width",                   pChat->GetWidth () );
+    CVARS_SET ( "chat_css_style_text",          pChat->GetCssStyleText () );
+    CVARS_SET ( "chat_css_style_background",    pChat->GetCssStyleBackground () );
+    CVARS_SET ( "chat_line_life",               (unsigned int)pChat->GetChatLineLife () );
+    CVARS_SET ( "chat_line_fade_out",           (unsigned int)pChat->GetChatLineFadeOut () );
+    CVARS_SET ( "chat_use_cegui",               pChat->GetUseCEGUI () );
+    // Save cvars
+    m_ClientVariables.Save ();
 
     delete m_pKeyBinds;
 
     // Delete interaction objects.
-    delete m_pClientVariables;
     delete m_pCommands;
     delete m_pConnectManager;
     delete m_pDirect3DData;
@@ -340,13 +336,6 @@ CNet* CCore::GetNetwork ( void )
 }
 
 
-CMainConfig* CCore::GetConfig ( void )
-{
-    assert ( m_pConfig );
-    return m_pConfig;
-}
-
-
 CKeyBindsInterface* CCore::GetKeyBinds ( void )
 {
     return m_pKeyBinds;
@@ -364,18 +353,6 @@ CVideoManager* CCore::GetVMR9Manager ( void )
 	return m_pVMR9Manager;
 }
 
-
-char* CCore::GetDebugFileName ( char* szBuffer, size_t bufferSize )
-{
-    assert ( m_pConfig );
-
-    if ( szBuffer )
-    {
-        strncpy ( szBuffer, m_pConfig->strDebugFileName.c_str (), bufferSize );
-        szBuffer[bufferSize-1] = '\0';
-    }
-    return szBuffer;
-}
 
 void CCore::ChatEcho ( const char* szText, bool bColorCoded )
 {
@@ -451,6 +428,7 @@ void CCore::DebugEchoColor ( const char* szText, unsigned char R, unsigned char 
     m_pLocalGUI->EchoDebug ( szText );
 }
 
+
 void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ... )
 {
     // Set the color
@@ -468,6 +446,7 @@ void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned c
     }
 }
 
+
 void CCore::DebugClear ( void )
 {
     CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
@@ -476,6 +455,7 @@ void CCore::DebugClear ( void )
         pDebugView->Clear();
     }
 }
+
 
 void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded )
 {
@@ -552,24 +532,12 @@ bool CCore::IsChatVisible ( void )
     return false;
 }
 
+
 void CCore::TakeScreenShot ( void )
 {
 	bScreenShot = true;
 }
 
-void CCore::SetScreenShotPath ( const char *szPath )
-{
-	CScreenShot::SetPath ( szPath );
-}
-
-void CCore::SetChatInputBackgroundColor ( DWORD dwColor )
-{
-    if ( m_pLocalGUI )
-    {
-        //m_pLocalGUI->GetChatBox ()->SetInputBackgroundColor ( dwColor );
-        m_pLocalGUI->GetChat ()->SetInputColor ( dwColor );
-    }
-}
 
 void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
 {
@@ -636,40 +604,7 @@ bool CCore::IsCursorForcedVisible ( void )
     return false;
 }
 
-
-void CCore::SetChatColor ( unsigned char R, unsigned char G, unsigned char B, unsigned char A )
-{
-    m_pLocalGUI->GetChat ()->SetColor ( CColor ( R, G, B, A ) );
-}
-
-
-void CCore::SetChatInputColor ( unsigned char R, unsigned char G, unsigned char B, unsigned char A )
-{
-    m_pLocalGUI->GetChat ()->SetInputColor ( CColor ( R, G, B, A ) );
-}
-
-
-void CCore::SetChatInputPrefixColor ( unsigned char R, unsigned char G, unsigned char B, unsigned char A )
-{
-    m_pLocalGUI->GetChat ()->SetInputPrefixColor ( CColor ( R, G, B, A ) );
-}
-
-
-void CCore::SetChatInputTextColor ( unsigned char R, unsigned char G, unsigned char B, unsigned char A )
-{
-    m_pLocalGUI->GetChat ()->SetInputTextColor ( CColor ( R, G, B, A ) );
-}
-
-
-void CCore::SetChatLines ( unsigned int uiLines )
-{
-    if ( uiLines > 30 )
-        uiLines = 30;
-
-    m_pLocalGUI->GetChat ()->SetNumLines ( uiLines );
-}
-
-
+/*
 void CCore::SetChatFont ( eChatFont font )
 {
     if ( font != m_ChatFont )
@@ -700,114 +635,51 @@ void CCore::SetChatFont ( eChatFont font )
         m_ChatFont = font;
     }
 }
-
-
-void CCore::SetChatScale ( CVector2D& vecScale )
-{
-    if ( vecScale.fX < 0.5f )
-        vecScale.fX = 0.5f;
-    else if ( vecScale.fX > 2.0f )
-        vecScale.fX = 2.0f;
-    if ( vecScale.fY < 0.5f )
-        vecScale.fY = 0.5f;
-    else if ( vecScale.fY > 2.0f )
-        vecScale.fY = 2.0f;
-
-    m_pLocalGUI->GetChat ()->SetScale ( vecScale );
-}
-
-
-void CCore::SetChatWidth ( float fWidth )
-{
-    if ( fWidth < 0.5f )
-        fWidth = 0.5f;
-    else if ( fWidth > 2.0f )
-        fWidth = 2.0f;
-
-    m_pLocalGUI->GetChat ()->SetWidth ( fWidth );
-}
-
-
-void CCore::SetChatCssStyleText ( bool bEnabled )
-{
-    m_pLocalGUI->GetChat ()->SetCssStyleText ( bEnabled );
-}
-
-
-void CCore::SetChatCssStyleBackground ( bool bEnabled )
-{
-    m_pLocalGUI->GetChat ()->SetCssStyleBackground ( bEnabled );
-}
-
-
-void CCore::SetChatLineLife ( unsigned long ulTime )
-{
-    m_pLocalGUI->GetChat ()->SetChatLineLife ( ulTime );
-}
-
-
-void CCore::SetChatLineFadeOut ( unsigned long ulTime )
-{
-    m_pLocalGUI->GetChat ()->SetChatLineFadeOut ( ulTime );
-}
-
-
-void CCore::SetChatUseCEGUI ( bool bUseCEGUI )
-{
-    m_pLocalGUI->GetChat ()->SetUseCEGUI ( bUseCEGUI );
-    m_pLocalGUI->GetDebugView ()->SetUseCEGUI ( bUseCEGUI );
-	m_bUseCEGUI = bUseCEGUI;
-}
+*/
 
 
 void CCore::ApplyConsoleSettings ( void )
 {
-    assert ( m_pConfig );
-
+    CVector2D vec;
     CConsole * pConsole = m_pLocalGUI->GetConsole ();
-    pConsole->SetPosition ( m_pConfig->vecConsolePosition );
-    pConsole->SetSize ( m_pConfig->vecConsoleSize );
+
+    CVARS_GET ( "console_pos", vec );
+    pConsole->SetPosition ( vec );
+    CVARS_GET ( "console_size", vec );
+    pConsole->SetSize ( vec );
 }
 
 
 void CCore::ApplyChatSettings ( void )
 {
-    assert ( m_pConfig );
+    CColor col;
+    CVector2D vec;
+    float fval;
+    bool bval;
+    unsigned int uval;
+    CChat *pChat = m_pLocalGUI->GetChat ();
 
-    SetChatFont ( (eChatFont) m_pConfig->ucChatFont );
-    SetChatLines ( m_pConfig->ucChatLines );
-    unsigned char R, G, B, A;
-    m_pConfig->GetChatColor ( R, G, B, A );
-    SetChatColor ( R, G, B, A );
-    m_pConfig->GetChatInputColor ( R, G, B, A );
-    SetChatInputColor ( R, G, B, A );
-    m_pConfig->GetChatInputPrefixColor ( R, G, B, A );
-    SetChatInputPrefixColor ( R, G, B, A );
-    m_pConfig->GetChatInputTextColor ( R, G, B, A );
-    SetChatInputTextColor ( R, G, B, A );
-    SetChatScale ( m_pConfig->vecChatScale );
-    SetChatWidth ( m_pConfig->fChatWidth );
-    SetChatCssStyleText ( m_pConfig->bChatCssStyleText );
-    SetChatCssStyleBackground ( m_pConfig->bChatCssStyleBackground );
-    SetChatLineLife ( m_pConfig->ulChatLineLife );
-    SetChatLineFadeOut ( m_pConfig->ulChatLineFadeOut );
-    SetChatUseCEGUI ( m_pConfig->bChatUseCEGUI );
+    CVARS_GET ( "chat_color",                   col );  pChat->SetColor ( col );
+    CVARS_GET ( "chat_input_color",             col );  pChat->SetInputColor ( col );
+    CVARS_GET ( "chat_input_prefix_color",      col );  pChat->SetInputPrefixColor ( col );
+    CVARS_GET ( "chat_input_text_color",        col );  pChat->SetInputTextColor ( col );
+    CVARS_GET ( "chat_scale",                   vec );  pChat->SetScale ( vec );
+    CVARS_GET ( "chat_width",                   fval ); pChat->SetWidth ( fval );
+    CVARS_GET ( "chat_css_style_text",          bval ); pChat->SetCssStyleText ( bval );
+    CVARS_GET ( "chat_css_style_background",    bval ); pChat->SetCssStyleBackground ( bval );
+    CVARS_GET ( "chat_line_life",               uval ); pChat->SetChatLineLife ( uval );
+    CVARS_GET ( "chat_line_fade_out",           uval ); pChat->SetChatLineFadeOut ( uval );
+    CVARS_GET ( "chat_use_cegui",               bval ); pChat->SetUseCEGUI ( bval );
 }
 
 
 void CCore::ApplyGameSettings ( void )
 {
-    assert ( m_pConfig );
-
+    bool bval;
     CControllerConfigManager * pController = m_pGame->GetControllerConfigManager ();
-    pController->SetMouseInverted ( m_pConfig->bInvertMouse );
-    pController->SetFlyWithMouse ( m_pConfig->bFlyWithMouse );
-}
 
-
-bool CCore::IsUsingCEGUIForText ( void )
-{
-	return m_bUseCEGUI;
+    CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
+    CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
 }
 
 
@@ -828,11 +700,13 @@ void CCore::SetOfflineMod ( bool bOffline )
     m_bIsOfflineMod = bOffline;
 }
 
+
 char * CCore::GetModInstallRoot ( char * szModName, char * szBuffer, size_t bufferSize )
 {
     _snprintf( szBuffer, bufferSize, "%s\\mods\\%s", GetInstallRoot(), szModName );
     return szBuffer;
 }
+
 
 const char* CCore::GetInstallRoot ( )
 {
@@ -844,6 +718,7 @@ const char* CCore::GetGTAInstallRoot ( void )
 {
     return m_szGTAInstallRoot;
 }
+
 
 void CCore::ForceCursorVisible ( bool bVisible )
 {
@@ -975,6 +850,7 @@ void CCore::CreateGame ( )
     }
 }
 
+
 void CCore::CreateMultiplayer ( )
 {
     // Check to see if our game has been created.
@@ -1056,9 +932,8 @@ void CCore::InitGUI ( IUnknown* pDevice )
 	SetCurrentDirectory ( szCurDir );
 
 	// and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-	char szScreenShotPath[MAX_PATH] = {0};
-    _snprintf( szScreenShotPath, MAX_PATH - 1, "%s\\screenshots", GetInstallRoot() );
-	SetScreenShotPath ( szScreenShotPath );
+    std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
+    CVARS_SET ( "screenshot_path", strScreenShotPath );
 }
 
 
@@ -1102,6 +977,7 @@ void CCore::DestroyGUI ( )
 	}
 	m_GUIModule.UnloadModule ();
 }
+
 
 void CCore::CreateNetwork ( )
 {
@@ -1186,7 +1062,7 @@ void CCore::CreateXML ( )
 	SetCurrentDirectory ( szCurDir );
 
     // Load XML-dependant subsystems
-    m_pConfig = new CMainConfig ( "mta\\coreconfig.xml" );
+    m_ClientVariables.Load ( MTA_CONFIG_PATH );
 }
 
 
@@ -1204,6 +1080,7 @@ void CCore::DestroyGame ( )
 
 }
 
+
 void CCore::DestroyMultiplayer ( )
 {
 	WriteDebugEvent ( "CCore::DestroyMultiplayer" );
@@ -1215,6 +1092,7 @@ void CCore::DestroyMultiplayer ( )
 
 	m_MultiplayerModule.UnloadModule();
 }
+
 
 void CCore::DestroyXML ( )
 {
@@ -1228,6 +1106,7 @@ void CCore::DestroyXML ( )
 	m_XMLModule.UnloadModule();
 }
 
+
 void CCore::DestroyNetwork ( )
 {
 	WriteDebugEvent ( "CCore::DestroyNetwork" );
@@ -1240,6 +1119,7 @@ void CCore::DestroyNetwork ( )
 	m_NetModule.UnloadModule();
 }
 
+
 void CCore::DoPreFramePulse ( )
 {
     m_pKeyBinds->DoPreFramePulse ();
@@ -1247,6 +1127,7 @@ void CCore::DoPreFramePulse ( )
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
 }
+
 
 void CCore::DoPostFramePulse ( )
 {
@@ -1262,11 +1143,9 @@ void CCore::DoPostFramePulse ( )
     static bool bFirstPulse = true;
     if ( bFirstPulse )
     {
-        assert ( m_pConfig );
-
         bFirstPulse = false;
 
-        m_pConfig->Load ();
+        // Apply all settings
         ApplyConsoleSettings ();
         ApplyChatSettings ();
         ApplyGameSettings ();
@@ -1393,19 +1272,12 @@ void CCore::RegisterCommands ( )
 #endif
 }
 
-void CCore::SaveNick ( const char* szNick )
-{
-    assert ( m_pConfig );
-
-    m_pConfig->strNick = const_cast < char* > ( szNick );
-
-    CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->LoadData ();
-}
 
 bool CCore::GetResetNeeded ( )
 {
 	return m_bResetNeeded;
 }
+
 
 void CCore::SetRenderDevice ( IUnknown* pDevice )
 {
@@ -1436,6 +1308,7 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
 	SetWindowLong ( hDeviceWindow, GWL_STYLE, WS_VISIBLE | WS_CHILD );
 }
 
+
 bool CCore::IsValidNick ( const char* szNick )
 {
     // Too long or too short?
@@ -1459,6 +1332,7 @@ bool CCore::IsValidNick ( const char* szNick )
 
     return false;
 }
+
 
 #ifndef MTA_DEBUG
 CResManager * CCore::GetResManager ( void )
@@ -1634,23 +1508,23 @@ const char* CCore::GetConnectCommandFromURI ( const char* szURI, char* szDest, s
     }
 
     // Grab the nickname
-    const char* szNick;
+    std::string strNick;
     if ( strlen ( szNickname ) > 0 )
     {
-        szNick = szNickname;
+        strNick = szNickname;
     }
     else
     {
-        szNick = m_pConfig->strNick.c_str ();
+        CVARS_GET ( "nick", strNick );
     }
 
     // Generate a string with the arguments to send to the mod IF we got a host
     if ( strlen ( szHost ) > 0 )
     {
         if ( strlen ( szPassword ) > 0 )
-            _snprintf ( szDest, destLength - 1, "connect %s %u %s %s", szHost, usPort, szNick, szPassword );
+            _snprintf ( szDest, destLength - 1, "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
         else
-            _snprintf ( szDest, destLength - 1, "connect %s %u %s", szHost, usPort, szNick );
+            _snprintf ( szDest, destLength - 1, "connect %s %u %s", szHost, usPort, strNick.c_str () );
     }
     else
     {

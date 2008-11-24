@@ -39,6 +39,9 @@ public:
 
     virtual IDirect3DDevice9 *	    GetDevice		    ( void ) = 0;
 
+    virtual void                    SetCEGUIUsed        ( bool bCEGUI ) = 0;
+    virtual bool                    GetCEGUIUsed        ( void ) = 0;
+
     virtual int                     GetTextExtent       ( const char* szText, float fScale ) = 0;
     virtual int                     GetTextHeight       ( float fScale ) = 0;
 

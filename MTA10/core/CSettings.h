@@ -19,7 +19,6 @@ class CSettings;
 #ifndef __CSETTINGS_H
 #define __CSETTINGS_H
 
-#include "CMainConfig.h"
 #include "CMainMenu.h"
 
 struct SKeyBindSection
@@ -139,8 +138,6 @@ private:
     bool                m_bCaptureKey;
 
 	CGUIListItem*	    m_pSelectedBind;
-
-	CMainConfig*	    m_pConfig;
 
 	DWORD			    m_dwFrameCount;
 

@@ -64,6 +64,9 @@ public:
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
 
+    bool                LoadServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
+    bool                SaveServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
 	bool				OnMouseDoubleClick		( CGUIMouseEventArgs Args );

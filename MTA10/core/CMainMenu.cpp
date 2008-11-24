@@ -61,8 +61,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	m_ucFade = FADE_INVISIBLE;
 	m_bFadeToCredits = false;
 
-	m_pConfig = CCore::GetSingleton().GetConfig ();
-
 	m_iButtons =			6;
 	m_fWindowX =			260.0f;
 	m_fWindowY =			330.0f;
@@ -150,8 +148,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
 	// This class is destroyed when the video mode is changed (vid), so the config can already be loaded
 	// If it is already loaded (and this constructor is not called on startup) then load the menu options
-	if ( m_pConfig->IsLoaded () )
-		LoadMenuOptions ();
+//    if ( CClientVariables::GetSingleton ().IsLoaded () )
+//		LoadMenuOptions ();
 }
 
 
@@ -728,7 +726,9 @@ void CMainMenu::SetStaticBackground ( bool bEnabled )
 	// And disable the dynamic scene option (if we're not ingame, cause that means Init3DScene has failed)
 	if (!m_bIsIngame) {
 		DWORD dwSelect = (DWORD) !m_bStaticBackground;
-		m_pConfig->iMenuOptions = ( m_pConfig->iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC );
+        int iMenuOptions;
+        CVARS_GET ( "menu_options", iMenuOptions );
+		CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
 	}
 }
 
@@ -763,7 +763,8 @@ void CMainMenu::DisableItem ( unsigned int uiIndex, bool bHide )
 
 void CMainMenu::LoadMenuOptions ( void )
 {
-	int iMenuOptions = m_pConfig->iMenuOptions;
+	int iMenuOptions;
+    CVARS_GET ( "menu_options", iMenuOptions );
 	
 	// Reload the menu options, in case they have changed
 	SetStaticBackground                            ( !(iMenuOptions & eMenuOptions::MENU_DYNAMIC) );            // Dynamic or static
