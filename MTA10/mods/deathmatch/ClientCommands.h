@@ -40,7 +40,7 @@ void COMMAND_MessageTarget          ( const char* szCmdLine );
 void COMMAND_VehicleNextWeapon      ( const char* szCmdLine );
 void COMMAND_VehiclePreviousWeapon  ( const char* szCmdLine );
 void COMMAND_TextScale              ( const char* szCmdLine );
-
+void COMMAND_ChatBox                ( const char* szCmdLine );
 
 // DISABLE THESE BEFORE RELEASE
 #ifdef MTA_DEBUG

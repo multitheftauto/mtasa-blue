@@ -144,7 +144,6 @@ void CCommandFuncs::Vid ( const char* szParameters )
 
             // Reload console and chat settings (removed in DestroyWindows)
             g_pCore->ApplyConsoleSettings ();
-            g_pCore->ApplyChatSettings ();
         }
         else
         {

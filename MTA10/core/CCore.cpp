@@ -198,8 +198,6 @@ CCore::CCore ( void )
 
 	// Reset the screenshot flag
 	bScreenShot = false;
-
-    m_ChatFont = CHAT_FONT_CLEAR;             
 }
 
 CCore::~CCore ( void )
@@ -225,26 +223,7 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
-    CVARS_SET ( "chat_font",                    m_ChatFont );
     
-    CColor color;
-    CChat *pChat = m_pLocalGUI->GetChat ();
-    CVector2D vec;
-    CVARS_SET ( "chat_lines",                   pChat->GetNumLines () );
-    pChat->GetColor ( color );
-    CVARS_SET ( "chat_color",                   color );
-    pChat->GetInputColor ( color );
-    CVARS_SET ( "chat_input_color",             color );
-    pChat->GetInputPrefixColor ( color );
-    CVARS_SET ( "chat_input_prefix_color",      color );
-    pChat->GetScale ( vec );
-    CVARS_SET ( "chat_scale",                   vec );
-    CVARS_SET ( "chat_width",                   pChat->GetWidth () );
-    CVARS_SET ( "chat_css_style_text",          pChat->GetCssStyleText () );
-    CVARS_SET ( "chat_css_style_background",    pChat->GetCssStyleBackground () );
-    CVARS_SET ( "chat_line_life",               (unsigned int)pChat->GetChatLineLife () );
-    CVARS_SET ( "chat_line_fade_out",           (unsigned int)pChat->GetChatLineFadeOut () );
-    CVARS_SET ( "chat_use_cegui",               pChat->GetUseCEGUI () );
     // Save cvars
     m_ClientVariables.Save ();
 
@@ -604,40 +583,6 @@ bool CCore::IsCursorForcedVisible ( void )
     return false;
 }
 
-/*
-void CCore::SetChatFont ( eChatFont font )
-{
-    if ( font != m_ChatFont )
-    {
-        CGUIFont* pFont = m_pGUI->GetDefaultFont ();
-        ID3DXFont* pDXFont = m_pGraphics->GetFont ();
-        switch ( font )
-        {
-            case CHAT_FONT_DEFAULT:
-                pFont = m_pGUI->GetDefaultFont ();
-				pDXFont = m_pGraphics->GetFont ( FONT_DEFAULT );
-                break;
-            case CHAT_FONT_CLEAR:
-                pFont = m_pGUI->GetClearFont ();
-				pDXFont = m_pGraphics->GetFont ( FONT_CLEAR );
-                break;
-            case CHAT_FONT_BOLD:
-                pFont = m_pGUI->GetBoldFont ();
-                pDXFont = m_pGraphics->GetFont ( FONT_DEFAULT_BOLD );
-                break;
-            case CHAT_FONT_ARIAL:
-				pDXFont = m_pGraphics->GetFont ( FONT_ARIAL );
-                break;                
-        }
-        m_pLocalGUI->GetChat ()->SetFont ( pFont );
-        m_pLocalGUI->GetChat ()->SetDXFont ( pDXFont );        
-
-        m_ChatFont = font;
-    }
-}
-*/
-
-
 void CCore::ApplyConsoleSettings ( void )
 {
     CVector2D vec;
@@ -647,29 +592,6 @@ void CCore::ApplyConsoleSettings ( void )
     pConsole->SetPosition ( vec );
     CVARS_GET ( "console_size", vec );
     pConsole->SetSize ( vec );
-}
-
-
-void CCore::ApplyChatSettings ( void )
-{
-    CColor col;
-    CVector2D vec;
-    float fval;
-    bool bval;
-    unsigned int uval;
-    CChat *pChat = m_pLocalGUI->GetChat ();
-
-    CVARS_GET ( "chat_color",                   col );  pChat->SetColor ( col );
-    CVARS_GET ( "chat_input_color",             col );  pChat->SetInputColor ( col );
-    CVARS_GET ( "chat_input_prefix_color",      col );  pChat->SetInputPrefixColor ( col );
-    CVARS_GET ( "chat_input_text_color",        col );  pChat->SetInputTextColor ( col );
-    CVARS_GET ( "chat_scale",                   vec );  pChat->SetScale ( vec );
-    CVARS_GET ( "chat_width",                   fval ); pChat->SetWidth ( fval );
-    CVARS_GET ( "chat_css_style_text",          bval ); pChat->SetCssStyleText ( bval );
-    CVARS_GET ( "chat_css_style_background",    bval ); pChat->SetCssStyleBackground ( bval );
-    CVARS_GET ( "chat_line_life",               uval ); pChat->SetChatLineLife ( uval );
-    CVARS_GET ( "chat_line_fade_out",           uval ); pChat->SetChatLineFadeOut ( uval );
-    CVARS_GET ( "chat_use_cegui",               bval ); pChat->SetUseCEGUI ( bval );
 }
 
 
@@ -1147,7 +1069,6 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
-        ApplyChatSettings ();
         ApplyGameSettings ();
 
 		m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();

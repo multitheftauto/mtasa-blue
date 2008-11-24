@@ -24,7 +24,6 @@ public:
                 CDebugView              ( CGUI* pManager, CVector2D & vecPosition );
 
     void        Draw                    ( void );
-    void        SetUseCEGUI             ( bool bUseCEGUI );
     void        Output                  ( char* szText, bool bColorCoded );
     void        Outputf                 ( bool bColorCoded, char* szText, ... );
 };

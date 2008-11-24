@@ -51,6 +51,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "shownetstat",			    "shows the network statistics",						    COMMAND_ShowNetstat );
     
     // Key commands (registered as 'mod commands', can be disabled)
+    g_pCore->GetCommands ()->Add ( "chatbox",				    "defines the chatbox color (r g b)",				    COMMAND_ChatBox, true );
     g_pCore->GetCommands ()->Add ( "enter_passenger",		    "enters a car as passenger",						    COMMAND_EnterPassenger, true );
     g_pCore->GetCommands ()->Add ( "radio_next",		        "next radio channel",						            COMMAND_RadioNext, true );
     g_pCore->GetCommands ()->Add ( "radio_previous",		    "previous radio channel",						        COMMAND_RadioPrevious, true );

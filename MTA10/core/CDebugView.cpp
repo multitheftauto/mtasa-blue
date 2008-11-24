@@ -29,8 +29,8 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     vecPosition.fY *= vecResolution.fY;
 
     m_bUseCEGUI = false;
-    m_ulChatLineLife = DEFAULT_CHAT_LINE_LIFE;
-    m_ulChatLineFadeOut = DEFAULT_CHAT_LINE_FADE_OUT;
+    m_ulChatLineLife = 0;
+    m_ulChatLineFadeOut = 0;
     m_bCssStyleText = false;
     m_bCssStyleBackground = false;
     m_szCommand = NULL;
@@ -73,15 +73,6 @@ void CDebugView::Draw ( void )
     CChat * pChat = g_pChat;
     g_pChat = this;
     CChat::Draw ();
-    g_pChat = pChat;
-}
-
-
-void CDebugView::SetUseCEGUI ( bool bUseCEGUI )
-{
-    CChat * pChat = g_pChat;
-    g_pChat = this;
-    CChat::SetUseCEGUI ( bUseCEGUI );
     g_pChat = pChat;
 }
 

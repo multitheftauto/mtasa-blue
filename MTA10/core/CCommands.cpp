@@ -91,7 +91,7 @@ bool CCommands::Execute ( const char* szCommandLine )
 
 bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool bHandleRemotely )
 {
-    // HACK: if its a 'chatboxsay' command, use the next paramater
+    // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
     if ( !stricmp ( szCommand, "chatboxsay" ) )
     {
