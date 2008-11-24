@@ -554,13 +554,13 @@ Section "Core components" SEC01
   File "${FILES_ROOT}\GTA San Andreas\mta\game_sa.dll"
   File "${FILES_ROOT}\GTA San Andreas\mta\multiplayer_sa.dll"
   File "${FILES_ROOT}\GTA San Andreas\mta\net.dll"
+  File "${FILES_ROOT}\GTA San Andreas\mta\d3dx9_33.dll"
+  File "${FILES_ROOT}\GTA San Andreas\mta\msvcp71.dll"
+  File "${FILES_ROOT}\GTA San Andreas\mta\msvcr71.dll"
   
   !ifndef LIGHTBUILD
     File "${FILES_ROOT}\GTA San Andreas\mta\lua5.1.dll"
     File "${FILES_ROOT}\GTA San Andreas\mta\libcurl.dll"
-    File "${FILES_ROOT}\GTA San Andreas\mta\d3dx9_33.dll"
-    File "${FILES_ROOT}\GTA San Andreas\mta\msvcp71.dll"
-    File "${FILES_ROOT}\GTA San Andreas\mta\msvcr71.dll"
     File "${FILES_ROOT}\GTA San Andreas\mta\vorbis.ax"
     File "${FILES_ROOT}\GTA San Andreas\mta\xv.ax"
     File "${FILES_ROOT}\GTA San Andreas\mta\xvidcore.dll"
@@ -633,11 +633,11 @@ SectionIn 1 2 RO ; section is required
     File "${SERVER_FILES_ROOT}\xmll.dll"
     File "${SERVER_FILES_ROOT}\MTA Server.exe"
     File "${SERVER_FILES_ROOT}\net.dll"
+    File "${SERVER_FILES_ROOT}\msvcp71.dll"
+    File "${SERVER_FILES_ROOT}\msvcr71.dll"
 
 !ifndef LIGHTBUILD
     File "${SERVER_FILES_ROOT}\libcurl.dll"
-    File "${SERVER_FILES_ROOT}\msvcp71.dll"
-    File "${SERVER_FILES_ROOT}\msvcr71.dll"
 !endif
 
 SectionEnd
@@ -824,12 +824,12 @@ Section Uninstall
     Delete "$INSTDIR\server\xmll.dll"
     Delete "$INSTDIR\server\MTA Server.exe"
     Delete "$INSTDIR\server\net.dll"
+    Delete "$INSTDIR\server\msvcp71.dll"
+    Delete "$INSTDIR\server\msvcr71.dll"
     !ifndef LIGHTBUILD
         Delete "$INSTDIR\server\pcre3.dll"
         Delete "$INSTDIR\server\pthreadVC2.dll"
         Delete "$INSTDIR\server\sqlite3.dll"
-        Delete "$INSTDIR\server\msvcp71.dll"
-        Delete "$INSTDIR\server\msvcr71.dll"
         Delete "$INSTDIR\server\libcurl.dll"
     !endif
     
