@@ -33,7 +33,7 @@ CGUIScrollBar_Impl::CGUIScrollBar_Impl ( CGUI_Impl* pGUI, bool bHorizontal, CGUI
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 	
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::Scrollbar::EventScrollPositionChanged, CEGUI::Event::Subscriber ( CGUIScrollBar_Impl::Event_OnScroll, this ) );
+	m_pWindow->subscribeEvent ( CEGUI::Scrollbar::EventScrollPositionChanged, CEGUI::Event::Subscriber ( &CGUIScrollBar_Impl::Event_OnScroll, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager

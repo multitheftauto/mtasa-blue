@@ -198,7 +198,7 @@ CSettings::CSettings ( void )
     // Set up the events
     m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
-	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( CSettings::OnLoginButtonClick, this ) );
+	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
 
 	// Copy the config pointer
 	m_pConfig = g_pCore->GetConfig ();

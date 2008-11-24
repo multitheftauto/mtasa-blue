@@ -36,7 +36,7 @@ CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
 	// Subscribe the clicked event
-    m_pWindow->subscribeEvent ( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber ( CGUIButton_Impl::Event_OnClick, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber ( &CGUIButton_Impl::Event_OnClick, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager

@@ -35,7 +35,7 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
     }
 
     // Create a handling entry for every original handling data.
-    for ( i = 0; i < 212; i++ )
+    for ( int i = 0; i < 212; i++ )
     {
         m_pOriginalEntries [i] = new CHandlingEntrySA ( &m_OriginalHandlingData [i] );
     }
@@ -62,7 +62,7 @@ CHandlingManagerSA::~CHandlingManagerSA ( void )
     }
 
     // Destroy all handling entries
-    for ( i = 0; i < 212; i++ )
+    for ( int i = 0; i < 212; i++ )
     {
         delete m_pEntries [i];
     }

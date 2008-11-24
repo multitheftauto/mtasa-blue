@@ -70,11 +70,11 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
 		m_pButton->SetPosition ( CVector2D ( 0.35f, 0.76f ), true );
 		m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
 
-		SetOnClickHandler ( GUI_CALLBACK ( CGUIMessageBox_Impl::OnResponseHandler, this ) );
+		SetOnClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
     }
 
 	// Set the KeyDown handler
-	m_pWindow->SetKeyDownHandler ( GUI_CALLBACK ( CGUIMessageBox_Impl::OnKeyDownHandler, this ) );
+	m_pWindow->SetKeyDownHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnKeyDownHandler, this ) );
 
 	// And finally set the focus to our window
 	m_pWindow->Activate ();

@@ -35,7 +35,7 @@ CGUICheckBox_Impl::CGUICheckBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::Checkbox::EventCheckStateChanged, CEGUI::Event::Subscriber ( CGUICheckBox_Impl::Event_OnClick, this ) );
+	m_pWindow->subscribeEvent ( CEGUI::Checkbox::EventCheckStateChanged, CEGUI::Event::Subscriber ( &CGUICheckBox_Impl::Event_OnClick, this ) );
     AddEvents ();
 
 	// Set selected state

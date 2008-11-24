@@ -35,7 +35,7 @@ CGUIMemo_Impl::CGUIMemo_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
     //m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.00f, 0.00f, 0.40f, 0.40f ) );
 
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::MultiLineEditbox::EventTextChanged, CEGUI::Event::Subscriber ( CGUIMemo_Impl::Event_TextChanged, this ) );
+	m_pWindow->subscribeEvent ( CEGUI::MultiLineEditbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIMemo_Impl::Event_TextChanged, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager

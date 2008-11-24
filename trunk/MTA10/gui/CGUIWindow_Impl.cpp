@@ -48,8 +48,8 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
 	delete [] szUpperCaption;
 
     // Register our events
-    m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( CGUIWindow_Impl::Event_OnCloseClick, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventKeyDown, CEGUI::Event::Subscriber ( CGUIWindow_Impl::Event_OnKeyDown, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnKeyDown, this ) );
     AddEvents ();
 
 	// Disable rolling up, because we don't need it and it causes a freeze

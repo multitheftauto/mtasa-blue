@@ -1301,7 +1301,7 @@ bool CStaticFunctionDefinitions::IsPedDoingTask ( CClientPed& Ped, const char* s
                 pTask = pTask->GetSubTask ();
             }
         }
-        for ( i = 0 ; i < TASK_SECONDARY_MAX ; i++ )
+        for ( int i = 0 ; i < TASK_SECONDARY_MAX ; i++ )
         {
             pTask = pTaskManager->GetTaskSecondary ( i );
             while ( pTask )

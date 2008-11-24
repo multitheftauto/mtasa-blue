@@ -230,7 +230,7 @@ void CTaskManagerSA::Flush(const int iPriority)
             pTask->MakeAbortable ( ped, iPriority, NULL );
         }
     }
-    for ( i = 0 ; i < TASK_SECONDARY_MAX ; i++ )
+    for ( int i = 0 ; i < TASK_SECONDARY_MAX ; i++ )
     {
         CTask * pTask = GetTaskSecondary ( i );
         if ( pTask )
