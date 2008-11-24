@@ -238,8 +238,11 @@ void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int 
     // Eventually delete our previous string
     m_strString = "";
 
-    // TODO: Fix memoryleak
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
 
     // Grab the argument type
     m_iType = lua_type ( luaVM, uiArgument );
@@ -363,7 +366,11 @@ void CLuaArgument::Push ( lua_State* luaVM ) const
 void CLuaArgument::Read ( bool bBool )
 {
     m_strString = "";
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_iType = LUA_TBOOLEAN;
     m_bBoolean = bBool;
 }
@@ -371,6 +378,11 @@ void CLuaArgument::Read ( bool bBool )
 void CLuaArgument::Read ( CLuaArguments * table )
 {
     m_strString = "";
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_pTableData = table;
     m_iType = LUA_TTABLE;
     m_bBoolean = false;
@@ -379,7 +391,11 @@ void CLuaArgument::Read ( CLuaArguments * table )
 void CLuaArgument::Read ( double dNumber )
 {
     m_strString = "";
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_iType = LUA_TNUMBER;
     m_Number = dNumber;
 }
@@ -390,7 +406,11 @@ void CLuaArgument::Read ( const char* szString )
     assert ( szString );
 
     m_iType = LUA_TSTRING;
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_strString = szString;
 }
 
@@ -400,7 +420,11 @@ void CLuaArgument::Read ( CElement* pElement )
     if ( pElement )
     {
         m_strString = "";
-        m_pTableData = NULL;
+        if ( m_pTableData )
+        {
+            delete m_pTableData;
+            m_pTableData = NULL;
+        }
         m_iType = LUA_TLIGHTUSERDATA;
         m_pLightUserData = (void*) pElement->GetID ();
     }
@@ -412,7 +436,11 @@ void CLuaArgument::Read ( CElement* pElement )
 void CLuaArgument::ReadUserData ( void* pUserData )
 {
     m_strString = "";
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_iType = LUA_TLIGHTUSERDATA;
     m_pLightUserData = pUserData;
 }
@@ -458,7 +486,11 @@ bool CLuaArgument::GetAsString ( char * szBuffer, unsigned int uiLength )
 
 bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream )
 {
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
 
     // Read out the type
     unsigned char cType = 0;
@@ -845,6 +877,12 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object )
 {
     if ( !is_error(object) )
     {
+        if ( m_pTableData )
+        {
+            delete m_pTableData;
+            m_pTableData = NULL;
+        }
+
         if ( !object )
             m_iType = LUA_TNIL; 
         else
