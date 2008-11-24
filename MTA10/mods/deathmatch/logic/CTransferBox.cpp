@@ -85,7 +85,7 @@ CTransferBox::CTransferBox ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( (TRANSFERBOX_WIDTH / 2) - 50, TRANSFERBOX_HEIGHT - TRANSFERBOX_SPACER - 25 ) );
     m_pButtonCancel->SetSize ( CVector2D ( 100, 25 ) );
 
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( CTransferBox::OnCancelClick, this ) );
+    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CTransferBox::OnCancelClick, this ) );
 
 	// set animation counters
 	m_uiVisible = 0;

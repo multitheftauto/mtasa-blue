@@ -89,7 +89,7 @@ CGameSA::CGameSA()
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
 
-	for(int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
+	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
 		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), (eWeaponType)i);
 
     /*
@@ -98,7 +98,7 @@ CGameSA::CGameSA()
     */
 
     // Set the model ids for all the CModelInfoSA instances
-    for ( i = 0; i < MODELINFO_MAX; i++ )
+    for ( int i = 0; i < MODELINFO_MAX; i++ )
     {
         ModelInfo [i].SetModelID ( i );
     }

@@ -24,9 +24,9 @@ CAnimManagerSA::~CAnimManagerSA ( void )
 {
     for ( unsigned int i = 0 ; i < MAX_ANIM_GROUPS ; i++ )
         if ( m_pAnimAssocGroups [ i ] ) delete m_pAnimAssocGroups [ i ];
-    for ( i = 0 ; i < MAX_ANIMATIONS ; i++ )
+    for ( unsigned int i = 0 ; i < MAX_ANIMATIONS ; i++ )
         if ( m_pAnimations [ i ] ) delete m_pAnimations [ i ];
-    for ( i = 0 ; i < MAX_ANIM_BLOCKS ; i++ )
+    for ( unsigned int i = 0 ; i < MAX_ANIM_BLOCKS ; i++ )
         if ( m_pAnimBlocks [ i ] ) delete m_pAnimBlocks [ i ];
 }
 

@@ -60,8 +60,8 @@ public:
 	inline eCGUIType			GetCGUIType					( void ) const					{ return m_pCGUIElement->GetType (); };
 	inline const char*			GetCGUITypeName				( void ) const					{ return m_szCGUITypeName; };
 
-	inline GUI_CALLBACK			GetCallback1				( void )						{ return GUI_CALLBACK ( CClientGUIElement::_CallbackEvent1, this ); };
-	inline GUI_CALLBACK			GetCallback2				( void )						{ return GUI_CALLBACK ( CClientGUIElement::_CallbackEvent2, this ); };
+	inline GUI_CALLBACK			GetCallback1				( void )						{ return GUI_CALLBACK ( &CClientGUIElement::_CallbackEvent1, this ); };
+	inline GUI_CALLBACK			GetCallback2				( void )						{ return GUI_CALLBACK ( &CClientGUIElement::_CallbackEvent2, this ); };
 
 	void						SetEvents					( const char* szFunc1, const char* szFunc2 = NULL );
 

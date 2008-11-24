@@ -91,17 +91,17 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 	// Mouse events
 	CEGUI::GlobalEventSet * pEvents = CEGUI::GlobalEventSet::getSingletonPtr ();
 
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventCharacterKey		, CEGUI::Event::Subscriber ( CGUI_Impl::Event_CharacterKey, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventKeyDown			, CEGUI::Event::Subscriber ( CGUI_Impl::Event_KeyDown, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseClick		, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseClick, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseDoubleClick	, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseDoubleClick, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseWheel		, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseWheel, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseMove			, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseMove, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseEnters		, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseEnter, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseLeaves		, CEGUI::Event::Subscriber ( CGUI_Impl::Event_MouseLeave, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved				, CEGUI::Event::Subscriber ( CGUI_Impl::Event_Moved, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized				, CEGUI::Event::Subscriber ( CGUI_Impl::Event_Sized, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested	, CEGUI::Event::Subscriber ( CGUI_Impl::Event_RedrawRequested, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventCharacterKey		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_CharacterKey, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventKeyDown			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_KeyDown, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseClick		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseClick, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseDoubleClick	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseDoubleClick, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseWheel		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseWheel, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseMove			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseMove, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseEnters		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseEnter, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseLeaves		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseLeave, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved				, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Moved, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized				, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Sized, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
 
 	// Disallow input routing to the GUI
 	m_bSwitchGUIInput = false;

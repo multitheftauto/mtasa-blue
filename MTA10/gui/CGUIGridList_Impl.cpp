@@ -54,7 +54,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
-    m_pWindow->subscribeEvent ( CEGUI::MultiColumnList::EventSortColumnChanged, CEGUI::Event::Subscriber ( CGUIGridList_Impl::Event_OnSortColumn, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::MultiColumnList::EventSortColumnChanged, CEGUI::Event::Subscriber ( &CGUIGridList_Impl::Event_OnSortColumn, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager

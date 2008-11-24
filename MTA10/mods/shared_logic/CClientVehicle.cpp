@@ -663,9 +663,9 @@ void CClientVehicle::Fix ( void )
     unsigned char ucDoorStates [ MAX_DOORS ];
     GetInitialDoorStates ( ucDoorStates );
     for ( int i = 0 ; i < MAX_DOORS ; i++ ) SetDoorStatus ( i, ucDoorStates [ i ] );
-    for ( i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
-    for ( i = 0 ; i < MAX_LIGHTS ; i++ ) SetLightStatus ( i, 0 );
-    for ( i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );    
+    for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
+    for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) SetLightStatus ( i, 0 );
+    for ( int i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );    
 }
 
 
@@ -1879,9 +1879,9 @@ void CClientVehicle::Create ( void )
 
             for ( int i = 0; i < MAX_DOORS; i++ )
                 pDamageManager->SetDoorStatus ( static_cast < eDoors > ( i ), m_ucDoorStates [i] );            
-            for ( i = 0; i < MAX_PANELS; i++ )
+            for ( int i = 0; i < MAX_PANELS; i++ )
                 pDamageManager->SetPanelStatus ( static_cast < ePanels > ( i ), m_ucPanelStates [i] );
-            for ( i = 0; i < MAX_LIGHTS; i++ )
+            for ( int i = 0; i < MAX_LIGHTS; i++ )
                 pDamageManager->SetLightStatus ( static_cast < eLights > ( i ), m_ucLightStates [i] );
         }
         for ( int i = 0; i < MAX_WHEELS; i++ )
@@ -1977,9 +1977,9 @@ void CClientVehicle::Destroy ( void )
 
             for ( int i = 0; i < MAX_DOORS; i++ )
                 m_ucDoorStates [i] = pDamageManager->GetDoorStatus ( static_cast < eDoors > ( i ) );            
-            for ( i = 0; i < MAX_PANELS; i++ )
+            for ( int i = 0; i < MAX_PANELS; i++ )
                 m_ucPanelStates [i] = pDamageManager->GetPanelStatus ( static_cast < ePanels > ( i ) );
-            for ( i = 0; i < MAX_LIGHTS; i++ )
+            for ( int i = 0; i < MAX_LIGHTS; i++ )
                 m_ucLightStates [i] = pDamageManager->GetLightStatus ( static_cast < eLights > ( i ) );
         }
         for ( int i = 0; i < MAX_WHEELS; i++ )

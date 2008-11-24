@@ -35,8 +35,8 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our event
-    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextAccepted, CEGUI::Event::Subscriber ( CGUIEdit_Impl::Event_OnTextAccepted, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextChanged, CEGUI::Event::Subscriber ( CGUIEdit_Impl::Event_OnTextChanged, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextAccepted, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnTextAccepted, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnTextChanged, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager

@@ -21,7 +21,7 @@
 list < CRemoteDataStorageSA* >          m_RemoteData;
 CPools *                                m_pPools;
 
-CRemoteDataSA::Init ( )
+void CRemoteDataSA::Init ( )
 {
     m_pPools = pGameInterface->GetPools();
 }

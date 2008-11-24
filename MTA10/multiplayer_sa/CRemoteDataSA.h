@@ -74,7 +74,7 @@ public:
 class CRemoteDataSA
 {
 public:
-    static                          Init ( );
+    static void                     Init ( );
 
     // Static accessors
     static CRemoteDataStorageSA *   GetRemoteDataStorage ( CPlayerPed * player );
