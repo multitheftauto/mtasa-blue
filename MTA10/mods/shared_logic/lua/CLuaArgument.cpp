@@ -243,8 +243,11 @@ void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int 
     // Clear the string
     m_strString = "";
 
-    // TODO: Fix memoryleak
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
 
     // Grab the argument type
     m_iType = lua_type ( luaVM, uiArgument );
@@ -321,7 +324,11 @@ void CLuaArgument::Read ( bool bBool )
 {
     m_strString = "";
     m_iType = LUA_TBOOLEAN;
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_bBoolean = bBool;
 }
 
@@ -330,7 +337,11 @@ void CLuaArgument::Read ( double dNumber )
 {
     m_strString = "";
     m_iType = LUA_TNUMBER;
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_Number = dNumber;
 }
 
@@ -340,7 +351,11 @@ void CLuaArgument::Read ( const char* szString )
     assert ( szString );
 
     m_iType = LUA_TSTRING;
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_strString = szString ? szString : "";
 }
 
@@ -348,7 +363,11 @@ void CLuaArgument::Read ( const char* szString )
 void CLuaArgument::Read ( void* pUserData )
 {
     m_strString = "";
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_iType = LUA_TLIGHTUSERDATA;
     m_pLightUserData = pUserData;
 }
@@ -359,7 +378,11 @@ void CLuaArgument::Read ( CClientEntity* pElement )
     if ( pElement )
     {
         m_strString = "";
-        m_pTableData = NULL;
+        if ( m_pTableData )
+        {
+            delete m_pTableData;
+            m_pTableData = NULL;
+        }
         m_iType = LUA_TLIGHTUSERDATA;
         m_pLightUserData = (void*) pElement->GetID ();
     }
@@ -371,7 +394,11 @@ void CLuaArgument::Read ( CClientEntity* pElement )
 void CLuaArgument::ReadElementID ( ElementID ID )
 {
     m_strString = "";
-    m_pTableData = NULL;
+    if ( m_pTableData )
+    {
+        delete m_pTableData;
+        m_pTableData = NULL;
+    }
     m_iType = LUA_TLIGHTUSERDATA;
     m_pLightUserData = (void*) ID;
 }
@@ -438,6 +465,12 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream )
     unsigned char cType = 0;
 	if ( bitStream.Read ( cType ) )
 	{
+        if ( m_pTableData )
+        {
+            delete m_pTableData;
+            m_pTableData = NULL;
+        }
+
         // Depending on what type...
 		switch ( cType )
 		{
