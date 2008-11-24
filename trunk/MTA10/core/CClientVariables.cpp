@@ -117,13 +117,18 @@ bool CClientVariables::Get ( const std::string strVariable, CColor &val )
 {
     std::stringstream ss;
     std::string strVal;
+    int iR, iG, iB, iA;
 
     if ( !Node ( strVariable ) ) return false;
     strVal = Node ( strVariable )->GetTagContent ();
     ss.str ( strVal );
 
     try {
-        ss >> val.R >> val.G >> val.B >> val.A;
+        ss >> iR >> iG >> iB >> iA;
+        val.R = iR;
+        val.G = iG;
+        val.B = iB;
+        val.A = iA;
     } catch (...) {
         return false;
     }
@@ -137,9 +142,10 @@ void CClientVariables::Set ( const std::string strVariable, CVector val )
     std::stringstream ss;
     if ( !m_pStorage ) return;
 
-    ss << val.fX << ' ' << val.fY << ' ' << val.fZ;
+    ss << val.fX << " " << val.fY << " " << val.fZ;
 
-    const char *szVal = ss.str ().c_str ();
+    std::string strVal = ss.str ();
+    const char *szVal = strVal.c_str ();
     Node ( strVariable )->SetTagContent ( szVal );
 }
 
@@ -149,7 +155,7 @@ void CClientVariables::Set ( const std::string strVariable, CVector2D val )
     std::stringstream ss;
     if ( !m_pStorage ) return;
 
-    ss << val.fX << ' ' << val.fY;
+    ss << val.fX << " " << val.fY;
 
     std::string strVal = ss.str ();
     const char *szVal = strVal.c_str ();
@@ -162,9 +168,10 @@ void CClientVariables::Set ( const std::string strVariable, CColor val )
     std::stringstream ss;
     if ( !m_pStorage ) return;
 
-    ss << val.R << ' ' << val.G << ' ' << val.B << ' ' << val.A;
+    ss << (unsigned int)val.R << " " << (unsigned int)val.G << " " << (unsigned int)val.B << " " << (unsigned int)val.A;
 
-    const char *szVal = ss.str ().c_str ();
+    std::string strVal = ss.str ();
+    const char *szVal = strVal.c_str ();
     Node ( strVariable )->SetTagContent ( szVal );
 }
 
