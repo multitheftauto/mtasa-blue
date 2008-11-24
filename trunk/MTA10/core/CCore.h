@@ -118,7 +118,6 @@ public:
 
     // Configuration
     void                    ApplyConsoleSettings            ( void );
-    void                    ApplyChatSettings               ( void );
     void                    ApplyGameSettings               ( void );
 
     // Net
@@ -241,7 +240,6 @@ private:
     char                        m_szGTAInstallRoot[MAX_PATH];
 
     bool                        m_bQuitOnPulse;
-    eChatFont                   m_ChatFont;
     bool                        m_bDestroyMessageBox;
 };
 

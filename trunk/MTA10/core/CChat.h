@@ -14,17 +14,16 @@
 #define __CCHAT_H
 
 #include "CGUI.h"
+#include <core/CCoreInterface.h>
 #include <list>
 using namespace std;
 
 class CChatLineSection;
 
-#define MAX_LINES 30
-#define CCHATBOX_MAXCHATLENGTH	96
-
-#define DEFAULT_CHAT_LINE_LIFE			12000
-#define DEFAULT_CHAT_LINE_FADE_OUT		3000
+#define CCHAT_MAX_LINES                 30
+#define CCHAT_MAX_CHAT_LENGTH           96
 #define CCHAT_BUFFER					1024
+#define CCHAT_UPDATE_CVARS              5000
 
 class CColor
 {
@@ -106,6 +105,7 @@ class CChat
     friend CChatLine;
     friend CChatInputLine;
     friend CChatLineSection;
+
 public:
     inline                      CChat                   ( void ) {};
                                 CChat                   ( CGUI* pManager, CVector2D & vecPosition );
@@ -117,82 +117,72 @@ public:
     void                        Clear                   ( void );
     void                        ClearInput              ( void );
     bool                        CharacterKeyHandler     ( CGUIKeyEventArgs KeyboardArgs );
+
     inline bool                 IsVisible               ( void )            { return m_bVisible; }
     void                        SetVisible              ( bool bVisible );
     inline bool                 IsInputVisible          ( void )            { return m_bInputVisible; }
     void                        SetInputVisible         ( bool bVisible );
-    inline unsigned int         GetNumLines             ( void )            { return m_uiNumLines; }
-    void                        SetNumLines             ( unsigned int uiNumLines );
-    inline CGUIFont*            GetFont                 ( void )            { return m_pFont; }
-    void                        SetFont                 ( CGUIFont* pFont );
-    inline LPD3DXFONT           GetDXFont               ( void )            { return m_pDXFont; }
-    void                        SetDXFont               ( LPD3DXFONT pFont );
-    void                        GetScale                ( CVector2D& vecScale );
-    void                        SetScale                ( CVector2D& vecScale );
-    float                       GetWidth                ( void );
-    void                        SetWidth                ( float fWidth );
-    inline void                 GetColor                ( CColor& color )   { color = m_Color; }
-    void                        SetColor                ( CColor& color );
-    inline void                 GetTextColor            ( CColor& color )   { color = m_TextColor; }
-    inline void                 SetTextColor            ( CColor& color )   { m_TextColor = color; }
-    inline void                 GetInputColor           ( CColor& color )   { color = m_InputColor; }
-    void                        SetInputColor           ( CColor& color );
-    void                        SetInputColor           ( unsigned long& ulColor );
+
     char*                       GetInputPrefix          ( void );
     void                        SetInputPrefix          ( char* szPrefix );
-    void                        GetInputPrefixColor     ( CColor& color );
-    void                        SetInputPrefixColor     ( CColor& color );
     char*                       GetInputText            ( void );
     void                        SetInputText            ( char* szText );
-    void                        GetInputTextColor       ( CColor& color );
-    void                        SetInputTextColor       ( CColor& color );
     inline char*                GetCommand              ( void );
     void                        SetCommand              ( char* szCommand );
-    inline bool                 GetCssStyleText         ( void )                    { return m_bCssStyleText; }
-    void                        SetCssStyleText         ( bool bEnabled );
-    inline bool                 GetCssStyleBackground   ( void )                    { return m_bCssStyleBackground; }
-    void                        SetCssStyleBackground   ( bool bEnabled );
-    inline unsigned long        GetChatLineLife         ( void )                    { return m_ulChatLineLife; }
-    void                        SetChatLineLife         ( unsigned long ulTime )    { m_ulChatLineLife = ulTime; }
-    inline unsigned long        GetChatLineFadeOut      ( void )                    { return m_ulChatLineFadeOut; }
-    void                        SetChatLineFadeOut      ( unsigned long ulTime )    { m_ulChatLineFadeOut = ulTime; }
-    inline bool                 GetUseCEGUI             ( void )                    { return m_bUseCEGUI; }
-    virtual void                SetUseCEGUI             ( bool bUseCEGUI );
 
     static float                GetFontHeight           ( float fScale = 1.0f );
     static float                GetCharacterWidth       ( int iChar, float fScale = 1.0f );
     static float                GetTextExtent           ( const char * szText, float fScale = 1.0f );
     static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
 
+    void                        SetColor                ( CColor& Color );
+    void                        SetInputColor           ( CColor& Color );
+    void                        SetTextColor            ( CColor& Color )   { m_TextColor = Color; };
+    void                        SetNumLines             ( unsigned int uiNumLines );
+
+    void                        SetChatFont             ( eChatFont Font );
+
+private:
+    void                        LoadCVars               ( void );
+    void                        UpdateGUI               ( void );
+
 protected:
     list < CChatLine* >         m_Lines;
-    unsigned int                m_uiNumLines;
+    CChatInputLine*             m_pInputLine;
+
     CGUI*                       m_pManager;
     CGUIFont*                   m_pFont;
     LPD3DXFONT                  m_pDXFont;
-    CGUIStaticImage*            m_pBackground;
-    CGUITexture*                m_pBackgroundTexture;
+
     CVector2D                   m_vecBackgroundPosition;
     CVector2D                   m_vecBackgroundSize;
-    CColor                      m_Color;
-    CColor                      m_TextColor;
-    CGUIStaticImage*            m_pInput;
-    CGUITexture*                m_pInputTexture;
     CVector2D                   m_vecInputPosition;
     CVector2D                   m_vecInputSize;
-    CColor                      m_InputColor;
-    CChatInputLine*             m_pInputLine;
+
+    CGUITexture*                m_pBackgroundTexture;
+    CGUITexture*                m_pInputTexture;
+    CGUIStaticImage*            m_pBackground;
+    CGUIStaticImage*            m_pInput;
+
     char*                       m_szInputText;
+    char*                       m_szCommand;
+
     bool                        m_bVisible;
     bool                        m_bInputVisible;
+    
+    unsigned int                m_uiNumLines;
+    CColor                      m_Color;
+    CColor                      m_TextColor;
+    CColor                      m_InputColor;
     float                       m_fWidth;
-    char*                       m_szCommand;
     bool                        m_bCssStyleText;
     bool                        m_bCssStyleBackground;
     unsigned long               m_ulChatLineLife;
     unsigned long               m_ulChatLineFadeOut;
     bool                        m_bUseCEGUI;
     CVector2D                   m_vecScale;
+
+    unsigned long               m_ulLastVarUpdate;
 };
 
 class CChatLineSection

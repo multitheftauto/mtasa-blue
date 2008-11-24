@@ -47,9 +47,6 @@ bool CClientVariables::Load ( const std::string strConfigFile )
     // Get the root node
     pRoot = m_pFile->GetRootNode ();
     if ( pRoot ) {
-        // Load the keybinds
-        pCore->GetKeyBinds ()->LoadFromXML ( pRoot->FindSubNode ( CVARS_NODE_KEYBINDS ) );
-
         // Load the server lists
         CServerBrowser *pBrowser = CServerBrowser::GetSingletonPtr ();
         pBrowser->LoadServerList ( pRoot->FindSubNode ( CVARS_NODE_SERVER_FAV ),
@@ -60,6 +57,9 @@ bool CClientVariables::Load ( const std::string strConfigFile )
         // New file, create root node
         pRoot = m_pFile->CreateRootNode ( CVARS_ROOT );
     }
+
+    // Load the keybinds (loads defaults if the subnode doesn't exist)
+    pCore->GetKeyBinds ()->LoadFromXML ( pRoot->FindSubNode ( CVARS_NODE_KEYBINDS ) );
 
     // Load the cvars
     m_pStorage = pRoot->FindSubNode ( CVARS_NODE_CVARS );
@@ -201,7 +201,7 @@ bool CClientVariables::Exists ( const std::string strVariable )
 
 void CClientVariables::LoadDefaults ( void )
 {
-    #define DEFAULT(__x,__y)    if(!m_pStorage->FindSubNode(__x)) \
+    #define DEFAULT(__x,__y)    if(!Exists(__x)) \
                                 Set(__x,__y)
     #define _S(__x)             std::string(__x)
 

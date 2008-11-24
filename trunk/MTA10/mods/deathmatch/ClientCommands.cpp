@@ -109,6 +109,33 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 }
 
 
+void COMMAND_ChatBox ( const char* szCmdLine )
+{
+    if ( !(szCmdLine && szCmdLine[0]) )
+        return;
+
+    // Split it up into command and rgb
+    char* szCommand = strtok ( const_cast < char* > ( szCmdLine ), " " );
+    char* szRed = strtok ( NULL, " " );
+    char* szGreen = strtok ( NULL, " " );
+    char* szBlue = strtok ( NULL, " " );
+    unsigned char ucRed = 0, ucGreen = 0, ucBlue = 0;
+
+    if ( !szCommand )
+        return;
+
+    if ( szRed && szGreen && szBlue )
+    {     
+        ucRed = static_cast < unsigned char > ( atoi ( szRed ) );
+        ucGreen = static_cast < unsigned char > ( atoi ( szGreen ) );
+        ucBlue = static_cast < unsigned char > ( atoi ( szBlue ) );
+    }
+
+    // Open the chatbox input with command and color
+    g_pCore->EnableChatInput ( szCommand, COLOR_ARGB ( 255, ucRed, ucGreen, ucBlue ) );
+}
+
+
 void COMMAND_Help ( const char *szCmdLine )
 {
     // This isnt used
