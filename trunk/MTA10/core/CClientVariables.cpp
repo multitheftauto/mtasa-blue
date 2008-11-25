@@ -42,7 +42,8 @@ bool CClientVariables::Load ( const std::string strConfigFile )
     if ( !m_pFile ) {
         assert ( false );
         return false;
-    };
+    }
+    m_pFile->Parse();
 
     // Get the root node
     pRoot = m_pFile->GetRootNode ();
