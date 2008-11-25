@@ -288,7 +288,7 @@ void CCommandFuncs::Connect ( const char* szParameters )
         else            strNick = szNick;
         
         // Got all required arguments?
-        if ( !szHost || !szPort || !strNick.empty () )
+        if ( !szHost || !szPort || strNick.empty () )
         {
             CCore::GetSingleton ().GetConsole ()->Print ( "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'" );
             return;
