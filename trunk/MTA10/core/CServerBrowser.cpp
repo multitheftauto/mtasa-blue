@@ -80,6 +80,9 @@ CServerBrowser::CServerBrowser ( void )
     m_pButtonFavouritesByIP->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPClick, this ) );
 
     // Create the "Add to favourites by IP" dialog
+    m_pFavouritesAddByIP.SetCallback ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPAddClick, this ) );
+
+    // Login dialog
     m_pBrowserLogin.SetVisible ( false );
     m_pBrowserLogin.SetCallback ( &CServerBrowser::CompleteConnect );
 }
