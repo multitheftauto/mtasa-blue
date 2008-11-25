@@ -648,6 +648,10 @@ SectionIn 1 2 RO ; section is required
     
     SetOverwrite on
     File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
+    File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
     
     SetOverwrite off
     File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
@@ -657,11 +661,7 @@ SectionIn 1 2 RO ; section is required
     File "${SERVER_FILES_ROOT}\mods\deathmatch\vehiclecolors.conf"
 
     !ifndef LIGHTBUILD
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
-    File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
-    
+   
     !ifdef CLIENT_SETUP
     File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
     !endif
@@ -837,12 +837,10 @@ Section Uninstall
     
     ; server DM files
     Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-    !ifndef LIGHTBUILD
-        Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-    !endif
+    Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
 !endif
 
   Delete "$INSTDIR\Multi Theft Auto.exe"
