@@ -7331,7 +7331,7 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, con
                     {
                         // Create an new XML in the resource directory path
                         char szFilepath [MAX_PATH + 1];
-                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath (), szMapName );
+                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath ().c_str(), szMapName );
                         CXMLFile* pXML = pLUA->CreateXML ( szFilepath );
                         if ( pXML )
                         {
@@ -7407,7 +7407,7 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, 
                     {
                         // Create an new XML in the resource directory path
                         char szFilepath [MAX_PATH + 1];
-                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath (), szConfigName );
+                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath ().c_str(), szConfigName );
                         CXMLFile* pXML = pLUA->CreateXML ( szFilepath );
                         if ( pXML )
                         {
