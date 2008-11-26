@@ -172,40 +172,41 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
             else
             {
                 // Grab the filename passed
-                std::string strFile = lua_tostring ( luaVM, 1 );
+                string strFile = lua_tostring ( luaVM, 1 );
 
                 // Verify the original filename
 		        if ( IsValidFilePath ( strFile.c_str () ) )
                 {
                     // Replace backslashes
                     ReplaceOccurrencesInString ( strFile, "\\", "/" );
-
-                    // Prefix the resource path
-                    strFile = pResource->GetResourceDirectoryPath () + strFile;
-
-                    // Create the XML
-                    CXMLFile* xmlFile = pLUA->CreateXML ( strFile.c_str () );
-                    if ( xmlFile )
+                    
+                    string strPath;
+                    if ( pResource->GetFilePath ( strFile.c_str (), strPath ) )
                     {
-                        // Try to parse it
-                        if ( xmlFile->Parse () )
+                        // Create the XML
+                        CXMLFile* xmlFile = pLUA->CreateXML ( strPath.c_str () );
+                        if ( xmlFile )
                         {
-                            // Grab the root node. If it didn't exist, create one
-                            CXMLNode * pRootNode = xmlFile->GetRootNode ();
-                            if ( !pRootNode )
-                                pRootNode = xmlFile->CreateRootNode ( "root" );
-
-                            // Could we create one?
-                            if ( pRootNode )
+                            // Try to parse it
+                            if ( xmlFile->Parse () )
                             {
-                                // Return the root node
-                                lua_pushxmlnode ( luaVM, pRootNode );
-                                return 1;
-                            }
-                        }
+                                // Grab the root node. If it didn't exist, create one
+                                CXMLNode * pRootNode = xmlFile->GetRootNode ();
+                                if ( !pRootNode )
+                                    pRootNode = xmlFile->CreateRootNode ( "root" );
 
-                        // Destroy it if we failed
-                        pLUA->DestroyXML ( xmlFile );
+                                // Could we create one?
+                                if ( pRootNode )
+                                {
+                                    // Return the root node
+                                    lua_pushxmlnode ( luaVM, pRootNode );
+                                    return 1;
+                                }
+                            }
+
+                            // Destroy it if we failed
+                            pLUA->DestroyXML ( xmlFile );
+                        }
                     }
                 }
             }
