@@ -20,10 +20,11 @@ using namespace std;
 
 class CChatLineSection;
 
-#define CCHAT_MAX_LINES                 30
-#define CCHAT_MAX_CHAT_LENGTH           96
-#define CCHAT_BUFFER					1024
-#define CCHAT_UPDATE_CVARS              5000
+#define CHAT_WIDTH              320                             // Chatbox default width
+#define CHAT_TEXT_COLOR         CColor(235, 221, 178, 255)      // Chatbox default text color
+#define CHAT_MAX_LINES          30                              // Chatbox maximum chat lines
+#define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
+#define CHAT_BUFFER             1024                            // Chatbox buffer size
 
 class CColor
 {
@@ -144,9 +145,10 @@ public:
 
 private:
     void                        LoadCVars               ( void );
-    void                        UpdateGUI               ( void );
 
 protected:
+    void                        UpdateGUI               ( void );
+
     list < CChatLine* >         m_Lines;
     CChatInputLine*             m_pInputLine;
 
@@ -174,13 +176,13 @@ protected:
     CColor                      m_Color;
     CColor                      m_TextColor;
     CColor                      m_InputColor;
-    float                       m_fWidth;
     bool                        m_bCssStyleText;
     bool                        m_bCssStyleBackground;
     unsigned long               m_ulChatLineLife;
     unsigned long               m_ulChatLineFadeOut;
     bool                        m_bUseCEGUI;
     CVector2D                   m_vecScale;
+    float                       m_fNativeWidth;
 
     unsigned long               m_ulLastVarUpdate;
 };
