@@ -162,6 +162,7 @@ public:
     void                                    Remove                  ( CServerListItem* pServer )    { m_Servers.remove ( pServer ); delete pServer; };
     void                                    Clear                   ( void );
     bool                                    Exists                  ( CServerListItem Server );
+    void                                    Remove                  ( CServerListItem Server );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { if ( m_bUpdated ) { m_bUpdated = false; return true; } else return false; };

@@ -509,7 +509,6 @@ bool CServerBrowser::OnRefreshClick ( CGUIElement* pElement )
 
 bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
 {
-    /*
     ServerBrowserType currentServerBrowserType = GetCurrentServerBrowserType ();
 
     // If there are more than 0 items selected in the browser
@@ -524,42 +523,34 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
         char* szName = m_pServerList [ currentServerBrowserType ]->GetItemText ( iIndex, m_hName [ currentServerBrowserType ] );
         char* szAddress = m_pServerList [ currentServerBrowserType ]->GetItemText ( iIndex, m_hHost [ currentServerBrowserType ] );
 
-        if ( !strncmp( szName, "[Offline] ", 10 ) )
-        {
-            // Remove the "[Offline] " tag for offline servers
-            szName += 10;
-        }
-
         char* szHost = strtok ( szAddress, ":" );
         char* szPort = strtok ( NULL, "\0" );
 
         if ( szName && szHost && szPort )
         {
-            unsigned short usPort = static_cast < unsigned short > ( atoi ( szPort ) );
+            unsigned short usPort = static_cast < unsigned short > ( atoi ( szPort ) ) + SERVER_LIST_QUERY_PORT_OFFSET;
+
+            in_addr Address;
+
+            CServerListItem::Parse ( std::string ( szHost ), Address );
+
+            CServerListItem pServer ( Address, usPort );
 
             if ( currentServerBrowserType == ServerBrowserType::FAVOURITES )
             {
-                g_pCore->GetConfig ()->GetFavouriteServers ().RemoveServer ( szHost, usPort );
+                m_ServersFavourites.Remove ( pServer );
             }
             else
             {
                 // Make sure the user didn't pull a Talidan and add the server again
-                if ( !g_pCore->GetConfig ()->GetFavouriteServers ().Exists ( szHost, usPort ) )
+                if ( !m_ServersFavourites.Exists ( pServer ) )
                 {
-                    CSavedServer* pSavedServer = g_pCore->GetConfig ()->GetFavouriteServers ().AddServer ( szName, szHost, usPort );
-                    if ( pSavedServer )
-                    {
-                        pSavedServer->SetOnline ( true, iServerListID );
-                    }
+                    m_ServersFavourites.Add ( pServer );
                 }
             }
-
-            UpdateServerList ();
+            UpdateServerList ( ServerBrowserType::FAVOURITES );
         }
     }
-
-    return true;
-    */
     return true;
 }
 

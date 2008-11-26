@@ -81,6 +81,20 @@ bool CServerList::Exists ( CServerListItem Server )
 }
 
 
+void CServerList::Remove ( CServerListItem Server )
+{
+    // Look for a duplicate entry
+    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
+    {
+        if ( **i == Server )
+        {
+            m_Servers.remove ( *i );
+            return;
+        }
+    }
+}
+
+
 void CServerList::Refresh ( void )
 {   // Assumes we already have a (saved) list of servers, so we just need to refresh
     m_iPass = 1;
