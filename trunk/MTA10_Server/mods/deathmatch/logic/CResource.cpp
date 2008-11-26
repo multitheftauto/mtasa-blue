@@ -1266,7 +1266,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                 ReplaceSlashes ( strFilename );
 
 				// Try to find the file
-                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
+                if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
 					// This one is supposed to be default, but there's already a default page
                     if ( bFoundDefault && bIsDefault )
@@ -1345,7 +1345,7 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                 ReplaceSlashes ( strFilename );
 
 				// Extract / grab the filepath
-                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
+                if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
 					// Create it and push it to the list over resource files. Depending on if it's client or server type
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG )
@@ -1394,7 +1394,7 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                 ReplaceSlashes ( strFilename );
 
 				// Create a new resourcefile item
-                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) && IsValidFilePath ( strFilename.c_str () ) )
+                if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                     m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                 else
                 {
@@ -1553,7 +1553,7 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 ReplaceSlashes ( strFilename );
 
 				// Extract / get the filepath of the file
-                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) && IsValidFilePath ( strFilename.c_str () ) )
+                if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
 					// Create it depending on the type (clietn or server) and add it to the list over resource files
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
@@ -1612,7 +1612,7 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 				// Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
-                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
+                if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                     m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), iDimension ) );
                 else
                 {
