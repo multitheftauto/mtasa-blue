@@ -146,6 +146,13 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	// Null the scene pointer
 	m_pMainMenuScene = new CMainMenuScene ( this );
 
+    // Load the server lists
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV ),
+        CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
+    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
+        CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+
 	// This class is destroyed when the video mode is changed (vid), so the config can already be loaded
 	// If it is already loaded (and this constructor is not called on startup) then load the menu options
 //    if ( CClientVariables::GetSingleton ().IsLoaded () )
@@ -155,6 +162,13 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
 CMainMenu::~CMainMenu ( void )
 {
+    // Save server lists
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    m_ServerBrowser.SaveServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV ),
+        CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
+    m_ServerBrowser.SaveServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
+        CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+
 	// Delete menu items
 	for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
 		if ( m_pItems[i] ) delete m_pItems[i];

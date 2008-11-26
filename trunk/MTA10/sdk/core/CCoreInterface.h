@@ -52,6 +52,7 @@ public:
     virtual CNet*                       GetNetwork                      ( void ) = 0;
     virtual CXML*                       GetXML                          ( void ) = 0;
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
+    virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     
@@ -93,6 +94,8 @@ public:
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
     virtual void                    HideMainMenu                    ( void ) = 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
+
+    virtual void                    SaveConfig                      ( void ) = 0;
 
 	virtual void					SwitchRenderWindow				( HWND hWnd, HWND hWndInput ) = 0;
 	virtual void					SetCenterCursor					( bool bEnabled ) = 0;

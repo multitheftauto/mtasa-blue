@@ -57,7 +57,14 @@ class CCore;
                                 "Copyright (C) 2003 - 2008 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
-#define MTA_CONFIG_PATH         "mta/coreconfig.xml"
+#define MTA_CONFIG_PATH             "mta/coreconfig.xml"
+#define CONFIG_ROOT                 "mainconfig"
+#define CONFIG_NODE_CVARS           "settings"                  // cvars node
+#define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node
+#define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
+#define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
+#define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
+#define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -77,11 +84,14 @@ public:
     CMultiplayer*           GetMultiplayer                  ( void );
     CNet*                   GetNetwork                      ( void );
     CXML*                   GetXML                          ( void )                { return m_pXML; };
+    CXMLNode*               GetConfig                       ( void );
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CLocalGUI*              GetLocalGUI                     ( void );
 	CVideoManager*			GetVMR9Manager					( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
+
+    void                    SaveConfig                      ( void );
 
     #ifndef MTA_DEBUG
     CResManager *           GetResManager                   ( void );
@@ -189,6 +199,7 @@ private:
 
     // Instances (put new classes here!)
     CCommunity                  m_Community;
+    CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
 
     // Hook interfaces.

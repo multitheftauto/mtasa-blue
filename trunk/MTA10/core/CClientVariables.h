@@ -23,16 +23,6 @@
 #include <CVector2D.h>
 #include "CChat.h"
 
-// This call uses XML codes as internal storage for client variables
-#define CVARS_ROOT              "mainconfig"
-#define CVARS_NODE_CVARS        "settings"                  // cvars node
-#define CVARS_NODE_KEYBINDS     "binds"                     // keybinds node
-#define CVARS_NODE_SERVER_FAV   "favourite_servers"         // favourite servers list node
-#define CVARS_NODE_SERVER_REC   "recently_played_servers"   // recently played servers list node
-
-#define CVARS_FAVOURITE_LIST_TAG   "favourite_server"
-#define CVARS_RECENT_LIST_TAG      "recently_played_server"
-
 // Macros
 #define CVARS_GET   CClientVariables::GetSingleton().Get
 #define CVARS_SET   CClientVariables::GetSingleton().Set
@@ -69,8 +59,7 @@ public:
 
     bool            Exists                  ( const std::string strVariable );
 
-    bool            Load                    ( const std::string strConfigFile );
-    bool            Save                    ( void );
+    bool            Load                    ( void );
     bool            IsLoaded                ( void ) { return m_bLoaded; }
 
 private:
@@ -78,7 +67,6 @@ private:
     void            LoadDefaults            ( void );
 
     bool            m_bLoaded;
-    CXMLFile        *m_pFile;
     CXMLNode        *m_pStorage;
 };
 
