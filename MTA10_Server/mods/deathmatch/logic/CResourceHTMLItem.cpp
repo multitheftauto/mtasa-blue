@@ -18,7 +18,7 @@
 extern CServerInterface* g_pServerInterface;
 extern CGame* g_pGame;
 
-CResourceHTMLItem::CResourceHTMLItem ( CResource * resource, char * szShortName, char * szResourceFileName, bool bIsDefault, bool bIsRaw, bool bRestricted ) : CResourceFile ( resource, szShortName, szResourceFileName )
+CResourceHTMLItem::CResourceHTMLItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, bool bIsDefault, bool bIsRaw, bool bRestricted ) : CResourceFile ( resource, szShortName, szResourceFileName )
 {
     m_bIsRaw = bIsRaw;
     m_szBuffer = NULL;

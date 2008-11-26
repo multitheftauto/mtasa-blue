@@ -29,7 +29,7 @@ class CResourceHTMLItem : public CResourceFile
     
 public:
 
-                                        CResourceHTMLItem               ( class CResource * resource, char * szShortName, char * szResourceFileName, bool bIsDefault, bool bIsRaw, bool bRestricted );
+                                        CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, bool bIsDefault, bool bIsRaw, bool bRestricted );
                                         ~CResourceHTMLItem              ( void );
 
     bool                                Start                           ( void );

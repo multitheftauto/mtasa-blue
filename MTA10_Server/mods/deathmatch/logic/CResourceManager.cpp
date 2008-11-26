@@ -267,10 +267,10 @@ void CResourceManager::UnloadRemovedResources ( void )
 {
     list < CResource* > resourcesToDelete;
     list < CResource* > ::iterator iter = m_resources.begin ();
+    string strPath;
     for ( ; iter != m_resources.end (); iter++ )
     {
-        char szPath [ MAX_PATH ] = {'\n'};
-        if ( (*iter)->GetFilePath ( "meta.xml", szPath, MAX_PATH ) == NULL )
+        if ( ! (*iter)->GetFilePath ( "meta.xml", strPath ) )
         {
             if ( (*iter)->IsActive() )
                 CLogger::ErrorPrintf ( "Resource '%s' has been removed while running! Stopping resource.\n", (*iter)->GetName().c_str () );
