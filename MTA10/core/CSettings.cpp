@@ -973,7 +973,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
     pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
 
-    CClientVariables::GetSingleton ().Save ();
+    CCore::GetSingleton ().SaveConfig ();
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )

@@ -92,6 +92,8 @@ CCore::CCore ( void )
     // Initialize critical sections
     CCriticalSection::Initialize ();
 
+    m_pConfigFile = NULL;
+
     // NULL the path buffers
     memset ( m_szInstallRoot, 0, MAX_PATH );
     memset ( m_szGTAInstallRoot, 0, MAX_PATH );
@@ -223,9 +225,6 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
-    
-    // Save cvars
-    m_ClientVariables.Save ();
 
     delete m_pKeyBinds;
 
@@ -302,6 +301,15 @@ CMultiplayer* CCore::GetMultiplayer ( void )
     return m_pMultiplayer;
 }
 
+CXMLNode* CCore::GetConfig ( void )
+{
+    if ( !m_pConfigFile )
+        return NULL;
+    CXMLNode* pRoot = m_pConfigFile->GetRootNode ();
+    if ( !pRoot )
+        pRoot = m_pConfigFile->CreateRootNode ( CONFIG_ROOT );
+    return pRoot;
+}
 
 CGUI* CCore::GetGUI ( void )
 {
@@ -332,6 +340,11 @@ CVideoManager* CCore::GetVMR9Manager ( void )
 	return m_pVMR9Manager;
 }
 
+void CCore::SaveConfig ( void )
+{
+    if ( m_pConfigFile )
+        m_pConfigFile->Write ();
+}
 
 void CCore::ChatEcho ( const char* szText, bool bColorCoded )
 {
@@ -983,8 +996,20 @@ void CCore::CreateXML ( )
 
 	SetCurrentDirectory ( szCurDir );
 
+    
+    // Load config XML file
+    m_pConfigFile = m_pXML->CreateXML ( MTA_CONFIG_PATH );
+    if ( !m_pConfigFile ) {
+        assert ( false );
+        return;
+    }
+    m_pConfigFile->Parse ();
+
+    // Load the keybinds (loads defaults if the subnode doesn't exist)
+    GetKeyBinds ()->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
+
     // Load XML-dependant subsystems
-    m_ClientVariables.Load ( MTA_CONFIG_PATH );
+    m_ClientVariables.Load ( );
 }
 
 
@@ -1019,6 +1044,12 @@ void CCore::DestroyMultiplayer ( )
 void CCore::DestroyXML ( )
 {
 	WriteDebugEvent ( "CCore::DestroyXML" );
+
+    // Save and unload configuration
+    if ( m_pConfigFile ) {
+        SaveConfig ();
+        delete m_pConfigFile;
+    }
 
 	if ( m_pXML )
 	{

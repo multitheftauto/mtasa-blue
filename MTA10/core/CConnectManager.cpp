@@ -295,7 +295,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 //                CCore::GetSingleton ().GetConfig ()->GetRecentlyPlayedServers ().AddServer ( szName, g_pConnectManager->m_szHost, g_pConnectManager->m_usPort, true );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
-                CClientVariables::GetSingleton ().Save ();
+                CCore::GetSingleton ().SaveConfig ();
 
                 // Reset our variables
                 if ( g_pConnectManager->m_szHost )

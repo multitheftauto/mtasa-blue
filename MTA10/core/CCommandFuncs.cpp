@@ -388,6 +388,6 @@ void CCommandFuncs::HUD ( const char* szParameters )
 
 void CCommandFuncs::SaveConfig ( const char* szParameters )
 {
-    CClientVariables::GetSingleton ().Save ();
+    CCore::GetSingleton ().SaveConfig ();
     g_pCore->GetConsole ()->Printf ( "Saved configuration file" );
 }
