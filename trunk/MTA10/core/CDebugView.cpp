@@ -25,8 +25,8 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
 
     CVector2D vecResolution = m_pManager->GetResolution ();
     m_vecScale = CVector2D ( vecResolution.fX / 800.0f, vecResolution.fY / 600.0f );
-    vecPosition.fX *= vecResolution.fX;
-    vecPosition.fY *= vecResolution.fY;
+    vecPosition = vecPosition * vecResolution;
+    m_vecBackgroundPosition = vecPosition;
 
     m_bUseCEGUI = false;
     m_ulChatLineLife = 0;
@@ -39,11 +39,9 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_uiNumLines = 7;
     m_pFont = m_pManager->GetBoldFont ();
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
-    m_fWidth = 1.0f;
-    m_vecBackgroundPosition = vecPosition;
-    m_vecBackgroundSize = CVector2D ( ( 576.0f * m_fWidth ) * m_vecScale.fX, ( CChat::GetFontHeight ( m_vecScale.fY ) ) * ( float ) ( ( float ) m_uiNumLines + 0.5f ) );
+    m_fNativeWidth = DEBUGVIEW_WIDTH;
     m_Color = CColor ( 0, 0, 0, 100 );
-    m_TextColor = CColor ( 235, 221, 178, 255 );
+    m_TextColor = DEBUGVIEW_TEXT_COLOR;
     unsigned long ulBackgroundColor = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
 
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -64,6 +62,8 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_szCommand = NULL;   
 
     g_pChat = pChat;
+
+    UpdateGUI ();
 }
 
 
