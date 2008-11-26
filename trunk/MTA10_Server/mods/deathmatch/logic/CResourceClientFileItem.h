@@ -20,7 +20,7 @@ class CResourceClientFileItem : public CResourceFile
     
 public:
 
-                                        CResourceClientFileItem         ( class CResource * resource, char * szShortName, char * szResourceFileName );
+                                        CResourceClientFileItem         ( class CResource * resource, const char * szShortName, const char * szResourceFileName );
                                         ~CResourceClientFileItem        ( void );
 
     bool                                Start                           ( void );

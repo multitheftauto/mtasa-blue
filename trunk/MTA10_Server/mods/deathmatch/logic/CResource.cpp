@@ -197,8 +197,8 @@ bool CResource::Load ( void )
         }
 
         // Load the meta.xml file
-        char szMeta[ MAX_PATH ];
-        if ( !GetFilePath ( "meta.xml", szMeta, MAX_PATH ) )
+        string strMeta;
+        if ( !GetFilePath ( "meta.xml", strMeta ) )
         {
             // Unregister the EHS stuff
             g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
@@ -212,7 +212,7 @@ bool CResource::Load ( void )
 
 	    // Load the XML file and parse it
         bool bParsedSuccessfully = false;
-        CXMLFile * metaFile = g_pServerInterface->GetXML ()->CreateXML ( szMeta );
+        CXMLFile * metaFile = g_pServerInterface->GetXML ()->CreateXML ( strMeta.c_str () );
         if ( metaFile )
         {
             bParsedSuccessfully = metaFile->Parse ();
@@ -221,14 +221,14 @@ bool CResource::Load ( void )
 	    // If we parsed it successfully
         if ( bParsedSuccessfully )
         {
-            CXMLNode * root = metaFile->GetRootNode();
+            CXMLNode * root = metaFile->GetRootNode ();
             if ( root )
             {
 			    // Find the settings node and copy it (meta xml is deleted at the end of this function, to preserve memory)
-			    CXMLNode * pNodeSettings = root->FindSubNode("settings",0);
+			    CXMLNode * pNodeSettings = root->FindSubNode ( "settings", 0 );
 			    if ( pNodeSettings ) m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
-                CXMLNode * update = root->FindSubNode("update", 0);
+                CXMLNode * update = root->FindSubNode ( "update", 0 );
                 if ( update )
                 {
                     CXMLAttributes * attributes = &(update->GetAttributes());
@@ -248,19 +248,19 @@ bool CResource::Load ( void )
                     }
                 }
 
-			    CXMLNode * info = root->FindSubNode("info",0);
+			    CXMLNode * info = root->FindSubNode ( "info", 0 );
                 if ( info )
                 {
-                    CXMLAttributes * attributes = &(info->GetAttributes());
+                    CXMLAttributes * attributes = & ( info->GetAttributes () );
                     if ( attributes )
                     {
                         for ( unsigned int i = 0; i < attributes->Count(); i++ )
                         {
-                            CXMLAttribute * attribute = attributes->Get(i);
+                            CXMLAttribute * attribute = attributes->Get ( i );
                             m_infoValues.push_back ( new CInfoValue ( attribute->GetName (), attribute->GetValue() ) );
                         }
 
-                        CXMLAttribute * version = attributes->Find("major");
+                        CXMLAttribute * version = attributes->Find ( "major" );
                         if ( version )
                         {
                             m_uiVersionMajor = atoi ( version->GetValue ().c_str () );
@@ -278,7 +278,7 @@ bool CResource::Load ( void )
                             m_uiVersionRevision = atoi ( version->GetValue ().c_str () );
                         }
 
-                        version = attributes->Find("state");
+                        version = attributes->Find ( "state" );
                         if ( version )
                         {
                             const char *szVersion = version->GetValue ().c_str ();
@@ -344,15 +344,21 @@ bool CResource::Load ( void )
     return m_bLoaded;
 }
 
-
-void ReplaceSlashes(char * filename)
+void ReplaceSlashes ( string& strPath )
 {
-    for ( unsigned int i = 0; i < strlen(filename); i++ )
+    ReplaceOccurrencesInString ( strPath, "\\", "/" );
+}
+
+void ReplaceSlashes ( char* szPath )
+{
+    size_t iLen = strlen ( szPath );
+    for ( int i = 0; i < iLen; i++ )
     {
-        if ( filename[i] == '\\' )
-            filename[i] = '/';
+        if ( szPath [ i ] == '\\' )
+            szPath [ i ] = '/';
     }
 }
+
 bool CResource::Unload ( void )
 {
     Stop(true); 
@@ -478,21 +484,21 @@ unsigned long CResource::GenerateCRC ( void )
 {
     // initialize all of the CRC variables
     unsigned long ulCRC = m_ulCRC = 0;
-    char szPath[MAX_PATH] = {'\0'};
+    string strPath;
 
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
-        if ( GetFilePath ( (*iterf)->GetName(), szPath, MAX_PATH ) )
+        if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
-            ulCRC = CRCGenerator::GetCRCFromFile ( szPath );
+            ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
             ( *iterf )->SetLastCRC ( ulCRC );
         }
     }
 
-    if ( GetFilePath ( "meta.xml", szPath, MAX_PATH ) )
+    if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        m_ulCRC = CRCGenerator::GetCRCFromFile ( szPath );   
+        m_ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
     }
 
     return m_ulCRC;
@@ -501,22 +507,22 @@ unsigned long CResource::GenerateCRC ( void )
 bool CResource::HasResourceChanged ()
 {
     unsigned long ulCRC = 0;
-    char szPath[MAX_PATH] = {'\0'};
+    string strPath;
 
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
-        if ( GetFilePath ( (*iterf)->GetName(), szPath, MAX_PATH ) )
+        if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
-            ulCRC = CRCGenerator::GetCRCFromFile ( szPath );
+            ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
             if ( ( *iterf )->GetLastCRC() != ulCRC )
                 return true;
         }
     }
 
-    if ( GetFilePath ( "meta.xml", szPath, MAX_PATH ) )
+    if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        ulCRC = CRCGenerator::GetCRCFromFile ( szPath );   
+        ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );   
         if ( ulCRC != m_ulCRC )
             return true;
     }
@@ -1133,18 +1139,18 @@ bool CResource::DoesFileExistInZip ( const char * szFilename )
 }
 
 // gets the path of the file specified, may extract it from the zip
-char * CResource::GetFilePath ( const char * szFilename, char * szPath, size_t buffer_size )
+bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 {
     // first, check the resource folder, then check the zip file
-    _snprintf ( szPath, buffer_size, "%s%s", m_strResourceDirectoryPath.c_str (), szFilename );
-    FILE * temp = fopen ( szPath, "r" );
+    strPath = m_strResourceDirectoryPath + szFilename;
+    FILE * temp = fopen ( strPath.c_str (), "r" );
     if ( temp )
     {
         fclose ( temp );
 #ifdef RESOURCE_DEBUG_MESSAGES
         CLogger::LogPrintf("%s is in resource folder\n", szFilename );
 #endif
-        return szPath;
+        return true;
     }
 
     if ( !m_zipfile )
@@ -1153,15 +1159,15 @@ char * CResource::GetFilePath ( const char * szFilename, char * szPath, size_t b
     {
         if ( unzLocateFile ( m_zipfile, szFilename, false ) != UNZ_END_OF_LIST_OF_FILE )
         {
-            _snprintf ( szPath, buffer_size, "%s%s", m_strResourceCachePath.c_str (), szFilename );
-            temp = fopen ( szPath, "r" );
+            strPath = m_strResourceCachePath + szFilename;
+            temp = fopen ( strPath.c_str (), "r" );
             if ( temp )
             {
                 fclose ( temp );
 
                 // we've already got a cached copy of this file, check its still the same
                 unsigned long ulFileInZipCRC = get_current_file_crc ( m_zipfile );
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile ( szPath );
+                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
                 
                 if ( ulFileInZipCRC == ulFileOnDiskCRC )
                 {
@@ -1170,7 +1176,7 @@ char * CResource::GetFilePath ( const char * szFilename, char * szPath, size_t b
 #endif
                     unzClose ( m_zipfile );
                     m_zipfile = NULL;
-                    return szPath; // we've already extracted EXACTLY this file before
+                    return true; // we've already extracted EXACTLY this file before
                 }
                 else
                 {
@@ -1190,13 +1196,13 @@ char * CResource::GetFilePath ( const char * szFilename, char * szPath, size_t b
             ExtractFile ( szFilename );
             unzClose ( m_zipfile );
             m_zipfile = NULL;
-            return szPath;
+            return true;
         }
     }
 #ifdef RESOURCE_DEBUG_MESSAGES
     CLogger::LogPrintf("Can't find %s in zip or in folder\n", szFilename );
 #endif
-    return NULL;
+    return false;
 }
 
 
@@ -1255,18 +1261,17 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
             if ( src )
             {
 				// If we found it grab the value
-                char szFilename [ MAX_PATH ];
-                char szFullFilename [ MAX_PATH ];
-                strncpy ( szFilename, src->GetValue ().c_str (), MAX_PATH - 1 );
-                ReplaceSlashes ( szFilename );
+                string strFilename = src->GetValue ();
+                string strFullFilename;
+                ReplaceSlashes ( strFilename );
 
 				// Try to find the file
-                if ( GetFilePath ( szFilename, szFullFilename, MAX_PATH ) )
+                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
 					// This one is supposed to be default, but there's already a default page
                     if ( bFoundDefault && bIsDefault )
                     {
-                        CLogger::LogPrintf ( "Only one html item can be default per resource, ignoring %s in %s\n", szFilename, m_strResourceName.c_str () );
+                        CLogger::LogPrintf ( "Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                         bIsDefault = false;
                     }
 
@@ -1275,7 +1280,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                         bFoundDefault = true;
 
 					// Create a new resource HTML file and add it to the list
-                    CResourceFile * afile = new CResourceHTMLItem ( this, szFilename, szFullFilename, bIsDefault, bIsRaw, bIsRestricted );
+                    CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), bIsDefault, bIsRaw, bIsRestricted );
                     m_resourceFiles.push_back ( afile );
 
 					// This is the first HTML file? Remember it
@@ -1285,9 +1290,9 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find html %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 511, "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find html %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
                 }
             }
@@ -1335,26 +1340,25 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
             if ( src )
             {
 				// Grab the filename
-                char szFilename [ MAX_PATH ];
-                char szFullFilename [ MAX_PATH ];
-                strncpy ( szFilename, src->GetValue ().c_str (), MAX_PATH - 1 );
-                ReplaceSlashes ( szFilename );
+                string strFilename = src->GetValue ();
+                string strFullFilename;
+                ReplaceSlashes ( strFilename );
 
 				// Extract / grab the filepath
-                if ( GetFilePath ( szFilename, szFullFilename, MAX_PATH ) )
+                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
 					// Create it and push it to the list over resource files. Depending on if it's client or server type
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG )
-                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, szFilename, szFullFilename ) );
+                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG )
-                        m_resourceFiles.push_back ( new CResourceClientConfigItem ( this, szFilename, szFullFilename ) );
+                        m_resourceFiles.push_back ( new CResourceClientConfigItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                 }
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find config %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 511, "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find config %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
                 }
             }
@@ -1385,20 +1389,19 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
             if ( src )
             {
 				// Grab the value
-                char szFilename [ MAX_PATH ];
-                char szFullFilename [ MAX_PATH ];
-                strncpy ( szFilename, src->GetValue ().c_str (), MAX_PATH - 1 );
-                ReplaceSlashes ( szFilename );
+                string strFilename = src->GetValue ();
+                string strFullFilename;
+                ReplaceSlashes ( strFilename );
 
 				// Create a new resourcefile item
-                if ( GetFilePath ( szFilename, szFullFilename, MAX_PATH ) && IsValidFilePath ( szFilename ) )
-                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, szFilename, szFullFilename ) );
+                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) && IsValidFilePath ( strFilename.c_str () ) )
+                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find file %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 511, "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find file %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
                 }
             }
@@ -1545,26 +1548,25 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
             if ( src )
             {
 				// Grab the source value from the attribute
-                char szFilename [ MAX_PATH ];
-                char szFullFilename [ MAX_PATH ];
-                strncpy ( szFilename, src->GetValue ().c_str (), MAX_PATH - 1 );
-                ReplaceSlashes ( szFilename );
+                string strFilename = src->GetValue ();
+                string strFullFilename;
+                ReplaceSlashes ( strFilename );
 
 				// Extract / get the filepath of the file
-                if ( GetFilePath ( szFilename, szFullFilename, MAX_PATH ) && IsValidFilePath ( szFilename ) )
+                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) && IsValidFilePath ( strFilename.c_str () ) )
                 {
 					// Create it depending on the type (clietn or server) and add it to the list over resource files
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, szFilename, szFullFilename ) );
+                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, szFilename, szFullFilename ) );
+                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
                 }
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find script %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 511, "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find script %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
                 }
             }
@@ -1606,19 +1608,18 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
             if ( src )
             {
 				// Grab the source text from the node
-                char szFilename [ MAX_PATH ];
-                char szFullFilename [ MAX_PATH ];
-                strncpy ( szFilename, src->GetValue ().c_str (), MAX_PATH - 1 );
-                ReplaceSlashes ( szFilename );
+                string strFilename = src->GetValue ();
+                string strFullFilename;
+                ReplaceSlashes ( strFilename );
 				// Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
-                if ( GetFilePath ( szFilename, szFullFilename, MAX_PATH ) )
-                    m_resourceFiles.push_back ( new CResourceMapItem ( this, szFilename, szFullFilename, iDimension ) );
+                if ( GetFilePath ( strFilename.c_str (), strFullFilename ) )
+                    m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), iDimension ) );
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find map %s for resource %s\n", szFilename, m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
                 }
             }

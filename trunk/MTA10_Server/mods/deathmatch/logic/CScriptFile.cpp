@@ -12,11 +12,12 @@
 
 #include "StdInc.h"
 
-CScriptFile::CScriptFile ( const char* szFilename, unsigned long ulMaxSize ) : CElement ( NULL )
+CScriptFile::CScriptFile ( CResource* pResource, const char* szFilename, unsigned long ulMaxSize ) : CElement ( NULL )
 {
     // Init
     m_iType = CElement::SCRIPTFILE;
     SetTypeName ( "file" );
+    m_pResource = pResource;
     m_pFile = NULL;
     m_strFilename = szFilename ? szFilename : "";
     m_ulMaxSize = ulMaxSize;
@@ -35,22 +36,28 @@ bool CScriptFile::Load ( eMode Mode )
     // If we haven't already got a file
     if ( !m_pFile )
     {
+        string strFilePath;
+
         switch ( Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                m_pFile = fopen ( m_strFilename.c_str (), "rb" );
+                if ( m_pResource->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
+                    m_pFile = fopen ( strFilePath.c_str (), "rb" );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                m_pFile = fopen ( m_strFilename.c_str (), "rb+" );
+                if ( m_pResource->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
+                    m_pFile = fopen ( strFilePath.c_str (), "rb+" );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                m_pFile = fopen ( m_strFilename.c_str (), "wb+" );
+                strFilePath = m_pResource->GetResourceDirectoryPath () + m_strFilename;
+                MakeSureDirExists ( strFilePath.c_str () );
+                m_pFile = fopen ( strFilePath.c_str (), "wb+" );
                 break;
         }
 

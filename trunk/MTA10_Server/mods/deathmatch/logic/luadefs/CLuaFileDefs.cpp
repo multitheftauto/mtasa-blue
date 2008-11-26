@@ -77,20 +77,14 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 				if ( IsValidFilePath ( strFile.c_str () ) &&
 					stricmp ( strFile.c_str (), "meta.xml" ) != 0 )
 				{
-					// Grab the absolute filepath to the file
-                    strFile = pResource->GetResourceDirectoryPath () + strFile;
-
 					// Replace backslashes
                     ReplaceOccurrencesInString ( strFile, "\\", "/" );
 
 					// We have a resource to use?
 					if ( pResource )
 					{
-						// Make sure the dir exists so we can successfully make the file
-						MakeSureDirExists ( strFile.c_str () );
-
 						// Create the file to create
-						CScriptFile* pFile = new CScriptFile ( strFile.c_str (), DEFAULT_MAX_FILESIZE );
+						CScriptFile* pFile = new CScriptFile ( pResource, strFile.c_str (), DEFAULT_MAX_FILESIZE );
 						assert ( pFile );
 
 						// Try to load it
@@ -201,9 +195,6 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 				if ( IsValidFilePath ( strFile.c_str () ) &&
 					stricmp ( strFile.c_str (), "meta.xml" ) != 0 )
 				{
-					// Grab the absolute filepath to the file
-                    strFile = pResource->GetResourceDirectoryPath () + strFile;
-
 					// Replace backslashes
                     ReplaceOccurrencesInString ( strFile, "\\", "/" );
 
@@ -211,7 +202,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 					if ( pResource )
 					{
 						// Create the file to create
-						CScriptFile* pFile = new CScriptFile ( strFile.c_str (), DEFAULT_MAX_FILESIZE );
+						CScriptFile* pFile = new CScriptFile ( pResource, strFile.c_str (), DEFAULT_MAX_FILESIZE );
 						assert ( pFile );
 
 						// Try to load it

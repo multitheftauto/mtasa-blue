@@ -25,7 +25,7 @@ class CResourceClientConfigItem : public CResourceFile
     
 public:
 
-                                        CResourceClientConfigItem       ( class CResource * resource, char * szShortName, char * szResourceFileName );
+                                        CResourceClientConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName );
                                         ~CResourceClientConfigItem      ( void );
 
     bool                                Start                           ( void );
