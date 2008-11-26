@@ -165,7 +165,7 @@ public:
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { if ( m_bUpdated ) { m_bUpdated = false; return true; } else return false; };
-
+    void                                    SetUpdated              ( bool bUpdated )               { m_bUpdated = bUpdated; };
 protected:
     bool                                    m_bUpdated;
     int                                     m_iPass;

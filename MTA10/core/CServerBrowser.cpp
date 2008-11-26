@@ -730,6 +730,7 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, std::string strTagName, C
             }
         }
     }
+    pList->SetUpdated ( true );
     return true;
 }
 
