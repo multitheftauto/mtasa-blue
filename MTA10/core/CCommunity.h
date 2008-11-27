@@ -40,6 +40,7 @@ enum eVerificationResult
 class CCommunity : public CCommunityInterface, public CSingleton < CCommunity >
 {
     friend class CSettings;
+    friend class CServerBrowserLogin;
 
 public:
 								CCommunity          ( void );

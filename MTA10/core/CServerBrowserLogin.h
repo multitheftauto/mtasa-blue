@@ -27,6 +27,9 @@ public:
     bool                    IsVisible           ( void );
 
     void                    SetCallback         ( BROWSERLOGINCALLBACK );
+    BROWSERLOGINCALLBACK    GetCallback         ( void );
+
+    static void             OnLoginCallback     ( bool bResult, char* szError, void* obj );
 
 private:
     bool                    OnButtonBackClick   ( CGUIElement* pElement );
