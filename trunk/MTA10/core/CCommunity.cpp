@@ -105,10 +105,6 @@ void CCommunity::DoPulse ( void )
             m_pCallback = NULL;
             m_pVerificationObject = NULL;
         }
-        
-        // Show message box on failure
-        if ( !m_bLoggedIn )
-            CCore::GetSingleton().ShowMessageBox ( "Multi Theft Auto Community", szVerificationMessages[Status], MB_BUTTON_OK | MB_ICON_WARNING );
     }
     // Check for timeout
     else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {

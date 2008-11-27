@@ -11,11 +11,14 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <utils/CMD5Hasher.h>
 
 extern CCore* g_pCore;
 
 CServerBrowserLogin::CServerBrowserLogin ( void )
 {
+    m_pCallBack = NULL;
+
     CGUI *pManager = g_pCore->GetGUI ();
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
@@ -96,12 +99,55 @@ bool CServerBrowserLogin::OnButtonBackClick ( CGUIElement* pElement )
     }
     else if ( pElement == m_pButtonLogin )
     {
+        if ( m_pEditUsername->GetText().empty() ||
+            m_pEditPassword->GetText().empty() )
+        {
+            g_pCore->ShowMessageBox ( "Serial Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+            return true;
+        }
+        // Hash password
+        char szPassword[33];
+        std::string strPassword;
+	    MD5 Password;
+	    CMD5Hasher Hasher;
+	    Hasher.Calculate ( m_pEditPassword->GetText ().c_str(), m_pEditPassword->GetText().length(), Password );
+	    Hasher.ConvertToHex ( Password, szPassword );
+        strPassword = std::string ( szPassword );
 
+        // Store the user/pass and log in using community
+        CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
+        pCommunity->SetUsername ( m_pEditUsername->GetText () );
+        pCommunity->SetPassword ( strPassword );
+	    CVARS_SET ( "community_username", m_pEditUsername->GetText () );
+        CVARS_SET ( "community_password", strPassword );
+        pCommunity->Login ( OnLoginCallback, this );
     }
     return true;
 }
 
-void CServerBrowserLogin::SetCallback ( BROWSERLOGINCALLBACK )
-{
 
+void CServerBrowserLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
+{
+    if ( !bResult )
+    {
+        g_pCore->ShowMessageBox ( "Serial Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+    }
+    else
+    {
+        CServerBrowserLogin* pLogin = reinterpret_cast < CServerBrowserLogin* > ( obj );
+        // Succeed, connect
+        pLogin->SetVisible ( false );
+        pLogin->GetCallback()();
+    }
+}
+
+
+void CServerBrowserLogin::SetCallback ( BROWSERLOGINCALLBACK pCallBack )
+{
+    m_pCallBack = pCallBack;
+}
+
+BROWSERLOGINCALLBACK CServerBrowserLogin::GetCallback ( void )
+{
+    return m_pCallBack;
 }
