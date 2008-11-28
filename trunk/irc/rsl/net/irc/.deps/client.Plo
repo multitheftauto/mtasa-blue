@@ -1,0 +1,494 @@
+client.lo client.o: client.cpp client.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/map \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_tree.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_algobase.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++config.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/os_defines.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-32.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/cpu_defines.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstring \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstddef \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/stddef.h \
+  /usr/include/string.h /usr/include/xlocale.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/climits \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/limits.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/syslimits.h \
+  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
+  /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
+  /usr/include/bits/stdio_lim.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstdlib \
+  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/sys/types.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/time.h /usr/include/sys/select.h \
+  /usr/include/bits/select.h /usr/include/bits/sigset.h \
+  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+  /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/iosfwd \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++locale.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstdio \
+  /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/wchar.h /usr/include/bits/wchar.h /usr/include/gconv.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/stdarg.h \
+  /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/clocale \
+  /usr/include/locale.h /usr/include/bits/locale.h \
+  /usr/include/langinfo.h /usr/include/nl_types.h /usr/include/iconv.h \
+  /usr/include/libintl.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++io.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/gthr.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/gthr-default.h \
+  /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
+  /usr/include/signal.h /usr/include/bits/setjmp.h /usr/include/unistd.h \
+  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+  /usr/include/bits/confname.h /usr/include/getopt.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cctype \
+  /usr/include/ctype.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stringfwd.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/postypes.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cwchar \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/ctime \
+  /usr/include/stdint.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/functexcept.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/exception_defines.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_pair.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/cpp_type_traits.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator_base_types.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator_base_funcs.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/concept_check.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/debug/debug.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/allocator.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++allocator.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/ext/new_allocator.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/new \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/exception \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_construct.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_function.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_map.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_multimap.h \
+  ../socket/ip.h /usr/include/sys/socket.h /usr/include/sys/uio.h \
+  /usr/include/bits/uio.h /usr/include/bits/socket.h \
+  /usr/include/bits/sockaddr.h /usr/include/asm/socket.h \
+  /usr/include/asm/sockios.h /usr/include/netdb.h \
+  /usr/include/netinet/in.h /usr/include/bits/in.h \
+  /usr/include/bits/byteswap.h /usr/include/rpc/netdb.h \
+  /usr/include/bits/siginfo.h /usr/include/bits/netdb.h \
+  ../socket/tcpclient.h ../socket/client.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/string \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/char_traits.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/memory \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_uninitialized.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_raw_storage_iter.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/limits \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/basic_string.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/atomicity.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/atomic_word.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/algorithm \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_algo.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_heap.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_tempbuf.h \
+  /usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/basic_string.tcc \
+  ../socket/ip.h ../socket/socketstream.h ../socket/../../stream/stream.h \
+  ../socket/tcpstream.h ../socket/tcpclientssl.h ../socket/tcpclient.h \
+  ../socket/tcpstreamssl.h /usr/include/openssl/ssl.h \
+  /usr/include/openssl/e_os2.h /usr/include/openssl/opensslconf.h \
+  /usr/include/openssl/comp.h /usr/include/openssl/crypto.h \
+  /usr/include/openssl/stack.h /usr/include/openssl/safestack.h \
+  /usr/include/openssl/opensslv.h /usr/include/openssl/ossl_typ.h \
+  /usr/include/openssl/symhacks.h /usr/include/openssl/bio.h \
+  /usr/include/openssl/x509.h /usr/include/openssl/buffer.h \
+  /usr/include/openssl/evp.h /usr/include/openssl/objects.h \
+  /usr/include/openssl/obj_mac.h /usr/include/openssl/asn1.h \
+  /usr/include/openssl/bn.h /usr/include/openssl/ec.h \
+  /usr/include/openssl/ecdsa.h /usr/include/openssl/ecdh.h \
+  /usr/include/openssl/rsa.h /usr/include/openssl/dsa.h \
+  /usr/include/openssl/dh.h /usr/include/openssl/sha.h \
+  /usr/include/openssl/x509_vfy.h /usr/include/openssl/lhash.h \
+  /usr/include/openssl/pkcs7.h /usr/include/openssl/pem.h \
+  /usr/include/openssl/pem2.h /usr/include/openssl/kssl.h \
+  /usr/include/openssl/ssl2.h /usr/include/openssl/ssl3.h \
+  /usr/include/openssl/pq_compat.h /usr/include/openssl/tls1.h \
+  /usr/include/openssl/dtls1.h /usr/include/openssl/pqueue.h \
+  /usr/include/openssl/ssl23.h message.h text.h user.h \
+  ../socket/socketstream.h /usr/include/errno.h /usr/include/bits/errno.h \
+  /usr/include/linux/errno.h /usr/include/asm/errno.h \
+  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h
+
+client.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/map:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_tree.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_algobase.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++config.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/os_defines.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-32.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/cpu_defines.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstring:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstddef:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/stddef.h:
+
+/usr/include/string.h:
+
+/usr/include/xlocale.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/climits:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/limits.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/bits/posix2_lim.h:
+
+/usr/include/bits/xopen_lim.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstdlib:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/iosfwd:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++locale.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cstdio:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/gconv.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/stdarg.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/clocale:
+
+/usr/include/locale.h:
+
+/usr/include/bits/locale.h:
+
+/usr/include/langinfo.h:
+
+/usr/include/nl_types.h:
+
+/usr/include/iconv.h:
+
+/usr/include/libintl.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++io.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/gthr.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/gthr-default.h:
+
+/usr/include/pthread.h:
+
+/usr/include/sched.h:
+
+/usr/include/bits/sched.h:
+
+/usr/include/signal.h:
+
+/usr/include/bits/setjmp.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cctype:
+
+/usr/include/ctype.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stringfwd.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/postypes.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/cwchar:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/ctime:
+
+/usr/include/stdint.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/functexcept.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/exception_defines.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_pair.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/cpp_type_traits.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator_base_types.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator_base_funcs.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/concept_check.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_iterator.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/debug/debug.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/allocator.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/c++allocator.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/ext/new_allocator.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/new:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/exception:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_construct.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_function.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_map.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_multimap.h:
+
+../socket/ip.h:
+
+/usr/include/sys/socket.h:
+
+/usr/include/sys/uio.h:
+
+/usr/include/bits/uio.h:
+
+/usr/include/bits/socket.h:
+
+/usr/include/bits/sockaddr.h:
+
+/usr/include/asm/socket.h:
+
+/usr/include/asm/sockios.h:
+
+/usr/include/netdb.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/bits/in.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/rpc/netdb.h:
+
+/usr/include/bits/siginfo.h:
+
+/usr/include/bits/netdb.h:
+
+../socket/tcpclient.h:
+
+../socket/client.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/string:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/char_traits.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/memory:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_uninitialized.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_raw_storage_iter.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/limits:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/basic_string.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/atomicity.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/i686-pc-linux-gnu/bits/atomic_word.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/algorithm:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_algo.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_heap.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/stl_tempbuf.h:
+
+/usr/lib/gcc/i686-pc-linux-gnu/4.1.2/include/g++-v4/bits/basic_string.tcc:
+
+../socket/ip.h:
+
+../socket/socketstream.h:
+
+../socket/../../stream/stream.h:
+
+../socket/tcpstream.h:
+
+../socket/tcpclientssl.h:
+
+../socket/tcpclient.h:
+
+../socket/tcpstreamssl.h:
+
+/usr/include/openssl/ssl.h:
+
+/usr/include/openssl/e_os2.h:
+
+/usr/include/openssl/opensslconf.h:
+
+/usr/include/openssl/comp.h:
+
+/usr/include/openssl/crypto.h:
+
+/usr/include/openssl/stack.h:
+
+/usr/include/openssl/safestack.h:
+
+/usr/include/openssl/opensslv.h:
+
+/usr/include/openssl/ossl_typ.h:
+
+/usr/include/openssl/symhacks.h:
+
+/usr/include/openssl/bio.h:
+
+/usr/include/openssl/x509.h:
+
+/usr/include/openssl/buffer.h:
+
+/usr/include/openssl/evp.h:
+
+/usr/include/openssl/objects.h:
+
+/usr/include/openssl/obj_mac.h:
+
+/usr/include/openssl/asn1.h:
+
+/usr/include/openssl/bn.h:
+
+/usr/include/openssl/ec.h:
+
+/usr/include/openssl/ecdsa.h:
+
+/usr/include/openssl/ecdh.h:
+
+/usr/include/openssl/rsa.h:
+
+/usr/include/openssl/dsa.h:
+
+/usr/include/openssl/dh.h:
+
+/usr/include/openssl/sha.h:
+
+/usr/include/openssl/x509_vfy.h:
+
+/usr/include/openssl/lhash.h:
+
+/usr/include/openssl/pkcs7.h:
+
+/usr/include/openssl/pem.h:
+
+/usr/include/openssl/pem2.h:
+
+/usr/include/openssl/kssl.h:
+
+/usr/include/openssl/ssl2.h:
+
+/usr/include/openssl/ssl3.h:
+
+/usr/include/openssl/pq_compat.h:
+
+/usr/include/openssl/tls1.h:
+
+/usr/include/openssl/dtls1.h:
+
+/usr/include/openssl/pqueue.h:
+
+/usr/include/openssl/ssl23.h:
+
+message.h:
+
+text.h:
+
+user.h:
+
+../socket/socketstream.h:
+
+/usr/include/errno.h:
+
+/usr/include/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
