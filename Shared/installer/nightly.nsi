@@ -554,11 +554,11 @@ Section "Core components" SEC01
   File "${FILES_ROOT}\GTA San Andreas\mta\game_sa.dll"
   File "${FILES_ROOT}\GTA San Andreas\mta\multiplayer_sa.dll"
   File "${FILES_ROOT}\GTA San Andreas\mta\net.dll"
-  File "${FILES_ROOT}\GTA San Andreas\mta\d3dx9_33.dll"
-  File "${FILES_ROOT}\GTA San Andreas\mta\msvcp71.dll"
-  File "${FILES_ROOT}\GTA San Andreas\mta\msvcr71.dll"
   
   !ifndef LIGHTBUILD
+    File "${FILES_ROOT}\GTA San Andreas\mta\d3dx9_33.dll"
+    File "${FILES_ROOT}\GTA San Andreas\mta\msvcp71.dll"
+    File "${FILES_ROOT}\GTA San Andreas\mta\msvcr71.dll"
     File "${FILES_ROOT}\GTA San Andreas\mta\lua5.1.dll"
     File "${FILES_ROOT}\GTA San Andreas\mta\libcurl.dll"
     File "${FILES_ROOT}\GTA San Andreas\mta\vorbis.ax"
