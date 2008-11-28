@@ -23,7 +23,7 @@ typedef void (*SERIALVERIFICATIONCALLBACK) ( CPlayer*, bool, char* );
 
 #define SERIAL_VERIFICATION_TIMEOUT 3000
 #define SERIAL_VERIFICATION_SERVER  "dp3.community.mtasa.com"
-#define SERIAL_VERIFICATION_URL     "http://dp3.community.mtasa.com/core/core.php"
+#define SERIAL_VERIFICATION_URL     "http://dp3.community.mtasa.com/core/1.0/server.php"
 
 enum eSerialVerificationResult
 {

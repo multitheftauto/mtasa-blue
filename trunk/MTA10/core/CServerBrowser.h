@@ -24,7 +24,7 @@ class CServerBrowser;
 #include "CServerList.h"
 #include "CSingleton.h"
 #include "CFavouritesAddByIP.h"
-#include "CServerBrowserLogin.h"
+#include "CCommunityLogin.h"
 #include <ctime>
 
 using namespace std;
@@ -82,7 +82,7 @@ protected:
 
     // Classes
     CFavouritesAddByIP  m_pFavouritesAddByIP;
-    CServerBrowserLogin m_pBrowserLogin;
+    CCommunityLogin     m_pCommunityLogin;
   
     // Tab controls
     CGUITab*            m_pTab [ SERVER_BROWSER_TYPE_COUNT ];

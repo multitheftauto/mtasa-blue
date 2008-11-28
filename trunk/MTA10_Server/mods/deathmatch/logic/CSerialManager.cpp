@@ -112,7 +112,7 @@ CSerialVerification::CSerialVerification ( CPlayer* pPlayer, SERIALVERIFICATIONC
 	if ( pPlayer->GetSerialUser().length() > 0 && pPlayer->GetSerial().length() > 0 )
 	{
         // Create the POST URL
-        std::string strPostData = "[\"s\",\"" + pPlayer->GetSerialUser () +
+        std::string strPostData = "[\"" + pPlayer->GetSerialUser () +
                                   "\",\"" + pPlayer->GetSerial () +
                                   "\"," + itoa ( g_pGame->GetConfig ()->GetServerPort (), buf, 10 ) + "]";
 

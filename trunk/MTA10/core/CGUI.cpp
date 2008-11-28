@@ -27,6 +27,8 @@ CLocalGUI::CLocalGUI ( void )
     m_pChat = NULL;
     m_pDebugView = NULL;
 
+    m_pCommunityRegistration = NULL;
+
     m_bForceCursorVisible = false;
     m_bChatboxVisible = true;
     m_pDebugViewVisible = false;
@@ -73,6 +75,10 @@ void CLocalGUI::CreateWindows ( void )
     // Create console
     m_pConsole = new CConsole ( pGUI );
     m_pConsole->SetVisible ( false );
+
+    // Create community registration window
+    m_pCommunityRegistration = new CCommunityRegistration ();
+    m_pCommunityRegistration->SetVisible ( false );
 
 	// Create the overlayed version labels
 	CVector2D ScreenSize = pGUI->GetResolution ();
@@ -161,6 +167,12 @@ void CLocalGUI::DestroyObjects ( void )
 CD3DMGEng* CLocalGUI::GetRenderingLibrary ( void )
 {
     return m_pRendererLibrary;
+}
+
+
+void CLocalGUI::DoPulse ( void )
+{
+    m_pCommunityRegistration->DoPulse ();
 }
 
 

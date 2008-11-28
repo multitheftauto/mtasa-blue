@@ -364,6 +364,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCommunityLogin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CCommunityRegistration.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CConnectManager.cpp"
 				>
 			</File>
@@ -560,10 +568,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerBrowserLogin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CServerList.cpp"
 				>
 			</File>
@@ -702,6 +706,14 @@
 			</File>
 			<File
 				RelativePath=".\CCommunity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCommunityLogin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCommunityRegistration.h"
 				>
 			</File>
 			<File
@@ -906,10 +918,6 @@
 			</File>
 			<File
 				RelativePath=".\CServerBrowser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CServerBrowserLogin.h"
 				>
 			</File>
 			<File
