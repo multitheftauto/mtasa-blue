@@ -109,7 +109,10 @@ public:
     // Copy constructor
 	CGUICallback ( const CGUICallback < Ret, Arguments > & copy )
 	{
-		m_pCallback = copy.m_pCallback->Copy();
+        if ( copy.m_pCallback )
+		    m_pCallback = copy.m_pCallback->Copy();
+        else
+            m_pCallback = NULL;
 	}
 
     // Destructor
