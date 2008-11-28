@@ -1079,6 +1079,8 @@ void CCore::DoPreFramePulse ( )
 
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
+
+    m_pLocalGUI->DoPulse ();
 }
 
 

@@ -19,7 +19,7 @@
 typedef void (*VERIFICATIONCALLBACK) ( bool, char*, void* obj );
 
 #define VERIFICATION_DELAY              150000
-#define VERIFICATION_URL                "http://dp3.community.mtasa.com/core/core.php"
+#define VERIFICATION_URL                "http://dp3.community.mtasa.com/core/1.0/client.php"
 #define VERIFICATION_DATA_BUFFER_SIZE   1024
 
 enum eVerificationResult
@@ -40,7 +40,7 @@ enum eVerificationResult
 class CCommunity : public CCommunityInterface, public CSingleton < CCommunity >
 {
     friend class CSettings;
-    friend class CServerBrowserLogin;
+    friend class CCommunityLogin;
 
 public:
 								CCommunity          ( void );

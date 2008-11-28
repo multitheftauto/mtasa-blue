@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CFavouritesAddByIP.h
-*  PURPOSE:     Header file for add to favourites by IP dialog
-*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
+*  FILE:        core/CCommunityLogin.cpp
+*  PURPOSE:     Community login dialog class
+*  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -15,7 +15,7 @@
 
 extern CCore* g_pCore;
 
-CServerBrowserLogin::CServerBrowserLogin ( void )
+CCommunityLogin::CCommunityLogin ( void )
 {
     m_pCallBack = NULL;
 
@@ -63,11 +63,11 @@ CServerBrowserLogin::CServerBrowserLogin ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 120.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
 
-    m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowserLogin::OnButtonBackClick, this ) );
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowserLogin::OnButtonBackClick, this ) );
+    m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
+    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
 }
 
-CServerBrowserLogin::~CServerBrowserLogin ( void )
+CCommunityLogin::~CCommunityLogin ( void )
 {
     delete m_pButtonLogin;
     delete m_pButtonCancel;
@@ -79,19 +79,19 @@ CServerBrowserLogin::~CServerBrowserLogin ( void )
     delete m_pWindow;
 }
 
-void CServerBrowserLogin::SetVisible ( bool bVisible )
+void CCommunityLogin::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
     if ( bVisible )
         m_pWindow->BringToFront ();
 }
 
-bool CServerBrowserLogin::IsVisible ( void )
+bool CCommunityLogin::IsVisible ( void )
 {
     return m_pWindow->IsVisible ();
 }
 
-bool CServerBrowserLogin::OnButtonBackClick ( CGUIElement* pElement )
+bool CCommunityLogin::OnButtonBackClick ( CGUIElement* pElement )
 {
     if ( pElement == m_pButtonCancel )
     {
@@ -126,7 +126,7 @@ bool CServerBrowserLogin::OnButtonBackClick ( CGUIElement* pElement )
 }
 
 
-void CServerBrowserLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
+void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
 {
     if ( !bResult )
     {
@@ -134,7 +134,7 @@ void CServerBrowserLogin::OnLoginCallback ( bool bResult, char* szError, void *o
     }
     else
     {
-        CServerBrowserLogin* pLogin = reinterpret_cast < CServerBrowserLogin* > ( obj );
+        CCommunityLogin* pLogin = reinterpret_cast < CCommunityLogin* > ( obj );
         // Succeed, connect
         pLogin->SetVisible ( false );
         pLogin->GetCallback()();
@@ -142,12 +142,12 @@ void CServerBrowserLogin::OnLoginCallback ( bool bResult, char* szError, void *o
 }
 
 
-void CServerBrowserLogin::SetCallback ( BROWSERLOGINCALLBACK pCallBack )
+void CCommunityLogin::SetCallback ( BROWSERLOGINCALLBACK pCallBack )
 {
     m_pCallBack = pCallBack;
 }
 
-BROWSERLOGINCALLBACK CServerBrowserLogin::GetCallback ( void )
+BROWSERLOGINCALLBACK CCommunityLogin::GetCallback ( void )
 {
     return m_pCallBack;
 }

@@ -2,26 +2,26 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CFavouritesAddByIP.h
-*  PURPOSE:     Header file for add to favourites by IP dialog
-*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
+*  FILE:        core/CCommunityLogin.cpp
+*  PURPOSE:     Header file for community login dialog
+*  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-class CServerBrowserLogin;
+class CCommunityLogin;
 
-#ifndef __CSERVERBROWSERLOGIN_H
-#define __CSERVERBROWSERLOGIN_H
+#ifndef __CCOMMUNITYLOGIN_H
+#define __CCOMMUNITYLOGIN_H
 
 typedef void (*BROWSERLOGINCALLBACK) ( void );
 
-class CServerBrowserLogin
+class CCommunityLogin
 {
 public:
-                            CServerBrowserLogin ( void );
-    virtual                ~CServerBrowserLogin ();
+                            CCommunityLogin     ( void );
+    virtual                ~CCommunityLogin     ();
 
     void                    SetVisible          ( bool bVisible );
     bool                    IsVisible           ( void );

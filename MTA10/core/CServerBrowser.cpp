@@ -83,8 +83,8 @@ CServerBrowser::CServerBrowser ( void )
     m_pFavouritesAddByIP.SetCallback ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPAddClick, this ) );
 
     // Login dialog
-    m_pBrowserLogin.SetVisible ( false );
-    m_pBrowserLogin.SetCallback ( &CServerBrowser::CompleteConnect );
+    m_pCommunityLogin.SetVisible ( false );
+    m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
 }
 
 
@@ -467,7 +467,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
             if ( strHost.compare ( pServer->strHost ) == 0 ) {
                 if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
                 {
-                    m_pBrowserLogin.SetVisible ( true );
+                    m_pCommunityLogin.SetVisible ( true );
                     return true;
                 }
                 // Get the nick from the config
