@@ -21,6 +21,8 @@ CHTTPClient::CHTTPClient ( void )
     m_szBuffer = NULL;
     m_nBufferLength = 0;
 	m_usPort = 0;
+    m_nPointer = 0;
+    m_bCompleted = false;
 
 	memset(&m_szProtocol, NULL, sizeof(m_szProtocol));
 	memset(&m_szHost, NULL, sizeof(m_szHost));
@@ -205,6 +207,9 @@ void CHTTPClient::OnClose ( void* pSocketPtr, void* pClassPtr )
 		CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
         CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
 
+        // Disconnected? This means we are done.
+        pClass->m_bCompleted = true;
+
 		// Destroy the socket
 		CTCPManager::GetSingleton ().DestroyClient ( pSocket );
         pClass->m_pHTTPSocket = NULL;
@@ -214,32 +219,49 @@ void CHTTPClient::OnClose ( void* pSocketPtr, void* pClassPtr )
 
 void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
 {
+    char szBuffer[HTTP_BUFFER_LENGTH] = {0};
+
 	if ( pSocketPtr != NULL )
 	{
 		CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
 		CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
 
 		// Attempt to read data from the socket
-        int iRead = pSocket->ReadBuffer ( pClass->m_szBuffer, pClass->m_nBufferLength );
-		if ( iRead > 0 )
-		{
-			// Parse the reply
-            unsigned int nHeaderSize, uiResponseCode;
-            const char * szData = CHTTPResponse::Parse ( pClass->m_szBuffer, pClass->m_nBufferLength, nHeaderSize, uiResponseCode );
-            if ( !szData ) pClass->m_strStatus = "error: failed reading HTTP header";
+        while ( true )
+        {
+            int iRead = pSocket->ReadBuffer ( szBuffer, HTTP_BUFFER_LENGTH );
+            if ( iRead <= 0 ) break;
 
-			// Set status
-			pClass->m_Status = uiResponseCode;
-            pClass->m_nHeaderSize = nHeaderSize;
-            pClass->m_nBufferLength = iRead;
+            // Is this our first chunk of data?
+            if ( pClass->m_nPointer == 0 ) {
+			    // Parse the header
+                unsigned int nHeaderSize, uiResponseCode;
+                const char * szData = CHTTPResponse::Parse ( szBuffer, HTTP_BUFFER_LENGTH, nHeaderSize, uiResponseCode );
+                if ( !szData ) pClass->m_strStatus = "error: failed reading HTTP header";
 
-			// Disconnect and delete the socket
-			pSocket->Disconnect ();
+                // Copy data to buffer
+                unsigned int nToRead = iRead - nHeaderSize;
+                if ( nToRead > 0 && pClass->m_nBufferLength > nToRead )
+                    memcpy ( pClass->m_szBuffer, szBuffer + nHeaderSize, nToRead );
 
-            stringstream ss;
-            ss << "server returned response " << uiResponseCode;
-            pClass->m_strStatus = ss.str ();
-		}
+			    // Set variables
+			    pClass->m_Status = uiResponseCode;
+                pClass->m_nPointer += nToRead;
+
+                // Set status message
+                stringstream ss;
+                ss << "server returned response " << uiResponseCode;
+                pClass->m_strStatus = ss.str ();
+            } else {
+                // Append the received data to the buffer
+                unsigned int nBuffer = pClass->m_nBufferLength - pClass->m_nPointer;
+                if ( nBuffer > (unsigned int)iRead )
+                    memcpy ( pClass->m_szBuffer + pClass->m_nPointer, szBuffer, iRead );
+                else
+                    assert ( false );   // Buffer is too small!
+                pClass->m_nPointer += iRead;
+            }
+        }
 	}
 }
 
@@ -247,10 +269,11 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
 bool CHTTPClient::GetData ( char ** szBuffer, unsigned int &nDataLength )
 {
     // Only return valid data when the response was 200 (success)
-    if ( m_Status != 200 || !m_nHeaderSize ) return false;
+    // and the HTTP request was completed
+    if ( m_Status != 200 || !m_bCompleted ) return false;
 
-    *szBuffer = (m_szBuffer + m_nHeaderSize);
-    nDataLength = m_nBufferLength - m_nHeaderSize;
+    *szBuffer = m_szBuffer;
+    nDataLength = m_nPointer;
     return true;
 }
 

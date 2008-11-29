@@ -93,7 +93,7 @@ public:
     bool                IsDebugViewVisible          ( void );
     void                EchoDebug                   ( const char* szText );
 
-    CCommunityRegistration* GetCommunityRegistration ( void )               { return m_pCommunityRegistration; };
+    CCommunityRegistration* GetCommunityRegistration ( void )               { return &m_CommunityRegistration; };
 
     bool                ProcessMessage              ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                InputGoesToGUI              ( void );
@@ -110,28 +110,28 @@ public:
 
 
 private:
-    void                UpdateCursor                ( void );
+    void                    UpdateCursor                ( void );
 
-    DWORD               TranslateScanCodeToGUIKey   ( DWORD dwCharacter );
+    DWORD                   TranslateScanCodeToGUIKey   ( DWORD dwCharacter );
 
-    CConsole*           m_pConsole;
-    CMainMenu*          m_pMainMenu;
-    //CChatBox*           m_pChatBox;
-    CChat*              m_pChat;
-    CDebugView*         m_pDebugView;
-    CD3DMGEng*          m_pRendererLibrary;
+    CConsole*               m_pConsole;
+    CMainMenu*              m_pMainMenu;
+    //CChatBox*             m_pChatBox;
+    CChat*                  m_pChat;
+    CDebugView*             m_pDebugView;
+    CD3DMGEng*              m_pRendererLibrary;
 
-    CCommunityRegistration* m_pCommunityRegistration;
+    CCommunityRegistration  m_CommunityRegistration;
 
-	CGUILabel*			m_pLabelVersionTag;
+	CGUILabel*			    m_pLabelVersionTag;
 
-	int					m_iVisibleWindows;
-	bool				m_bVisibleWindows;
+	int					    m_iVisibleWindows;
+	bool				    m_bVisibleWindows;
 
-    bool                m_bForceCursorVisible;
-    bool                m_bChatboxVisible;
-    bool                m_pDebugViewVisible;
-    bool                m_bGUIHasInput;
+    bool                    m_bForceCursorVisible;
+    bool                    m_bChatboxVisible;
+    bool                    m_pDebugViewVisible;
+    bool                    m_bGUIHasInput;
 };
 
 #endif

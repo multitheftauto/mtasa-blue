@@ -23,6 +23,9 @@
 #define snprintf _snprintf
 #endif
 
+// HTTP buffer size (for OnRead)
+#define HTTP_BUFFER_LENGTH      4096
+
 using namespace std;
 
 class CHTTPClient
@@ -49,11 +52,12 @@ private:
     int                 ReadHeader              ( char* pBuffer, unsigned int uiBufferSize );
 
     char *              m_szBuffer;
+    unsigned int        m_nPointer;
     unsigned int        m_nBufferLength;
-    unsigned int        m_nHeaderSize;
 
     unsigned int        m_Status;
     std::string         m_strStatus;
+    bool                m_bCompleted;
 
     char				m_szProtocol[64];
     char				m_szHost[256];

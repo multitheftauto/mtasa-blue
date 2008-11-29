@@ -25,8 +25,10 @@ const char * CHTTPResponse::Parse ( const char * szBuffer, unsigned int nLength,
     if ( nLength < 4 ) return NULL;
     for ( unsigned int i = 0; i < ( nLength - 4 ); i++ )
         if ( szBuffer[i]   == '\r' && szBuffer[i+1] == '\n' &&
-             szBuffer[i+2] == '\r' && szBuffer[i+3] == '\n' )
-             nHeaderSize = i + 4;
+             szBuffer[i+2] == '\r' && szBuffer[i+3] == '\n' ) {
+                nHeaderSize = i + 4;
+                break;
+             }
     if ( !nHeaderSize ) return NULL;
 
     // Parse the header
