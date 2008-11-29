@@ -226,8 +226,6 @@ CCore::~CCore ( void )
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
 
-    delete m_pKeyBinds;
-
     // Delete interaction objects.
     delete m_pCommands;
     delete m_pConnectManager;
@@ -251,6 +249,9 @@ CCore::~CCore ( void )
     // Delete lazy subsystems
     DestroyGUI ();
     DestroyXML ();
+
+    // Delete keybinds
+    delete m_pKeyBinds;
 
     // Delete the logger
     delete m_pLogger;
@@ -343,7 +344,13 @@ CVideoManager* CCore::GetVMR9Manager ( void )
 void CCore::SaveConfig ( void )
 {
     if ( m_pConfigFile )
+    {
+        CXMLNode* pBindsNode = GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS );
+        if ( !pBindsNode )
+            pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
+        m_pKeyBinds->SaveToXML ( pBindsNode );
         m_pConfigFile->Write ();
+    }
 }
 
 void CCore::ChatEcho ( const char* szText, bool bColorCoded )
