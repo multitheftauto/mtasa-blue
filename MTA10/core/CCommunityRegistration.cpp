@@ -11,15 +11,18 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <utils/CMD5Hasher.h>
-#include "CCommunityRegistration.h"
 
 extern CCore* g_pCore;
 
 CCommunityRegistration::CCommunityRegistration ( void )
 {
     m_ulStartTime = 0;
+}
 
+
+void CCommunityRegistration::CreateWindows ( void )
+{
+    __asm int 3;
     CGUI *pManager = g_pCore->GetGUI ();
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
@@ -91,6 +94,7 @@ CCommunityRegistration::CCommunityRegistration ( void )
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
 }
 
+
 CCommunityRegistration::~CCommunityRegistration ( void )
 {
     delete m_pButtonRegister;
@@ -137,6 +141,10 @@ void CCommunityRegistration::DoPulse ( void )
             // Succeed, deal with the response
             m_ulStartTime = 0;
             m_pWindow->SetVisible ( true );
+
+            FILE * ff = fopen("c:\\temp.png","wb");
+            fwrite(szBuffer,uiBufferLength,1,ff);
+            fclose(ff);
 
             //g_pCore->GetConsole()->Printf ( "success!" );
         }

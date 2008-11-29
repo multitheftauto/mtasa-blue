@@ -16,11 +16,14 @@ class CCommunityRegistration;
 #define __CCOMMUNITYREGISTRATION_H
 
 #define REGISTRATION_DELAY              150000
-#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
-#define REGISTRATION_DATA_BUFFER_SIZE   1024
+//#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
+#define REGISTRATION_URL                "http://www.mtasa.com/images/button_center.png"
+#define REGISTRATION_DATA_BUFFER_SIZE   100000
 
 class CCommunityRegistration
 {
+    friend class CLocalGUI;
+
 public:
                             CCommunityRegistration  ( void );
     virtual                ~CCommunityRegistration  ( void );
@@ -31,6 +34,9 @@ public:
     bool                    IsVisible           ( void )                        { return m_pWindow->IsVisible(); };
 
     void                    DoPulse             ( void );
+
+protected:
+    void                    CreateWindows       ( void );
 
 private:
 
