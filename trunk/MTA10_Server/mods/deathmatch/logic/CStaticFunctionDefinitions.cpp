@@ -29,7 +29,7 @@ static CPickupManager *                             m_pPickupManager;
 static CPlayerManager *                             m_pPlayerManager;
 static CVehicleManager *                            m_pVehicleManager;
 static CObjectManager *                             m_pObjectManager;
-static CMarkers*                                    m_pMarkers;
+static CMarkerManager*                              m_pMarkerManager;
 static CMapManager*                                 m_pMapManager;
 static CBlipManager*                                m_pBlipManager;
 static CRadarAreaManager*                           m_pRadarAreaManager;
@@ -55,7 +55,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
     m_pPlayerManager = pGame->GetPlayerManager ();
     m_pVehicleManager = pGame->GetVehicleManager ();
     m_pObjectManager = pGame->GetObjectManager ();
-    m_pMarkers = pGame->GetMarkers ();
+    m_pMarkerManager = pGame->GetMarkerManager ();
     m_pMapManager = pGame->GetMapManager ();
     m_pBlipManager = pGame->GetBlipManager ();
     m_pRadarAreaManager = pGame->GetRadarAreaManager ();
@@ -375,7 +375,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
         {
             CMarker* pMarker = static_cast < CMarker* > ( pElement );
 
-            CMarker* pTemp = m_pMarkers->Create ( pElement->GetParentEntity () );
+            CMarker* pTemp = m_pMarkerManager->Create ( pElement->GetParentEntity () );
             if ( pTemp )
             {
                 pTemp->SetMarkerType ( pMarker->GetMarkerType () );
@@ -4471,12 +4471,12 @@ CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const 
     assert ( szType );
 
     // Grab the type id
-    unsigned char ucType = CMarkers::StringToType ( szType );
+    unsigned char ucType = CMarkerManager::StringToType ( szType );
     if ( ucType != CMarker::TYPE_INVALID )
     {
         // Create the marker
         //CMarker* pMarker = m_pMarkers->Create ( m_pMapManager->GetRootElement () );
-		CMarker* pMarker = m_pMarkers->Create ( pResource->GetDynamicElementRoot() );
+		CMarker* pMarker = m_pMarkerManager->Create ( pResource->GetDynamicElementRoot() );
         if ( pMarker )
         {
             // Set the properties
@@ -4504,7 +4504,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const 
 
 bool CStaticFunctionDefinitions::GetMarkerCount ( unsigned int& uiCount )
 {
-    uiCount = m_pMarkers->Count ();
+    uiCount = m_pMarkerManager->Count ();
     return true;
 }
 
@@ -4513,7 +4513,7 @@ bool CStaticFunctionDefinitions::GetMarkerType ( CMarker* pMarker, char* szType 
 {
     assert ( pMarker );
 
-    return CMarkers::TypeToString ( pMarker->GetMarkerType (), szType );
+    return CMarkerManager::TypeToString ( pMarker->GetMarkerType (), szType );
 }
 
 
@@ -4556,7 +4556,7 @@ bool CStaticFunctionDefinitions::GetMarkerIcon ( CMarker* pMarker, char* szIcon 
 {
     assert ( pMarker );
 
-    return CMarkers::IconToString ( pMarker->GetIcon (), szIcon );
+    return CMarkerManager::IconToString ( pMarker->GetIcon (), szIcon );
 }
 
 
@@ -4570,7 +4570,7 @@ bool CStaticFunctionDefinitions::SetMarkerType ( CElement* pElement, const char*
     if ( IS_MARKER ( pElement ) )
     {
         // Grab the marker type
-        unsigned char ucType = CMarkers::StringToType ( szType );
+        unsigned char ucType = CMarkerManager::StringToType ( szType );
         if ( ucType != CMarker::TYPE_INVALID )
         {
             // Set the new type
@@ -4648,7 +4648,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CElement* pElement, const char*
     // Is this a marker?
     if ( IS_MARKER ( pElement ) )
     {
-        unsigned char ucIcon = CMarkers::StringToIcon ( szIcon );
+        unsigned char ucIcon = CMarkerManager::StringToIcon ( szIcon );
         if ( ucIcon != CMarker::ICON_INVALID )
         {
             // Set the new icon

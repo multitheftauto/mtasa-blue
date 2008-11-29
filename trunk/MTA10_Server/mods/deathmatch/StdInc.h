@@ -112,7 +112,7 @@
 #include "CTeam.h"
 #include "CPickup.h"
 #include "CVehicleNames.h"
-#include "CMarkers.h"
+#include "CMarkerManager.h"
 #include "CKeyBinds.h"
 #include "CWhoWas.h"
 #include "CTextDisplay.h"

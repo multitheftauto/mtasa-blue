@@ -43,7 +43,7 @@ public:
                                                               CPickupManager* pPickupManager, 
                                                               CPlayerManager* pPlayerManager, 
                                                               CRadarAreaManager* pRadarAreaManager,
-                                                              CMarkers* pMarkers,
+                                                              CMarkerManager* pMarkerManager,
                                                               CVehicleManager* pVehicleManager,
                                                               CTeamManager* pTeamManager,
                                                               CPedManager* pPedManager,
@@ -102,7 +102,7 @@ private:
     CPickupManager*             m_pPickupManager;
     CPlayerManager*             m_pPlayerManager;
     CRadarAreaManager*          m_pRadarAreaManager;
-    CMarkers*                   m_pMarkers;
+    CMarkerManager*             m_pMarkerManager;
     CVehicleManager*            m_pVehicleManager;
     CTeamManager*               m_pTeamManager;
     CPedManager*                m_pPedManager;

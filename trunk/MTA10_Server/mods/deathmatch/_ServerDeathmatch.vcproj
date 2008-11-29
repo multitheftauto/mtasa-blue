@@ -448,7 +448,7 @@
 					RelativePath=".\logic\CMarker.cpp">
 				</File>
 				<File
-					RelativePath=".\logic\CMarkers.cpp">
+					RelativePath=".\logic\CMarkerManager.cpp">
 				</File>
 				<File
 					RelativePath=".\logic\CMD5Hasher.cpp">
@@ -1193,7 +1193,7 @@
 					RelativePath=".\logic\CMarker.h">
 				</File>
 				<File
-					RelativePath=".\logic\CMarkers.h">
+					RelativePath=".\logic\CMarkerManager.h">
 				</File>
 				<File
 					RelativePath=".\logic\CMD5Hasher.h">

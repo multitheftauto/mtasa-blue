@@ -69,7 +69,7 @@ CGame::CGame ( void )
     m_pLuaManager = NULL;
     m_pMapFiles = NULL;
     m_pPacketTranslator = NULL;
-    m_pMarkers = NULL;
+    m_pMarkerManager = NULL;
     m_pRadarAreaManager = NULL;
     m_pPlayerManager = NULL;
     m_pVehicleManager = NULL;
@@ -156,7 +156,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pLuaManager );
     SAFE_DELETE ( m_pMapFiles );
     SAFE_DELETE ( m_pPacketTranslator );
-    SAFE_DELETE ( m_pMarkers );
+    SAFE_DELETE ( m_pMarkerManager );
     SAFE_DELETE ( m_pRadarAreaManager );
     SAFE_DELETE ( m_pPlayerManager );
     SAFE_DELETE ( m_pVehicleManager );
@@ -344,7 +344,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pPickupManager = new CPickupManager ( m_pColManager );
     m_pPlayerManager = new CPlayerManager;
     m_pRadarAreaManager = new CRadarAreaManager;
-    m_pMarkers = new CMarkers ( m_pColManager );
+    m_pMarkerManager = new CMarkerManager ( m_pColManager );
     m_pHandlingManager = new CHandlingManager;
     m_pVehicleManager = new CVehicleManager;
     m_pPacketTranslator = new CPacketTranslator ( m_pPlayerManager );
@@ -353,7 +353,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkers, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pMapFiles, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
+    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pMapFiles, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
     m_pACLManager = new CAccessControlListManager;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
@@ -468,7 +468,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     CStaticFunctionDefinitions ( this );
     CLuaFunctionDefinitions::SetBlipManager ( m_pBlipManager );
     CLuaFunctionDefinitions::SetLuaManager ( m_pLuaManager );
-    CLuaFunctionDefinitions::SetMarkerManager ( m_pMarkers );
+    CLuaFunctionDefinitions::SetMarkerManager ( m_pMarkerManager );
     CLuaFunctionDefinitions::SetObjectManager ( m_pObjectManager );
     CLuaFunctionDefinitions::SetPickupManager ( m_pPickupManager );
     CLuaFunctionDefinitions::SetPlayerManager ( m_pPlayerManager );
@@ -489,7 +489,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                            m_pBlipManager,
                            m_pHandlingManager,
                            m_pLuaManager,
-                           m_pMarkers,
+                           m_pMarkerManager,
                            m_pObjectManager,
                            m_pPickupManager,
                            m_pPlayerManager,

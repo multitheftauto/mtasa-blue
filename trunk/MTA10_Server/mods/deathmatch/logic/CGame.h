@@ -77,7 +77,7 @@ class CHTTPD;
 class CMainConfig;
 class CMapFiles;
 class CMapManager;
-class CMarkers;
+class CMarkerManager;
 class CObjectManager;
 class CPacket;
 class CPacketTranslator;
@@ -185,7 +185,7 @@ public:
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
-    inline CMarkers*                GetMarkers                  ( void )        { return m_pMarkers; };
+    inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; };
     inline CBlipManager*            GetBlipManager              ( void )        { return m_pBlipManager; };
     inline CPickupManager*          GetPickupManager            ( void )        { return m_pPickupManager; };
     inline CRadarAreaManager*       GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; };
@@ -283,7 +283,7 @@ private:
     CConsole*                       m_pConsole;
     CUnoccupiedVehicleSync*         m_pUnoccupiedVehicleSync;
     CPedSync*                       m_pPedSync;
-    CMarkers*                       m_pMarkers;
+    CMarkerManager*                 m_pMarkerManager;
     CClock*                         m_pClock;
     CBanManager*                    m_pBanManager;
     CTeamManager*                   m_pTeamManager;

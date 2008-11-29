@@ -23,7 +23,7 @@
 #include "../CHandlingManager.h"
 #include "../lua/CLuaManager.h"
 #include "../CMainConfig.h"
-#include "../CMarkers.h"
+#include "../CMarkerManager.h"
 #include "../CObjectManager.h"
 #include "../CPickupManager.h"
 #include "../CPlayerManager.h"
@@ -65,7 +65,7 @@ public:
                                             CBlipManager* pBlipManager,
                                             CHandlingManager* pHandlingManager,
                                             CLuaManager* pLuaManager,
-                                            CMarkers* pMarkers,
+                                            CMarkerManager* pMarkers,
                                             CObjectManager* pObjectManager,
                                             CPickupManager* pPickupManager,
                                             CPlayerManager* pPlayerManager,
@@ -90,7 +90,7 @@ protected:
     static CBlipManager*                m_pBlipManager;
     static CHandlingManager*            m_pHandlingManager;
     static CLuaManager*                 m_pLuaManager;
-    static CMarkers*                    m_pMarkers;
+    static CMarkerManager*              m_pMarkerManager;
     static CObjectManager*              m_pObjectManager;
     static CPickupManager*              m_pPickupManager;
     static CPlayerManager*              m_pPlayerManager;

@@ -1941,17 +1941,23 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // Heavy variables
     CVector vecPosition;
     CVector vecRotation;
+#ifdef MTA_DEBUG
     g_pCore->GetConsole()->Printf ( "Packet_EntityAdd" );
+#endif
     // HACK: store new entities and link up anything depending on other entities after
     list < SEntityDependantStuff* > newEntitiesStuff;
 
     ElementID NumEntities = 0;
     if ( !bitStream.Read ( NumEntities ) || NumEntities == 0 )
         return;
-    g_pCore->GetConsole()->Printf ( "1" );
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole()->Printf ( "Going to add %d entities", NumEntities );
+#endif
     for ( ElementID EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
-        g_pCore->GetConsole()->Printf ( "2" );
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Printf ( "  Adding entity %d", EntityIndex );
+#endif
         // Read out the entity type id and the entity id
         ElementID EntityID;
         unsigned char ucEntityTypeID;
@@ -1974,7 +1980,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                                    bitStream.Read ( vecAttachedRotation.fY ) &&
                                                    bitStream.Read ( vecAttachedRotation.fZ )) ) )
         {
-            g_pCore->GetConsole()->Printf ( "3" );
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Printf ( "    Retrieved common properties. Typeid %d", ucEntityTypeID );
+#endif
 			/*
 #ifdef MTA_DEBUG
             char* names [ 17 ] = { "dummy", "player", "vehicle", "object", "marker", "blip",
@@ -1994,6 +2002,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
             CCustomData* pCustomData = new CCustomData;
             unsigned short usNumData = 0;
             bitStream.Read ( usNumData );
+#ifdef MTA_DEBUG
+			g_pCore->GetConsole ()->Printf ( "    Adding %d custom data", usNumData );
+#endif
             for ( unsigned short us = 0 ; us < usNumData ; us++ )
             {
                 unsigned char ucNameLength = 0;
@@ -2012,6 +2023,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                             bitStream.Read ( szName, ucNameLength );
                             szName[32] = '\0';
+#ifdef MTA_DEBUG
+							g_pCore->GetConsole ()->Printf ( "      %s", szName );
+#endif
 
                             Argument.ReadFromBitStream ( bitStream );
 
@@ -2107,7 +2121,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::OBJECT:
                 {
                     unsigned short usObjectID;
-                    g_pCore->GetConsole()->Printf ( "4" );
+                    g_pCore->GetConsole()->Printf ( "    It's an object" );
                     // Read out the position and the rotation
                     if ( bitStream.Read ( vecPosition.fX ) &&
                          bitStream.Read ( vecPosition.fY ) &&
@@ -2117,7 +2131,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                          bitStream.Read ( vecRotation.fZ ) &&
                          bitStream.Read ( usObjectID ) )
                     {
-                        g_pCore->GetConsole()->Printf ( "5" );
+                        g_pCore->GetConsole()->Printf ( "    Got model/pos/rot %d (%.2f %.2f %.2f) (%.2f %.2f %.2f)", usObjectID, vecPosition.fX, vecPosition.fY, vecPosition.fZ, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
                         // Valid object id?
                         if ( !CClientObjectManager::IsValidModel ( usObjectID ) )
                         {
@@ -2129,6 +2143,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pObject;
                         if ( pObject )
                         {
+							g_pCore->GetConsole()->Printf ( "    Created object successfully" );
                             pObject->SetOrientation ( vecPosition, vecRotation );
                         }
                         else
@@ -3099,7 +3114,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         CClientEntity* pTempEntity = pEntityStuff->pEntity;
         ElementID TempParent = pEntityStuff->Parent;
         ElementID TempAttachedToID = pEntityStuff->AttachedToID;
-        CCustomData* pCustomData = pEntityStuff->pCustomData;
 
         if ( TempParent != INVALID_ELEMENT_ID )
         {

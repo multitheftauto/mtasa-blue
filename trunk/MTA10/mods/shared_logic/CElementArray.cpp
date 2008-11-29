@@ -30,9 +30,11 @@ CClientEntity* CElementIDs::GetElement ( ElementID ID )
         return m_Elements [ID];
     }
 
+/*
 #ifdef MTA_DEBUG
     assert ( 0 );
 #endif
+*/
     return NULL;
 }
 

@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMarkers.cpp
+*  FILE:        mods/deathmatch/logic/CMarkerManager.cpp
 *  PURPOSE:     Marker entity manager class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CMarkers::CMarkers ( CColManager* pColManager )
+CMarkerManager::CMarkerManager ( CColManager* pColManager )
 {
     // Init
     m_pColManager = pColManager;
@@ -21,7 +21,7 @@ CMarkers::CMarkers ( CColManager* pColManager )
 }
 
 
-CMarker* CMarkers::Create ( CElement* pParent, CXMLNode* pNode )
+CMarker* CMarkerManager::Create ( CElement* pParent, CXMLNode* pNode )
 {
     // Create the marker
     CMarker* pMarker = new CMarker ( this, m_pColManager, pParent, pNode );
@@ -38,7 +38,7 @@ CMarker* CMarkers::Create ( CElement* pParent, CXMLNode* pNode )
 }
 
 
-CMarker* CMarkers::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CMarker* CMarkerManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
 {
     // Create the marker
     CMarker* pMarker = new CMarker ( this, m_pColManager, pParent, &Node );
@@ -56,7 +56,7 @@ CMarker* CMarkers::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* 
 }
 
 
-void CMarkers::DeleteAll ( void )
+void CMarkerManager::DeleteAll ( void )
 {
     // Delete all markers in the list
     m_bDontRemove = true;
@@ -72,7 +72,7 @@ void CMarkers::DeleteAll ( void )
 }
 
 
-bool CMarkers::Exists ( CMarker* pMarker )
+bool CMarkerManager::Exists ( CMarker* pMarker )
 {
     list < CMarker* > ::const_iterator iter = m_Markers.begin ();
     for ( ; iter != m_Markers.end (); iter++ )
@@ -87,7 +87,7 @@ bool CMarkers::Exists ( CMarker* pMarker )
 }
 
 
-int CMarkers::StringToType ( const char* szString )
+int CMarkerManager::StringToType ( const char* szString )
 {
     if ( strcmp ( szString, "default" ) == 0 || strcmp ( szString, "checkpoint" ) == 0 )
     {
@@ -116,7 +116,7 @@ int CMarkers::StringToType ( const char* szString )
 }
 
 
-bool CMarkers::TypeToString ( unsigned int uiType, char* szString )
+bool CMarkerManager::TypeToString ( unsigned int uiType, char* szString )
 {
     switch ( uiType )
     {
@@ -147,7 +147,7 @@ bool CMarkers::TypeToString ( unsigned int uiType, char* szString )
 }
 
 
-void CMarkers::RemoveFromList ( CMarker* pMarker )
+void CMarkerManager::RemoveFromList ( CMarker* pMarker )
 {
     if ( !m_bDontRemove && !m_Markers.empty() )
     {
@@ -156,7 +156,7 @@ void CMarkers::RemoveFromList ( CMarker* pMarker )
 }
 
 
-unsigned char CMarkers::StringToIcon ( const char* szString )
+unsigned char CMarkerManager::StringToIcon ( const char* szString )
 {
     if ( strcmp ( szString, "none" ) == 0 )
     {
@@ -177,7 +177,7 @@ unsigned char CMarkers::StringToIcon ( const char* szString )
 }
 
 
-bool CMarkers::IconToString ( unsigned char ucIcon, char* szString )
+bool CMarkerManager::IconToString ( unsigned char ucIcon, char* szString )
 {
     switch ( ucIcon )
     {

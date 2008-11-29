@@ -24,7 +24,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CPickupManager* pPickupManager, 
                            CPlayerManager* pPlayerManager,
                            CRadarAreaManager* pRadarAreaManager,
-                           CMarkers* pMarkers,
+                           CMarkerManager* pMarkerManager,
                            CVehicleManager* pVehicleManager,
                            CTeamManager* pTeamManager,
                            CPedManager* pPedManager,
@@ -43,7 +43,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pPickupManager = pPickupManager;
     m_pPlayerManager = pPlayerManager;
     m_pRadarAreaManager = pRadarAreaManager;
-    m_pMarkers = pMarkers;
+    m_pMarkerManager = pMarkerManager;
     m_pVehicleManager = pVehicleManager;
     m_pTeamManager = pTeamManager;
     m_pPedManager = pPedManager;
@@ -339,8 +339,8 @@ void CMapManager::SendPerPlayerEntities ( CPlayer& Player )
     CEntityAddPacket Packet;
 
     // Add the markers to the packet
-    list < CMarker* > ::const_iterator iterMarkers = m_pMarkers->IterBegin ();
-    for ( ; iterMarkers != m_pMarkers->IterEnd (); iterMarkers++ )
+    list < CMarker* > ::const_iterator iterMarkers = m_pMarkerManager->IterBegin ();
+    for ( ; iterMarkers != m_pMarkerManager->IterEnd (); iterMarkers++ )
     {
         if ( (*iterMarkers)->IsVisibleToPlayer ( Player ) )
         {
@@ -863,7 +863,7 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     }
     else if ( strBuffer.compare ( "marker" ) == 0 )
     {
-        CMarker* pMarker = m_pMarkers->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
+        CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pMarker;
         if ( pMarker )
         {
