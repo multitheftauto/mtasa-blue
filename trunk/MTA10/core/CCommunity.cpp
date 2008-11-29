@@ -89,30 +89,33 @@ void CCommunity::Login ( VERIFICATIONCALLBACK pCallBack, void* pObject )
 
 void CCommunity::DoPulse ( void )
 {
-    char *szBuffer;
-    eVerificationResult Status;
-    unsigned int nDataLength;
+    if ( m_ulStartTime )
+    {
+        char *szBuffer;
+        eVerificationResult Status;
+        unsigned int nDataLength;
 
-    // Poll the HTTP client
-    if ( m_ulStartTime && m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
-        // Get the returned status
-        Status = (eVerificationResult)(szBuffer[0] - 48);
-        m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;
-        m_ulStartTime = 0;
+        // Poll the HTTP client
+        if ( m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
+            // Get the returned status
+            Status = (eVerificationResult)(szBuffer[0] - 48);
+            m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;
+            m_ulStartTime = 0;
 
-        // Change GUI
-        CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( m_bLoggedIn, m_strUsername );
-        CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
+            // Change GUI
+            CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( m_bLoggedIn, m_strUsername );
+            CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
 
-        // Perform callback
-        if ( m_pCallback ) {
-            m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
-            m_pCallback = NULL;
-            m_pVerificationObject = NULL;
+            // Perform callback
+            if ( m_pCallback ) {
+                m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
+                m_pCallback = NULL;
+                m_pVerificationObject = NULL;
+            }
         }
-    }
-    // Check for timeout
-    else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {
-        Logout ();
+        // Check for timeout
+        else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {
+            Logout ();
+        }
     }
 }
