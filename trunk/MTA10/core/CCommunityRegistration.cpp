@@ -22,7 +22,6 @@ CCommunityRegistration::CCommunityRegistration ( void )
 
 void CCommunityRegistration::CreateWindows ( void )
 {
-    __asm int 3;
     CGUI *pManager = g_pCore->GetGUI ();
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
@@ -141,10 +140,6 @@ void CCommunityRegistration::DoPulse ( void )
             // Succeed, deal with the response
             m_ulStartTime = 0;
             m_pWindow->SetVisible ( true );
-
-            FILE * ff = fopen("c:\\temp.png","wb");
-            fwrite(szBuffer,uiBufferLength,1,ff);
-            fclose(ff);
 
             //g_pCore->GetConsole()->Printf ( "success!" );
         }
