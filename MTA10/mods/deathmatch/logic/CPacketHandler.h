@@ -29,7 +29,6 @@ class CPacketHandler
         CClientEntity*      pEntity;
         ElementID           Parent;
         ElementID           AttachedToID;
-        CCustomData*        pCustomData;
     };
 
 public:

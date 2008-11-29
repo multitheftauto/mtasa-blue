@@ -21,7 +21,7 @@ class CPerPlayerEntity : public CElement
     friend class CElement;
 
 public:
-                                CPerPlayerEntity                ( CElement* pParent, CXMLNode* pNode = NULL ) : CElement ( pParent, pNode ) { m_bIsSynced = false; };
+                                CPerPlayerEntity                ( CElement* pParent, CXMLNode* pNode = NULL );
                                 ~CPerPlayerEntity               ( void );
 
     bool                        IsEntity                        ( void )                    { return true; }

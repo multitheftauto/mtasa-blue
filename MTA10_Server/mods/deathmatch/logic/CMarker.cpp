@@ -15,7 +15,7 @@
 
 #include "StdInc.h"
 
-CMarker::CMarker ( CMarkers* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode ) : CPerPlayerEntity ( pParent, pNode )
+CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode ) : CPerPlayerEntity ( pParent, pNode )
 {
     // Init
     m_pMarkerManager = pMarkerManager;
@@ -85,7 +85,7 @@ bool CMarker::ReadSpecialData ( void )
     if ( GetCustomDataString ( "type", szBuffer, 128, true ) )
     {
         // Convert it to a type
-        m_ucType = static_cast < unsigned char > ( CMarkers::StringToType ( szBuffer ) );
+        m_ucType = static_cast < unsigned char > ( CMarkerManager::StringToType ( szBuffer ) );
         if ( m_ucType == CMarker::TYPE_INVALID )
         {
             CLogger::LogPrintf ( "WARNING: Unknown 'type' value specified in <marker>; defaulting to \"default\" (line %u)\n", m_uiLine );

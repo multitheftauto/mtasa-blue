@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMarkers.h
+*  FILE:        mods/deathmatch/logic/CMarkerManager.h
 *  PURPOSE:     Marker entity manager class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
@@ -11,10 +11,10 @@
 *
 *****************************************************************************/
 
-class CMarkers;
+class CMarkerManager;
 
-#ifndef __CMARKERS_H
-#define __CMARKERS_H
+#ifndef __CMarkerManager_H
+#define __CMarkerManager_H
 
 #include "CColManager.h"
 #include "CMarker.h"
@@ -22,13 +22,13 @@ class CMarkers;
 
 using namespace std;
 
-class CMarkers
+class CMarkerManager
 {
     friend class CMarker;
 
 public:
-                                                        CMarkers                    ( CColManager* pColManager );
-    inline                                              ~CMarkers                   ( void )        { DeleteAll (); };
+                                                        CMarkerManager                    ( CColManager* pColManager );
+    inline                                              ~CMarkerManager                   ( void )        { DeleteAll (); };
 
     CMarker*                                            Create                      ( CElement* pParent, CXMLNode* pNode = NULL );
     CMarker*                                            CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );

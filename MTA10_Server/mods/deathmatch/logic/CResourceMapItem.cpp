@@ -25,7 +25,7 @@ extern CGame* g_pGame;
 CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortName, const char* szResourceFileName, int iDimension ) : CResourceFile ( resource, szShortName, szResourceFileName )
 {
     m_pGroups = g_pGame->GetGroups();  // isn't in CGame
-    m_pMarkers = g_pGame->GetMarkers();
+    m_pMarkerManager = g_pGame->GetMarkerManager();
     m_pBlipManager = g_pGame->GetBlipManager();
     m_pObjectManager = g_pGame->GetObjectManager();
     m_pPickupManager = g_pGame->GetPickupManager();
@@ -197,10 +197,12 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pBlip;
+        /*
         if ( pBlip )
         {
             pBlip->SetIsSynced ( bIsDuringStart );
         }
+        */
     }
     else if ( strBuffer.compare ( "pickup" ) == 0 )
     {
@@ -208,21 +210,25 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( strBuffer.compare ( "marker" ) == 0 )
     {
-        CMarker* pMarker = m_pMarkers->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pMarker;
+        /*
         if ( pMarker )
         {
             pMarker->SetIsSynced ( bIsDuringStart );
         }
+        */
     }
     else if ( strBuffer.compare ( "radararea" ) == 0 )
     {
         CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pRadarArea;
+        /*
         if ( pRadarArea )
         {
             pRadarArea->SetIsSynced ( bIsDuringStart );
         }
+        */
     }
     else if ( strBuffer.compare ( "team" ) == 0 )
     {

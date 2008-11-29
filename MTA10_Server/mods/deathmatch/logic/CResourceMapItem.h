@@ -22,7 +22,7 @@
 #include "CDummy.h"
 #include "CEvents.h"
 #include "CGroups.h"
-#include "CMarkers.h"
+#include "CMarkerManager.h"
 #include "CObjectManager.h"
 #include "CPickupManager.h"
 #include "CPlayerManager.h"
@@ -58,7 +58,7 @@ private:
     bool                                HandleNode                          ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart, CElement** pCreated );
 
     CGroups*                            m_pGroups;
-    CMarkers*                           m_pMarkers;
+    CMarkerManager*                     m_pMarkerManager;
     CBlipManager*                       m_pBlipManager;
     CObjectManager*                     m_pObjectManager;
     CPickupManager*                     m_pPickupManager;

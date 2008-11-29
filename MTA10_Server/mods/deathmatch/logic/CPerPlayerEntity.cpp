@@ -12,6 +12,12 @@
 
 #include "StdInc.h"
 
+CPerPlayerEntity::CPerPlayerEntity ( CElement* pParent, CXMLNode* pNode ) : CElement ( pParent, pNode )
+{
+    m_bIsSynced = false;
+    AddVisibleToReference ( g_pGame->GetMapManager ()->GetRootElement () );
+};
+
 CPerPlayerEntity::~CPerPlayerEntity ( void )
 {
     // Unsync us from everyone
@@ -31,7 +37,7 @@ bool CPerPlayerEntity::Sync ( bool bSync )
     // Are we getting synced but not already synced or vice versa?
     if ( bSync != m_bIsSynced )
     {
-        // Create it for everyone we're visible if it's synced, otherwize destroy
+        // Create it for everyone we're visible if it's synced, otherwise destroy
         if ( bSync )
         {
             m_bIsSynced = true;

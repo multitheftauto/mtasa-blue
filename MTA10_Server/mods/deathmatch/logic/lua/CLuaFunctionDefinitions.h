@@ -35,7 +35,7 @@ class CLuaFunctionDefinitions
 public:
     static void     SetBlipManager                      ( class CBlipManager* pBlipManager );
     static void     SetLuaManager                       ( class CLuaManager* pLuaManager );
-    static void     SetMarkerManager                    ( class CMarkers* pMarkerManager );
+    static void     SetMarkerManager                    ( class CMarkerManager* pMarkerManager );
     static void     SetObjectManager                    ( class CObjectManager* pObjectManager );
     static void     SetPickupManager                    ( class CPickupManager* pPickupManager );
     static void     SetPlayerManager                    ( class CPlayerManager* pPlayerManager );

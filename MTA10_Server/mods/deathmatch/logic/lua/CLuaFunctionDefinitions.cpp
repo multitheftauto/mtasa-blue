@@ -61,7 +61,7 @@ LUALIB_API int luaM_toref (lua_State *L, int i) {
 
 static CBlipManager*                                    m_pBlipManager = NULL;
 static CLuaManager*                                     m_pLuaManager = NULL;
-static CMarkers*                                        m_pMarkerManager = NULL;
+static CMarkerManager*                                  m_pMarkerManager = NULL;
 static CObjectManager*                                  m_pObjectManager = NULL;
 static CPickupManager*                                  m_pPickupManager = NULL;
 static CPlayerManager*                                  m_pPlayerManager = NULL;
@@ -92,7 +92,7 @@ void CLuaFunctionDefinitions::SetLuaManager ( CLuaManager* pLuaManager )
 }
 
 
-void CLuaFunctionDefinitions::SetMarkerManager ( CMarkers* pMarkerManager )
+void CLuaFunctionDefinitions::SetMarkerManager ( CMarkerManager* pMarkerManager )
 {
     m_pMarkerManager = pMarkerManager;
 }

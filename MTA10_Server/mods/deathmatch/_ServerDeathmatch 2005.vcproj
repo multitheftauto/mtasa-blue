@@ -603,7 +603,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CMarkers.cpp"
+					RelativePath=".\logic\CMarkerManager.cpp"
 					>
 				</File>
 				<File
@@ -1588,7 +1588,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CMarkers.h"
+					RelativePath=".\logic\CMarkerManager.h"
 					>
 				</File>
 				<File

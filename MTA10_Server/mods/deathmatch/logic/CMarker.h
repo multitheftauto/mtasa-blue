@@ -24,7 +24,7 @@
 
 class CMarker : public CPerPlayerEntity, private CColCallback
 {
-    friend class CMarkers;
+    friend class CMarkerManager;
 
 public:
     enum
@@ -46,7 +46,7 @@ public:
     };
 
 public:
-                            CMarker                 ( class CMarkers* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode );
+                            CMarker                 ( class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode );
                             ~CMarker                ( void );
 
     void                    Unlink                  ( void );
@@ -85,7 +85,7 @@ private:
 
     void                    UpdateCollisionObject   ( unsigned char ucOldType );
 
-    class CMarkers*         m_pMarkerManager;
+    class CMarkerManager*         m_pMarkerManager;
     CColManager*            m_pColManager;
     bool                    m_bHasTarget;
     CVector                 m_vecTarget;
