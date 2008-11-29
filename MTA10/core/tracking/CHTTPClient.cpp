@@ -15,6 +15,10 @@
 
 CHTTPClient::CHTTPClient ( void )
 {
+	m_usPort = 0;
+    m_strStatus = "";
+	m_pHTTPSocket = NULL;
+
     Reset ();
 }
 
@@ -28,12 +32,9 @@ CHTTPClient::~CHTTPClient ( void )
 
 void CHTTPClient::Reset ( void )
 {
-    m_strStatus = "";
-	m_pHTTPSocket = NULL;
     m_Status = 0;
     m_szBuffer = NULL;
     m_nBufferLength = 0;
-	m_usPort = 0;
     m_nPointer = 0;
     m_bCompleted = false;
 
@@ -45,12 +46,15 @@ void CHTTPClient::Reset ( void )
 
 bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBufferLength )
 {
+    // Delete any previous socket
     if ( m_pHTTPSocket )
 		delete m_pHTTPSocket;
-    Reset();
+
+    // Reset
+    Reset ();
+
     // Parse the URL into protocol, host, port and path
     m_strStatus = "connecting to " + strURL;
-    m_Status = 0;
     m_szBuffer = szBuffer;
     m_nBufferLength = nBufferLength;
 
