@@ -34,6 +34,8 @@ public:
                         CHTTPClient             ( void );
                         ~CHTTPClient            ( void );
 
+    void                Reset                   ( void );
+
     bool                Get                     ( std::string strURL, char * szBuffer, unsigned int nBufferLength );
     const std::string&  GetStatusMessage        ( void )        { return m_strStatus; };
     unsigned int        GetStatus               ( void )        { return m_Status; };

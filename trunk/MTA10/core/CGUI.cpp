@@ -76,7 +76,7 @@ void CLocalGUI::CreateWindows ( void )
 
     // Create community registration window
     m_CommunityRegistration.CreateWindows ();
-    m_CommunityRegistration.SetVisible ( true );
+    m_CommunityRegistration.SetVisible ( false );
 
 	// Create the overlayed version labels
 	CVector2D ScreenSize = pGUI->GetResolution ();

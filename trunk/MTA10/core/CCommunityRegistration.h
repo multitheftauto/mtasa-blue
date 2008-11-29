@@ -16,9 +16,17 @@ class CCommunityRegistration;
 #define __CCOMMUNITYREGISTRATION_H
 
 #define REGISTRATION_DELAY              150000
-//#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
-#define REGISTRATION_URL                "http://www.mtasa.com/images/button_center.png"
+#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
 #define REGISTRATION_DATA_BUFFER_SIZE   100000
+#define REGISTRATION_TEMP_FILE          "MTA\\temp.png"
+
+enum eRegistrationResult
+{
+	REGISTRATION_ERROR_UNEXPECTED,
+	REGISTRATION_ERROR_SUCCESS,
+    REGISTRATION_ERROR_REQUEST,
+	REGISTRATION_ERROR_ERROR
+};
 
 class CCommunityRegistration
 {
@@ -34,6 +42,8 @@ public:
     bool                    IsVisible           ( void )                        { return m_pWindow->IsVisible(); };
 
     void                    DoPulse             ( void );
+
+    bool                    HashString          ( const char* szString, std::string &strHashString );
 
 protected:
     void                    CreateWindows       ( void );
@@ -57,12 +67,16 @@ private:
     CGUIEdit*               m_pEditEmail;
     CGUIEdit*               m_pEditCode;
 
+    CGUIStaticImage*        m_pImageCode;
+
     CGUIButton*             m_pButtonRegister;
     CGUIButton*             m_pButtonCancel;
 
     // Community stuff
     CHTTPClient                 m_HTTP;
     char                        m_szBuffer[REGISTRATION_DATA_BUFFER_SIZE];
+
+    std::string                 m_strCommunityHash;
 
     unsigned long               m_ulStartTime;
 };

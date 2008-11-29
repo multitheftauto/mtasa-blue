@@ -148,7 +148,12 @@ CSettings::CSettings ( void )
 
 	m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Login" ) );
 	m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
+    m_pButtonLogin->GetPosition ( vecTemp, false );
 	m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+
+	m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
+	m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
+	m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 
 	/**
 	 *	Multiplayer tab
@@ -199,7 +204,7 @@ CSettings::CSettings ( void )
     m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
 	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
-
+    m_pButtonRegister->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -898,6 +903,13 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
     {
         CCommunity::GetSingleton ().Logout ();
     }
+    return true;
+}
+
+
+bool CSettings::OnRegisterButtonClick ( CGUIElement* pElement )
+{
+    g_pCore->GetLocalGUI()->GetCommunityRegistration()->Open ();
     return true;
 }
 

@@ -114,6 +114,7 @@ protected:
 	CGUIEdit*			m_pEditUser;
 	CGUIEdit*			m_pEditPass;
 	CGUIButton*			m_pButtonLogin;
+    CGUIButton*			m_pButtonRegister;
 
     CGUILabel*          m_pControlsMouseLabel;
     CGUICheckBox*       m_pInvertMouse;
@@ -126,6 +127,7 @@ protected:
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
 	bool				OnLoginButtonClick		( CGUIElement* pElement );
+    bool				OnRegisterButtonClick	( CGUIElement* pElement );
 
 	bool			    OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
