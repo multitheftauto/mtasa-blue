@@ -928,6 +928,7 @@ void CSettings::OnLoginStateChange ( bool bResult )
     m_pEditUser->SetEnabled ( !bResult );
     m_pEditPass->SetEnabled ( !bResult );
     m_pButtonLogin->SetText ( ( bResult ) ? "Logout" : "Login" );
+    m_pButtonRegister->SetVisible ( !bResult );
 }
 
 
