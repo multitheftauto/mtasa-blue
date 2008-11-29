@@ -21,16 +21,9 @@ class CAccessControlListGroup;
 #include <xml/CXMLNode.h>
 #include <list>
 
-#ifdef WIN32
-#include <hash_map>
-#else
-#include <ext/hash_map>
-#endif
+#include <google/sparse_hash_map>
 
 using namespace std;
-
-using namespace stdext;
-
 
 class CAccessControlListGroupObject
 {
@@ -98,9 +91,14 @@ public:
     void                                            WriteToXMLNode              ( CXMLNode* pNode );
 
 private:
-    typedef list < class CAccessControlList* >      ACLsList;
-    typedef list < class CAccessControlListGroupObject* > ObjectList;
-    typedef hash_map < unsigned int, class CAccessControlListGroupObject* > ObjectMap;
+    typedef std::list < class CAccessControlList* >
+                                                    ACLsList;
+
+    typedef std::list < class CAccessControlListGroupObject* >
+                                                    ObjectList;
+
+    typedef google::sparse_hash_map < unsigned int, class CAccessControlListGroupObject* >
+                                                    ObjectMap;
 
     char                                            m_szGroupName               [ 256 ];
     
