@@ -49,6 +49,11 @@ void CCommunity::Logout ( void )
 {
     m_ulStartTime = 0;
     m_bLoggedIn = false;
+
+    // Change GUI
+    CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( false, "" );
+    CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( false );
+
 }
 
 
