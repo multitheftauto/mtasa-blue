@@ -96,6 +96,8 @@ void CCommunityRegistration::CreateWindows ( void )
 
     m_pButtonRegister->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
+
+    m_pWindow->SetAlpha ( 0.9f );
 }
 
 
@@ -165,6 +167,7 @@ void CCommunityRegistration::DoPulse ( void )
                         m_pImageCode->LoadFromFile ( "temp.png" );
 	                    m_pImageCode->SetSize ( CVector2D ( 65.0f, 20.0f ), false );
                         m_pWindow->SetVisible ( true );
+                        m_pWindow->BringToFront ();
 
                         // Delete the temp file
                         remove ( REGISTRATION_TEMP_FILE );
