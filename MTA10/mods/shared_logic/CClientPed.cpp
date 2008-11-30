@@ -208,6 +208,8 @@ CClientPed::~CClientPed ( void )
     {
 		SetHealth ( GetMaxHealth () );
         SetPosition ( CVector ( 2488.562f, -1662.40f, 23.335f ) );
+        // Also reset voice to default (CJ)
+        SetPedVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
     }
     else
     {
@@ -4440,4 +4442,16 @@ void CClientPed::SetOnFire ( bool bIsOnFire )
         m_pPlayerPed->SetOnFire ( bIsOnFire );
     }
     m_bIsOnFire = bIsOnFire;
+}
+
+void CClientPed::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
+{
+    if ( m_pPlayerPed )
+        m_pPlayerPed->GetPedVoice ( pszVoiceType, pszVoice );
+}
+
+void CClientPed::SetPedVoice ( const char* szVoiceType, const char* szVoice )
+{
+    if ( m_pPlayerPed )
+        m_pPlayerPed->SetPedVoice ( szVoiceType, szVoice );
 }

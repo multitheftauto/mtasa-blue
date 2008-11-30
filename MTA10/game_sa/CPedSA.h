@@ -26,6 +26,7 @@ class CPedSA;
 #include "CPedIKSA.h"
 #include "CPhysicalSA.h"
 
+#include "CPedSoundSA.h"
 #include "CPoolsSA.h"
 #include "CVehicleSA.h"
 #include "CWeaponSA.h"
@@ -103,7 +104,7 @@ class CPedIntelligenceSAInterface;
 #define FUNC_SetWaitState				0x4F28A0
 #define FUNC_Teleport					0x4F5690
 #define FUNC_WarpPedIntoCar				0x4EF8B0
-#define FUNC_DetachPedFromEntity       0x5E7EC0
+#define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
 
 #define VAR_LocalPlayer					0x94AD28
@@ -269,7 +270,9 @@ public:
     // current weapon slot 1184 ( and +1816?)
 	//CPedIKSAInterface		pedIK; // 528
 	//CWeaponSAInterface	Weapons[9];	// 1032
-	BYTE bPad[820];
+	BYTE bPad[348];
+    CPedSoundSAInterface pedSound;
+    BYTE bPad11[472 - sizeof(CPedSoundSAInterface)];
     CPedFlags pedFlags; // 1132 (16 bytes long including alignment probably)
     CPedIntelligenceSAInterface * pPedIntelligence;
     CPlayerPedDataSAInterface * pPlayerData; //1152
@@ -408,9 +411,11 @@ public:
     bool                IsOnFire ( void );
     void                SetOnFire ( bool bOnFire );
 
-    inline bool         GetStayInSamePlace ( void )             { return GetPedInterface()->pedFlags.bStayInSamePlace; }
+    inline bool         GetStayInSamePlace ( void )             { return GetPedInterface ()->pedFlags.bStayInSamePlace; }
     void                SetStayInSamePlace ( bool bStay );
 
+    void                GetPedVoice             ( const char** pszVoiceType, const char** pszVoice );
+    void                SetPedVoice             ( const char* szVoiceType, const char* szVoice );
 };
 
 #endif

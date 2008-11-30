@@ -584,6 +584,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPedSoundSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CPhysicalSA.cpp"
 				>
 			</File>
@@ -1058,6 +1062,10 @@
 			</File>
 			<File
 				RelativePath="CPedSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedSoundSA.h"
 				>
 			</File>
 			<File

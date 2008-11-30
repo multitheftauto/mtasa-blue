@@ -825,6 +825,28 @@ void CPedSA::SetStayInSamePlace ( bool bStay )
     GetPedInterface()->pedFlags.bStayInSamePlace = bStay;
 }
 
+void CPedSA::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
+{
+    short sVoiceType = GetPedInterface ()->pedSound.m_sVoiceType;
+    short sVoiceID = GetPedInterface ()->pedSound.m_sVoiceID;
+    if ( pszVoiceType )
+        *pszVoiceType = CPedSoundSA::GetVoiceTypeName ( sVoiceType );
+    if ( pszVoice )
+        *pszVoice = CPedSoundSA::GetVoiceName ( sVoiceType, sVoiceID );
+}
+
+void CPedSA::SetPedVoice ( const char* szVoiceType, const char* szVoice )
+{
+    short sVoiceType = CPedSoundSA::GetVoiceTypeID ( szVoiceType );
+    if ( sVoiceType < 0 )
+        return;
+    short sVoiceID = CPedSoundSA::GetVoiceID ( sVoiceType, szVoice );
+    if ( sVoiceID < 0 )
+        return;
+    GetPedInterface ()->pedSound.m_sVoiceType = sVoiceType;
+    GetPedInterface ()->pedSound.m_sVoiceID = sVoiceID;
+}
+
 /*
 BOOL CPedSA::CanPedReturnToState (  )
 {

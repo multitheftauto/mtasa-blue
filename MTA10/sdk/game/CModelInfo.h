@@ -92,10 +92,6 @@ public:
     virtual void            SetCustomCarPlateText ( char * szText )=0;
     virtual unsigned int    GetNumRemaps ( void )=0;
 
-    // ONLY use for CPedModelInfos
-    virtual void            SetPedVoice ( eVoiceGens VoiceGen, char szVoiceBankFirst[PED_VOICE_BANK_LENGTH], char szVoiceBankLast[PED_VOICE_BANK_LENGTH] ) = 0;
-    virtual void            SetPedAudioType ( const char *szPedAudioType ) = 0;
-
     // ONLY use for upgrade models
     virtual void            RequestVehicleUpgrade ( void )=0;
 

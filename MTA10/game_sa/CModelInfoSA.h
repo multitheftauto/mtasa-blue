@@ -270,10 +270,6 @@ public:
     void                            SetCustomCarPlateText   ( char * szText );
     unsigned int                    GetNumRemaps            ( void );
 
-    // CPedModelInfo specific
-    void                            SetPedVoice             ( eVoiceGens VoiceGen, char szVoiceBankFirst[PED_VOICE_BANK_LENGTH], char szVoiceBankLast[PED_VOICE_BANK_LENGTH] );
-    void                            SetPedAudioType         ( const char *szPedAudioType );
-
     // Upgrades only!
     void                            RequestVehicleUpgrade   ( void );
 

@@ -345,7 +345,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );
 
-    CLuaCFunctions::AddFunction ( "setPedAudioType", CLuaFunctionDefinitions::SetPedAudioType );
+    CLuaCFunctions::AddFunction ( "getPedVoice", CLuaFunctionDefinitions::GetPedVoice );
     CLuaCFunctions::AddFunction ( "setPedVoice", CLuaFunctionDefinitions::SetPedVoice );
     CLuaCFunctions::AddFunction ( "getPedRotation", CLuaFunctionDefinitions::GetPedRotation );
     CLuaCFunctions::AddFunction ( "canPedBeKnockedOffBike", CLuaFunctionDefinitions::CanPedBeKnockedOffBike );

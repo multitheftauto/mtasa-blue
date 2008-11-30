@@ -3464,64 +3464,58 @@ int CLuaFunctionDefinitions::GetPlayerName ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefinitions::SetPedAudioType ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPedVoice ( lua_State* luaVM )
 {
     // Right type?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && 
-         lua_istype ( luaVM, 2, LUA_TSTRING ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
     {
         CClientPed* pPed = lua_toped ( luaVM, 1 );
-        const char* szAudioType = lua_tostring ( luaVM, 2 );
-
-		if ( pPed && szAudioType )
-		{
-            pPed->GetModelInfo ()->SetPedAudioType ( szAudioType );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+        if ( pPed )
+        {
+            const char* szVoiceType = 0;
+            const char* szVoiceBank = 0;
+            pPed->GetPedVoice ( &szVoiceType, &szVoiceBank );
+            if ( szVoiceType && szVoiceBank )
+            {
+                lua_pushstring ( luaVM, szVoiceType );
+                lua_pushstring ( luaVM, szVoiceBank );
+                return 2;
+            }
         }
-        else if ( !pPed )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAudioType", "ped", 1 );
-        else if ( !szAudioType )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAudioType", "audiotype", 1 );
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedVoice", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAudioType" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedVoice" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-
 int CLuaFunctionDefinitions::SetPedVoice ( lua_State* luaVM )
 {
     // Right type?
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && 
-         lua_istype ( luaVM, 2, LUA_TNUMBER ) && 
-         lua_istype ( luaVM, 3, LUA_TSTRING ) && 
-         lua_istype ( luaVM, 4, LUA_TSTRING ) )
+         lua_istype ( luaVM, 2, LUA_TSTRING ) && 
+         lua_istype ( luaVM, 3, LUA_TSTRING ) )
     {
         CClientPed* pPed = lua_toped ( luaVM, 1 );
-        int iVoiceGen = lua_tonumber ( luaVM, 2 );
-        const char* szVoiceBankFirst = lua_tostring ( luaVM, 3 );
-        const char* szVoiceBankLast = lua_tostring ( luaVM, 4 );
+        const char* szVoiceType = lua_tostring ( luaVM, 2 );
+        const char* szVoiceBank = lua_tostring ( luaVM, 3 );
 
-		if ( pPed && szVoiceBankFirst && szVoiceBankLast )
+		if ( pPed && szVoiceType && szVoiceBank )
 		{
-            char szFirst[PED_VOICE_BANK_LENGTH], szLast[PED_VOICE_BANK_LENGTH];
-            strncpy ( szFirst, szVoiceBankFirst, PED_VOICE_BANK_LENGTH );
-            strncpy ( szLast, szVoiceBankLast, PED_VOICE_BANK_LENGTH );
-            pPed->GetModelInfo ()->SetPedVoice ( (eVoiceGens) iVoiceGen, szFirst, szLast );
+            pPed->SetPedVoice ( szVoiceType, szVoiceBank );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
         else if ( !pPed )
             m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "ped", 1 );
-        else if ( !szVoiceBankFirst )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicebankfirst", 1 );
-        else if ( !szVoiceBankLast )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicebanklast", 1 );
+        else if ( !szVoiceType )
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicetype", 1 );
+        else if ( !szVoiceBank )
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicebank", 1 );
 
     }
     else
