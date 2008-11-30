@@ -3712,6 +3712,8 @@ void CClientGame::ResetMapInfo ( void )
     g_pGame->GetHud ()->DisableAll ( false );
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud ()->DisableAreaName ( true );
+    g_pGame->GetHud ()->DisableVitalStats ( true );
+
     m_bHudAreaNameDisabled = false;       
 
     // Gravity
