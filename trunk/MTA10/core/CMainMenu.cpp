@@ -113,6 +113,11 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pCommunityLabel->SetAlpha ( 0.7f );
     m_pCommunityLabel->SetVisible ( false );
 
+    std::string strUsername;
+    CCore::GetSingleton().GetCommunity()->GetUsername ( strUsername );
+    if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
+        ChangeCommunityState ( true, strUsername );
+
 	// Determine some variables based on the current screen size
 	unsigned int uiItemStartY = ScreenSize.fY / 2;
 	//unsigned int uiItemHeight = ( uiItemStartY / 1.55f ) / CORE_MTA_MENU_ITEMS;
