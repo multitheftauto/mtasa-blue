@@ -158,8 +158,37 @@ void CCommandFuncs::Window ( const char* szParameters )
     // Make sure no mod is loaded
     if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
     {
-        // Run "vid 0"
-        Vid ( "0" );
+        CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+        unsigned int currentMode = gameSettings->GetCurrentVideoMode();
+
+        if ( currentMode == 0 )
+        {
+            // Maybe not the best way to find out the mode to return to
+
+            VideoMode           vidModeInfo, currentModeInfo;
+            int                 vidMode, numVidModes, currentVidMode;
+
+            gameSettings->GetVideoModeInfo(&currentModeInfo, currentMode);
+
+            numVidModes = gameSettings->GetNumVideoModes();
+            currentVidMode = gameSettings->GetCurrentVideoMode();
+
+            for (vidMode = 0; vidMode < numVidModes; vidMode++)
+            {
+                gameSettings->GetVideoModeInfo(&vidModeInfo, vidMode);
+
+                if ( vidModeInfo.width == currentModeInfo.width &&
+                     vidModeInfo.height == currentModeInfo.height &&
+                     vidModeInfo.depth == currentModeInfo.depth &&
+                     ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) != ( currentModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) )
+                        gameSettings->SetCurrentVideoMode ( vidMode );
+            }
+        }
+        else
+        {
+            // Run "vid 0"
+            Vid ( "0" );
+        }
     }
     else
     {
