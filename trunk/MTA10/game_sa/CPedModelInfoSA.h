@@ -22,8 +22,6 @@ class ePedStats;
 typedef long AssocGroupID;
 
 #define		FUNC_SetMotionAnimGroup				            0x5b3580
-#define     FUNC_CAEPedSpeechAudioEntity__GetVoice          0x4e3cd0        // 4E3CD0 ; public: static short __cdecl CAEPedSpeechAudioEntity::GetVoice(char *,short)
-#define     FUNC_CAEPedSpeechAudioEntity__GetAudioPedType   0x4e3c60        // 4E3C60 ; public: static short __cdecl CAEPedSpeechAudioEntity::GetAudioPedType(char *)
 
 // CPedModelInfo:
 // +36 = Motion anim group (AssocGroupID, long)
@@ -67,9 +65,6 @@ public:
     CPedModelInfoSAInterface *      GetPedInterface     ( void )        { return reinterpret_cast < CPedModelInfoSAInterface * > ( m_pInterface ); }
 
 	void							SetMotionAnimGroup	( AssocGroupId animGroup );
-
-    void                            SetPedVoice         ( eVoiceGens VoiceGen, char szVoiceBankFirst[PED_VOICE_BANK_LENGTH], char szVoiceBankLast[PED_VOICE_BANK_LENGTH] );
-    void                            SetPedAudioType     ( const char *szPedAudioType );
 };
 
 #endif

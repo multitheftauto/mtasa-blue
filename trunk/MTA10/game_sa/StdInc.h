@@ -42,6 +42,7 @@
 #include "CWeatherSA.h"
 #include "CTextSA.h"
 #include "CPedSA.h"
+#include "CPedSoundSA.h"
 #include "CAudioSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPopulationSA.h"

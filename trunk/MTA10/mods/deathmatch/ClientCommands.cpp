@@ -1044,11 +1044,6 @@ void COMMAND_Debug ( const char *szCmdLine )
 {
     __debugbreak();
 
-    CClientPed* pPlayer = g_pClientGame->GetPlayerManager ()->GetLocalPlayer ();
-
-    pPlayer->GetModelInfo ()->SetPedAudioType ( "PED_TYPE_GEN" );
-    pPlayer->GetModelInfo ()->SetPedVoice ( VOICE_GEN, "VOICE_GEN_BBDYG1", "VOICE_GEN_BBDYG2" );
-
     return;
 
     CPools* pPools = g_pGame->GetPools ();

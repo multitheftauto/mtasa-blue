@@ -222,6 +222,9 @@ public:
     virtual bool            GetStayInSamePlace ( void ) = 0;
     virtual void            SetStayInSamePlace ( bool bStay ) = 0;
 
+    virtual void            GetPedVoice        ( const char** pszVoiceType, const char** pszVoice ) = 0;
+    virtual void            SetPedVoice        ( const char* szVoiceType, const char* szVoice ) = 0;
+
 	/*virtual	BOOL		CanPedReturnToState (  )=0;
 	virtual BOOL		CanSeeEntity ( CEntity * entity, FLOAT fUnknown )=0;
 	virtual VOID		ClearAimFlag (  )=0;
