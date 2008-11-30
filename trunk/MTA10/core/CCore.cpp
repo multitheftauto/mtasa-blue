@@ -1214,7 +1214,7 @@ void CCore::RegisterCommands ( )
 
     m_pCommands->Add ( "vid",				"changes the video settings (id)",	CCommandFuncs::Vid );
 
-    m_pCommands->Add ( "window",            "enter windowed mode",	            CCommandFuncs::Window );
+    m_pCommands->Add ( "window",            "enter/leave windowed mode",	    CCommandFuncs::Window );
 
     m_pCommands->Add ( "load",				"loads a mod (name args)",			CCommandFuncs::Load );
     m_pCommands->Add ( "unload",			"unloads a mod (name)",				CCommandFuncs::Unload );
