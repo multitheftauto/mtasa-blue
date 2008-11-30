@@ -514,10 +514,13 @@ void CClientGame::SetupLocalGame ( const char* szConfig )
 }
 
 
-bool CClientGame::StartLocalGame ( const char* szNick, const char* szConfig, const char* szPassword )
+bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword )
 {
     // Verify that the nickname is valid
-    if ( !IsNickValid ( szNick ) )
+    std::string strNick;
+    g_pCore->GetCVars()->Get ( "nick", strNick );
+
+    if ( !IsNickValid ( strNick.c_str() ) )
     {
         g_pCore->ShowMessageBox ( "Error", "A valid nickname isn't set. Please go to Settings and set a new.", MB_BUTTON_OK | MB_ICON_ERROR );
         g_pCore->GetModManager ()->RequestUnload ();
@@ -537,7 +540,7 @@ bool CClientGame::StartLocalGame ( const char* szNick, const char* szConfig, con
     }
 
     // Store our nickname
-    strncpy ( m_szLocalNick, szNick, MAX_PLAYER_NICK_LENGTH );
+    strncpy ( m_szLocalNick, strNick.c_str(), MAX_PLAYER_NICK_LENGTH );
     m_szLocalNick [MAX_PLAYER_NICK_LENGTH] = 0;
 
     // Got a server?

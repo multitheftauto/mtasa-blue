@@ -157,7 +157,7 @@ bool CLocalServer::OnStartButtonClick ( CGUIElement *pElement )
     Save();
 	// Connect
 
-    g_pClientGame->StartLocalGame ( "Player", m_strConfig.c_str(), m_pEditPass->GetText().c_str() );
+    g_pClientGame->StartLocalGame ( m_strConfig.c_str(), m_pEditPass->GetText().c_str() );
 
     return true;
 }

@@ -183,7 +183,7 @@ public:
                                         ~CClientGame                    ( void );
 
     bool                                StartGame                       ( const char* szNick, const char* szPassword );
-    bool                                StartLocalGame                  ( const char* szNick, const char* szConfig, const char* szPassword = NULL );
+    bool                                StartLocalGame                  ( const char* szConfig, const char* szPassword = NULL );
     void                                SetupLocalGame                  ( const char* szConfig );
     //bool                                StartGame                       ( void );
 
