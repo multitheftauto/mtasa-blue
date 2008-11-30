@@ -148,7 +148,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
                 g_pClientGame = new CClientGame ( true );
 
 				// Connect
-				g_pClientGame->StartLocalGame ( "Player", "editor.conf" );
+                g_pClientGame->StartLocalGame ( "editor.conf" );
 			}
 			else
 			{
