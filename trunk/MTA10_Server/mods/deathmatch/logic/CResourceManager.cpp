@@ -486,6 +486,7 @@ void CResourceManager::OnPlayerJoin ( CPlayer& Player )
 
 CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 {
+    luaVM = lua_getmainstate ( luaVM );
     list < CResource* > ::iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
