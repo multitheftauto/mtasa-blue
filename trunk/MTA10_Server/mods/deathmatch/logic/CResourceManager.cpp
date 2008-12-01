@@ -246,16 +246,16 @@ void CResourceManager::ListResourcesLoaded ( void )
         {
             if ( res->IsActive() )
             {
-                CLogger::LogPrintf ( "%-20.20s   RUNNING   (%d dependents)\n", res->GetName(), res->GetDependentCount() );
+                CLogger::LogPrintf ( "%-20.20s   RUNNING   (%d dependents)\n", res->GetName().c_str(), res->GetDependentCount() );
                 uiRunningCount++;
             }
             else
-                CLogger::LogPrintf ( "%-20.20s   STOPPED   (%d files)\n", res->GetName(), res->GetFileCount() );
+                CLogger::LogPrintf ( "%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount() );
             uiCount ++;
         }
         else
         {
-            CLogger::LogPrintf ( "%-20.20s   FAILED    (see info command for reason)\n", (*iter)->GetName().c_str () );
+            CLogger::LogPrintf ( "%-20.20s   FAILED    (see info command for reason)\n", res->GetName().c_str () );
             uiFailedCount ++;
         }
     }
