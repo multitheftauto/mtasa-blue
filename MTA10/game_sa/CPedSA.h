@@ -414,7 +414,9 @@ public:
     inline bool         GetStayInSamePlace ( void )             { return GetPedInterface ()->pedFlags.bStayInSamePlace; }
     void                SetStayInSamePlace ( bool bStay );
 
+    void                GetPedVoice             ( short* psVoiceType, short* psVoiceID );
     void                GetPedVoice             ( const char** pszVoiceType, const char** pszVoice );
+    void                SetPedVoice             ( short sVoiceType, short sVoiceID );
     void                SetPedVoice             ( const char* szVoiceType, const char* szVoice );
 };
 
