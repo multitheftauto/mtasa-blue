@@ -9850,7 +9850,8 @@ int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
 
 	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) > LUA_TNIL ) {
 		CLuaArguments Args;
-		Args.ReadArgument ( luaVM, 2 );
+        for ( int i = 2; i <= lua_gettop ( luaVM ); i++ )
+		    Args.ReadArgument ( luaVM, i );
 
         std::string strSetting = lua_tostring ( luaVM, 1 );
         std::string strResourceName = pResource->GetName ();
