@@ -510,7 +510,7 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
             m_bCaptureKey = true;
 
 		    // Determine if the primary or secondary column was selected
-		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) == m_hPriKey ) {
+		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) + 1 == m_hPriKey ) {
 			    // Create a messagebox to notify the user
 			    //sprintf ( szText, "Press a key to bind to '%s'", pItemBind->GetText ().c_str() );
 			    sprintf ( szText, "Press a key to bind" );

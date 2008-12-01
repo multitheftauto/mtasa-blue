@@ -825,14 +825,30 @@ void CPedSA::SetStayInSamePlace ( bool bStay )
     GetPedInterface()->pedFlags.bStayInSamePlace = bStay;
 }
 
-void CPedSA::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
+void CPedSA::GetPedVoice ( short* psVoiceType, short* psVoiceID )
 {
     short sVoiceType = GetPedInterface ()->pedSound.m_sVoiceType;
     short sVoiceID = GetPedInterface ()->pedSound.m_sVoiceID;
+    if ( psVoiceType )
+        *psVoiceType = sVoiceType;
+    if ( psVoiceID )
+        *psVoiceID = sVoiceID;
+}
+
+void CPedSA::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
+{
+    short sVoiceType, sVoiceID;
+    GetPedVoice ( &sVoiceType, &sVoiceID );
     if ( pszVoiceType )
         *pszVoiceType = CPedSoundSA::GetVoiceTypeName ( sVoiceType );
     if ( pszVoice )
         *pszVoice = CPedSoundSA::GetVoiceName ( sVoiceType, sVoiceID );
+}
+
+void CPedSA::SetPedVoice ( short sVoiceType, short sVoiceID )
+{
+    GetPedInterface ()->pedSound.m_sVoiceType = sVoiceType;
+    GetPedInterface ()->pedSound.m_sVoiceID = sVoiceID;
 }
 
 void CPedSA::SetPedVoice ( const char* szVoiceType, const char* szVoice )
@@ -843,8 +859,7 @@ void CPedSA::SetPedVoice ( const char* szVoiceType, const char* szVoice )
     short sVoiceID = CPedSoundSA::GetVoiceID ( sVoiceType, szVoice );
     if ( sVoiceID < 0 )
         return;
-    GetPedInterface ()->pedSound.m_sVoiceType = sVoiceType;
-    GetPedInterface ()->pedSound.m_sVoiceID = sVoiceID;
+    SetPedVoice ( sVoiceType, sVoiceID );
 }
 
 /*

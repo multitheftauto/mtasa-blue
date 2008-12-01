@@ -363,7 +363,9 @@ public:
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
 
+    void                        GetPedVoice             ( short* psVoiceType, short* psVoiceID );
     void                        GetPedVoice             ( const char** pszVoiceType, const char** pszVoice );
+    void                        SetPedVoice             ( short sVoiceType, short sVoiceID );
     void                        SetPedVoice             ( const char* szVoiceType, const char* szVoice );
 
 protected:
