@@ -53,18 +53,18 @@ public:
     BYTE                bSecondRadioStation;    // 57   Second radio station
     BYTE                bIsInRace;              // 58   Race (byte)
     BYTE                pad3 [ 1 ];             // 59   
-    short               pedAudioType;           // 60   Audio ped type (short)
-    short               FirstVoice;             // 62   First voice
-    short               LastVoice;              // 64   Last voice
-    short               NextVoice;              // 66   Next voice
+    short               sVoiceType;             // 60   Voice type
+    short               sFirstVoice;            // 62   First voice
+    short               sLastVoice;             // 64   Last voice
+    short               sNextVoice;             // 66   Next voice
 };
 
 class CPedModelInfoSA : public CModelInfoSA, public CPedModelInfo
 {
 public:
-    CPedModelInfoSAInterface *      GetPedInterface     ( void )        { return reinterpret_cast < CPedModelInfoSAInterface * > ( m_pInterface ); }
+    CPedModelInfoSAInterface *      GetPedModelInfoInterface   ( void )        { return reinterpret_cast < CPedModelInfoSAInterface * > ( m_pInterface ); }
 
-	void							SetMotionAnimGroup	( AssocGroupId animGroup );
+	void							SetMotionAnimGroup	       ( AssocGroupId animGroup );
 };
 
 #endif

@@ -18,6 +18,7 @@
 
 #include <windows.h>
 #include "CColModel.h"
+class CPedModelInfo;
 
 class CBoundingBox
 {
@@ -48,8 +49,6 @@ enum eVehicleUpgradePosn
     VEHICLE_UPGRADE_POSN_REAR_BUMPER,
     VEHICLE_UPGRADE_POSN_MISC,
 };
-
-#include "CPedModelInfo.h"
 
 class CModelInfo
 {
@@ -94,6 +93,12 @@ public:
 
     // ONLY use for upgrade models
     virtual void            RequestVehicleUpgrade ( void )=0;
+
+    // ONLY use for peds
+    virtual void            GetVoice            ( short* psVoiceType, short* psVoice ) = 0;
+    virtual void            GetVoice            ( const char** pszVoiceType, const char** szVoice ) = 0;
+    virtual void            SetVoice            ( short sVoiceType, short sVoice ) = 0;
+    virtual void            SetVoice            ( const char* szVoiceType, const char* szVoice ) = 0;
 
 	// Custom collision related functions
 	virtual void			SetCustomModel ( RpClump* pClump )=0;

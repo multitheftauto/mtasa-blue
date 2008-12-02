@@ -17,7 +17,7 @@ class CPlayerPed;
 class CProjectileInfo
 {
 public:
-    virtual BOOL					AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
+    virtual bool					AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
     virtual CProjectile *           GetProjectile ( DWORD ID ) = 0;
     virtual CProjectile *           GetProjectile ( void * projectilePointer )=0; //hack, don't use please
     virtual CProjectileInfo         * GetProjectileInfo ( void * projectileInfoInterface )=0; //don't use

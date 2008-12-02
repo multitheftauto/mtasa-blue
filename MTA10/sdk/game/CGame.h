@@ -45,6 +45,7 @@ typedef void ( InRenderer ) ( void );
 #include "CModelInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
+#include "CPedModelInfo.h"
 #include "CPickups.h"
 #include "CPlayerInfo.h"
 #include "CPools.h"

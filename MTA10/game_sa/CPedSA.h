@@ -315,30 +315,31 @@ class CPedSA : public virtual CPed, public virtual CPhysicalSA
 {
 	friend class CPoolsSA;
 private:
-//	CPedSAInterface		* internalInterface;
-	CWeaponSA			* Weapons[WEAPONSLOT_MAX];
-	CPedIKSA			* PedIK;
-	CPedIntelligenceSA	* PedIntelligence;
+	CWeaponSA			* m_pWeapons[WEAPONSLOT_MAX];
+	CPedIKSA			* m_pPedIK;
+	CPedIntelligenceSA	* m_pPedIntelligence;
     CPedSAInterface     * m_pPedInterface;
+    CPedSoundSA         m_PedSound;
 
-	DWORD				dwType;
+	DWORD				m_dwType;
     unsigned char       m_ucOccupiedSeat;
 public:
 	                    CPedSA(  );
 	                    CPedSA( CPedSAInterface * pedInterface );
                         ~CPedSA();
 
+    VOID                SetInterface( CEntitySAInterface * intInterface );
     CPedSAInterface *   GetPedInterface ( void ) { return ( CPedSAInterface * ) GetInterface (); }
-	VOID				Init();
-	VOID				SetModelIndex ( DWORD dwModelIndex );
-	VOID				AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
-	VOID				AttachPedToEntity(DWORD dwEntityInterface, CVector * vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType, BOOL bChangeCamera);
-    VOID                DetachPedFromEntity ( void );
+	void				Init();
+	void				SetModelIndex ( DWORD dwModelIndex );
+	void				AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
+	void				AttachPedToEntity(DWORD dwEntityInterface, CVector * vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType, bool bChangeCamera);
+    void                DetachPedFromEntity ( void );
 	
-	BOOL				CanSeeEntity(CEntity * entity, FLOAT fDistance);
+	bool				CanSeeEntity(CEntity * entity, FLOAT fDistance);
 	CVehicle			* GetVehicle();
-	VOID				Respawn (CVector * position, bool bCameraCut);
-    BOOL                AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
+	void				Respawn (CVector * position, bool bCameraCut);
+    bool                AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
 	FLOAT				GetHealth       ( void );
     void				SetHealth       ( float fHealth );
@@ -353,16 +354,16 @@ public:
     void                RemoveWeaponModel ( int iModel );
     void                ClearWeapon     ( eWeaponType weaponType );
 
-	VOID				SetIsStanding( bool bStanding );
+	void				SetIsStanding( bool bStanding );
 	CPedIntelligence	* GetPedIntelligence ( void );
 	DWORD				GetType ( void );
-	VOID				SetType ( DWORD dwType );
+	void				SetType ( DWORD dwType );
     DWORD               * GetMemoryValue ( DWORD dwOffset );
 
 	FLOAT		        GetCurrentRotation();
 	FLOAT		        GetTargetRotation();
-	VOID		        SetCurrentRotation(FLOAT fRotation);
-	VOID		        SetTargetRotation(FLOAT fRotation);
+	void		        SetCurrentRotation(FLOAT fRotation);
+	void		        SetTargetRotation(FLOAT fRotation);
 
     eWeaponSlot         GetCurrentWeaponSlot ();
     void                SetCurrentWeaponSlot ( eWeaponSlot weaponSlot );
@@ -382,8 +383,8 @@ public:
     bool                IsWearingGoggles ( void );
     void                SetGogglesState ( bool bIsWearingThem );
 
-	VOID			    SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType );
-	VOID			    RebuildPlayer ( void );
+	void			    SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType );
+	void			    RebuildPlayer ( void );
 
     eFightingStyle      GetFightingStyle ( void );
     void                SetFightingStyle ( eFightingStyle style, BYTE bStyleExtra = 6 );

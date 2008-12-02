@@ -769,3 +769,41 @@ void CModelInfoSA::MakeCustomModel ( void )
         SetColModel ( m_pColModel );
     }
 }
+
+
+void CModelInfoSA::GetVoice ( short* psVoiceType, short* psVoiceID )
+{
+    if ( psVoiceType )
+        *psVoiceType = GetPedModelInfoInterface ()->sVoiceType;
+    if ( psVoiceID )
+        *psVoiceID = GetPedModelInfoInterface ()->sFirstVoice;
+}
+
+void CModelInfoSA::GetVoice ( const char** pszVoiceType, const char** pszVoice )
+{
+    short sVoiceType, sVoiceID;
+    GetVoice ( &sVoiceType, &sVoiceID );
+    if ( pszVoiceType )
+        *pszVoiceType = CPedSoundSA::GetVoiceTypeNameFromID ( sVoiceType );
+    if ( pszVoice )
+        *pszVoice = CPedSoundSA::GetVoiceNameFromID ( sVoiceType, sVoiceID );
+}
+
+void CModelInfoSA::SetVoice ( short sVoiceType, short sVoiceID )
+{
+    GetPedModelInfoInterface ()->sVoiceType = sVoiceType;
+    GetPedModelInfoInterface ()->sFirstVoice = sVoiceID;
+    GetPedModelInfoInterface ()->sLastVoice = sVoiceID;
+    GetPedModelInfoInterface ()->sNextVoice = sVoiceID;
+}
+
+void CModelInfoSA::SetVoice ( const char* szVoiceType, const char* szVoice )
+{
+    short sVoiceType = CPedSoundSA::GetVoiceTypeIDFromName ( szVoiceType );
+    if ( sVoiceType < 0 )
+        return;
+    short sVoiceID = CPedSoundSA::GetVoiceIDFromName ( sVoiceType, szVoice );
+    if ( sVoiceID < 0 )
+        return;
+    SetVoice ( sVoiceType, sVoiceID );
+}

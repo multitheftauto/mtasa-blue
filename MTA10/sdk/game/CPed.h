@@ -145,12 +145,12 @@ public:
 
     virtual class CPedSAInterface * GetPedInterface ( void ) = 0;
 
-	virtual VOID			AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;
-    virtual VOID            DetachPedFromEntity ( void )=0;
+	virtual void			AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;
+    virtual void            DetachPedFromEntity ( void )=0;
 
-	virtual BOOL			CanSeeEntity(CEntity * entity, FLOAT fDistance)=0;
+	virtual bool			CanSeeEntity(CEntity * entity, FLOAT fDistance)=0;
 	virtual CVehicle		* GetVehicle()=0;
-	virtual VOID			Respawn (CVector * position,bool bCameraCut)=0;
+	virtual void			Respawn (CVector * position,bool bCameraCut)=0;
 
     virtual void            SetModelIndex       ( unsigned long ulModel ) = 0;
 
@@ -158,7 +158,7 @@ public:
     virtual void			SetHealth ( float fHealth )=0;
     virtual float           GetArmor () = 0;
     virtual void            SetArmor ( float fArmor ) = 0;
-    virtual BOOL            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
+    virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
     virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )=0;
     virtual CWeapon *       GetWeapon ( eWeaponSlot weaponSlot )=0;
     virtual CWeapon *       GetWeapon ( eWeaponType weaponType )=0;
@@ -166,7 +166,7 @@ public:
     virtual void            RemoveWeaponModel ( int iModel ) = 0;
     virtual void            ClearWeapon     ( eWeaponType weaponType )=0;
 
-	virtual VOID			SetIsStanding( bool bStanding )=0;
+	virtual void			SetIsStanding( bool bStanding )=0;
 	virtual DWORD			GetType ()=0;
 	virtual CPedIntelligence	* GetPedIntelligence()=0;
     virtual DWORD               * GetMemoryValue ( DWORD dwOffset )=0;
@@ -174,8 +174,8 @@ public:
 
 	virtual FLOAT		    GetCurrentRotation()=0;
 	virtual FLOAT		    GetTargetRotation()=0;
-	virtual VOID		    SetCurrentRotation(FLOAT fRotation)=0;
-	virtual VOID		    SetTargetRotation(FLOAT fRotation)=0;
+	virtual void		    SetCurrentRotation(FLOAT fRotation)=0;
+	virtual void		    SetTargetRotation(FLOAT fRotation)=0;
     virtual eWeaponSlot     GetCurrentWeaponSlot()=0;
     virtual void            SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )=0;
 
@@ -227,61 +227,61 @@ public:
     virtual void            SetPedVoice        ( short sVoiceType, short sVoiceID ) = 0;
     virtual void            SetPedVoice        ( const char* szVoiceType, const char* szVoice ) = 0;
 
-	/*virtual	BOOL		CanPedReturnToState (  )=0;
-	virtual BOOL		CanSeeEntity ( CEntity * entity, FLOAT fUnknown )=0;
-	virtual VOID		ClearAimFlag (  )=0;
-	virtual VOID		ClearAll (  )=0;
-	virtual VOID		ClearAttackByRemovingAnim (  )=0;
-	virtual VOID		ClearInvestigateEvent (  )=0;
-	virtual VOID		ClearLookFlag (  )=0;
-	virtual VOID		ClearObjective (  )=0;
-	virtual VOID		ClearPointGunAt (  )=0;
-	virtual VOID		ClearWeapons (  )=0;
-	virtual VOID		CreateDeadPedMoney (  )=0;
-	virtual VOID		CreateDeadPedWeaponPickups (  )=0;
-	virtual VOID		GetLocalDirection ( CVector2D * vector )=0;
+	/*virtual	bool		CanPedReturnToState (  )=0;
+	virtual bool		CanSeeEntity ( CEntity * entity, FLOAT fUnknown )=0;
+	virtual void		ClearAimFlag (  )=0;
+	virtual void		ClearAll (  )=0;
+	virtual void		ClearAttackByRemovingAnim (  )=0;
+	virtual void		ClearInvestigateEvent (  )=0;
+	virtual void		ClearLookFlag (  )=0;
+	virtual void		ClearObjective (  )=0;
+	virtual void		ClearPointGunAt (  )=0;
+	virtual void		ClearWeapons (  )=0;
+	virtual void		CreateDeadPedMoney (  )=0;
+	virtual void		CreateDeadPedWeaponPickups (  )=0;
+	virtual void		GetLocalDirection ( CVector2D * vector )=0;
 	virtual CWeapon		* GiveWeapon ( eWeaponType weapon, DWORD dwAmmo )=0;
 	virtual CWeapon		* GetWeapon ( eWeaponSlot weaponSlot )=0;
-	virtual VOID		SetCurrentWeapon ( eWeaponType weapon )=0;
-	virtual VOID		SetCurrentWeapon ( eWeaponSlot slot )=0;
+	virtual void		SetCurrentWeapon ( eWeaponType weapon )=0;
+	virtual void		SetCurrentWeapon ( eWeaponSlot slot )=0;
 	virtual CWeapon		* GetCurrentWeapon (  )=0;	
-	virtual BOOL		IsPedInControl (  )=0;
-	virtual BOOL		IsPedShootable (  )=0;
-	virtual VOID		SetAttackTimer ( DWORD dwTimer )=0;
-	virtual VOID		SetDead (  )=0;
-	virtual VOID		SetDie ( DWORD AnimationID, FLOAT fUnknown1, FLOAT fUnknown2 )=0;
-	virtual VOID		SetEvasiveDive ( CPhysical * avoid, BYTE bUnknown )=0;
-	virtual VOID		SetEvasiveStep ( CPhysical * avoid, BYTE bUnknown )=0;
-	virtual VOID		SetFall ( DWORD dwUnknown, DWORD AnimationID, BYTE bUnknown )=0;
-	virtual VOID		SetFlee ( CVector2D * vecPoint, DWORD dwDuration )=0;
-	virtual VOID		SetIdle (  )=0;
-	virtual VOID		SetLeader ( CPed * leader )=0;
-	virtual VOID		SetLookFlag ( CEntity * lookat, BOOL bIgnoreCurrentLook )=0; // confirm BOOL
-	virtual VOID		SetLookTimer ( DWORD dwLookTime )=0;
-	virtual VOID		SetModelIndex ( DWORD dwModelIndex )=0;
-	virtual VOID		SetMoveState ( eMoveState movestate )=0;
+	virtual bool		IsPedInControl (  )=0;
+	virtual bool		IsPedShootable (  )=0;
+	virtual void		SetAttackTimer ( DWORD dwTimer )=0;
+	virtual void		SetDead (  )=0;
+	virtual void		SetDie ( DWORD AnimationID, FLOAT fUnknown1, FLOAT fUnknown2 )=0;
+	virtual void		SetEvasiveDive ( CPhysical * avoid, BYTE bUnknown )=0;
+	virtual void		SetEvasiveStep ( CPhysical * avoid, BYTE bUnknown )=0;
+	virtual void		SetFall ( DWORD dwUnknown, DWORD AnimationID, BYTE bUnknown )=0;
+	virtual void		SetFlee ( CVector2D * vecPoint, DWORD dwDuration )=0;
+	virtual void		SetIdle (  )=0;
+	virtual void		SetLeader ( CPed * leader )=0;
+	virtual void		SetLookFlag ( CEntity * lookat, bool bIgnoreCurrentLook )=0; // confirm bool
+	virtual void		SetLookTimer ( DWORD dwLookTime )=0;
+	virtual void		SetModelIndex ( DWORD dwModelIndex )=0;
+	virtual void		SetMoveState ( eMoveState movestate )=0;
 	virtual eObjective	GetObjective (  )=0;
 	virtual CEntity *	GetObjectiveEntity (  )=0;
-	virtual VOID		GetObjectiveVector ( CVector * vector )=0;
-	virtual VOID		SetObjective ( eObjective objective, CVehicle * vehicle )=0;
-	virtual VOID		SetObjective ( eObjective objective, CPed * ped )=0;
-	virtual VOID		SetObjective ( eObjective objective )=0;
-	virtual VOID		SetObjective ( eObjective objective, CVector * vecPoint )=0;
-	virtual VOID		SetSeekCar ( CVehicle * vehicle )=0;
-	virtual VOID		SetShootTimer ( DWORD dwTime )=0;
-	virtual VOID		SetSolicit (  )=0;
-	virtual VOID		SetStoredState (  )=0;
-	virtual VOID		RestorePreviousState (  )=0;
-	virtual VOID		SetWaitState ( eWaitState waitstate )=0;
-	virtual VOID		Teleport ( CVector * vecPoint )=0;
-	virtual VOID		WarpPedIntoCar ( CVehicle * vehicle )=0;
+	virtual void		GetObjectiveVector ( CVector * vector )=0;
+	virtual void		SetObjective ( eObjective objective, CVehicle * vehicle )=0;
+	virtual void		SetObjective ( eObjective objective, CPed * ped )=0;
+	virtual void		SetObjective ( eObjective objective )=0;
+	virtual void		SetObjective ( eObjective objective, CVector * vecPoint )=0;
+	virtual void		SetSeekCar ( CVehicle * vehicle )=0;
+	virtual void		SetShootTimer ( DWORD dwTime )=0;
+	virtual void		SetSolicit (  )=0;
+	virtual void		SetStoredState (  )=0;
+	virtual void		RestorePreviousState (  )=0;
+	virtual void		SetWaitState ( eWaitState waitstate )=0;
+	virtual void		Teleport ( CVector * vecPoint )=0;
+	virtual void		WarpPedIntoCar ( CVehicle * vehicle )=0;
 	virtual FLOAT		GetHealth ( )=0;
-	virtual VOID		SetHealth ( FLOAT fHealth )=0;
+	virtual void		SetHealth ( FLOAT fHealth )=0;
 	virtual CVehicle *	GetCurrentVehicle (  )=0;
-	virtual BOOL		IsInVehicle()=0;
+	virtual bool		IsInVehicle()=0;
 
-	virtual VOID		SetAsActivePed()=0;
-	virtual VOID		SetPedState(ePedState PedState)=0;
+	virtual void		SetAsActivePed()=0;
+	virtual void		SetPedState(ePedState PedState)=0;
 	virtual ePedState	GetPedState()=0;*/
 
 
