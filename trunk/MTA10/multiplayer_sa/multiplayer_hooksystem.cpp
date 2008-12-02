@@ -20,9 +20,7 @@ VOID HookInstallMethod(	DWORD dwInstallAddress,
 {
 	DWORD oldProt, oldProt2;
 
-	VirtualProtect((LPVOID)dwInstallAddress,4,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(PDWORD)dwInstallAddress = (DWORD)dwHookFunction;
-	VirtualProtect((LPVOID)dwInstallAddress,4,oldProt,&oldProt2);
 }
 
 VOID HookInstallCall ( DWORD dwInstallAddress,
@@ -30,10 +28,8 @@ VOID HookInstallCall ( DWORD dwInstallAddress,
 {
     DWORD oldProt, oldProt2;
     DWORD dwOffset = dwHookFunction - (dwInstallAddress + 5);
-	VirtualProtect((LPVOID)dwInstallAddress,5,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(BYTE*)(dwInstallAddress) = 0xE8;
     *(DWORD*)(dwInstallAddress+1) = dwOffset;
-	VirtualProtect((LPVOID)dwInstallAddress,5,oldProt,&oldProt2);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -51,9 +47,7 @@ BOOL HookInstall( DWORD dwInstallAddress,
 
 		DWORD oldProt, oldProt2;
 
-		VirtualProtect((LPVOID)dwInstallAddress,iJmpCodeSize,PAGE_EXECUTE_READWRITE,&oldProt);		
 		memcpy((PVOID)dwInstallAddress,JumpBytes,iJmpCodeSize);
-		VirtualProtect((LPVOID)dwInstallAddress,iJmpCodeSize,oldProt,&oldProt2);
 		return TRUE;
 	}
 	else
