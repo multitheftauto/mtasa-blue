@@ -90,6 +90,8 @@ class CSettings
     void                OnLoginStateChange      ( bool bResult );
 
 protected:
+    const static int    SecKeyNum = 3;     // Number of secondary keys
+
 	// Keep these protected so we can access them in the event handlers of CClientGame
     CGUIWindow*         m_pWindow;
 	CGUITabPanel*	    m_pTabs;
@@ -106,7 +108,7 @@ protected:
 	
 	CGUIGridList*	    m_pBindsList;
 	CGUIButton*		    m_pBindsDefButton;
-	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKey;
+	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
 	CGUILabel*			m_pLabelCommunity;
 	CGUILabel*			m_pLabelUser;

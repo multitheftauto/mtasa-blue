@@ -112,9 +112,10 @@ CSettings::CSettings ( void )
     m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
 
-	m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.40f );
-    m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.30f );
-	m_hSecKey = m_pBindsList->AddColumn ( "ALT. KEY", 0.30f );
+	m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
+    m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.24f );
+    for ( int k = 0 ; k < SecKeyNum ; k++ )
+    	m_hSecKeys[k] = m_pBindsList->AddColumn ( "ALT. KEY", 0.24f );
 
 	/**
 	 *	Community tab
@@ -278,9 +279,13 @@ void CSettings::ProcessKeyBinds ( void )
         // Get the type and keys
         unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );        
 		char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
-        char* szSec = m_pBindsList->GetItemText ( i, m_hSecKey );
 		const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
-		const SBindableKey* pSecKey = szSec ? pKeyBinds->GetBindableFromKey ( szSec ) : NULL;
+ 		const SBindableKey* pSecKeys[SecKeyNum];
+        for ( int k = 0 ; k < SecKeyNum ; k++ )
+        {
+            char* szSec = m_pBindsList->GetItemText ( i, m_hSecKeys[k] );
+            pSecKeys[k] = szSec ? pKeyBinds->GetBindableFromKey ( szSec ) : NULL;
+        }
         
         // If the type is control
 		if ( ucType == KEY_BIND_GTA_CONTROL )
@@ -297,36 +302,39 @@ void CSettings::ProcessKeyBinds ( void )
                     pKeyBinds->Remove ( pBind );
             }
 
-            CGTAControlBind* pSecBind = reinterpret_cast < CGTAControlBind* > ( m_pBindsList->GetItemData ( i, m_hSecKey ) );
-            if ( pSecBind )
+            for ( int k = 0 ; k < SecKeyNum ; k++ )
             {
-                // If theres a secondary key, change it
-                if ( pSecKey )
+                CGTAControlBind* pSecBind = reinterpret_cast < CGTAControlBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
+                if ( pSecBind )
                 {
-                    if ( pSecBind->boundKey != pSecKey )
+                    // If theres a secondary key, change it
+                    if ( pSecKeys[k] )
                     {
-                        if ( !pKeyBinds->GTAControlExists ( pSecKey, pSecBind->control ) )
+                        if ( pSecBind->boundKey != pSecKeys[k] )
                         {
-                            pSecBind->boundKey = pSecKey;
-                        }
-                        else
-                        {
-                            // If not remove the bind
-                            pKeyBinds->Remove ( pSecBind );
+                            if ( !pKeyBinds->GTAControlExists ( pSecKeys[k], pSecBind->control ) )
+                            {
+                                pSecBind->boundKey = pSecKeys[k];
+                            }
+                            else
+                            {
+                                // If not remove the bind
+                                pKeyBinds->Remove ( pSecBind );
+                            }
                         }
                     }
+                    else
+                    {
+                        // If not remove the bind
+                        pKeyBinds->Remove ( pSecBind );
+                    }
                 }
-                else
+                else if ( pSecKeys[k] && pBind )
                 {
-                    // If not remove the bind
-                    pKeyBinds->Remove ( pSecBind );
+                    SBindableGTAControl* pControl = pBind->control;
+                    if ( !pKeyBinds->GTAControlExists ( pSecKeys[k], pControl ) )
+                        pKeyBinds->AddGTAControl ( pSecKeys[k], pControl );
                 }
-            }
-            else if ( pSecKey && pBind )
-            {
-                SBindableGTAControl* pControl = pBind->control;
-                if ( !pKeyBinds->GTAControlExists ( pSecKey, pControl ) )
-                    pKeyBinds->AddGTAControl ( pSecKey, pControl );
             }
 
         }
@@ -338,9 +346,10 @@ void CSettings::ProcessKeyBinds ( void )
             if ( pPriKey )
                 // If theres a new key for primary, add a new bind
                 pKeyBinds->AddGTAControl ( pPriKey, pControl );
-            if ( pSecKey )
-                // If theres a new key for secondary, add a new bind
-                pKeyBinds->AddGTAControl ( pSecKey, pControl );
+            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                if ( pSecKeys[k] )
+                 // If theres a new key for secondary, add a new bind
+                    pKeyBinds->AddGTAControl ( pSecKeys[k], pControl );
         }
         // If the type is a command
         else if ( ucType == KEY_BIND_COMMAND )
@@ -376,23 +385,26 @@ void CSettings::ProcessKeyBinds ( void )
             }
 
 			/** Secondary keybinds **/
-            pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hSecKey ) );
-			// If this is a valid bind in the keybinds list
-            if ( pBind )
+            for ( int k = 0 ; k < SecKeyNum ; k++ )
             {
-				// And our secondary key field was not empty
-                if ( pSecKey )
+                pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
+			    // If this is a valid bind in the keybinds list
+                if ( pBind )
                 {
-					if ( pSecKey != pBind->boundKey )
-                        pBind->boundKey = pSecKey;
+				    // And our secondary key field was not empty
+                    if ( pSecKeys[k] )
+                    {
+					    if ( pSecKeys[k] != pBind->boundKey )
+                            pBind->boundKey = pSecKeys[k];
+                    }
+				    // If the secondary key field was empty, we should remove the keybind
+				    else
+                        pKeyBinds->Remove ( pBind );
                 }
-				// If the secondary key field was empty, we should remove the keybind
-				else
-                    pKeyBinds->Remove ( pBind );
+			    // If this key bind didn't exist, create it
+                else if ( pSecKeys[k] )
+				    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
             }
-			// If this key bind didn't exist, create it
-            else if ( pSecKey )
-				pKeyBinds->AddCommand ( pSecKey, szCommand, szArguments );
         }
         else if ( ucType == KEY_BIND_FUNCTION ) // keys bound to script functions
         {
@@ -440,53 +452,56 @@ void CSettings::ProcessKeyBinds ( void )
 
             CKeyFunctionBind* pPrimaryBind = pBind;
 			/** Secondary keybinds **/
-            pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hSecKey ) );
-			// If this is a valid bind in the keybinds list
-            if ( pBind )
+            for ( int k = 0 ; k < SecKeyNum ; k++ )
             {
-                CKeyFunctionBind* pSecondSecondaryBind = NULL;
-                list < CKeyBind* > ::const_iterator iterr = pKeyBinds->IterBegin ();
-                for ( unsigned int uiIndex = 0 ; iterr != pKeyBinds->IterEnd (); iterr++, uiIndex++ )
+                pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
+			    // If this is a valid bind in the keybinds list
+                if ( pBind )
                 {
-                    eKeyBindType bindType = (*iterr)->GetType ();
-                    if ( (*iterr)->GetType () == KEY_BIND_FUNCTION )
+                    CKeyFunctionBind* pSecondSecondaryBind = NULL;
+                    list < CKeyBind* > ::const_iterator iterr = pKeyBinds->IterBegin ();
+                    for ( unsigned int uiIndex = 0 ; iterr != pKeyBinds->IterEnd (); iterr++, uiIndex++ )
                     {
-                        CKeyFunctionBind* pBindItem = reinterpret_cast < CKeyFunctionBind* > ( (*iterr) );
-                        if ( pBindItem->boundKey == pBind->boundKey && pBindItem->bHitState == !pBind->bHitState )
+                        eKeyBindType bindType = (*iterr)->GetType ();
+                        if ( (*iterr)->GetType () == KEY_BIND_FUNCTION )
                         {
-                            if ( pSecondBind != pBindItem ) // don't want to find the same bind we found for the primary one
+                            CKeyFunctionBind* pBindItem = reinterpret_cast < CKeyFunctionBind* > ( (*iterr) );
+                            if ( pBindItem->boundKey == pBind->boundKey && pBindItem->bHitState == !pBind->bHitState )
                             {
-                                pSecondSecondaryBind = pBindItem;
-                                break;
+                                if ( pSecondBind != pBindItem ) // don't want to find the same bind we found for the primary one
+                                {
+                                    pSecondSecondaryBind = pBindItem;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
 
-				// And our secondary key field was not empty
-                if ( pSecKey )
-                {
-					if ( pSecKey != pBind->boundKey )
+				    // And our secondary key field was not empty
+                    if ( pSecKeys[k] )
                     {
-                        pBind->boundKey = pSecKey;
-                        if ( pSecondSecondaryBind )
-                            pSecondSecondaryBind->boundKey = pSecKey;
+					    if ( pSecKeys[k] != pBind->boundKey )
+                        {
+                            pBind->boundKey = pSecKeys[k];
+                            if ( pSecondSecondaryBind )
+                                pSecondSecondaryBind->boundKey = pSecKeys[k];
+                        }
+                    }
+				    // If the secondary key field was empty, we should remove the keybind
+				    else
+                    {
+                        pKeyBinds->Remove ( pBind );
+                        pKeyBinds->Remove ( pSecondSecondaryBind );
                     }
                 }
-				// If the secondary key field was empty, we should remove the keybind
-				else
+			    // If this key bind didn't exist, create it
+                else if ( pSecKeys[k] && pPrimaryBind )
                 {
-                    pKeyBinds->Remove ( pBind );
-                    pKeyBinds->Remove ( pSecondSecondaryBind );
-                }
-            }
-			// If this key bind didn't exist, create it
-            else if ( pSecKey && pPrimaryBind )
-            {
-                pKeyBinds->AddFunction ( pSecKey, pPrimaryBind->Handler, pPrimaryBind->bHitState, pPrimaryBind->bIgnoreGUI );
-                if ( pSecondBind ) // if the primary key bind had a second bind, we want one too!
-                {
-                    pKeyBinds->AddFunction ( pSecKey, pSecondBind->Handler, pSecondBind->bHitState, pSecondBind->bIgnoreGUI );
+                    pKeyBinds->AddFunction ( pSecKeys[k], pPrimaryBind->Handler, pPrimaryBind->bHitState, pPrimaryBind->bIgnoreGUI );
+                    if ( pSecondBind ) // if the primary key bind had a second bind, we want one too!
+                    {
+                        pKeyBinds->AddFunction ( pSecKeys[k], pSecondBind->Handler, pSecondBind->bHitState, pSecondBind->bIgnoreGUI );
+                    }
                 }
             }
         }
@@ -510,16 +525,16 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
             m_bCaptureKey = true;
 
 		    // Determine if the primary or secondary column was selected
-		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) + 1 == m_hPriKey ) {
+		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
 			    // Create a messagebox to notify the user
 			    //sprintf ( szText, "Press a key to bind to '%s'", pItemBind->GetText ().c_str() );
-			    sprintf ( szText, "Press a key to bind" );
-			    CCore::GetSingleton ().ShowMessageBox ( szText, "Binding a primary key", MB_ICON_QUESTION );
+			    sprintf ( szText, "Press a key to bind, or escape to clear" );
+			    CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", szText, MB_ICON_QUESTION );
 		    } else {
 			    // Create a messagebox to notify the user
 			    //sprintf ( szText, "Press a key to bind to '%s'", pItemBind->GetText ().c_str() );
-			    sprintf ( szText, "Press a key to bind" );
-			    CCore::GetSingleton ().ShowMessageBox ( szText, "Binding a secondary key", MB_ICON_QUESTION );
+			    sprintf ( szText, "Press a key to bind, or escape to clear" );
+			    CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", szText, MB_ICON_QUESTION );
 		    }
 	    }
     }
@@ -634,18 +649,20 @@ void CSettings::Initialize ( void )
 				        iBind = m_pBindsList->InsertRowAfter ( iRowGame );
 				        m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
 				        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
-				        m_pBindsList->SetItemText ( iBind, m_hSecKey, CORE_SETTINGS_NO_KEY );
+			            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                            m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
 				        m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_GTA_CONTROL );
                         m_pBindsList->SetItemData ( iBind, m_hPriKey, pBind );
                         iGameRowCount++;
                     }
-                    // Secondary key?
-                    else if ( uiMatchCount == 1 )
-                    {
-                        m_pBindsList->SetItemText ( iBind, m_hSecKey, pBind->boundKey->szKey );
-                        m_pBindsList->SetItemData ( iBind, m_hSecKey, pBind );
-                    }
-                    // What about a 3rd or 4th bind?
+                    // Secondary keys?
+                    else
+ 			            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                            if ( uiMatchCount == k+1 )
+                            {
+                                m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], pBind->boundKey->szKey );
+                                m_pBindsList->SetItemData ( iBind, m_hSecKeys[k], pBind );
+                            }
                     uiMatchCount++;
                 }
             }
@@ -656,7 +673,8 @@ void CSettings::Initialize ( void )
             iBind = m_pBindsList->InsertRowAfter ( iRowGame );
 			m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
 			m_pBindsList->SetItemText ( iBind, m_hPriKey, CORE_SETTINGS_NO_KEY );
-			m_pBindsList->SetItemText ( iBind, m_hSecKey, CORE_SETTINGS_NO_KEY );
+ 	        for ( int k = 0 ; k < SecKeyNum ; k++ )
+    			m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
 			m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_UNDEFINED );
             m_pBindsList->SetItemData ( iBind, m_hPriKey, pControl );
             iGameRowCount++;
@@ -700,11 +718,12 @@ void CSettings::Initialize ( void )
                     if ( bMatched )
                     {
                         bFoundMatches = true;
-                        if ( pListedCommand->uiMatchCount == 0 )
-                        {
-                            m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKey, pBind->boundKey->szKey );
-                            m_pBindsList->SetItemData ( pListedCommand->iIndex, m_hSecKey, pBind );
-                        }
+             	        for ( int k = 0 ; k < SecKeyNum ; k++ )
+                            if ( pListedCommand->uiMatchCount == k )
+                            {
+                                m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKeys[k], pBind->boundKey->szKey );
+                                m_pBindsList->SetItemData ( pListedCommand->iIndex, m_hSecKeys[k], pBind );
+                            }
                         pListedCommand->uiMatchCount++;
                     }
                 }
@@ -740,7 +759,8 @@ void CSettings::Initialize ( void )
 				        iBind = m_pBindsList->InsertRowAfter ( row );
                         m_pBindsList->SetItemText ( iBind, m_hBind, szDescription );
 				        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
-				        m_pBindsList->SetItemText ( iBind, m_hSecKey, CORE_SETTINGS_NO_KEY );
+                        for ( int k = 0 ; k < SecKeyNum ; k++ )
+                            m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
                         m_pBindsList->SetItemData ( iBind, m_hBind, (void*) bindType );
                         m_pBindsList->SetItemData ( iBind, m_hPriKey, pBind );
                         if ( bDeleteDescription )
