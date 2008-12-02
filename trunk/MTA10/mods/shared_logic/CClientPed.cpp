@@ -4345,8 +4345,10 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 
 void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable, bool bOffsetPed, bool bHoldLastFrame )
 {
+    /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
     KillAnimation ();
+    */
 
     // Are we streamed in?
     if ( m_pPlayerPed )
