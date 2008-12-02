@@ -73,7 +73,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     CNet* pNet = CCore::GetSingleton ().GetNetwork ();
     if ( m_bIsConnecting || pNet->IsConnected () )
     {
-        return false;
+        CModManager::GetSingleton ().Unload ();
     }    
 
 	// Is the nick valid?
