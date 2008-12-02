@@ -155,6 +155,10 @@ DWORD FUNC_CBike_ProcessRiderAnims = 0x6B7280;
 
 CMultiplayerSA::CMultiplayerSA()
 {
+    // Unprotect all of the GTASA code at once and leave it that way
+    DWORD oldProt;
+    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+
     // Initialize the offsets
     eGameVersion version = pGameInterface->GetGameVersion ();
     switch ( version )
@@ -189,35 +193,6 @@ void CMultiplayerSA::InitHooks()
 	bSetCenterOfWorld = false;
 	bHasProcessedScript = false;
 
-    // Set the memory areas we might change later through accessors
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0x712330,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x716380,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x713950,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x717180,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x561760,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6194A0,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x4D9888,5,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x7449F0,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6E3950,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x5702FD,5,PAGE_EXECUTE_READWRITE,&oldProt); // CPlayerInfo__Process
-    VirtualProtect((LPVOID)0x6AD75A,5,PAGE_EXECUTE_READWRITE,&oldProt); // CAutomobile__ProcessControlInputs
-    VirtualProtect((LPVOID)0x6BE34B,5,PAGE_EXECUTE_READWRITE,&oldProt); // CBike__ProcessControlInputs
-    VirtualProtect((LPVOID)0x67E834,5,PAGE_EXECUTE_READWRITE,&oldProt); // CTaskSimpleJetPack__ProcessControlInput
-    VirtualProtect((LPVOID)0x540120,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B5A10,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B7449,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B763C,4,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B7617,5,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B62A7,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B7642,5,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6B7449,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6A90D8,5,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x72C665,6,PAGE_EXECUTE_READWRITE,&oldProt);	 // waves
-    VirtualProtect((LPVOID)0x72C659,10,PAGE_EXECUTE_READWRITE,&oldProt);	//waves
-    VirtualProtect((LPVOID)0x534540,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x96C048,10600,PAGE_EXECUTE_READWRITE,&oldProt); // Garages
-
 	//00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
 	//00442DC6     E9 32090000    JMP gta_sa_u.004436FD
 
@@ -225,15 +200,11 @@ void CMultiplayerSA::InitHooks()
     *(int *)0x8a5a84 = 127;
 
     // DISABLE CGameLogic::Update
-	VirtualProtect((LPVOID)0x442AD0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x442AD0, 0xC3, 1);
-	VirtualProtect((LPVOID)0x442AD0,1,oldProt,&oldProt2);
 
     // STOP IT TRYING TO LOAD THE SCM
-	VirtualProtect((LPVOID)0x468EB5,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x468EB5 = 0xEB;
 	*(BYTE *)0x468EB6 = 0x32;
-	VirtualProtect((LPVOID)0x468EB5,2,oldProt,&oldProt2);
 
 	HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, &STORE_FindPlayerCoors, 6);
 	HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, &STORE_FindPlayerCentreOfWorld, 6);
@@ -258,131 +229,91 @@ void CMultiplayerSA::InitHooks()
 	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
 
     // Increase double link limit from 3200 ro 4000
-    VirtualProtect((LPVOID)0x550F82,4,PAGE_EXECUTE_READWRITE,&oldProt);	
     *(int*)0x00550F82 = 4000;
-    VirtualProtect((LPVOID)0x550F82,4,oldProt,&oldProt2); 
 
 
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
     // func that StopRadio just jumps to.
-    VirtualProtect((LPVOID)0x4E9820,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x4E9820 = 0xC2;
     *(BYTE *)0x4E9821 = 0x08;
     *(BYTE *)0x4E9822 = 0x00;
-	VirtualProtect((LPVOID)0x4E9820,3,oldProt,&oldProt2); 
 
     // Disable GTA being able to call CAudio::StartRadio ()
-    VirtualProtect((LPVOID)0x4DBEC0,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x4DBEC0 = 0xC2;
     *(BYTE *)0x4DBEC1 = 0x00;
     *(BYTE *)0x4DBEC2 = 0x00;
-	VirtualProtect((LPVOID)0x4DBEC0,3,oldProt,&oldProt2); 
 
-    VirtualProtect((LPVOID)0x4EB3C0,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x4EB3C0 = 0xC2;
     *(BYTE *)0x4EB3C1 = 0x10;
     *(BYTE *)0x4EB3C2 = 0x00;
-	VirtualProtect((LPVOID)0x4EB3C0,3,oldProt,&oldProt2); 
     
     // DISABLE cinematic camera for trains
-    VirtualProtect((LPVOID)0x52A535,1,PAGE_EXECUTE_READWRITE,&oldProt);
     *(BYTE *)0x52A535 = 0;
-    VirtualProtect((LPVOID)0x52A535,1,oldProt,&oldProt2);
 
     // DISABLE wanted levels for military zones
-    VirtualProtect((LPVOID)0x72DF0D,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x72DF0D = 0xEB;
-	VirtualProtect((LPVOID)0x72DF0D,1,oldProt,&oldProt2); 
 
     // THROWN projectiles throw more accurately
-    VirtualProtect((LPVOID)0x742685,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x742685 = 0x90;
     *(BYTE *)0x742686 = 0xE9;
-	VirtualProtect((LPVOID)0x742685,2,oldProt,&oldProt2);    
 
     // DISABLE CProjectileInfo::RemoveAllProjectiles
-    VirtualProtect((LPVOID)0x7399B0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x7399B0 = 0xC3;
-	VirtualProtect((LPVOID)0x7399B0,1,oldProt,&oldProt2);   
 
     // DISABLE CRoadBlocks::GenerateRoadblocks
-    VirtualProtect((LPVOID)0x4629E0,1,PAGE_EXECUTE_READWRITE,&oldProt);
     *(BYTE *)0x4629E0 = 0xC3;
-    VirtualProtect((LPVOID)0x4629E0,1,oldProt,&oldProt2);   
 
 
     // Temporary hack for disabling hand up
     /*
-    VirtualProtect((LPVOID)0x62AEE7,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x62AEE7 = 0x90;
     *(BYTE *)0x62AEE8 = 0x90;
     *(BYTE *)0x62AEE9 = 0x90;
     *(BYTE *)0x62AEEA = 0x90;
     *(BYTE *)0x62AEEB = 0x90;
     *(BYTE *)0x62AEEC = 0x90;
-	VirtualProtect((LPVOID)0x62AEE7,6,oldProt,&oldProt2);  
     */
 
     // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges(void) (special DJ banter)
-    VirtualProtect((LPVOID)0x4E8410,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x4E8410 = 0xC3; // retn
-	VirtualProtect((LPVOID)0x4E8410,1,oldProt,&oldProt2);    
 
     // DISABLE CPopulation__AddToPopulation
-    VirtualProtect((LPVOID)0x614720,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x614720 = 0x32; // xor al, al
     *(BYTE *)0x614721 = 0xC0;
     *(BYTE *)0x614722 = 0xC3; // retn
-	VirtualProtect((LPVOID)0x614720,3,oldProt,&oldProt2);      
 
     // Disables deletion of RenderWare objects during unloading of ModelInfo
     // This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
-    //VirtualProtect((LPVOID)0x4C9890,1,PAGE_EXECUTE_READWRITE,&oldProt);
     //*(BYTE *)0x4C9890 = 0xC3;
-    //VirtualProtect((LPVOID)0x4C9890,1,oldProt,&oldProt2);
 
-    //VirtualProtect((LPVOID)0x408A1B,5,PAGE_EXECUTE_READWRITE,&oldProt);
     //memset ( (void*)0x408A1B, 0x90, 5 );
-    //VirtualProtect((LPVOID)0x408A1B,5,oldProt,&oldProt2);
 
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
-    VirtualProtect((LPVOID)0x620607,2,PAGE_EXECUTE_READWRITE,&oldProt);
     *(unsigned char *)0x620607 = 0x33;
     *(unsigned char *)0x620608 = 0xC0;
-    VirtualProtect((LPVOID)0x620607,2,oldProt,&oldProt2); 
 
-    VirtualProtect((LPVOID)0x620618,5,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(unsigned char *)0x620618 = 0x33;
     *(unsigned char *)0x620619 = 0xC0;
     *(unsigned char *)0x62061A = 0x90;
     *(unsigned char *)0x62061B = 0x90;
     *(unsigned char *)0x62061C = 0x90;
-    VirtualProtect((LPVOID)0x620618,5,oldProt,&oldProt2); 
 
     // Hack to make non-local players always update their aim on akimbo weapons using camera
     // so they don't freeze when local player doesn't aim.
-    VirtualProtect((LPVOID)0x61EFFE,1,PAGE_EXECUTE_READWRITE,&oldProt);
     *(BYTE *)0x61EFFE = 0xEB;   // JMP imm8 (was JZ imm8)
-    VirtualProtect((LPVOID)0x61EFFE,1,oldProt,&oldProt2);    
     
 
     // DISABLE CGameLogic__SetPlayerWantedLevelForForbiddenTerritories
-    VirtualProtect((LPVOID)0x441770,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x441770 = 0xC3;
-	VirtualProtect((LPVOID)0x441770,1,oldProt,&oldProt2);    
 
     // DISABLE CCrime__ReportCrime
-    VirtualProtect((LPVOID)0x532010,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x532010 = 0xC3;
-	VirtualProtect((LPVOID)0x532010,1,oldProt,&oldProt2);    
     
 	// Disables deletion of RenderWare objects during unloading of ModelInfo
 	// This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
-    //VirtualProtect((LPVOID)0x4C9890,1,PAGE_EXECUTE_READWRITE,&oldProt);
 	//*(BYTE *)0x4C9890 = 0xC3;
-	//VirtualProtect((LPVOID)0x4C9890,1,oldProt,&oldProt2);
 
     /*
     004C021D   B0 00            MOV AL,0
@@ -390,184 +321,135 @@ void CMultiplayerSA::InitHooks()
     004C0220   90               NOP
     004C0221   90               NOP
     */
-    VirtualProtect((LPVOID)0x4C01F0,5,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x4C01F0 = 0xB0;
 	*(BYTE *)0x4C01F1 = 0x00;
     *(BYTE *)0x4C01F2 = 0x90;
     *(BYTE *)0x4C01F3 = 0x90;
     *(BYTE *)0x4C01F4 = 0x90;
-	VirtualProtect((LPVOID)0x4C01F0,5,oldProt,&oldProt2);    
 
     // Disable MakePlayerSafe
-	VirtualProtect((LPVOID)0x56E870,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x56E870 = 0xC2;
 	*(BYTE *)0x56E871 = 0x08;
 	*(BYTE *)0x56E872 = 0x00;
-	VirtualProtect((LPVOID)0x56E870,3,oldProt,&oldProt2);    
 
     // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
     // so vehicles that catch fire (upside down) then delete them, repeating a few times.
-	VirtualProtect((LPVOID)0x4DCF87,6,PAGE_EXECUTE_READWRITE,&oldProt);		
     memset((void*)0x4DCF87,0x90,6);
-	VirtualProtect((LPVOID)0x4DCF87,6,oldProt,&oldProt2);
     
     /*
     // DISABLE CPed__RemoveBodyPart
-	VirtualProtect((LPVOID)0x5F0140,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x5F0140 = 0xC2;
     *(BYTE *)0x5F0141 = 0x08;
     *(BYTE *)0x5F0142 = 0x00;
-	VirtualProtect((LPVOID)0x5F0140,3,oldProt,&oldProt2);
     */
 
     // ALLOW picking up of all vehicles (GTA doesn't allow picking up of 'locked' script created vehicles)
-	VirtualProtect((LPVOID)0x6A436C,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6A436C = 0x90;
     *(BYTE *)0x6A436D = 0x90;
-	VirtualProtect((LPVOID)0x6A436C,2,oldProt,&oldProt2);
 
     // MAKE CEntity::GetIsOnScreen always return true, experimental
-   /* VirtualProtect((LPVOID)0x534540,3,PAGE_EXECUTE_READWRITE,&oldProt);		
+   /*
 	*(BYTE *)0x534540 = 0xB0;
     *(BYTE *)0x534541 = 0x01;
     *(BYTE *)0x534542 = 0xC3;
-	VirtualProtect((LPVOID)0x534540,3,oldProt,&oldProt2);
-*/    
+    */
+
     //DISABLE CPad::ReconcileTwoControllersInput
-	/*VirtualProtect((LPVOID)0x53F530,3,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*
 	*(BYTE *)0x53F530 = 0xC2;
     *(BYTE *)0x53F531 = 0x0C;
     *(BYTE *)0x53F532 = 0x00;
-	VirtualProtect((LPVOID)0x53F530,3,oldProt,&oldProt2);
 
-	VirtualProtect((LPVOID)0x53EF80,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x53EF80 = 0xC3;
-	VirtualProtect((LPVOID)0x53EF80,1,oldProt,&oldProt2);
 
-    VirtualProtect((LPVOID)0x541DDC,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x541DDC = 0xEB;
     *(BYTE *)0x541DDD = 0x60;
-	VirtualProtect((LPVOID)0x541DDC,2,oldProt,&oldProt2);
 */
     // DISABLE big buildings (test)
-    /*VirtualProtect((LPVOID)0x533150,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+    /*
 	*(char*)0x533150 = 0xC3;
-	VirtualProtect((LPVOID)0x533150,1,oldProt,&oldProt2);*/
+    */
     
 	// PREVENT THE RADIO OR ENGINE STOPPING WHEN PLAYER LEAVES VEHICLE
 	// THIS ON ITS OWN will cause sounds to be left behind and other artifacts
 	/*
-	VirtualProtect((LPVOID)0x4FB8C0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
-	memset((void *)0x4FB8C0, 0xC3, 1);
-	VirtualProtect((LPVOID)0x4FB8C0,1,oldProt,&oldProt2);
+	*(char *)0x4FB8C0 = 0xC3;
 	*/
 
 
-/*	VirtualProtect((LPVOID)0x4FBA3E,5,PAGE_EXECUTE_READWRITE,&oldProt);		
+/*	
 	memset((void *)0x4FBA3E, 0x90, 5);
-	VirtualProtect((LPVOID)0x4FBA3E,5,oldProt,&oldProt2);*/
+	*/
 	
 
 	// DISABLE REPLAYS
-/*	VirtualProtect((LPVOID)0x460500,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+/*	
 	memset((void *)0x460500, 0xC3, 1);
-	VirtualProtect((LPVOID)0x460500,1,oldProt,&oldProt2);
 */
     // PREVENT the game from making dummy objects (may fix a crash, guesswork really)
     // This seems to work, but doesn't actually fix anything. Maybe a reason to do it in the future.
     //00615FE3     EB 09          JMP SHORT gta_sa_u.00615FEE
-	/*VirtualProtect((LPVOID)0x615FE3,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*
 	memset((void *)0x615FE3, 0xEB, 1);
-	VirtualProtect((LPVOID)0x615FE3,1,oldProt,&oldProt2);*/
+	*/
 
     // Make combines eat players *untested*
-	//VirtualProtect((LPVOID)0x6A9739,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	//memset ( (LPVOID)0x6A9739, 0x90, 6 );
-	//VirtualProtect((LPVOID)0x6A9739,6,oldProt,&oldProt2);
     
     // Players always lean out whatever the camera mode
     // 00621983     EB 13          JMP SHORT hacked_g.00621998
-	VirtualProtect((LPVOID)0x621983,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x621983 = 0xEB;
-	VirtualProtect((LPVOID)0x621983,1,oldProt,&oldProt2);
 
     
     // Players can fire drivebys whatever camera mode
     // 627E01 - 6 bytes
-	VirtualProtect((LPVOID)0x627E01,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x627E01, 0x90, 6 );
-	VirtualProtect((LPVOID)0x627E01,6,oldProt,&oldProt2);
 
-	VirtualProtect((LPVOID)0x62840D,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x62840D, 0x90, 6 );
-	VirtualProtect((LPVOID)0x62840D,6,oldProt,&oldProt2);
 
 	// Satchel crash fix
 	// C89110: satchel (bomb) positions pointer?
 	// C891A8+4: satchel (model) positions pointer? gets set to NULL on player death, causing an access violation
 	// C891A8+12: satchel (model) disappear time (in SystemTime format). 738F99 clears the satchel when VAR_SystemTime is larger.
-	VirtualProtect((LPVOID)0x738F3A,83,PAGE_EXECUTE_READWRITE,&oldProt);
 	memset ( (LPVOID)0x738F3A, 0x90, 83 );
-	VirtualProtect((LPVOID)0x738F3A,83,oldProt,&oldProt2);
 
     // Prevent gta stopping driveby players from falling off
-	VirtualProtect((LPVOID)0x6B5B17,6,PAGE_EXECUTE_READWRITE,&oldProt);
 	memset ( (LPVOID)0x6B5B17, 0x90, 6 );
-	VirtualProtect((LPVOID)0x6B5B17,6,oldProt,&oldProt2);
 
     // Increase VehicleStruct pool size
-	VirtualProtect((LPVOID)0x5B8FE4,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x5B8FE4 = 0x7F; // its signed so the higest you can go with this is 0x7F before it goes negative = crash
-	VirtualProtect((LPVOID)0x5B8FE4,1,oldProt,&oldProt2);
     
 	/*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
-	VirtualProtect((LPVOID)0x6446A7,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x6446A7, 0x90, 6 );
-	VirtualProtect((LPVOID)0x6446A7,6,oldProt,&oldProt2);
     
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for passengers
-	VirtualProtect((LPVOID)0x6446BD,6,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x6446BD, 0x90, 6 );
-	VirtualProtect((LPVOID)0x6446BD,6,oldProt,&oldProt2);
 	*/
     
 
 	// DISABLE PLAYING REPLAYS
-	VirtualProtect((LPVOID)0x460390,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x460390, 0xC3, 1);
-	VirtualProtect((LPVOID)0x460390,1,oldProt,&oldProt2);
 
-	VirtualProtect((LPVOID)0x4600F0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x4600F0, 0xC3, 1);
-	VirtualProtect((LPVOID)0x4600F0,1,oldProt,&oldProt2);
 
-	VirtualProtect((LPVOID)0x45F050,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x45F050, 0xC3, 1);
-	VirtualProtect((LPVOID)0x45F050,1,oldProt,&oldProt2);
 
 	// DISABLE CHEATS
-	VirtualProtect((LPVOID)0x439AF0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x439AF0, 0xC3, 1);
-	VirtualProtect((LPVOID)0x439AF0,1,oldProt,&oldProt2);
 		
-	VirtualProtect((LPVOID)0x438370,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x438370, 0xC3, 1);
-	VirtualProtect((LPVOID)0x438370,1,oldProt,&oldProt2);
 
 
     // DISABLE GARAGES
-    VirtualProtect((LPVOID)0x44AA89,6,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)(0x44AA89 + 0) = 0xE9;
     *(BYTE *)(0x44AA89 + 1) = 0x28;
     *(BYTE *)(0x44AA89 + 2) = 0x01;
     *(BYTE *)(0x44AA89 + 3) = 0x00;
     *(BYTE *)(0x44AA89 + 4) = 0x00;
     *(BYTE *)(0x44AA89 + 5) = 0x90;
-    VirtualProtect((LPVOID)0x44AA89,6,oldProt,&oldProt2);
 
-    VirtualProtect((LPVOID)0x44C7E0,212,PAGE_EXECUTE_READWRITE,&oldProt);
     *(DWORD *)0x44C7E0 = 0x44C7C4;
     *(DWORD *)0x44C7E4 = 0x44C7C4;
     *(DWORD *)0x44C7F8 = 0x44C7C4;
@@ -588,195 +470,134 @@ void CMultiplayerSA::InitHooks()
     *(DWORD *)0x44C8A0 = 0x44C7C4;
     *(DWORD *)0x44C8AC = 0x44C7C4;
     *(DWORD *)0x44C8B0 = 0x44C7C4;
-    VirtualProtect((LPVOID)0x44C7E0,212,oldProt,&oldProt2);
 
-    VirtualProtect((LPVOID)0x44C39A,6,PAGE_EXECUTE_READWRITE,&oldProt);
     *(BYTE *)(0x44C39A + 0) = 0x0F;
     *(BYTE *)(0x44C39A + 1) = 0x84;
     *(BYTE *)(0x44C39A + 2) = 0x24;
     *(BYTE *)(0x44C39A + 3) = 0x04;
     *(BYTE *)(0x44C39A + 4) = 0x00;
     *(BYTE *)(0x44C39A + 5) = 0x00;
-    VirtualProtect((LPVOID)0x44C39A,6,oldProt,&oldProt2);
 
     // Avoid garage doors closing when you change your model
-    VirtualProtect((LPVOID)0x4486F7,4,PAGE_EXECUTE_READWRITE,&oldProt);
     memset((LPVOID)0x4486F7, 0x90, 4);
-    VirtualProtect((LPVOID)0x4486F7,4,oldProt,&oldProt2);
     
 
     // Disable CStats::IncrementStat (returns at start of function)
-    VirtualProtect((LPVOID)0x55C180,1,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(BYTE *)0x55C180 = 0xC3;
-	VirtualProtect((LPVOID)0x55C180,1,oldProt,&oldProt2); 
 	/*
-	VirtualProtect((LPVOID)0x55C180,648,PAGE_EXECUTE_READWRITE,&oldProt);
 	memset((void *)0x55C1A9, 0x90, 14 );
 	memset((void *)0x55C1DD, 0x90, 7 );
-	VirtualProtect((LPVOID)0x55C180,648,oldProt,&oldProt2);
 	*/
 
 	// DISABLE STATS DECREMENTING
-	VirtualProtect((LPVOID)0x559FA0,204,PAGE_EXECUTE_READWRITE,&oldProt);
 	memset((void *)0x559FD5, 0x90, 7 );
 	memset((void *)0x559FEB, 0x90, 7 );
-	VirtualProtect((LPVOID)0x559FA0,204,oldProt,&oldProt2);
 
 	// DISABLE STATS MESSAGES
-	VirtualProtect((LPVOID)0x55B980,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x55B980, 0xC3, 1);
-	VirtualProtect((LPVOID)0x55B980,1,oldProt,&oldProt2);
 
-	VirtualProtect((LPVOID)0x559760,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x559760, 0xC3, 1);
-	VirtualProtect((LPVOID)0x559760,1,oldProt,&oldProt2);
 
     // ALLOW more than 8 players (crash with more if this isn't done)
     //0060D64D   90               NOP
     //0060D64E   E9 9C000000      JMP gta_sa.0060D6EF
-	VirtualProtect((LPVOID)0x60D64D,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x60D64D = 0x90;
     *(BYTE *)0x60D64E = 0xE9;
-	VirtualProtect((LPVOID)0x60D64D,2,oldProt,&oldProt2);
 
     // PREVENT CJ smoking and drinking like an addict
     //005FBA26   EB 29            JMP SHORT gta_sa.005FBA51
-	VirtualProtect((LPVOID)0x5FBA26,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x5FBA26 = 0xEB;
-	VirtualProtect((LPVOID)0x5FBA26,1,oldProt,&oldProt2);
 
     // PREVENT the camera from messing up for drivebys for vehicle drivers
-	VirtualProtect((LPVOID)0x522423,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x522423 = 0x90;
     *(BYTE *)0x522424 = 0x90;
-	VirtualProtect((LPVOID)0x522423,2,oldProt,&oldProt2);
     
     LPVOID patchAddress = NULL;
     // ALLOW ALT+TABBING WITHOUT PAUSING
-    VirtualProtect((LPVOID)0x748ADD,2,PAGE_EXECUTE_READWRITE,&oldProt);
     //if ( pGameInterface->GetGameVersion() == GAME_VERSION_US ) // won't work as pGameInterface isn't inited
     if ( *(BYTE *)0x748ADD == 0xFF && *(BYTE *)0x748ADE == 0x53 )
         patchAddress = (LPVOID)0x748A8D;
     else
         patchAddress = (LPVOID)0x748ADD;
 
-    VirtualProtect((LPVOID)patchAddress,6,oldProt,&oldProt2);
-    VirtualProtect((LPVOID)patchAddress,6,PAGE_EXECUTE_READWRITE,&oldProt);
     memset(patchAddress, 0x90, 6);
-	VirtualProtect((LPVOID)patchAddress,6,oldProt,&oldProt2);
 
     // CENTER VEHICLE NAME and ZONE NAME messages
     // 0058B0AD   6A 02            PUSH 2 // orientation
     // VEHICLE
-	VirtualProtect((LPVOID)0x58B0AE,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x58B0AE = 0x00;
-	VirtualProtect((LPVOID)0x58B0AE,1,oldProt,&oldProt2);
 
     // ZONE
-	VirtualProtect((LPVOID)0x58AD56,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x58AD56 = 0x00;
-	VirtualProtect((LPVOID)0x58AD56,1,oldProt,&oldProt2);
 
     // 85953C needs to equal 320.0 to center the text (640.0 being the base width)
-	VirtualProtect((LPVOID)0x85953C,4,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(float *)0x85953C = 320.0f;
-	VirtualProtect((LPVOID)0x85953C,4,oldProt,&oldProt2);
 
     // 0058B147   D80D 0C958500    FMUL DWORD PTR DS:[85950C] // the text needs to be moved to the left
     //VEHICLE
-	VirtualProtect((LPVOID)0x58B149,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x58B149 = 0x3C;
-	VirtualProtect((LPVOID)0x58B149,1,oldProt,&oldProt2);
 
     //ZONE
-	VirtualProtect((LPVOID)0x58AE52,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x58AE52 = 0x3C;
-	VirtualProtect((LPVOID)0x58AE52,1,oldProt,&oldProt2);
 
 	// DISABLE SAM SITES
-	VirtualProtect((LPVOID)0x5A07D0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x5A07D0 = 0xC3;
-	VirtualProtect((LPVOID)0x5A07D0,1,oldProt,&oldProt2);
 
 	// DISABLE TRAINS (AUTO GENERATED ONES)
-	VirtualProtect((LPVOID)0x6F7900,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6F7900 = 0xC3;
-	VirtualProtect((LPVOID)0x6F7900,1,oldProt,&oldProt2);
     
     // Prevent TRAINS spawning with PEDs
-	VirtualProtect((LPVOID)0x6F7865,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6F7865 = 0xEB;
-	VirtualProtect((LPVOID)0x6F7865,1,oldProt,&oldProt2);
 
 	// DISABLE PLANES
-	VirtualProtect((LPVOID)0x6CD2F0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6CD2F0 = 0xC3;
-	VirtualProtect((LPVOID)0x6CD2F0,1,oldProt,&oldProt2);
 	
 	// DISABLE EMERGENCY VEHICLES
-	VirtualProtect((LPVOID)0x42B7D0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x42B7D0 = 0xC3;
-	VirtualProtect((LPVOID)0x42B7D0,1,oldProt,&oldProt2);
 
 	// DISABLE CAR GENERATORS
-	VirtualProtect((LPVOID)0x6F3F40,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6F3F40 = 0xC3;
-	VirtualProtect((LPVOID)0x6F3F40,1,oldProt,&oldProt2);
 
     // DISABLE CEntryExitManager::Update (they crash when you enter anyway)
-	VirtualProtect((LPVOID)0x440D10,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x440D10 = 0xC3;
-	VirtualProtect((LPVOID)0x440D10,1,oldProt,&oldProt2);
 
 	// Disable MENU AFTER alt + tab
-	//0053BC72   C605 7B67BA00 01 MOV BYTE PTR DS:[BA677B],1
-	VirtualProtect((LPVOID)0x53BC78,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+	//0053BC72   C605 7B67BA00 01 MOV BYTE PTR DS:[BA677B],1	
 	*(BYTE *)0x53BC78 = 0x00;
-	VirtualProtect((LPVOID)0x53BC78,1,oldProt,&oldProt2);
 
 	// DISABLE HUNGER MESSAGES
-	VirtualProtect((LPVOID)0x56E740,5,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x56E740, 0x90, 5 );
-	VirtualProtect((LPVOID)0x56E740,5,oldProt,&oldProt2);
 
 	// DISABLE RANDOM VEHICLE UPGRADES
-	VirtualProtect((LPVOID)0x6B0BC2,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset ( (LPVOID)0x6B0BC2, 0xEB, 1 );
-	VirtualProtect((LPVOID)0x6B0BC2,1,oldProt,&oldProt2);	
 
 	// DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
-	/*VirtualProtect((LPVOID)0x616650,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*	
 	*(BYTE *)0x616650 = 0xC3;
     *(BYTE *)0xA43088 = 1;
-	VirtualProtect((LPVOID)0x616650,1,oldProt,&oldProt2);*/
+	*/
 
 	// SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
-	VirtualProtect((LPVOID)0x53C017,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x53C017 = 0x90;
 	*(BYTE *)0x53C018 = 0x90;
-	VirtualProtect((LPVOID)0x53C017,2,oldProt,&oldProt2);
 
 	// DISABLE random cars
-	VirtualProtect((LPVOID)0x4341C0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	//*(BYTE *)0x4341C0 = 0xC3;
-	VirtualProtect((LPVOID)0x4341C0,1,oldProt,&oldProt2);
 	
 	// DISABLE heat flashes
-	/*VirtualProtect((LPVOID)0x6E3521,2,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*
 	*(BYTE *)0x6E3521 = 0x90;
 	*(BYTE *)0x6E3522 = 0xE9;
-	VirtualProtect((LPVOID)0x4341C0,2,oldProt,&oldProt2);*/
+	*/
 
 	// DECREASE ROF for missiles from hydra
 	// 006D462C     81E1 E8030000  AND ECX,3E8
 	// 006D4632     81C1 E8030000  ADD ECX,3E8
-    /*
-	VirtualProtect((LPVOID)0x6D462E,12,PAGE_EXECUTE_READWRITE,&oldProt);		
+    /*	
 	*(BYTE *)0x6D462E = 0xE8;
 	*(BYTE *)0x6D462F = 0x03;
 	*(BYTE *)0x6D4634 = 0xE8;
 	*(BYTE *)0x6D4635 = 0x03;
-	VirtualProtect((LPVOID)0x6D462E,12,oldProt,&oldProt2);
     */
 
 	// HACK to allow boats to be rotated
@@ -787,161 +608,115 @@ void CMultiplayerSA::InitHooks()
 	006F208C   90               NOP
 	006F208D   90               NOP
 	*/
-	VirtualProtect((LPVOID)0x6F2089,5,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x6F2089 = 0x58;
 	memset((void *)0x6F208A,0x90,4);
-	VirtualProtect((LPVOID)0x6F2089,5,oldProt,&oldProt2);
 
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
-    VirtualProtect((LPVOID)0x42CD10,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x42CD10 = 0xC3;
-	VirtualProtect((LPVOID)0x42CD10,1,oldProt,&oldProt2);
 
     // DISABLE real-time shadows for peds
-    VirtualProtect((LPVOID)0x5E68A0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x5E68A0 = 0xEB;
-	VirtualProtect((LPVOID)0x5E68A0,1,oldProt,&oldProt2);
 
     // and some more, just to be safe
     //00542483   EB 0B            JMP SHORT gta_sa.00542490
-    VirtualProtect((LPVOID)0x542483,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x542483 = 0xEB;
-	VirtualProtect((LPVOID)0x542483,1,oldProt,&oldProt2);
 
     // DISABLE weapon pickups
-    VirtualProtect((LPVOID)0x5B47B0,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x5B47B0 = 0xC3;
-	VirtualProtect((LPVOID)0x5B47B0,1,oldProt,&oldProt2);
 
     // INCREASE CEntyInfoNode pool size
     //00550FB9   68 F4010000      PUSH 1F4
-    VirtualProtect((LPVOID)0x550FBA,2,PAGE_EXECUTE_READWRITE,&oldProt);		
     /*
     *(BYTE *)0x550FBA = 0xE8;
     *(BYTE *)0x550FBB = 0x03;
     */
     *(BYTE *)0x550FBA = 0x00;
     *(BYTE *)0x550FBB = 0x10;
-	VirtualProtect((LPVOID)0x550FBA,2,oldProt,&oldProt2);    
 
     
-	/*VirtualProtect((LPVOID)0x469F00,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*
 	*(BYTE *)0x469F00 = 0xC3;
-	VirtualProtect((LPVOID)0x469F00,1,oldProt,&oldProt2);*/
+	*/
 
 	// CCAM::PROCESSFIXED remover
 /*
-	VirtualProtect((LPVOID)0x51D470,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x51D470 = 0xC2;
 	*(BYTE *)0x51D471 = 0x10;
 	*(BYTE *)0x51D472 = 0x00;
-	VirtualProtect((LPVOID)0x51D470,3,oldProt,&oldProt2);
-
 */
 
 	// HACK to prevent RealTimeShadowManager crash
 	// 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
-	/*VirtualProtect((LPVOID)0x542483,1,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*
 	*(BYTE *)0x542483 = 0xEB;
-	VirtualProtect((LPVOID)0x542483,1,oldProt,&oldProt2);
 */
 	
 	//InitShotsyncHooks();
 
     //DISABLE CPad::ReconcileTwoControllersInput
-    VirtualProtect((LPVOID)0x53F530,3,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x53F530 = 0xC2;
     *(BYTE *)0x53F531 = 0x0C;
     *(BYTE *)0x53F532 = 0x00;
-    VirtualProtect((LPVOID)0x53F530,3,oldProt,&oldProt2);
 
-    VirtualProtect((LPVOID)0x53EF80,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x53EF80 = 0xC3;
-    VirtualProtect((LPVOID)0x53EF80,1,oldProt,&oldProt2);
 
-    VirtualProtect((LPVOID)0x541DDC,2,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x541DDC = 0xEB;
     *(BYTE *)0x541DDD = 0x60;
-    VirtualProtect((LPVOID)0x541DDC,2,oldProt,&oldProt2);
 
     // DISABLE CWanted Helis (always return 0 from CWanted::NumOfHelisRequired)
-    VirtualProtect((LPVOID)0x561FA4,2,PAGE_EXECUTE_READWRITE,&oldProt);		
     *(BYTE *)0x561FA4 = 0x90;
     *(BYTE *)0x561FA5 = 0x90;
-    VirtualProtect((LPVOID)0x561FA4,2,oldProt,&oldProt2);
 
     // DISABLE  CWanted__UpdateEachFrame
-    VirtualProtect((LPVOID)0x53BFF6,5,PAGE_EXECUTE_READWRITE,&oldProt);		
     memset( (void*)0x53BFF6, 0x90, 5 );
-    VirtualProtect((LPVOID)0x53BFF6,5,oldProt,&oldProt2);
 
     // DISABLE CWanted__Update
-    VirtualProtect((LPVOID)0x60EBCC,5,PAGE_EXECUTE_READWRITE,&oldProt);		
     memset( (void*)0x60EBCC, 0x90, 5 );
-    VirtualProtect((LPVOID)0x60EBCC,5,oldProt,&oldProt2);
 
 	// Disable armour-increase upon entering an enforcer
-	VirtualProtect((LPVOID)0x6D189B,1,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(BYTE *)0x6D189B = 0x06;
-	VirtualProtect((LPVOID)0x6D189B,1,oldProt,&oldProt2);
 
 	// Removes the last weapon pickups from interiors as well
-	VirtualProtect((LPVOID)0x591F90,1,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(BYTE *)0x591F90 = 0xC3;
-	VirtualProtect((LPVOID)0x591F90,1,oldProt,&oldProt2);
 
 	// Trains may infact go further than Los Santos
-	VirtualProtect((LPVOID)0x4418E0,1,PAGE_EXECUTE_READWRITE,&oldProt);
 	*(BYTE *)0x4418E0 = 0xC3;
-	VirtualProtect((LPVOID)0x4418E0,1,oldProt,&oldProt2);
 
     // EXPERIMENTAL - disable unloading of cols
-    //VirtualProtect((LPVOID)0x4C4EDA,10,PAGE_EXECUTE_READWRITE,&oldProt);		
    // memset( (void*)0x4C4EDA, 0x90, 10 );
-    //VirtualProtect((LPVOID)0x4C4EDA,10,oldProt,&oldProt2);
 
     // Make CTaskComplexSunbathe::CanSunbathe always return true
-    VirtualProtect((LPVOID)0x632140,3,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(BYTE *)0x632140 = 0xB0;
     *(BYTE *)0x632141 = 0x01;
     *(BYTE *)0x632142 = 0xC3;
-	VirtualProtect((LPVOID)0x632140,3,oldProt,&oldProt2); 
     
     // Stop CTaskSimpleCarDrive::ProcessPed from exiting passengers with CTaskComplexSequence (some timer check)
-    VirtualProtect((LPVOID)0x644C18,2,PAGE_EXECUTE_READWRITE,&oldProt);	
     *(BYTE *)0x644C18 = 0x90;
 	*(BYTE *)0x644C19 = 0xE9;
-	VirtualProtect((LPVOID)0x644C18,2,oldProt,&oldProt2);
 
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
-    VirtualProtect((LPVOID)0x5E8E84,5,PAGE_EXECUTE_READWRITE,&oldProt);	
     memset ( (void*)0x5E8E84, 0x90, 5 );
-	VirtualProtect((LPVOID)0x5E8E84,5,oldProt,&oldProt2);
 
     // Stop CVehicle::UpdateClumpAlpha from calling CVisibilityPlugins::SetClumpAlpha
-    VirtualProtect((LPVOID)0x6D29CB,5,PAGE_EXECUTE_READWRITE,&oldProt);	
     memset ( (void*)0x6D29CB, 0x90, 5 );
-	VirtualProtect((LPVOID)0x6D29CB,5,oldProt,&oldProt2);    
 
     // Disable CVehicle::DoDriveByShootings
-    VirtualProtect((LPVOID)0x741FD0,3,PAGE_EXECUTE_READWRITE,&oldProt);	
     memset ( (void*)0x741FD0, 0x90, 3 );
     *(BYTE *)0x741FD0 = 0xC3;
-	VirtualProtect((LPVOID)0x741FD0,3,oldProt,&oldProt2);
 
     // Disable CTaskSimplePlayerOnFoot::PlayIdleAnimations (ret 4)
-    VirtualProtect((LPVOID)0x6872C0,3,PAGE_EXECUTE_READWRITE,&oldProt);	
     *(BYTE *)0x6872C0 = 0xC2;
     *(BYTE *)0x6872C1 = 0x04;
     *(BYTE *)0x6872C2 = 0x00;
-	VirtualProtect((LPVOID)0x6872C0,3,oldProt,&oldProt2);    
 
     /*
     // Disable forcing of ped animations to the player one in CPlayerPed::ProcessAnimGroups
-    VirtualProtect( (LPVOID)0x609A44, 21, PAGE_EXECUTE_READWRITE, &oldProt );
     memset ( (LPVOID)0x609A44, 0x90, 21 );
-    VirtualProtect( (LPVOID)0x609A44, 21, oldProt, &oldProt2 );
     */
+
+    // Let us sprint everywhere (always return 0 from CSurfaceData::isSprint)
+    *(DWORD *)0x55E870 = 0xC2C03366;
+    *(WORD *)0x55E874  = 0x0004;
 }
 
 
@@ -1010,8 +785,6 @@ void CMultiplayerSA::AllowWindowsCursorShowing ( bool bAllow )
     */
     BYTE originalCode[16] = {0x6A, 0x00, 0xFF, 0x15, 0xEC, 0x82, 0x85, 0x00, 0x6A, 0x00, 0xFF, 0x15, 0x9C, 0x82, 0x85, 0x00};
 
-	VirtualProtect( (LPVOID)ADDR_CursorHiding,16,PAGE_EXECUTE_READWRITE,&oldProt);
-
     if ( bAllow )
     {
 	    memset ( (LPVOID)ADDR_CursorHiding, 0x90, 16 );
@@ -1020,8 +793,6 @@ void CMultiplayerSA::AllowWindowsCursorShowing ( bool bAllow )
     {
         memcpy ( (LPVOID)ADDR_CursorHiding, &originalCode, 16 );
     }
-
-	VirtualProtect((LPVOID)ADDR_CursorHiding,16,oldProt,&oldProt2);
 }
 
 
