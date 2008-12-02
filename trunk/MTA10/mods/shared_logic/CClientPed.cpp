@@ -2693,6 +2693,11 @@ void CClientPed::_CreateModel ( void )
             delete [] szAnimName;
         }
 
+        // Set the voice that corresponds to our model
+        short sVoiceType, sVoiceID;
+        static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
+        SetPedVoice ( sVoiceType, sVoiceID );
+
         // Tell the streamer we created the player
         NotifyCreate ();
 	}
@@ -2734,7 +2739,7 @@ void CClientPed::_CreateLocalModel ( void )
 		// Give him the default fighting style
 		m_pPlayerPed->SetFightingStyle ( m_FightingStyle, 6 );
         m_pPlayerPed->SetMoveAnim ( m_MoveAnim );
-		SetHasJetPack ( m_bHasJetPack );            
+		SetHasJetPack ( m_bHasJetPack );
 
 		// Rebuild him so he gets his clothes
 		RebuildModel ();
@@ -2915,6 +2920,11 @@ void CClientPed::_ChangeModel ( void )
                 RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
                 delete [] szAnimName;
             }
+
+            // Set the voice that corresponds to the new model
+            short sVoiceType, sVoiceID;
+            m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
+            SetPedVoice ( sVoiceType, sVoiceID );
         }
         else
         {
@@ -4446,10 +4456,22 @@ void CClientPed::SetOnFire ( bool bIsOnFire )
     m_bIsOnFire = bIsOnFire;
 }
 
+void CClientPed::GetPedVoice ( short* psVoiceType, short* psVoiceID )
+{
+    if ( m_pPlayerPed )
+        m_pPlayerPed->GetPedVoice ( psVoiceType, psVoiceID );
+}
+
 void CClientPed::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
 {
     if ( m_pPlayerPed )
         m_pPlayerPed->GetPedVoice ( pszVoiceType, pszVoice );
+}
+
+void CClientPed::SetPedVoice ( short sVoiceType, short sVoiceID )
+{
+    if ( m_pPlayerPed )
+        m_pPlayerPed->SetPedVoice ( sVoiceType, sVoiceID );
 }
 
 void CClientPed::SetPedVoice ( const char* szVoiceType, const char* szVoice )

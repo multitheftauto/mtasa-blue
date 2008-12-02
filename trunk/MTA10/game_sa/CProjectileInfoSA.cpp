@@ -19,9 +19,9 @@ extern CGameSA * pGame;
 /**
  * This destroys all the projectiles in the world
  */
-VOID CProjectileInfoSA::RemoveAllProjectiles (  )
+void CProjectileInfoSA::RemoveAllProjectiles (  )
 {
-	DEBUG_TRACE("VOID CProjectileInfoSA::RemoveAllProjectiles (  )");
+	DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
 	DWORD dwFunction = FUNC_RemoveAllProjectiles;
 	_asm
 	{
@@ -111,9 +111,9 @@ CProjectileInfo * CProjectileInfoSA::GetProjectileInfo ( DWORD dwIndex )
  */
 
 
-BOOL CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )
+bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )
 {
-	DEBUG_TRACE("BOOL CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
+	DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
 	
 	DWORD dwFunction = FUNC_AddProjectile;
 	DWORD dwReturn = 0;

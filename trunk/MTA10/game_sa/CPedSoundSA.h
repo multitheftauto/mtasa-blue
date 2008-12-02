@@ -3,16 +3,19 @@ class CPedSoundSA;
 #ifndef __CGAMESA_PEDSOUND
 #define __CGAMESA_PEDSOUND
 
-#define FUNC_CAEPedSpeechAudioEntity__GetVoice          0x4e3cd0        // 4E3CD0 ; public: static short __cdecl CAEPedSpeechAudioEntity::GetVoice(char *,short)
-#define FUNC_CAEPedSpeechAudioEntity__GetAudioPedType   0x4e3c60        // 4E3C60 ; public: static short __cdecl CAEPedSpeechAudioEntity::GetAudioPedType(char *)
+#define FUNC_CAEPedSound__GetVoice          0x4E3CD0        // 4E3CD0 ; public: static short __cdecl CAEPedSound::GetVoice(char *,short)
+#define FUNC_CAEPedSound__GetAudioPedType   0x4E3C60        // 4E3C60 ; public: static short __cdecl CAEPedSound::GetAudioPedType(char *)
+#define FUNC_CAEPedSound__SetPed            0x4E68D0        // 4E69D0 ; public: void __thiscall CAEPedSound::SetPed(CPedSAInterface *)
 
-#define VAR_CAEPedSpeechAudioEntity__VoiceTypeNames     0x8C8108        // Array of 6 pointers to strings
+#define VAR_CAEPedSound__VoiceTypeNames     0x8C8108        // Array of 6 pointers to strings
 
-#define VAR_CAEPedSpeechAudioEntity__VoiceNames_GEN     0x8AE6A8        // 20 bytes per voice name
-#define VAR_CAEPedSpeechAudioEntity__VoiceNames_EMG     0x8BA0D8
-#define VAR_CAEPedSpeechAudioEntity__VoiceNames_PLAYER  0x8BBD40
-#define VAR_CAEPedSpeechAudioEntity__VoiceNames_GANG    0x8BE1A8
-#define VAR_CAEPedSpeechAudioEntity__VoiceNames_GFD     0x8C4120
+#define VAR_CAEPedSound__VoiceNames_GEN     0x8AE6A8        // 20 bytes per voice name
+#define VAR_CAEPedSound__VoiceNames_EMG     0x8BA0D8
+#define VAR_CAEPedSound__VoiceNames_PLAYER  0x8BBD40
+#define VAR_CAEPedSound__VoiceNames_GANG    0x8BE1A8
+#define VAR_CAEPedSound__VoiceNames_GFD     0x8C4120
+
+
 
 #define NUM_PED_VOICE_TYPES 5
 
@@ -50,13 +53,25 @@ private:
     static int            m_iNumVoicesPerType[];
     static SPedVoiceName* m_pVoiceNamesPerType[];
 
-public:
-    static short          GetVoiceTypeID          ( const char* szVoiceTypeName );
-    static short          GetVoiceID              ( short sVoiceTypeID, const char* szVoiceName );
-    static short          GetVoiceID              ( const char* szVoiceTypeName, const char* szVoiceName );
+    CPedSoundSAInterface* m_pPedSoundInterface;
 
-    static const char*    GetVoiceTypeName        ( short sVoiceTypeID );
-    static const char*    GetVoiceName            ( short sVoiceTypeID, short sVoiceID );
+public:
+                          CPedSoundSA             ( void );
+                          CPedSoundSA             ( CPedSoundSAInterface* pPedSoundInterface );
+    CPedSoundSAInterface* GetPedSoundInterface    ( void ) { return m_pPedSoundInterface; }
+    void                  SetPedSoundInterface    ( CPedSoundSAInterface* pPedSoundInterface ) { m_pPedSoundInterface = pPedSoundInterface; }
+
+    short                 GetVoiceTypeID          ( void );
+    short                 GetVoiceID              ( void );
+    void                  SetVoiceTypeID          ( short sVoiceType );
+    void                  SetVoiceID              ( short sVoiceID );
+
+    static short          GetVoiceTypeIDFromName  ( const char* szVoiceTypeName );
+    static short          GetVoiceIDFromName      ( short sVoiceTypeID, const char* szVoiceName );
+    static short          GetVoiceIDFromName      ( const char* szVoiceTypeName, const char* szVoiceName );
+
+    static const char*    GetVoiceTypeNameFromID  ( short sVoiceTypeID );
+    static const char*    GetVoiceNameFromID      ( short sVoiceTypeID, short sVoiceID );
 };
 
 #endif

@@ -69,13 +69,13 @@ public:
     }
 
 
-	VOID					RemoveAllProjectiles (  );
+	void					RemoveAllProjectiles (  );
     void                    RemoveProjectile ( CProjectileInfo * pProjectileInfo, CProjectile * pProjectile );
 	CProjectile				* GetProjectile ( DWORD ID );
     CProjectileInfo         * GetProjectileInfo ( void * projectileInfoInterface );
     CProjectileInfo         * GetProjectileInfo ( DWORD dwIndex );
     CProjectileInfo         * GetNextFreeProjectileInfo ( );
-	BOOL					 AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
+	bool					 AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
     CProjectile *           GetProjectile ( void * projectilePointer );
 
     CEntity*                GetTarget ( void );

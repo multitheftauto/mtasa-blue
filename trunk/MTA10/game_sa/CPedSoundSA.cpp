@@ -11,16 +11,54 @@ int CPedSoundSA::m_iNumVoicesPerType[] =
 
 SPedVoiceName* CPedSoundSA::m_pVoiceNamesPerType[] =
 {
-    (SPedVoiceName *)VAR_CAEPedSpeechAudioEntity__VoiceNames_GEN,
-    (SPedVoiceName *)VAR_CAEPedSpeechAudioEntity__VoiceNames_EMG,
-    (SPedVoiceName *)VAR_CAEPedSpeechAudioEntity__VoiceNames_PLAYER,
-    (SPedVoiceName *)VAR_CAEPedSpeechAudioEntity__VoiceNames_GANG,
-    (SPedVoiceName *)VAR_CAEPedSpeechAudioEntity__VoiceNames_GFD
+    (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_GEN,
+    (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_EMG,
+    (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_PLAYER,
+    (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_GANG,
+    (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_GFD
 };
 
-short CPedSoundSA::GetVoiceTypeID ( const char* szVoiceTypeName )
+CPedSoundSA::CPedSoundSA ( )
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSpeechAudioEntity__GetAudioPedType;
+    m_pPedSoundInterface = NULL;
+}
+
+CPedSoundSA::CPedSoundSA ( CPedSoundSAInterface* pPedSoundInterface )
+{
+    m_pPedSoundInterface = pPedSoundInterface;
+}
+
+short CPedSoundSA::GetVoiceTypeID ( )
+{
+    if ( GetPedSoundInterface () )
+        return GetPedSoundInterface ()->m_sVoiceType;
+    else
+        return -1;
+}
+
+short CPedSoundSA::GetVoiceID ( )
+{
+    if ( GetPedSoundInterface () )
+        return GetPedSoundInterface ()->m_sVoiceID;
+    else
+        return -1;
+}
+
+void CPedSoundSA::SetVoiceTypeID ( short sVoiceType )
+{
+    if ( GetPedSoundInterface () )
+        GetPedSoundInterface ()->m_sVoiceType = sVoiceType;
+}
+
+void CPedSoundSA::SetVoiceID ( short sVoiceID )
+{
+    if ( GetPedSoundInterface () )
+        GetPedSoundInterface ()->m_sVoiceID = sVoiceID;
+}
+
+short CPedSoundSA::GetVoiceTypeIDFromName ( const char* szVoiceTypeName )
+{
+    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetAudioPedType;
     short sVoiceTypeID;
 
     _asm
@@ -33,9 +71,9 @@ short CPedSoundSA::GetVoiceTypeID ( const char* szVoiceTypeName )
     return sVoiceTypeID;
 }
 
-short CPedSoundSA::GetVoiceID ( short sVoiceTypeID, const char* szVoiceName )
+short CPedSoundSA::GetVoiceIDFromName ( short sVoiceTypeID, const char* szVoiceName )
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSpeechAudioEntity__GetVoice;
+    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetVoice;
     short sVoiceID;
     
     _asm
@@ -50,24 +88,24 @@ short CPedSoundSA::GetVoiceID ( short sVoiceTypeID, const char* szVoiceName )
     return sVoiceID;
 }
 
-short CPedSoundSA::GetVoiceID ( const char* szVoiceTypeName, const char* szVoiceName )
+short CPedSoundSA::GetVoiceIDFromName ( const char* szVoiceTypeName, const char* szVoiceName )
 {
-    short sVoiceTypeID = GetVoiceTypeID ( szVoiceTypeName );
+    short sVoiceTypeID = GetVoiceTypeIDFromName ( szVoiceTypeName );
     if ( sVoiceTypeID < 0 )
         return -1;
 
-    return GetVoiceID ( sVoiceTypeID, szVoiceName );
+    return GetVoiceIDFromName ( sVoiceTypeID, szVoiceName );
 }
 
-const char* CPedSoundSA::GetVoiceTypeName ( short sVoiceTypeID )
+const char* CPedSoundSA::GetVoiceTypeNameFromID ( short sVoiceTypeID )
 {
     if ( sVoiceTypeID < 0 || sVoiceTypeID >= NUM_PED_VOICE_TYPES )
         return NULL;
 
-    return ( (const char**)VAR_CAEPedSpeechAudioEntity__VoiceTypeNames ) [ sVoiceTypeID ];
+    return ( (const char**)VAR_CAEPedSound__VoiceTypeNames ) [ sVoiceTypeID ];
 }
 
-const char* CPedSoundSA::GetVoiceName ( short sVoiceTypeID, short sVoiceID )
+const char* CPedSoundSA::GetVoiceNameFromID ( short sVoiceTypeID, short sVoiceID )
 {
     if ( sVoiceTypeID < 0 || sVoiceTypeID >= NUM_PED_VOICE_TYPES )
         return NULL;
