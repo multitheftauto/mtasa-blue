@@ -1181,6 +1181,7 @@ void CCore::DoPostFramePulse ( )
         }
     }
 
+    GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
 
     // Notify the mod manager and the connect manager

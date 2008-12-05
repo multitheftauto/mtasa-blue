@@ -42,6 +42,7 @@
 #include "CExceptionInformation_Impl.h"
 #include "tracking/CHTTPClient.h"
 #include "UtilityMacros.h"
+#include "CJoystickManager.h"
 
 // SDK includes
 #include <xml/CXMLNode.h>

@@ -99,7 +99,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr9.lib CEGUIBase.lib DirectX9GUIRenderer.lib CEGUIFalagardBase.lib freetype2110.lib"
-				OutputFile="C:\Program Files\Rockstar Games\GTA San Andreas\MTAcgui.dll"
+				OutputFile="C:\Program Files\Rockstar Games\GTA San Andreas\MTA\cgui.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../dependencies/cegui/lib"
 				GenerateDebugInformation="TRUE"
