@@ -14,6 +14,7 @@
 
 CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevice )
 {
+    GetJoystickManager ( )->AddDevice ( pDevice );
     WriteDebugEvent ( "CProxyDirectInputDevice8::CProxyDirectInputDevice8" );
     
     // Notify the event handler
@@ -29,6 +30,7 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevi
 
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8 ( )
 {
+    GetJoystickManager ( )->RemoveDevice ( m_pDevice );
     WriteDebugEvent ( "CProxyDirectInputDevice8::~CProxyDirectInputDevice8" );
 }
 
@@ -166,6 +168,7 @@ HRESULT CProxyDirectInputDevice8::GetDeviceData              ( DWORD a, LPDIDEVI
 
 HRESULT CProxyDirectInputDevice8::SetDataFormat              ( LPCDIDATAFORMAT a )
 {
+    GetJoystickManager ( )->SetDeviceDataFormat ( m_pDevice, a );
     return m_pDevice->SetDataFormat ( a );
 }
 

@@ -123,6 +123,39 @@ SBindableKey g_bkKeys[] =
     { "num_enter", 0x0D,        GTA_KEY_NUMPADENTER,    DATA_EXTENDED,          0 },
     { "clear",   0x0C,          NO_KEY_DEFINED,         DATA_NUMPAD,            70 },
 
+    { "joy1",    VK_JOY(1),          GTA_KEY_JOY(1),            DATA_NONE,              0 },
+    { "joy2",    VK_JOY(2),          GTA_KEY_JOY(2),            DATA_NONE,              0 },
+    { "joy3",    VK_JOY(3),          GTA_KEY_JOY(3),            DATA_NONE,              0 },
+    { "joy4",    VK_JOY(4),          GTA_KEY_JOY(4),            DATA_NONE,              0 },
+    { "joy5",    VK_JOY(5),          GTA_KEY_JOY(5),            DATA_NONE,              0 },
+    { "joy6",    VK_JOY(6),          GTA_KEY_JOY(6),            DATA_NONE,              0 },
+    { "joy7",    VK_JOY(7),          GTA_KEY_JOY(7),            DATA_NONE,              0 },
+    { "joy8",    VK_JOY(8),          GTA_KEY_JOY(8),            DATA_NONE,              0 },
+    { "joy9",    VK_JOY(9),          GTA_KEY_JOY(9),            DATA_NONE,              0 },
+    { "joy10",    VK_JOY(10),          GTA_KEY_JOY(10),            DATA_NONE,              0 },
+    { "joy11",    VK_JOY(11),          GTA_KEY_JOY(11),            DATA_NONE,              0 },
+    { "joy12",    VK_JOY(12),          GTA_KEY_JOY(12),            DATA_NONE,              0 },
+    { "joy13",    VK_JOY(13),          GTA_KEY_JOY(13),            DATA_NONE,              0 },
+    { "joy14",    VK_JOY(14),          GTA_KEY_JOY(14),            DATA_NONE,              0 },
+    { "joy15",    VK_JOY(15),          GTA_KEY_JOY(15),            DATA_NONE,              0 },
+    { "joy16",    VK_JOY(16),          GTA_KEY_JOY(16),            DATA_NONE,              0 },
+    { "joy17",    VK_JOY(17),          GTA_KEY_JOY(17),            DATA_NONE,              0 },
+    { "joy18",    VK_JOY(18),          GTA_KEY_JOY(18),            DATA_NONE,              0 },
+    { "joy19",    VK_JOY(19),          GTA_KEY_JOY(19),            DATA_NONE,              0 },
+    { "joy20",    VK_JOY(20),          GTA_KEY_JOY(20),            DATA_NONE,              0 },
+    { "joy21",    VK_JOY(21),          GTA_KEY_JOY(21),            DATA_NONE,              0 },
+    { "joy22",    VK_JOY(22),          GTA_KEY_JOY(22),            DATA_NONE,              0 },
+    { "joy23",    VK_JOY(23),          GTA_KEY_JOY(23),            DATA_NONE,              0 },
+    { "joy24",    VK_JOY(24),          GTA_KEY_JOY(24),            DATA_NONE,              0 },
+    { "joy25",    VK_JOY(25),          GTA_KEY_JOY(25),            DATA_NONE,              0 },
+    { "joy26",    VK_JOY(26),          GTA_KEY_JOY(26),            DATA_NONE,              0 },
+    { "joy27",    VK_JOY(27),          GTA_KEY_JOY(27),            DATA_NONE,              0 },
+    { "joy28",    VK_JOY(28),          GTA_KEY_JOY(28),            DATA_NONE,              0 },
+    { "joy29",    VK_JOY(29),          GTA_KEY_JOY(29),            DATA_NONE,              0 },
+    { "joy30",    VK_JOY(30),          GTA_KEY_JOY(30),            DATA_NONE,              0 },
+    { "joy31",    VK_JOY(31),          GTA_KEY_JOY(31),            DATA_NONE,              0 },
+    { "joy32",    VK_JOY(32),          GTA_KEY_JOY(32),            DATA_NONE,              0 },
+
     { "",           0,          NO_KEY_DEFINED,         DATA_NONE }
 };
 
@@ -1981,6 +2014,8 @@ void CKeyBinds::DoPostFramePulse ( void )
         }
         cs.ButtonTriangle = ( g_bcControls [ 9 ].bState ) ? 255 : 0; // Enter Exit
         cs.Select = ( g_bcControls [ 10 ].bState ) ? 255 : 0; // Change View   
+
+        GetJoystickManager ()->ApplyAxes ( cs );
     }
         
     m_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &cs );
@@ -2362,6 +2397,15 @@ void CKeyBinds::LoadControlsFromGTA ( void )
                 if ( iKey != NO_KEY_DEFINED )
                 {
                     const SBindableKey* pKey = GetBindableFromGTARelative ( iKey );
+                    if ( pKey )
+                        AddGTAControl ( pKey, pControl );
+                }
+
+                // Joystick
+                iKey = pGame->GetControllerConfigManager()->GetControllerKeyAssociatedWithAction ( (eControllerAction)i, JOYSTICK );
+                if ( iKey )
+                {
+                    const SBindableKey* pKey = GetBindableFromGTARelative ( GTA_KEY_JOY(iKey) );
                     if ( pKey )
                         AddGTAControl ( pKey, pControl );
                 }
