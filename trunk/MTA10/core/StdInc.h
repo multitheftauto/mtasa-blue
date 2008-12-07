@@ -4,7 +4,7 @@
 #pragma warning (disable:4995)
 #pragma warning (disable:4244)
 
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -19,6 +19,8 @@
 #include <winsock.h>
 #include <conio.h>
 
+#include <map>
+#include <set>
 #include <string>
 #include <sstream>
 #include <cstdlib>

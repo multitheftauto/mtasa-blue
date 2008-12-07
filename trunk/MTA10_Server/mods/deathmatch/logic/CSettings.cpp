@@ -40,6 +40,8 @@ CSettings::CSettings ( CResourceManager* pResourceManager )
 
 		// Create a new root node
 		m_pNodeGlobalSettings = m_pFile->CreateRootNode ( ROOTNODE_SETTINGS );
+
+        m_pFile->Write ();
 	}
 }
 
