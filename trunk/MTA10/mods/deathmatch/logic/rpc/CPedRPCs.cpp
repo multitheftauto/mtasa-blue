@@ -267,6 +267,11 @@ void CPedRPCs::RemovePedFromVehicle ( NetBitStreamInterface& bitStream )
             // Remove the player from his vehicle
             pPed->RemoveFromVehicle ();
             pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+            if ( pPed->m_bIsLocalPlayer )
+            {
+                // Reset expectation of vehicle enter completion, in case we were removed while entering
+                g_pClientGame->ResetVehicleInOut ();
+            }
         }
     }
 }
