@@ -131,14 +131,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
         }
     }
 
-    // Try to execute the handler
-    if ( m_pfnExecuteHandler )
-    {
-        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ) ) )
-            return true;
-    }
-
-    // If it not a command, it may be a cvar (syntax: cvar[=value], whitespaces allowed)
+    // Is it a cvar? (syntax: cvar[=value], whitespaces allowed)
     std::string val = std::string ( szCommand ) + std::string ( szParameters );
     unsigned int nOpIndex = val.find ( '=' );
     std::string key = val.substr ( 0, nOpIndex );
@@ -159,6 +152,13 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
         val = ss.str ();
         CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
         return true;
+    }
+
+    // Try to execute the handler
+    if ( m_pfnExecuteHandler )
+    {
+        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ) ) )
+            return true;
     }
 
     // Unknown command
