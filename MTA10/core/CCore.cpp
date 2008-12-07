@@ -1128,17 +1128,28 @@ void CCore::DoPostFramePulse ( )
             {
                 m_bFirstFrame = false;
 
-                // Parse commandline (TODO: Pretty hacky... Need to manage this more nicely in r2)
-                char szCommandLine [512];
-                strncpy ( szCommandLine, GetCommandLine (), 512 );
+                std::map < std::string, std::string > options;
+                char* szArgs = NULL;
+                const char* szNoValOptions[] =
+                {
+                    "window",
+                    NULL
+                };
+                ParseCommandLine ( options, szArgs, szNoValOptions );
 
-                // Does it begin with mta://?
-                if ( strnicmp ( szCommandLine, "mtasa://", 8 ) == 0 )
+                /*
+                // Go into window mode?
+                if ( options.find ( "window" ) != options.end () )
+                    CCommandFuncs::Window ( "" );       // Doesn't work this way...
+                */
+
+                // Does it begin with mtasa://?
+                if ( szArgs && strnicmp ( szArgs, "mtasa://", 8 ) == 0 )
                 {
                     char szArguments [256];
                     szArguments [255] = 0;
 
-                    GetConnectCommandFromURI(szCommandLine, szArguments, sizeof(szArguments));
+                    GetConnectCommandFromURI(szArgs, szArguments, sizeof(szArguments));
                     // Run the connect command
                     if ( strlen( szArguments ) > 0 && !m_pCommands->Execute ( szArguments ) )
                     {
@@ -1146,32 +1157,23 @@ void CCore::DoPostFramePulse ( )
                     }
                 }
                 else
-                {   
-                    char* szKey = strtok ( szCommandLine, " " );
-                    if ( szKey )
+                {
+                    // We want to load a mod?
+                    if ( options.find ( "l" ) != options.end () )
                     {
-                        // We want to load a mod?
-                        if ( strcmp ( szKey, "-l" ) == 0 )
+                        // Try to load the mod
+                        if ( !m_pModManager->Load ( options [ "l" ].c_str (), szArgs ) )
                         {
-                            char* szMod = strtok ( NULL, " " );
-                            char* szArguments = strtok ( NULL, "\0" );
-                            
-                            // Try to load the mod
-                            if ( !m_pModManager->Load ( szMod, szArguments ) )
-                            {
-                                char szTemp [128];
-                                _snprintf ( szTemp, 128, "Error running mod specified in command line ('%s')", szMod );
-                                ShowMessageBox ( "Error", szTemp, MB_BUTTON_OK | MB_ICON_ERROR );
-                            }
+                            char szTemp [128];
+                            _snprintf ( szTemp, 128, "Error running mod specified in command line ('%s')", options [ "l" ].c_str () );
+                            ShowMessageBox ( "Error", szTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
-                        // We want to connect to a server?
-                        else if ( strcmp ( szKey, "-c" ) == 0 )
-                        {
-                            char* szArguments = strtok ( NULL, "\0" );
-                            
-                            CCommandFuncs::Connect ( szArguments );
-                        }
-                    }                                                    
+                    }
+                    // We want to connect to a server?
+                    else if ( options.find ( "c" ) != options.end () )
+                    {
+                        CCommandFuncs::Connect ( options [ "c" ].c_str () );
+                    }
                 }
             }
         }
@@ -1181,7 +1183,6 @@ void CCore::DoPostFramePulse ( )
         }
     }
 
-    GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
 
     // Notify the mod manager and the connect manager
@@ -1347,6 +1348,82 @@ bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 	return bHandled;
 }
 
+void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, char*& szArgs, const char** pszNoValOptions )
+{
+    std::set < std::string > noValOptions;
+    if ( pszNoValOptions )
+    {
+        while ( *pszNoValOptions )
+        {
+            noValOptions.insert ( *pszNoValOptions );
+            pszNoValOptions++;
+        }
+    }
+
+    char* szCmdLine = GetCommandLine ();
+    char szCmdLineCopy[512];
+    strncpy ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
+    
+    char* pCmdLineEnd = szCmdLineCopy + strlen ( szCmdLineCopy );
+    char* pStart = szCmdLineCopy;
+    char* pEnd = pStart;
+    bool bInQuoted = false;
+    std::string strKey;
+    szArgs = NULL;
+
+    while ( pEnd != pCmdLineEnd )
+    {
+        pEnd = strchr ( pEnd + 1, ' ' );
+        if ( !pEnd )
+            pEnd = pCmdLineEnd;
+        if ( bInQuoted && *(pEnd - 1) == '"' )
+            bInQuoted = false;
+        else if ( *pStart == '"' )
+            bInQuoted = true;
+
+        if ( !bInQuoted )
+        {
+            *pEnd = 0;
+            if ( strKey.empty () )
+            {
+                if ( *pStart == '-' )
+                {
+                    strKey = pStart + 1;
+                    if ( noValOptions.find ( strKey ) != noValOptions.end () )
+                    {
+                        options [ strKey ] = "";
+                        strKey.clear ();
+                    }
+                }
+                else
+                {
+                    szArgs = pStart - szCmdLineCopy + szCmdLine;
+                    break;
+                }
+            }
+            else
+            {
+                if ( *pStart == '-' )
+                {
+                    options [ strKey ] = "";
+                    strKey = pStart + 1;
+                }
+                else
+                {
+                    if ( *pStart == '"' )
+                        pStart++;
+                    if ( *(pEnd - 1) == '"' )
+                        *(pEnd - 1) = 0;
+                    options [ strKey ] = pStart;
+                    strKey.clear ();
+                }
+            }
+            pStart = pEnd;
+            while ( pStart != pCmdLineEnd && *(++pStart) == ' ' );
+            pEnd = pStart;
+        }
+    }
+}
 
 const char* CCore::GetConnectCommandFromURI ( const char* szURI, char* szDest, size_t destLength )
 {

@@ -184,6 +184,7 @@ public:
     void                    RegisterCommands                ( void );
     bool					IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
+    static void             ParseCommandLine                ( std::map < std::string, std::string > & options, char*& szArgs, const char** pszNoValOptions = NULL );
     const char *            GetConnectCommandFromURI        ( const char* szURI, char* szDest, size_t destLength );	
 	bool					bScreenShot;
 
