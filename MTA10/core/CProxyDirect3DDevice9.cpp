@@ -179,6 +179,11 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
 {
     CDirect3DEvents9::OnPresent ( m_pDevice );
 
+    // A fog flicker fix for some ATI cards
+    D3DMATRIX projMatrix;
+    m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
+    m_pDevice->SetTransform ( D3DTS_PROJECTION, &projMatrix );
+
     return m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
 }
 
