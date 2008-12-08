@@ -77,7 +77,7 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
                 g_pGame->GetHud ()->DisableRadar ( bDisabled );
                 break;
             case HUD_CLOCK:
-                //g_pGame->GetHud ()->DisableClock ( bDisabled ); TODO
+                g_pGame->GetHud ()->DisableClock ( bDisabled );
                 break;
         }
     }        
