@@ -327,7 +327,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerNametagColor", CLuaFunctionDefinitions::GetPlayerNametagColor );
     CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefinitions::GetPlayerPing );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefinitions::IsPlayerDead );
-    CLuaCFunctions::AddFunction ( "isPlayerMuted", CLuaFunctionDefinitions::IsPlayerMuted );
     CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefinitions::GetPlayerTeam );
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefinitions::GetPlayerFromNick );
     CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefinitions::GetPlayerMoney );   

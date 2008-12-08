@@ -130,7 +130,6 @@ public:
     LUA_DECLARE ( GetPlayerFromNick );
     LUA_DECLARE ( GetPlayerNametagText );
     LUA_DECLARE ( GetPlayerNametagColor );
-    LUA_DECLARE ( IsPlayerMuted );
     LUA_DECLARE ( GetPlayerPing );
     LUA_DECLARE ( GetPlayerTeam );
     LUA_DECLARE ( IsPlayerDead );

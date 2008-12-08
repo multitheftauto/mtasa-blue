@@ -4229,32 +4229,6 @@ int CLuaFunctionDefinitions::IsPedDucked ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::IsPlayerMuted ( lua_State* luaVM )
-{
-    // Check type
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        // Grab the player
-        CClientPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
-        {
-            // Grab whether he's muted or not and return it
-            bool bMuted = pPlayer->GetMuted ();
-            lua_pushboolean ( luaVM, bMuted );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPlayerMuted", "player", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPlayerMuted" );
-
-    // Failed
-    lua_pushnil ( luaVM );
-    return 1;
-}
-
-
 int CLuaFunctionDefinitions::IsPedInVehicle ( lua_State* luaVM )
 {
     // Check type
