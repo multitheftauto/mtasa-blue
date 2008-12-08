@@ -72,9 +72,6 @@ public:
     inline void                     SetAdminLevel           ( unsigned char ucAdminLevel )      { m_ucAdminLevel = ucAdminLevel; };
     inline unsigned char            GetAdminLevel           ( void )                            { return m_ucAdminLevel; };
 
-    inline void                     SetMuted                ( bool bMuted )                     { m_bMuted = bMuted; };
-    inline bool                     GetMuted                ( void )                            { return m_bMuted; };
-
     inline void                     SetIsExtrapolatingAim   ( bool m_bExtrap )                  { m_bDoExtrapolatingAim = m_bExtrap; };
     inline bool                     IsExtrapolatingAim      ( void )                            { return m_bDoExtrapolatingAim; };
     void                            UpdateAimPosition       ( const CVector &vecAim );
@@ -119,7 +116,6 @@ private:
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
     unsigned char                   m_ucAdminLevel;
 
-    bool                            m_bMuted;    
     unsigned int                    m_uiPing;
 
     CVector                         m_vecTargetPosition;

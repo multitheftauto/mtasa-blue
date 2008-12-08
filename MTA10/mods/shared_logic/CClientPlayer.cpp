@@ -30,7 +30,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     m_szNick [ 0 ] = '\0';
 
-	m_bMuted = false;
     m_ucAdminLevel = 0;
     m_usLatency = 0;
 
