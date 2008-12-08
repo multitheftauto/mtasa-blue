@@ -300,13 +300,17 @@ void CMainMenu::Update ( void )
     {
 		// Initialize our 3D scene once the device is available
 		IDirect3DDevice9 * pDevice = m_pGraphics->GetDevice ();
-		if ( !m_bInitialized && pDevice ) {
+		if ( !m_bInitialized && pDevice )
+        {            
 			m_bInitialized = true;
 
 			// If the static flag has not already been set
-			if ( m_bStaticBackground ) {
+			if ( m_bStaticBackground )
+            {
 				SetStaticBackground ( true );
-			} else {
+			}
+            else
+            {
 				// Create the texture to be used in the background
 				CVector2D ScreenSize = m_pManager->GetResolution ();
 				m_pRenderTarget = m_pManager->CreateTexture ();

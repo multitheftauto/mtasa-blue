@@ -624,6 +624,10 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
 }
 
+void CCore::ApplyMenuSettings ( void )
+{
+    m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();
+}
 
 void CCore::SetConnected ( bool bConnected )
 {
@@ -1110,8 +1114,7 @@ void CCore::DoPostFramePulse ( )
         // Apply all settings
         ApplyConsoleSettings ();
         ApplyGameSettings ();
-
-		m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();
+        ApplyMenuSettings ();
 
         m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
 		m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
