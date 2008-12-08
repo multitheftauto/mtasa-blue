@@ -129,6 +129,7 @@ public:
     // Configuration
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyGameSettings               ( void );
+    void                    ApplyMenuSettings               ( void );
 
     // Net
     void                    SetConnected                    ( bool bConnected );
