@@ -717,6 +717,9 @@ void CMultiplayerSA::InitHooks()
     // Let us sprint everywhere (always return 0 from CSurfaceData::isSprint)
     *(DWORD *)0x55E870 = 0xC2C03366;
     *(WORD *)0x55E874  = 0x0004;
+
+    // Create pickup objects in interior 0 instead of 13
+    *(BYTE *)0x59FAA3 = 0x00;
 }
 
 
