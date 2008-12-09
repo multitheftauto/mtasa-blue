@@ -880,6 +880,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
 	// and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
     CVARS_SET ( "screenshot_path", strScreenShotPath );
+    CScreenShot::SetPath ( strScreenShotPath.c_str() );
 }
 
 
