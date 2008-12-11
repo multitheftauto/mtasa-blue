@@ -173,7 +173,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
             if ( account )
             {
                 // Check that the password is right
-                if ( strcmp ( account->GetPassword ().c_str (), authPassword.c_str () ) == 0 )
+				if ( account->IsPassword ( authPassword.c_str () ) == 0 )
                 {
                     // Check that it isn't the Console account
                     std::string strAccountName = account->GetName ();
