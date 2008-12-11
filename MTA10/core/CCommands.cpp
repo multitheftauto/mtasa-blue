@@ -132,7 +132,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
     }
 
     // Is it a cvar? (syntax: cvar[=value], whitespaces allowed)
-    std::string val = std::string ( szCommand ) + std::string ( szParameters );
+    std::string val = std::string ( szCommand ) + std::string ( szParameters ? szParameters : "" );
     unsigned int nOpIndex = val.find ( '=' );
     std::string key = val.substr ( 0, nOpIndex );
     if ( CClientVariables::GetSingleton ().Exists ( key ) ) {
