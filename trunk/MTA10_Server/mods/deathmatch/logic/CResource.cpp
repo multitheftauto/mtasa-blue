@@ -478,6 +478,47 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
 	// If there was no matching key, create a new one and add it to our list
     pValue = new CInfoValue ( szKey, szValue );
     m_infoValues.push_back ( pValue );
+
+    // Save to xml
+    std::string strPath;
+    if ( GetFilePath ( "meta.xml", strPath ) )
+    {
+        // Load the meta file
+        CXMLFile* metaFile = g_pServerInterface->GetXML ()->CreateXML ( strPath.c_str() );
+        if ( metaFile )
+        {
+            // Parse it
+            if ( metaFile->Parse () )
+            {
+                // Grab its rootnode
+                CXMLNode* pRootNode = metaFile->GetRootNode ();
+                if ( pRootNode )
+                {
+                    // Create a new map subnode
+                    CXMLNode* pInfoNode = pRootNode->FindSubNode ( "info" );
+                    if ( pInfoNode )
+                    {
+                        CXMLAttribute* pAttr = pInfoNode->GetAttributes ().Find ( szKey );
+                        if ( pAttr ) pAttr->SetValue ( szValue );
+                        else pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
+                        // Success, write and destroy XML
+                    }
+                    else
+                    {
+                        pInfoNode = pInfoNode = pRootNode->CreateSubNode ( "info" );
+                        if ( pInfoNode )
+                        {
+                            pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
+                        }
+                    }
+                    metaFile->Write ();
+                }
+            }
+
+            // Destroy it
+            delete metaFile;
+        }
+    }
 }
 
 unsigned long CResource::GenerateCRC ( void )
