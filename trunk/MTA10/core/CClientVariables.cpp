@@ -188,7 +188,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "debugfile",                  _S("") );                       // debug filename
     DEFAULT ( "console_pos",                CVector2D ( 0.20f, 0.20f ) );   // console position
     DEFAULT ( "fps_limit",                  100 );                          // frame limiter
-    DEFAULT ( "chat_font",                  1 );                            // chatbox font type
+    DEFAULT ( "chat_font",                  0 );                            // chatbox font type
     DEFAULT ( "chat_lines",                 7 );                            // chatbox lines
     DEFAULT ( "chat_color",                 CColor (0,0,128,100) );         // chatbox color
     DEFAULT ( "chat_input_color",           CColor (0,0,191,110) );         // chatbox input color
