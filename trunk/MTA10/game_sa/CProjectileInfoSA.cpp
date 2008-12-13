@@ -158,7 +158,7 @@ bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, 
 		pop		eax
 	}
 	pGame->GetWorld()->IgnoreEntity(NULL);
-	return dwReturn;
+	return dwReturn != 0;
 }
 
 CEntity* CProjectileInfoSA::GetTarget ( void )

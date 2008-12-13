@@ -25,6 +25,9 @@ extern "C"
 #include "json.h"
 
 class CElement;
+class CLuaArguments;
+
+#define LUA_TTABLEREF 9
 
 class CLuaArgument
 {
@@ -34,16 +37,17 @@ public:
                             CLuaArgument        ( double dNumber );
                             CLuaArgument        ( const char* szString );
                             CLuaArgument        ( CElement* pElement );
-                            CLuaArgument        ( const CLuaArgument& Argument );
-                            CLuaArgument        ( lua_State* luaVM, signed int uiArgument, unsigned int depth = 0 );
+                            CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
+                            CLuaArgument        ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+                            CLuaArgument        ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
                             ~CLuaArgument       ( void );
 
     const CLuaArgument&     operator =          ( const CLuaArgument& Argument );
     bool                    operator ==         ( const CLuaArgument& Argument );
     bool                    operator !=         ( const CLuaArgument& Argument );
 
-    void                    Read                ( lua_State* luaVM, signed int uiArgument, unsigned int depth = 0 );
-    void                    Push                ( lua_State* luaVM ) const;
+    void                    Read                ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
+    void                    Push                ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL ) const;
     
     void                    Read                ( bool bBool );
     void                    Read                ( double dNumber );
@@ -62,10 +66,10 @@ public:
     CElement*               GetElement          ( void ) const;
     bool                    GetAsString         ( char * szBuffer, unsigned int uiLength );
 
-    bool                    ReadFromBitStream   ( NetServerBitStreamInterface& bitStream );
-    bool                    WriteToBitStream    ( NetServerBitStreamInterface& bitStream ) const;
-    json_object*            WriteToJSONObject   ( bool bSerialize = false );
-    bool                    ReadFromJSONObject  ( json_object* object );
+    bool                    ReadFromBitStream   ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    bool                    WriteToBitStream    ( NetServerBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    json_object*            WriteToJSONObject   ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
+    bool                    ReadFromJSONObject  ( json_object* object, std::vector < CLuaArguments* > * pKnownTables = NULL );
     char *                  WriteToString       ( char * szBuffer, int length );
 
 private:
@@ -76,10 +80,15 @@ private:
     lua_Number              m_Number;
     std::string             m_strString;
     void*                   m_pLightUserData;
-    class CLuaArguments*    m_pTableData;
+    CLuaArguments*          m_pTableData;
+    bool                    m_bWeakTableRef;
 
     std::string             m_strFilename;
     int                     m_iLine;
+
+    void                    CopyRecursive       ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
+    bool                    CompareRecursive    ( const CLuaArgument& Argument, std::set < CLuaArguments* > * pKnownTables = NULL );
+    void                    DeleteTableData     ( void );
 };
 
 #endif
