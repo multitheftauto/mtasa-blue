@@ -11,6 +11,9 @@
 #include <winsock.h>
 
 #include <list>
+#include <map>
+#include <set>
+#include <vector>
 #include <cstdio>
 #include <cstring>
 

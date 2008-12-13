@@ -720,6 +720,12 @@ void CMultiplayerSA::InitHooks()
 
     // Create pickup objects in interior 0 instead of 13
     *(BYTE *)0x59FAA3 = 0x00;
+
+    // Don't get shotguns from police cars
+    *(BYTE *)0x6D19CD = 0xEB;
+
+    // Don't get golf clubs from caddies
+    *(BYTE *)0x6D1A1A = 0xEB;
 }
 
 
@@ -779,7 +785,6 @@ CPed * CMultiplayerSA::GetContextSwitchedPed ( void )
 
 void CMultiplayerSA::AllowWindowsCursorShowing ( bool bAllow )
 {
-    DWORD oldProt, oldProt2;
     /*
     0074821D   6A 00            PUSH 0
     0074821F   FF15 EC828500    CALL DWORD PTR DS:[<&USER32.ShowCursor>] ; USER32.ShowCursor

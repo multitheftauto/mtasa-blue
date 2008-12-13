@@ -16,10 +16,6 @@
 
 extern CGame* g_pGame;
 
-// used in WriteToBitStream
-#define ARGUMENT_TYPE_INT		9
-#define ARGUMENT_TYPE_FLOAT		10
-
 #ifndef VERIFY_ELEMENT
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
 #endif
@@ -68,19 +64,26 @@ CLuaArgument::CLuaArgument ( CElement* pElement )
 }
 
 
-CLuaArgument::CLuaArgument ( const CLuaArgument& Argument )
+CLuaArgument::CLuaArgument ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
-    operator= ( Argument );
+    CopyRecursive ( Argument, pKnownTables );
 }
 
 
-CLuaArgument::CLuaArgument ( lua_State* luaVM, signed int uiArgument, unsigned int depth )
+CLuaArgument::CLuaArgument ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
+{
+    m_pTableData = NULL;
+    ReadFromBitStream ( bitStream, pKnownTables );
+}
+
+
+CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables )
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
-    Read ( luaVM, uiArgument, depth );
+    Read ( luaVM, iArgument, pKnownTables );
 
     // Store debug data for later retrieval
     m_iLine = 0;
@@ -99,23 +102,17 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, signed int uiArgument, unsigned i
 
 CLuaArgument::~CLuaArgument ( void )
 {
-    // Eventually destroy our string
-    if ( m_pTableData )
-        delete m_pTableData;
+    // Eventually destroy our table
+    DeleteTableData ();
 }
 
-
-const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
+void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Clear the string
     m_strString = "";
 
     // Destroy our old tabledata if neccessary
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
 
     // Copy over line and filename too
     m_strFilename = Argument.m_strFilename;
@@ -145,7 +142,16 @@ const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
 
         case LUA_TTABLE:
         {
-            m_pTableData = new CLuaArguments(*Argument.m_pTableData);
+            if ( pKnownTables && pKnownTables->find ( Argument.m_pTableData ) != pKnownTables->end () )
+            {
+                m_pTableData = pKnownTables->find ( Argument.m_pTableData )->second;
+                m_bWeakTableRef = true;
+            }
+            else
+            {
+                m_pTableData = new CLuaArguments ( *Argument.m_pTableData, pKnownTables );
+                m_bWeakTableRef = false;
+            }
             break;
         }
 
@@ -157,6 +163,11 @@ const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
 
         default: break;
     }
+}
+
+const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
+{
+    CopyRecursive ( Argument );
 
     // Return the given class allowing for chaining
     return Argument;
@@ -164,6 +175,19 @@ const CLuaArgument& CLuaArgument::operator = ( const CLuaArgument& Argument )
 
 
 bool CLuaArgument::operator == ( const CLuaArgument& Argument )
+{
+    std::set < CLuaArguments* > knownTables;
+    return CompareRecursive ( Argument, &knownTables );
+}
+
+
+bool CLuaArgument::operator != ( const CLuaArgument& Argument )
+{
+    std::set < CLuaArguments* > knownTables;
+    return !CompareRecursive ( Argument, &knownTables );
+}
+
+bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < CLuaArguments* > * pKnownTables )
 {
     // If the types differ, they're not matching
     if ( Argument.m_iType != m_iType )
@@ -196,8 +220,12 @@ bool CLuaArgument::operator == ( const CLuaArgument& Argument )
             vector < CLuaArgument * > ::const_iterator iterCompare = Argument.m_pTableData->IterBegin ();
             while ( iter != m_pTableData->IterEnd () && iterCompare != Argument.m_pTableData->IterEnd () )
             {
-                if ( *iter != *iterCompare )
-                    return false;
+                if ( pKnownTables->find ( m_pTableData ) == pKnownTables->end () )
+                {
+                    pKnownTables->insert ( m_pTableData );
+                    if ( *iter != *iterCompare )
+                        return false;
+                }
             
                 iter++;
                 iterCompare++;
@@ -213,14 +241,7 @@ bool CLuaArgument::operator == ( const CLuaArgument& Argument )
     return true;
 }
 
-
-bool CLuaArgument::operator != ( const CLuaArgument& Argument )
-{
-    return !( operator == ( Argument ) );
-}
-
-
-void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int depth )
+void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables )
 {
     // Store debug data for later retrieval
     m_iLine = 0;
@@ -238,14 +259,10 @@ void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int 
     // Eventually delete our previous string
     m_strString = "";
 
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
 
     // Grab the argument type
-    m_iType = lua_type ( luaVM, uiArgument );
+    m_iType = lua_type ( luaVM, iArgument );
     if ( m_iType != LUA_TNONE )
     {
         // Read out the content depending on the type
@@ -256,42 +273,44 @@ void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int 
 
             case LUA_TBOOLEAN:
             {
-                m_bBoolean = lua_toboolean ( luaVM, uiArgument ) ? true:false;
+                m_bBoolean = lua_toboolean ( luaVM, iArgument ) ? true : false;
                 break;
             }
 
             case LUA_TTABLE:
             {
-                m_pTableData = new CLuaArguments();
-                if ( uiArgument < 0 )
-                    uiArgument--;
-                
-                if ( depth < 12 ) 
-                    m_pTableData->ReadTable ( luaVM, uiArgument, depth + 1 );
-                else {
-                    g_pGame->GetScriptDebugging()->LogWarning ( NULL, "Truncated table at depth 12. You may have a self-referencing table." );
-                    m_iType = LUA_TNIL;
+                const void* pTable = lua_topointer ( luaVM, iArgument );
+                if ( pKnownTables && pKnownTables->find ( pTable ) != pKnownTables->end () )
+                {
+                    m_pTableData = pKnownTables->find ( pTable )->second;
+                    m_bWeakTableRef = true;
+                }
+                else
+                {
+                    m_pTableData = new CLuaArguments ();
+                    m_pTableData->ReadTable ( luaVM, iArgument, pKnownTables );
+                    m_bWeakTableRef = false;
                 }
                 break;
             }
 
             case LUA_TLIGHTUSERDATA:
             {
-                m_pLightUserData = lua_touserdata ( luaVM, uiArgument );
+                m_pLightUserData = lua_touserdata ( luaVM, iArgument );
                 break;
             }
 
             case LUA_TNUMBER:
             {
-                m_Number = lua_tonumber ( luaVM, uiArgument );
+                m_Number = lua_tonumber ( luaVM, iArgument );
                 break;
             }
 
             case LUA_TSTRING:
             {
                 // Grab the lua string and its size
-                const char* szLuaString = lua_tostring ( luaVM, uiArgument );
-                size_t sizeLuaString = lua_strlen ( luaVM, uiArgument );
+                const char* szLuaString = lua_tostring ( luaVM, iArgument );
+                size_t sizeLuaString = lua_strlen ( luaVM, iArgument );
 
                 // Set our string
                 m_strString.assign ( szLuaString, sizeLuaString );
@@ -315,7 +334,7 @@ void CLuaArgument::Read ( lua_State* luaVM, signed int uiArgument, unsigned int 
 }
 
 
-void CLuaArgument::Push ( lua_State* luaVM ) const
+void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables ) const
 {
     // Got any type?
     if ( m_iType != LUA_TNONE )
@@ -349,7 +368,14 @@ void CLuaArgument::Push ( lua_State* luaVM ) const
 
             case LUA_TTABLE:
             {
-                m_pTableData->PushAsTable ( luaVM );
+                if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+                {
+                    lua_pushvalue ( luaVM, pKnownTables->find ( m_pTableData )->second );
+                }
+                else
+                {
+                    m_pTableData->PushAsTable ( luaVM, pKnownTables );
+                }
                 break;
             }
 
@@ -366,11 +392,7 @@ void CLuaArgument::Push ( lua_State* luaVM ) const
 void CLuaArgument::Read ( bool bBool )
 {
     m_strString = "";
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
     m_iType = LUA_TBOOLEAN;
     m_bBoolean = bBool;
 }
@@ -378,24 +400,15 @@ void CLuaArgument::Read ( bool bBool )
 void CLuaArgument::Read ( CLuaArguments * table )
 {
     m_strString = "";
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
-    m_pTableData = table;
+    DeleteTableData ();
+    m_pTableData = new CLuaArguments ( *table );
     m_iType = LUA_TTABLE;
-    m_bBoolean = false;
 }
 
 void CLuaArgument::Read ( double dNumber )
 {
     m_strString = "";
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
     m_iType = LUA_TNUMBER;
     m_Number = dNumber;
 }
@@ -406,25 +419,17 @@ void CLuaArgument::Read ( const char* szString )
     assert ( szString );
 
     m_iType = LUA_TSTRING;
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
     m_strString = szString;
 }
 
 
 void CLuaArgument::Read ( CElement* pElement )
 {
+    m_strString = "";
+    DeleteTableData ();
     if ( pElement )
     {
-        m_strString = "";
-        if ( m_pTableData )
-        {
-            delete m_pTableData;
-            m_pTableData = NULL;
-        }
         m_iType = LUA_TLIGHTUSERDATA;
         m_pLightUserData = (void*) pElement->GetID ();
     }
@@ -436,11 +441,7 @@ void CLuaArgument::Read ( CElement* pElement )
 void CLuaArgument::ReadUserData ( void* pUserData )
 {
     m_strString = "";
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
     m_iType = LUA_TLIGHTUSERDATA;
     m_pLightUserData = pUserData;
 }
@@ -484,13 +485,9 @@ bool CLuaArgument::GetAsString ( char * szBuffer, unsigned int uiLength )
 }
 
 
-bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream )
+bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
-    if ( m_pTableData )
-    {
-        delete m_pTableData;
-        m_pTableData = NULL;
-    }
+    DeleteTableData ();
 
     // Read out the type
     unsigned char cType = 0;
@@ -515,11 +512,39 @@ bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream )
 				break;
 			}
 
+            // Number type
+			case LUA_TNUMBER:
+			{
+				float fNum;
+				if ( bitStream.Read ( fNum ) )
+				{
+					Read ( ( double ) fNum );
+				}
+				break;
+			}
+
             // Table type
             case LUA_TTABLE:
             {
-                m_pTableData = new CLuaArguments(bitStream);
+                m_pTableData = new CLuaArguments ( bitStream, pKnownTables );
+                m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
+                break;
+            }
+
+            // Table reference
+            case LUA_TTABLEREF:
+            {
+                unsigned long ulTableRef;
+                if ( bitStream.Read ( ulTableRef ) )
+                {
+                    if ( pKnownTables && ulTableRef < pKnownTables->size () )
+                    {
+                        m_pTableData = pKnownTables->at ( ulTableRef );
+                        m_bWeakTableRef = true;
+                        m_iType = LUA_TTABLE;
+                    }
+                }
                 break;
             }
 
@@ -559,35 +584,13 @@ bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream )
 				}
 				break;
 			}
-
-            // ??
-			case ARGUMENT_TYPE_INT:
-			{
-				int iNum;
-				if ( bitStream.Read ( iNum ) )
-				{
-					Read ( ( double ) iNum );
-				}
-				break;
-			}
-
-            // ??
-			case ARGUMENT_TYPE_FLOAT:
-			{
-				float fNum;
-				if ( bitStream.Read ( fNum ) )
-				{
-					Read ( fNum );
-				}
-				break;
-			}
 		}
     }
     return true;
 }
 
 
-bool CLuaArgument::WriteToBitStream ( NetServerBitStreamInterface& bitStream ) const
+bool CLuaArgument::WriteToBitStream ( NetServerBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
     switch ( GetType () )
     {
@@ -604,38 +607,34 @@ bool CLuaArgument::WriteToBitStream ( NetServerBitStreamInterface& bitStream ) c
 			bitStream.Write ( (unsigned char)LUA_TBOOLEAN );
 
             // Write the boolean to it
-            bitStream.Write ( static_cast < unsigned char > ( ( GetBoolean () ) ? 1 : 0 ) );
+            bitStream.Write ( static_cast < unsigned char > ( GetBoolean () ? 1 : 0 ) );
             break;
         }
 
         // Table argument
         case LUA_TTABLE:
         {
-            bitStream.Write ( (unsigned char)LUA_TTABLE );
+            if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+            {
+                // Self-referencing table
+                bitStream.Write ( (unsigned char)LUA_TTABLEREF );
+                bitStream.Write ( pKnownTables->find ( m_pTableData )->second );
+            }
+            else
+            {
+                bitStream.Write ( (unsigned char)LUA_TTABLE );
 
-            // Write the subtable to the bitstream
-            m_pTableData->WriteToBitStream(bitStream);
+                // Write the subtable to the bitstream
+                m_pTableData->WriteToBitStream ( bitStream, pKnownTables );
+            }
             break;
         }
 
         // Number argument?
         case LUA_TNUMBER:
         {
-            // ChrML: Why is this being done? A float is 4 bytes and an int is 4 bytes... To complicate things?
-			float fNum = static_cast < float > ( GetNumber () );
-			int iNum = static_cast < int > ( GetNumber () );
-			if ( iNum == fNum )
-			{
-				// we can use the int, the number was a whole number
-				bitStream.Write ( (unsigned char)ARGUMENT_TYPE_INT );
-				bitStream.Write ( iNum );
-			}
-			else
-			{
-				bitStream.Write ( (unsigned char)ARGUMENT_TYPE_FLOAT );
-				bitStream.Write ( fNum );
-			}
-
+            bitStream.Write ( (unsigned char)LUA_TNUMBER );
+			bitStream.Write ( static_cast < float > ( GetNumber () ) );
             break;
         }
 
@@ -712,7 +711,7 @@ bool CLuaArgument::WriteToBitStream ( NetServerBitStreamInterface& bitStream ) c
     return true;
 }
 
-json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize )
+json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLuaArguments*, unsigned long > * pKnownTables )
 {
     switch ( GetType () )
     {
@@ -726,7 +725,16 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize )
         }
         case LUA_TTABLE:
         {
-            return this->m_pTableData->WriteTableToJSONObject ( bSerialize );
+            if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
+            {
+                char szTableID[10];
+                _snprintf ( szTableID, sizeof(szTableID), "^T^%d", pKnownTables->find ( m_pTableData )->second );
+                return json_object_new_string ( szTableID );
+            }
+            else
+            {
+                return m_pTableData->WriteTableToJSONObject ( bSerialize, pKnownTables );
+            }
         }
         case LUA_TNUMBER:
         {
@@ -873,15 +881,11 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
     return NULL;
 }
 
-bool CLuaArgument::ReadFromJSONObject ( json_object* object )
+bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaArguments* > * pKnownTables )
 {
     if ( !is_error(object) )
     {
-        if ( m_pTableData )
-        {
-            delete m_pTableData;
-            m_pTableData = NULL;
-        }
+        DeleteTableData ();
 
         if ( !object )
             m_iType = LUA_TNIL; 
@@ -906,12 +910,14 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object )
                 break;
             case json_type_object:
                 m_pTableData = new CLuaArguments();
-                m_pTableData->ReadFromJSONObject ( object );
+                m_pTableData->ReadFromJSONObject ( object, pKnownTables );
+                m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
                 break;
             case json_type_array:
                 m_pTableData = new CLuaArguments();
-                m_pTableData->ReadFromJSONArray ( object );
+                m_pTableData->ReadFromJSONArray ( object, pKnownTables );
+                m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
                 break;
             case json_type_string:
@@ -921,29 +927,49 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object )
                 {
                     switch ( szString[1] )
                     {
-                    case 'E': // element
-                    {
-                        int id = atoi(szString+3);
-                        CElement * element = NULL;
-                        if ( id != INT_MAX && id != INT_MIN && id != 0 )
-                            element = CElementIDs::GetElement(id);
-                        if ( element )
-                            Read ( element );
-                        else 
+                        case 'E': // element
                         {
-                            g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified." );
-                            m_iType = LUA_TNIL;
+                            int id = atoi ( szString + 3 );
+                            CElement * element = NULL;
+                            if ( id != INT_MAX && id != INT_MIN && id != 0 )
+                                element = CElementIDs::GetElement(id);
+                            if ( element )
+                            {
+                                Read ( element );
+                            }
+                            else 
+                            {
+                                g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified." );
+                                m_iType = LUA_TNIL;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case 'R': // resource
+                        case 'R': // resource
                         {
                             CResource * resource = g_pGame->GetResourceManager()->GetResource(szString+3);
                             if ( resource )
+                            {
                                 ReadUserData ((void *)resource);
+                            }
                             else 
                             {
                                 g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid resource specified." );
+                                m_iType = LUA_TNIL;
+                            }
+                            break;
+                        }
+                        case 'T':   // Table reference
+                        {
+                            long lTableID = static_cast < unsigned long > ( atol ( szString + 3 ) );
+                            if ( pKnownTables && lTableID >= 0 && lTableID < pKnownTables->size () )
+                            {
+                                m_pTableData = pKnownTables->at ( lTableID );
+                                m_bWeakTableRef = true;
+                                m_iType = LUA_TTABLE;
+                            }
+                            else
+                            {
+                                g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid table reference specified." );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -973,5 +999,15 @@ void CLuaArgument::LogUnableToPacketize ( const char* szMessage ) const
     else
     {
         g_pGame->GetScriptDebugging ()->LogWarning ( NULL, "Unknown: %s\n", szMessage );
+    }
+}
+
+void CLuaArgument::DeleteTableData ( )
+{
+    if ( m_pTableData )
+    {
+        if ( !m_bWeakTableRef )
+            delete m_pTableData;
+        m_pTableData = NULL;
     }
 }

@@ -352,7 +352,7 @@ void ReplaceSlashes ( string& strPath )
 void ReplaceSlashes ( char* szPath )
 {
     size_t iLen = strlen ( szPath );
-    for ( int i = 0; i < iLen; i++ )
+    for ( size_t i = 0; i < iLen; i++ )
     {
         if ( szPath [ i ] == '\\' )
             szPath [ i ] = '/';

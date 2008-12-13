@@ -18,15 +18,12 @@
 VOID HookInstallMethod(	DWORD dwInstallAddress,
 						DWORD dwHookFunction )
 {
-	DWORD oldProt, oldProt2;
-
 	*(PDWORD)dwInstallAddress = (DWORD)dwHookFunction;
 }
 
 VOID HookInstallCall ( DWORD dwInstallAddress,
 						DWORD dwHookFunction )
 {
-    DWORD oldProt, oldProt2;
     DWORD dwOffset = dwHookFunction - (dwInstallAddress + 5);
 	*(BYTE*)(dwInstallAddress) = 0xE8;
     *(DWORD*)(dwInstallAddress+1) = dwOffset;
@@ -44,8 +41,6 @@ BOOL HookInstall( DWORD dwInstallAddress,
 	if (CreateJump((DWORD)dwHookStorage, JumpBytes))
 	{	
 		*dwHookStorage = dwHookHandler;
-
-		DWORD oldProt, oldProt2;
 
 		memcpy((PVOID)dwInstallAddress,JumpBytes,iJmpCodeSize);
 		return TRUE;

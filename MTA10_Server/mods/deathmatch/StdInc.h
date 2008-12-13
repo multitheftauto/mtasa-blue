@@ -9,7 +9,10 @@
 #include <pthread.h>
 
 #include <list>
+#include <map>
+#include <set>
 #include <string>
+#include <vector>
 #include <ctime>
 
 // SDK includes

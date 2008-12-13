@@ -173,7 +173,7 @@ public:
     static bool                 SpawnPlayer                         ( CPlayer* pPlayer, const CVector& vecPosition, float fRotation, unsigned long ulModel, unsigned char ucInterior, unsigned short usDimension, CTeam* pTeam = NULL );
 	static bool					SetPlayerMuted						( CElement* pElement, bool bMuted );
     static bool                 SetPlayerBlurLevel                  ( CElement* pElement, unsigned char ucLevel );
-    static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPort );
+    static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );

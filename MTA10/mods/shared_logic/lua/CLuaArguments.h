@@ -27,28 +27,30 @@ extern "C"
 #include "CLuaArgument.h"
 #include <vector>
 
-
-using namespace std;
+class CLuaArguments;
 
 class CLuaArguments
 {
 public:
-    inline                                              CLuaArguments       ( void )                {};
-                                                        CLuaArguments       ( const CLuaArguments& Arguments );
-														CLuaArguments		( NetBitStreamInterface& bitStream );
-    inline                                              ~CLuaArguments      ( void )                { DeleteArguments (); };
+                                                        CLuaArguments       ( void )                { }
+                                                        CLuaArguments       ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
+														CLuaArguments		( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+                                                        ~CLuaArguments      ( void )                { DeleteArguments (); };
+
+    void                                                CopyRecursive       ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
 
     const CLuaArguments&                                operator =          ( const CLuaArguments& Arguments );
+	CLuaArgument*										operator []			( const unsigned int uiPosition ) const;
 
-    void                                                ReadArgument        ( lua_State* luaVM, unsigned int uiIndex );
-    void                                                ReadArguments       ( lua_State* luaVM, unsigned int uiIndexBegin = 1 );
+    void                                                ReadArgument        ( lua_State* luaVM, signed int uiIndex );
+    void                                                ReadArguments       ( lua_State* luaVM, signed int uiIndexBegin = 1 );
     void                                                PushArguments       ( lua_State* luaVM ) const;
     void                                                PushArguments       ( CLuaArguments& Arguments );
     bool                                                Call                ( class CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments * returnValues = NULL ) const;
-    bool                                                CallGlobal          ( class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments * returnValues = NULL ) const;
+	bool                                                CallGlobal          ( class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments * returnValues = NULL ) const;
 
-    void                                                ReadTable           ( lua_State* luaVM, signed int uiIndexBegin, unsigned int depth = 0 );
-    void                                                PushAsTable         ( lua_State* luaVM );
+    void                                                ReadTable           ( lua_State* luaVM, int iIndexBegin, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
+    void                                                PushAsTable         ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL );
 
     CLuaArgument*                                       PushNil             ( void );
     CLuaArgument*                                       PushBoolean         ( bool bBool );
@@ -56,19 +58,22 @@ public:
     CLuaArgument*                                       PushString          ( const char* szString );
     CLuaArgument*                                       PushUserData        ( void* pUserData );
     CLuaArgument*                                       PushElement         ( CClientEntity* pElement );
-    CLuaArgument*                                       PushArgument        ( CLuaArgument & Argument );
+    CLuaArgument*                                       PushArgument        ( CLuaArgument& argument );
+    CLuaArgument*                                       PushTable           ( CLuaArguments * table );
 
     void                                                DeleteArguments     ( void );
-	
-    bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream );
-    bool												WriteToBitStream	( NetBitStreamInterface& bitStream );
 
-    inline unsigned int                                 Count               ( void ) const          { return static_cast < unsigned int > ( m_Arguments.size () ); };
-    inline vector < CLuaArgument* > ::const_iterator    IterBegin           ( void )                { return m_Arguments.begin (); };
-    inline vector < CLuaArgument* > ::const_iterator    IterEnd             ( void )                { return m_Arguments.end (); };
+    bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+
+    unsigned int                                        Count               ( void ) const          { return static_cast < unsigned int > ( m_Arguments.size () ); };
+    std::vector < CLuaArgument* > ::const_iterator      IterBegin           ( void )                { return m_Arguments.begin (); };
+    std::vector < CLuaArgument* > ::const_iterator      IterEnd             ( void )                { return m_Arguments.end (); };
 
 private:
-    vector < CLuaArgument* >                            m_Arguments;
+    std::vector < CLuaArgument* >                       m_Arguments;
 };
 
 #endif
+
+
