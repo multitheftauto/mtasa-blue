@@ -22,10 +22,8 @@ CConnectManager::CConnectManager ( void )
 {
     g_pConnectManager = this;
 
-    m_szHost = NULL;
-    m_szNick = NULL;
-    m_szPassword = NULL;
     m_usPort = 0;
+    m_bReconnect = false;
     m_bIsConnecting = false;
     m_tConnectStarted = 0;
 
@@ -38,21 +36,6 @@ CConnectManager::CConnectManager ( void )
 
 CConnectManager::~CConnectManager ( void )
 {
-    if ( m_szHost )
-    {
-        delete [] m_szHost;
-        m_szHost = NULL;
-    }
-    if ( m_szNick )
-    {
-        delete [] m_szNick;
-        m_szNick = NULL;
-    }
-    if ( m_szPassword )
-    {
-        delete [] m_szPassword;
-        m_szPassword = NULL;
-    }
     if ( m_pOnCancelClick )
     {
         delete m_pOnCancelClick;
@@ -107,32 +90,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         return false;
     }
 
-    // Eventually free previous host and nick
-    if ( m_szHost )
-    {
-        delete [] m_szHost;
-        m_szHost = NULL;
-    }
-    if ( m_szNick )
-    {
-        delete [] m_szNick;
-        m_szNick = NULL;
-    }
-    if ( m_szPassword )
-    {
-        delete [] m_szPassword;
-        m_szPassword = NULL;
-    }
-
-    // Allocate a new host and nick buffer and store the strings in them
-    m_szHost = new char [ strlen ( szHost ) + 1 ];
-    strcpy ( m_szHost, szHost );
-
-    m_szNick = new char [ strlen ( szNick ) + 1 ];
-    strcpy ( m_szNick, szNick );
-
-    m_szPassword = new char [ strlen ( szPassword ) + 1 ];
-    strcpy ( m_szPassword, szPassword );
+    m_strHost = szHost;
+    m_strNick = szNick;
+    m_strPassword = szPassword;
 
     // Store the port and that we're connecting
     m_usPort = usPort;
@@ -140,8 +100,31 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_tConnectStarted = time ( NULL );
 
     // Display the status box
-	_snprintf ( szBuffer, 255, "Connecting to %s:%u ...", szHost, usPort );
+    _snprintf ( szBuffer, 255, "Connecting to %s:%u ...", m_strHost.c_str(), usPort );
     CCore::GetSingleton ().ShowMessageBox ( "Connecting", szBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+
+    return true;
+}
+
+
+bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword )
+{
+    // Allocate a new host and nick buffer and store the strings in them
+    if ( szHost )
+    {
+        m_strHost = szHost;
+    }
+    if ( szPassword )
+    {
+        m_strPassword = szPassword;
+    }
+
+    if ( usPort )
+    {
+        m_usPort = usPort;
+    }
+
+    m_bReconnect = true;
 
     return true;
 }
@@ -166,23 +149,9 @@ bool CConnectManager::Abort ( void )
     pNet->Reset ();
 
     // Reset our variables
-    if ( m_szHost )
-    {
-        delete [] m_szHost;
-        m_szHost = NULL;
-    }
-
-    if ( m_szNick )
-    {
-        delete [] m_szNick;
-        m_szNick = NULL;
-    }
-
-    if ( m_szPassword )
-    {
-        delete [] m_szPassword;
-        m_szPassword = NULL;
-    }
+    m_strHost = "";
+    m_strNick = "";
+    m_strPassword = "";
 
     m_usPort = 0;
     m_bIsConnecting = false;
@@ -254,6 +223,13 @@ void CConnectManager::DoPulse ( void )
         // Pulse the network interface
         CCore::GetSingleton ().GetNetwork ()->DoPulse ();
     }
+    else if ( m_bReconnect )
+    {
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+        Connect ( m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str() );
+        m_bReconnect = false;
+    }
 }
 
 
@@ -273,7 +249,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 // Populate the arguments to pass it (-c host port nick)
                 char szArguments [256];
                 szArguments [255] = 0;
-                _snprintf ( szArguments, 255, "%s %s", g_pConnectManager->m_szNick, g_pConnectManager->m_szPassword );
+                _snprintf ( szArguments, 255, "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton ().RemoveMessageBox ();
@@ -284,37 +260,23 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     pQuickConnect->SetVisible ( false );
 
                 // Save the connection details into the config
-                CVARS_SET ( "host",     std::string ( g_pConnectManager->m_szHost ) );
+                CVARS_SET ( "host",     g_pConnectManager->m_strHost );
                 CVARS_SET ( "port",     g_pConnectManager->m_usPort );
-                CVARS_SET ( "password", std::string ( g_pConnectManager->m_szPassword ) );
+                CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
 
                 // Save the connection details into the recently played servers list
                 char szName [ 32 ];
-                _snprintf ( szName, 32, "%s:%u", g_pConnectManager->m_szHost, g_pConnectManager->m_usPort );
+                _snprintf ( szName, 32, "%s:%u", g_pConnectManager->m_strHost.c_str(), g_pConnectManager->m_usPort );
 //                CCore::GetSingleton ().GetConfig ()->GetRecentlyPlayedServers ().AddServer ( szName, g_pConnectManager->m_szHost, g_pConnectManager->m_usPort, true );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
 
                 // Reset our variables
-                if ( g_pConnectManager->m_szHost )
-                {
-                    delete [] g_pConnectManager->m_szHost;
-                    g_pConnectManager->m_szHost = NULL;
-                }
-
-                if ( g_pConnectManager->m_szNick )
-                {
-                    delete [] g_pConnectManager->m_szNick;
-                    g_pConnectManager->m_szNick = NULL;
-                }
-
-                if ( g_pConnectManager->m_szPassword )
-                {
-                    delete [] g_pConnectManager->m_szPassword;
-                    g_pConnectManager->m_szPassword = NULL;
-                }
+                g_pConnectManager->m_strNick = "";
+                g_pConnectManager->m_strHost = "";
+                g_pConnectManager->m_strPassword = "";
 
                 g_pConnectManager->m_usPort = 0;
                 g_pConnectManager->m_bIsConnecting = false;

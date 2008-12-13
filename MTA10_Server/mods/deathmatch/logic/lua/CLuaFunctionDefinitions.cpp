@@ -2794,6 +2794,42 @@ int CLuaFunctionDefinitions::SetPlayerBlurLevel ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::RedirectPlayer ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+
+        const char* szHost = lua_tostring ( luaVM, 2 );
+        unsigned short usPort = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
+
+        const char* szPassword = NULL;
+        if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )        
+            szPassword = lua_tostring ( luaVM, 4 );
+
+        if ( pElement )
+        {
+            if ( CStaticFunctionDefinitions::RedirectPlayer ( pElement, szHost, usPort, szPassword ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "redirectPlayer", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "redirectPlayer" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetPedChoking ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&

@@ -20,6 +20,7 @@ void CInputRPCs::LoadFunctions ( void )
     AddHandler ( TOGGLE_CONTROL_ABILITY, ToggleControl, "ToggleControl" );
     AddHandler ( TOGGLE_ALL_CONTROL_ABILITY, ToggleAllControls, "ToggleAllControls" );
     AddHandler ( SET_CONTROL_STATE, SetControlState, "SetControlState" );
+    AddHandler ( FORCE_RECONNECT, ForceReconnect, "ForceReconnect" );
     AddHandler ( SHOW_CURSOR, ShowCursor, "ShowCursor" );
 	AddHandler ( SHOW_CHAT, ShowChat, "ShowChat" );
 }
@@ -161,6 +162,40 @@ void CInputRPCs::SetControlState ( NetBitStreamInterface& bitStream )
             }
         }
         delete [] szControl;
+    }
+}
+
+
+void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucHost, ucPassword;
+    unsigned short usPort;
+
+    if ( bitStream.Read ( ucHost ) )
+    {
+        char* szHost = new char [ ucHost + 1 ];
+		szHost [ ucHost ] = NULL;
+
+        bitStream.Read ( szHost, ucHost );
+
+        if ( szHost && bitStream.Read ( usPort ) )
+        {
+            if ( bitStream.Read ( ucPassword ) )
+            {
+                char* szPassword = new char [ ucPassword + 1 ];
+		        szPassword [ ucPassword ] = NULL;
+
+                bitStream.Read ( szPassword, ucPassword );
+
+                if ( szPassword )
+                {
+                    g_pCore->Reconnect ( szHost, usPort, szPassword );
+                    return;
+                }
+            }
+
+            g_pCore->Reconnect ( szHost, usPort, NULL );
+        }
     }
 }
 

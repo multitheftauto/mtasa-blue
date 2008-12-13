@@ -278,6 +278,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerNametagShowing", CLuaFunctionDefinitions::SetPlayerNametagShowing );
     CLuaCFunctions::AddFunction ( "setPlayerMuted", CLuaFunctionDefinitions::SetPlayerMuted );
     CLuaCFunctions::AddFunction ( "setPlayerBlurLevel", CLuaFunctionDefinitions::SetPlayerBlurLevel );
+    CLuaCFunctions::AddFunction ( "redirectPlayer", CLuaFunctionDefinitions::RedirectPlayer );
     
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );
