@@ -119,8 +119,8 @@ public:
 // Version stuff
 #define MTA_DM_VERSION 0x0100
 #define MTA_DM_VERSIONSTRING "1.0"
-#define MTA_DM_FULL_STRING "MTA Deathmatch Server"
-#define MTA_DM_NETCODE_VERSION 0x0122
+#define MTA_DM_FULL_STRING "MTA Deathmatch Client"
+#define MTA_DM_NETCODE_VERSION 0x0123
 
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
