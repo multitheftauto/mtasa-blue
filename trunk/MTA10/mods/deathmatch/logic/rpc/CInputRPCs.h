@@ -26,6 +26,7 @@ public:
     DECLARE_RPC ( ToggleControl );
     DECLARE_RPC ( ToggleAllControls );
     DECLARE_RPC ( SetControlState );
+    DECLARE_RPC ( ForceReconnect );
     DECLARE_RPC ( ShowCursor );
 	DECLARE_RPC ( ShowChat );
 };

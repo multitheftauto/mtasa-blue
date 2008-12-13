@@ -134,6 +134,7 @@ public:
     // Net
     void                    SetConnected                    ( bool bConnected );
 	bool					IsConnected						( void );
+    bool					Reconnect						( const char* szHost, unsigned short usPort, const char* szPassword );
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );

@@ -641,6 +641,12 @@ bool CCore::IsConnected ( void )
 }
 
 
+bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword )
+{
+    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword );
+}
+
+
 void CCore::SetOfflineMod ( bool bOffline )
 {
     m_bIsOfflineMod = bOffline;

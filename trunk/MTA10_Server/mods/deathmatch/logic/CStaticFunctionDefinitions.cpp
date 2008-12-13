@@ -2149,6 +2149,32 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel ( CElement* pElement, unsign
 }
 
 
+bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword )
+{
+    if ( IS_PLAYER ( pElement ) )
+    {
+        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+
+        unsigned char ucHostLength = static_cast < unsigned char > ( strlen ( szHost ) );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( ucHostLength );
+        BitStream.pBitStream->Write ( const_cast < char* > ( szHost ), ucHostLength );
+        BitStream.pBitStream->Write ( usPort );
+        if ( szPassword )
+        {
+            unsigned char ucPasswordLength = static_cast < unsigned short > ( strlen ( szPassword ) );
+            BitStream.pBitStream->Write ( ucPasswordLength );
+            BitStream.pBitStream->Write ( const_cast < char* > ( szPassword ), ucPasswordLength );
+        }
+        pPlayer->Send ( CLuaPacket ( FORCE_RECONNECT, *BitStream.pBitStream ) );
+
+		return true;
+	}
+	return false;
+}
+
+
 // ***************** PED GET FUNCS ***************** //
 bool CStaticFunctionDefinitions::GetPedArmor ( CPed* pPed, float& fArmor )
 {

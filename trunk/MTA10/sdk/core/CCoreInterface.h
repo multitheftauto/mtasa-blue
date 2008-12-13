@@ -83,6 +83,7 @@ public:
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
 
 	virtual bool					IsConnected						( void ) = 0;
+	virtual bool					Reconnect						( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
     virtual char*                   GetModInstallRoot               ( char * szModName, char * szBuffer, size_t bufferSize )=0;

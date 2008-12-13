@@ -176,6 +176,7 @@ protected:
         TOGGLE_CONTROL_ABILITY,
         TOGGLE_ALL_CONTROL_ABILITY,
         SET_CONTROL_STATE,
+        FORCE_RECONNECT,
 
         SET_TEAM_NAME,
         SET_TEAM_COLOR,
