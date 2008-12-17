@@ -64,7 +64,8 @@ bool CResourceMapItem::Start ( void )
         m_pVM = m_resource->GetVirtualMachine ();
         m_pElementGroup = new CElementGroup ( m_resource );
 
-        return LoadMap ( m_szResourceFileName );
+        LoadMap ( m_szResourceFileName );
+        return true;
     }
 
     return false;
@@ -165,11 +166,8 @@ bool CResourceMapItem::LoadSubNodes ( CXMLNode& Node, CElement* pParent, vector 
         pNode = *iter;
         if ( pNode )
         {
-            // Handle it
-            if ( !HandleNode ( *pNode, pParent, pAdded, bIsDuringStart, NULL ) )
-            {
-                return false;
-            }
+            // Handle it (if it can't be handled, just ignore it and continue to the next)
+            HandleNode ( *pNode, pParent, pAdded, bIsDuringStart, NULL );
         }
     }
 
