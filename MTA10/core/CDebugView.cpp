@@ -69,9 +69,21 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
 
 void CDebugView::Draw ( void )
 {
+    // Are we visible?
+    if ( !m_bVisible )
+        return;
+
     // Make the chat use our data, dirty as you like!
     CChat * pChat = g_pChat;
     g_pChat = this;
+
+    // Force the window on screen
+    CVector2D vecPosition ( 0.23f, 0.985f );
+    CVector2D vecResolution = m_pManager->GetResolution ();
+    float height = m_uiNumLines * GetFontHeight ( 1 );
+    m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D ( 0, height );
+    m_pBackground->SetPosition ( m_vecBackgroundPosition );
+
     CChat::Draw ();
     g_pChat = pChat;
 }
