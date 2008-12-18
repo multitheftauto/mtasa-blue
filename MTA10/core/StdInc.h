@@ -19,6 +19,8 @@
 #include <winsock.h>
 #include <conio.h>
 
+#include <list>
+#include <vector>
 #include <map>
 #include <set>
 #include <string>
