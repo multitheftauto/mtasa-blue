@@ -29,6 +29,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     // Create our history
     m_pConsoleHistory = new CConsoleHistory ( CONSOLE_HISTORY_LENGTH );
     m_iHistoryIndex = -1;
+    m_iAutoCompleteIndex = -1;
     m_bIsEnabled = true;
 
 	m_fWindowSpacer = 9.0f;
@@ -330,6 +331,50 @@ void CConsole::SetPreviousHistoryText ( void )
         m_pInput->SetCaratAtStart(); // Resetting so it scrolls the input back after long text
         m_pInput->SetCaratAtEnd ();
         --m_iHistoryIndex;
+    }
+}
+
+
+void CConsole::ResetAutoCompleteMatch ( void )
+{
+    m_iAutoCompleteIndex = -1;
+}
+
+
+void CConsole::SetNextAutoCompleteMatch ( void )
+{
+    // Update match list if required
+    if( m_iAutoCompleteIndex == -1 )
+    {
+        m_AutoCompleteList.clear();
+
+        // Get current input
+        string strInput = m_pInput->GetText ();
+
+        // Step through the history
+        int iIndex = -1;
+        while( const char* szItem = m_pConsoleHistory->Get ( ++iIndex ) )
+        {
+            // Save the index of any matches
+            if ( strnicmp( szItem, strInput.c_str (), strInput.length () ) == 0 )
+                m_AutoCompleteList.push_back ( iIndex );
+        }
+    }
+
+    // Stop if no matches
+    if ( m_AutoCompleteList.size () == 0 )
+        return;
+
+    // Step to next match
+    m_iAutoCompleteIndex = ( m_iAutoCompleteIndex + 1 ) % m_AutoCompleteList.size ();
+
+    // Grab the item and set the input text to it
+    const char* szItem = m_pConsoleHistory->Get ( m_AutoCompleteList.at ( m_iAutoCompleteIndex ) );
+    if ( szItem )
+    {       
+        m_pInput->SetText ( szItem );
+        m_pInput->SetCaratAtStart (); // Resetting so it scrolls the input back after long text
+        m_pInput->SetCaratAtEnd ();
     }
 }
 

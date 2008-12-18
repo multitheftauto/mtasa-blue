@@ -50,6 +50,8 @@ public:
 
     void                SetNextHistoryText              ( void );
     void                SetPreviousHistoryText          ( void );
+    void                SetNextAutoCompleteMatch        ( void );
+    void                ResetAutoCompleteMatch          ( void );
 
     CVector2D           GetPosition                     ( void );
     void                SetPosition                     ( CVector2D& vecPosition );
@@ -72,6 +74,8 @@ private:
 
     CConsoleHistory*    m_pConsoleHistory;
     int                 m_iHistoryIndex;
+    vector < int >      m_AutoCompleteList;
+    int                 m_iAutoCompleteIndex;
 
     CGUIWindow*         m_pWindow;
     CGUIEdit*           m_pInput;
