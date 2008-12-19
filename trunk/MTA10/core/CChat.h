@@ -184,7 +184,7 @@ protected:
     CVector2D                   m_vecScale;
     float                       m_fNativeWidth;
 
-    unsigned long               m_ulLastVarUpdate;
+    int                         m_iCVarsRevision;
 };
 
 class CChatLineSection

@@ -19,6 +19,7 @@ CClientVariables::CClientVariables ( void )
 {
     m_pStorage = NULL;
     m_bLoaded = false;
+    m_iRevision = 1;
 }
 
 
@@ -33,6 +34,7 @@ bool CClientVariables::Load ( void )
     CXMLNode *pRoot = CCore::GetSingleton ().GetConfig ();
     if ( !pRoot )
         return false;
+    m_iRevision++;
 
     // Load the cvars
     m_pStorage = pRoot->FindSubNode ( CONFIG_NODE_CVARS );
@@ -114,6 +116,7 @@ void CClientVariables::Set ( const std::string strVariable, CVector val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
+    m_iRevision++;
 
     ss << val.fX << " " << val.fY << " " << val.fZ;
 
@@ -127,6 +130,7 @@ void CClientVariables::Set ( const std::string strVariable, CVector2D val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
+    m_iRevision++;
 
     ss << val.fX << " " << val.fY;
 
@@ -140,6 +144,7 @@ void CClientVariables::Set ( const std::string strVariable, CColor val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
+    m_iRevision++;
 
     ss << (unsigned int)val.R << " " << (unsigned int)val.G << " " << (unsigned int)val.B << " " << (unsigned int)val.A;
 

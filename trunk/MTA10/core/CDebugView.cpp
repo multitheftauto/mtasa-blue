@@ -80,11 +80,17 @@ void CDebugView::Draw ( void )
     // Force the window on screen
     CVector2D vecPosition ( 0.23f, 0.985f );
     CVector2D vecResolution = m_pManager->GetResolution ();
-    float height = m_uiNumLines * GetFontHeight ( 1 );
+    float height = m_uiNumLines * GetFontHeight ( 1 ) * m_vecScale.fY;
     m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D ( 0, height );
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
 
     CChat::Draw ();
+    // Hax upon hax
+    if ( m_fNativeWidth != DEBUGVIEW_WIDTH )
+    {
+        m_fNativeWidth = DEBUGVIEW_WIDTH;
+        UpdateGUI ();
+    }
     g_pChat = pChat;
 }
 
