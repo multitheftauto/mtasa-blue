@@ -48,11 +48,11 @@ public:
     bool            Get                     ( const std::string strVariable, CColor &val );
 
     // Set queries
-    void            Set                     ( const std::string strVariable, bool val )                     { SAN; Node(strVariable)->SetTagContent ( val ); };
-    void            Set                     ( const std::string strVariable, const std::string val )        { SAN; Node(strVariable)->SetTagContent ( val.c_str () ); };
-    void            Set                     ( const std::string strVariable, int val )                      { SAN; Node(strVariable)->SetTagContent ( val ); };
-    void            Set                     ( const std::string strVariable, unsigned int val )             { SAN; Node(strVariable)->SetTagContent ( val ); };
-    void            Set                     ( const std::string strVariable, float val )                    { SAN; Node(strVariable)->SetTagContent ( val ); };
+    void            Set                     ( const std::string strVariable, bool val )                     { SAN; m_iRevision++; Node(strVariable)->SetTagContent ( val ); };
+    void            Set                     ( const std::string strVariable, const std::string val )        { SAN; m_iRevision++; Node(strVariable)->SetTagContent ( val.c_str () ); };
+    void            Set                     ( const std::string strVariable, int val )                      { SAN; m_iRevision++; Node(strVariable)->SetTagContent ( val ); };
+    void            Set                     ( const std::string strVariable, unsigned int val )             { SAN; m_iRevision++; Node(strVariable)->SetTagContent ( val ); };
+    void            Set                     ( const std::string strVariable, float val )                    { SAN; m_iRevision++; Node(strVariable)->SetTagContent ( val ); };
     void            Set                     ( const std::string strVariable, CVector val );
     void            Set                     ( const std::string strVariable, CVector2D val );
     void            Set                     ( const std::string strVariable, CColor val );
@@ -61,6 +61,7 @@ public:
 
     bool            Load                    ( void );
     bool            IsLoaded                ( void ) { return m_bLoaded; }
+    int             GetRevision             ( void ) { return m_iRevision; }
 
 private:
     CXMLNode*       Node                    ( const std::string strVariable );
@@ -68,6 +69,7 @@ private:
 
     bool            m_bLoaded;
     CXMLNode        *m_pStorage;
+    int             m_iRevision;
 };
 
 #endif

@@ -30,7 +30,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     // Initialize variables
     m_TextColor = CHAT_TEXT_COLOR;
     m_bUseCEGUI = false;
-    m_ulLastVarUpdate = 0;
+    m_iCVarsRevision = -1;
     m_szCommand = NULL;
     m_bVisible = false;
     m_bInputVisible = false;
@@ -92,6 +92,7 @@ CChat::~CChat ( void )
 void CChat::LoadCVars ( void )
 {
     unsigned int Font;
+    float fWidth = 1;
 
     CVARS_GET ( "chat_color",                   m_Color );              SetColor ( m_Color );
     CVARS_GET ( "chat_input_color",             m_InputColor );         SetInputColor ( m_InputColor );
@@ -99,6 +100,7 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_lines",                   m_uiNumLines );         SetNumLines ( m_uiNumLines);
     CVARS_GET ( "chat_text_color",              m_TextColor );
     CVARS_GET ( "chat_scale",                   m_vecScale );
+    CVARS_GET ( "chat_width",                   fWidth );               m_fNativeWidth = fWidth * CHAT_WIDTH;
     CVARS_GET ( "chat_css_style_text",          m_bCssStyleText );
     CVARS_GET ( "chat_css_style_background",    m_bCssStyleBackground );
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
@@ -116,8 +118,8 @@ void CChat::Draw ( void )
         return;
 
     // Is it time to update all the chat related cvars?
-    if ( ( CClientTime::GetTime () - m_ulLastVarUpdate ) > CHAT_MAX_CHAT_LENGTH ) {
-        m_ulLastVarUpdate = CClientTime::GetTime ();
+    if( m_iCVarsRevision != CClientVariables::GetSingleton ().GetRevision () ) {
+        m_iCVarsRevision = CClientVariables::GetSingleton ().GetRevision ();
         LoadCVars ();
     }
 
@@ -407,7 +409,7 @@ void CChat::UpdateGUI ( void )
 {
     m_vecBackgroundSize = CVector2D (
         m_fNativeWidth * g_pChat->m_vecScale.fX,
-        CChat::GetFontHeight ( g_pChat->m_vecScale.fY ) * float(m_uiNumLines) + 0.5f
+        CChat::GetFontHeight ( g_pChat->m_vecScale.fY ) * (float(m_uiNumLines) + 0.5f)
     );
     m_pBackground->SetSize ( m_vecBackgroundSize );
 
