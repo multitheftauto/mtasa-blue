@@ -2346,14 +2346,11 @@ void CKeyBinds::LoadDefaultControls ( void )
 
 void CKeyBinds::LoadDefaultCommands ( void )
 {
-	AddCommand ( "mouse2", "driveby", "1", true );
-	AddCommand ( "mouse2", "driveby", "0", false );
     AddCommand ( "g", "enter_passenger", NULL, true );
     AddCommand ( "F12", "screenshot", NULL, true );
     AddCommand ( "t", "chatbox", "chatboxsay", true );
     AddCommand ( "y", "chatbox", "teamsay 255 0 0", true );
-    AddCommand ( "F11", "radar", "1", true );
-    AddCommand ( "F11", "radar", "0", false );
+    AddCommand ( "F11", "radar", "-1", true );
     AddCommand ( "num_add", "radar_zoom_in", NULL, true );
     AddCommand ( "num_sub", "radar_zoom_out", NULL, true );
     AddCommand ( "num_8", "radar_move_north", NULL, true );
