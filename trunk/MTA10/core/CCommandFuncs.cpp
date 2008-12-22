@@ -127,6 +127,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
                 LONG lLong = GetWindowLong ( hDeviceWindow, GWL_STYLE ) ^ WS_THICKFRAME;
                 lLong ^= WS_MAXIMIZEBOX;
 				lLong ^= WS_MINIMIZEBOX;
+				lLong ^= WS_SYSMENU;
 			    SetWindowLong ( hDeviceWindow, GWL_STYLE, lLong );
 
                 SetWindowLong ( NULL, GWL_STYLE, WS_BORDER | WS_CAPTION );

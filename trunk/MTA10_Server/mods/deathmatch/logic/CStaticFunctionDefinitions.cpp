@@ -5610,6 +5610,8 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
         bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucKeyLength );
         bitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bHitState ) ? 1 : 0 ) );
         pPlayer->Send ( CLuaPacket ( UNBIND_KEY, *bitStream.pBitStream ) );
+
+        bSuccess = true;
     }
 
     return bSuccess;
