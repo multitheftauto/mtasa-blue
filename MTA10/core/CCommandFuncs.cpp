@@ -131,6 +131,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
 
                 SetWindowLong ( NULL, GWL_STYLE, WS_BORDER | WS_CAPTION );
 			    SetWindowPos ( NULL, HWND_TOP, 0, 0, 0, 0, /* SWP_NOMOVE | SWP_NOSIZE | */ SWP_NOSENDCHANGING  );
+		        SetWindowPos( hDeviceWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE );
 		    }
 
             // Grab viewport settings
