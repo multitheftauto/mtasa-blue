@@ -118,7 +118,10 @@ void CClientRadarMarkerManager::OrderMarkers ( void )
     iter = m_Markers.begin ();
     for ( ; iter != m_Markers.end () ; iter++ )
     {
-        (*iter)->CreateMarker ();
+        if ( (*iter)->GetDimension() == m_usDimension )
+        {
+            (*iter)->CreateMarker ();
+        }
     }
 }
 
