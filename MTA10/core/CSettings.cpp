@@ -38,7 +38,7 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
-	CGUITab *pTabMultiplayer, *pTabVideo, *pTabBinds, *pTabControls, *pTabCommunity;
+	CGUITab *pTabMultiplayer, *pTabVideo, *pTabBinds, *pTabJoypad, *pTabControls, *pTabCommunity;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -67,6 +67,7 @@ CSettings::CSettings ( void )
 	pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
 	pTabVideo = m_pTabs->CreateTab ( "Video" );
 	pTabBinds = m_pTabs->CreateTab ( "Binds" );
+	pTabJoypad = m_pTabs->CreateTab ( "Joypad" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
 	pTabCommunity = m_pTabs->CreateTab ( "Community" );
 
@@ -91,6 +92,108 @@ CSettings::CSettings ( void )
 	m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
 	m_pBindsDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
 	m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+
+	/**
+	 *	Joypad tab
+	 **/
+    {
+        m_JoypadSettingsRevision = -1;
+
+        CJoystickManagerInterface* JoyMan = GetJoystickManager ();
+
+        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
+        m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.133f ), true );
+	    m_pJoypadName->SetFont ( "default-bold-small" );
+        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 24.0f ) );
+        m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0 ) );
+        m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabJoypad ) );
+        m_pEditDeadzone->SetPosition ( CVector2D ( 0.76f, 0.385f ), true );
+        m_pEditDeadzone->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pEditDeadzone->SetMaxLength ( 3 );
+        m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
+
+        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabJoypad ) );
+        m_pEditSaturation->SetPosition ( CVector2D ( 0.76f, 0.485f ), true );
+        m_pEditSaturation->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pEditSaturation->SetMaxLength ( 3 );
+        m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
+
+        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Dead Zone" ) );
+        pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 55.f, 0 ) );
+	    pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Saturation" ) );
+        pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 55.f, 0 ) );
+	    pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUIButton*  m_pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabJoypad, "Load defaults" ) );
+	    m_pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
+	    m_pJoyDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+
+
+        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
+        pLabelHelp->SetPosition ( CVector2D ( 0.022f, 0.02f ), true );
+        pLabelHelp->SetSize ( CVector2D ( 668.0f, 24.0f ) );
+        pLabelHelp->SetText ( "** NOTE: This tab is for mapping analog axis only. Use the 'Binds' tab for joypad buttons. **" );
+
+        // Layout the mapping buttons like a dual axis joypad
+        CVector2D vecPosList[] = {  CVector2D ( 0.01f,  0.435f ),     // Left Stick
+                                    CVector2D ( 0.23f,  0.435f ),
+                                    CVector2D ( 0.12f,  0.305f ),
+                                    CVector2D ( 0.12f,  0.565f ),
+
+                                    CVector2D ( 0.39f,  0.435f ),     // Right Stick
+                                    CVector2D ( 0.61f,  0.435f ),
+                                    CVector2D ( 0.50f,  0.305f ),
+                                    CVector2D ( 0.50f,  0.565f ),
+
+                                    CVector2D ( 0.445f, 0.820f ),     // Acceleration/Brake
+                                    CVector2D ( 0.175f, 0.820f )     };
+
+
+        for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
+        {
+            CVector2D vecPos = vecPosList[i];
+
+            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
+            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.09f ), true );
+	        pLabel->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+            pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
+            pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
+
+            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabJoypad ) );
+            pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
+            pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
+	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+            pButton->SetUserData ( (void*) i );
+	        pButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
+
+	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
+
+            m_pJoypadLabels.push_back ( pLabel );
+            m_pJoypadButtons.push_back ( pButton );
+        }
+
+        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Left Stick" ) );
+        pLabelLeft->SetPosition ( CVector2D ( 0.12f, 0.435f ), true );
+	    pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Right Stick" ) );
+        pLabelRight->SetPosition ( CVector2D ( 0.50f, 0.435f ), true );
+	    pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+    }
 
     /**
 	 *	Controls tab
@@ -248,9 +351,143 @@ void CSettings::Update ( void )
 		bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0;
 		if ( m_pCheckBoxMenuPostEffects->GetSelected () != bCompare )   m_pCheckBoxMenuPostEffects->SetSelected ( bCompare );
 
+        UpdateJoypadTab ();
+
 		m_dwFrameCount = 0;
 	}
 	m_dwFrameCount++;
+
+    UpdateCaptureAxis ();
+
+}
+
+
+//
+// Saves the Joypad settings
+//
+void CSettings::ProcessJoypad( void )
+{
+    // Update from GUI
+    GetJoystickManager ()->SetDeadZone ( atoi ( m_pEditDeadzone->GetText ().c_str () ) );
+    GetJoystickManager ()->SetSaturation ( atoi ( m_pEditSaturation->GetText ().c_str () ) );
+
+    GetJoystickManager ()->SaveConfig ();
+}
+
+
+//
+// Update GUI elements for the Joypad Tab
+//
+void CSettings::UpdateJoypadTab ()
+{
+    CJoystickManagerInterface* JoyMan = GetJoystickManager ();
+
+    // Has anything changed?
+    if ( m_JoypadSettingsRevision == JoyMan->GetSettingsRevision () )
+        return;
+
+
+    // Update controller name label
+    if ( JoyMan->IsJoypadConnected () )
+	    m_pJoypadName->SetText ( ( string("Axis mapping for :   ") + JoyMan->GetControllerName () ).c_str () );
+    else
+	    m_pJoypadName->SetText ( "Joypad not detected  -  Check connections and restart game" );
+
+
+    // Update DeadZone and Saturation edit boxes
+    char szDeadzone[32] = "";
+    char szSaturation[32] = "";
+    itoa ( JoyMan->GetDeadZone (), szDeadzone, 10 );
+    itoa ( JoyMan->GetSaturation (), szSaturation, 10 );
+
+    m_pEditDeadzone->SetText ( szDeadzone );
+    m_pEditSaturation->SetText ( szSaturation );
+
+
+    // Update axes labels and buttons
+    for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < (int)m_pJoypadButtons.size () ; i++ )
+    {
+        string outputName = JoyMan->GetOutputName (i);         // LeftStickPosX etc
+        string inputName  = JoyMan->GetOutputInputName (i);     // X+ or RZ- etc
+
+        CGUILabel* pLabel = m_pJoypadLabels[i];
+        pLabel->SetText ( outputName.c_str () );
+
+        CGUIButton* pButton = m_pJoypadButtons[i];
+        pButton->SetText ( inputName.c_str () );
+    }
+
+    m_JoypadSettingsRevision = JoyMan->GetSettingsRevision ();
+}
+
+
+//
+// React to the DeadZone and Saturation edit boxes changing
+//
+bool CSettings::OnJoypadTextChanged ( CGUIElement* pElement )
+{
+    // Update from GUI
+    GetJoystickManager ()->SetDeadZone ( atoi ( m_pEditDeadzone->GetText ().c_str () ) );
+    GetJoystickManager ()->SetSaturation ( atoi ( m_pEditSaturation->GetText ().c_str () ) );
+
+    // Dont immediately read back these settings
+    m_JoypadSettingsRevision = GetJoystickManager ()->GetSettingsRevision ();
+
+	return true;
+}
+
+
+//
+// Called every frame. If capturing an axis, see if its all done yet.
+//
+void CSettings::UpdateCaptureAxis ()
+{
+    if ( m_bCaptureAxis )
+    {
+        // Are we done?        
+        if ( GetJoystickManager ()->IsAxisBindComplete () )
+        {
+	        // Remove the messagebox we created earlier
+	        CCore::GetSingleton ().RemoveMessageBox ();
+
+	        // Update GUI elements
+            UpdateJoypadTab();
+
+            m_bCaptureAxis = false;
+        }
+    }
+}
+
+
+//
+// Called when the user clicks on an map axis button. Starts the capture axis process.
+//
+bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
+{
+    int index = reinterpret_cast < int > ( pElement->GetUserData () );
+
+    if ( GetJoystickManager ()->BindNextUsedAxisToOutput ( index ) )
+    {
+        m_bCaptureAxis = true;
+        CCore::GetSingleton ().ShowMessageBox ( "Binding axis", "Move an axis to bind, or escape to clear", MB_ICON_QUESTION );
+    }
+
+	return true;
+}
+
+
+//
+// Called when the user clicks on the joypad 'Load Defaults' button.
+//
+bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
+{
+	// Load the default binds
+	GetJoystickManager ()->LoadDefaultConfig ();
+
+	// Update the GUI
+	UpdateJoypadTab ();
+
+	return true;
 }
 
 
@@ -857,6 +1094,7 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
 
 	// Process keybinds
 	ProcessKeyBinds ();
+	ProcessJoypad ();
 	
     // Invalid nickname?
     if ( !CCore::GetSingleton ().IsValidNick ( m_pEditNick->GetText ().c_str () ) )

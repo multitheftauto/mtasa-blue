@@ -351,13 +351,16 @@ void CConsole::SetNextAutoCompleteMatch ( void )
         // Get current input
         string strInput = m_pInput->GetText ();
 
-        // Step through the history
-        int iIndex = -1;
-        while( const char* szItem = m_pConsoleHistory->Get ( ++iIndex ) )
+        if ( strInput.length () > 0 )
         {
-            // Save the index of any matches
-            if ( strnicmp( szItem, strInput.c_str (), strInput.length () ) == 0 )
-                m_AutoCompleteList.push_back ( iIndex );
+            // Step through the history
+            int iIndex = -1;
+            while( const char* szItem = m_pConsoleHistory->Get ( ++iIndex ) )
+            {
+                // Save the index of any matches
+                if ( strnicmp( szItem, strInput.c_str (), strInput.length () ) == 0 )
+                    m_AutoCompleteList.push_back ( iIndex );
+            }
         }
     }
 
