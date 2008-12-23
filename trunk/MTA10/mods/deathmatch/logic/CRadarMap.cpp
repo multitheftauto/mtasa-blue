@@ -134,41 +134,46 @@ void CRadarMap::DoPulse ( void )
 
 
         // Now loop our radar areas
+        unsigned short usDimension = m_pRadarAreaManager->GetDimension ();
         CClientRadarArea * pArea = NULL;
         list < CClientRadarArea* > ::const_iterator areaIter = m_pRadarAreaManager->IterBegin ();
         for ( ; areaIter != m_pRadarAreaManager->IterEnd (); areaIter++ )
         {
             pArea = *areaIter;
 
-            // Grab the area image and calculate the position to put it on the screen
-            CVector2D vecPos;
-            CalculateEntityOnScreenPosition ( pArea, vecPos, 1.0f, CVector2D ( 0.5f, 0.5f ) );
+            if ( pArea->GetDimension() == usDimension )
+            {
+                // Grab the area image and calculate the position to put it on the screen
+                CVector2D vecPos;
+                CalculateEntityOnScreenPosition ( pArea, vecPos, 1.0f, CVector2D ( 0.5f, 0.5f ) );
 
-            // Get the area size and work out the ratio
-            CVector2D vecSize;
-            float fX = (*areaIter)->GetSize ().fX;
-            float fY = (*areaIter)->GetSize ().fY;
-            float fRatio = 6000.0f / m_fMapSize;
+                // Get the area size and work out the ratio
+                CVector2D vecSize;
+                float fX = (*areaIter)->GetSize ().fX;
+                float fY = (*areaIter)->GetSize ().fY;
+                float fRatio = 6000.0f / m_fMapSize;
 
-            // Calculate the size of the area
-            vecSize.fX = static_cast < float > ( fX / fRatio );
-            vecSize.fY = static_cast < float > ( fY / fRatio );
-            unsigned long ulColor = pArea->GetColor ();
+                // Calculate the size of the area
+                vecSize.fX = static_cast < float > ( fX / fRatio );
+                vecSize.fY = static_cast < float > ( fY / fRatio );
+                unsigned long ulColor = pArea->GetColor ();
 
-            // Convert the color from ABGR to ARGB
-            ulColor = ( ulColor & 0xFF000000 ) |            // a
-                      ( ( ulColor & 0x000000FF ) << 16 ) |  // r
-                      ( ulColor & 0x0000FF00 ) |            // g
-                      ( ( ulColor & 0x00FF0000 ) >> 16 );   // b
+                // Convert the color from ABGR to ARGB
+                ulColor = ( ulColor & 0xFF000000 ) |            // a
+                        ( ( ulColor & 0x000000FF ) << 16 ) |  // r
+                        ( ulColor & 0x0000FF00 ) |            // g
+                        ( ( ulColor & 0x00FF0000 ) >> 16 );   // b
 
-            g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, ulColor );
+                g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, ulColor );
+            }
         }
 
         // Now loop our radar markers
+        usDimension == m_pRadarMarkerManager->GetDimension();
         list < CClientRadarMarker* > ::const_iterator markerIter = m_pRadarMarkerManager->IterBegin ();
         for ( ; markerIter != m_pRadarMarkerManager->IterEnd (); markerIter++ )
         {
-            if ( (*markerIter)->IsVisible () )
+            if ( (*markerIter)->IsVisible () && (*markerIter)->GetDimension() == usDimension )
             {
                 // Grab the marker image and calculate the position to put it on the screen
                 CVector2D vecPos;
