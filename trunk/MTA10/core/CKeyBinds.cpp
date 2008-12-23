@@ -156,6 +156,11 @@ SBindableKey g_bkKeys[] =
     { "joy31",    VK_JOY(31),          GTA_KEY_JOY(31),            DATA_NONE,              0 },
     { "joy32",    VK_JOY(32),          GTA_KEY_JOY(32),            DATA_NONE,              0 },
 
+    { "pov_up",     VK_POV(1),          NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "pov_right",  VK_POV(2),          NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "pov_down",   VK_POV(3),          NO_KEY_DEFINED,            DATA_NONE,              0 },
+    { "pov_left",   VK_POV(4),          NO_KEY_DEFINED,            DATA_NONE,              0 },
+
     { "",           0,          NO_KEY_DEFINED,         DATA_NONE }
 };
 

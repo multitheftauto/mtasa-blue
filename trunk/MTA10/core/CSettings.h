@@ -81,6 +81,8 @@ class CSettings
     void                LoadData                ( void );
 
     inline bool         IsCapturingKey          ( void )            { return m_bCaptureKey; }
+    void                UpdateCaptureAxis       ();
+    void                UpdateJoypadTab         ();
 
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
@@ -110,6 +112,13 @@ protected:
 	CGUIButton*		    m_pBindsDefButton;
 	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
+    CGUILabel*              m_pJoypadName;
+    CGUIEdit*               m_pEditDeadzone;
+    CGUIEdit*               m_pEditSaturation;
+    vector < CGUILabel* >   m_pJoypadLabels;
+    vector < CGUIButton* >  m_pJoypadButtons;
+    int                     m_JoypadSettingsRevision;
+
 	CGUILabel*			m_pLabelCommunity;
 	CGUILabel*			m_pLabelUser;
 	CGUILabel*			m_pLabelPass;
@@ -123,6 +132,9 @@ protected:
     CGUICheckBox*       m_pSteerWithMouse;
     CGUICheckBox*       m_pFlyWithMouse;
 
+    bool			    OnJoypadTextChanged	    ( CGUIElement* pElement );
+	bool			    OnAxisSelectClick       ( CGUIElement* pElement );
+	bool			    OnJoypadDefaultClick    ( CGUIElement* pElement );
 	bool			    OnBindsDefaultClick		( CGUIElement* pElement );
 	bool			    OnBindsListClick		( CGUIElement* pElement );
 	bool			    OnCheckBoxClick         ( CGUIElement* pElement );
@@ -135,11 +147,13 @@ protected:
 
 private:
 	void			    ProcessKeyBinds			( void );
-	
+	void			    ProcessJoypad			( void );
+
     void                SaveData                ( void );
 
 	unsigned int	    m_uiCaptureKey;
     bool                m_bCaptureKey;
+    bool                m_bCaptureAxis;
 
 	CGUIListItem*	    m_pSelectedBind;
 
