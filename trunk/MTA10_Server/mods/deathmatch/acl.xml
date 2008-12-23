@@ -97,6 +97,7 @@
       <right name="function.removeResourceFile" access="false"/>
       <right name="function.setResourceDefaultSetting" access="false"/>
       <right name="function.removeResourceDefaultSetting" access="false"/>
+	  <right name="function.redirectPlayer" access="false"/>
       <right name="function.aclReload" access="false"/>
       <right name="function.aclSave" access="false"/>
       <right name="function.aclCreate" access="false"/>
@@ -142,6 +143,7 @@
       <right name="function.startResource" access="true"/>
       <right name="function.stopResource" access="true"/>
       <right name="function.restartResource" access="true"/>
+	  <right name="function.redirectPlayer" access="true"/>
    </acl>
    <acl name="SuperModerator">
       <right name="general.ModifyOtherObjects" access="false"/>
