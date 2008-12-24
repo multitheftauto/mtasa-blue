@@ -37,6 +37,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_pFont = m_pManager->GetClearFont ();
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = CHAT_WIDTH;
+    m_bCanChangeWidth = true;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -100,7 +101,7 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_lines",                   m_uiNumLines );         SetNumLines ( m_uiNumLines);
     CVARS_GET ( "chat_text_color",              m_TextColor );
     CVARS_GET ( "chat_scale",                   m_vecScale );
-    CVARS_GET ( "chat_width",                   fWidth );               m_fNativeWidth = fWidth * CHAT_WIDTH;
+    CVARS_GET ( "chat_width",                   fWidth );               if( m_bCanChangeWidth ) m_fNativeWidth = fWidth * CHAT_WIDTH;
     CVARS_GET ( "chat_css_style_text",          m_bCssStyleText );
     CVARS_GET ( "chat_css_style_background",    m_bCssStyleBackground );
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );

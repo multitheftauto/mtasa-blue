@@ -184,6 +184,7 @@ protected:
     CVector2D                   m_vecScale;
     float                       m_fNativeWidth;
 
+    bool                        m_bCanChangeWidth;
     int                         m_iCVarsRevision;
 };
 

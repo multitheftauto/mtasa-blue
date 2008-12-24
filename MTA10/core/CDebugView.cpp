@@ -40,6 +40,7 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_pFont = m_pManager->GetBoldFont ();
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = DEBUGVIEW_WIDTH;
+    m_bCanChangeWidth = false;
     m_Color = CColor ( 0, 0, 0, 100 );
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
     unsigned long ulBackgroundColor = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
@@ -85,12 +86,6 @@ void CDebugView::Draw ( void )
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
 
     CChat::Draw ();
-    // Hax upon hax
-    if ( m_fNativeWidth != DEBUGVIEW_WIDTH )
-    {
-        m_fNativeWidth = DEBUGVIEW_WIDTH;
-        UpdateGUI ();
-    }
     g_pChat = pChat;
 }
 

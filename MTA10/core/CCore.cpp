@@ -1093,23 +1093,6 @@ void CCore::DestroyNetwork ( )
 
 void CCore::DoPreFramePulse ( )
 {
-    /////////////////////////////////////////////////////////////
-    // Test code for tracking issue #3515 - delete at will
-    // 
-    // To use, type this in the in-game console:
-    // debug_sleep = 10
-    //
-    // And see if the situation improves
-    //
-    // (valid range is 0 to 100, and -1 turns the test off)
-    //
-    int iSleep = -1;
-    CVARS_GET ( "debug_sleep",                   iSleep );
-    CVARS_SET ( "debug_sleep",                   iSleep );
-    if( iSleep >= 0 && iSleep <= 100 )
-        Sleep(iSleep);
-    /////////////////////////////////////////////////////////////
-
     m_pKeyBinds->DoPreFramePulse ();
 
     // Notify the mod manager
