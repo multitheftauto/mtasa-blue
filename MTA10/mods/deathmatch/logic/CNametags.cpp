@@ -154,7 +154,7 @@ void CNametags::DrawFromAim ( void )
             if ( pColPoint ) pColPoint->Destroy (); 
 
             // Un-ignore the local player
-            pLocalPlayer->WorldIgnore ( false );            
+            pLocalPlayer->WorldIgnore ( false );
 
             // Did we find an entity?
             if ( pEntity )
@@ -472,6 +472,8 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             if ( fHealth > 255 )
             {
                 lRed = static_cast < long > ( 512.0f - fHealth );
+                if ( lRed > 255 )
+                    lRed = 255;
                 lGreen = 255;
             }
             else if ( fHealth <= 255 )
