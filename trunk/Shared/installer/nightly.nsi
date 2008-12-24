@@ -61,9 +61,9 @@ Var Install_Dir
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
+!insertmacro MUI_PAGE_DIRECTORY
 !define MUI_PAGE_CUSTOMFUNCTION_PRE                 SkipDirectoryPage
 !define MUI_DIRECTORYPAGE_VARIABLE                  $INSTDIR
-!insertmacro MUI_PAGE_DIRECTORY
 !define MUI_PAGE_HEADER_TEXT                        "Grand Theft Auto: San Andreas location"
 !define MUI_PAGE_HEADER_SUBTEXT                     ""
 !define MUI_DIRECTORYPAGE_TEXT_DESTINATION          "Grand Theft Auto: San Andreas folder"
