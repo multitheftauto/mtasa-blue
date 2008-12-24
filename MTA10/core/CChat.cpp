@@ -95,7 +95,7 @@ void CChat::LoadCVars ( void )
     unsigned int Font;
     float fWidth = 1;
 
-    CVARS_GET ( "chat_color",                   m_Color );              SetColor ( m_Color );
+    CVARS_GET ( "chat_color",                   m_Color );              if( m_bCanChangeWidth ) SetColor ( m_Color );
     CVARS_GET ( "chat_input_color",             m_InputColor );         SetInputColor ( m_InputColor );
     CVARS_GET ( "chat_use_cegui",               m_bUseCEGUI );
     CVARS_GET ( "chat_lines",                   m_uiNumLines );         SetNumLines ( m_uiNumLines);
