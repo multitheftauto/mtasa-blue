@@ -111,6 +111,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             CSettings* pSettings = pMainMenu->GetSettingsWindow ();
             if ( pSettings )
             {
+                if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && GetJoystickManager ()->IsCapturingAxis () )
+                {
+                    GetJoystickManager ()->CancelCaptureAxis ( true );
+                    return true;
+                }
                 bWasCaptureKey = ( pSettings->IsCapturingKey () && pSettings->ProcessMessage ( uMsg, wParam, lParam ) );
 		        if ( !bWasCaptureKey )
 		        {
