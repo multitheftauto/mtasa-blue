@@ -961,9 +961,6 @@ void CJoystickManager::LoadDefaultConfig ( void )
 ///////////////////////////////////////////////////////////////
 bool CJoystickManager::LoadConfig ( void )
 {
-    if ( !IsJoypadValid () )
-        return false;
-
     m_SettingsRevision++;
 
     // Try load
