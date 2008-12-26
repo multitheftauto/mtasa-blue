@@ -312,6 +312,12 @@ CGUIScrollBar* CGUI_Impl::_CreateScrollBar ( bool bHorizontal, CGUIElement_Impl*
 }
 
 
+CGUIComboBox* CGUI_Impl::_CreateComboBox ( CGUIElement_Impl* pParent, const char* szCaption )
+{
+    return new CGUIComboBox_Impl ( this, pParent, szCaption );
+}
+
+
 CGUITexture* CGUI_Impl::CreateTexture ( void )
 {
     return new CGUITexture_Impl ( this );
@@ -1136,3 +1142,16 @@ CGUIScrollBar* CGUI_Impl::CreateScrollBar ( bool bHorizontal, CGUITab* pParent )
     return _CreateScrollBar ( bHorizontal, wnd );
 }
 
+
+CGUIComboBox* CGUI_Impl::CreateComboBox ( CGUIElement* pParent, const char* szCaption )
+{
+    CGUIWindow_Impl* wnd = reinterpret_cast < CGUIWindow_Impl* > ( pParent );
+    return _CreateComboBox ( wnd, szCaption );
+}
+
+
+CGUIComboBox* CGUI_Impl::CreateComboBox ( CGUIComboBox* pParent, const char* szCaption )
+{
+    CGUIComboBox_Impl* wnd = reinterpret_cast < CGUIComboBox_Impl* > ( pParent );
+    return _CreateComboBox ( wnd, szCaption );
+}

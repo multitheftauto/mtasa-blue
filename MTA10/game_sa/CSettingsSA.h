@@ -44,6 +44,8 @@ public:
 
     bool            IsFrameLimiterEnabled ( void );
     void            SetFrameLimiterEnabled ( bool bEnabled );
+    bool            IsWideScreenEnabled ( void );
+    void            SetWideScreenEnabled ( bool bEnabled );
     unsigned int    GetNumVideoModes ( void );
     VideoMode *     GetVideoModeInfo ( VideoMode * modeInfo, unsigned int modeIndex );
     unsigned int    GetCurrentVideoMode ( void );

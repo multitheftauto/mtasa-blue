@@ -32,6 +32,16 @@ void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
     settings->bFrameLimiter = bEnabled;
 }
 
+bool CSettingsSA::IsWideScreenEnabled ( void )
+{
+    return settings->bUseWideScreen;
+}
+
+void CSettingsSA::SetWideScreenEnabled ( bool bEnabled )
+{
+    settings->bUseWideScreen = bEnabled;
+}
+
 unsigned int CSettingsSA::GetNumVideoModes ( void )
 {
     unsigned int uiReturn = 0;
