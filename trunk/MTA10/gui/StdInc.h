@@ -27,3 +27,4 @@
 #include "CGUITabPanel_Impl.h"
 #include "CGUITexture_Impl.h"
 #include "CGUIWindow_Impl.h"
+#include "CGUIComboBox_Impl.h"

@@ -264,45 +264,74 @@ CSettings::CSettings ( void )
 	 **/
     m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
     m_pLabelNick->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pLabelNick->GetPosition ( vecTemp, false );
 	m_pLabelNick->AutoSize ( "Nick:" );
 
     // Nick edit
     m_pEditNick = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabMultiplayer ) );
-    m_pEditNick->SetPosition ( CVector2D ( 0.10f, 0.04f ), true );
+    m_pEditNick->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
     m_pEditNick->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pEditNick->SetMaxLength ( 16 );
 
+    m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
+    m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
+    m_pLabelConnection->GetPosition ( vecTemp, false );
+	m_pLabelConnection->AutoSize ( "Connection:" );
+
+    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "moo" ) );
+	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
+	m_pComboConnection->SetSize ( CVector2D ( 168.0f, 90.0f ) );
+    m_pComboConnection->SetReadOnly ( true );
+    m_pComboConnection->AddItem ( "Lan" );
+    m_pComboConnection->AddItem ( "DSL" );
+    m_pComboConnection->AddItem ( "Modem" );
+
     // Video tab	
-    /*
-    m_pCheckBoxVideoWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed mode", false ) );
-    m_pCheckBoxVideoWindowed->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
-	m_pCheckBoxVideoWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    */
+
+    m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "General" ) );
+    m_pVideoGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
+	m_pVideoGeneralLabel->AutoSize ( "General  " );
+	m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
+
+    m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Resolution:" ) );
+    m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
+    m_pVideoResolutionLabel->AutoSize ( "Resolution: " );
+
+    m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "moo" ) );
+	m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY - 1.0f ) );
+	m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
+    m_pComboResolution->SetReadOnly ( true );
+
+    m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+	m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    // Out for now
+    m_pCheckBoxWindowed->SetVisible ( false );
+
+    m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
+    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+	m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
-    m_pVideoRenderingLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
+    m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
 	m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
 	m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
-    m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( 0.022f, 0.1f ), true );
+    m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
 	m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 	m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
-	m_pCheckBoxMenuDynamic->SetUserData ( reinterpret_cast < void* > ( eCheckBox::CHECKBOX_MENU_DYNAMIC ) );
-	m_pCheckBoxMenuDynamic->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
-
 
     m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
-	m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( 0.5f, 0.1f ), true );
+	m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( vecTemp.fX + 200.0f, vecTemp.fY ) );
 	m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 224.0f, 20.0f ) );
-	m_pCheckBoxMenuVideo->SetUserData ( reinterpret_cast < void* > ( eCheckBox::CHECKBOX_MENU_VIDEO ) );
-	m_pCheckBoxMenuVideo->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
 
     m_pCheckBoxMenuPostEffects = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "PS2.0 post-effects", true ) );
 	m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
 	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-	m_pCheckBoxMenuPostEffects->SetUserData ( reinterpret_cast < void* > ( eCheckBox::CHECKBOX_MENU_POSTEFFECTS ) );
-	m_pCheckBoxMenuPostEffects->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
 	
     // Set up the events
     m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1207,6 +1236,14 @@ void CSettings::LoadData ( void )
         m_pEditNick->SetText ( "Player" );
     }
 
+    // Connection type
+    unsigned int uiMTUSize = NET_MTU_LAN;
+    CVARS_GET ( "mtu_size", uiMTUSize );
+	if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
+	else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
+    else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
+
+    // Controls
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
     CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
     CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
@@ -1216,6 +1253,36 @@ void CSettings::LoadData ( void )
 	if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
     CVARS_GET ( "community_password", strVar );
 	if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
+
+    // Video
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+
+    char modeStr[100];
+    VideoMode           vidModemInfo;
+    int                 vidMode, numVidModes, currentVidMode;
+
+    m_pComboResolution->Clear ();
+    numVidModes = gameSettings->GetNumVideoModes();
+    currentVidMode = gameSettings->GetCurrentVideoMode();
+
+    for (vidMode = 0; vidMode < numVidModes; vidMode++)
+    {
+        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
+        
+        if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        {
+            sprintf ( modeStr, "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            m_pComboResolution->AddItem ( modeStr )->SetData ( (void*)vidMode );
+        }
+        if ( vidMode == currentVidMode )
+        {
+            sprintf ( modeStr, "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            
+            m_pComboResolution->SetText ( modeStr );
+        }
+    }
+    m_pCheckBoxWindowed->SetSelected ( currentVidMode == 0 );
+    m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
 }
 
 
@@ -1235,6 +1302,9 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "nick", m_pEditNick->GetText () );
     }
 
+    // Connection type
+    CCommandFuncs::ConnectionType ( m_pComboConnection->GetText().c_str() );
+
     // Very hacky
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();    
     CVARS_SET ( "invert_mouse", m_pInvertMouse->GetSelected () );
@@ -1245,6 +1315,33 @@ void CSettings::SaveData ( void )
     pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
 
     CCore::GetSingleton ().SaveConfig ();
+
+    // Video
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    int numVidModes = gameSettings->GetNumVideoModes(),
+        currentVidMode = gameSettings->GetCurrentVideoMode();
+
+    CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem ();
+    if ( pSelected )
+    {
+        g_pCore->GetConsole()->Printf ( "selected" );
+        int selectedVidMode = ( int ) pSelected->GetData();;
+        g_pCore->GetConsole()->Printf ( "%d", selectedVidMode );
+        if ( selectedVidMode != currentVidMode &&
+             selectedVidMode <= numVidModes &&
+             selectedVidMode >= 0 )
+        {
+            gameSettings->SetCurrentVideoMode ( selectedVidMode );
+        }
+    }
+    gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
+    /*
+    currentVidMode = gameSettings->GetCurrentVideoMode();
+    if ( m_pCheckBoxWindowed->GetSelected() && currentVidMode != 0 )
+        CCommandFuncs::Window ( "" );
+    else if ( !m_pCheckBoxWindowed->GetSelected() && currentVidMode == 0 )
+        CCommandFuncs::Window ( "" );
+    */
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )

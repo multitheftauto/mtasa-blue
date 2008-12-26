@@ -101,8 +101,14 @@ protected:
 	CGUIButton*		    m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
-	//CGUICheckBox*	    m_pCheckBoxVideoWindowed;
+    CGUILabel*          m_pLabelConnection;
+    CGUIComboBox*       m_pComboConnection;
 
+    CGUILabel*		    m_pVideoGeneralLabel;
+    CGUILabel*		    m_pVideoResolutionLabel;
+    CGUIComboBox*       m_pComboResolution;
+    CGUICheckBox*       m_pCheckBoxWindowed;
+    CGUICheckBox*       m_pCheckBoxWideScreen;
 	CGUILabel*		    m_pVideoRenderingLabel;
 	CGUICheckBox*	    m_pCheckBoxMenuDynamic;
 	CGUICheckBox*	    m_pCheckBoxMenuVideo;

@@ -220,6 +220,9 @@
 				RelativePath=".\CGUICheckBox_Impl.cpp">
 			</File>
 			<File
+				RelativePath=".\CGUIComboBox_Impl.cpp">
+			</File>
+			<File
 				RelativePath=".\CGUIEdit_Impl.cpp">
 			</File>
 			<File
@@ -309,6 +312,9 @@
 				RelativePath=".\CGUICheckBox_Impl.h">
 			</File>
 			<File
+				RelativePath=".\CGUIComboBox_Impl.h">
+			</File>
+			<File
 				RelativePath=".\CGUIEdit_Impl.h">
 			</File>
 			<File
@@ -376,6 +382,9 @@
 				</File>
 				<File
 					RelativePath="..\sdk\gui\CGUICheckBox.h">
+				</File>
+				<File
+					RelativePath="..\sdk\gui\CGUIComboBox.h">
 				</File>
 				<File
 					RelativePath="..\sdk\gui\CGUIEdit.h">

@@ -34,6 +34,7 @@ class CGUI;
 #include "CGUITexture.h"
 #include "CGUIWindow.h"
 #include "CGUITabPanel.h"
+#include "CGUIComboBox.h"
 #include "CGUITypes.h"
 
 // Path defines for CGUI
@@ -116,7 +117,10 @@ public:
 
 	virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUIElement* pParent = NULL ) = 0;
 	virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUITab* pParent = NULL ) = 0;
-	//
+
+    virtual CGUIComboBox*       CreateComboBox          ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
+    virtual CGUIComboBox*       CreateComboBox          ( CGUIComboBox* pParent = NULL, const char* szCaption = "" ) = 0;
+    //
 
 	virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
 	virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false ) = 0;

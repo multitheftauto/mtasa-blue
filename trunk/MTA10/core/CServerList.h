@@ -24,7 +24,7 @@ class CServerListItem;
 #include "tracking/CHTTPClient.h"
 
 // Master server list URL
-#define SERVER_LIST_MASTER_URL              "http://1mgg.com/affil/mta-1.0dp2"
+#define SERVER_LIST_MASTER_URL              "http://1mgg.com/affil/mta-1.0"
 
 // Master server data buffer (16KB should be enough, but be warned)
 #define SERVER_LIST_DATA_BUFFER             16384

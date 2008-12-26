@@ -42,6 +42,7 @@ class CGUIRadioButton;
 class CGUIStaticImage;
 class CGUIScrollBar;
 class CGUIScrollPane;
+class CGUIComboBox;
 class CGUITexture;
 class CGUIWindow;
 class CGUITab;
@@ -122,6 +123,9 @@ public:
 
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUIElement* pParent = NULL );
 	CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );
+
+    CGUIComboBox*					CreateComboBox				( CGUIElement* pParent = NULL, const char* szCaption = "" );
+	CGUIComboBox*					CreateComboBox				( CGUIComboBox* pParent = NULL, const char* szCaption = "" );
 
 	CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
 	//
@@ -208,6 +212,7 @@ private:
     CGUITabPanel*                   _CreateTabPanel              ( CGUIElement_Impl* pParent = NULL );
 	CGUIScrollPane*                 _CreateScrollPane            ( CGUIElement_Impl* pParent = NULL );
 	CGUIScrollBar*                  _CreateScrollBar             ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
+    CGUIComboBox*                   _CreateComboBox              ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 
     IDirect3DDevice9*               m_pDevice;
 

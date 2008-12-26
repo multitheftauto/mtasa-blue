@@ -78,6 +78,8 @@ class CGameSettings
 public:
     virtual bool            IsFrameLimiterEnabled ( void )=0;
     virtual void            SetFrameLimiterEnabled ( bool bEnabled )=0;
+    virtual bool            IsWideScreenEnabled ( void )=0;
+    virtual void            SetWideScreenEnabled ( bool bEnabled )=0;
     virtual unsigned int    GetNumVideoModes ( void )=0;
     virtual VideoMode *     GetVideoModeInfo ( VideoMode * modeInfo, unsigned int modeIndex )=0;
     virtual unsigned int    GetCurrentVideoMode ( void )=0;
