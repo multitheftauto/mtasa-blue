@@ -38,7 +38,7 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
-	CGUITab *pTabMultiplayer, *pTabVideo, *pTabBinds, *pTabJoypad, *pTabControls, *pTabCommunity;
+	CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabJoypad, *pTabControls, *pTabCommunity;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -66,6 +66,7 @@ CSettings::CSettings ( void )
 	m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
 	pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
 	pTabVideo = m_pTabs->CreateTab ( "Video" );
+    pTabAudio = m_pTabs->CreateTab ( "Audio" );
 	pTabBinds = m_pTabs->CreateTab ( "Binds" );
 	pTabJoypad = m_pTabs->CreateTab ( "Joypad" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
@@ -286,7 +287,39 @@ CSettings::CSettings ( void )
     m_pComboConnection->AddItem ( "DSL" );
     m_pComboConnection->AddItem ( "Modem" );
 
-    // Video tab	
+	/**
+	 *	Audio tab
+	 **/
+    m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Radio volume:" ) );
+    m_pLabelRadioVolume->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pLabelRadioVolume->GetPosition ( vecTemp, false );
+	m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
+
+    m_pAudioRadioVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+    m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
+    m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelSFXVolume->GetPosition ( vecTemp, false );
+	m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
+
+    m_pAudioSFXVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+    m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
+    m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelMTAVolume->GetPosition ( vecTemp, false );
+	m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
+
+    m_pAudioMTAVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+	/**
+	 *	Video tab
+	 **/
 
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "General" ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
@@ -1254,8 +1287,11 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "community_password", strVar );
 	if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
-    // Video
+    // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    m_pAudioRadioVolume->SetProgress ( gameSettings->GetRadioVolume() / 64 * 100.0f );
+    m_pAudioSFXVolume->SetProgress ( gameSettings->GetSFXVolume() / 64 * 100.0f );
+    // Video
 
     char modeStr[100];
     VideoMode           vidModemInfo;
@@ -1316,8 +1352,13 @@ void CSettings::SaveData ( void )
 
     CCore::GetSingleton ().SaveConfig ();
 
-    // Video
+    // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    gameSettings->SetRadioVolume ( ( unsigned char )( m_pAudioRadioVolume->GetProgress() / 100 * 64 ) );
+    gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetProgress() / 100 * 64 ) );
+
+
+    // Video
     int numVidModes = gameSettings->GetNumVideoModes(),
         currentVidMode = gameSettings->GetCurrentVideoMode();
 
