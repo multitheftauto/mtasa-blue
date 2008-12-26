@@ -85,3 +85,23 @@ void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex )
         add     esp, 4
     }
 }
+
+unsigned char CSettingsSA::GetRadioVolume ( void )
+{
+    return *(BYTE *)VAR_RadioVolume;
+}
+
+void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
+{
+    *(BYTE *)VAR_RadioVolume = ucVolume;
+}
+
+unsigned char CSettingsSA::GetSFXVolume ( void )
+{
+    return *(BYTE *)VAR_SfxVolume;
+}
+
+void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
+{
+    *(BYTE *)VAR_SfxVolume = ucVolume;
+}

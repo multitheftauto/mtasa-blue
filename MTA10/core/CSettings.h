@@ -114,6 +114,13 @@ protected:
 	CGUICheckBox*	    m_pCheckBoxMenuVideo;
 	CGUICheckBox*	    m_pCheckBoxMenuPostEffects;
 	
+    CGUILabel*          m_pLabelRadioVolume;
+    CGUILabel*          m_pLabelSFXVolume;
+    CGUILabel*          m_pLabelMTAVolume;
+    CGUIProgressBar*    m_pAudioRadioVolume;
+    CGUIProgressBar*    m_pAudioSFXVolume;
+    CGUIProgressBar*    m_pAudioMTAVolume;
+
 	CGUIGridList*	    m_pBindsList;
 	CGUIButton*		    m_pBindsDefButton;
 	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
