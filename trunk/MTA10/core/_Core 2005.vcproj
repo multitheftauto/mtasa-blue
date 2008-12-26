@@ -464,6 +464,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CJoystickManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CKeyBinds.cpp"
 				>
 			</File>
@@ -826,6 +830,10 @@
 			</File>
 			<File
 				RelativePath=".\CGUI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CJoystickManager.h"
 				>
 			</File>
 			<File
