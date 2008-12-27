@@ -19,6 +19,8 @@ struct CRegistryResult;
 #include "CLogger.h"
 #include "lua/CLuaArguments.h"
 #include <list>
+#include <vector>
+#include <string>
 #include <sqlite3.h>
 
 using namespace std;
@@ -45,6 +47,8 @@ public:
 
 protected:
 
+    bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
+
 	sqlite3						*m_db;
 	bool						m_bOpened;
 	bool						m_bMutexLocked;
@@ -54,18 +58,52 @@ private:
 
 };
 
-struct CRegistryResult {
-                                CRegistryResult ( void )
+struct CRegistryResultCell
+{
+                                CRegistryResultCell ( void )
                                 {
-                                    pResult = NULL;
-                                };
-								~CRegistryResult ( void )
+                                    nType = SQLITE_NULL;
+                                    nLength = 0;
+                                    pVal = NULL;
+                                }
+                                CRegistryResultCell ( const CRegistryResultCell& cell )
                                 {
-                                    if ( pResult ) sqlite3_free_table ( pResult );
+                                    nType = cell.nType;
+                                    nLength = cell.nLength;
+                                    nVal = cell.nVal;
+                                    fVal = cell.fVal;
+                                    pVal = NULL;
+                                    if ( (nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0 )
+                                    {
+                                        pVal = new unsigned char [ nLength ];
+                                        memcpy ( pVal, cell.pVal, nLength );
+                                    }
                                 };
-	char						**pResult;
-	int							nRows;
-	int							nColumns;
+                                ~CRegistryResultCell ( void )
+                                {
+                                    if ( pVal )
+                                        delete pVal;
+                                }
+
+    int                         nType;      // Type identifier, SQLITE_*
+    int                         nLength;    // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
+                                            //    (includes zero terminator if TEXT)
+    int                         nVal;
+    float                       fVal;
+    unsigned char*              pVal;
+};
+
+struct CRegistryResult
+{
+                                             CRegistryResult ( void )
+                                             {
+                                                nRows = 0;
+                                                nColumns = 0;
+                                             }
+    vector < string >                        ColNames;
+	vector < vector<CRegistryResultCell> >   Data;
+	int							             nRows;
+	int							             nColumns;
 };
 
 #endif
