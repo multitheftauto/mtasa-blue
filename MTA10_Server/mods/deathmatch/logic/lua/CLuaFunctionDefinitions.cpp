@@ -9012,27 +9012,42 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
 		CLuaArguments Args;
 		CRegistryResult Result;
         std::string strQuery = std::string ( lua_tostring ( luaVM, 1 ) );
-		unsigned int uiArray;
 
 		Args.ReadArguments ( luaVM, 2 );
 
 		if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
 			lua_newtable ( luaVM );
 			for ( int i = 0; i < Result.nRows; i++ ) {
-				lua_newtable ( luaVM );										// new table
-				lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
-				lua_pushvalue ( luaVM, -2 );								// value
-				lua_settable ( luaVM, -4 );									// refer to the top level table
-				for ( int j = 0; j < Result.nColumns; j++ ) {
-					uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
-					lua_pushnumber ( luaVM, j+1 );							// push the column index
-					if ( Result.pResult[uiArray] != NULL )
-						lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
-					else
-						lua_pushnil ( luaVM );								// if there's no value, push nil
+				lua_newtable ( luaVM );								// new table
+				lua_pushnumber ( luaVM, i+1 );						// row index number (starting at 1, not 0)
+				lua_pushvalue ( luaVM, -2 );						// value
+				lua_settable ( luaVM, -4 );						    // refer to the top level table
+				for ( int j = 0; j < Result.nColumns; j++ )
+                {
+                    CRegistryResultCell& cell = Result.Data[i][j];
+                    if ( cell.nType == SQLITE_NULL )
+                        continue;
+					lua_pushnumber ( luaVM, j + 1 );		        // push the column index
+                    switch ( cell.nType )                           // push the value with the right type
+                    {
+                        case SQLITE_INTEGER:
+                            lua_pushnumber ( luaVM, cell.nVal );
+                            break;
+                        case SQLITE_FLOAT:
+                            lua_pushnumber ( luaVM, cell.fVal );
+                            break;
+                        case SQLITE_BLOB:
+                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                            break;
+                        case SQLITE_TEXT:
+                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                            break;
+                        default:
+                            lua_pushnil ( luaVM );
+                    }
 					lua_settable ( luaVM, -3 );
 				}
-				lua_pop ( luaVM, 1 );										// pop the inner table
+				lua_pop ( luaVM, 1 );							    // pop the inner table
 			}
 			return 1;
 		} else {
@@ -9055,33 +9070,52 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         std::string strTable = std::string ( lua_tostring ( luaVM, 1 ) );
         std::string strColumns = std::string ( lua_tostring ( luaVM, 2 ) );
         std::string strWhere;
-		unsigned int uiLimit = 0, uiArray;
+		unsigned int uiLimit = 0;
 
 		if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             strWhere = std::string ( lua_tostring ( luaVM, 3 ) );
 		if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
 			uiLimit = static_cast < unsigned int > ( lua_tonumber ( luaVM, 4 ) );
 
-		if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) ) {
+		if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) )
+        {
 			lua_newtable ( luaVM );
 			for ( int i = 0; i < Result.nRows; i++ ) {
-				lua_newtable ( luaVM );										// new table
-				lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
-				lua_pushvalue ( luaVM, -2 );								// value
-				lua_settable ( luaVM, -4 );									// refer to the top level table
-				for ( int j = 0; j < Result.nColumns; j++ ) {
-					uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
-					lua_pushnumber ( luaVM, j+1 );							// push the column index
-					if ( Result.pResult[uiArray] != NULL )
-						lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
-					else
-						lua_pushnil ( luaVM );								// if there's no value, push nil
+				lua_newtable ( luaVM );								// new table
+				lua_pushnumber ( luaVM, i+1 );						// row index number (starting at 1, not 0)
+				lua_pushvalue ( luaVM, -2 );						// value
+				lua_settable ( luaVM, -4 );						    // refer to the top level table
+				for ( int j = 0; j < Result.nColumns; j++ )
+                {
+                    CRegistryResultCell& cell = Result.Data[i][j];
+                    if ( cell.nType == SQLITE_NULL )
+                        continue;
+					lua_pushnumber ( luaVM, j + 1 );		        // push the column index
+                    switch ( cell.nType )                           // push the value with the right type
+                    {
+                        case SQLITE_INTEGER:
+                            lua_pushnumber ( luaVM, cell.nVal );
+                            break;
+                        case SQLITE_FLOAT:
+                            lua_pushnumber ( luaVM, cell.fVal );
+                            break;
+                        case SQLITE_BLOB:
+                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                            break;
+                        case SQLITE_TEXT:
+                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                            break;
+                        default:
+                            lua_pushnil ( luaVM );
+                    }
 					lua_settable ( luaVM, -3 );
 				}
-				lua_pop ( luaVM, 1 );										// pop the inner table
+				lua_pop ( luaVM, 1 );							    // pop the inner table
 			}
 			return 1;
-		} else {
+		}
+        else
+        {
 			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
 		}
     }

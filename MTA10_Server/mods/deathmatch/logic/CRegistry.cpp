@@ -148,6 +148,80 @@ bool CRegistry::Delete ( std::string strTable, std::string strWhere )
 	return true;
 }
 
+bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
+{
+	// Prepare the query
+    sqlite3_stmt* pStmt;
+    if ( sqlite3_prepare ( m_db, szQuery, strlen ( szQuery ) + 1, &pStmt, NULL ) != SQLITE_OK )
+    {
+        m_strLastError = sqlite3_errmsg ( m_db );
+        return false;
+    }
+
+    // Get column names
+    pResult->nColumns = sqlite3_column_count ( pStmt );
+    pResult->ColNames.clear ();
+    for ( int i = 0; i < pResult->nColumns; i++ )
+    {
+        pResult->ColNames.push_back ( sqlite3_column_name ( pStmt, i ) );
+    }
+
+    // Fetch the rows
+    pResult->nRows = 0;
+    pResult->Data.clear ();
+    int status;
+    while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
+    {
+        pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
+        vector < CRegistryResultCell > & row = *(pResult->Data.end () - 1);
+        for ( i = 0; i < pResult->nColumns; i++ )
+        {
+            CRegistryResultCell& cell = row[i];
+            cell.nType = sqlite3_column_type ( pStmt, i );
+            switch ( cell.nType )
+            {
+                case SQLITE_NULL:
+                    break;
+                case SQLITE_INTEGER:
+                    cell.nVal = sqlite3_column_int ( pStmt, i );
+                    break;
+                case SQLITE_FLOAT:
+                    cell.fVal = (float)sqlite3_column_double ( pStmt, i );
+                    break;
+                case SQLITE_BLOB:
+                    cell.nLength = sqlite3_column_bytes ( pStmt, i );
+                    if ( cell.nLength == 0 )
+                    {
+                        cell.pVal = NULL;
+                    }
+                    else
+                    {
+                        cell.pVal = new unsigned char [ cell.nLength ];
+                        memcpy ( cell.pVal, sqlite3_column_blob, cell.nLength );
+                    }
+                    break;
+                default:
+                    cell.nLength = sqlite3_column_bytes ( pStmt, i ) + 1;
+                    cell.pVal = new unsigned char [ cell.nLength ];
+                    memcpy ( cell.pVal, sqlite3_column_text ( pStmt, i ), cell.nLength );
+                    break;
+            }
+        }
+        pResult->nRows++;
+    }
+
+    // Did we leave the fetching loop because of an error?
+    if ( status != SQLITE_DONE )
+    {
+        m_strLastError = sqlite3_errmsg ( m_db );
+        sqlite3_finalize ( pStmt );
+        return false;
+    }
+
+    // All done
+    sqlite3_finalize ( pStmt );
+	return true;
+}
 
 bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
 {
@@ -206,13 +280,7 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 		}
 	}
 
-	// Execute the query and get the result table
-    if ( sqlite3_get_table ( m_db, strParsedQuery.c_str (), &pResult->pResult, &pResult->nRows, &pResult->nColumns, &szErrorMsg ) != SQLITE_OK ) {
-        m_strLastError = std::string ( szErrorMsg );
-        sqlite3_free ( szErrorMsg );
-		return false;
-	}
-	return true;
+    return QueryInternal ( strParsedQuery.c_str (), pResult );
 }
 
 
@@ -232,11 +300,6 @@ bool CRegistry::Select ( std::string strColumns, std::string strTable, std::stri
     if ( uiLimit > 0 )
         strQuery += " LIMIT " + std::string ( itoa ( uiLimit, szBuffer, 10 ) );
 
-	// Execute the query and get the result table
-    if ( sqlite3_get_table ( m_db, strQuery.c_str (), &pResult->pResult, &pResult->nRows, &pResult->nColumns, &szErrorMsg ) != SQLITE_OK ) {
-		m_strLastError = std::string ( szErrorMsg );
-        sqlite3_free ( szErrorMsg );
-		return false;
-	}
-	return true;
+	// Execute the query
+    return QueryInternal ( strQuery.c_str (), pResult );
 }
