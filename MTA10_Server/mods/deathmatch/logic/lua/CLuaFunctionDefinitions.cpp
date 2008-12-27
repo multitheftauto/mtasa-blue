@@ -9017,29 +9017,24 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
 		Args.ReadArguments ( luaVM, 2 );
 
 		if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
-			if ( Result.nRows > 0 ) {
-				lua_newtable ( luaVM );
-				for ( int i = 0; i < Result.nRows; i++ ) {
-					lua_newtable ( luaVM );										// new table
-					lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
-					lua_pushvalue ( luaVM, -2 );								// value
-					lua_settable ( luaVM, -4 );									// refer to the top level table
-					for ( int j = 0; j < Result.nColumns; j++ ) {
-						uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
-						lua_pushnumber ( luaVM, j+1 );							// push the column index
-						if ( Result.pResult[uiArray] != NULL )
-							lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
-						else
-							lua_pushnil ( luaVM );								// if there's no value, push nil
-						lua_settable ( luaVM, -3 );
-					}
-					lua_pop ( luaVM, 1 );										// pop the inner table
+			lua_newtable ( luaVM );
+			for ( int i = 0; i < Result.nRows; i++ ) {
+				lua_newtable ( luaVM );										// new table
+				lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
+				lua_pushvalue ( luaVM, -2 );								// value
+				lua_settable ( luaVM, -4 );									// refer to the top level table
+				for ( int j = 0; j < Result.nColumns; j++ ) {
+					uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
+					lua_pushnumber ( luaVM, j+1 );							// push the column index
+					if ( Result.pResult[uiArray] != NULL )
+						lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
+					else
+						lua_pushnil ( luaVM );								// if there's no value, push nil
+					lua_settable ( luaVM, -3 );
 				}
-				return 1;
-			} else {
-				lua_pushboolean ( luaVM, true );
-				return 1;
+				lua_pop ( luaVM, 1 );										// pop the inner table
 			}
+			return 1;
 		} else {
 			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
 		}
@@ -9068,29 +9063,24 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
 			uiLimit = static_cast < unsigned int > ( lua_tonumber ( luaVM, 4 ) );
 
 		if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) ) {
-			if ( Result.nRows > 0 ) {
-				lua_newtable ( luaVM );
-				for ( int i = 0; i < Result.nRows; i++ ) {
-					lua_newtable ( luaVM );										// new table
-					lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
-					lua_pushvalue ( luaVM, -2 );								// value
-					lua_settable ( luaVM, -4 );									// refer to the top level table
-					for ( int j = 0; j < Result.nColumns; j++ ) {
-						uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
-						lua_pushnumber ( luaVM, j+1 );							// push the column index
-						if ( Result.pResult[uiArray] != NULL )
-							lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
-						else
-							lua_pushnil ( luaVM );								// if there's no value, push nil
-						lua_settable ( luaVM, -3 );
-					}
-					lua_pop ( luaVM, 1 );										// pop the inner table
+			lua_newtable ( luaVM );
+			for ( int i = 0; i < Result.nRows; i++ ) {
+				lua_newtable ( luaVM );										// new table
+				lua_pushnumber ( luaVM, i+1 );								// row index number (starting at 1, not 0)
+				lua_pushvalue ( luaVM, -2 );								// value
+				lua_settable ( luaVM, -4 );									// refer to the top level table
+				for ( int j = 0; j < Result.nColumns; j++ ) {
+					uiArray = (i+1)*Result.nColumns + j;					// (the first row contains the column names and not the values, so skip it)
+					lua_pushnumber ( luaVM, j+1 );							// push the column index
+					if ( Result.pResult[uiArray] != NULL )
+						lua_pushstring ( luaVM, Result.pResult[uiArray] );	// if there's a value, push the column value as string
+					else
+						lua_pushnil ( luaVM );								// if there's no value, push nil
+					lua_settable ( luaVM, -3 );
 				}
-				return 1;
-			} else {
-				lua_pushboolean ( luaVM, false );
-				return 1;
+				lua_pop ( luaVM, 1 );										// pop the inner table
 			}
+			return 1;
 		} else {
 			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
 		}
