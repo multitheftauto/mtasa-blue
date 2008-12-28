@@ -174,7 +174,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
     {
         pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
         vector < CRegistryResultCell > & row = *(pResult->Data.end () - 1);
-        for ( i = 0; i < pResult->nColumns; i++ )
+        for ( int i = 0; i < pResult->nColumns; i++ )
         {
             CRegistryResultCell& cell = row[i];
             cell.nType = sqlite3_column_type ( pStmt, i );
