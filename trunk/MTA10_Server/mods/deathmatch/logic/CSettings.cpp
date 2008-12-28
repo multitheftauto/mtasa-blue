@@ -64,9 +64,9 @@ CSettings::~CSettings ( void )
 // Returns the XML node in pNode
 //
 // Status values: NotFound (none found), NoAccess (no access/error) or Found (found)
-CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool &bDeleteNode, SettingStatus &eStatus )
+CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool &bDeleteNode, SettingStatus &eStatus, CXMLNode* pMultiresultParentNode )
 {
-	CXMLNode *pNode, *pFullNode = NULL;
+	CXMLNode *pNode = NULL;
     unsigned int uiCurrentIndex = 0, uiResourceNameLength = 0;
 	char szQueryResource[MAX_RESOURCE_LENGTH] = {0}, szResource[MAX_RESOURCE_LENGTH] = {0};
 	const char *szName, *szQueryName = NULL;
@@ -74,7 +74,8 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 	bDeleteNode = false;
 
 	// Return if there was no source
-	if ( pSource == NULL ) return NULL;
+	if ( pSource == NULL )
+        return NULL;
 
 	// Get the resource name from the specified setting
 	if ( !GetResourceName ( szSetting, szQueryResource, MAX_RESOURCE_LENGTH - 1 ) ) {	// (something): No resource specified, so use the local resource name
@@ -126,15 +127,15 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 				if ( ( uiResourceNameLength == 0 && ( strcmpi ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private ) ) 
 					|| ( uiResourceNameLength > 0 && ( ( strcmpi ( szResource, szQueryResource ) == 0 && ( eAccess != CSettings::Private || strcmpi ( szResource, szLocalResource ) == 0 ) ) 
 					) ) ) {
-					if ( pFullNode == NULL ) {
+					if ( pMultiresultParentNode == NULL ) {
 						// Create a new temporary node (in which we can put all nodes we have access to), and add it as temporary subnode of pSource
 						// The node itself will be deleted
-						pFullNode = pStorage->CreateSubNode ( "setting" );
+						pMultiresultParentNode = pStorage->CreateSubNode ( "setting" );
 					}
 
 					// We are meant to return an entire node. Since we are allowed to read this node, copy it and add it to our storage node
 					eStatus = Found;
-					CreateSetting ( pFullNode, strContent.c_str (), pValue->GetValue ().c_str () );
+					CreateSetting ( pMultiresultParentNode, strContent.c_str (), pValue->GetValue ().c_str () );
 				}
 			} else if ( strcmpi ( szName, szQueryName ) == 0 &&
 						strcmpi ( szResource, szQueryResource ) == 0 ) {			// If the query name/resource and found node name/resource combinations are equal
@@ -144,10 +145,12 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 		}
 	}
 	// If we have multiple entries, return the storage node
-	if ( bDeleteNode ) return pFullNode;
+	if ( bDeleteNode )
+        return pMultiresultParentNode;
 	
 	// Otherwise, return NULL
-	eStatus = NotFound; return NULL;
+	eStatus = NotFound;
+    return NULL;
 }
 
 // Get ( [resource requesting the query], [setting name], [return buffer], [return buffer length], [delete node] )
@@ -182,26 +185,38 @@ CXMLNode* CSettings::Get ( const char *szLocalResource, const char *szSetting, b
 	if ( pResource ) {
 		CXMLNode *pSource = pResource->GetSettingsNode ();
 
-
-		// ACHTUNG: NEED TO COMBINE THE RESULTS OF THE SETTINGS REGISTRY AND RESOURCE META FILE WHEN DOING "<resource>.", "." OR ""
-
-
 		// Try to get the value for the appropriate setting from the settings registry
 		if ( pStorage )
+        {
 			pNode = Get ( m_pNodeGlobalSettings, pStorage, "", szLocalResource, szSetting, bDeleteNode, eStatus );
+            // If we're getting all of the resource's settings, throw in those from the meta as well
+            if ( bDeleteNode )
+            {
+                SettingStatus eMetaStatus = NotFound;
+                CXMLNode* pMetaNode = Get ( pSource, pStorage, pResource->GetName ().c_str (), szLocalResource, szSetting, bDeleteNode, eStatus, pNode );
+                if ( eMetaStatus == Found )
+                {
+                    eStatus = eMetaStatus;
+                    pNode = pMetaNode;
+                }
+            }
+        }
 
 		// See if we found a matching setting
-		if ( eStatus == Found ) return pNode;	// Found
+		if ( eStatus == Found )
+            return pNode;	// Found
 		else if ( eStatus == NotFound ) {		// Not found, continue searching
 			// Try to get the value for the appropriate setting from the resource's meta XML file
 			if ( pSource )
 				pNode = Get ( pSource, pStorage, pResource->GetName ().c_str (), szLocalResource, szSetting, bDeleteNode, eStatus );
-			if ( eStatus == Found ) return pNode;
+			if ( eStatus == Found )
+                return pNode;
 		}
 	} else {
 		// Try to get the value for the appropriate setting from the settings registry
 		pNode = Get ( m_pNodeGlobalSettings, pStorage, "", szLocalResource, szSetting, bDeleteNode, eStatus );
-		if ( eStatus == Found ) return pNode;
+		if ( eStatus == Found )
+            return pNode;
 	}
 
 	return NULL;							// No access or no settings found
