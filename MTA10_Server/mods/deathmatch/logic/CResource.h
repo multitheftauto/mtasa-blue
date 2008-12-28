@@ -236,7 +236,6 @@ private:
     bool                    ReadIncludedHTML ( CXMLNode * root );
     bool                    ReadIncludedExports ( CXMLNode * root );
 	bool					ReadIncludedFiles ( CXMLNode * root );
-	bool					ReadIncludedSettings ( void );
     bool                    CreateVM ( void );
     bool                    DestroyVM ( void );
     void                    TidyUp ( void );

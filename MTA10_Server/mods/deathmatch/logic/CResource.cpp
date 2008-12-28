@@ -226,8 +226,11 @@ bool CResource::Load ( void )
             {
 			    // Find the settings node and copy it (meta xml is deleted at the end of this function, to preserve memory)
 			    CXMLNode * pNodeSettings = root->FindSubNode ( "settings", 0 );
-			    if ( pNodeSettings ) m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
+			    if ( pNodeSettings )
+                    m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
+                // disabled for now
+                /*
                 CXMLNode * update = root->FindSubNode ( "update", 0 );
                 if ( update )
                 {
@@ -237,16 +240,15 @@ bool CResource::Load ( void )
                         CXMLAttribute * urlAttr = attributes->Find ( "url" );
                         if ( urlAttr )
                         {
-                            /*
                             char szURL[512];
                             urlAttr->GetValue ( szURL, 511 );
                             szURL[511] = '\0';
 
-                            //g_pGame->GetResourceDownloader()->AddUpdateSite ( szURL ); // disabled for now
-                            */
+                            //g_pGame->GetResourceDownloader()->AddUpdateSite ( szURL );
                         }
                     }
                 }
+                */
 
 			    CXMLNode * info = root->FindSubNode ( "info", 0 );
                 if ( info )
@@ -299,8 +301,7 @@ bool CResource::Load ( void )
                     !ReadIncludedScripts ( root ) ||
                     !ReadIncludedHTML ( root ) ||
 				    !ReadIncludedExports ( root ) ||
-				    !ReadIncludedConfigs ( root ) ||
-					!ReadIncludedSettings () )
+				    !ReadIncludedConfigs ( root ) )
 			    {
 				    delete metaFile;
                     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
@@ -1673,41 +1674,6 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
 
     return true;
 }
-
-bool CResource::ReadIncludedSettings ( void )
-{
-    if ( m_pNodeSettings )
-    {
-	        // Look through its subnodes for settings with a matching name
-        unsigned int uiCount = m_pNodeSettings->GetSubNodeCount ();
-        unsigned int i = 0;
-        std::string strTagName;
-        for ( ; i < uiCount; i++ )
-        {
-            // Grab its tag name
-            CXMLNode* pTemp = m_pNodeSettings->GetSubNode ( i );
-            strTagName = pTemp->GetTagName ();
-
-            // Check that its "setting"
-            if ( stricmp ( strTagName.c_str (), "setting" ) == 0 )
-            {
-                // Grab the name attribute and compare it to the name we look for
-                CXMLAttribute* pName = m_pNodeSettings->GetAttributes ().Find ( "name" );
-			    CXMLAttribute* pValue = m_pNodeSettings->GetAttributes ().Find ( "value" );
-                if ( pName && pValue )
-                { // Taken from the set function in CLuaFunctionDefinitions
-				    CLuaArguments Args;
-                    std::string strJSON;
-				    Args.PushString ( pValue->GetValue ().c_str () );
-                    Args.WriteToJSONString ( strJSON );
-                    g_pGame->GetSettings ()->Set ( m_strResourceName.c_str (), pName->GetValue ().c_str (), strJSON.c_str () );
-                }
-            }
-        }
-    }
-    return true;
-}
-
 
 bool CResource::GetDefaultSetting ( const char* szName, char* szValue, size_t sizeBuffer )
 {

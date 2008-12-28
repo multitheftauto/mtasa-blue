@@ -42,7 +42,7 @@ private:
 		Found
 	};
 
-	CXMLNode*						Get						( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool& bDeleteNode, SettingStatus& eSetting );
+	CXMLNode*						Get						( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool& bDeleteNode, SettingStatus& eSetting, CXMLNode* pMultiresultParentNode = NULL );
 
 	CXMLNode*						CreateSetting			( CXMLNode *pDst, const char *szSetting, const char *szContent );
 	inline CSettings::AccessType	GetAccessType			( char cCharacter );
