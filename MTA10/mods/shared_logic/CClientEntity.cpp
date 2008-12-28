@@ -1081,6 +1081,8 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
         return CCLIENTPICKUP;
     else if ( strcmp ( szTypeName, "radararea" ) == 0 )
         return CCLIENTRADARAREA;
+ 	else if ( strcmp ( szTypeName, "sound" ) == 0 )
+ 	    return CCLIENTSOUND;
     else
         return CCLIENTUNKNOWN;
 }

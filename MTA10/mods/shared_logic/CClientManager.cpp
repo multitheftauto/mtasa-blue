@@ -45,6 +45,7 @@ CClientManager::CClientManager ( void )
     m_pPlayerManager = new CClientPlayerManager ( this );
     m_pRadarAreaManager = new CClientRadarAreaManager ( this );
     m_pRadarMarkerManager = new CClientRadarMarkerManager ( this );
+    m_pSoundManager = new CClientSoundManager ( this );
     m_pTeamManager = new CClientTeamManager;
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager ( this );
@@ -121,6 +122,9 @@ CClientManager::~CClientManager ( void )
     delete m_pTeamManager;
     m_pTeamManager = NULL;
 
+    delete m_pSoundManager;
+    m_pSoundManager = NULL;
+
     delete m_pRadarMarkerManager;
     m_pRadarMarkerManager = NULL;
 
@@ -183,6 +187,7 @@ void CClientManager::DoPulse ( void )
         m_pPedManager->DoPulse ();
         m_pObjectManager->DoPulse ();
         m_pProjectileManager->DoPulse ();
+        m_pSoundManager->DoPulse ();
         m_pPlayerManager->DoPulse ();        
     }
 }

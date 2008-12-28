@@ -427,6 +427,22 @@ public:
     static bool                         FxAddBulletSplash                   ( CVector & vecPosition );
     static bool                         FxAddFootSplash                     ( CVector & vecPosition );
 
+    // Sound funcs
+    static CClientSound*                PlaySound                           ( CResource* pResource, const char* szSound, bool bLoop );
+    static CClientSound*                PlaySound3D                         ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop );
+    static bool                         StopSound                           ( CClientSound& Sound );
+    static bool                         SetSoundPosition                    ( CClientSound& Sound, unsigned int uiPosition );
+    static bool                         GetSoundPosition                    ( CClientSound& Sound, unsigned int& uiPosition );
+    static bool                         GetSoundLength                      ( CClientSound& Sound, unsigned int& uiLength );
+    static bool                         SetSoundPaused                      ( CClientSound& Sound, bool bPaused );
+    static bool                         IsSoundPaused                       ( CClientSound& Sound, bool& bPaused );
+    static bool                         SetSoundVolume                      ( CClientSound& Sound, float fVolume );
+    static bool                         GetSoundVolume                      ( CClientSound& Sound, float& fVolume );
+    static bool                         SetSoundMinDistance                 ( CClientSound& Sound, float fDistance );
+    static bool                         GetSoundMinDistance                 ( CClientSound& Sound, float& fDistance );
+    static bool                         SetSoundMaxDistance                 ( CClientSound& Sound, float fDistance );
+    static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
+
 #ifdef MTA_VOICE
     // Voice funcs
 	static bool							SetVoiceInputEnabled				( bool bEnabled );

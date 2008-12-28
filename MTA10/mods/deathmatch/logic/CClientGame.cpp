@@ -1785,6 +1785,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
     m_pManager->GetRadarAreaManager ()->SetDimension ( usDimension );
     m_pManager->GetVehicleStreamer ()->SetDimension ( usDimension );
     m_pManager->GetRadarMarkerManager ()->SetDimension ( usDimension );
+    m_pManager->GetSoundManager ()->SetDimension ( usDimension );
     m_pNametags->SetDimension ( usDimension );
 }
 

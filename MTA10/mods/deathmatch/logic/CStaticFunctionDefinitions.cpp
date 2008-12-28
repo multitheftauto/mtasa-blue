@@ -42,6 +42,7 @@ static CRadarMap*                                   m_pRadarMap;
 static CClientCamera*                               m_pCamera;
 static CClientExplosionManager*                     m_pExplosionManager;
 static CClientProjectileManager*                    m_pProjectileManager;
+static CClientSoundManager*                         m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN list<CClientEntity*>::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
@@ -79,6 +80,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pCamera = pManager->GetCamera ();
     m_pExplosionManager = pManager->GetExplosionManager ();
     m_pProjectileManager = pManager->GetProjectileManager ();
+    m_pSoundManager = pManager->GetSoundManager ();
 }
 
 
@@ -4887,6 +4889,106 @@ bool CStaticFunctionDefinitions::FxAddBulletSplash ( CVector & vecPosition )
 bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
 {
     g_pGame->GetFx ()->TriggerFootSplash ( vecPosition );
+    return true;
+}
+
+
+CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const char* szSound, bool bLoop )
+{
+    CClientSound* pSound = m_pSoundManager->PlaySound2D ( szSound, bLoop );
+    if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
+    return pSound;
+}
+
+
+CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop )
+{
+    CClientSound* pSound = m_pSoundManager->PlaySound3D ( szSound, vecPosition, bLoop );
+    if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
+    return pSound;
+}
+
+
+bool CStaticFunctionDefinitions::StopSound ( CClientSound& Sound )
+{
+    Sound.Stop ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, unsigned int uiPosition )
+{
+    Sound.SetPlayPosition ( uiPosition );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, unsigned int& uiPosition )
+{
+    uiPosition = Sound.GetPlayPosition ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, unsigned int& uiLength )
+{
+    uiLength = Sound.GetLength ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundPaused ( CClientSound& Sound, bool bPaused )
+{
+    Sound.SetPaused ( bPaused );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsSoundPaused ( CClientSound& Sound, bool& bPaused )
+{
+    bPaused = Sound.IsPaused ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundVolume ( CClientSound& Sound, float fVolume )
+{
+    Sound.SetVolume ( fVolume );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundVolume ( CClientSound& Sound, float& fVolume )
+{
+    fVolume = Sound.GetVolume ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundMinDistance ( CClientSound& Sound, float fDistance )
+{
+    Sound.SetMinDistance ( fDistance );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundMinDistance ( CClientSound& Sound, float& fDistance )
+{
+    fDistance = Sound.GetMinDistance ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetSoundMaxDistance ( CClientSound& Sound, float fDistance )
+{
+    Sound.SetMaxDistance ( fDistance );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, float& fDistance )
+{
+    fDistance = Sound.GetMaxDistance ();
     return true;
 }
 

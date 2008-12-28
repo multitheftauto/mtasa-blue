@@ -319,6 +319,20 @@ void CLuaManager::LoadCFunctions ( void )
     
 	// Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "synthProcessMIDI", CLuaFunctionDefinitions::SynthProcessMIDI );
+    CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefinitions::PlaySound );
+    CLuaCFunctions::AddFunction ( "playSound3D", CLuaFunctionDefinitions::PlaySound3D );
+    CLuaCFunctions::AddFunction ( "stopSound", CLuaFunctionDefinitions::StopSound );
+    CLuaCFunctions::AddFunction ( "setSoundPosition", CLuaFunctionDefinitions::SetSoundPosition );
+    CLuaCFunctions::AddFunction ( "getSoundPosition", CLuaFunctionDefinitions::GetSoundPosition );
+    CLuaCFunctions::AddFunction ( "getSoundLength", CLuaFunctionDefinitions::GetSoundPosition );
+    CLuaCFunctions::AddFunction ( "setSoundPaused", CLuaFunctionDefinitions::SetSoundPaused );
+    CLuaCFunctions::AddFunction ( "isSoundPaused", CLuaFunctionDefinitions::IsSoundPaused );
+    CLuaCFunctions::AddFunction ( "setSoundVolume", CLuaFunctionDefinitions::SetSoundVolume );
+    CLuaCFunctions::AddFunction ( "getSoundVolume", CLuaFunctionDefinitions::GetSoundVolume );
+    CLuaCFunctions::AddFunction ( "setSoundMinDistance", CLuaFunctionDefinitions::SetSoundMinDistance );
+    CLuaCFunctions::AddFunction ( "getSoundMinDistance", CLuaFunctionDefinitions::GetSoundMinDistance );
+    CLuaCFunctions::AddFunction ( "setSoundMaxDistance", CLuaFunctionDefinitions::SetSoundMaxDistance );
+    CLuaCFunctions::AddFunction ( "getSoundMaxDistance", CLuaFunctionDefinitions::GetSoundMaxDistance );
 
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getLocalPlayer", CLuaFunctionDefinitions::GetLocalPlayer );
