@@ -187,9 +187,11 @@ public:
     void                    RegisterCommands                ( void );
     bool					IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    static void             ParseCommandLine                ( std::map < std::string, std::string > & options, char*& szArgs, const char** pszNoValOptions = NULL );
     const char *            GetConnectCommandFromURI        ( const char* szURI, char* szDest, size_t destLength );	
 	bool					bScreenShot;
+    std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
+    const char *            GetCommandLineOption            ( const char* szOption );
+    const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
 
 private:
     // Core devices.
@@ -256,6 +258,11 @@ private:
 
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
+
+    // Command line
+    static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );
+    std::map < std::string, std::string > m_CommandLineOptions;     // e.g. "-o option" -> {"o" = "option"}
+    const char*                 m_szCommandLineArgs;                // Everything that comes after the options
 };
 
 #endif

@@ -102,12 +102,11 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
 			assert ( pCustomData );
             BitStream.Write ( static_cast < unsigned short > ( pCustomData->Count () ) );
-            list < SCustomData* > ::const_iterator iter = pCustomData->IterBegin ();
-            for ( ; iter != pCustomData->IterEnd () ; iter++ )
+            map < string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
+            for ( ; iter != pCustomData->IterEnd (); iter++ )
             {
-                SCustomData* pCustomDataBit = *iter;
-                char* szName = pCustomDataBit->szName;
-                CLuaArgument* pArgument = &pCustomDataBit->Variable;
+                const char* szName = iter->first.c_str ();
+                const CLuaArgument* pArgument = &iter->second.Variable;
 
                 unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
                 BitStream.Write ( ucNameLength );

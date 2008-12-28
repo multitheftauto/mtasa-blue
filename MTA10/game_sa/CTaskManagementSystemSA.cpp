@@ -19,14 +19,12 @@ using namespace std;
 
 VOID HOOK_CTask_Operator_Delete();
 
-DWORD STORE_CTask_Operator_Delete = 0;
-
 CTaskSAInterface * pTempTaskInterface = 0;
 
 CTaskManagementSystemSA::CTaskManagementSystemSA ( void )
 {
     // Install our hook used to delete our tasks when GTA does
-    HookInstall ( FUNC_CTask_Operator_Delete, (DWORD)HOOK_CTask_Operator_Delete, &STORE_CTask_Operator_Delete, 6 );
+    HookInstall ( FUNC_CTask_Operator_Delete, (DWORD)HOOK_CTask_Operator_Delete, 6 );
 }
 
 CTaskManagementSystemSA::~CTaskManagementSystemSA ( void )

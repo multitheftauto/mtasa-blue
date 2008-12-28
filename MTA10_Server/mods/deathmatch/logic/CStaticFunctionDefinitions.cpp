@@ -2163,7 +2163,7 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
         BitStream.pBitStream->Write ( usPort );
         if ( szPassword )
         {
-            unsigned char ucPasswordLength = static_cast < unsigned short > ( strlen ( szPassword ) );
+            unsigned char ucPasswordLength = static_cast < unsigned char > ( strlen ( szPassword ) );
             BitStream.pBitStream->Write ( ucPasswordLength );
             BitStream.pBitStream->Write ( const_cast < char* > ( szPassword ), ucPasswordLength );
         }

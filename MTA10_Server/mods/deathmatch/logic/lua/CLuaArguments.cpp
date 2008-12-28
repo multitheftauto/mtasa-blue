@@ -364,7 +364,7 @@ CLuaArgument* CLuaArguments::PushNumber ( double dNumber )
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument & argument )
+CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument & argument )
 {
     CLuaArgument* pArgument = new CLuaArgument (argument); // create a copy
     m_Arguments.push_back ( pArgument );

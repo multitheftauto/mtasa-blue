@@ -403,8 +403,11 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
             // Grab the node (we can assume it exists here)
             CXMLAttribute* pAttribute = pAttributes->Get ( uiIndex );
 
-            // Make a lua argument from it and set the content as a string
-            SetCustomData ( pAttribute->GetName ().c_str (), CLuaArgument ( pAttribute->GetValue ().c_str () ), pLuaMain );
+            // Make a lua argument from it and set the content
+            CLuaArguments args;
+            if ( !args.ReadFromJSONString ( pAttribute->GetValue ().c_str() ) )
+                args.PushString ( pAttribute->GetValue ().c_str () );
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain );
         }
     }
 }
@@ -415,10 +418,10 @@ CLuaArgument* CElement::GetCustomData ( const char* szName, bool bInheritData )
     assert ( szName );
 
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get ( szName );
+    const SCustomData* pData = m_pCustomData->Get ( szName );
     if ( pData )
     {
-        return &pData->Variable;
+        return (CLuaArgument *)&pData->Variable;
     }
 
     // If none, try returning parent's custom data
@@ -436,12 +439,12 @@ CLuaArguments* CElement::GetAllCustomData ( CLuaArguments * table )
     assert ( table );
 
     // Grab it and return a pointer to the variable
-    list < SCustomData* > ::const_iterator iter = m_pCustomData->IterBegin();
+    map < string, SCustomData > :: const_iterator iter = m_pCustomData->IterBegin();
     int i = 1;
     for ( ; iter != m_pCustomData->IterEnd(); iter++ )
     {
-        table->PushString( (*iter)->szName ); // key
-        table->PushArgument ( (*iter)->Variable ); // value
+        table->PushString( iter->first.c_str () );       // key
+        table->PushArgument ( iter->second.Variable );   // value
         i++;
     }
 
@@ -619,7 +622,7 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
 
     // Grab the old variable
     CLuaArgument oldVariable;
-    SCustomData * pData = m_pCustomData->Get ( szName );
+    const SCustomData * pData = m_pCustomData->Get ( szName );
     if ( pData )
     {
         oldVariable = pData->Variable;

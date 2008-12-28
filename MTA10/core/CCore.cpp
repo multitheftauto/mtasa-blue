@@ -144,6 +144,13 @@ CCore::CCore ( void )
         m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] = 0;
     }
 
+    // Parse the command line
+    const char* pszNoValOptions[] =
+    {
+        "window",
+        NULL
+    };
+    ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
 
     // Create a logger instance.
     m_pLogger                   = new CLogger ( );
@@ -816,7 +823,7 @@ void CCore::CreateMultiplayer ( )
     typedef CMultiplayer* (*pfnMultiplayerInitializer) ( CGame * );
     pfnMultiplayerInitializer pfnMultiplayerInit;
 
-    // Load approrpiate compilation-specific library.
+    // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
     m_MultiplayerModule.LoadModule ( "mta/multiplayer_sa_d.dll" );
 # else
@@ -1138,28 +1145,14 @@ void CCore::DoPostFramePulse ( )
             {
                 m_bFirstFrame = false;
 
-                std::map < std::string, std::string > options;
-                char* szArgs = NULL;
-                const char* szNoValOptions[] =
-                {
-                    "window",
-                    NULL
-                };
-                ParseCommandLine ( options, szArgs, szNoValOptions );
-
-                /*
-                // Go into window mode?
-                if ( options.find ( "window" ) != options.end () )
-                    CCommandFuncs::Window ( "" );       // Doesn't work this way...
-                */
-
+                // Parse the command line
                 // Does it begin with mtasa://?
-                if ( szArgs && strnicmp ( szArgs, "mtasa://", 8 ) == 0 )
+                if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
                 {
                     char szArguments [256];
                     szArguments [255] = 0;
 
-                    GetConnectCommandFromURI(szArgs, szArguments, sizeof(szArguments));
+                    GetConnectCommandFromURI(m_szCommandLineArgs, szArguments, sizeof(szArguments));
                     // Run the connect command
                     if ( strlen( szArguments ) > 0 && !m_pCommands->Execute ( szArguments ) )
                     {
@@ -1169,20 +1162,21 @@ void CCore::DoPostFramePulse ( )
                 else
                 {
                     // We want to load a mod?
-                    if ( options.find ( "l" ) != options.end () )
+                    const char* szOptionValue;
+                    if ( szOptionValue = GetCommandLineOption( "l" ) )
                     {
                         // Try to load the mod
-                        if ( !m_pModManager->Load ( options [ "l" ].c_str (), szArgs ) )
+                        if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
                             char szTemp [128];
-                            _snprintf ( szTemp, 128, "Error running mod specified in command line ('%s')", options [ "l" ].c_str () );
+                            _snprintf ( szTemp, 128, "Error running mod specified in command line ('%s')", szOptionValue );
                             ShowMessageBox ( "Error", szTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
                     }
                     // We want to connect to a server?
-                    else if ( options.find ( "c" ) != options.end () )
+                    else if ( szOptionValue = GetCommandLineOption ( "c" ) )
                     {
-                        CCommandFuncs::Connect ( options [ "c" ].c_str () );
+                        CCommandFuncs::Connect ( szOptionValue );
                     }
                 }
             }
@@ -1359,7 +1353,7 @@ bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 	return bHandled;
 }
 
-void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, char*& szArgs, const char** pszNoValOptions )
+void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )
 {
     std::set < std::string > noValOptions;
     if ( pszNoValOptions )
@@ -1371,7 +1365,7 @@ void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, 
         }
     }
 
-    char* szCmdLine = GetCommandLine ();
+    const char* szCmdLine = GetCommandLine ();
     char szCmdLineCopy[512];
     strncpy ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
     
@@ -1434,6 +1428,15 @@ void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, 
             pEnd = pStart;
         }
     }
+}
+
+const char* CCore::GetCommandLineOption ( const char* szOption )
+{
+    std::map < std::string, std::string >::iterator it = m_CommandLineOptions.find ( szOption );
+    if ( it != m_CommandLineOptions.end () )
+        return it->second.c_str ();
+    else
+        return NULL;
 }
 
 const char* CCore::GetConnectCommandFromURI ( const char* szURI, char* szDest, size_t destLength )

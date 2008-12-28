@@ -148,9 +148,7 @@ CPickup * CPickupsSA::CreatePickup(CVector * position, DWORD ModelIndex, ePickup
 
 void CPickupsSA::DisablePickupProcessing ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_CPickups__Update,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_CPickups__Update;
@@ -161,6 +159,4 @@ void CPickupsSA::DisablePickupProcessing ( bool bDisabled )
 	    *(BYTE *)FUNC_CPickups__Update = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_CPickups__Update,1,oldProt,&oldProt2);
 }

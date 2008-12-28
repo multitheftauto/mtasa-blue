@@ -54,25 +54,16 @@ VOID CPadSA::Restore()
 
 bool CPadSA::IsEnabled ( void )
 {
-	DWORD oldProt, oldProt2;
-
-	VirtualProtect((LPVOID)FUNC_CPad_UpdatePads,1,PAGE_EXECUTE_READ,&oldProt);		
     bool bEnabled = *(BYTE *)FUNC_CPad_UpdatePads == 0x56;
-	VirtualProtect((LPVOID)FUNC_CPad_UpdatePads,1,oldProt,&oldProt2);
-
     return bEnabled;
 }
 
 VOID CPadSA::Disable( bool bDisable )
 {
-	DWORD oldProt, oldProt2;
-
-	VirtualProtect((LPVOID)FUNC_CPad_UpdatePads,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	if ( bDisable )
 		*(BYTE *)FUNC_CPad_UpdatePads = 0xC3;
 	else
 		*(BYTE *)FUNC_CPad_UpdatePads = 0x56;
-	VirtualProtect((LPVOID)FUNC_CPad_UpdatePads,1,oldProt,&oldProt2);
 
 	//this->internalInterface->DisablePlayerControls = bDisable;
 }

@@ -17,10 +17,10 @@
 
 void CCustomData::Copy ( CCustomData* pCustomData )
 {
-    list < SCustomData* > ::const_iterator iter = pCustomData->IterBegin ();
+    map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
     for ( ; iter != pCustomData->IterEnd (); iter++ )
     {
-        Set ( (*iter)->szName, (*iter)->Variable, (*iter)->pLuaMain );
+        Set ( iter->first.c_str (), iter->second.Variable, iter->second.pLuaMain );
     }
 }
 
@@ -28,18 +28,10 @@ SCustomData* CCustomData::Get ( const char* szName )
 {
     assert ( szName );
 
-    // Try finding the name in our list
-    list < SCustomData* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        // Names matches?
-        if ( strcmp ( (*iter)->szName, szName ) == 0 )
-        {
-            return *iter;
-        }
-    }
+    std::map < std::string, SCustomData > :: const_iterator it = m_Data.find ( szName );
+    if ( it != m_Data.end () )
+        return (SCustomData *)&it->second;
 
-    // Doesn't exist
     return NULL;
 }
 
@@ -62,13 +54,11 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
     }
     else
     {
-        // Add it and set the stuff
-        pData = new SCustomData;
-        m_List.push_back ( pData );
-        strncpy ( pData->szName, szName, MAX_CUSTOMDATA_NAME_LENGTH );
-        pData->szName [MAX_CUSTOMDATA_NAME_LENGTH] = 0;
-        pData->Variable = Variable;
-        pData->pLuaMain = pLuaMain;
+        // Set the stuff and add it
+        SCustomData newData;
+        newData.Variable = Variable;
+        newData.pLuaMain = pLuaMain;
+        m_Data [ szName ] = newData;
     }
 }
 
@@ -76,13 +66,10 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
 bool CCustomData::Delete ( const char* szName )
 {
     // Find the item and delete it
-    SCustomData* pData = Get ( szName );
-    if ( pData )
+    std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
+    if ( it != m_Data.end () )
     {
-        if ( !m_List.empty() ) m_List.remove ( pData );
-        delete pData;
-
-        // Success
+        m_Data.erase ( it );
         return true;
     }
 
@@ -94,22 +81,14 @@ bool CCustomData::Delete ( const char* szName )
 void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
 {
     // Delete any items with matching VM's
-    list < SCustomData* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    std::map < std::string, SCustomData > :: iterator iter = m_Data.begin ();
+    while ( iter != m_Data.end () )
     {
         // Delete it if they match
-        if ( (*iter)->pLuaMain == pLuaMain )
-        {
-			// Delete the object
-            delete *iter;
-
-			// Remove from list
-			m_List.erase ( iter );
-
-			// Continue from the beginning, unless the list is empty
-			if ( m_List.empty () ) break;
-			iter = m_List.begin ();
-        }
+        if ( iter->second.pLuaMain == pLuaMain )
+			m_Data.erase ( iter );
+        else
+            iter++;
     }
 }
 
@@ -117,40 +96,33 @@ void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
 void CCustomData::DeleteAll ( void )
 {
     // Delete all the items
-    list < SCustomData* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_List.clear ();
+    m_Data.clear ();
 }
 
 CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
 {
-    list < SCustomData* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    std::map < std::string, SCustomData > :: const_iterator iter = m_Data.begin ();
+    for ( ; iter != m_Data.end (); iter++ )
     {
-        CLuaArgument * arg = &(*iter)->Variable;
+        CLuaArgument* arg = (CLuaArgument *)&iter->second.Variable;
         
         switch ( arg->GetType() )
         {
         case LUA_TSTRING:
             {
-                CXMLAttribute * attr = pNode->GetAttributes().Create( (*iter)->szName );
+                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
                 attr->SetValue ( arg->GetString ().c_str () );
                 break;
             }
         case LUA_TNUMBER:
             {
-                CXMLAttribute * attr = pNode->GetAttributes().Create( (*iter)->szName );
+                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
                 attr->SetValue ( (float)arg->GetNumber () );
                 break;
             }
         case LUA_TBOOLEAN:
             {
-                CXMLAttribute * attr = pNode->GetAttributes().Create( (*iter)->szName );
+                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
                 attr->SetValue ( arg->GetBoolean () );
                 break;
             }

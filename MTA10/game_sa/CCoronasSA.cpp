@@ -100,9 +100,7 @@ RwTexture * CCoronasSA::GetTexture(eCoronaType type)
 
 void CCoronasSA::DisableSunAndMoon ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DoSunAndMoon,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DoSunAndMoon;
@@ -113,6 +111,4 @@ void CCoronasSA::DisableSunAndMoon ( bool bDisabled )
 	    *(BYTE *)FUNC_DoSunAndMoon = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DoSunAndMoon,1,oldProt,&oldProt2);
 }

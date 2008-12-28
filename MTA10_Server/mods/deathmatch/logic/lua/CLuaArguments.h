@@ -74,7 +74,7 @@ public:
     CLuaArgument*                                       PushTextItem        ( CTextItem* pTextItem );
     CLuaArgument*                                       PushTimer           ( CLuaTimer* pLuaTimer );
 
-    CLuaArgument*                                       PushArgument        ( CLuaArgument& argument );
+    CLuaArgument*                                       PushArgument        ( const CLuaArgument& argument );
     CLuaArgument*                                       PushTable           ( CLuaArguments * table );
 
     void                                                DeleteArguments     ( void );
