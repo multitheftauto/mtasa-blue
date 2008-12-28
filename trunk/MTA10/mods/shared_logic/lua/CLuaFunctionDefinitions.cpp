@@ -14236,6 +14236,331 @@ int CLuaFunctionDefinitions::SynthProcessMIDI ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::PlaySound ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    {
+        const char* szSound = lua_tostring ( luaVM, 1 );
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            CResource* pResource = luaMain->GetResource();
+            if ( pResource )
+            {
+		        char szFilename [ MAX_STRING_LENGTH ];
+                snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+                {
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+                    }
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, szFilename, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::PlaySound3D ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    if ( ( lua_istype ( luaVM, 1, LUA_TSTRING ) ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    {
+        CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                              static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                              static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+
+        const char* szSound = lua_tostring ( luaVM, 1 );
+
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            CResource* pResource = luaMain->GetResource();
+            if ( pResource )
+            {
+		        char szFilename [ MAX_STRING_LENGTH ];
+                snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+                {
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
+                    }
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, szFilename, vecPosition, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::StopSound ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            if ( CStaticFunctionDefinitions::StopSound ( *pSound ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetSoundPosition ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            unsigned int uiPosition = ( unsigned int ) lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundPosition ( *pSound, uiPosition ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetSoundPosition ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            unsigned int uiPosition = 0;
+            if ( CStaticFunctionDefinitions::GetSoundPosition ( *pSound, uiPosition ) )
+            {
+                lua_pushnumber ( luaVM, uiPosition );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetSoundLength ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            unsigned int uiLength = 0;
+            if ( CStaticFunctionDefinitions::GetSoundLength ( *pSound, uiLength ) )
+            {
+                lua_pushnumber ( luaVM, uiLength );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetSoundPaused ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            bool bPaused = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+            if ( CStaticFunctionDefinitions::SetSoundPaused ( *pSound, bPaused ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::IsSoundPaused ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            bool bPaused = false;
+            if ( CStaticFunctionDefinitions::IsSoundPaused ( *pSound, bPaused ) )
+            {
+                lua_pushboolean ( luaVM, bPaused );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetSoundVolume ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fVolume = ( float ) lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundVolume ( *pSound, fVolume ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetSoundVolume ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fVolume = 0.0f;
+            if ( CStaticFunctionDefinitions::GetSoundVolume ( *pSound, fVolume ) )
+            {
+                lua_pushnumber ( luaVM, fVolume );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetSoundMinDistance ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fDistance = ( float ) lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundMinDistance ( *pSound, fDistance ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetSoundMinDistance ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fDistance = 0.0f;
+            if ( CStaticFunctionDefinitions::GetSoundMinDistance ( *pSound, fDistance ) )
+            {
+                lua_pushnumber ( luaVM, fDistance );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetSoundMaxDistance ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fDistance = ( float ) lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundMaxDistance ( *pSound, fDistance ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetSoundMaxDistance ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fDistance = 0.0f;
+            if ( CStaticFunctionDefinitions::GetSoundMaxDistance ( *pSound, fDistance ) )
+            {
+                lua_pushnumber ( luaVM, fDistance );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 #ifdef MTA_VOICE
 int CLuaFunctionDefinitions::SetVoiceInputEnabled ( lua_State* luaVM )
 {

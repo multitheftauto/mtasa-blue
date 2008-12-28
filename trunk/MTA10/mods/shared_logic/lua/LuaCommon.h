@@ -69,6 +69,7 @@ CClientPickup*          lua_topickup        ( lua_State* luaVM, int iArgument );
 CClientPlayer*          lua_toplayer        ( lua_State* luaVM, int iArgument );
 CLuaTimer*              lua_totimer         ( lua_State* luaVM, int iArgument );
 CResource*              lua_toresource      ( lua_State* luaVM, int iArgument );
+CClientSound*			lua_tosound         ( lua_State* luaVM, int iArgument );
 CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
 CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
 CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );

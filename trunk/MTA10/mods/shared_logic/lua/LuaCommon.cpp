@@ -169,6 +169,17 @@ CResource* lua_toresource ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
+CClientSound* lua_tosound ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTSOUND )
+    {
+        return static_cast < CClientSound* > ( pElement );
+    }
+
+    return NULL;
+}
+
 CClientTeam* lua_toteam ( lua_State* luaVM, int iArgument )
 {
     CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
