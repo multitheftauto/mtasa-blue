@@ -141,6 +141,7 @@
 #include "CZoneNames.h"
 #include "CConsoleCommand.h"
 #include "CColCuboid.h"
+#include "CColPolygon.h"
 #include "CCommandLineParser.h"
 #include "CEvents.h"
 #include "CStack.h"

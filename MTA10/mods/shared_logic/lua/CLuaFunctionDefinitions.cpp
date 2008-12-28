@@ -13757,6 +13757,67 @@ int CLuaFunctionDefinitions::CreateColRectangle ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
+{ // Formerly createColSquare
+    // Verify the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        // Grab the values
+        CVector vecPosition = CVector ( ( float ) lua_tonumber ( luaVM, 1 ), ( float ) lua_tonumber ( luaVM, 2 ), 0.0f );
+
+		CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+		if ( pLuaMain )
+		{
+			CResource* pResource = pLuaMain->GetResource();
+			if ( pResource )
+			{
+				// Create it and return it
+				CClientColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( *pResource, vecPosition );
+				if ( pShape )
+				{
+                    // Get the points
+                    int iArgument = 3;
+                    int iArgumentX = lua_type ( luaVM, iArgument++ );
+                    int iArgumentY = lua_type ( luaVM, iArgument++ );
+                    while ( iArgumentX != LUA_TNONE && iArgumentY != LUA_TNONE )
+                    {
+                        if ( ( iArgumentX == LUA_TNUMBER || iArgumentX == LUA_TSTRING ) &&
+                             ( iArgumentY == LUA_TNUMBER || iArgumentY == LUA_TSTRING ) )
+                        {
+                            pShape->AddPoint ( CVector2D ( ( float ) lua_tonumber ( luaVM, iArgument - 2 ),
+                                                           ( float ) lua_tonumber ( luaVM, iArgument - 1 ) ) );
+
+                            iArgumentX = lua_type ( luaVM, iArgument++ );
+                            iArgumentY = lua_type ( luaVM, iArgument++ );
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+					CElementGroup * pGroup = pResource->GetElementGroup();
+					if ( pGroup )
+					{
+						pGroup->Add ( pShape );
+					}
+					lua_pushelement ( luaVM, pShape );
+					return 1;
+				}
+			}
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "createColPolygon" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::CreateColTube ( lua_State* luaVM )
 {
     // Verify the argument types

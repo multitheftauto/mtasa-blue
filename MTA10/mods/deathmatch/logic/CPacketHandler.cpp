@@ -2784,6 +2784,20 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pEntity = pShape = pTube;
                             break;
                         }
+                        case COLSHAPE_POLYGON:
+                        {
+                            unsigned int uiPoints;
+                            CVector2D vecPoint;
+                            bitStream.Read ( uiPoints );
+                            CClientColPolygon* pPolygon = new CClientColPolygon ( g_pClientGame->m_pManager, EntityID, vecPosition );
+                            for ( unsigned int i = 0; i < uiPoints; i++ )
+                            {
+                                bitStream.Read ( vecPoint.fX );
+                                bitStream.Read ( vecPoint.fY );
+                                pPolygon->AddPoint ( vecPoint );
+                            }
+                            pEntity = pShape = pPolygon ;
+                        }
                         default:
                         {
                             RaiseProtocolError ( 54 );

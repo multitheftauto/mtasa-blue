@@ -354,6 +354,7 @@ public:
     static int      CreateColCuboid                     ( lua_State* luaVM );
     static int      CreateColSphere                     ( lua_State* luaVM );
     static int      CreateColRectangle                  ( lua_State* luaVM );
+    static int      CreateColPolygon                    ( lua_State* luaVM );
     static int      CreateColTube                       ( lua_State* luaVM );
 
     // Weapon funcs

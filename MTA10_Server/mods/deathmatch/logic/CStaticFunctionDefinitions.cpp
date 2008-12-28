@@ -6033,6 +6033,35 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 }
 
 
+CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource, const CVector& vecPosition )
+{
+    CColPolygon * pColShape = new CColPolygon ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition );
+    
+    // Run collision detection on some elements
+    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
+    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
+    {
+        CPlayer * pPlayer = *iterPlayers;
+        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
+    }
+    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
+    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
+    {
+        CVehicle * pVehicle = *iterVehicles;
+        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
+    }
+
+	if ( pResource->HasStarted() )
+	{
+		CEntityAddPacket Packet;
+		Packet.Add ( pColShape );
+		m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+	}
+
+    return pColShape;
+}
+
+
 CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight )
 {
     //CColTube * pColShape = new CColTube ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius, fHeight );

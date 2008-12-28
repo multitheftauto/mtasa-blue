@@ -4721,6 +4721,14 @@ CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource&
 }
 
 
+CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource& Resource, const CVector& vecPosition )
+{
+    CClientColPolygon * pShape = new CClientColPolygon ( m_pManager, INVALID_ELEMENT_ID, vecPosition );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    return pShape;
+}
+
+
 CClientColTube* CStaticFunctionDefinitions::CreateColTube ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight )
 {
     CClientColTube* pShape = new CClientColTube ( m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius, fHeight );

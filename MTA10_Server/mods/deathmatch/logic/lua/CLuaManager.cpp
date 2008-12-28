@@ -513,6 +513,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createColCuboid", CLuaFunctionDefinitions::CreateColCuboid );
     CLuaCFunctions::AddFunction ( "createColSphere", CLuaFunctionDefinitions::CreateColSphere );
     CLuaCFunctions::AddFunction ( "createColRectangle", CLuaFunctionDefinitions::CreateColRectangle );
+    CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefinitions::CreateColPolygon );
     CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefinitions::CreateColTube );
 
     // Weapon funcs

@@ -33,6 +33,7 @@ class CStaticFunctionDefinitions;
 #include "../../shared_logic/CClientColCuboid.h"
 #include "../../shared_logic/CClientColSphere.h"
 #include "../../shared_logic/CClientColRectangle.h"
+#include "../../shared_logic/CClientColPolygon.h"
 #include "../../shared_logic/CClientColTube.h"
 #include "../../shared_logic/CClientDummy.h"
 
@@ -397,6 +398,7 @@ public:
     static CClientColCuboid*            CreateColCuboid                     ( CResource& Resource, const CVector& vecPosition, const CVector& vecSize );
     static CClientColSphere*            CreateColSphere                     ( CResource& Resource, const CVector& vecPosition, float fRadius );
     static CClientColRectangle*         CreateColRectangle                  ( CResource& Resource, const CVector& vecPosition, const CVector2D& vecSize );
+    static CClientColPolygon*           CreateColPolygon                    ( CResource& Resource, const CVector& vecPosition );
     static CClientColTube*              CreateColTube                       ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight );
 	static CClientColShape*				GetElementColShape					( CClientEntity* pEntity );
 
