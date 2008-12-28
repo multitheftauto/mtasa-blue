@@ -475,6 +475,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CColPolygon.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CColRectangle.cpp"
 					>
 				</File>
@@ -1453,6 +1457,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CColManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CColPolygon.h"
 					>
 				</File>
 				<File

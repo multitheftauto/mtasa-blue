@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -70,11 +70,11 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="libv2.lib lua5.1sd.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd.lib"
+				AdditionalDependencies="libv2.lib lua5.1sd.lib irrKlang.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
+				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.pdb"
@@ -136,7 +136,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="1"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;MTARACE_EXPORTS;COMPILE_FOR_SA;SERIALS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -162,10 +162,10 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1s.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib"
+				AdditionalDependencies="libv2.lib lua5.1s.lib irrKlang.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
+				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBC.lib"
 				GenerateDebugInformation="true"
@@ -233,7 +233,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="1"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;MTARACE_EXPORTS;COMPILE_FOR_SA;MTA_ENABLE_PACKETRECORD;MTA_SCRIPT_LOGGING"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -259,10 +259,10 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1s.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib"
+				AdditionalDependencies="libv2.lib lua5.1s.lib irrKlang.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib"
 				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
+				AdditionalLibraryDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\core\xml\lib;logic\xml\lib;..\..\dependencies\zlib;..\..\..\Shared\publicsdk\lib"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -665,6 +665,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientColPolygon.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientColRectangle.cpp"
 					>
 				</File>
@@ -830,6 +834,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRadarMarkerManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientSound.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientSoundManager.cpp"
 					>
 				</File>
 				<File
@@ -1391,6 +1403,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientColPolygon.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientColRectangle.h"
 					>
 				</File>
@@ -1568,6 +1584,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRadarMarkerManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientSound.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientSoundManager.h"
 					>
 				</File>
 				<File
