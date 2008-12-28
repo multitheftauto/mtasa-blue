@@ -100,13 +100,10 @@ VOID CHudSA::SetZoneName( char * szName )
 VOID CHudSA::Disable ( bool bDisabled )
 {
 	DEBUG_TRACE("VOID CHudSA::Disable ( bool bDisabled )");
-	DWORD oldProt, oldProt2;
-	VirtualProtect((LPVOID)FUNC_Draw,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 	if ( bDisabled )
 		*(BYTE *)FUNC_Draw = 0xC3;
 	else
 		*(BYTE *)FUNC_Draw = 0x80;
-	VirtualProtect((LPVOID)FUNC_Draw,1,oldProt,&oldProt2);
 
 }
 
@@ -172,9 +169,7 @@ void CHudSA::Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float f
 
 void CHudSA::DisableAmmo ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawAmmo,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawAmmo;
@@ -185,15 +180,11 @@ void CHudSA::DisableAmmo ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawAmmo = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawAmmo,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableWeaponIcon ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawWeaponIcon,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawWeaponIcon;
@@ -204,15 +195,11 @@ void CHudSA::DisableWeaponIcon ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawWeaponIcon = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawWeaponIcon,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableHealth ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_PrintHealthForPlayer,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintHealthForPlayer;
@@ -223,15 +210,11 @@ void CHudSA::DisableHealth ( bool bDisabled )
 	    *(BYTE *)FUNC_PrintHealthForPlayer = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_PrintHealthForPlayer,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableBreath ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_PrintBreathForPlayer,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintBreathForPlayer;
@@ -242,15 +225,11 @@ void CHudSA::DisableBreath ( bool bDisabled )
 	    *(BYTE *)FUNC_PrintBreathForPlayer = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_PrintBreathForPlayer,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableArmour ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_PrintArmourForPlayer,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintArmourForPlayer;
@@ -261,15 +240,11 @@ void CHudSA::DisableArmour ( bool bDisabled )
 	    *(BYTE *)FUNC_PrintArmourForPlayer = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_PrintArmourForPlayer,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableVitalStats ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawVitalStats,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawVitalStats;
@@ -280,37 +255,27 @@ void CHudSA::DisableVitalStats ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawVitalStats = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawVitalStats,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableMoney ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static DWORD dwOriginal = 0;
-    VirtualProtect((LPVOID)CODE_ShowMoney,4,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !dwOriginal )
     {
         dwOriginal = *(DWORD *)CODE_ShowMoney;
-        VirtualProtect((LPVOID)CODE_ShowMoney,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	    *(BYTE *)CODE_ShowMoney       = 0x90;
         *(BYTE *)(CODE_ShowMoney + 1) = 0xE9;
-	    VirtualProtect((LPVOID)CODE_ShowMoney,2,oldProt,&oldProt2);
     }
     else if ( !bDisabled && dwOriginal )
     {
 	    *(DWORD *)CODE_ShowMoney = dwOriginal;
         dwOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)CODE_ShowMoney,4,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableVehicleName ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawVehicleName,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawVehicleName;
@@ -321,15 +286,11 @@ void CHudSA::DisableVehicleName ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawVehicleName = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawVehicleName,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableHelpText ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawHelpText,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawHelpText;
@@ -340,15 +301,11 @@ void CHudSA::DisableHelpText ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawHelpText = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawHelpText,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableAreaName ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawAreaName,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawAreaName;
@@ -359,15 +316,11 @@ void CHudSA::DisableAreaName ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawAreaName = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawAreaName,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableRadar ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
     static BYTE byteOriginal = 0;
-    VirtualProtect((LPVOID)FUNC_DrawRadar,1,PAGE_EXECUTE_READWRITE,&oldProt);		
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawRadar;
@@ -378,16 +331,11 @@ void CHudSA::DisableRadar ( bool bDisabled )
 	    *(BYTE *)FUNC_DrawRadar = byteOriginal;
         byteOriginal = 0;
     }
-
-	VirtualProtect((LPVOID)FUNC_DrawRadar,1,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableClock ( bool bDisabled )
 {
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)VAR_DisableClock,4,PAGE_EXECUTE_READWRITE,&oldProt);		
 	*(int *)VAR_DisableClock = bDisabled ? 0 : 1;
-	VirtualProtect((LPVOID)VAR_DisableClock,4,oldProt,&oldProt2);
 }
 
 void CHudSA::DisableAll ( bool bDisabled )

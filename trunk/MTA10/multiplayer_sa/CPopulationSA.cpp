@@ -21,17 +21,14 @@ DWORD               pedVtable;
 VOID HOOK_EndOf_CPopulation__Add();
 VOID HOOK_CPopulation__RemovePed();
 
-DWORD STORE_EndOf_CPopulation__Add = 0;
-DWORD STORE_CPopulation__RemovePed = 0;
-
 CivilianAddHandler		* m_pCivilianAddHandler;
 CivilianRemoveHandler	* m_pCivilianRemoveHandler;
 
 CPopulationSA::CPopulationSA()
 {
 	dwPedCount = 0;
-	HookInstall(HOOKPOS_EndOf_CPopulation__Add, (DWORD)HOOK_EndOf_CPopulation__Add, &STORE_EndOf_CPopulation__Add, 6);
-	HookInstall(HOOKPOS_CPopulation__RemovePed, (DWORD)HOOK_CPopulation__RemovePed, &STORE_CPopulation__RemovePed, 6);
+	HookInstall(HOOKPOS_EndOf_CPopulation__Add, (DWORD)HOOK_EndOf_CPopulation__Add, 6);
+	HookInstall(HOOKPOS_CPopulation__RemovePed, (DWORD)HOOK_CPopulation__RemovePed, 6);
 	pSingleton = this;
 	m_pCivilianRemoveHandler = NULL;
 	m_pCivilianAddHandler = NULL;

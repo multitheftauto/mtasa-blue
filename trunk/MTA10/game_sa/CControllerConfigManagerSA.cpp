@@ -90,10 +90,7 @@ bool CControllerConfigManagerSA::IsMouseInverted ( void )
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
 {
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0xBA6745,1,PAGE_EXECUTE_READWRITE,&oldProt);
     * ( unsigned char * ) ( 0xBA6745 ) = ( bInverted ) ? 0 : 1;
-    VirtualProtect((LPVOID)0xBA6745,1,oldProt,&oldProt2);    
 }
 
 bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
@@ -103,10 +100,7 @@ bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
 
 void CControllerConfigManagerSA::SetFlyWithMouse ( bool bFlyWithMouse )
 {
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0xC1CC03,1,PAGE_EXECUTE_READWRITE,&oldProt);
     * ( unsigned char * ) ( 0xC1CC03 ) = ( bFlyWithMouse ) ? 1 : 0;
-    VirtualProtect((LPVOID)0xC1CC03,1,oldProt,&oldProt2);    
 }
 
 bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
@@ -116,8 +110,5 @@ bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
 
 void CControllerConfigManagerSA::SetSteerWithMouse ( bool bSteerWithMouse )
 {
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0xC1CC02,1,PAGE_EXECUTE_READWRITE,&oldProt);
     * ( unsigned char * ) ( 0xC1CC02 ) = ( bSteerWithMouse ) ? 1 : 0;
-    VirtualProtect((LPVOID)0xC1CC02,1,oldProt,&oldProt2);    
 }

@@ -52,9 +52,6 @@ unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 #define HOOKPOS_FxManager_CreateFxSystem 0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
 
-DWORD STORE_FxManager_CreateFxSystem = 0;
-DWORD STORE_FxManager_DestroyFxSystem = 0;
-
 DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
 DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
 
@@ -64,22 +61,6 @@ DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
 
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0x6859A7;
 DWORD RETURN_CPed_IsPlayer = 0x5DF8F6;
-
-DWORD STORE_CCam_ProcessFixed = 0;
-DWORD STORE_FindPlayerCoors = 0;
-DWORD STORE_FindPlayerCentreOfWorld = 0;
-DWORD STORE_FindPlayerHeading = 0;
-DWORD STORE_CStreaming_Update_Caller = 0;
-DWORD STORE_CHook_Draw_Caller = 0;
-DWORD STORE_CRunningScript_Process = 0;
-DWORD STORE_CExplosion_AddExplosion = 0;
-DWORD STORE_CRealTimeShadowManager__ReturnRealTimeShadow = 0;
-DWORD STORE_CCustomRoadsignMgr__RenderRoadsignAtomic = 0;
-DWORD STORE_Trailer_BreakTowLink = 0;
-DWORD STORE_CRadar__DrawRadarGangOverlay = 0;
-DWORD STORE_CTaskComplexJump__CreateSubTask = 0;
-DWORD STORE_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0;
-DWORD STORE_CPed_IsPlayer = 0;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -206,23 +187,23 @@ void CMultiplayerSA::InitHooks()
 	*(BYTE *)0x468EB5 = 0xEB;
 	*(BYTE *)0x468EB6 = 0x32;
 
-	HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, &STORE_FindPlayerCoors, 6);
-	HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, &STORE_FindPlayerCentreOfWorld, 6);
-	HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, &STORE_FindPlayerHeading, 6);
-	HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, &STORE_CStreaming_Update_Caller, 7);
-	HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, &STORE_CHook_Draw_Caller, 10);
-	HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, &STORE_CRunningScript_Process, 6);
-	HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, &STORE_CExplosion_AddExplosion, 6);
-    HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, &STORE_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
-	HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, &STORE_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
-    HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, &STORE_Trailer_BreakTowLink, 6);
-    HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, &STORE_CRadar__DrawRadarGangOverlay, 6);
-    HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, &STORE_CTaskComplexJump__CreateSubTask, 6);
-    HookInstall(HOOKPOS_FxManager_CreateFxSystem, (DWORD)HOOK_FxManager_CreateFxSystem, &STORE_FxManager_CreateFxSystem, 8 );
-    HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, &STORE_FxManager_DestroyFxSystem, 7 );
-    HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, &STORE_CCam_ProcessFixed, 7 );
-    HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, &STORE_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7 );
-    HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, &STORE_CPed_IsPlayer, 6 );
+	HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, 6);
+	HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
+	HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, 6);
+	HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
+	HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
+	HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
+	HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
+    HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
+	HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
+    HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
+    HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
+    HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
+    HookInstall(HOOKPOS_FxManager_CreateFxSystem, (DWORD)HOOK_FxManager_CreateFxSystem, 8);
+    HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, 7);
+    HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 7);
+    HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
+    HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );

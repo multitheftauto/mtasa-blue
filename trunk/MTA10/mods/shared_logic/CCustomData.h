@@ -20,12 +20,10 @@
 
 using namespace std;
 
-#define MAX_CUSTOMDATA_ID_LENGTH 64
 #define MAX_CUSTOMDATA_NAME_LENGTH 32
 
 struct SCustomData
 {
-    char                szName [MAX_CUSTOMDATA_NAME_LENGTH + 1];
     CLuaArgument        Variable;
     class CLuaMain*     pLuaMain;
 };
@@ -33,7 +31,6 @@ struct SCustomData
 class CCustomData
 {
 public:
-                            ~CCustomData        ( void );
 
     void                    Copy                ( CCustomData* pCustomData );
 
@@ -44,13 +41,13 @@ public:
     void                    DeleteAll           ( class CLuaMain* pLuaMain );
     void                    DeleteAll           ( void );
 
-    inline unsigned int     Count               ( void )                    { return static_cast < unsigned int > ( m_List.size () ); }
+    inline unsigned int     Count               ( void )                           { return static_cast < unsigned int > ( m_Data.size () ); }
 
-    list < SCustomData* > ::const_iterator IterBegin    ( void )             { return m_List.begin (); }
-    list < SCustomData* > ::const_iterator IterEnd      ( void )             { return m_List.end (); }
+    std::map < std::string, SCustomData > :: const_iterator IterBegin   ( void )   { return m_Data.begin (); }
+    std::map < std::string, SCustomData > :: const_iterator IterEnd     ( void )   { return m_Data.end (); }
 
 private:
-    list < SCustomData* >   m_List;
+    std::map < std::string, SCustomData >       m_Data;
 };
 
 #endif

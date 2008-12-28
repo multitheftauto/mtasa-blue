@@ -18,7 +18,7 @@
 
 VOID HookInstallMethod(	DWORD dwInstallAddress, DWORD dwHookFunction );
 VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );
-BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, DWORD * dwHookStorage, int iJmpCodeSize );
-BYTE * CreateJump ( DWORD dwJumpAddress, BYTE * ByteArray );
+BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
+BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
 
 #endif

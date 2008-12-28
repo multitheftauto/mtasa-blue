@@ -218,13 +218,10 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
 {
     CPed * pLocalPlayer = pGame->GetPools()->GetPed ( 1 );
 
-    DWORD oldProt, oldProt2;
     if ( !bCameraCut )
     {
          // DISABLE call to CCamera__RestoreWithJumpCut when respawning
-        VirtualProtect((LPVOID)0x4422EA,20,PAGE_EXECUTE_READWRITE,&oldProt);		
         memset( (void*)0x4422EA, 0x90, 20 );
-        VirtualProtect((LPVOID)0x4422EA,20,oldProt,&oldProt2);
     }
 
 	DEBUG_TRACE("void CPedSA::Respawn(CVector * position)");
@@ -266,9 +263,7 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
         // B9 28 F0 B6 00 E8 4C 9A 0C 00 B9 28 F0 B6 00 E8 B2 97 0C 00
         unsigned char szCode[] = {0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0x4C, 0x9A, 0x0C, 0x00, 0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0xB2, 0x97, 0x0C, 0x00} ;
         // RE-ENABLE call to CCamera__RestoreWithJumpCut when respawning
-        VirtualProtect((LPVOID)0x4422EA,20,PAGE_EXECUTE_READWRITE,&oldProt);		
         memcpy( (void*)0x4422EA, szCode, 20 );
-        VirtualProtect((LPVOID)0x4422EA,20,oldProt,&oldProt2);
     }
     //OutputDebugString ( "Respawn!!!!" );
 }

@@ -169,7 +169,7 @@ void CRadarMap::DoPulse ( void )
         }
 
         // Now loop our radar markers
-        usDimension == m_pRadarMarkerManager->GetDimension();
+        usDimension = m_pRadarMarkerManager->GetDimension();
         list < CClientRadarMarker* > ::const_iterator markerIter = m_pRadarMarkerManager->IterBegin ();
         for ( ; markerIter != m_pRadarMarkerManager->IterEnd (); markerIter++ )
         {

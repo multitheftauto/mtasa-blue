@@ -31,13 +31,15 @@ float* CGameSA::VAR_OldTimeStep;
 float* CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
-DWORD		STORE_CDebug_DebugDisplayTextBuffer = 0;
-
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
 CGameSA::CGameSA()
 {
+    // Unprotect all of the GTASA code at once and leave it that way
+    DWORD oldProt;
+    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+
     // Initialize the offsets
     eGameVersion version = FindGameVersion ();
     switch ( version )
@@ -268,10 +270,7 @@ float CGameSA::GetGravity ( void )
 
 void CGameSA::SetGravity ( float fGravity )
 {
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0x863984,4,PAGE_EXECUTE_READWRITE,&oldProt);
     * ( float* ) ( 0x863984 ) = fGravity;
-    VirtualProtect((LPVOID)0x863984,4,oldProt,&oldProt2);
 }
 
 float CGameSA::GetGameSpeed ( void )
@@ -292,33 +291,23 @@ VOID CGameSA::DisableRenderer( bool bDisabled )
 	// DISABLED:
 	// 0053DF40   C3               RETN
 
-	DWORD oldProt, oldProt2;
-
 	if ( bDisabled )
 	{
-		VirtualProtect((LPVOID)0x53DF40,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 		*(BYTE *)0x53DF40 = 0xC3;
-		VirtualProtect((LPVOID)0x53DF40,1,oldProt,&oldProt2);
 	}
 	else
 	{
-		VirtualProtect((LPVOID)0x53DF40,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 		*(BYTE *)0x53DF40 = 0xD9;
-		VirtualProtect((LPVOID)0x53DF40,1,oldProt,&oldProt2);
 	}
 }
 
 VOID CGameSA::SetRenderHook ( InRenderer* pInRenderer )
 {
-	DWORD oldProt, oldProt2;
-
 	if ( pInRenderer )
-		HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, &STORE_CDebug_DebugDisplayTextBuffer, 6 );
+		HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
 	else
 	{
-		VirtualProtect((LPVOID)FUNC_CDebug_DebugDisplayTextBuffer,1,PAGE_EXECUTE_READWRITE,&oldProt);		
 		*(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
-		VirtualProtect((LPVOID)FUNC_CDebug_DebugDisplayTextBuffer,1,oldProt,&oldProt2);
 	}
 }
 

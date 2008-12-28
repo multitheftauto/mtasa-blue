@@ -66,26 +66,6 @@ extern ProjectileStopHandler* m_pProjectileStopHandler;
 
 char szDebug[255] = {'\0'};
 
-// used to store pointers to these functions
-DWORD STORE_CWeapon__Fire = 0;
-DWORD STORE_CWeapon__PostFire = 0;
-DWORD STORE_CWeapon__PostFire2 = 0;
-DWORD STORE_CPedIK__PointGunInDirection = 0;
-DWORD STORE_CTaskSimpleGangDriveBy__PlayerTarget = 0;
-DWORD STORE_CWeapon__Fire_Sniper = 0;
-DWORD STORE_CEventDamage__AffectsPed = 0;
-DWORD STORE_CFireManager__StartFire = 0;
-DWORD STORE_CFireManager__StartFire_ = 0;
-DWORD STORE_CProjectileInfo__AddProjectile = 0;
-DWORD STORE_CProjectile__CProjectile = 0;
-DWORD STORE_IKChainManager_PointArm = 0;
-DWORD STORE_IKChainManager_LookAt = 0;
-DWORD STORE_SkipAim = 0;
-DWORD STORE_CTaskSimpleUsegun_ProcessPed = 0;
-DWORD STORE_CWeapon_FireInstantHit = 0;
-DWORD STORE_CWeapon_FireInstantHit_CameraMode = 0;
-DWORD STORE_CWeapon_FireInstantHit_IsPlayer = 0;
-
 DWORD RETURN_CProjectile__AddProjectile = 0x401C3D;
 DWORD RETURN_CProjectile__CProjectile = 0x4037B3;
 CPools * m_pools = 0;
@@ -94,24 +74,24 @@ CPools * m_pools = 0;
 
 VOID InitShotsyncHooks()
 {
-    HookInstall ( HOOKPOS_CWeapon__Fire, (DWORD)HOOK_CWeapon__Fire, &STORE_CWeapon__Fire, 6 );
-    HookInstall ( HOOKPOS_CWeapon__PostFire, (DWORD)HOOK_CWeapon__PostFire, &STORE_CWeapon__PostFire, 6 );
-    HookInstall ( HOOKPOS_CWeapon__PostFire2, (DWORD)HOOK_CWeapon__PostFire2, &STORE_CWeapon__PostFire2, 6 );
-    HookInstall ( HOOKPOS_CPedIK__PointGunInDirection, (DWORD)HOOK_CPedIK__PointGunInDirection, &STORE_CPedIK__PointGunInDirection, 7 );
-    HookInstall ( HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget, (DWORD)HOOK_CTaskSimpleGangDriveBy__PlayerTarget, &STORE_CTaskSimpleGangDriveBy__PlayerTarget, 6 );
-    HookInstall ( HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, &STORE_CWeapon__Fire_Sniper, 6 );
-    HookInstall ( HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, &STORE_CEventDamage__AffectsPed, 6 );
-    HookInstall ( HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, &STORE_CFireManager__StartFire, 6 );
-    HookInstall ( HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, &STORE_CFireManager__StartFire_, 6 );
-    HookInstall ( HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, &STORE_CProjectileInfo__AddProjectile, 7 );
-    HookInstall ( HOOKPOS_CProjectile__CProjectile, (DWORD)HOOK_CProjectile__CProjectile, &STORE_CProjectile__CProjectile, 7 );
-    HookInstall ( HOOKPOS_IKChainManager_PointArm, (DWORD)HOOK_IKChainManager_PointArm, &STORE_IKChainManager_PointArm, 7 );
-    HookInstall ( HOOKPOS_IKChainManager_LookAt, (DWORD)HOOK_IKChainManager_LookAt, &STORE_IKChainManager_LookAt, 7 );
-    HookInstall ( HOOKPOS_IKChainManager_SkipAim, (DWORD)HOOK_SkipAim, &STORE_SkipAim, 6 );
-	HookInstall ( HOOKPOS_CTaskSimpleUsegun_ProcessPed, (DWORD)HOOK_CTaskSimpleUsegun_ProcessPed, &STORE_CTaskSimpleUsegun_ProcessPed, 8 );
-    HookInstall ( HOOKPOS_CWeapon_FireInstantHit, (DWORD)HOOK_CWeapon_FireInstantHit, &STORE_CWeapon_FireInstantHit, 9 );
-    HookInstall ( HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, &STORE_CWeapon_FireInstantHit_CameraMode, 6 );
-    HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, &STORE_CWeapon_FireInstantHit_IsPlayer, 7 );
+    HookInstall ( HOOKPOS_CWeapon__Fire, (DWORD)HOOK_CWeapon__Fire, 6 );
+    HookInstall ( HOOKPOS_CWeapon__PostFire, (DWORD)HOOK_CWeapon__PostFire, 6 );
+    HookInstall ( HOOKPOS_CWeapon__PostFire2, (DWORD)HOOK_CWeapon__PostFire2, 6 );
+    HookInstall ( HOOKPOS_CPedIK__PointGunInDirection, (DWORD)HOOK_CPedIK__PointGunInDirection, 7 );
+    HookInstall ( HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget, (DWORD)HOOK_CTaskSimpleGangDriveBy__PlayerTarget, 6 );
+    HookInstall ( HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, 6 );
+    HookInstall ( HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6 );
+    HookInstall ( HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6 );
+    HookInstall ( HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, 6 );
+    HookInstall ( HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7 );
+    HookInstall ( HOOKPOS_CProjectile__CProjectile, (DWORD)HOOK_CProjectile__CProjectile, 7 );
+    HookInstall ( HOOKPOS_IKChainManager_PointArm, (DWORD)HOOK_IKChainManager_PointArm, 7 );
+    HookInstall ( HOOKPOS_IKChainManager_LookAt, (DWORD)HOOK_IKChainManager_LookAt, 7 );
+    HookInstall ( HOOKPOS_IKChainManager_SkipAim, (DWORD)HOOK_SkipAim, 6 );
+	HookInstall ( HOOKPOS_CTaskSimpleUsegun_ProcessPed, (DWORD)HOOK_CTaskSimpleUsegun_ProcessPed, 8 );
+    HookInstall ( HOOKPOS_CWeapon_FireInstantHit, (DWORD)HOOK_CWeapon_FireInstantHit, 9 );
+    HookInstall ( HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6 );
+    HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7 );
 
 	/*
     DWORD oldProt, oldProt2;
