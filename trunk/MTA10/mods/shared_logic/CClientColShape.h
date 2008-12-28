@@ -48,8 +48,8 @@ public:
 
     inline eClientEntityType            GetType                         ( void ) const                          { return CCLIENTCOLSHAPE; }
 
-    inline void                         GetPosition                     ( CVector& vecPosition ) const          { vecPosition = m_vecPosition; };
-    inline void                         SetPosition                     ( const CVector& vecPosition )          { m_vecPosition = vecPosition; };
+    virtual void                        GetPosition                     ( CVector& vecPosition ) const          { vecPosition = m_vecPosition; };
+    virtual void                        SetPosition                     ( const CVector& vecPosition )          { m_vecPosition = vecPosition; };
 
     virtual bool                        DoHitDetection                  ( const CVector& vecNowPosition, float fRadius ) = 0;
 
