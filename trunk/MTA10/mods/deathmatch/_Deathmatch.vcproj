@@ -492,6 +492,9 @@
 					RelativePath="..\shared_logic\CClientColModelManager.cpp">
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientColPolygon.cpp">
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientColRectangle.cpp">
 				</File>
 				<File
@@ -1048,6 +1051,9 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientColModelManager.h">
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientColPolygon.h">
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientColRectangle.h">

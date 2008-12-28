@@ -609,6 +609,18 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                             BitStream.Write ( static_cast < CColTube* > ( pColShape )->GetHeight () );
                             break;
                         }
+                        case COLSHAPE_POLYGON:
+                        {
+                            CColPolygon* pPolygon = static_cast < CColPolygon* > ( pColShape );
+                            BitStream.Write ( pPolygon->CountPoints() );
+                            std::vector < CVector2D > ::const_iterator iter = pPolygon->IterBegin();
+                            for ( ; iter != pPolygon->IterEnd () ; iter++ )
+                            {
+                                BitStream.Write ( (*iter).fX );
+                                BitStream.Write ( (*iter).fY );
+                            }
+                            break;
+                        }
                         default: break;
                     }
                     break;

@@ -385,6 +385,7 @@ public:
     static CColCuboid*          CreateColCuboid                     ( CResource* pResource, const CVector& vecPosition, const CVector& vecSize );
     static CColSphere*          CreateColSphere                     ( CResource* pResource, const CVector& vecPosition, float fRadius );
     static CColRectangle*       CreateColRectangle                  ( CResource* pResource, const CVector& vecPosition, const CVector2D& vecSize );
+    static CColPolygon*         CreateColPolygon                    ( CResource* pResource, const CVector& vecPosition );
     static CColTube*            CreateColTube                       ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight );
 
     // Weapon funcs
