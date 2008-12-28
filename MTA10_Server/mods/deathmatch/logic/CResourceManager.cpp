@@ -337,6 +337,11 @@ CResource * CResourceManager::Load ( const char * szResourceName )
     iter = resourcesToDelete.begin ();
     for ( ; iter != resourcesToDelete.end (); iter++ )
     {
+        // Stop it first. This fixes bug #3729 because it isn't removed from the list before it's stopped.
+        // Removing it from the resources list first caused the resource pointer to be unverifyable, and
+        // the pointer wouldn't work in resource LUA functions.
+        (*iter)->Stop ( true );
+
         if ( !m_resources.empty() ) m_resources.remove ( *iter );
         m_resourcesToStartAfterRefresh.remove ( *iter );
         RemoveFromQueue ( *iter );
