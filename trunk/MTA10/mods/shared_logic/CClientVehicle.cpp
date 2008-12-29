@@ -2114,11 +2114,29 @@ void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
     if ( pVehicle )
     {      
         // Add it
-        CVehicle * pGameVehicle = pVehicle->GetGameVehicle ();        
-        if ( pGameVehicle && m_pVehicle )
+        if ( m_pVehicle )
         {
-            if ( m_pVehicle->GetTowedVehicle () != pGameVehicle )
-                pGameVehicle->SetTowLink ( m_pVehicle );
+            CVehicle * pGameVehicle = pVehicle->GetGameVehicle ();
+
+            if ( pGameVehicle )
+            {
+                // Both vehicles are streamed in
+                if ( m_pVehicle->GetTowedVehicle () != pGameVehicle )
+                    pGameVehicle->SetTowLink ( m_pVehicle );
+            }
+            else
+            {
+                // If only the towing vehicle is streamed in, force the towed vehicle to stream in
+                pVehicle->StreamIn ( true );
+            }
+        }
+        else
+        {
+            // If the towing vehicle is not streamed in, the towed vehicle can't be streamed in,
+            // so we move it to the towed position.
+            CVector vecPosition;
+            pVehicle->GetPosition ( vecPosition );
+            pVehicle->UpdateStreamPosition ( vecPosition );
         }
         pVehicle->m_pTowedByVehicle = this;
     }
