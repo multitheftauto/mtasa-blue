@@ -335,7 +335,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     strType         = _STR;
     strMap          = _STR;
     strVersion      = _STR;
-    bPassworded     = ( _STR == "yes" ) ? true : false;
+    bPassworded     = ( _STR == "1" ) ? true : false;
     nPlayers        = atoi ( _STR.c_str () );
     nMaxPlayers     = atoi ( _STR.c_str () );
 
