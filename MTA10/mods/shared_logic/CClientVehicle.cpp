@@ -2112,7 +2112,9 @@ void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
 
     // Do we have a new one to set?
     if ( pVehicle )
-    {      
+    {
+        pVehicle->m_pTowedByVehicle = this;
+
         // Add it
         if ( m_pVehicle )
         {
@@ -2138,7 +2140,6 @@ void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
             pVehicle->GetPosition ( vecPosition );
             pVehicle->UpdateStreamPosition ( vecPosition );
         }
-        pVehicle->m_pTowedByVehicle = this;
     }
     else
         m_ulIllegalTowBreakTime = 0;
