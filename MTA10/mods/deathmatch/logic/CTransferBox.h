@@ -47,12 +47,8 @@ public:
 private:
 	CGUIWindow*							m_pWindow;
 	CGUIStaticImage*					m_pIcon[TRANSFERBOX_FRAMES];
-	CGUILabel*							m_pL1;
-	CGUILabel*							m_pFiles;
-	CGUILabel*							m_pNum;
-	CGUILabel*							m_pStats;
+	CGUILabel*							m_pInfo;
 	CGUIProgressBar*					m_pProgress;
-    CGUIButton*                         m_pButtonCancel;
 
     bool                                m_bMultipleDownloads;
 
