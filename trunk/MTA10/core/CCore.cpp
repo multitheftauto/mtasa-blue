@@ -232,6 +232,7 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
+	CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -619,6 +620,14 @@ void CCore::ApplyConsoleSettings ( void )
     pConsole->SetPosition ( vec );
     CVARS_GET ( "console_size", vec );
     pConsole->SetSize ( vec );
+}
+
+void CCore::ApplyServerBrowserSettings ( void )
+{
+    CVector2D vec;
+
+    CVARS_GET ( "serverbrowser_size", vec );
+    m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->SetSize ( vec );
 }
 
 
@@ -1127,6 +1136,7 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
+		ApplyServerBrowserSettings ();
         ApplyGameSettings ();
         ApplyMenuSettings ();
 

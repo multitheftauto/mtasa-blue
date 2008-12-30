@@ -18,6 +18,9 @@ extern CCore* g_pCore;
 
 template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 
+#define BROWSER_DEFAULTWIDTH	720.0f
+#define BROWSER_DEFAULTHEIGHT    495.0f
+
 CServerBrowser::CServerBrowser ( void )
 {
     CGUI *pManager = g_pCore->GetGUI ();
@@ -29,26 +32,27 @@ CServerBrowser::CServerBrowser ( void )
     m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Server Browser" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetMovable ( true );
-    m_pWindow->SetSizingEnabled ( false );
+    m_pWindow->SetSizingEnabled ( true );
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 720.0f / 2, resolution.fY / 2 - 495.0f / 2 + yoff  ), false );
-    m_pWindow->SetSize ( CVector2D ( 720.0f, 495.0f ) );
+    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - BROWSER_DEFAULTWIDTH / 2, resolution.fY / 2 - BROWSER_DEFAULTHEIGHT / 2 + yoff  ), false );
+    m_pWindow->SetSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT ) );
     m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->SetMinimumSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT ) );
 
 	// Create the serverlist tab panel and some tabs
 	m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
-	m_pTabs->SetPosition ( CVector2D ( 0.0f, 0.05f ), true );
-	m_pTabs->SetSize ( CVector2D ( 1.0f, 0.878f ), true );		// ACHTUNG: ABSOLUTIFY
+	m_pTabs->SetPosition ( CVector2D ( 0.0f, 25.0f ) );
+	m_pTabs->SetSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT - 60.0f ) );
     
     // Back button
     m_pButtonBack = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Back" ) );
-    m_pButtonBack->SetPosition ( CVector2D ( 0.83f, 0.935f ), true );
-    m_pButtonBack->SetSize ( CVector2D ( 0.15f, 0.04f ), true );
+    m_pButtonBack->SetPosition ( CVector2D ( BROWSER_DEFAULTWIDTH - 123.0f, BROWSER_DEFAULTHEIGHT - 32.0f ), false );
+    m_pButtonBack->SetSize ( CVector2D ( 108.0f, 20.0f ), false );
 
     // Create the serverlist status label
     m_pServerListStatus = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Loading..." ) );
-    m_pServerListStatus->SetPosition ( CVector2D ( 0.02f, 0.937f ), true );
+    m_pServerListStatus->SetPosition ( CVector2D ( 14.0f, BROWSER_DEFAULTHEIGHT - 30.0f ) );
 	m_pServerListStatus->SetSize ( CVector2D ( 0.40f, 0.40f ), true );
     //m_pServerListStatus->SetMinimumSize ( CVector2D ( 1.0f, 1.0f ) );
     //m_pServerListStatus->SetMaximumSize ( CVector2D ( 1.0f, 1.0f ) );
@@ -65,7 +69,9 @@ CServerBrowser::CServerBrowser ( void )
 	m_pSerialIcon->SetFrameEnabled ( false );
 	m_pSerialIcon->LoadFromFile ( "cgui\\images\\shield.png" );
 
+    //Set necessary handlers
     m_pButtonBack->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
+    m_pWindow->SetSizedHandler ( GUI_CALLBACK ( &CServerBrowser::OnWindowSize, this ) );
 
     // Create the tabs
     CreateTab ( ServerBrowserType::INTERNET, "Internet" );
@@ -203,6 +209,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_hMap [ type ] = m_pServerList [ type ]->AddColumn ( "Map", 0.25f );
     m_hHost [ type ] = m_pServerList [ type ]->AddColumn ( "Host", 0.25f );
 
+    // Disable resizing of the first and second columns (Serial Auth & Locked)
+    m_pServerList [ type ]->AutoSizeColumn ( 1 );
+    m_pServerList [ type ]->AutoSizeColumn ( 2 );
+
     // Player List Columns
     m_hPlayerName [ type ] = m_pServerPlayerList [ type ]->AddColumn ( "Name", 0.75f );
 }
@@ -275,6 +285,45 @@ void CServerBrowser::Update ( void )
         // Update last time updated
         m_ulLastUpdateTime = CClientTime::GetTime ();
     }
+}
+
+CVector2D CServerBrowser::GetSize ( void )
+{
+    if ( m_pWindow )
+    {
+        return m_pWindow->GetSize ();
+    }
+    return CVector2D ();
+}
+
+
+void CServerBrowser::SetSize ( CVector2D& vecSize )
+{
+    if ( m_pWindow )
+    {
+        CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+        float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
+        // OnWindowSize should do the rest
+        m_pWindow->SetSize ( vecSize );
+        // Centre the window
+        m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - vecSize.fX / 2, resolution.fY / 2 - vecSize.fY / 2 + yoff  ), false );
+    }
+}
+
+bool CServerBrowser::OnWindowSize ( CGUIElement* pElement )
+{
+    CVector2D WindowSize = m_pWindow->GetSize ();
+
+	// Update the Tab panel size
+	m_pTabs->SetSize ( CVector2D ( WindowSize.fX, WindowSize.fY - 60.0f ) );
+    
+    // Back button position
+    m_pButtonBack->SetPosition ( CVector2D ( WindowSize.fX - 123.0f, WindowSize.fY - 32.0f ) );
+
+    //Status label position
+    m_pServerListStatus->SetPosition ( CVector2D ( 14.0f, WindowSize.fY - 30.0f ) );
+
+    return true;
 }
 
 

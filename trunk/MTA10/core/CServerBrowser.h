@@ -56,6 +56,9 @@ public:
 
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
+    
+    void                SetSize                 ( CVector2D& vecSize );
+    CVector2D           GetSize                 ( void );
 
     bool                ConnectToSelectedServer ( void );
 
@@ -137,6 +140,7 @@ private:
     bool                    OnIncludeOfflineClick           ( CGUIElement* pElement );
     bool                    OnFavouritesByIPClick           ( CGUIElement* pElement );
     bool                    OnFavouritesByIPAddClick        ( CGUIElement* pElement );
+    bool                    OnWindowSize                    ( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
 
