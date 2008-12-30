@@ -78,21 +78,20 @@ public:
         Init ();
     }
 
-    static bool         Parse           ( std::string strAddress, in_addr &Address )
+    static bool         Parse           ( const char* szAddress, in_addr& Address )
     {
-        unsigned int c;
-        std::istringstream iss;
-        std::string s;
+        DWORD dwIP = inet_addr ( szAddress );
+        if ( dwIP == INADDR_NONE )
+        {
+            hostent* pHostent = gethostbyname ( szAddress );
+            if ( !pHostent )
+                return false;
+            dwIP = *(DWORD *)pHostent->h_addr_list[0];
+            if ( dwIP == 0 )
+                return false;
+        }
 
-        // Parse the address (xxx.xxx.xxx.xxx) into little-endian in_addr
-        // equivalent of inet_pton
-        iss.str ( strAddress );
-        for ( c = 0; c < 4; c++ ) {
-            std::getline ( iss, s, '.' );
-            if ( !iss ) break;
-            ((BYTE*)&Address.S_un.S_addr)[c] = atoi ( s.c_str () );
-        } if ( c != 4 ) return false;
-
+        Address.S_un.S_addr = dwIP;
         return true;
     }
 
@@ -131,7 +130,7 @@ public:
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version
     std::string         strName;        // Server name
-    std::string         strHost;        // Server hostname:port
+    std::string         strHost;        // Server hostname
     std::string         strType;        // Game type
     std::string         strMap;         // Map name
 
@@ -165,7 +164,7 @@ public:
     void                                    Remove                  ( CServerListItem Server );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
-    bool                                    IsUpdated               ( void )                        { if ( m_bUpdated ) { m_bUpdated = false; return true; } else return false; };
+    bool                                    IsUpdated               ( void )                        { return m_bUpdated; };
     void                                    SetUpdated              ( bool bUpdated )               { m_bUpdated = bUpdated; };
 protected:
     bool                                    m_bUpdated;

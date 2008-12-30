@@ -52,7 +52,7 @@ void CServerList::Pulse ( void )
     }
 
     // If we queried any new servers, we should toggle the GUI update flag
-    m_bUpdated = ( j > 0 );
+    m_bUpdated = m_bUpdated || ( j > 0 );
 
     // Check whether we are done scanning
     std::stringstream ss;
@@ -313,24 +313,19 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
     // Check header
     if(!(_B('E')&&_B('Y')&&_B('E')&&_B('1'))) return false;
-
-    // Get IPv4-address as string
-    stringstream ss;
-    ss << (unsigned int)Address.S_un.S_un_b.s_b1 << "."
-       << (unsigned int)Address.S_un.S_un_b.s_b2 << "."
-       << (unsigned int)Address.S_un.S_un_b.s_b3 << "."
-       << (unsigned int)Address.S_un.S_un_b.s_b4;
     
-    g_pCore->GetConsole()->Printf("Got server %s",ss.str().c_str());
+    // Get IP as string
+    const char* szIP = inet_ntoa ( Address );
+
+    g_pCore->GetConsole()->Printf ( "Got server %s", szIP );
 
     // Calculate the ping/latency
     nPing           = CClientTime::GetTime () - m_ulQueryStart;
 
     // Parse relevant data
-    char buf[32];
     strGame         = _STR;
     usGamePort      = atoi ( _STR.c_str () );
-    strHost         = ss.str () + ":" + itoa ( usGamePort, buf, 10 );
+    strHost         = szIP;
     strName         = _STR;
     strType         = _STR;
     strMap          = _STR;

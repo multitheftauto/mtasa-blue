@@ -266,9 +266,17 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 
 
                 // Save the connection details into the recently played servers list
-                char szName [ 32 ];
-                _snprintf ( szName, 32, "%s:%u", g_pConnectManager->m_strHost.c_str(), g_pConnectManager->m_usPort );
-//                CCore::GetSingleton ().GetConfig ()->GetRecentlyPlayedServers ().AddServer ( szName, g_pConnectManager->m_szHost, g_pConnectManager->m_usPort, true );
+                in_addr Address;
+                if ( CServerListItem::Parse ( g_pConnectManager->m_strHost.c_str (), Address ) )
+                {
+                    CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
+                    CServerList* pRecentList = pServerBrowser->GetRecentList ();
+                    CServerListItem RecentServer ( Address, g_pConnectManager->m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+                    if ( !pRecentList->Exists ( RecentServer ) )
+                    {
+                        pRecentList->Add ( RecentServer );
+                    }
+                }
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();

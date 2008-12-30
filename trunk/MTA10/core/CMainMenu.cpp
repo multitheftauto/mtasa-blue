@@ -169,14 +169,21 @@ CMainMenu::~CMainMenu ( void )
 {
     // Save server lists
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    m_ServerBrowser.SaveServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV ),
-        CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
-    m_ServerBrowser.SaveServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
-        CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+
+    CXMLNode* pFavourites = pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV );
+    if ( !pFavourites )
+        pFavourites = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_FAV );
+    m_ServerBrowser.SaveServerList ( pFavourites, CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
+    
+    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC );
+    if ( !pRecent )
+        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
+    m_ServerBrowser.SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
 
 	// Delete menu items
 	for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
-		if ( m_pItems[i] ) delete m_pItems[i];
+		if ( m_pItems[i] )
+            delete m_pItems[i];
 	}
 
     // Destroy GUI items
