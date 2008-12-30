@@ -1739,6 +1739,10 @@ void CClientVehicle::Create ( void )
     // If the vehicle doesn't exist
     if ( !m_pVehicle )
     {
+        #ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Printf ( "CClientVehicle::Create %d", GetModel() );
+        #endif
+
         // Check again that the limit isn't reached. We are required to do so because
         // we load async. The streamer isn't always aware of our limits.
         if ( CClientVehicleManager::IsVehicleLimitReached () )
@@ -1907,12 +1911,17 @@ void CClientVehicle::Create ( void )
         if ( m_pTowedVehicle )
         {
             CVehicle* pGameVehicle = m_pTowedVehicle->GetGameVehicle ();
-            if ( pGameVehicle ) pGameVehicle->SetTowLink ( m_pVehicle );
+            if ( pGameVehicle )
+                pGameVehicle->SetTowLink ( m_pVehicle );
         }
 
         // Reattach if we're being towed
         if ( m_pTowedByVehicle )
         {
+            CVector vecTowedByPos;
+            m_pTowedByVehicle->GetPosition ( vecTowedByPos );
+            SetPosition ( vecTowedByPos );
+
             CVehicle* pGameVehicle = m_pTowedByVehicle->GetGameVehicle ();
             if ( pGameVehicle )
             {
@@ -1952,6 +1961,11 @@ void CClientVehicle::Destroy ( void )
     // If the vehicle exists
     if ( m_pVehicle )
     {
+
+        #ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Printf ( "CClientVehicle::Destroy %d", GetModel() );
+        #endif
+
         // Invalidate
         m_pManager->InvalidateEntity ( this );
 

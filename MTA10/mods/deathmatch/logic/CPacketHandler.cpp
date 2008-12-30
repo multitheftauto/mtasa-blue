@@ -1719,6 +1719,9 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
         {
             if ( bAttached )
             {
+                #ifdef MTA_DEBUG
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: attaching trailer" );
+                #endif
                 pVehicle->SetTowedVehicle ( pTrailer );
 
                 // Call the onClientTrailerAttach
@@ -1728,6 +1731,9 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
             }
             else
             {
+                #ifdef MTA_DEBUG
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: detaching trailer" );
+                #endif
                 pVehicle->SetTowedVehicle ( NULL );
 
                 // Call the onClientTrailerDetach
@@ -1735,6 +1741,12 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
                 Arguments.PushElement ( pVehicle );
                 pTrailer->CallEvent ( "onClientTrailerDetach", Arguments, true );
             }
+        }
+        else
+        {
+            #ifdef MTA_DEBUG
+                g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: vehicle or trailer not found" );
+            #endif
         }
     }
 }
