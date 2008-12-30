@@ -129,6 +129,7 @@ public:
 
     // Configuration
     void                    ApplyConsoleSettings            ( void );
+    void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
     void                    ApplyMenuSettings               ( void );
 
