@@ -20,7 +20,7 @@ CFavouritesAddByIP::CFavouritesAddByIP ( void )
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Add to favourites by IP" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Add to favourites" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
