@@ -325,8 +325,10 @@ bool CServerBrowser::OnWindowSize ( CGUIElement* pElement )
     
     //Make sure the Icon columns are of the correct size.  Its of a forced relative size - 0.03*562 was the default size.
     for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-        m_pServerList [ ServerBrowserType::LAN ]->SetColumnWidth ( 0, 18.0f, false );
-        m_pServerList [ ServerBrowserType::LAN ]->SetColumnWidth ( 1, 18.0f, false );
+    {
+        m_pServerList [ i ]->SetColumnWidth ( 0, 18.0f, false );
+        m_pServerList [ i ]->SetColumnWidth ( 1, 18.0f, false );
+    }
         
     return true;
 }
