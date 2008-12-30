@@ -78,7 +78,7 @@ CServerBrowser::CServerBrowser ( void )
 	CreateTab ( ServerBrowserType::LAN, "Lan" );
     CreateTab ( ServerBrowserType::FAVOURITES, "Favourites" );
     CreateTab ( ServerBrowserType::RECENTLY_PLAYED, "Recently Played" );
-
+    
     // Create the "Add to favourites by IP" button
     m_pButtonFavouritesByIP = reinterpret_cast < CGUIButton * > ( pManager->CreateButton ( m_pTab [ ServerBrowserType::FAVOURITES ], "Add by host/port" ) );
     m_pButtonFavouritesByIP->SetPosition ( CVector2D ( 0.30f, 0.93f ), true );
@@ -119,7 +119,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
     m_pServerList [ type ]->SetPosition ( CVector2D ( 0.02f, 0.10f ), true );
     m_pServerList [ type ]->SetSize ( CVector2D ( 0.80f, 0.815f ), true );
-
+    
     // Server player list label
     m_pServerPlayerListLabel [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Player List:" ) );
     m_pServerPlayerListLabel [ type ]->SetPosition ( CVector2D ( 0.83f, 0.29f ), true );
@@ -210,8 +210,8 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_hHost [ type ] = m_pServerList [ type ]->AddColumn ( "Host", 0.25f );
 
     // Disable resizing of the first and second columns (Serial Auth & Locked)
-    m_pServerList [ type ]->AutoSizeColumn ( 1 );
-    m_pServerList [ type ]->AutoSizeColumn ( 2 );
+    m_pServerList [ type ]->SetColumnSegmentSizingEnabled(0, false);
+    m_pServerList [ type ]->SetColumnSegmentSizingEnabled(1, false);
 
     // Player List Columns
     m_hPlayerName [ type ] = m_pServerPlayerList [ type ]->AddColumn ( "Name", 0.75f );
@@ -322,7 +322,12 @@ bool CServerBrowser::OnWindowSize ( CGUIElement* pElement )
 
     //Status label position
     m_pServerListStatus->SetPosition ( CVector2D ( 14.0f, WindowSize.fY - 30.0f ) );
-
+    
+    //Make sure the Icon columns are of the correct size.  Its of a forced relative size - 0.03*562 was the default size.
+    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+        m_pServerList [ ServerBrowserType::LAN ]->SetColumnWidth ( 0, 18.0f, false );
+        m_pServerList [ ServerBrowserType::LAN ]->SetColumnWidth ( 1, 18.0f, false );
+        
     return true;
 }
 
@@ -331,7 +336,6 @@ void CServerBrowser::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
     m_pWindow->BringToFront ();
-
     // Are we making this window visible?
     if ( bVisible )
     {

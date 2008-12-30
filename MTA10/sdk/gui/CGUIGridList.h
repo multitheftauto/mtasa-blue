@@ -44,6 +44,7 @@ public:
     virtual unsigned int			AddColumn               ( const char* szTitle, float fWidth ) = 0;
 	virtual void					RemoveColumn			( unsigned int uiColumn ) = 0;
 	virtual void                    AutoSizeColumn			( unsigned int hColumn ) = 0;
+    virtual void                    SetColumnWidth          ( int hColumn, float fWidth, bool bRelative = true ) = 0;
 
 	virtual void					SetSelectionMode		( SelectionMode mode ) = 0;
 
@@ -73,6 +74,9 @@ public:
 	virtual int						GetRowCount				( void ) = 0;
 
     virtual void                    Sort                    ( unsigned int uiColumn, SortDirection direction ) = 0;
+
+    virtual bool                    IsColumnSegmentSizingEnabled         ( int hColumn ) = 0;
+    virtual void                    SetColumnSegmentSizingEnabled        ( int hColumn, bool bEnabled ) = 0;
 
     virtual void                    SetSelectedItem         ( int iRow, int hColumn, bool bReset ) = 0;
 
