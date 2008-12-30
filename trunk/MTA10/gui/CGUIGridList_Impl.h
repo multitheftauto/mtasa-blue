@@ -31,6 +31,7 @@ public:
     unsigned int                        AddColumn               ( const char* szTitle, float fWidth );
 	void								RemoveColumn			( unsigned int uiColumn );
 	void			                    AutoSizeColumn			( unsigned int hColumn );
+    void                                SetColumnWidth          ( int hColumn, float fWidth, bool bRelative = true );
 
 	void								SetSelectionMode		( SelectionMode mode );
 
@@ -58,6 +59,9 @@ public:
     int                                 GetSelectedItemRow      ( void );
 	int                                 GetSelectedItemColumn   ( void );
 	int									GetRowCount				( void );
+
+    bool                                IsColumnSegmentSizingEnabled     ( int hColumn );
+    void                                SetColumnSegmentSizingEnabled    ( int hColumn, bool bEnabled );
 
     void                                Sort                    ( unsigned int uiColumn, SortDirection direction );
 

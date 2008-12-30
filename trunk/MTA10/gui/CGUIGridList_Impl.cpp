@@ -118,6 +118,15 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
     return ( hUniqueHandle );
 }
 
+void CGUIGridList_Impl::SetColumnWidth ( int hColumn, float fWidth, bool bRelative )
+{
+    try
+    {
+		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderWidth ( hColumn, fWidth , bRelative );
+    }
+    catch ( CEGUI::Exception )
+	{}
+}
 
 void CGUIGridList_Impl::SetHorizontalScrollBar ( bool bEnabled )
 {
@@ -190,6 +199,7 @@ void CGUIGridList_Impl::AutoSizeColumn ( unsigned int hColumn )
     catch ( CEGUI::Exception )
 	{}
 }
+
 
 
 void CGUIGridList_Impl::Clear ( void )
@@ -358,6 +368,28 @@ void CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText,
 		//reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> requestRedraw ();
     }
 	catch ( CEGUI::Exception ) {}
+}
+
+void CGUIGridList_Impl::SetColumnSegmentSizingEnabled (int hColumn, bool bEnabled)
+{
+    try
+    {
+		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserColumnSegmentSizingEnabled ( hColumn, bEnabled );
+    }
+    catch ( CEGUI::Exception )
+	{}
+}
+
+bool CGUIGridList_Impl::IsColumnSegmentSizingEnabled ( int hColumn )
+{
+    try
+    {
+        return  reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> isUserColumnSegmentSizingEnabled ( hColumn );
+    }
+    catch ( CEGUI::Exception )
+    {
+        return false;
+    } 
 }
 
 
