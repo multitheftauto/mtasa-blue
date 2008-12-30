@@ -86,9 +86,10 @@ public:
             hostent* pHostent = gethostbyname ( szAddress );
             if ( !pHostent )
                 return false;
-            dwIP = *(DWORD *)pHostent->h_addr_list[0];
-            if ( dwIP == 0 )
+            DWORD* pIP = (DWORD *)pHostent->h_addr_list[0];
+            if ( !pIP )
                 return false;
+            dwIP = *pIP;
         }
 
         Address.S_un.S_addr = dwIP;
