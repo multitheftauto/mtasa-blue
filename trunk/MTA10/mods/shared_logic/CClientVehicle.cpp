@@ -247,20 +247,16 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
     // Is this a trailer being towed?
     else if ( m_pTowedByVehicle )
     {
-        // Is it streamed out?
-        if ( !m_pVehicle )
+        // Is it streamed out or not attached properly?
+        if ( !m_pVehicle || !m_pVehicle->GetTowedByVehicle () )
         {
+            // Grab the position behind the vehicle (should take X/Y rotation into acount)
             m_pTowedByVehicle->GetPosition ( vecPosition );
 
-            // Is it not attached properly?
-            if ( ! m_pVehicle->GetTowedByVehicle () )
-            {
-                // Grab the position behind the vehicle (should take X/Y rotation into acount)
-                CVector vecRotation;
-                m_pTowedByVehicle->GetRotationRadians ( vecRotation );
-                vecPosition.fX -= ( 5.0f * sin ( vecRotation.fZ ) );
-                vecPosition.fY -= ( 5.0f * cos ( vecRotation.fZ ) );
-            }
+            CVector vecRotation;
+            m_pTowedByVehicle->GetRotationRadians ( vecRotation );
+            vecPosition.fX -= ( 5.0f * sin ( vecRotation.fZ ) );
+            vecPosition.fY -= ( 5.0f * cos ( vecRotation.fZ ) );
         }
         else
         {

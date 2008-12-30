@@ -311,6 +311,22 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
 
     // Send per-player entities
     SendPerPlayerEntities ( Player );
+
+    // Send the trailer attachments
+    CVehicle* pVehicle;
+    CVehicle* pTowedVehicle;
+    iterVehicles = m_pVehicleManager->IterBegin ();
+    for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
+    {
+        pVehicle = *iterVehicles;
+        pTowedVehicle = pVehicle->GetTowedVehicle ( );
+
+        if ( pTowedVehicle )
+        {
+            CVehicleTrailerPacket AttachPacket ( pVehicle, pTowedVehicle, true );
+            Player.Send ( AttachPacket );
+        }
+    }
 }
 
 
