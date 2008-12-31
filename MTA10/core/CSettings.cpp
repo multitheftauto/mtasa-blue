@@ -281,11 +281,18 @@ CSettings::CSettings ( void )
 
     m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
 	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
+    m_pComboConnection->GetPosition ( vecTemp, false );
 	m_pComboConnection->SetSize ( CVector2D ( 168.0f, 90.0f ) );
     m_pComboConnection->SetReadOnly ( true );
     m_pComboConnection->AddItem ( "Lan" );
     m_pComboConnection->AddItem ( "DSL" );
     m_pComboConnection->AddItem ( "Modem" );
+
+    m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Save server passwords", true ) );
+    m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
+    m_pSavePasswords->GetPosition ( vecTemp, false );
+    m_pSavePasswords->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
 
 	/**
 	 *	Audio tab
@@ -1277,6 +1284,9 @@ void CSettings::LoadData ( void )
     else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
     else m_pComboConnection->SetText ( "Unknown" );
 
+    // Save server password
+    CVARS_GET ( "save_server_passwords", bVar ); m_pSavePasswords->SetSelected ( bVar );
+
     // Controls
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
     CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
@@ -1341,6 +1351,14 @@ void CSettings::SaveData ( void )
 
     // Connection type
     CCommandFuncs::ConnectionType ( m_pComboConnection->GetText().c_str() );
+
+    // Server pass saving
+    bool bServerPasswords = m_pSavePasswords->GetSelected ();
+    CVARS_SET ( "save_server_passwords", bServerPasswords );
+    if ( !bServerPasswords )
+    {
+        g_pCore->GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->ClearServerPasswords ();
+    }
 
     // Very hacky
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();    

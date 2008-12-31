@@ -70,6 +70,10 @@ public:
     bool                LoadServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
     bool                SaveServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
 
+    void                SetServerPassword       ( std::string strHost, std::string strPassword );
+    std::string         GetServerPassword       ( std::string strHost );
+    void                ClearServerPasswords    ( void );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
 	bool				OnMouseDoubleClick		( CGUIMouseEventArgs Args );
