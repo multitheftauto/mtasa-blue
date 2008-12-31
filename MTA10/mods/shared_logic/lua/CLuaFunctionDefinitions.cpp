@@ -10283,6 +10283,30 @@ int CLuaFunctionDefinitions::GUIGridListRemoveColumn ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GUIGridListSetColumnWidth ( lua_State* luaVM )
+{
+	if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 4, LUA_TBOOLEAN ) )
+	{
+		CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
+		if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
+        {
+            CStaticFunctionDefinitions::GUIGridListSetColumnWidth ( *pGUIElement, (static_cast < int > ( lua_tonumber ( luaVM, 2 ) ) ) -1, static_cast < float > ( lua_tonumber ( luaVM, 3 ) ), lua_toboolean ( luaVM, 4 ) ? true : false );
+
+		    lua_pushboolean ( luaVM, true );
+		    return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListRemoveColumn", "gui-element", 1 );
+	}
+
+	// error: bad arguments
+	lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GUIGridListAddRow ( lua_State* luaVM )
 {
