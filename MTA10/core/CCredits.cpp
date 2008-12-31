@@ -24,7 +24,7 @@ const char g_szCredits [] = "== The Multi Theft Auto Development Team ==\n" \
                             "Kent \"Kent747\" Simon\n" \
                             "Kevin \"Kevuwk\" Whiteside\n" \
                             "Oliver \"Oli\" Brown\n" \
-                            "Stanislav \"lil_Toady\" Bobrov\n" \
+                            "Stanislav \"lil_Toady\" Bobrov\n" \ // We are still investigating how he got in here not knowing how to code
                             "Alberto \"ryden\" Alonso\n" \
 							"\n" \
 
