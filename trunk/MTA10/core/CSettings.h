@@ -103,6 +103,7 @@ protected:
     CGUIEdit*           m_pEditNick;
     CGUILabel*          m_pLabelConnection;
     CGUIComboBox*       m_pComboConnection;
+	CGUICheckBox*	    m_pSavePasswords;
 
     CGUILabel*		    m_pVideoGeneralLabel;
     CGUILabel*		    m_pVideoResolutionLabel;

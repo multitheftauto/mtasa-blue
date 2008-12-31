@@ -64,6 +64,7 @@ class CCore;
 #define CONFIG_NODE_JOYPAD          "joypad"
 #define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
+#define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 

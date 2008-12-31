@@ -343,7 +343,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
     {
         // Start refreshing all servers
         for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-            GetServerList ( (ServerBrowserType)i )->Refresh ();
+            GetServerList ( (ServerBrowserType)i )->Refresh ();          
     }
     else
     {
@@ -473,17 +473,30 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
         CServerList * pList = GetServerList ( Type );
         CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
         std::string strSelectedEndpoint = m_pServerList [ Type ]->GetItemText ( iSelectedIndex, m_hHost [ Type ] );
-        for ( i = i_b; i != i_e; i++ ) {
+        for ( i = i_b; i != i_e; i++ ) 
+        {
             CServerListItem * pServer = *i;
             std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
-            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 ) {
+            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 ) 
+            {
                 // We found the server, add all the players
-                for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) {
+                for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) 
+                {
                     int k = m_pServerPlayerList [ Type ]->AddRow ();
                     m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[k].strName.c_str () );
                 }
             }
+            bool bSavedPasswords;
+            CVARS_GET ( "serverbrowser_size", bSavedPasswords );
+            if ( pServer->bPassworded && bSavedPasswords )
+            {
+                    m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
+            }
         }
+    }
+    else
+    {
+        m_pEditPassword [ Type ]->SetText ( "" );
     }
 
     return true;
@@ -548,6 +561,14 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
                 char szPassword [48];
                 szPassword [47] = 0;
                 strncpy ( szPassword, m_pEditPassword [ Type ]->GetText ().c_str (), 47 );
+                
+                bool bSavedPasswords;
+                CVARS_GET ( "serverbrowser_size", bSavedPasswords );
+                if ( pServer->bPassworded && bSavedPasswords )
+                {
+                    SetServerPassword ( strEndpoint, ( std::string )szPassword );
+                }
+                
 
                 // Start the connect
                 CCore::GetSingleton ().GetConnectManager ()->Connect ( pServer->strHost.c_str (), pServer->usGamePort, strNick.c_str (), szPassword );
@@ -823,4 +844,80 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, C
         }
     }
     return true;
+}
+
+void CServerBrowser::SetServerPassword ( std::string strHost, std::string strPassword )
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    if ( !pServerPasswords )
+    {
+        pServerPasswords = pConfig ->CreateSubNode ( CONFIG_NODE_SERVER_SAVED );
+    }
+    //Check if the server password already exists
+    for ( unsigned int i = 0 ; i < pServerPasswords->GetSubNodeCount() ; i++ )
+    {    
+        CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
+        if ( pAttributes->Find( "host" ) )
+        {
+            if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
+            {
+                std::string strXMLHost = pHost->GetValue();
+                if ( strXMLHost == strHost )
+                {
+                    CXMLAttribute* pPassword = pAttributes->Create( "password" );
+                    pPassword->SetValue(strPassword.c_str());
+                    return;
+                }
+            }
+        }
+        
+    }
+
+    // Otherwise create the node from scratch
+    CXMLNode* pNode = pServerPasswords->CreateSubNode( "server" );
+    CXMLAttribute* pHostAttribute = pNode->GetAttributes().Create ( "host" );
+    pHostAttribute->SetValue(strHost.c_str());
+    CXMLAttribute* pPasswordAttribute = pNode->GetAttributes().Create ( "password" );
+    pPasswordAttribute->SetValue(strPassword.c_str());
+}
+
+
+std::string CServerBrowser::GetServerPassword ( std::string strHost )
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    if ( !pServerPasswords )
+    {
+        pServerPasswords = pConfig ->CreateSubNode ( CONFIG_NODE_SERVER_SAVED );
+    }
+    //Check if the server password already exists
+    for ( unsigned int i = 0 ; i < pServerPasswords->GetSubNodeCount() ; i++ )
+    {    
+        CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
+        if ( pAttributes->Find( "host" ) )
+        {
+            if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
+            {
+                std::string strXMLHost = pHost->GetValue();
+                if ( strXMLHost == strHost )
+                {
+                    CXMLAttribute* pPassword = pAttributes->Create( "password" );
+                    std::string strPassword = pPassword->GetValue();
+                    return strPassword;
+                }
+            }
+        }
+        
+    }
+    return "";
+}
+
+
+void CServerBrowser::ClearServerPasswords ()
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    pServerPasswords->DeleteAllSubNodes();
+    pConfig->DeleteSubNode ( pServerPasswords );
 }
