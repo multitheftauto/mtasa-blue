@@ -279,7 +279,7 @@ CSettings::CSettings ( void )
     m_pLabelConnection->GetPosition ( vecTemp, false );
 	m_pLabelConnection->AutoSize ( "Connection:" );
 
-    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "moo" ) );
+    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
 	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
 	m_pComboConnection->SetSize ( CVector2D ( 168.0f, 90.0f ) );
     m_pComboConnection->SetReadOnly ( true );
@@ -332,7 +332,7 @@ CSettings::CSettings ( void )
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
     m_pVideoResolutionLabel->AutoSize ( "Resolution: " );
 
-    m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "moo" ) );
+    m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
 	m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY - 1.0f ) );
 	m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->SetReadOnly ( true );
@@ -1275,6 +1275,7 @@ void CSettings::LoadData ( void )
 	if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
 	else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
     else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
+    else m_pComboConnection->SetText ( "Unknown" );
 
     // Controls
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
