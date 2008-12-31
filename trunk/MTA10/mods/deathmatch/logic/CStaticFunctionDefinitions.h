@@ -328,6 +328,7 @@ public:
 	static void					        GUIGridListSetSortingEnabled		( CClientEntity& Element, bool bEnabled );
 	static inline unsigned int			GUIGridListAddColumn				( CClientGUIElement& GUIElement, const char *szTitle, float fWidth )						{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddColumn ( szTitle, fWidth ); };
 	static inline void					GUIGridListRemoveColumn				( CClientGUIElement& GUIElement, unsigned int uiColumn )									{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveColumn ( uiColumn ); };
+    static inline void					GUIGridListSetColumnWidth			( CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnWidth ( uiColumn, fWidth, bRelative ); };
 	static void					        GUIGridListSetScrollBars			( CClientEntity& Element, bool bH, bool bV );
 	static inline int					GUIGridListAddRow					( CClientGUIElement& GUIElement )															{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow (); };
 	static inline int					GUIGridListInsertRowAfter			( CClientGUIElement& GUIElement, int iRow )												{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow ); };

@@ -620,6 +620,7 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "guiGridListSetSortingEnabled", CLuaFunctionDefinitions::GUIGridListSetSortingEnabled );
 	CLuaCFunctions::AddFunction ( "guiGridListAddColumn", CLuaFunctionDefinitions::GUIGridListAddColumn );
 	CLuaCFunctions::AddFunction ( "guiGridListRemoveColumn", CLuaFunctionDefinitions::GUIGridListRemoveColumn );
+	CLuaCFunctions::AddFunction ( "guiGridListSetColumnWidth", CLuaFunctionDefinitions::GUIGridListSetColumnWidth );
 	CLuaCFunctions::AddFunction ( "guiGridListSetScrollBars", CLuaFunctionDefinitions::GUIGridListSetScrollBars );
 	CLuaCFunctions::AddFunction ( "guiGridListGetRowCount", CLuaFunctionDefinitions::GUIGridListGetRowCount );
 	CLuaCFunctions::AddFunction ( "guiGridListAddRow", CLuaFunctionDefinitions::GUIGridListAddRow );
