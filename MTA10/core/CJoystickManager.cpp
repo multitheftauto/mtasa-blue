@@ -622,8 +622,6 @@ void CJoystickManager::ReadCurrentState ( void )
         for ( int i = 0; i < 32 ; i++ )
             m_JoystickState.rgbButtons[i] = js.rgbButtons[i];
 
-        // Stop after first successful joystick read
-        return;
     }
 }
 
@@ -1260,7 +1258,7 @@ bool CJoystickManager::BindNextUsedAxisToOutput ( int iOutputIndex )
     // Cancel any previous
     m_bCaptureAxis          = false;
 
-    // Get current state too compare changes
+    // Get current state to compare changes
     ReadCurrentState();
     m_PreBindJoystickState  = m_JoystickState;
 

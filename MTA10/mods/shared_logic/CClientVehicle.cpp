@@ -655,6 +655,7 @@ void CClientVehicle::SetHealth ( float fHealth )
 void CClientVehicle::Fix ( void )
 {
     m_bBlown = false;
+    m_bBlowNextFrame = false;
     if ( m_pVehicle )
     {
         m_pVehicle->Fix ();

@@ -357,9 +357,21 @@ void CConsole::SetNextAutoCompleteMatch ( void )
             int iIndex = -1;
             while( const char* szItem = m_pConsoleHistory->Get ( ++iIndex ) )
             {
+                if ( strlen(szItem) < 3 )   // Skip very short lines
+                    continue;
+                
                 // Save the index of any matches
                 if ( strnicmp( szItem, strInput.c_str (), strInput.length () ) == 0 )
+                {
+                    if ( m_AutoCompleteList.size () )   // Dont add duplicates of the previously added line
+                    {
+                        const char* szPrevItem = m_pConsoleHistory->Get ( m_AutoCompleteList.at ( m_AutoCompleteList.size () - 1 ) );
+                        if ( strcmp ( szItem, szPrevItem ) == 0 )
+                            continue;
+                    }
+                        
                     m_AutoCompleteList.push_back ( iIndex );
+                }
             }
         }
     }
