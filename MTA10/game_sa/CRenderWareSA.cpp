@@ -387,7 +387,7 @@ void CRenderWareSA::ModelInfoImportTXD ( RwTexDictionary * pSource, unsigned sho
 
 	// Get the Txd associated with the CTXDStore
 	RwTexDictionary * pTXD = CTxdStore_GetTxd ( usTXDId );
-    assert ( pTXD != NULL );
+    //assert ( pTXD != NULL );
 
 //	RwTexDictionarySetCurrent ( pTxd );
 	if ( pTXD ) {
