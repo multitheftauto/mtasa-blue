@@ -320,6 +320,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedAnimation", CLuaFunctionDefinitions::SetPedAnimation );
     CLuaCFunctions::AddFunction ( "setPedOnFire", CLuaFunctionDefinitions::SetPedOnFire );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefinitions::SetPedHeadless );
+    CLuaCFunctions::AddFunction ( "getPedSkin", CLuaElementDefs::getElementModel );
+    CLuaCFunctions::AddFunction ( "setPedSkin", CLuaElementDefs::setElementModel );
 
     // Weapon give/take functions
     CLuaCFunctions::AddFunction ( "giveWeapon", CLuaFunctionDefinitions::GiveWeapon );
