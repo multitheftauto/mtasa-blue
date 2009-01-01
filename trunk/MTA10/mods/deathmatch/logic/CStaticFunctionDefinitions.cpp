@@ -1368,7 +1368,6 @@ bool CStaticFunctionDefinitions::GetPlayerNametagColor ( CClientPlayer & Player,
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int iSlot )
 {
     RUN_CHILDREN SetPedWeaponSlot ( **iter, iSlot );
@@ -1472,6 +1471,20 @@ bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, 
         CClientPlayer& Player = static_cast < CClientPlayer& > ( Entity );
 
         Player.SetNametagOverrideColor ( ucR, ucG, ucB );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPlayerNametagShowing ( CClientEntity& Entity, bool bShowing )
+{
+    RUN_CHILDREN SetPlayerNametagShowing ( **iter, bShowing );
+
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPlayer& Player = static_cast < CClientPlayer& > ( Entity );
+
+        Player.SetNametagShowing ( bShowing );
         return true;
     }
     return false;

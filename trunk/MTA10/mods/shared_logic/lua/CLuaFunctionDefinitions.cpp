@@ -4063,6 +4063,28 @@ int CLuaFunctionDefinitions::GetPlayerNametagColor ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::IsPlayerNametagShowing ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        if ( pPlayer )
+        {
+            bool bIsNametagShowing = pPlayer->IsNametagShowing ();
+            lua_pushboolean ( luaVM, bIsNametagShowing );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isPlayerNametagShowing", "player", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isPlayerNametagShowing" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GetPedStat ( lua_State* luaVM )
 {
@@ -4642,6 +4664,38 @@ int CLuaFunctionDefinitions::SetPlayerNametagColor ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefinitions::SetPlayerNametagShowing ( lua_State* luaVM )
+{
+    // Check types
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+    {
+        // Grab the entity
+        CClientPlayer * pPlayer = lua_toplayer ( luaVM, 1 );
+        bool bShowing = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
+
+        // Valid pPlayer?
+        if ( pPlayer )
+		{
+            // Set the new rotation
+            if ( CStaticFunctionDefinitions::SetPlayerNametagShowing ( *pPlayer, bShowing ) )
+            {
+			    lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerNametagShowing", "element", 1 );
+	}
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPlayerNametagShowing" );
+
+    // Failed
+	lua_pushboolean ( luaVM, false );
+	return 1;
+}
+
 
 
 int CLuaFunctionDefinitions::GetPedClothes ( lua_State* luaVM )

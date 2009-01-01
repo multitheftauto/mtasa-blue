@@ -339,6 +339,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefinitions::GetPlayerName );
     CLuaCFunctions::AddFunction ( "getPlayerNametagText", CLuaFunctionDefinitions::GetPlayerNametagText );
     CLuaCFunctions::AddFunction ( "getPlayerNametagColor", CLuaFunctionDefinitions::GetPlayerNametagColor );
+    CLuaCFunctions::AddFunction ( "isPlayerNametagShowing", CLuaFunctionDefinitions::IsPlayerNametagShowing );
     CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefinitions::GetPlayerPing );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefinitions::IsPlayerDead );
     CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefinitions::GetPlayerTeam );
@@ -353,6 +354,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefinitions::TakePlayerMoney );
     CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefinitions::SetPlayerNametagText );
     CLuaCFunctions::AddFunction ( "setPlayerNametagColor", CLuaFunctionDefinitions::SetPlayerNametagColor );
+    CLuaCFunctions::AddFunction ( "setPlayerNametagShowing", CLuaFunctionDefinitions::SetPlayerNametagShowing );
     
 
     // Ped funcs
@@ -678,11 +680,13 @@ void CLuaManager::LoadCFunctions ( void )
 
 	CLuaCFunctions::AddFunction ( "guiGetScreenSize", CLuaFunctionDefinitions::GUIGetScreenSize );
 
+    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefinitions::GUIEditSetCaratIndex );
 	CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefinitions::GUIEditSetCaratIndex );
 	CLuaCFunctions::AddFunction ( "guiEditSetMasked", CLuaFunctionDefinitions::GUIEditSetMasked );
 	CLuaCFunctions::AddFunction ( "guiEditSetMaxLength", CLuaFunctionDefinitions::GUIEditSetMaxLength );
 	CLuaCFunctions::AddFunction ( "guiEditSetReadOnly", CLuaFunctionDefinitions::GUIEditSetReadOnly );
 
+	CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefinitions::GUIMemoSetCaratIndex );
 	CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefinitions::GUIMemoSetCaratIndex );
 	CLuaCFunctions::AddFunction ( "guiMemoSetReadOnly", CLuaFunctionDefinitions::GUIMemoSetReadOnly );
 
