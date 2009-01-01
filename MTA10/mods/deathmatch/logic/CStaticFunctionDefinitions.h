@@ -115,6 +115,7 @@ public:
     static bool                         TakePlayerMoney                     ( long lMoney );
     static bool                         SetPlayerNametagText                ( CClientEntity& Entity, char *  szText );
     static bool                         SetPlayerNametagColor               ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB );
+    static bool                         SetPlayerNametagShowing             ( CClientEntity& Entity, bool bShowing );
 
     // Ped funcs
     static CClientPed*                  CreatePed                           ( CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation );

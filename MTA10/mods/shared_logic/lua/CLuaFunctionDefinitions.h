@@ -144,6 +144,7 @@ public:
     LUA_DECLARE ( GetPlayerFromNick );
     LUA_DECLARE ( GetPlayerNametagText );
     LUA_DECLARE ( GetPlayerNametagColor );
+    LUA_DECLARE ( IsPlayerNametagShowing );
     LUA_DECLARE ( GetPlayerPing );
     LUA_DECLARE ( GetPlayerTeam );
     LUA_DECLARE ( IsPlayerDead );
@@ -157,6 +158,7 @@ public:
     LUA_DECLARE ( TakePlayerMoney );
     LUA_DECLARE ( SetPlayerNametagText );
     LUA_DECLARE ( SetPlayerNametagColor );
+    LUA_DECLARE ( SetPlayerNametagShowing );
 
     // Ped funcs
     LUA_DECLARE ( CreatePed );
