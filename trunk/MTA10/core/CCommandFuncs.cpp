@@ -144,8 +144,9 @@ void CCommandFuncs::Vid ( const char* szParameters )
 		    CCore::GetSingleton ().GetGUI ()->SetResolution ( (float) iViewportX, (float) iViewportY );
 		    CCore::GetSingleton ().GetLocalGUI ()->CreateWindows ();
 
-            // Reload console and chat settings (removed in DestroyWindows)
+            // Reload console, serverbrowser and chat settings (removed in DestroyWindows)
             g_pCore->ApplyConsoleSettings ();
+            g_pCore->ApplyServerBrowserSettings ();
             g_pCore->ApplyMenuSettings ();
         }
         else
