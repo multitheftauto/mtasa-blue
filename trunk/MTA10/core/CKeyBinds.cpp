@@ -276,7 +276,6 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     {
         if ( !bIsCursorForced )
         {
-            SetAllControls ( false );
             bIsCursorForced = true;
         }
     }
@@ -305,7 +304,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
             {
                 case KEY_BIND_GTA_CONTROL:
                 {
-                    if ( !bState || ( !bInputGoesToGUI && !m_pCore->IsCursorForcedVisible () ) )
+                    if ( !bState || !bInputGoesToGUI )
                     {
                         CallGTAControlBind ( static_cast < CGTAControlBind* > ( *iter ), bState );
                         bFound = true;
