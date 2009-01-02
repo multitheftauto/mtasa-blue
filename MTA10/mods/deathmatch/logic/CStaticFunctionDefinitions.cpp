@@ -2787,6 +2787,10 @@ bool CStaticFunctionDefinitions::CreateExplosion ( CVector& vecPosition, unsigne
     return true;
 }
 
+bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize )
+{
+	return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
+}
 
 bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, unsigned short usSlot )
 {

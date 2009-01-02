@@ -487,7 +487,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setObjectStatic", CLuaFunctionDefinitions::SetObjectStatic );
 
     // Explosion funcs
-    CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefinitions::CreateExplosion );    
+    CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefinitions::CreateExplosion );
+
+	// Fire funcs
+    CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefinitions::CreateFire );
 
 	// Engine funcs
     CLuaCFunctions::AddFunction ( "engineLoadCOL", CLuaFunctionDefinitions::EngineLoadCOL );

@@ -466,7 +466,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefinitions::CreateExplosion );
 
     // Fire create funcs
-    //CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefinitions::CreateFire ); TODO
+    //CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefinitions::CreateFire );
 
     // Audio funcs
     //CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio );

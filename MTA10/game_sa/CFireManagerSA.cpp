@@ -33,13 +33,12 @@ CFireManagerSA::~CFireManagerSA ( void )
 }
 
 
-VOID CFireManagerSA::ExtinguishPoint ( CVector * vecPosition, float fRadius )
+VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )
 {
-	DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector * vecPosition, float fRadius )");
-	CVector * vecPos = (CVector *)vecPosition;
-	FLOAT fX = vecPos->fX;
-	FLOAT fY = vecPos->fY;
-	FLOAT fZ = vecPos->fZ;
+	DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )");
+	FLOAT fX = vecPosition.fX;
+	FLOAT fY = vecPosition.fY;
+	FLOAT fZ = vecPosition.fZ;
 	DWORD dwFunction  = FUNC_ExtinguishPoint;
 		
 	_asm
@@ -70,9 +69,9 @@ CFire * CFireManagerSA::StartFire ( CEntity * entityTarget, CEntity * entityCrea
 	return fire;
 }
 
-CFire * CFireManagerSA::StartFire ( CVector * vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )
+CFire * CFireManagerSA::StartFire ( CVector & vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )
 {
-	DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CVector * vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
+	DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CVector & vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
 	CFire * fire = this->FindFreeFire();
 
     if ( fire != NULL )

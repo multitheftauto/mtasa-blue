@@ -56,7 +56,7 @@ public:
 
 	VOID					Extinguish (  );
 	CVector				    * GetPosition ( );
-	VOID					SetPosition ( CVector * vecPosition );
+	VOID					SetPosition ( CVector & vecPosition );
 	VOID					SetTimeToBurnOut ( DWORD dwTime );
 	DWORD					GetTimeToBurnOut (  );
 	CEntity					* GetCreator (  );

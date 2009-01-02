@@ -6662,12 +6662,15 @@ int CLuaFunctionDefinitions::CreateFire ( lua_State* luaVM )
 	CElement* pCreator = NULL;
     if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
          ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
     {
         // Grab the values
         CVector vecPosition = CVector ( float ( lua_tonumber ( luaVM, 1 ) ), float ( lua_tonumber ( luaVM, 2 ) ), float ( lua_tonumber ( luaVM, 3 ) ) );
-        float fSize = ( float ) lua_tonumber ( luaVM, 4 );
+        float fSize = 1.8f;
+		if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+		{
+			fSize = float ( lua_tonumber ( luaVM, 4 ) );
+		}
 
 		if ( iArgument5 == LUA_TLIGHTUSERDATA )
 		{
