@@ -1720,7 +1720,7 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
             if ( bAttached )
             {
                 #ifdef MTA_DEBUG
-                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: attaching trailer" );
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: attaching trailer %d to vehicle %d", TrailerID, ID );
                 #endif
                 pVehicle->SetTowedVehicle ( pTrailer );
 
@@ -1732,7 +1732,7 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
             else
             {
                 #ifdef MTA_DEBUG
-                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: detaching trailer" );
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: detaching trailer %d from vehicle %d", TrailerID, ID );
                 #endif
                 pVehicle->SetTowedVehicle ( NULL );
 
@@ -1745,7 +1745,10 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
         else
         {
             #ifdef MTA_DEBUG
-                g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: vehicle or trailer not found" );
+                if ( !pVehicle )
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: vehicle (id %d) not found", ID );
+                if ( !pTrailer )
+                    g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: trailer (id %d) not found", TrailerID );
             #endif
         }
     }
@@ -1960,16 +1963,28 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     list < SEntityDependantStuff* > newEntitiesStuff;
 
     ElementID NumEntities = 0;
-    if ( !bitStream.Read ( NumEntities ) || NumEntities == 0 )
+    if ( !bitStream.Read ( NumEntities ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Printf ( "!! Could not read NumEntities" );
+#endif
         return;
+    }
+    
+    if ( NumEntities == 0 )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Printf ( "!! NumEntities == 0" );
+#endif
+        return;
+    }
+
 #ifdef MTA_DEBUG
     g_pCore->GetConsole()->Printf ( "Going to add %d entities", NumEntities );
 #endif
+
     for ( ElementID EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
-#ifdef MTA_DEBUG
-        g_pCore->GetConsole ()->Printf ( "  Adding entity %d", EntityIndex );
-#endif
         // Read out the entity type id and the entity id
         ElementID EntityID;
         unsigned char ucEntityTypeID;
@@ -1992,9 +2007,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                                    bitStream.Read ( vecAttachedRotation.fY ) &&
                                                    bitStream.Read ( vecAttachedRotation.fZ )) ) )
         {
-#ifdef MTA_DEBUG
-            g_pCore->GetConsole ()->Printf ( "    Retrieved common properties. Typeid %d", ucEntityTypeID );
-#endif
 			/*
 #ifdef MTA_DEBUG
             char* names [ 17 ] = { "dummy", "player", "vehicle", "object", "marker", "blip",
@@ -2014,9 +2026,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
             CCustomData* pCustomData = new CCustomData;
             unsigned short usNumData = 0;
             bitStream.Read ( usNumData );
-#ifdef MTA_DEBUG
-			g_pCore->GetConsole ()->Printf ( "    Adding %d custom data", usNumData );
-#endif
             for ( unsigned short us = 0 ; us < usNumData ; us++ )
             {
                 unsigned char ucNameLength = 0;
@@ -2035,9 +2044,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                             bitStream.Read ( szName, ucNameLength );
                             szName[32] = '\0';
-#ifdef MTA_DEBUG
-							g_pCore->GetConsole ()->Printf ( "      %s", szName );
-#endif
 
                             Argument.ReadFromBitStream ( bitStream );
 
@@ -2133,7 +2139,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::OBJECT:
                 {
                     unsigned short usObjectID;
-                    g_pCore->GetConsole()->Printf ( "    It's an object" );
                     // Read out the position and the rotation
                     if ( bitStream.Read ( vecPosition.fX ) &&
                          bitStream.Read ( vecPosition.fY ) &&
@@ -2143,7 +2148,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                          bitStream.Read ( vecRotation.fZ ) &&
                          bitStream.Read ( usObjectID ) )
                     {
-                        g_pCore->GetConsole()->Printf ( "    Got model/pos/rot %d (%.2f %.2f %.2f) (%.2f %.2f %.2f)", usObjectID, vecPosition.fX, vecPosition.fY, vecPosition.fZ, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
                         // Valid object id?
                         if ( !CClientObjectManager::IsValidModel ( usObjectID ) )
                         {
@@ -2155,7 +2159,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pObject;
                         if ( pObject )
                         {
-							g_pCore->GetConsole()->Printf ( "    Created object successfully" );
                             pObject->SetOrientation ( vecPosition, vecRotation );
                         }
                         else
