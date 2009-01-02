@@ -210,4 +210,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "invert_mouse",               false );                        // mouse inverting
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls
     DEFAULT ( "steer_with_mouse",           false );                        // steering with mouse controls
+    DEFAULT ( "classic_controls",           false );                        // classic/standard controls
 }

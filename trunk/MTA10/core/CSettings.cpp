@@ -200,21 +200,52 @@ CSettings::CSettings ( void )
 	 *	Controls tab
 	 **/
     // Toggles
-    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse options" ) );
+    //Create everything under a scrollpane
+    CGUIScrollPane* m_pControlsScrollPane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
+    m_pControlsScrollPane->SetProperty ( "ContentPaneAutoSized", "False" );
+    m_pControlsScrollPane->SetProperty ( "VertStepSize", "0.15" );
+    m_pControlsScrollPane->SetPosition ( CVector2D ( 0.0f, 0.0f ), true );
+    m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
+    m_pControlsScrollPane->SetVerticalScrollBar ( true );
+    
+    //Mouse Options
+    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Mouse options" ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
 	m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
 	m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
-    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Invert mouse vertically", true ) );
+    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Invert mouse vertically", true ) );
     m_pInvertMouse->SetPosition ( CVector2D ( 0.022f, 0.1f ), true );
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
+    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Steer with mouse", true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( 0.5f, 0.1f ), true );
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
+    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
+
+    //Joypad options
+    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Joypad options" ) );
+    m_pControlsJoypadLabel->SetPosition ( CVector2D ( 0.022f, 0.27f ), true );
+	m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
+	m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
+
+    //Create a mini-scrollpane for the radio buttons (only way to group them together)
+    m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( m_pControlsScrollPane ) ); 
+    m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
+    m_pControlsInputTypePane->SetPosition ( CVector2D ( 0.0f, 0.327f ), true );
+    m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
+
+    m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
+    m_pStandardControls->SetSelected ( true );
+    m_pStandardControls->SetPosition ( CVector2D ( 0.022f, 0.0f ), true );
+    m_pStandardControls->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+
+    m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Classic controls (Joypad)" ) ); 
+    m_pClassicControls->SetPosition ( CVector2D ( 0.5f, 0.0f ), true );
+    m_pClassicControls->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+
 
 	m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
     m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.24f );
@@ -1291,6 +1322,7 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
     CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
     CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
+    CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
 	// Community
     CVARS_GET ( "community_username", strVar );
@@ -1361,13 +1393,17 @@ void CSettings::SaveData ( void )
     }
 
     // Very hacky
-    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();    
+    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
     CVARS_SET ( "invert_mouse", m_pInvertMouse->GetSelected () );
     pController->SetMouseInverted ( m_pInvertMouse->GetSelected () );
     CVARS_SET ( "steer_with_mouse", m_pSteerWithMouse->GetSelected () );
     pController->SetSteerWithMouse ( m_pSteerWithMouse->GetSelected () );
     CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
     pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
+
+    bool bClassicControls = m_pClassicControls->GetSelected ();
+    CVARS_SET ( "classic_controls", bClassicControls );
+    bClassicControls ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
 
     CCore::GetSingleton ().SaveConfig ();
 
