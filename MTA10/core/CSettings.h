@@ -146,6 +146,11 @@ protected:
     CGUICheckBox*       m_pSteerWithMouse;
     CGUICheckBox*       m_pFlyWithMouse;
 
+    CGUILabel*          m_pControlsJoypadLabel;
+    CGUIScrollPane*     m_pControlsInputTypePane;
+    CGUIRadioButton*    m_pStandardControls;
+    CGUIRadioButton*    m_pClassicControls;
+
     bool			    OnJoypadTextChanged	    ( CGUIElement* pElement );
 	bool			    OnAxisSelectClick       ( CGUIElement* pElement );
 	bool			    OnJoypadDefaultClick    ( CGUIElement* pElement );
