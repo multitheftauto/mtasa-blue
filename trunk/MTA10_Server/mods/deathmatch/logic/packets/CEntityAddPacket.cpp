@@ -50,6 +50,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
     {
         // Write the number of entities
         BitStream.Write ( ( ElementID ) m_Entities.size () );
+        assert ( m_Entities.size () > 0 );
 
         // For each entity ...
         CVector vecTemp;
