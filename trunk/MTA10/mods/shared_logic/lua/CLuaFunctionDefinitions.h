@@ -308,6 +308,9 @@ public:
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );
 
+	// Fire functions
+	LUA_DECLARE ( CreateFire );
+
     // Audio funcs
     LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );

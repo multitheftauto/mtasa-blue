@@ -47,11 +47,11 @@ CVector * CFireSA::GetPosition ( )
  * @param vecPosition CVector * containing the desired position for the fire.
  * @see CFireSA::SetTarget
  */
-VOID CFireSA::SetPosition ( CVector * vecPosition )
+VOID CFireSA::SetPosition ( CVector & vecPosition )
 {
-	DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector * vecPosition )");
+	DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector & vecPosition )");
 	this->internalInterface->entityTarget = 0;
-	memcpy(&internalInterface->vecPosition, vecPosition, sizeof(CVector));
+	memcpy(&internalInterface->vecPosition, &vecPosition, sizeof(CVector));
 }
 
 /**

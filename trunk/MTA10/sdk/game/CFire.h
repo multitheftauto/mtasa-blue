@@ -26,7 +26,7 @@ class CFire
 public:
 	virtual VOID					Extinguish (  )=0;
 	virtual CVector				    * GetPosition ( )=0;
-	virtual VOID					SetPosition ( CVector * vecPosition )=0;
+	virtual VOID					SetPosition ( CVector & vecPosition )=0;
 	virtual VOID					SetTimeToBurnOut ( DWORD dwTime )=0;
 	virtual DWORD					GetTimeToBurnOut (  )=0;
 	virtual CEntity					* GetCreator (  )=0;

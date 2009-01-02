@@ -7482,6 +7482,38 @@ int CLuaFunctionDefinitions::CreateExplosion ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::CreateFire ( lua_State* luaVM )
+{
+	// Grab the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+
+	if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+    {
+        CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                              static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                              static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+		float fSize = 1.8f;
+		if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+			fSize = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+
+        if ( CStaticFunctionDefinitions::CreateFire ( vecPosition, fSize ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "createFire" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::PlayMissionAudio ( lua_State* luaVM )
 {
