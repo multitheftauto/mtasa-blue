@@ -34,8 +34,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pWindow->SetMovable ( true );
     m_pWindow->SetSizingEnabled ( true );
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-    float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - BROWSER_DEFAULTWIDTH / 2, resolution.fY / 2 - BROWSER_DEFAULTHEIGHT / 2 + yoff  ), false );
+    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - BROWSER_DEFAULTWIDTH / 2, resolution.fY / 2 - BROWSER_DEFAULTHEIGHT / 2  ), false );
     m_pWindow->SetSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT ) );
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->SetMinimumSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT ) );
