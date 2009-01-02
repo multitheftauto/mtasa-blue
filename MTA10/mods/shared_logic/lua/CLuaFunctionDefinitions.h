@@ -421,8 +421,6 @@ public:
     LUA_DECLARE ( tocolor );
     LUA_DECLARE ( Reference );
     LUA_DECLARE ( Dereference );
-    LUA_DECLARE ( RandInt );
-    LUA_DECLARE ( RandFloat );
     LUA_DECLARE ( GetColorFromString );
 	
 	// GUI funcs

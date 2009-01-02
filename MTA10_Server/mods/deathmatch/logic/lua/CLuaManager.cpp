@@ -549,8 +549,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefinitions::GetDistanceBetweenPoints3D );
 
     // Util funcs
-    CLuaCFunctions::AddFunction ( "randInt", CLuaFunctionDefinitions::RandInt );
-    CLuaCFunctions::AddFunction ( "randFloat", CLuaFunctionDefinitions::RandFloat );
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefinitions::GetTickCount_ );
     CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefinitions::GetCTime );
     CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefinitions::Split );
