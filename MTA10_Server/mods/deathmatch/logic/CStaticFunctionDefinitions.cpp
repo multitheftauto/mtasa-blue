@@ -2960,7 +2960,7 @@ bool CStaticFunctionDefinitions::SetPedOnFire ( CElement * pElement, bool bIsOnF
 bool CStaticFunctionDefinitions::SetPedHeadless ( CElement * pElement, bool bIsHeadless )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedOnFire ( *iter, bIsHeadless );
+    RUN_CHILDREN SetPedHeadless ( *iter, bIsHeadless );
 
     if ( IS_PED ( pElement ) )
     {
