@@ -8435,48 +8435,6 @@ int CLuaFunctionDefinitions::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::RandInt ( lua_State* luaVM )
-{
-    // Valid types?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-    {
-        // Grab the lower and the upper bound
-        int iLowerBound = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-        int iUpperBound = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-
-        // Upper bound must be bigger than lower bound
-        if ( iUpperBound >= iLowerBound )
-        {
-            // Grab the delta value and multiply it with a randomly generated float
-            int iRandom = GetRandom ( iLowerBound, iUpperBound );
-            
-            // Return it as an integer number
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( iRandom ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogWarning ( luaVM, "Upper bound passed to randInt must be bigger or equal to lower bound" );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "randInt" );
-
-    // Return false (failed)
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::RandFloat ( lua_State* luaVM )
-{
-    // Return it as float between 0 and 1
-    lua_pushnumber ( luaVM, static_cast < lua_Number > ( GetRandomDouble () ) );
-    return 1;
-}
-
-
 int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, GetTime () );
