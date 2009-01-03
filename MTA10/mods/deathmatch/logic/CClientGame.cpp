@@ -2786,9 +2786,6 @@ void CClientGame::Event_OnIngame ( void )
     //g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
     g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( 0 );  
 
-    // Make sure key config is set to keyboard+mouse
-    g_pGame->GetControllerConfigManager ()->SetInputType ( 1 );
-
     // Set the FPS limit
     g_pGame->SetFramelimiter ( 60 );    // about 40fps
 
