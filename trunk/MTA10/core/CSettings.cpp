@@ -133,7 +133,7 @@ CSettings::CSettings ( void )
     m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( m_pControlsScrollPane ) ); 
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pControlsInputTypePane->SetPosition ( CVector2D ( 0.0f, 0.327f ), true );
-    m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
+    m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
 
     m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
     m_pStandardControls->SetSelected ( true );
@@ -154,7 +154,7 @@ CSettings::CSettings ( void )
         m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane ) );
         m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.48f ), true );
 	    m_pJoypadName->SetFont ( "default-bold-small" );
-        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 24.0f ) );
+        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 16.0f ) );
         m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.5f ) );
         m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
@@ -183,7 +183,7 @@ CSettings::CSettings ( void )
 
         CGUIButton*  m_pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pControlsScrollPane, "Load defaults" ) );
 	    m_pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-	    m_pJoyDefButton->SetPosition ( CVector2D ( 395.0f, 343.0f ) );
+	    m_pJoyDefButton->SetPosition ( CVector2D ( 390.0f, 343.0f ) );
 
         // Layout the mapping buttons like a dual axis joypad
         CVector2D vecPosList[] = {  CVector2D ( 0.01f,  0.782f ),     // Left Stick
@@ -482,9 +482,13 @@ void CSettings::UpdateJoypadTab ()
 
     // Update controller name label
     if ( JoyMan->IsJoypadConnected () )
+    {
 	    m_pJoypadName->SetText ( ( string("Axis mapping for :   ") + JoyMan->GetControllerName () ).c_str () );
+        m_pJoypadName->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+    }
     else
 	    m_pJoypadName->SetText ( "Joypad not detected  -  Check connections and restart game" );
+        m_pJoypadName->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
 
 
     // Update DeadZone and Saturation edit boxes
