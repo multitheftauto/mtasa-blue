@@ -301,11 +301,10 @@ void CServerBrowser::SetSize ( CVector2D& vecSize )
     if ( m_pWindow )
     {
         CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-        float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
         // OnWindowSize should do the rest
         m_pWindow->SetSize ( vecSize );
         // Centre the window
-        m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - vecSize.fX / 2, resolution.fY / 2 - vecSize.fY / 2 + yoff  ), false );
+        m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - vecSize.fX / 2, resolution.fY / 2 - vecSize.fY / 2 ), false );
     }
 }
 
