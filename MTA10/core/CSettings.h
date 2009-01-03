@@ -127,6 +127,7 @@ protected:
 	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
     CGUILabel*              m_pJoypadName;
+    CGUILabel*              m_pJoypadUnderline;
     CGUIEdit*               m_pEditDeadzone;
     CGUIEdit*               m_pEditSaturation;
     vector < CGUILabel* >   m_pJoypadLabels;
