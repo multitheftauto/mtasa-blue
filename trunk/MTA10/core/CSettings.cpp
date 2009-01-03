@@ -47,7 +47,7 @@ CSettings::CSettings ( void )
     CVector2D vecTemp;
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Settings" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Settings       " ) );   // Spaces to align the text
     m_pWindow->SetCloseButtonEnabled ( true );
     m_pWindow->SetMovable ( true );
 
@@ -98,6 +98,7 @@ CSettings::CSettings ( void )
 	 **/
     // Toggles
     //Create everything under a scrollpane
+#if 0   // Keep this puppy handy 'case we need it again
     CGUIScrollPane* m_pControlsScrollPane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
     m_pControlsScrollPane->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pControlsScrollPane->SetProperty( "ContentArea", "l:0.000000 t:0.000000 r:0.000000 b:395.000000" ); //Defines the height of hte content
@@ -105,32 +106,36 @@ CSettings::CSettings ( void )
     m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
     m_pControlsScrollPane->SetVerticalScrollStepSize ( 0.15f );
     m_pControlsScrollPane->SetVerticalScrollBar(true);
-    
+    CGUIElement* pControlsPane = m_pControlsScrollPane;
+#else
+    CGUIElement* pControlsPane = pTabControls;
+#endif
+
     //Mouse Options
-    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Mouse options" ) );
+    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse options" ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
 	m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
 	m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
-    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Invert mouse vertically", true ) );
+    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Invert mouse vertically", true ) );
     m_pInvertMouse->SetPosition ( CVector2D ( 0.022f, 0.1f ), true );
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Steer with mouse", true ) );
+    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Steer with mouse", true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( 0.5f, 0.1f ), true );
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pControlsScrollPane, "Fly with mouse", true ) );
+    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
 
     //Joypad options
-    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Joypad options" ) );
+    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 0.022f, 0.27f ), true );
 	m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
 	m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
-    m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( m_pControlsScrollPane ) ); 
+    m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pControlsPane ) ); 
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pControlsInputTypePane->SetPosition ( CVector2D ( 0.0f, 0.327f ), true );
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
@@ -138,11 +143,11 @@ CSettings::CSettings ( void )
     m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
     m_pStandardControls->SetSelected ( true );
     m_pStandardControls->SetPosition ( CVector2D ( 0.022f, 0.0f ), true );
-    m_pStandardControls->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+    m_pStandardControls->SetSize ( CVector2D ( 240.0f, 15.0f ), false );
 
     m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Classic controls (Joypad)" ) ); 
     m_pClassicControls->SetPosition ( CVector2D ( 0.5f, 0.0f ), true );
-    m_pClassicControls->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+    m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
 
 
     //Advanced Joypad settings
@@ -151,88 +156,91 @@ CSettings::CSettings ( void )
 
         CJoystickManagerInterface* JoyMan = GetJoystickManager ();
 
-        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane ) );
-        m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.48f ), true );
-	    m_pJoypadName->SetFont ( "default-bold-small" );
-        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 16.0f ) );
-        m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.5f ) );
+        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
         m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pControlsScrollPane ) );
-        m_pEditDeadzone->SetPosition ( CVector2D ( 0.73f, 0.732f ), true );
-        m_pEditDeadzone->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pJoypadUnderline = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
+        m_pJoypadUnderline->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        m_pJoypadUnderline->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
+        m_pEditDeadzone->SetPosition ( CVector2D ( 0.02f, 0.567f ), true );
+        m_pEditDeadzone->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditDeadzone->SetMaxLength ( 3 );
         m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
-        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pControlsScrollPane ) );
-        m_pEditSaturation->SetPosition ( CVector2D ( 0.73f, 0.832f ), true );
-        m_pEditSaturation->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
+        m_pEditSaturation->SetPosition ( CVector2D ( 0.02f, 0.667f ), true );
+        m_pEditSaturation->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditSaturation->SetMaxLength ( 3 );
         m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
-        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Dead Zone" ) );
-        pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, 0.48f ) );
+        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Dead Zone" ) );
+        pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, -1.f ) );
 	    pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Saturation" ) );
-        pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, 0.48f ) );
+        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Saturation" ) );
+        pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
 	    pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUIButton*  m_pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pControlsScrollPane, "Load defaults" ) );
-	    m_pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-	    m_pJoyDefButton->SetPosition ( CVector2D ( 390.0f, 343.0f ) );
+        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
+	    pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
+	    pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
+
+        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
+        pLabelHelp->SetPosition ( CVector2D ( 0.02f, 0.91f ), true );
+	    pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
+        pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         // Layout the mapping buttons like a dual axis joypad
-        CVector2D vecPosList[] = {  CVector2D ( 0.01f,  0.782f ),     // Left Stick
-                                    CVector2D ( 0.23f,  0.782f ),
-                                    CVector2D ( 0.12f,  0.652f ),
-                                    CVector2D ( 0.12f,  0.912f ),
+        CVector2D vecPosList[] = {  CVector2D ( 0.30f,  0.617f ),     // Left Stick
+                                    CVector2D ( 0.52f,  0.617f ),
+                                    CVector2D ( 0.41f,  0.516f ),
+                                    CVector2D ( 0.41f,  0.718f ),
 
-                                    CVector2D ( 0.37f,  0.782f ),     // Right Stick
-                                    CVector2D ( 0.59f,  0.782f ),
-                                    CVector2D ( 0.48f,  0.625f ),
-                                    CVector2D ( 0.48f,  0.912f ),
+                                    CVector2D ( 0.65f,  0.617f ),     // Right Stick
+                                    CVector2D ( 0.87f,  0.617f ),
+                                    CVector2D ( 0.76f,  0.516f ),
+                                    CVector2D ( 0.76f,  0.718f ),
 
-                                    CVector2D ( 0.445f, 1.167f ),     // Acceleration/Brake
-                                    CVector2D ( 0.175f, 1.167f )     };
+                                    CVector2D ( 0.716f, 0.892f ),     // Acceleration/Brake
+                                    CVector2D ( 0.455f, 0.892f )     };
 
 
         for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
         {
             CVector2D vecPos = vecPosList[i];
 
-            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane ) );
-            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.09f ), true );
-	        pLabel->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-            pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
-            pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
-
-            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pControlsScrollPane ) );
+            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane ) );
             pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
             pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
 	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
 	        pButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
 
-	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
+            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.085f ), true );
             pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
+	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
+            pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
 
             m_pJoypadLabels.push_back ( pLabel );
             m_pJoypadButtons.push_back ( pButton );
         }
 
-        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Left Stick" ) );
-        pLabelLeft->SetPosition ( CVector2D ( 0.12f, 0.782f ), true );
+        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Left Stick" ) );
+        pLabelLeft->SetPosition ( CVector2D ( 0.41f, 0.611f ), true );
 	    pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Right Stick" ) );
-        pLabelRight->SetPosition ( CVector2D ( 0.48f, 0.782f ), true );
+        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Right Stick" ) );
+        pLabelRight->SetPosition ( CVector2D ( 0.76f, 0.611f ), true );
 	    pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
@@ -479,16 +487,26 @@ void CSettings::UpdateJoypadTab ()
     if ( m_JoypadSettingsRevision == JoyMan->GetSettingsRevision () )
         return;
 
+    // Update the joystick name
+    string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : "Joypad not detected  -  Check connections and restart game";
 
-    // Update controller name label
-    if ( JoyMan->IsJoypadConnected () )
-    {
-	    m_pJoypadName->SetText ( ( string("Axis mapping for :   ") + JoyMan->GetControllerName () ).c_str () );
-        m_pJoypadName->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
-    }
-    else
-	    m_pJoypadName->SetText ( "Joypad not detected  -  Check connections and restart game" );
-        m_pJoypadName->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
+    m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
+	m_pJoypadName->SetText ( strJoystickName.c_str () );
+	m_pJoypadName->AutoSize ( strJoystickName.c_str () );
+    m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.0f ) );
+
+
+    // Joystick name underline
+    string strUnderline = "";
+    int inumChars = m_pJoypadName->GetSize ().fX / 7.f + 0.5f;
+    for ( int i = 0 ; i < inumChars ; i++ )
+        strUnderline = strUnderline + "_";
+
+    m_pJoypadUnderline->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
+	m_pJoypadUnderline->SetText ( strUnderline.c_str () );
+	m_pJoypadUnderline->AutoSize ( strUnderline.c_str () );
+    m_pJoypadUnderline->SetPosition ( m_pJoypadUnderline->GetPosition () - CVector2D ( m_pJoypadUnderline->GetSize ().fX * 0.5, -2.0f ) );
+    m_pJoypadUnderline->SetVisible ( JoyMan->IsJoypadConnected () );
 
 
     // Update DeadZone and Saturation edit boxes
