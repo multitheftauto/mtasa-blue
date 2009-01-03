@@ -38,7 +38,7 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
-	CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabJoypad, *pTabControls, *pTabCommunity;
+	CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -68,7 +68,6 @@ CSettings::CSettings ( void )
 	pTabVideo = m_pTabs->CreateTab ( "Video" );
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
 	pTabBinds = m_pTabs->CreateTab ( "Binds" );
-	pTabJoypad = m_pTabs->CreateTab ( "Joypad" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
 	pTabCommunity = m_pTabs->CreateTab ( "Community" );
 
@@ -94,108 +93,6 @@ CSettings::CSettings ( void )
 	m_pBindsDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
 	m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
 
-	/**
-	 *	Joypad tab
-	 **/
-    {
-        m_JoypadSettingsRevision = -1;
-
-        CJoystickManagerInterface* JoyMan = GetJoystickManager ();
-
-        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
-        m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.133f ), true );
-	    m_pJoypadName->SetFont ( "default-bold-small" );
-        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 24.0f ) );
-        m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0 ) );
-        m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
-        m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
-
-        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabJoypad ) );
-        m_pEditDeadzone->SetPosition ( CVector2D ( 0.76f, 0.385f ), true );
-        m_pEditDeadzone->SetSize ( CVector2D ( 48.0f, 24.0f ) );
-        m_pEditDeadzone->SetMaxLength ( 3 );
-        m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
-
-        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabJoypad ) );
-        m_pEditSaturation->SetPosition ( CVector2D ( 0.76f, 0.485f ), true );
-        m_pEditSaturation->SetSize ( CVector2D ( 48.0f, 24.0f ) );
-        m_pEditSaturation->SetMaxLength ( 3 );
-        m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
-
-        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Dead Zone" ) );
-        pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 55.f, 0 ) );
-	    pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-
-        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Saturation" ) );
-        pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 55.f, 0 ) );
-	    pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-
-        CGUIButton*  m_pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabJoypad, "Load defaults" ) );
-	    m_pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-	    m_pJoyDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
-
-
-        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
-        pLabelHelp->SetPosition ( CVector2D ( 0.022f, 0.02f ), true );
-        pLabelHelp->SetSize ( CVector2D ( 668.0f, 24.0f ) );
-        pLabelHelp->SetText ( "** NOTE: This tab is for mapping analog axis only. Use the 'Binds' tab for joypad buttons. **" );
-
-        // Layout the mapping buttons like a dual axis joypad
-        CVector2D vecPosList[] = {  CVector2D ( 0.01f,  0.435f ),     // Left Stick
-                                    CVector2D ( 0.23f,  0.435f ),
-                                    CVector2D ( 0.12f,  0.305f ),
-                                    CVector2D ( 0.12f,  0.565f ),
-
-                                    CVector2D ( 0.39f,  0.435f ),     // Right Stick
-                                    CVector2D ( 0.61f,  0.435f ),
-                                    CVector2D ( 0.50f,  0.305f ),
-                                    CVector2D ( 0.50f,  0.565f ),
-
-                                    CVector2D ( 0.445f, 0.820f ),     // Acceleration/Brake
-                                    CVector2D ( 0.175f, 0.820f )     };
-
-
-        for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
-        {
-            CVector2D vecPos = vecPosList[i];
-
-            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad ) );
-            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.09f ), true );
-	        pLabel->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-            pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
-            pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
-
-            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabJoypad ) );
-            pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
-            pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
-	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
-            pButton->SetUserData ( (void*) i );
-	        pButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
-
-	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
-            pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
-
-            m_pJoypadLabels.push_back ( pLabel );
-            m_pJoypadButtons.push_back ( pButton );
-        }
-
-        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Left Stick" ) );
-        pLabelLeft->SetPosition ( CVector2D ( 0.12f, 0.435f ), true );
-	    pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
-        pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
-
-        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabJoypad, "Right Stick" ) );
-        pLabelRight->SetPosition ( CVector2D ( 0.50f, 0.435f ), true );
-	    pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
-        pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
-        pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
-
-    }
-
     /**
 	 *	Controls tab
 	 **/
@@ -203,10 +100,11 @@ CSettings::CSettings ( void )
     //Create everything under a scrollpane
     CGUIScrollPane* m_pControlsScrollPane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
     m_pControlsScrollPane->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pControlsScrollPane->SetProperty ( "VertStepSize", "0.15" );
+    m_pControlsScrollPane->SetProperty( "ContentArea", "l:0.000000 t:0.000000 r:0.000000 b:395.000000" ); //Defines the height of hte content
     m_pControlsScrollPane->SetPosition ( CVector2D ( 0.0f, 0.0f ), true );
     m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
-    m_pControlsScrollPane->SetVerticalScrollBar ( true );
+    m_pControlsScrollPane->SetVerticalScrollStepSize ( 0.15f );
+    m_pControlsScrollPane->SetVerticalScrollBar(true);
     
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Mouse options" ) );
@@ -247,6 +145,101 @@ CSettings::CSettings ( void )
     m_pClassicControls->SetSize ( CVector2D ( 270.0f, 14.0f ), false );
 
 
+    //Advanced Joypad settings
+    {
+        m_JoypadSettingsRevision = -1;
+
+        CJoystickManagerInterface* JoyMan = GetJoystickManager ();
+
+        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane ) );
+        m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.48f ), true );
+	    m_pJoypadName->SetFont ( "default-bold-small" );
+        m_pJoypadName->SetSize ( CVector2D ( 428.0f, 24.0f ) );
+        m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.5f ) );
+        m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pControlsScrollPane ) );
+        m_pEditDeadzone->SetPosition ( CVector2D ( 0.73f, 0.732f ), true );
+        m_pEditDeadzone->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pEditDeadzone->SetMaxLength ( 3 );
+        m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
+
+        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pControlsScrollPane ) );
+        m_pEditSaturation->SetPosition ( CVector2D ( 0.73f, 0.832f ), true );
+        m_pEditSaturation->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+        m_pEditSaturation->SetMaxLength ( 3 );
+        m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
+
+        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Dead Zone" ) );
+        pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, 0.48f ) );
+	    pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Saturation" ) );
+        pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, 0.48f ) );
+	    pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUIButton*  m_pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pControlsScrollPane, "Load defaults" ) );
+	    m_pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
+	    m_pJoyDefButton->SetPosition ( CVector2D ( 395.0f, 343.0f ) );
+
+        // Layout the mapping buttons like a dual axis joypad
+        CVector2D vecPosList[] = {  CVector2D ( 0.01f,  0.782f ),     // Left Stick
+                                    CVector2D ( 0.23f,  0.782f ),
+                                    CVector2D ( 0.12f,  0.652f ),
+                                    CVector2D ( 0.12f,  0.912f ),
+
+                                    CVector2D ( 0.37f,  0.782f ),     // Right Stick
+                                    CVector2D ( 0.59f,  0.782f ),
+                                    CVector2D ( 0.48f,  0.625f ),
+                                    CVector2D ( 0.48f,  0.912f ),
+
+                                    CVector2D ( 0.445f, 1.167f ),     // Acceleration/Brake
+                                    CVector2D ( 0.175f, 1.167f )     };
+
+
+        for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
+        {
+            CVector2D vecPos = vecPosList[i];
+
+            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane ) );
+            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.09f ), true );
+	        pLabel->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+            pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
+            pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
+	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
+
+            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pControlsScrollPane ) );
+            pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
+            pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
+	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+            pButton->SetUserData ( (void*) i );
+	        pButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
+
+	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
+
+            m_pJoypadLabels.push_back ( pLabel );
+            m_pJoypadButtons.push_back ( pButton );
+        }
+
+        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Left Stick" ) );
+        pLabelLeft->SetPosition ( CVector2D ( 0.12f, 0.782f ), true );
+	    pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pControlsScrollPane, "Right Stick" ) );
+        pLabelRight->SetPosition ( CVector2D ( 0.48f, 0.782f ), true );
+	    pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+
+    }
+
+    
 	m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
     m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.24f );
     for ( int k = 0 ; k < SecKeyNum ; k++ )
