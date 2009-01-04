@@ -553,14 +553,53 @@ void CAccountManager::RemoveAll ( void )
     m_bRemoveFromList = true;
 }
 
-
-void CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin )
+bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword )
 {
-    // If they match, replace his account with the registered one
+    // Is he already logged in?
+    if ( pClient->IsRegistered () )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: You are already logged in" );
+        return false;
+    }
+
+    // Grab the account on his nick if any
+    CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
+    if ( !pAccount )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: No account with your nick" );
+        return false;
+    }
+
+    if ( pAccount->GetClient () )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: Account in use" );
+        return false;
+    }
+
+    // Compare the passwords
+    if ( !pAccount->IsPassword ( szPassword ) )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: Bad password" );
+        CLogger::LogPrintf ( "LOGIN: %s tried to log in with a bad password\n", szNick );
+        return false;
+    }
+
+    // Try to log him in
+    return LogIn ( pClient, pEchoClient, pAccount );
+}
+
+bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin )
+{
+    // Log him in
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pClient->SetAccount ( pAccount );
     pAccount->SetClient ( pClient );
 
+    // Set IP in account
     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
@@ -570,20 +609,74 @@ void CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         pAccount->SetIP ( szIP );
     }
 
-    // Tell him that he successfully logged in
-    if ( pEchoClient )
+    // Call the onClientLogin script event
+    CElement* pClientElement = NULL;
+    switch ( pClient->GetClientType () )
     {
-        char szBuffer [128];
-        if ( bAutoLogin )
-            _snprintf ( szBuffer, 128, "auto-login: You successfully logged in" );
-        else
-            _snprintf ( szBuffer, 128, "login: You successfully logged in" );
-        pEchoClient->SendEcho ( szBuffer );
+        case CClient::CLIENT_PLAYER:
+        {
+            CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+            pClientElement = static_cast < CElement* > ( pPlayer );
+            break;
+        }
+        case CClient::CLIENT_CONSOLE:
+        {
+            CConsoleClient* pConsoleClient = static_cast < CConsoleClient* > ( pClient );
+            pClientElement = static_cast < CElement* > ( pConsoleClient );
+            break;
+        }
+    }
+    if ( pClientElement )
+    {
+        CLuaArguments Arguments;
+        Arguments.PushAccount ( pCurrentAccount );
+        Arguments.PushAccount ( pAccount );
+        Arguments.PushBoolean ( bAutoLogin );
+        if ( !pClientElement->CallEvent ( "onClientLogin", Arguments ) )
+        {
+            // DENIED!
+            pClient->SetAccount ( pCurrentAccount );
+            pAccount->SetClient ( NULL );
+            return false;
+        }
     }
 
     // Tell the console
     CLogger::LogPrintf ( "LOGIN: %s successfully logged in\n", pClient->GetNick () );
 
+    // Tell the player
+    if ( pEchoClient )
+    {
+        if ( bAutoLogin )
+            pEchoClient->SendEcho ( "auto-login: You successfully logged in" );
+        else
+            pEchoClient->SendEcho ( "login: You successfully logged in" );
+    }
+    
+    // Delete the old account if it was a guest account
+    if ( !pCurrentAccount->IsRegistered () )
+        delete pCurrentAccount;
+
+    return true;
+}
+
+bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
+{
+    // Is he logged in?
+    if ( !pClient->IsRegistered () )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "logout: You were not logged in" );
+        return false;
+    }
+
+    CAccount* pCurrentAccount = pClient->GetAccount ();
+    pCurrentAccount->SetClient ( NULL );
+
+    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
+    pClient->SetAccount ( pAccount );
+
+    // Call the onClientLogout event
     CElement* pClientElement = NULL;
     switch ( pClient->GetClientType () )
     {
@@ -606,11 +699,22 @@ void CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         CLuaArguments Arguments;
         Arguments.PushAccount ( pCurrentAccount );
         Arguments.PushAccount ( pAccount );
-        Arguments.PushBoolean ( bAutoLogin );
-        pClientElement->CallEvent ( "onClientLogin", Arguments );
+        if ( !pClientElement->CallEvent ( "onClientLogout", Arguments ) )
+        {
+            // DENIED!
+            pClient->SetAccount ( pCurrentAccount );
+            pCurrentAccount->SetClient ( pClient );
+            delete pAccount;
+            return false;
+        }
     }
+
+    // Tell the console
+    CLogger::LogPrintf ( "LOGOUT: %s logged out\n", pClient->GetNick () );
+
+    // Tell the player
+    if ( pEchoClient )
+        pEchoClient->SendEcho ( "logout: You logged out" );
     
-    // Delete the old account if it was a guest account
-    if ( !pCurrentAccount->IsRegistered () )
-        delete pCurrentAccount;
+    return true;
 }
