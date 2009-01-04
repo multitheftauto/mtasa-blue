@@ -9,6 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#ifdef COMPILE_FOR_VC
 
 #include "CProxyDirect3D8.h"
 #include "CLogger.h"
@@ -146,3 +147,4 @@ HRESULT     CProxyDirect3D8::CreateDevice                ( UINT Adapter, D3DDEVT
     return hResult;
 }
 
+#endif

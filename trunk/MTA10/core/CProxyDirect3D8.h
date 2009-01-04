@@ -9,6 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#ifdef COMPILE_FOR_VC
 
 #ifndef __CPROXYDIRECT3D8_H
 #define __CPROXYDIRECT3D8_H
@@ -50,3 +51,4 @@ class CProxyDirect3D8 : public IDirect3D8
 };
 
 #endif
+#endif  // COMPILE_FOR_VC
