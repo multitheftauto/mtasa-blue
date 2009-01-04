@@ -260,11 +260,11 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 				}
 			}
 
-			// Copy the string into the query, and escape the quotes and slashes as well
+			// Copy the string into the query, and escape the single quotes as well
 			if ( szContent ) {
 				for ( unsigned int k = 0; k < strlen ( szContent ); k++ ) {
-					if ( szContent[k] == '\'' || szContent[k] == '\\' )
-                        strParsedQuery += '\\';
+					if ( szContent[k] == '\'' )
+                        strParsedQuery += '\'';
                     strParsedQuery += szContent[k];
 				}
 				// If we have a string, add a quote at the end too
