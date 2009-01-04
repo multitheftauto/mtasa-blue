@@ -253,7 +253,9 @@ char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
 			    unsigned char ucSpacerSize = (unsigned char)(strlen ( CGUIGRIDLIST_SPACER ));
 
 			    if ( hColumn == 1 ) {
-				    szRet += ucSpacerSize;
+                    // Make sure there is a spacer to skip
+                    if ( strncmp ( szRet, CGUIGRIDLIST_SPACER, strlen ( CGUIGRIDLIST_SPACER ) ) == 0 )
+    				    szRet += ucSpacerSize;
 			    }
             }
 
