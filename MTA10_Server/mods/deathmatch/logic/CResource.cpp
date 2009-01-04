@@ -1945,12 +1945,12 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
     int i = 0;
 
 	// Loop through the included resources list
-    for ( CXMLNode * inc = root->FindSubNode("include", i);
-        inc != NULL; inc = root->FindSubNode("include", ++i ) )
+    for ( CXMLNode * inc = root->FindSubNode ( "include", i );
+        inc != NULL; inc = root->FindSubNode ( "include", ++i ) )
     {
 		// Grab the attributelist from this node
-        CXMLAttributes * attributes = &(inc->GetAttributes());
-        if ( attributes )
+        CXMLAttributes Attributes = inc->GetAttributes ();
+        if ( Attributes )
         {
 			// Grab the minversion attribute (minimum version the included resource needs to be)
 			SVersion svMinVersion;
@@ -1963,11 +1963,13 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
 			svMaxVersion.m_uiRevision = 0;
 			unsigned int uiMinVersion = 0;
 			unsigned int uiMaxVersion = 0;
-            CXMLAttribute * minversion = attributes->Find("minversion"); //optional
+            CXMLAttribute * minversion = Attributes.Find ( "minversion" ); // optional
             if ( minversion )
             {
+                /* TODO: Convert this code into std::string */
+                std::string strMinversion = minversion->GetValue ();
                 char szMinversion[MAX_RESOURCE_VERSION_LENGTH];
-                strncpy ( szMinversion, minversion->GetValue ().c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
+                strncpy ( szMinversion, strMinversion.c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
                 uiMinVersion = atoi(szMinversion);
 				char* sz1 = new char;
 				char* sz2 = new char;
@@ -1993,11 +1995,13 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
             }
 
 			// Grab the maxversion attribute (maximum version the included resource needs to be)
-            CXMLAttribute * maxversion = attributes->Find("maxversion"); //optional
+            CXMLAttribute * maxversion = Attributes.Find ( "maxversion" ); //optional
             if ( maxversion )
             {
+                /* TODO: Convert this code into std::string */
+                std::string strMaxversion = maxversion->GetValue ();
 				char szMaxversion[MAX_RESOURCE_VERSION_LENGTH];
-                strncpy ( szMaxversion, maxversion->GetValue ().c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
+                strncpy ( szMaxversion, strMaxversion.c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
 
                 uiMaxVersion = atoi(szMaxversion);
 				char* sz1 = new char;
@@ -2024,7 +2028,7 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
             }
 
 			// Grab the resource attribute
-            CXMLAttribute * src = attributes->Find("resource");
+            CXMLAttribute * src = Attributes.Find ( "resource" );
             if ( src )
             {
 				// Grab the value and add an included resource
@@ -2032,7 +2036,6 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
 
 				// If there's text in the node
 				if ( !strIncludedResource.empty () )
-					//m_includedResources.push_back ( new CIncludedResources ( m_resourceManager, szIncludedResource, uiMinversion, uiMaxversion, this ) );
 					m_includedResources.push_back ( new CIncludedResources ( m_resourceManager, strIncludedResource.c_str (), svMinVersion, svMaxVersion, uiMinVersion, uiMaxVersion, this ) );
 				else
 					CLogger::LogPrintf ( "WARNING: Empty 'resource' attribute from 'include' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str () );
