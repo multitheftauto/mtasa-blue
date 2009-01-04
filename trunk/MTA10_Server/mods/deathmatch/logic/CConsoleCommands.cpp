@@ -1121,50 +1121,18 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
 
         if ( szNick && szPassword )
         {
-            // Is he already logged in?
-            if ( !pClient->IsRegistered () )
-            {
-                // Grab the account on his nick if any
-                CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
-                if ( pAccount )
-                {
-                    if ( !pAccount->GetClient () )
-                    {
-                        // Compare the passwords
-                        if ( pAccount->IsPassword ( szPassword ) )
-                        {
-                            g_pGame->GetAccountManager ()->LogIn ( pClient, pEchoClient, pAccount );
-                            return true;
-                        }
-                        else
-                        {
-                            pEchoClient->SendEcho ( "login: Bad password" );
-                            CLogger::LogPrintf ( "LOGIN: %s tried to log in with a bad password\n", szNick );
-                        }
-                    }
-                    else
-                    {
-                        pEchoClient->SendEcho ( "login: Account in use" );
-                    }
-                }
-                else
-                {
-                    pEchoClient->SendEcho ( "login: No account with your nick" );
-                }
-            }
-            else
-            {
-                pEchoClient->SendEcho ( "login: You are already logged in" );
-            }
+            return g_pGame->GetAccountManager ()->LogIn ( pClient, pEchoClient, szNick, szPassword );
         }
         else
         {
-            pEchoClient->SendEcho ( "login: Syntax is 'login [<nick>] <password>'" );
+            if ( pEchoClient )
+                pEchoClient->SendEcho ( "login: Syntax is 'login [<nick>] <password>'" );
         }
     }
     else
     {
-        pEchoClient->SendEcho ( "login: Syntax is 'login [<nick>] <password>'" );
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: Syntax is 'login [<nick>] <password>'" );
     }
 
     return false;
@@ -1174,62 +1142,7 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
 bool CConsoleCommands::LogOut ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // logout
-
-    // Grab the sender's nick
-    const char* szNick = pClient->GetNick ();
-    if ( szNick )
-    {
-        // Is he logged in?
-        if ( pClient->IsRegistered () )
-        {
-            CAccount* pCurrentAccount = pClient->GetAccount ();
-            pCurrentAccount->SetClient ( NULL );
-            // TODO: copy any data?
-            CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
-            pClient->SetAccount ( pAccount );
-
-            // Tell the console
-            CLogger::LogPrintf ( "LOGOUT: %s logged out\n", szNick );
-
-            // Tell him that he successfully logged out
-            char szBuffer [128];
-            _snprintf ( szBuffer, 128, "logout: You logged out" );
-            pEchoClient->SendEcho ( szBuffer );
-
-            CElement* pClientElement = NULL;
-            switch ( pClient->GetClientType () )
-            {
-                case CClient::CLIENT_PLAYER:
-                {
-                    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-                    pClientElement = static_cast < CElement* > ( pPlayer );
-                    break;
-                }
-                case CClient::CLIENT_CONSOLE:
-                {
-                    CConsoleClient* pConsoleClient = static_cast < CConsoleClient* > ( pClient );
-                    pClientElement = static_cast < CElement* > ( pConsoleClient );
-                    break;
-                }
-            }
-            if ( pClientElement )
-            {
-                // Call our script event
-                CLuaArguments Arguments;
-                Arguments.PushAccount ( pCurrentAccount );
-                Arguments.PushAccount ( pAccount );
-                pClientElement->CallEvent ( "onClientLogout", Arguments );
-            }
-
-            return true;
-        }
-        else
-        {
-            pEchoClient->SendEcho ( "logout: You were not logged in" );
-        }
-    }
-
-    return false;
+    return g_pGame->GetAccountManager ()->LogOut ( pClient, pEchoClient );
 }
 
 

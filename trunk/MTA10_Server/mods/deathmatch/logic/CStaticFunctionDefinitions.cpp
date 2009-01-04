@@ -6858,52 +6858,13 @@ bool CStaticFunctionDefinitions::CopyAccountData ( CAccount* pAccount, CAccount*
 
 bool CStaticFunctionDefinitions::LogIn ( CPlayer* pPlayer, CAccount* pAccount, const char* szPassword )
 {
-    // Not already logged in?
-    if ( !pAccount->GetClient () &&
-         !pPlayer->IsRegistered () )
-    {
-        // Compare the passwords
-        if ( szPassword && pAccount->IsPassword ( szPassword ) )
-        {
-            // Log him in
-            m_pAccountManager->LogIn ( pPlayer, NULL, pAccount );
-            return true;
-        }
-    }
-
-    // Failed
-    return false;
+    return m_pAccountManager->LogIn ( pPlayer, pPlayer, pAccount->GetName ().c_str (), szPassword );
 }
 
 
 bool CStaticFunctionDefinitions::LogOut ( CPlayer* pPlayer )
 {
-    // Is he logged in?
-    if ( pPlayer->IsRegistered () )
-    {
-        CAccount* pCurrentAccount = pPlayer->GetAccount ();
-        pCurrentAccount->SetClient ( NULL );
-        // TODO: Fix memoryleak
-        CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
-        pPlayer->SetAccount ( pAccount );
-
-        // Grab the sender's nick
-        const char* szNick = pPlayer->GetNick ();
-        if ( szNick )
-        {
-            // Tell the console
-            CLogger::LogPrintf ( "LOGOUT: %s logged out\n", szNick );
-        }
-
-        // Call our script event
-        CLuaArguments Arguments;
-        Arguments.PushAccount ( pCurrentAccount );
-        Arguments.PushAccount ( pAccount );
-        pPlayer->CallEvent ( "onClientLogout", Arguments );
-        return true;
-    }
-
-    return false;
+    return m_pAccountManager->LogOut ( pPlayer, pPlayer );
 }
 
 
