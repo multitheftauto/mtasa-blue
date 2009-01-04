@@ -980,7 +980,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
     {
         char szIP [ 25 ];
         Player.GetSourceIP ( szIP );
-        CAccount* pAccount = m_pAccountManager->Get ( const_cast < char* > ( Player.GetNick () ), szIP );
+        CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), szIP );
         if ( pAccount )
         {
             m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
