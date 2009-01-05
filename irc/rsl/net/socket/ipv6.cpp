@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 #include "ipv6.h"
 
+using Rsl::Net::Socket::IPAddr;
 using Rsl::Net::Socket::IPV6Addr;
 
 IPV6Addr::IPV6Addr()
@@ -38,6 +39,11 @@ IPV6Addr::IPV6Addr(const char* addr, const char* service)
   : m_errno(0)
 {
   Create(addr, service);
+}
+
+IPV6Addr::IPV6Addr(const IPV6Addr& Right)
+  : IPAddr(Right), m_errno(Right.m_errno)
+{
 }
 
 void IPV6Addr::Create(const char* addr, const char* service)
@@ -53,6 +59,12 @@ void IPV6Addr::Create(const char* addr, const char* service)
   {
     m_errno = errno;
   }
+}
+
+IPAddr* IPV6Addr::Clone() const
+{
+  IPV6Addr* newAddr = new IPV6Addr(*this);
+  return newAddr;
 }
 
 bool IPV6Addr::Ok() const

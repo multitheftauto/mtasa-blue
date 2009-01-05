@@ -73,6 +73,12 @@ const IPAddr& IPAddr::operator=(const IPAddr& copyFrom)
   return *this;
 }
 
+IPAddr* IPAddr::Clone() const
+{
+  IPAddr* newAddr = new IPAddr(*this);
+  return newAddr;
+}
+
 void IPAddr::CloneAddrinfo(const addrinfo* from)
 {
   if (from == 0)

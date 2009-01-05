@@ -59,7 +59,7 @@ bool SocketClientTCP::Connect()
       Close();
 
     sockdesc = -1;
-    for (const addrinfo* info = m_addr.GetAddr(); info != 0; info = info->ai_next)
+    for (const addrinfo* info = m_addr->GetAddr(); info != 0; info = info->ai_next)
     {
       if (info->ai_socktype == SOCK_STREAM)
       {
@@ -117,7 +117,7 @@ const char * SocketClientTCP::Error() const
 
 bool SocketClientTCP::Ok() const
 {
-  return m_addr.Ok() && m_bindAddr.Ok() && !m_errno;
+  return m_addr->Ok() && m_bindAddr->Ok() && !m_errno;
 }
 
 SocketStream& SocketClientTCP::GetStream()

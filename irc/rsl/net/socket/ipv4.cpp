@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 #include "ipv4.h"
 
+using Rsl::Net::Socket::IPAddr;
 using Rsl::Net::Socket::IPV4Addr;
 
 IPV4Addr::IPV4Addr()
@@ -38,6 +39,11 @@ IPV4Addr::IPV4Addr(const char* addr, const char* service)
   : m_errno(0)
 {
   Create(addr, service);
+}
+
+IPV4Addr::IPV4Addr(const IPV4Addr& Right)
+ : IPAddr(Right), m_errno(Right.m_errno)
+{
 }
 
 void IPV4Addr::Create(const char* addr, const char* service)
@@ -53,6 +59,12 @@ void IPV4Addr::Create(const char* addr, const char* service)
   {
     m_errno = errno;
   }
+}
+
+IPAddr* IPV4Addr::Clone() const
+{
+  IPV4Addr* newAddr = new IPV4Addr(*this);
+  return newAddr;
 }
 
 bool IPV4Addr::Ok() const

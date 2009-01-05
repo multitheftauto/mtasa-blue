@@ -42,7 +42,11 @@ namespace Rsl { namespace Net { namespace Socket {
      */
     IPV6Addr(const char* addr, const char* service);
 
+    IPV6Addr(const IPV6Addr& Right);
+
     void Create(const char* addr, const char* service);
+    IPAddr* Clone() const;
+
     /**
      * State of DNS query.
      * @return True if it was ok, false if not

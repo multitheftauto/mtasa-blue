@@ -45,9 +45,9 @@ namespace Rsl { namespace Net { namespace Socket {
     void Create(const IPAddr& addr, const IPAddr& bindAddr);
 
     int sockdesc;
-    Rsl::Net::Socket::IPAddr m_addr;
+    Rsl::Net::Socket::IPAddr* m_addr;
     const addrinfo* m_currentAddr;
-    Rsl::Net::Socket::IPAddr m_bindAddr;
+    Rsl::Net::Socket::IPAddr* m_bindAddr;
 
   public:
     int GetHandler() const;
