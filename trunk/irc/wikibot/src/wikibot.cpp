@@ -437,10 +437,12 @@ static inline void ColorizeSyntax ( std::string& syntax )
   /* Colorize types */
   unsigned int typeFound;
   size_t typePos;
+
   const char* types[] = { "int", "float", "bool", "function", "string",
                           "vehicle", "ped", "player", "colshape", "marker",
-                          "resource", "xmlnode", "timer", "file", "gui-element",
-                          "element",
+                          "pickup", "blip", "radararea", "projectile", "txd",
+                          "dff", "col", "sound", "resource", "xmlnode",
+                          "timer", "file", "gui-element", "element", "team",
                           0 };
 
   p = 0;
@@ -470,7 +472,7 @@ static inline void ColorizeSyntax ( std::string& syntax )
     p = typePos + typeLength + 6;
 
     /* Find the next delimiter */
-    const char delimiters [] = { '(', ',', 0 };
+    const char delimiters [] = { '(', ',', ')', 0 };
     size_t delimiterPos = std::string::npos;
 
     for ( unsigned int i = 0; delimiters[i] != 0; ++i )
@@ -543,15 +545,22 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
   p = buffer.find("Syntax</span></h2>");
   if ( p != std::string::npos )
   {
-    int server;
-    int client;
-    int def;
+    size_t server;
+    size_t client;
+    size_t def;
+
+    bool isClient = buffer.find("Client-only function") == std::string::npos ? false : true;
+    bool isServer = buffer.find("Server-only function") == std::string::npos ? false : true;
+    if ( buffer.find("Client and Server function") != std::string::npos )
+    {
+      isClient = isServer = true;
+    }
 
     server = buffer.find("<!-- BEGIN SECTION |1|server|Server|-->", p);
     client = buffer.find("<!-- BEGIN SECTION |2|client|Client|-->", p);
     def = buffer.find("<!-- PLAIN TEXT CODE FOR BOTS |", p);
 
-    if ( server != std::string::npos && client != std::string::npos )
+    if ( server != std::string::npos && client != std::string::npos && isClient && isServer && server < p + 45 )
     {
       /* Client and server function with different syntax */
       server = buffer.find ( "<!-- PLAIN TEXT CODE FOR BOTS |", server );
@@ -586,16 +595,12 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
         std::string syntax = buffer.substr ( def + 31, p2 - def - 31 );
         ColorizeSyntax ( syntax );
 
-        size_t server = buffer.find("Server-only function");
-        size_t client = buffer.find("Client-only function");
-        size_t both = buffer.find("Client and Server function");
-
-        if ( server != std::string::npos )
-          SendChannel(IRCText("%B%C07Server%C:%B %s", syntax.c_str()), channel.c_str());
-        else if ( client != std::string::npos )
-          SendChannel(IRCText("%B%C04Client%C:%B %s", syntax.c_str()), channel.c_str());
-        else if ( both != std::string::npos )
+        if ( isServer && isClient )
           SendChannel(IRCText("%B%C07Server%C/%C04Client%C:%B %s", syntax.c_str()), channel.c_str());
+        else if ( isServer )
+          SendChannel(IRCText("%B%C07Server%C:%B %s", syntax.c_str()), channel.c_str());
+        else if ( isClient )
+          SendChannel(IRCText("%B%C04Client%C:%B %s", syntax.c_str()), channel.c_str());
         else
           SendChannel(IRCText("%BSyntax:%B %s", syntax.c_str()), channel.c_str());
       }
