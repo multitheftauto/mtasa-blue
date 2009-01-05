@@ -53,7 +53,7 @@ void SocketClientUDP::Create(const IPAddr& addr, const IPAddr& bindAddr)
   const addrinfo *info;
   SocketClient::Create(addr, bindAddr);
 
-  for (info = m_addr.GetAddr(); info != 0; info = info->ai_next)
+  for (info = m_addr->GetAddr(); info != 0; info = info->ai_next)
   {
     if (info->ai_socktype == SOCK_DGRAM)
     {
@@ -68,7 +68,7 @@ void SocketClientUDP::Create(const IPAddr& addr, const IPAddr& bindAddr)
 
   if (sockdesc > -1 && m_currentAddr)
   {
-    if (!bind(sockdesc, m_bindAddr.GetAddr()->ai_addr, m_bindAddr.GetAddr()->ai_addrlen))
+    if (!bind(sockdesc, m_bindAddr->GetAddr()->ai_addr, m_bindAddr->GetAddr()->ai_addrlen))
     {
       m_stream.SetHandle(sockdesc);
       m_stream.SetAddr(m_currentAddr);

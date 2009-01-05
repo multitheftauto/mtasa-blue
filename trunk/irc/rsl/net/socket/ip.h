@@ -48,6 +48,8 @@ namespace Rsl { namespace Net { namespace Socket {
     virtual ~IPAddr();
 
     virtual void Create(const char* addr, const char* service) {};
+    virtual IPAddr* Clone() const;
+
     /**
      * State of DNS query.
      * @return True if was ok, false if not.

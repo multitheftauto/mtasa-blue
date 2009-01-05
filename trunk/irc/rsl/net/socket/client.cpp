@@ -27,23 +27,27 @@
 
 using Rsl::Net::Socket::SocketClient;
 
-SocketClient::SocketClient() : sockdesc(-1)
+SocketClient::SocketClient() : sockdesc(-1), m_addr ( 0 ), m_bindAddr ( 0 )
 {
 }
 
-SocketClient::SocketClient(const IPAddr& addr, const IPAddr& bindAddr) : sockdesc(-1)
+SocketClient::SocketClient(const IPAddr& addr, const IPAddr& bindAddr) : sockdesc(-1), m_addr ( 0 ), m_bindAddr ( 0 )
 {
   Create(addr, bindAddr);
 }
 
 SocketClient::~SocketClient()
 {
+  if ( m_addr )
+    delete m_addr;
+  if ( m_bindAddr )
+    delete m_bindAddr;
 }
 
 void SocketClient::Create(const IPAddr& addr, const IPAddr& bindAddr)
 {
-  m_addr = addr;
-  m_bindAddr = bindAddr;
+  m_addr = addr.Clone ( );
+  m_bindAddr = bindAddr.Clone ( );
 }
 
 int SocketClient::GetHandler() const
