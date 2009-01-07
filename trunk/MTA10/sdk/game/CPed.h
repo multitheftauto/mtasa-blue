@@ -222,10 +222,10 @@ public:
     virtual bool            GetStayInSamePlace ( void ) = 0;
     virtual void            SetStayInSamePlace ( bool bStay ) = 0;
 
-    virtual void            GetPedVoice        ( short* psVoiceType, short* psVoiceID ) = 0;
-    virtual void            GetPedVoice        ( const char** pszVoiceType, const char** pszVoice ) = 0;
-    virtual void            SetPedVoice        ( short sVoiceType, short sVoiceID ) = 0;
-    virtual void            SetPedVoice        ( const char* szVoiceType, const char* szVoice ) = 0;
+    virtual void            GetVoice           ( short* psVoiceType, short* psVoiceID ) = 0;
+    virtual void            GetVoice           ( const char** pszVoiceType, const char** pszVoice ) = 0;
+    virtual void            SetVoice           ( short sVoiceType, short sVoiceID ) = 0;
+    virtual void            SetVoice           ( const char* szVoiceType, const char* szVoice ) = 0;
 
 	/*virtual	bool		CanPedReturnToState (  )=0;
 	virtual bool		CanSeeEntity ( CEntity * entity, FLOAT fUnknown )=0;

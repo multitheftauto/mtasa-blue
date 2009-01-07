@@ -3474,7 +3474,7 @@ int CLuaFunctionDefinitions::GetPedVoice ( lua_State* luaVM )
         {
             const char* szVoiceType = 0;
             const char* szVoiceBank = 0;
-            pPed->GetPedVoice ( &szVoiceType, &szVoiceBank );
+            pPed->GetVoice ( &szVoiceType, &szVoiceBank );
             if ( szVoiceType && szVoiceBank )
             {
                 lua_pushstring ( luaVM, szVoiceType );
@@ -3506,7 +3506,7 @@ int CLuaFunctionDefinitions::SetPedVoice ( lua_State* luaVM )
 
 		if ( pPed && szVoiceType && szVoiceBank )
 		{
-            pPed->SetPedVoice ( szVoiceType, szVoiceBank );
+            pPed->SetVoice ( szVoiceType, szVoiceBank );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

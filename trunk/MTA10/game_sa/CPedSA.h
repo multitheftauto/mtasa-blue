@@ -415,10 +415,10 @@ public:
     inline bool         GetStayInSamePlace ( void )             { return GetPedInterface ()->pedFlags.bStayInSamePlace; }
     void                SetStayInSamePlace ( bool bStay );
 
-    void                GetPedVoice             ( short* psVoiceType, short* psVoiceID );
-    void                GetPedVoice             ( const char** pszVoiceType, const char** pszVoice );
-    void                SetPedVoice             ( short sVoiceType, short sVoiceID );
-    void                SetPedVoice             ( const char* szVoiceType, const char* szVoice );
+    void                GetVoice                ( short* psVoiceType, short* psVoiceID );
+    void                GetVoice                ( const char** pszVoiceType, const char** pszVoice );
+    void                SetVoice                ( short sVoiceType, short sVoiceID );
+    void                SetVoice                ( const char* szVoiceType, const char* szVoice );
 };
 
 #endif

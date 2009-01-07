@@ -3761,6 +3761,21 @@ void CClientGame::ResetMapInfo ( void )
     {
         pGarage->SetOpen ( false );
     }
+
+    // Player specific stuff
+    if ( m_pLocalPlayer )
+    {
+        // Interior
+        m_pLocalPlayer->SetInterior ( 0 );
+
+        // Headless state
+        m_pLocalPlayer->SetHeadless ( false );
+
+        // Voice
+        short sVoiceType, sVoiceID;
+        m_pLocalPlayer->GetModelInfo ()->GetVoice ( &sVoiceType, &sVoiceID );
+        m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
+    }
 }
 
 
