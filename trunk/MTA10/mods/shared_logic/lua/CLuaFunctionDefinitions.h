@@ -625,6 +625,8 @@ public:
     LUA_DECLARE ( IsPlayerMapForced );
     LUA_DECLARE ( IsPlayerMapVisible );
 
+    LUA_DECLARE ( Md5 );
+
 #ifdef MTA_VOICE
 	// Voice funcs
 	LUA_DECLARE ( SetVoiceInputEnabled );
