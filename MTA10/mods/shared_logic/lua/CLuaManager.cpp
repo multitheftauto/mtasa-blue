@@ -822,6 +822,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefinitions::IsPlayerMapForced );
     CLuaCFunctions::AddFunction ( "isPlayerMapVisible", CLuaFunctionDefinitions::IsPlayerMapVisible );
 
+    CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
+
 #ifdef MTA_VOICE
     // Voice funcs
     CLuaCFunctions::AddFunction ( "setVoiceInputEnabled", CLuaFunctionDefinitions::SetVoiceInputEnabled );

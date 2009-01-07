@@ -473,6 +473,8 @@ public:
 	// Settings registry funcs
 	static int		Get									( lua_State* luaVM );
 	static int		Set									( lua_State* luaVM );
+
+    static int      Md5                                 ( lua_State* luaVM );
 };
 
 #endif

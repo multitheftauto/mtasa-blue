@@ -10020,3 +10020,23 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 	lua_pushboolean ( luaVM, false );
 	return 1;
 }
+
+int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING || lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        MD5 md5bytes;
+        char szResult[33];
+        CMD5Hasher hasher;
+        hasher.Calculate ( lua_tostring ( luaVM, 1 ), lua_objlen ( luaVM, 1 ), md5bytes );
+		hasher.ConvertToHex ( md5bytes, szResult );
+        lua_pushstring ( luaVM, szResult );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "md5" );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

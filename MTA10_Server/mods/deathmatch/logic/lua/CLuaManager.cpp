@@ -656,4 +656,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Settings registry funcs
     CLuaCFunctions::AddFunction ( "get", CLuaFunctionDefinitions::Get );
     CLuaCFunctions::AddFunction ( "set", CLuaFunctionDefinitions::Set );
+
+    CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
 }
