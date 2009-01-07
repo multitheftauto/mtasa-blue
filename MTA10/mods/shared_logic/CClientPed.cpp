@@ -210,8 +210,8 @@ CClientPed::~CClientPed ( void )
         SetPosition ( CVector ( 2488.562f, -1662.40f, 23.335f ) );
         SetInterior ( 0 );
         SetDimension ( 0 );
-        // Also reset voice to default (CJ)
-        SetPedVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
+        SetVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
+        SetHeadless ( false );
     }
     else
     {
@@ -2698,7 +2698,7 @@ void CClientPed::_CreateModel ( void )
         // Set the voice that corresponds to our model
         short sVoiceType, sVoiceID;
         static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
-        SetPedVoice ( sVoiceType, sVoiceID );
+        SetVoice ( sVoiceType, sVoiceID );
 
         // Tell the streamer we created the player
         NotifyCreate ();
@@ -2926,7 +2926,7 @@ void CClientPed::_ChangeModel ( void )
             // Set the voice that corresponds to the new model
             short sVoiceType, sVoiceID;
             m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
-            SetPedVoice ( sVoiceType, sVoiceID );
+            SetVoice ( sVoiceType, sVoiceID );
         }
         else
         {
@@ -4458,26 +4458,26 @@ void CClientPed::SetOnFire ( bool bIsOnFire )
     m_bIsOnFire = bIsOnFire;
 }
 
-void CClientPed::GetPedVoice ( short* psVoiceType, short* psVoiceID )
+void CClientPed::GetVoice ( short* psVoiceType, short* psVoiceID )
 {
     if ( m_pPlayerPed )
-        m_pPlayerPed->GetPedVoice ( psVoiceType, psVoiceID );
+        m_pPlayerPed->GetVoice ( psVoiceType, psVoiceID );
 }
 
-void CClientPed::GetPedVoice ( const char** pszVoiceType, const char** pszVoice )
+void CClientPed::GetVoice ( const char** pszVoiceType, const char** pszVoice )
 {
     if ( m_pPlayerPed )
-        m_pPlayerPed->GetPedVoice ( pszVoiceType, pszVoice );
+        m_pPlayerPed->GetVoice ( pszVoiceType, pszVoice );
 }
 
-void CClientPed::SetPedVoice ( short sVoiceType, short sVoiceID )
+void CClientPed::SetVoice ( short sVoiceType, short sVoiceID )
 {
     if ( m_pPlayerPed )
-        m_pPlayerPed->SetPedVoice ( sVoiceType, sVoiceID );
+        m_pPlayerPed->SetVoice ( sVoiceType, sVoiceID );
 }
 
-void CClientPed::SetPedVoice ( const char* szVoiceType, const char* szVoice )
+void CClientPed::SetVoice ( const char* szVoiceType, const char* szVoice )
 {
     if ( m_pPlayerPed )
-        m_pPlayerPed->SetPedVoice ( szVoiceType, szVoice );
+        m_pPlayerPed->SetVoice ( szVoiceType, szVoice );
 }
