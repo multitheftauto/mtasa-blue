@@ -208,6 +208,8 @@ CClientPed::~CClientPed ( void )
     {
 		SetHealth ( GetMaxHealth () );
         SetPosition ( CVector ( 2488.562f, -1662.40f, 23.335f ) );
+        SetInterior ( 0 );
+        SetDimension ( 0 );
         // Also reset voice to default (CJ)
         SetPedVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
     }
