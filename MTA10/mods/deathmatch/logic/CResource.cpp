@@ -233,19 +233,21 @@ static bool CheckFileForCorruption(  string strPath )
         // Open the file
         if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
         {
-            // Load the header
             struct {
                 long id;
                 long size;
-            } header = {0,0};
-            fread ( &header, 1, sizeof(header), pFile );
+                long ver;
+            } headers[2] = {0,0,0,0,0,1};
 
-            // Get the file size
-            fseek ( pFile, 0, SEEK_END );
-            long filesize = ftell ( pFile );
+            // Load the first header
+            fread ( &headers[0], 1, sizeof(headers[0]), pFile );
 
-            // Check file size
-            if ( filesize - 12 != header.size )
+            // Load the last header
+            fseek ( pFile, headers[0].size, SEEK_SET );
+            fread ( &headers[1], 1, sizeof(headers[1]), pFile );
+
+            // Check integrity
+            if ( headers[0].ver != headers[1].ver || headers[1].size > 0)
                 bIsBad = true;
 
             // Close the file
