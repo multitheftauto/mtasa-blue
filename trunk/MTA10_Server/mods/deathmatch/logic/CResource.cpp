@@ -546,30 +546,25 @@ unsigned long CResource::GenerateCRC ( void )
     return m_ulCRC;
 }
 
+
 //
 // Quick integrity check of png, dff and txd files
 //
-static bool endsIn( const char* szPath, const char* szExt )
-{
-    int iLen    = strlen ( szPath );
-    int iLenExt = strlen ( szExt );
-    return iLen >= iLenExt && stricmp ( szPath + iLen - iLenExt, szExt ) == 0;
-}
-
 static bool CheckFileForCorruption( string strPath )
 {
-    bool bIsBad = false;
+    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+    bool bIsBad         = false;
 
-    if ( endsIn ( strPath.c_str (), ".PNG" ) )
+    if ( stricmp ( szExt, ".PNG" ) == 0 )
     {
         // Open the file
         if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
         {
             // This is what the png header should look like
-            char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+            unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
              // Load the header
-            char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
+            unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
             fread ( pBuffer, 1, 8, pFile );
 
             // Check header integrity
@@ -581,7 +576,7 @@ static bool CheckFileForCorruption( string strPath )
         }
     }
     else
-    if ( endsIn ( strPath.c_str (), ".TXD" ) || endsIn ( strPath.c_str (), ".DFF" ) )
+    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
     {
         // Open the file
         if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
@@ -590,19 +585,26 @@ static bool CheckFileForCorruption( string strPath )
                 long id;
                 long size;
                 long ver;
-            } headers[2] = {0,0,0,0,0,1};
+            } header = {0,0,0};
 
             // Load the first header
-            fread ( &headers[0], 1, sizeof(headers[0]), pFile );
+            fread ( &header, 1, sizeof(header), pFile );
+            long pos = sizeof(header);
+            long validSize = header.size + pos;
 
-            // Load the last header
-            fseek ( pFile, headers[0].size, SEEK_SET );
-            fread ( &headers[1], 1, sizeof(headers[1]), pFile );
+            // Step through the sections
+            while ( pos < validSize )
+            {
+                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
+                    break;
+                fseek ( pFile, header.size, SEEK_CUR );
+                pos += header.size + sizeof(header);
+            }
 
             // Check integrity
-            if ( headers[0].ver != headers[1].ver || headers[1].size > 0)
+            if ( pos != validSize )
                 bIsBad = true;
-
+               
             // Close the file
             fclose ( pFile );
         }        
