@@ -193,6 +193,70 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
     return false;
 }
 
+//
+// Quick integrity check of png, dff and txd files
+//
+static bool endsIn ( const char* szPath, const char* szExt )
+{
+    int iLen    = strlen ( szPath );
+    int iLenExt = strlen ( szExt );
+    return iLen >= iLenExt && stricmp ( szPath + iLen - iLenExt, szExt ) == 0;
+}
+
+static bool CheckFileForCorruption(  string strPath )
+{
+    bool bIsBad = false;
+
+    if ( endsIn ( strPath.c_str (), ".PNG" ) )
+    {
+        // Open the file
+        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+        {
+            // This is what the png header should look like
+            char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+
+             // Load the header
+            char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
+            fread ( pBuffer, 1, 8, pFile );
+
+            // Check header integrity
+            if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
+                bIsBad = true;
+
+            // Close the file
+            fclose ( pFile );
+        }
+    }
+    else
+    if ( endsIn ( strPath.c_str (), ".TXD" ) || endsIn ( strPath.c_str (), ".DFF" ) )
+    {
+        // Open the file
+        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+        {
+            // Load the header
+            struct {
+                long id;
+                long size;
+            } header = {0,0};
+            fread ( &header, 1, sizeof(header), pFile );
+
+            // Get the file size
+            fseek ( pFile, 0, SEEK_END );
+            long filesize = ftell ( pFile );
+
+            // Check file size
+            if ( filesize - 12 != header.size )
+                bIsBad = true;
+
+            // Close the file
+            fclose ( pFile );
+        }        
+    }
+
+    return bIsBad;
+}
+
+
 void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
@@ -215,6 +279,13 @@ void CResource::Load ( CClientEntity *pRootEntity )
         {
             // Load the resource file
 		    m_pLuaVM->LoadScriptFromFile ( ( *iter )->GetName () );
+        }
+        else
+        if ( CheckFileForCorruption ( ( *iter )->GetName () ) )
+        {
+            char buffer[256];
+            snprintf ( buffer, 256, "WARNING: File '%s' in resource '%s' is invalid.", (*iter)->GetShortName (), m_szResourceName );
+            g_pCore->ChatEchoColor ( buffer, 255, 0, 0 );
         }
     }
 
