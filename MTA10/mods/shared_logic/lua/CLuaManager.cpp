@@ -324,7 +324,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "stopSound", CLuaFunctionDefinitions::StopSound );
     CLuaCFunctions::AddFunction ( "setSoundPosition", CLuaFunctionDefinitions::SetSoundPosition );
     CLuaCFunctions::AddFunction ( "getSoundPosition", CLuaFunctionDefinitions::GetSoundPosition );
-    CLuaCFunctions::AddFunction ( "getSoundLength", CLuaFunctionDefinitions::GetSoundPosition );
+    CLuaCFunctions::AddFunction ( "getSoundLength", CLuaFunctionDefinitions::GetSoundLength );
     CLuaCFunctions::AddFunction ( "setSoundPaused", CLuaFunctionDefinitions::SetSoundPaused );
     CLuaCFunctions::AddFunction ( "isSoundPaused", CLuaFunctionDefinitions::IsSoundPaused );
     CLuaCFunctions::AddFunction ( "setSoundVolume", CLuaFunctionDefinitions::SetSoundVolume );
