@@ -37,6 +37,467 @@ extern CGame* g_pGame;
 
 extern int errno;
 
+
+///////////////////////////////////////////////////////////////
+//
+// Helper functions
+//
+///////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////
+//
+// CheckFileForCorruption
+//
+// Quick integrity check of png, dff and txd files.
+//
+///////////////////////////////////////////////////////////////
+static bool CheckFileForCorruption ( string strPath )
+{
+    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+    bool bIsBad         = false;
+
+    if ( stricmp ( szExt, ".PNG" ) == 0 )
+    {
+        // Open the file
+        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+        {
+            // This is what the png header should look like
+            unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+
+             // Load the header
+            unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
+            fread ( pBuffer, 1, 8, pFile );
+
+            // Check header integrity
+            if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
+                bIsBad = true;
+
+            // Close the file
+            fclose ( pFile );
+        }
+    }
+    else
+    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
+    {
+        // Open the file
+        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+        {
+            struct {
+                long id;
+                long size;
+                long ver;
+            } header = {0,0,0};
+
+            // Load the first header
+            fread ( &header, 1, sizeof(header), pFile );
+            long pos = sizeof(header);
+            long validSize = header.size + pos;
+
+            // Step through the sections
+            while ( pos < validSize )
+            {
+                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
+                    break;
+                fseek ( pFile, header.size, SEEK_CUR );
+                pos += header.size + sizeof(header);
+            }
+
+            // Check integrity
+            if ( pos != validSize )
+                bIsBad = true;
+               
+            // Close the file
+            fclose ( pFile );
+        }        
+    }
+
+    return bIsBad;
+}
+
+static void CheckLuaBufferForNotices ( char* buffer, long length, string strFileName, bool bClientScript );
+static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber );
+
+///////////////////////////////////////////////////////////////
+//
+// CheckLuaFileForNotices
+//
+// Check for any issues that may need to be logged at the server.
+//
+///////////////////////////////////////////////////////////////
+static void CheckLuaFileForNotices ( string strPath, string strFileName, bool bClientScript )
+{
+    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+
+    if ( stricmp ( szExt, ".LUA" ) != 0 )
+        return;
+
+    // Open the file
+    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+    {
+	    // Get the file size,
+	    long lLength = 0;
+	    fseek( pFile, 0, SEEK_END );
+	    lLength = ftell( pFile );
+	    fseek( pFile, 0, SEEK_SET );
+
+        // Load into a padded buffer
+        long lHeadPadSize    = 8;
+        long lTailPadSize    = 8;
+        long lLengthPadded   = lLength + lHeadPadSize + lTailPadSize;
+        char* pBufferPadded  = new char[ lLengthPadded ];
+        char* pBuffer        = pBufferPadded + lHeadPadSize;
+        memset ( pBufferPadded, 0, lLengthPadded );
+
+        bool bReadError = fread ( pBuffer, 1, lLength, pFile ) != lLength;
+
+        // Close the file
+        fclose ( pFile );
+
+        // Process
+        if ( !bReadError )
+            CheckLuaBufferForNotices ( pBuffer, lLength, strFileName, bClientScript );
+
+        // Cleanup
+        delete [] pBufferPadded;
+
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CheckLuaBufferForNotices
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static void CheckLuaBufferForNotices ( char* pBuffer, long lLength, string strFileName, bool bClientScript )
+{
+
+    //
+    // Look for function names not in comment blocks
+    //
+    // Note: Currently ignores quotes
+    //
+
+    unsigned long ulLineNumber = 0;
+    bool bBlockComment          = false;
+    bool bLineComment           = false;
+    map < string, long > doneMap;
+
+    // Search the buffer for function names
+    for ( long lPos = 0 ; lPos < lLength ; lPos++ )
+    {
+        char* pBufPos = pBuffer + lPos;
+        char c = *pBufPos;
+
+        // Handle comments
+        if ( strncmp ( pBufPos, "--[[", 4 ) == 0 )
+        {
+            if ( !bLineComment )
+            {
+                bBlockComment = true;
+                lPos += 3;
+                continue;
+            }
+        }
+        if ( strncmp ( pBufPos, "]]", 2 ) == 0 )
+        {
+            bBlockComment = false;
+            lPos += 1;
+            continue;
+        }
+        if ( strncmp ( pBufPos, "--", 2 ) == 0 )
+        {
+            bLineComment = true;
+        }
+        if ( c == '\n' || c == '\r' )
+        {
+            bLineComment = false;
+        }
+        if ( c == '\r' )
+        {
+            ulLineNumber++;
+        }
+
+        if ( bLineComment || bBlockComment )
+            continue;
+
+        if ( c == '(' )
+        {
+            // Do we have a function name?
+            // Search backwards. Skip whitespace, then read ident chars, stop with an non-ident char
+            char* pStartOfName = NULL;
+            char* pEndOfName = NULL;
+            for ( int i = 1; i < 100; i++ )
+            {
+                char* dptr = pBuffer + lPos - i;
+                char d = *dptr;
+
+                bool bIsWhiteSpace = ( d == ' ' || d == '\t' || d == '\n' || d == '\r' );
+                bool bIsMidIdent   = ( isdigit ( d ) || isalpha ( d ) || d == '_' );
+                bool bIsNonIdent   = !bIsMidIdent;
+
+                if ( !pEndOfName )
+                {
+                    if ( bIsWhiteSpace )
+                        continue;               // Still between function name and '('
+                    if ( bIsMidIdent )
+                        pEndOfName = dptr + 1;  // Got last character of function name
+                    else
+                        break;                  // Not a function name
+                }
+                else
+                {
+                    if ( bIsNonIdent )
+                    {
+                        // Maybe found start of function name
+                        if ( d == ':' || ( d == '.' && dptr[-1] != '.' ) )
+                            break;          // . or : So not a global function name 
+
+                        char e = dptr[1];
+                        bool bIsFirstIdent = ( isalpha ( e ) || e == '_' );
+                        if( !bIsFirstIdent )
+                            break;          // First letter of function name not valid
+
+                        pStartOfName = dptr + 1;
+                        break;               // Found a function name
+                    }
+                }
+            }
+
+            // Process result
+            unsigned long lNameLength = pEndOfName - pStartOfName;
+            if ( lNameLength > 0 && lNameLength < 100 )
+            {
+                string strFunctionName( pStartOfName, lNameLength );
+
+                // Only do the function once per file
+                if ( doneMap.find ( strFunctionName ) == doneMap.end () )
+                {
+                    doneMap[strFunctionName] = 1;
+                    CheckLuaFunctionNameForNotices ( strFunctionName, strFileName, bClientScript, ulLineNumber );
+                }
+            }
+        }
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// CheckLuaFunctionNameForNotices
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber )
+{
+    static map < string, string > hashClient;
+    static map < string, string > hashServer;
+
+    if ( hashClient.size () == 0 )
+    {
+        // Setup the hash
+
+        ////////////////////////////////////////////////////
+        //
+        // NOTE: The infomation here was gathered from:
+        //
+        // * http://development.mtasa.com/
+        // * file: MTA10\mods\deathmatch\logic\CClientGame.cpp(2083)
+        // * file: MTA10\mods\shared_logic\lua\CLuaManager.cpp(185)
+        // * file: MTA10_Server\mods\deathmatch\logic\lua\CLuaManager.cpp(178)
+        // * file: MTA10_Server\mods\deathmatch\logic\luadefs\CLuaElementDefs.cpp(19)
+        // * file: MTA10_Server\mods\deathmatch\logic\luadefs\CLuaXMLDefs.cpp(21)
+        //
+        // If you correct anything here, be sure to do it there, and vice-versa. mmkay?
+        //
+        ////////////////////////////////////////////////////
+
+        // Client events. (from the C++ code)
+        hashClient["onClientPlayerDamage"]      = "Replaced|onClientPedDamage";
+        hashClient["onClientPlayerWeaponFire"]  = "Replaced|onClientPedWeaponFire";
+        hashClient["onClientPlayerWasted"]      = "Replaced|onClientPedWasted";
+
+        // Client functions. (from the C++ code)
+        hashClient["getPlayerRotation"]         = "Replaced|getPedRotation";
+        hashClient["canPlayerBeKnockedOffBike"] = "Replaced|canPedBeKnockedOffBike";
+        hashClient["getPlayerContactElement"]   = "Replaced|getPedContactElement";
+        hashClient["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
+        hashClient["doesPlayerHaveJetPack"]     = "Replaced|doesPedHaveJetPack";
+        hashClient["isPlayerInWater"]           = "Replaced|isElementInWater";
+        hashClient["isPedInWater"]              = "Replaced|isElementInWater";
+        hashClient["isPedOnFire"]               = "Replaced|isPedOnFire";
+        hashClient["setPedOnFire"]              = "Replaced|setPedOnFire";
+        hashClient["isPlayerOnGround"]          = "Replaced|isPedOnGround";
+        hashClient["getPlayerTask"]             = "Replaced|getPedTask";
+        hashClient["getPlayerSimplestTask"]     = "Replaced|getPedSimplestTask";
+        hashClient["isPlayerDoingTask"]         = "Replaced|isPedDoingTask";
+        hashClient["getPlayerTarget"]           = "Replaced|getPedTarget";
+        hashClient["getPlayerTargetStart"]      = "Replaced|getPedTargetStart";
+        hashClient["getPlayerTargetEnd"]        = "Replaced|getPedTargetEnd";
+        hashClient["getPlayerTargetRange"]      = "Replaced|getPedTargetRange";
+        hashClient["getPlayerTargetCollision"]  = "Replaced|getPedTargetCollision";
+        hashClient["getPlayerWeaponSlot"]       = "Replaced|getPedWeaponSlot";
+        hashClient["getPlayerWeapon"]           = "Replaced|getPedWeapon";
+        hashClient["getPlayerAmmoInClip"]       = "Replaced|getPedAmmoInClip";
+        hashClient["getPlayerTotalAmmo"]        = "Replaced|getPedTotalAmmo";
+        hashClient["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
+        hashClient["getPlayerArmor"]            = "Replaced|getPedArmor";
+        hashClient["getPlayerSkin"]             = "Replaced|getElementModel";
+        hashClient["isPlayerChoking"]           = "Replaced|isPedChoking";
+        hashClient["isPlayerDucked"]            = "Replaced|isPedDucked";
+        hashClient["getPlayerStat"]             = "Replaced|getPedStat";
+        hashClient["setPlayerWeaponSlot"]       = "Replaced|setPedWeaponSlot";
+        hashClient["setPlayerSkin"]             = "Replaced|setElementModel";
+        hashClient["setPlayerRotation"]         = "Replaced|setPedRotation";
+        hashClient["setPlayerCanBeKnockedOffBike"] = "Replaced|setPedCanBeKnockedOffBike";
+        hashClient["setVehicleModel"]           = "Replaced|setElementModel";
+        hashClient["getVehicleModel"]           = "Replaced|getElementModel";
+        hashClient["getPedSkin"]                = "Replaced|getElementModel";
+        hashClient["setPedSkin"]                = "Replaced|setElementModel";
+        hashClient["getObjectRotation"]         = "Replaced|getElementRotation";
+        hashClient["setObjectRotation"]         = "Replaced|setElementRotation";
+        hashClient["getModel"]                  = "Replaced|getElementModel";
+        hashClient["getVehicleIDFromName"]      = "Replaced|getVehicleModelFromName";
+        hashClient["getVehicleID"]              = "Replaced|getElementModel";
+        hashClient["getVehicleRotation"]        = "Replaced|getElementRotation";
+        hashClient["getVehicleNameFromID"]      = "Replaced|getVehicleNameFromModel";
+        hashClient["setVehicleRotation"]        = "Replaced|setElementRotation";
+        hashClient["attachElementToElement"]    = "Replaced|attachElements";
+        hashClient["detachElementFromElement"]  = "Replaced|detachElements";
+        hashClient["xmlFindSubNode"]            = "Replaced|xmlNodeFindChild";
+        hashClient["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
+        hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlNodeFindChild";
+        hashClient["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
+
+        // Client functions. (from the wiki but missing in the code)
+        // Camera
+        hashClient["getCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashClient["getCameraRotation"]         = "Removed|Spend ages changing everything.";
+        hashClient["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
+        hashClient["setCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashClient["getCameraFixedModeTarget"]  = "Removed|Spend ages changing everything.";
+        hashClient["toggleCameraFixedMode"]     = "Removed|Spend ages changing everything.";
+        hashClient["rotateCameraRight"]         = "Removed|Spend ages changing everything.";
+        hashClient["rotateCameraUp"]            = "Removed|Spend ages changing everything.";
+        // Edit
+        hashClient["guiEditSetCaratIndex"]      = "Replaced|guiEditSetCaretIndex";
+
+
+        // Server functions. (from the C++ code)
+        hashServer["getPlayerSkin"]             = "Replaced|getElementModel";
+        hashServer["setPlayerSkin"]             = "Replaced|setElementModel";
+        hashServer["getVehicleModel"]           = "Replaced|getElementModel";
+        hashServer["setVehicleModel"]           = "Replaced|setElementModel";
+        hashServer["getObjectModel"]            = "Replaced|getElementModel";
+        hashServer["setObjectModel"]            = "Replaced|setElementModel";
+        hashServer["getVehicleID"]              = "Replaced|getElementModel";
+        hashServer["getVehicleIDFromName"]      = "Replaced|getVehicleModelFromName";
+        hashServer["getVehicleNameFromID"]      = "Replaced|getVehicleNameFromModel";
+        hashServer["getPlayerWeaponSlot"]       = "Replaced|getPedWeaponSlot";
+        hashServer["getPlayerArmor"]            = "Replaced|getPedArmor";
+        hashServer["getPlayerRotation"]         = "Replaced|getPedRotation";
+        hashServer["isPlayerChoking"]           = "Replaced|isPedChoking";
+        hashServer["isPlayerDead"]              = "Replaced|isPedDead";
+        hashServer["isPlayerDucked"]            = "Replaced|isPedDucked";
+        hashServer["getPlayerStat"]             = "Replaced|getPedStat";
+        hashServer["getPlayerTarget"]           = "Replaced|getPedTarget";
+        hashServer["getPlayerClothes"]          = "Replaced|getPedClothes";
+        hashServer["doesPlayerHaveJetPack"]     = "Replaced|doesPedHaveJetPack";
+        hashServer["isPlayerInWater"]           = "Replaced|isElementInWater";
+        hashServer["isPedInWater"]              = "Replaced|isElementInWater";
+        hashServer["isPlayerOnGround"]          = "Replaced|isPedOnGround";
+        hashServer["getPlayerFightingStyle"]    = "Replaced|getPedFightingStyle";
+        hashServer["getPlayerGravity"]          = "Replaced|getPedGravity";
+        hashServer["getPlayerContactElement"]   = "Replaced|getPedContactElement";
+        hashServer["setPlayerArmor"]            = "Replaced|setPedArmor";
+        hashServer["setPlayerWeaponSlot"]       = "Replaced|setPedWeaponSlot";
+        hashServer["killPlayer"]                = "Replaced|killPed";
+        hashServer["setPlayerRotation"]         = "Replaced|setPedRotation";
+        hashServer["setPlayerStat"]             = "Replaced|setPedStat";
+        hashServer["addPlayerClothes"]          = "Replaced|addPedClothes";
+        hashServer["removePlayerClothes"]       = "Replaced|removePedClothes";
+        hashServer["givePlayerJetPack"]         = "Replaced|givePedJetPack";
+        hashServer["removePlayerJetPack"]       = "Replaced|removePedJetPack";
+        hashServer["setPlayerFightingStyle"]    = "Replaced|setPedFightingStyle";
+        hashServer["setPlayerGravity"]          = "Replaced|setPedGravity";
+        hashServer["setPlayerChoking"]          = "Replaced|setPedChoking";
+        hashServer["warpPlayerIntoVehicle"]     = "Replaced|warpPedIntoVehicle";
+        hashServer["removePlayerFromVehicle"]   = "Replaced|removePedFromVehicle";
+
+        hashServer["attachElementToElement"]    = "Replaced|attachElements";
+        hashServer["detachElementFromElement"]  = "Replaced|detachElements";
+
+        hashServer["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
+        hashServer["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
+        hashServer["xmlFindSubNode"]            = "Replaced|xmlNodeFindChild";
+
+        // Server functions. (from the wiki but missing/not clear in the code)
+        // Camera
+        hashServer["getCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashServer["setCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashServer["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
+        hashServer["setCameraMode"]             = "Removed|Spend ages changing everything.";
+        // Player
+        hashServer["getPlayerAmmoInClip"]       = "Other|Wiki says depreciated.";
+        hashServer["getPlayerOccupiedVehicle"]  = "Other|Wiki says depreciated.";
+        hashServer["getPlayerOccupiedVehicleSeat"] = "Other|Wiki says depreciated.";
+        hashServer["getPlayerPing"]             = "Other|Wiki says depreciated.";
+        hashServer["getPlayerTotalAmmo"]        = "Other|Wiki says depreciated.";
+        hashServer["getPlayerWeapon"]           = "Other|Wiki says depreciated.";
+        hashServer["isPlayerInVehicle"]         = "Other|Wiki says depreciated.";
+        // Utility
+        hashServer["randFloat"]                 = "Removed|Use math.random instead.";
+        hashServer["randInt"]                   = "Removed|Use math.random instead.";
+    }
+
+    // Which hash?
+    const map< string, string >& hash = bClientScript ? hashClient : hashServer;
+
+    // Query the hash
+    map < string, string >::const_iterator iter = hash.find ( strFunctionName );
+
+    if ( iter == hash.end () )
+        return;     // Nothing found
+
+    // Compute and output helpful message
+    string value    = iter->second.c_str ();
+
+    long lPos       = max<long>( value.find ('|') , 0 );
+    string strWhat  = value.substr ( 0, lPos );
+    string strHow   = value.substr ( lPos + 1 );
+
+    char szTemp [ 256 ];  
+    if ( strWhat == "Replaced" )
+    {
+        _snprintf ( szTemp, sizeof(szTemp), "%s is depreciated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount()/60000)%7 ? "" : " before Tuesday" );
+    }
+    else
+    if ( strWhat == "Removed" )
+    {
+        _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );        
+    }
+    else
+    {
+        _snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
+    }
+
+    char szResult [ 512 ];
+    _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %d) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
+
+    CLogger::LogPrint ( szResult );
+}
+
+///////////////////////////////////////////////////////////////
+//
+// End of helper functions
+//
+///////////////////////////////////////////////////////////////
+
+
 // (IJs) This class contains very nasty unchecked and unproper code. Please revise.
 
 CResource::CResource ( CResourceManager * resourceManager, const char * szResourceName, bool bLoad )
@@ -547,73 +1008,6 @@ unsigned long CResource::GenerateCRC ( void )
 }
 
 
-//
-// Quick integrity check of png, dff and txd files
-//
-static bool CheckFileForCorruption( string strPath )
-{
-    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
-    bool bIsBad         = false;
-
-    if ( stricmp ( szExt, ".PNG" ) == 0 )
-    {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            // This is what the png header should look like
-            unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-
-             // Load the header
-            unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
-            fread ( pBuffer, 1, 8, pFile );
-
-            // Check header integrity
-            if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
-                bIsBad = true;
-
-            // Close the file
-            fclose ( pFile );
-        }
-    }
-    else
-    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
-    {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            struct {
-                long id;
-                long size;
-                long ver;
-            } header = {0,0,0};
-
-            // Load the first header
-            fread ( &header, 1, sizeof(header), pFile );
-            long pos = sizeof(header);
-            long validSize = header.size + pos;
-
-            // Step through the sections
-            while ( pos < validSize )
-            {
-                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
-                    break;
-                fseek ( pFile, header.size, SEEK_CUR );
-                pos += header.size + sizeof(header);
-            }
-
-            // Check integrity
-            if ( pos != validSize )
-                bIsBad = true;
-               
-            // Close the file
-            fclose ( pFile );
-        }        
-    }
-
-    return bIsBad;
-}
-
-
 bool CResource::HasResourceChanged ()
 {
     unsigned long ulCRC = 0;
@@ -624,6 +1018,7 @@ bool CResource::HasResourceChanged ()
     {
         if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
+            CheckLuaFileForNotices ( strPath, (*iterf)->GetName(), (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT  );
             if ( CheckFileForCorruption ( strPath ) )
             {
                 CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' is invalid.\n", (*iterf)->GetName(), m_strResourceName.c_str () );
