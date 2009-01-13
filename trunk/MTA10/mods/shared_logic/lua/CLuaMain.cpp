@@ -178,7 +178,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             if ( szRes )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", szRes );
-                g_pClientGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed: %s", szRes );
+                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", szRes );
             }
             else
             {
