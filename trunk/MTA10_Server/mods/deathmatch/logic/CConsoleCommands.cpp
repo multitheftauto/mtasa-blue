@@ -385,6 +385,13 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
     return true;
 }
 
+bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    g_pGame->GetResourceManager()->Upgrade();
+    return true;
+}
+
+
 bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // say <text>

@@ -46,90 +46,180 @@ extern int errno;
 
 ///////////////////////////////////////////////////////////////
 //
-// CheckFileForCorruption
-//
-// Quick integrity check of png, dff and txd files.
+// Begin/EndResourceUpgrade global functions and var
 //
 ///////////////////////////////////////////////////////////////
-static bool CheckFileForCorruption ( string strPath )
+static bool bUpgradeScripts = false;
+
+void BeginResourceUpgrade()
+{
+    bUpgradeScripts = true;
+}
+
+void EndResourceUpgrade()
+{
+    bUpgradeScripts = false;
+    CLogger::LogPrint( "Basic script upgrade completed.\n" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// Begin/EndCheckFilesForIssues local functions and var
+//
+///////////////////////////////////////////////////////////////
+static unsigned long ulDepreciatedWarningCount = 0;
+
+static void BeginCheckFilesForIssues()
+{
+    ulDepreciatedWarningCount = 0;
+}
+
+static void EndCheckFilesForIssues( const string& strResourceName )
+{
+    if ( ulDepreciatedWarningCount )
+    {
+        CLogger::LogPrintf ( "Some files in '%s' use depreciated functions.\n", strResourceName.c_str () );
+        CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
+    }
+}
+
+
+// Local function forward declarations
+static void CheckPngFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName );
+static void CheckRwFileForIssues            ( const string& strPath, const string& strFileName, const string& strResourceName );
+static void CheckLuaFileForIssues           ( string strPath, string strFileName, bool bClientScript );
+static void CheckLuaSourceForIssues         ( string strLuaSource, string strFileName, bool bClientScript, string strMode, string* pstrOutResult=NULL );
+static long FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber = NULL );
+static bool UpgradeLuaFunctionName          ( string strFunctionName, bool bClientScript, string& strOutUpgraded );
+static void IssueLuaFunctionNameWarnings    ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber );
+static bool GetLuaFunctionNameUpgradeInfo   ( string strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow );
+
+///////////////////////////////////////////////////////////////
+//
+// CheckFileForIssues
+//
+// Check for any issues that may need to be logged at the server.
+//
+///////////////////////////////////////////////////////////////
+static void CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
     bool bIsBad         = false;
 
     if ( stricmp ( szExt, ".PNG" ) == 0 )
     {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            // This is what the png header should look like
-            unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-
-             // Load the header
-            unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
-            fread ( pBuffer, 1, 8, pFile );
-
-            // Check header integrity
-            if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
-                bIsBad = true;
-
-            // Close the file
-            fclose ( pFile );
-        }
+        CheckPngFileForIssues( strPath, strFileName, strResourceName );
     }
     else
     if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
     {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            struct {
-                long id;
-                long size;
-                long ver;
-            } header = {0,0,0};
-
-            // Load the first header
-            fread ( &header, 1, sizeof(header), pFile );
-            long pos = sizeof(header);
-            long validSize = header.size + pos;
-
-            // Step through the sections
-            while ( pos < validSize )
-            {
-                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
-                    break;
-                fseek ( pFile, header.size, SEEK_CUR );
-                pos += header.size + sizeof(header);
-            }
-
-            // Check integrity
-            if ( pos != validSize )
-                bIsBad = true;
-               
-            // Close the file
-            fclose ( pFile );
-        }        
+        CheckRwFileForIssues( strPath, strFileName, strResourceName );
     }
-
-    return bIsBad;
+    else
+    if ( stricmp ( szExt, ".LUA" ) == 0 )
+    {
+        CheckLuaFileForIssues( strPath, strFileName, bClientScript );
+    }
 }
 
-static void CheckLuaBufferForNotices ( char* buffer, long length, string strFileName, bool bClientScript );
-static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber );
 
 ///////////////////////////////////////////////////////////////
 //
-// CheckLuaFileForNotices
+// CheckPngFileForIssues
 //
-// Check for any issues that may need to be logged at the server.
+//
 //
 ///////////////////////////////////////////////////////////////
-static void CheckLuaFileForNotices ( string strPath, string strFileName, bool bClientScript )
+static void CheckPngFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName )
 {
-    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+    bool bIsBad         = false;
 
-    if ( stricmp ( szExt, ".LUA" ) != 0 )
-        return;
+    // Open the file
+    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+    {
+        // This is what the png header should look like
+        unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+
+            // Load the header
+        unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
+        fread ( pBuffer, 1, 8, pFile );
+
+        // Check header integrity
+        if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
+            bIsBad = true;
+
+        // Close the file
+        fclose ( pFile );
+    }
+
+    if ( bIsBad )
+    {
+        CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' is invalid.\n", strFileName.c_str () , strResourceName.c_str () );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CheckRwFileForIssues
+//
+// Check dff and txd files
+//
+///////////////////////////////////////////////////////////////
+static void CheckRwFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName )
+{
+    bool bIsBad         = false;
+
+    // Open the file
+    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+    {
+        struct {
+            long id;
+            long size;
+            long ver;
+        } header = {0,0,0};
+
+        // Load the first header
+        fread ( &header, 1, sizeof(header), pFile );
+        long pos = sizeof(header);
+        long validSize = header.size + pos;
+
+        // Step through the sections
+        while ( pos < validSize )
+        {
+            if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
+                break;
+            fseek ( pFile, header.size, SEEK_CUR );
+            pos += header.size + sizeof(header);
+        }
+
+        // Check integrity
+        if ( pos != validSize )
+            bIsBad = true;
+            
+        // Close the file
+        fclose ( pFile );
+    }        
+
+    if ( bIsBad )
+    {
+        CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' is invalid.\n", strFileName.c_str () , strResourceName.c_str () );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CheckLuaFileForIssues
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static void CheckLuaFileForIssues ( string strPath, string strFileName, bool bClientScript )
+{
+    // Load the original file into a string
+    string strFileContents;
 
     // Open the file
     if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
@@ -140,55 +230,147 @@ static void CheckLuaFileForNotices ( string strPath, string strFileName, bool bC
 	    lLength = ftell( pFile );
 	    fseek( pFile, 0, SEEK_SET );
 
-        // Load into a padded buffer
-        long lHeadPadSize    = 8;
-        long lTailPadSize    = 8;
-        long lLengthPadded   = lLength + lHeadPadSize + lTailPadSize;
-        char* pBufferPadded  = new char[ lLengthPadded ];
-        char* pBuffer        = pBufferPadded + lHeadPadSize;
-        memset ( pBufferPadded, 0, lLengthPadded );
+        // Load file into a buffer
+        char* pBuffer  = new char[ lLength + 1 ];
+        memset ( pBuffer, 0, lLength + 1 );
+        pBuffer[ lLength ] = 0;
 
-        bool bReadError = fread ( pBuffer, 1, lLength, pFile ) != lLength;
+        if ( fread ( pBuffer, 1, lLength, pFile ) == lLength )
+        {
+            // assign to the string
+            strFileContents.assign ( pBuffer, lLength );
+        }
 
-        // Close the file
+        // Clean up
         fclose ( pFile );
+        delete [] pBuffer;
+    }
 
-        // Process
-        if ( !bReadError )
-            CheckLuaBufferForNotices ( pBuffer, lLength, strFileName, bClientScript );
+    if ( strFileContents.length () == 0 )
+        return;
 
-        // Cleanup
-        delete [] pBufferPadded;
+    // Process
 
+    // Ouput warnings...
+    if ( bUpgradeScripts == false )
+    {
+        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, "Warnings" );
+    }
+    else
+    // ..or do an upgrade
+    if ( bUpgradeScripts == true )
+    {
+        string strNewFileContents;
+        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, "Upgrade", &strNewFileContents );
+
+        // Has contents changed?
+        if ( strNewFileContents.length () > 0 && strNewFileContents != strFileContents )
+        {
+            // Rename old to lua.dp2
+            string strBakFilename = strPath + ".dp2";
+            if ( rename( strPath.c_str (), strBakFilename.c_str () ) )
+            {
+                CLogger::LogPrintf ( "Upgrader: Unable to rename %s to %s\n", strPath.c_str (), strBakFilename.c_str () );
+            }
+            else
+            {
+                // Save new content
+                if ( FILE* pFile = fopen ( strPath.c_str (), "wb" ) )
+                {
+                    fwrite ( strNewFileContents.c_str (), 1, strNewFileContents.length (), pFile );
+                    fclose ( pFile );
+                    CLogger::LogPrintf ( "Upgrading %s ...........done\n", strFileName.c_str () );
+                }
+            }
+        }
     }
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CheckLuaBufferForNotices
+// CheckLuaSourceForIssues
 //
-//
+// Look for function names not in comment blocks
+// Note: Ignores quotes
 //
 ///////////////////////////////////////////////////////////////
-static void CheckLuaBufferForNotices ( char* pBuffer, long lLength, string strFileName, bool bClientScript )
+static void CheckLuaSourceForIssues ( string strLuaSource, string strFileName, bool bClientScript, string strMode, string* pstrOutResult )
 {
+    map < string, long > doneWarningMap;
+    long lLineNumber = 1;
 
-    //
-    // Look for function names not in comment blocks
-    //
-    // Note: Currently ignores quotes
-    //
+    // Step through each identifier in the file.
+    for ( long lPos = 0 ; lPos < (long)strLuaSource.length () ; lPos++ )
+    {
+        long lNameLength;
+        long lNameOffset = FindLuaIdentifier ( strLuaSource.c_str () + lPos, &lNameLength, &lLineNumber );
 
-    unsigned long ulLineNumber = 0;
+        if ( lNameOffset == - 1 )
+            break;
+
+        lNameOffset += lPos;                // Make offset absolute from the start of the file
+        lPos = lNameOffset + lNameLength;   // Adjust so the next pass starts from just after this identifier
+
+        string strIdentifierName( strLuaSource.c_str () + lNameOffset, lNameLength );
+
+        // In-place upgrade...
+        if ( strMode == "Upgrade" )
+        {
+            string strUpgraded;
+            if ( UpgradeLuaFunctionName( strIdentifierName, bClientScript, strUpgraded ) )
+            {
+                // Old head
+                string strHead( strLuaSource.c_str (), lNameOffset );
+                // Old tail
+                string strTail( strLuaSource.c_str () + lNameOffset + lNameLength );
+                // New source
+                string strNewSource = strHead + strUpgraded + strTail;
+
+                strLuaSource = strNewSource;
+
+                lPos += -lNameLength + strUpgraded.length ();
+            }
+        }
+
+        // Log warnings...
+        if ( strMode == "Warnings" )
+        {
+            // Only do the identifier once per file
+            if ( doneWarningMap.find ( strIdentifierName ) == doneWarningMap.end () )
+            {
+                doneWarningMap[strIdentifierName] = 1;
+                IssueLuaFunctionNameWarnings ( strIdentifierName, strFileName, bClientScript, lLineNumber );
+            }
+        }
+    }
+
+    if ( pstrOutResult )
+        *pstrOutResult = strLuaSource;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// FindLuaIdentifier
+//
+// Finds the first identifier in a zero terminated character string.
+// Returns an offset to the identifier if found, and puts its length in plOutLength.
+// Returns -1 if no identifier could be found.
+//
+///////////////////////////////////////////////////////////////
+static long FindLuaIdentifier ( const char* szLuaSource, long* plOutLength, long* plLineNumber )
+{
+    long lSourceLength          = strlen ( szLuaSource );
     bool bBlockComment          = false;
     bool bLineComment           = false;
-    map < string, long > doneMap;
+    long lStartOfName           = -1;
+    bool bPrevIsNonIdent        = true;
 
-    // Search the buffer for function names
-    for ( long lPos = 0 ; lPos < lLength ; lPos++ )
+    // Search the string for function names
+    for ( long lPos = 0 ; lPos < lSourceLength ; lPos++ )
     {
-        char* pBufPos = pBuffer + lPos;
+        const char* pBufPos = szLuaSource + lPos;
         char c = *pBufPos;
 
         // Handle comments
@@ -217,82 +399,116 @@ static void CheckLuaBufferForNotices ( char* pBuffer, long lLength, string strFi
         }
         if ( c == '\r' )
         {
-            ulLineNumber++;
+            if ( plLineNumber )
+                (*plLineNumber)++;
         }
 
         if ( bLineComment || bBlockComment )
             continue;
 
-        if ( c == '(' )
+        // Look for identifier
+        bool bIsWhiteSpace = ( c == ' ' || c == '\t' || c == '\n' || c == '\r' );
+        bool bIsFirstIdent = ( isalpha ( c ) || c == '_' || c == '$' );
+        bool bIsMidIdent   = ( isdigit ( c ) || bIsFirstIdent );
+        bool bIsNonIdent   = !bIsMidIdent;
+
+        // Identifier start is bIsNonIdent followed by a bIsFirstIdent
+        // Identifier end   is bIsMidIdent followed by a bIsNonIdent
+        if ( lStartOfName == -1 )
         {
-            // Do we have a function name?
-            // Search backwards. Skip whitespace, then read ident chars, stop with an non-ident char
-            char* pStartOfName = NULL;
-            char* pEndOfName = NULL;
-            for ( int i = 1; i < 100; i++ )
+            if ( bIsFirstIdent )
             {
-                char* dptr = pBuffer + lPos - i;
-                char d = *dptr;
-
-                bool bIsWhiteSpace = ( d == ' ' || d == '\t' || d == '\n' || d == '\r' );
-                bool bIsMidIdent   = ( isdigit ( d ) || isalpha ( d ) || d == '_' );
-                bool bIsNonIdent   = !bIsMidIdent;
-
-                if ( !pEndOfName )
-                {
-                    if ( bIsWhiteSpace )
-                        continue;               // Still between function name and '('
-                    if ( bIsMidIdent )
-                        pEndOfName = dptr + 1;  // Got last character of function name
-                    else
-                        break;                  // Not a function name
-                }
-                else
-                {
-                    if ( bIsNonIdent )
-                    {
-                        // Maybe found start of function name
-                        if ( d == ':' || ( d == '.' && dptr[-1] != '.' ) )
-                            break;          // . or : So not a global function name 
-
-                        char e = dptr[1];
-                        bool bIsFirstIdent = ( isalpha ( e ) || e == '_' );
-                        if( !bIsFirstIdent )
-                            break;          // First letter of function name not valid
-
-                        pStartOfName = dptr + 1;
-                        break;               // Found a function name
-                    }
-                }
-            }
-
-            // Process result
-            unsigned long lNameLength = pEndOfName - pStartOfName;
-            if ( lNameLength > 0 && lNameLength < 100 )
-            {
-                string strFunctionName( pStartOfName, lNameLength );
-
-                // Only do the function once per file
-                if ( doneMap.find ( strFunctionName ) == doneMap.end () )
-                {
-                    doneMap[strFunctionName] = 1;
-                    CheckLuaFunctionNameForNotices ( strFunctionName, strFileName, bClientScript, ulLineNumber );
-                }
+                if ( lPos == 0 || bPrevIsNonIdent )
+                    lStartOfName = lPos;    // Start of identifier
             }
         }
+        else
+        {
+            if ( !bIsMidIdent )
+            {
+                *plOutLength = lPos - lStartOfName; // End of identifier
+                return lStartOfName;
+            }
+        }
+
+        bPrevIsNonIdent = bIsNonIdent;
+    }
+
+    return -1;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// UpgradeLuaFunctionName
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static bool UpgradeLuaFunctionName ( string strFunctionName, bool bClientScript, string& strOutUpgraded )
+{
+    string strWhat;
+    string strHow;
+
+    if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
+    {
+        if ( strWhat == "Replaced" )
+        {
+            strOutUpgraded = strHow;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// IssueLuaFunctionNameWarnings
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static void IssueLuaFunctionNameWarnings ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber )
+{
+    string strWhat;
+    string strHow;
+
+    if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
+    {
+        char szTemp [ 256 ];  
+        if ( strWhat == "Replaced" )
+        {
+            ulDepreciatedWarningCount++;
+            _snprintf ( szTemp, sizeof(szTemp), "%s is depreciated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount()/60000)%7 ? "" : " before Tuesday" );
+        }
+        else
+        if ( strWhat == "Removed" )
+        {
+            _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );        
+        }
+        else
+        {
+            _snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
+        }
+
+        char szResult [ 512 ];
+        _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %d) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
+
+        CLogger::LogPrint ( szResult );
     }
 }
 
 
-
 ///////////////////////////////////////////////////////////////
 //
-// CheckLuaFunctionNameForNotices
+// GetLuaFunctionNameUpgradeInfo
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber )
+static bool GetLuaFunctionNameUpgradeInfo ( string strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
 {
     static map < string, string > hashClient;
     static map < string, string > hashServer;
@@ -433,7 +649,7 @@ static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strF
 
         hashServer["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
         hashServer["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
-        hashServer["xmlFindSubNode"]            = "Replaced|xmlNodeFindChild";
+        hashServer["xmlFindSubNode"]            = "Replaced|xmlFindChild";
 
         // Server functions. (from the wiki but missing/not clear in the code)
         // Camera
@@ -442,16 +658,16 @@ static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strF
         hashServer["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
         hashServer["setCameraMode"]             = "Removed|Spend ages changing everything.";
         // Player
-        hashServer["getPlayerAmmoInClip"]       = "Other|Wiki says depreciated.";
-        hashServer["getPlayerOccupiedVehicle"]  = "Other|Wiki says depreciated.";
-        hashServer["getPlayerOccupiedVehicleSeat"] = "Other|Wiki says depreciated.";
-        hashServer["getPlayerPing"]             = "Other|Wiki says depreciated.";
-        hashServer["getPlayerTotalAmmo"]        = "Other|Wiki says depreciated.";
-        hashServer["getPlayerWeapon"]           = "Other|Wiki says depreciated.";
-        hashServer["isPlayerInVehicle"]         = "Other|Wiki says depreciated.";
+        hashServer["getPlayerAmmoInClip"]       = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerOccupiedVehicle"]  = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerOccupiedVehicleSeat"] = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerPing"]             = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerTotalAmmo"]        = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerWeapon"]           = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["isPlayerInVehicle"]         = "Other|Wiki says depreciated, but no replacement available.";
         // Utility
-        hashServer["randFloat"]                 = "Removed|Use math.random instead.";
-        hashServer["randInt"]                   = "Removed|Use math.random instead.";
+        hashServer["randFloat"]                 = "Replaced|math.random";
+        hashServer["randInt"]                   = "Replaced|math.random";
     }
 
     // Which hash?
@@ -461,34 +677,14 @@ static void CheckLuaFunctionNameForNotices ( string strFunctionName, string strF
     map < string, string >::const_iterator iter = hash.find ( strFunctionName );
 
     if ( iter == hash.end () )
-        return;     // Nothing found
+        return false;     // Nothing found
 
-    // Compute and output helpful message
     string value    = iter->second.c_str ();
 
     long lPos       = max<long>( value.find ('|') , 0 );
-    string strWhat  = value.substr ( 0, lPos );
-    string strHow   = value.substr ( lPos + 1 );
-
-    char szTemp [ 256 ];  
-    if ( strWhat == "Replaced" )
-    {
-        _snprintf ( szTemp, sizeof(szTemp), "%s is depreciated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount()/60000)%7 ? "" : " before Tuesday" );
-    }
-    else
-    if ( strWhat == "Removed" )
-    {
-        _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );        
-    }
-    else
-    {
-        _snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
-    }
-
-    char szResult [ 512 ];
-    _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %d) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
-
-    CLogger::LogPrint ( szResult );
+    strOutWhat      = value.substr ( 0, lPos );
+    strOutHow       = value.substr ( lPos + 1 );
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1013,16 +1209,23 @@ bool CResource::HasResourceChanged ()
     unsigned long ulCRC = 0;
     string strPath;
 
+    // Check/upgrade all resource files first
+    BeginCheckFilesForIssues();
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
         if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
-            CheckLuaFileForNotices ( strPath, (*iterf)->GetName(), (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT  );
-            if ( CheckFileForCorruption ( strPath ) )
-            {
-                CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' is invalid.\n", (*iterf)->GetName(), m_strResourceName.c_str () );
-            }
+            CheckFileForIssues ( strPath, (*iterf)->GetName(), m_strResourceName, (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
+        }
+    }
+    EndCheckFilesForIssues( m_strResourceName );
+
+    iterf = m_resourceFiles.begin ();
+    for ( ; iterf != m_resourceFiles.end (); iterf++ )
+    {
+        if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
+        {
             ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
             if ( ( *iterf )->GetLastCRC() != ulCRC )
                 return true;

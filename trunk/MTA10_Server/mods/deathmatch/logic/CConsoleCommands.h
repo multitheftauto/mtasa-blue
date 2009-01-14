@@ -30,6 +30,7 @@ public:
     static bool         ListResources   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         ResourceInfo    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         InstallResource ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         UpgradeResources( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         Say             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         TeamSay         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
