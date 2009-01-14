@@ -451,6 +451,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "list", CConsoleCommands::ListResources, false );
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
     RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
+    RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
 
     RegisterCommand ( "say", CConsoleCommands::Say, false );
     RegisterCommand ( "teamsay", CConsoleCommands::TeamSay, false );

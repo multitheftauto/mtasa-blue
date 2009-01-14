@@ -200,6 +200,16 @@ bool CResourceManager::Refresh ( void )
     return false;
 }
 
+void BeginResourceUpgrade();
+void EndResourceUpgrade();
+
+void CResourceManager::Upgrade ( void )
+{
+    BeginResourceUpgrade();
+    Refresh ();
+    EndResourceUpgrade();
+}
+
 char * CResourceManager::GetResourceDirectory ( void )
 {
     return m_szResourceDirectory;

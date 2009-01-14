@@ -72,6 +72,7 @@ public:
     void                        ListResourcesLoaded             ( void );
     list <CResource *>*         GetLoadedResources              ( void );
     bool                        Refresh                         ( void );
+    void                        Upgrade                         ( void );
     inline unsigned int         GetResourceLoadedCount          ( void )            { return m_uiResourceLoadedCount; }
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }
     void                        OnPlayerJoin                    ( CPlayer& Player );
