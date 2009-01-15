@@ -4819,6 +4819,15 @@ bool CStaticFunctionDefinitions::IsPlayerMapVisible ( bool & bVisible )
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox ( CVector &vecMin, CVector &vecMax )
+{
+    if ( m_pRadarMap->GetBoundingBox ( vecMin, vecMax ) )
+    {
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::FxAddBlood ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness )
 {

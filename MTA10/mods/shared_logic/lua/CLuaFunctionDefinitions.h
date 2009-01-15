@@ -624,6 +624,7 @@ public:
     // Map funcs
     LUA_DECLARE ( IsPlayerMapForced );
     LUA_DECLARE ( IsPlayerMapVisible );
+    LUA_DECLARE ( GetPlayerMapBoundingBox );
 
     LUA_DECLARE ( Md5 );
 

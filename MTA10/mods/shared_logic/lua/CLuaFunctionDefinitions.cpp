@@ -14344,6 +14344,22 @@ int CLuaFunctionDefinitions::IsPlayerMapVisible ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetPlayerMapBoundingBox ( lua_State* luaVM )
+{    
+    // Grab the bounding box and return it
+    CVector vecMin, vecMax;
+    if ( CStaticFunctionDefinitions::GetPlayerMapBoundingBox ( vecMin, vecMax ) )
+    {
+        lua_pushnumber ( luaVM, vecMin.fX );
+        lua_pushnumber ( luaVM, vecMin.fY );
+        lua_pushnumber ( luaVM, vecMax.fX );
+        lua_pushnumber ( luaVM, vecMax.fY );
+        return 4;
+    }
+    //The map is invisible
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::SynthProcessMIDI ( lua_State* luaVM )
 {

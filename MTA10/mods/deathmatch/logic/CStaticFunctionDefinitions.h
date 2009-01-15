@@ -417,6 +417,7 @@ public:
     // Map funcs
     static bool                         IsPlayerMapForced                   ( bool & bForced );
     static bool                         IsPlayerMapVisible                  ( bool & bVisible );
+    static bool                         GetPlayerMapBoundingBox             ( CVector &vecMin, CVector &vecMax );
 
     // Fx funcs
     static bool                         FxAddBlood                          ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness );
