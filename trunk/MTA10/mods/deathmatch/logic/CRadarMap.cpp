@@ -699,3 +699,22 @@ bool CRadarMap::IsRadarShowing ( void )
              m_pLocalPlayerBlip &&
              ( !g_pCore->GetConsole ()->IsVisible () && !g_pCore->IsMenuVisible () ) );
 }
+
+bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
+{
+    // If our radar image exists (Values are not calculated unless map is showing)
+    if ( IsRadarShowing () )
+	{
+		vecMin.fX = m_iMapMinX;
+		vecMin.fY = m_iMapMinY;
+
+		vecMax.fX = m_iMapMaxX;
+		vecMax.fY = m_iMapMaxY;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

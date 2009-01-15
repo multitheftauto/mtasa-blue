@@ -41,6 +41,8 @@ public:
     inline bool                         GetForcedState                      ( void ) const                  { return m_bForcedState; }
     void                                SetForcedState                      ( bool bState );
 
+	bool                                GetBoundingBox                      ( CVector &vecMin, CVector &vecMax );
+
 protected:
     void                                InternalSetRadarEnabled             ( bool bEnabled );
 public:

@@ -821,6 +821,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Map funcs
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefinitions::IsPlayerMapForced );
     CLuaCFunctions::AddFunction ( "isPlayerMapVisible", CLuaFunctionDefinitions::IsPlayerMapVisible );
+    CLuaCFunctions::AddFunction ( "getPlayerMapBoundingBox", CLuaFunctionDefinitions::GetPlayerMapBoundingBox );
 
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
 
