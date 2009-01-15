@@ -591,7 +591,7 @@ static bool GetLuaFunctionNameUpgradeInfo ( string strFunctionName, bool bClient
 
         // Client functions. (from the wiki but missing in the code)
         // Camera
-        hashClient["getCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashClient["getCameraPosition"]         = "Replaced|getCameraMatrix";
         hashClient["getCameraRotation"]         = "Removed|Spend ages changing everything.";
         hashClient["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
         hashClient["setCameraPosition"]         = "Removed|Spend ages changing everything.";
@@ -653,7 +653,7 @@ static bool GetLuaFunctionNameUpgradeInfo ( string strFunctionName, bool bClient
 
         // Server functions. (from the wiki but missing/not clear in the code)
         // Camera
-        hashServer["getCameraPosition"]         = "Removed|Spend ages changing everything.";
+        hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
         hashServer["setCameraPosition"]         = "Removed|Spend ages changing everything.";
         hashServer["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
         hashServer["setCameraMode"]             = "Removed|Spend ages changing everything.";
