@@ -90,7 +90,7 @@ static void CheckPngFileForIssues           ( const string& strPath, const strin
 static void CheckRwFileForIssues            ( const string& strPath, const string& strFileName, const string& strResourceName );
 static void CheckLuaFileForIssues           ( const string& strPath, const string& strFileName, bool bClientScript );
 static void CheckLuaSourceForIssues         ( string strLuaSource, const string& strFileName, bool bClientScript, const string& strMode, string* pstrOutResult=NULL );
-static long FindLuaIdentifier               ( const char* szLuaSource, long lSourceLength, long* plOutLength, long* plLineNumber = NULL );
+static long FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber = NULL );
 static bool UpgradeLuaFunctionName          ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded );
 static void IssueLuaFunctionNameWarnings    ( const string& strFunctionName, const string& strFileName, bool bClientScript, unsigned long ulLineNumber );
 static bool GetLuaFunctionNameUpgradeInfo   ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow );
@@ -306,7 +306,7 @@ static void CheckLuaSourceForIssues ( string strLuaSource, const string& strFile
     for ( long lPos = 0 ; lPos < (long)strLuaSource.length () ; lPos++ )
     {
         long lNameLength;
-        long lNameOffset = FindLuaIdentifier ( strLuaSource.c_str () + lPos, strLuaSource.length () - lPos, &lNameLength, &lLineNumber );
+        long lNameOffset = FindLuaIdentifier ( strLuaSource.c_str () + lPos, &lNameLength, &lLineNumber );
 
         if ( lNameOffset == - 1 )
             break;
@@ -327,9 +327,7 @@ static void CheckLuaSourceForIssues ( string strLuaSource, const string& strFile
                 // Old tail
                 string strTail( strLuaSource.c_str () + lNameOffset + lNameLength );
                 // New source
-                string strNewSource = strHead + strUpgraded + strTail;
-
-                strLuaSource = strNewSource;
+                strLuaSource = strHead + strUpgraded + strTail;
 
                 lPos += -lNameLength + strUpgraded.length ();
             }
@@ -361,7 +359,7 @@ static void CheckLuaSourceForIssues ( string strLuaSource, const string& strFile
 // Returns -1 if no identifier could be found.
 //
 ///////////////////////////////////////////////////////////////
-static long FindLuaIdentifier ( const char* szLuaSource, long lSourceLength, long* plOutLength, long* plLineNumber )
+static long FindLuaIdentifier ( const char* szLuaSource, long* plOutLength, long* plLineNumber )
 {
     bool bBlockComment          = false;
     bool bLineComment           = false;
@@ -369,13 +367,13 @@ static long FindLuaIdentifier ( const char* szLuaSource, long lSourceLength, lon
     bool bPrevIsNonIdent        = true;
 
     // Search the string for function names
-    for ( long lPos = 0 ; lPos < lSourceLength ; lPos++ )
+    for ( long lPos = 0 ; szLuaSource[lPos] ; lPos++ )
     {
         const char* pBufPos = szLuaSource + lPos;
         char c = *pBufPos;
 
         // Handle comments
-        if ( strncmp ( pBufPos, "--[[", 4 ) == 0 )
+        if ( c == '-' && strncmp ( pBufPos, "--[[", 4 ) == 0 )
         {
             if ( !bLineComment )
             {
@@ -384,13 +382,13 @@ static long FindLuaIdentifier ( const char* szLuaSource, long lSourceLength, lon
                 continue;
             }
         }
-        if ( strncmp ( pBufPos, "]]", 2 ) == 0 )
+        if ( c == ']' && strncmp ( pBufPos, "]]", 2 ) == 0 )
         {
             bBlockComment = false;
             lPos += 1;
             continue;
         }
-        if ( strncmp ( pBufPos, "--", 2 ) == 0 )
+        if ( c == '-' && strncmp ( pBufPos, "--", 2 ) == 0 )
         {
             bLineComment = true;
         }
@@ -661,7 +659,6 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashServer["getPlayerAmmoInClip"]       = "Other|Wiki says depreciated, but no replacement available.";
         hashServer["getPlayerOccupiedVehicle"]  = "Other|Wiki says depreciated, but no replacement available.";
         hashServer["getPlayerOccupiedVehicleSeat"] = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["getPlayerPing"]             = "Other|Wiki says depreciated, but no replacement available.";
         hashServer["getPlayerTotalAmmo"]        = "Other|Wiki says depreciated, but no replacement available.";
         hashServer["getPlayerWeapon"]           = "Other|Wiki says depreciated, but no replacement available.";
         hashServer["isPlayerInVehicle"]         = "Other|Wiki says depreciated, but no replacement available.";
