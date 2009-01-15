@@ -88,12 +88,12 @@ static void EndCheckFilesForIssues( const string& strResourceName )
 // Local function forward declarations
 static void CheckPngFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName );
 static void CheckRwFileForIssues            ( const string& strPath, const string& strFileName, const string& strResourceName );
-static void CheckLuaFileForIssues           ( string strPath, string strFileName, bool bClientScript );
-static void CheckLuaSourceForIssues         ( string strLuaSource, string strFileName, bool bClientScript, string strMode, string* pstrOutResult=NULL );
-static long FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber = NULL );
-static bool UpgradeLuaFunctionName          ( string strFunctionName, bool bClientScript, string& strOutUpgraded );
-static void IssueLuaFunctionNameWarnings    ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber );
-static bool GetLuaFunctionNameUpgradeInfo   ( string strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow );
+static void CheckLuaFileForIssues           ( const string& strPath, const string& strFileName, bool bClientScript );
+static void CheckLuaSourceForIssues         ( string strLuaSource, const string& strFileName, bool bClientScript, const string& strMode, string* pstrOutResult=NULL );
+static long FindLuaIdentifier               ( const char* szLuaSource, long lSourceLength, long* plOutLength, long* plLineNumber = NULL );
+static bool UpgradeLuaFunctionName          ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded );
+static void IssueLuaFunctionNameWarnings    ( const string& strFunctionName, const string& strFileName, bool bClientScript, unsigned long ulLineNumber );
+static bool GetLuaFunctionNameUpgradeInfo   ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow );
 
 ///////////////////////////////////////////////////////////////
 //
@@ -216,7 +216,7 @@ static void CheckRwFileForIssues ( const string& strPath, const string& strFileN
 //
 //
 ///////////////////////////////////////////////////////////////
-static void CheckLuaFileForIssues ( string strPath, string strFileName, bool bClientScript )
+static void CheckLuaFileForIssues ( const string& strPath, const string& strFileName, bool bClientScript )
 {
     // Load the original file into a string
     string strFileContents;
@@ -250,6 +250,8 @@ static void CheckLuaFileForIssues ( string strPath, string strFileName, bool bCl
         return;
 
     // Process
+    if ( strFileContents.length () > 1000000 )
+        CLogger::LogPrintf ( "Please wait...\n" );
 
     // Ouput warnings...
     if ( bUpgradeScripts == false )
@@ -295,7 +297,7 @@ static void CheckLuaFileForIssues ( string strPath, string strFileName, bool bCl
 // Note: Ignores quotes
 //
 ///////////////////////////////////////////////////////////////
-static void CheckLuaSourceForIssues ( string strLuaSource, string strFileName, bool bClientScript, string strMode, string* pstrOutResult )
+static void CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, bool bClientScript, const string& strMode, string* pstrOutResult )
 {
     map < string, long > doneWarningMap;
     long lLineNumber = 1;
@@ -304,7 +306,7 @@ static void CheckLuaSourceForIssues ( string strLuaSource, string strFileName, b
     for ( long lPos = 0 ; lPos < (long)strLuaSource.length () ; lPos++ )
     {
         long lNameLength;
-        long lNameOffset = FindLuaIdentifier ( strLuaSource.c_str () + lPos, &lNameLength, &lLineNumber );
+        long lNameOffset = FindLuaIdentifier ( strLuaSource.c_str () + lPos, strLuaSource.length () - lPos, &lNameLength, &lLineNumber );
 
         if ( lNameOffset == - 1 )
             break;
@@ -359,9 +361,8 @@ static void CheckLuaSourceForIssues ( string strLuaSource, string strFileName, b
 // Returns -1 if no identifier could be found.
 //
 ///////////////////////////////////////////////////////////////
-static long FindLuaIdentifier ( const char* szLuaSource, long* plOutLength, long* plLineNumber )
+static long FindLuaIdentifier ( const char* szLuaSource, long lSourceLength, long* plOutLength, long* plLineNumber )
 {
-    long lSourceLength          = strlen ( szLuaSource );
     bool bBlockComment          = false;
     bool bLineComment           = false;
     long lStartOfName           = -1;
@@ -407,7 +408,6 @@ static long FindLuaIdentifier ( const char* szLuaSource, long* plOutLength, long
             continue;
 
         // Look for identifier
-        bool bIsWhiteSpace = ( c == ' ' || c == '\t' || c == '\n' || c == '\r' );
         bool bIsFirstIdent = ( isalpha ( c ) || c == '_' || c == '$' );
         bool bIsMidIdent   = ( isdigit ( c ) || bIsFirstIdent );
         bool bIsNonIdent   = !bIsMidIdent;
@@ -445,7 +445,7 @@ static long FindLuaIdentifier ( const char* szLuaSource, long* plOutLength, long
 //
 //
 ///////////////////////////////////////////////////////////////
-static bool UpgradeLuaFunctionName ( string strFunctionName, bool bClientScript, string& strOutUpgraded )
+static bool UpgradeLuaFunctionName ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded )
 {
     string strWhat;
     string strHow;
@@ -470,7 +470,7 @@ static bool UpgradeLuaFunctionName ( string strFunctionName, bool bClientScript,
 //
 //
 ///////////////////////////////////////////////////////////////
-static void IssueLuaFunctionNameWarnings ( string strFunctionName, string strFileName, bool bClientScript, unsigned long ulLineNumber )
+static void IssueLuaFunctionNameWarnings ( const string& strFunctionName, const string& strFileName, bool bClientScript, unsigned long ulLineNumber )
 {
     string strWhat;
     string strHow;
@@ -508,7 +508,7 @@ static void IssueLuaFunctionNameWarnings ( string strFunctionName, string strFil
 //
 //
 ///////////////////////////////////////////////////////////////
-static bool GetLuaFunctionNameUpgradeInfo ( string strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
+static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
 {
     static map < string, string > hashClient;
     static map < string, string > hashServer;
