@@ -1250,7 +1250,7 @@ int CLuaFunctionDefinitions::dxDrawText ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "dxDrawText" );
 
     // Failed
-    lua_pushboolean ( luaVM, true );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
@@ -1299,9 +1299,100 @@ int CLuaFunctionDefinitions::dxDrawRectangle ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "dxDrawRectangle" );
 
     // Failed
-    lua_pushboolean ( luaVM, true );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefinitions::dxDrawImage ( lua_State* luaVM )
+{
+    // dxDrawImage ( float x,float y,float width,float height,string filename,[float rotation,
+    //            float rotCenOffX, float rotCenOffY, int color=0xffffffff, bool postgui] )
+
+    // Grab all argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    int iArgument5 = lua_type ( luaVM, 5 );
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+         (                              iArgument5 == LUA_TSTRING ) )
+    {
+        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        float fWidth = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+        const char * szFile = lua_tostring ( luaVM, 5 );
+        float fRotation = 0;
+        float fRotCenOffX = 0;
+        float fRotCenOffY = 0;
+        unsigned long ulColor = 0xFFFFFFFF;
+
+        int iArgument6 = lua_type ( luaVM, 6 );
+        if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+        {
+            fRotation = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
+        }
+
+        int iArgument7 = lua_type ( luaVM, 7 );
+        if ( ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) )
+        {
+            fRotCenOffX = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+        }
+
+        int iArgument8 = lua_type ( luaVM, 8 );
+        if ( ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) )
+        {
+            fRotCenOffY = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
+        }
+
+        int iArgument9 = lua_type ( luaVM, 9 );
+        if ( ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING ) )
+        {
+            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 9 ) );
+        }
+
+		// Got a post gui specifier?
+		bool bPostGUI = false;
+		int iArgument10 = lua_type ( luaVM, 10 );
+		if ( iArgument10 == LUA_TBOOLEAN )
+		{
+			bPostGUI = ( lua_toboolean ( luaVM, 10 ) ) ? true:false;
+		}
+
+		CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+		CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+
+	    // Check for a valid (and sane) file path
+	    if ( pResource && szFile && IsValidFilePath ( szFile ) )
+        {
+		    // Get the correct directory
+		    char szPath[MAX_PATH] = {0};
+
+		    snprintf ( szPath, MAX_PATH, "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		    szPath[MAX_PATH-1] = '\0';
+
+            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, szPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+            {
+                // Success
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+
+            m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load %s", szFile );
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawImage" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 
 int CLuaFunctionDefinitions::dxGetTextWidth ( lua_State* luaVM )
@@ -1337,7 +1428,7 @@ int CLuaFunctionDefinitions::dxGetTextWidth ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "dxGetTextWidth" );
 
     // Failed
-    lua_pushboolean ( luaVM, true );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 

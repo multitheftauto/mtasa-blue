@@ -83,8 +83,8 @@ public:
 
     // Textures
     IDirect3DTexture9*  CreateTexture           ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight );
-    IDirect3DTexture9*  LoadTexture             ( char* szFile );
-    IDirect3DTexture9*  LoadTexture             ( char* szFile, unsigned int uiWidth, unsigned int uiHeight );
+    IDirect3DTexture9*  LoadTexture             ( const char* szFile );
+    IDirect3DTexture9*  LoadTexture             ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight );
     void                DrawTexture             ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, unsigned char ucAlpha = 255 );
 
 	// Interface functions
@@ -108,6 +108,15 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
+    bool                DrawTextureQueued       ( float fX, float fY,
+                                                  float fWidth, float fHeight,
+                                                  const string& strFilename,
+                                                  float fRotation,
+                                                  float fRotCenOffX,
+                                                  float fRotCenOffY,
+                                                  unsigned long ulColor,
+                                                  bool bPostGUI );
+
 	void                DrawTextQueued          ( int iLeft, int iTop,
 												  int iRight, int iBottom,
 												  unsigned long dwColor,
@@ -126,6 +135,8 @@ private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
+    IDirect3DTexture9*  CacheTexture            ( const string& strFilename );
+    void                ExpireCachedTextures    ( bool bExpireAll = false );
 
     CLocalGUI*          m_pGUI;
     CGUIFont*			m_pFont;
@@ -196,7 +207,7 @@ private:
         int				iRight;
         int				iBottom;
         unsigned long	ulColor;
-        char*			szText;
+        //char*			szText;
 		float			fScaleX;
 		float			fScaleY;
 		unsigned long	ulFormat;
@@ -225,11 +236,18 @@ private:
         IDirect3DTexture9* texture;
         float           fX;
         float           fY;
+        float           fWidth;
+        float           fHeight;
+        float           fRotation;
+        float           fRotCenOffX;
+        float           fRotCenOffY;
+        unsigned long   ulColor;
     };
 
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
+        string              strText;
 
         // Queue item data based on the eType.
         union
@@ -252,6 +270,17 @@ private:
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
+
+
+    // Texures cached with DrawTextureQueued
+    struct SCachedTextureInfo
+    {
+        IDirect3DTexture9*  texture;
+        unsigned long       ulTimeLastUsed;
+    };
+
+    map < string, SCachedTextureInfo > m_CachedTextureInfoMap;
+
 };
 
 #endif

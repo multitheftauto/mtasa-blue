@@ -73,8 +73,8 @@ public:
     virtual eFontType               GetFontType         ( char * szFontName ) = 0;
 
     virtual IDirect3DTexture9*      CreateTexture       ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight ) = 0;
-    virtual IDirect3DTexture9*      LoadTexture         ( char* szFile ) = 0;
-    virtual IDirect3DTexture9*      LoadTexture         ( char* szFile, unsigned int uiWidth, unsigned int uiHeight ) = 0;
+    virtual IDirect3DTexture9*      LoadTexture         ( const char* szFile ) = 0;
+    virtual IDirect3DTexture9*      LoadTexture         ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight ) = 0;
     virtual void                    DrawTexture         ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, unsigned char ucAlpha = 255 ) = 0;
 
     // Queued up drawing
@@ -93,6 +93,15 @@ public:
 														  float fWidth, float fHeight,
 														  unsigned long ulColor,
 														  bool bPostGUI ) = 0;
+
+    virtual bool                    DrawTextureQueued   ( float fX, float fY,
+                                                          float fWidth, float fHeight,
+                                                          const string& strFilename,
+                                                          float fRotation,
+                                                          float fRotCenOffX,
+                                                          float fRotCenOffY,
+                                                          unsigned long ulColor,
+                                                          bool bPostGUI ) = 0;
 
 	virtual void					DrawTextQueued      ( int iLeft, int iTop,
 														  int iRight, int iBottom,

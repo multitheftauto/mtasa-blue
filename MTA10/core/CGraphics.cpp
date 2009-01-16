@@ -53,6 +53,7 @@ CGraphics::~CGraphics ( void )
         m_pLineInterface->Release ();
 
 	DestroyFonts ();
+    ExpireCachedTextures ( true );
 }
 
 
@@ -596,6 +597,37 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
 }
 
 
+bool CGraphics::DrawTextureQueued ( float fX, float fY,
+                                 float fWidth, float fHeight,
+                                 const string& strFilename,
+                                 float fRotation,
+                                 float fRotCenOffX,
+                                 float fRotCenOffY,
+                                 unsigned long ulColor,
+                                 bool bPostGUI )
+{
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_TEXTURE;
+    Item.Texture.fX = fX;
+    Item.Texture.fY = fY;
+    Item.Texture.fWidth = fWidth;
+    Item.Texture.fHeight = fHeight;
+    Item.Texture.texture = CacheTexture( strFilename );
+    Item.Texture.fRotation = fRotation;
+    Item.Texture.fRotCenOffX = fRotCenOffX;
+    Item.Texture.fRotCenOffY = fRotCenOffY;
+    Item.Texture.ulColor = ulColor;
+
+    if ( !Item.Texture.texture )
+        return false;
+
+    // Add it to the queue
+    AddQueueItem ( Item, bPostGUI );
+    return true;
+}
+
+
 void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 								 int iRight, int iBottom,
 								 unsigned long dwColor,
@@ -640,7 +672,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 		Item.Text.ulFormat = ulFormat;
 		Item.Text.pDXFont = pDXFont;
 
-		Item.Text.szText = (char*)szText;
+		Item.strText = szText;
 
 		// Add it to the queue
 		AddQueueItem ( Item, bPostGUI );
@@ -726,14 +758,14 @@ IDirect3DTexture9* CGraphics::CreateTexture ( DWORD* dwBitMap, unsigned int uiWi
     return texture;
 }
 
-IDirect3DTexture9* CGraphics::LoadTexture ( char* szFile )
+IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile )
 {
     IDirect3DTexture9* texture = NULL;
 	D3DXCreateTextureFromFile ( m_pDevice, szFile, &texture );
     return texture;
 }
 
-IDirect3DTexture9* CGraphics::LoadTexture ( char* szFile, unsigned int uiWidth, unsigned int uiHeight )
+IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight )
 {
     IDirect3DTexture9* texture = NULL;
     D3DXCreateTextureFromFileEx ( m_pDevice, szFile, uiWidth, uiHeight, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &texture );
@@ -888,6 +920,9 @@ void CGraphics::DrawPostGUIQueue ( void )
         // Clear the list
         m_PostGUIQueue.clear ();
     }
+
+    // Clean out unused textures here
+    ExpireCachedTextures ();
 }
 
 
@@ -967,20 +1002,25 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 			D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
 			D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
 			m_pDXSprite->SetTransform ( &matrix );        
-			Item.Text.pDXFont->DrawText ( m_pDXSprite, Item.Text.szText, -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+			Item.Text.pDXFont->DrawText ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
             m_pDXSprite->End ();
 			break;
 		}
         case QUEUE_TEXTURE:
         {
             m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+            D3DSURFACE_DESC texureDesc;
+            Item.Texture.texture->GetLevelDesc( 0, &texureDesc );
+            float texureWidth   = texureDesc.Width;
+            float texureHeight  = texureDesc.Height;
+            float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
             D3DXMATRIX matrix;
-            D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
-            D3DXVECTOR2 scaling ( 1.0f, 1.0f );
-            D3DXVECTOR3 position ( Item.Texture.fX, Item.Texture.fY, 0.0f );
-            D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, NULL, NULL, NULL );
+            D3DXVECTOR2 scaling         ( Item.Texture.fWidth / texureWidth, Item.Texture.fHeight / texureHeight );
+            D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
+            D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+			D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
             m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( Item.Texture.texture, NULL, NULL, &position, D3DCOLOR_ARGB ( 255, 255, 255, 255 ) );
+            m_pDXSprite->Draw ( Item.Texture.texture, NULL, NULL, NULL, Item.Texture.ulColor );
             m_pDXSprite->End ();
             break;
         }
@@ -991,3 +1031,52 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         };
     }
 }
+
+
+// Cache a texture for current and future use.
+IDirect3DTexture9* CGraphics::CacheTexture ( const string& strFilename )
+{
+    // Find exisiting
+    map < string, SCachedTextureInfo >::iterator iter = m_CachedTextureInfoMap.find ( strFilename );
+
+    if ( iter == m_CachedTextureInfoMap.end () )
+    {
+        // Add if not found
+        m_CachedTextureInfoMap[strFilename] = SCachedTextureInfo();
+        iter = m_CachedTextureInfoMap.find ( strFilename );
+
+        SCachedTextureInfo& info = iter->second;
+        info.texture = LoadTexture( strFilename.c_str () );
+    }
+
+    SCachedTextureInfo& info = iter->second;
+    info.ulTimeLastUsed = GetTickCount();
+
+    return info.texture;
+}
+
+
+// Remove any cached texures that have not been used for a little while.
+void CGraphics::ExpireCachedTextures ( bool bExpireAll )
+{
+    // Expire unused cached textures
+    // 1 cached texture     = 15 seconds till expire
+    // 50 cached textures   = 8 seconds till expire
+    // 100 cached textures  = 1 second till expire
+    long ulNumTextures              = m_CachedTextureInfoMap.size ();
+    unsigned long ulMaxAgeSeconds   = max( 1, 15 - (ulNumTextures * 15 / 100) );
+
+    map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
+    for ( ; iter != m_CachedTextureInfoMap.end (); iter++ )
+    {
+        SCachedTextureInfo& info    = iter->second;
+        unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
+        if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
+        {
+            info.texture->Release ();
+            m_CachedTextureInfoMap.erase ( iter );
+            iter = m_CachedTextureInfoMap.begin ();
+        }
+    }
+}
+

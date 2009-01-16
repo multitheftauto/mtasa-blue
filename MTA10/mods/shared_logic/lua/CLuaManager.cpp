@@ -514,6 +514,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxDrawLine3D", CLuaFunctionDefinitions::dxDrawLine3D );
     CLuaCFunctions::AddFunction ( "dxDrawText", CLuaFunctionDefinitions::dxDrawText );
     CLuaCFunctions::AddFunction ( "dxDrawRectangle", CLuaFunctionDefinitions::dxDrawRectangle );
+    CLuaCFunctions::AddFunction ( "dxDrawImage", CLuaFunctionDefinitions::dxDrawImage );
     CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefinitions::dxGetTextWidth );
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefinitions::dxGetFontHeight );
 
