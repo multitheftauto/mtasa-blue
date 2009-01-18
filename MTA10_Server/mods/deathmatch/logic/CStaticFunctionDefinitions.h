@@ -137,8 +137,6 @@ public:
     static bool                 GetPlayerTotalAmmo                  ( CPlayer* pPlayer, unsigned short& usAmmo );
     static bool                 GetPlayerWeapon                     ( CPlayer* pPlayer, unsigned char& ucWeapon );
     static CPlayer*             GetPlayerFromNick                   ( const char* szNick );
-    static CVehicle*            GetPlayerOccupiedVehicle            ( CPlayer* pPlayer );
-    static bool                 GetPlayerOccupiedVehicleSeat        ( CPlayer* pPlayer, unsigned int& uiSeat );
     static bool                 GetPlayerPing                       ( CPlayer* pPlayer, unsigned int& uiPing );
     static bool                 GetPlayerMoney                      ( CPlayer* pPlayer, long& lMoney );
     static bool                 GetPlayerSourceIP                   ( CPlayer* pPlayer, char* szIP );
@@ -194,6 +192,8 @@ public:
     static bool                 IsPedDoingGangDriveby               ( CPed* pPed, bool & bDoingGangDriveby );
     static bool                 IsPedOnFire                         ( CPed* pPed, bool & bIsOnFire );
     static bool                 IsPedHeadless                       ( CPed* pPed, bool & bIsHeadless );
+    static CVehicle*            GetPedOccupiedVehicle               ( CPlayer* pPlayer );
+    static bool                 GetPedOccupiedVehicleSeat           ( CPlayer* pPlayer, unsigned int& uiSeat );
 
     // Ped set funcs
     static bool                 SetPedArmor                         ( CElement* pElement, float fArmor );

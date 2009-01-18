@@ -1591,7 +1591,7 @@ CPlayer* CStaticFunctionDefinitions::GetPlayerFromNick ( const char* szNick )
 }
 
 
-CVehicle* CStaticFunctionDefinitions::GetPlayerOccupiedVehicle ( CPlayer* pPlayer )
+CVehicle* CStaticFunctionDefinitions::GetPedOccupiedVehicle ( CPlayer* pPlayer )
 {
     assert ( pPlayer );
 
@@ -1599,7 +1599,7 @@ CVehicle* CStaticFunctionDefinitions::GetPlayerOccupiedVehicle ( CPlayer* pPlaye
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerOccupiedVehicleSeat ( CPlayer* pPlayer, unsigned int& uiSeat )
+bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat ( CPlayer* pPlayer, unsigned int& uiSeat )
 {
     assert ( pPlayer );
 

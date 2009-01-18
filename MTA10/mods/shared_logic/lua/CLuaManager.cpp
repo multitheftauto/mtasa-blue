@@ -233,6 +233,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaFunctionDefinitions::XMLNodeGetChildren );
     CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefinitions::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefinitions::XMLCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefinitions::XMLNodeFindChild );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Resource funcs
@@ -764,7 +765,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefinitions::ToggleAllControls );
 
     // XML functions
-    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefinitions::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlFindChild", CLuaFunctionDefinitions::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlNodeGetChildren", CLuaFunctionDefinitions::XMLNodeGetChildren );
     CLuaCFunctions::AddFunction ( "xmlNodeGetValue", CLuaFunctionDefinitions::XMLNodeGetValue );
     CLuaCFunctions::AddFunction ( "xmlNodeSetValue", CLuaFunctionDefinitions::XMLNodeSetValue );
