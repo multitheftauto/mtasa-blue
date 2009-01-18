@@ -1163,10 +1163,10 @@ int CLuaFunctionDefinitions::GetPedOccupiedVehicle ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
+        CPed* pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
         {
-            CVehicle* pVehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle ( pPlayer );
+            CVehicle* pVehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle ( pPed );
             if ( pVehicle )
             {
                 lua_pushelement ( luaVM, pVehicle );
@@ -1174,7 +1174,7 @@ int CLuaFunctionDefinitions::GetPedOccupiedVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOccupiedVehicle", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOccupiedVehicle", "ped", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getPedOccupiedVehicle" );
@@ -1188,19 +1188,19 @@ int CLuaFunctionDefinitions::GetPedOccupiedVehicleSeat ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        CPed* pPed = lua_toped ( luaVM, 1 );
         unsigned int uiSeat = 0;
 
-        if ( pPlayer )
+        if ( pPed )
         {
-            if ( CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat ( pPlayer, uiSeat ) )
+            if ( CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat ( pPed, uiSeat ) )
             {
                 lua_pushnumber ( luaVM, uiSeat );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOccupiedVehicleSeat", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOccupiedVehicleSeat", "ped", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getPedOccupiedVehicleSeat" );
@@ -1381,18 +1381,18 @@ int CLuaFunctionDefinitions::IsPedInVehicle ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        CPed* pPed = lua_toped ( luaVM, 1 );
         bool bInVehicle;
 
-        if ( pPlayer )
+        if ( pPed )
         {
-            bInVehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle ( pPlayer ) != NULL;
+            bInVehicle = CStaticFunctionDefinitions::GetPedOccupiedVehicle ( pPed ) != NULL;
             
             lua_pushboolean ( luaVM, bInVehicle );
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedInVehicle", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedInVehicle", "ped", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "isPedInVehicle" );

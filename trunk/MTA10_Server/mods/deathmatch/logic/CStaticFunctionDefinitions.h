@@ -192,8 +192,8 @@ public:
     static bool                 IsPedDoingGangDriveby               ( CPed* pPed, bool & bDoingGangDriveby );
     static bool                 IsPedOnFire                         ( CPed* pPed, bool & bIsOnFire );
     static bool                 IsPedHeadless                       ( CPed* pPed, bool & bIsHeadless );
-    static CVehicle*            GetPedOccupiedVehicle               ( CPlayer* pPlayer );
-    static bool                 GetPedOccupiedVehicleSeat           ( CPlayer* pPlayer, unsigned int& uiSeat );
+    static CVehicle*            GetPedOccupiedVehicle               ( CPed* pPed );
+    static bool                 GetPedOccupiedVehicleSeat           ( CPed* pPed, unsigned int& uiSeat );
 
     // Ped set funcs
     static bool                 SetPedArmor                         ( CElement* pElement, float fArmor );
