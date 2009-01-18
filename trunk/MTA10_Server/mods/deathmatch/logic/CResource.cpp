@@ -270,19 +270,24 @@ static void CheckLuaFileForIssues ( const string& strPath, const string& strFile
         {
             // Rename old to lua.dp2
             string strBakFilename = strPath + ".dp2";
-            if ( rename( strPath.c_str (), strBakFilename.c_str () ) )
+            for ( int i = 0 ; rename( strPath.c_str (), strBakFilename.c_str () ) ; i++ )
             {
-                CLogger::LogPrintf ( "Upgrader: Unable to rename %s to %s\n", strPath.c_str (), strBakFilename.c_str () );
-            }
-            else
-            {
-                // Save new content
-                if ( FILE* pFile = fopen ( strPath.c_str (), "wb" ) )
+                if ( i > 100 )
                 {
-                    fwrite ( strNewFileContents.c_str (), 1, strNewFileContents.length (), pFile );
-                    fclose ( pFile );
-                    CLogger::LogPrintf ( "Upgrading %s ...........done\n", strFileName.c_str () );
+                    CLogger::LogPrintf ( "Upgrader: Unable to rename %s to %s\n", strPath.c_str (), strBakFilename.c_str () );
+                    return;
                 }
+                char buffer[32];
+                _snprintf( buffer, 32, "%d", i + 1 );
+                strBakFilename = strPath + ".dp2_" + buffer;
+            }
+
+            // Save new content
+            if ( FILE* pFile = fopen ( strPath.c_str (), "wb" ) )
+            {
+                fwrite ( strNewFileContents.c_str (), 1, strNewFileContents.length (), pFile );
+                fclose ( pFile );
+                CLogger::LogPrintf ( "Upgrading %s ...........done\n", strFileName.c_str () );
             }
         }
     }
@@ -582,9 +587,9 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashClient["setVehicleRotation"]        = "Replaced|setElementRotation";
         hashClient["attachElementToElement"]    = "Replaced|attachElements";
         hashClient["detachElementFromElement"]  = "Replaced|detachElements";
-        hashClient["xmlFindSubNode"]            = "Replaced|xmlNodeFindChild";
+        hashClient["xmlFindSubNode"]            = "Replaced|xmlFindChild";
         hashClient["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
-        hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlNodeFindChild";
+        hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlFindChild";
         hashClient["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
 
         // Client functions. (from the wiki but missing in the code)
@@ -599,6 +604,9 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashClient["rotateCameraUp"]            = "Removed|Spend ages changing everything.";
         // Edit
         hashClient["guiEditSetCaratIndex"]      = "Replaced|guiEditSetCaretIndex";
+
+        // Client functions. (policy changes)
+        hashClient["xmlNodeFindChild"]          = "Replaced|xmlFindChild";
 
 
         // Server functions. (from the C++ code)
@@ -656,12 +664,10 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashServer["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
         hashServer["setCameraMode"]             = "Removed|Spend ages changing everything.";
         // Player
-        hashServer["getPlayerAmmoInClip"]       = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["getPlayerOccupiedVehicle"]  = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["getPlayerOccupiedVehicleSeat"] = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["getPlayerTotalAmmo"]        = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["getPlayerWeapon"]           = "Other|Wiki says depreciated, but no replacement available.";
-        hashServer["isPlayerInVehicle"]         = "Other|Wiki says depreciated, but no replacement available.";
+        hashServer["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
+        hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
+        hashServer["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
+
         // Utility
         hashServer["randFloat"]                 = "Replaced|math.random";
         hashServer["randInt"]                   = "Replaced|math.random";

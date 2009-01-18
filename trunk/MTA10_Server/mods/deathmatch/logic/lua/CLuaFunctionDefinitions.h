@@ -82,12 +82,9 @@ public:
     static int      GetPlayerWeapon                     ( lua_State* luaVM );
     static int      GetPlayerFromNick                   ( lua_State* luaVM );
     static int      GetPlayerMoney                      ( lua_State* luaVM );
-    static int      GetPlayerOccupiedVehicle            ( lua_State* luaVM );
-    static int      GetPlayerOccupiedVehicleSeat        ( lua_State* luaVM );
     static int      GetPlayerPing                       ( lua_State* luaVM );
     static int      GetRandomPlayer                     ( lua_State* luaVM );
     static int      IsPlayerMuted                       ( lua_State* luaVM );
-    static int      IsPlayerInVehicle                   ( lua_State* luaVM );
     static int      GetPlayerTeam                       ( lua_State* luaVM );
     static int      CanPlayerUseFunction                ( lua_State* luaVM );
     static int      GetPlayerWantedLevel                ( lua_State* luaVM );
@@ -140,6 +137,9 @@ public:
     static int      IsPedDoingGangDriveby               ( lua_State* luaVM );
     static int      IsPedOnFire                         ( lua_State* luaVM );
     static int      IsPedHeadless                       ( lua_State* luaVM );
+    static int      GetPedOccupiedVehicle               ( lua_State* luaVM );
+    static int      GetPedOccupiedVehicleSeat           ( lua_State* luaVM );
+    static int      IsPedInVehicle                      ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPedArmor                         ( lua_State* luaVM );    
