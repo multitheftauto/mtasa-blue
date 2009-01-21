@@ -244,6 +244,16 @@ CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
 }
 
 
+CBan* lua_toban ( lua_State* luaVM, int iArgument )
+{
+    CBan* pBan = reinterpret_cast < CBan* > ( lua_touserdata ( luaVM, iArgument ) );
+    if ( g_pGame->GetBanManager ()->Exists ( pBan ) )
+        return pBan;
+
+    return NULL;
+}
+
+
 void lua_pushelement ( lua_State* luaVM, CElement* pElement )
 {
     if ( pElement )
@@ -305,4 +315,10 @@ void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pElement )
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 {
     lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pElement->GetID () ) );
+}
+
+
+void lua_pushban ( lua_State* luaVM, CBan* pBan )
+{
+    lua_pushlightuserdata ( luaVM, pBan );
 }

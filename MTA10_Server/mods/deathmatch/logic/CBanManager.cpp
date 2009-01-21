@@ -51,28 +51,6 @@ void CBanManager::DoPulse ( void )
 }
 
 
-CBan* CBanManager::AddBan ( const char* szIP, bool bSaveList )
-{
-    if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
-    {
-        CBan* pBan = new CBan;
-        pBan->SetIP ( szIP );
-
-        m_BanManager.push_back ( pBan );
-        g_pNetServer->AddBan ( szIP );
-
-        if ( bSaveList )
-        {
-            SaveBanList ();
-        }
-
-        return pBan;
-    }
-
-    return NULL;
-}
-
-
 CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
@@ -82,34 +60,10 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szRe
 
         if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
         {
-            time_t rawtime = time(NULL);
-            tm* time = localtime(&rawtime);
-
-            char szDate[256] = { '\0' };
-            _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-			szDate[255] = '\0';
-
-            char szTime[256] = { '\0' };
-            _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-			szTime[255] = '\0';
-
-            // Create the ban and assign its values
-            CBan* pBan = new CBan;
+            CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetIP ( szIP );
-            pBan->SetNick ( pPlayer->GetNick () );
-            pBan->SetReason ( szReason );
-            pBan->SetDateOfBan ( szDate );
-            pBan->SetTimeOfBan ( szTime );
-            pBan->SetTimeOfUnban ( tTimeOfUnban );
 
-            // Eventually set the banner
-            if ( pBanner )
-            {
-                pBan->SetBanner ( pBanner->GetNick () );
-            }
-
-            // Add it to the back of our banned list, add it to net server's ban list
-            m_BanManager.push_back ( pBan );
             g_pNetServer->AddBan ( szIP );
 
             // Save the list
@@ -124,186 +78,134 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szRe
 
 CBan* CBanManager::AddBan ( const char* szIP, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
 {
-    if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) && pBanner )
+    if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
     {
-        time_t rawtime = time(NULL);
-        tm* time = localtime(&rawtime);
-
-        char szDate[256] = { '\0' };
-        _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-		szDate[255] = '\0';
-
-        char szTime[256] = { '\0' };
-        _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-		szTime[255] = '\0';
-
-        // Create the ban and assign its values
-        CBan* pBan = new CBan;
+        CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
         pBan->SetIP ( szIP );
+
+        g_pNetServer->AddBan ( szIP );
+
+        // Save the list
+        SaveBanList ();
+        return pBan;
+    }
+
+    return NULL;
+}
+
+
+CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+{
+    if ( pPlayer )
+    {
+        if ( !pPlayer->GetSerial ().empty() && !IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
+	    {
+		    CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            pBan->SetNick ( pPlayer->GetNick() );
+            pBan->SetSerial ( pPlayer->GetSerial () );
+            SaveBanList ();
+
+            return pBan;
+        }
+    }
+
+    return NULL;
+}
+
+
+CBan* CBanManager::AddSerialBan ( const char* szSerial, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+{
+    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( szSerial ) )
+	{
+		CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+        pBan->SetSerial ( szSerial );
+        SaveBanList ();
+
+        return pBan;
+    }
+
+    return NULL;
+}
+
+
+CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+{
+    if ( pPlayer )
+    {
+        if ( !pPlayer->GetSerialUser ().empty() && !IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
+	    {
+		    CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            pBan->SetNick ( pPlayer->GetNick() );
+            pBan->SetAccount ( pPlayer->GetSerialUser () );
+            SaveBanList ();
+
+            return pBan;
+        }
+    }
+
+    return NULL;
+}
+
+
+CBan* CBanManager::AddAccountBan ( const char* szAccount, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+{
+    if ( !IsAccountBanned ( szAccount ) )
+	{
+		CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+        pBan->SetSerial ( szAccount );
+        SaveBanList ();
+
+        return pBan;
+    }
+
+    return NULL;
+}
+
+
+CBan* CBanManager::AddBan ( CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+{
+    time_t rawtime = time ( NULL );
+    tm* time = localtime(&rawtime);
+
+    char szDate[256] = { '\0' };
+    _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
+	szDate[255] = '\0';
+
+    char szTime[256] = { '\0' };
+    _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
+	szTime[255] = '\0';
+
+    // Create the ban and assign its values
+    CBan* pBan = new CBan;
+    pBan->SetDateOfBan ( szDate );
+    pBan->SetTimeOfBan ( szTime );
+    pBan->SetTimeOfUnban ( tTimeOfUnban );
+
+    if ( szReason )
         pBan->SetReason ( szReason );
-        pBan->SetDateOfBan ( szDate );
-        pBan->SetTimeOfBan ( szTime );
-        pBan->SetTimeOfUnban ( tTimeOfUnban );
 
-        // Eventually set the banner
-        if ( pBanner )
+    if ( pBanner )
+        pBan->SetBanner ( pBanner->GetNick () );
+
+    // Add it to the back of our banned list, add it to net server's ban list
+    m_BanManager.push_back ( pBan );
+
+    return pBan;
+}
+
+
+bool CBanManager::Exists ( CBan* pBan )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( *iter == pBan )
         {
-            pBan->SetBanner ( pBanner->GetNick () );
+            return true;
         }
-
-        // Add it to the back of our banned list, add it to net server's ban list
-        m_BanManager.push_back ( pBan );
-        g_pNetServer->AddBan ( szIP );
-
-        // Save the list
-        SaveBanList ();
-        return pBan;
     }
 
-    return NULL;
-}
-
-
-CBan* CBanManager::AddBan ( const char* szIP, CPlayer* pBanner )
-{
-    if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) && pBanner )
-	{
-		time_t rawtime = time(NULL);
-        tm* time = localtime(&rawtime);
-
-        char szDate[256] = { '\0' };
-        _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-		szDate[255] = '\0';
-
-        char szTime[256] = { '\0' };
-        _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-		szTime[255] = '\0';
-
-        // Create the ban and assign its values
-        CBan* pBan = new CBan;
-        pBan->SetIP ( szIP );
-        pBan->SetDateOfBan ( szDate );
-        pBan->SetTimeOfBan ( szTime );
-
-        // Eventually set the banner
-        if ( pBanner )
-        {
-            pBan->SetBanner ( pBanner->GetNick () );
-        }
-
-        // Add it to the back of our banned list, add it to net server's ban list
-        m_BanManager.push_back ( pBan );
-        g_pNetServer->AddBan ( szIP );
-
-        // Save the list
-        SaveBanList ();
-        return pBan;
-    }
-
-    return NULL;
-}
-
-
-CBan* CBanManager::AddSerialBan ( const char* szSerial )
-{
-    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( szSerial ) )
-	{
-		time_t rawtime = time(NULL);
-        tm* time = localtime(&rawtime);
-
-        char szDate[256] = { '\0' };
-        _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-		szDate[255] = '\0';
-
-        char szTime[256] = { '\0' };
-        _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-		szTime[255] = '\0';
-
-        // Create the ban and assign its values
-        CBan* pBan = new CBan;
-        pBan->SetSerial ( szSerial );
-        pBan->SetDateOfBan ( szDate );
-        pBan->SetTimeOfBan ( szTime );
-
-        m_BanManager.push_back ( pBan );
-        SaveBanList ();
-
-        return pBan;
-    }
-
-    return NULL;
-}
-
-
-CBan* CBanManager::AddSerialBan ( const char* szSerial, const char* szReason, CClient* pBanner )
-{
-    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( szSerial ) )
-	{
-		time_t rawtime = time(NULL);
-        tm* time = localtime(&rawtime);
-
-        char szDate[256] = { '\0' };
-        _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-		szDate[255] = '\0';
-
-        char szTime[256] = { '\0' };
-        _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-		szTime[255] = '\0';
-
-        // Create the ban and assign its values
-        CBan* pBan = new CBan;
-		if ( szReason )
-			pBan->SetReason ( szReason );
-        pBan->SetSerial ( szSerial );
-        pBan->SetDateOfBan ( szDate );
-        pBan->SetTimeOfBan ( szTime );
-
-        // Eventually set the banner
-        if ( pBanner )
-        {
-            pBan->SetBanner ( pBanner->GetNick () );
-        }
-
-        m_BanManager.push_back ( pBan );
-        SaveBanList ();
-
-        return pBan;
-    }
-
-    return NULL;
-}
-
-
-CBan* CBanManager::AddSerialBan ( const char* szSerial, const char* szReason )
-{
-    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( szSerial ) )
-	{
-		time_t rawtime = time(NULL);
-        tm* time = localtime(&rawtime);
-
-        char szDate[256] = { '\0' };
-        _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-		szDate[255] = '\0';
-
-        char szTime[256] = { '\0' };
-        _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-		szTime[255] = '\0';
-
-        // Create the ban and assign its values
-        CBan* pBan = new CBan;
-		if ( szReason )
-			pBan->SetReason ( szReason );
-        pBan->SetSerial ( szSerial );
-        pBan->SetDateOfBan ( szDate );
-        pBan->SetTimeOfBan ( szTime );
-
-        m_BanManager.push_back ( pBan );
-        SaveBanList ();
-
-        return pBan;
-    }
-
-    return NULL;
+    return false;
 }
 
 
@@ -334,6 +236,21 @@ bool CBanManager::IsSerialBanned ( const char* szSerial )
     for ( ; iter != m_BanManager.end (); iter++ )
     {
         if ( (*iter)->GetSerial () == szSerial )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+bool CBanManager::IsAccountBanned ( const char* szAccount )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( (*iter)->GetAccount () == szAccount )
         {
             return true;
         }

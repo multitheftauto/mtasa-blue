@@ -9645,16 +9645,35 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
             CPlayer* pResponsible = NULL;
             const char* szReason = NULL;
 
-            if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+            bool bIP = true;
+            bool bUsername = false;
+            bool bSerial = false;
+
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                pResponsible = lua_toplayer ( luaVM, 2 );
+                bIP = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
             }
-            if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-                szReason = lua_tostring ( luaVM, 3 );
+
+            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+            {
+                bUsername = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
+            }
+
+            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+            {
+                bSerial = ( lua_toboolean ( luaVM, 4 ) ) ? true : false;
+            }
+
+            if ( lua_type ( luaVM, 5 ) == LUA_TLIGHTUSERDATA )
+            {
+                pResponsible = lua_toplayer ( luaVM, 5 );
+            }
+            if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
+                szReason = lua_tostring ( luaVM, 6 );
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::BanPlayer ( pPlayer, pResponsible, szReason ) )
+                if ( CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -9672,96 +9691,75 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::BanIP ( lua_State* luaVM )
+int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) ||
+         ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) ||
+         ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) )
     {
-        const char* szIP = lua_tostring ( luaVM, 1 );
-        CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        const char* szIP = NULL;
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
         {
-            pResponsible = lua_toplayer ( luaVM, 2 );
+            szIP = lua_tostring ( luaVM, 1 );
         }
 
-        if ( CStaticFunctionDefinitions::BanIP ( szIP, pResponsible ) )
+        const char* szUsername = NULL;
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+        {
+            szUsername = lua_tostring ( luaVM, 2 );
+        }
+
+        const char* szSerial = NULL;
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+        {
+            szSerial = lua_tostring ( luaVM, 3 );
+        }
+
+        CPlayer* pResponsible = NULL;
+        if ( lua_type ( luaVM, 4 ) == LUA_TLIGHTUSERDATA )
+        {
+            pResponsible = lua_toplayer ( luaVM, 4 );
+        }
+
+        const char* szReason = NULL;
+        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+        {
+            szReason = lua_tostring ( luaVM, 5 );
+        }
+
+		if ( CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "banIP" );
+        m_pScriptDebugging->LogBadType ( luaVM, "addBan" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
-int CLuaFunctionDefinitions::UnbanIP ( lua_State* luaVM )
+int CLuaFunctionDefinitions::RemoveBan ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        const char* szIP = lua_tostring ( luaVM, 1 );
-        CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
         {
-            pResponsible = lua_toplayer ( luaVM, 2 );
-        }
+            CPlayer* pResponsible = NULL;
+            if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+            {
+                pResponsible = lua_toplayer ( luaVM, 2 );
+            }
 
-        if ( CStaticFunctionDefinitions::UnbanIP ( szIP, pResponsible ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "unbanIP" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::BanSerial ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szSerial = lua_tostring ( luaVM, 1 );
-        CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-        {
-            pResponsible = lua_toplayer ( luaVM, 2 );
-        }
-
-		if ( CStaticFunctionDefinitions::BanSerial ( szSerial, pResponsible ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "banSerial" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::UnbanSerial ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szSerial = lua_tostring ( luaVM, 1 );
-        CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-        {
-            pResponsible = lua_toplayer ( luaVM, 2 );
-        }
-
-        if ( CStaticFunctionDefinitions::UnbanSerial ( szSerial, pResponsible ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::RemoveBan ( pBan, pResponsible ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
@@ -9772,41 +9770,187 @@ int CLuaFunctionDefinitions::UnbanSerial ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetBansXML ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetBans ( lua_State* luaVM )
 {
     // Grab its lua
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
     {
-        // Save the ban list before retrieving it
-        g_pGame->GetBanManager ()->SaveBanList ();
+        lua_newtable ( luaVM );
+        
+        CStaticFunctionDefinitions::GetBans ( pLuaMain );
 
-        // Create a ban XML
-	    CXMLFile* pBanFile = g_pServerInterface->GetXML()->CreateXML ( g_pGame->GetBanManager()->GetFilePath () );
-	    if ( pBanFile )
-	    {
-            // Try to parse it
-            if ( pBanFile->Parse () )
-            {
-                // Try to parse it
-		        CXMLNode* pNode = pBanFile->GetRootNode ();
-		        if ( pNode )
-		        {
-                    // Reference it in the LUA VM so that it's for sure deleted
-                    pLuaMain->AddXML ( pBanFile );
-
-                    // Return the node
-			        lua_pushxmlnode ( luaVM, pNode );
-			        return 1;
-		        }
-            }
-
-            // Delete it again
-            g_pServerInterface->GetXML()->DeleteXML ( pBanFile );
-	    }
+        return 1;
     }
 
-    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetBanIP ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szIP [32];
+            if ( CStaticFunctionDefinitions::GetBanIP ( pBan, szIP, 31 ) )
+            {
+                lua_pushstring ( luaVM, szIP );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanIP" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanSerial ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szSerial [64];
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szSerial, 63 ) )
+            {
+                lua_pushstring ( luaVM, szSerial );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanSerial" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanUsername ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szUsername [32];
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szUsername, 31 ) )
+            {
+                lua_pushstring ( luaVM, szUsername );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanUsername" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanNick ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szNick [32];
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szNick, 31 ) )
+            {
+                lua_pushstring ( luaVM, szNick );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanNick" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanTime ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szTime [32];
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szTime, 31 ) )
+            {
+                lua_pushstring ( luaVM, szTime );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanTime" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanReason ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szReason [256];
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szReason, 255 ) )
+            {
+                lua_pushstring ( luaVM, szReason );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanReason" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetBanAdmin ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            char szAdmin [32];
+            if ( CStaticFunctionDefinitions::GetBanAdmin ( pBan, szAdmin, 255 ) )
+            {
+                lua_pushstring ( luaVM, szAdmin );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBanAdmin" );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

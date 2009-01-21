@@ -1081,6 +1081,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerPickupUse", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onPlayerContact", "previous, current", NULL, false );
+    m_Events.AddEvent ( "onPlayerBan", "ban", NULL, false );
 
     // Element events
     m_Events.AddEvent ( "onElementColShapeHit", "colshape, matchingDimension", NULL, false );

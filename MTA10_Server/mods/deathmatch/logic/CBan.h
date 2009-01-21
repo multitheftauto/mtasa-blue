@@ -21,10 +21,10 @@ class CBan
 public:
                                 CBan                    ( void ) ;
 
-    inline  const std::string&  GetIP                   ( void )                        { return m_strIP; };
+    inline const std::string&   GetIP                   ( void )                        { return m_strIP; };
     inline void                 SetIP                   ( const std::string& strIP )    { m_strIP = strIP; };
 
-    inline  const std::string&  GetNick                 ( void )                        { return m_strNick; };
+    inline const std::string&   GetNick                 ( void )                        { return m_strNick; };
     inline void                 SetNick                 ( const std::string& strNick )  { m_strNick = strNick; };
 
     inline const std::string&   GetBanner               ( void )                        { return m_strBanner; };
@@ -45,6 +45,9 @@ public:
     inline const std::string&   GetSerial               ( void )                        { return m_strSerial; };
     void                        SetSerial               ( const std::string& strSerial ){ m_strSerial = strSerial; };
 
+    inline const std::string&   GetAccount              ( void )                        { return m_strAccount; };
+    void                        SetAccount              ( const std::string& strAccount ){ m_strAccount = strAccount; };
+
 private:
     std::string                 m_strIP;
     std::string                 m_strNick;
@@ -53,8 +56,8 @@ private:
     std::string                 m_strDateOfBan;
     std::string                 m_strTimeOfBan;
     std::string                 m_strSerial;
+    std::string                 m_strAccount;
     time_t                      m_tTimeOfUnban;
-
 };
 
 #endif

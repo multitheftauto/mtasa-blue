@@ -505,13 +505,20 @@ public:
 
     // Admin funcs
     static bool                 KickPlayer                          ( CPlayer* pPlayer, CPlayer* pResponsible = NULL, const char* szReason = NULL );
-    static bool                 BanPlayer                           ( CPlayer* pPlayer, CPlayer* pResponsible = NULL, const char* szReason = NULL );
+    static bool                 BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL );
 
-    static bool                 BanIP                               ( const char* szIP, CPlayer* pResponsible = NULL );
-    static bool                 UnbanIP                             ( const char* szIP, CPlayer* pResponsible = NULL );
-	static bool					BanSerial							( const char* szSerial, CPlayer* pResponsible = NULL );
-	static bool					UnbanSerial							( const char* szSerial, CPlayer* pResponsible = NULL );
+    static bool                 AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason );
+    static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
+    static bool					GetBans							    ( CLuaMain* pLuaMain );
+
+    static bool					GetBanIP							( CBan* pBan, char* szIP, size_t size );
+    static bool					GetBanSerial						( CBan* pBan, char* szSerial, size_t size );
+    static bool					GetBanUsername						( CBan* pBan, char* szUsername, size_t size );
+    static bool					GetBanNick							( CBan* pBan, char* szNick, size_t size );
+    static bool					GetBanTime							( CBan* pBan, char* szTime, size_t size );
+    static bool					GetBanReason						( CBan* pBan, char* szReason, size_t size );
+    static bool                 GetBanAdmin                         ( CBan* pBan, char* szAdmin, size_t size );
     // Cursor get funcs
     static bool                 IsCursorShowing                     ( CPlayer* pPlayer, bool& bShowing );
 

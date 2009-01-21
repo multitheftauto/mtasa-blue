@@ -621,12 +621,19 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "kickPlayer", CLuaFunctionDefinitions::KickPlayer );
     CLuaCFunctions::AddFunction ( "banPlayer", CLuaFunctionDefinitions::BanPlayer );
 
-    CLuaCFunctions::AddFunction ( "banIP", CLuaFunctionDefinitions::BanIP );
-    CLuaCFunctions::AddFunction ( "unbanIP", CLuaFunctionDefinitions::UnbanIP );
-	CLuaCFunctions::AddFunction ( "banSerial", CLuaFunctionDefinitions::BanSerial );
-	CLuaCFunctions::AddFunction ( "unbanSerial", CLuaFunctionDefinitions::UnbanSerial );
+    CLuaCFunctions::AddFunction ( "addBan", CLuaFunctionDefinitions::AddBan );
+    CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefinitions::RemoveBan );
 
-	CLuaCFunctions::AddFunction ( "getBansXML", CLuaFunctionDefinitions::GetBansXML );
+    CLuaCFunctions::AddFunction ( "getBans", CLuaFunctionDefinitions::GetBans );
+
+    CLuaCFunctions::AddFunction ( "getBanIP", CLuaFunctionDefinitions::GetBanIP );
+    CLuaCFunctions::AddFunction ( "getBanSerial", CLuaFunctionDefinitions::GetBanSerial );
+    CLuaCFunctions::AddFunction ( "getBanUsername", CLuaFunctionDefinitions::GetBanUsername );
+    CLuaCFunctions::AddFunction ( "getBanNick", CLuaFunctionDefinitions::GetBanNick );
+    CLuaCFunctions::AddFunction ( "getBanTime", CLuaFunctionDefinitions::GetBanTime );
+    CLuaCFunctions::AddFunction ( "getBanReason", CLuaFunctionDefinitions::GetBanReason );
+    CLuaCFunctions::AddFunction ( "getBanAdmin", CLuaFunctionDefinitions::GetBanAdmin );
+
     /*
     CLuaCFunctions::AddFunction ( "aexec", CLuaFunctionDefinitions::Aexec );
     CLuaCFunctions::AddFunction ( "kickPlayer", CLuaFunctionDefinitions::KickPlayer );
