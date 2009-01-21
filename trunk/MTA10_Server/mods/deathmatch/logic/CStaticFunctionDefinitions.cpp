@@ -6925,293 +6925,259 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, CPlayer* pRespon
 }
 
 
-bool CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, CPlayer* pResponsible, const char* szReason )
+bool CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason )
 {
     assert ( pPlayer );
 
+    CBan* pBan = NULL;
     const char* szResponsible = "Console";
     if ( pResponsible )
         szResponsible = pResponsible->GetNick ();
 
-    const char* szReasonPointer = NULL;
     char szMessage [256];
-    szMessage [255] = 0;
+    char szInfoMessage [256];
 
     // Got any reason?
+    _snprintf ( szMessage, 255, "You were banned by %s", szResponsible );
+    _snprintf ( szInfoMessage, 255, "%s was banned from the game by %s", pPlayer->GetNick (), szResponsible );
     if ( szReason )
     {
         size_t sizeReason = strlen ( szReason );
         if ( sizeReason >= MIN_BAN_REASON_LENGTH && sizeReason <= MAX_BAN_REASON_LENGTH )
         {
-            _snprintf ( szMessage, 255, "You were banned by %s (%s)", szResponsible, szReason );
-            szReasonPointer = szReason;
+            _snprintf ( szMessage, 255, "%s (%s)", szMessage, szReason );
+            _snprintf ( szInfoMessage, 255, "%s (%s)", szInfoMessage, szReason );
         }
-        else
-        {
-            _snprintf ( szMessage, 255, "You were banned by %s", szResponsible );
-        }
-    }
-    else
-    {
-        _snprintf ( szMessage, 255, "You were banned by %s", szResponsible );
-    }
-
-    // Make a message to send to everyone else
-    char szInfoMessage [256];
-    szInfoMessage [255] = 0;
-    if ( szReasonPointer )
-    {
-        _snprintf ( szInfoMessage, 255, "%s was banned from the game by %s (%s)", pPlayer->GetNick (), szResponsible, szReasonPointer );
-    }
-    else
-    {
-        _snprintf ( szInfoMessage, 255, "%s was banned from the game by %s", pPlayer->GetNick (), szResponsible );
     }
 
     // Ban the player
-    m_pBanManager->AddBan ( pPlayer, pResponsible, ( szReason ) ? szReason : "Unknown" );
+    if ( bIP )
+        pBan = m_pBanManager->AddBan ( pPlayer, pResponsible, ( szReason ) ? szReason : "Unknown" );
+    // Can not ban by username or serial if serial verification is not enabled
+    else if ( m_pMainConfig->GetSerialVerificationEnabled () && ( bUsername || bSerial ) )
+        pBan = m_pBanManager->AddBan ( pResponsible, ( szReason ) ? szReason : "Unknown" );
 
-    // Tell the player that was banned why. QuitPlayer will delete the player.
-    pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-    g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false );
+    if ( pBan )
+    {
+        if ( m_pMainConfig->GetSerialVerificationEnabled () )
+        {
+            if ( bUsername ) pBan->SetAccount ( pPlayer->GetSerialUser () );
+            if ( bSerial ) pBan->SetSerial ( pPlayer->GetSerial () );
 
-    // Tell everyone else that he was banned from the game including console
-    // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
-    CLogger::LogPrintf ( "BAN: %s\n", szInfoMessage );
+            m_pBanManager->SaveBanList ();
+        }
+
+        // Call the event
+        CLuaArguments Arguments;
+        Arguments.PushUserData ( pBan );
+        if ( pResponsible )
+            Arguments.PushUserData ( pResponsible );
+        pPlayer->CallEvent ( "onPlayerBan", Arguments );
+
+        // Tell the player that was banned why. QuitPlayer will delete the player.
+        pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
+        g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false );
+
+        // Tell everyone else that he was banned from the game including console
+        // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
+        CLogger::LogPrintf ( "BAN: %s\n", szInfoMessage );
+
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason )
+{
+    CBan* pBan = NULL;
+    char szMessage [256];
+
+    // Got an IP?
+    if ( szIP )
+        pBan = m_pBanManager->AddBan ( szIP, pResponsible, szReason );
+    // If not IP provided make sure a username or serial are there
+    else if ( szUsername || szSerial )
+        pBan = m_pBanManager->AddBan ( pResponsible, szReason );
+
+    if ( pBan )
+    {
+		char szMessage [256];
+		szMessage[0] = '\0';
+
+        _snprintf ( szMessage, 255, "You were banned by %s", ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+
+        if ( szUsername ) pBan->SetAccount ( szUsername );
+        if ( szSerial ) pBan->SetSerial ( szSerial );
+
+        if ( szUsername || szSerial )
+            m_pBanManager->SaveBanList ();
+
+        // Call the event
+        CLuaArguments Arguments;
+        Arguments.PushUserData ( pBan );
+        if ( pResponsible )
+            Arguments.PushUserData ( pResponsible );
+        m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
+
+        // Log
+        if ( szIP )
+            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+        else if ( szUsername )
+            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szUsername, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+        else
+            CLogger::LogPrintf ( "BAN: Serial ban was added by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+
+        // Loop through players to see if we should kick anyone
+		list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+		for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+		{	
+            bool bBan = false;
+
+            if ( szIP )
+            {
+			    char szPlayerIP [20];
+			    ( *iter )->GetSourceIP ( szPlayerIP );
+                bBan = strcmp ( szIP, szPlayerIP ) == 0;
+            }
+
+            if ( !bBan && szUsername )
+            {
+                std::string strUsername = (*iter)->GetSerialUser ();
+                bool bBan = stricmp ( strUsername.c_str (), szUsername ) == 0;
+            }
+
+            if ( !bBan && szSerial )
+            {
+                std::string strSerial = (*iter)->GetSerial ();
+                bool bBan = stricmp ( strSerial.c_str (), szSerial ) == 0;
+            }
+
+            if ( bBan )
+            {
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushUserData ( pBan );
+                if ( pResponsible )
+                    Arguments.PushUserData ( pResponsible );
+                (*iter)->CallEvent ( "onPlayerBan", Arguments );
+
+                // Tell the player that was banned why. QuitPlayer will delete the player.
+                (*iter)->Send ( CPlayerDisconnectedPacket ( szMessage ) );
+                g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false );
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::RemoveBan ( CBan* pBan, CPlayer* pResponsible )
+{
+	CLuaArguments Arguments;
+	Arguments.PushUserData ( pBan );
+    if ( pResponsible )
+        Arguments.PushUserData ( pResponsible );
+	m_pMapManager->GetRootElement()->CallEvent ( "onUnban", Arguments );
+
+
+    CLogger::LogPrintf ( "UNBAN: A ban was removed by %s\n", ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+
+    m_pBanManager->RemoveBan ( pBan );
 
     return true;
 }
 
-
-bool CStaticFunctionDefinitions::BanIP ( const char* szIP, CPlayer* pResponsible )
+bool CStaticFunctionDefinitions::GetBans ( CLuaMain* pLuaMain )
 {
-    // Got an IP?
-    if ( szIP )
+    lua_State* pLua = pLuaMain->GetVM();
+    list < CBan* > ::const_iterator iter = m_pBanManager->IterBegin();
+    unsigned int uiIndex = 0;
+
+    for ( ; iter != m_pBanManager->IterEnd(); iter++ )
     {
-		char szMessage [256];
-		szMessage[0] = '\0';
+        lua_pushnumber ( pLua, ++uiIndex );
+        lua_pushban ( pLua, *iter );
+        lua_settable ( pLua, -3 );
+    }
+    return true;
+}
 
-        if ( pResponsible )
-        {
-			CLuaArguments Arguments;
-			Arguments.PushString ( szIP );
-			if ( !pResponsible->CallEvent ( "onBan", Arguments ) )
-				return false;
 
-			m_pBanManager->AddBan ( szIP, pResponsible );
-			CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szIP, pResponsible->GetNick () );
-			_snprintf ( szMessage, 255, "You were banned by %s", pResponsible->GetNick () );
-        }
-        else
-        {
-			CLuaArguments Arguments;
-			Arguments.PushString ( szIP );
-			if ( !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments ) )
-				return false;
-
-			m_pBanManager->AddBan ( szIP );
-            CLogger::LogPrintf ( "BAN: %s was banned by Console\n", szIP );
-			_snprintf ( szMessage, 255, "You were banned by Console" );
-        }
-
-		// Kick players that have this IP
-		list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-		for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-		{	
-			char szPlayerIP [20];
-			szPlayerIP[0] = '\0';
-			( *iter )->GetSourceIP ( szPlayerIP );
-			if ( strcmp ( szIP, szPlayerIP ) == 0 )
-			{
-				CPlayer* pPlayer = *iter;
-				pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-
-				// Tell our scripts the player has quit
-				CLuaArguments Arguments;
-				Arguments.PushString ( "Banned" );
-				pPlayer->CallEvent ( "onPlayerQuit", Arguments );
-
-				// Output
-				CLogger::LogPrintf ( "QUIT: %s left the game [Banned]\n", pPlayer->GetNick () );
-
-				// Tell the map manager
-				m_pMapManager->OnPlayerQuit ( *pPlayer );
-
-				// Tell all the players except the parting one
-				CPlayerQuitPacket Packet;
-				Packet.SetPlayer ( pPlayer->GetID() );
-				Packet.SetQuitReason ( static_cast < unsigned char > ( CClient::QUIT_BAN ) );
-				m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
-
-				#ifdef MTA_VOICE
-					// Remove from voice system.
-					if ( m_pVoiceServer )
-					{
-						m_pVoiceServer->DeleteClient ( pPlayer->GetID ( ) );
-					}
-				#endif
-
-				// Delete it, don't unlink yet, we could be inside the player-manager's iteration
-				m_pElementDeleter->Delete ( pPlayer, false );
-			}
-		}
-
+bool CStaticFunctionDefinitions::GetBanIP ( CBan* pBan, char* szIP, size_t size )
+{
+    if ( !pBan->GetIP ().empty () )
+    {
+        _snprintf ( szIP, size, pBan->GetIP ().c_str() );
         return true;
     }
-
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::UnbanIP ( const char* szIP, CPlayer* pResponsible )
+bool CStaticFunctionDefinitions::GetBanSerial ( CBan* pBan, char* szSerial, size_t size )
 {
-    // Got an IP?
-    if ( szIP )
+    if ( !pBan->GetSerial ().empty () )
     {
-        // Unban the player
-        CBan* pBan = m_pBanManager->GetBan ( szIP );
-        if ( pBan )
-        {
-            if ( pResponsible )
-            {
-				CLuaArguments Arguments;
-				Arguments.PushString ( szIP );
-				if ( !pResponsible->CallEvent ( "onUnban", Arguments ) )
-					return false;
-
-                CLogger::LogPrintf ( "UNBAN: %s was unbanned by %s\n", szIP, pResponsible->GetNick () );
-            }
-            else
-            {
-				CLuaArguments Arguments;
-				Arguments.PushString ( szIP );
-				if ( !m_pMapManager->GetRootElement()->CallEvent ( "onUnban", Arguments ) )
-					return false;
-
-                CLogger::LogPrintf ( "UNBAN: %s was unbanned by Console\n", szIP );
-            }
-
-			m_pBanManager->RemoveBan ( pBan );
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::BanSerial ( const char* szSerial, CPlayer* pResponsible )
-{
-    // Got a Serial?
-    if ( szSerial )
-    {
-		char szMessage [256];
-		szMessage[0] = '\0';
-
-        if ( pResponsible )
-        {
-			CLuaArguments Arguments;
-			Arguments.PushString ( szSerial );
-			if ( !pResponsible->CallEvent ( "onBan", Arguments ) )
-				return false;
-
-			m_pBanManager->AddSerialBan ( szSerial, "Unknown", pResponsible );
-			CLogger::LogPrintf ( "BAN: a serial was banned by %s\n", pResponsible->GetNick () );
-			_snprintf ( szMessage, 255, "You were banned by %s", pResponsible->GetNick () );
-        }
-        else
-        {
-			CLuaArguments Arguments;
-			Arguments.PushString ( szSerial );
-			if ( !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments ) )
-				return false;
-
-			m_pBanManager->AddSerialBan ( szSerial, "Unknown" );
-            CLogger::LogPrintf ( "BAN: a serial was banned by Console\n" );
-			_snprintf ( szMessage, 255, "You were banned by Console" );
-        }
-
-		// Check if the serial is currently in use and kick that player
-		list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-		for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-		{	
-			if ( (*iter)->GetSerial() == szSerial )
-			{
-				CPlayer* pPlayer = *iter;
-				pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-
-				// Tell our scripts the player has quit
-				CLuaArguments Arguments;
-				Arguments.PushString ( "Banned" );
-				pPlayer->CallEvent ( "onPlayerQuit", Arguments );
-
-				// Output
-				CLogger::LogPrintf ( "QUIT: %s left the game [Banned]\n", pPlayer->GetNick () );
-
-				// Tell the map manager
-				m_pMapManager->OnPlayerQuit ( *pPlayer );
-
-				// Tell all the players except the parting one
-				CPlayerQuitPacket Packet;
-				Packet.SetPlayer ( pPlayer->GetID() );
-				Packet.SetQuitReason ( static_cast < unsigned char > ( CClient::QUIT_BAN ) );
-				m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
-
-				#ifdef MTA_VOICE
-					// Remove from voice system.
-					if ( m_pVoiceServer )
-					{
-						m_pVoiceServer->DeleteClient ( pPlayer->GetID ( ) );
-					}
-				#endif
-
-				// Delete it, don't unlink yet, we could be inside the player-manager's iteration
-				m_pElementDeleter->Delete ( pPlayer, false );
-			}
-		}
-
+        _snprintf ( szSerial, size, pBan->GetSerial ().c_str() );
         return true;
     }
-
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::UnbanSerial( const char* szSerial, CPlayer* pResponsible )
+bool CStaticFunctionDefinitions::GetBanUsername ( CBan* pBan, char* szUsername, size_t size )
 {
-    // Got a serial
-    if ( szSerial )
+    if ( !pBan->GetAccount ().empty () )
     {
-        // Unban the serial
-        CBan* pBan = m_pBanManager->GetSerialBan ( szSerial );
-        if ( pBan )
-        {
-            if ( pResponsible )
-            {
-				CLuaArguments Arguments;
-				Arguments.PushString ( szSerial );
-				if ( !pResponsible->CallEvent ( "onUnban", Arguments ) )
-					return false;
-
-                CLogger::LogPrintf ( "UNBAN: a serial was unbanned by %s\n", pResponsible->GetNick () );
-            }
-            else
-            {
-				CLuaArguments Arguments;
-				Arguments.PushString ( szSerial );
-				if ( !m_pMapManager->GetRootElement()->CallEvent ( "onUnban", Arguments ) )
-					return false;
-
-                CLogger::LogPrintf ( "UNBAN: a serial was unbanned by Console\n" );
-            }
-
-			m_pBanManager->RemoveBan ( pBan );
-
-            return true;
-        }
+        _snprintf ( szUsername, size, pBan->GetAccount ().c_str() );
+        return true;
     }
+    return false;
+}
 
+
+bool CStaticFunctionDefinitions::GetBanNick ( CBan* pBan, char* szNick, size_t size )
+{
+    if ( !pBan->GetNick ().empty () )
+    {
+        _snprintf ( szNick, size, pBan->GetNick ().c_str() );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetBanTime ( CBan* pBan, char* szTime, size_t size )
+{
+    if ( !pBan->GetTimeOfBan ().empty () )
+    {
+        _snprintf ( szTime, size, pBan->GetTimeOfBan ().c_str() );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetBanReason ( CBan* pBan, char* szReason, size_t size )
+{
+    if ( !pBan->GetReason ().empty () )
+    {
+        _snprintf ( szReason, size, pBan->GetReason ().c_str() );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetBanAdmin ( CBan* pBan, char* szAdmin, size_t size )
+{
+    if ( !pBan->GetBanner ().empty () )
+    {
+        _snprintf ( szAdmin, size, pBan->GetBanner ().c_str() );
+        return true;
+    }
     return false;
 }
 

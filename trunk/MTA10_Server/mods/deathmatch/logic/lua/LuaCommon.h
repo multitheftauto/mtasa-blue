@@ -51,6 +51,7 @@ class CTextItem*        lua_totextitem          ( lua_State* luaVM, int iArgumen
 class CLuaTimer*        lua_totimer             ( lua_State* luaVM, int iArgument );
 class CVehicle*         lua_tovehicle           ( lua_State* luaVM, int iArgument );
 class CXMLNode*         lua_toxmlnode           ( lua_State* luaVM, int iArgument );
+class CBan*             lua_toban               ( lua_State* luaVM, int iArgument );
 
 
 // Lua push macros for our datatypes
@@ -63,6 +64,7 @@ void                    lua_pushtextdisplay     ( lua_State* luaVM, class CTextD
 void                    lua_pushtextitem        ( lua_State* luaVM, class CTextItem* pItem );
 void                    lua_pushtimer           ( lua_State* luaVM, class CLuaTimer* pTimer );
 void                    lua_pushxmlnode         ( lua_State* luaVM, class CXMLNode* pNode );
+void                    lua_pushban             ( lua_State* luaVM, class CBan* pBan );
 
 enum eLuaNetworkDependantFunctions
 {

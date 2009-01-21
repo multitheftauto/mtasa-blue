@@ -450,12 +450,18 @@ public:
     static int      KickPlayer                          ( lua_State* luaVM );
     static int      BanPlayer                           ( lua_State* luaVM );
 
-    static int      BanIP                               ( lua_State* luaVM );
-    static int      UnbanIP                             ( lua_State* luaVM );
-	static int		BanSerial							( lua_State* luaVM );
-	static int		UnbanSerial							( lua_State* luaVM );
+    static int      AddBan                              ( lua_State* luaVM );
+    static int      RemoveBan                           ( lua_State* luaVM );
 
-	static int		GetBansXML							( lua_State* luaVM );
+    static int		GetBans							    ( lua_State* luaVM );
+
+    static int		GetBanIP							( lua_State* luaVM );
+    static int		GetBanSerial						( lua_State* luaVM );
+    static int		GetBanUsername						( lua_State* luaVM );
+    static int		GetBanNick							( lua_State* luaVM );
+    static int		GetBanTime							( lua_State* luaVM );
+    static int		GetBanReason						( lua_State* luaVM );
+    static int		GetBanAdmin						    ( lua_State* luaVM );
 
     // Cursor get funcs
     static int      IsCursorShowing                     ( lua_State* luaVM );

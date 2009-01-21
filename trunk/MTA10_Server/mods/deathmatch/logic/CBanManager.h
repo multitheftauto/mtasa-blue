@@ -27,16 +27,23 @@ public:
 
     void                DoPulse                 ( void );
 
-    CBan*               AddBan                  ( const char* szIP, bool bSaveList = true );
-    CBan*               AddBan                  ( CPlayer* pPlayer, CClient* pBanner, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-    CBan*               AddBan                  ( const char* szIP, CClient* pBanner, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-	CBan*				AddBan					( const char* szIP, CPlayer* pPlayer );
-	CBan*				AddSerialBan			( const char* szSerial );
-	CBan*				AddSerialBan			( const char* szSerial, const char* szReason, CClient* pBanner );
-	CBan*				AddSerialBan			( const char* szSerial, const char* szReason );
+    CBan*               AddBan                  ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddBan                  ( const char* szIP, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+
+    CBan*				AddSerialBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+	CBan*				AddSerialBan			( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+
+    CBan*				AddAccountBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+	CBan*				AddAccountBan			( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+
+    CBan*               AddBan                  ( CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+
+    bool                Exists                  ( CBan* pBan );
+
     bool                IsBanned                ( const char* szIP );
     bool                IsSpecificallyBanned    ( const char* szIP );
 	bool				IsSerialBanned			( const char* szSerial );
+    bool				IsAccountBanned			( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
     void                RemoveBan               ( const char* szIP );
     void                RemoveAllBans           ( bool bPermanentDelete = false );
@@ -54,6 +61,9 @@ public:
     bool                IsValidIP               ( const char* szIP );
 
 	char*				GetFilePath				( void )			{ return reinterpret_cast <char*> (m_szPath); }
+
+    inline list < CBan* > ::const_iterator  IterBegin   ( void )                    { return m_BanManager.begin (); };
+    inline list < CBan* > ::const_iterator  IterEnd     ( void )                    { return m_BanManager.end (); };
 
 private:
     char                m_szFileName            [20];
