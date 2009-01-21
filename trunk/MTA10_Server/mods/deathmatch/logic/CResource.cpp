@@ -68,18 +68,18 @@ void EndResourceUpgrade()
 // Begin/EndCheckFilesForIssues local functions and var
 //
 ///////////////////////////////////////////////////////////////
-static unsigned long ulDepreciatedWarningCount = 0;
+static unsigned long ulDeprecatedWarningCount = 0;
 
 static void BeginCheckFilesForIssues()
 {
-    ulDepreciatedWarningCount = 0;
+    ulDeprecatedWarningCount = 0;
 }
 
 static void EndCheckFilesForIssues( const string& strResourceName )
 {
-    if ( ulDepreciatedWarningCount )
+    if ( ulDeprecatedWarningCount )
     {
-        CLogger::LogPrintf ( "Some files in '%s' use depreciated functions.\n", strResourceName.c_str () );
+        CLogger::LogPrintf ( "Some files in '%s' use deprecated functions.\n", strResourceName.c_str () );
         CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
     }
 }
@@ -483,8 +483,8 @@ static void IssueLuaFunctionNameWarnings ( const string& strFunctionName, const 
         char szTemp [ 256 ];  
         if ( strWhat == "Replaced" )
         {
-            ulDepreciatedWarningCount++;
-            _snprintf ( szTemp, sizeof(szTemp), "%s is depreciated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount()/60000)%7 ? "" : " before Tuesday" );
+            ulDeprecatedWarningCount++;
+            _snprintf ( szTemp, sizeof(szTemp), "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount()/60000)%7 ? "" : " before Tuesday" );
         }
         else
         if ( strWhat == "Removed" )
@@ -548,8 +548,8 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashClient["doesPlayerHaveJetPack"]     = "Replaced|doesPedHaveJetPack";
         hashClient["isPlayerInWater"]           = "Replaced|isElementInWater";
         hashClient["isPedInWater"]              = "Replaced|isElementInWater";
-        hashClient["isPedOnFire"]               = "Replaced|isPedOnFire";
-        hashClient["setPedOnFire"]              = "Replaced|setPedOnFire";
+        //hashClient["isPedOnFire"]               = "Replaced|isPedOnFire";
+        //hashClient["setPedOnFire"]              = "Replaced|setPedOnFire";
         hashClient["isPlayerOnGround"]          = "Replaced|isPedOnGround";
         hashClient["getPlayerTask"]             = "Replaced|getPedTask";
         hashClient["getPlayerSimplestTask"]     = "Replaced|getPedSimplestTask";
@@ -1224,9 +1224,12 @@ bool CResource::HasResourceChanged ()
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
-        if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
+        if ( (*iterf)->ShouldValidateContent () )
         {
-            CheckFileForIssues ( strPath, (*iterf)->GetName(), m_strResourceName, (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
+            if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
+            {
+                CheckFileForIssues ( strPath, (*iterf)->GetName(), m_strResourceName, (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
+            }
         }
     }
     EndCheckFilesForIssues( m_strResourceName );
@@ -2106,6 +2109,10 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
+			// Grab the validatecontent attribute (true / false) (defaults to true)
+            CXMLAttribute * validate = attributes->Find("validate");
+            bool bValidateContent = !validate || stricmp ( validate->GetValue ().c_str (), "false" );
+
 			// Grab the filepath attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
@@ -2117,7 +2124,7 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
 
 				// Create a new resourcefile item
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
-                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
+                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
                 else
                 {
                     char szBuffer[512];
@@ -2265,6 +2272,10 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                     CLogger::LogPrintf ( "Unknown script type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
+			// Grab the validatecontent attribute (true / false) (defaults to true)
+            CXMLAttribute * validate = attributes->Find("validate");
+            bool bValidateContent = !validate || stricmp ( validate->GetValue ().c_str (), "false" );
+
 			// Grab the source attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
@@ -2279,9 +2290,9 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 {
 					// Create it depending on the type (clietn or server) and add it to the list over resource files
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
+                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
+                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
                 }
                 else
                 {

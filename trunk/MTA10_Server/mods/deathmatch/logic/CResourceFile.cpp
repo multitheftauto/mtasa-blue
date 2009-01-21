@@ -19,7 +19,7 @@
 
 #include "StdInc.h"
 
-CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, const char* szResourceFileName ) 
+CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, const char* szResourceFileName, bool bValidateContent ) 
 { 
     m_szResourceFileName = new char [ strlen ( szResourceFileName ) + 1 ];
     strcpy ( m_szResourceFileName, szResourceFileName ); 
@@ -55,6 +55,7 @@ CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, co
     m_resource = resource;
     m_pVM = NULL;
     m_ulCRC = 0;
+    m_bValidateContent = bValidateContent;
 }
 
 CResourceFile::~CResourceFile ( void )

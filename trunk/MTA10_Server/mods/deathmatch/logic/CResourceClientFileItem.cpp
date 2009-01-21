@@ -17,7 +17,7 @@
 
 extern CGame* g_pGame;
 
-CResourceClientFileItem::CResourceClientFileItem ( CResource * resource, const char * szShortName, const char * szResourceFileName ) : CResourceFile ( resource, szShortName, szResourceFileName )
+CResourceClientFileItem::CResourceClientFileItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, bool bValidateContent ) : CResourceFile ( resource, szShortName, szResourceFileName, bValidateContent )
 {
     m_type = RESOURCE_FILE_TYPE_CLIENT_FILE;
 }
