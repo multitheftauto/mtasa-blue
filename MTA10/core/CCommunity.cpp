@@ -44,7 +44,9 @@ void CCommunity::Initialize ( void )
 {
     CVARS_GET ( "community_username", m_strUsername );
     CVARS_GET ( "community_password", m_strPassword );
-    Login ();
+
+    if ( !m_strUsername.empty() && !m_strPassword.empty() )
+        Login ();
 }
 
 CCommunity::~CCommunity ( void )
