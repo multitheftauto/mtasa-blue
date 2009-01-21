@@ -3097,7 +3097,9 @@ bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector & vecPosition, CVecto
 
 CClientEntity * CStaticFunctionDefinitions::GetCameraTarget ( void )
 {
-    return m_pCamera->GetTargetEntity ();
+    if ( !m_pCamera->IsInFixedMode() )
+        return m_pCamera->GetTargetEntity ();
+    return NULL;
 }
 
 
