@@ -400,16 +400,16 @@ void CGUIElement_Impl::SetProperty ( const char *szProperty, const char *szValue
 
 std::string CGUIElement_Impl::GetProperty ( const char *szProperty )
 {
+    CEGUI::String strValue;
 	try
     {
 		// Return the string. std::string will copy it
-		CEGUI::String strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
-		return strValue.c_str ();
+		strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
 	}
     catch ( CEGUI::Exception e )
     {}
 
-    return NULL;
+    return strValue.c_str ();
 }
 
 
