@@ -46,6 +46,7 @@ public:
 								CCommunity          ( void );
 								~CCommunity         ( void );
 
+    void                        Initialize          ( void );
     void                        GetUsername         ( std::string & strUsername )   { strUsername = m_strUsername; };
     void                        GetPassword         ( std::string & strPassword )   { strPassword = m_strPassword; };
 

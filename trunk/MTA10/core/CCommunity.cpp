@@ -40,6 +40,13 @@ CCommunity::CCommunity ( void )
 }
 
 
+void CCommunity::Initialize ( void )
+{
+    CVARS_GET ( "community_username", m_strUsername );
+    CVARS_GET ( "community_password", m_strPassword );
+    Login ();
+}
+
 CCommunity::~CCommunity ( void )
 {
 }
@@ -50,6 +57,8 @@ void CCommunity::Logout ( void )
     m_ulStartTime = 0;
     m_bLoggedIn = false;
 
+    CVARS_SET ( "community_username", std::string () );
+    CVARS_SET ( "community_password", std::string () );
     // Change GUI
     CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( false, "" );
     CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( false );

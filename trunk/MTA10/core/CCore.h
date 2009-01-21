@@ -206,9 +206,9 @@ private:
     IUnknown *					m_pRenderDevice;
 
     // Instances (put new classes here!)
-    CCommunity                  m_Community;
     CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
+    CCommunity                  m_Community;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;
