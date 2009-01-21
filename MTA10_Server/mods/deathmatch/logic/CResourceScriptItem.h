@@ -20,7 +20,7 @@ class CResourceScriptItem : public CResourceFile
     
 public:
 
-                                        CResourceScriptItem             ( class CResource * resource, const char * szShortName, const char * szResourceFileName );
+                                        CResourceScriptItem             ( class CResource * resource, const char * szShortName, const char * szResourceFileName, bool bValidateContent );
                                         ~CResourceScriptItem            ( void );
 
     bool                                Start                           ( void );
