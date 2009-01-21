@@ -671,6 +671,13 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         // Utility
         hashServer["randFloat"]                 = "Replaced|math.random";
         hashServer["randInt"]                   = "Replaced|math.random";
+
+        // Admin
+        hashServer["banIP"]                     = "Removed|Spend ages changing everything.";
+        hashServer["banSerial"]                 = "Removed|Spend ages changing everything.";
+        hashServer["unbanIP"]                   = "Removed|Spend ages changing everything.";
+        hashServer["unbanSerial"]               = "Removed|Spend ages changing everything.";
+        hashServer["getBansXML"]                = "Removed|Spend ages changing everything.";
     }
 
     // Which hash?
