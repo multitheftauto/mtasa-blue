@@ -1143,6 +1143,8 @@ void CCore::DoPostFramePulse ( )
 
         m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
 		m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+
+        m_Community.Initialize ();
     }
 
     // This is the first frame in the menu?
