@@ -1015,68 +1015,75 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
             // Check its validity
             if ( IsNickValid ( szNewNick ) )
             {
-                // Verify the length
-                size_t sizeNewNick = strlen ( szNewNick );
-                if ( sizeNewNick >= MIN_NICK_LENGTH && sizeNewNick <= MAX_NICK_LENGTH )
+                if ( CheckNickProvided ( szNewNick ) )
                 {
-                    // Does the nickname differ from the previous nickname?
-                    const char* szNick = pClient->GetNick ();
-                    if ( !szNick || strcmp ( szNewNick, szNick ) != 0 )
+                    // Verify the length
+                    size_t sizeNewNick = strlen ( szNewNick );
+                    if ( sizeNewNick >= MIN_NICK_LENGTH && sizeNewNick <= MAX_NICK_LENGTH )
                     {
-                        // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a different case)
-                        if ( szNick && stricmp ( szNick, szNewNick ) == 0 || !pConsole->GetPlayerManager ()->Get ( szNewNick ) )
+                        // Does the nickname differ from the previous nickname?
+                        const char* szNick = pClient->GetNick ();
+                        if ( !szNick || strcmp ( szNewNick, szNick ) != 0 )
                         {
-							CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-							
-							// Call the event
-                            CLuaArguments Arguments;
-							Arguments.PushString ( pClient->GetNick () );
-                            Arguments.PushString ( szNewNick );
-							if ( pPlayer->CallEvent ( "onClientChangeNick", Arguments ) )
-							{
-								// Tell the console
-								CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );
-	
-								// Change the nick
-								pPlayer->SetNick ( szNewNick );
-	
-								// Tell all ingame players about the nick change
-								CPlayerChangeNickPacket Packet ( szNewNick );
-								Packet.SetSourceElement ( pPlayer );
-								pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( Packet );
+                            // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a different case)
+                            if ( szNick && stricmp ( szNick, szNewNick ) == 0 || !pConsole->GetPlayerManager ()->Get ( szNewNick ) )
+                            {
+							    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+    							
+							    // Call the event
+                                CLuaArguments Arguments;
+							    Arguments.PushString ( pClient->GetNick () );
+                                Arguments.PushString ( szNewNick );
+							    if ( pPlayer->CallEvent ( "onClientChangeNick", Arguments ) )
+							    {
+								    // Tell the console
+								    CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );
+    	
+								    // Change the nick
+								    pPlayer->SetNick ( szNewNick );
+    	
+								    // Tell all ingame players about the nick change
+								    CPlayerChangeNickPacket Packet ( szNewNick );
+								    Packet.SetSourceElement ( pPlayer );
+								    pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( Packet );
 
-								return true;
-							}
-							else 
-								return false;
+								    return true;
+							    }
+							    else 
+								    return false;
+                            }
+                            else
+                            {
+                                pEchoClient->SendEcho ( "nick: Chosen nickname is already in use" );
+                            }
                         }
                         else
                         {
-                            pEchoClient->SendEcho ( "nick: Chosen nickname is already in use" );
+                            // Tell the player
+                            char szBuffer [128];
+                            szBuffer[0] = '\0';
+
+                            _snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
+                            szBuffer[127] = '\0';
+
+                            pEchoClient->SendEcho ( szBuffer );
                         }
                     }
                     else
                     {
                         // Tell the player
-                        char szBuffer [128];
+                        char szBuffer [64];
                         szBuffer[0] = '\0';
 
-                        _snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
-                        szBuffer[127] = '\0';
+                        _snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
+                        szBuffer[63] = '\0';
 
                         pEchoClient->SendEcho ( szBuffer );
                     }
                 }
                 else
                 {
-                    // Tell the player
-                    char szBuffer [64];
-                    szBuffer[0] = '\0';
-
-                    _snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
-                    szBuffer[63] = '\0';
-
-                    pEchoClient->SendEcho ( szBuffer );
+                    pEchoClient->SendEcho ( "nick: Chosen nickname is not allowed" );
                 }
             }
             else
