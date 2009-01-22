@@ -36,7 +36,7 @@ class CResourceMapItem : public CResourceFile
     
 public:
 
-                                        CResourceMapItem                ( class CResource* resource, const char* szShortName, const char* szResourceFileName, int iDimension );
+                                        CResourceMapItem                ( class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes, int iDimension );
                                         ~CResourceMapItem               ( void );
 
     inline CElementGroup *              GetElementGroup                 ( void ) { return m_pElementGroup; }

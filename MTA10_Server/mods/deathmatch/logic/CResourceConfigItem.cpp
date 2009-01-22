@@ -21,7 +21,7 @@
 
 extern CServerInterface* g_pServerInterface;
 
-CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char* szShortName, const char* szResourceFileName ) : CResourceFile ( resource, szShortName, szResourceFileName )
+CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
 {
     m_pXMLFile = NULL;
     m_pXMLRootNode = NULL;

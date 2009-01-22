@@ -1224,13 +1224,18 @@ bool CResource::HasResourceChanged ()
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
-        if ( (*iterf)->ShouldValidateContent () )
+        CResourceFile* pResourceFile = *iterf;
+        if ( stricmp( pResourceFile->GetMetaFileAttribute ( "validate" ).c_str (), "false" ) )
         {
-            if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
+            if ( GetFilePath ( pResourceFile->GetName(), strPath ) )
             {
-                CheckFileForIssues ( strPath, (*iterf)->GetName(), m_strResourceName, (*iterf)->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
+                CheckFileForIssues ( strPath, pResourceFile->GetName(), m_strResourceName, pResourceFile->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
             }
         }
+#if MTA_DEBUG
+        else
+            CLogger::LogPrintf ( "DEBUG: Skipping check/upgrade of %s in %s\n", pResourceFile->GetName(), m_strResourceName.c_str () );        
+#endif
     }
     EndCheckFilesForIssues( m_strResourceName );
 
@@ -2005,7 +2010,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                         bFoundDefault = true;
 
 					// Create a new resource HTML file and add it to the list
-                    CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), bIsDefault, bIsRaw, bIsRestricted );
+                    CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bIsDefault, bIsRaw, bIsRestricted );
                     m_resourceFiles.push_back ( afile );
 
 					// This is the first HTML file? Remember it
@@ -2074,9 +2079,9 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                 {
 					// Create it and push it to the list over resource files. Depending on if it's client or server type
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG )
-                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
+                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG )
-                        m_resourceFiles.push_back ( new CResourceClientConfigItem ( this, strFilename.c_str (), strFullFilename.c_str () ) );
+                        m_resourceFiles.push_back ( new CResourceClientConfigItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 }
                 else
                 {
@@ -2109,10 +2114,6 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
-			// Grab the validatecontent attribute (true / false) (defaults to true)
-            CXMLAttribute * validate = attributes->Find("validate");
-            bool bValidateContent = !validate || stricmp ( validate->GetValue ().c_str (), "false" );
-
 			// Grab the filepath attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
@@ -2124,7 +2125,7 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
 
 				// Create a new resourcefile item
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
-                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
+                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 else
                 {
                     char szBuffer[512];
@@ -2272,10 +2273,6 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                     CLogger::LogPrintf ( "Unknown script type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
-			// Grab the validatecontent attribute (true / false) (defaults to true)
-            CXMLAttribute * validate = attributes->Find("validate");
-            bool bValidateContent = !validate || stricmp ( validate->GetValue ().c_str (), "false" );
-
 			// Grab the source attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
@@ -2290,9 +2287,9 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 {
 					// Create it depending on the type (clietn or server) and add it to the list over resource files
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
+                        m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
-                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), bValidateContent ) );
+                        m_resourceFiles.push_back ( new CResourceClientScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 }
                 else
                 {
@@ -2346,7 +2343,7 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 ReplaceSlashes ( strFilename );
 				// Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
-                    m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), iDimension ) );
+                    m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, iDimension ) );
                 else
                 {
                     char szBuffer[512];
@@ -2434,7 +2431,7 @@ bool CResource::AddMapFile ( const char* szName, const char* szFullFilename, int
                         pMapNode->GetAttributes ().Create ( "dimension" )->SetValue ( iDimension );
 
                         // If we're loaded, add it to the resourcefiles too
-                        m_resourceFiles.push_back ( new CResourceMapItem ( this, szName, szFullFilename, iDimension ) );
+                        m_resourceFiles.push_back ( new CResourceMapItem ( this, szName, szFullFilename, &pMapNode->GetAttributes (), iDimension ) );
 
                         // Success, write and destroy XML
                         metaFile->Write ();
@@ -2487,7 +2484,7 @@ bool CResource::AddConfigFile ( const char* szName, const char* szFullFilepath, 
                             pMapNode->GetAttributes ().Create ( "type" )->SetValue ( "server" );
 
                         // If we're loaded, add it to the resourcefiles too
-                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, szName, szFullFilepath ) );
+                        m_resourceFiles.push_back ( new CResourceConfigItem ( this, szName, szFullFilepath, &pMapNode->GetAttributes () ) );
 
                         // Success, write and destroy XML
                         metaFile->Write ();

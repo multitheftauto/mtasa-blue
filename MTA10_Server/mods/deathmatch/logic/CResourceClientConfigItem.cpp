@@ -21,7 +21,7 @@
 extern CServerInterface* g_pServerInterface;
 extern CGame* g_pGame;
 
-CResourceClientConfigItem::CResourceClientConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName ) : CResourceFile ( resource, szShortName, szResourceFileName )
+CResourceClientConfigItem::CResourceClientConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
 {
     m_pXMLFile = NULL;
     m_pXMLRootNode = NULL;
