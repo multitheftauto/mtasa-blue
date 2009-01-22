@@ -29,7 +29,7 @@ class CResourceConfigItem : public CResourceFile
     
 public:
 
-                                        CResourceConfigItem             ( class CResource * resource, const char* szShortName, const char* szResourceFileName );
+                                        CResourceConfigItem             ( class CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes );
                                         ~CResourceConfigItem            ( void );
 
     bool                                Start                           ( void );

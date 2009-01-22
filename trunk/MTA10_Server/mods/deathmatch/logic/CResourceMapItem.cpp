@@ -22,7 +22,7 @@
 
 extern CGame* g_pGame;
 
-CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortName, const char* szResourceFileName, int iDimension ) : CResourceFile ( resource, szShortName, szResourceFileName )
+CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes, int iDimension ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
 {
     m_pGroups = g_pGame->GetGroups();  // isn't in CGame
     m_pMarkerManager = g_pGame->GetMarkerManager();
