@@ -6941,7 +6941,7 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, CPlayer* pRespon
 }
 
 
-bool CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason )
+CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason )
 {
     assert ( pPlayer );
 
@@ -6998,13 +6998,13 @@ bool CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bU
         // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
         CLogger::LogPrintf ( "BAN: %s\n", szInfoMessage );
 
-        return true;
+        return pBan;
     }
-    return false;
+    return NULL;
 }
 
 
-bool CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason )
+CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason )
 {
     CBan* pBan = NULL;
     char szMessage [256];
@@ -7083,9 +7083,9 @@ bool CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUserna
                 g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false );
             }
         }
-        return true;
+        return pBan;
     }
-    return false;
+    return NULL;
 }
 
 
