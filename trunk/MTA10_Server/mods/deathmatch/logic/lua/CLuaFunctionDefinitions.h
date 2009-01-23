@@ -66,14 +66,6 @@ public:
 	static int      GetCancelReason                     ( lua_State* luaVM );
     static int      WasEventCancelled                   ( lua_State* luaVM );
 
-    // Client get functions
-    static int      GetClientName                       ( lua_State* luaVM );
-    static int      GetClientIP                         ( lua_State* luaVM );
-    static int      GetClientAccount                    ( lua_State* luaVM );
-
-    // Client set functions
-    static int      SetClientName                       ( lua_State* luaVM );
-
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );
     static int      GetPlayerAmmoInClip                 ( lua_State* luaVM );
@@ -101,6 +93,9 @@ public:
     static int      IsPlayerQA                          ( lua_State* luaVM );
     static int      GetPlayerUserName                   ( lua_State* luaVM );
     static int      GetPlayerBlurLevel                  ( lua_State* luaVM );
+    static int      GetPlayerName                       ( lua_State* luaVM );
+    static int      GetPlayerIP                         ( lua_State* luaVM );
+    static int      GetPlayerAccount                    ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPlayerMoney                      ( lua_State* luaVM );
@@ -116,6 +111,7 @@ public:
     static int		SetPlayerMuted						( lua_State* luaVM );
     static int      SetPlayerBlurLevel                  ( lua_State* luaVM );
     static int      RedirectPlayer                      ( lua_State* luaVM );
+    static int      SetPlayerName                       ( lua_State* luaVM );
 
     // Ped get functions
     static int      CreatePed                           ( lua_State* luaVM );

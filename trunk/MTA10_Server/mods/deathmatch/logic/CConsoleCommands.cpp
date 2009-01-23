@@ -1034,7 +1034,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                                 CLuaArguments Arguments;
 							    Arguments.PushString ( pClient->GetNick () );
                                 Arguments.PushString ( szNewNick );
-							    if ( pPlayer->CallEvent ( "onClientChangeNick", Arguments ) )
+							    if ( pPlayer->CallEvent ( "onPlayerChangeNick", Arguments ) )
 							    {
 								    // Tell the console
 								    CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );

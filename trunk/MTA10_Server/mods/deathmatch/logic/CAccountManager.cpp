@@ -632,7 +632,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         Arguments.PushAccount ( pCurrentAccount );
         Arguments.PushAccount ( pAccount );
         Arguments.PushBoolean ( bAutoLogin );
-        if ( !pClientElement->CallEvent ( "onClientLogin", Arguments ) )
+        if ( !pClientElement->CallEvent ( "onPlayerLogin", Arguments ) )
         {
             // DENIED!
             pClient->SetAccount ( pCurrentAccount );
@@ -699,7 +699,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
         CLuaArguments Arguments;
         Arguments.PushAccount ( pCurrentAccount );
         Arguments.PushAccount ( pAccount );
-        if ( !pClientElement->CallEvent ( "onClientLogout", Arguments ) )
+        if ( !pClientElement->CallEvent ( "onPlayerLogout", Arguments ) )
         {
             // DENIED!
             pClient->SetAccount ( pCurrentAccount );

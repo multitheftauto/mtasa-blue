@@ -1082,6 +1082,9 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onPlayerContact", "previous, current", NULL, false );
     m_Events.AddEvent ( "onPlayerBan", "ban", NULL, false );
+    m_Events.AddEvent ( "onPlayerLogin", "guest_account, account, auto-login", NULL, false );
+    m_Events.AddEvent ( "onPlayerLogout", "account, guest_account", NULL, false );
+	m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
 
     // Element events
     m_Events.AddEvent ( "onElementColShapeHit", "colshape, matchingDimension", NULL, false );
@@ -1109,11 +1112,6 @@ void CGame::AddBuiltInEvents ( void )
 
     // Console events
     m_Events.AddEvent ( "onConsole", "text", NULL, false );
-
-    // Client events
-    m_Events.AddEvent ( "onClientLogin", "guest_account, account, auto-login", NULL, false );
-    m_Events.AddEvent ( "onClientLogout", "account, guest_account", NULL, false );
-	m_Events.AddEvent ( "onClientChangeNick", "oldnick, newnick", NULL, false );
 
 	// Ban events
 	m_Events.AddEvent ( "onBan", "ip", NULL, false );

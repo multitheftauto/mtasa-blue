@@ -566,7 +566,7 @@ int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetClientName ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPlayerName ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -575,24 +575,24 @@ int CLuaFunctionDefinitions::GetClientName ( lua_State* luaVM )
 
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::GetClientName ( pElement, szNick ) )
+            if ( CStaticFunctionDefinitions::GetPlayerName ( pElement, szNick ) )
             {
                 lua_pushstring ( luaVM, szNick );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getClientName", "client", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerName", "client", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getClientName" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
-int CLuaFunctionDefinitions::GetClientIP ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPlayerIP ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -601,31 +601,31 @@ int CLuaFunctionDefinitions::GetClientIP ( lua_State* luaVM )
 
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::GetClientIP ( pElement, szIP ) )
+            if ( CStaticFunctionDefinitions::GetPlayerIP ( pElement, szIP ) )
             {
                 lua_pushstring ( luaVM, szIP );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getClientIP", "client", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerIP", "client", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getClientIP" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerIP" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
-int CLuaFunctionDefinitions::GetClientAccount ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPlayerAccount ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            CAccount* pAccount = CStaticFunctionDefinitions::GetClientAccount ( pElement );
+            CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount ( pElement );
             if ( pAccount )
             {
                 lua_pushaccount ( luaVM, pAccount );
@@ -633,17 +633,17 @@ int CLuaFunctionDefinitions::GetClientAccount ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getClientAccount", "client", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerAccount", "client", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getClientAccount" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerAccount" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
-int CLuaFunctionDefinitions::SetClientName ( lua_State* luaVM )
+int CLuaFunctionDefinitions::SetPlayerName ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
@@ -652,17 +652,17 @@ int CLuaFunctionDefinitions::SetClientName ( lua_State* luaVM )
         const char* szName = lua_tostring ( luaVM, 2 );
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetClientName ( pElement, szName ) )
+            if ( CStaticFunctionDefinitions::SetPlayerName ( pElement, szName ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setClientName", "client", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerName", "client", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setClientName" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setPlayerName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
