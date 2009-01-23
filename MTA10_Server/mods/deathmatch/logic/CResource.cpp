@@ -668,6 +668,12 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
         hashServer["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
 
+        // Client
+        hashServer["getClientName"]             = "Replaced|getPlayerName";
+        hashServer["getClientIP"]               = "Replaced|getPlayerIP";
+        hashServer["getClientAccount"]          = "Replaced|getPlayerAccount";
+        hashServer["setClientName"]             = "Replaced|setPlayerName";
+
         // Utility
         hashServer["randFloat"]                 = "Replaced|math.random";
         hashServer["randInt"]                   = "Replaced|math.random";

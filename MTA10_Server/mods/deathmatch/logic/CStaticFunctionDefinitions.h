@@ -123,14 +123,6 @@ public:
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );
     static bool                 RemoveScoreboardColumn              ( const char* szID );
 
-    // Client get funcs
-    static bool                 GetClientName                       ( CElement* pElement, char* szName );
-    static bool                 GetClientIP                         ( CElement* pElement, char* szIP );
-    static CAccount*            GetClientAccount                    ( CElement* pElement );
-
-    // Client set funcs
-    static bool                 SetClientName                       ( CElement* pElement, const char* szName );
-
     // Player get funcs
     static unsigned int         GetPlayerCount                      ( void );
     static bool                 GetPlayerAmmoInClip                 ( CPlayer* pPlayer, unsigned short& ucAmmo );
@@ -155,7 +147,10 @@ public:
     static const std::string&   GetPlayerUserName                   ( CPlayer* pPlayer );
     static const std::string&   GetPlayerCommunityID                ( CPlayer* pPlayer );
     static bool                 GetPlayerBlurLevel                  ( CPlayer* pPlayer, unsigned char& ucLevel );
-    
+    static bool                 GetPlayerName                       ( CElement* pElement, char* szName );
+    static bool                 GetPlayerIP                         ( CElement* pElement, char* szIP );
+    static CAccount*            GetPlayerAccount                    ( CElement* pElement );
+
     // Player set functions
     static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney );
     static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo );
@@ -172,6 +167,7 @@ public:
 	static bool					SetPlayerMuted						( CElement* pElement, bool bMuted );
     static bool                 SetPlayerBlurLevel                  ( CElement* pElement, unsigned char ucLevel );
     static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
+    static bool                 SetPlayerName                       ( CElement* pElement, const char* szName );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );

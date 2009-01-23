@@ -1389,7 +1389,7 @@ bool CStaticFunctionDefinitions::ClearElementVisibleTo ( CElement* pElement )
 }
 
 
-bool CStaticFunctionDefinitions::GetClientName ( CElement* pElement, char* szNick )
+bool CStaticFunctionDefinitions::GetPlayerName ( CElement* pElement, char* szNick )
 {
     assert ( pElement );
     assert ( szNick );
@@ -1413,7 +1413,7 @@ bool CStaticFunctionDefinitions::GetClientName ( CElement* pElement, char* szNic
 }
 
 
-bool CStaticFunctionDefinitions::GetClientIP ( CElement* pElement, char* szIP )
+bool CStaticFunctionDefinitions::GetPlayerIP ( CElement* pElement, char* szIP )
 {
     assert ( pElement );
     assert ( szIP );
@@ -1437,7 +1437,7 @@ bool CStaticFunctionDefinitions::GetClientIP ( CElement* pElement, char* szIP )
 }
 
 
-CAccount* CStaticFunctionDefinitions::GetClientAccount ( CElement* pElement )
+CAccount* CStaticFunctionDefinitions::GetPlayerAccount ( CElement* pElement )
 {
     assert ( pElement );
 
@@ -1450,7 +1450,7 @@ CAccount* CStaticFunctionDefinitions::GetClientAccount ( CElement* pElement )
 }
 
 
-bool CStaticFunctionDefinitions::SetClientName ( CElement* pElement, const char* szName )
+bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char* szName )
 {
     assert ( pElement );
     assert ( szName );
@@ -5931,7 +5931,23 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, 
         CVehicle * pVehicle = *iterVehicles;
         m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
     }
-
+/*
+    list < CElement * > ::const_iterator iter = m_pElementManager->IterBegin ();
+    for ( ; iter != m_pElementManager->IterEnd () ; iter++ )
+    {
+        if ( IS_COLSHAPE ( *iter ) ||
+             IS_FILE ( *iter ) ||
+             IS_HANDLING ( *iter ) ||
+             IS_RADAR_AREA ( *iter ) ||
+             IS_CONSOLE ( *iter ) ||
+             IS_TEAM ( *iter ) )
+        {
+            continue;
+        }
+        m_pGame->GetR
+        m_pColManager->DoHitDetection ( (*iter)->GetPosition (), (*iter)->GetPosition (), 0.0f, *iter, pColShape );
+    }
+*/
 	if ( pResource->HasStarted() )
 	{
 		CEntityAddPacket Packet;
