@@ -501,9 +501,9 @@ public:
 
     // Admin funcs
     static bool                 KickPlayer                          ( CPlayer* pPlayer, CPlayer* pResponsible = NULL, const char* szReason = NULL );
-    static bool                 BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL );
+    static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL );
 
-    static bool                 AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason );
+    static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason );
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
     static bool					GetBans							    ( CLuaMain* pLuaMain );

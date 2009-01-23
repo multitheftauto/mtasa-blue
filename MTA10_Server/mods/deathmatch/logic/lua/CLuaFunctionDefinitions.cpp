@@ -9673,9 +9673,10 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason ) )
+                CBan* pBan = NULL;
+                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason ) )
                 {
-                    lua_pushboolean ( luaVM, true );
+                    lua_pushban ( luaVM, pBan );
                     return 1;
                 }
             }
@@ -9727,9 +9728,10 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
             szReason = lua_tostring ( luaVM, 5 );
         }
 
-		if ( CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason ) )
+        CBan* pBan = NULL;
+		if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason ) )
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushban ( luaVM, pBan );
             return 1;
         }
     }
