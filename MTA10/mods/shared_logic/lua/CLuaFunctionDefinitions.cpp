@@ -12811,6 +12811,26 @@ int CLuaFunctionDefinitions::GetControlState ( lua_State * luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetAnalogControlState ( lua_State * luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    {
+        const char* szControl = lua_tostring ( luaVM, 1 );
+        float fState;
+        if ( CStaticFunctionDefinitions::GetAnalogControlState ( szControl , fState ) )
+        {
+            lua_pushnumber ( luaVM, fState );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 
 int CLuaFunctionDefinitions::IsControlEnabled ( lua_State * luaVM )
 {

@@ -561,6 +561,7 @@ public:
     LUA_DECLARE ( UnbindKey );
     LUA_DECLARE ( GetKeyState );
     LUA_DECLARE ( GetControlState );
+    LUA_DECLARE ( GetAnalogControlState );
     LUA_DECLARE ( IsControlEnabled );
     LUA_DECLARE ( GetBoundKeys );
 
