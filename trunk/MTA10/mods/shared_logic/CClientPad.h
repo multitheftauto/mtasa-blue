@@ -13,6 +13,7 @@
 #define __CClientPad_H
 
 #define MAX_GTA_CONTROLS 44
+#define MAX_GTA_ANALOG_CONTROLS 14
 
 class CClientPed;
 class CControllerState;
@@ -22,7 +23,9 @@ class CClientPad
 public:
     static bool                     GetControlIndex         ( const char * szName, unsigned int & uiIndex );
     static const char *             GetControlName          ( unsigned int uiIndex );
-    
+
+    static bool                     GetAnalogControlIndex ( const char * szName, unsigned int & uiIndex );
+
                                     CClientPad              ( void );
 
     bool                            GetControlState         ( const char * szName, bool & bState );
@@ -30,6 +33,7 @@ public:
 
     void                            DoPulse                 ( CClientPed * pPed );
 
+    static bool                     GetAnalogControlState   ( const char * szName, CControllerState & cs, bool bOnFoot, float & fState );
     static bool                     GetControlState         ( const char * szName, CControllerState & State, bool bOnFoot );
 
 protected:

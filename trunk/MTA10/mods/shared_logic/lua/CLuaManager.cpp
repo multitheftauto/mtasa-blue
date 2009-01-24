@@ -757,6 +757,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "unbindKey", CLuaFunctionDefinitions::UnbindKey );
     CLuaCFunctions::AddFunction ( "getKeyState", CLuaFunctionDefinitions::GetKeyState );    
     CLuaCFunctions::AddFunction ( "getControlState", CLuaFunctionDefinitions::GetControlState );
+    CLuaCFunctions::AddFunction ( "getAnalogControlState", CLuaFunctionDefinitions::GetAnalogControlState );
     CLuaCFunctions::AddFunction ( "isControlEnabled", CLuaFunctionDefinitions::IsControlEnabled );
     CLuaCFunctions::AddFunction ( "getBoundKeys", CLuaFunctionDefinitions::GetBoundKeys );
     

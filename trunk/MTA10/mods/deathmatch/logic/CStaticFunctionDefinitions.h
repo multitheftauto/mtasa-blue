@@ -389,6 +389,7 @@ public:
     static bool                         UnbindKey                           ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, int iLuaFunction = LUA_REFNIL );
     static bool                         GetKeyState                         ( const char* szKey, bool& bState );
     static bool                         GetControlState                     ( const char* szControl, bool& bState );
+    static bool                         GetAnalogControlState                     ( const char* szControl, float& fState );
     static bool                         IsControlEnabled                    ( const char* szControl, bool& bEnabled );
 
     static bool                         SetControlState                     ( const char* szControl, bool bState );

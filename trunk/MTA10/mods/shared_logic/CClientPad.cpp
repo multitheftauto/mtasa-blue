@@ -31,9 +31,27 @@ const char * g_GTAControls [ MAX_GTA_CONTROLS ] =
     { "group_control_back" },
 };
 
+const char * g_AnalogGTAControls [ MAX_GTA_ANALOG_CONTROLS ] =
+{
+    {  "left",  },
+    {  "right",  },
+    {  "forwards",  },
+    {  "backwards",  },
+    {  "vehicle_left",  },
+    {  "vehicle_right",  },
+    {  "steer_forward", },
+    {  "steer_back", },
+    {  "accelerate",  },
+    {  "brake_reverse",  },
+    {  "special_control_left",  },
+    {  "special_control_right",  },
+    {  "special_control_up",  },
+    {  "special_control_down",  },
+};
+
 
 bool CClientPad::GetControlIndex ( const char * szName, unsigned int & uiIndex )
-{
+{ 
     for ( unsigned int i = 0 ; i < MAX_GTA_CONTROLS ; i++ )
     {
         if ( !stricmp ( g_GTAControls [ i ], szName ) )
@@ -215,3 +233,54 @@ bool CClientPad::GetControlState ( const char * szName, CControllerState & State
     return false;
 }
 
+bool CClientPad::GetAnalogControlIndex ( const char * szName, unsigned int & uiIndex )
+{
+    for ( unsigned int i = 0 ; i < MAX_GTA_ANALOG_CONTROLS ; i++ )
+    {
+        if ( !stricmp ( g_AnalogGTAControls [ i ], szName ) )
+        {
+            uiIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CClientPad::GetAnalogControlState ( const char * szName, CControllerState & cs, bool bOnFoot, float & fState )
+{
+    unsigned int uiIndex;
+    if ( GetAnalogControlIndex ( szName, uiIndex ) )
+    {       
+        if ( bOnFoot )
+        {
+            switch ( uiIndex )
+            {
+                case 0: fState = cs.LeftStickX < 0 ? cs.LeftStickX/-128.0f : 0 ; return true;  //Left
+                case 1: fState = cs.LeftStickX > 0 ? cs.LeftStickX/128.0f : 0 ; return true;  //Right
+                case 2: fState = cs.LeftStickY < 0 ? cs.LeftStickY/-128.0f : 0 ; return true;  //Up
+                case 3: fState = cs.LeftStickY > 0 ? cs.LeftStickY/128.0f : 0 ; return true;  //Down
+                default: fState = 0; return true;
+            }
+            
+        }
+        else
+        {
+            switch ( uiIndex )
+            { 
+                case 4: fState = cs.LeftStickX  < 0 ? cs.LeftStickX/-128.0f : 0 ; return true;  //Left
+                case 5: fState = cs.LeftStickX  > 0 ? cs.LeftStickX/128.0f : 0 ; return true;  //Right 
+                case 6: fState = cs.LeftStickY  < 0 ? cs.LeftStickY/-128.0f : 0 ; return true;  //Up
+                case 7: fState = cs.LeftStickY  > 0 ? cs.LeftStickY/128.0f : 0 ; return true;  //Down
+                case 8: fState = cs.ButtonCross > 0 ? cs.ButtonCross/255.0f : 0 ; return true;  //Accel
+                case 9: fState = cs.ButtonSquare > 0 ? cs.ButtonSquare/255.0f : 0 ; return true;  //Reverse
+                case 10: fState = cs.RightStickX < 0 ? cs.RightStickX/-128.0f : 0 ; return true;  //Special Left
+                case 11: fState = cs.RightStickX > 0 ? cs.RightStickX/128.0f : 0 ; return true;  //Special Right
+                case 12: fState = cs.RightStickY < 0 ? cs.RightStickY/-128.0f : 0 ; return true;  //Special Up
+                case 13: fState = cs.RightStickY > 0 ? cs.RightStickY/128.0f : 0 ; return true;  //Special Down
+                default: fState = 0; return true;
+            }
+        }
+    }
+    return false;
+}

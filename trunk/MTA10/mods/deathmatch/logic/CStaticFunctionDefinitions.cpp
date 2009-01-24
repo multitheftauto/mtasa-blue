@@ -4600,6 +4600,19 @@ bool CStaticFunctionDefinitions::GetControlState ( const char* szControl, bool& 
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetAnalogControlState ( const char * szControl, float & fState )
+{
+    CControllerState cs;
+    CClientPlayer* localPlayer = m_pPlayerManager->GetLocalPlayer ();
+    localPlayer->GetControllerState( cs );
+    bool bOnFoot = ( !localPlayer->GetRealOccupiedVehicle () );
+    if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+    {
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::IsControlEnabled ( const char* szControl, bool& bEnabled )
 {
