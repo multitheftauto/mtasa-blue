@@ -25,14 +25,14 @@ void CTeamRPCs::LoadFunctions ( void )
 void CTeamRPCs::SetTeamName ( NetBitStreamInterface& bitStream )
 {
     ElementID TeamID;
-    unsigned char ucNameLength;
+    unsigned short usNameLength;
     if ( bitStream.Read ( TeamID ) &&
-         bitStream.Read ( ucNameLength ) )
+         bitStream.Read ( usNameLength ) )
     {
-        char* szName = new char [ ucNameLength + 1 ];
-        szName [ ucNameLength ] = NULL;
+        char* szName = new char [ usNameLength + 1 ];
+        szName [ usNameLength ] = NULL;
 
-        if ( bitStream.Read ( szName, ucNameLength ) )
+        if ( bitStream.Read ( szName, usNameLength ) )
         {
             CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
             if ( pTeam )
