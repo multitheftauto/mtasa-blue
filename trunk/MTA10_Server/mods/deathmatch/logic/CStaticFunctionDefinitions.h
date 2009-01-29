@@ -213,7 +213,6 @@ public:
     static bool                 SetPedHeadless                      ( CElement * pElement, bool bIsHeadless );
 
     // Camera get functions
-    static bool                 GetCameraMode                       ( CPlayer * pPlayer, char* szBuffer, size_t sizeBuffer );
     static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt );
     static CElement*            GetCameraTarget                     ( CPlayer * pPlayer );
     static bool                 GetCameraInterior                   ( CPlayer * pPlayer, unsigned char & ucInterior );
