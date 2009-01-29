@@ -595,13 +595,13 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         // Client functions. (from the wiki but missing in the code)
         // Camera
         hashClient["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        hashClient["getCameraRotation"]         = "Removed|Spend ages changing everything.";
-        hashClient["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
-        hashClient["setCameraPosition"]         = "Removed|Spend ages changing everything.";
-        hashClient["getCameraFixedModeTarget"]  = "Removed|Spend ages changing everything.";
-        hashClient["toggleCameraFixedMode"]     = "Removed|Spend ages changing everything.";
-        hashClient["rotateCameraRight"]         = "Removed|Spend ages changing everything.";
-        hashClient["rotateCameraUp"]            = "Removed|Spend ages changing everything.";
+        hashClient["getCameraRotation"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["getCameraFixedModeTarget"]  = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["toggleCameraFixedMode"]     = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["rotateCameraRight"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashClient["rotateCameraUp"]            = "Removed|Please manually update this.  Refer to the wiki for details";
         // Edit
         hashClient["guiEditSetCaratIndex"]      = "Replaced|guiEditSetCaretIndex";
 
@@ -660,9 +660,10 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         // Server functions. (from the wiki but missing/not clear in the code)
         // Camera
         hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        hashServer["setCameraPosition"]         = "Removed|Spend ages changing everything.";
-        hashServer["setCameraLookAt"]           = "Removed|Spend ages changing everything.";
-        hashServer["setCameraMode"]             = "Removed|Spend ages changing everything.";
+        hashServer["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["setCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["getCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
         // Player
         hashServer["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
         hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
@@ -679,11 +680,11 @@ static bool GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool 
         hashServer["randInt"]                   = "Replaced|math.random";
 
         // Admin
-        hashServer["banIP"]                     = "Removed|Spend ages changing everything.";
-        hashServer["banSerial"]                 = "Removed|Spend ages changing everything.";
-        hashServer["unbanIP"]                   = "Removed|Spend ages changing everything.";
-        hashServer["unbanSerial"]               = "Removed|Spend ages changing everything.";
-        hashServer["getBansXML"]                = "Removed|Spend ages changing everything.";
+        hashServer["banIP"]                     = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["banSerial"]                 = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["unbanIP"]                   = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["unbanSerial"]               = "Removed|Please manually update this.  Refer to the wiki for details";
+        hashServer["getBansXML"]                = "Removed|Please manually update this.  Refer to the wiki for details";
     }
 
     // Which hash?
