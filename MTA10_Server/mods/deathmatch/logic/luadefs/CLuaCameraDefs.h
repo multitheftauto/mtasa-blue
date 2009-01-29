@@ -22,7 +22,6 @@ public:
     static void     LoadFunctions                       ( void );
 
     // Get functions
-    static int      getCameraMode                       ( lua_State* luaVM );
     static int      getCameraMatrix                     ( lua_State* luaVM );
     static int      getCameraTarget                     ( lua_State* luaVM );
     static int      getCameraInterior                   ( lua_State* luaVM );

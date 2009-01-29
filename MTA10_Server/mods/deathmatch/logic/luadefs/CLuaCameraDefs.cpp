@@ -16,7 +16,6 @@
 void CLuaCameraDefs::LoadFunctions ( void )
 {
     // Get functions
-    CLuaCFunctions::AddFunction ( "getCameraMode", CLuaCameraDefs::getCameraMode );
     CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaCameraDefs::getCameraMatrix );
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaCameraDefs::getCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaCameraDefs::getCameraInterior );
@@ -26,31 +25,6 @@ void CLuaCameraDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaCameraDefs::setCameraTarget );
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaCameraDefs::setCameraInterior );
     CLuaCFunctions::AddFunction ( "fadeCamera", CLuaCameraDefs::fadeCamera );
-}
-
-
-int CLuaCameraDefs::getCameraMode ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
-        {
-            char szMode [ 256 ];
-            if ( CStaticFunctionDefinitions::GetCameraMode ( pPlayer, szMode, 256 ) )
-            {
-                lua_pushstring ( luaVM, szMode );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getCameraMode", "player", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getCameraMode" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
 }
 
 

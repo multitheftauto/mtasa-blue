@@ -2979,15 +2979,6 @@ bool CStaticFunctionDefinitions::SetPedHeadless ( CElement * pElement, bool bIsH
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMode ( CPlayer* pPlayer, char* szBuffer, size_t sizeBuffer )
-{
-    assert ( pPlayer );
-
-    CPlayerCamera::GetMode ( pPlayer->GetCamera ()->GetMode (), szBuffer, sizeBuffer );
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt )
 {
     assert ( pPlayer );
@@ -3008,7 +2999,14 @@ bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer * pPlayer, CVector & 
 CElement* CStaticFunctionDefinitions::GetCameraTarget ( CPlayer* pPlayer )
 {
     assert ( pPlayer );
-    return pPlayer->GetCamera ()->GetTarget ();
+    CPlayerCamera * pCamera = pPlayer->GetCamera ();
+
+    // Only allow this if we're targeting a player
+    if ( pCamera->GetMode () == CAMERAMODE_PLAYER )
+    {
+        return pCamera->GetTarget ();
+    }
+    return NULL;
 }
 
 
