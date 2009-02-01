@@ -293,7 +293,7 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
 					strncpy ( szBuffer, szSetting, MAX_SETTINGS_LENGTH - 1 );
 			}
 
-			if ( !bExists || !pSource ) {				// No existing settings registry entry, so create a new setting
+			if ( !bExists || !pNode ) {				// No existing settings registry entry, so create a new setting
 				CreateSetting ( m_pNodeGlobalSettings, szBuffer, szContent );
 			} else {						// Existing settings registry entry
 				// Get the attributes
