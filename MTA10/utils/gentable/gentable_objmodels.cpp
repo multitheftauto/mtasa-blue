@@ -5,7 +5,7 @@
 *  FILE:        utils/gentable/gentable_objmodels.cpp
 *  PURPOSE:     Object model table generator
 *  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
-*		KWKSND         <kwksnd@gmail.com>
+*               KWKSND         <kwksnd@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -55,7 +55,6 @@ int main()
   AllowRange(table, 700, 792, true);
   AllowRange(table, 800, 906, true);
   AllowRange(table, 910, 998, true);
-  AllowRange(table, 966, 998, true);
   AllowRange(table, 1000, 1085, true);
   AllowRange(table, 1088, 1193, true);
   AllowRange(table, 1207, 1384, true);
