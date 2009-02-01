@@ -3797,7 +3797,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         // Resource Chunk Size
         unsigned char ucChunkSize;
         // Resource Chunk Data
-        char* szChunkData;
+        char* szChunkData = NULL;
         // Resource Chunk Sub Type
         unsigned char ucChunkSubType;
         // Resource Chunk CRC
