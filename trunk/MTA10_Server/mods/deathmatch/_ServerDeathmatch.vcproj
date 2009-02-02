@@ -523,6 +523,9 @@
 					RelativePath=".\logic\CResource.cpp">
 				</File>
 				<File
+					RelativePath=".\logic\CResourceChecker.cpp">
+				</File>
+				<File
 					RelativePath=".\logic\CResourceClientConfigItem.cpp">
 				</File>
 				<File
@@ -1272,6 +1275,9 @@
 				</File>
 				<File
 					RelativePath=".\logic\CResource.h">
+				</File>
+				<File
+					RelativePath=".\logic\CResourceChecker.h">
 				</File>
 				<File
 					RelativePath=".\logic\CResourceClientConfigItem.h">

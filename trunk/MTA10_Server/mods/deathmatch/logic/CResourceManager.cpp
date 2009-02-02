@@ -200,14 +200,11 @@ bool CResourceManager::Refresh ( void )
     return false;
 }
 
-void BeginResourceUpgrade();
-void EndResourceUpgrade();
-
 void CResourceManager::Upgrade ( void )
 {
-    BeginResourceUpgrade();
+    CResourceChecker::BeginUpgradeMode();
     Refresh ();
-    EndResourceUpgrade();
+    CResourceChecker::EndUpgradeMode();
 }
 
 char * CResourceManager::GetResourceDirectory ( void )
