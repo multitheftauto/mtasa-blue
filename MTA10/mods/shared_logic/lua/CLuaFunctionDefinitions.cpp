@@ -2092,6 +2092,12 @@ int CLuaFunctionDefinitions::GetElementsByType ( lua_State* luaVM )
                 }
             }
 
+            bool bStreamedIn = false;
+            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+            {
+                bStreamedIn = lua_toboolean ( luaVM, 3 ) ? true : false;
+            }
+
             // Grab the argument
             const char* szType = lua_tostring ( luaVM, 1 );
 
@@ -2099,7 +2105,7 @@ int CLuaFunctionDefinitions::GetElementsByType ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the elements with a matching type to it
-            startAt->FindAllChildrenByType ( szType, pLuaMain );
+            startAt->FindAllChildrenByType ( szType, pLuaMain, bStreamedIn );
             return 1;
         }
         else
