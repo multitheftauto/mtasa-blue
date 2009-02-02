@@ -26,6 +26,7 @@ public:
                                                       unsigned char ucBlendedWeatherHour,
                                                       unsigned char ucClockHour,
                                                       unsigned char ucClockMin,
+                                                      unsigned long ulMinuteDuration,
                                                       bool bShowNametags,
                                                       bool bShowRadar,
                                                       float fGravity,
@@ -52,6 +53,7 @@ private:
     unsigned char           m_ucBlendedWeatherHour;
     unsigned char           m_ucClockHour;
     unsigned char           m_ucClockMin;
+    unsigned long           m_ulMinuteDuration;
     bool                    m_bShowNametags;
     bool                    m_bShowRadar;
     float                   m_fGravity;
