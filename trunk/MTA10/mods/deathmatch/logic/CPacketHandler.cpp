@@ -1809,6 +1809,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     // Set the time
     g_pGame->GetClock ()->Set ( ucClockHour, ucClockMinute );
 
+    // Read and set minute duration
+    unsigned long ulMinuteDuration;
+    bitStream.Read ( ulMinuteDuration );
+
+    g_pClientGame->SetMinuteDuration ( ulMinuteDuration );
+
     // Flags
     unsigned char ucFlags;
     bitStream.Read ( ucFlags );

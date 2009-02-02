@@ -20,6 +20,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucBlendedWeatherHour,
                                  unsigned char ucClockHour,
                                  unsigned char ucClockMin,
+                                 unsigned long ulMinuteDuration,
                                  bool bShowNametags,
                                  bool bShowRadar,
                                  float fGravity,
@@ -40,6 +41,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucBlendedWeatherHour = ucBlendedWeatherHour;
     m_ucClockHour = ucClockHour;
     m_ucClockMin = ucClockMin;
+    m_ulMinuteDuration = ulMinuteDuration;
     m_bShowNametags = bShowNametags;
     m_bShowRadar = bShowRadar;
     m_fGravity = fGravity;
@@ -78,6 +80,8 @@ bool CMapInfoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
     // Write the map hour
     BitStream.Write ( m_ucClockHour );
     BitStream.Write ( m_ucClockMin );
+
+    BitStream.Write ( m_ulMinuteDuration );
 
     // Gather the map flags
     unsigned char ucFlags = 0;

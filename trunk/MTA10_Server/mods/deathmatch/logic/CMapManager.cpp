@@ -438,6 +438,9 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned char ucClockHour, ucClockMin;
     m_pServerClock->Get ( ucClockHour, ucClockMin );
 
+    // Grab minute duration
+    unsigned long ulMinuteDuration = m_pServerClock->GetMinuteDuration();
+
     // Nametags and radar enabled
     bool bNametagsEnabled = true;
     bool bRadarEnabled = true;
@@ -471,6 +474,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBlendedWeatherHour,
                                    ucClockHour,
                                    ucClockMin,
+                                   ulMinuteDuration,
                                    bNametagsEnabled,
                                    bRadarEnabled,
                                    fGravity,
