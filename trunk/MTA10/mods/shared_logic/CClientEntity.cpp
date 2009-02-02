@@ -900,7 +900,7 @@ CClientEntity* CClientEntity::FindChildByTypeIndex ( unsigned int uiTypeHash, un
 }
 
 
-void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMain )
+void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMain, bool bStreamedIn )
 {
     assert ( szType );
     assert ( pLuaMain );
@@ -908,11 +908,11 @@ void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMa
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
     unsigned int uiTypeHash = HashString ( szType );
-    FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex );
+    FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
 }
 
 
-void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex )
+void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex, bool bStreamedIn )
 {
     assert ( pLuaMain );
 
@@ -921,17 +921,22 @@ void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMa
     // Our type matches?
     if ( m_uiTypeHash == uiTypeHash )
     {
-        // Add it to the table
-        lua_pushnumber ( luaVM, ++uiIndex );
-        lua_pushelement ( luaVM, this );
-        lua_settable ( luaVM, -3 );
+        // Only streamed in elements?
+        if ( !bStreamedIn || !IsStreamingCompatibleClass() || 
+             reinterpret_cast < CClientStreamElement* > ( this )->IsStreamedIn() )
+        {
+            // Add it to the table
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushelement ( luaVM, this );
+            lua_settable ( luaVM, -3 );
+        }
     }
 
     // Call us on the children
     list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex );
+        (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
     }
 }
 

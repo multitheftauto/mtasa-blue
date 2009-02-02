@@ -181,8 +181,8 @@ public:
     CClientEntity*                              FindChildIndex          ( const char* szType, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive );
     CClientEntity*                              FindChildByType         ( const char* szType, unsigned int uiIndex, bool bRecursive );
     CClientEntity*                              FindChildByTypeIndex    ( unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive );
-    void                                        FindAllChildrenByType       ( const char* szType, CLuaMain* pLuaMain );
-    void                                        FindAllChildrenByTypeIndex  ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex );
+    void                                        FindAllChildrenByType       ( const char* szType, CLuaMain* pLuaMain, bool bStreamedIn = false );
+    void                                        FindAllChildrenByTypeIndex  ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex, bool bStreamedIn = false );
 
     inline unsigned int                         CountChildren           ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
 
