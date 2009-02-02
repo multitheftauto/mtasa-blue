@@ -216,6 +216,7 @@
 #include "CDummy.h"
 #include "CConfig.h"
 #include "CResource.h"
+#include "CResourceChecker.h"
 
 // Utility includes
 #include "utils/base64.h"
