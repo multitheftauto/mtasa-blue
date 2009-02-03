@@ -13573,7 +13573,7 @@ int CLuaFunctionDefinitions::XMLCopyFile ( lua_State* luaVM )
         {
             // Grab the full filepath of the copied xml and make sure its legal
             char szFilename [ MAX_STRING_LENGTH ];
-		    snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", m_pClientGame->GetModRoot(), lua_tostring ( luaVM, 2 ) );
+		    snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
 		    if ( IsValidFilePath ( lua_tostring ( luaVM, 2 ) ) )
             {
                 // Grab the source node
