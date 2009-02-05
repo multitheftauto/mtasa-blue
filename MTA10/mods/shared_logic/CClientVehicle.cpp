@@ -944,7 +944,7 @@ bool CClientVehicle::IsBelowWater ( void ) const
     GetPosition ( vecPosition );
     float fWaterLevel = 0.0f;
 
-    if ( g_pGame->GetWorld ()->GetWaterLevel ( &vecPosition, &fWaterLevel, 1, NULL ) )
+    if ( g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, true, NULL ) )
     {
         if ( vecPosition.fZ < fWaterLevel - 0.7 )
         {
@@ -2369,11 +2369,11 @@ bool CClientVehicle::IsInWater ( void )
         if ( pBoundingBox )
         {
             CVector vecMin = pBoundingBox->vecBoundMin;
-            CVector vecPosition, vecTemp;;
+            CVector vecPosition, vecTemp;
             GetPosition ( vecPosition );
             vecMin += vecPosition;
             float fWaterLevel;
-            if ( g_pGame->GetWorld ()->GetWaterLevel ( &vecPosition, &fWaterLevel, true, &vecTemp ) )
+            if ( g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, true, &vecTemp ) )
             {
                 if ( vecPosition.fZ <= fWaterLevel )
                 {

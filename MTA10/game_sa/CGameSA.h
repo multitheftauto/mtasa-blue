@@ -102,6 +102,7 @@ public:
     inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
+    inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
 
     class CEventDamage              * GetEventDamage ( CEventDamageSAInterface * pInterface );
 
@@ -184,7 +185,8 @@ private:
     CVisibilityPlugins      * m_pVisibilityPlugins;
     CKeyGen                 * m_pKeyGen;
     CRopes                  * m_pRopes;
-    CFx                    * m_pFx;
+    CFx                     * m_pFx;
+    CWaterManager           * m_pWaterManager;
 
 	CPad					    * m_pPad;
 	CTheCarGenerators		    * m_pTheCarGenerators;

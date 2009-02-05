@@ -532,6 +532,7 @@ public:
     LUA_DECLARE ( IsLineOfSightClear );
     LUA_DECLARE ( TestLineAgainstWater );
     LUA_DECLARE ( GetWaterLevel );
+    LUA_DECLARE ( SetWaterLevel );
     LUA_DECLARE ( GetWorldFromScreenPosition );
     LUA_DECLARE ( GetScreenFromWorldPosition  );
     LUA_DECLARE ( GetWeather );

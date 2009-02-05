@@ -527,6 +527,9 @@
 				RelativePath="CWantedSA.cpp">
 			</File>
 			<File
+				RelativePath=".\CWaterManagerSA.cpp">
+			</File>
+			<File
 				RelativePath="CWeaponInfoSA.cpp">
 			</File>
 			<File
@@ -886,6 +889,9 @@
 			</File>
 			<File
 				RelativePath="CWantedSA.h">
+			</File>
+			<File
+				RelativePath=".\CWaterManagerSA.h">
 			</File>
 			<File
 				RelativePath="CWeaponInfoSA.h">

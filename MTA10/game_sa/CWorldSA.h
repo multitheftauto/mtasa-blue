@@ -22,8 +22,6 @@
 #define FUNC_CTimer_Update									0x561B10 // ##SA##
 #define FUNC_CRenderer_RequestObjectsInDirection			0x555CB0 // ##SA##
 #define FUNC_CStreaming_LoadScene							0x40EB70 // ##SA##
-#define FUNC_GetWaterLevel									0x6EB690 // ##SA##
-#define FUNC_TestLineAgainstWater							0x6E61B0 // ##SA##
 #define FUNC_IsLineOfSightClear								0x56A490 // ##SA##
 #define FUNC_HasCollisionBeenLoaded                         0x410CE0 // ##SA##
 #define FUNC_RemoveBuildingsNotInArea                       0x4094B0 // ##SA##

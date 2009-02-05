@@ -742,6 +742,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefinitions::SetTime );
+    CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefinitions::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefinitions::ResetSkyGradient );
     CLuaCFunctions::AddFunction ( "setWeather", CLuaFunctionDefinitions::SetWeather );

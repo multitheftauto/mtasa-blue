@@ -90,6 +90,7 @@ CGameSA::CGameSA()
     this->m_pKeyGen                 = new CKeyGenSA;
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
+    this->m_pWaterManager           = new CWaterManagerSA ();
 
 	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
 		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), (eWeaponType)i);
