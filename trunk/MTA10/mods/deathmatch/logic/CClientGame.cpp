@@ -3021,11 +3021,13 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
     // Grab the damaged ped
     CClientPed* pDamagedPed = NULL;    
-    if ( pDamagePed ) pDamagedPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pDamagePed ), true, true );
+    if ( pDamagePed )
+        pDamagedPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pDamagePed ), true, true );
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
-    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor );
+    if ( pInflictor )
+        pInflictingEntity = m_pManager->FindEntity ( pInflictor );
 
     // If the damage was caused by an explosion
     if ( weaponUsed == WEAPONTYPE_EXPLOSION )
@@ -3033,7 +3035,8 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         CClientEntity * pLastExplosionCreator = m_pManager->GetExplosionManager ()->m_pLastCreator;
         
         // If we don't have an inflictor, look for the last explosion creator
-        if ( !pInflictor && pLastExplosionCreator ) pInflictingEntity = pLastExplosionCreator;
+        if ( !pInflictor && pLastExplosionCreator )
+            pInflictingEntity = pLastExplosionCreator;
         
         // Change the weapon used to whatever created the explosion
         weaponUsed = m_pManager->GetExplosionManager ()->m_LastWeaponType;
@@ -3041,7 +3044,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
     // Do we have a damaged ped?
     if ( pDamagedPed )
-    {               
+    {
         float fPreviousHealth = pDamagedPed->m_fHealth;
         float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
         float fPreviousArmor = pDamagedPed->m_fArmor;
@@ -3073,7 +3076,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 if ( pTeam )
                 {
                     // Is this friendly-fire from a team-mate?
-                    if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () )
+                    if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
                     {
                         return false;
                     }
