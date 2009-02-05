@@ -284,7 +284,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                         Arguments.PushElement ( pVehicle );
                                         pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );
 
-                                        pVehicle->SetTowedVehicle ( NULL, true );
+                                        pVehicle->SetTowedVehicle ( NULL );
                                     }
 
                                     // If something else is towing this trailer
@@ -300,10 +300,10 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                         Arguments.PushElement ( pCurrentVehicle );
                                         pTrailer->CallEvent ( "onTrailerDetach", Arguments );
 
-                                        pCurrentVehicle->SetTowedVehicle ( NULL, true );
+                                        pCurrentVehicle->SetTowedVehicle ( NULL );
                                     }
 
-                                    pVehicle->SetTowedVehicle ( pTrailer, true );
+                                    pVehicle->SetTowedVehicle ( pTrailer );
 
                                     // Tell everyone to attach the new one
                                     CVehicleTrailerPacket AttachPacket ( pVehicle, pTrailer, true );
@@ -329,7 +329,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle ();
                                 if ( pCurrentTrailer )
                                 {
-                                    pVehicle->SetTowedVehicle ( NULL, true );
+                                    pVehicle->SetTowedVehicle ( NULL );
 
                                     // Tell everyone else to detach them
                                     CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );

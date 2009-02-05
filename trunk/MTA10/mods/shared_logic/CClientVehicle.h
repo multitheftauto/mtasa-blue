@@ -259,7 +259,7 @@ public:
 
     CClientVehicle*             GetTowedVehicle         ( void );
     CClientVehicle*             GetRealTowedVehicle     ( void );
-    void                        SetTowedVehicle         ( CClientVehicle* pVehicle );
+    bool                        SetTowedVehicle         ( CClientVehicle* pVehicle );
     inline CClientVehicle *     GetTowedByVehicle       ( void )                            { return m_pTowedByVehicle; }
 
     eWinchType                  GetWinchType            ( void )                            { return m_eWinchType; }
