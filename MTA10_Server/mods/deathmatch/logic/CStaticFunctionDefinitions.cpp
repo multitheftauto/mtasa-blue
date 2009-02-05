@@ -4294,8 +4294,8 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
         if ( pTrailer->GetTowedByVehicle () == NULL )
         {
             // Attach them
-            pVehicle->SetTowedVehicle ( pTrailer );
-            pTrailer->SetTowedByVehicle ( pVehicle );
+            if ( !pVehicle->SetTowedVehicle ( pTrailer ) )
+                return false;
 
             // Tell everyone to attach them
             CVehicleTrailerPacket AttachPacket ( pVehicle, pTrailer, true );
@@ -7005,7 +7005,6 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason )
 {
     CBan* pBan = NULL;
-    char szMessage [256];
 
     // Got an IP?
     if ( szIP )

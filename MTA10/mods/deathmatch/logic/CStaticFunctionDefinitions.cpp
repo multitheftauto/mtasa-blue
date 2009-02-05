@@ -2233,8 +2233,7 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicl
         if ( Trailer.GetTowedByVehicle () == NULL )
         {
             // Attach them
-            Vehicle.SetTowedVehicle ( &Trailer );
-            return true;
+            return Vehicle.SetTowedVehicle ( &Trailer );
         }
     }
 

@@ -2110,7 +2110,7 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle ( void )
 }
 
 
-void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
+bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
 {
     // Do we already have a towed vehicle?
     if ( m_pTowedVehicle && pVehicle != m_pTowedVehicle )
@@ -2119,11 +2119,21 @@ void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
         CVehicle * pGameVehicle = m_pTowedVehicle->GetGameVehicle ();
         if ( pGameVehicle && m_pVehicle ) pGameVehicle->BreakTowLink ();
         m_pTowedVehicle->m_pTowedByVehicle = NULL;
+        m_pTowedVehicle = NULL;
     }
 
     // Do we have a new one to set?
     if ( pVehicle )
     {
+        // Are we trying to establish a circular loop? (this would freeze everything up)
+        CClientVehicle* pCircTestVehicle = pVehicle;
+        while ( pCircTestVehicle )
+        {
+            if ( pCircTestVehicle == this )
+                return false;
+            pCircTestVehicle = pCircTestVehicle->m_pTowedVehicle;
+        }
+
         pVehicle->m_pTowedByVehicle = this;
 
         // Add it
@@ -2156,12 +2166,13 @@ void CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
         m_ulIllegalTowBreakTime = 0;
 
     m_pTowedVehicle = pVehicle;
+    return true;
 }
 
 
 bool CClientVehicle::SetWinchType ( eWinchType winchType )
 {
-    if ( GetModel () == 417 ) // Leviathon
+    if ( GetModel () == 417 ) // Leviathan
     {
         if ( m_pVehicle )
         {

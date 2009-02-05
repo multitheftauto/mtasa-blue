@@ -494,27 +494,57 @@ void CVehicle::SetUpgrades ( CVehicleUpgrades* pUpgrades )
 }
 
 
-inline void CVehicle::SetTowedVehicle ( CVehicle* pVehicle, bool bSetTowedVehicle )
+bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedVehicle && ( pVehicle || bSetTowedVehicle ) )
-        m_pTowedVehicle->SetTowedByVehicle ( NULL );
+    if ( m_pTowedVehicle && pVehicle )
+    {
+        m_pTowedVehicle->m_pTowedByVehicle = NULL;
+        m_pTowedVehicle = NULL;
+    }
 
-    if ( pVehicle && bSetTowedVehicle )
-        pVehicle->SetTowedByVehicle ( this );
+    if ( pVehicle )
+    {
+        // Are we trying to establish a circular loop? (would freeze everything up)
+        CVehicle* pCircTestVehicle = pVehicle;
+        while ( pCircTestVehicle )
+        {
+            if ( pCircTestVehicle == this )
+                return false;
+            pCircTestVehicle = pCircTestVehicle->m_pTowedVehicle;
+        }
+
+        pVehicle->m_pTowedByVehicle = this;
+    }
 
     m_pTowedVehicle = pVehicle;
+    return true;
 }
 
 
-inline void CVehicle::SetTowedByVehicle ( CVehicle* pVehicle, bool bSetTowedByVehicle )
+bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedByVehicle && ( pVehicle || bSetTowedByVehicle ) )
-        m_pTowedByVehicle->SetTowedVehicle ( NULL );
+    if ( m_pTowedByVehicle && pVehicle )
+    {
+        m_pTowedByVehicle->m_pTowedVehicle = NULL;
+        m_pTowedByVehicle = NULL;
+    }
 
-    if ( pVehicle && bSetTowedByVehicle )
-        pVehicle->SetTowedVehicle ( this );
+    if ( pVehicle )
+    {
+        // Are we trying to establish a circular loop? (would freeze everything up)
+        CVehicle* pCircTestVehicle = pVehicle;
+        while ( pCircTestVehicle )
+        {
+            if ( pCircTestVehicle == this )
+                return false;
+            pCircTestVehicle = pCircTestVehicle->m_pTowedByVehicle;
+        }
+
+        pVehicle->m_pTowedVehicle = this;
+    }
 
     m_pTowedByVehicle = pVehicle;
+    return true;
 }
 
 

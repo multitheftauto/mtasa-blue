@@ -147,7 +147,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             // If theres a trailer already attached
                             if ( pCurrentTrailer )
                             {
-                                pTowedByVehicle->SetTowedVehicle ( NULL, true );
+                                pTowedByVehicle->SetTowedVehicle ( NULL );
 
                                 // Tell everyone to detach them
                                 CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );
@@ -163,7 +163,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             CVehicle* pCurrentVehicle = pTrailer->GetTowedByVehicle ();
                             if ( pCurrentVehicle )
                             {
-                                pCurrentVehicle->SetTowedVehicle ( NULL, true );
+                                pCurrentVehicle->SetTowedVehicle ( NULL );
 
                                 // Tell everyone to detach them
                                 CVehicleTrailerPacket AttachPacket ( pCurrentVehicle, pTrailer, false );
@@ -175,7 +175,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                                 pTrailer->CallEvent ( "onTrailerDetach", Arguments );
                             }
 
-                            pTowedByVehicle->SetTowedVehicle ( pTrailer, true );
+                            pTowedByVehicle->SetTowedVehicle ( pTrailer );
 
                             // Tell everyone to attach the new one
                             CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pTrailer, true );
@@ -207,7 +207,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                 CVehicle* pCurrentTrailer = pTowedByVehicle->GetTowedVehicle ();
                 if ( pCurrentTrailer )
                 {
-                    pTowedByVehicle->SetTowedVehicle ( NULL, true );
+                    pTowedByVehicle->SetTowedVehicle ( NULL );
 
                     // Tell everyone else to detach them
                     CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );

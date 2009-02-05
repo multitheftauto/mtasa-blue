@@ -187,9 +187,9 @@ public:
     inline void                     SetOverrideLights       ( unsigned char ucLights )      { m_ucOverrideLights = ucLights; }
 
     inline CVehicle*                GetTowedVehicle         ( void )                        { return m_pTowedVehicle; }
-    void                            SetTowedVehicle         ( CVehicle* pVehicle, bool bSetTowedVehicle = false );
+    bool                            SetTowedVehicle         ( CVehicle* pVehicle );
     inline CVehicle*                GetTowedByVehicle       ( void )                        { return m_pTowedByVehicle; }
-    void                            SetTowedByVehicle       ( CVehicle* pVehicle, bool bSetTowedByVehicle = false );
+    bool                            SetTowedByVehicle       ( CVehicle* pVehicle );
 
     inline const char*              GetRegPlate             ( void )                        { return m_szRegPlate; }
     void                            SetRegPlate             ( const char* szRegPlate );
