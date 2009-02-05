@@ -12157,18 +12157,13 @@ int CLuaFunctionDefinitions::TestLineAgainstWater ( lua_State* luaVM )
                            static_cast < float > ( lua_tonumber ( luaVM, 6 ) ) );
 
         CVector vecCollision;
-        bool bCollision;
-        if ( CStaticFunctionDefinitions::TestLineAgainstWater ( vecStart, vecEnd, bCollision, vecCollision ) )
+        if ( CStaticFunctionDefinitions::TestLineAgainstWater ( vecStart, vecEnd, vecCollision ) )
         {
-            lua_pushboolean ( luaVM, bCollision );
-            if ( bCollision )
-            {
-                lua_pushnumber ( luaVM, vecCollision.fX );
-                lua_pushnumber ( luaVM, vecCollision.fY );
-                lua_pushnumber ( luaVM, vecCollision.fZ );
-                return 4;
-            }
-            return 1;
+            lua_pushboolean ( luaVM, true );
+            lua_pushnumber ( luaVM, vecCollision.fX );
+            lua_pushnumber ( luaVM, vecCollision.fY );
+            lua_pushnumber ( luaVM, vecCollision.fZ );
+            return 4;
         }
     }
     else
@@ -12197,14 +12192,10 @@ int CLuaFunctionDefinitions::GetWaterLevel ( lua_State* luaVM )
 
         float fWaterLevel;
         CVector vecUnknown;
-        bool bFound;
-        if ( CStaticFunctionDefinitions::GetWaterLevel ( vecPosition, bFound, fWaterLevel, bCheckWaves, vecUnknown ) )
+        if ( CStaticFunctionDefinitions::GetWaterLevel ( vecPosition, fWaterLevel, bCheckWaves, vecUnknown ) )
         {
-            if ( bFound )
-            {
-                lua_pushnumber ( luaVM, fWaterLevel );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fWaterLevel );
+            return 1;
         }
     }
     else
@@ -12214,6 +12205,41 @@ int CLuaFunctionDefinitions::GetWaterLevel ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource ();
+        if ( pResource )
+        {
+            int iArgument1 = lua_type ( luaVM, 1 );
+            int iArgument2 = lua_type ( luaVM, 2 );
+            int iArgument3 = lua_type ( luaVM, 3 );
+            int iArgument4 = lua_type ( luaVM, 4 );
+
+            if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+                 ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+            {
+                CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                                    static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                                    static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+                if ( CStaticFunctionDefinitions::SetWaterLevel ( vecPosition, fLevel, pResource ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setWaterLevel" );
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::GetWorldFromScreenPosition ( lua_State * luaVM )
 {

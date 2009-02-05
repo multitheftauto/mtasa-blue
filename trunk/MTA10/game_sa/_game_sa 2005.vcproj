@@ -584,10 +584,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CPedSoundSA.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CPhysicalSA.cpp"
 				>
 			</File>
@@ -705,6 +701,10 @@
 			</File>
 			<File
 				RelativePath="CWantedSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWaterManagerSA.cpp"
 				>
 			</File>
 			<File
@@ -1065,10 +1065,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CPedSoundSA.h"
-				>
-			</File>
-			<File
 				RelativePath="CPhysicalSA.h"
 				>
 			</File>
@@ -1186,6 +1182,10 @@
 			</File>
 			<File
 				RelativePath="CWantedSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWaterManagerSA.h"
 				>
 			</File>
 			<File

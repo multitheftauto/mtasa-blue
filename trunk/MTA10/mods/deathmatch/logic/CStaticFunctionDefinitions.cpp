@@ -4203,19 +4203,21 @@ bool CStaticFunctionDefinitions::IsLineOfSightClear ( CVector& vecStart, CVector
 }
 
 
-bool CStaticFunctionDefinitions::TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, bool& bCollision, CVector& vecCollision )
+bool CStaticFunctionDefinitions::TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector& vecCollision )
 {
-    bCollision = g_pGame->GetWorld ()->TestLineAgainstWater ( &vecStart, &vecEnd, &vecCollision );
-
-    return true;
+    return g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecStart, vecEnd, &vecCollision );
 }
 
 
-bool CStaticFunctionDefinitions::GetWaterLevel ( CVector& vecPosition, bool& bFound, float& fWaterLevel, bool bCheckWaves, CVector& vecUnknown )
+bool CStaticFunctionDefinitions::GetWaterLevel ( CVector& vecPosition, float& fWaterLevel, bool bCheckWaves, CVector& vecUnknown )
 {
-    bFound = g_pGame->GetWorld ()->GetWaterLevel ( &vecPosition, &fWaterLevel, bCheckWaves, &vecUnknown );
+    return g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, bCheckWaves, &vecUnknown );
+}
 
-    return true;
+
+bool CStaticFunctionDefinitions::SetWaterLevel ( CVector& vecPosition, float fLevel, void* pChangeSource )
+{
+    return g_pGame->GetWaterManager ()->SetWaterLevel ( vecPosition, fLevel, pChangeSource );
 }
 
 

@@ -101,6 +101,9 @@ CResource::~CResource ( void )
 	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceGUIEntity );
 	m_pResourceGUIEntity = NULL;
 
+    // Undo all changes to water
+    g_pGame->GetWaterManager ()->UndoChanges ( this );
+
     // TODO: remove them from the core too!!
     // Destroy all the element groups attached directly to this resource
     list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();

@@ -29,9 +29,6 @@ public:
 	virtual FLOAT		FindGroundZForPosition(FLOAT fX, FLOAT fY)=0;
 	virtual FLOAT		FindGroundZFor3DPosition(CVector * vecPosition)=0;
 	virtual VOID		LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)=0;
-	// returns true vecPosition is above the water, fWaterLevelZ returns level of water including waves
-	virtual	bool		GetWaterLevel ( CVector * vecPosition, float * fWaterLevelZ, bool bUnknown, CVector * vecUnknown )=0;
-	virtual bool		TestLineAgainstWater ( CVector * vecStart, CVector * vecEnd, CVector * vecCollision )=0;
 	virtual bool		IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false )=0;
     virtual bool        HasCollisionBeenLoaded ( CVector * vecPosition )=0;
     virtual DWORD       GetCurrentArea ( void )=0;

@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <list>
+#include <map>
+#include <vector>
+
 // SDK includes
 #include <game/CGame.h>
 #include <ijsify.h>
@@ -85,4 +89,4 @@
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
 #include "CRestartSA.h"
-
+#include "CWaterManagerSA.h"

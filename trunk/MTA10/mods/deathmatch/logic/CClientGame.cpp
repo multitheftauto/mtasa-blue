@@ -3740,6 +3740,9 @@ void CClientGame::ResetMapInfo ( void )
     // Wave-level
     g_pMultiplayer->SetWaveLevel ( DEFAULT_WAVE_LEVEL );
 
+    // Water areas
+    g_pGame->GetWaterManager ()->Reset ();
+
     // Players
     m_pPlayerManager->ResetAll ();
 

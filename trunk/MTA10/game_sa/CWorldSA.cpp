@@ -317,52 +317,6 @@ VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)
 
 }
 
-bool CWorldSA::GetWaterLevel ( CVector * vecPosition, float * fWaterLevelZ, bool bUnknown, CVector * vecUnknown )
-{
-	DWORD dwFunc = FUNC_GetWaterLevel;
-	FLOAT fX = vecPosition->fX;
-	FLOAT fY = vecPosition->fY;
-	FLOAT fZ = vecPosition->fZ;
-	bool bReturn = false;
-	DWORD dwUnknown = bUnknown;
-	_asm
-	{
-		push	vecUnknown
-		push	dwUnknown
-		push	fWaterLevelZ
-		push	fZ
-		push	fY
-		push	fX
-		call	dwFunc
-		add		esp, 0x18
-		mov		bReturn, al
-	}
-	return bReturn;
-}
-
-
-bool CWorldSA::TestLineAgainstWater ( CVector * vecStart, CVector * vecEnd, CVector * vecCollision )
-{
-	DWORD dwFunc = FUNC_TestLineAgainstWater;
-	bool bRet;
-	_asm
-	{
-		push	vecCollision
-		mov		eax, vecStart
-		push	[eax+8]
-		push	[eax+4]
-		push	[eax]
-		mov		eax, vecEnd
-		push	[eax+8]
-		push	[eax+4]
-		push	[eax]
-		call	dwFunc
-		add		esp, 28
-		mov		bRet, al
-	}
-	return bRet;
-}
-
 bool CWorldSA::IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings,
 								   bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects,
 								   bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera )
