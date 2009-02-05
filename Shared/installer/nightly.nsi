@@ -786,11 +786,11 @@ FunctionEnd
 Section Uninstall
   !ifdef CLIENT_SETUP
   ReadRegStr $GTA_DIR HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
-  IfFileExists "$INSTDIR\mods\map_editor\maps\*.*" ask 0 ;no maps folder, so delete everything
-  IfFileExists "$INSTDIR\mods\map_editor\screenshots\*.*" ask 0 ;no maps folder, so delete everything
-  IfFileExists "$INSTDIR\mods\race\screenshots\*.*" ask deleteall ;no maps folder, so delete everything
+  IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
+  IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
+  IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
   ask:
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources and screenshots)? If you click no, any maps or screenshots you have created will be lost." IDYES preservemapsfolder
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any maps or screenshots you have created will be lost." IDYES preservemapsfolder
 
   deleteall:
   RmDir /r "$INSTDIR\mods"
@@ -837,10 +837,10 @@ Section Uninstall
   
   RmDir /r "$GTA_DIR\MTA\cgui"
   RmDir /r "$GTA_DIR\MTA\data"
-  Delete "$GTA_DIR\MTA\data\*.dll"
-  Delete "$GTA_DIR\MTA\data\*.ax"
-  Delete "$GTA_DIR\MTA\data\*.log"
-  Delete "$GTA_DIR\MTA\data\*.txt"
+  Delete "$GTA_DIR\MTA\*.dll"
+  Delete "$GTA_DIR\MTA\*.ax"
+  Delete "$GTA_DIR\MTA\*.log"
+  Delete "$GTA_DIR\MTA\*.txt"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
