@@ -839,7 +839,6 @@ Section Uninstall
   RmDir /r "$GTA_DIR\MTA\data"
   Delete "$GTA_DIR\MTA\*.dll"
   Delete "$GTA_DIR\MTA\*.ax"
-  Delete "$GTA_DIR\MTA\*.log"
   Delete "$GTA_DIR\MTA\*.txt"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
