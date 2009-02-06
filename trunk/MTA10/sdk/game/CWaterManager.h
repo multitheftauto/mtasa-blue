@@ -20,6 +20,9 @@ enum EWaterPolyType
     WATER_POLY_LIST       = 3
 };
 
+#define WATER_VISIBLE 1
+#define WATER_SHALLOW 2
+
 class CWaterVertex
 {
 public:
@@ -31,6 +34,7 @@ class CWaterPoly
 {
 public:
     virtual EWaterPolyType      GetType           () = 0;
+    virtual WORD                GetID             () = 0;
     virtual int                 GetNumVertices    () = 0;
     virtual CWaterVertex*       GetVertex         ( int index ) = 0;
     virtual bool                ContainsPoint     ( float fX, float fY ) = 0;
@@ -42,6 +46,10 @@ class CWaterManager
 {
 public:
     virtual CWaterPoly*         GetPolyAtPoint    ( CVector& vecPosition ) = 0;
+    virtual CWaterPoly*         CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false ) = 0;
+    virtual CWaterPoly*         CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false ) = 0;
+    virtual bool                DeletePoly        ( CWaterPoly* pPoly ) = 0;
+
     virtual bool                GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;
     virtual bool                SetWaterLevel     ( CVector& vecPosition, float fLevel, void* pChangeSource = NULL ) = 0;
     virtual bool                TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision ) = 0;

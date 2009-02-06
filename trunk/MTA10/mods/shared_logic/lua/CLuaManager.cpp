@@ -726,6 +726,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "processLineOfSight", CLuaFunctionDefinitions::ProcessLineOfSight );
     CLuaCFunctions::AddFunction ( "isLineOfSightClear", CLuaFunctionDefinitions::IsLineOfSightClear );
     CLuaCFunctions::AddFunction ( "testLineAgainstWater", CLuaFunctionDefinitions::TestLineAgainstWater );
+    //CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefinitions::CreateWater );
     CLuaCFunctions::AddFunction ( "getWaterLevel", CLuaFunctionDefinitions::GetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWorldFromScreenPosition", CLuaFunctionDefinitions::GetWorldFromScreenPosition );
     CLuaCFunctions::AddFunction ( "getScreenFromWorldPosition", CLuaFunctionDefinitions::GetScreenFromWorldPosition );

@@ -12173,6 +12173,60 @@ int CLuaFunctionDefinitions::TestLineAgainstWater ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
+{
+    __asm int 3
+    int iArgument1  = lua_type ( luaVM, 1 );
+    int iArgument2  = lua_type ( luaVM, 2 );
+    int iArgument3  = lua_type ( luaVM, 3 );
+    int iArgument4  = lua_type ( luaVM, 4 );
+    int iArgument5  = lua_type ( luaVM, 5 );
+    int iArgument6  = lua_type ( luaVM, 6 );
+    int iArgument7  = lua_type ( luaVM, 7 );
+    int iArgument8  = lua_type ( luaVM, 8 );
+    int iArgument9  = lua_type ( luaVM, 9 );
+    int iArgument10 = lua_type ( luaVM, 10 );
+    int iArgument11 = lua_type ( luaVM, 11 );
+    int iArgument12 = lua_type ( luaVM, 12 );
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+         ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
+         ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) &&
+         ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) &&
+         ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) &&
+         ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING ) )
+    {
+        CVector v1 ( (float)lua_tonumber(luaVM, 1), (float)lua_tonumber(luaVM, 2), (float)lua_tonumber(luaVM, 3) );
+        CVector v2 ( (float)lua_tonumber(luaVM, 4), (float)lua_tonumber(luaVM, 5), (float)lua_tonumber(luaVM, 6) );
+        CVector v3 ( (float)lua_tonumber(luaVM, 7), (float)lua_tonumber(luaVM, 8), (float)lua_tonumber(luaVM, 9) );
+        if ( ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING ) &&
+             ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING ) &&
+             ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING ) )
+        {
+            CVector v4 ( (float)lua_tonumber(luaVM, 10), (float)lua_tonumber(luaVM, 11), (float)lua_tonumber(luaVM, 12) );
+            bool bShallow = false;
+            if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN && lua_toboolean ( luaVM, 13 ) )
+                bShallow = true;
+            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateWater ( &v1, &v2, &v3, &v4, bShallow ) );
+            return 1;
+        }
+        else
+        {
+            bool bShallow = false;
+            if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN && lua_toboolean ( luaVM, 10 ) )
+                bShallow = true;
+            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateWater ( &v1, &v2, &v3, NULL, bShallow ) );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "createWater" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::GetWaterLevel ( lua_State* luaVM )
 {
