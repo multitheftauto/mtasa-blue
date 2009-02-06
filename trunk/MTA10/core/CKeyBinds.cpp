@@ -1204,7 +1204,7 @@ bool CKeyBinds::RemoveFunction ( const SBindableKey* pKey, KeyFunctionBindHandle
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
             CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
             if ( pBind->Handler == Handler )
@@ -1241,7 +1241,7 @@ bool CKeyBinds::RemoveAllFunctions ( KeyFunctionBindHandler Handler )
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
             CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
             if ( pBind->Handler == Handler )
@@ -1272,7 +1272,7 @@ bool CKeyBinds::RemoveAllFunctions ( void )
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
             if ( m_bProcessingKeyStroke )
             {
@@ -1309,7 +1309,7 @@ bool CKeyBinds::FunctionExists ( const SBindableKey* pKey, KeyFunctionBindHandle
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
     {
-        if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
             CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
             if ( !Handler || pBind->Handler == Handler )
@@ -1392,7 +1392,7 @@ bool CKeyBinds::RemoveControlFunction ( SBindableGTAControl* pControl, ControlFu
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
             CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( *iter );
             if ( pBind->Handler == Handler )
@@ -1429,7 +1429,7 @@ bool CKeyBinds::RemoveAllControlFunctions ( ControlFunctionBindHandler Handler )
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
             CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( *iter );
             if ( pBind->Handler == Handler )
@@ -1460,7 +1460,7 @@ bool CKeyBinds::RemoveAllControlFunctions ( void )
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
     while ( iter != m_pList->end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
             if ( m_bProcessingKeyStroke )
             {
@@ -1497,7 +1497,7 @@ bool CKeyBinds::ControlFunctionExists ( SBindableGTAControl* pControl, ControlFu
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
     {
-        if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
             CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( *iter );
             if ( pBind->Handler == Handler )
