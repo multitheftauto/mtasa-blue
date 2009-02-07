@@ -545,7 +545,7 @@ CWaterPoly* CWaterManagerSA::GetPolyAtPoint ( CVector& vecPosition )
     return NULL;
 }
 
-CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecTL, CVector& vecTR, CVector& vecBR, CVector& vecBL, bool bShallow, void* pChangeSource )
+CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow, void* pChangeSource )
 {
     if ( vecTL.fX >= vecTR.fX || vecBL.fX >= vecBR.fX ||
          vecTL.fY <= vecBL.fY || vecTR.fY <= vecBR.fY ||
