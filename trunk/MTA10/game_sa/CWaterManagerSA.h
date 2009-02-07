@@ -240,7 +240,7 @@ public:
     CWaterVertex*                    CreateVertex      ( CVector& vecPosition );
 
     CWaterPoly*                      GetPolyAtPoint    ( CVector& vecPosition );
-    CWaterPoly*                      CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false, void* pChangeSource = NULL );
+    CWaterPoly*                      CreateQuad        ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false, void* pChangeSource = NULL );
     CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false, void* pChangeSource = NULL );
     bool                             DeletePoly        ( CWaterPoly* pPoly );
 
