@@ -54,7 +54,7 @@ CXMLAttributeImpl::~CXMLAttributeImpl ( void )
     // Delete the attribute from the node aswell if we're supposed to
     if ( m_bDeleteAttribute )
     {
-        delete &m_Attribute;
+        m_Node.RemoveAttribute ( GetName () );
     }
 
     // Remove us from parent list
