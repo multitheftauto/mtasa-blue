@@ -726,7 +726,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "processLineOfSight", CLuaFunctionDefinitions::ProcessLineOfSight );
     CLuaCFunctions::AddFunction ( "isLineOfSightClear", CLuaFunctionDefinitions::IsLineOfSightClear );
     CLuaCFunctions::AddFunction ( "testLineAgainstWater", CLuaFunctionDefinitions::TestLineAgainstWater );
-    //CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefinitions::CreateWater );
     CLuaCFunctions::AddFunction ( "getWaterLevel", CLuaFunctionDefinitions::GetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWorldFromScreenPosition", CLuaFunctionDefinitions::GetWorldFromScreenPosition );
     CLuaCFunctions::AddFunction ( "getScreenFromWorldPosition", CLuaFunctionDefinitions::GetScreenFromWorldPosition );
@@ -743,6 +742,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefinitions::SetTime );
+    CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefinitions::CreateWater );
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefinitions::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefinitions::ResetSkyGradient );

@@ -101,6 +101,8 @@ public:
     CWaterVertexSAInterface*         GetInterface      () { return m_pInterface; }
     void                             SetInterface      ( CWaterVertexSAInterface* pInterface ) { m_pInterface = pInterface; }
 
+    WORD                             GetID             ();
+
     void                             GetPosition       ( CVector& vec );
     void                             SetPosition       ( CVector& vec, void* pChangeSource = NULL );
 
@@ -209,10 +211,16 @@ public:
 class CWaterChangeVertexMove : public CWaterChange
 {
 public:
-                                     CWaterChangeVertexMove ( CWaterVertex* pVertex );
+                                     CWaterChangeVertexMove ( CWaterVertex* pVertex ) { pVertex->GetPosition ( m_vecOriginalPosition ); }
     void                             Undo              ( void* pChangedObject );
 private:
     CVector                          m_vecOriginalPosition;
+};
+
+class CWaterChangePolyCreate : public CWaterChange
+{
+public:
+    void                             Undo              ( void* pChangedObject );
 };
 
 // -------------------------------
@@ -225,15 +233,16 @@ public:
                                      ~CWaterManagerSA  ();
 
     void                             RelocatePools     ();
-
-    CWaterPoly*                      GetPolyAtPoint    ( CVector& vecPosition );
-    CWaterPoly*                      CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false );
-    CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false );
-    bool                             DeletePoly        ( CWaterPoly* pPoly );
-
     CWaterZoneSA*                    GetZoneContaining ( float fX, float fY );
     CWaterZoneSA*                    GetZoneContaining ( CWaterPoly* pPoly );
     CWaterZoneSA*                    GetZoneContaining ( CVector& v1, CVector& v2, CVector& v3 );
+
+    CWaterVertex*                    CreateVertex      ( CVector& vecPosition );
+
+    CWaterPoly*                      GetPolyAtPoint    ( CVector& vecPosition );
+    CWaterPoly*                      CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false, void* pChangeSource = NULL );
+    CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false, void* pChangeSource = NULL );
+    bool                             DeletePoly        ( CWaterPoly* pPoly );
 
     bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
     bool                             SetWaterLevel     ( CVector& vecPosition, float fLevel, void* pChangeSource = NULL );
