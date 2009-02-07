@@ -63,6 +63,13 @@ CWaterManagerSA* g_pWaterManager = NULL;
 // -----------------------------------------------------
 // Vertices
 
+WORD CWaterVertexSA::GetID ()
+{
+    if ( !m_pInterface )
+        return ~0;
+    return (WORD)(m_pInterface - g_pWaterManager->m_VertexPool);
+}
+
 void CWaterVertexSA::GetPosition ( CVector& vec )
 {
     vec.fX = (float)m_pInterface->m_sX;
@@ -74,8 +81,8 @@ void CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
 {
     if ( pChangeSource )
         g_pWaterManager->AddChange ( pChangeSource, this, new CWaterChangeVertexMove ( this ) );
-    m_pInterface->m_sX = (short)vec.fX;
-    m_pInterface->m_sY = (short)vec.fY;
+    m_pInterface->m_sX = ((short)vec.fX) & ~1;
+    m_pInterface->m_sY = ((short)vec.fY) & ~1;
     m_pInterface->m_fZ = vec.fZ;
 }
 
@@ -85,7 +92,7 @@ void CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
 void CWaterQuadSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
-    m_wID = (WORD) ( ((DWORD)pInterface - (DWORD)g_pWaterManager->m_QuadPool) / sizeof ( CWaterQuadSAInterface ) );
+    m_wID = (WORD)(pInterface - g_pWaterManager->m_QuadPool);
 
     CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( this );
     assert ( pZone );
@@ -104,7 +111,7 @@ void CWaterQuadSA::SetInterface ( CWaterPolySAInterface* pInterface )
 void CWaterTriangleSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
-    m_wID = (WORD) ( ((DWORD)pInterface - (DWORD)g_pWaterManager->m_TrianglePool) / sizeof ( CWaterTriangleSAInterface ) );
+    m_wID = (WORD)(pInterface - g_pWaterManager->m_TrianglePool);
 
     CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( this );
     assert ( pZone );
@@ -266,9 +273,6 @@ CWaterPolySA* CWaterZoneSA::iterator::operator* ()
 
 CWaterZoneSA::iterator::operator CWaterPolyEntrySAInterface* ()
 {
-    if ( (m_bSinglePoly && m_pCurrent != m_pFirst) || m_pCurrent->m_wValue == 0 )
-        return NULL;
-
     return m_pCurrent;
 }
 
@@ -419,14 +423,14 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
 // -----------------------------------------------------
 // Change trackkeepers
 
-CWaterChangeVertexMove::CWaterChangeVertexMove ( CWaterVertex* pVertex )
-{
-    pVertex->GetPosition ( m_vecOriginalPosition );
-}
-
 void CWaterChangeVertexMove::Undo ( void* pChangedObject )
 {
     ((CWaterVertexSA *)pChangedObject)->SetPosition ( m_vecOriginalPosition );
+}
+
+void CWaterChangePolyCreate::Undo ( void* pChangedObject )
+{
+    g_pWaterManager->DeletePoly ( (CWaterPoly *)pChangedObject );
 }
 
 // -----------------------------------------------------
@@ -464,129 +468,6 @@ void CWaterManagerSA::RelocatePools ()
             **ppXref += dwDelta;
         }
     }
-}
-
-CWaterPoly* CWaterManagerSA::GetPolyAtPoint ( CVector& vecPosition )
-{
-    if ( vecPosition.fX < -3000.0f || vecPosition.fX > 3000.0f || vecPosition.fY < -3000.0f || vecPosition.fY > 3000.0f )
-        return NULL;
-
-    CWaterZoneSA* pZone = GetZoneContaining ( vecPosition.fX, vecPosition.fY );
-    if ( !pZone )
-        return NULL;
-
-    CWaterZoneSA::iterator it;
-    for ( it = pZone->begin (); *it; ++it )
-    {
-        if ( (*it)->ContainsPoint ( vecPosition.fX, vecPosition.fY ) )
-        {
-            return *it;
-        }
-    }
-    return NULL;
-}
-
-CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecTL, CVector& vecTR, CVector& vecBR, CVector& vecBL, bool bShallow )
-{
-    if ( vecTL.fX >= vecTR.fX || vecBL.fX >= vecBR.fX ||
-         vecTL.fY <= vecBL.fY || vecTR.fY <= vecBR.fY ||
-         vecTL.fX < -3000.0f || vecTL.fX > 3000.0f || vecTL.fY < -3000.0f || vecTL.fY > 3000.0f ||
-         vecTR.fX < -3000.0f || vecTR.fX > 3000.0f || vecTR.fY < -3000.0f || vecTR.fY > 3000.0f ||
-         vecBL.fX < -3000.0f || vecBL.fX > 3000.0f || vecBL.fY < -3000.0f || vecBL.fY > 3000.0f ||
-         vecBR.fX < -3000.0f || vecBR.fX > 3000.0f || vecBR.fY < -3000.0f || vecBR.fY > 3000.0f )
-        return NULL;
-
-    if ( *(DWORD *)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices ||
-         *(DWORD *)VAR_NumWaterQuads + 1 > NUM_NewWaterQuads ||
-         *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
-        return NULL;
-
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vecBL, vecBR, vecTL );
-    if ( !pZone )
-        return NULL;
-
-    WORD wV1 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vecBL.fX, (short)vecBL.fY, vecBL.fZ, 0.0f, 0.0f, 0 );
-    WORD wV2 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vecBR.fX, (short)vecBR.fY, vecBR.fZ, 0.0f, 0.0f, 0 );
-    WORD wV3 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vecTL.fX, (short)vecTL.fY, vecTL.fZ, 0.0f, 0.0f, 0 );
-    WORD wV4 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vecTR.fX, (short)vecTR.fY, vecTR.fZ, 0.0f, 0.0f, 0 );
-
-    CWaterQuadSAInterface* pInterface = &g_pWaterManager->m_QuadPool [ *(DWORD *)VAR_NumWaterQuads ];
-    pInterface->m_wVertexIDs [ 0 ] = wV1;
-    pInterface->m_wVertexIDs [ 1 ] = wV2;
-    pInterface->m_wVertexIDs [ 2 ] = wV3;
-    pInterface->m_wVertexIDs [ 3 ] = wV4;
-    pInterface->m_wFlags = WATER_VISIBLE;
-    if ( bShallow )
-        pInterface->m_wFlags |= WATER_SHALLOW;
-
-    pZone->AddPoly ( WATER_POLY_QUAD, *(WORD *)VAR_NumWaterQuads );
-
-    (*(DWORD *)VAR_NumWaterQuads)++;
-    if ( g_pWaterManager->m_Quads.size () < *(DWORD *)VAR_NumWaterQuads )
-        g_pWaterManager->m_Quads.push_back ( CWaterQuadSA () );
-    CWaterQuadSA* pPoly = &g_pWaterManager->m_Quads [ *(DWORD *)VAR_NumWaterQuads - 1 ];
-    pPoly->SetInterface ( pInterface );
-    return pPoly;
-}
-
-CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow )
-{
-    if ( vec1.fX >= vec2.fX || vec1.fY == vec3.fY || vec2.fY == vec3.fY ||
-         (vec1.fY < vec3.fY) != (vec2.fY < vec3.fY) ||
-         vec1.fX < -3000.0f || vec1.fX > 3000.0f || vec1.fY < -3000.0f || vec1.fY > 3000.0f ||
-         vec2.fX < -3000.0f || vec2.fX > 3000.0f || vec2.fY < -3000.0f || vec2.fY > 3000.0f ||
-         vec3.fX < -3000.0f || vec3.fX > 3000.0f || vec3.fY < -3000.0f || vec3.fY > 3000.0f )
-        return NULL;
-
-    if ( *(DWORD *)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices ||
-         *(DWORD *)VAR_NumWaterTriangles + 1 > NUM_NewWaterTriangles ||
-         *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
-        return NULL;
-
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vec1, vec2, vec3 );
-    if ( !pZone )
-        return NULL;
-
-    WORD wV1 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vec1.fX, (short)vec1.fY, vec1.fZ, 0.0f, 0.0f, 0 );
-    WORD wV2 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vec2.fX, (short)vec2.fY, vec2.fZ, 0.0f, 0.0f, 0 );
-    WORD wV3 = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (short)vec3.fX, (short)vec3.fY, vec3.fZ, 0.0f, 0.0f, 0 );
-
-    CWaterTriangleSAInterface* pInterface = &g_pWaterManager->m_TrianglePool [ *(DWORD *)VAR_NumWaterTriangles ];
-    pInterface->m_wVertexIDs [ 0 ] = wV1;
-    pInterface->m_wVertexIDs [ 1 ] = wV2;
-    pInterface->m_wVertexIDs [ 2 ] = wV3;
-    pInterface->m_wFlags = WATER_VISIBLE;
-    if ( bShallow )
-        pInterface->m_wFlags |= WATER_SHALLOW;
-
-    pZone->AddPoly ( WATER_POLY_TRIANGLE, *(WORD *)VAR_NumWaterTriangles );
-
-    (*(DWORD *)VAR_NumWaterTriangles)++;
-    if ( g_pWaterManager->m_Triangles.size () < *(DWORD *)VAR_NumWaterTriangles )
-        g_pWaterManager->m_Triangles.push_back ( CWaterTriangleSA () );
-    CWaterTriangleSA* pPoly = &g_pWaterManager->m_Triangles [ *(DWORD *)VAR_NumWaterTriangles - 1 ];
-    pPoly->SetInterface ( pInterface );
-    return pPoly;
-}
-
-bool CWaterManagerSA::DeletePoly ( CWaterPoly* pPoly )
-{
-    CWaterZoneSA* pZone = GetZoneContaining ( pPoly );
-    if ( !pZone || !pZone->RemovePoly ( pPoly ) )
-        return false;
-
-    CWaterPolySAInterface* pInterface = ((CWaterPolySA *)pPoly)->GetInterface ();
-    if ( pPoly->GetType () == WATER_POLY_QUAD )
-    {
-        memcpy ( pInterface, pInterface + 1, (DWORD)&m_QuadPool [ *(DWORD *)VAR_NumWaterQuads ] - (DWORD)(pInterface + 1) );
-        (*(DWORD *)VAR_NumWaterQuads)--;
-    }
-    else
-    {
-        memcpy ( pInterface, pInterface + 1, (DWORD)&m_TrianglePool [ *(DWORD *)VAR_NumWaterQuads ] - (DWORD)(pInterface + 1) );
-        (*(DWORD *)VAR_NumWaterTriangles)--;
-    }
-    return true;
 }
 
 CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( float fX, float fY )
@@ -633,6 +514,153 @@ CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( CVector& v1, CVector& v2, CVe
     return NULL;
 }
 
+CWaterVertex* CWaterManagerSA::CreateVertex ( CVector& vecPosition )
+{
+    WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.0f, 0.0f, 0 );
+    if ( wID + 1 > m_Vertices.size () )
+    {
+        m_Vertices.resize ( wID + 1 );
+        m_Vertices [ wID ].SetInterface ( &m_VertexPool [ wID ] );
+    }
+    return &m_Vertices [ wID ];
+}
+
+CWaterPoly* CWaterManagerSA::GetPolyAtPoint ( CVector& vecPosition )
+{
+    if ( vecPosition.fX < -3000.0f || vecPosition.fX > 3000.0f || vecPosition.fY < -3000.0f || vecPosition.fY > 3000.0f )
+        return NULL;
+
+    CWaterZoneSA* pZone = GetZoneContaining ( vecPosition.fX, vecPosition.fY );
+    if ( !pZone )
+        return NULL;
+
+    CWaterZoneSA::iterator it;
+    for ( it = pZone->begin (); *it; ++it )
+    {
+        if ( (*it)->ContainsPoint ( vecPosition.fX, vecPosition.fY ) )
+        {
+            return *it;
+        }
+    }
+    return NULL;
+}
+
+CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecTL, CVector& vecTR, CVector& vecBR, CVector& vecBL, bool bShallow, void* pChangeSource )
+{
+    if ( vecTL.fX >= vecTR.fX || vecBL.fX >= vecBR.fX ||
+         vecTL.fY <= vecBL.fY || vecTR.fY <= vecBR.fY ||
+         vecTL.fX < -3000.0f || vecTL.fX > 3000.0f || vecTL.fY < -3000.0f || vecTL.fY > 3000.0f ||
+         vecTR.fX < -3000.0f || vecTR.fX > 3000.0f || vecTR.fY < -3000.0f || vecTR.fY > 3000.0f ||
+         vecBL.fX < -3000.0f || vecBL.fX > 3000.0f || vecBL.fY < -3000.0f || vecBL.fY > 3000.0f ||
+         vecBR.fX < -3000.0f || vecBR.fX > 3000.0f || vecBR.fY < -3000.0f || vecBR.fY > 3000.0f )
+        return NULL;
+
+    if ( *(DWORD *)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices ||
+         *(DWORD *)VAR_NumWaterQuads + 1 > NUM_NewWaterQuads ||
+         *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
+        return NULL;
+
+    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vecBL, vecBR, vecTL );
+    if ( !pZone )
+        return NULL;
+
+    CWaterVertex* pV1 = CreateVertex ( vecBL );
+    CWaterVertex* pV2 = CreateVertex ( vecBR );
+    CWaterVertex* pV3 = CreateVertex ( vecTL );
+    CWaterVertex* pV4 = CreateVertex ( vecTR );
+    
+    CWaterQuadSAInterface* pInterface = g_pWaterManager->m_QuadPool;
+    while ( *(DWORD *)&pInterface->m_wVertexIDs != 0 )
+        pInterface++;
+    pInterface->m_wVertexIDs [ 0 ] = pV1->GetID ();
+    pInterface->m_wVertexIDs [ 1 ] = pV2->GetID ();
+    pInterface->m_wVertexIDs [ 2 ] = pV3->GetID ();
+    pInterface->m_wVertexIDs [ 3 ] = pV4->GetID ();
+    pInterface->m_wFlags = WATER_VISIBLE;
+    if ( bShallow )
+        pInterface->m_wFlags |= WATER_SHALLOW;
+
+    WORD wID = (WORD)(pInterface - g_pWaterManager->m_QuadPool);
+    pZone->AddPoly ( WATER_POLY_QUAD, wID );
+
+    (*(DWORD *)VAR_NumWaterQuads)++;
+    if ( g_pWaterManager->m_Quads.size () < *(DWORD *)VAR_NumWaterQuads )
+        g_pWaterManager->m_Quads.resize ( *(DWORD *)VAR_NumWaterQuads );
+    CWaterQuadSA* pPoly = &g_pWaterManager->m_Quads [ wID ];
+    pPoly->SetInterface ( pInterface );
+
+    if ( pChangeSource )
+        g_pWaterManager->AddChange ( pChangeSource, pPoly, new CWaterChangePolyCreate () );
+
+    return pPoly;
+}
+
+CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow, void* pChangeSource )
+{
+    if ( vec1.fX >= vec2.fX || vec1.fY == vec3.fY || vec2.fY == vec3.fY ||
+         (vec1.fY < vec3.fY) != (vec2.fY < vec3.fY) ||
+         vec1.fX < -3000.0f || vec1.fX > 3000.0f || vec1.fY < -3000.0f || vec1.fY > 3000.0f ||
+         vec2.fX < -3000.0f || vec2.fX > 3000.0f || vec2.fY < -3000.0f || vec2.fY > 3000.0f ||
+         vec3.fX < -3000.0f || vec3.fX > 3000.0f || vec3.fY < -3000.0f || vec3.fY > 3000.0f )
+        return NULL;
+
+    if ( *(DWORD *)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices ||
+         *(DWORD *)VAR_NumWaterTriangles + 1 > NUM_NewWaterTriangles ||
+         *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
+        return NULL;
+
+    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vec1, vec2, vec3 );
+    if ( !pZone )
+        return NULL;
+
+    CWaterVertex* pV1 = CreateVertex ( vec1 );
+    CWaterVertex* pV2 = CreateVertex ( vec2 );
+    CWaterVertex* pV3 = CreateVertex ( vec3 );
+
+    CWaterTriangleSAInterface* pInterface = g_pWaterManager->m_TrianglePool;
+    while ( *(DWORD *)&pInterface->m_wVertexIDs != 0 )
+        pInterface++;
+    pInterface->m_wVertexIDs [ 0 ] = pV1->GetID ();
+    pInterface->m_wVertexIDs [ 1 ] = pV2->GetID ();
+    pInterface->m_wVertexIDs [ 2 ] = pV3->GetID ();
+    pInterface->m_wFlags = WATER_VISIBLE;
+    if ( bShallow )
+        pInterface->m_wFlags |= WATER_SHALLOW;
+
+    WORD wID = (WORD)(pInterface - g_pWaterManager->m_TrianglePool);
+    pZone->AddPoly ( WATER_POLY_TRIANGLE, wID );
+
+    (*(DWORD *)VAR_NumWaterTriangles)++;
+    if ( g_pWaterManager->m_Triangles.size () < *(DWORD *)VAR_NumWaterTriangles )
+        g_pWaterManager->m_Triangles.resize ( *(DWORD *)VAR_NumWaterTriangles );
+    CWaterTriangleSA* pPoly = &g_pWaterManager->m_Triangles [ wID ];
+    pPoly->SetInterface ( pInterface );
+
+    if ( pChangeSource )
+        g_pWaterManager->AddChange ( pChangeSource, pPoly, new CWaterChangePolyCreate () );
+
+    return pPoly;
+}
+
+bool CWaterManagerSA::DeletePoly ( CWaterPoly* pPoly )
+{
+    CWaterZoneSA* pZone = GetZoneContaining ( pPoly );
+    if ( !pZone || !pZone->RemovePoly ( pPoly ) )
+        return false;
+
+    if ( pPoly->GetType () == WATER_POLY_QUAD )
+    {
+        memset ( ((CWaterQuadSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterQuadSAInterface ) );
+        (*(DWORD *)VAR_NumWaterQuads)--;
+    }
+    else
+    {
+        memset ( ((CWaterTriangleSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterTriangleSAInterface ) );
+        (*(DWORD *)VAR_NumWaterTriangles)--;
+    }
+    return true;
+}
+
 bool CWaterManagerSA::GetWaterLevel ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown )
 {
     return ( (GetWaterLevel_t) FUNC_GetWaterLevel )
@@ -664,7 +692,10 @@ bool CWaterManagerSA::TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd,
 void CWaterManagerSA::AddChange ( void *pChangeSource, void* pChangedObject, CWaterChange* pChange )
 {
     if ( !pChangeSource )
+    {
+        delete pChange;
         return;
+    }
 
     std::map < void*, std::map < void*, CWaterChange* > >::iterator sourceIt = m_Changes.find ( pChangeSource );
     if ( sourceIt == m_Changes.end () )
@@ -686,11 +717,12 @@ void CWaterManagerSA::UndoChanges ( void* pChangeSource )
 {
     if ( pChangeSource == NULL )
     {
-        std::map < void*, std::map < void*, CWaterChange* > >::iterator sourceIt = m_Changes.begin ();
-        for ( ; sourceIt != m_Changes.end (); sourceIt++ )
+        while ( !m_Changes.empty () )
         {
-            if ( sourceIt->first )
-                UndoChanges ( sourceIt->first );
+            if ( m_Changes.begin ()->first )
+                UndoChanges ( m_Changes.begin ()->first );
+            else
+                m_Changes.erase ( m_Changes.begin () );
         }
     }
     else
@@ -710,6 +742,8 @@ void CWaterManagerSA::UndoChanges ( void* pChangeSource )
 
 void CWaterManagerSA::Reset ()
 {
+    UndoChanges ();
+
     memset ( m_QuadPool, 0, sizeof ( m_QuadPool ) );
     memset ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
 

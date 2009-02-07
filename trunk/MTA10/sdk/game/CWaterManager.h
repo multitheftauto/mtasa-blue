@@ -26,6 +26,7 @@ enum EWaterPolyType
 class CWaterVertex
 {
 public:
+    virtual WORD                GetID             () = 0;
     virtual void                GetPosition       ( CVector& vec ) = 0;
     virtual void                SetPosition       ( CVector& vec, void* pChangeSource = NULL ) = 0;
 };
@@ -46,8 +47,8 @@ class CWaterManager
 {
 public:
     virtual CWaterPoly*         GetPolyAtPoint    ( CVector& vecPosition ) = 0;
-    virtual CWaterPoly*         CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false ) = 0;
-    virtual CWaterPoly*         CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false ) = 0;
+    virtual CWaterPoly*         CreateQuad        ( CVector& vec1, CVector& vec2, CVector& vec3, CVector& vec4, bool bShallow = false, void* pChangeSource = NULL ) = 0;
+    virtual CWaterPoly*         CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false, void* pChangeSource = NULL ) = 0;
     virtual bool                DeletePoly        ( CWaterPoly* pPoly ) = 0;
 
     virtual bool                GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;

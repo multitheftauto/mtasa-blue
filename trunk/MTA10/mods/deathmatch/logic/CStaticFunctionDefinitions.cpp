@@ -4208,12 +4208,12 @@ bool CStaticFunctionDefinitions::TestLineAgainstWater ( CVector& vecStart, CVect
 }
 
 
-bool CStaticFunctionDefinitions::CreateWater ( CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow )
+bool CStaticFunctionDefinitions::CreateWater ( CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow, void* pChangeSource )
 {
     if ( pV4 )
-        return g_pGame->GetWaterManager ()->CreateQuad ( *pV1, *pV2, *pV3, *pV4, bShallow );
+        return g_pGame->GetWaterManager ()->CreateQuad ( *pV1, *pV2, *pV3, *pV4, bShallow, pChangeSource ) != NULL;
     else
-        return g_pGame->GetWaterManager ()->CreateTriangle ( *pV1, *pV2, *pV3, bShallow );
+        return g_pGame->GetWaterManager ()->CreateTriangle ( *pV1, *pV2, *pV3, bShallow, pChangeSource ) != NULL;
 }
 
 
