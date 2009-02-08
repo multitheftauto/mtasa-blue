@@ -104,11 +104,10 @@ bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessCo
     ObjectMap::iterator iter = m_ObjectsById.find ( uiHash );
     if ( iter != m_ObjectsById.end() )
     {
-        
         // Delete, remove from list and return true
         delete ( iter->second );
         m_Objects.remove ( iter->second );
-
+        m_ObjectsById.set_deleted_key ( iter->first );
         m_ObjectsById.erase( iter );
 
         return true;
