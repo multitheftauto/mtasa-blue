@@ -58,7 +58,7 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
 
             string strCacheDir = pResource->GetResourceCacheDirectoryPath ();
 
-            static vector < string > pathInArchiveList;
+            vector < string > pathInArchiveList;
 
             for ( unsigned long i = 0 ; i < m_upgradedFullPathList.size () ; i++ )
             {
