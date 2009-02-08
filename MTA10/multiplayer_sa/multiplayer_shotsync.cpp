@@ -910,7 +910,7 @@ void _declspec(naked) HOOK_CProjectile__CProjectile()
 static inline void CheckInVehicleDamage()
 {
     CPlayerPed * pPed = dynamic_cast < CPlayerPed * > ( m_pools->GetPed ( ( DWORD * ) pShootingPed ) );
-    if ( !IsLocalPlayer( pPed ) )
+    if ( pPed && !IsLocalPlayer( pPed ) )
     {
         // Did he hit a vehicle?
         if ( *ppInstantHitEntity && (*ppInstantHitEntity)->nType == ENTITY_TYPE_VEHICLE )
