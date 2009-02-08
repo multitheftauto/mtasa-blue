@@ -93,38 +93,12 @@ void CWaterQuadSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
     m_wID = (WORD)(pInterface - g_pWaterManager->m_QuadPool);
-
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( this );
-    assert ( pZone );
-    CWaterZoneSA::iterator it;
-    for ( it = pZone->begin (); *it; ++it )
-    {
-        if ( (*it)->GetID () == m_wID )
-        {
-            m_pEntryInterface = (CWaterPolyEntrySAInterface *)it;
-            return;
-        }
-    }
-    assert ( false );
 }
 
 void CWaterTriangleSA::SetInterface ( CWaterPolySAInterface* pInterface )
 {
     m_pInterface = pInterface;
     m_wID = (WORD)(pInterface - g_pWaterManager->m_TrianglePool);
-
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( this );
-    assert ( pZone );
-    CWaterZoneSA::iterator it;
-    for ( it = pZone->begin (); *it; ++it )
-    {
-        if ( (*it)->GetID () == m_wID )
-        {
-            m_pEntryInterface = (CWaterPolyEntrySAInterface *)it;
-            return;
-        }
-    }
-    assert ( false );
 }
 
 CWaterVertex* CWaterPolySA::GetVertex ( int index )
@@ -484,7 +458,7 @@ CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( float fX, float fY )
     return &m_Zones [ zoneID ];
 }
 
-CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( CWaterPoly* pPoly )
+void CWaterManagerSA::GetZonesContaining ( CWaterPoly* pPoly, std::vector < CWaterZoneSA* >& out )
 {
     CVector v1;
     CVector v2;
@@ -494,11 +468,12 @@ CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( CWaterPoly* pPoly )
     pPoly->GetVertex ( 1 )->GetPosition ( v2 );
     pPoly->GetVertex ( 2 )->GetPosition ( v3 );
 
-    return GetZoneContaining ( v1, v2, v3 );
+    GetZonesContaining ( v1, v2, v3, out );
 }
 
-CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( CVector& v1, CVector& v2, CVector& v3 )
+void CWaterManagerSA::GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3, std::vector < CWaterZoneSA* >& out )
 {
+    out.clear ();
     float fColumnLeft = -3000.0f;
     for ( int column = 0; column < 12; column++ )
     {
@@ -506,17 +481,16 @@ CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( CVector& v1, CVector& v2, CVe
         for ( int row = 0; row < 12; row++ )
         {
             if ( v2.fX >= fColumnLeft && v1.fX < fColumnLeft + 500.0f && std::max<float>(v1.fY, v3.fY) >= fRowBottom && std::min<float>(v1.fY, v3.fY) < fRowBottom + 500.0f )
-                return &m_Zones [ column*12 + row ];
+                 out.push_back ( &m_Zones [ column*12 + row ] );
             fRowBottom += 500.0f;
         }
         fColumnLeft += 500.0f;
     }
-    return NULL;
 }
 
 CWaterVertex* CWaterManagerSA::CreateVertex ( CVector& vecPosition )
 {
-    WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.0f, 0.0f, 0 );
+    WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.2f, 0.1f, 0 );
     if ( wID + 1 > m_Vertices.size () )
     {
         m_Vertices.resize ( wID + 1 );
@@ -560,8 +534,9 @@ CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecBL, CVector& vecBR, CVecto
          *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
         return NULL;
 
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vecBL, vecBR, vecTL );
-    if ( !pZone )
+    std::vector < CWaterZoneSA* > zones;
+    g_pWaterManager->GetZonesContaining ( vecBL, vecBR, vecTL, zones );
+    if ( zones.empty () )
         return NULL;
 
     CWaterVertex* pV1 = CreateVertex ( vecBL );
@@ -581,7 +556,9 @@ CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecBL, CVector& vecBR, CVecto
         pInterface->m_wFlags |= WATER_SHALLOW;
 
     WORD wID = (WORD)(pInterface - g_pWaterManager->m_QuadPool);
-    pZone->AddPoly ( WATER_POLY_QUAD, wID );
+    std::vector < CWaterZoneSA* >::iterator it;
+    for ( it = zones.begin (); it != zones.end (); it++)
+        (*it)->AddPoly ( WATER_POLY_QUAD, wID );
 
     (*(DWORD *)VAR_NumWaterQuads)++;
     if ( g_pWaterManager->m_Quads.size () < *(DWORD *)VAR_NumWaterQuads )
@@ -609,8 +586,9 @@ CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVec
          *(DWORD *)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys )
         return NULL;
 
-    CWaterZoneSA* pZone = g_pWaterManager->GetZoneContaining ( vec1, vec2, vec3 );
-    if ( !pZone )
+    std::vector < CWaterZoneSA* > zones;
+    g_pWaterManager->GetZonesContaining ( vec1, vec2, vec3, zones );
+    if ( zones.empty () )
         return NULL;
 
     CWaterVertex* pV1 = CreateVertex ( vec1 );
@@ -628,7 +606,9 @@ CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVec
         pInterface->m_wFlags |= WATER_SHALLOW;
 
     WORD wID = (WORD)(pInterface - g_pWaterManager->m_TrianglePool);
-    pZone->AddPoly ( WATER_POLY_TRIANGLE, wID );
+    std::vector < CWaterZoneSA* >::iterator it;
+    for ( it = zones.begin (); it != zones.end (); it++)
+        (*it)->AddPoly ( WATER_POLY_TRIANGLE, wID );
 
     (*(DWORD *)VAR_NumWaterTriangles)++;
     if ( g_pWaterManager->m_Triangles.size () < *(DWORD *)VAR_NumWaterTriangles )
@@ -644,9 +624,14 @@ CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVec
 
 bool CWaterManagerSA::DeletePoly ( CWaterPoly* pPoly )
 {
-    CWaterZoneSA* pZone = GetZoneContaining ( pPoly );
-    if ( !pZone || !pZone->RemovePoly ( pPoly ) )
+    std::vector < CWaterZoneSA* > zones;
+    GetZonesContaining ( pPoly, zones );
+    if ( zones.empty () )
         return false;
+
+    std::vector < CWaterZoneSA* >::iterator it;
+    for ( it = zones.begin (); it != zones.end (); it++ )
+        (*it)->RemovePoly ( pPoly );
 
     if ( pPoly->GetType () == WATER_POLY_QUAD )
     {

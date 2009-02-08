@@ -124,14 +124,13 @@ public:
 
 protected:
     CWaterPolySAInterface*           m_pInterface;
-    CWaterPolyEntrySAInterface*      m_pEntryInterface;
     WORD                             m_wID;
 };
 
 class CWaterQuadSA : public CWaterPolySA
 {
 public:
-                                     CWaterQuadSA      () { m_pInterface = NULL; m_pEntryInterface = NULL; m_wID = ~0; }
+                                     CWaterQuadSA      () { m_pInterface = NULL; m_wID = ~0; }
                                      CWaterQuadSA      ( CWaterPolySAInterface* pInterface ) { SetInterface ( pInterface ); }
 
     CWaterQuadSAInterface*           GetInterface      () { return (CWaterQuadSAInterface *)m_pInterface; }
@@ -144,7 +143,7 @@ public:
 class CWaterTriangleSA : public CWaterPolySA
 {
 public:
-                                     CWaterTriangleSA  () { m_pInterface = NULL; m_pEntryInterface = NULL; m_wID = ~0; }
+                                     CWaterTriangleSA  () { m_pInterface = NULL; m_wID = ~0; }
                                      CWaterTriangleSA  ( CWaterPolySAInterface* pInterface ) { SetInterface ( pInterface ); }
 
     CWaterTriangleSAInterface*       GetInterface      () { return (CWaterTriangleSAInterface *)m_pInterface; }
@@ -234,8 +233,8 @@ public:
 
     void                             RelocatePools     ();
     CWaterZoneSA*                    GetZoneContaining ( float fX, float fY );
-    CWaterZoneSA*                    GetZoneContaining ( CWaterPoly* pPoly );
-    CWaterZoneSA*                    GetZoneContaining ( CVector& v1, CVector& v2, CVector& v3 );
+    void                             GetZonesContaining ( CWaterPoly* pPoly, std::vector < CWaterZoneSA* >& out );
+    void                             GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3, std::vector < CWaterZoneSA* >& out );
 
     CWaterVertex*                    CreateVertex      ( CVector& vecPosition );
 
