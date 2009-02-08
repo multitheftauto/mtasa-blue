@@ -53,8 +53,6 @@ public:
 	FLOAT		FindGroundZForPosition(FLOAT fX, FLOAT fY);
 	FLOAT		FindGroundZFor3DPosition(CVector * vecPosition);
 	VOID		LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius);
-	bool		GetWaterLevel ( CVector * vecPosition, float * fWaterLevelZ, bool bUnknown, CVector * vecUnknown );
-	bool		TestLineAgainstWater ( CVector * vecStart, CVector * vecEnd, CVector * vecCollision );
 	bool		IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false );
     bool        HasCollisionBeenLoaded ( CVector * vecPosition );
     DWORD       GetCurrentArea ( void );
