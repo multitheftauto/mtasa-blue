@@ -146,7 +146,8 @@
 				TypeLibraryName=".\Release/Network.tlb"
 				HeaderFileName=""/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="copy /y xmll.dll &quot;c:\program files\rockstar games\gta san andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\MTA10_Server\output&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -173,12 +174,20 @@
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				OptimizeForWindowsApplication="TRUE"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL"
+				StringPooling="TRUE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
@@ -189,26 +198,25 @@
 				ObjectFile="$(IntDir)/"
 				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
 				WarningLevel="3"
-				SuppressStartupBanner="FALSE"
+				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="msvcrt.lib msvcprt.lib"
 				OutputFile="xmll.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories=""
-				IgnoreAllDefaultLibraries="TRUE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
-				AssemblyDebug="1"
 				ProgramDatabaseFile="c:\Symbols\Nightly_XML.pdb"
 				GenerateMapFile="TRUE"
 				MapFileName="c:\Symbols\Nightly_ServerXML.map"
 				MapExports="TRUE"
 				MapLines="TRUE"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				ImportLibrary="./Release/xmll.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -220,7 +228,8 @@
 				TypeLibraryName=".\Debug/Network.tlb"
 				HeaderFileName=""/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="copy /y xmll.dll &quot;..\..\output\gta san andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\output\server\xmll.dll&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
