@@ -1008,7 +1008,7 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
 bool FireInstantHit_CameraMode ()
 {
     CPlayerPed * pPed = dynamic_cast < CPlayerPed * > ( m_pools->GetPed ( ( DWORD * ) pShootingPed ) );
-    if ( !IsLocalPlayer( pPed ) )
+    if ( pPed && !IsLocalPlayer( pPed ) )
     {
         // Are we onfoot?
         if ( !pPed->GetVehicle () )
@@ -1074,13 +1074,17 @@ CPedSAInterface * pFireInstantHit_IsPlayerPed = NULL;
 bool FireInstantHit_IsPlayer ()
 {
     CPlayerPed * pPed = dynamic_cast < CPlayerPed * > ( m_pools->GetPed ( ( DWORD * ) pFireInstantHit_IsPlayerPed ) );
-    if ( IsLocalPlayer( pPed ) ) return true;
-    CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pPed );
-    if ( data )
+    if ( pPed )
     {
-        if ( data->ProcessPlayerWeapon () )
-        {
+        if ( IsLocalPlayer( pPed ) )
             return true;
+        CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pPed );
+        if ( data )
+        {
+            if ( data->ProcessPlayerWeapon () )
+            {
+                return true;
+            }
         }
     }
     return false;
