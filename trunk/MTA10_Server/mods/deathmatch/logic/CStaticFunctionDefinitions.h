@@ -518,7 +518,7 @@ public:
     static bool                 IsCursorShowing                     ( CPlayer* pPlayer, bool& bShowing );
 
     // Cursor set funcs
-    static bool                 ShowCursor                          ( CElement* pElement, CLuaMain* pLuaMain, bool bShow );
+    static bool                 ShowCursor                          ( CElement* pElement, CLuaMain* pLuaMain, bool bShow, bool bToggleControls );
 
 	// Chat funcs
 	static bool                 ShowChat							( CElement* pElement, bool bShow );

@@ -9996,8 +9996,11 @@ int CLuaFunctionDefinitions::ShowCursor ( lua_State* luaVM )
            
             if ( pElement )
             {
-                if ( CStaticFunctionDefinitions::ShowCursor ( pElement, pLuaMain, bShow ) )
-                {
+                bool bToggleControls = true;
+                if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                    bToggleControls = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
+                if ( CStaticFunctionDefinitions::ShowCursor ( pElement, pLuaMain, bShow, bToggleControls ) )
+                {                  
                     lua_pushboolean ( luaVM, true );
                     return 1;
                 }

@@ -125,6 +125,7 @@ public:
     bool                    IsSettingsVisible               ( void );
     bool                    IsMenuVisible                   ( void );
     bool                    IsCursorForcedVisible           ( void );
+    bool                    IsCursorControlsToggled         ( void ) { return m_bCursorToggleControls; }
     void                    HideMainMenu                    ( void );
 	void			        SetCenterCursor                 ( bool bEnabled );
 
@@ -141,7 +142,7 @@ public:
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );
-    void                    ForceCursorVisible              ( bool bVisible );
+    void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true );
     void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor );
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
@@ -248,6 +249,7 @@ private:
 	bool						m_bResetNeeded;
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
+    bool                        m_bCursorToggleControls;
     pfnProcessMessage           m_pfnMessageProcessor;
 
     CGUIMessageBox*				m_pMessageBox;

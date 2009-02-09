@@ -177,6 +177,7 @@ CCore::CCore ( void )
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
+    m_bCursorToggleControls = false;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -689,8 +690,9 @@ const char* CCore::GetGTAInstallRoot ( void )
 }
 
 
-void CCore::ForceCursorVisible ( bool bVisible )
+void CCore::ForceCursorVisible ( bool bVisible, bool bToggleControls )
 {
+    m_bCursorToggleControls = bToggleControls;
     m_pLocalGUI->ForceCursorVisible ( bVisible );
 }
 
