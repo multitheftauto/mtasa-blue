@@ -289,10 +289,6 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( EWaterPolyType type, WORD wI
         g_pWaterManager->m_ZonePolyPool [ wOffset + 2 ].m_wValue = 0;
         m_pInterface->m_wValue = MAKE_POLYENTRY ( WATER_POLY_LIST, wOffset );
 
-        CWaterPolyEntrySAInterface* pZoneInterface = m_pInterface + 1;
-        for ( ; pZoneInterface < &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
-            pZoneInterface->m_wValue += 3;
-
         *(DWORD *)VAR_NumWaterZonePolys += 3;
         return &g_pWaterManager->m_ZonePolyPool [ wOffset + 1 ];
     }
@@ -311,9 +307,14 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( EWaterPolyType type, WORD wI
         }
         pZoneEnd->m_wValue = MAKE_POLYENTRY ( type, wID );
 
-        CWaterPolyEntrySAInterface* pZoneInterface = m_pInterface + 1;
+        WORD wZoneEndOffset = pZoneEnd - g_pWaterManager->m_ZonePolyPool;
+        CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;
         for ( ; pZoneInterface != &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
-            pZoneInterface->m_wValue++;
+        {
+            if ( POLYENTRY_TYPE ( pZoneInterface ) == WATER_POLY_LIST &&
+                 POLYENTRY_ID ( pZoneInterface ) > wZoneEndOffset )
+                pZoneInterface->m_wValue++;
+        }
 
         (*(DWORD *)VAR_NumWaterZonePolys)++;
         return pZoneEnd;
@@ -347,6 +348,7 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
     {
         CWaterPolyEntrySAInterface* pEntries = (CWaterPolyEntrySAInterface *)begin ();
         CWaterPolyEntrySAInterface* pEnd = &g_pWaterManager->m_ZonePolyPool [ *(DWORD *)VAR_NumWaterZonePolys ];
+        WORD wOffset = pEntries - g_pWaterManager->m_ZonePolyPool;
         if ( end () - begin () == 2 )
         {
             if ( pEntries [ 0 ].m_wValue == MAKE_POLYENTRY ( type, wID ) ||
@@ -361,9 +363,13 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
                 for ( ; pEntry < pEnd; pEntry++ )
                     (pEntry - 3)->m_wValue = pEntry->m_wValue;
 
-                CWaterPolyEntrySAInterface* pZoneInterface = m_pInterface + 1;
+                CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;
                 for ( ; pZoneInterface < &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
-                    pZoneInterface->m_wValue -= 3;
+                {
+                    if ( POLYENTRY_TYPE ( pZoneInterface ) == WATER_POLY_LIST &&
+                         POLYENTRY_ID ( pZoneInterface ) > wOffset )
+                        pZoneInterface->m_wValue -= 3;
+                }
                 *(DWORD *)VAR_NumWaterZonePolys -= 3;
                 return true;
             }
@@ -382,9 +388,13 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
                     for ( ; pEntry < pEnd; pEntry++ )
                         (pEntry - 1)->m_wValue = pEntry->m_wValue;
 
-                    CWaterPolyEntrySAInterface* pZoneInterface = m_pInterface + 1;
+                    CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;;
                     for ( ; pZoneInterface < &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
-                        pZoneInterface->m_wValue--;
+                    {
+                        if ( POLYENTRY_TYPE ( pZoneInterface ) == WATER_POLY_LIST &&
+                             POLYENTRY_ID ( pZoneInterface ) > wOffset )
+                            pZoneInterface->m_wValue--;
+                    }
                     (*(DWORD *)VAR_NumWaterZonePolys)--;
                     return true;
                 }
@@ -418,6 +428,7 @@ CWaterManagerSA::CWaterManagerSA ()
 {
     g_pWaterManager = this;
     RelocatePools ();
+    InstallHooks ();
 }
 
 CWaterManagerSA::~CWaterManagerSA ()
@@ -442,6 +453,19 @@ void CWaterManagerSA::RelocatePools ()
             **ppXref += dwDelta;
         }
     }
+}
+
+void __declspec(naked) Hook6E9E23 ()
+{
+    __asm
+    {
+        
+    }
+}
+
+void CWaterManagerSA::InstallHooks ()
+{
+
 }
 
 CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( float fX, float fY )

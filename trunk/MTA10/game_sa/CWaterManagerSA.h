@@ -232,6 +232,7 @@ public:
                                      ~CWaterManagerSA  ();
 
     void                             RelocatePools     ();
+    void                             InstallHooks      ();
     CWaterZoneSA*                    GetZoneContaining ( float fX, float fY );
     void                             GetZonesContaining ( CWaterPoly* pPoly, std::vector < CWaterZoneSA* >& out );
     void                             GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3, std::vector < CWaterZoneSA* >& out );
