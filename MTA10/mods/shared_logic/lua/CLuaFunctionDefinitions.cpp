@@ -11907,13 +11907,16 @@ int CLuaFunctionDefinitions::ShowCursor ( lua_State* luaVM )
         {
             // Grab the argument
             bool bShow = lua_toboolean ( luaVM, 1 ) ?true:false;
+            bool bToggleControls = true;
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+                bToggleControls = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
 
             // Grab the resource belonging to this VM
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
                 // Show/hide it inside that resource
-                pResource->ShowCursor ( bShow );
+                pResource->ShowCursor ( bShow, bToggleControls );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }

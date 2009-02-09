@@ -86,7 +86,7 @@ public:
 	void					DeleteClientChildren		( void );
 
     // Use this for cursor showing/hiding
-    void                    ShowCursor                  ( bool bShow );
+    void                    ShowCursor                  ( bool bShow, bool bToggleControls = true );
 
 private:
     unsigned short          m_usID;

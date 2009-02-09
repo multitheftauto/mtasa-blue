@@ -328,7 +328,7 @@ void CResource::DeleteClientChildren ( void )
 }
 
 
-void CResource::ShowCursor ( bool bShow )
+void CResource::ShowCursor ( bool bShow, bool bToggleControls )
 {
     // Different cursor showing state than earlier?
     if ( bShow != m_bShowingCursor )
@@ -350,7 +350,7 @@ void CResource::ShowCursor ( bool bShow )
         m_bShowingCursor = bShow;
 
         // Show cursor if more than 0 resources wanting the cursor on
-        g_pCore->ForceCursorVisible ( m_iShowingCursor > 0 );
+        g_pCore->ForceCursorVisible ( m_iShowingCursor > 0, bToggleControls );
         g_pClientGame->SetCursorEventsEnabled ( m_iShowingCursor > 0 );
     }
 }

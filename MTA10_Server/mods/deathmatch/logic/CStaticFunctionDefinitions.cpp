@@ -7204,10 +7204,10 @@ bool CStaticFunctionDefinitions::IsCursorShowing ( CPlayer* pPlayer, bool& bShow
 }
 
 
-bool CStaticFunctionDefinitions::ShowCursor ( CElement* pElement, CLuaMain* pLuaMain, bool bShow )
+bool CStaticFunctionDefinitions::ShowCursor ( CElement* pElement, CLuaMain* pLuaMain, bool bShow, bool bToggleControls )
 {
     assert ( pElement );
-    RUN_CHILDREN ShowCursor ( *iter, pLuaMain, bShow );
+    RUN_CHILDREN ShowCursor ( *iter, pLuaMain, bShow, bToggleControls );
 
     if ( IS_PLAYER ( pElement ) )
     {
@@ -7224,6 +7224,7 @@ bool CStaticFunctionDefinitions::ShowCursor ( CElement* pElement, CLuaMain* pLua
             CBitStream BitStream;
             BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bShow ) ? 1 : 0 ) );
             BitStream.pBitStream->Write ( static_cast < unsigned short > ( pResource->GetID () ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bToggleControls ) ? 1 : 0 ) );
             pPlayer->Send ( CLuaPacket ( SHOW_CURSOR, *BitStream.pBitStream ) );
 
             return true;
