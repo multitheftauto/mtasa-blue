@@ -230,6 +230,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -254,14 +255,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
 				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;RACE_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				BufferSecurityCheck="true"
+				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
@@ -284,8 +287,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ASEQuerySDK.lib lua5.1.lib wsock32.lib sqlite3.lib zlib.lib ehs.lib pthreadVC2.lib pme.lib pcre.lib json.lib"
-				OutputFile="..\..\..\output\server\mods\deathmatch\deathmatch.dll"
+				AdditionalDependencies="ASEQuerySDK.lib lua5.1.lib wsock32.lib sqlite3.lib zlib.lib ehs_2005.lib pthreadVC2.lib pme_2005.lib pcre.lib json.lib"
+				OutputFile="../../../output/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../dependencies/zlib;logic/lib;../../dependencies;../../../Shared/publicsdk/lib;../../dependencies/bullet-2.64/lib"
