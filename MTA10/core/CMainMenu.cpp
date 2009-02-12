@@ -81,10 +81,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
 	m_pBackground->LoadFromFile ( CGUI_IMAGE_BACKGROUND );
     m_pBackground->MoveToBack ();
-    m_pBackground->SetFrameEnabled ( false );
     m_pBackground->SetVisible ( false );
 	m_pBackground->SetAlpha ( 0 );
-	m_pBackground->SetEnabled ( false );
 
 	// Filler background image
     m_pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -106,7 +104,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	m_pHeader->SetSize ( CVector2D ( CORE_MTA_HEADER_X, CORE_MTA_HEADER_Y ) );
 	m_pHeader->SetAlpha ( 0 );
 
-	m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( "Not logged in" ) );
+	m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pBackground, "Not logged in" ) );
     m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 	m_pCommunityLabel->AutoSize ( "Not logged in" );
     m_pCommunityLabel->SetAlwaysOnTop ( true );
@@ -697,7 +695,7 @@ bool CMainMenu::OnItemLeave ( CGUIElement* pElement )
 
 void CMainMenu::CreateItem ( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler )
 {
-	CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( szText ) );
+	CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, szText ) );
 
 	// Set the position, font face and size
 	pItem->SetPosition ( vecPosition );

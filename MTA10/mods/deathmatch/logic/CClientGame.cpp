@@ -3859,10 +3859,7 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
         CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
         if ( GetGUIManager ()->Exists ( pGUIElement ) )
         {
-            if ( !g_pCore->IsMenuVisible ()  )
-            {
-                pGUIElement->CallEvent ( "onClientGUIClick", Arguments, true );
-            }
+            pGUIElement->CallEvent ( "onClientGUIClick", Arguments, true );
         }
     }
 
@@ -3900,10 +3897,7 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
         CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
         if ( GetGUIManager ()->Exists ( pGUIElement ) )
         {
-            if ( !g_pCore->IsMenuVisible ()  )
-            {
-                pGUIElement->CallEvent ( "onClientGUIDoubleClick", Arguments, true );
-            }
+            pGUIElement->CallEvent ( "onClientGUIDoubleClick", Arguments, true );
         }
     }
 
