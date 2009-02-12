@@ -1275,6 +1275,7 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
     else
     {
         CCommunity::GetSingleton ().Logout ();
+        m_pEditPass->SetText ( "" );
     }
     return true;
 }
