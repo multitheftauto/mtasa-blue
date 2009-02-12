@@ -3837,11 +3837,11 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
     char* szState = NULL;
     switch ( Args.button )
     {
-    case CGUIMouse::LeftButton: szButton = "left"; szState = "down";
+    case CGUIMouse::LeftButton: szButton = "left"; szState = "up";
         break;
-    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "down";
+    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "up";
         break;
-    case CGUIMouse::RightButton: szButton = "right"; szState = "down";
+    case CGUIMouse::RightButton: szButton = "right"; szState = "up";
         break;
     }
 
@@ -3855,16 +3855,14 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
         Arguments.PushString ( szState );
         Arguments.PushNumber ( Args.position.fX );
         Arguments.PushNumber ( Args.position.fY );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( true );
 
         CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
         if ( GetGUIManager ()->Exists ( pGUIElement ) )
         {
-            pGUIElement->CallEvent ( "onClientGUIClick", Arguments, true );
+            if ( !g_pCore->IsMenuVisible ()  )
+            {
+                pGUIElement->CallEvent ( "onClientGUIClick", Arguments, true );
+            }
         }
     }
 
@@ -3880,11 +3878,11 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     char* szState = NULL;
     switch ( Args.button )
     {
-    case CGUIMouse::LeftButton: szButton = "left"; szState = "down";
+    case CGUIMouse::LeftButton: szButton = "left"; szState = "up";
         break;
-    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "down";
+    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "up";
         break;
-    case CGUIMouse::RightButton: szButton = "right"; szState = "down";
+    case CGUIMouse::RightButton: szButton = "right"; szState = "up";
         break;
     }
 
@@ -3898,16 +3896,14 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
         Arguments.PushString ( szState );
         Arguments.PushNumber ( Args.position.fX );
         Arguments.PushNumber ( Args.position.fY );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( false );
-        Arguments.PushBoolean ( true );
 
         CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
         if ( GetGUIManager ()->Exists ( pGUIElement ) )
         {
-            pGUIElement->CallEvent ( "onClientGUIDoubleClick", Arguments, true );
+            if ( !g_pCore->IsMenuVisible ()  )
+            {
+                pGUIElement->CallEvent ( "onClientGUIDoubleClick", Arguments, true );
+            }
         }
     }
 
