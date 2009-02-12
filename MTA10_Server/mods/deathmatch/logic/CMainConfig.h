@@ -71,7 +71,7 @@ public:
 	inline bool						GetSerialVerificationEnabled	( void )		{ return m_bVerifySerials; };
 
 	inline unsigned short			GetFPSLimit						( void )		{ return m_usFPSLimit; };
-	void							SetFPSLimit						( unsigned short usFPS )	{ m_usFPSLimit = usFPS; };
+	void							SetFPSLimit						( unsigned short usFPS );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
