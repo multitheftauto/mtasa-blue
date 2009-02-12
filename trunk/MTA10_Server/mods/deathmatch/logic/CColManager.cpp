@@ -27,8 +27,28 @@ CColManager::~CColManager ( void )
 }
 
 
-void CColManager::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis )
+void CColManager::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis, bool bChildren )
 {
+    if ( bChildren )
+    {
+        list < CElement* > ::const_iterator iter = pElement->IterBegin ();
+        for ( ; iter != pElement->IterEnd (); iter++ )
+        {
+            DoHitDetection ( (*iter)->GetLastPosition(), (*iter)->GetPosition(), 0.0f, *iter, pJustThis, true );
+        }
+        if ( IS_COLSHAPE ( pElement ) ||
+             IS_FILE ( pElement ) ||
+             IS_HANDLING ( pElement ) ||
+             IS_RADAR_AREA ( pElement ) ||
+             IS_CONSOLE ( pElement ) ||
+             IS_TEAM ( pElement ) ||
+             IS_BLIP ( pElement ) ||
+             IS_DUMMY ( pElement ) )
+        {
+            return;
+        }
+    }
+
     if ( !pJustThis )
     {
         m_bIteratingList = true;

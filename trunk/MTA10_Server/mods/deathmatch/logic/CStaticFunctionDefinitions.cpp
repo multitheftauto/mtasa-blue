@@ -5916,36 +5916,10 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, 
     //CColCircle * pColShape = new CColCircle ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );
 	CColCircle * pColShape = new CColCircle ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
-/*
-    list < CElement * > ::const_iterator iter = m_pElementManager->IterBegin ();
-    for ( ; iter != m_pElementManager->IterEnd () ; iter++ )
-    {
-        if ( IS_COLSHAPE ( *iter ) ||
-             IS_FILE ( *iter ) ||
-             IS_HANDLING ( *iter ) ||
-             IS_RADAR_AREA ( *iter ) ||
-             IS_CONSOLE ( *iter ) ||
-             IS_TEAM ( *iter ) )
-        {
-            continue;
-        }
-        m_pGame->GetR
-        m_pColManager->DoHitDetection ( (*iter)->GetPosition (), (*iter)->GetPosition (), 0.0f, *iter, pColShape );
-    }
-*/
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+
 	if ( pResource->HasStarted() )
 	{
 		CEntityAddPacket Packet;
@@ -5962,19 +5936,9 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource* pResource, 
     //CColCuboid * pColShape = new CColCuboid ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, vecSize );
 	CColCuboid * pColShape = new CColCuboid ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, vecSize );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
 
 	if ( pResource->HasStarted() )
 	{
@@ -5992,19 +5956,9 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource* pResource, 
     //CColSphere * pColShape = new CColSphere ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );
 	CColSphere * pColShape = new CColSphere ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
 
 	if ( pResource->HasStarted() )
 	{
@@ -6022,19 +5976,9 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 	//CColRectangle * pColShape = new CColRectangle ( m_pColManager, m_pMapManager->GetRootElement(), vecPosition, vecSize );
     CColRectangle * pColShape = new CColRectangle ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, vecSize );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
 
 	if ( pResource->HasStarted() )
 	{
@@ -6051,19 +5995,9 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource
 {
     CColPolygon * pColShape = new CColPolygon ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
 
 	if ( pResource->HasStarted() )
 	{
@@ -6081,19 +6015,9 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
     //CColTube * pColShape = new CColTube ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius, fHeight );
 	CColTube * pColShape = new CColTube ( m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius, fHeight );
     
-    // Run collision detection on some elements
-    list < CPlayer * > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd () ; iterPlayers++ )
-    {
-        CPlayer * pPlayer = *iterPlayers;
-        m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer, pColShape );
-    }
-    list < CVehicle * > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd () ; iterVehicles++ )
-    {
-        CVehicle * pVehicle = *iterVehicles;
-        m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle, pColShape );
-    }
+    // Run collision detection
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
 
 	if ( pResource->HasStarted() )
 	{
