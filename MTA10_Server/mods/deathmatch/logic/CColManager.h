@@ -27,7 +27,7 @@ public:
                                             CColManager         ( void );
                                             ~CColManager        ( void );
 
-    void                                    DoHitDetection      ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL );
+    void                                    DoHitDetection      ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
 
     bool                                    Exists              ( CColShape* pShape );
     void                                    DeleteAll           ( void );
