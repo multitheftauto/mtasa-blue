@@ -531,6 +531,16 @@ void CMainConfig::SetPassword ( const char* szPassword )
 }
 
 
+void CMainConfig::SetFPSLimit ( unsigned short usFPS )
+{
+    if ( usFPS >= 25 && usFPS <= 100 )
+    {
+        m_usFPSLimit = usFPS;
+        SetInteger ( m_pRootNode, "fpslimit", usFPS );
+    }
+}
+
+
 void CMainConfig::RegisterCommand ( const char* szName, FCommandHandler* pFunction, bool bRestricted )
 {
     // Register the function with the given name and function pointer
