@@ -311,14 +311,14 @@ void CMarker::SetIcon ( unsigned char ucIcon )
 
 void CMarker::Callback_OnCollision ( CColShape& Shape, CElement& Element )
 {
+    // Call the marker hit event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( &Element );
+    Arguments.PushBoolean ( ( GetDimension () == Element.GetDimension () ) ); // matching dimension?
+    CallEvent ( "onMarkerHit", Arguments );
+
     if ( IS_PLAYER ( &Element ) )
     {
-        // Call the marker hit event
-        CLuaArguments Arguments;
-        Arguments.PushElement ( &Element );            // player that hit it
-        Arguments.PushBoolean ( ( GetDimension () == Element.GetDimension () ) ); // matching dimension?
-        CallEvent ( "onMarkerHit", Arguments );
-
         CLuaArguments Arguments2;
         Arguments2.PushElement ( this );        // marker
         Arguments2.PushBoolean ( GetDimension () == Element.GetDimension () ); // matching dimension?
@@ -329,14 +329,14 @@ void CMarker::Callback_OnCollision ( CColShape& Shape, CElement& Element )
 
 void CMarker::Callback_OnLeave ( CColShape& Shape, CElement& Element )
 {
+    // Call the marker hit event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( &Element );
+    Arguments.PushBoolean ( ( GetDimension () == Element.GetDimension () ) ); // matching dimension?
+    CallEvent ( "onMarkerLeave", Arguments );
+
     if ( IS_PLAYER ( &Element ) )
     {
-        // Call the marker hit event
-        CLuaArguments Arguments;
-        Arguments.PushElement ( &Element );            // player that hit it
-        Arguments.PushBoolean ( ( Shape.GetDimension () == Element.GetDimension () ) ); // matching dimension?
-        CallEvent ( "onMarkerLeave", Arguments );
-
         CLuaArguments Arguments2;
         Arguments2.PushElement ( this );        // marker
         Arguments2.PushBoolean ( Shape.GetDimension () == Element.GetDimension () ); // matching dimension?
