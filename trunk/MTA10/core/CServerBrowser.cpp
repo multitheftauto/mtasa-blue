@@ -538,7 +538,8 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
         for ( i = i_b; i != i_e; i++ ) {
             CServerListItem * pServer = *i;
             std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
-            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 ) {
+            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 )
+            {
                 if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
                 {
                     m_pCommunityLogin.SetVisible ( true );
