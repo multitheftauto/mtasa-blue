@@ -211,6 +211,7 @@ CClientPed::~CClientPed ( void )
         SetInterior ( 0 );
         SetDimension ( 0 );
         SetVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
+        SetCanBeKnockedOffBike ( false );
         SetHeadless ( false );
     }
     else
