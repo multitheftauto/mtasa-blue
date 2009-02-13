@@ -33,8 +33,8 @@ public:
     inline const std::string&   GetReason               ( void )                        { return m_strReason; };
     inline void                 SetReason               ( const std::string& strReason ){ m_strReason = strReason; };
 
-    inline const time_t         GetTimeOfBan            ( void )                        { return m_tTimeOfUnban; };
-    inline void                 SetTimeOfBan            ( time_t tTimeOfBan )           { m_tTimeOfUnban = tTimeOfBan; };
+    inline const time_t         GetTimeOfBan            ( void )                        { return m_tTimeOfBan; };
+    inline void                 SetTimeOfBan            ( time_t tTimeOfBan )           { m_tTimeOfBan = tTimeOfBan; };
 
     inline time_t               GetTimeOfUnban          ( void )                        { return m_tTimeOfUnban; };
     inline void                 SetTimeOfUnban          ( time_t tTimeOfUnban )         { m_tTimeOfUnban = tTimeOfUnban; };
