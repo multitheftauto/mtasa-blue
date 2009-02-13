@@ -23,7 +23,9 @@ public:
 
     eClientEntityType          GetType                () const { return CCLIENTWATER; }
     void                       GetPosition            ( CVector& vecPosition ) const;
+    bool                       GetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       SetPosition            ( const CVector& vecPosition );
+    bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       Unlink                 ();
 
 private:

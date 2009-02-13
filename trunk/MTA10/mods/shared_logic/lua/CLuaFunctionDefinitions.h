@@ -533,7 +533,9 @@ public:
     LUA_DECLARE ( TestLineAgainstWater );
     LUA_DECLARE ( CreateWater );
     LUA_DECLARE ( GetWaterLevel );
+    LUA_DECLARE ( GetWaterVertexPosition );
     LUA_DECLARE ( SetWaterLevel );
+    LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( GetWorldFromScreenPosition );
     LUA_DECLARE ( GetScreenFromWorldPosition  );
     LUA_DECLARE ( GetWeather );
