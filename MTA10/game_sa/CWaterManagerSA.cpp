@@ -638,8 +638,6 @@ bool CWaterManagerSA::GetWaterLevel ( CVector& vecPosition, float* pfLevel, bool
 
 bool CWaterManagerSA::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
 {
-    CVector vecVertexPos;
-
     if ( pvecPosition )
     {
         // Specific water poly
@@ -647,22 +645,30 @@ bool CWaterManagerSA::SetWaterLevel ( CVector* pvecPosition, float fLevel, void*
         if ( !pPoly )
             return false;
 
-        for ( int i = 0; i < pPoly->GetNumVertices (); i++ )
-        {
-            pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
-            vecVertexPos.fZ = fLevel;
-            pPoly->GetVertex ( i )->SetPosition ( vecVertexPos, pChangeSource );
-        }
+        return SetWaterLevel ( pPoly, fLevel, pChangeSource );
     }
     else
     {
         // All water polys
+        CVector vecVertexPos;
         for ( DWORD i = 0; i < *(DWORD *)VAR_NumWaterVertices; i++ )
         {
             m_Vertices [ i ].GetPosition ( vecVertexPos );
             vecVertexPos.fZ = fLevel;
             m_Vertices [ i ].SetPosition ( vecVertexPos, pChangeSource );
         }
+    }
+    return true;
+}
+
+bool CWaterManagerSA::SetWaterLevel ( CWaterPoly* pPoly, float fLevel, void* pChangeSource )
+{
+    CVector vecVertexPos;
+    for ( int i = 0; i < pPoly->GetNumVertices (); i++ )
+    {
+        pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
+        vecVertexPos.fZ = fLevel;
+        pPoly->GetVertex ( i )->SetPosition ( vecVertexPos, pChangeSource );
     }
     return true;
 }

@@ -4231,9 +4231,45 @@ bool CStaticFunctionDefinitions::GetWaterLevel ( CVector& vecPosition, float& fW
 }
 
 
+bool CStaticFunctionDefinitions::GetWaterLevel ( CClientWater* pWater, float& fLevel )
+{
+    CVector vecPosition;
+    pWater->GetPosition ( vecPosition );
+    fLevel = vecPosition.fZ;
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition )
+{
+    return pWater->GetVertexPosition ( iVertexIndex - 1, vecPosition );
+}
+
+
 bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
 {
     return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
+}
+
+
+bool CStaticFunctionDefinitions::SetWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+{
+    if ( pWater )
+    {
+        CVector vecPosition;
+        pWater->GetPosition ( vecPosition );
+        vecPosition.fZ = fLevel;
+        pWater->SetPosition ( vecPosition );
+    }
+    else
+    {
+        return g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fLevel, pChangeSource );
+    }
+}
+
+
+bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition )
+{
+    return pWater->SetVertexPosition ( iVertexIndex - 1, vecPosition );
 }
 
 

@@ -348,8 +348,12 @@ public:
     static bool                         IsLineOfSightClear                  ( CVector& vecStart, CVector& vecEnd, bool& bIsClear, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, CEntity* pIgnoredEntity = NULL );
     static bool                         TestLineAgainstWater                ( CVector& vecStart, CVector& vecEnd, CVector& vecCollision );
     static CClientWater*                CreateWater                         ( CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow );
-    static bool                         GetWaterLevel                       ( CVector& vecPosition, float& fWaterLevel, bool bCheckWaves, CVector& vecUnknown );
+    static bool                         GetWaterLevel                       ( CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown );
+    static bool                         GetWaterLevel                       ( CClientWater* pWater, float& fLevel );
+    static bool                         GetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         SetWaterLevel                       ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
+    static bool                         SetWaterLevel                       ( CClientWater* pWater, float fLevel, void* pChangeSource = NULL );
+    static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         GetWorldFromScreenPosition          ( CVector& vecScreen, CVector& vecWorld );
     static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen );
     static bool                         GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );

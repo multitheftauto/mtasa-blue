@@ -150,6 +150,8 @@ public:
 
     bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
     bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
+    bool                             SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL );
+    
     bool                             TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision );
 
     void                             AddChange         ( void* pChangeSource, void* pChangedObject, CWaterChange* pChange );

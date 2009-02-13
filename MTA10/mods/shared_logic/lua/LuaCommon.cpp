@@ -213,6 +213,17 @@ CClientVehicle* lua_tovehicle ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
+CClientWater* lua_towater ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTWATER )
+    {
+        return static_cast < CClientWater* > ( pElement );
+    }
+
+    return NULL;
+}
+
 CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
 {
     return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );

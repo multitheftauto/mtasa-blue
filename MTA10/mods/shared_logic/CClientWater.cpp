@@ -49,6 +49,19 @@ void CClientWater::GetPosition ( CVector& vecPosition ) const
     vecPosition /= m_pPoly->GetNumVertices ();
 }
 
+bool CClientWater::GetVertexPosition ( int iVertexIndex, CVector& vecPosition )
+{
+    if ( !m_pPoly )
+        return false;
+
+    CWaterVertex* pVertex = m_pPoly->GetVertex ( iVertexIndex );
+    if ( !pVertex )
+        return false;
+
+    pVertex->GetPosition ( vecPosition );
+    return true;
+}
+
 void CClientWater::SetPosition ( const CVector& vecPosition )
 {
     if ( !m_pPoly )
@@ -66,6 +79,19 @@ void CClientWater::SetPosition ( const CVector& vecPosition )
         m_pPoly->GetVertex ( i )->SetPosition ( vecVertexPos );
     }
     g_pGame->GetWaterManager ()->RebuildIndex ();
+}
+
+bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition )
+{
+    if ( !m_pPoly )
+        return false;
+
+    CWaterVertex* pVertex = m_pPoly->GetVertex ( iVertexIndex );
+    if ( !pVertex )
+        return false;
+
+    pVertex->SetPosition ( vecPosition );
+    return true;
 }
 
 void CClientWater::Unlink ()
