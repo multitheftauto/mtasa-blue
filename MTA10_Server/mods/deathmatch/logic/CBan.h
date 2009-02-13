@@ -33,11 +33,8 @@ public:
     inline const std::string&   GetReason               ( void )                        { return m_strReason; };
     inline void                 SetReason               ( const std::string& strReason ){ m_strReason = strReason; };
 
-    inline const std::string&   GetDateOfBan            ( void )                        { return m_strDateOfBan; };
-    inline void                 SetDateOfBan            ( const std::string& strDate )  { m_strDateOfBan = strDate; };
-
-    inline const std::string&   GetTimeOfBan            ( void )                        { return m_strTimeOfBan; };
-    inline void                 SetTimeOfBan            ( const std::string& strTime )  { m_strTimeOfBan = strTime; };
+    inline const time_t         GetTimeOfBan            ( void )                        { return m_tTimeOfUnban; };
+    inline void                 SetTimeOfBan            ( time_t tTimeOfBan )           { m_tTimeOfUnban = tTimeOfBan; };
 
     inline time_t               GetTimeOfUnban          ( void )                        { return m_tTimeOfUnban; };
     inline void                 SetTimeOfUnban          ( time_t tTimeOfUnban )         { m_tTimeOfUnban = tTimeOfUnban; };
@@ -53,10 +50,9 @@ private:
     std::string                 m_strNick;
     std::string                 m_strBanner;
     std::string                 m_strReason;
-    std::string                 m_strDateOfBan;
-    std::string                 m_strTimeOfBan;
     std::string                 m_strSerial;
     std::string                 m_strAccount;
+    time_t                      m_tTimeOfBan;
     time_t                      m_tTimeOfUnban;
 };
 

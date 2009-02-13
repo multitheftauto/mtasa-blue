@@ -500,9 +500,9 @@ public:
 
     // Admin funcs
     static bool                 KickPlayer                          ( CPlayer* pPlayer, CPlayer* pResponsible = NULL, const char* szReason = NULL );
-    static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL );
+    static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL, time_t tUnban = 0 );
 
-    static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason );
+    static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban );
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
     static bool					GetBans							    ( CLuaMain* pLuaMain );
@@ -511,9 +511,12 @@ public:
     static bool					GetBanSerial						( CBan* pBan, char* szSerial, size_t size );
     static bool					GetBanUsername						( CBan* pBan, char* szUsername, size_t size );
     static bool					GetBanNick							( CBan* pBan, char* szNick, size_t size );
-    static bool					GetBanTime							( CBan* pBan, char* szTime, size_t size );
     static bool					GetBanReason						( CBan* pBan, char* szReason, size_t size );
     static bool                 GetBanAdmin                         ( CBan* pBan, char* szAdmin, size_t size );
+
+    static bool					GetBanTime							( CBan* pBan, time_t& time );
+    static bool					GetUnbanTime						( CBan* pBan, time_t& time );
+
     // Cursor get funcs
     static bool                 IsCursorShowing                     ( CPlayer* pPlayer, bool& bShowing );
 

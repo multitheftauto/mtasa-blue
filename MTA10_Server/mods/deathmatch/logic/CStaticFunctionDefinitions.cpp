@@ -6863,7 +6863,7 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, CPlayer* pRespon
 }
 
 
-CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason )
+CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban )
 {
     assert ( pPlayer );
 
@@ -6890,10 +6890,10 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 
     // Ban the player
     if ( bIP )
-        pBan = m_pBanManager->AddBan ( pPlayer, pResponsible, ( szReason ) ? szReason : "Unknown" );
+        pBan = m_pBanManager->AddBan ( pPlayer, pResponsible, ( szReason ) ? szReason : "Unknown", tUnban );
     // Can not ban by username or serial if serial verification is not enabled
     else if ( m_pMainConfig->GetSerialVerificationEnabled () && ( bUsername || bSerial ) )
-        pBan = m_pBanManager->AddBan ( pResponsible, ( szReason ) ? szReason : "Unknown" );
+        pBan = m_pBanManager->AddBan ( pResponsible, ( szReason ) ? szReason : "Unknown", tUnban );
 
     if ( pBan )
     {
@@ -6926,16 +6926,16 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 }
 
 
-CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason )
+CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban )
 {
     CBan* pBan = NULL;
 
     // Got an IP?
     if ( szIP )
-        pBan = m_pBanManager->AddBan ( szIP, pResponsible, szReason );
+        pBan = m_pBanManager->AddBan ( szIP, pResponsible, szReason, tUnban );
     // If not IP provided make sure a username or serial are there
     else if ( szUsername || szSerial )
-        pBan = m_pBanManager->AddBan ( pResponsible, szReason );
+        pBan = m_pBanManager->AddBan ( pResponsible, szReason, tUnban );
 
     if ( pBan )
     {
@@ -7086,14 +7086,17 @@ bool CStaticFunctionDefinitions::GetBanNick ( CBan* pBan, char* szNick, size_t s
 }
 
 
-bool CStaticFunctionDefinitions::GetBanTime ( CBan* pBan, char* szTime, size_t size )
+bool CStaticFunctionDefinitions::GetBanTime ( CBan* pBan, time_t& time )
 {
-    if ( !pBan->GetTimeOfBan ().empty () )
-    {
-        _snprintf ( szTime, size, pBan->GetTimeOfBan ().c_str() );
-        return true;
-    }
-    return false;
+    time = pBan->GetTimeOfBan ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetUnbanTime ( CBan* pBan, time_t& time )
+{
+    time = pBan->GetTimeOfUnban ();
+    return true;
 }
 
 

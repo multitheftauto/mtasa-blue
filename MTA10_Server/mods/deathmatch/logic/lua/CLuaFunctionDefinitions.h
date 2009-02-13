@@ -456,6 +456,7 @@ public:
     static int		GetBanUsername						( lua_State* luaVM );
     static int		GetBanNick							( lua_State* luaVM );
     static int		GetBanTime							( lua_State* luaVM );
+    static int		GetUnbanTime						( lua_State* luaVM );
     static int		GetBanReason						( lua_State* luaVM );
     static int		GetBanAdmin						    ( lua_State* luaVM );
 
