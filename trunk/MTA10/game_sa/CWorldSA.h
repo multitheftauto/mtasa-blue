@@ -40,23 +40,23 @@
 class CWorldSA : public CWorld
 {
 public:
-	VOID		Add ( CEntity * entity );
-	VOID		Add ( CEntitySAInterface * entityInterface );
-	VOID		Remove ( CEntity * entity );
-	VOID		Remove ( CEntitySAInterface * entityInterface );
-    VOID        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
-	bool		ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity = NULL, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, bool bShootThroughStuff = false);
-    bool        TestLineSphere(CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
-	//bool		ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity);
-	VOID		IgnoreEntity(CEntity * entity);
-	BYTE		GetLevelFromPosition(CVector * vecPosition);
-	FLOAT		FindGroundZForPosition(FLOAT fX, FLOAT fY);
-	FLOAT		FindGroundZFor3DPosition(CVector * vecPosition);
-	VOID		LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius);
-	bool		IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false );
-    bool        HasCollisionBeenLoaded ( CVector * vecPosition );
-    DWORD       GetCurrentArea ( void );
-    void        SetCurrentArea ( DWORD dwArea );
+	void		Add                       ( CEntity * entity );
+	void		Add                       ( CEntitySAInterface * entityInterface );
+	void		Remove                    ( CEntity * entity );
+	void		Remove                    ( CEntitySAInterface * entityInterface );
+    void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
+	bool		ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity = NULL, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, bool bShootThroughStuff = false );
+    bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
+	//bool		ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
+	void		IgnoreEntity              ( CEntity * entity );
+	BYTE		GetLevelFromPosition      ( CVector * vecPosition );
+	float		FindGroundZForPosition    ( float fX, float fY );
+	float		FindGroundZFor3DPosition  ( CVector * vecPosition );
+	void        LoadMapAroundPoint        ( CVector * vecPosition, float fRadius );
+	bool		IsLineOfSightClear        ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false );
+    bool        HasCollisionBeenLoaded    ( CVector * vecPosition );
+    DWORD       GetCurrentArea            ( void );
+    void        SetCurrentArea            ( DWORD dwArea );
 
 	/**
 	 * \todo Add FindObjectsKindaColliding (see 0x430577)

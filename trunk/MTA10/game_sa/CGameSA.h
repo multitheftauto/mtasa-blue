@@ -15,18 +15,10 @@
 *
 *****************************************************************************/
 
-#include <game/CGame.h>
-#include <game/CWanted.h>
-
-#include "CEventDamageSA.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #ifndef __CGAMESA
 #define __CGAMESA
 
-#include "Common.h"
+#include "CEventDamageSA.h"
 #include "CModelInfoSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
@@ -49,6 +41,16 @@
 
 #define		FUNC_CDebug_DebugDisplayTextBuffer		0x532260
 #define     FUNC_JPegCompressScreenToFile   0x5D0820
+
+#define     VAR_FlyingCarsEnabled           0x969160 // ##SA##
+#define     VAR_ExtraBunnyhopEnabled        0x969161 // ##SA##
+#define     VAR_HoveringCarsEnabled         0x969152 // ##SA##
+#define     VAR_ExtraJumpEnabled            0x96916C // ##SA##
+
+#define CHEAT_HOVERINGCARS   "hovercars"
+#define CHEAT_FLYINGCARS     "aircars"
+#define CHEAT_EXTRABUNNYHOP  "extrabunny"
+#define CHEAT_EXTRAJUMP      "extrajump"
 
 class CGameSA : public CGame
 {
@@ -156,6 +158,10 @@ public:
 	unsigned long			GetMinuteDuration		( void );
 	void					SetMinuteDuration		( unsigned long ulTime );
 
+    bool                    IsCheatEnabled          ( const char* szCheatName );
+    bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
+    void                    ResetCheats             ();
+
 private:
 	CPools					* m_pPools;
 	CPlayerInfo				* m_pPlayerInfo;
@@ -219,6 +225,8 @@ private:
     static float*           VAR_OldTimeStep;
     static float*           VAR_TimeStep;
     static unsigned long*   VAR_Framelimiter;
+
+    std::map < std::string, BYTE* > m_Cheats;
 };
 
 #endif

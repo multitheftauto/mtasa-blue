@@ -38,7 +38,6 @@ bool g_bBoundsChecker = true;
 double dHack;
 #define DEFAULT_GRAVITY 0.008f
 #define DEFAULT_GAME_SPEED 1.0f
-#define DEFAULT_WAVE_LEVEL 1.0f
 #define DEFAULT_BLUR_LEVEL 36
 #define DEFAULT_MINUTE_DURATION 1000
 
@@ -3740,11 +3739,11 @@ void CClientGame::ResetMapInfo ( void )
     // Sky-gradient
     g_pMultiplayer->ResetSky ();
 
-    // Wave-level
-    g_pMultiplayer->SetWaveLevel ( DEFAULT_WAVE_LEVEL );
-
-    // Water areas
+    // Water
     g_pGame->GetWaterManager ()->Reset ();
+
+    // Cheats
+    g_pGame->ResetCheats ();
 
     // Players
     m_pPlayerManager->ResetAll ();

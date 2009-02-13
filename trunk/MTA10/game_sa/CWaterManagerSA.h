@@ -15,6 +15,8 @@
 
 #include "CWaterSA.h"
 
+#define DEFAULT_WAVE_LEVEL                 1.0f
+
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
 #define FUNC_CreateWaterVertex             0x6E5A40         // (word x, word y, float z, float unknown, float height, word flow)
 #define FUNC_CreateWaterQuad               0x6E7EF0         // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word x4, ..., word flags)
@@ -151,6 +153,8 @@ public:
     bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
     bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
     bool                             SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL );
+    float                            GetWaveLevel      ();
+    void                             SetWaveLevel      ( float fWaveLevel );
     
     bool                             TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision );
 

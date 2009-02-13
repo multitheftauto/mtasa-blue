@@ -107,6 +107,12 @@ CGameSA::CGameSA()
     }
 
 	m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
+
+    // Init cheat name => address map
+    m_Cheats [ CHEAT_HOVERINGCARS  ] = (BYTE *)VAR_HoveringCarsEnabled;
+    m_Cheats [ CHEAT_FLYINGCARS    ] = (BYTE *)VAR_FlyingCarsEnabled;
+    m_Cheats [ CHEAT_EXTRABUNNYHOP ] = (BYTE *)VAR_ExtraBunnyhopEnabled;
+    m_Cheats [ CHEAT_EXTRAJUMP     ] = (BYTE *)VAR_ExtraJumpEnabled;
 }
 
 CGameSA::~CGameSA ( void )
@@ -463,4 +469,28 @@ unsigned long CGameSA::GetMinuteDuration ( void )
 void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 {
     * ( unsigned long * ) 0xB7015C = ulTime;
+}
+
+bool CGameSA::IsCheatEnabled ( const char* szCheatName )
+{
+    std::map < std::string, BYTE* >::iterator it = m_Cheats.find ( szCheatName );
+    if ( it == m_Cheats.end () )
+        return false;
+    return *(it->second) != 0;
+}
+
+bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
+{
+    std::map < std::string, BYTE* >::iterator it = m_Cheats.find ( szCheatName );
+    if ( it == m_Cheats.end () )
+        return false;
+    *(it->second) = bEnable;
+    return true;
+}
+
+void CGameSA::ResetCheats ()
+{
+    std::map < std::string, BYTE* >::iterator it;
+    for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ )
+        *(it->second) = 0;
 }

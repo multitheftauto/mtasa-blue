@@ -366,6 +366,7 @@ public:
     static bool                         GetGaragePosition                   ( unsigned char ucGarageID, CVector& vecPosition );
     static bool                         GetGarageSize                       ( unsigned char ucGarageID, float& fHeight, float& fWidth, float& fDepth );
     static bool                         GetGarageBoundingBox                ( unsigned char ucGarageID, float& fLeft, float& fRight, float& fFront, float& fBack );
+    static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
 
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
@@ -377,6 +378,7 @@ public:
     static bool                         SetWaveHeight                       ( float fHeight );
 	static bool							SetMinuteDuration					( unsigned long ulDelay );
     static bool                         SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
+    static bool                         SetWorldSpecialPropertyEnabled      ( const char* szPropName, bool bEnabled );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );

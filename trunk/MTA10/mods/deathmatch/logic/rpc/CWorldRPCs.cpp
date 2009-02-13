@@ -118,7 +118,7 @@ void CWorldRPCs::SetWaveHeight ( NetBitStreamInterface& bitStream )
     float fHeight;
     if ( bitStream.Read ( fHeight ) )
     {
-        g_pMultiplayer->SetWaveLevel ( fHeight );
+        g_pGame->GetWaterManager ()->SetWaveLevel ( fHeight );
     }
 }
 

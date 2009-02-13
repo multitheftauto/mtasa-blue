@@ -172,8 +172,11 @@ public:
 	virtual unsigned char		GetBlurLevel ( void ) = 0;
 	virtual void				SetBlurLevel ( unsigned char ucLevel ) = 0;
 
-    virtual eGameVersion        GetGameVersion ( void )=0;
+    virtual eGameVersion        GetGameVersion ( void ) = 0;
 
+    virtual bool                IsCheatEnabled              ( const char* szCheatName ) = 0;
+    virtual bool                SetCheatEnabled             ( const char* szCheatName, bool bEnable ) = 0;
+    virtual void                ResetCheats                 () = 0;
 };
 
 #endif

@@ -25,6 +25,9 @@ public:
     virtual bool                GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;
     virtual bool                SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL ) = 0;
     virtual bool                SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL ) = 0;
+    virtual float               GetWaveLevel      () = 0;
+    virtual void                SetWaveLevel      ( float fWaveLevel ) = 0;
+
     virtual bool                TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision ) = 0;
 
     virtual void                UndoChanges       ( void* pChangeSource = NULL ) = 0;

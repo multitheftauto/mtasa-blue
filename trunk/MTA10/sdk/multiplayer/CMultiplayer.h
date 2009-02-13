@@ -115,8 +115,6 @@ public:
     virtual void                        ResetSky ( void )=0;
     virtual void                        DisableClouds ( bool bDisabled )=0;
     virtual void                        DisableEnterExitVehicleKey( bool bDisabled )=0;
-    virtual float                       GetWaveLevel ( void )=0;
-    virtual void                        SetWaveLevel ( float fWaveLevel )=0;
 
     virtual void                        RebuildMultiplayerPlayer ( class CPed * player )=0;
 
