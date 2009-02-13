@@ -698,8 +698,7 @@ void CWaterManagerSA::AddChange ( void *pChangeSource, void* pChangedObject, CWa
     }
     else
     {
-        delete changeIt->second;
-        changeIt->second = pChange;
+        delete pChange;
     }
 }
 
