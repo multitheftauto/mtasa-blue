@@ -708,6 +708,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CWaterSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CWeaponInfoSA.cpp"
 				>
 			</File>
@@ -1186,6 +1190,10 @@
 			</File>
 			<File
 				RelativePath=".\CWaterManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWaterSA.h"
 				>
 			</File>
 			<File

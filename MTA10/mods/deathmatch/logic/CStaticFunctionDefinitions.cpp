@@ -4208,12 +4208,20 @@ bool CStaticFunctionDefinitions::TestLineAgainstWater ( CVector& vecStart, CVect
 }
 
 
-bool CStaticFunctionDefinitions::CreateWater ( CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow, void* pChangeSource )
+CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow )
 {
+    CClientWater* pWater;
     if ( pV4 )
-        return g_pGame->GetWaterManager ()->CreateQuad ( *pV1, *pV2, *pV3, *pV4, bShallow, pChangeSource ) != NULL;
+        pWater = new CClientWater ( INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
     else
-        return g_pGame->GetWaterManager ()->CreateTriangle ( *pV1, *pV2, *pV3, bShallow, pChangeSource ) != NULL;
+        pWater = new CClientWater ( INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
+    if ( !pWater->Valid () ) {
+        delete pWater;
+        return NULL;
+    }
+
+    pWater->SetParent ( resource.GetResourceDynamicEntity () );
+    return pWater;
 }
 
 
@@ -4223,9 +4231,9 @@ bool CStaticFunctionDefinitions::GetWaterLevel ( CVector& vecPosition, float& fW
 }
 
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CVector& vecPosition, float fLevel, void* pChangeSource )
+bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
 {
-    return g_pGame->GetWaterManager ()->SetWaterLevel ( vecPosition, fLevel, pChangeSource );
+    return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
 }
 
 

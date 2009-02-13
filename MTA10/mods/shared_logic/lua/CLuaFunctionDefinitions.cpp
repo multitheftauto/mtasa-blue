@@ -12217,8 +12217,8 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
                     bool bShallow = false;
                     if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN && lua_toboolean ( luaVM, 13 ) )
                         bShallow = true;
-                    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateWater (
-                        &v1, &v2, &v3, &v4, bShallow, pResource ) );
+                    lua_pushelement ( luaVM, CStaticFunctionDefinitions::CreateWater (
+                        *pResource, &v1, &v2, &v3, &v4, bShallow ) );
                     return 1;
                 }
                 else
@@ -12226,8 +12226,8 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
                     bool bShallow = false;
                     if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN && lua_toboolean ( luaVM, 10 ) )
                         bShallow = true;
-                    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateWater (
-                        &v1, &v2, &v3, NULL, bShallow, pResource ) );
+                    lua_pushelement ( luaVM, CStaticFunctionDefinitions::CreateWater (
+                        *pResource, &v1, &v2, &v3, NULL, bShallow ) );
                     return 1;
                 }
             }
@@ -12280,23 +12280,34 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
         if ( pResource )
         {
             int iArgument1 = lua_type ( luaVM, 1 );
-            int iArgument2 = lua_type ( luaVM, 2 );
-            int iArgument3 = lua_type ( luaVM, 3 );
-            int iArgument4 = lua_type ( luaVM, 4 );
-
-            if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-                 ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+            if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
             {
-                CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-                                    static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                                    static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-                float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-                if ( CStaticFunctionDefinitions::SetWaterLevel ( vecPosition, fLevel, pResource ) )
+                int iArgument2 = lua_type ( luaVM, 2 );
+                int iArgument3 = lua_type ( luaVM, 3 );
+                int iArgument4 = lua_type ( luaVM, 4 );
+
+                if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+                     ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+                     ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
                 {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
+                    CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                                          static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                                          static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                    float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+                    if ( CStaticFunctionDefinitions::SetWaterLevel ( &vecPosition, fLevel, pResource ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                }
+                else
+                {
+                    float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+                    if ( CStaticFunctionDefinitions::SetWaterLevel ( NULL, fLevel, pResource ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 }
             }
             else

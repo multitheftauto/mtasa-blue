@@ -34,23 +34,18 @@
 #include <ijsify.h>
 #include <Common.h>
 
-// Deathmatch includes
-#include "Client.h"
-#include "ClientCommands.h"
-#include "CClient.h"
-#include "HeapTrace.h"
-#include "logic/CClientGame.h"
-#include "logic/Packets.h"
-#include "logic/CDeathmatchVehicle.h"
-#include "logic/CResource.h"
-#include "logic/CStaticFunctionDefinitions.h"
-#include "logic/CSFX.h"
-
 // Shared logic includes
 #include <Utils.h>
 #include <CClientCommon.h>
+#include <CClientManager.h>
 #include <CClient3DMarker.h>
 #include <CClientCheckpoint.h>
+#include <CClientColCircle.h>
+#include <CClientColCuboid.h>
+#include <CClientColSphere.h>
+#include <CClientColRectangle.h>
+#include <CClientColPolygon.h>
+#include <CClientColTube.h>
 #include <CClientCorona.h>
 #include <CClientCRC32Hasher.h>
 #include <CClientDFF.h>
@@ -69,6 +64,7 @@
 #include <CClientTextDisplayFadeEffect.h>
 #include <CClientTextDisplayGlowEffect.h>
 #include <CClientTXD.h>
+#include <CClientWater.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
@@ -86,3 +82,16 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
+
+// Deathmatch includes
+#include "Client.h"
+#include "ClientCommands.h"
+#include "CClient.h"
+#include "CEvents.h"
+#include "HeapTrace.h"
+#include "logic/CClientGame.h"
+#include "logic/Packets.h"
+#include "logic/CDeathmatchVehicle.h"
+#include "logic/CResource.h"
+#include "logic/CStaticFunctionDefinitions.h"
+#include "logic/CSFX.h"

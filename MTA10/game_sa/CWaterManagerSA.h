@@ -13,6 +13,8 @@
 #ifndef __CWATERMANAGERSA_H
 #define __CWATERMANAGERSA_H
 
+#include "CWaterSA.h"
+
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
 #define FUNC_CreateWaterVertex             0x6E5A40         // (word x, word y, float z, float unknown, float height, word flow)
 #define FUNC_CreateWaterQuad               0x6E7EF0         // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word x4, ..., word flags)
@@ -24,6 +26,7 @@
 
 typedef void (__cdecl *ReadWaterConfiguration_t)();
 typedef WORD (__cdecl *CreateWaterVertex_t)(short sX, short sY, float fZ, float fUnknown, float fHeight, WORD wFlow);
+typedef void (__cdecl *BuildWaterIndex_t)();
 typedef bool (__cdecl *TestLineAgainstWater_t)(float fStartX, float fStartY, float fStartZ, float fEndX, float fEndY, float fEndZ, CVector* pvecCollision);
 typedef bool (__cdecl *GetWaterLevel_t)(float fX, float fY, float fZ, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
 
@@ -51,38 +54,6 @@ typedef bool (__cdecl *GetWaterLevel_t)(float fX, float fY, float fZ, float* pfL
 // -------------------------------
 // SA interfaces
 
-class CWaterVertexSAInterface
-{
-public:
-    short m_sX;
-    short m_sY;
-    float m_fZ;
-    float m_fUnknown;
-    float m_fHeight;
-    char m_cFlowX;
-    char m_cFlowY;
-    WORD m_wPadding;   
-};
-
-class CWaterPolySAInterface
-{
-public:
-    WORD m_wVertexIDs[3];
-};
-
-class CWaterQuadSAInterface : public CWaterPolySAInterface
-{
-public:
-    WORD m_wFourthVertexIDDummy;
-    WORD m_wFlags;
-};
-
-class CWaterTriangleSAInterface : public CWaterPolySAInterface
-{
-public:
-    WORD m_wFlags;
-};
-
 class CWaterPolyEntrySAInterface
 {
 public:
@@ -91,67 +62,6 @@ public:
 
 // -------------------------------
 // Interface wrappers
-
-class CWaterVertexSA : public CWaterVertex
-{
-public:
-                                     CWaterVertexSA    () { m_pInterface = NULL; }
-                                     CWaterVertexSA    ( CWaterVertexSAInterface* pInterface ) { m_pInterface = pInterface; }
-
-    CWaterVertexSAInterface*         GetInterface      () { return m_pInterface; }
-    void                             SetInterface      ( CWaterVertexSAInterface* pInterface ) { m_pInterface = pInterface; }
-
-    WORD                             GetID             ();
-
-    void                             GetPosition       ( CVector& vec );
-    void                             SetPosition       ( CVector& vec, void* pChangeSource = NULL );
-
-protected:
-    CWaterVertexSAInterface*         m_pInterface;
-};
-
-class CWaterPolySA : public CWaterPoly
-{
-public:
-    CWaterPolySAInterface*           GetInterface      () { return m_pInterface; }
-    virtual void                     SetInterface      ( CWaterPolySAInterface* pInterface ) = 0;
-
-    virtual EWaterPolyType           GetType           () = 0;
-    virtual int                      GetNumVertices    () = 0;
-    WORD                             GetID             () { return m_wID; }
-    CWaterVertex*                    GetVertex         ( int index );
-    bool                             ContainsPoint     ( float fX, float fY );
-
-protected:
-    CWaterPolySAInterface*           m_pInterface;
-    WORD                             m_wID;
-};
-
-class CWaterQuadSA : public CWaterPolySA
-{
-public:
-                                     CWaterQuadSA      () { m_pInterface = NULL; m_wID = ~0; }
-                                     CWaterQuadSA      ( CWaterPolySAInterface* pInterface ) { SetInterface ( pInterface ); }
-
-    CWaterQuadSAInterface*           GetInterface      () { return (CWaterQuadSAInterface *)m_pInterface; }
-    void                             SetInterface      ( CWaterPolySAInterface* pInterface );
-
-    EWaterPolyType                   GetType           () { return WATER_POLY_QUAD; }
-    int                              GetNumVertices    () { return 4; }
-};
-
-class CWaterTriangleSA : public CWaterPolySA
-{
-public:
-                                     CWaterTriangleSA  () { m_pInterface = NULL; m_wID = ~0; }
-                                     CWaterTriangleSA  ( CWaterPolySAInterface* pInterface ) { SetInterface ( pInterface ); }
-
-    CWaterTriangleSAInterface*       GetInterface      () { return (CWaterTriangleSAInterface *)m_pInterface; }
-    void                             SetInterface      ( CWaterPolySAInterface* pInterface );
-
-    EWaterPolyType                   GetType           () { return WATER_POLY_TRIANGLE; }
-    int                              GetNumVertices    () { return 3; }
-};
 
 class CWaterZoneSA
 {
@@ -216,12 +126,6 @@ private:
     CVector                          m_vecOriginalPosition;
 };
 
-class CWaterChangePolyCreate : public CWaterChange
-{
-public:
-    void                             Undo              ( void* pChangedObject );
-};
-
 // -------------------------------
 // Manager
 
@@ -240,16 +144,17 @@ public:
     CWaterVertex*                    CreateVertex      ( CVector& vecPosition );
 
     CWaterPoly*                      GetPolyAtPoint    ( CVector& vecPosition );
-    CWaterPoly*                      CreateQuad        ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false, void* pChangeSource = NULL );
-    CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false, void* pChangeSource = NULL );
+    CWaterPoly*                      CreateQuad        ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false );
+    CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false );
     bool                             DeletePoly        ( CWaterPoly* pPoly );
 
     bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
-    bool                             SetWaterLevel     ( CVector& vecPosition, float fLevel, void* pChangeSource = NULL );
+    bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
     bool                             TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision );
 
     void                             AddChange         ( void* pChangeSource, void* pChangedObject, CWaterChange* pChange );
     void                             UndoChanges       ( void* pChangeSource = NULL );
+    void                             RebuildIndex      ();
     void                             Reset             ();
 
 private:

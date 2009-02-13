@@ -2625,6 +2625,9 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, char* szErr
 
 		// Send him the join details
 		pPlayer->Send ( CPlayerConnectCompletePacket () );
+
+        // The player is spawned when he's connected, just the Camera is not faded in/not targetting
+        pPlayer->SetSpawned ( true );
 	}
 	else
 	{
