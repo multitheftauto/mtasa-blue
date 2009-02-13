@@ -69,9 +69,6 @@ public:
 
     void                        AllowWindowsCursorShowing ( bool bAllow );
 
-    float                       GetWaveLevel ( void );
-    void                        SetWaveLevel ( float fWaveLevel );
-
     CShotSyncData *             GetLocalShotSyncData ( void );
 
     void                        SetPreContextSwitchHandler ( PreContextSwitchHandler* pHandler );

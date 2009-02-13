@@ -673,6 +673,47 @@ bool CWaterManagerSA::SetWaterLevel ( CWaterPoly* pPoly, float fLevel, void* pCh
     return true;
 }
 
+float CWaterManagerSA::GetWaveLevel ()
+{
+    return *(float *)0xC812E8;
+}
+
+void CWaterManagerSA::SetWaveLevel ( float fWaveLevel )
+{
+    if ( fWaveLevel >= 0.0f )
+    {
+        // DISABLE the game reseting the wave level
+        *(BYTE *)0x72C665 = 0xDD;
+        *(BYTE *)0x72C666 = 0xD8;
+        memset( (void*)0x72C667, 0x90, 4 );
+        memset( (void*)0x72C659, 0x90, 10 );
+
+        *(float *)0xC812E8 = fWaveLevel;
+    }
+    else
+    {
+        *(BYTE *)0x72C665 = 0xD9;
+        *(BYTE *)0x72C666 = 0x1D;
+        *(BYTE *)0x72C667 = 0xE8;
+        *(BYTE *)0x72C668 = 0x12;
+        *(BYTE *)0x72C669 = 0xC8;
+        *(BYTE *)0x72C66A = 0x00;
+
+        *(BYTE *)0x72C659 = 0xC7;
+        *(BYTE *)0x72C65A = 0x05;
+        *(BYTE *)0x72C65B = 0xE8;
+        *(BYTE *)0x72C65C = 0x12;
+        *(BYTE *)0x72C65D = 0xC8;
+        *(BYTE *)0x72C65E = 0x00;
+        *(BYTE *)0x72C65F = 0x00;
+        *(BYTE *)0x72C660 = 0x00;
+        *(BYTE *)0x72C661 = 0x80;
+        *(BYTE *)0x72C662 = 0x3F;
+
+        *(float *)0xC812E8 = 0.6f;
+    }
+}
+
 bool CWaterManagerSA::TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision )
 {
     return ( (TestLineAgainstWater_t) FUNC_TestLineAgainstWater )
@@ -760,4 +801,6 @@ void CWaterManagerSA::Reset ()
     m_Triangles.resize ( NUM_DefWaterTriangles );
     for ( i = 0; i < NUM_DefWaterTriangles; i++ )
         m_Triangles [ i ].SetInterface ( &m_TrianglePool [ i ] );
+
+    SetWaveLevel ( DEFAULT_WAVE_LEVEL );
 }

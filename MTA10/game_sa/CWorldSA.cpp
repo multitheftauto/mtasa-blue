@@ -15,7 +15,7 @@
 
 #include "StdInc.h"
 
-VOID CWorldSA::Add ( CEntity * pEntity )
+void CWorldSA::Add ( CEntity * pEntity )
 {
 	DEBUG_TRACE("VOID CWorldSA::Add ( CEntity * pEntity )");
 
@@ -35,7 +35,7 @@ VOID CWorldSA::Add ( CEntity * pEntity )
 }
 
 
-VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )
+void CWorldSA::Add ( CEntitySAInterface * entityInterface )
 {
 	DEBUG_TRACE("VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )");
 	DWORD dwFunction = FUNC_Add;
@@ -47,7 +47,7 @@ VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )
 	}
 }
 
-VOID CWorldSA::Remove ( CEntity * pEntity )
+void CWorldSA::Remove ( CEntity * pEntity )
 {
 	DEBUG_TRACE("VOID CWorldSA::Remove ( CEntity * entity )");
 
@@ -66,7 +66,7 @@ VOID CWorldSA::Remove ( CEntity * pEntity )
 	}
 }
 
-VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )
+void CWorldSA::Remove ( CEntitySAInterface * entityInterface )
 {
 	DEBUG_TRACE("VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )");
 	DWORD dwFunction = FUNC_Remove;
@@ -83,7 +83,7 @@ VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )
 	}
 }
 
-VOID CWorldSA::RemoveReferencesToDeletedObject ( CEntitySAInterface * entity )
+void CWorldSA::RemoveReferencesToDeletedObject ( CEntitySAInterface * entity )
 {
     DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
     DWORD dwEntity = (DWORD)entity;
@@ -215,7 +215,7 @@ bool CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoin
 }
 
 
-VOID CWorldSA::IgnoreEntity(CEntity * pEntity)
+void CWorldSA::IgnoreEntity(CEntity * pEntity)
 {
 	DEBUG_TRACE("VOID CWorldSA::IgnoreEntity(CEntity * entity)");
 
@@ -243,7 +243,7 @@ BYTE CWorldSA::GetLevelFromPosition(CVector * vecPosition)
 	return bReturn;
 }
 
-FLOAT CWorldSA::FindGroundZForPosition(FLOAT fX, FLOAT fY)
+float CWorldSA::FindGroundZForPosition(float fX, float fY)
 {
 	DEBUG_TRACE("FLOAT CWorldSA::FindGroundZForPosition(FLOAT fX, FLOAT fY)");
 	DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
@@ -259,7 +259,7 @@ FLOAT CWorldSA::FindGroundZForPosition(FLOAT fX, FLOAT fY)
 	return fReturn;
 }
 
-FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)
+float CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)
 {
 	DEBUG_TRACE("FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)");
 	DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
@@ -281,7 +281,7 @@ FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)
 	return fReturn;
 }
 
-VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)
+void CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)
 {
 	DEBUG_TRACE("VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)");
 	DWORD dwFunc = FUNC_CTimer_Stop;

@@ -11,10 +11,12 @@
 #include <algorithm>
 #include <list>
 #include <map>
+#include <string>
 #include <vector>
 
 // SDK includes
 #include <game/CGame.h>
+#include <game/CWanted.h>
 #include <ijsify.h>
 
 // Game includes

@@ -4351,7 +4351,7 @@ bool CStaticFunctionDefinitions::GetMinuteDuration ( unsigned long& ulDelay )
 
 bool CStaticFunctionDefinitions::GetWaveHeight ( float& fHeight )
 {
-    fHeight = g_pMultiplayer->GetWaveLevel ();
+    fHeight = g_pGame->GetWaterManager ()->GetWaveLevel ();
     return true;
 }
 
@@ -4405,6 +4405,11 @@ bool CStaticFunctionDefinitions::GetGarageBoundingBox ( unsigned char ucGarageID
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
+{
+    return g_pGame->IsCheatEnabled ( szPropName );
 }
 
 bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue )
@@ -4502,7 +4507,7 @@ bool CStaticFunctionDefinitions::SetWaveHeight ( float fHeight )
 {
     if ( fHeight >= -1.0f && fHeight <= 100.0f )
     {
-        g_pMultiplayer->SetWaveLevel ( fHeight );
+        g_pGame->GetWaterManager ()->SetWaveLevel ( fHeight );
         
         return true;
     }
@@ -4521,6 +4526,12 @@ bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool 
     }
 
     return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled ( const char* szPropName, bool bEnabled )
+{
+    return g_pGame->SetCheatEnabled ( szPropName, bEnabled );
 }
 
 

@@ -8,6 +8,9 @@
 #include <assert.h>
 
 #include <list>
+#include <map>
+#include <string>
+#include <vector>
 
 // SDK includes
 #include <game/CGame.h>

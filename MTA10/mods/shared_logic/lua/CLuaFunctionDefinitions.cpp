@@ -15044,6 +15044,35 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::IsWorldSpecialPropertyEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled (
+            lua_tostring ( luaVM, 1 ) ) );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isWorldSpecialPropertyEnabled" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetWorldSpecialPropertyEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+    {
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled (
+            lua_tostring ( luaVM, 1 ), lua_toboolean ( luaVM, 2 ) ) );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setWorldSpecialPropertyEnabled" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 #ifdef MTA_VOICE
 int CLuaFunctionDefinitions::SetVoiceInputEnabled ( lua_State* luaVM )

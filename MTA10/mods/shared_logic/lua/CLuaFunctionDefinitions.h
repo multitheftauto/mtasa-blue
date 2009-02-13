@@ -534,8 +534,6 @@ public:
     LUA_DECLARE ( CreateWater );
     LUA_DECLARE ( GetWaterLevel );
     LUA_DECLARE ( GetWaterVertexPosition );
-    LUA_DECLARE ( SetWaterLevel );
-    LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( GetWorldFromScreenPosition );
     LUA_DECLARE ( GetScreenFromWorldPosition  );
     LUA_DECLARE ( GetWeather );
@@ -548,6 +546,7 @@ public:
     LUA_DECLARE ( GetGaragePosition );
     LUA_DECLARE ( GetGarageSize );
     LUA_DECLARE ( GetGarageBoundingBox );
+    LUA_DECLARE ( IsWorldSpecialPropertyEnabled );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );
@@ -557,8 +556,11 @@ public:
     LUA_DECLARE ( SetGravity );
     LUA_DECLARE ( SetGameSpeed );
 	LUA_DECLARE ( SetMinuteDuration );
+    LUA_DECLARE ( SetWaterLevel );
+    LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
+    LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );

@@ -1836,7 +1836,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     // Read out the wave height
     float fWaveHeight = 0;
     bitStream.Read ( fWaveHeight );
-    g_pMultiplayer->SetWaveLevel ( fWaveHeight );
+    g_pGame->GetWaterManager ()->SetWaveLevel ( fWaveHeight );
 
 	short sFPSLimit = 36;
 	bitStream.Read ( sFPSLimit );
