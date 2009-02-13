@@ -1274,8 +1274,18 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 									// Tell the console
 									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned)\n", szNick );
 
-									// Tell the player the password was wrong
+									// Tell the player he's banned
 									DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
+									return;
+								}
+
+                                if ( m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
+								{
+									// Tell the console
+									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned)\n", szNick );
+
+									// Tell the player he's banned
+									DisconnectPlayer ( this, *pPlayer, "Disconnected: Account is banned" );
 									return;
 								}
 

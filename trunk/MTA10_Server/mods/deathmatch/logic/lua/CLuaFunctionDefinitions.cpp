@@ -8440,7 +8440,8 @@ int CLuaFunctionDefinitions::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, GetTime () );
+    double dTime = ( ( double ) time ( NULL ) * 1000 ) + ( double ) ( GetTime () % 100 );
+    lua_pushnumber ( luaVM, dTime );
     return 1;
 }
 
@@ -8449,6 +8450,10 @@ int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
     time_t timer;
     time ( &timer );
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        timer = ( time_t ) lua_tonumber ( luaVM, 1 );
+    }
     tm * time = localtime ( &timer );
 
     CLuaArguments ret;
@@ -9671,10 +9676,17 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
             if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
                 szReason = lua_tostring ( luaVM, 6 );
 
+            time_t tUnban = 0;
+            if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER || lua_type ( luaVM, 7 ) == LUA_TSTRING )
+            {
+                tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 7 ) );
+                if ( tUnban > 0 ) tUnban += time ( NULL );
+            }
+
             if ( pPlayer )
             {
                 CBan* pBan = NULL;
-                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason ) )
+                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason, tUnban ) )
                 {
                     lua_pushban ( luaVM, pBan );
                     return 1;
@@ -9728,8 +9740,15 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
             szReason = lua_tostring ( luaVM, 5 );
         }
 
+        time_t tUnban = 0;
+        if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER || lua_type ( luaVM, 6 ) == LUA_TSTRING )
+        {
+            tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 6 ) );
+            if ( tUnban > 0 ) tUnban += time ( NULL );
+        }
+
         CBan* pBan = NULL;
-		if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason ) )
+		if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason, tUnban ) )
         {
             lua_pushban ( luaVM, pBan );
             return 1;
@@ -9847,7 +9866,7 @@ int	CLuaFunctionDefinitions::GetBanUsername ( lua_State* luaVM )
         if ( pBan )
         {
             char szUsername [32];
-            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szUsername, 31 ) )
+            if ( CStaticFunctionDefinitions::GetBanUsername ( pBan, szUsername, 31 ) )
             {
                 lua_pushstring ( luaVM, szUsername );
                 return 1;
@@ -9871,7 +9890,7 @@ int	CLuaFunctionDefinitions::GetBanNick ( lua_State* luaVM )
         if ( pBan )
         {
             char szNick [32];
-            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szNick, 31 ) )
+            if ( CStaticFunctionDefinitions::GetBanNick ( pBan, szNick, 31 ) )
             {
                 lua_pushstring ( luaVM, szNick );
                 return 1;
@@ -9894,16 +9913,40 @@ int	CLuaFunctionDefinitions::GetBanTime ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szTime [32];
-            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szTime, 31 ) )
+            time_t tTime;
+            if ( CStaticFunctionDefinitions::GetBanTime ( pBan, tTime ) )
             {
-                lua_pushstring ( luaVM, szTime );
+                lua_pushnumber ( luaVM, ( double ) tTime );
                 return 1;
             }
         }
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getBanTime" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int	CLuaFunctionDefinitions::GetUnbanTime ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBan* pBan = lua_toban ( luaVM, 1 );
+
+        if ( pBan )
+        {
+            time_t tTime;
+            if ( CStaticFunctionDefinitions::GetUnbanTime ( pBan, tTime ) )
+            {
+                lua_pushnumber ( luaVM, ( double ) tTime );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getUnbanTime" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9919,7 +9962,7 @@ int	CLuaFunctionDefinitions::GetBanReason ( lua_State* luaVM )
         if ( pBan )
         {
             char szReason [256];
-            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szReason, 255 ) )
+            if ( CStaticFunctionDefinitions::GetBanReason ( pBan, szReason, 255 ) )
             {
                 lua_pushstring ( luaVM, szReason );
                 return 1;

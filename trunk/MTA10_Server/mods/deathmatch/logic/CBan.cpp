@@ -14,5 +14,6 @@
 
 CBan::CBan ( void )
 {
+    m_tTimeOfBan = 0;
     m_tTimeOfUnban = 0;
 }

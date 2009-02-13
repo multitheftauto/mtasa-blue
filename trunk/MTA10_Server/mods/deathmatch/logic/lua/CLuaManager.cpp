@@ -631,6 +631,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBanUsername", CLuaFunctionDefinitions::GetBanUsername );
     CLuaCFunctions::AddFunction ( "getBanNick", CLuaFunctionDefinitions::GetBanNick );
     CLuaCFunctions::AddFunction ( "getBanTime", CLuaFunctionDefinitions::GetBanTime );
+    CLuaCFunctions::AddFunction ( "getUnbanTime", CLuaFunctionDefinitions::GetBanTime );
     CLuaCFunctions::AddFunction ( "getBanReason", CLuaFunctionDefinitions::GetBanReason );
     CLuaCFunctions::AddFunction ( "getBanAdmin", CLuaFunctionDefinitions::GetBanAdmin );
 

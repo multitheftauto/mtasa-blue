@@ -22,6 +22,8 @@ CBanManager::CBanManager ( void )
     strcpy ( m_szFileName, "banlist.xml" );
 
     g_pServerInterface->GetModManager ()->GetAbsolutePath ( m_szFileName, m_szPath, MAX_PATH );
+
+    m_tUpdate = 0;
 }
 
 
@@ -34,19 +36,23 @@ CBanManager::~CBanManager ( void )
 
 void CBanManager::DoPulse ( void )
 {
-    list < CBan* > ::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        time_t tTime = time ( NULL );
+    time_t tTime = time ( NULL );
 
-        if ( (*iter)->GetTimeOfUnban () )
+    if ( tTime > m_tUpdate )
+    {
+        list < CBan* > ::const_iterator iter = m_BanManager.begin ();
+        for ( ; iter != m_BanManager.end (); iter++ )
         {
-            if ( tTime >= (*iter)->GetTimeOfUnban () )
+            if ( (*iter)->GetTimeOfUnban () > 0 )
             {
-                RemoveBan ( *iter );
-                return;
+                if ( tTime >= (*iter)->GetTimeOfUnban () )
+                {
+                    RemoveBan ( *iter );
+                    iter = m_BanManager.begin ();
+                }
             }
         }
+        m_tUpdate = tTime + 1;
     }
 }
 
@@ -164,21 +170,9 @@ CBan* CBanManager::AddAccountBan ( const char* szAccount, CClient* pBanner, cons
 
 CBan* CBanManager::AddBan ( CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
 {
-    time_t rawtime = time ( NULL );
-    tm* time = localtime(&rawtime);
-
-    char szDate[256] = { '\0' };
-    _snprintf ( szDate, 256, "%d/%d/%d", time->tm_mday, time->tm_mon + 1, time->tm_year + 1900 );
-	szDate[255] = '\0';
-
-    char szTime[256] = { '\0' };
-    _snprintf ( szTime, 256, "%02d:%02d:%02d", time->tm_hour, time->tm_min, time->tm_sec );
-	szTime[255] = '\0';
-
     // Create the ban and assign its values
     CBan* pBan = new CBan;
-    pBan->SetDateOfBan ( szDate );
-    pBan->SetTimeOfBan ( szTime );
+    pBan->SetTimeOfBan ( time ( NULL ) );
     pBan->SetTimeOfUnban ( tTimeOfUnban );
 
     if ( szReason )
@@ -264,21 +258,8 @@ void CBanManager::RemoveBan ( CBan* pBan )
 {
     if ( pBan )
     {
-        g_pNetServer->RemoveBan ( pBan->GetIP ().c_str () );
-        if ( !m_BanManager.empty() ) m_BanManager.remove ( pBan );
-        delete pBan;
-    }
-	SaveBanList ();
-}
-
-
-void CBanManager::RemoveBan ( const char* szIP )
-{
-    CBan* pBan = GetBan ( szIP );
-
-    if ( pBan )
-    {
-        g_pNetServer->RemoveBan ( szIP );
+        if ( !pBan->GetIP ().empty() )
+            g_pNetServer->RemoveBan ( pBan->GetIP ().c_str () );
         if ( !m_BanManager.empty() ) m_BanManager.remove ( pBan );
         delete pBan;
     }
@@ -339,21 +320,6 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
 }
 
 
-CBan* CBanManager::GetSerialBan ( const char* szSerial )
-{
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( (*iter)->GetSerial () == szSerial )
-        {
-            return *iter;
-        }
-    }
-    
-    return NULL;
-}
-
-
 unsigned int CBanManager::GetBansWithNick ( const char* szNick )
 {
     unsigned int uiOccurrances = 0;
@@ -377,22 +343,6 @@ unsigned int CBanManager::GetBansWithBanner ( const char* szBanner )
     for ( ; iter != m_BanManager.end (); iter++ )
     {
         if ( (*iter)->GetBanner (), szBanner )
-        {
-            uiOccurrances++;
-        }
-    }
-
-    return uiOccurrances;
-}
-
-
-unsigned int CBanManager::GetBansWithDate ( const char* szDateOfBan )
-{
-    unsigned int uiOccurrances = 0;
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( (*iter)->GetDateOfBan (), szDateOfBan )
         {
             uiOccurrances++;
         }
@@ -426,7 +376,7 @@ bool CBanManager::LoadBanList ( void )
         pRootNode = pFile->CreateRootNode ( "banlist" );
     }
 
-    // Is the rootnode's name <map>?
+    // Is the rootnode's name <banlist>?
     if ( pRootNode->GetTagName ().compare ( "banlist" ) != 0 )
     {
         CLogger::ErrorPrintf ( "Wrong root node ('banlist')\n" );
@@ -444,150 +394,30 @@ bool CBanManager::LoadBanList ( void )
 
         if ( pNode )
         {
-            if ( pNode->GetTagName ().compare ( "ip" ) == 0 )
+            if ( pNode->GetTagName ().compare ( "ban" ) == 0 )
             {
-                CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "address" );
-
-                if ( pAttribute )
+                std::string strIP = SafeGetValue ( pNode, "ip" ),
+                            strSerial = SafeGetValue ( pNode, "serial" ),
+                            strAccount = SafeGetValue ( pNode, "account" );
+                if ( !strIP.empty() || !strSerial.empty() || !strAccount.empty() )
                 {
-                    if ( !pAttribute->GetValue ().empty () )
+                    CBan* pBan = AddBan ();
+                    if ( IsValidIP ( strIP.c_str() ) )
                     {
-                        CBan* pBan = AddBan ( pAttribute->GetValue ().c_str (), false );
-                        CXMLNode* pSubNode = NULL;
-
-                        if ( pBan )
-                        {
-                            unsigned int uiSubCount = pNode->GetSubNodeCount ();
-
-                            for ( unsigned int ui = 0; ui < uiSubCount; ui++ )
-                            {
-                                pSubNode = pNode->GetSubNode ( ui );
-
-                                if ( pSubNode )
-                                {
-                                    if ( pSubNode->GetTagName ().compare ( "nick" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetNick ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-									if ( pSubNode->GetTagName ().compare ( "serial" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetSerial ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "banner" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetBanner ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "reason" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetReason ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "date" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetDateOfBan ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "time" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetTimeOfBan ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "unban" ) == 0 )
-                                    {
-                                        int iTime = 0;
-                                        pSubNode->GetTagContent ( iTime );
-
-                                        pBan->SetTimeOfUnban ( iTime );
-                                    }
-                                }
-                            }
-                        }
+                        pBan->SetIP ( strIP );
+                        g_pNetServer->AddBan ( strIP.c_str() );
                     }
-                }
-			}
+                    pBan->SetAccount ( strAccount );
+                    pBan->SetSerial ( strSerial );
+                    pBan->SetBanner ( SafeGetValue ( pNode, "banner" ) );
+                    pBan->SetNick ( SafeGetValue ( pNode, "nick" ) );
+                    pBan->SetReason ( SafeGetValue ( pNode, "reason" ) );
 
-            else if ( pNode->GetTagName ().compare ( "serial" ) == 0 )
-            {
-                CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "value" );
+                    std::string strTime = SafeGetValue ( pNode, "time" );
+                    if ( !strTime.empty() ) pBan->SetTimeOfBan ( ( time_t ) atoi ( strTime.c_str() ) );
 
-                if ( pAttribute )
-                {
-                    if ( !pAttribute->GetValue ().empty () )
-                    {
-                        CBan* pBan = AddSerialBan ( pAttribute->GetValue ().c_str () );
-                        CXMLNode* pSubNode = NULL;
-
-                        if ( pBan )
-                        {
-                            unsigned int uiSubCount = pNode->GetSubNodeCount ();
-
-                            for ( unsigned int ui = 0; ui < uiSubCount; ui++ )
-                            {
-                                pSubNode = pNode->GetSubNode ( ui );
-
-                                if ( pSubNode )
-                                {
-                                    if ( pSubNode->GetTagName ().compare ( "nick" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetNick ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "banner" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetBanner ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "reason" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetReason ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "date" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetDateOfBan ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "time" ) == 0 )
-                                    {
-                                        if ( !pSubNode->GetTagContent ().empty () )
-                                        {
-                                            pBan->SetTimeOfBan ( pSubNode->GetTagContent ().c_str () );
-                                        }
-                                    }
-                                    else if ( pSubNode->GetTagName ().compare ( "unban" ) == 0 )
-                                    {
-                                        int iTime = 0;
-                                        pSubNode->GetTagContent ( iTime );
-
-                                        pBan->SetTimeOfUnban ( iTime );
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    strTime = SafeGetValue ( pNode, "unban" );
+                    if ( !strTime.empty() ) pBan->SetTimeOfUnban ( ( time_t ) atoi ( strTime.c_str() ) );
                 }
             }
         }
@@ -615,124 +445,23 @@ void CBanManager::SaveBanList ( void )
             list < CBan* >::const_iterator iter = m_BanManager.begin ();
             for ( ; iter != m_BanManager.end (); iter++ )
             {
-                pNode = NULL;
+                pNode = pRootNode->CreateSubNode ( "ban" );
 
-                // We got an IP to ban? Create an IP node
-                const std::string& strIP = (*iter)->GetIP ();
-				if ( strIP.length () > 0 )
-				{
-					// Create the new 'ip' node
-					pNode = pRootNode->CreateSubNode ( "ip" );
-					if ( pNode )
-					{
-						// Create the address attribute
-						CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( "address" );
-						if ( pAttribute )
-						{
-							// Add it to the attribute
-							pAttribute->SetValue ( strIP.c_str () );
-                        }
+                if ( pNode )
+                {
+                    SafeSetValue ( pNode, "nick", (*iter)->GetNick() );
+                    SafeSetValue ( pNode, "ip", (*iter)->GetIP() );
+                    SafeSetValue ( pNode, "serial", (*iter)->GetSerial() );
+                    SafeSetValue ( pNode, "account", (*iter)->GetAccount() );
+                    SafeSetValue ( pNode, "banner", (*iter)->GetBanner() );
+                    SafeSetValue ( pNode, "reason", (*iter)->GetReason() );
+                    SafeSetValue ( pNode, "time", ( unsigned int )(*iter)->GetTimeOfBan() );
+                    if ( (*iter)->GetTimeOfUnban() > 0 )
+                    {
+                        SafeSetValue ( pNode, "unban", ( unsigned int )(*iter)->GetTimeOfUnban() );
                     }
                 }
-                else
-                {
-                    // Got a serial ban to write?
-                    const std::string& strSerial = (*iter)->GetSerial ();
-                    if ( strSerial.length () > 0 )
-                    {
-                        // Create the new 'ip' node
-                        pNode = pRootNode->CreateSubNode ( "serial" );
-                        if ( pNode )
-                        {
-                            // Create the address attribute
-                            CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( "value" );
-                            if ( pAttribute )
-                            {
-                                // Add it to the attribute
-                                pAttribute->SetValue ( strSerial.c_str () );
-                            }
-                        }
-                    }
-
-                    // Did we create a node successfully?
-                    if ( pNode )
-                    {
-						// Create subnode pointer
-						CXMLNode* pSubNode = NULL;
-
-						// Create subnodes here
-                        const std::string& strNick = (*iter)->GetNick ();
-						if ( strNick.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "nick" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strNick.c_str () );
-							}
-						}
-
-                        const std::string& strSerial = (*iter)->GetSerial ();
-						if ( strSerial.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "serial" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strSerial.c_str () );
-							}
-						}
-
-                        const std::string& strBanner = (*iter)->GetBanner ();
-						if ( strBanner.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "banner" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strBanner.c_str () );
-							}
-						}
-
-                        const std::string& strReason = (*iter)->GetReason ();
-						if ( strReason.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "reason" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strReason.c_str () );
-							}
-						}
-
-                        const std::string& strDate = (*iter)->GetDateOfBan ();
-						if ( strDate.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "date" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strDate.c_str () );
-							}
-						}
-
-                        const std::string& strTimeOfBan = (*iter)->GetTimeOfBan ();
-						if ( strTimeOfBan.length () > 0 )
-						{
-							pSubNode = pNode->CreateSubNode ( "time" );
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( strTimeOfBan.c_str () );
-							}
-						}
-
-						if ( (*iter)->GetTimeOfUnban () )
-						{
-							pSubNode = pNode->CreateSubNode ( "unban" );
-
-							if ( pSubNode )
-							{
-								pSubNode->SetTagContent ( (unsigned int) (*iter)->GetTimeOfUnban () );
-							}
-						}
-					}
-				}
-			}
+            }
 
             // Write the XML file
             pFile->Write ();
@@ -741,6 +470,44 @@ void CBanManager::SaveBanList ( void )
         // Delete the file pointer
         delete pFile;
     }
+}
+
+
+void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, std::string strValue )
+{
+    if ( !strValue.empty() )
+	{
+        CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( szKey );
+        if ( pAttribute )
+        {
+            pAttribute->SetValue ( strValue.c_str () );
+        }
+	}
+}
+
+
+void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, unsigned int uiValue )
+{
+    if ( uiValue )
+	{
+        CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( szKey );
+        if ( pAttribute )
+        {
+            pAttribute->SetValue ( uiValue );
+        }
+	}
+}
+
+
+std::string CBanManager::SafeGetValue ( CXMLNode* pNode, const char* szKey )
+{
+    CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( szKey );
+
+    if ( pAttribute )
+    {
+        return pAttribute->GetValue ();
+    }
+    return std::string();
 }
 
 

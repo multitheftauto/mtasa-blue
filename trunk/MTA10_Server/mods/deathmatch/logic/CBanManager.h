@@ -18,7 +18,6 @@
 #include "CClient.h"
 #include "CPlayerManager.h"
 
-
 class CBanManager
 {
 public:
@@ -45,19 +44,19 @@ public:
 	bool				IsSerialBanned			( const char* szSerial );
     bool				IsAccountBanned			( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
-    void                RemoveBan               ( const char* szIP );
     void                RemoveAllBans           ( bool bPermanentDelete = false );
 
     CBan*               GetBan                  ( const char* szIP );
     CBan*               GetBan                  ( const char* szNick, unsigned int uiOccurrance );
-	CBan*				GetSerialBan			( const char* szSerial );
 
     unsigned int        GetBansWithNick         ( const char* szNick );
     unsigned int        GetBansWithBanner       ( const char* szBanner );
-    unsigned int        GetBansWithDate         ( const char* szDateOfBan );
 
     bool                LoadBanList             ( void );
     void                SaveBanList             ( void );
+    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, std::string strValue );
+    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );
+    std::string         SafeGetValue            ( CXMLNode* pNode, const char* szKey );
     bool                IsValidIP               ( const char* szIP );
 
 	char*				GetFilePath				( void )			{ return reinterpret_cast <char*> (m_szPath); }
@@ -70,6 +69,8 @@ private:
     char                m_szPath                [MAX_PATH];
 
     list < CBan* >      m_BanManager;
+
+    time_t              m_tUpdate;
 
 };
 
