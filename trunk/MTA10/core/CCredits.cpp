@@ -271,6 +271,7 @@ void CCredits::Update ( void )
 void CCredits::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
+    m_pWindow->BringToFront ();
     m_clkStart = clock ();
 }
 

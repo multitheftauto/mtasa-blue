@@ -83,6 +83,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pBackground->MoveToBack ();
     m_pBackground->SetVisible ( false );
 	m_pBackground->SetAlpha ( 0 );
+    m_pBackground->SetZOrderingEnabled ( false );
 
 	// Filler background image
     m_pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
