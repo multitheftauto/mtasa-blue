@@ -11446,10 +11446,10 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 {
-    unsigned long ulCount;
-    if ( CStaticFunctionDefinitions::GetTickCount_ ( ulCount ) )
+    double dCount;
+    if ( CStaticFunctionDefinitions::GetTickCount_ ( dCount ) )
     {
-        lua_pushnumber ( luaVM, ulCount );
+        lua_pushnumber ( luaVM, dCount );
         return 1;
     }
 
@@ -11461,6 +11461,10 @@ int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
     time_t timer;
     time ( &timer );
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        timer = ( time_t ) lua_tonumber ( luaVM, 1 );
+    }
     tm * time = localtime ( &timer );
 
     CLuaArguments ret;
