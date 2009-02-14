@@ -1548,7 +1548,7 @@ bool CStaticFunctionDefinitions::GetPlayerTotalAmmo ( CPlayer* pPlayer, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo )
+bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip )
 {
     assert ( pElement );
     CPlayer* pPlayer = NULL;
@@ -1558,13 +1558,15 @@ bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned ch
         return false;
     unsigned char ucWeaponID = pPlayer->GetWeapon ( ucSlot )->ucType;
     
-	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo );
+	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo, usAmmoInClip );
 
     if ( pPlayer->IsSpawned () )
     {
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucWeaponID );
         BitStream.pBitStream->Write ( usAmmo );
+        BitStream.pBitStream->Write ( usAmmoInClip );
+
         pPlayer->Send ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
 
         return true;
@@ -3263,10 +3265,10 @@ bool CStaticFunctionDefinitions::TakeWeaponAmmo ( CElement* pElement, unsigned c
 }
 
 
-bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo )
+bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip )
 {
     assert ( pElement );
-	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo );
+	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo, usAmmoInClip );
 
 	if ( IS_PED ( pElement ) )
     {
@@ -3277,6 +3279,8 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
             BitStream.pBitStream->Write ( pPed->GetID () );
 		    BitStream.pBitStream->Write ( ucWeaponID );
             BitStream.pBitStream->Write ( usAmmo );
+            BitStream.pBitStream->Write ( usAmmoInClip );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
 
 		    return true;

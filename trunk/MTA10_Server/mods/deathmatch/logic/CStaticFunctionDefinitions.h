@@ -153,7 +153,7 @@ public:
 
     // Player set functions
     static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney );
-    static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo );
+    static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip );
 	static bool                 GivePlayerMoney                     ( CElement* pElement, long lMoney );
     static bool                 TakePlayerMoney                     ( CElement* pElement, long lMoney );
     static bool                 ShowPlayerHudComponent              ( CElement* pElement, unsigned char ucComponent, bool bShow );
@@ -229,7 +229,7 @@ public:
     static bool                 TakeAllWeapons                      ( CElement* pElement );
 	static bool					GiveWeaponAmmo						( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo );
     static bool                 TakeWeaponAmmo                      ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo );
-    static bool                 SetWeaponAmmo                       ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo );
+    static bool                 SetWeaponAmmo                       ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip );
 
     // Vehicle create/destroy functions
     static CVehicle*            CreateVehicle                       ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate = NULL );
