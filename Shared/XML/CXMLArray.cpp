@@ -42,7 +42,7 @@ unsigned long CXMLArray::PopUniqueID ( CXMLCommon* pEntry )
         m_Elements [ulID] = pEntry;
     }
 
-    return ulID;
+    return MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + ulID;
 }
 
 
@@ -50,8 +50,10 @@ void CXMLArray::PushUniqueID ( unsigned long ulID )
 {
     // Push the ID back and NULL the entity there
     if ( ulID != INVALID_XML_ID &&
-         ulID < MAX_XML )
+         ulID >= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS &&
+         ulID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + MAX_XML )
     {
+        ulID -= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS;
         PushStack ( ulID );
         m_Elements [ulID] = NULL;
     }
@@ -68,8 +70,9 @@ CXMLCommon* CXMLArray::GetEntry ( unsigned long ulID )
 {
     // Return the element with the given ID
     if ( ulID != INVALID_XML_ID &&
-         ulID < MAX_XML )
-        return m_Elements [ulID];
+         ulID >= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS &&
+         ulID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + MAX_XML )
+        return m_Elements [ulID - (MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS)];
 
     return NULL;
 }

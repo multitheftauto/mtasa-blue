@@ -27,9 +27,10 @@
 #define MAX_TYPENAME_LENGTH 32
 #define MAX_ELEMENT_NAME_LENGTH 64
 
-// Allow 100k server elements and 100k client elements
+// Allow 100k server elements, 100k client elements and 100k xml nodes
 #define MAX_SERVER_ELEMENTS 100000
 #define MAX_CLIENT_ELEMENTS 100000
+#define MAX_XML             100000
 typedef unsigned long ElementID;
 
 // Event name characteristics
