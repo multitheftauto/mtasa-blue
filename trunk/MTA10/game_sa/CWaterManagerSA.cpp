@@ -192,8 +192,8 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( EWaterPolyType type, WORD wI
             return NULL;
         
         WORD wOffset = *(WORD *)VAR_NumWaterZonePolys;
-        g_pWaterManager->m_ZonePolyPool [ wOffset ].m_wValue = m_pInterface->m_wValue;
-        g_pWaterManager->m_ZonePolyPool [ wOffset + 1 ].m_wValue = MAKE_POLYENTRY ( type, wID );
+        g_pWaterManager->m_ZonePolyPool [ wOffset ].m_wValue = MAKE_POLYENTRY ( type, wID );
+        g_pWaterManager->m_ZonePolyPool [ wOffset + 1 ].m_wValue = m_pInterface->m_wValue;
         g_pWaterManager->m_ZonePolyPool [ wOffset + 2 ].m_wValue = 0;
         m_pInterface->m_wValue = MAKE_POLYENTRY ( WATER_POLY_LIST, wOffset );
 
@@ -204,28 +204,27 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( EWaterPolyType type, WORD wI
     {
         if ( *(DWORD *)VAR_NumWaterZonePolys + 1 > NUM_NewWaterZonePolys )
             return NULL;
-
-        iterator it = end ();
-        CWaterPolyEntrySAInterface* pZoneEnd = (CWaterPolyEntrySAInterface *)it;
+        
+        CWaterPolyEntrySAInterface* pZoneStart = (CWaterPolyEntrySAInterface *)begin ();
         CWaterPolyEntrySAInterface* pEntry = &g_pWaterManager->m_ZonePolyPool [ *(DWORD *)VAR_NumWaterZonePolys ];
-        while ( pEntry > pZoneEnd )
+        while ( pEntry > pZoneStart )
         {
             pEntry->m_wValue = (pEntry - 1)->m_wValue;
             pEntry--;
         }
-        pZoneEnd->m_wValue = MAKE_POLYENTRY ( type, wID );
+        pZoneStart->m_wValue = MAKE_POLYENTRY ( type, wID );
 
-        WORD wZoneEndOffset = pZoneEnd - g_pWaterManager->m_ZonePolyPool;
+        WORD wZoneStartOffset = pZoneStart - g_pWaterManager->m_ZonePolyPool;
         CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;
         for ( ; pZoneInterface != &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
         {
             if ( POLYENTRY_TYPE ( pZoneInterface ) == WATER_POLY_LIST &&
-                 POLYENTRY_ID ( pZoneInterface ) > wZoneEndOffset )
+                 POLYENTRY_ID ( pZoneInterface ) > wZoneStartOffset )
                 pZoneInterface->m_wValue++;
         }
 
         (*(DWORD *)VAR_NumWaterZonePolys)++;
-        return pZoneEnd;
+        return pZoneStart;
     }
 }
 

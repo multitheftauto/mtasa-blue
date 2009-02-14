@@ -21,7 +21,7 @@ unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
 unsigned long* CGameSA::VAR_IsGameLoaded;
 bool* CGameSA::VAR_GamePaused;
-bool* CGameSA::VAR_IsForegroundWindow;;
+bool* CGameSA::VAR_IsForegroundWindow;
 unsigned long* CGameSA::VAR_SystemState;
 void* CGameSA::VAR_StartGame;
 bool* CGameSA::VAR_IsNastyGame;
