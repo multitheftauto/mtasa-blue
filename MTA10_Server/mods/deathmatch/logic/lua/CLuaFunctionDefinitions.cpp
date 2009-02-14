@@ -1059,10 +1059,16 @@ int CLuaFunctionDefinitions::SetPlayerAmmo ( lua_State* luaVM )
             int iArgument2 = lua_type ( luaVM, 3 );
             if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
             ucSlot = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            int iArgument4 = lua_type ( luaVM, 4 );
+            unsigned short usAmmoInClip = NULL;
+            if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+            {
+                usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
+            }
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pPlayer, ucSlot, usAmmo ) )
+                if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pPlayer, ucSlot, usAmmo, usAmmoInClip ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -3119,6 +3125,7 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
     int iArgument1 = lua_type ( luaVM, 1 );
     int iArgument2 = lua_type ( luaVM, 2 );
     int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
     if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
          ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
@@ -3126,9 +3133,14 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
+        unsigned short usAmmoInClip = NULL;
+        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+        {
+            usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
+        }
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo ) )
+            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo, usAmmoInClip ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

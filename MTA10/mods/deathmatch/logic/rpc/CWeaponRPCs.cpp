@@ -235,9 +235,11 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 	ElementID ID;
     unsigned char ucWeaponID;
     unsigned short usAmmo;
+    unsigned short usAmmoInClip;
     if ( bitStream.Read ( ID ) &&
          bitStream.Read ( ucWeaponID ) &&
-         bitStream.Read ( usAmmo ) )
+         bitStream.Read ( usAmmo )  &&
+         bitStream.Read ( usAmmoInClip ) )
     {
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -250,13 +252,16 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 		    if ( pPlayerWeapon == NULL ) return;
 
             unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
-            pPlayerWeapon->SetAmmoInClip ( 0 );
+            pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
             pPlayerWeapon->SetAmmoTotal ( usAmmo );
 
-            if ( usAmmo > ucAmmoInClip )
-                pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
-            else if ( usAmmo <= ucAmmoInClip )
-                pPlayerWeapon->SetAmmoInClip ( usAmmo );
+            if ( !usAmmoInClip )
+            {
+                if ( usAmmo > ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
+                else if ( usAmmo <= ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( usAmmo );
+            }
         }
     }
 }
