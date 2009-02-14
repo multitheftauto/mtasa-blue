@@ -1,17 +1,16 @@
-/*********************************************************
+/*****************************************************************************
 *
-*  Multi Theft Auto :: Codename "Blue" (version 1.1)
-*  Copyright © 2003-2006 MTA.  All Rights Reserved.
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        gui/CGUIComboBox_Impl.h
+*  PURPOSE:     Combobox widget class
+*  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Cecill Etheredge <ijsf@gmx.net>
+*               Stanislav Bobrov <lil_Toady@hotmail.com>
 *
-*  Grand Theft Auto is © 1997-2005 Rockstar North
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
-*  THE FOLLOWING SOURCES ARE CONSIDIERED HIGHLY CONFIDENTIAL
-*  AND ARE TO BE VIEWED ONLY BY MEMBERS OF THE MULTI THEFT
-*  AUTO STAFF.  ANY VIOLATION OF THESE TERMS CAN LEAD TO
-*  CRIMINAL PROSECUTION AND/OR LARGE FINES UNDER UNITED
-*  STATES LAW.
-*
-**********************************************************/
+*****************************************************************************/
 
 #include "StdInc.h"
 
