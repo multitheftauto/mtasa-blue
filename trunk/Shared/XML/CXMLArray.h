@@ -15,8 +15,6 @@
 
 class CXMLCommon;
 
-#define MAX_XML 100000
-
 class CXMLArray
 {
 public:

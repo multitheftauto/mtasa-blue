@@ -14,6 +14,7 @@
 #endif
 
 // SDK includes
+#include <Common.h>
 #include "CXMLArray.h"
 #include "CXMLAttributeImpl.h"
 #include "CXMLAttributesImpl.h"

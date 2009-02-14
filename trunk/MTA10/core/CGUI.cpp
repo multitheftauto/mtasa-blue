@@ -373,6 +373,11 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
 {
     if ( m_pMainMenu )
     {
+        // This code installs the original CCore mouseclick handlers when the ingame menu
+        // is shown, and restores the mod mouseclick handlers when the menu is hidden again.
+        // This is needed to prevent a crash when double clicking a server in the server browser
+        // while already ingame: the mod module gets unloaded while its doubleclick handler is
+        // still running.
         m_pMainMenu->SetVisible ( bVisible );
         CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
         if ( bVisible )
