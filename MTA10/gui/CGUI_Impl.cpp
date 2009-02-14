@@ -398,12 +398,6 @@ void CGUI_Impl::GetUniqueName ( char* pBuf )
 }
 
 
-void CGUI_Impl::SetCharacterKeyHandler ( const GUI_CALLBACK_KEY & Callback )
-{
-    m_pCharacterKeyHandler = new GUI_CALLBACK_KEY ( Callback );
-}
-
-
 bool CGUI_Impl::Event_CharacterKey ( const CEGUI::EventArgs& Args )
 {
 	if ( m_pCharacterKeyHandler )

@@ -282,9 +282,8 @@ CClientGame::~CClientGame ( void )
 
     // Reset CGUI's global events
     g_pCore->GetGUI ()->SetKeyDownHandler           ( );
-    // Jax: LEAVE COMMENTED! this gets reset to CCore::OnMouseClick / CCore::OnMouseDoubleClick on unload-request (before here)
-    //g_pCore->GetGUI ()->SetMouseClickHandler        ( );
-    //g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( );
+    g_pCore->GetGUI ()->SetMouseClickHandler        ( );
+    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( );
     g_pCore->GetGUI ()->SetMouseMoveHandler         ( );
     g_pCore->GetGUI ()->SetMouseEnterHandler        ( );
     g_pCore->GetGUI ()->SetMouseLeaveHandler        ( );

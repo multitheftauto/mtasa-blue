@@ -132,6 +132,9 @@ private:
     bool                    m_bChatboxVisible;
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
+
+	GUI_CALLBACK_MOUSE*	    m_pModMouseClickHandler;
+	GUI_CALLBACK_MOUSE*	    m_pModMouseDoubleClickHandler;
 };
 
 #endif

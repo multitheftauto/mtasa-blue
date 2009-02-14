@@ -34,6 +34,9 @@ CLocalGUI::CLocalGUI ( void )
 
 	m_bVisibleWindows = false;
 	m_iVisibleWindows = 0;
+
+	m_pModMouseClickHandler = NULL;
+	m_pModMouseDoubleClickHandler = NULL;
 }
 
 
@@ -371,6 +374,49 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
     if ( m_pMainMenu )
     {
         m_pMainMenu->SetVisible ( bVisible );
+        CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
+        if ( bVisible )
+        {
+            if ( m_pModMouseClickHandler )
+            {
+                delete m_pModMouseClickHandler;
+                m_pModMouseClickHandler = NULL;
+            }
+            if ( pGUI->GetMouseClickHandler () )
+                m_pModMouseClickHandler = new GUI_CALLBACK_MOUSE ( *pGUI->GetMouseClickHandler () );
+            if ( m_pModMouseDoubleClickHandler )
+            {
+                delete m_pModMouseDoubleClickHandler;
+                m_pModMouseDoubleClickHandler = NULL;
+            }
+            if ( pGUI->GetMouseDoubleClickHandler () )
+                m_pModMouseDoubleClickHandler = new GUI_CALLBACK_MOUSE ( *pGUI->GetMouseDoubleClickHandler () );
+            pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
+            pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
+        }
+        else
+        {
+            if ( m_pModMouseClickHandler )
+            {
+                pGUI->SetMouseClickHandler ( *m_pModMouseClickHandler );
+                delete m_pModMouseClickHandler;
+                m_pModMouseClickHandler = NULL;
+            }
+            else
+            {
+                pGUI->SetMouseClickHandler ();
+            }
+            if ( m_pModMouseDoubleClickHandler )
+            {
+                pGUI->SetMouseDoubleClickHandler ( *m_pModMouseDoubleClickHandler );
+                delete m_pModMouseDoubleClickHandler;
+                m_pModMouseDoubleClickHandler = NULL;
+            }
+            else
+            {
+                pGUI->SetMouseDoubleClickHandler ();
+            }
+        }
     }
     else
     {
