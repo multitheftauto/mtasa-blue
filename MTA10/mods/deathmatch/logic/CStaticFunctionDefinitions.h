@@ -409,7 +409,7 @@ public:
     static bool                         GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
 
     // Util funcs
-    static bool                         GetTickCount_                       ( unsigned long& ulCount );
+    static bool                         GetTickCount_                       ( double& dCount );
 
     // Map funcs
     static bool                         IsPlayerMapForced                   ( bool & bForced );
