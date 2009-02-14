@@ -159,27 +159,38 @@ public:
 	void							SetWorkingDirectory			( const char * szDir );
 	inline const char*				GetWorkingDirectory			( void )	{ return const_cast < const char* > ( m_szWorkingDirectory ); }
 
-	void							SetCharacterKeyHandler		( void )									{ m_pCharacterKeyHandler = NULL; }
-	void							SetKeyDownHandler			( void )									{ m_pKeyDownHandler = NULL; }
-	void							SetMouseClickHandler		( void )									{ m_pMouseClickHandler = NULL; }
-	void							SetMouseDoubleClickHandler	( void )									{ m_pMouseDoubleClickHandler = NULL; }
-	void							SetMouseMoveHandler			( void )									{ m_pMouseMoveHandler = NULL; }
-	void							SetMouseEnterHandler		( void )									{ m_pMouseEnterHandler = NULL; }
-	void							SetMouseLeaveHandler		( void )									{ m_pMouseLeaveHandler = NULL; }
-	void							SetMouseWheelHandler		( void )									{ m_pMouseWheelHandler = NULL; }
-	void							SetMovedHandler				( void )									{ m_pMovedHandler = NULL; }
-	void							SetSizedHandler				( void )									{ m_pSizedHandler = NULL; }
+   	const GUI_CALLBACK_KEY*			GetCharacterKeyHandler		( void )									{ return m_pCharacterKeyHandler; }
+	const GUI_CALLBACK_KEY*			GetKeyDownHandler			( void )									{ return m_pKeyDownHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseClickHandler		( void )									{ return m_pMouseClickHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseDoubleClickHandler	( void )									{ return m_pMouseDoubleClickHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseMoveHandler			( void )									{ return m_pMouseMoveHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseEnterHandler		( void )									{ return m_pMouseEnterHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseLeaveHandler		( void )									{ return m_pMouseLeaveHandler; }
+	const GUI_CALLBACK_MOUSE*		GetMouseWheelHandler		( void )									{ return m_pMouseWheelHandler; }
+	const GUI_CALLBACK*				GetMovedHandler				( void )									{ return m_pMovedHandler; }
+	const GUI_CALLBACK*				GetSizedHandler				( void )									{ return m_pSizedHandler; }
 
-	void							SetCharacterKeyHandler		( const GUI_CALLBACK_KEY & Callback );
-	void							SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback )		{ m_pKeyDownHandler = new GUI_CALLBACK_KEY ( Callback ); }
-	void							SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseClickHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseDoubleClickHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseMoveHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseEnterHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseLeaveHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMouseWheelHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_pMouseWheelHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
-	void							SetMovedHandler				( const GUI_CALLBACK & Callback )			{ m_pMovedHandler = new GUI_CALLBACK ( Callback ); }
-	void							SetSizedHandler				( const GUI_CALLBACK & Callback )			{ m_pSizedHandler = new GUI_CALLBACK ( Callback ); }
+	void							SetCharacterKeyHandler		( void )									{ if ( m_pCharacterKeyHandler ) delete m_pCharacterKeyHandler; m_pCharacterKeyHandler = NULL; }
+	void							SetKeyDownHandler			( void )									{ if ( m_pKeyDownHandler ) delete m_pKeyDownHandler; m_pKeyDownHandler = NULL; }
+	void							SetMouseClickHandler		( void )									{ if ( m_pMouseClickHandler ) delete m_pMouseClickHandler; m_pMouseClickHandler = NULL; }
+	void							SetMouseDoubleClickHandler	( void )									{ if ( m_pMouseDoubleClickHandler ) delete m_pMouseDoubleClickHandler; m_pMouseDoubleClickHandler = NULL; }
+	void							SetMouseMoveHandler			( void )									{ if ( m_pMouseMoveHandler ) delete m_pMouseMoveHandler; m_pMouseMoveHandler = NULL; }
+	void							SetMouseEnterHandler		( void )									{ if ( m_pMouseEnterHandler ) delete m_pMouseEnterHandler; m_pMouseEnterHandler = NULL; }
+	void							SetMouseLeaveHandler		( void )									{ if ( m_pMouseLeaveHandler ) delete m_pMouseLeaveHandler; m_pMouseLeaveHandler = NULL; }
+	void							SetMouseWheelHandler		( void )									{ if ( m_pMouseWheelHandler ) delete m_pMouseWheelHandler; m_pMouseWheelHandler = NULL; }
+	void							SetMovedHandler				( void )									{ if ( m_pMovedHandler ) delete m_pMovedHandler; m_pMovedHandler = NULL; }
+	void							SetSizedHandler				( void )									{ if ( m_pSizedHandler ) delete m_pSizedHandler; m_pSizedHandler = NULL; }
+
+    void							SetCharacterKeyHandler		( const GUI_CALLBACK_KEY & Callback )       { if ( m_pCharacterKeyHandler ) delete m_pCharacterKeyHandler; m_pCharacterKeyHandler = new GUI_CALLBACK_KEY ( Callback ); }
+	void							SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback )		{ if ( m_pKeyDownHandler ) delete m_pKeyDownHandler; m_pKeyDownHandler = new GUI_CALLBACK_KEY ( Callback ); }
+	void							SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseClickHandler ) delete m_pMouseClickHandler; m_pMouseClickHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseDoubleClickHandler ) delete m_pMouseDoubleClickHandler; m_pMouseDoubleClickHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseMoveHandler ) delete m_pMouseMoveHandler; m_pMouseMoveHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseEnterHandler) delete m_pMouseEnterHandler; m_pMouseEnterHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseLeaveHandler ) delete m_pMouseLeaveHandler; m_pMouseLeaveHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMouseWheelHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ if ( m_pMouseWheelHandler ) delete m_pMouseWheelHandler; m_pMouseWheelHandler = new GUI_CALLBACK_MOUSE ( Callback ); }
+	void							SetMovedHandler				( const GUI_CALLBACK & Callback )			{ if ( m_pMovedHandler ) delete m_pMovedHandler; m_pMovedHandler = new GUI_CALLBACK ( Callback ); }
+	void							SetSizedHandler				( const GUI_CALLBACK & Callback )			{ if ( m_pSizedHandler ) delete m_pSizedHandler; m_pSizedHandler = new GUI_CALLBACK ( Callback ); }
 
     bool                            IsTransferBoxVisible        ( void )                                    { return m_bTransferBoxVisible; };
     void                            SetTransferBoxVisible       ( bool bVisible )                           { m_bTransferBoxVisible = bVisible; };
@@ -244,10 +255,10 @@ private:
     GUI_CALLBACK_KEY*				m_pKeyDownHandler;
 	GUI_CALLBACK_MOUSE*				m_pMouseClickHandler;
 	GUI_CALLBACK_MOUSE*				m_pMouseDoubleClickHandler;
-	GUI_CALLBACK_MOUSE*				m_pMouseWheelHandler;
 	GUI_CALLBACK_MOUSE*				m_pMouseMoveHandler;
 	GUI_CALLBACK_MOUSE*				m_pMouseEnterHandler;
 	GUI_CALLBACK_MOUSE*				m_pMouseLeaveHandler;
+    GUI_CALLBACK_MOUSE*				m_pMouseWheelHandler;
 	GUI_CALLBACK*					m_pMovedHandler;
 	GUI_CALLBACK*					m_pSizedHandler;
 

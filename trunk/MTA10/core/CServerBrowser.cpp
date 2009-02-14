@@ -520,7 +520,6 @@ void CServerBrowser::CompleteConnect ( void )
 bool CServerBrowser::ConnectToSelectedServer ( void )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
-    g_pCore->GetConsole()->Printf ( "Test: %d", m_pServerList [ Type ]->GetSelectedCount () );
     m_pServerPlayerList [ Type ]->Clear ();
 
     char buf[32];

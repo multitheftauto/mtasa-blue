@@ -140,6 +140,17 @@ public:
 
 	virtual void				SetWorkingDirectory		( const char * szDir ) = 0;
 
+   	virtual const GUI_CALLBACK_KEY* 	GetCharacterKeyHandler		( void ) = 0;
+	virtual const GUI_CALLBACK_KEY*		GetKeyDownHandler			( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseClickHandler		( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseDoubleClickHandler	( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseMoveHandler			( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseEnterHandler		( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseLeaveHandler		( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE*	GetMouseWheelHandler		( void ) = 0;
+	virtual const GUI_CALLBACK*			GetMovedHandler				( void ) = 0;
+	virtual const GUI_CALLBACK*			GetSizedHandler				( void ) = 0;
+
 	virtual void				SetCharacterKeyHandler		( void ) = 0;
 	virtual void				SetKeyDownHandler			( void ) = 0;
 	virtual void				SetMouseClickHandler		( void ) = 0;
