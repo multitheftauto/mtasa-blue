@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="_ServerDeathmatch 2005"
@@ -264,7 +264,7 @@
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
-				EnableFunctionLevelLinking="false"
+				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
