@@ -267,6 +267,17 @@ static bool CheckFileForCorruption( string strPath )
 void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
+    if ( m_pRootEntity )
+    {
+		// Set the GUI parent to the resource root entity
+        m_pResourceCOLRoot->SetParent ( m_pResourceEntity );
+        m_pResourceDFFEntity->SetParent ( m_pResourceEntity );
+		m_pResourceGUIEntity->SetParent ( m_pResourceEntity );
+        m_pResourceTXDRoot->SetParent ( m_pResourceEntity );
+    }
+
+    CLogger::LogPrintf ( "> Starting resource '%s'", m_szResourceName );
+
 	char szBuffer [ MAX_PATH ] = { 0 };
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
     for ( ; iterc != m_ConfigFiles.end (); iterc++ )
@@ -299,17 +310,9 @@ void CResource::Load ( CClientEntity *pRootEntity )
 	// Set active flag
 	m_bActive = true;
 
-    CLogger::LogPrintf ( "> Starting resource '%s'", m_szResourceName );
-
 	// Did we get a resource root entity?
 	if ( m_pResourceEntity )
 	{
-		// Set the GUI parent to the resource root entity
-        m_pResourceCOLRoot->SetParent ( m_pResourceEntity );
-        m_pResourceDFFEntity->SetParent ( m_pResourceEntity );
-		m_pResourceGUIEntity->SetParent ( m_pResourceEntity );
-        m_pResourceTXDRoot->SetParent ( m_pResourceEntity );
-
 		// Call the Lua "onClientResourceStart" event
 		CLuaArguments Arguments;
 		Arguments.PushUserData ( this );
