@@ -358,6 +358,9 @@ void CChat::SetVisible ( bool bVisible )
 
 void CChat::SetInputVisible ( bool bVisible )
 {    
+    if ( !IsVisible () )
+        bVisible = false;
+
     if ( bVisible )
     {
         ClearInput ();
