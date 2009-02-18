@@ -186,7 +186,7 @@ public:
     virtual void        OnSetDataFormat             ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a );
     virtual void        RemoveDevice                ( IDirectInputDevice8A* pDevice );
     virtual void        DoPulse                     ( void );
-    virtual void        ApplyAxes                   ( CControllerState& cs );
+    virtual void        ApplyAxes                   ( CControllerState& cs, bool bInVehicle );
 
     // Status
     virtual bool        IsJoypadConnected           ( void );
@@ -633,7 +633,7 @@ void CJoystickManager::ReadCurrentState ( void )
 // Map physical axes into CControllerState
 //
 ///////////////////////////////////////////////////////////////
-void CJoystickManager::ApplyAxes ( CControllerState& cs )
+void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
 {
     if ( !IsJoypadConnected () )
         return;
@@ -662,8 +662,8 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs )
         else if ( line.OutputAxisIndex == eLeftStickY )   cs.LeftStickY += iValue;
         else if ( line.OutputAxisIndex == eRightStickX )  cs.RightStickX += iValue;
         else if ( line.OutputAxisIndex == eRightStickY )  cs.RightStickY += iValue;
-        else if ( line.OutputAxisIndex == eAccelerate )   cs.ButtonCross += iValue;
-        else if ( line.OutputAxisIndex == eBrake )        cs.ButtonSquare += iValue;
+        else if ( line.OutputAxisIndex == eAccelerate && bInVehicle )   cs.ButtonCross += iValue;
+        else if ( line.OutputAxisIndex == eBrake && bInVehicle )        cs.ButtonSquare += iValue;
     }
 
 
@@ -672,7 +672,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs )
     cs.LeftStickY  = Clamp < const short > ( -128, cs.LeftStickY, 128 );
     cs.RightStickX = Clamp < const short > ( -128, cs.RightStickX, 128 );
     cs.RightStickY = Clamp < const short > ( -128, cs.RightStickY, 128 );
-
+    
     cs.ButtonCross  = Clamp < const short > ( 0, cs.ButtonCross, 255 );
     cs.ButtonSquare = Clamp < const short > ( 0, cs.ButtonSquare, 255 );
 

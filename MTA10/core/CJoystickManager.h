@@ -22,7 +22,7 @@ public:
     virtual void        OnSetDataFormat             ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a ) = 0;
     virtual void        RemoveDevice                ( IDirectInputDevice8A* pDevice ) = 0;
     virtual void        DoPulse                     ( void ) = 0;
-    virtual void        ApplyAxes                   ( class CControllerState& cs ) = 0;
+    virtual void        ApplyAxes                   ( class CControllerState& cs, bool bInVehicle ) = 0;
 
     // Status
     virtual bool        IsJoypadConnected           ( void ) = 0;

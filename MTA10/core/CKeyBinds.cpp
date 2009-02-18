@@ -2023,7 +2023,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         cs.ButtonTriangle = ( g_bcControls [ 9 ].bState ) ? 255 : 0; // Enter Exit
         cs.Select = ( g_bcControls [ 10 ].bState ) ? 255 : 0; // Change View   
 
-        GetJoystickManager ()->ApplyAxes ( cs );
+        GetJoystickManager ()->ApplyAxes ( cs, bInVehicle );
     }
         
     m_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &cs );
