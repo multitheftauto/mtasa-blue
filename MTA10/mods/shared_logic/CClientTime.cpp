@@ -74,10 +74,8 @@ bool CClientTime::InitializeTime ( void )
         m_lTimeCounts = lFrequency.QuadPart / 1000;
         m_bUsePerformanceCounter = true;
 
-		long long tps;
-		QueryPerformanceFrequency ( (LARGE_INTEGER*)&tps );
-		m_dTickMultiply = 1.0 / (double)tps;
-		m_lMaxDelta = (long long)(tps * 0.1);
+		m_dTickMultiply = 1.0 / (double)lFrequency.QuadPart;
+		m_lMaxDelta = (long long)((double)lFrequency.QuadPart * 0.1);
 		QueryPerformanceCounter((LARGE_INTEGER *)&m_lBaseReading);
 		m_lLastReading = m_lBaseReading;
     }

@@ -4265,7 +4265,6 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CClientWater* pWater, float fLe
     {
         return g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fLevel, pChangeSource );
     }
-    return false;
 }
 
 
@@ -4883,7 +4882,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
-    dCount = static_cast < double > ( time ( NULL ) ) * 1000 + static_cast < double > ( CClientTime::GetTime () % 1000 );
+    dCount = ( double ) ( (long long)time ( NULL ) * 1000 + ( CClientTime::GetTime () % 1000 ) );
     return true;
 }
 
