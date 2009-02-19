@@ -4259,11 +4259,13 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CClientWater* pWater, float fLe
         pWater->GetPosition ( vecPosition );
         vecPosition.fZ = fLevel;
         pWater->SetPosition ( vecPosition );
+        return true;
     }
     else
     {
         return g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fLevel, pChangeSource );
     }
+    return false;
 }
 
 
@@ -4881,7 +4883,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
-    dCount = ( ( double ) time ( NULL ) * 1000 ) + ( double ) ( CClientTime::GetTime () % 100 );
+    dCount = static_cast < double > ( time ( NULL ) ) * 1000 + static_cast < double > ( CClientTime::GetTime () % 1000 );
     return true;
 }
 
