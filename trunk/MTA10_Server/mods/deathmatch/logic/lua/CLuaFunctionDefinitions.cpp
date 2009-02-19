@@ -8452,7 +8452,7 @@ int CLuaFunctionDefinitions::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 {
-    double dTime = ( ( double ) time ( NULL ) * 1000 ) + ( double ) ( GetTime () % 100 );
+    double dTime = ( ( double ) time ( NULL ) * 1000 ) + ( double ) ( GetTime () % 1000 );
     lua_pushnumber ( luaVM, dTime );
     return 1;
 }
