@@ -62,6 +62,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ucAlpha = 255;
     m_pJackingPlayer = NULL;
     m_bInWater = false;
+    m_bDerailed = false;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
