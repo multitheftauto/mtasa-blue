@@ -345,6 +345,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Turn the engine on if it's on
                         pVehicle->SetEngineOn ( ( pData->ucFlags & 0x40 ) ? true : false );
 
+                        // Derailed state
+                        pVehicle->SetDerailed ( ( pData->ucFlags & 0x80 ) ? true : false );
+
 					    // Run colpoint checks on vehicle
 					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );  
 

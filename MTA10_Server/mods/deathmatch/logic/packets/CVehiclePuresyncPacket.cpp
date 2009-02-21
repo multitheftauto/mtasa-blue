@@ -273,6 +273,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
             bool bLandingGearDown = ( ucFlags & 0x10 ) ? true:false;
             bool bOnGround = ( ucFlags & 0x20 ) ? true:false;
             bool bInWater = ( ucFlags & 0x40 ) ? true:false;
+            bool bIsDerailed = ( ucFlags & 0x80 ) ? true:false;
 
             pSourcePlayer->SetWearingGoggles ( bWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( bDoingGangDriveby );            
@@ -328,6 +329,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                 pVehicle->SetLandingGearDown ( bLandingGearDown );
                 pVehicle->SetOnGround ( bOnGround );
                 pVehicle->SetInWater ( bInWater );
+                pVehicle->SetDerailed ( bIsDerailed );
             }
 
             // Success
@@ -414,6 +416,7 @@ bool CVehiclePuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) co
             if ( pVehicle->IsLandingGearDown () ) ucFlags |= 0x10;
             if ( pVehicle->IsOnGround () ) ucFlags |= 0x20;
             if ( pVehicle->IsInWater () ) ucFlags |= 0x40;
+            if ( pVehicle->IsDerailed () ) ucFlags |= 0x80;
 
             // Write the flags
             BitStream.Write ( ucFlags );

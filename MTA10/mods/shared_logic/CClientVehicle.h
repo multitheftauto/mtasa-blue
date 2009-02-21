@@ -249,6 +249,12 @@ public:
     void                        SetPreviousTrainCarriage    ( CClientVehicle* pPrevious );
     void                        SetNextTrainCarriage    ( CClientVehicle* pNext );
 
+    void                        SetTrainDerailed        ( bool bDerailed );
+    bool                        IsTrainDerailed         ( void );
+
+    void                        SetTrainDirection       ( int iDirection )                  { m_iTrainDirection = iDirection; };
+    int                         GetTrainDirection       ( void )                            { return m_iTrainDirection; };
+
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
 
@@ -415,6 +421,9 @@ protected:
 	double						m_dLastRotationTime;
     bool                        m_bBlowNextFrame;
     bool                        m_bIsOnGround;
+
+    bool                        m_bIsDerailed;
+    int                         m_iTrainDirection;
 
     bool                        m_bInterpolationEnabled;
     double                      m_dResetInterpolationTime;

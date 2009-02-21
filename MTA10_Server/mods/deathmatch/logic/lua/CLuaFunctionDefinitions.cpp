@@ -3225,6 +3225,10 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
             }
         }
 
+        bool bDirection = false;
+        if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )
+            bDirection = ( lua_toboolean ( luaVM, 9 ) ) ? true : false;
+
 		CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
 		if ( pLuaMain )
 		{
@@ -3232,7 +3236,7 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
 			if ( pResource )
 			{
 				// Create the vehicle and return its handle
-				CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, const_cast < char* > ( szRegPlate ) );
+				CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, const_cast < char* > ( szRegPlate ), bDirection );
 				if ( pVehicle )
 				{
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -4204,6 +4208,31 @@ int CLuaFunctionDefinitions::GetVehicleEngineState ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleEngineState" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::IsTrainDerailed ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            bool bDerailed;
+            if ( CStaticFunctionDefinitions::IsTrainDerailed ( pVehicle, bDerailed ) )
+            {
+                lua_pushboolean ( luaVM, bDerailed );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isTrainDerailed", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isTrainDerailed" );
     
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -5197,6 +5226,35 @@ int CLuaFunctionDefinitions::SetVehicleFrozen ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setVehicleFrozen" );
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            {
+                if ( CStaticFunctionDefinitions::SetTrainDerailed ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true:false ) )
+                {
+                        lua_pushboolean ( luaVM, true );
+                }
+                return 1;
+                    
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDerailed", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }

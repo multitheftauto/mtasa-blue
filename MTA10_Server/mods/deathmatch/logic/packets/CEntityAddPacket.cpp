@@ -298,19 +298,22 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     bool bAreDoorsUndamageable = pVehicle->AreDoorsUndamageable ();
                     bool bDamageProof = pVehicle->IsDamageProof ();
                     bool bFrozen = pVehicle->GetFrozen ();
+                    bool bDerailed = pVehicle->IsDerailed ();
 
                     // Put them in a byte
-                    unsigned char ucFlags = 0;
-                    if ( bIsLandingGearDown ) ucFlags |= 0x1;
-                    if ( bSireneActive ) ucFlags |= 0x2;
-                    if ( bFuelTankExplodable ) ucFlags |= 0x4;
-                    if ( bIsEngineOn ) ucFlags |= 0x8;
-                    if ( bIsLocked ) ucFlags |= 0x10;
-                    if ( bDamageProof ) ucFlags |= 0x20;
-                    if ( bFrozen ) ucFlags |= 0x40;
+                    unsigned short usFlags = 0;
+                    if ( bIsLandingGearDown ) usFlags |= 0x1;
+                    if ( bSireneActive ) usFlags |= 0x2;
+                    if ( bFuelTankExplodable ) usFlags |= 0x4;
+                    if ( bIsEngineOn ) usFlags |= 0x8;
+                    if ( bIsLocked ) usFlags |= 0x10;
+                    if ( bAreDoorsUndamageable ) usFlags |= 0x20;
+                    if ( bDamageProof ) usFlags |= 0x40;
+                    if ( bFrozen ) usFlags |= 0x80;
+                    if ( bDerailed ) usFlags |= 0x100;
 
                     // Write the flagbyte
-                    BitStream.Write ( ucFlags );
+                    BitStream.Write ( usFlags );
 
                     // Write alpha
                     BitStream.Write ( pVehicle->GetAlpha () );	

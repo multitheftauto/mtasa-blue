@@ -1844,7 +1844,14 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( CClientVehicle& Vehic
 }
 
 
-CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate )
+bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool& bDerailed )
+{
+    bDerailed = Vehicle.IsTrainDerailed ();
+	return true;
+}
+
+
+CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate, bool bDirection )
 {
     if ( CClientVehicleManager::IsValidModel ( usModel ) )
     {      
@@ -1857,6 +1864,9 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource,
             pVehicle->SetRotationDegrees ( vecRotation );
             if ( szRegPlate )
                 pVehicle->SetRegPlate ( const_cast < char * > ( szRegPlate ) );            
+
+            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+                pVehicle->SetTrainDirection ( ( bDirection ) ? 1 : 0 );
 
             return pVehicle;
         }
@@ -2385,6 +2395,13 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehic
 	}
 
     return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, bool bDerailed )
+{
+	Vehicle.SetTrainDerailed ( bDerailed );
+    return true;
 }
 
 

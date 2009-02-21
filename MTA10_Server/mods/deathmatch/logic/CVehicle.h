@@ -226,6 +226,9 @@ public:
     inline bool                     IsDamageProof           ( void )                        { return m_bDamageProof; }
     inline void                     SetDamageProof          ( bool bDamageProof )           { m_bDamageProof = bDamageProof; }
 
+    inline bool                     IsDerailed              ( void )                        { return m_bDerailed; }
+    inline void                     SetDerailed             ( bool bDerailed )              { m_bDerailed = bDerailed; }
+
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
@@ -284,6 +287,7 @@ private:
     bool                            m_bSmokeTrail;
     unsigned char                   m_ucAlpha;
     bool                            m_bInWater;
+    bool                            m_bDerailed;
 
     CPlayer *                       m_pJackingPlayer;
 

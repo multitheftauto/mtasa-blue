@@ -118,9 +118,11 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bHasTargetRotation = false;
     m_bBlowNextFrame = false;
     m_bIsOnGround = false;
+    m_bIsDerailed = false;
     m_ulIllegalTowBreakTime = 0;
     m_bBlown = false;
     m_LastSyncedData = new SLastSyncedVehData;
+    m_iTrainDirection = 0;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -1569,6 +1571,26 @@ void CClientVehicle::SetNextTrainCarriage ( CClientVehicle* pNext )
 }
 
 
+void CClientVehicle::SetTrainDerailed ( bool bDerailed )
+{
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    {
+        m_pVehicle->SetTrainDerailed ( bDerailed );
+    }
+    m_bIsDerailed = bDerailed;
+}
+
+
+bool CClientVehicle::IsTrainDerailed ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->IsTrainDerailed ();
+    }
+    return m_bIsDerailed;
+}
+
+
 void CClientVehicle::SetOverrideLights ( unsigned char ucOverrideLights )
 {
     if ( m_pVehicle )
@@ -1767,7 +1789,7 @@ void CClientVehicle::Create ( void )
         {
             DWORD dwModels [1];
             dwModels [0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, 0 );
+            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_iTrainDirection );
         }
         else
         {
@@ -1816,6 +1838,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         m_pVehicle->SetTyresDontBurst ( !m_bTyresCanBurst );
+        m_pVehicle->SetTrainDerailed ( m_bIsDerailed );
 
         // Re-add all the upgrades
         if ( m_pUpgrades )

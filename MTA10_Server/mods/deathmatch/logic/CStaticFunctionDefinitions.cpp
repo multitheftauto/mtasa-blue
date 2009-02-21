@@ -3291,7 +3291,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
 }
 
 
-CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate )
+CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate, bool bDirection )
 {
     if ( CVehicleManager::IsValidModel ( usModel ) )
     {
@@ -3592,6 +3592,14 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState ( CVehicle * pVehicle, bo
     return true;
 }
 
+
+bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDerailed )
+{
+    assert ( pVehicle );
+
+    bDerailed = pVehicle->IsDerailed ();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 {
@@ -4489,6 +4497,25 @@ bool CStaticFunctionDefinitions::SetVehicleFrozen ( CVehicle* pVehicle, bool bFr
         BitStream.pBitStream->Write ( ( unsigned char ) 1 );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_FROZEN, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDerailed )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetDerailed ( bDerailed );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    if ( bDerailed )
+        BitStream.pBitStream->Write ( ( unsigned char ) 0 );
+    else
+        BitStream.pBitStream->Write ( ( unsigned char ) 1 );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILED, *BitStream.pBitStream ) );
 
     return true;
 }

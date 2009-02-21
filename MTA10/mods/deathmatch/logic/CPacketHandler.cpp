@@ -2382,18 +2382,19 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetOverrideLights ( ucOverrideLights );
 
                     // Flags
-                    unsigned char ucFlags = 0;
-                    bitStream.Read ( ucFlags );
+                    unsigned short usFlags = 0;
+                    bitStream.Read ( usFlags );
 
                     // Extract the flag bools
-                    bool bLandingGearDown = ( ucFlags & 0x01 ) ? true:false;
-                    bool bSirenesActive = ( ucFlags & 0x02 ) ? true:false;
-                    bool bPetrolTankWeak = ( ucFlags & 0x04 ) ? true:false;
-                    bool bEngineOn = ( ucFlags & 0x08 ) ? true:false;
-                    bool bLocked = ( ucFlags & 0x10 ) ? true:false;
-                    bool bDoorsUndamageable = ( ucFlags & 0x20 ) ? true:false;
-                    bool bDamageProof = ( ucFlags & 0x40 ) ? true:false;
-                    bool bFrozen = ( ucFlags & 0x80 ) ? true:false;
+                    bool bLandingGearDown = ( usFlags & 0x01 ) ? true:false;
+                    bool bSirenesActive = ( usFlags & 0x02 ) ? true:false;
+                    bool bPetrolTankWeak = ( usFlags & 0x04 ) ? true:false;
+                    bool bEngineOn = ( usFlags & 0x08 ) ? true:false;
+                    bool bLocked = ( usFlags & 0x10 ) ? true:false;
+                    bool bDoorsUndamageable = ( usFlags & 0x20 ) ? true:false;
+                    bool bDamageProof = ( usFlags & 0x40 ) ? true:false;
+                    bool bFrozen = ( usFlags & 0x80 ) ? true:false;
+                    bool bDerailed = ( usFlags & 0x100 ) ? true:false;
 
                     // If the vehicle has a landing gear, set landing gear state
                     if ( CClientVehicleManager::HasLandingGears ( usModel ) )
@@ -2414,6 +2415,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetDoorsUndamageable ( bDoorsUndamageable );
                     pVehicle->SetScriptCanBeDamaged ( !bDamageProof );
                     pVehicle->SetFrozen ( bFrozen );
+                    pVehicle->SetTrainDerailed ( bDerailed );
 
                     // Read out and set alpha
                     unsigned char ucAlpha = 255;
