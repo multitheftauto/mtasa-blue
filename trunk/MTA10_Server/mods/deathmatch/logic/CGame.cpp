@@ -192,9 +192,12 @@ CGame::~CGame ( void )
 void CGame::GetTag ( char *szInfoTag, int iInfoTag )
 {
 	// Construct the info tag
+    unsigned int uiMaxPlayers;
+    if ( !m_CommandLineParser.GetMaxPlayers ( uiMaxPlayers ) )
+        uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 	_snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA:SA Deathmatch R1 %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
 			   132, 135, szProgress[ucProgress], 132,
-		       130, 130, m_pPlayerManager->Count (), m_pMainConfig->GetMaxPlayers (),
+		       130, 130, m_pPlayerManager->Count (), uiMaxPlayers,
                130, 130, m_pResourceManager->GetResourceLoadedCount (),
 			   130, 130, m_usFPS );
 	if (iInfoTag > 0)
@@ -387,11 +390,20 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
 
     // Grab the IP to put the server at
-    const char* szServerIP = m_pMainConfig->GetServerIP ().c_str ();
-    if ( !szServerIP || szServerIP [0] == '\0' )
-    {
+    const char* szServerIP;
+    if ( !m_CommandLineParser.GetIP ( szServerIP ) )
+        szServerIP = m_pMainConfig->GetServerIP ().c_str ();
+
+    if ( szServerIP && szServerIP [0] == '\0' )
         szServerIP = NULL;
-    }
+    
+    unsigned short usServerPort;
+    if ( !m_CommandLineParser.GetPort ( usServerPort ) )
+        usServerPort = m_pMainConfig->GetServerPort ();
+
+    unsigned int uiMaxPlayers;
+    if ( !m_CommandLineParser.GetMaxPlayers ( uiMaxPlayers ) )
+        uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
     // Create the account manager
     m_pAccountManager = new CAccountManager ( NULL );
@@ -441,10 +453,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
                                 MTA_VERSION,
 								m_pMainConfig->GetServerName ().c_str (),
-								m_pMainConfig->GetServerIP ().c_str (),
-								m_pMainConfig->GetServerPort (),
+								szServerIP,
+								usServerPort,
 								pszLogFileName,
-								m_pMainConfig->GetMaxPlayers (),
+								uiMaxPlayers,
 								m_pMainConfig->GetMTUSize () );
 
 	if ( !bLogFile )
@@ -559,8 +571,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 	unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
 
     // Try to start the network
-	unsigned short usServerPort = m_pMainConfig->GetServerPort ();
-    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, m_pMainConfig->GetMaxPlayers () ) )
+    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
     {
 		CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
         return false;
@@ -611,8 +622,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () )
     {
-        std::string strServerIP = m_pMainConfig->GetServerIP ();
-		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( m_pMainConfig->GetServerPort () ), ( strServerIP.empty () ) ? NULL : strServerIP.c_str () );
+		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
@@ -622,7 +632,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
 		char szURL[256] = { '\0' };
         CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-		sprintf ( szURL, QUERY_URL_GAME_MONITOR, m_pMainConfig->GetServerPort () + 123);
+		sprintf ( szURL, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
 		CHTTPRequest * request = new CHTTPRequest ( szURL );
         CHTTPResponse * response = request->Send ( pTCP );
