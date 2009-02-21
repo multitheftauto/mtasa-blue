@@ -17,7 +17,10 @@ using namespace std;
 CCommandLineParser::CCommandLineParser ( void )
 {
     m_bMainConfig = false;
-    m_szMainConfig [0] = 0;
+    m_bIP = false;
+    m_bPort = false;
+    m_bMaxPlayers = false;
+
     m_bHTTPEnabled = true;
 }
 
@@ -32,14 +35,37 @@ bool CCommandLineParser::Parse ( int iArgumentCount, char* szArguments [] )
     while ( iIndex < iArgumentCount )
     {
         // Any argument type we know?
-        if ( stricmp ( szArguments [iIndex], "--config" ) == 0 )
+        if ( stricmp ( szArguments [ iIndex ], "--config" ) == 0 )
         {
             // Grab the next argument
             if ( ++iIndex < iArgumentCount )
             {
                 m_bMainConfig = true;
-                strncpy ( m_szMainConfig, szArguments [iIndex], 256 );
-                m_szMainConfig[255] = '\0';
+                m_strMainConfig = szArguments [iIndex];
+            }
+        }
+        else if ( stricmp ( szArguments [ iIndex ], "--ip" ) == 0 )
+        {
+            if ( ++iIndex < iArgumentCount )
+            {
+                m_bIP = true;
+                m_strIP = szArguments [ iIndex ];
+            }
+        }
+        else if ( stricmp ( szArguments [ iIndex ], "--port" ) == 0 )
+        {
+            if ( ++iIndex < iArgumentCount )
+            {
+                m_bPort = true;
+                m_usPort = (unsigned short) atoi ( szArguments [ iIndex ] );
+            }
+        }
+        else if ( stricmp ( szArguments [ iIndex ], "--maxplayers" ) == 0 )
+        {
+            if ( ++iIndex < iArgumentCount )
+            {
+                m_bMaxPlayers = true;
+                m_uiMaxPlayers = (unsigned int) atoi ( szArguments [ iIndex ] );
             }
         }
 
@@ -57,11 +83,4 @@ bool CCommandLineParser::Parse ( int iArgumentCount, char* szArguments [] )
 
     // Success
     return true;
-}
-
-
-bool CCommandLineParser::GetMainConfig ( const char*& pszMainConfig )
-{
-    pszMainConfig = m_szMainConfig;
-    return m_bMainConfig;
 }
