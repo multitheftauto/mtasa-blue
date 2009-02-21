@@ -1279,7 +1279,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 								pPlayer->SetSerial ( strSerial );
 
 								// Check the serial for validity
-								if ( m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
+                                if ( !pPlayer->GetSerial ().empty() &&
+                                     m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
 								{
 									// Tell the console
 									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned)\n", szNick );
@@ -1289,7 +1290,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 									return;
 								}
 
-                                if ( m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
+                                if ( !pPlayer->GetSerialUser ().empty() &&
+                                     m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
 								{
 									// Tell the console
 									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned)\n", szNick );
