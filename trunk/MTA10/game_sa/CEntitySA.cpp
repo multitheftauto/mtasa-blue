@@ -44,6 +44,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
         vecPos->fZ = fZ;
     }
 
+    /*
     WORD wModelID = GetModelIndex();
     if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
     {
@@ -56,7 +57,8 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
         }
         
         //OutputDebugString ( "Set train position on tracks!\n" );
-    }    
+    }
+    */
 }
 
 VOID CEntitySA::Teleport ( float fX, float fY, float fZ )
@@ -281,6 +283,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
 
+        /*
         WORD wModelID = GetModelIndex();
         if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
         {
@@ -294,6 +297,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
             
             //OutputDebugString ( "Set train position on tracks (matrix)!\n" );
         }
+        */
 
 		pGame->GetWorld()->Remove ( this );
 		DWORD dwThis = (DWORD) m_pInterface;

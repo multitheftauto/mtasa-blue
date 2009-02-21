@@ -381,6 +381,11 @@ public:
 	CVehicle* m_pVehicle;
 	/*** END SECTION that was added by us ***/
 
+    long Padding213[93];
+
+    //1444
+    float m_fTrainSpeed;
+
     unsigned long ul_doorstate;
 };
 
@@ -406,6 +411,9 @@ public:
     CVehicleSAInterface *       GetPreviousCarriageInTrain ( void );
     CVehicle *                  GetPreviousTrainCarriage ( void );
     void                        SetPreviousTrainCarriage ( CVehicle * previous );
+
+    void                        SetTrainDerailed ( bool bDerailed );
+    bool                        IsTrainDerailed ( void );
 
     bool                        CanPedEnterCar ( void );
     bool                        CanPedJumpOutCar ( CPed* pPed );

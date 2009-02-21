@@ -202,6 +202,45 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
         return NULL;
 }
 
+
+void CVehicleSA::SetTrainDerailed ( bool bDerailed )
+{
+    WORD wModelID = GetModelIndex();
+    if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
+    {
+        DWORD dwThis = (DWORD) this->GetInterface ();
+
+        if ( bDerailed )
+        {
+            * ( BYTE * ) ( dwThis + 1465 ) |= ( BYTE ) 1;
+            * ( DWORD * ) ( dwThis + 64 ) &= ( DWORD ) 0xFFFDFFFB;
+        }
+        else
+        {
+            * ( BYTE * ) ( dwThis + 1465 ) &= ( BYTE ) ~1;
+            * ( DWORD * ) ( dwThis + 64 ) |= ( DWORD ) 0x20004;
+
+            // Reset the speed
+            * ( FLOAT * ) ( dwThis + 1444 ) = 0.0f;
+
+            // Call gta function to put it back on track
+            DWORD dwFunc = 0x6F6CC0;
+            _asm
+            {
+                mov     ecx, dwThis
+                call    dwFunc
+            }
+        }
+    }   
+}
+
+
+bool CVehicleSA::IsTrainDerailed ( void )
+{
+    return * ( BYTE * ) ( ( DWORD ) this->GetInterface () + 1465 ) & 1;
+}
+
+
 bool CVehicleSA::CanPedEnterCar ( void )
 {
 	DEBUG_TRACE("bool CVehicleSA::CanPedEnterCar ( void )");

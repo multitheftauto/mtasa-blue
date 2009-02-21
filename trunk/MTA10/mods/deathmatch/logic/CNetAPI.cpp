@@ -1126,6 +1126,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     bool bLandingGearDown = ( ucFlags & 0x10 ) ? true:false;
     bool bIsOnGround = ( ucFlags & 0x20 ) ? true:false;
     bool bInWater = ( ucFlags & 0x40 ) ? true:false;
+    bool bDerailed = ( ucFlags & 0x80 ) ? true:false;
 
     // Set flag stuff
     pPlayer->SetWearingGoggles ( bWearingGoggles );
@@ -1147,6 +1148,12 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     if ( CClientVehicleManager::HasLandingGears ( iModelID ) )
     {
         pVehicle->SetLandingGearDown ( bLandingGearDown );
+    }
+
+    // Derailed state
+    if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
+    {
+        pVehicle->SetTrainDerailed ( bDerailed );
     }
 
     // Current weapon id
@@ -1340,6 +1347,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     if ( pVehicle->IsLandingGearDown () ) ucFlags |= 0x10;
     if ( pVehicle->IsOnGround () ) ucFlags |= 0x20;
     if ( pVehicle->IsInWater () ) ucFlags |= 0x40;
+    if ( pVehicle->IsTrainDerailed () ) ucFlags |= 0x80;
 
     // Write the flags
     BitStream.Write ( ucFlags );

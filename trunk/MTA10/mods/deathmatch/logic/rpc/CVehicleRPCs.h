@@ -44,6 +44,7 @@ public:
     DECLARE_RPC ( SetVehicleFuelTankExplodable );
     DECLARE_RPC ( SetVehicleWheelStates );
     DECLARE_RPC ( SetVehicleFrozen );
+    DECLARE_RPC ( SetTrainDerailed );
 };
 
 #endif

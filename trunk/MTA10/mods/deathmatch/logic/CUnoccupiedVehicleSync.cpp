@@ -258,6 +258,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                 if ( ucFlags & 0x08 ) pVehicle->SetTurnSpeed ( vecTurnSpeed );
                 if ( ucFlags & 0x10 ) pVehicle->SetHealth ( fHealth );
                 pVehicle->SetEngineOn ( ( ucFlags & 0x40 ) ? true : false );
+                if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
+                    pVehicle->SetTrainDerailed ( ( ucFlags & 0x80 ) ? true : false );
 
 #ifdef MTA_DEBUG
 				pVehicle->m_pLastSyncer = NULL;
@@ -336,6 +338,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( pVehicle->m_LastSyncedData->fHealth != pVehicle->GetHealth() ) ucFlags |= 0x10;
     if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) ucFlags |= 0x20;
     if ( pVehicle->IsEngineOn () ) ucFlags |= 0x40;
+    if ( pVehicle->IsTrainDerailed () ) ucFlags |= 0x80;
 
     // If nothing has changed we dont sync the vehicle
     if ( ucFlags == 0 ) return;

@@ -50,6 +50,9 @@ public:
     virtual CVehicle *          GetPreviousTrainCarriage ( void ) = 0;
     virtual void                SetPreviousTrainCarriage ( CVehicle * previous ) = 0;
 
+    virtual void                SetTrainDerailed ( bool bDerailed ) = 0;
+    virtual bool                IsTrainDerailed ( void ) = 0;
+
     virtual bool                CanPedEnterCar ( void ) = 0;
     virtual bool                CanPedJumpOutCar ( CPed* pPed ) = 0;
     virtual void                AddVehicleUpgrade ( DWORD dwModelID ) = 0;

@@ -38,6 +38,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_FUEL_TANK_EXPLODABLE, SetVehicleFuelTankExplodable, "SetVehicleFuelTankExplodable" );
     AddHandler ( SET_VEHICLE_WHEEL_STATES, SetVehicleWheelStates, "SetVehicleWheelStates" );
     AddHandler ( SET_VEHICLE_FROZEN, SetVehicleFrozen, "SetVehicleFrozen" );
+    AddHandler ( SET_TRAIN_DERAILED, SetTrainDerailed, "SetTrainDerailed" );
 }
 
 
@@ -507,6 +508,21 @@ void CVehicleRPCs::SetVehicleFrozen ( NetBitStreamInterface& bitStream )
                 pVehicle->SetScriptFrozen ( false );
                 pVehicle->SetFrozen ( false );
             }
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetTrainDerailed ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    unsigned char ucDerailed;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDerailed ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            pVehicle->SetTrainDerailed ( ucDerailed == 1 );
         }
     }
 }

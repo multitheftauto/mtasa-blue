@@ -145,7 +145,7 @@ public:
 
 
     // Vehicle get funcs
-    static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL );
+    static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL, bool bDirection = false );
     static bool                         GetVehicleModelFromName             ( const char* szName, unsigned short& usModel );
     static bool					        GetVehicleUpgradeSlotName			( unsigned char ucSlot, char* szName, unsigned short len );
 	static bool					        GetVehicleUpgradeSlotName			( unsigned short usUpgrade, char* szName, unsigned short len );
@@ -154,6 +154,7 @@ public:
     static bool                         GetVehicleNameFromModel             ( unsigned short usModel, char* szName, unsigned short len );
 	static bool							GetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetVehicleEngineState               ( CClientVehicle& Vehicle, bool & bState );
+    static bool                         IsTrainDerailed                     ( CClientVehicle& Vehicle, bool & bDerailed );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -183,6 +184,7 @@ public:
     static bool                         SetVehicleFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetVehicleAdjustableProperty        ( CClientEntity& Entity, unsigned short usAdjustableProperty );
 	static bool							SetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float fSpeed );
+	static bool							SetTrainDerailed				    ( CClientVehicle& Vehicle, bool bDerailed );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
