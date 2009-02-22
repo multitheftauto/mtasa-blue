@@ -2377,6 +2377,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( szRegPlate, 8 );
                     pVehicle->SetRegPlate ( szRegPlate );
 
+                    // Read the light override
                     unsigned char ucOverrideLights;
                     bitStream.Read ( ucOverrideLights );
                     pVehicle->SetOverrideLights ( ucOverrideLights );
@@ -2386,15 +2387,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( usFlags );
 
                     // Extract the flag bools
-                    bool bLandingGearDown = ( usFlags & 0x01 ) ? true:false;
-                    bool bSirenesActive = ( usFlags & 0x02 ) ? true:false;
-                    bool bPetrolTankWeak = ( usFlags & 0x04 ) ? true:false;
-                    bool bEngineOn = ( usFlags & 0x08 ) ? true:false;
-                    bool bLocked = ( usFlags & 0x10 ) ? true:false;
-                    bool bDoorsUndamageable = ( usFlags & 0x20 ) ? true:false;
-                    bool bDamageProof = ( usFlags & 0x40 ) ? true:false;
-                    bool bFrozen = ( usFlags & 0x80 ) ? true:false;
-                    bool bDerailed = ( usFlags & 0x100 ) ? true:false;
+                    bool bLandingGearDown = ( usFlags & 0x01 ) ? true : false;
+                    bool bSirenesActive = ( usFlags & 0x02 ) ? true : false;
+                    bool bPetrolTankWeak = ( usFlags & 0x04 ) ? true : false;
+                    bool bEngineOn = ( usFlags & 0x08 ) ? true : false;
+                    bool bLocked = ( usFlags & 0x10 ) ? true : false;
+                    bool bDoorsUndamageable = ( usFlags & 0x20 ) ? true : false;
+                    bool bDamageProof = ( usFlags & 0x40 ) ? true : false;
+                    bool bFrozen = ( usFlags & 0x80 ) ? true : false;
+                    bool bDerailed = ( usFlags & 0x100 ) ? true : false;
+                    bool bTrainDirection = ( usFlags & 0x200 ) ? true : false;
 
                     // If the vehicle has a landing gear, set landing gear state
                     if ( CClientVehicleManager::HasLandingGears ( usModel ) )
@@ -2402,7 +2404,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pVehicle->SetLandingGearDown ( bLandingGearDown );
                     }
 
-                    // If the vehicle has sirenes, set the sirene state
+                    // If the vehicle has sirens, set the siren state
                     if ( CClientVehicleManager::HasSirens ( usModel ) )
                     {
                         pVehicle->SetSirenOrAlarmActive ( bSirenesActive );
@@ -2415,7 +2417,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetDoorsUndamageable ( bDoorsUndamageable );
                     pVehicle->SetScriptCanBeDamaged ( !bDamageProof );
                     pVehicle->SetFrozen ( bFrozen );
-                    pVehicle->SetTrainDerailed ( bDerailed );
+                    if ( CClientVehicleManager::IsTrainModel ( usModel ) )
+                    {
+                        pVehicle->SetDerailed ( bDerailed );
+                        pVehicle->SetTrainDirection ( bTrainDirection );
+                    }
 
                     // Read out and set alpha
                     unsigned char ucAlpha = 255;

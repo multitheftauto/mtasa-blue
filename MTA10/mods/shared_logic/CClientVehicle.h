@@ -244,16 +244,19 @@ public:
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
 
-    CClientVehicle*             GetPreviousTrainCarriage    ( void );
+    CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
-    void                        SetPreviousTrainCarriage    ( CClientVehicle* pPrevious );
+    void                        SetPreviousTrainCarriage( CClientVehicle* pPrevious );
     void                        SetNextTrainCarriage    ( CClientVehicle* pNext );
 
-    void                        SetTrainDerailed        ( bool bDerailed );
-    bool                        IsTrainDerailed         ( void );
+    bool                        IsDerailed              ( void );
+    void                        SetDerailed             ( bool bDerailed );
 
-    void                        SetTrainDirection       ( int iDirection )                  { m_iTrainDirection = iDirection; };
-    int                         GetTrainDirection       ( void )                            { return m_iTrainDirection; };
+    bool                        GetTrainDirection       ( void );
+    void                        SetTrainDirection       ( bool bDirection );
+
+    float                       GetTrainSpeed           ( void );
+    void                        SetTrainSpeed           ( float fSpeed );
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
@@ -353,10 +356,10 @@ protected:
     unsigned char               m_ucMaxPassengers;
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
-    CClientPed*         m_pDriver;
-    CClientPed*         m_pPassengers [8];
-    CClientPed*         m_pOccupyingDriver;
-    CClientPed*         m_pOccupyingPassengers [8];
+    CClientPed*                 m_pDriver;
+    CClientPed*                 m_pPassengers [8];
+    CClientPed*                 m_pOccupyingDriver;
+    CClientPed*                 m_pOccupyingPassengers [8];
 	RpClump*					m_pClump;
 	short						m_usRemoveTimer;
 
@@ -423,7 +426,8 @@ protected:
     bool                        m_bIsOnGround;
 
     bool                        m_bIsDerailed;
-    int                         m_iTrainDirection;
+    bool                        m_bTrainDirection;
+    float                       m_fTrainSpeed;
 
     bool                        m_bInterpolationEnabled;
     double                      m_dResetInterpolationTime;

@@ -90,7 +90,7 @@ public:
     virtual void            DumpPoolsStatus ()=0;
 	virtual CVehicle		* AddVehicle ( eVehicleTypes vehicleType )=0;
 	virtual CPed			* AddPed ( ePedModel pedType )=0;
-    virtual CVehicle        * AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, int iDirection )=0;
+    virtual CVehicle        * AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection ) = 0;
 
 	virtual CPed *			CreateCivilianPed ( DWORD * pedInterface )=0; // or this (remove it if we possibly can)
 

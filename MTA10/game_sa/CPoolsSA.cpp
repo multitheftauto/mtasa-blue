@@ -482,7 +482,7 @@ DWORD CPoolsSA::GetPedCount (  )
 	return dwPedCount;
 }
 
-CVehicle * CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, int iDirection )
+CVehicle * CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )
 {
     // clean the existing array
     memset ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
@@ -519,7 +519,7 @@ CVehicle * CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSi
         lea     ecx, trainBegining 
         push    ecx // begining of train
         push    0 // train type (always use 0 as thats where we're writing to)
-        push    iDirection // direction 
+        push    bDirection // direction 
         push    fZ // z
         push    fY // y
         push    fX // x

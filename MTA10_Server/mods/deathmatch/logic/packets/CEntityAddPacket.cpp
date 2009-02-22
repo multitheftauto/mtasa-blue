@@ -286,7 +286,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     const char* cszRegPlate = pVehicle->GetRegPlate ();
                     BitStream.Write ( cszRegPlate, 8 );
 
-                    //
+                    // Light override
                     BitStream.Write ( pVehicle->GetOverrideLights () );
 
                     // Grab various vehicle flags
@@ -299,6 +299,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     bool bDamageProof = pVehicle->IsDamageProof ();
                     bool bFrozen = pVehicle->GetFrozen ();
                     bool bDerailed = pVehicle->IsDerailed ();
+                    bool bTrainDirection = pVehicle->GetTrainDirection ();
 
                     // Put them in a byte
                     unsigned short usFlags = 0;
@@ -311,8 +312,9 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     if ( bDamageProof ) usFlags |= 0x40;
                     if ( bFrozen ) usFlags |= 0x80;
                     if ( bDerailed ) usFlags |= 0x100;
+                    if ( bTrainDirection ) usFlags |= 0x200;
 
-                    // Write the flagbyte
+                    // Write the flags
                     BitStream.Write ( usFlags );
 
                     // Write alpha

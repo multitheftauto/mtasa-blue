@@ -258,6 +258,8 @@ public:
 	LUA_DECLARE ( GetHelicopterRotorSpeed );
     LUA_DECLARE ( GetVehicleEngineState );
     LUA_DECLARE ( IsTrainDerailed );
+    LUA_DECLARE ( GetTrainDirection );
+    LUA_DECLARE ( GetTrainSpeed );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
@@ -295,6 +297,8 @@ public:
     LUA_DECLARE ( SetVehicleAdjustableProperty );
 	LUA_DECLARE ( SetHelicopterRotorSpeed );
     LUA_DECLARE ( SetTrainDerailed );
+    LUA_DECLARE ( SetTrainDirection );
+    LUA_DECLARE ( SetTrainSpeed );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );

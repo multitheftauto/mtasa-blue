@@ -1153,7 +1153,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     // Derailed state
     if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
-        pVehicle->SetTrainDerailed ( bDerailed );
+        pVehicle->SetDerailed ( bDerailed );
     }
 
     // Current weapon id
@@ -1347,7 +1347,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     if ( pVehicle->IsLandingGearDown () ) ucFlags |= 0x10;
     if ( pVehicle->IsOnGround () ) ucFlags |= 0x20;
     if ( pVehicle->IsInWater () ) ucFlags |= 0x40;
-    if ( pVehicle->IsTrainDerailed () ) ucFlags |= 0x80;
+    if ( pVehicle->IsDerailed () ) ucFlags |= 0x80;
 
     // Write the flags
     BitStream.Write ( ucFlags );

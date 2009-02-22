@@ -1846,12 +1846,35 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( CClientVehicle& Vehic
 
 bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool& bDerailed )
 {
-    bDerailed = Vehicle.IsTrainDerailed ();
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    bDerailed = Vehicle.IsDerailed ();
 	return true;
 }
 
 
-CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate, bool bDirection )
+bool CStaticFunctionDefinitions::GetTrainDirection ( CClientVehicle& Vehicle, bool& bDirection )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    bDirection = Vehicle.GetTrainDirection ();
+	return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float& fSpeed )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    fSpeed = Vehicle.GetTrainSpeed ();
+	return true;
+}
+
+
+CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate )
 {
     if ( CClientVehicleManager::IsValidModel ( usModel ) )
     {      
@@ -1863,10 +1886,7 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource,
 
             pVehicle->SetRotationDegrees ( vecRotation );
             if ( szRegPlate )
-                pVehicle->SetRegPlate ( const_cast < char * > ( szRegPlate ) );            
-
-            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
-                pVehicle->SetTrainDirection ( ( bDirection ) ? 1 : 0 );
+                pVehicle->SetRegPlate ( const_cast < char * > ( szRegPlate ) );
 
             return pVehicle;
         }
@@ -2400,7 +2420,30 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehic
 
 bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, bool bDerailed )
 {
-	Vehicle.SetTrainDerailed ( bDerailed );
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+	Vehicle.SetDerailed ( bDerailed );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainDirection ( CClientVehicle& Vehicle, bool bDirection )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+	Vehicle.SetTrainDirection ( bDirection );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float fSpeed )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+	Vehicle.SetTrainSpeed ( fSpeed );
     return true;
 }
 

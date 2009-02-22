@@ -4239,6 +4239,56 @@ int CLuaFunctionDefinitions::IsTrainDerailed ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetTrainDirection ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            bool bDirection;
+            if ( CStaticFunctionDefinitions::GetTrainDirection ( pVehicle, bDirection ) )
+            {
+                lua_pushboolean ( luaVM, bDirection );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTrainDirection", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getTrainDirection" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetTrainSpeed ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            float fSpeed;
+            if ( CStaticFunctionDefinitions::GetTrainSpeed ( pVehicle, fSpeed ) )
+            {
+                lua_pushnumber ( luaVM, fSpeed );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTrainSpeed", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getTrainSpeed" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::FixVehicle ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -5240,12 +5290,11 @@ int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetTrainDerailed ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true:false ) )
+                if ( CStaticFunctionDefinitions::SetTrainDerailed ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
                 {
-                        lua_pushboolean ( luaVM, true );
-                }
-                return 1;
-                    
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }   
             }
             else
                 m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
@@ -5255,6 +5304,66 @@ int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetTrainDirection ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            {
+                if ( CStaticFunctionDefinitions::SetTrainDirection ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setTrainDirection" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDirection", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDirection" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetTrainSpeed ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER || lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            {
+                float fSpeed = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+                if ( CStaticFunctionDefinitions::SetTrainSpeed ( pVehicle, fSpeed ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setTrainSpeed" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainSpeed", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainSpeed" );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

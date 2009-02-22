@@ -448,6 +448,8 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "getHelicopterRotorSpeed", CLuaFunctionDefinitions::GetHelicopterRotorSpeed );
     CLuaCFunctions::AddFunction ( "getVehicleEngineState", CLuaFunctionDefinitions::GetVehicleEngineState );
     CLuaCFunctions::AddFunction ( "isTrainDerailed", CLuaFunctionDefinitions::IsTrainDerailed );
+    CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefinitions::GetTrainDirection );
+    CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefinitions::GetTrainSpeed );
 
 
     // Vehicle set funcs
@@ -478,6 +480,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleAdjustableProperty", CLuaFunctionDefinitions::SetVehicleAdjustableProperty );
 	CLuaCFunctions::AddFunction ( "setHelicopterRotorSpeed", CLuaFunctionDefinitions::SetHelicopterRotorSpeed );
     CLuaCFunctions::AddFunction ( "setTrainDerailed", CLuaFunctionDefinitions::SetTrainDerailed );
+    CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
+    CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
 
 
     // Object create/destroy funcs
