@@ -790,15 +790,15 @@ void CWaterManagerSA::Reset ()
         m_Zones [ i ].SetInterface ( &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ i ] );
 
     m_Vertices.resize ( NUM_DefWaterVertices );
-    for ( i = 0; i < NUM_DefWaterVertices; i++ )
+    for ( DWORD i = 0; i < NUM_DefWaterVertices; i++ )
         m_Vertices [ i ].SetInterface ( &m_VertexPool [ i ] );
 
     m_Quads.resize ( NUM_DefWaterQuads );
-    for ( i = 0; i < NUM_DefWaterQuads; i++ )
+    for ( DWORD i = 0; i < NUM_DefWaterQuads; i++ )
         m_Quads [ i ].SetInterface ( &m_QuadPool [ i ] );
 
     m_Triangles.resize ( NUM_DefWaterTriangles );
-    for ( i = 0; i < NUM_DefWaterTriangles; i++ )
+    for ( DWORD i = 0; i < NUM_DefWaterTriangles; i++ )
         m_Triangles [ i ].SetInterface ( &m_TrianglePool [ i ] );
 
     SetWaveLevel ( DEFAULT_WAVE_LEVEL );
