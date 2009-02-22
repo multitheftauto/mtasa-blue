@@ -118,11 +118,12 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bHasTargetRotation = false;
     m_bBlowNextFrame = false;
     m_bIsOnGround = false;
-    m_bIsDerailed = false;
     m_ulIllegalTowBreakTime = 0;
     m_bBlown = false;
     m_LastSyncedData = new SLastSyncedVehData;
-    m_iTrainDirection = 0;
+    m_bIsDerailed = false;
+    m_bTrainDirection = false;
+    m_fTrainSpeed = 0.0f;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -526,6 +527,9 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
             m_pVehicle->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
         }
         m_vecMoveSpeed = vecMoveSpeed;
+
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && !IsDerailed () )
+            SetTrainSpeed ( vecMoveSpeed.Length () );
     }
 }
 
@@ -1571,23 +1575,63 @@ void CClientVehicle::SetNextTrainCarriage ( CClientVehicle* pNext )
 }
 
 
-void CClientVehicle::SetTrainDerailed ( bool bDerailed )
+bool CClientVehicle::IsDerailed ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->IsDerailed ();
+    }
+    return m_bIsDerailed;
+}
+
+
+void CClientVehicle::SetDerailed ( bool bDerailed )
 {
     if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
     {
-        m_pVehicle->SetTrainDerailed ( bDerailed );
+        m_pVehicle->SetDerailed ( bDerailed );
     }
     m_bIsDerailed = bDerailed;
 }
 
 
-bool CClientVehicle::IsTrainDerailed ( void )
+bool CClientVehicle::GetTrainDirection ( void )
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->IsTrainDerailed ();
+        return m_pVehicle->GetTrainDirection ();
     }
-    return m_bIsDerailed;
+    return m_bTrainDirection;
+}
+
+
+void CClientVehicle::SetTrainDirection ( bool bDirection )
+{
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    {
+        m_pVehicle->SetTrainDirection ( bDirection );
+    }
+    m_bTrainDirection = bDirection;
+}
+
+
+float CClientVehicle::GetTrainSpeed ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetTrainSpeed ();
+    }
+    return m_fTrainSpeed;
+}
+
+
+void CClientVehicle::SetTrainSpeed ( float fSpeed )
+{
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    {
+        m_pVehicle->SetTrainSpeed ( fSpeed );
+    }
+    m_fTrainSpeed = fSpeed;
 }
 
 
@@ -1789,7 +1833,7 @@ void CClientVehicle::Create ( void )
         {
             DWORD dwModels [1];
             dwModels [0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_iTrainDirection );
+            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection );
         }
         else
         {
@@ -1838,7 +1882,12 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         m_pVehicle->SetTyresDontBurst ( !m_bTyresCanBurst );
-        m_pVehicle->SetTrainDerailed ( m_bIsDerailed );
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+            m_pVehicle->SetDerailed ( m_bIsDerailed );
+            m_pVehicle->SetTrainDirection ( m_bTrainDirection );
+            m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
+        }
 
         // Re-add all the upgrades
         if ( m_pUpgrades )

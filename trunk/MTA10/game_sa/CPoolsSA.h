@@ -148,7 +148,7 @@ public:
 	CPed			* AddPed ( ePedModel pedType );
 	CPed			* AddPed ( CPedSAInterface * ped );
 	CBuilding		* AddBuilding ( DWORD dwModelID );
-    CVehicle        * AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, int iDirection );
+    CVehicle        * AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection );
     
 	CPed *			CreateCivilianPed ( DWORD * pedInterface );
 

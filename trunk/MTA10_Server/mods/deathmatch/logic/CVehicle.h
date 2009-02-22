@@ -228,6 +228,8 @@ public:
 
     inline bool                     IsDerailed              ( void )                        { return m_bDerailed; }
     inline void                     SetDerailed             ( bool bDerailed )              { m_bDerailed = bDerailed; }
+    inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
+    inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
@@ -288,6 +290,7 @@ private:
     unsigned char                   m_ucAlpha;
     bool                            m_bInWater;
     bool                            m_bDerailed;
+    bool                            m_bTrainDirection;
 
     CPlayer *                       m_pJackingPlayer;
 

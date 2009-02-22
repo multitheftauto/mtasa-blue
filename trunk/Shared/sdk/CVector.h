@@ -51,7 +51,7 @@ public:
         }
     }
 
-	float Length( void )
+	float Length( void ) const
 	{
 		return sqrt((fX*fX) + (fY*fY) + (fZ*fZ));
 	}

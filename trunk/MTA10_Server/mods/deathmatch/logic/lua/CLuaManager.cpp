@@ -369,6 +369,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isVehicleOnGround", CLuaFunctionDefinitions::IsVehicleOnGround );
     CLuaCFunctions::AddFunction ( "getVehicleEngineState", CLuaFunctionDefinitions::GetVehicleEngineState );
     CLuaCFunctions::AddFunction ( "isTrainDerailed", CLuaFunctionDefinitions::IsTrainDerailed );
+    CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefinitions::GetTrainDirection );
+    CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefinitions::GetTrainSpeed );
 
     // Vehicle create/destroy funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefinitions::CreateVehicle );
@@ -407,6 +409,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleFuelTankExplodable", CLuaFunctionDefinitions::SetVehicleFuelTankExplodable );
     CLuaCFunctions::AddFunction ( "setVehicleFrozen", CLuaFunctionDefinitions::SetVehicleFrozen );
     CLuaCFunctions::AddFunction ( "setTrainDerailed", CLuaFunctionDefinitions::SetTrainDerailed );
+    CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
+    CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );

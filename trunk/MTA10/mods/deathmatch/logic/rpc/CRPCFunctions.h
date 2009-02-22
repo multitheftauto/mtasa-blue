@@ -134,6 +134,8 @@ protected:
         SET_VEHICLE_WHEEL_STATES,
         SET_VEHICLE_FROZEN,
         SET_TRAIN_DERAILED,
+        SET_TRAIN_DIRECTION,
+        SET_TRAIN_SPEED,
 
         GIVE_WEAPON,
         TAKE_WEAPON,

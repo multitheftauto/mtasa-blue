@@ -3601,6 +3601,25 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
     return true;
 }
 
+
+bool CStaticFunctionDefinitions::GetTrainDirection ( CVehicle* pVehicle, bool& bDirection )
+{
+    assert ( pVehicle );
+
+    bDirection = pVehicle->GetTrainDirection ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpeed )
+{
+    assert ( pVehicle );
+
+    const CVector& vecVelocity = pVehicle->GetVelocity ();
+    fSpeed = vecVelocity.Length ();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 {
     assert ( pElement );
@@ -4510,12 +4529,44 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDe
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( pVehicle->GetID () );
-    if ( bDerailed )
-        BitStream.pBitStream->Write ( ( unsigned char ) 0 );
-    else
-        BitStream.pBitStream->Write ( ( unsigned char ) 1 );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailed ? 1 : 0 ) );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainDirection ( CVehicle* pVehicle, bool bDirection )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetTrainDirection ( bDirection );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDirection ? 1 : 0 ) );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DIRECTION, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpeed )
+{
+    assert ( pVehicle );
+
+    CVector vecVelocity = pVehicle->GetVelocity ();
+    vecVelocity.Normalize ();
+    vecVelocity *= fSpeed;
+    pVehicle->SetVelocity ( vecVelocity );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( fSpeed );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_SPEED, *BitStream.pBitStream ) );
 
     return true;
 }
