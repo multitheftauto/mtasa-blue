@@ -381,12 +381,12 @@ public:
 	CVehicle* m_pVehicle;
 	/*** END SECTION that was added by us ***/
 
-    long Padding213[43];
+    unsigned long ul_doorstate;
+
+    long Padding213[42];
 
     //1444
     float m_fTrainSpeed;
-
-    unsigned long ul_doorstate;
 };
 
 
