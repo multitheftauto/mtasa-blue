@@ -6732,7 +6732,7 @@ bool CStaticFunctionDefinitions::ExecuteSQLUpdate ( std::string strTable, std::s
 }
 
 
-CClient* CStaticFunctionDefinitions::GetAccountClient ( CAccount* pAccount )
+CClient* CStaticFunctionDefinitions::GetAccountPlayer ( CAccount* pAccount )
 {
     assert ( pAccount );
 

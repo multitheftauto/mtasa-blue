@@ -606,7 +606,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Account get functions
     CLuaCFunctions::AddFunction ( "getAccountName", CLuaFunctionDefinitions::GetAccountName );
-    CLuaCFunctions::AddFunction ( "getAccountClient", CLuaFunctionDefinitions::GetAccountClient );
+    CLuaCFunctions::AddFunction ( "getAccountPlayer", CLuaFunctionDefinitions::GetAccountPlayer );
     CLuaCFunctions::AddFunction ( "isGuestAccount", CLuaFunctionDefinitions::IsGuestAccount );
     CLuaCFunctions::AddFunction ( "getAccountData", CLuaFunctionDefinitions::GetAccountData );
     CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefinitions::GetAccount );
