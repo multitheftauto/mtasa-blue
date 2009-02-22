@@ -599,6 +599,10 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         // Client functions. (policy changes)
         hashClient["xmlNodeFindChild"]          = "Replaced|xmlFindChild";
 
+        // Server events. (from the C++ code)
+        hashServer["onClientLogin"]             = "Replaced|onPlayerLogin";
+        hashServer["onClientLogout"]            = "Replaced|onPlayerLogout";
+        hashServer["onClientChangeNick"]        = "Replaced|onPlayerChangeNick";
 
         // Server functions. (from the C++ code)
         hashServer["getPlayerSkin"]             = "Replaced|getElementModel";
