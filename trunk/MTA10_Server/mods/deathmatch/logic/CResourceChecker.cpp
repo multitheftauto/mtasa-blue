@@ -664,6 +664,7 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["getClientName"]             = "Replaced|getPlayerName";
         hashServer["getClientIP"]               = "Replaced|getPlayerIP";
         hashServer["getClientAccount"]          = "Replaced|getPlayerAccount";
+        hashServer["getAccountClient"]          = "Replaced|getAccountPlayer";
         hashServer["setClientName"]             = "Replaced|setPlayerName";
 
         // Utility

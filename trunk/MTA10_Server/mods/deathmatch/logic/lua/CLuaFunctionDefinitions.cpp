@@ -9382,14 +9382,14 @@ int CLuaFunctionDefinitions::GetAccountName ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetAccountClient ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetAccountPlayer ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CAccount* pAccount = lua_toaccount ( luaVM, 1 );
         if ( pAccount )
         {
-            CClient* pClient =CStaticFunctionDefinitions::GetAccountClient ( pAccount );
+            CClient* pClient = CStaticFunctionDefinitions::GetAccountPlayer ( pAccount );
             if ( pClient )
             {
                 lua_pushelement ( luaVM, pClient->GetElement () );
@@ -9397,10 +9397,10 @@ int CLuaFunctionDefinitions::GetAccountClient ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getAccountClient", "account", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getAccountPlayer", "account", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getAccountClient" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getAccountPlayer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

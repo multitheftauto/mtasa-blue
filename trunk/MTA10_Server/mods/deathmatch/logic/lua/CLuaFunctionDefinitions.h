@@ -433,7 +433,7 @@ public:
 	static int		GetAccount							( lua_State* luaVM );
     static int      GetAccounts                         ( lua_State* luaVM );
     static int      GetAccountName                      ( lua_State* luaVM );
-    static int      GetAccountClient                    ( lua_State* luaVM );
+    static int      GetAccountPlayer                    ( lua_State* luaVM );
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
 

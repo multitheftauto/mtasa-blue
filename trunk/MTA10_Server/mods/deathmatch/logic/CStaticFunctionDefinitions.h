@@ -489,7 +489,7 @@ public:
     // Account get funcs
     static CAccount*            GetAccount                          ( const char* szName, const char* szPassword );
     static bool                 GetAccounts                         ( CLuaMain* pLuaMain );
-    static CClient*             GetAccountClient                    ( CAccount* pAccount );
+    static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, char* szKey );
     
