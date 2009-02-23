@@ -19,7 +19,7 @@ Var CreateSMShortcuts
 ;!define SERVER_FILES_ROOT "c:\build\mta10_server\output"
 ;!define LIGHTBUILD
 !ifndef PRODUCT_VERSION
-!define PRODUCT_VERSION "v1.0"
+	!define PRODUCT_VERSION "v1.0"
 !endif
 ; ###########################################################################################################
 
@@ -49,42 +49,45 @@ Var CreateSMShortcuts
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON			"mta.ico"
-!define MUI_UNICON		  "mta.ico"
+!define MUI_ICON		"mta.ico"
+!define MUI_UNICON		"mta.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
-!insertmacro MUI_PAGE_LICENSE					   "eula.txt"
+!insertmacro MUI_PAGE_LICENSE					"eula.txt"
 
 ; Components page
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
-!define MUI_DIRECTORYPAGE_VARIABLE				  $INSTDIR
+!define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
 !insertmacro MUI_PAGE_DIRECTORY
-!define MUI_PAGE_CUSTOMFUNCTION_PRE				 SkipDirectoryPage
-!define MUI_PAGE_HEADER_TEXT						"Grand Theft Auto: San Andreas location"
-!define MUI_PAGE_HEADER_SUBTEXT					 ""
-!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		  "Grand Theft Auto: San Andreas folder"
-!define MUI_DIRECTORYPAGE_TEXT_TOP				  "Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
-!define MUI_DIRECTORYPAGE_VARIABLE				  $GTA_DIR
-!insertmacro MUI_PAGE_DIRECTORY
+
+!ifdef CLIENT_SETUP
+	!define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
+	!define MUI_PAGE_HEADER_TEXT					"Grand Theft Auto: San Andreas location"
+	!define MUI_PAGE_HEADER_SUBTEXT					""
+	!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"Grand Theft Auto: San Andreas folder"
+	!define MUI_DIRECTORYPAGE_TEXT_TOP				"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+	!define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
+	!insertmacro MUI_PAGE_DIRECTORY
+!endif
 
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-!define MUI_FINISHPAGE_RUN						  ""
-!define MUI_FINISHPAGE_RUN_FUNCTION				 "LaunchLink"
+!define MUI_FINISHPAGE_RUN						""
+!define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_INSTFILES
 
 ; Language files
-!insertmacro MUI_LANGUAGE						   "English"
+!insertmacro MUI_LANGUAGE							"English"
 LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
 LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA DM modification, allowing you to play online."
 LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA DM, allowing you to create and edit maps."
@@ -96,7 +99,7 @@ LangString DESC_Section6 ${LANG_ENGLISH}			"This is an set of required resources
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
 LangString DESC_Section8 ${LANG_ENGLISH}			"This is a preview of the new MTA editor. It is incomplete and partially non-functional."
 LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-LangString DESC_SectionGroupDev ${LANG_ENGLISH}	 "Development code and toolss that aid in the creation of mods for Multi Theft Auto"
+LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and toolss that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 Var Dialog
@@ -659,31 +662,31 @@ ShowUnInstDetails show
 	!ifndef LIGHTBUILD
 		Section "Core resources" SEC06
 		SectionIn 1 2 RO ; section is required
-		  SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-		  SetOverwrite ifnewer
-		  File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\required\*.zip"
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\edf"
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\freecam"
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\msgbox"
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\move_*"
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\tooltip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOverwrite ifnewer
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\required\*.zip"
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\edf"
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\freecam"
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\msgbox"
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\move_*"
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\tooltip"
 		SectionEnd
 	!endif
 
 	!ifndef LIGHTBUILD
 		Section "Resource and maps pack" SEC07
 		SectionIn 1 2
-		  SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-		  SetOverwrite ifnewer
-		  File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\*.zip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOverwrite ifnewer
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\*.zip"
 		SectionEnd
 	!endif
 
 	!ifdef INCLUDE_EDITOR
 		Section /o "Editor (Developer version *still unzipped*)" SEC08
-		  SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-		  SetOverwrite ifnewer
-		  File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\editor*"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOverwrite ifnewer
+			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\editor*"
 		SectionEnd
 	!endif
 
@@ -853,10 +856,10 @@ Section Uninstall
 	SetAutoClose true
 SectionEnd
 
-# Function that skips the game directory page if client is not selected
+; Function that skips the game directory page if client is not selected
 Function SkipDirectoryPage
 	SectionGetFlags ${SEC01} $R0
 	IntOp $R0 $R0 & ${SF_SELECTED}
-	IntCmp $R0 ${SF_SELECTED} 0 +2
+	IntCmp $R0 ${SF_SELECTED} +2 0
 	Abort
 FunctionEnd
