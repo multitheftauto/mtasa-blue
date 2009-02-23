@@ -95,11 +95,11 @@ LangString DESC_SectionGroupMods ${LANG_ENGLISH}	"Modifications for Multi Theft 
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA DM modification for the server."
-LangString DESC_Section6 ${LANG_ENGLISH}			"This is an set of required resources for your server."
+LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
 LangString DESC_Section8 ${LANG_ENGLISH}			"This is a preview of the new MTA editor. It is incomplete and partially non-functional."
 LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and toolss that aid in the creation of mods for Multi Theft Auto"
+LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 Var Dialog
@@ -795,7 +795,7 @@ Section Uninstall
 		IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
 		IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
 		ask:
-		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any maps or screenshots you have created will be lost." IDYES preservemapsfolder
+		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost." IDYES preservemapsfolder
 
 		deleteall:
 		RmDir /r "$INSTDIR\mods"
