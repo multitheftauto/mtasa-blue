@@ -2084,12 +2084,26 @@ void CClientPed::StreamedInPulse ( void )
         GetControllerState ( Current );
         unsigned long ulNow = CClientTime::GetTime ();                
 
+        // Remember when we start aiming if we're aiming.
+        CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+        {
+            if ( m_ulLastTimeAimed == 0 )
+                m_ulLastTimeAimed = ulNow;
+        }
+        else
+        {
+            m_ulLastTimeAimed = 0;
+        }
+
         // Remember when we start the crouching if we're crouching.
-        CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
+        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
         if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
         {
             if ( m_ulLastTimeBeganCrouch == 0 )
                 m_ulLastTimeBeganCrouch = ulNow;
+                // No longer aiming if we're in the process of crouching
+                m_ulLastTimeAimed = 0;
         }
         else
         {
@@ -2101,11 +2115,27 @@ void CClientPed::StreamedInPulse ( void )
         // the crouching animation and shoot quickly with slow shooting weapons. Also fixes
         // the exploit making you able to get crouched without being able to move and shoot
         // with infinite ammo for remote players.
-        if ( m_ulLastTimeBeganCrouch != 0 &&
-             m_ulLastTimeBeganCrouch >= ulNow - 400 )
+        if ( m_ulLastTimeBeganCrouch != 0 )
         {
-            Current.ButtonSquare = 0;
-            Current.ButtonCross = 0;
+            if ( m_ulLastTimeBeganCrouch >= ulNow - 600 )
+            {
+                Current.ButtonSquare = 0;
+                Current.ButtonCross = 0;
+                //Disable the fire keys whilst crouching as well
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+                if ( m_ulLastTimeBeganCrouch >= ulNow - 400 )
+                {
+                    //Disable double crouching (another anim cut)
+                    Current.ShockButtonL = 0;
+                }
+            }
+        }
+        // If we just started aiming, make sure they dont try and crouch
+        else if ( m_ulLastTimeAimed != 0 &&
+             m_ulLastTimeAimed >= ulNow - 300 )
+        {
+            Current.ShockButtonL = 0;
         }
 
         // Are we working on entering a vehicle?
