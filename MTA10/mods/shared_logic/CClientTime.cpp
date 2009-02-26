@@ -37,6 +37,20 @@ unsigned long CClientTime::GetTime ( void )
 }
 
 
+double CClientTime::GetGameSeconds ( void )
+{
+    static double dCount = 0;
+    static DWORD dwWas = GetTickCount ();
+    DWORD dwNow = GetTickCount ();
+    DWORD dwDelta = dwNow - dwWas;
+    dwWas = dwNow;
+
+    if( dwDelta < 0x40000000 )      // Avoid negative leaps
+        dCount += dwDelta * 0.001;  // Accumulate delta
+    return dCount;
+}
+
+
 double CClientTime::GetTimeNano ( void )
 {
     // Use the performance counter if initialize succeeded to initiate using it
