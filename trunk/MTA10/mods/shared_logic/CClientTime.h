@@ -24,6 +24,7 @@ class CClientTime
 public:
     static unsigned long    GetTime             ( void );
 	static double			GetTimeNano			( void );
+	static double			GetGameSeconds		( void );
 
 private:
     static bool             InitializeTime      ( void );

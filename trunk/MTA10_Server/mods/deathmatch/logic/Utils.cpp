@@ -387,6 +387,20 @@ void InitializeTime ( void )
 }
 
 
+double GetGameSeconds()
+{
+    static double dCount = 0;
+    static DWORD dwWas = GetTickCount ();
+    DWORD dwNow = GetTickCount ();
+    DWORD dwDelta = dwNow - dwWas;
+    dwWas = dwNow;
+
+    if( dwDelta < 0x40000000 )      // Avoid negative leaps
+        dCount += dwDelta * 0.001;  // Accumulate delta
+    return dCount;
+}
+
+
 void DisconnectPlayer ( CGame* pGame, CPlayer& Player, const char* szMessage )
 {
     // Send it to the disconnected player
