@@ -2082,7 +2082,9 @@ void CClientPed::StreamedInPulse ( void )
         
         CControllerState Current;
         GetControllerState ( Current );
-        unsigned long ulNow = CClientTime::GetTime ();                
+        unsigned long ulNow = CClientTime::GetTime (); 
+        //MS checks must take into account the gamespeed
+        float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
 
         // Remember when we start aiming if we're aiming.
         CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
@@ -2117,14 +2119,14 @@ void CClientPed::StreamedInPulse ( void )
         // with infinite ammo for remote players.
         if ( m_ulLastTimeBeganCrouch != 0 )
         {
-            if ( m_ulLastTimeBeganCrouch >= ulNow - 600 )
+            if ( m_ulLastTimeBeganCrouch >= ulNow - 600.0f*fSpeedRatio )
             {
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
                 //Disable the fire keys whilst crouching as well
                 Current.ButtonCircle = 0;
                 Current.LeftShoulder1 = 0;
-                if ( m_ulLastTimeBeganCrouch >= ulNow - 400 )
+                if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
                 {
                     //Disable double crouching (another anim cut)
                     Current.ShockButtonL = 0;
@@ -2133,7 +2135,7 @@ void CClientPed::StreamedInPulse ( void )
         }
         // If we just started aiming, make sure they dont try and crouch
         else if ( m_ulLastTimeAimed != 0 &&
-             m_ulLastTimeAimed >= ulNow - 300 )
+             m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio )
         {
             Current.ShockButtonL = 0;
         }
