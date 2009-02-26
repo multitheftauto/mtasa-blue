@@ -8632,6 +8632,11 @@ int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
         timer = ( time_t ) lua_tonumber ( luaVM, 1 );
+        if ( timer < 0 )
+        {
+            lua_pushboolean ( luaVM, 0 );
+            return 1;
+        }
     }
     tm * time = localtime ( &timer );
 
