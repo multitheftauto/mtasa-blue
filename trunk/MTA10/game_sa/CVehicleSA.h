@@ -105,6 +105,12 @@ class CVehicleSA;
 //0041BDD0  public: void __thiscall CVehicle::SetEngineOn(bool)
 #define FUNC_CVehicle_SetEngineOn               0x41BDD0
 
+//006F6CC0  public: void __thiscall CVehicle::RecalcOnRailDistance(void)
+#define FUNC_CVehicle_RecalcOnRailDistance           0x6F6CC0
+
+//006F6BD0  int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
+#define FUNC_GetTrainNodeNearPoint              0x6F6BD0
+
 #define FUNC_CVehicle_QueryPickedUpEntityWithWinch              0x6d3cf0
 #define FUNC_CVehicle_PickUpEntityWithWinch                     0x6d3cd0
 #define FUNC_CVehicle_ReleasePickedUpEntityWithWinch            0x6d3cb0
@@ -138,7 +144,20 @@ class CVehicleSA;
 // Used when deleting vehicles
 #define VTBL_CPlaceable							0x863C40
 
-#define MAX_PASSENGERS						8
+#define MAX_PASSENGERS						    8
+
+#define NUM_RAILTRACKS                          4
+#define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
+#define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
+
+typedef struct
+{
+    short sX;               // x coordinate times 8
+    short sY;               // y coordinate times 8
+    short sZ;               // z coordinate times 8
+    short sRailDistance;    // on-rail distance times 3
+    short padding;
+} SRailNodeSA;
 
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
 {
@@ -387,6 +406,13 @@ public:
 
     //1444
     float m_fTrainSpeed;
+    //1448
+    float m_fTrainRailDistance;    // Distance along rail starting from first rail node
+    
+    long padding9001[5];
+
+    //1472
+    BYTE m_ucRailTrackID;
 };
 
 
@@ -402,6 +428,9 @@ public:
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
 								CVehicleSA                      ( eVehicleTypes dwModelID );
 								~CVehicleSA                     ();
+
+    // Override of CPhysicalSA::SetMoveSpeed to take trains into account
+    VOID                        SetMoveSpeed                    ( CVector* vecMoveSpeed );
 
     bool                        AddProjectile                   ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
