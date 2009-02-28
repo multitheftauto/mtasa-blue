@@ -247,6 +247,19 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     char szBuffer [MAX_PATH];
     if ( m_NetworkLibrary.Load ( GetAbsolutePath ( szNetworkLibName, szBuffer, MAX_PATH ) ) )
     {
+        // Network module compatibility check
+        typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
+        PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
+        if ( pfnCheckCompatibility && !pfnCheckCompatibility ( 0x0001 ) )
+        {
+            // net.dll doesn't like our version number
+            Print ( "Network module not compatible!\n" );
+            Print ( "Press Q to shut down the server!\n" );
+            WaitForKey ( 'q' );
+			DestroyWindow ( );
+            return ERROR_NETWORK_LIBRARY_FAILED;
+        }
+
         if ( m_XMLLibrary.Load ( GetAbsolutePath ( szXMLLibName, szBuffer, MAX_PATH ) ) )
         {
             // Grab the network interface
