@@ -232,7 +232,6 @@ protected:
 
     list < class CPerPlayerEntity* >            m_ElementReferenced;
     list < class CColShape* >                   m_Collisions;
-    list < class CPlayerCamera* >               m_FollowingCameras;
 
     CElement*                                   m_pAttachedTo;
     CVector                                     m_vecAttachedPosition;
