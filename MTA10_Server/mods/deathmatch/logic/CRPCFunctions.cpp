@@ -16,7 +16,6 @@ CRPCFunctions * g_pRPCFunctions = NULL;
 extern CGame * g_pGame;
 
 CPlayer * CRPCFunctions::m_pSourcePlayer;
-unsigned long CRPCFunctions::m_ulTimeStamp;
 
 static CPlayerManager * m_pPlayerManager;
 
@@ -62,9 +61,8 @@ void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback )
 }
 
 
-void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream, unsigned long ulTimeStamp )
+void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream )
 {
-    m_ulTimeStamp = ulTimeStamp;
     m_pSourcePlayer = m_pPlayerManager->Get ( Socket );
     if ( m_pSourcePlayer && !m_pSourcePlayer->IsBeingDeleted () )
     {

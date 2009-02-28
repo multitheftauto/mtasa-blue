@@ -248,7 +248,7 @@ void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
 }
 
 
-void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet, unsigned long ulTimeStamp )
+void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
 {
     // Are we synced? (if not we're not visible to anybody)
     if ( m_bIsSynced )
@@ -257,7 +257,7 @@ void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet, unsigned lo
         list < CPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end (); iter++ )
         {
-            (*iter)->Send ( Packet, ulTimeStamp );
+            (*iter)->Send ( Packet );
         }
     }
 }

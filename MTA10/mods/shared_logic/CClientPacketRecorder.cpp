@@ -168,7 +168,7 @@ void CClientPacketRecorder::SetFrameSkip ( unsigned int uiFrameSkip )
 }
 
 
-void CClientPacketRecorder::RecordPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long ulTimeStamp )
+void CClientPacketRecorder::RecordPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     if ( m_bRecording && m_szFilename )
     {
@@ -214,7 +214,7 @@ void CClientPacketRecorder::RecordPacket ( unsigned char ucPacketID, NetBitStrea
 }
 
 
-void CClientPacketRecorder::RecordLocalData ( CClientPlayer* pLocalPlayer, unsigned long ulTimeStamp )
+void CClientPacketRecorder::RecordLocalData ( CClientPlayer* pLocalPlayer )
 {
     if ( m_bRecording && m_szFilename )
     {
@@ -419,7 +419,7 @@ void CClientPacketRecorder::DoPulse ( void )
 
                         // Send it to the packethandler
 						//g_pCore->GetConsole()->Printf("(time: %u, current: %u) %u\n",ulTimeStamp,lCurTime,ucPacketID);
-                        m_pfnPacketHandler ( ucPacketID, *pBitStream, ulTimeStamp );
+                        m_pfnPacketHandler ( ucPacketID, *pBitStream, 0 );
 
                         // Destroy the bitstream
                         g_pNet->DeallocateNetBitStream ( pBitStream );

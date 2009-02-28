@@ -112,7 +112,7 @@ public:
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
-    void                                        Send                        ( const CPacket& Packet, unsigned long ulTimeStamp = 0, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
+    void                                        Send                        ( const CPacket& Packet, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
     void                                        SendEcho                    ( const char* szEcho );
     void                                        SendConsole                 ( const char* szEcho );
 

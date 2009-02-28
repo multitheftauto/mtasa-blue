@@ -720,7 +720,7 @@ void CGame::Stop ( void )
 }
 
 
-bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream, unsigned long ulTimeStamp )
+bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream, unsigned long )
 {
     // Is it a join packet? Pass it to the handler immediately
     if ( ucPacketID == PACKET_ID_PLAYER_JOIN )
@@ -732,16 +732,16 @@ bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& S
     // Is it an rpc call?
     if ( ucPacketID == PACKET_ID_RPC )
     {
-        g_pGame->m_pRPCFunctions->ProcessPacket ( Socket, BitStream, ulTimeStamp );
+        g_pGame->m_pRPCFunctions->ProcessPacket ( Socket, BitStream );
         return true;
     }
 
     // Translate the packet
-    CPacket* pPacket = g_pGame->m_pPacketTranslator->Translate ( Socket, static_cast < ePacketID > ( ucPacketID ), BitStream, ulTimeStamp );
+    CPacket* pPacket = g_pGame->m_pPacketTranslator->Translate ( Socket, static_cast < ePacketID > ( ucPacketID ), BitStream );
     if ( pPacket )
     {
         // Handle it
-        bool bHandled = g_pGame->ProcessPacket ( *pPacket, ulTimeStamp );
+        bool bHandled = g_pGame->ProcessPacket ( *pPacket );
 
         // Destroy the packet and return whether it could handle it or not
         delete pPacket;
@@ -753,7 +753,7 @@ bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& S
 }
 
 
-bool CGame::ProcessPacket ( CPacket& Packet, unsigned long ulTimeStamp )
+bool CGame::ProcessPacket ( CPacket& Packet )
 {
     // Can we handle it?
     ePacketID PacketID = Packet.GetPacketID ();
@@ -1462,7 +1462,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
                     if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
                     {
                         // Send it.
-                        pSendPlayer->Send ( Packet, Packet.m_ulTimeStamp );
+                        pSendPlayer->Send ( Packet );
                     }
                 }
             }
@@ -1546,7 +1546,7 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
                     if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
                     {
                         // Send it.
-                        pSendPlayer->Send ( Packet, Packet.m_ulTimeStamp );
+                        pSendPlayer->Send ( Packet );
                     }
                 }
             }

@@ -146,14 +146,12 @@ public:
     inline void                         SetSourceElement    ( CElement* pSource )                               { m_pSourceElement = pSource; };
     inline CElement*                    GetSourceElement    ( void ) const                                      { return m_pSourceElement; };
     CPlayer*                            GetSourcePlayer     ( void );
-    void                                SetTimeStamp        ( unsigned long ulTimeStamp )                       { m_ulTimeStamp = ulTimeStamp; };
     inline void                         SetSourceSocket     ( const NetServerPlayerID& Source )                 { m_Source = Source; };
     inline const NetServerPlayerID&     GetSourceSocket     ( void ) const                                      { return m_Source; };
     inline unsigned long                GetSourceIP         ( void ) const                                      { return m_Source.GetBinaryAddress (); };
     inline unsigned short               GetSourcePort       ( void ) const                                      { return m_Source.GetPort (); };
 
     virtual void                        Send                ( CPlayer* pPlayer ) const;
-    unsigned long                       m_ulTimeStamp;
 private:
     
 protected:

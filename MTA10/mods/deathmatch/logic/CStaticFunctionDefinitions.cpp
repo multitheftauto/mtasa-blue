@@ -3191,8 +3191,8 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVecto
             // Write our data
             pNetAPI->WriteCameraSync ( *pBitStream );
 
-            // Send the packet and destroy it (timestamped)
-            g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME, true );
+            // Send the packet and destroy it
+            g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
@@ -3240,8 +3240,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
         // Write our data
         m_pClientGame->GetNetAPI ()->WriteCameraSync ( *pBitStream );
 
-        // Send the packet and destroy it (timestamped)
-        g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME, true );
+        // Send the packet and destroy it
+        g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
         g_pNet->DeallocateNetBitStream ( pBitStream );
     }
 

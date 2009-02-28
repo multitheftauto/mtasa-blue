@@ -43,7 +43,7 @@ public:
 
     void                        AddHandlers                             ( void );
     static void                 AddHandler                              ( unsigned char ucID, pfnRPCHandler Callback );
-    void                        ProcessPacket                           ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream, unsigned long ulTimeStamp );
+    void                        ProcessPacket                           ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream );
 
 protected:
     DECLARE_RPC ( PlayerInGameNotice );
@@ -55,7 +55,6 @@ protected:
 
 protected:
     static CPlayer *            m_pSourcePlayer;
-    static unsigned long        m_ulTimeStamp;
 
     vector < SRPCHandler * >    m_RPCHandlers;
 

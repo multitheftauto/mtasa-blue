@@ -26,7 +26,7 @@
 
 #define NET_INVALID_PACKET_ID		255
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, NetBitStreamInterface&, unsigned long ulTimeStamp );
+typedef bool (*PPACKETHANDLER) ( unsigned char, NetBitStreamInterface&, unsigned long );
 
 enum NetPacketPriority
 {

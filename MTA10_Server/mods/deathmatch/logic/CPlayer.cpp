@@ -169,8 +169,8 @@ char* CPlayer::GetSourceIP ( char* pBuffer )
     return pBuffer;
 }
 
-
-void CPlayer::Send ( const CPacket& Packet, unsigned long ulTimeStamp, NetServerPacketOrdering packetOrdering )
+// TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
+void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrdering )
 {
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
@@ -210,7 +210,7 @@ void CPlayer::Send ( const CPacket& Packet, unsigned long ulTimeStamp, NetServer
         // Write the content to it and send it
         if ( Packet.Write ( *pBitStream ) )
         {
-            g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, packetOrdering, ulTimeStamp );
+            g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, packetOrdering );
         }
 
         // Destroy the bitstream

@@ -162,8 +162,8 @@ public:
     bool                        Start                       ( int iArgumentCount, char* szArguments [] );
     void                        Stop                        ( void );
 
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream, unsigned long ulTimeStamp = 0 );
-    bool                        ProcessPacket               ( CPacket& Packet, unsigned long ulTimeStamp = 0 );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream, unsigned long );
+    bool                        ProcessPacket               ( CPacket& Packet );
 
     inline void                 SetIsFinished               ( bool bFinished )  { m_bIsFinished = bFinished; };
     inline bool                 IsFinished                  ( void )            { return m_bIsFinished; };

@@ -99,7 +99,6 @@ void CSyncDebug::OnDraw ( void )
                "Position: %f %f %f\n"
                "Rotation: %f\n"
                "Is dead: %u\n"
-               "Timestamp: %u\n"
                "Ping to server: %u\n"
                "Player syncs: %u\n"
                "Vehicle syncs: %u\n"
@@ -109,7 +108,6 @@ void CSyncDebug::OnDraw ( void )
                vecPosition.fX, vecPosition.fY, vecPosition.fZ,
                fCurrentRotation,
                m_pPlayer->IsDead (),
-               m_pPlayer->GetTimeStamp (),
                m_pPlayer->GetLatency (),
                m_pPlayer->GetPlayerSyncCount (),
                m_pPlayer->GetVehicleSyncCount (),

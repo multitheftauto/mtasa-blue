@@ -32,7 +32,7 @@ class CPacketHandler
     };
 
 public:
-    bool                ProcessPacket                   ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long ulTimeStamp );
+    bool                ProcessPacket                   ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
     void                Packet_ServerConnected          ( NetBitStreamInterface& bitStream );
     void                Packet_ServerJoined             ( NetBitStreamInterface& bitStream );

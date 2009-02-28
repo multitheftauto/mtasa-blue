@@ -233,7 +233,7 @@ void CConnectManager::DoPulse ( void )
 }
 
 
-bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& BitStream, unsigned long ulTimeStamp )
+bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& BitStream, unsigned long )
 {
     // We're working on connecting?
     if ( g_pConnectManager->m_bIsConnecting )

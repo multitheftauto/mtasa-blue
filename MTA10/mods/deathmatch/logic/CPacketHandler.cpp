@@ -20,10 +20,10 @@ class CCore;
 
 // TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the 
 //       horribly big CClientGame file.
-bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long ulTimeStamp )
+bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     // Can the net api handle it?
-    if ( g_pClientGame->m_pNetAPI->ProcessPacket ( ucPacketID, bitStream, ulTimeStamp ) )
+    if ( g_pClientGame->m_pNetAPI->ProcessPacket ( ucPacketID, bitStream ) )
     {
         return true;
     }
