@@ -37,7 +37,7 @@ public:
 		this->fZ = fZ;
 	}
 
-    void Normalize( void ) 
+    void Normalize ( void ) 
     { 
         double t = sqrt(fX*fX + fY*fY + fZ*fZ);
         if ( t > 0 )
@@ -51,19 +51,21 @@ public:
         }
     }
 
-	float Length( void ) const
+	float Length ( void ) const
 	{
 		return sqrt((fX*fX) + (fY*fY) + (fZ*fZ));
 	}
 
-    void dotproduct( CVector * param ) 
+    float DotProduct ( CVector * param ) const
+    {
+        return fX*param->fX + fY*param->fY + fZ*param->fZ;
+    }
+
+    void CrossProduct ( CVector * param ) 
     { 
-        double xh = fY * param->fZ - param->fY * fZ;
-        double yh = fZ * param->fX - param->fZ * fX;
-        double zh = fX * param->fY - param->fX * fY;
-        fX = (float)xh;
-        fY = (float)yh;
-        fZ = (float)zh;
+        fX = fY * param->fZ - param->fY * fZ;
+        fY = fZ * param->fX - param->fZ * fX;
+        fZ = fX * param->fY - param->fX * fY;
     }
 
     CVector operator + ( const CVector& vecRight ) const

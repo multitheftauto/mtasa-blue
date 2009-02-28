@@ -527,9 +527,6 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
             m_pVehicle->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
         }
         m_vecMoveSpeed = vecMoveSpeed;
-
-        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && !IsDerailed () )
-            SetTrainSpeed ( vecMoveSpeed.Length () );
     }
 }
 

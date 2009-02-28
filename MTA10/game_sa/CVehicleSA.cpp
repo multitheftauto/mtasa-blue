@@ -131,6 +131,54 @@ CVehicleSA::~CVehicleSA()
 	}
 }
 
+VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
+{
+    DWORD dwFunc = FUNC_GetMoveSpeed;
+    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwReturn = 0;
+    _asm
+    {
+        mov		ecx, dwThis
+        call	dwFunc
+        mov		dwReturn, eax
+    }
+    memcpy((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
+
+    // In case of train: calculate on-rail speed
+    WORD wModelID = GetModelIndex();
+    if ( (wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449)
+         && !IsDerailed () )
+    {
+        CVehicleSAInterface* pInterf = GetVehicleInterface ();
+
+        // Find the rail node we are on
+        DWORD dwNumNodes = ((DWORD *)ARRAY_NumRailTrackNodes) [ pInterf->m_ucRailTrackID ];
+        SRailNodeSA* pNode = ( (SRailNodeSA **) ARRAY_RailTrackNodePointers ) [ pInterf->m_ucRailTrackID ];
+        SRailNodeSA* pNodesEnd = &pNode [ dwNumNodes ];
+        while ( (float)pNode->sRailDistance / 3.0f <= pInterf->m_fTrainRailDistance && pNode < pNodesEnd )
+        {
+            pNode++;
+        }
+        if ( pNode >= pNodesEnd )
+            return;
+        // Get the direction vector between the nodes the train is between
+        CVector vecNode1 ( (float)(pNode - 1)->sX / 8.0f, (float)(pNode - 1)->sY / 8.0f, (float)(pNode - 1)->sZ / 8.0f );
+        CVector vecNode2 ( (float)pNode->sX / 8.0f, (float)pNode->sY / 8.0f, (float)pNode->sZ / 8.0f );
+        CVector vecDirection = vecNode2 - vecNode1;
+        // Now then, are we going with or against the direction of the track (forwards/backwards)?
+        if ( vecDirection.DotProduct ( vecMoveSpeed ) >= 0.0f )
+        {
+            // Forwards
+            pInterf->m_fTrainSpeed = vecMoveSpeed->Length ();
+        }
+        else
+        {
+            // Backwards
+            pInterf->m_fTrainSpeed = -vecMoveSpeed->Length ();
+        }
+    }
+}
+
 CVehicleSAInterface * CVehicleSA::GetNextCarriageInTrain ( void )
 {
     return (CVehicleSAInterface *)*(DWORD *)((DWORD)this->GetInterface() + 1492);
@@ -228,10 +276,9 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
 
             // Reset the speed
             GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
-            //* ( FLOAT * ) ( dwThis + 1444 ) = 0.0f;
 
-            // Call gta function to put it back on track
-            DWORD dwFunc = 0x6F6CC0;
+            // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
+            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
             _asm
             {
                 mov     ecx, dwThis

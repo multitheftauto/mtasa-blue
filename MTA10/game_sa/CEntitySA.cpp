@@ -44,21 +44,18 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
         vecPos->fZ = fZ;
     }
 
-    /*
     WORD wModelID = GetModelIndex();
     if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
     {
+        // If it's a train, recalculate its rail position parameter (does not affect derailed state)
         DWORD dwThis = (DWORD) m_pInterface;
-        DWORD dwFunc = 0x6F6CC0;
+        DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
         _asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
-        
-        //OutputDebugString ( "Set train position on tracks!\n" );
     }
-    */
 }
 
 VOID CEntitySA::Teleport ( float fX, float fY, float fZ )
