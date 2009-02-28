@@ -970,6 +970,16 @@ void CCore::CreateNetwork ( )
     // Load approrpiate compilation-specific library.
     m_NetModule.LoadModule ( "net.dll" );
 
+    // Network module compatibility check
+    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
+    PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
+    if ( pfnCheckCompatibility && !pfnCheckCompatibility ( 0x0001 ) )
+    {
+        // net.dll doesn't like our version number
+        MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        TerminateProcess ( GetCurrentProcess (), 0 );
+    }
+
     // Get client initializer function from DLL's routine.
     pfnNetInit = static_cast< pfnNetInitializer > 
     ( m_NetModule.GetFunctionPointer ( "InitNetInterface" ) );
