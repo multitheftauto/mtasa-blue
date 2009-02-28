@@ -123,6 +123,9 @@ void CPlayerCamera::SetTarget ( CElement * pElement )
 {
     // We should always have a target here
     assert ( pElement );
+
+    if ( m_pTarget ) m_pTarget->m_FollowingCameras.remove ( this );
+    if ( pElement ) pElement->m_FollowingCameras.push_back ( this );
     m_pTarget = pElement;
 }
 

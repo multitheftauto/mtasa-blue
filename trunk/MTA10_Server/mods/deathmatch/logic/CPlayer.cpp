@@ -101,6 +101,9 @@ CPlayer::~CPlayer ( void )
 
     if ( m_pCamera )
     {
+        // Remove the camera from its targets FollowingCameras list
+        if ( m_pCamera->GetTarget () )
+            m_pCamera->GetTarget ()->m_FollowingCameras.remove ( m_pCamera );
         delete m_pCamera;
         m_pCamera = NULL;
     }    

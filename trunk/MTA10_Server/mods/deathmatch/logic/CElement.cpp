@@ -89,6 +89,13 @@ CElement::~CElement ( void )
 
     RemoveAllCollisions ( true );
 
+    // Null all camera elements referencing us
+    list < CPlayerCamera* > ::const_iterator iterFollowingCameras = m_FollowingCameras.begin ();
+    for ( ; iterFollowingCameras != m_FollowingCameras.end (); iterFollowingCameras++ )
+    {
+        (*iterFollowingCameras)->m_pTarget = NULL;
+    }
+
     if ( m_pAttachedTo )
         m_pAttachedTo->RemoveAttachedElement ( this );
 
