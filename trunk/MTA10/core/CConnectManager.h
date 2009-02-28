@@ -35,7 +35,7 @@ public:
 
     void            DoPulse             ( void );
 
-    static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream, unsigned long ulTimeStamp );
+    static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream, unsigned long );
 
 	inline void		SetMTUSize			( unsigned short usMTUSize )											{ m_usMTUSize = usMTUSize; };
 

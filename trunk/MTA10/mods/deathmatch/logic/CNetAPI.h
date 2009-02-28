@@ -41,7 +41,7 @@ public:
                             CNetAPI                         ( CClientManager * pManager);
 
     void                    DoPulse                         ( void );
-    bool                    ProcessPacket                   ( unsigned char bytePacketID, NetBitStreamInterface &bitStream, unsigned long ulTimeStamp );
+    bool                    ProcessPacket                   ( unsigned char bytePacketID, NetBitStreamInterface &bitStream );
 
     void                    ResetReturnPosition             ( void );
 
@@ -80,7 +80,7 @@ public:
     bool                    IsCameraSyncNeeded              ( bool bDifferenceCheck );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );
 
-    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME, bool bTimestamp = false );
+    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
 
 private:
     CClientManager*         m_pManager;

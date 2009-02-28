@@ -3526,12 +3526,12 @@ void CClientGame::PostWeaponFire ( void )
 }
 
 
-bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long ulTimeStamp )
+bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long )
 {
     if ( g_pClientGame )
     {
-        g_pClientGame->GetManager ()->GetPacketRecorder ()->RecordPacket ( ucPacketID, bitStream, ulTimeStamp );
-        return g_pClientGame->m_pPacketHandler->ProcessPacket ( ucPacketID, bitStream, ulTimeStamp );
+        g_pClientGame->GetManager ()->GetPacketRecorder ()->RecordPacket ( ucPacketID, bitStream );
+        return g_pClientGame->m_pPacketHandler->ProcessPacket ( ucPacketID, bitStream );
     }
 
     return false;

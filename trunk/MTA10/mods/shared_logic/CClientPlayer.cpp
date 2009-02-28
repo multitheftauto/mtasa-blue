@@ -40,7 +40,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ulLastPuresyncTime = 0;
     m_bHasConnectionTrouble = false;    
 
-    m_ulTimeStamp  = 0;
     m_bForce = false;
     m_bDoExtrapolatingAim = false;
 

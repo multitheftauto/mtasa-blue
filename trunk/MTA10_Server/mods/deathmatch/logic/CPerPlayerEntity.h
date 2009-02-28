@@ -48,7 +48,7 @@ protected:
     virtual void                CreateEntity                    ( CPlayer* pPlayer );
     virtual void                DestroyEntity                   ( CPlayer* pPlayer );
 
-    void                        BroadcastOnlyVisible            ( const CPacket& Packet, unsigned long ulTimeStamp = 0 );
+    void                        BroadcastOnlyVisible            ( const CPacket& Packet );
     bool                        m_bIsSynced;
 
     list < CElement* >          m_ElementReferences;

@@ -19,7 +19,6 @@ CPacket::CPacket ( void )
     // Init
     m_pSourceElement = NULL;
     memset ( &m_Source, 0, sizeof ( NetServerPlayerID ) );
-    m_ulTimeStamp = 0x10000000;
 }
 
 
@@ -31,5 +30,5 @@ CPlayer * CPacket::GetSourcePlayer ( void )
 
 void CPacket::Send ( CPlayer* pPlayer ) const
 {
-    pPlayer->Send ( *this, m_ulTimeStamp );
+    pPlayer->Send ( *this );
 }

@@ -269,7 +269,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, list < CPlayer * > & pla
     }
 }
 
-
+// TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
 void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip, NetServerPacketOrdering packetOrdering )
 {
     // Send the packet to each ingame player on the server except the skipped one
@@ -278,7 +278,7 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
     {
         if ( *iter != pSkip && (*iter)->IsJoined () )
         {
-            (*iter)->Send ( Packet, Packet.m_ulTimeStamp, packetOrdering );
+            (*iter)->Send ( Packet, packetOrdering );
         }
     }
 }

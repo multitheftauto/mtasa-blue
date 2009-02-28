@@ -76,9 +76,6 @@ public:
     inline bool                     IsExtrapolatingAim      ( void )                            { return m_bDoExtrapolatingAim; };
     void                            UpdateAimPosition       ( const CVector &vecAim );
 
-    inline unsigned long            GetTimeStamp            ( void )                            { return m_ulTimeStamp; };
-    inline void                     SetTimeStamp            ( unsigned long ulTimeStamp )       { m_ulTimeStamp = ulTimeStamp; };
-
     inline unsigned short           GetLatency              ( void )                            { return m_usLatency; };
     inline void                     SetLatency              ( unsigned short usLatency )        { m_usLatency = (m_usLatency + usLatency) / 2; };
 
@@ -124,7 +121,6 @@ private:
     CVector                         m_vecTargetIncrements;
     unsigned int                    m_uiFramesSincePositionUpdate;
 
-    unsigned long                   m_ulTimeStamp;
     unsigned short                  m_usLatency;
     CVector                         m_vecAimSpeed;
     CVector                         m_vecOldAim;

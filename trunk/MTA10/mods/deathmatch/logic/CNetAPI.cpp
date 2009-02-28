@@ -37,7 +37,7 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
 }
 
 
-bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface& BitStream, unsigned long ulTimeStamp ) 
+bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface& BitStream ) 
 {
     switch ( bytePacketID )
     { 
@@ -51,9 +51,6 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
                 if ( pPlayer )
                 {
-                    // Set his timestamp for later
-                    pPlayer->SetTimeStamp ( ulTimeStamp );
-
                     // Read out and apply the puresync data
                     ReadPlayerPuresync ( pPlayer, BitStream );
                 }
@@ -95,9 +92,6 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
                 if ( pPlayer )
                 {
-                    // Set his timestamp for later
-                    pPlayer->SetTimeStamp ( ulTimeStamp );
-
                     // Read out the keysync data
                     ReadKeysync ( pPlayer, BitStream );
                 }
@@ -260,7 +254,7 @@ void CNetAPI::DoPulse ( void )
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
 			// Record local data in the packet recorder
-			m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer, ulCurrentTime );
+			m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
 
             // We should do a puresync?
             if ( IsPureSyncNeeded () )
@@ -275,8 +269,8 @@ void CNetAPI::DoPulse ( void )
                         // Write our data
                         WriteVehiclePuresync ( pPlayer, pVehicle, *pBitStream );
 
-                        // Send the packet and destroy it (timestamped)
-                        g_pNet->SendPacket( PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME, true );
+                        // Send the packet and destroy it
+                        g_pNet->SendPacket( PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
                         g_pNet->DeallocateNetBitStream ( pBitStream );
                     }
 
@@ -298,8 +292,8 @@ void CNetAPI::DoPulse ( void )
                             // Write our data
                             WritePlayerPuresync ( pPlayer, *pBitStream );
 
-                            // Send the packet and destroy it (timestamped)
-                            g_pNet->SendPacket( PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME, true );
+                            // Send the packet and destroy it
+                            g_pNet->SendPacket( PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
                             g_pNet->DeallocateNetBitStream ( pBitStream );
                         }
                     }
@@ -333,8 +327,8 @@ void CNetAPI::DoPulse ( void )
                     // Write our data
                     WriteCameraSync ( *pBitStream );
 
-                    // Send the packet and destroy it (timestamped)
-                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME, true );
+                    // Send the packet and destroy it
+                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
                     g_pNet->DeallocateNetBitStream ( pBitStream );
                 }
             }
@@ -1744,7 +1738,7 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 }
 
 
-void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, NetPacketOrdering packetOrdering, bool bTimestamp )
+void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, NetPacketOrdering packetOrdering )
 {
     NetBitStreamInterface* pRPCBitStream = g_pNet->AllocateNetBitStream ();
     if ( pRPCBitStream )
@@ -1765,7 +1759,7 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
             pBitStream->ResetReadPointer ();
         }
 
-        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, packetOrdering, bTimestamp );
+        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, packetOrdering );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
 }

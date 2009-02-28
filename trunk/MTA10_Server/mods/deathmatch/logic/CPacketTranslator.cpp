@@ -27,7 +27,7 @@ CPacketTranslator::~CPacketTranslator ( void )
 }
 
 
-CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetServerBitStreamInterface& BitStream, unsigned long ulTimeStamp )
+CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetServerBitStreamInterface& BitStream )
 {
     // Create the packet class
     CPacket* pTemp = NULL;
@@ -124,7 +124,6 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
     if ( pTemp )
     {
         // Set the source socket and player
-        pTemp->SetTimeStamp(ulTimeStamp);
         pTemp->SetSourceSocket ( Socket );
 
         // Make sure players that have just disconnected don't get their packet processed
