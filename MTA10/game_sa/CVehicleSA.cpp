@@ -146,28 +146,30 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
 
     // In case of train: calculate on-rail speed
     WORD wModelID = GetModelIndex();
-    if ( (wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449)
-         && !IsDerailed () )
+    if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
     {
-        CVehicleSAInterface* pInterf = GetVehicleInterface ();
-
-        // Find the rail node we are on
-        DWORD dwNumNodes = ((DWORD *)ARRAY_NumRailTrackNodes) [ pInterf->m_ucRailTrackID ];
-        SRailNodeSA* pNode = ( (SRailNodeSA **) ARRAY_RailTrackNodePointers ) [ pInterf->m_ucRailTrackID ];
-        SRailNodeSA* pNodesEnd = &pNode [ dwNumNodes ];
-        while ( (float)pNode->sRailDistance / 3.0f <= pInterf->m_fTrainRailDistance && pNode < pNodesEnd )
+        if ( !IsDerailed () )
         {
-            pNode++;
+            CVehicleSAInterface* pInterf = GetVehicleInterface ();
+
+            // Find the rail node we are on
+            DWORD dwNumNodes = ((DWORD *)ARRAY_NumRailTrackNodes) [ pInterf->m_ucRailTrackID ];
+            SRailNodeSA* pNode = ( (SRailNodeSA **) ARRAY_RailTrackNodePointers ) [ pInterf->m_ucRailTrackID ];
+            SRailNodeSA* pNodesEnd = &pNode [ dwNumNodes ];
+            while ( (float)pNode->sRailDistance / 3.0f <= pInterf->m_fTrainRailDistance && pNode < pNodesEnd )
+            {
+                pNode++;
+            }
+            if ( pNode >= pNodesEnd )
+                return;
+            // Get the direction vector between the nodes the train is between
+            CVector vecNode1 ( (float)(pNode - 1)->sX / 8.0f, (float)(pNode - 1)->sY / 8.0f, (float)(pNode - 1)->sZ / 8.0f );
+            CVector vecNode2 ( (float)pNode->sX / 8.0f, (float)pNode->sY / 8.0f, (float)pNode->sZ / 8.0f );
+            CVector vecDirection = vecNode2 - vecNode1;
+            vecDirection.Normalize ();
+            // Set the speed
+            pInterf->m_fTrainSpeed = vecDirection.DotProduct ( vecMoveSpeed );
         }
-        if ( pNode >= pNodesEnd )
-            return;
-        // Get the direction vector between the nodes the train is between
-        CVector vecNode1 ( (float)(pNode - 1)->sX / 8.0f, (float)(pNode - 1)->sY / 8.0f, (float)(pNode - 1)->sZ / 8.0f );
-        CVector vecNode2 ( (float)pNode->sX / 8.0f, (float)pNode->sY / 8.0f, (float)pNode->sZ / 8.0f );
-        CVector vecDirection = vecNode2 - vecNode1;
-        vecDirection.Normalize ();
-        // Set the speed
-        pInterf->m_fTrainSpeed = vecDirection.DotProduct ( vecMoveSpeed );
     }
 }
 
@@ -266,9 +268,6 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
             * ( BYTE * ) ( dwThis + 1465 ) &= ( BYTE ) ~1;
             * ( DWORD * ) ( dwThis + 64 ) |= ( DWORD ) 0x20004;
 
-            // Reset the speed
-            GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
-
             // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
             DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
             _asm
@@ -276,6 +275,9 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
                 mov     ecx, dwThis
                 call    dwFunc
             }
+
+            // Reset the speed
+            GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
         }
     }   
 }

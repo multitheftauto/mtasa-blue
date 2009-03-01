@@ -1584,7 +1584,7 @@ bool CClientVehicle::IsDerailed ( void )
 
 void CClientVehicle::SetDerailed ( bool bDerailed )
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN  )
+    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN && bDerailed != IsDerailed () )
     {
         m_pVehicle->SetDerailed ( bDerailed );
     }
