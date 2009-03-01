@@ -2049,6 +2049,7 @@ void CClientVehicle::Destroy ( void )
         m_usAdjustablePropertyValue = m_pVehicle->GetAdjustablePropertyValue ();
         m_bEngineOn = m_pVehicle->IsEngineOn ();
         m_bIsOnGround = IsOnGround ();
+        m_bIsDerailed = IsDerailed ();
 
 	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||

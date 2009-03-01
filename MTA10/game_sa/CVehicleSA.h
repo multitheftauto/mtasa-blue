@@ -405,9 +405,9 @@ public:
     long Padding213[42];
 
     //1444
-    float m_fTrainSpeed;
+    float m_fTrainSpeed;           // Speed along rails
     //1448
-    float m_fTrainRailDistance;    // Distance along rail starting from first rail node
+    float m_fTrainRailDistance;    // Distance along rail starting from first rail node (determines train position when on rails)
     
     long padding9001[5];
 
@@ -447,6 +447,8 @@ public:
     void                        SetTrainSpeed                   ( float fSpeed );
     bool                        GetTrainDirection               ();
     void                        SetTrainDirection               ( bool bDirection );
+    BYTE                        GetRailTrack                    ();
+    void                        SetRailTrack                    ( BYTE ucTrackID );
 
     bool                        CanPedEnterCar                  ();
     bool                        CanPedJumpOutCar                ( CPed* pPed );

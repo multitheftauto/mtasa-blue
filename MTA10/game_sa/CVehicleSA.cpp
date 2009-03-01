@@ -165,17 +165,9 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
         CVector vecNode1 ( (float)(pNode - 1)->sX / 8.0f, (float)(pNode - 1)->sY / 8.0f, (float)(pNode - 1)->sZ / 8.0f );
         CVector vecNode2 ( (float)pNode->sX / 8.0f, (float)pNode->sY / 8.0f, (float)pNode->sZ / 8.0f );
         CVector vecDirection = vecNode2 - vecNode1;
-        // Now then, are we going with or against the direction of the track (forwards/backwards)?
-        if ( vecDirection.DotProduct ( vecMoveSpeed ) >= 0.0f )
-        {
-            // Forwards
-            pInterf->m_fTrainSpeed = vecMoveSpeed->Length ();
-        }
-        else
-        {
-            // Backwards
-            pInterf->m_fTrainSpeed = -vecMoveSpeed->Length ();
-        }
+        vecDirection.Normalize ();
+        // Set the speed
+        pInterf->m_fTrainSpeed = vecDirection.DotProduct ( vecMoveSpeed );
     }
 }
 
@@ -316,6 +308,29 @@ void CVehicleSA::SetTrainDirection ( bool bDirection )
     else
     {
         *( (BYTE *)GetInterface () + 1464 ) &= ~0x40;
+    }
+}
+
+BYTE CVehicleSA::GetRailTrack ()
+{
+    return GetVehicleInterface ()->m_ucRailTrackID;
+}
+
+void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
+{
+    if ( ucTrackID >= NUM_RAILTRACKS )
+        return;
+
+    CVehicleSAInterface* pInterf = GetVehicleInterface ();
+    pInterf->m_ucRailTrackID = ucTrackID;
+    if ( !IsDerailed () )
+    {
+        DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+        _asm
+        {
+            mov ecx, pInterf
+            call dwFunc
+        }
     }
 }
 
