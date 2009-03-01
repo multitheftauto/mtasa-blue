@@ -26,7 +26,7 @@ public:
                                             CKeysyncPacket              ( class CPlayer* pPlayer );
 
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_KEYSYNC; };
-    unsigned long                           GetFlags                    ( void ) const                  { return 0; };
+    unsigned long                           GetFlags                    ( void ) const                  { return PACKET_SEQUENCED; };
 
     bool                                    Read                        ( NetServerBitStreamInterface& BitStream );
     bool                                    Write                       ( NetServerBitStreamInterface& BitStream ) const;

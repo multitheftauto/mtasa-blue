@@ -26,7 +26,7 @@ public:
     inline explicit         CPlayerPuresyncPacket           ( CPlayer* pPlayer )            { m_pSourceElement = pPlayer; };
 
     inline ePacketID        GetPacketID                     ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
-    inline unsigned long    GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY; };
+    inline unsigned long    GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
     bool                    Read                            ( NetServerBitStreamInterface& BitStream );
     bool                    Write                           ( NetServerBitStreamInterface& BitStream ) const;

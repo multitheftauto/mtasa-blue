@@ -22,7 +22,7 @@ class CCameraSyncPacket : public CPacket
 public:
 
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_CAMERA_SYNC; };
-    unsigned long                           GetFlags                    ( void ) const                  { return 0; };
+    unsigned long                           GetFlags                    ( void ) const                  { return PACKET_SEQUENCED; };
 
     bool                                    Read                        ( NetServerBitStreamInterface& BitStream );
 
