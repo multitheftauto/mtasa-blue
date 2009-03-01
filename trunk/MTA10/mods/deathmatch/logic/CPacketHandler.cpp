@@ -1962,32 +1962,15 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // Heavy variables
     CVector vecPosition;
     CVector vecRotation;
-#ifdef MTA_DEBUG
-    g_pCore->GetConsole()->Printf ( "Packet_EntityAdd" );
-#endif
+
     // HACK: store new entities and link up anything depending on other entities after
     list < SEntityDependantStuff* > newEntitiesStuff;
 
     ElementID NumEntities = 0;
-    if ( !bitStream.Read ( NumEntities ) )
+    if ( !bitStream.Read ( NumEntities ) || NumEntities == 0 )
     {
-#ifdef MTA_DEBUG
-        g_pCore->GetConsole ()->Printf ( "!! Could not read NumEntities" );
-#endif
         return;
     }
-    
-    if ( NumEntities == 0 )
-    {
-#ifdef MTA_DEBUG
-        g_pCore->GetConsole ()->Printf ( "!! NumEntities == 0" );
-#endif
-        return;
-    }
-
-#ifdef MTA_DEBUG
-    g_pCore->GetConsole()->Printf ( "Going to add %d entities", NumEntities );
-#endif
 
     for ( ElementID EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
