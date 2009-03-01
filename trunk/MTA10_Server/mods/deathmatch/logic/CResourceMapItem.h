@@ -67,6 +67,7 @@ private:
     CVehicleManager*                    m_pVehicleManager;
     CTeamManager*                       m_pTeamManager;
     CPedManager*                        m_pPedManager;
+    CWaterManager*                      m_pWaterManager;
     CLuaManager*                        m_pLuaManager;
     CEvents*                            m_pEvents;
     class CScriptDebugging*             m_pScriptDebugging; // are these 

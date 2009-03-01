@@ -269,6 +269,15 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( pHandling );
     }
 
+    // Add the water polys to the packet
+    CWaterManager* pWaterManager = g_pGame->GetWaterManager ();
+    list < CWater* > ::const_iterator iterWater = pWaterManager->IterBegin ();
+    for ( ; iterWater != pWaterManager->IterEnd (); iterWater++ )
+    {
+        CWater* pWater = *iterWater;
+        EntityPacket.Add ( pWater );
+    }
+
     // Send it
     Player.Send ( EntityPacket );
 
@@ -491,7 +500,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomBlue,
 								   usFPSLimit ) );
 
-    // Send him all the elementsw
+    // Send him all the elements
     SendMapInformation ( Player );
 }
 

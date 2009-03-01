@@ -24,35 +24,6 @@ class CStaticFunctionDefinitions;
 #ifndef __CSTATICFUNCTIONDEFINITIONS_H
 #define __CSTATICFUNCTIONDEFINITIONS_H
 
-class CGame;
-struct CRegistryResult;
-class CElement;
-class CColCircle;
-class CColCuboid;
-class CColSphere;
-class CColRectangle;
-class CColTube;
-class CColShape;
-class CLuaArguments;
-class CLuaMain;
-class CMarker;
-class CPlayer;
-class CBlip;
-class CObject;
-class CPickup;
-class CRadarArea;
-class CResource;
-class CTeam;
-class CVector;
-class CVehicle;
-class CAccount;
-class CVector2D;
-class CXMLNode;
-class CLuaArgument;
-class CDummy;
-class CPed;
-class CClient;
-
 #ifndef NULL
 #define NULL 0
 #endif
@@ -434,6 +405,9 @@ public:
     static bool                 SetTeamColor                        ( CTeam* pTeam, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     static bool                 SetPlayerTeam                       ( CPlayer* pPlayer, CTeam* pTeam );
     static bool                 SetTeamFriendlyFire                 ( CTeam* pTeam, bool bFriendlyFire );
+
+    // Water get funcs
+    static CWater*              CreateWater                         ( CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4 );
 
 	// Standard server functions
     static unsigned char        GetMaxPlayers                       ( void );

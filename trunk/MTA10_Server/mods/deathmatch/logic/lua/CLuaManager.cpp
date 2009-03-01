@@ -527,6 +527,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefinitions::CreateColPolygon );
     CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefinitions::CreateColTube );
 
+    // Water functions
+    CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefinitions::CreateWater );
+
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefinitions::GetWeaponIDFromName );

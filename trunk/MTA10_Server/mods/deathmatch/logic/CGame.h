@@ -99,6 +99,7 @@ class CPedSync;
 class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
+class CWaterManager;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -169,9 +170,9 @@ public:
     inline bool                 IsFinished                  ( void )            { return m_bIsFinished; };
 
     inline CMainConfig*             GetConfig                   ( void )        { return m_pMainConfig; }
-    inline CHandlingManager*        GetHandlingManager          ( void )        { return m_pHandlingManager; };
+    inline CHandlingManager*        GetHandlingManager          ( void )        { return m_pHandlingManager; }
     inline CMapManager*             GetMapManager               ( void )        { return m_pMapManager; }
-    inline CPlayerManager*          GetPlayerManager            ( void )        { return m_pPlayerManager; };
+    inline CPlayerManager*          GetPlayerManager            ( void )        { return m_pPlayerManager; }
     inline CObjectManager*          GetObjectManager            ( void )        { return m_pObjectManager; }
     inline CVehicleManager*         GetVehicleManager           ( void )        { return m_pVehicleManager; }
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
@@ -185,24 +186,25 @@ public:
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
-    inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; };
-    inline CBlipManager*            GetBlipManager              ( void )        { return m_pBlipManager; };
-    inline CPickupManager*          GetPickupManager            ( void )        { return m_pPickupManager; };
-    inline CRadarAreaManager*       GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; };
-    inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; };
-    inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; };
-    inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; };
-	inline CSettings*			    GetSettings					( void )		{ return m_pSettings; };
-    inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; };
-	inline CBanManager*			    GetBanManager				( void )		{ return m_pBanManager; };
-    inline CRemoteCalls*            GetRemoteCalls              ( void )        { return m_pRemoteCalls; };
-    inline CResourceDownloader*     GetResourceDownloader       ( void )        { return m_pResourceDownloader; };
+    inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
+    inline CBlipManager*            GetBlipManager              ( void )        { return m_pBlipManager; }
+    inline CPickupManager*          GetPickupManager            ( void )        { return m_pPickupManager; }
+    inline CRadarAreaManager*       GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; }
+    inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; }
+    inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; }
+    inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; }
+	inline CSettings*			    GetSettings					( void )		{ return m_pSettings; }
+    inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
+	inline CBanManager*			    GetBanManager				( void )		{ return m_pBanManager; }
+    inline CRemoteCalls*            GetRemoteCalls              ( void )        { return m_pRemoteCalls; }
+    inline CResourceDownloader*     GetResourceDownloader       ( void )        { return m_pResourceDownloader; }
     inline CZoneNames*              GetZoneNames                ( void )        { return m_pZoneNames; }
     inline CClock*                  GetClock                    ( void )        { return m_pClock; }
-    inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; };
+    inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
+    inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
 
 #ifdef WIN32
-    inline CRITICAL_SECTION *   GetCriticalSection          ( void )        { return &m_cs; };
+    inline CRITICAL_SECTION *   GetCriticalSection          ( void )        { return &m_cs; }
 #endif
 
     void                        JoinPlayer                  ( CPlayer& Player );
@@ -301,6 +303,7 @@ private:
     CHandlingManager*               m_pHandlingManager;
     CRPCFunctions*                  m_pRPCFunctions;
 	CLanBroadcast*                  m_pLanBroadcast;
+    CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
     

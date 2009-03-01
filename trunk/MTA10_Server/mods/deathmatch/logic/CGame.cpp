@@ -97,6 +97,7 @@ CGame::CGame ( void )
     m_pRPCFunctions = NULL;
 	m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
+    m_pWaterManager = NULL;
 
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
@@ -183,6 +184,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRemoteCalls );
     SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
+    SAFE_DELETE ( m_pWaterManager );
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -364,6 +366,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pConsole = new CConsole ( m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas, m_pMapFiles, m_pBanManager, m_pACLManager );
     m_pMainConfig = new CMainConfig ( m_pConsole, m_pLuaManager );
     m_pRPCFunctions = new CRPCFunctions;
+    m_pWaterManager = new CWaterManager;
 
     // Parse the commandline
     if ( !m_CommandLineParser.Parse ( iArgumentCount, szArguments ) )

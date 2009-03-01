@@ -29,22 +29,23 @@
 
 using namespace std;
 
-#define IS_BLIP(element) ((element)->GetType()==CElement::BLIP)
+#define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
-#define IS_DUMMY(element) ((element)->GetType()==CElement::DUMMY)
-#define IS_FILE(element) ((element)->GetType()==CElement::SCRIPTFILE)
+#define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
+#define IS_FILE(element)     ((element)->GetType()==CElement::SCRIPTFILE)
 #define IS_HANDLING(element) ((element)->GetType()==CElement::HANDLING)
-#define IS_MARKER(element) ((element)->GetType()==CElement::MARKER)
-#define IS_OBJECT(element) ((element)->GetType()==CElement::OBJECT)
+#define IS_MARKER(element)   ((element)->GetType()==CElement::MARKER)
+#define IS_OBJECT(element)   ((element)->GetType()==CElement::OBJECT)
 #define IS_PATHNODE(element) ((element)->GetType()==CElement::PATH_NODE)
 #define IS_PERPLAYER_ENTITY(element) ((element)->IsPerPlayerEntity())
-#define IS_PICKUP(element) ((element)->GetType()==CElement::PICKUP)
-#define IS_PED(element) ((element)->GetType()==CElement::PLAYER||(element)->GetType()==CElement::PED)
-#define IS_PLAYER(element) ((element)->GetType()==CElement::PLAYER)
+#define IS_PICKUP(element)   ((element)->GetType()==CElement::PICKUP)
+#define IS_PED(element)      ((element)->GetType()==CElement::PLAYER||(element)->GetType()==CElement::PED)
+#define IS_PLAYER(element)   ((element)->GetType()==CElement::PLAYER)
 #define IS_RADAR_AREA(element) ((element)->GetType()==CElement::RADAR_AREA)
-#define IS_VEHICLE(element) ((element)->GetType()==CElement::VEHICLE)
-#define IS_CONSOLE(element) ((element)->GetType()==CElement::CONSOLE)
-#define IS_TEAM(element) ((element)->GetType()==CElement::TEAM)
+#define IS_VEHICLE(element)  ((element)->GetType()==CElement::VEHICLE)
+#define IS_CONSOLE(element)  ((element)->GetType()==CElement::CONSOLE)
+#define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
+#define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 
 class CElement
 {
@@ -74,6 +75,7 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         HANDLING,
+        WATER,
         UNKNOWN,
     };
 

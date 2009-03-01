@@ -110,6 +110,7 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         HANDLING,
+        WATER,
         UNKNOWN,
     };
 
