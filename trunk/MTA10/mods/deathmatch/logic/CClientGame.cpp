@@ -3368,7 +3368,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                 pBitStream->Write ( static_cast < unsigned char > ( uiDoor ) );
 
                                                 // Send and destroy it
-                                                g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_SEQUENCED );
+                                                g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
                                                 g_pNet->DeallocateNetBitStream ( pBitStream );
 
                                                 // We're now entering a vehicle
