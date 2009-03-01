@@ -707,6 +707,10 @@ void CMultiplayerSA::InitHooks()
 
     // Don't get golf clubs from caddies
     *(BYTE *)0x6D1A1A = 0xEB;
+
+    // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
+    memset((void *)0x6F701D, 0x90, 6);
+    *(BYTE *)0x6F7069 = 0xEB;
 }
 
 

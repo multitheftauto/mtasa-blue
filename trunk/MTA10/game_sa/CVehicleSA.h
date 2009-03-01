@@ -155,8 +155,8 @@ typedef struct
     short sX;               // x coordinate times 8
     short sY;               // y coordinate times 8
     short sZ;               // z coordinate times 8
-    short sRailDistance;    // on-rail distance times 3
-    short padding;
+    WORD  sRailDistance;    // on-rail distance times 3
+    WORD  padding;
 } SRailNodeSA;
 
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
