@@ -42,6 +42,7 @@ static CRegistry*                                   m_pRegistry;
 static CAccountManager*                             m_pAccountManager;
 static CBanManager*                                 m_pBanManager;
 static CPedManager*                                 m_pPedManager;
+static CWaterManager*                               m_pWaterManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN list<CElement*>::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
@@ -68,6 +69,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
     m_pAccountManager = pGame->GetAccountManager ();
     m_pBanManager = pGame->GetBanManager ();
     m_pPedManager = pGame->GetPedManager ();
+    m_pWaterManager = pGame->GetWaterManager ();
 }
 
 
@@ -5990,6 +5992,42 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire ( CTeam* pTeam, bool bFrien
     }
 
     return false;
+}
+
+
+CWater* CStaticFunctionDefinitions::CreateWater ( CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4 )
+{
+    if ( !pV1 || !pV2 || !pV3 )
+        return NULL;
+
+    CWater* pWater = m_pWaterManager->Create ( pV4 ? CWater::QUAD : CWater::TRIANGLE,
+        pResource->GetDynamicElementRoot () );
+    
+    if ( pWater )
+    {
+        pWater->SetVertex ( 0, *pV1 );
+        pWater->SetVertex ( 1, *pV2 );
+        pWater->SetVertex ( 2, *pV3 );
+        if ( pWater->GetWaterType () == CWater::QUAD )
+            pWater->SetVertex ( 3, *pV4 );
+
+        if ( !pWater->Valid () )
+        {
+            delete pWater;
+            return NULL;
+        }
+
+		if ( pResource->HasStarted() )
+		{
+			CEntityAddPacket Packet;
+			Packet.Add ( pWater );
+			m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+		}
+
+        return pWater;
+    }
+
+    return NULL;
 }
 
 

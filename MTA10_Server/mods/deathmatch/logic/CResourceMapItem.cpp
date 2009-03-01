@@ -34,6 +34,7 @@ CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortNa
     m_pVehicleManager = g_pGame->GetVehicleManager();
     m_pTeamManager = g_pGame->GetTeamManager();
     m_pPedManager = g_pGame->GetPedManager();
+    m_pWaterManager = g_pGame->GetWaterManager ();
     m_pLuaManager = g_pGame->GetLuaManager();
     m_pEvents = g_pGame->GetEvents();
     m_pScriptDebugging = g_pGame->GetScriptDebugging();
@@ -235,6 +236,10 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     else if ( strBuffer.compare ( "ped" ) == 0 )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+    }
+    else if ( strBuffer.compare ( "water" ) == 0 )
+    {
+        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
 	else if ( strBuffer.empty () )
 	{

@@ -773,7 +773,7 @@ void CWaterManagerSA::RebuildIndex ()
 {
     memset ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
     *(DWORD *)VAR_NumWaterZonePolys = 0;
-    ((BuildWaterIndex_t)FUNC_BuildWaterIndex) ();
+    ( (BuildWaterIndex_t) FUNC_BuildWaterIndex ) ();
 }
 
 void CWaterManagerSA::Reset ()

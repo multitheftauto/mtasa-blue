@@ -7715,6 +7715,85 @@ int CLuaFunctionDefinitions::SetTeamFriendlyFire ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource ();
+        if ( pResource )
+        {
+            int iArgument1  = lua_type ( luaVM, 1 );
+            int iArgument2  = lua_type ( luaVM, 2 );
+            int iArgument3  = lua_type ( luaVM, 3 );
+            int iArgument4  = lua_type ( luaVM, 4 );
+            int iArgument5  = lua_type ( luaVM, 5 );
+            int iArgument6  = lua_type ( luaVM, 6 );
+            int iArgument7  = lua_type ( luaVM, 7 );
+            int iArgument8  = lua_type ( luaVM, 8 );
+            int iArgument9  = lua_type ( luaVM, 9 );
+            int iArgument10 = lua_type ( luaVM, 10 );
+            int iArgument11 = lua_type ( luaVM, 11 );
+            int iArgument12 = lua_type ( luaVM, 12 );
+            if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
+                 ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+                 ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
+                 ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) &&
+                 ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) &&
+                 ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) &&
+                 ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING ) )
+            {
+                CVector v1 ( (float)lua_tonumber(luaVM, 1), (float)lua_tonumber(luaVM, 2), (float)lua_tonumber(luaVM, 3) );
+                CVector v2 ( (float)lua_tonumber(luaVM, 4), (float)lua_tonumber(luaVM, 5), (float)lua_tonumber(luaVM, 6) );
+                CVector v3 ( (float)lua_tonumber(luaVM, 7), (float)lua_tonumber(luaVM, 8), (float)lua_tonumber(luaVM, 9) );
+                if ( ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING ) &&
+                     ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING ) &&
+                     ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING ) )
+                {
+                    CVector v4 ( (float)lua_tonumber(luaVM, 10),
+                                 (float)lua_tonumber(luaVM, 11),
+                                 (float)lua_tonumber(luaVM, 12) );
+                    CWater* pWater = CStaticFunctionDefinitions::CreateWater (
+                        pResource, &v1, &v2, &v3, &v4 );
+                    if ( pWater )
+                    {
+                        CElementGroup * pGroup = pResource->GetElementGroup();
+                        if ( pGroup )
+                        {
+                            pGroup->Add ( pWater );
+                        }
+                        lua_pushelement ( luaVM, pWater );
+                        return 1;
+                    }
+                }
+                else
+                {
+                    CWater* pWater = CStaticFunctionDefinitions::CreateWater (
+                        pResource, &v1, &v2, &v3, NULL );
+                    if ( pWater )
+                    {
+                        CElementGroup * pGroup = pResource->GetElementGroup();
+                        if ( pGroup )
+                        {
+                            pGroup->Add ( pWater );
+                        }
+                        lua_pushelement ( luaVM, pWater );
+                        return 1;
+                    }
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "createWater" );
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::CreateColCircle ( lua_State* luaVM )
 {
     // Verify the argument types

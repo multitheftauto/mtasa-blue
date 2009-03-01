@@ -3100,6 +3100,41 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     break;
                 }
 
+                case CClientGame::WATER:
+                {
+                    BYTE ucNumVertices;
+                    short sX;
+                    short sY;
+                    bitStream.Read ( ucNumVertices );
+                    assert ( ucNumVertices == 3 || ucNumVertices == 4 );
+
+                    CVector vecVertices[4];
+                    for ( int i = 0; i < ucNumVertices; i++ )
+                    {
+                        bitStream.Read ( sX );
+                        bitStream.Read ( sY );
+                        bitStream.Read ( vecVertices[i].fZ );
+                        vecVertices[i].fX = sX;
+                        vecVertices[i].fY = sY;
+                    }
+                    CClientWater* pWater = NULL;
+                    if ( ucNumVertices == 3 )
+                    {
+                        pWater = new CClientWater ( EntityID, vecVertices[0], vecVertices[1], vecVertices[2] );
+                    }
+                    else
+                    {
+                        pWater = new CClientWater ( EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3] );
+                    }
+                    if ( !pWater->Valid () )
+                    {
+                        delete pWater;
+                        pWater = NULL;
+                    }
+                    pEntity = pWater;
+                    break;
+                }
+
                 default:
                 {
                     assert ( 0 );

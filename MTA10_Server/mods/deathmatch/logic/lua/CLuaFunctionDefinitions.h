@@ -336,6 +336,14 @@ public:
     static int      ToggleControl                       ( lua_State* luaVM );
     static int      ToggleAllControls                   ( lua_State* luaVM ); 
 
+    // Shape create funcs
+    static int      CreateColCircle                     ( lua_State* luaVM );
+    static int      CreateColCuboid                     ( lua_State* luaVM );
+    static int      CreateColSphere                     ( lua_State* luaVM );
+    static int      CreateColRectangle                  ( lua_State* luaVM );
+    static int      CreateColPolygon                    ( lua_State* luaVM );
+    static int      CreateColTube                       ( lua_State* luaVM );
+
     // Team get funcs
     static int      CreateTeam                          ( lua_State* luaVM );    
     static int      GetTeamFromName                     ( lua_State* luaVM );
@@ -349,15 +357,10 @@ public:
     static int      SetPlayerTeam                       ( lua_State* luaVM );
     static int      SetTeamName                         ( lua_State* luaVM );
     static int      SetTeamColor                        ( lua_State* luaVM );       
-    static int      SetTeamFriendlyFire                 ( lua_State* luaVM ); 
+    static int      SetTeamFriendlyFire                 ( lua_State* luaVM );
 
-    // Shape create funcs
-    static int      CreateColCircle                     ( lua_State* luaVM );
-    static int      CreateColCuboid                     ( lua_State* luaVM );
-    static int      CreateColSphere                     ( lua_State* luaVM );
-    static int      CreateColRectangle                  ( lua_State* luaVM );
-    static int      CreateColPolygon                    ( lua_State* luaVM );
-    static int      CreateColTube                       ( lua_State* luaVM );
+    // Water funcs
+    static int      CreateWater                         ( lua_State* luaVM );
 
     // Weapon funcs
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );

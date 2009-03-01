@@ -832,6 +832,22 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     break;
                 }
 
+                case CElement::WATER:
+                {
+                    CWater* pWater = static_cast < CWater* > ( pElement );
+                    BYTE ucNumVertices = pWater->GetNumVertices ();
+                    BitStream.Write ( ucNumVertices );
+                    CVector vecVertex;
+                    for ( int i = 0; i < ucNumVertices; i++ )
+                    {
+                        pWater->GetVertex ( i, vecVertex );
+                        BitStream.Write ( (short)vecVertex.fX );
+                        BitStream.Write ( (short)vecVertex.fY );
+                        BitStream.Write ( vecVertex.fZ );
+                    }
+                    break;
+                }
+
                 default:
                 {
                     assert ( 0 );

@@ -2768,7 +2768,7 @@ void CClientGame::Event_OnIngame ( void )
     pHud->DisableVitalStats ( true );
     pHud->DisableAreaName ( true );
 
-    // Switch of peds and traffic
+    // Switch off peds and traffic
     g_pGame->GetPathFind ()->SwitchRoadsOffInArea ( &CVector(-100000.0f, -100000.0f, -100000.0f), &CVector(100000.0f, 100000.0f, 100000.0f) );
     g_pGame->GetPathFind ()->SwitchPedRoadsOffInArea ( &CVector(-100000.0f, -100000.0f, -100000.0f), &CVector(100000.0f, 100000.0f, 100000.0f) );
     g_pGame->GetPathFind ()->SetPedDensity ( 0.0f );
@@ -2789,6 +2789,7 @@ void CClientGame::Event_OnIngame ( void )
 
     // Reset anything from last game
     ResetMapInfo ();
+    g_pGame->GetWaterManager ()->Reset ();      // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer ( m_pManager, m_LocalID, true );
@@ -3739,7 +3740,7 @@ void CClientGame::ResetMapInfo ( void )
     g_pMultiplayer->ResetSky ();
 
     // Water
-    g_pGame->GetWaterManager ()->Reset ();
+    g_pGame->GetWaterManager ()->UndoChanges ();
 
     // Cheats
     g_pGame->ResetCheats ();

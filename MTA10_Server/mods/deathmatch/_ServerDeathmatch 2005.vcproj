@@ -822,6 +822,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CWater.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWaterManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CWeaponNames.cpp"
 					>
 				</File>
@@ -1824,6 +1832,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CVehicleUpgrades.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWater.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWaterManager.h"
 					>
 				</File>
 				<File
