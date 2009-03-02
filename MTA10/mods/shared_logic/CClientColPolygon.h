@@ -13,10 +13,6 @@
 #ifndef __CCLIENTCOLPOLYGON_H
 #define __CCLIENTCOLPOLYGON_H
 
-#include "CClientColShape.h"
-
-#include <list>
-
 class CClientColPolygon : public CClientColShape
 {
 public:

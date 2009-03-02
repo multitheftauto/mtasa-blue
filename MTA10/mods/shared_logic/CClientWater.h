@@ -15,13 +15,14 @@
 class CClientWater : public CClientEntity
 {
 public:
-                               CClientWater           ( ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false );
-                               CClientWater           ( ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false );
+                               CClientWater           ( CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false );
+                               CClientWater           ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false );
                                ~CClientWater          ();
 
     bool                       Valid                  () { return m_pPoly != NULL; }
 
     eClientEntityType          GetType                () const { return CCLIENTWATER; }
+    int                        GetNumVertices         () const;
     void                       GetPosition            ( CVector& vecPosition ) const;
     bool                       GetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       SetPosition            ( const CVector& vecPosition );
@@ -30,6 +31,7 @@ public:
 
 private:
     CWaterPoly*                m_pPoly;
+    CClientWaterManager*       m_pManager;
 };
 
 #endif

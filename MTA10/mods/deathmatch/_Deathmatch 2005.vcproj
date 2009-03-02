@@ -604,6 +604,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\rpc\CWaterRPCs.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\rpc\CWeaponRPCs.cpp"
 						>
 					</File>
@@ -910,6 +914,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWater.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientWaterManager.cpp"
 					>
 				</File>
 				<File
@@ -1338,6 +1346,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\rpc\CWaterRPCs.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\rpc\CWeaponRPCs.h"
 						>
 					</File>
@@ -1664,6 +1676,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWater.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientWaterManager.h"
 					>
 				</File>
 				<File

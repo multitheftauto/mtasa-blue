@@ -4272,9 +4272,9 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
 {
     CClientWater* pWater;
     if ( pV4 )
-        pWater = new CClientWater ( INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
+        pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
     else
-        pWater = new CClientWater ( INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
+        pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
     if ( !pWater->Valid () ) {
         delete pWater;
         return NULL;

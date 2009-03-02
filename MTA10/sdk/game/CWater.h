@@ -28,7 +28,7 @@ class CWaterVertex
 public:
     virtual WORD                GetID             () = 0;
     virtual void                GetPosition       ( CVector& vec ) = 0;
-    virtual void                SetPosition       ( CVector& vec, void* pChangeSource = NULL ) = 0;
+    virtual bool                SetPosition       ( CVector& vec, void* pChangeSource = NULL ) = 0;
 };
 
 class CWaterPoly

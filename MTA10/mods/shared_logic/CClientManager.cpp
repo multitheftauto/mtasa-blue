@@ -60,6 +60,7 @@ CClientManager::CClientManager ( void )
     m_pColModelManager = new CClientColModelManager ( this );
     m_pHandlingManager = new CClientHandlingManager ( this );
     m_pExplosionManager = new CClientExplosionManager ( this );
+    m_pWaterManager = new CClientWaterManager ( this );
 
 	m_pPacketRecorder = new CClientPacketRecorder ( this );
 
@@ -163,6 +164,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pModelRequestManager;
     m_pModelRequestManager = NULL;
+
+    delete m_pWaterManager;
+    m_pWaterManager = NULL;
 
     // Delete the connection trouble texture
     delete m_pConnectionTroubleTexture;

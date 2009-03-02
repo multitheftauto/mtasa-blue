@@ -254,6 +254,16 @@ CBan* lua_toban ( lua_State* luaVM, int iArgument )
 }
 
 
+CWater* lua_towater ( lua_State* luaVM, int iArgument )
+{
+    CElement* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && IS_WATER ( pElement ) )
+        return static_cast < CWater* > ( pElement );
+    else
+        return NULL;
+}
+
+
 void lua_pushelement ( lua_State* luaVM, CElement* pElement )
 {
     if ( pElement )
