@@ -133,8 +133,8 @@ private:
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
 
-	GUI_CALLBACK_MOUSE*	    m_pModMouseClickHandler;
-	GUI_CALLBACK_MOUSE*	    m_pModMouseDoubleClickHandler;
+	GUI_CALLBACK_MOUSE      m_ModMouseClickHandler;
+	GUI_CALLBACK_MOUSE      m_ModMouseDoubleClickHandler;
 };
 
 #endif
