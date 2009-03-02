@@ -14,8 +14,6 @@
 #ifndef __CCLIENTCOLCIRCLE_H
 #define __CCLIENTCOLCIRCLE_H
 
-#include "CClientColShape.h"
-
 class CClientColCircle : public CClientColShape
 {
 public:

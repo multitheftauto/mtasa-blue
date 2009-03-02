@@ -12,6 +12,7 @@
 
 #include <StdInc.h>
 
+#include "CRPCFunctions.h"
 #include "CAudioRPCs.h"
 #include "CBlipRPCs.h"
 #include "CCameraRPCs.h"
@@ -28,21 +29,8 @@
 #include "CTeamRPCs.h"
 #include "CVehicleRPCs.h"
 #include "CWeaponRPCs.h"
+#include "CWaterRPCs.h"
 #include "CWorldRPCs.h"
-
-/*
-#include "CRPCFunctions.h"
-#include <CClientPlayerClothes.h>
-#include "../../../shared_logic/CClient3DMarker.h"
-#include "../../../shared_logic/CClientCheckpoint.h"
-#include "../../../shared_logic/CClientCorona.h"
-#include "../../../shared_logic/CClientHandling.h"
-#include "../../../shared_logic/CElementArray.h"
-#include "../../../shared_logic/CVehicleUpgrades.h"
-#include "../CClientGame.h"
-#include "../CResource.h"
-#include "../CBlendedWeather.h"
-*/
 
 CClientManager*             CRPCFunctions::m_pManager;
 CClientCamera*              CRPCFunctions::m_pCamera;
@@ -59,12 +47,12 @@ CClientTeamManager*         CRPCFunctions::m_pTeamManager;
 CClientPedManager*          CRPCFunctions::m_pPedManager;
 CBlendedWeather*            CRPCFunctions::m_pBlendedWeather;
 CClientGame*                CRPCFunctions::m_pClientGame;
+CClientWaterManager*        CRPCFunctions::m_pWaterManager;
 
-CRPCFunctions * g_pRPCFunctions = NULL;
+CRPCFunctions::SRPCHandler  CRPCFunctions::m_RPCHandlers[];
 
 CRPCFunctions::CRPCFunctions ( CClientGame* pClientGame )
 {
-    g_pRPCFunctions = this;
     m_bShowRPCs = false;
     m_pManager = pClientGame->GetManager ();
     m_pCamera = m_pManager->GetCamera ();
@@ -79,7 +67,8 @@ CRPCFunctions::CRPCFunctions ( CClientGame* pClientGame )
     m_pPathManager = m_pManager->GetPathManager ();
     m_pTeamManager = m_pManager->GetTeamManager ();
     m_pPedManager = m_pManager->GetPedManager ();
-    m_pBlendedWeather = pClientGame->GetBlendedWeather ();    
+    m_pBlendedWeather = pClientGame->GetBlendedWeather ();
+    m_pWaterManager = m_pManager->GetWaterManager ();
     m_pClientGame = pClientGame;
 
     AddHandlers ();
@@ -88,13 +77,7 @@ CRPCFunctions::CRPCFunctions ( CClientGame* pClientGame )
 
 CRPCFunctions::~CRPCFunctions ( void )
 {
-    vector < SRPCHandler * > ::iterator iter = m_RPCHandlers.begin ();
-    for ( ; iter != m_RPCHandlers.end () ; iter++ )
-    {
-        delete *iter;
-    }
-    m_RPCHandlers.clear ();
-    g_pRPCFunctions = NULL;
+    
 }
 
 
@@ -116,38 +99,35 @@ void CRPCFunctions::AddHandlers ( void )
     CTeamRPCs::LoadFunctions ();
     CVehicleRPCs::LoadFunctions ();
     CWeaponRPCs::LoadFunctions ();
-    CWorldRPCs::LoadFunctions ();	
+    CWaterRPCs::LoadFunctions ();
+    CWorldRPCs::LoadFunctions ();
 }
 
 
 void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback, char * szName )
 {
-    SRPCHandler * pHandler = new SRPCHandler;
-    pHandler->ID = ucID;
-    pHandler->Callback = Callback;
-    strncpy ( pHandler->szName, szName, 32 );
-    g_pRPCFunctions->m_RPCHandlers.push_back ( pHandler );
+    if ( ucID >= NUM_RPC_FUNCS )
+        return;
+
+    m_RPCHandlers [ ucID ].Callback = Callback;
+    strncpy ( m_RPCHandlers [ ucID ].szName, szName, sizeof ( m_RPCHandlers [ ucID ].szName ) );
 }
 
 
 void CRPCFunctions::ProcessPacket ( NetBitStreamInterface& bitStream )
 {
     unsigned char ucFunctionID = 255;
-    bitStream.Read ( ucFunctionID );
+    if ( !bitStream.Read ( ucFunctionID ) ||
+         ucFunctionID >= NUM_RPC_FUNCS )
+        return;
 
-    SRPCHandler * pHandler;
-    vector < SRPCHandler * > ::iterator iter = m_RPCHandlers.begin ();
-    for ( ; iter != m_RPCHandlers.end () ; iter++ )
+    SRPCHandler* pHandler = &m_RPCHandlers [ ucFunctionID ];
+    if ( pHandler->Callback == NULL )
+        return;
+
+    if ( m_bShowRPCs )
     {
-        pHandler = *iter;
-        if ( pHandler->ID == ucFunctionID )
-        {
-            if ( m_bShowRPCs )
-            {
-                g_pCore->GetConsole ()->Printf ( "* rpc: %s", pHandler->szName );
-            }
-            (pHandler->Callback) ( bitStream );
-            break;
-        }
+        g_pCore->GetConsole ()->Printf ( "* rpc: %s", pHandler->szName );
     }
+    (pHandler->Callback) ( bitStream );
 }

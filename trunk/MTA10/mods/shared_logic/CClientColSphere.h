@@ -13,8 +13,6 @@
 #ifndef __CCLIENTCOLSPHERE_H
 #define __CCLIENTCOLSPHERE_H
 
-#include "CClientColShape.h"
-
 class CClientColSphere : public CClientColShape
 {
 public:

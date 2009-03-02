@@ -6031,6 +6031,37 @@ CWater* CStaticFunctionDefinitions::CreateWater ( CResource* pResource, CVector*
 }
 
 
+bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CWater* pWater, int iVertexIndex, CVector& vecPosition )
+{
+    iVertexIndex--;
+    if ( !pWater || iVertexIndex < 0 || iVertexIndex >= pWater->GetNumVertices () )
+        return false;
+
+    return pWater->GetVertex ( iVertexIndex, vecPosition );
+}
+
+
+bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CWater* pWater, int iVertexIndex, CVector& vecPosition )
+{
+    iVertexIndex--;
+    if ( !pWater || iVertexIndex < 0 || iVertexIndex >= pWater->GetNumVertices () )
+        return false;
+
+    bool bSuccess = pWater->SetVertex ( iVertexIndex, vecPosition );
+    if ( bSuccess )
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pWater->GetID () );
+        BitStream.pBitStream->Write ( (unsigned char) iVertexIndex );
+        BitStream.pBitStream->Write ( (short) vecPosition.fX );
+        BitStream.pBitStream->Write ( (short) vecPosition.fY );
+        BitStream.pBitStream->Write ( vecPosition.fZ );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_VERTEX_POSITION, *BitStream.pBitStream ) );
+    }
+    return bSuccess;
+}
+
+
 CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, const CVector& vecPosition, float fRadius )
 {
     //CColCircle * pColShape = new CColCircle ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );

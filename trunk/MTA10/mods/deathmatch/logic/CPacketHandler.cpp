@@ -3120,11 +3120,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     CClientWater* pWater = NULL;
                     if ( ucNumVertices == 3 )
                     {
-                        pWater = new CClientWater ( EntityID, vecVertices[0], vecVertices[1], vecVertices[2] );
+                        pWater = new CClientWater ( g_pClientGame->GetManager (), EntityID, vecVertices[0], vecVertices[1], vecVertices[2] );
                     }
                     else
                     {
-                        pWater = new CClientWater ( EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3] );
+                        pWater = new CClientWater ( g_pClientGame->GetManager (), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3] );
                     }
                     if ( !pWater->Valid () )
                     {

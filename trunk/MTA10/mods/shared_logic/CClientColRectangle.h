@@ -13,8 +13,6 @@
 #ifndef __CCLIENTCOLRECTANGLE_H
 #define __CCLIENTCOLRECTANGLE_H
 
-#include "CClientColShape.h"
-
 class CClientColRectangle : public CClientColShape
 {
 public:

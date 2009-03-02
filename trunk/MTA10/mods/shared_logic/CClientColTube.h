@@ -13,8 +13,6 @@
 #ifndef __CCLIENTCOLTUBE_H
 #define __CCLIENTCOLTUBE_H
 
-#include "CClientColShape.h"
-
 class CClientColTube : public CClientColShape
 {
 public:

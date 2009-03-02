@@ -13,8 +13,6 @@
 #ifndef __CCLIENTCOLCUBOID_H
 #define __CCLIENTCOLCUBOID_H
 
-#include "CClientColShape.h"
-
 class CClientColCuboid : public CClientColShape
 {
 public:

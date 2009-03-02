@@ -11,8 +11,6 @@
 *
 *****************************************************************************/
 
-class CClientColShape;
-
 #ifndef __CCLIENTCOLSHAPE_H
 #define __CCLIENTCOLSHAPE_H
 

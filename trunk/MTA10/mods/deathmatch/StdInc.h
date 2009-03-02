@@ -13,6 +13,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <string>
 #include <vector>
 #include <cstdio>
 #include <cstring>
@@ -40,6 +41,7 @@
 #include <CClientManager.h>
 #include <CClient3DMarker.h>
 #include <CClientCheckpoint.h>
+#include <CClientColShape.h>
 #include <CClientColCircle.h>
 #include <CClientColCuboid.h>
 #include <CClientColSphere.h>

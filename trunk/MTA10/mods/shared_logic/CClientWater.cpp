@@ -13,22 +13,37 @@
 
 extern CGame* g_pGame;
 
-CClientWater::CClientWater ( ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow ) : CClientEntity ( ID )
+CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow ) : CClientEntity ( ID )
 {
+    m_pManager = pManager->GetWaterManager ();
     m_pPoly = g_pGame->GetWaterManager ()->CreateQuad ( vecBL, vecBR, vecTL, vecTR, bShallow );
     SetTypeName ( "water" );
+
+    m_pManager->AddToList ( this );
 }
 
-CClientWater::CClientWater ( ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow ) : CClientEntity ( ID )
+CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow ) : CClientEntity ( ID )
 {
+    m_pManager = pManager->GetWaterManager ();
     m_pPoly = g_pGame->GetWaterManager ()->CreateTriangle ( vecL, vecR, vecTB, bShallow );
     SetTypeName ( "water" );
+
+    m_pManager->AddToList ( this );
 }
 
 CClientWater::~CClientWater ()
 {
+    Unlink ();
     if ( m_pPoly )
         g_pGame->GetWaterManager ()->DeletePoly ( m_pPoly );
+}
+
+int CClientWater::GetNumVertices () const
+{
+    if ( !m_pPoly )
+        return 0;
+    
+    return m_pPoly->GetNumVertices ();
 }
 
 void CClientWater::GetPosition ( CVector& vecPosition ) const
@@ -41,7 +56,7 @@ void CClientWater::GetPosition ( CVector& vecPosition ) const
         return;
 
     CVector vecVertexPos;
-    for ( int i = 0; i < m_pPoly->GetNumVertices (); i++ )
+    for ( int i = 0; i < GetNumVertices (); i++ )
     {
         m_pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
         vecPosition += vecVertexPos;
@@ -72,7 +87,7 @@ void CClientWater::SetPosition ( const CVector& vecPosition )
     CVector vecDelta = vecPosition - vecCurrentPosition;
 
     CVector vecVertexPos;
-    for ( int i = 0; i < m_pPoly->GetNumVertices (); i++ )
+    for ( int i = 0; i < GetNumVertices (); i++ )
     {
         m_pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
         vecVertexPos += vecDelta;
@@ -90,11 +105,10 @@ bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition )
     if ( !pVertex )
         return false;
 
-    pVertex->SetPosition ( vecPosition );
-    return true;
+    return pVertex->SetPosition ( vecPosition );
 }
 
 void CClientWater::Unlink ()
 {
-
+    m_pManager->RemoveFromList ( this );
 }

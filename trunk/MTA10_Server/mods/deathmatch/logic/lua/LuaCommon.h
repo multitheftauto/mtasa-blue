@@ -52,6 +52,7 @@ class CLuaTimer*        lua_totimer             ( lua_State* luaVM, int iArgumen
 class CVehicle*         lua_tovehicle           ( lua_State* luaVM, int iArgument );
 class CXMLNode*         lua_toxmlnode           ( lua_State* luaVM, int iArgument );
 class CBan*             lua_toban               ( lua_State* luaVM, int iArgument );
+class CWater*           lua_towater             ( lua_State* luaVM, int iArgument );
 
 
 // Lua push macros for our datatypes
@@ -214,6 +215,8 @@ enum eLuaNetworkDependantFunctions
     HANDLING_SET_PROPERTY,
 
     TOGGLE_DEBUGGER,
+
+    SET_WATER_VERTEX_POSITION,
 
     NUM_RPC_FUNCS,
 };

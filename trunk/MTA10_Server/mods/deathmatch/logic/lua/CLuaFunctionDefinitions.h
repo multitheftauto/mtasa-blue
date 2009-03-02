@@ -361,6 +361,8 @@ public:
 
     // Water funcs
     static int      CreateWater                         ( lua_State* luaVM );
+    static int      GetWaterVertexPosition              ( lua_State* luaVM );
+    static int      SetWaterVertexPosition              ( lua_State* luaVM );
 
     // Weapon funcs
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );

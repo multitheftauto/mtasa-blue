@@ -31,7 +31,7 @@ void CWaterVertexSA::GetPosition ( CVector& vec )
     vec.fZ = m_pInterface->m_fZ;
 }
 
-void CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
+bool CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
 {
     if ( pChangeSource )
         g_pWaterManager->AddChange ( pChangeSource, this, new CWaterChangeVertexMove ( this ) );
@@ -39,6 +39,7 @@ void CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
     m_pInterface->m_sX = ((short)vec.fX) & ~1;
     m_pInterface->m_sY = ((short)vec.fY) & ~1;
     m_pInterface->m_fZ = vec.fZ;
+    return true;
 }
 
 // -----------------------------------------------------

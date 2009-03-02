@@ -408,6 +408,8 @@ public:
 
     // Water get funcs
     static CWater*              CreateWater                         ( CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4 );
+    static bool                 GetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
+    static bool                 SetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
 
 	// Standard server functions
     static unsigned char        GetMaxPlayers                       ( void );

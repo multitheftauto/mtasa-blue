@@ -64,49 +64,54 @@ void CWater::SetPosition ( const CVector& vecPosition )
 
 bool CWater::ReadSpecialData ()
 {
-    // Grab the "posX" data
-    if ( !GetCustomDataFloat ( "posX", m_vecPosition.fX, true ) )
-    {
-        CLogger::ErrorPrintf ( "Bad/missing 'posX' attribute in <water> (line %u)\n", m_uiLine );
-        return false;
-    }
-
-    // Grab the "posY" data
-    if ( !GetCustomDataFloat ( "posY", m_vecPosition.fY, true ) )
-    {
-        CLogger::ErrorPrintf ( "Bad/missing 'posY' attribute in <water> (line %u)\n", m_uiLine );
-        return false;
-    }
-
-    // Grab the "posZ" data
-    if ( !GetCustomDataFloat ( "posZ", m_vecPosition.fZ, true ) )
-    {
-        CLogger::ErrorPrintf ( "Bad/missing 'posZ' attribute in <water> (line %u)\n", m_uiLine );
-        return false;
-    }
-
-    float fWidth = 20.0f;
-    float fHeight = 20.0f;
-    GetCustomDataFloat ( "sizeX", fWidth, false );
-    GetCustomDataFloat ( "sizeY", fHeight, false );
-
-    if ( fWidth <= 0.0f )
-    {
-        CLogger::ErrorPrintf ( "Invalid 'sizeX' attribute in <water> (line %u)\n", m_uiLine );
-        return false;
-    }
-
-    if ( fHeight <= 0.0f )
-    {
-        CLogger::ErrorPrintf ( "Invalid 'sizeY' attribute in <water> (line %u)\n", m_uiLine );
-        return false;
-    }
-
+    char szPropName[10];
     m_WaterType = QUAD;
-    m_Vertices [ 0 ] = m_vecPosition + CVector ( -fWidth / 2.0f, -fHeight / 2.0f, 0.0f );
-    m_Vertices [ 1 ] = m_vecPosition + CVector (  fWidth / 2.0f, -fHeight / 2.0f, 0.0f );
-    m_Vertices [ 2 ] = m_vecPosition + CVector ( -fWidth / 2.0f,  fHeight / 2.0f, 0.0f );
-    m_Vertices [ 3 ] = m_vecPosition + CVector (  fWidth / 2.0f,  fHeight / 2.0f, 0.0f );
+    for ( int i = 0; i < 4; i++ )
+    {
+        _snprintf ( szPropName, sizeof(szPropName), "posX%d", i + 1 );
+        if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fX, true ) )
+        {
+            if ( i == 3 )
+            {
+                m_WaterType = TRIANGLE;
+                break;
+            }
+            else
+            {
+                CLogger::ErrorPrintf ( "Bad/missing 'posX%d' attribute in <water> (line %u)\n", i + 1, m_uiLine );
+                return false;
+            }
+        }
+        _snprintf ( szPropName, sizeof(szPropName), "posY%d", i + 1 );
+        if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fY, true ) )
+        {
+            if ( i == 3 )
+            {
+                m_WaterType = TRIANGLE;
+                break;
+            }
+            else
+            {
+                CLogger::ErrorPrintf ( "Bad/missing 'posY%d' attribute in <water> (line %u)\n", i + 1, m_uiLine );
+                return false;
+            }
+        }
+        _snprintf ( szPropName, sizeof(szPropName), "posZ%d", i + 1 );
+        if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fZ, true ) )
+        {
+            if ( i == 3 )
+            {
+                m_WaterType == TRIANGLE;
+                break;
+            }
+            else
+            {
+                CLogger::ErrorPrintf ( "Bad/missing 'posZ%d' attribute in <water> (line %u)\n", i + 1, m_uiLine );
+                return false;
+            }
+        }
+    }
+    
     RoundVertices ();
     if ( !Valid () )
     {
@@ -130,8 +135,14 @@ bool CWater::SetVertex ( int index, CVector& vecPosition )
     if ( index < 0 || index >= GetNumVertices () )
         return false;
 
+    CVector vecOriginalPosition = m_Vertices [ index ];
     m_Vertices [ index ] = vecPosition;
     RoundVertex ( index );
+    if ( !Valid () )
+    {
+        m_Vertices [ index ] = vecOriginalPosition;
+        return false;
+    }
     return true;
 }
 

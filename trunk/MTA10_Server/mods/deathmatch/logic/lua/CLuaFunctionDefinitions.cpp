@@ -7794,6 +7794,72 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetWaterVertexPosition ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CWater* pWater = lua_towater ( luaVM, 1 );
+        if ( pWater )
+        {
+            int iVertexIndex = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+            CVector vecPosition;
+            if ( CStaticFunctionDefinitions::GetWaterVertexPosition ( pWater, iVertexIndex, vecPosition ) )
+            {
+                lua_pushnumber ( luaVM, vecPosition.fX );
+                lua_pushnumber ( luaVM, vecPosition.fY );
+                lua_pushnumber ( luaVM, vecPosition.fZ );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getWaterVertexPosition", "water", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getWaterVertexPosition" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetWaterVertexPosition ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    int iArgument5 = lua_type ( luaVM, 5 );
+
+    if ( iArgument1 == LUA_TLIGHTUSERDATA &&
+       ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+       ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+       ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+       ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
+    {
+        CWater* pWater = lua_towater ( luaVM, 1 );
+        if ( pWater )
+        {
+            int iVertexIndex = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+            CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                                  static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
+                                  static_cast < float > ( lua_tonumber ( luaVM, 5 ) ) );
+            if ( CStaticFunctionDefinitions::SetWaterVertexPosition ( pWater, iVertexIndex, vecPosition ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setWaterVertexPosition", "water", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setWaterVertexPosition" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::CreateColCircle ( lua_State* luaVM )
 {
     // Verify the argument types

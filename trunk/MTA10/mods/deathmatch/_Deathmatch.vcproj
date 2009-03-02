@@ -445,6 +445,9 @@
 						RelativePath=".\logic\rpc\CVehicleRPCs.cpp">
 					</File>
 					<File
+						RelativePath=".\logic\rpc\CWaterRPCs.cpp">
+					</File>
+					<File
 						RelativePath=".\logic\rpc\CWeaponRPCs.cpp">
 					</File>
 					<File
@@ -676,6 +679,9 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWater.cpp">
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientWaterManager.cpp">
 				</File>
 				<File
 					RelativePath="..\shared_logic\CConfig.cpp">
@@ -1003,6 +1009,9 @@
 						RelativePath=".\logic\rpc\CVehicleRPCs.h">
 					</File>
 					<File
+						RelativePath=".\logic\rpc\CWaterRPCs.h">
+					</File>
+					<File
 						RelativePath=".\logic\rpc\CWeaponRPCs.h">
 					</File>
 					<File
@@ -1249,6 +1258,9 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWater.h">
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientWaterManager.h">
 				</File>
 				<File
 					RelativePath="..\shared_logic\CConfig.h">
