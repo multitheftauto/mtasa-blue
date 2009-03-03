@@ -267,6 +267,11 @@ void CModManager::Unload ( void )
         CCore::GetSingleton ().SetConnected ( false );
         CLocalGUI::GetSingleton ().GetMainMenu ()->SetIsIngame ( false );
         CLocalGUI::GetSingleton ().GetMainMenu ()->SetVisible ( true, false );
+
+        if ( XfireIsLoaded () )
+        {
+            XfireSetCustomGameData ( 0, NULL, NULL ); 
+        }
     }
 }
 
