@@ -747,34 +747,10 @@
 				Name="client"
 				Filter="">
 				<File
-					RelativePath=".\client\CClientBase.h">
-				</File>
-				<File
-					RelativePath=".\client\CCommandsInterface.h">
-				</File>
-				<File
-					RelativePath=".\client\CConsoleInterface.h">
-				</File>
-				<File
-					RelativePath=".\client\CCoreInterface.h">
-				</File>
-				<File
 					RelativePath=".\CExceptionInformation_Impl.h">
 				</File>
 				<File
-					RelativePath=".\client\CGraphicsInterface.h">
-				</File>
-				<File
-					RelativePath=".\client\CKeyBindsInterface.h">
-				</File>
-				<File
 					RelativePath=".\client\CMainConfigInterface.h">
-				</File>
-				<File
-					RelativePath=".\client\CModManagerInterface.h">
-				</File>
-				<File
-					RelativePath=".\net\CNetHTTPDownloadManagerInterface.h">
 				</File>
 				<File
 					RelativePath=".\client\CSerialManagerInterface.h">
@@ -810,6 +786,66 @@
 				<File
 					RelativePath=".\client\utils\CMD5Hasher.h">
 				</File>
+			</Filter>
+			<Filter
+				Name="sdk"
+				Filter="">
+				<Filter
+					Name="core"
+					Filter="">
+					<File
+						RelativePath="..\sdk\core\CClientBase.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCommandsInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCommunityInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CConsoleInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCoreInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCVarsInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CExceptionInformation.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CGraphicsInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CKeyBindsInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CModManagerInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h">
+					</File>
+				</Filter>
+				<Filter
+					Name="net"
+					Filter="">
+					<File
+						RelativePath="..\sdk\net\CNet.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\CNetHTTPDownloadManagerInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_bitstream.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_common.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_packetenums.h">
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>
