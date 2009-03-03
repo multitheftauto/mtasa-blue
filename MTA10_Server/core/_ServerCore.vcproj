@@ -371,27 +371,6 @@
 				Name="server"
 				Filter="">
 				<File
-					RelativePath=".\server\CModManager.h">
-				</File>
-				<File
-					RelativePath=".\server\CServerBase.h">
-				</File>
-				<File
-					RelativePath=".\server\CServerInterface.h">
-				</File>
-				<File
-					RelativePath=".\server\CTCP.h">
-				</File>
-				<File
-					RelativePath=".\server\CTCPClientSocket.h">
-				</File>
-				<File
-					RelativePath=".\server\CTCPServerSocket.h">
-				</File>
-				<File
-					RelativePath=".\server\CTCPSocket.h">
-				</File>
-				<File
 					RelativePath=".\server\CXML.h">
 				</File>
 				<File
@@ -428,6 +407,63 @@
 				<File
 					RelativePath=".\sockets\CTCPServerSocketImplManager.h">
 				</File>
+			</Filter>
+			<Filter
+				Name="sdk"
+				Filter="">
+				<File
+					RelativePath="..\sdk\Platform.h">
+				</File>
+				<Filter
+					Name="core"
+					Filter="">
+					<File
+						RelativePath="..\sdk\core\CModManager.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CServerBase.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CServerInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CTCP.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CTCPClientSocket.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CTCPServerSocket.h">
+					</File>
+					<File
+						RelativePath="..\sdk\core\CTCPSocket.h">
+					</File>
+				</Filter>
+				<Filter
+					Name="net"
+					Filter="">
+					<File
+						RelativePath="..\sdk\net\CLanBroadcastInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\CNetHTTPDownloadManagerInterface.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\CNetServer.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\ns_bitstream.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\ns_common.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\ns_packetenums.h">
+					</File>
+					<File
+						RelativePath="..\sdk\net\ns_playerid.h">
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>
