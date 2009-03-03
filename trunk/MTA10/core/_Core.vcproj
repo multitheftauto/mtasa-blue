@@ -465,6 +465,9 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\xfire.cpp">
+			</File>
 			<Filter
 				Name="d3d"
 				Filter="">
@@ -723,6 +726,9 @@
 			</File>
 			<File
 				RelativePath=".\UtilityMacros.h">
+			</File>
+			<File
+				RelativePath=".\xfire.h">
 			</File>
 			<Filter
 				Name="tracking"
