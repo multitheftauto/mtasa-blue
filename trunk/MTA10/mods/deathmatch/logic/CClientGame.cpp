@@ -3527,7 +3527,7 @@ void CClientGame::PostWeaponFire ( void )
 }
 
 
-bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream, unsigned long )
+bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     if ( g_pClientGame )
     {

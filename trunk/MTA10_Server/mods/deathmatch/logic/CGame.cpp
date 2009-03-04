@@ -723,7 +723,7 @@ void CGame::Stop ( void )
 }
 
 
-bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream, unsigned long )
+bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetServerBitStreamInterface& BitStream )
 {
     // Is it a join packet? Pass it to the handler immediately
     if ( ucPacketID == PACKET_ID_PLAYER_JOIN )

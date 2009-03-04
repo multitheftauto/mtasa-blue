@@ -419,7 +419,7 @@ void CClientPacketRecorder::DoPulse ( void )
 
                         // Send it to the packethandler
 						//g_pCore->GetConsole()->Printf("(time: %u, current: %u) %u\n",ulTimeStamp,lCurTime,ucPacketID);
-                        m_pfnPacketHandler ( ucPacketID, *pBitStream, 0 );
+                        m_pfnPacketHandler ( ucPacketID, *pBitStream );
 
                         // Destroy the bitstream
                         g_pNet->DeallocateNetBitStream ( pBitStream );
