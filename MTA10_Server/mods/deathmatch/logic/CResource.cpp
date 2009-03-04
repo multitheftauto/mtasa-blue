@@ -476,7 +476,11 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
         }
     }
 
-	// If there was no matching key, create a new one and add it to our list
+    // There was no matching key.
+    if ( !szValue )         // If we were going to delete the key, we are done at this point
+        return;
+
+	// If we were going to set a new value, create a new key and add it to our list
     pValue = new CInfoValue ( szKey, szValue );
     m_infoValues.push_back ( pValue );
 
