@@ -1853,6 +1853,15 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool
 	return true;
 }
 
+bool CStaticFunctionDefinitions::CanTrainDerail ( CClientVehicle& Vehicle, bool& bCanDerail )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    bCanDerail = Vehicle.CanDerail ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetTrainDirection ( CClientVehicle& Vehicle, bool& bDirection )
 {
@@ -2424,6 +2433,16 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, boo
         return false;
 
 	Vehicle.SetDerailed ( bDerailed );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainCanDerail ( CClientVehicle& Vehicle, bool bCanDerail )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+	Vehicle.SetCanDerail ( bCanDerail );
     return true;
 }
 

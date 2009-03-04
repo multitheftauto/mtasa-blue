@@ -258,6 +258,7 @@ public:
 	LUA_DECLARE ( GetHelicopterRotorSpeed );
     LUA_DECLARE ( GetVehicleEngineState );
     LUA_DECLARE ( IsTrainDerailed );
+    LUA_DECLARE ( CanTrainDerail );
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
 
@@ -297,6 +298,7 @@ public:
     LUA_DECLARE ( SetVehicleAdjustableProperty );
 	LUA_DECLARE ( SetHelicopterRotorSpeed );
     LUA_DECLARE ( SetTrainDerailed );
+    LUA_DECLARE ( SetTrainCanDerail );
     LUA_DECLARE ( SetTrainDirection );
     LUA_DECLARE ( SetTrainSpeed );
 

@@ -251,6 +251,8 @@ public:
 
     bool                        IsDerailed              ( void );
     void                        SetDerailed             ( bool bDerailed );
+    bool                        CanDerail               ( void );
+    void                        SetCanDerail            ( bool bCanDerail );
 
     bool                        GetTrainDirection       ( void );
     void                        SetTrainDirection       ( bool bDirection );
@@ -426,6 +428,7 @@ protected:
     bool                        m_bIsOnGround;
 
     bool                        m_bIsDerailed;
+    bool                        m_bCanDerail;
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
 

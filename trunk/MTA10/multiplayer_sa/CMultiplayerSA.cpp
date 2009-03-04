@@ -39,6 +39,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
 unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
+unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -118,6 +119,7 @@ VOID HOOK_CCam_ProcessFixed ();
 VOID HOOK_Render3DStuff ();
 VOID HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 VOID HOOK_CPed_IsPlayer ();
+VOID HOOK_CTrain_ProcessControl_Derail ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -204,6 +206,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 7);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
+    HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -1958,6 +1961,42 @@ VOID _declspec(naked) HOOK_CRunningScript_Process()
     {
         popad
 	    retn
+    }
+}
+
+static CVehicleSAInterface* pDerailingTrain = NULL;
+VOID _declspec(naked) HOOK_CTrain_ProcessControl_Derail()
+{
+    // If the train wouldn't derail, don't modify anything
+    _asm
+    {
+        jnp     train_would_derail
+        mov     eax, 0x6F8F89
+        jmp     eax
+train_would_derail:
+        pushad
+        mov     pDerailingTrain, esi
+    }
+
+    // At this point we know that GTA wants to derail the train
+    if ( pDerailingTrain->m_pVehicle->CanDerail () )
+    {
+        // Go back to the derailment code
+        _asm
+        {
+            popad
+            mov     eax, 0x6F8DC0
+            jmp     eax
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            mov     eax, 0x6F8F89
+            jmp     eax
+        }
     }
 }
 

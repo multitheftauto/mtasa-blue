@@ -40,6 +40,7 @@ void COffsetsMP::Initialize11 ( void )
     CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion =                                       0x737280; // 1.01
     CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow =                  0x70636B; // 1.01
     CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic =                      0x6FFB8B; // 1.01
+    CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail =                                  0x6F8DBA; // 1.01???? ACHTUNG!
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E6F0; // 1.01
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x5074A0; // 1.01
     CMultiplayerSA::FUNC_CHud_Draw =                                                        0x5902B0; // 1.01
@@ -68,11 +69,10 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink =                                          0x6E0027;
     CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay =                                  0x586650;
     CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask =                               0x67DABE;
+    CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail =                                  0x6F8DBA;
 
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E670;
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x507030;
     CMultiplayerSA::FUNC_CHud_Draw =                                                        0x58FAE0;
-    CMultiplayerSA::FUNC_CPlayerInfoBase =                                                  0xB7CD98;
-    
-    
+    CMultiplayerSA::FUNC_CPlayerInfoBase =                                                  0xB7CD98;    
 }
