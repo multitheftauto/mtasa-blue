@@ -72,6 +72,8 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     SetHandlingData ( pEntry );
 
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
+
+    m_bCanDerail = true;
 }
 
 CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
@@ -281,7 +283,6 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
         }
     }   
 }
-
 
 float CVehicleSA::GetTrainSpeed ()
 {
