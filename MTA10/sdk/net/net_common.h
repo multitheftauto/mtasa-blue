@@ -26,7 +26,7 @@
 
 #define NET_INVALID_PACKET_ID		255
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, NetBitStreamInterface&, unsigned long );
+typedef bool (*PPACKETHANDLER) ( unsigned char, NetBitStreamInterface& );
 
 enum NetPacketPriority
 {
@@ -41,7 +41,7 @@ enum NetPacketReliability
 	PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
 	PACKET_RELIABILITY_RELIABLE,
 	PACKET_RELIABILITY_RELIABLE_ORDERED,
-	PACKET_RELIABILITY_RELIABLE_SEQUENCED
+	PACKET_RELIABILITY_RELIABLE_SEQUENCED   //     Can drop packets
 };
 
 enum NetPacketOrdering
