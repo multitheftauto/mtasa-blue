@@ -101,7 +101,7 @@ bool CWater::ReadSpecialData ()
         {
             if ( i == 3 )
             {
-                m_WaterType == TRIANGLE;
+                m_WaterType = TRIANGLE;
                 break;
             }
             else
