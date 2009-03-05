@@ -63,6 +63,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_pJackingPlayer = NULL;
     m_bInWater = false;
     m_bDerailed = false;
+    m_bIsDerailable = true;
     m_bTrainDirection = true;
 
     // Initialize the occupied Players

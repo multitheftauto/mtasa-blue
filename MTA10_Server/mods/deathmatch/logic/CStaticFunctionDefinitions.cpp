@@ -3603,6 +3603,14 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsTrainDerailable ( CVehicle* pVehicle, bool& bDerailable )
+{
+    assert ( pVehicle );
+
+    bDerailable = pVehicle->IsDerailable ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetTrainDirection ( CVehicle* pVehicle, bool& bDirection )
 {
@@ -4534,6 +4542,22 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDe
     BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailed ? 1 : 0 ) );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainDerailable ( CVehicle* pVehicle, bool bDerailable )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetDerailable ( bDerailable );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailable ? 1 : 0 ) );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILABLE, *BitStream.pBitStream ) );
 
     return true;
 }

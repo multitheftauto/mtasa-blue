@@ -228,6 +228,8 @@ public:
 
     inline bool                     IsDerailed              ( void )                        { return m_bDerailed; }
     inline void                     SetDerailed             ( bool bDerailed )              { m_bDerailed = bDerailed; }
+    inline bool                     IsDerailable            ( void )                        { return m_bIsDerailable; }
+    inline void                     SetDerailable           ( bool bDerailable )            { m_bIsDerailable = bDerailable; }
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
@@ -290,6 +292,7 @@ private:
     unsigned char                   m_ucAlpha;
     bool                            m_bInWater;
     bool                            m_bDerailed;
+    bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
 
     CPlayer *                       m_pJackingPlayer;

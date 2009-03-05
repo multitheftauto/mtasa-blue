@@ -2370,16 +2370,17 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( usFlags );
 
                     // Extract the flag bools
-                    bool bLandingGearDown = ( usFlags & 0x01 ) ? true : false;
-                    bool bSirenesActive = ( usFlags & 0x02 ) ? true : false;
-                    bool bPetrolTankWeak = ( usFlags & 0x04 ) ? true : false;
-                    bool bEngineOn = ( usFlags & 0x08 ) ? true : false;
-                    bool bLocked = ( usFlags & 0x10 ) ? true : false;
-                    bool bDoorsUndamageable = ( usFlags & 0x20 ) ? true : false;
-                    bool bDamageProof = ( usFlags & 0x40 ) ? true : false;
-                    bool bFrozen = ( usFlags & 0x80 ) ? true : false;
-                    bool bDerailed = ( usFlags & 0x100 ) ? true : false;
-                    bool bTrainDirection = ( usFlags & 0x200 ) ? true : false;
+                    bool bLandingGearDown   = ( usFlags & 0x0001 ) ? true : false;
+                    bool bSirenesActive     = ( usFlags & 0x0002 ) ? true : false;
+                    bool bPetrolTankWeak    = ( usFlags & 0x0004 ) ? true : false;
+                    bool bEngineOn          = ( usFlags & 0x0008 ) ? true : false;
+                    bool bLocked            = ( usFlags & 0x0010 ) ? true : false;
+                    bool bDoorsUndamageable = ( usFlags & 0x0020 ) ? true : false;
+                    bool bDamageProof       = ( usFlags & 0x0040 ) ? true : false;
+                    bool bFrozen            = ( usFlags & 0x0080 ) ? true : false;
+                    bool bDerailed          = ( usFlags & 0x0100 ) ? true : false;
+                    bool bIsDerailable      = ( usFlags & 0x0200 ) ? true : false;
+                    bool bTrainDirection    = ( usFlags & 0x0400 ) ? true : false;
 
                     // If the vehicle has a landing gear, set landing gear state
                     if ( CClientVehicleManager::HasLandingGears ( usModel ) )
@@ -2403,6 +2404,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     if ( CClientVehicleManager::IsTrainModel ( usModel ) )
                     {
                         pVehicle->SetDerailed ( bDerailed );
+                        pVehicle->SetDerailable ( bIsDerailable );
                         pVehicle->SetTrainDirection ( bTrainDirection );
                     }
 

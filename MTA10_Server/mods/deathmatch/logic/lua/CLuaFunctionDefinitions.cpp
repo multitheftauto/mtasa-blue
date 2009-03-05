@@ -4239,6 +4239,31 @@ int CLuaFunctionDefinitions::IsTrainDerailed ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::IsTrainDerailable ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            bool bDerailable;
+            if ( CStaticFunctionDefinitions::IsTrainDerailable ( pVehicle, bDerailable ) )
+            {
+                lua_pushboolean ( luaVM, bDerailable );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isTrainDerailable", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isTrainDerailable" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetTrainDirection ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -5304,6 +5329,35 @@ int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetTrainDerailable ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            {
+                if ( CStaticFunctionDefinitions::SetTrainDerailable ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }   
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailable" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDerailable", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

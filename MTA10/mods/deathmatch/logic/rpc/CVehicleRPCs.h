@@ -45,6 +45,7 @@ public:
     DECLARE_RPC ( SetVehicleWheelStates );
     DECLARE_RPC ( SetVehicleFrozen );
     DECLARE_RPC ( SetTrainDerailed );
+    DECLARE_RPC ( SetTrainDerailable );
     DECLARE_RPC ( SetTrainDirection );
     DECLARE_RPC ( SetTrainSpeed );
 };
