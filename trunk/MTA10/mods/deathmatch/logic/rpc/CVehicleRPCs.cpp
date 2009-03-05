@@ -39,6 +39,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_WHEEL_STATES, SetVehicleWheelStates, "SetVehicleWheelStates" );
     AddHandler ( SET_VEHICLE_FROZEN, SetVehicleFrozen, "SetVehicleFrozen" );
     AddHandler ( SET_TRAIN_DERAILED, SetTrainDerailed, "SetTrainDerailed" );
+    AddHandler ( SET_TRAIN_DERAILABLE, SetTrainDerailable, "SetTrainDerailable" );
     AddHandler ( SET_TRAIN_DIRECTION, SetTrainDirection, "SetTrainDirection" );
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
 }
@@ -525,6 +526,21 @@ void CVehicleRPCs::SetTrainDerailed ( NetBitStreamInterface& bitStream )
         if ( pVehicle )
         {
             pVehicle->SetDerailed ( ucDerailed != 0 );
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetTrainDerailable ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    unsigned char ucDerailable;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDerailable ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            pVehicle->SetDerailable ( ucDerailable != 0 );
         }
     }
 }

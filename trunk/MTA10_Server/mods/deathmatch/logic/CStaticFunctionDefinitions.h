@@ -235,6 +235,7 @@ public:
     static bool                 IsVehicleOnGround                   ( CVehicle* pVehicle, bool& bOnGround );
     static bool                 GetVehicleEngineState               ( CVehicle* pVehicle, bool& bState );
     static bool                 IsTrainDerailed                     ( CVehicle* pVehicle, bool& bDerailed );
+    static bool                 IsTrainDerailable                   ( CVehicle* pVehicle, bool& bDerailable );
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
 
@@ -273,6 +274,7 @@ public:
     static bool                 SetVehicleFuelTankExplodable        ( CElement* pElement, bool bExplodable );
     static bool                 SetVehicleFrozen                    ( CVehicle* pVehicle, bool bFrozen );
     static bool                 SetTrainDerailed                    ( CVehicle* pVehicle, bool bDerailed );
+    static bool                 SetTrainDerailable                  ( CVehicle* pVehicle, bool bDerailable );
     static bool                 SetTrainDirection                   ( CVehicle* pVehicle, bool bDireciton );
     static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
 
