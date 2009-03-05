@@ -52,8 +52,8 @@ public:
 
     virtual bool                IsDerailed                  () = 0;
     virtual void                SetDerailed                 ( bool bDerailed ) = 0;
-    virtual bool                CanDerail                   () = 0;
-    virtual void                SetCanDerail                ( bool bCanDerail ) = 0;
+    virtual bool                IsDerailable                () = 0;
+    virtual void                SetDerailable               ( bool bDerailable ) = 0;
     virtual float               GetTrainSpeed               () = 0;
     virtual void                SetTrainSpeed               ( float fSpeed ) = 0;
     virtual bool                GetTrainDirection           () = 0;

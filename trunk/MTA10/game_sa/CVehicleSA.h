@@ -422,7 +422,7 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 private:
 	CDamageManagerSA		* damageManager;
     CHandlingEntrySA*       m_pHandlingData;
-    bool                    m_bCanDerail;
+    bool                    m_bIsDerailable;
 
 public:
 								CVehicleSA                      ()      { };
@@ -444,8 +444,8 @@ public:
 
     bool                        IsDerailed                      ();
     void                        SetDerailed                     ( bool bDerailed );
-    inline bool                 CanDerail                       () { return m_bCanDerail; }
-    inline void                 SetCanDerail                    ( bool bCanDerail ) { m_bCanDerail = bCanDerail; }
+    inline bool                 IsDerailable                    () { return m_bIsDerailable; }
+    inline void                 SetDerailable                   ( bool bDerailable ) { m_bIsDerailable = bDerailable; }
     float                       GetTrainSpeed                   ();
     void                        SetTrainSpeed                   ( float fSpeed );
     bool                        GetTrainDirection               ();

@@ -1853,12 +1853,12 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool
 	return true;
 }
 
-bool CStaticFunctionDefinitions::CanTrainDerail ( CClientVehicle& Vehicle, bool& bCanDerail )
+bool CStaticFunctionDefinitions::IsTrainDerailable ( CClientVehicle& Vehicle, bool& bIsDerailable )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-    bCanDerail = Vehicle.CanDerail ();
+    bIsDerailable = Vehicle.IsDerailable ();
     return true;
 }
 
@@ -2437,12 +2437,12 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, boo
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainCanDerail ( CClientVehicle& Vehicle, bool bCanDerail )
+bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientVehicle& Vehicle, bool bDerailable )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-	Vehicle.SetCanDerail ( bCanDerail );
+	Vehicle.SetDerailable ( bDerailable );
     return true;
 }
 

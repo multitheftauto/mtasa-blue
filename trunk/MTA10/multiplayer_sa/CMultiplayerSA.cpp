@@ -1979,7 +1979,7 @@ train_would_derail:
     }
 
     // At this point we know that GTA wants to derail the train
-    if ( pDerailingTrain->m_pVehicle->CanDerail () )
+    if ( pDerailingTrain->m_pVehicle->IsDerailable () )
     {
         // Go back to the derailment code
         _asm

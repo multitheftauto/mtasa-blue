@@ -122,7 +122,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bBlown = false;
     m_LastSyncedData = new SLastSyncedVehData;
     m_bIsDerailed = false;
-    m_bCanDerail = true;
+    m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
 
@@ -1592,22 +1592,22 @@ void CClientVehicle::SetDerailed ( bool bDerailed )
     m_bIsDerailed = bDerailed;
 }
 
-bool CClientVehicle::CanDerail ( void )
+bool CClientVehicle::IsDerailable ( void )
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->CanDerail ();
+        return m_pVehicle->IsDerailable ();
     }
-    return m_bCanDerail;
+    return m_bIsDerailable;
 }
 
-void CClientVehicle::SetCanDerail ( bool bCanDerail )
+void CClientVehicle::SetDerailable ( bool bDerailable )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->SetCanDerail ( bCanDerail );
+        m_pVehicle->SetDerailable ( bDerailable );
     }
-    m_bCanDerail = bCanDerail;
+    m_bIsDerailable = bDerailable;
 }
 
 
@@ -1901,7 +1901,7 @@ void CClientVehicle::Create ( void )
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {
             m_pVehicle->SetDerailed ( m_bIsDerailed );
-            m_pVehicle->SetCanDerail ( m_bCanDerail );
+            m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
         }

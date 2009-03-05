@@ -6369,25 +6369,25 @@ int CLuaFunctionDefinitions::IsTrainDerailed ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::CanTrainDerail ( lua_State* luaVM )
+int CLuaFunctionDefinitions::IsTrainDerailable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            bool bCanDerail;
-            if ( CStaticFunctionDefinitions::CanTrainDerail ( *pVehicle, bCanDerail ) )
+            bool bIsDerailable;
+            if ( CStaticFunctionDefinitions::IsTrainDerailable ( *pVehicle, bIsDerailable ) )
             {
-                lua_pushboolean ( luaVM, bCanDerail );
+                lua_pushboolean ( luaVM, bIsDerailable );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "canTrainDerail", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isTrainDerailable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "canTrainDerail" );
+        m_pScriptDebugging->LogBadType ( luaVM, "isTrainDerailable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7389,7 +7389,7 @@ int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::SetTrainCanDerail ( lua_State* luaVM )
+int CLuaFunctionDefinitions::SetTrainDerailable ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
          ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
@@ -7397,18 +7397,18 @@ int CLuaFunctionDefinitions::SetTrainCanDerail ( lua_State* luaVM )
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            bool bCanDerail = ( lua_toboolean ( luaVM, 2 ) ? true : false );
-            if ( CStaticFunctionDefinitions::SetTrainCanDerail ( *pVehicle, bCanDerail ) )
+            bool bDerailable = ( lua_toboolean ( luaVM, 2 ) ? true : false );
+            if ( CStaticFunctionDefinitions::SetTrainDerailable ( *pVehicle, bDerailable ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainCanDerail", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDerailable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setTrainCanDerail" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
