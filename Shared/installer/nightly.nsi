@@ -646,6 +646,8 @@ ShowUnInstDetails show
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\banlist.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\editor.conf"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\vehiclecolors.conf"
 
 		!ifndef LIGHTBUILD
