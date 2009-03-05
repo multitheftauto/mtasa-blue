@@ -448,7 +448,7 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "getHelicopterRotorSpeed", CLuaFunctionDefinitions::GetHelicopterRotorSpeed );
     CLuaCFunctions::AddFunction ( "getVehicleEngineState", CLuaFunctionDefinitions::GetVehicleEngineState );
     CLuaCFunctions::AddFunction ( "isTrainDerailed", CLuaFunctionDefinitions::IsTrainDerailed );
-    CLuaCFunctions::AddFunction ( "canTrainDerail", CLuaFunctionDefinitions::CanTrainDerail );
+    CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefinitions::IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefinitions::GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefinitions::GetTrainSpeed );
 
@@ -481,7 +481,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleAdjustableProperty", CLuaFunctionDefinitions::SetVehicleAdjustableProperty );
 	CLuaCFunctions::AddFunction ( "setHelicopterRotorSpeed", CLuaFunctionDefinitions::SetHelicopterRotorSpeed );
     CLuaCFunctions::AddFunction ( "setTrainDerailed", CLuaFunctionDefinitions::SetTrainDerailed );
-    CLuaCFunctions::AddFunction ( "setTrainCanDerail", CLuaFunctionDefinitions::SetTrainCanDerail );
+    CLuaCFunctions::AddFunction ( "setTrainDerailable", CLuaFunctionDefinitions::SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
 

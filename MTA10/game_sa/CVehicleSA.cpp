@@ -73,7 +73,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
 
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
-    m_bCanDerail = true;
+    m_bIsDerailable = true;
 }
 
 CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
