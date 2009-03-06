@@ -851,10 +851,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
-    CLuaCFunctions::AddFunction ( "getVersionString", CLuaFunctionDefinitions::GetVersionString );
-    CLuaCFunctions::AddFunction ( "getVersionName", CLuaFunctionDefinitions::GetVersionName );
-    CLuaCFunctions::AddFunction ( "getNetcodeVersion", CLuaFunctionDefinitions::GetNetcodeVersion );
-    CLuaCFunctions::AddFunction ( "getOperatingSystemName", CLuaFunctionDefinitions::GetOperatingSystemName );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

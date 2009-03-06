@@ -492,12 +492,7 @@ public:
 
     static int      Md5                                 ( lua_State* luaVM );
 
-    // Version funcs
     static int      GetVersion                          ( lua_State* luaVM );
-    static int      GetVersionString                    ( lua_State* luaVM );
-    static int      GetVersionName                      ( lua_State* luaVM );
-    static int      GetNetcodeVersion                   ( lua_State* luaVM );
-    static int      GetOperatingSystemName              ( lua_State* luaVM );
 };
 
 #endif
