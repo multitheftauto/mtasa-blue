@@ -125,6 +125,11 @@ void CClientPickup::Create ( void )
         m_pPickup = g_pGame->GetPickups ()->CreatePickup ( &m_vecPosition, m_usModel, PICKUP_ONCE );
         if ( m_pPickup )
         {
+            // Grab the attributes from the MTA interface for this pickup
+            m_pObject = NULL;
+            unsigned char ucAreaCode = GetInterior ();
+            unsigned short usDimension = GetDimension ();
+
             // Make sure we have an object
             if ( !m_pPickup->GetObject () ) m_pPickup->GiveUsAPickUpObject ();
 
@@ -138,6 +143,10 @@ void CClientPickup::Create ( void )
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;
+
+            // Restore the attributes
+            SetInterior ( ucAreaCode );
+            SetDimension ( usDimension );
         }
     }
 }
