@@ -7601,3 +7601,30 @@ bool CStaticFunctionDefinitions::RemoveResourceFile ( CResource* pResource, cons
     // Failed
     return false;
 }
+
+
+/** Version functions **/
+unsigned long CStaticFunctionDefinitions::GetVersion ()
+{
+    return MTA_DM_VERSION;
+}
+
+const char* CStaticFunctionDefinitions::GetVersionString ()
+{
+    return MTA_DM_VERSIONSTRING;
+}
+
+const char* CStaticFunctionDefinitions::GetVersionName ()
+{
+    return MTA_DM_FULL_STRING;
+}
+
+unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
+{
+    return MTA_DM_NETCODE_VERSION;
+}
+
+const char* CStaticFunctionDefinitions::GetOperatingSystemName ()
+{
+    return MTA_OS_STRING;
+}

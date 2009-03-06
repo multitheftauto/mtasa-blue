@@ -15306,3 +15306,40 @@ int CLuaFunctionDefinitions::SetVoiceMuteAllEnabled ( lua_State* luaVM )
 	return 1;
 }
 #endif
+
+
+/** Version functions **/
+int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
+{
+    unsigned long ulVersion = CStaticFunctionDefinitions::GetVersion ();
+    lua_pushnumber ( luaVM, ulVersion );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetVersionString ( lua_State* luaVM )
+{
+    const char* szVersion = CStaticFunctionDefinitions::GetVersionString ();
+    lua_pushstring ( luaVM, szVersion );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetVersionName ( lua_State* luaVM )
+{
+    const char* szVersionName = CStaticFunctionDefinitions::GetVersionName ();
+    lua_pushstring ( luaVM, szVersionName );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetNetcodeVersion ( lua_State* luaVM )
+{
+    unsigned long ulVersion = CStaticFunctionDefinitions::GetNetcodeVersion ();
+    lua_pushnumber ( luaVM, ulVersion );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetOperatingSystemName ( lua_State* luaVM )
+{
+    const char* szOS = CStaticFunctionDefinitions::GetOperatingSystemName ();
+    lua_pushstring ( luaVM, szOS );
+    return 1;
+}

@@ -849,6 +849,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setMuteAllEnabled", CLuaFunctionDefinitions::SetVoiceMuteAllEnabled );
 #endif
 
+    // Version functions
+    CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
+    CLuaCFunctions::AddFunction ( "getVersionString", CLuaFunctionDefinitions::GetVersionString );
+    CLuaCFunctions::AddFunction ( "getVersionName", CLuaFunctionDefinitions::GetVersionName );
+    CLuaCFunctions::AddFunction ( "getNetcodeVersion", CLuaFunctionDefinitions::GetNetcodeVersion );
+    CLuaCFunctions::AddFunction ( "getOperatingSystemName", CLuaFunctionDefinitions::GetOperatingSystemName );
+
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

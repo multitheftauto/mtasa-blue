@@ -461,6 +461,13 @@ public:
 	static bool							SetVoiceInputEnabled				( bool bEnabled );
 	static bool							SetVoiceMuteAllEnabled				( bool bEnabled );
 #endif
+
+    // Version funcs
+    static unsigned long                GetVersion                          ( );
+    static const char*                  GetVersionString                    ( );
+    static const char*                  GetVersionName                      ( );
+    static unsigned long                GetNetcodeVersion                   ( );
+    static const char*                  GetOperatingSystemName              ( );
 };
 
 #endif

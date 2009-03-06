@@ -649,6 +649,13 @@ public:
 	LUA_DECLARE ( SetVoiceInputEnabled );
 	LUA_DECLARE ( SetVoiceMuteAllEnabled );
 #endif
+
+    // Version functions
+    LUA_DECLARE ( GetVersion );
+    LUA_DECLARE ( GetVersionString );
+    LUA_DECLARE ( GetVersionName );
+    LUA_DECLARE ( GetNetcodeVersion );
+    LUA_DECLARE ( GetOperatingSystemName );
 };
 
 #endif
