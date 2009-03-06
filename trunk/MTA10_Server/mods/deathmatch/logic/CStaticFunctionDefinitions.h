@@ -518,6 +518,13 @@ public:
     static CXMLNode*            AddResourceMap                      ( CResource* pResource, const char* szMapName, int iDimension, CLuaMain* pLUA );
     static CXMLNode*            AddResourceConfig                   ( CResource* pResource, const char* szConfigName, int iType, CLuaMain* pLUA );
     static bool                 RemoveResourceFile                  ( CResource* pResource, const char* szFilename );
+
+    // Version funcs
+    static unsigned long        GetVersion                          ( );
+    static const char*          GetVersionString                    ( );
+    static const char*          GetVersionName                      ( );
+    static unsigned long        GetNetcodeVersion                   ( );
+    static const char*          GetOperatingSystemName              ( );
 };
 
 #endif
