@@ -10617,38 +10617,29 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 }
 
 
-/** Version functions **/
 int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 {
-    unsigned long ulVersion = CStaticFunctionDefinitions::GetVersion ();
-    lua_pushnumber ( luaVM, ulVersion );
-    return 1;
-}
+    lua_createtable ( luaVM, 0, 5 );
 
-int CLuaFunctionDefinitions::GetVersionString ( lua_State* luaVM )
-{
-    const char* szVersion = CStaticFunctionDefinitions::GetVersionString ();
-    lua_pushstring ( luaVM, szVersion );
-    return 1;
-}
+    lua_pushstring ( luaVM, "number" );
+    lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetVersion () );
+    lua_settable   ( luaVM, -3 );
+    
+    lua_pushstring ( luaVM, "mta" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionString () );
+    lua_settable   ( luaVM, -3 );
 
-int CLuaFunctionDefinitions::GetVersionName ( lua_State* luaVM )
-{
-    const char* szVersionName = CStaticFunctionDefinitions::GetVersionName ();
-    lua_pushstring ( luaVM, szVersionName );
-    return 1;
-}
+    lua_pushstring ( luaVM, "name" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionName () );
+    lua_settable   ( luaVM, -3 );
 
-int CLuaFunctionDefinitions::GetNetcodeVersion ( lua_State* luaVM )
-{
-    unsigned long ulVersion = CStaticFunctionDefinitions::GetNetcodeVersion ();
-    lua_pushnumber ( luaVM, ulVersion );
-    return 1;
-}
+    lua_pushstring ( luaVM, "netcode" );
+    lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetNetcodeVersion () );
+    lua_settable   ( luaVM, -3 );
 
-int CLuaFunctionDefinitions::GetOperatingSystemName ( lua_State* luaVM )
-{
-    const char* szOS = CStaticFunctionDefinitions::GetOperatingSystemName ();
-    lua_pushstring ( luaVM, szOS );
+    lua_pushstring ( luaVM, "os" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetOperatingSystemName () );
+    lua_settable   ( luaVM, -3 );
+
     return 1;
 }
