@@ -682,4 +682,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "set", CLuaFunctionDefinitions::Set );
 
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
+
+    CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
 }
