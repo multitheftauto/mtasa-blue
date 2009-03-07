@@ -184,15 +184,6 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
 			if ( pClient->GetNick () )
 				CLogger::LogPrintf ( "start: Requested by %s\n", pClient->GetNick () );
 
-            // start command is not valid for gamemodes
-            std::string strType;
-            resource->GetInfoValue ( "type", strType );
-            if ( strType == "gamemode" )
-            {
-                pEchoClient->SendConsole ( "start: Use changemode to start or restart a gamemode" );
-                return true;
-            }
-
             if ( resource->IsLoaded() )
             {
                 if ( !resource->IsActive() )
@@ -232,15 +223,6 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
         {
 			if ( pClient->GetNick () )
 				CLogger::LogPrintf ( "restart: Requested by %s\n", pClient->GetNick () );
-
-            // restart command is not valid for gamemodes
-            std::string strType;
-            resource->GetInfoValue ( "type", strType );
-            if ( strType == "gamemode" )
-            {
-                pEchoClient->SendConsole ( "restart: Use changemode to start or restart a gamemode" );
-                return true;
-            }
 
             if ( resource->IsLoaded() )
             {
