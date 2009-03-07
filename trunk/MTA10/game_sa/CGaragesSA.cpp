@@ -34,11 +34,11 @@ CGaragesSA::~CGaragesSA ( )
 
 void CGaragesSA::Initialize ( )
 {
-    for ( int i = 0 ; i < MAX_GARAGES ; i++ )
+    // Disable pay and sprays and mod shops
+    static const int iPayAndSprays [] = { 7, 8, 10, 11, 12, 15, 18, 19, 24, 27, 32, 33, 36, 40, 41, 47 };
+    for ( unsigned int i = 0; i < sizeof ( iPayAndSprays ) / sizeof ( int ); ++i )
     {
-        CGarageSA* pGarage = this->Garages[i];
-        // Disable pay and sprays and allow safehouse gargages closing with someone inside
-        pGarage->SetType ( 1 );
+        this->Garages [ iPayAndSprays [ i ] ]->SetType ( 1 );
     }
 }
 
