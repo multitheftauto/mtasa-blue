@@ -340,31 +340,6 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
         CResource* resource = lua_toresource ( luaVM, 1 );
         if ( resource )
         {
-
-            // Reject start attempts for gamemodes outside the mapmanger
-            std::string strType;
-            resource->GetInfoValue ( "type", strType );
-            if ( strType == "gamemode" )
-            {
-                // Bad hack to detect where the call came from
-                string strFilename = "";
-                lua_Debug debugInfo;
-                if ( lua_getstack ( luaVM, 1, &debugInfo ) )
-                {
-                    lua_getinfo ( luaVM, "nlS", &debugInfo );
-
-                    const char * szFilename = GetFilenameFromPath ( debugInfo.source );
-                    if ( szFilename ) strFilename = szFilename;
-                }
-
-                if ( strFilename.find ( "mapmanager" ) == string::npos )
-                {
-			        CLogger::LogPrintf ( "startResource: Use changemode to start or restart a gamemode\n" );
-                    lua_pushboolean ( luaVM, false );
-                    return 1;  
-                }
-            }
-
             if ( resource->IsLoaded() )
             {
 				if ( !resource->IsActive() && !resource->IsStarting() )
@@ -468,16 +443,6 @@ int CLuaResourceDefs::restartResource ( lua_State* luaVM )
         CResource* resource = lua_toresource ( luaVM, 1 );
         if ( resource )
         {
-            // Reject restart attempts for gamemodes
-            std::string strType;
-            resource->GetInfoValue ( "type", strType );
-            if ( strType == "gamemode" )
-            {
-			    CLogger::LogPrintf ( "restartResource: Use changemode to start or restart a gamemode\n" );
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-
             if ( resource->IsActive() )
             {
 				bool bPersistent = false;
