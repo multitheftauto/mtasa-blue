@@ -851,10 +851,21 @@ Section Uninstall
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas"
+		
+		; Delete shortcuts
+		Delete "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas.lnk"
 	!else
 		RmDir /r "$INSTDIR\server" ; for server only install
 	!endif
+
 	RmDir "$INSTDIR" ; fix for #3898
+
+	; Delete shortcuts
+	Delete "$SMPROGRAMS\\MTA San Andreas\MTA Server.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas Server.lnk"
+	RmDir /r "$SMPROGRAMS\\MTA San Andreas"
+	
 	SetAutoClose true
 SectionEnd
 
