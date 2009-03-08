@@ -109,23 +109,6 @@ bool CLuaModuleManager::GetResourceName ( lua_State * luaVM, std::string& strNam
 }
 
 
-lua_State* CLuaModuleManager::GetResourceFromName ( const char* szResourceName )
-{
-	CResource* pResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
-
-	if ( pResource )
-	{
-		CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
-		if ( pLuaMain )
-		{
-			return pLuaMain->GetVM ();
-		}
-	}
-
-	return NULL;
-}
-
-
 unsigned long CLuaModuleManager::GetResourceMetaCRC ( lua_State* luaVM )
 {
 	if ( luaVM )
@@ -163,6 +146,49 @@ unsigned long CLuaModuleManager::GetResourceFileCRC ( lua_State* luaVM, const ch
             }
 		}
 	}
+	return NULL;
+}
+
+
+unsigned long CLuaModuleManager::GetVersion ( )
+{
+    return CStaticFunctionDefinitions::GetVersion ( );
+}
+
+const char* CLuaModuleManager::GetVersionString ( )
+{
+    return CStaticFunctionDefinitions::GetVersionString ( );
+}
+
+const char* CLuaModuleManager::GetVersionName ( )
+{
+    return CStaticFunctionDefinitions::GetVersionName ( );
+}
+
+unsigned long CLuaModuleManager::GetNetcodeVersion ( )
+{
+    return CStaticFunctionDefinitions::GetNetcodeVersion ( );
+}
+
+const char* CLuaModuleManager::GetOperatingSystemName ( )
+{
+    return CStaticFunctionDefinitions::GetOperatingSystemName ( );
+}
+
+
+lua_State* CLuaModuleManager::GetResourceFromName ( const char* szResourceName )
+{
+	CResource* pResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
+
+	if ( pResource )
+	{
+		CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
+		if ( pLuaMain )
+		{
+			return pLuaMain->GetVM ();
+		}
+	}
+
 	return NULL;
 }
 
