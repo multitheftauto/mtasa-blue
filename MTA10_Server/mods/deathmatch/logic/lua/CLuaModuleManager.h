@@ -47,21 +47,28 @@ struct FunctionInfo
 	RegisterModuleFunc	ResourceStopped;
 };
 
-class CLuaModuleManager : public ILuaModuleManager
+class CLuaModuleManager : public ILuaModuleManager10
 {
 public:
 							CLuaModuleManager		( CLuaManager* pLuaManager );
 							~CLuaModuleManager		( void );
 
-	// functions for external modules
+	// functions for external modules until DP2.3
 	void					Printf					( const char * szFormat, ... );
 	void					ErrorPrintf				( const char * szFormat, ... );
 	void					DebugPrintf				( lua_State * luaVM, const char * szFormat, ... );
 	bool					RegisterFunction		( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func );
     bool                    GetResourceName         ( lua_State * luaVM, std::string &strName );
-	lua_State*              GetResourceFromName     ( const char* szResourceName );
 	unsigned long			GetResourceMetaCRC		( lua_State * luaVM );
 	unsigned long			GetResourceFileCRC		( lua_State * luaVM, const char* szFile );
+
+    // functions for external modules until 1.0
+    unsigned long           GetVersion              ( );
+    const char*             GetVersionString        ( );
+    const char*             GetVersionName          ( );
+    unsigned long           GetNetcodeVersion       ( );
+    const char*             GetOperatingSystemName  ( );
+    lua_State*              GetResourceFromName     ( const char* szResourceName );
 
 	// functions for deathmatch
 	void					_DoPulse				( void );
