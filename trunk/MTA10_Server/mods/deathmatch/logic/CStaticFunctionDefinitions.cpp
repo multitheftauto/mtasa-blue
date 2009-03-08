@@ -6071,8 +6071,10 @@ bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CWater* pWater, int iV
     if ( !pWater || iVertexIndex < 0 || iVertexIndex >= pWater->GetNumVertices () )
         return false;
 
-    bool bSuccess = pWater->SetVertex ( iVertexIndex, vecPosition );
-    if ( bSuccess )
+    CVector vecOriginalPosition;
+    pWater->GetVertex ( iVertexIndex, vecOriginalPosition );
+    pWater->SetVertex ( iVertexIndex, vecPosition );
+    if ( pWater->Valid () )
     {
         CBitStream BitStream;
         BitStream.pBitStream->Write ( pWater->GetID () );
@@ -6081,8 +6083,13 @@ bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CWater* pWater, int iV
         BitStream.pBitStream->Write ( (short) vecPosition.fY );
         BitStream.pBitStream->Write ( vecPosition.fZ );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_VERTEX_POSITION, *BitStream.pBitStream ) );
+        return true;
     }
-    return bSuccess;
+    else
+    {
+        pWater->SetVertex ( iVertexIndex, vecOriginalPosition );
+        return false;
+    }
 }
 
 

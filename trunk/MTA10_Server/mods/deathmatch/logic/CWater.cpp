@@ -130,20 +130,13 @@ bool CWater::GetVertex ( int index, CVector& vecPosition )
     return true;
 }
 
-bool CWater::SetVertex ( int index, CVector& vecPosition )
+void CWater::SetVertex ( int index, CVector& vecPosition )
 {
     if ( index < 0 || index >= GetNumVertices () )
-        return false;
+        return;
 
-    CVector vecOriginalPosition = m_Vertices [ index ];
     m_Vertices [ index ] = vecPosition;
     RoundVertex ( index );
-    if ( !Valid () )
-    {
-        m_Vertices [ index ] = vecOriginalPosition;
-        return false;
-    }
-    return true;
 }
 
 bool CWater::Valid ()

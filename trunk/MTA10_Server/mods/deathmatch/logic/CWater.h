@@ -38,7 +38,7 @@ public:
     EWaterType                  GetWaterType            ()  { return m_WaterType; }
     int                         GetNumVertices          ()  { return m_WaterType == TRIANGLE ? 3 : 4; }
     bool                        GetVertex               ( int index, CVector& vecPosition );
-    bool                        SetVertex               ( int index, CVector& vecPosition );
+    void                        SetVertex               ( int index, CVector& vecPosition );
 
     bool                        Valid                   ();
 
