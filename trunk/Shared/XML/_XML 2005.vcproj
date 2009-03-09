@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Shared - XML"
 	ProjectGUID="{E28A87BB-7417-4DD7-ADF4-88F918CF055C}"
 	RootNamespace="_XML 2005"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y xmll_d.dll &quot;c:\program files\rockstar games\gta san andreas\mta\xmll_d.dll&quot; &amp;&amp; copy /y xmll_d.dll &quot;..\..\MTA10_Server\output&quot;"
+				CommandLine="copy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll_d.dll&quot; &amp;&amp; copy /y xmll_d.dll &quot;..\..\MTA10_Server\output&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -223,6 +223,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\MTA10_Server\output&quot;"
 			/>
 		</Configuration>
 		<Configuration

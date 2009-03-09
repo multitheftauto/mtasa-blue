@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Client - Multiplayer SA"
 	ProjectGUID="{916D94E2-FB0B-4992-A52C-3698CCBB0A41}"
 	RootNamespace="_Multiplayer SA 2005"
@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="c:\program files\rockstar games\gta san andreas\mta\multiplayer_SA_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\mta\multiplayer_SA_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -180,7 +180,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\Rockstar Games\GTA San Andreas\MTA\multiplayer_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\MTA\multiplayer_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
