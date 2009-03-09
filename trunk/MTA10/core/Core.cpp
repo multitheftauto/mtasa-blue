@@ -28,7 +28,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
         g_pCore = new CCore;
 
-        FileTranslator.GetProcessRootDirectory ( WorkingDirectory );
+        FileTranslator.GetGTARootDirectory ( WorkingDirectory );
         SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 	} 
 	else if (dwReason == DLL_PROCESS_DETACH)

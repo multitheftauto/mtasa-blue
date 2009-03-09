@@ -50,9 +50,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
 	m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
-    char szLogPath [256];
-    sprintf ( szLogPath, "%s\\MTA\\console.log", CCore::GetSingleton ().GetGTAInstallRoot () );
-    m_pConsoleHistory->LoadFromFile ( szLogPath, true );
+    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ), true );
 }
 
 CConsole::~CConsole ( void )

@@ -24,11 +24,8 @@ CClientManager::CClientManager ( void )
     CClientTime::InitializeTime ();
 
     // Load the connection trouble texture
-    char szBuffer [MAX_PATH];
-    const char* szGTAInstallRoot = g_pCore->GetGTAInstallRoot ();
-    snprintf ( szBuffer, MAX_PATH, "%s\\%s", szGTAInstallRoot, CGUI_ICON_NETWORK_TROUBLE );
     m_pConnectionTroubleTexture = g_pCore->GetGUI ()->CreateTexture ();
-    m_pConnectionTroubleTexture->LoadFromFile ( szBuffer );
+    m_pConnectionTroubleTexture->LoadFromFile ( CalcMTASAPath( CGUI_ICON_NETWORK_TROUBLE ) );
 
     m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f );
     m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f );

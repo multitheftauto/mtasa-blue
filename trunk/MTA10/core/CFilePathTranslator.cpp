@@ -58,7 +58,7 @@ void CFilePathTranslator::SetCurrentWorkingDirectory ( string PathBasedOffModule
     string RootDirectory;
 
     // Get the root directory.
-    GetProcessRootDirectory ( RootDirectory );
+    GetMTASARootDirectory ( RootDirectory );
 
     // Store it
     m_WorkingDirectory =  RootDirectory;
@@ -76,7 +76,7 @@ void CFilePathTranslator::GetCurrentWorkingDirectory ( string & WorkingDirectory
     WorkingDirectoryOut = m_WorkingDirectory;
 }
 
-void CFilePathTranslator::GetProcessRootDirectory ( string & ModuleRootDirOut )
+void CFilePathTranslator::GetGTARootDirectory ( string & ModuleRootDirOut )
 {
     HMODULE     hMainModule;
     char        szCurrentDir [ 512 ];
@@ -92,3 +92,32 @@ void CFilePathTranslator::GetProcessRootDirectory ( string & ModuleRootDirOut )
 
     ModuleRootDirOut = szCurrentDir;
 }
+
+
+void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
+{
+	static char szInstallRoot[MAX_PATH] = "";
+	if( !szInstallRoot[0] )
+	{
+        memset ( szInstallRoot, 0, MAX_PATH );
+
+        HKEY hkey = NULL;
+        DWORD dwBufferSize = MAX_PATH;
+        DWORD dwType = 0;
+        if ( RegOpenKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
+        {
+            // Read out the MTA installpath
+            if ( RegQueryValueEx ( hkey, "temp", NULL, &dwType, (LPBYTE)szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
+                strlen ( szInstallRoot ) == 0 )
+            {
+                MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
+                RegCloseKey ( hkey );
+                TerminateProcess ( GetCurrentProcess (), 9 );
+            }
+			RegCloseKey ( hkey );
+        }
+	}
+	InstallRootDirOut = szInstallRoot;
+}
+
+

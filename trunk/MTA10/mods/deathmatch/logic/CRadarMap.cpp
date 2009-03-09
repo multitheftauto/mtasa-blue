@@ -49,8 +49,8 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_fStandardImageBlipSize = ( m_fMapSize / m_ucZoom ) / 50.0f;
 
     // Create the radar and local player blip images
-    m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( "MTA\\cgui\\images\\radar.jpg", RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( "MTA\\cgui\\images\\radarset\\03.png"  );
+    m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
+    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\03.png")  );
 
     // Create the text display for the mode text
     m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );

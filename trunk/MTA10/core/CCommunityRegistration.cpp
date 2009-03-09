@@ -158,7 +158,7 @@ void CCommunityRegistration::DoPulse ( void )
                     // TODO: Load it without a temp file
 
                     // Create a temp file for the png
-                    FILE * fp = fopen ( REGISTRATION_TEMP_FILE, "wb" );
+                    FILE * fp = fopen ( CalcMTASAPath( REGISTRATION_TEMP_FILE ), "wb" );
                     if ( fp )
                     {
                         fwrite ( &szBuffer[33], uiBufferLength, 1, fp );

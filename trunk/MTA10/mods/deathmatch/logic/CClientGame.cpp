@@ -221,7 +221,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
 
     #if defined (MTA_SCRIPT_LOGGING)
-    m_pScriptDebugging->SetLogfile ( "mta\\clientscript.log", 3 );
+    m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
     #endif
 
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );

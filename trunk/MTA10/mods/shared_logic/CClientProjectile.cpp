@@ -63,7 +63,7 @@ CClientProjectile::~CClientProjectile ( void )
     // If our creator is getting destroyed, this should be null
     if ( m_pCreator )
     {
-        switch ( m_pCreator->GetType () )
+        switch ( m_pCreator->GetType () )   // TODO m_pCreator can be invalid (start of next map?)
         {
             case CCLIENTPLAYER:
             case CCLIENTPED:               

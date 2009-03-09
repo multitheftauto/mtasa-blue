@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#include "ClientSharedUtil.hpp"
 
 CClient* g_pClient = NULL;
 
