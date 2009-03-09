@@ -76,6 +76,7 @@ void CClientSound::Stop ( void )
         m_pSound->stop ();
     }
     g_pClientGame->GetElementDeleter()->Delete ( this );
+    m_pSoundManager->RemoveFromList ( this );
 }
 
 void CClientSound::SetPaused ( bool bPaused )
