@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Client - Core"
 	ProjectGUID="{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
 	RootNamespace="Client - Core"
@@ -81,7 +81,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="strmiids.lib libv2.lib TextureRenderer_d.lib zlibd.lib libpngd.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib"
 				ShowProgress="0"
-				OutputFile="c:\program files\rockstar games\gta san andreas\mta\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
@@ -184,7 +184,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="strmiids.lib libv2.lib TextureRenderer.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
-				OutputFile="C:\Program Files\Rockstar Games\GTA San Andreas\MTA\core.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
