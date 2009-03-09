@@ -29,12 +29,9 @@ CModManager::CModManager ( void )
     m_hClientDLL = NULL;
     m_pClientBase = NULL;
     m_bUnloadRequested = false;
-    m_szRequestedMod = NULL;
-    m_szRequestedModArguments = NULL;
 
     // Default mod name defaults to "default"
-    m_szDefaultModName = new char [ strlen ( "default" ) + 1 ];
-    strcpy ( m_szDefaultModName, "default" );
+    m_strDefaultModName = "default";
 
     // Grab path to MTA installation folder
     char szModsRoot[MAX_PATH + 10] = {'\0'};
@@ -64,21 +61,6 @@ CModManager::~CModManager ( void )
     // Free up the modlist
     FreeModList ();
 
-    // Free our strings
-    if ( m_szDefaultModName )
-    {
-        delete [] m_szDefaultModName;
-    }
-
-    if ( m_szRequestedMod )
-    {
-        delete [] m_szRequestedMod;
-    }
-
-    if ( m_szRequestedModArguments )
-    {
-        delete [] m_szRequestedModArguments;
-    }
 }
 
 
@@ -94,22 +76,17 @@ void CModManager::RequestLoad ( const char* szModName, const char* szArguments )
     if ( szModName )
     {
         // Store it
-        m_szRequestedMod = new char [ strlen ( szModName ) + 1 ];
-        strcpy ( m_szRequestedMod, szModName );
+        m_strRequestedMod = szModName;
 
         // Arguments?
-        if ( szArguments )
-        {
-            m_szRequestedModArguments = new char [ strlen ( szArguments ) + 1 ];
-            strcpy ( m_szRequestedModArguments, szArguments );
-        }
+        m_strRequestedModArguments = szArguments ? szArguments : "";
     }
 }
 
 
 void CModManager::RequestLoadDefault ( const char* szArguments )
 {
-    RequestLoad ( m_szDefaultModName, szArguments );
+    RequestLoad ( m_strDefaultModName.c_str (), szArguments );
 }
 
 
@@ -123,18 +100,10 @@ void CModManager::RequestUnload ( void )
 void CModManager::ClearRequest ( void )
 {
     // Free the old mod name
-    if ( m_szRequestedMod )
-    {
-        delete [] m_szRequestedMod;
-        m_szRequestedMod = NULL;
-    }
+    m_strRequestedMod = "";
 
     // Free the old mod arguments
-    if ( m_szRequestedModArguments )
-    {
-        delete [] m_szRequestedModArguments;
-        m_szRequestedModArguments = NULL;
-    }
+    m_strRequestedModArguments = "";
 
     // No unload requested now
     m_bUnloadRequested = false;
@@ -150,7 +119,7 @@ bool CModManager::IsLoaded ( void )
 CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 {
     char szOriginalDirectory[255] = {'\0'};
-    char szMTADirectory[255] = {'\0'};
+    SString strMTADirectory;
 
     // Make sure we haven't already loaded a mod
     Unload ();
@@ -165,8 +134,8 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 
     // Change the current directory
     GetCurrentDirectory ( 255, szOriginalDirectory );
-    _snprintf ( szMTADirectory, 255, "%s\\mta", szOriginalDirectory );
-    SetCurrentDirectory ( szMTADirectory );
+    strMTADirectory = CalcMTASAPath ( "mta" );
+    SetCurrentDirectory ( strMTADirectory );
     
     // Load the library
     m_hClientDLL = LoadLibrary ( pMod->szClientDLLPath );
@@ -294,9 +263,9 @@ void CModManager::DoPulsePostFrame ( void )
         Unload ();
 
         // Load a new mod?
-        if ( m_szRequestedMod )
+        if ( m_strRequestedMod != "" )
         {
-            Load ( m_szRequestedMod, m_szRequestedModArguments );
+            Load ( m_strRequestedMod, m_strRequestedModArguments );
         }
 
         // Clear the request
@@ -316,9 +285,9 @@ void CModManager::DoPulsePostFrame ( void )
         Unload ();
 
         // Load a new mod?
-        if ( m_szRequestedMod )
+        if ( m_strRequestedMod != "" )
         {
-            Load ( m_szRequestedMod, m_szRequestedModArguments );
+            Load ( m_strRequestedMod, m_strRequestedModArguments );
         }
 
         // Clear the request
@@ -423,7 +392,7 @@ long WINAPI CModManager::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException
 void CModManager::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
 {
     // Write a log with the generic exception information
-    FILE* pFile = fopen ( "mta\\core.log", "a+" );
+    FILE* pFile = fopen ( CalcMTASAPath ( "mta\\core.log" ), "a+" );
     if ( pFile )
     {
         // Header
@@ -511,7 +480,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 		if ( pDump )
 		{
 			// Create the file
-			HANDLE hFile = CreateFile ( "mta\\core.dmp", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+			HANDLE hFile = CreateFile ( CalcMTASAPath ( "mta\\core.dmp" ), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct
@@ -532,7 +501,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 GetLocalTime ( &SystemTime );
 
                 // Create the dump directory
-                CreateDirectory ( "mta\\dumps", 0 );
+                CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 // Add a log entry.
                 char szFilename [256];
@@ -543,7 +512,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                                                                                       SystemTime.wMinute );
 
                 // Copy the file
-                CopyFile ( "mta\\core.dmp", szFilename, false );
+                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( szFilename ), false );
 			}
 		}
 

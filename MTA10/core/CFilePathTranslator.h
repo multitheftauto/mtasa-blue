@@ -33,7 +33,8 @@ class CFilePathTranslator
     bool        GetFileFromModPath               ( string FileToGet, string & TranslatedFilePathOut );
     bool        GetFileFromWorkingDirectory      ( string FileToGet, string & TranslatedFilePathOut );
 
-    void        GetProcessRootDirectory           ( string & ModuleRootDirOut );
+    void        GetGTARootDirectory              ( string & ModuleRootDirOut );
+    void        GetMTASARootDirectory            ( string & InstallRootDirOut );
 
     private:
 

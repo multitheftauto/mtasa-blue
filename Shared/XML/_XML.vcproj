@@ -64,7 +64,7 @@
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y xmll_d.dll &quot;c:\program files\rockstar games\gta san andreas\mta\xmll_d.dll&quot; &amp;&amp; copy /y xmll_d.dll &quot;..\..\MTA10_Server\output&quot;"/>
+				CommandLine="copy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll_d.dll&quot; &amp;&amp; copy /y xmll_d.dll &quot;..\..\MTA10_Server\output&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -147,7 +147,7 @@
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y xmll.dll &quot;c:\program files\rockstar games\gta san andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\MTA10_Server\output&quot;"/>
+				CommandLine="copy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\MTA10_Server\output&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool

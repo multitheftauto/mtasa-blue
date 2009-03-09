@@ -50,7 +50,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\Rockstar Games\GTA San Andreas\MTA\game_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\MTA\game_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
@@ -124,7 +124,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="c:\program files\rockstar games\gta san andreas\mta\game_sa_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\mta\game_sa_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"

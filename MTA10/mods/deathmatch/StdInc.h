@@ -19,6 +19,7 @@
 #include <cstring>
 
 // SDK includes
+#include "ClientSharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

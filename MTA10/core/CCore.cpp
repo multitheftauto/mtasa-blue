@@ -19,6 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include "ClientSharedUtil.hpp"
 
 static float fTest = 1;
 
@@ -105,7 +106,7 @@ CCore::CCore ( void )
     if ( RegOpenKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
     {
         // Read out the MTA installpath
-        if ( RegQueryValueEx ( hkey, "", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
+        if ( RegQueryValueEx ( hkey, "temp", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
              strlen ( m_szInstallRoot ) == 0 )
         {
             MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
@@ -790,9 +791,9 @@ void CCore::CreateGame ( )
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
-    m_GameModule.LoadModule ( "mta/game_sa_d.dll" );
+    m_GameModule.LoadModule ( CalcMTASAPath ( "mta/game_sa_d.dll" ) );
 # else
-    m_GameModule.LoadModule ( "mta/game_sa.dll" );
+    m_GameModule.LoadModule ( CalcMTASAPath ( "mta/game_sa.dll" ) );
 
 #endif
 
@@ -837,9 +838,9 @@ void CCore::CreateMultiplayer ( )
 
     // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
-    m_MultiplayerModule.LoadModule ( "mta/multiplayer_sa_d.dll" );
+    m_MultiplayerModule.LoadModule ( CalcMTASAPath ( "mta/multiplayer_sa_d.dll" ) );
 # else
-    m_MultiplayerModule.LoadModule ( "mta/multiplayer_sa.dll" );
+    m_MultiplayerModule.LoadModule ( CalcMTASAPath ( "mta/multiplayer_sa.dll" ) );
 #endif
 
     // Get client initializer function from DLL's routine.
@@ -1045,7 +1046,7 @@ void CCore::CreateXML ( )
 
     
     // Load config XML file
-    m_pConfigFile = m_pXML->CreateXML ( MTA_CONFIG_PATH );
+    m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
     if ( !m_pConfigFile ) {
         assert ( false );
         return;

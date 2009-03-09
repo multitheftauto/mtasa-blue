@@ -18,9 +18,9 @@
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 
 #ifdef MTA_DEBUG
-    #define MTA_DLL_NAME ".\\mta\\core_d.dll"
+    #define MTA_DLL_NAME "core_d.dll"
 #else
-    #define MTA_DLL_NAME ".\\mta\\core.dll"
+    #define MTA_DLL_NAME "core.dll"
 #endif
 
 #endif

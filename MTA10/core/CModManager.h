@@ -74,11 +74,11 @@ private:
     HMODULE             m_hClientDLL;
     CClientBase*        m_pClientBase;
 
-    char*               m_szDefaultModName;
+    SString              m_strDefaultModName;
 
     bool                m_bUnloadRequested;
-    char*               m_szRequestedMod;
-    char*               m_szRequestedModArguments;
+    SString             m_strRequestedMod;
+    SString             m_strRequestedModArguments;
 };
 
 #endif

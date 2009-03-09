@@ -684,7 +684,7 @@ bool CGraphics::LoadFonts ( void )
 	std::string strFontPath;
 
 	CFilePathTranslator FilePathTranslator;
-	FilePathTranslator.GetProcessRootDirectory ( strFontPath );
+	FilePathTranslator.GetMTASARootDirectory ( strFontPath );
 	strFontPath += "\\MTA\\cgui\\";
 
 	// Add our custom font resources
@@ -715,7 +715,7 @@ bool CGraphics::DestroyFonts ( void )
 	std::string strFontPath;
 
 	CFilePathTranslator FilePathTranslator;
-	FilePathTranslator.GetProcessRootDirectory ( strFontPath );
+	FilePathTranslator.GetMTASARootDirectory ( strFontPath );
 	strFontPath += "\\MTA\\cgui\\";
 
 	// Remove our custom font resources (needs to be identical to LoadFonts)
