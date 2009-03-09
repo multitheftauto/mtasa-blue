@@ -142,6 +142,8 @@ void CLuaMain::InitSecurity ( void )
 	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
 	lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
 	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "getfenv", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
 }
 
 
