@@ -33,6 +33,7 @@
 				Name="VCLinkerTool"
 				OutputFile="../output/MTA Server_d.exe"
 				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/launcher.pdb"
 				SubSystem="1"
@@ -63,14 +64,19 @@
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;MTA_RELEASE"
-				BasicRuntimeChecks="0"
+				StringPooling="TRUE"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="FALSE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -81,6 +87,7 @@
 				Name="VCLinkerTool"
 				OutputFile="../output/MTA Server.exe"
 				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="C:/Symbols/Release_ServerLauncher.pdb"
 				GenerateMapFile="TRUE"
@@ -117,27 +124,35 @@
 			OutputDirectory="..\..\obj\server\launcher"
 			IntermediateDirectory="..\..\obj\server\launcher"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;MTA_RELEASE"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="..\..\output\server\MTA Server.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/launcher.pdb"
 				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
