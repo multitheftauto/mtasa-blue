@@ -17,8 +17,6 @@
 #include "resource.h"
 #include <shlwapi.h>
 #include <stdio.h>
-#include <string>
-using namespace std;
 
 #ifndef _WINDOWS_
 #define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce executable size
@@ -72,25 +70,22 @@ bool TerminateGTAIfRunning ( void )
     return true;
 }
 
-string GetMTASAPath ()
+void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
 {
     // Get current module full path
-    TCHAR szPath[256]=TEXT("");
-    GetModuleFileName ( NULL, szPath, sizeof(szPath)/sizeof(szPath[0]) );
+    GetModuleFileName ( NULL, szBuffer, sizeBufferSize - 1 );
 
     // Strip the module name out of the path.
-    PathRemoveFileSpec ( szPath );
-    string strPath = szPath;
+    PathRemoveFileSpec ( szBuffer );
 
     // Save to a temp registry key
     HKEY hkey;
     RegCreateKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, NULL );
 
     if ( hkey )
-        RegSetValueEx ( hkey, "temp", NULL, REG_SZ, (LPBYTE)strPath.c_str (), strPath.length () + 1 );
+        RegSetValueEx ( hkey, "temp", NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
 
     RegCloseKey ( hkey );
-    return strPath;
 }
 
 
@@ -188,6 +183,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     PROCESS_INFORMATION piLoadee;
     STARTUPINFO siLoadee;
 
+    char szMTASAPath[MAX_PATH];
     char szGTAPath[MAX_PATH];
 
 	int iResult;
@@ -202,7 +198,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return 5;
 	}
 
-	string strMTASAPath = GetMTASAPath ();
+    GetMTASAPath ( szMTASAPath, MAX_PATH );
 
     // If we aren't compiling in debug-mode...
     #ifndef MTA_DEBUG
@@ -222,12 +218,13 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     #endif
 
     // Grab the MTA folder
+    char szDir[MAX_PATH];
     char szGTAEXEPath[MAX_PATH];
     strcpy ( szGTAEXEPath, szGTAPath );
     strcat ( szGTAEXEPath, "\\" );
     strcat ( szGTAEXEPath, MTA_GTAEXE_NAME ) ;
-
-    string strDir = strMTASAPath + "\\mta";
+    strcpy ( szDir, szMTASAPath );
+    strcat ( szDir, "\\mta" );
    
     // Make sure the gta executable exists
     SetCurrentDirectory ( szGTAPath );
@@ -252,7 +249,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              strDir.c_str (),
+                              szDir,
                               &siLoadee,
                               &piLoadee ) )
     {
@@ -262,12 +259,11 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 2;
     }
 
-    //char szCoreDLL[MAX_PATH] = {'\0'};
-    //_snprintf ( szCoreDLL, MAX_PATH, "%s\\%s", szMTAPath, MTA_DLL_NAME );
-    string strDllName = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
+    char szCoreDLL[MAX_PATH] = {'\0'};
+    _snprintf ( szCoreDLL, MAX_PATH, "%s\\mta\\%s", szMTASAPath, MTA_DLL_NAME );
 
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
-    if ( INVALID_HANDLE_VALUE == FindFirstFile ( strDllName.c_str (), &fdFileInfo ) )
+    if ( INVALID_HANDLE_VALUE == FindFirstFile ( szCoreDLL, &fdFileInfo ) )
     {
         MessageBox( NULL, "Load failed.  Please ensure that "
                           "the file core.dll is in the modules "
@@ -278,7 +274,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
     // Inject the core into GTA
-    RemoteLoadLibrary ( piLoadee.hProcess, strDllName.c_str () );
+    RemoteLoadLibrary ( piLoadee.hProcess, szCoreDLL );
     
     // If we aren't debugging, we destroy the splash we created
     #ifndef MTA_DEBUG
