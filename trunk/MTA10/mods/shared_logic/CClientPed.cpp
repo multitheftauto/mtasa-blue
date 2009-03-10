@@ -124,6 +124,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bIsChoking = false;
     m_ulLastTimeAimed = 0;
     m_ulLastTimeBeganCrouch = 0;
+    m_ulLastTimeBeganStand = 0; //Standing after crouching
     m_bRecreatingModel = false;
     m_pCurrentContactEntity = NULL;
     m_bSunbathing = false;
@@ -2086,12 +2087,28 @@ void CClientPed::StreamedInPulse ( void )
         //MS checks must take into account the gamespeed
         float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
 
+        // Remember when we started standing from crouching
+        if ( m_bWasDucked && m_bWasDucked != IsDucked() )
+        {
+            m_ulLastTimeBeganStand = ulNow;
+            m_bWasDucked = false;
+        }
+        
         // Remember when we start aiming if we're aiming.
         CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
         if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
         {
             if ( m_ulLastTimeAimed == 0 )
+            {
                 m_ulLastTimeAimed = ulNow;
+            }
+            if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
+            {
+                //Disable movement keys.  This stops an exploit where players can run
+                //with guns shortly after standing
+                Current.LeftStickX = 0;
+                Current.LeftStickY = 0;
+            }
         }
         else
         {
@@ -2102,6 +2119,7 @@ void CClientPed::StreamedInPulse ( void )
         pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
         if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
         {
+            m_bWasDucked = true;
             if ( m_ulLastTimeBeganCrouch == 0 )
                 m_ulLastTimeBeganCrouch = ulNow;
                 // No longer aiming if we're in the process of crouching
@@ -2109,6 +2127,7 @@ void CClientPed::StreamedInPulse ( void )
         }
         else
         {
+            m_bWasDucked = false;
             m_ulLastTimeBeganCrouch = 0;
         }
 
@@ -3223,6 +3242,8 @@ void CClientPed::Duck ( bool bDuck )
         }
         else
         {
+            //Reset ducking
+            m_ulLastTimeBeganCrouch = 0;
             // Jax: lets give this a whirl (it seems to cancel the task automatically)
             m_pPlayerPed->SetDucking ( false );
         }
