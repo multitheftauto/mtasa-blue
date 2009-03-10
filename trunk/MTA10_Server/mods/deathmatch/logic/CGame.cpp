@@ -197,7 +197,7 @@ void CGame::GetTag ( char *szInfoTag, int iInfoTag )
     unsigned int uiMaxPlayers;
     if ( !m_CommandLineParser.GetMaxPlayers ( uiMaxPlayers ) )
         uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
-	_snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA:SA Deathmatch R1 %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
+    _snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
 			   132, 135, szProgress[ucProgress], 132,
 		       130, 130, m_pPlayerManager->Count (), uiMaxPlayers,
                130, 130, m_pResourceManager->GetResourceLoadedCount (),
@@ -443,7 +443,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Show the server header
 	CLogger::LogPrintfNoStamp ( "===========================================================\n" \
-								"= Multi Theft Auto: San Andreas Deathmatch v%s\n" \
+								"= Multi Theft Auto: San Andreas v%s\n" \
 								"===========================================================\n" \
 								"= Server name		: %s\n" \
 								"= Server IP address	: %s\n" \
