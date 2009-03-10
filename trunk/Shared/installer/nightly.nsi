@@ -118,7 +118,7 @@ Function nsDialogsMtaBetaWelcomePage
 		Abort
 	${EndIf}
 	
-	${NSD_CreateLabel} 0 0 100% 20u "Multi Theft Auto: Deathmatch has a central login system that provides a unique username for each user."
+	${NSD_CreateLabel} 0 0 100% 20u "Multi Theft Auto: San Andreas has a central login system that provides a unique username for each user."
 	Pop $Label
 
 	${NSD_CreateLabel} 0 20u 100% 20u "Although the system is entirely optional, some servers may prevent you joining without an account and some features may be unavailable to you."
