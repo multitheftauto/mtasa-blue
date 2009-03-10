@@ -436,6 +436,7 @@ public:
     CRemoteDataStorage*         m_remoteDataStorage;
     unsigned long               m_ulLastTimeAimed;
     unsigned long               m_ulLastTimeBeganCrouch;
+    unsigned long               m_ulLastTimeBeganStand;
     CModelInfo*                 m_pLoadedModelInfo;
     eWeaponSlot                 m_pOutOfVehicleWeaponSlot;
     float                       m_fBeginAimX;
@@ -466,6 +467,7 @@ public:
     CClientEntity*              m_pTargetedEntity;
     list < SDelayedSyncData* >  m_SyncBuffer;
     bool                        m_bDucked;
+    bool                        m_bWasDucked; //For knowing when to register standing up
     bool                        m_bIsChoking;
     bool                        m_bWearingGoggles;
     bool                        m_bVisible;
