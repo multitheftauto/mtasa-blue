@@ -394,22 +394,28 @@ CSettings::CSettings ( void )
 
     m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
     m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
-	m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+	m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
 	m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
+	m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
 
     m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
 	m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( vecTemp.fX + 200.0f, vecTemp.fY ) );
-	m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 224.0f, 20.0f ) );
+	m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 174.0f, 20.0f ) );
+	m_pCheckBoxMenuVideo->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_VIDEO );
 
     m_pCheckBoxMenuPostEffects = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "PS2.0 post-effects", true ) );
 	m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
-	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
+	m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
 	
     // Set up the events
     m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
 	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
     m_pButtonRegister->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
+    m_pCheckBoxMenuDynamic->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
+    m_pCheckBoxMenuVideo->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
+    m_pCheckBoxMenuPostEffects->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
