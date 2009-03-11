@@ -154,6 +154,14 @@ private:
     float                           m_fNametagDistance;
 
     bool                            m_bNetworkDead;
+
+#ifdef MTA_WEPSYNCDBG
+private:
+    bool m_bShowingWepdata;
+public:
+    inline void SetShowingWepdata ( bool bState ) { m_bShowingWepdata = bState; }
+    inline bool IsShowingWepdata ( ) const { return m_bShowingWepdata; }
+#endif
 };
 
 #endif

@@ -88,6 +88,10 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
         g_pCore->GetCommands ()->Add ( "fakelag",			"enables fake lag",									COMMAND_FakeLag );
     #endif
 
+#ifdef MTA_WEPSYNCDBG
+        pCore->GetCommands ()->Add ( "showwepdata",			"shows the given player weapon data (nick)",		COMMAND_ShowWepdata );
+#endif
+
     #if defined (MTA_DEBUG) || defined (MTA_DEBUG_COMMANDS)
         pCore->GetCommands ()->Add ( "showtasks",			"shows the local player tasks (nick)",				COMMAND_ShowTasks );
         pCore->GetCommands ()->Add ( "showplayer",			"shows extended player information (nick)",			COMMAND_ShowPlayer );
