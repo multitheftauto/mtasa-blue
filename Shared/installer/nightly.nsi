@@ -458,7 +458,7 @@ FunctionEnd
 Function .onInstSuccess
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "" $INSTDIR
+		; WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "" $INSTDIR
 
 		; Add the protocol handler
 		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
@@ -536,7 +536,7 @@ ShowUnInstDetails show
 			SectionIn 1 RO ; section is required
 
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "" $INSTDIR
+			; WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "" $INSTDIR
 
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
