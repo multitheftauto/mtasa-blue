@@ -13,14 +13,13 @@
 //
 // Simpler, safer, slower sprintf
 //
-SString Printf( const char* format, ... )
+SString SString::Printf( const char* format, ... )
 {
     static char buffer[8192];
     int count = sizeof(buffer) / sizeof(buffer[0]);
-    const char* lastarg = format;
 
     va_list argptr;
-    va_start( argptr, lastarg );
+    va_start( argptr, format );
 
     int Result = _vsnprintf( buffer, count-1, format, argptr );
 

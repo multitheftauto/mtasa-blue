@@ -30,7 +30,7 @@ public:
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
 
     // Static functions
-    static SString Format ( const char *formatstring );
+    static SString Printf ( const char *format, ... );
 };
 
 
