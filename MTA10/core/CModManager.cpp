@@ -33,19 +33,8 @@ CModManager::CModManager ( void )
     // Default mod name defaults to "default"
     m_strDefaultModName = "default";
 
-    // Grab path to MTA installation folder
-    char szModsRoot[MAX_PATH + 10] = {'\0'};
-    memset ( szModsRoot, 0, MAX_PATH + 10 );
-    _snprintf ( szModsRoot, MAX_PATH, "%s\\mods", CCore::GetSingleton().GetInstallRoot() );
-    size_t sizeModsRoot = strlen ( szModsRoot );
-    if ( szModsRoot [sizeModsRoot - 1] != '/' &&
-         szModsRoot [sizeModsRoot - 1] != '\\' )
-    {
-        szModsRoot [sizeModsRoot] = '\\';
-    }
-
     // Load the modlist from the folders in "mta/mods"
-    InitializeModList ( szModsRoot );
+    InitializeModList ( CalcMTASAPath( "mods\\" ) );
 
     // Set up our exception handler
     #ifndef MTA_DEBUG
@@ -326,9 +315,7 @@ void CModManager::RefreshMods ( void )
 {
     // Clear the list, and load it again
     Clear ();
-    char szModsRoot[MAX_PATH] = {'\0'};
-    _snprintf ( szModsRoot, MAX_PATH, "%s\\mods", CCore::GetSingleton().GetInstallRoot() );
-    InitializeModList ( szModsRoot );
+    InitializeModList ( CalcMTASAPath( "mods\\" ) );
 }
 
 
@@ -504,15 +491,15 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 // Add a log entry.
-                char szFilename [256];
-                sprintf ( szFilename, "mta\\dumps\\client_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
-                                                                                      SystemTime.wDay,
-                                                                                      SystemTime.wYear,
-                                                                                      SystemTime.wHour,
-                                                                                      SystemTime.wMinute );
+                SString strFilename =
+                SString::Printf ( "mta\\dumps\\client_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
+                                                                                  SystemTime.wDay,
+                                                                                  SystemTime.wYear,
+                                                                                  SystemTime.wHour,
+                                                                                  SystemTime.wMinute );
 
                 // Copy the file
-                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( szFilename ), false );
+                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
 			}
 		}
 
@@ -523,6 +510,8 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
 void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
 {
+// MTA Error Reporter is not currently used
+#if 0 
     // Populate arguments for the error reporter
     char szBuffer [512];
     _snprintf ( szBuffer, 512, "0x%08X", pExceptionInformation->GetOffset () );
@@ -562,6 +551,7 @@ void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
     {
         ShellExecute ( 0, "open", "MTA Error Reporter.exe", szBuffer, "mta", 1 );
     }
+#endif
 }
 
 
@@ -572,19 +562,14 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     HANDLE hFind;
 
     // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
-    size_t sizeWildchars = strlen ( szModFolderPath ) + 10;
-    char* szPathWildchars = new char [ sizeWildchars ];
-    _snprintf ( szPathWildchars, sizeWildchars, "%s*.*", szModFolderPath );
+    SString strPathWildchars = SString::Printf( "%s*.*", szModFolderPath );
 
     // Set the working directory to the MTA folder
     CFilePathTranslator pFilePathTranslator;
     pFilePathTranslator.SetCurrentWorkingDirectory ( "mta" );
 
     // Create a search
-    hFind = FindFirstFile ( szPathWildchars, &FindData );
-
-    // Free the searchstring
-    delete [] szPathWildchars;
+    hFind = FindFirstFile ( strPathWildchars, &FindData );
 
     // If we found a first file ...
     if ( hFind != INVALID_HANDLE_VALUE )
@@ -625,21 +610,17 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
          ( stricmp ( szName, "race" ) != 0 ) )
     {
         // Put together a modpath string and a MTA-relative path to Client(_d).dll
-        char* szModPath = new char [ strlen ( szModFolderPath) + strlen ( szName ) + 64 ];
-        sprintf ( szModPath, "%s%s", szModFolderPath, szName );
-        
-        char* szClientDLL = new char [ strlen ( szModPath ) + 32 ];
-        sprintf ( szClientDLL, "%s\\%s", szModPath, CMODMANAGER_CLIENTDLL );
+        SString strClientDLL = SString::Printf ( "%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL );
 
         // Attempt to load the primary client DLL
-        HMODULE hDLL = LoadLibrary ( szClientDLL );
+        HMODULE hDLL = LoadLibrary ( strClientDLL );
         if (hDLL != 0)
         {
             // Check if InitClient symbol exists
             if ( GetProcAddress ( hDLL, "InitClient" ) != NULL )
             {
                 // Add it to the list
-                AddEntry ( szName, szClientDLL );
+                AddEntry ( szName, strClientDLL );
             }
             else
             {
@@ -653,10 +634,6 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
         {
             CLogger::GetSingleton ().ErrorPrintf ( "Invalid mod DLL: %s (reason: %d)", szName, GetLastError() );
         }
-
-		// Free the strings
-        delete [] szClientDLL;
-        delete [] szModPath;
     }
 }
 
