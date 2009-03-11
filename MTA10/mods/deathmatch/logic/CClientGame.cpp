@@ -807,6 +807,16 @@ void CClientGame::DoPulsePostFrame ( void )
         }
         #endif
 
+        #ifdef MTA_WEPSYNCDBG
+        std::list < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+        {
+            CClientPlayer* pPlayer = *iter;
+            if ( pPlayer->IsStreamedIn () && pPlayer->IsShowingWepdata () )
+                DrawWeaponsyncData ( pPlayer );
+        }
+        #endif
+
         // Pulse the blended weather manager
         m_pBlendedWeather->DoPulse ();
 
@@ -1074,6 +1084,16 @@ void CClientGame::ShowNetstat ( bool bShow )
     m_bShowNetstat = bShow;
 }
 
+#ifdef MTA_WEPSYNCDBG
+void CClientGame::ShowWepdata ( const char* szNick )
+{
+    CClientPlayer* pPlayer = m_pPlayerManager->Get ( szNick );
+    if ( pPlayer )
+    {
+        pPlayer->SetShowingWepdata ( ! pPlayer->IsShowingWepdata() );
+    }
+}
+#endif
 
 #ifdef MTA_DEBUG
 
@@ -2397,6 +2417,57 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     m_pDisplayManager->DrawText2D ( szBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );
 }
 
+
+#ifdef MTA_WEPSYNCDBG
+void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
+{
+    CVector vecSource;
+    CVector vecTarget;
+    CVector vecCrosshair;
+
+    // red line: unprocessed aim (without collision checks, from gun moozle)
+    pPlayer->GetShotData ( &vecSource, &vecTarget, NULL, NULL, NULL, NULL, &vecCrosshair );
+    g_pCore->GetGraphics ()->DrawLine3D ( vecSource, vecTarget, 0x90DE1212, 0.5f );
+
+    // yellow line: same as before but target is the crosshair (the line that we use to make collision tests)
+    if ( pPlayer != m_pPlayerManager->GetLocalPlayer () )
+    {
+        vecCrosshair = pPlayer->GetCrosshairPosition();
+    }
+    g_pCore->GetGraphics ()->DrawLine3D ( vecCrosshair, vecTarget, 0x90DEDE12, 1.5f );
+
+    CColPoint* pCollision;
+    CVector vecTemp;
+    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecCrosshair, &vecTarget, &pCollision, NULL );
+    if ( pCollision )
+    {
+      if ( bCollision )
+      {
+        CVector vecBullet = *pCollision->GetPosition() - vecSource;
+        vecBullet.Normalize();
+        CVector vecTarget = vecSource + (vecBullet * 200);
+        // Green line: the processed line
+        g_pCore->GetGraphics ()->DrawLine3D ( vecSource, vecTarget, 0x9012DE12, 2.0f );
+      }
+      pCollision->Destroy();
+    }
+
+    bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecSource, &vecTarget, &pCollision, NULL );
+    if ( pCollision )
+    {
+      if ( bCollision )
+      {
+        CVector vecBullet = *pCollision->GetPosition() - vecSource;
+        vecBullet.Normalize();
+        vecTarget = vecSource + (vecBullet * 200);
+        // Green line: the processed line
+        g_pCore->GetGraphics ()->DrawLine3D ( vecSource, vecTarget, 0x901212DE, 2.0f );
+      }
+      pCollision->Destroy();
+    }
+}
+
+#endif
 
 void CClientGame::UpdateMimics ( void )
 {

@@ -973,6 +973,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
 
             // Grab the shot origin and target.
             CVector vecOrigin, vecTarget;
+
             pPlayerModel->GetShotData ( &vecOrigin, &vecTarget );
 
             // Write the source vector

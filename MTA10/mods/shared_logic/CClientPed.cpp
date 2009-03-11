@@ -3655,23 +3655,7 @@ void CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             }
             else if ( Controller.RightShoulder1 == 255 )	// First-person weapons: gun muzzle as origin (assumed)
             {
-                CColPoint* pCollision;
-                CVector vecTemp;
-                bool bCollision;
-
-                g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecTemp, &vecTarget );
-
-                bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecTemp, &vecTarget, &pCollision, NULL );
-                if ( pCollision )
-                {
-                    if ( bCollision )
-                    {
-                        CVector vecBullet = *pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
-                    }
-                    pCollision->Destroy();
-                }
+                g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
             }
 			else if ( pVehicle )							// Drive-by/vehicle weapons: camera origin as origin
 			{

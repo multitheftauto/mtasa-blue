@@ -251,6 +251,10 @@ public:
     inline void                         ShowSyncingInfo                 ( bool bShow )  { m_bShowSyncingInfo = bShow; };
     #endif
 
+#ifdef MTA_WEPSYNCDBG
+    void                                ShowWepdata                     ( const char* szNick );
+#endif
+
     #ifdef MTA_DEBUG
     void								ShowTasks                       ( const char* szNick );
     void                                ShowPlayer                      ( const char* szNick );
@@ -360,6 +364,11 @@ private:
     void                                UpdateMimics                    ( void );
     void                                DoPaintballs                    ( void );
     #endif
+
+    #ifdef MTA_WEPSYNCDBG
+    void                                DrawWeaponsyncData              ( CClientPlayer* pPlayer );
+    #endif
+
 
 	void								DownloadFiles					( void );
 

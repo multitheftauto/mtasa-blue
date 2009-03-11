@@ -57,6 +57,10 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_Foo                ( const char* szCmdLine );
 #endif
 
+#ifdef MTA_WEPSYNCDBG
+    void COMMAND_ShowWepdata         ( const char* szCmdLine );
+#endif
+
 #if defined(MTA_DEBUG) || defined(COMMAND_ShowTasks)
     void COMMAND_ShowTasks          ( const char* szCmdLine );
     void COMMAND_ShowPlayer         ( const char* szCmdLine );

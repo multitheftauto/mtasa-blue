@@ -753,6 +753,14 @@ void COMMAND_Foo ( const char* szCmdLine )
 
 #endif
 
+#ifdef MTA_WEPSYNCDBG
+void COMMAND_ShowWepdata ( const char* szCmdLine )
+{
+    if ( !(szCmdLine && szCmdLine[0]) )
+        return;
+    g_pClientGame->ShowWepdata ( szCmdLine );
+}
+#endif
 
 #if defined(MTA_DEBUG) || defined(MTA_DEBUG_COMMANDS)
 
