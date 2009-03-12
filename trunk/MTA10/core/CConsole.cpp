@@ -102,7 +102,7 @@ void CConsole::Printf ( const char* szFormat, ... )
     char szBuffer [1024];
 	va_list ap;
 	va_start ( ap, szFormat );
-	_vsnprintf ( szBuffer, 1024, szFormat, ap );
+	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
 	va_end ( ap );
 
     // Echo it

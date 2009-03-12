@@ -41,3 +41,13 @@ public:
 SString CalcMTASAPath ( const SString& strPath );
 
 
+//
+// _vsnprintf with buffer full check
+//
+#define _VSNPRINTF( buffer, count, format, argptr ) \
+    { \
+	    int iResult = _vsnprintf ( buffer, count, format, argptr ); \
+        if( iResult == -1 || iResult == (count) ) \
+	        (buffer)[(count)-1] = 0; \
+    }
+
