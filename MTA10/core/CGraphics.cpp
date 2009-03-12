@@ -160,7 +160,7 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     char szBuffer [ 1024 ];
 	va_list ap;
 	va_start ( ap, szText );
-	_vsnprintf ( szBuffer, 1024, szText, ap );
+	_VSNPRINTF ( szBuffer, 1024, szText, ap );
 	va_end ( ap );
 
     DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
@@ -214,7 +214,7 @@ void CGraphics::DrawText2DA ( int uiX, int uiY, unsigned long ulColor, float fSc
     char szBuffer [ 1024 ];
 	va_list ap;
 	va_start ( ap, szDisplayText );
-	_vsnprintf ( szBuffer, 1024, szDisplayText, ap );
+	_VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
 	va_end ( ap );
 
     // Start drawing
@@ -233,7 +233,7 @@ void CGraphics::DrawText3DA	( float fX, float fY, float fZ, unsigned long ulColo
     char szBuffer [ 1024 ];
 	va_list ap;
 	va_start ( ap, szDisplayText );
-	_vsnprintf ( szBuffer, 1024, szDisplayText, ap );
+	_VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
 	va_end ( ap );
 
     // Initialize ViewMatrix

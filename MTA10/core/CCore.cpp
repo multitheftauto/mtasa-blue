@@ -401,7 +401,7 @@ void CCore::DebugPrintf ( const char* szFormat, ... )
     char szBuffer [1024];
 	va_list ap;
 	va_start ( ap, szFormat );
-	_vsnprintf ( szBuffer, 1024, szFormat, ap );
+	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
 	va_end ( ap );
 
     DebugEcho ( szBuffer );
@@ -447,7 +447,7 @@ void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned c
         char szBuffer [1024];
 	    va_list ap;
 	    va_start ( ap, B );
-	    _vsnprintf ( szBuffer, 1024, szFormat, ap );
+	    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
 	    va_end ( ap );
 
         // Echo it to the console and chat
@@ -494,7 +494,7 @@ void CCore::ChatPrintf ( const char* szFormat, bool bColorCoded, ... )
     char szBuffer [1024];
 	va_list ap;
 	va_start ( ap, bColorCoded );
-	_vsnprintf ( szBuffer, 1024, szFormat, ap );
+	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
 	va_end ( ap );
 
     // Echo it to the console and chat
@@ -513,7 +513,7 @@ void CCore::ChatPrintfColor ( const char* szFormat, bool bColorCoded, unsigned c
             char szBuffer [1024];
 	        va_list ap;
 	        va_start ( ap, B );
-	        _vsnprintf ( szBuffer, 1024, szFormat, ap );
+	        _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
 	        va_end ( ap );
 
             // Echo it to the console and chat

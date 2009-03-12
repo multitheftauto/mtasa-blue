@@ -57,7 +57,7 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, unsigned char ucRed, unsign
         // Copy it to a buffer
         va_list ap;
 	    va_start ( ap, szFormat );
-        _vsnprintf ( szBuffer, 256, szFormat, ap );
+        _VSNPRINTF ( szBuffer, 256, szFormat, ap );
         va_end ( ap );
         szBuffer[255] = '\0';
 
@@ -81,7 +81,7 @@ void CScriptDebugging::LogInformation ( lua_State* luaVM, const char* szFormat, 
     // Copy it to a buffer
     va_list ap;
 	va_start ( ap, szFormat );
-    _vsnprintf ( szBuffer + 6, 250, szFormat, ap );
+    _VSNPRINTF ( szBuffer + 6, 250, szFormat, ap );
     va_end ( ap );
     szBuffer[255] = '\0';
 
@@ -101,7 +101,7 @@ void CScriptDebugging::LogWarning ( lua_State* luaVM, const char* szFormat, ... 
     // Copy it to a buffer
     va_list ap;
 	va_start ( ap, szFormat );
-    _vsnprintf ( &szBuffer [ 9 ], 247, szFormat, ap );
+    _VSNPRINTF ( &szBuffer [ 9 ], 247, szFormat, ap );
     va_end ( ap );
     szBuffer[255] = '\0';
 
@@ -122,7 +122,7 @@ void CScriptDebugging::LogError ( lua_State* luaVM, const char* szFormat, ... )
     // Copy it to a buffer
     va_list ap;
 	va_start ( ap, szFormat );
-    _vsnprintf ( szBuffer + 7, 247, szFormat, ap );
+    _VSNPRINTF ( szBuffer + 7, 247, szFormat, ap );
     va_end ( ap );
 
     // Log it

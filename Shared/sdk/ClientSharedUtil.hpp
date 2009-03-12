@@ -21,10 +21,7 @@ SString SString::Printf( const char* format, ... )
     va_list argptr;
     va_start( argptr, format );
 
-    int Result = _vsnprintf( buffer, count-1, format, argptr );
-
-    if( Result == -1 || Result == count-1 )
-	    buffer[count-1] = 0;
+    _VSNPRINTF ( buffer, count, format, argptr );
 
     va_end( argptr );
 
