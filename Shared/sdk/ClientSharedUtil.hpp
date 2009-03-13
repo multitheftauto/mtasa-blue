@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        UtilUtil.hpp
+*  FILE:        ClientSharedUtil.hpp
 *  PURPOSE:
-*  DEVELOPERS:
+*  DEVELOPERS:  ccw <chris@codewave.co.uk>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

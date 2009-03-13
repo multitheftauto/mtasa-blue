@@ -626,17 +626,17 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 		unsigned int i_own = CScreenShot::GetScreenShots ();
 		unsigned int i_num = i_own + MASK_DEFAULT_ITEMS;
 		if ( i_num > MASK_ITEMS ) i_num = MASK_ITEMS;
-		char szTexPath[MAX_PATH] = {0};
+        SString strTexPath;
 
 		// Grab them from the screenshot class (directory)
 		for ( unsigned int i = 0; i < i_num; i++ ) {
 			if ( i < i_own ) {
-				CScreenShot::GetScreenShotPath ( i + 1, szTexPath, MAX_PATH );
+				strTexPath = CScreenShot::GetScreenShotPath ( i + 1 );
 			} else {
 				// Add our default screenshots as well
-				_snprintf ( szTexPath, MAX_PATH - 1, "data\\default%u.png", i - i_own );
+				strTexPath = SString::Printf ( "data\\default%u.png", i - i_own );
 			}
-			D3DXCreateTextureFromFile ( m_pDevice, szTexPath, &pMaskAnimTexture[i] );
+			D3DXCreateTextureFromFile ( m_pDevice, strTexPath, &pMaskAnimTexture[i] );
 			iMaskAnimTextures++;
 		}
 
@@ -667,12 +667,11 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 			}
 
 			// Get the correct path
-			char szPath[MAX_PATH] = {0};
-			_snprintf ( &szPath[0], MAX_PATH-1, CORE_MTA_TEXTURE_PATH, pMaterialStore[i].pTextureFilename );
+			SString strPath = SString::Printf ( CORE_MTA_TEXTURE_PATH, pMaterialStore[i].pTextureFilename );
 			
 			// Create the texture, loading failure isn't fatal here (just a blank texture)
-			if ( FAILED ( D3DXCreateTextureFromFile ( m_pDevice, szPath, &pMeshTextures[i] ) ) ) {
-				CLogger::GetSingleton ().ErrorPrintf ( "Could not load mesh texture (%s)", szPath );
+			if ( FAILED ( D3DXCreateTextureFromFile ( m_pDevice, strPath, &pMeshTextures[i] ) ) ) {
+				CLogger::GetSingleton ().ErrorPrintf ( "Could not load mesh texture (%s)", strPath.c_str () );
 			}
 
 			// Disable lighting for screen textures
@@ -734,8 +733,7 @@ void CMainMenuScene::Draw3DScene ( void )
 
 	// DEBUG START
 	dwTimerCurrent = dwTick - dwTimerStart;
-	char buf[128] = {0};
-	_snprintf(buf,127,"inc rate: %.2f - time: %.2f\ncount: %u - (%u,%u,%u)",fInc,((float)dwTimerCurrent)/1000.0f,dwFrameCount,dwFrameStart,dwFrameMid,dwFrameStop);
+	SString buf = SString::Printf ( "inc rate: %.2f - time: %.2f\ncount: %u - (%u,%u,%u)",fInc,((float)dwTimerCurrent)/1000.0f,dwFrameCount,dwFrameStart,dwFrameMid,dwFrameStop);
 	// DEBUG END
 
 	// Check if we have a video renderer
@@ -2111,14 +2109,12 @@ void CMainMenuScene::DestroyRenderTargets ( void )
 bool CMainMenuScene::InitCreditSprites ( void )
 {
 	/*
-	char buf[64] = {0};
-
 	// Determine the number of credits we have
 	unsigned char ucNumCredits = sizeof ( vecCredits ) / sizeof ( D3DXVECTOR3 );
 
 	// Now load all the credit textures
 	for ( unsigned char i = 0; i < ucNumCredits; i++ ) {
-		_snprintf ( buf, 63, CORE_MTA_CREDITS, &pCredits[i] );
+		SString buf = SString::Printf ( CORE_MTA_CREDITS, &pCredits[i] );
 		if ( FAILED(D3DXCreateTextureFromFile ( m_pDevice, buf, &pCredits[0])) ) return false;
 	}
 

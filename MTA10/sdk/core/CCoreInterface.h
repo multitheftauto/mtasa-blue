@@ -87,7 +87,7 @@ public:
 	virtual bool					Reconnect						( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
-    virtual char*                   GetModInstallRoot               ( char * szModName, char * szBuffer, size_t bufferSize )=0;
+    virtual SString                 GetModInstallRoot               ( char * szModName )=0;
     virtual const char *            GetGTAInstallRoot               ( void ) = 0;
 
     virtual void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true ) = 0;

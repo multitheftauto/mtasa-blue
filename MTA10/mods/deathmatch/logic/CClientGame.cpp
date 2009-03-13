@@ -122,12 +122,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 	m_pSFX = new CSFX ();
 
     // Grab the mod path
-    if ( !g_pCore->GetModInstallRoot ( "deathmatch", m_szModRoot, MAX_PATH ) )
-    {
-        g_pCore->GetConsole()->Echo ( "Could not find mod install path, cannot startup. To fix this problem, please reinstall." );
-        g_pCore->GetConsole()->Show ();
-        g_pCore->GetModManager ()->RequestUnload ();
-    }
+    m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
     // Override CGUI's global events
     g_pCore->GetGUI ()->SetKeyDownHandler           ( GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );

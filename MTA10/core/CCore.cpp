@@ -375,9 +375,7 @@ void CCore::ChatEcho ( const char* szText, bool bColorCoded )
     m_pLocalGUI->EchoChat ( szText, bColorCoded );
     if ( bColorCoded )
     {
-        char szTemp [ 512 ];
-        CChatLine::RemoveColorCode ( const_cast < char* > ( szText ), szTemp, 512 );
-        m_pLocalGUI->EchoConsole ( szTemp );
+        m_pLocalGUI->EchoConsole ( CChatLine::RemoveColorCode ( szText ) );
     }
     else
         m_pLocalGUI->EchoConsole ( szText );
@@ -479,9 +477,7 @@ void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G
     m_pLocalGUI->EchoChat ( szText, bColorCoded );
     if ( bColorCoded )
     {
-        char szTemp [ 512 ];
-        CChatLine::RemoveColorCode ( const_cast < char* > ( szText ), szTemp, 512 );
-        m_pLocalGUI->EchoConsole ( szTemp );
+        m_pLocalGUI->EchoConsole ( CChatLine::RemoveColorCode ( szText ) );
     }
     else
         m_pLocalGUI->EchoConsole ( szText );
@@ -672,10 +668,9 @@ void CCore::SetOfflineMod ( bool bOffline )
 }
 
 
-char * CCore::GetModInstallRoot ( char * szModName, char * szBuffer, size_t bufferSize )
+SString CCore::GetModInstallRoot ( char * szModName )
 {
-    _snprintf( szBuffer, bufferSize, "%s\\mods\\%s", GetInstallRoot(), szModName );
-    return szBuffer;
+    return SString::Printf ( "%s\\mods\\%s", GetInstallRoot(), szModName );
 }
 
 
@@ -1175,12 +1170,9 @@ void CCore::DoPostFramePulse ( )
                 // Does it begin with mtasa://?
                 if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
                 {
-                    char szArguments [256];
-                    szArguments [255] = 0;
-
-                    GetConnectCommandFromURI(m_szCommandLineArgs, szArguments, sizeof(szArguments));
+                    SString strArguments = GetConnectCommandFromURI ( m_szCommandLineArgs );
                     // Run the connect command
-                    if ( strlen( szArguments ) > 0 && !m_pCommands->Execute ( szArguments ) )
+                    if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
                     {
                         ShowMessageBox ( "Error", "Error executing URL", MB_BUTTON_OK | MB_ICON_ERROR );
                     }
@@ -1194,9 +1186,8 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            char szTemp [128];
-                            _snprintf ( szTemp, 128, "Error running mod specified in command line ('%s')", szOptionValue );
-                            ShowMessageBox ( "Error", szTemp, MB_BUTTON_OK | MB_ICON_ERROR );
+                            SString strTemp = SString::Printf ( "Error running mod specified in command line ('%s')", szOptionValue );
+                            ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
                     }
                     // We want to connect to a server?
@@ -1465,7 +1456,7 @@ const char* CCore::GetCommandLineOption ( const char* szOption )
         return NULL;
 }
 
-const char* CCore::GetConnectCommandFromURI ( const char* szURI, char* szDest, size_t destLength )
+SString CCore::GetConnectCommandFromURI ( const char* szURI )
 {
     // Grab the length of the string
     size_t sizeURI = strlen ( szURI );
@@ -1598,17 +1589,14 @@ const char* CCore::GetConnectCommandFromURI ( const char* szURI, char* szDest, s
     }
 
     // Generate a string with the arguments to send to the mod IF we got a host
+    SString strDest;
     if ( strlen ( szHost ) > 0 )
     {
         if ( strlen ( szPassword ) > 0 )
-            _snprintf ( szDest, destLength - 1, "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
+            strDest = SString::Printf ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
         else
-            _snprintf ( szDest, destLength - 1, "connect %s %u %s", szHost, usPort, strNick.c_str () );
-    }
-    else
-    {
-        szDest [ 0 ] = '\0';
+            strDest = SString::Printf ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
     }
 
-    return szDest;
+    return strDest;
 }

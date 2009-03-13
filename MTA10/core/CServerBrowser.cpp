@@ -387,9 +387,8 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
     }
 
     /*
-    char szTitle [ 128 ] = { 0 };
-    _snprintf ( szTitle, 128, "Server Browser - %d servers - %d/%d players", iNumServers, iNumPlayers, iNumPlayerSlots );
-    m_pWindow->SetText ( szTitle );
+    SString strTitle = SString::Printf ( "Server Browser - %d servers - %d/%d players", iNumServers, iNumPlayers, iNumPlayerSlots );
+    m_pWindow->SetText ( strTitle );
     */
     m_pServerList [ Type ]->ForceUpdate ();
     pList->SetUpdated ( false );

@@ -18,11 +18,9 @@ static char szScreenShotPath[MAX_PATH] = {0};
 static bool bIsChatVisible = false;
 static bool bIsDebugVisible = false;
 
-void CScreenShot::PreScreenShot ( char *szBuffer, unsigned int uiSize )
+SString CScreenShot::PreScreenShot ()
 {
     int iNumberOfFiles = 1;
-    char szFindData[MAX_PATH] = { '\0' };
-	char szScreenShotName[MAX_PATH] = {0};
 
 	bIsChatVisible = g_pCore->IsChatVisible ();
 	bIsDebugVisible = g_pCore->IsDebugVisible ();
@@ -31,20 +29,20 @@ void CScreenShot::PreScreenShot ( char *szBuffer, unsigned int uiSize )
 	g_pCore->SetChatVisible ( false );
 	g_pCore->SetDebugVisible ( false );
 
-    _snprintf ( szFindData, MAX_PATH, "%s\\*.jpg", &szScreenShotPath[0] );
-    _snprintf ( szScreenShotName, MAX_PATH, "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+    SString strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
 
     OFSTRUCT ReOpenBuff;
-    HFILE hFile = OpenFile ( &szScreenShotName[0], &ReOpenBuff, OF_CANCEL );    
+    HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
 
     while ( hFile != HFILE_ERROR )
     {
+        CloseHandle( (HANDLE)hFile );
         iNumberOfFiles++;
-        _snprintf ( szScreenShotName, MAX_PATH, "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-        hFile = OpenFile ( szScreenShotName, &ReOpenBuff, OF_CANCEL );
+        strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+        hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
     }
 
-	strncpy ( szBuffer, &szScreenShotName[0], uiSize );
+    return strScreenShotName;
 }
 
 void CScreenShot::PostScreenShot ( const char *szFileName )
@@ -68,8 +66,6 @@ void CScreenShot::SetPath ( const char *szPath )
 int CScreenShot::GetScreenShots ( void )
 {
     int iNumberOfFiles = 1;
-    char szFindData[MAX_PATH] = { '\0' };
-	char szScreenShotName[MAX_PATH] = {0};
 
 	bIsChatVisible = g_pCore->IsChatVisible ();
 	bIsDebugVisible = g_pCore->IsDebugVisible ();
@@ -78,24 +74,24 @@ int CScreenShot::GetScreenShots ( void )
 	g_pCore->SetChatVisible ( false );
 	g_pCore->SetDebugVisible ( false );
 
-    _snprintf ( szFindData, MAX_PATH, "%s\\*.jpg", &szScreenShotPath[0] );
-    _snprintf ( szScreenShotName, MAX_PATH, "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+    SString strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
 
     OFSTRUCT ReOpenBuff;
-    HFILE hFile = OpenFile ( &szScreenShotName[0], &ReOpenBuff, OF_CANCEL );    
+    HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
 
     while ( hFile != HFILE_ERROR )
     {
+        CloseHandle( (HANDLE)hFile );
         iNumberOfFiles++;
-        _snprintf ( szScreenShotName, MAX_PATH, "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-        hFile = OpenFile ( szScreenShotName, &ReOpenBuff, OF_CANCEL );
+        strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+        hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
 	}
 
 	return iNumberOfFiles;
 }
 
-void CScreenShot::GetScreenShotPath ( int iNumber, char *szBuffer, unsigned int nBuffer )
+SString CScreenShot::GetScreenShotPath ( int iNumber )
 {
 	// Get a random number
-	_snprintf ( szBuffer, nBuffer - 1, "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumber );
+	return SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumber );
 }

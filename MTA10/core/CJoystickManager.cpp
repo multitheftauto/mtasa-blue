@@ -75,15 +75,12 @@ static int Round ( float value )
 	return (int)floor(value + 0.5f);
 }
 
-static string GUIDToString ( const GUID& g )
+static SString GUIDToString ( const GUID& g )
 {
-    char szBuffer[256] = "";
-    _snprintf ( szBuffer, NUMELMS(szBuffer),
+    return SString::Printf (
                     "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
                     g.Data1, g.Data2, g.Data3, g.Data4[0], g.Data4[1], g.Data4[2],
                     g.Data4[3], g.Data4[4], g.Data4[5], g.Data4[6], g.Data4[7] );
-
-    return szBuffer;
 }
 
 DEFINE_GUID(GUID_Xbox360Controller,   0x028E045E,0x0000,0x0000,0x00,0x00,0x50,0x49,0x44,0x56,0x49,0x44);
@@ -374,7 +371,7 @@ BOOL CJoystickManager::DoEnumObjectsCallback ( const DIDEVICEOBJECTINSTANCE* pdi
        }
 
 #ifdef MTA_DEBUG
-#if 1
+#if 0
         if ( CCore::GetSingleton ().GetConsole () )
             CCore::GetSingleton ().GetConsole ()->Printf(
                             "%p  dwHow:%d  dwObj:%d  guid:%x  index:%d  lMin:%d  lMax:%d"
@@ -681,8 +678,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
 #ifdef MTA_DEBUG
 #if 0
 
-    char szBuffer [256];
-    _snprintf ( szBuffer, 256, "LeftShoulder1: %u\n"
+    SString strBuffer = SString::Printf ( "LeftShoulder1: %u\n"
                                 "LeftShoulder2: %u\n"
                                 "RightShoulder1: %u\n"
                                 "RightShoulder2: %u\n"
@@ -717,9 +713,9 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.ShockButtonR,
                                 cs.m_bPedWalk );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 150, 0xFFFFFFFF, 1, szBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 150, 0xFFFFFFFF, 1, strBuffer );
 
-    _snprintf ( szBuffer, 256, "VehicleMouseLook: %u\n"
+    strBuffer = SString::Printf ( "VehicleMouseLook: %u\n"
                                 "LeftStickX: %u\n"
                                 "LeftStickY: %u\n"
                                 "RightStickX: %u\n"
@@ -730,10 +726,10 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.RightStickX,
                                 cs.RightStickY );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 450, 0xFFFFFFFF, 1, szBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 450, 0xFFFFFFFF, 1, strBuffer );
 
 
-    _snprintf ( szBuffer, 256,
+    strBuffer = SString::Printf (
                                 "AxisX: %5.8f\n"
                                 "AxisY: %5.8f\n"
                                 "AxisZ: %5.8f\n"
@@ -750,7 +746,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 m_JoystickState.rgfAxis[6]
                             );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 550, 0xFFFFFFFF, 1, szBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
 
 #endif
 #endif

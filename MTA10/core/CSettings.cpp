@@ -873,7 +873,6 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
     if ( pItem )
     {
 	    CGUIListItem *pItemBind = m_pBindsList->GetItem ( m_pBindsList->GetItemRowIndex ( pItem ), m_hBind );
-	    char szText [ 128 ];
 
 	    // Proceed if the user didn't select the "Bind"-column
 	    if ( pItem != pItemBind )
@@ -885,14 +884,14 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
 		    // Determine if the primary or secondary column was selected
 		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
 			    // Create a messagebox to notify the user
-			    //sprintf ( szText, "Press a key to bind to '%s'", pItemBind->GetText ().c_str() );
-			    sprintf ( szText, "Press a key to bind, or escape to clear" );
-			    CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", szText, MB_ICON_QUESTION );
+			    //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+			    SString strText = SString::Printf ( "Press a key to bind, or escape to clear" );
+			    CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", strText, MB_ICON_QUESTION );
 		    } else {
 			    // Create a messagebox to notify the user
-			    //sprintf ( szText, "Press a key to bind to '%s'", pItemBind->GetText ().c_str() );
-			    sprintf ( szText, "Press a key to bind, or escape to clear" );
-			    CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", szText, MB_ICON_QUESTION );
+			    //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+			    SString strText = SString::Printf ( "Press a key to bind, or escape to clear" );
+			    CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", strText, MB_ICON_QUESTION );
 		    }
 	    }
     }
@@ -1091,21 +1090,18 @@ void CSettings::Initialize ( void )
                 {
                     unsigned int row = iGameRowCount + 1;
                     // Combine command and arguments
-                    char* szDescription = NULL;
-                    bool bDeleteDescription = true;
+                    SString strDescription;
                     bool bSkip = true;
                     if ( bindType == KEY_BIND_COMMAND )
                     {
                         CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
                         if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
                         {
-                            szDescription = new char [ strlen ( pCommandBind->szCommand ) + strlen ( pCommandBind->szArguments ) + 5 ];
-                            sprintf ( szDescription, "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                            strDescription = SString::Printf ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
                         }
                         else
                         {
-                            szDescription = pCommandBind->szCommand;
-                            bDeleteDescription = false;
+                            strDescription = pCommandBind->szCommand;
                         }
                         iMultiplayerRowCount++;
                         bSkip = false;
@@ -1115,14 +1111,12 @@ void CSettings::Initialize ( void )
                     {
 				        // Add the bind to the list
 				        iBind = m_pBindsList->InsertRowAfter ( row );
-                        m_pBindsList->SetItemText ( iBind, m_hBind, szDescription );
+                        m_pBindsList->SetItemText ( iBind, m_hBind, strDescription );
 				        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
                         for ( int k = 0 ; k < SecKeyNum ; k++ )
                             m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
                         m_pBindsList->SetItemData ( iBind, m_hBind, (void*) bindType );
                         m_pBindsList->SetItemData ( iBind, m_hPriKey, pBind );
-                        if ( bDeleteDescription )
-                            delete [] szDescription;
 
                         // Add it to the already-listed array
                         SListedCommand* pListedCommand = &listedCommands [ uiNumListedCommands ];
@@ -1358,7 +1352,6 @@ void CSettings::LoadData ( void )
     m_pAudioSFXVolume->SetProgress ( gameSettings->GetSFXVolume() / 64 * 100.0f );
     // Video
 
-    char modeStr[100];
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes, currentVidMode;
 
@@ -1372,14 +1365,14 @@ void CSettings::LoadData ( void )
         
         if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
         {
-            sprintf ( modeStr, "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
-            m_pComboResolution->AddItem ( modeStr )->SetData ( (void*)vidMode );
+            SString strMode = SString::Printf ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
         }
         if ( vidMode == currentVidMode )
         {
-            sprintf ( modeStr, "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            SString strMode = SString::Printf ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             
-            m_pComboResolution->SetText ( modeStr );
+            m_pComboResolution->SetText ( strMode );
         }
     }
     m_pCheckBoxWindowed->SetSelected ( currentVidMode == 0 );
