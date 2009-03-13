@@ -150,7 +150,6 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 
 		D3DLOCKED_RECT LockedRect;
 		IDirect3DSurface9 *pSurface, *pLockSurface;
-		char szFileName[MAX_PATH] = {0};
 
 		// Define a screen rectangle
 		ScreenSize.top = ScreenSize.left = 0;
@@ -175,7 +174,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 			}
 
 			// Call the pre-screenshot function	
-			CScreenShot::PreScreenShot ( szFileName, MAX_PATH - 1 );
+			SString strFileName = CScreenShot::PreScreenShot ();
 
 			unsigned long ulScreenHeight = ScreenSize.bottom - ScreenSize.top;
 			unsigned long ulScreenWidth = ScreenSize.right - ScreenSize.left;
@@ -195,7 +194,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 			pLockSurface->Release ();
 
 			// Save to png (strip the output alpha channel and read as BGR)
-			FILE *file = fopen (szFileName, "wb");
+			FILE *file = fopen (strFileName, "wb");
 				png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
 				png_info* info_ptr = png_create_info_struct ( png_ptr );
 				png_init_io ( png_ptr, file );
@@ -209,7 +208,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 			fclose(file);
 
 			// Call the post-screenshot function
-			CScreenShot::PostScreenShot ( szFileName );
+			CScreenShot::PostScreenShot ( strFileName );
 
 			CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount () - ulBeginTime) / 1000.0f );
 		}

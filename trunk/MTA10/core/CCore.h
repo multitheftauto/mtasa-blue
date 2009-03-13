@@ -147,7 +147,7 @@ public:
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
-    char *                  GetModInstallRoot               ( char * szModName, char * szBuffer, size_t bufferSize );
+    SString                 GetModInstallRoot               ( char * szModName );
     const char *            GetInstallRoot                  ( void );
     const char *            GetGTAInstallRoot               ( void );
 
@@ -190,7 +190,7 @@ public:
     void                    RegisterCommands                ( void );
     bool					IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    const char *            GetConnectCommandFromURI        ( const char* szURI, char* szDest, size_t destLength );	
+    SString                 GetConnectCommandFromURI        ( const char* szURI );	
 	bool					bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );

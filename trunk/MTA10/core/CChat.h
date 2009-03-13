@@ -58,7 +58,7 @@ public:
     virtual float               GetWidth                ( unsigned int uiLength = 0 );
     virtual unsigned int        GetLength               ( void )    { return m_uiLength; }
     
-    static void                 RemoveColorCode         ( char* szText, char* szReturn, unsigned int uiReturnLength );
+    static SString              RemoveColorCode         ( const char* szText );
 
     inline unsigned long        GetCreationTime         ( void )    { return m_ulCreationTime; }
 

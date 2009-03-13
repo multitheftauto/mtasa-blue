@@ -513,8 +513,7 @@ void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
 // MTA Error Reporter is not currently used
 #if 0 
     // Populate arguments for the error reporter
-    char szBuffer [512];
-    _snprintf ( szBuffer, 512, "0x%08X", pExceptionInformation->GetOffset () );
+    SString strBuffer = SString::Printf ( "0x%08X", pExceptionInformation->GetOffset () );
     
     // Grab the GTA install path
     HKEY hkey = NULL;
@@ -545,11 +544,11 @@ void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
         strcat ( szGTASARoot, "\\MTA Error Reporter.exe" );
 
         // Launch the error reporter
-        ShellExecute ( 0, "open", szGTASARoot, szBuffer, szMTASARoot, 1 );
+        ShellExecute ( 0, "open", szGTASARoot, strBuffer, szMTASARoot, 1 );
     }
     else
     {
-        ShellExecute ( 0, "open", "MTA Error Reporter.exe", szBuffer, "mta", 1 );
+        ShellExecute ( 0, "open", "MTA Error Reporter.exe", strBuffer, "mta", 1 );
     }
 #endif
 }

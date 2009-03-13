@@ -535,7 +535,7 @@ void CChat::SetCommand ( char* szCommand )
         }
         else
         {
-            char* szTemp = new char [ strlen ( m_szCommand ) + 3 ];
+            char* szTemp = new char [ strlen ( m_szCommand ) + 4 ];
             sprintf ( szTemp, "%s: ", m_szCommand );
             *szTemp = toupper ( *szTemp );
             SetInputPrefix ( szTemp );
@@ -840,17 +840,16 @@ float CChatLine::GetWidth ( unsigned int uiLength )
 }
 
 
-void CChatLine::RemoveColorCode ( char* szString, char* szReturn, unsigned int uiReturnLength )
+SString CChatLine::RemoveColorCode ( const char* szString )
 {
-    char* szText = new char [ strlen ( szString ) + 1 ];
-    strcpy ( szText, szString );
-    char szTemp [ 1024 ] = { 0 };
+    const SString strText = szString;
+    SString strTemp;
     
-    unsigned int uiTextLength = static_cast < unsigned int > ( strlen ( szText ) );
+    unsigned int uiTextLength = strText.length ();
     unsigned int uiLastMarkerEnd = 0;
     for ( unsigned int i = 0 ; i < uiTextLength ; i++ )
     {
-        char c = szText [ i ];
+        char c = strText[ i ];
         if ( c == '#' )
         {
             unsigned int uiMarkerEnd = i + 7;
@@ -860,16 +859,14 @@ void CChatLine::RemoveColorCode ( char* szString, char* szReturn, unsigned int u
 
                 for ( j = i + 1 ; j < uiMarkerEnd ; j++ )
                 {
-                    if ( !IsNumber ( szText [ j ] ) )
+                    if ( !IsNumber ( strText [ j ] ) )
                     {
                         break;
                     }
                 }
                 if ( j == uiMarkerEnd )
                 {
-                    szText [ i ] = 0;
-                    sprintf ( szTemp, "%s%s", szTemp, &szText [ uiLastMarkerEnd ] );
-                    szText [ i ] = c;
+                    strTemp += strText.substr ( uiLastMarkerEnd, i - uiLastMarkerEnd );
                     uiLastMarkerEnd = uiMarkerEnd;
                 }
             }
@@ -877,12 +874,10 @@ void CChatLine::RemoveColorCode ( char* szString, char* szReturn, unsigned int u
     }
     if ( uiLastMarkerEnd != uiTextLength )
     {
-        sprintf ( szTemp, "%s%s", szTemp, &szText [ uiLastMarkerEnd ] );
+        strTemp += strText.substr ( uiLastMarkerEnd, strText.length () - uiLastMarkerEnd );
     }
-    delete [] szText;
 
-    strncpy ( szReturn, szTemp, uiReturnLength );
-    szReturn [ uiReturnLength - 1 ] = 0;
+    return strTemp;
 }
 
 

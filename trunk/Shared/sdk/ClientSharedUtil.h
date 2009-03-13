@@ -2,9 +2,9 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        UtilUtil.h
+*  FILE:        ClientSharedUtil.h
 *  PURPOSE:
-*  DEVELOPERS:
+*  DEVELOPERS:  ccw <chris@codewave.co.uk>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -23,7 +23,7 @@ class SString : public string
 public:
     // Constructors
     SString ( ) : string () {}
-    SString ( const char* szText ) : string ( szText ) {}
+    SString ( const char* szText ) : string ( szText ? szText : "" ) {}
     SString ( const string& strText ) : string ( strText ) {}
 
     // Assignment  

@@ -300,7 +300,7 @@ public:
 
     void                                AddBuiltInEvents                ( void );
 
-	inline const char*					GetModRoot						( void )						{ return m_szModRoot; };
+	inline const char*					GetModRoot						( void )						{ return m_strModRoot; };
 
     void                                SetGameSpeed                    ( float fSpeed );
 	void								SetMinuteDuration				( unsigned long ulDelay );
@@ -471,7 +471,7 @@ private:
 
     // Map statuses
     char                                m_szCurrentMapName [MAX_MAPNAME_LENGTH + 1];
-    char                                m_szModRoot [MAX_PATH];
+    SString                             m_strModRoot;
 
     CBlendedWeather*                    m_pBlendedWeather;
     bool                                m_bShowNametags;

@@ -811,11 +811,10 @@ void CMainMenu::ChangeCommunityState ( bool bIn, std::string strUsername )
 {
     if ( bIn )
     {
-        char szText[64] = { '\0' };
-        sprintf ( szText, "Logged in as: %s", strUsername.c_str() );
+        SString strText = SString::Printf ( "Logged in as: %s", strUsername.c_str () );
 
-        m_pCommunityLabel->SetText ( szText );
-	    m_pCommunityLabel->AutoSize ( szText );
+        m_pCommunityLabel->SetText ( strText );
+	    m_pCommunityLabel->AutoSize ( strText );
         return;
     }
     m_pCommunityLabel->SetText ( "Not logged in" );

@@ -86,7 +86,6 @@ void CCommandFuncs::Vid ( const char* szParameters )
 
     if ( strlen(szParameters) == 0 )
     {
-        char modeStr[100];
         VideoMode           vidModemInfo;
         int                 vidMode, numVidModes, currentVidMode;
 
@@ -97,14 +96,14 @@ void CCommandFuncs::Vid ( const char* szParameters )
         {
             gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
 
-            sprintf(modeStr, "%d: %lu x %lu x %lu %s %s",
+            SString strMode = SString::Printf ( "%d: %lu x %lu x %lu %s %s",
                     vidMode, vidModemInfo.width, vidModemInfo.height,
                     vidModemInfo.depth,
                     vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE ?
                     "(Fullscreen)" : "",
                     currentVidMode == vidMode ? "(Current)" : "" );
 
-            CCore::GetSingleton ().GetConsole ()->Printf(modeStr);
+            CCore::GetSingleton ().GetConsole ()->Printf ( strMode );
         }
         CCore::GetSingleton ().GetConsole ()->Printf( "* Syntax: vid <mode>" );
     }
@@ -203,15 +202,14 @@ void CCommandFuncs::Window ( const char* szParameters )
 
 void CCommandFuncs::Time ( const char* szParameters )
 {
-	char szTimeAndDate[255] = {'\0'};
 	time_t rawtime;
 	struct tm * timeinfo;
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
 	
-	sprintf ( szTimeAndDate, "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
-    CCore::GetSingleton ().ChatEchoColor ( szTimeAndDate, 255, 100, 100 );
+	SString strTimeAndDate = SString::Printf ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+    CCore::GetSingleton ().ChatEchoColor ( strTimeAndDate, 255, 100, 100 );
 }
 
 // this fails randomly, see comments in CConsole
@@ -302,10 +300,9 @@ void CCommandFuncs::Connect ( const char* szParameters )
         if ( !strncmp( szBuffer, "mtasa://", 8 ) )
         {
             // Using a mtasa:// URI to connect
-            char szArguments[256];
-            g_pCore->GetConnectCommandFromURI ( szBuffer, szArguments, sizeof(szArguments) );
+            SString strArguments = g_pCore->GetConnectCommandFromURI ( szBuffer );
 
-            if ( strlen( szArguments ) > 0 && g_pCore->GetCommands()->Execute ( szArguments ) )
+            if ( strArguments.length () > 0 && g_pCore->GetCommands()->Execute ( strArguments ) )
             {
                 return;
             }
@@ -373,11 +370,9 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
     CVARS_GET ( "port",         uiPort );
 
     // Restart the connection.
-    char szTemp [ 256 ];
-    _snprintf ( szTemp, 256, "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
-    szTemp [ 255 ] = 0;
+    SString strTemp = SString::Printf ( "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
 
-    Connect ( szTemp );
+    Connect ( strTemp );
 }
 
 void CCommandFuncs::Bind ( const char* szParameters )
