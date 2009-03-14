@@ -935,8 +935,8 @@ bool CStaticFunctionDefinitions::AttachElements ( CClientEntity& Entity, CClient
             {
                 ConvertDegreesToRadians ( vecRotation );
 
-                Entity.AttachTo ( &AttachedToEntity );
                 Entity.SetAttachedOffsets ( vecPosition, vecRotation );
+                Entity.AttachTo ( &AttachedToEntity );
 
                 return true;
             }

@@ -1168,8 +1168,8 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
             if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () )
             {
                 ConvertDegreesToRadians ( vecRotation );
-                pElement->AttachTo ( pAttachedToElement );
                 pElement->SetAttachedOffsets ( vecPosition, vecRotation );
+                pElement->AttachTo ( pAttachedToElement );
 
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( pElement->GetID () );
