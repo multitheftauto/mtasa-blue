@@ -75,7 +75,7 @@ public:
     void                    SetResourceEntity ( CClientEntity* pEntity )    { m_pResourceEntity = pEntity; }
 	class CClientEntity*    GetResourceDynamicEntity ( void )						{ return m_pResourceDynamicEntity; }
     void                    SetResourceDynamicEntity ( CClientEntity* pEntity )		{ m_pResourceDynamicEntity = pEntity; }
-    inline const char *     GetResourceDirectoryPath () { return m_szResourceDirectoryPath; };
+    inline const char *     GetResourceDirectoryPath () { return m_strResourceDirectoryPath.c_str (); };
 	class CClientEntity*	GetResourceGUIEntity ( void )					{ return m_pResourceGUIEntity; }
 	void					SetResourceGUIEntity	  ( CClientEntity* pEntity )	{ m_pResourceGUIEntity = pEntity; }
     inline CClientEntity*   GetResourceCOLModelRoot ( void )                           { return m_pResourceCOLRoot; };
@@ -107,7 +107,7 @@ private:
     static int              m_iShowingCursor;
     bool                    m_bShowingCursor;
 
-    char                    m_szResourceDirectoryPath [MAX_PATH]; // stores the path to /mods/deathmatch/resources/resource_name
+    SString                 m_strResourceDirectoryPath; // stores the path to /mods/deathmatch/resources/resource_name
 
     list < class CResourceFile* >           m_ResourceFiles;
     list < class CResourceConfigItem* >     m_ConfigFiles;

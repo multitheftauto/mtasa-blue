@@ -183,9 +183,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Set the screenshot path
 	/* This is now done in CCore, to maintain a global screenshot path
-    char szScreenShotPath[MAX_PATH];
-    _snprintf ( szScreenShotPath, MAX_PATH, "%s\\screenshots", m_szModRoot );
-    g_pCore->SetScreenShotPath ( szScreenShotPath );
+    SString strScreenShotPath = SString::Printf ( "%s\\screenshots", m_szModRoot );
+    g_pCore->SetScreenShotPath ( strScreenShotPath );
 	*/
 
     // Create the transfer box (GUI)
@@ -523,8 +522,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     m_bWaitingForLocalConnect = false;
 
     // Gotta copy the config in case we got it from local server setup gui
-    char szTemp [MAX_PATH];
-    snprintf ( szTemp, MAX_PATH, szConfig );
+    SString strTemp = szConfig;
 
     if ( m_pLocalServer )
     {
@@ -540,7 +538,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     if ( m_bLocalPlay )
     {
         // Start the server locally
-        if ( !m_Server.Start ( szTemp ) )
+        if ( !m_Server.Start ( strTemp ) )
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
@@ -625,8 +623,8 @@ void CClientGame::DoPulsePostFrame ( void )
         CControllerState cs;
         g_pGame->GetPad ()->GetCurrentControllerState ( &cs );
 
-        char szBuffer [256];
-        _snprintf ( szBuffer, 256, "LeftShoulder1: %u\n"
+        SString strBuffer;
+        strBuffer = SString::Printf ( "LeftShoulder1: %u\n"
                                    "LeftShoulder2: %u\n"
                                    "RightShoulder1: %u\n"
                                    "RightShoulder2: %u\n"
@@ -661,9 +659,9 @@ void CClientGame::DoPulsePostFrame ( void )
                                    cs.ShockButtonR,
                                    cs.m_bPedWalk );
 
-        g_pCore->GetGraphics ()->DrawTextTTF ( 300, 10, 1280, 800, 0xFFFFFFFF, szBuffer, 1.0f, 0 );
+        g_pCore->GetGraphics ()->DrawTextTTF ( 300, 10, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0 );
 
-        _snprintf ( szBuffer, 256, "VehicleMouseLook: %u\n"
+        strBuffer = SString::Printf ( "VehicleMouseLook: %u\n"
                                    "LeftStickX: %u\n"
                                    "LeftStickY: %u\n"
                                    "RightStickX: %u\n"
@@ -674,7 +672,7 @@ void CClientGame::DoPulsePostFrame ( void )
                                    cs.RightStickX,
                                    cs.RightStickY );
 
-        g_pCore->GetGraphics ()->DrawTextTTF ( 300, 320, 1280, 800, 0xFFFFFFFF, szBuffer, 1.0f, 0 );
+        g_pCore->GetGraphics ()->DrawTextTTF ( 300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0 );
     #endif
 
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
@@ -835,7 +833,6 @@ void CClientGame::DoPulsePostFrame ( void )
         if ( m_bShowSyncingInfo )
         {
             // Draw the header boxz
-            char szBuffer [256];
             CVector vecPosition = CVector ( 0.05f, 0.32f, 0 );
             m_pDisplayManager->DrawText2D ( "Syncing vehicles:", vecPosition, 1.0f, 0xFFFFFFFF );
 
@@ -847,9 +844,9 @@ void CClientGame::DoPulsePostFrame ( void )
                 vecPosition.fY += 0.03f;
                 pVehicle = *iter;
 
-                _snprintf ( szBuffer, 256, "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
+                SString strBuffer = SString::Printf ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
 
-                m_pDisplayManager->DrawText2D ( szBuffer, vecPosition, 1.0f, 0xFFFFFFFF );
+                m_pDisplayManager->DrawText2D ( strBuffer, vecPosition, 1.0f, 0xFFFFFFFF );
             }
         }
         #endif
@@ -914,40 +911,40 @@ void CClientGame::DoPulsePostFrame ( void )
             }
             else
             {
-                char szError [NET_DISCONNECT_REASON_SIZE] = {0};
+                SString strError;
                 switch ( ucError )
                 {
                     case ID_RSA_PUBLIC_KEY_MISMATCH:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: unknown protocol error." );  // encryption key mismatch
+                        strError = "Disconnected: unknown protocol error.";  // encryption key mismatch
                         break;
                     case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: disconnected remotely." );
+                        strError = "Disconnected: disconnected remotely.";
                         break;
                     case ID_REMOTE_CONNECTION_LOST:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: connection lost remotely." );
+                        strError = "Disconnected: connection lost remotely.";
                         break;
                     case ID_CONNECTION_BANNED:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: you are banned from this server." );
+                        strError = "Disconnected: you are banned from this server.";
                         break;
                     case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: the server is currently full." );
+                        strError = "Disconnected: the server is currently full.";
                         break;
                     case ID_DISCONNECTION_NOTIFICATION:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: disconnected from the server." );
+                        strError = "Disconnected: disconnected from the server.";
                         break;
                     case ID_CONNECTION_LOST:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: connection to the server was lost." );
+                        strError = "Disconnected: connection to the server was lost.";
                         break;
                     case ID_INVALID_PASSWORD:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: invalid password specified." );
+                        strError = "Disconnected: invalid password specified.";
                         break;
                     default:
-                        _snprintf ( szError, NET_DISCONNECT_REASON_SIZE - 1, "Disconnected: connection was refused." );
+                        strError = "Disconnected: connection was refused.";
                         break;
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowMessageBox ( "Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pNet->SetConnectionError ( 0 );
                 g_pNet->SetImmediateError ( 0 );
                 g_pCore->GetModManager ()->RequestUnload ();
@@ -2201,7 +2198,6 @@ void CClientGame::DrawFPS ( void )
                                         0x78000000 );
 
 
-    char szBuffer [256];
     static char x = 0;
     static float fDisp = 0.0f;
     if ( x == 20)
@@ -2211,11 +2207,11 @@ void CClientGame::DrawFPS ( void )
     }
     else
         x++;
-    _snprintf ( szBuffer, 255,
+    SString strBuffer = SString::Printf (
         "FrameRate: %4.2f\n", fDisp);
 
     // Print it
-    m_pDisplayManager->DrawText2D ( szBuffer, CVector ( 0.76f, 0.23f, 0 ), 1.0f, 0xFFFFFFFF );
+    m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.23f, 0 ), 1.0f, 0xFFFFFFFF );
 }
 
 #ifdef MTA_DEBUG
@@ -2236,86 +2232,61 @@ void CClientGame::DrawTasks ( CClientPlayer* pPlayer )
 		}
 
         // Grab the current task
-        char szBuffer [256] = {0};
-        char szOutput [1024] = {0};
-        char szSubOutput [ 1024 ] = {0};
+        SString strOutput;
+        SString strSubOutput;
 
         pTask = man->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        _snprintf ( &szBuffer[0], 256, "Physical Response: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Physical Response: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-        _snprintf ( &szBuffer[0], 256, "Event Response Temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Event Response Temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-        _snprintf ( &szBuffer[0], 256, "Event Response Non-temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Event Response Non-temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_PRIMARY );
-        _snprintf ( &szBuffer[0], 256, "Primary: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Primary: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_DEFAULT );
-        _snprintf ( &szBuffer[0], 256, "Default: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Default: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-        _snprintf ( &szBuffer[0], 256, "Secondary Attack: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary Attack: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_DUCK );
-        _snprintf ( &szBuffer[0], 256, "Secondary Duck: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary Duck: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_SAY );
-        _snprintf ( &szBuffer[0], 256, "Secondary Say: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary Say: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_FACIAL_COMPLEX );
-        _snprintf ( &szBuffer[0], 256, "Secondary Facial Complex: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary Facial Complex: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_PARTIAL_ANIM );
-        _snprintf ( &szBuffer[0], 256, "Secondary Partial Anim: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary Partial Anim: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_IK );
-        _snprintf ( &szBuffer[0], 256, "Secondary IK: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szOutput[0], &szBuffer[0] );
-        _snprintf ( &szBuffer[0], 256, "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
-        strcat ( &szSubOutput[0], &szBuffer[0] );
+        strOutput += SString::Printf ( "Secondary IK: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
-        m_pDisplayManager->DrawText2D ( szOutput, CVector ( 0.05f, 0.5f,0 ), 1.0f );
-        m_pDisplayManager->DrawText2D ( szSubOutput, CVector ( 0.5f, 0.5f,0 ), 1.0f );
+        m_pDisplayManager->DrawText2D ( strOutput, CVector ( 0.05f, 0.5f,0 ), 1.0f );
+        m_pDisplayManager->DrawText2D ( strSubOutput, CVector ( 0.5f, 0.5f,0 ), 1.0f );
     }
 }
 
 int iPlayerTask = 0;
 void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
 {
-    char szBuffer [1024];
-
     // Get the info
     CControllerState cs;
 
@@ -2354,7 +2325,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     int iPrimaryTask = pPrimaryTask ? pPrimaryTask->GetTaskType () : -1;
 
     // Copy the stuff
-    _snprintf ( szBuffer, 1024, "Orient:\n"
+    SString strBuffer = SString::Printf ( "Orient:\n"
                                 "Position: %f %f %f\n"
                                 "Rotation/camera: %f %f\n"
                                 "Health: %f\n"
@@ -2409,7 +2380,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
                                 ucDrivebyAim );
 
     // Draw it
-    m_pDisplayManager->DrawText2D ( szBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );
+    m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );
 }
 
 

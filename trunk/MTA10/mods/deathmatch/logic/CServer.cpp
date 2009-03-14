@@ -67,7 +67,7 @@ CServer::CServer ( void )
     strncat ( m_szServerRoot, "server/", MAX_PATH );
 
     // Append the server core dll name to it
-    snprintf ( m_szDLLFile, MAX_PATH, "%s%s", m_szServerRoot, SERVER_DLL_PATH );
+    m_strDLLFile = SString::Printf ( "%s%s", m_szServerRoot, SERVER_DLL_PATH );
 }
 
 
@@ -137,9 +137,9 @@ bool CServer::Start ( const char* szConfig )
 	    strcpy ( m_szConfig, szConfig );
 
         // Check that the DLL exists
-        if ( !DoesFileExist ( m_szDLLFile ) )
+        if ( !DoesFileExist ( m_strDLLFile ) )
         {
-            g_pCore->GetConsole ()->Printf ( "Unable to find: '%s'", m_szDLLFile );
+            g_pCore->GetConsole ()->Printf ( "Unable to find: '%s'", m_strDLLFile.c_str () );
             return false;
         }
 
@@ -283,7 +283,7 @@ unsigned long CServer::Thread_Run ( void )
 
     // Load the DLL
     m_pLibrary = new CDynamicLibrary;
-    if ( m_pLibrary->Load ( m_szDLLFile ) )
+    if ( m_pLibrary->Load ( m_strDLLFile ) )
     {
         // Grab the entrypoint
         typedef int ( Main_t )( int, char* [] );

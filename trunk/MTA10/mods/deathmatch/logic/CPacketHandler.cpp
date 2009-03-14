@@ -343,8 +343,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
             bitStream.Read ( g_pClientGame->m_usHTTPDownloadPort );
             // TODO: Set m_szHTTPDownloadURL to the appropriate path based off of server ip / port
             unsigned long ulHTTPDownloadPort = g_pClientGame->m_usHTTPDownloadPort;
-            snprintf ( g_pClientGame->m_szHTTPDownloadURL, MAX_HTTP_DOWNLOAD_URL, "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
-            g_pClientGame->m_szHTTPDownloadURL[MAX_HTTP_DOWNLOAD_URL] = '\0';
+            g_pClientGame->m_strHTTPDownloadURL = SString::Printf ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
 
             // We are downloading from the internal HTTP Server, therefore disable multiple downloads
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
@@ -352,15 +351,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
         }
         case HTTP_DOWNLOAD_ENABLED_URL:
         {
-            unsigned short usHTTPDownloadURL;
-            bitStream.Read ( usHTTPDownloadURL );
-
-            if ( usHTTPDownloadURL > 0 && usHTTPDownloadURL <= MAX_HTTP_DOWNLOAD_URL )
-            {
-                bitStream.Read ( g_pClientGame->m_szHTTPDownloadURL, usHTTPDownloadURL );
-            }
-
-            g_pClientGame->m_szHTTPDownloadURL[usHTTPDownloadURL] = '\0';
+            BitStreamReadUsString( bitStream, g_pClientGame->m_strHTTPDownloadURL );
 
             // We are downloading from a URL, therefore allow multiple downloads
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( false );
@@ -3909,18 +3900,14 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                     MakeSureDirExists ( szTempName );
                                 }
 
-                                // Initialize a variable to hold the entire HTTP Download URL with the File Name
-                                char szHTTPDownloadURLFull [MAX_HTTP_DOWNLOAD_URL_WITH_FILE + 1];
-                                memset ( szHTTPDownloadURLFull, 0, sizeof ( szHTTPDownloadURLFull ) );
-
                                 // Combine the HTTP Download URL, the Resource Name and the Resource File
-                                _snprintf ( szHTTPDownloadURLFull, MAX_HTTP_DOWNLOAD_URL_WITH_FILE, "%s/%s/%s", g_pClientGame->m_szHTTPDownloadURL, pResource->GetName (), pDownloadableResource->GetShortName () );
+                                SString strHTTPDownloadURLFull = SString::Printf ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
                                 // Delete the file that already exists
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                pHTTP->QueueFile ( szHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL );
+                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;

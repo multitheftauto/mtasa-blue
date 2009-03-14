@@ -629,8 +629,7 @@ int CLuaFunctionDefinitions::EngineLoadCOL ( lua_State* luaVM )
 	        if ( szFile && IsValidFilePath ( szFile ) )
             {
                 // Generate the full path to the file
-		        char szPath [MAX_PATH+1] = {0};
-		        snprintf ( szPath, MAX_PATH, "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName (), szFile );
+		        SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName (), szFile );
 
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
@@ -639,7 +638,7 @@ int CLuaFunctionDefinitions::EngineLoadCOL ( lua_State* luaVM )
                 CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
 
                 // Attempt loading the file
-                if ( pCol->LoadCol ( szPath ) )
+                if ( pCol->LoadCol ( strPath ) )
                 {
                     // Success. Make it a child of the resource collision root
                     pCol->SetParent ( pRoot );
@@ -686,8 +685,7 @@ int CLuaFunctionDefinitions::EngineLoadDFF ( lua_State* luaVM )
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
                     // Grab the path to resource root
-		            char szPath[MAX_PATH+1] = {0};
-		            snprintf ( szPath, MAX_PATH, "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		            SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
@@ -696,7 +694,7 @@ int CLuaFunctionDefinitions::EngineLoadDFF ( lua_State* luaVM )
                     CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Try to load the DFF file
-                    if ( pDFF->LoadDFF ( szPath, usModelID ) )
+                    if ( pDFF->LoadDFF ( strPath, usModelID ) )
                     {
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent ( pRoot );
@@ -742,8 +740,7 @@ int CLuaFunctionDefinitions::EngineLoadTXD ( lua_State* luaVM )
 	        if ( szFile && IsValidFilePath ( szFile ) )
             {
                 // Grab the path to resource root
-		        char szPath[MAX_PATH+1] = {0};
-		        snprintf ( szPath, MAX_PATH, "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		        SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
@@ -752,7 +749,7 @@ int CLuaFunctionDefinitions::EngineLoadTXD ( lua_State* luaVM )
                 CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
 
                 // Try to load the TXD file
-                if ( pTXD->LoadTXD ( szPath ) )
+                if ( pTXD->LoadTXD ( strPath ) )
                 {
                     // Success loading the file. Set parent to TXD root
                     pTXD->SetParent ( pRoot );
@@ -1370,12 +1367,9 @@ int CLuaFunctionDefinitions::dxDrawImage ( lua_State* luaVM )
 	    if ( pResource && szFile && IsValidFilePath ( szFile ) )
         {
 		    // Get the correct directory
-		    char szPath[MAX_PATH] = {0};
+		    SString strPath = SString::Printf ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
-		    snprintf ( szPath, MAX_PATH, "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
-		    szPath[MAX_PATH-1] = '\0';
-
-            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, szPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
             {
                 // Success
                 lua_pushboolean ( luaVM, true );
@@ -9781,14 +9775,13 @@ int CLuaFunctionDefinitions::GUIStaticImageLoadImage ( lua_State* luaVM )
 		    if ( IsValidFilePath ( szFile ) ) {
 
 			    // get the correct directory
-			    char szPath[MAX_PATH+1] = {0};
-			    snprintf ( szPath, MAX_PATH, "%s/resources/%s/", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName () );
+			    SString strPath = SString::Printf ( "%s/resources/%s/", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName () );
 
 			    // and attempt to load the image
 			    CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
                 if ( pEntity )
                 {
-			        bRet = CStaticFunctionDefinitions::GUIStaticImageLoadImage ( *pEntity, szFile, szPath );
+			        bRet = CStaticFunctionDefinitions::GUIStaticImageLoadImage ( *pEntity, szFile, strPath );
                 }
                 else
                     m_pScriptDebugging->LogBadPointer ( luaVM, "guiStaticImageLoadImage", "gui-element", 1 );
@@ -11488,12 +11481,10 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         char* strText = new char [ strlen ( szText ) + 1 ];
         strcpy ( strText, szText );
 
-        char szDelimiter [32];
-        snprintf ( szDelimiter, 31, "%c", iDelimiter );
-        szDelimiter [31] = 0;
+        SString strDelimiter = SString::Printf ( "%c", iDelimiter );
 
         unsigned int uiCount = 1;
-        char* szToken = strtok ( strText, szDelimiter );
+        char* szToken = strtok ( strText, strDelimiter );
 
         // We're looking for the first part?
         if ( iToken != 1 )
@@ -11502,7 +11493,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
             do
             {
                 uiCount++;
-                szToken = strtok ( NULL, szDelimiter );
+                szToken = strtok ( NULL, strDelimiter );
             }
             while ( uiCount != iToken );
         }
@@ -11544,12 +11535,10 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     char* strText = new char [ strlen ( szText ) + 1 ];
     strcpy ( strText, szText );
 
-    char szDelimiter [32];
-    szDelimiter [31] = 0;
-    snprintf ( szDelimiter, 31, "%c", iDelimiter );
+    SString strDelimiter = SString::Printf ( "%c", iDelimiter );
 
     unsigned int uiCount = 0;
-    char* szToken = strtok ( strText, szDelimiter );
+    char* szToken = strtok ( strText, strDelimiter );
 
 	// Create a new table
 	lua_newtable ( luaVM );
@@ -11560,7 +11549,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
 	lua_settable ( luaVM, -3 );
 
     // strtok until we're out of tokens
-	while ( szToken = strtok ( NULL, szDelimiter ) )
+	while ( szToken = strtok ( NULL, strDelimiter ) )
 	{
 		// Add the token to the table
 		lua_pushnumber ( luaVM, ++uiCount );
@@ -13758,13 +13747,12 @@ int CLuaFunctionDefinitions::XMLLoadFile ( lua_State* luaVM )
         if ( luaMain )
         {
             //const char * szFilename = lua_tostring ( luaVM, 1 );
-		    char szFilename [ MAX_STRING_LENGTH ];
-            snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
+            SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
             //if ( IsValidFilePath ( szFilename ) ) // This would be checking the full path when we only need to check the user input
 		    if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
             {
                 // Create the XML
-                CXMLFile * xmlFile = luaMain->CreateXML ( szFilename );
+                CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
                 if ( xmlFile )
                 {
                     // Parse it
@@ -13919,16 +13907,12 @@ int CLuaFunctionDefinitions::XMLCreateChild ( lua_State* luaVM )
     {
 		// Get the Node
 		CXMLNode* pXMLNode = lua_toxmlnode ( luaVM, 1 );
-		char szSubNodeName [ MAX_STRING_LENGTH ];
 		if ( pXMLNode )
 		{
-			snprintf ( szSubNodeName, MAX_STRING_LENGTH, "%s", lua_tostring ( luaVM, 2 ) );
-			if ( szSubNodeName )
-			{
-				CXMLNode* pXMLSubNode = pXMLNode->CreateSubNode ( szSubNodeName );
-				lua_pushxmlnode ( luaVM, pXMLSubNode );
-				return 1;
-			}
+			SString strSubNodeName = SString::Printf ( "%s", lua_tostring ( luaVM, 2 ) );
+			CXMLNode* pXMLSubNode = pXMLNode->CreateSubNode ( strSubNodeName );
+			lua_pushxmlnode ( luaVM, pXMLSubNode );
+			return 1;
         }
     }
 
@@ -13978,8 +13962,7 @@ int CLuaFunctionDefinitions::XMLCopyFile ( lua_State* luaVM )
              lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
             // Grab the full filepath of the copied xml and make sure its legal
-            char szFilename [ MAX_STRING_LENGTH ];
-		    snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
+		    SString strFilename = SString::Printf ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
 		    if ( IsValidFilePath ( lua_tostring ( luaVM, 2 ) ) )
             {
                 // Grab the source node
@@ -13994,7 +13977,7 @@ int CLuaFunctionDefinitions::XMLCopyFile ( lua_State* luaVM )
                     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
 
                     // Create the new XML file and its root node
-                    CXMLFile* pNewXML = pLUA->CreateXML ( szFilename );
+                    CXMLFile* pNewXML = pLUA->CreateXML ( strFilename );
                     if ( pNewXML )
                     {
                         // Create root for new XML
@@ -14916,8 +14899,7 @@ int CLuaFunctionDefinitions::PlaySound ( lua_State* luaVM )
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-		        char szFilename [ MAX_STRING_LENGTH ];
-                snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+                SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
 		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
                 {
                     bool bLoop = false;
@@ -14925,7 +14907,7 @@ int CLuaFunctionDefinitions::PlaySound ( lua_State* luaVM )
                     {
                         bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
                     }
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, szFilename, bLoop );
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strFilename, bLoop );
                     if ( pSound )
                     {
                         lua_pushelement ( luaVM, pSound );
@@ -14962,8 +14944,7 @@ int CLuaFunctionDefinitions::PlaySound3D ( lua_State* luaVM )
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-		        char szFilename [ MAX_STRING_LENGTH ];
-                snprintf ( szFilename, MAX_STRING_LENGTH, "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+                SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
 		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
                 {
                     bool bLoop = false;
@@ -14971,7 +14952,7 @@ int CLuaFunctionDefinitions::PlaySound3D ( lua_State* luaVM )
                     {
                         bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
                     }
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, szFilename, vecPosition, bLoop );
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strFilename, vecPosition, bLoop );
                     if ( pSound )
                     {
                         lua_pushelement ( luaVM, pSound );

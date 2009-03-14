@@ -27,7 +27,6 @@
 
 CTransferBox::CTransferBox ( void )
 {
-    char szIcon[MAX_PATH] = { '\0' };
 	CVector2D ScreenSize = g_pCore->GetGUI ()->GetResolution ();
 	float fFontHeight = g_pCore->GetGUI ()->GetDefaultFont ()->GetFontHeight ();
 
@@ -49,13 +48,12 @@ CTransferBox::CTransferBox ( void )
 
 	// create the icons
 	for ( unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++ ) {
-		_snprintf ( szIcon, MAX_PATH, "cgui\\images\\transferset\\%u.png", i+1 );
-		szIcon[MAX_PATH-1] = '\0';
+		SString strIcon = SString::Printf ( "cgui\\images\\transferset\\%u.png", i+1 );
 		m_pIcon[i] = g_pCore->GetGUI ()->CreateStaticImage ( m_pProgress );
 		m_pIcon[i]->SetFrameEnabled ( false );
 		m_pIcon[i]->SetPosition ( CVector2D ( TRANSFERBOX_DRAWXSTART, ((TRANSFERBOX_PROGRESSHEIGHT)/2)  - (TRANSFERBOX_ICONSIZE/2) ) );
 		m_pIcon[i]->SetSize ( CVector2D ( TRANSFERBOX_ICONSIZE, TRANSFERBOX_ICONSIZE ) );
-		m_pIcon[i]->LoadFromFile ( szIcon );
+		m_pIcon[i]->LoadFromFile ( strIcon );
 		m_pIcon[i]->SetVisible ( false );
 	}
 	m_pIcon[0]->SetVisible ( true );
@@ -100,28 +98,20 @@ void CTransferBox::Hide ( void )
 
 void CTransferBox::SetInfoSingleDownload ( const char* szFileName, double dDownloadSizeNow )
 {
-    char szBuffer[64] = {0};
-
     // Convert to reasonable units
-    char szDownloadSizeNow [64];
-    char szDownloadSizeTotal [64];
-    GetDataUnit ( static_cast < unsigned int > ( dDownloadSizeNow ), szDownloadSizeNow );
-    GetDataUnit ( static_cast < unsigned int > ( m_dTotalSize ), szDownloadSizeTotal );
+    SString strDownloadSizeNow   = GetDataUnit ( static_cast < unsigned int > ( dDownloadSizeNow ) );
+    SString strDownloadSizeTotal = GetDataUnit ( static_cast < unsigned int > ( m_dTotalSize ) );
 
-    _snprintf ( szBuffer, 64, "Download Progress: %s of %s", szDownloadSizeNow, szDownloadSizeTotal );
-	szBuffer[63] = '\0';
-	m_pWindow->SetText ( szBuffer );
+    SString strBuffer = SString::Printf ( "Download Progress: %s of %s", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
+	m_pWindow->SetText ( strBuffer );
 
     m_pProgress->SetProgress ( (dDownloadSizeNow / m_dTotalSize) );
 }
 
 void CTransferBox::SetInfoMultipleDownload ( double dDownloadSizeNow, double dDownloadSizeTotal, int iDownloadsRemaining, int iDownloadsTotal )
 {
-    char szBuffer[64] = {0};
-
-    _snprintf ( szBuffer, 64, "Download Progress: %.2fMB of %.2fMB", (float) ( dDownloadSizeNow / 1048576.0 ), (float) ( dDownloadSizeTotal / 1048576.0 ) );
-	szBuffer[63] = '\0';
-	m_pWindow->SetText ( szBuffer );
+    SString strBuffer = SString::Printf ( "Download Progress: %.2fMB of %.2fMB", (float) ( dDownloadSizeNow / 1048576.0 ), (float) ( dDownloadSizeTotal / 1048576.0 ) );
+	m_pWindow->SetText ( strBuffer );
 
     m_pProgress->SetProgress ( (dDownloadSizeNow / dDownloadSizeTotal) );
 }

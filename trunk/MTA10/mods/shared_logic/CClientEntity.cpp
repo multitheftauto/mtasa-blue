@@ -330,33 +330,29 @@ CLuaArgument* CClientEntity::GetCustomData ( const char* szName, bool bInheritDa
 }
 
 
-bool CClientEntity::GetCustomDataString ( const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData )
+bool CClientEntity::GetCustomDataString ( const char* szName, SString& strOut, bool bInheritData )
 {
     // Grab the custom data variable
     CLuaArgument* pData = GetCustomData ( szName, bInheritData );
     if ( pData )
     {
-        // Make sure it gets 0 terminated
-        sizeBuffer -= 1;
-        pOut [sizeBuffer] = 0;
-
         // Write the content depending on what type it is
         int iType = pData->GetType ();
         if ( iType == LUA_TSTRING )
         {
-            strncpy ( pOut, pData->GetString (), sizeBuffer );
+            strOut = pData->GetString ();
         }
         else if ( iType == LUA_TNUMBER )
         {
-            snprintf ( pOut, sizeBuffer, "%f", pData->GetNumber () );
+            strOut = SString::Printf ( "%f", pData->GetNumber () );
         }
         else if ( iType == LUA_TBOOLEAN )
         {
-            snprintf ( pOut, sizeBuffer, "%u", pData->GetBoolean () );
+            strOut = SString::Printf ( "%u", pData->GetBoolean () );
         }
         else if ( iType == LUA_TNIL )
         {
-            pOut [0] = 0;
+            strOut = "";
         }
         else
         {

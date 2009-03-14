@@ -3382,17 +3382,14 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
 	// Check for a valid (and sane) file path
 	if ( szFile && IsValidFilePath ( szFile ) )
     {
-		// Get the correct directory
-		char szPath[MAX_PATH] = {0};
-       
+		// Get the correct directory       
         if ( !pResource )
             pResource = LuaMain.GetResource ();
 
-		snprintf ( szPath, MAX_PATH, "%s\\resources\\%s\\", m_pClientGame->GetModRoot (), pResource->GetName () );
-		szPath[MAX_PATH-1] = '\0';
+		SString strPath = SString::Printf ( "%s\\resources\\%s\\", m_pClientGame->GetModRoot (), pResource->GetName () );
 
 		// Load the image
-		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( szFile, szPath ) ) {
+		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( szFile, strPath ) ) {
 			// If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
 			// So delete it and reset the pointer, so we return NULL
 			delete pGUIElement;

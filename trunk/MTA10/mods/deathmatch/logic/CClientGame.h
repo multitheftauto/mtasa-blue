@@ -528,7 +528,7 @@ private:
 
     eHTTPDownloadType                   m_ucHTTPDownloadType;
     unsigned short                      m_usHTTPDownloadPort;
-    char                                m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
+    SString                             m_strHTTPDownloadURL;
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     bool                                m_bShowSyncingInfo;

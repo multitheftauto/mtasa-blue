@@ -148,10 +148,8 @@ void RaiseFatalError ( unsigned int uiCode )
 #endif
 
     // Populate the message and show the box
-    char szBuffer [96];
-    _snprintf ( szBuffer, 96, "Fatal error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
-    szBuffer [95] = 0;
-    g_pCore->ShowMessageBox ( "Fatal error", szBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+    SString strBuffer = SString::Printf ( "Fatal error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    g_pCore->ShowMessageBox ( "Fatal error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
@@ -165,10 +163,8 @@ void RaiseProtocolError ( unsigned int uiCode )
 //#endif
 
     // Populate the message and show the box
-    char szBuffer [96];
-    _snprintf ( szBuffer, 96, "Protocol error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
-    szBuffer [95] = 0;
-    g_pCore->ShowMessageBox ( "Connection error", szBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+    SString strBuffer = SString::Printf ( "Protocol error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    g_pCore->ShowMessageBox ( "Connection error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
@@ -239,7 +235,7 @@ unsigned int GetRandom ( unsigned int uiLow, unsigned int uiHigh )
 }
 
 
-void GetDataUnit ( unsigned int uiInput, char* szOutput )
+SString GetDataUnit ( unsigned int uiInput )
 {
     // Convert it to a float
     float fInput = static_cast < float > ( uiInput );
@@ -247,44 +243,39 @@ void GetDataUnit ( unsigned int uiInput, char* szOutput )
     // Bytes per sec?
     if ( fInput < 1024 )
     {
-        sprintf ( szOutput, "%u B", uiInput );
-        return;
+        return SString::Printf ( "%u B", uiInput );
     }
 
     // Kilobytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        sprintf ( szOutput, "%.2f kB", fInput );
-        return;
+        return SString::Printf ( "%.2f kB", fInput );
     }
 
     // Megabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        sprintf ( szOutput, "%.2f MB", fInput );
-        return;
+        return SString::Printf ( "%.2f MB", fInput );
     }
 
     // Gigabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        sprintf ( szOutput, "%.2f GB", fInput );
-        return;
+        return SString::Printf ( "%.2f GB", fInput );
     }
 
     // Terrabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        sprintf ( szOutput, "%.2f TB", fInput );
-        return;
+        return SString::Printf ( "%.2f TB", fInput );
     }
 
     // Unknown
-    sprintf ( szOutput, "X" );
+    return SString::Printf ( "X" );
 }
 
 
