@@ -295,8 +295,8 @@ void CElementRPCs::AttachElements ( NetBitStreamInterface& bitStream )
         CClientEntity* pAttachedToEntity = CElementIDs::GetElement ( usAttachedToID );
         if ( pEntity && pAttachedToEntity )
         {
-            pEntity->AttachTo ( pAttachedToEntity );
             pEntity->SetAttachedOffsets ( vecPosition, vecRotation );
+            pEntity->AttachTo ( pAttachedToEntity );
         }
     }
 }
