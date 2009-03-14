@@ -170,7 +170,7 @@ void CCommunityRegistration::DoPulse ( void )
                         m_pWindow->BringToFront ();
 
                         // Delete the temp file
-                        remove ( REGISTRATION_TEMP_FILE );
+                        remove ( CalcMTASAPath( REGISTRATION_TEMP_FILE ) );
                         return;
                     }
                 }
