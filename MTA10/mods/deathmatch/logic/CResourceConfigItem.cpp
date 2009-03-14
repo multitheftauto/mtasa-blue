@@ -19,7 +19,7 @@
 
 #include <StdInc.h>
 
-CResourceConfigItem::CResourceConfigItem ( CResource * resource, char * szShortName, char * szResourceFileName, unsigned long ulServerCRC ) :
+CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, unsigned long ulServerCRC ) :
     CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, ulServerCRC, true )
 {
     m_pXMLFile = NULL;

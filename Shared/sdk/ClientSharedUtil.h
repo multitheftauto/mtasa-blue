@@ -51,3 +51,10 @@ SString CalcMTASAPath ( const SString& strPath );
 	        (buffer)[(count)-1] = 0; \
     }
 
+
+//
+// Safely read a ushort sized string from a NetBitStreamInterface
+//
+bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& strOut );
+
+

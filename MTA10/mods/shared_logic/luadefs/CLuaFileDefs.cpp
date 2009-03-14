@@ -65,14 +65,13 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
              stricmp ( szFilename, "meta.xml" ) != 0 )
         {
             // Grab the absolute filepath to the file
-            char szAbsoluteFilename [MAX_PATH];
-            snprintf ( szAbsoluteFilename, MAX_PATH, "%s\\%s", pResource->GetResourceDirectoryPath (), szFilename );
+            SString strAbsoluteFilename = SString::Printf ( "%s\\%s", pResource->GetResourceDirectoryPath (), szFilename );
 
             // We have a resource to use?
             if ( pResource )
             {
                 // Create the file to create
-                CScriptFile* pFile = new CScriptFile ( szAbsoluteFilename, DEFAULT_MAX_FILESIZE );
+                CScriptFile* pFile = new CScriptFile ( strAbsoluteFilename, DEFAULT_MAX_FILESIZE );
                 assert ( pFile );
 
                 // Try to load it
@@ -151,14 +150,13 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
              stricmp ( szFilename, "meta.xml" ) != 0 )
         {
             // Grab the absolute filepath to the file
-            char szAbsoluteFilename [MAX_PATH];
-            snprintf ( szAbsoluteFilename, MAX_PATH, "%s\\%s", pResource->GetResourceDirectoryPath (), szFilename );
+            SString strAbsoluteFilename = SString::Printf ( "%s\\%s", pResource->GetResourceDirectoryPath (), szFilename );
 
             // We have a resource to use?
             if ( pResource )
             {
                 // Create the file to create
-                CScriptFile* pFile = new CScriptFile ( szAbsoluteFilename, DEFAULT_MAX_FILESIZE );
+                CScriptFile* pFile = new CScriptFile ( strAbsoluteFilename, DEFAULT_MAX_FILESIZE );
                 assert ( pFile );
 
                 // Try to load it

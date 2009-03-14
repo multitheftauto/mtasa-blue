@@ -196,7 +196,7 @@ float           GetRandomFloat              ( void );
 
 unsigned int    HashString                  ( const char* szString );
 
-void            GetDataUnit                 ( unsigned int uiInput, char* szOutput );
+SString         GetDataUnit                 ( unsigned int uiInput );
 
 unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );

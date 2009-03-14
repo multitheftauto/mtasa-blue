@@ -62,7 +62,7 @@ CResource::CResource ( unsigned short usID, char* szResourceName )
 	m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
-    _snprintf ( m_szResourceDirectoryPath, MAX_PATH, "%s\\resources\\%s", g_pClientGame->GetModRoot (), m_szResourceName );
+    m_strResourceDirectoryPath = SString::Printf ( "%s\\resources\\%s", g_pClientGame->GetModRoot (), m_szResourceName );
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine();
     if ( m_pLuaVM )
@@ -143,12 +143,9 @@ CResource::~CResource ( void )
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, unsigned long ulServerCRC )
 {
     // Create the resource file and add it to the list
-    char szBuffer [ MAX_PATH ] = { 0 };
-    _snprintf ( szBuffer, MAX_PATH, "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
-    if ( MAX_PATH )
-        szBuffer [ MAX_PATH-1 ] = '\0';
+    SString strBuffer = SString::Printf ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
 
-    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, szBuffer, ulServerCRC );
+    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, ulServerCRC );
     if ( pResourceFile )
     {
         m_ResourceFiles.push_back ( pResourceFile );
@@ -161,12 +158,9 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 CDownloadableResource* CResource::AddConfigFile ( char *szFileName, unsigned long ulServerCRC )
 {
     // Create the config file and add it to the list
-    char szBuffer [ MAX_PATH ] = { 0 };
-    _snprintf ( szBuffer, MAX_PATH, "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
-    if ( MAX_PATH )
-        szBuffer [ MAX_PATH-1 ] = '\0';
+    SString strBuffer = SString::Printf ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
     
-    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, szBuffer, ulServerCRC );
+    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, ulServerCRC );
     if ( pConfig )
     {
         m_ConfigFiles.push_back ( pConfig );
@@ -301,9 +295,8 @@ void CResource::Load ( CClientEntity *pRootEntity )
         else
         if ( CheckFileForCorruption ( ( *iter )->GetName () ) )
         {
-            char buffer[256];
-            snprintf ( buffer, 256, "WARNING: File '%s' in resource '%s' is invalid.", (*iter)->GetShortName (), m_szResourceName );
-            g_pCore->ChatEchoColor ( buffer, 255, 0, 0 );
+            SString strBuffer = SString::Printf ( "WARNING: File '%s' in resource '%s' is invalid.", (*iter)->GetShortName (), m_szResourceName );
+            g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
         }
     }
 

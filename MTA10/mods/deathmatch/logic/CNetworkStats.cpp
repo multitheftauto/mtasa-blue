@@ -58,19 +58,13 @@ void CNetworkStats::Draw ( void )
                                         0x78000000 );
 
     // Grab the bytes sent/recv and datarate in the proper unit
-    char szBytesSent [64];
-    char szBytesRecv [64];
-    char szRecvRate [64];
-    char szSendRate [64];
-
-    GetDataUnit ( g_pNet->GetBitsSent () / 8, szBytesSent );
-    GetDataUnit ( g_pNet->GetBitsReceived () / 8, szBytesRecv );
-    GetDataUnit ( ( m_uiBitsReceived - m_uiLastBitsReceived ) / 8, szRecvRate );
-    GetDataUnit ( ( m_uiBitsSent - m_uiLastBitsSent ) / 8, szSendRate );
+    SString strBytesSent = GetDataUnit ( g_pNet->GetBitsSent () / 8 );
+    SString strBytesRecv = GetDataUnit ( g_pNet->GetBitsReceived () / 8 );
+    SString strRecvRate  = GetDataUnit ( ( m_uiBitsReceived - m_uiLastBitsReceived ) / 8 );
+    SString strSendRate  = GetDataUnit ( ( m_uiBitsSent - m_uiLastBitsSent ) / 8 );
 
     // Populate a string to print
-    char szBuffer [512];
-    size_t bufferLength = _snprintf ( szBuffer, sizeof ( szBuffer ) - 1,
+    SString strBuffer = SString::Printf (
                 "Ping: %u ms\n"
                 "Messages in send buffer: %u\n"
                 "Messages sent: %u\n"
@@ -102,16 +96,15 @@ void CNetworkStats::Draw ( void )
                 g_pNet->GetPacketsSent (),
                 g_pNet->GetPacketLoss (),
 
-                szBytesRecv,
-                szBytesSent,
-                szRecvRate,
-                szSendRate,
+                strBytesRecv.c_str (),
+                strBytesSent.c_str (),
+                strRecvRate.c_str (),
+                strSendRate.c_str (),
                 m_uiPacketsReceived - m_uiLastPacketsReceived,
                 m_uiPacketsSent - m_uiLastPacketsSent );
-	szBuffer[ bufferLength ] = '\0';
 
     // Print it
-    m_pDisplayManager->DrawText2D ( szBuffer, CVector ( 0.76f, 0.31f, 0 ), 1.0f, 0xFFFFFFFF );
+    m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.31f, 0 ), 1.0f, 0xFFFFFFFF );
 }
 
 

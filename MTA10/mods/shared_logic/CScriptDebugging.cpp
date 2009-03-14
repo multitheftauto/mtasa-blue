@@ -26,7 +26,7 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
 
 void CScriptDebugging::OutputDebugInfo ( lua_State* luaVM, int iLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
-    char szDebugDump[255];
+    SString strDebugDump;
     
     lua_Debug debugInfo;
     if ( lua_getstack ( luaVM, 1, &debugInfo ) )
@@ -34,11 +34,10 @@ void CScriptDebugging::OutputDebugInfo ( lua_State* luaVM, int iLevel, unsigned 
         lua_getinfo ( luaVM, "nlS", &debugInfo );
         
         // first version includes script path - makes much longer though
-        //  snprintf ( szDebugDump, 255, "Line: %d (%s + %d) %s", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined, debugInfo.short_src );
-        _snprintf ( szDebugDump, 255, "Line: %d (%s + %d)", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined );
-        szDebugDump[255-1] = '\0';
+        //  strDebugDump = SString::Printf ( "Line: %d (%s + %d) %s", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined, debugInfo.short_src );
+        strDebugDump = SString::Printf ( "Line: %d (%s + %d)", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined );
 
-        LogString ( szDebugDump, iLevel, ucRed, ucGreen, ucBlue );
+        LogString ( strDebugDump, iLevel, ucRed, ucGreen, ucBlue );
     }
 }
 
@@ -61,12 +60,10 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, unsigned char ucRed, unsign
         va_end ( ap );
         szBuffer[255] = '\0';
 
-        char szOutBuffer [512];
-        _snprintf ( szOutBuffer, 512, "%s: %s - Line: %d", szFilename, szBuffer, debugInfo.currentline );
-        szOutBuffer[511] = '\0';
+        SString strOutBuffer = SString::Printf ( "%s: %s - Line: %d", szFilename, szBuffer, debugInfo.currentline );
 
         // Log it
-        LogString ( szOutBuffer, 0, ucRed, ucGreen, ucBlue );
+        LogString ( strOutBuffer, 0, ucRed, ucGreen, ucBlue );
     }
 }
 

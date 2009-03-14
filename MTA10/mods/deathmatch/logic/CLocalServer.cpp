@@ -172,10 +172,11 @@ bool CLocalServer::OnCancelButtonClick ( CGUIElement *pElement )
 bool CLocalServer::Load ( void )
 {
     // Get server module root
-    strncpy ( m_szServerPath, g_pCore->GetInstallRoot (), MAX_PATH );
-    strncat ( m_szServerPath, "/server/mods/deathmatch/", MAX_PATH );
-    snprintf ( m_szConfigPath, MAX_PATH, "%s%s", m_szServerPath, m_strConfig.c_str() );
-    m_pConfig = g_pCore->GetXML ()->CreateXML ( m_szConfigPath );
+    m_strServerPath = g_pCore->GetInstallRoot ();
+    m_strServerPath += "/server/mods/deathmatch/";
+
+    m_strConfigPath = SString::Printf ( "%s%s", m_strServerPath.c_str (), m_strConfig.c_str () );
+    m_pConfig = g_pCore->GetXML ()->CreateXML ( m_strConfigPath );
     if ( m_pConfig && m_pConfig->Parse() )
     {
         CXMLNode* pRoot = m_pConfig->GetRootNode();
@@ -203,8 +204,8 @@ bool CLocalServer::Load ( void )
     }
     //
 
-    snprintf ( m_szResourceDirectoryPath, MAX_PATH, "%sresources/*", m_szServerPath );
-    snprintf ( m_szResourceCachePath, MAX_PATH, "%sresourcecache/", m_szServerPath );
+    m_strResourceDirectoryPath = SString::Printf ( "%sresources/*", m_strServerPath.c_str () );
+    m_strResourceCachePath     = SString::Printf ( "%sresourcecache/", m_strServerPath.c_str () );
 
     unsigned int uiCount = 0;
 
@@ -212,7 +213,7 @@ bool CLocalServer::Load ( void )
 
         // Find all .map files in the maps folder
         WIN32_FIND_DATA FindData;
-        HANDLE hFind = FindFirstFile ( m_szResourceDirectoryPath, &FindData );
+        HANDLE hFind = FindFirstFile ( m_strResourceDirectoryPath, &FindData );
         if ( hFind != INVALID_HANDLE_VALUE )
         {
             // Remove the extension and store the time
@@ -249,7 +250,7 @@ bool CLocalServer::Load ( void )
 		time_t llHighestTime = 0;
 		char szPath[MAX_PATH] = {0};
 
-		if ( ( Dir = opendir ( m_szResourceDirectoryPath ) ) )
+		if ( ( Dir = opendir ( m_strResourceDirectoryPath ) ) )
 		{
 			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
 			{

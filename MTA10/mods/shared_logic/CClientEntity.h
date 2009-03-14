@@ -132,7 +132,7 @@ public:
 
     inline CCustomData*                         GetCustomDataPointer    ( void )                    { return m_pCustomData; }
     CLuaArgument*                               GetCustomData           ( const char* szName, bool bInheritData );
-    bool                                        GetCustomDataString     ( const char * szKey, char* pOut, size_t sizeBuffer, bool bInheritData );
+    bool                                        GetCustomDataString     ( const char * szKey, SString& strOut, bool bInheritData );
     bool                                        GetCustomDataFloat      ( const char * szKey, float& fOut, bool bInheritData );
     bool                                        GetCustomDataInt        ( const char * szKey, int& iOut, bool bInheritData );
     bool                                        GetCustomDataBool       ( const char * szKey, bool& bOut, bool bInheritData );

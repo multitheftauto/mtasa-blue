@@ -348,10 +348,8 @@ void COMMAND_MessageTarget ( const char* szCmdLine )
         const char * szNick = pTarget->GetNickPointer();
         if ( !szNick )
             return;
-        char* szParameters = new char [ strlen ( szCmdLine ) + strlen(szNick) + 2 ];
-        sprintf ( szParameters, "%s %s", pTarget->GetNickPointer (), szCmdLine );
-        g_pCore->GetCommands ()->Execute ( "msg", szParameters );
-        delete [] szParameters;
+        SString strParameters = SString::Printf ( "%s %s", pTarget->GetNickPointer (), szCmdLine );
+        g_pCore->GetCommands ()->Execute ( "msg", strParameters );
     }
     else
         g_pCore->ChatEchoColor ( "Error: no player target found", 255, 168, 0 );
@@ -649,9 +647,8 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
 void COMMAND_DumpPlayers ( const char* szCmdLine )
 {
     // Create a file to dump to
-    char szBuffer [256];
-    snprintf ( szBuffer, 256, "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
-    FILE* pFile = fopen ( szBuffer, "w+" );
+    SString strBuffer = SString::Printf ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
+    FILE* pFile = fopen ( strBuffer, "w+" );
     if ( pFile )
     {
         // Write time now

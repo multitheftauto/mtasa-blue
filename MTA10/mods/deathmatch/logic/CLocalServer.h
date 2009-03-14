@@ -40,10 +40,10 @@ private:
     string                      m_strConfig;
     CXMLFile*                   m_pConfig;
 
-    char                        m_szServerPath [MAX_PATH];
-    char                        m_szConfigPath [MAX_PATH];
-    char                        m_szResourceDirectoryPath [MAX_PATH];
-    char                        m_szResourceCachePath [MAX_PATH];
+    SString                     m_strServerPath;
+    SString                     m_strConfigPath;
+    SString                     m_strResourceDirectoryPath;
+    SString                     m_strResourceCachePath;
 
     CGUI*						m_pGUI;
 
