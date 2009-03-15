@@ -154,6 +154,9 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     // Object id
                     BitStream.Write ( pObject->GetModel () );
 
+                    // Alpha
+                    BitStream.Write ( pObject->GetAlpha() );
+
                     break;
                 }
 
