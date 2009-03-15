@@ -772,15 +772,17 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
     return texture;
 }
 
+extern CCore* g_pCore;
 void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
 {
     m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
     D3DSURFACE_DESC textureDesc;
     texture->GetLevelDesc( 0, &textureDesc );
+    g_pCore->GetConsole()->Printf ( "%d %d", textureDesc.Width, textureDesc.Height );
     D3DXMATRIX matrix;
     D3DXVECTOR2 scaling ( fScaleX, fScaleY );
     D3DXVECTOR2 rotationCenter  ( ( float ) textureDesc.Width * fCenterX, ( float ) textureDesc.Height * fCenterY );
-    D3DXVECTOR2 position ( fX, fY );
+    D3DXVECTOR2 position ( fX - ( float ) textureDesc.Width * fScaleX * fCenterX, fY - ( float ) textureDesc.Height * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( texture, NULL, NULL, NULL, D3DCOLOR_ARGB ( ucAlpha, 255, 255, 255 ) );

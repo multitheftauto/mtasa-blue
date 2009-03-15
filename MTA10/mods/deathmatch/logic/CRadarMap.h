@@ -66,8 +66,8 @@ public:
     void                                ZoomOut                             ( void );
 
 private:
-    bool                                CalculateEntityOnScreenPosition     ( class CClientEntity* pEntity, CVector2D& vecLocalPos, float fBlipSize, CVector2D vecBlipPosition );
-    bool                                CalculateEntityOnScreenPosition     ( CVector vecPosition, CVector2D& vecLocalPos, float fBlipSize, CVector2D vecBlipPosition );
+    bool                                CalculateEntityOnScreenPosition     ( class CClientEntity* pEntity, CVector2D& vecLocalPos );
+    bool                                CalculateEntityOnScreenPosition     ( CVector vecPosition, CVector2D& vecLocalPos );
     void                                SetupMapVariables                   ( void );
 
     void                                MoveNorth                           ( void );
