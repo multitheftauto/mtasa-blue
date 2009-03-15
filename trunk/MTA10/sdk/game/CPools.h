@@ -79,6 +79,7 @@ public:
 	virtual CObject			* AddObject ( DWORD ID )=0;
 	virtual VOID			RemoveObject ( CObject * object )=0;
 	virtual CObject			* GetObject ( DWORD ID )=0;
+    virtual CObject         * GetObject ( CObjectSAInterface * ObjectInterface )=0;
 	virtual DWORD			GetObjectRef ( CObject * object )=0;
 	virtual DWORD			GetObjectCount (  )=0;
 	virtual CPed			* GetPed ( DWORD ID )=0;

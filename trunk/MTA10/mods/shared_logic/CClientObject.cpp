@@ -449,7 +449,6 @@ void CClientObject::NotifyDestroy ( void )
     m_pObjectManager->OnDestruction ( this );
 }
 
-
 void CClientObject::StreamedInPulse ( void )
 {
     // Are we not a static object (allowed to move by physics)

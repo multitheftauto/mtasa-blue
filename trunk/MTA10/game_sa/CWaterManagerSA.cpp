@@ -480,7 +480,7 @@ void CWaterManagerSA::GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3
 CWaterVertex* CWaterManagerSA::CreateVertex ( CVector& vecPosition )
 {
     WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.2f, 0.1f, 0 );
-    if ( wID + 1 > m_Vertices.size () )
+    if ( wID + 1 > static_cast < WORD > ( m_Vertices.size () ) )
     {
         m_Vertices.resize ( wID + 1 );
         m_Vertices [ wID ].SetInterface ( &m_VertexPool [ wID ] );
