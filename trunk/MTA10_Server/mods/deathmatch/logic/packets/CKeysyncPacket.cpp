@@ -63,10 +63,6 @@ bool CKeysyncPacket::Read ( NetServerBitStreamInterface& BitStream )
             {
                 unsigned char ucTemp;
 
-                // Read out the weapon state and set it
-                BitStream.Read ( ucTemp );
-                pSourcePlayer->SetCurrentWeaponState ( ucTemp );
-
                 // And ammo in clip
                 unsigned short usAmmoInClip;
                 BitStream.Read ( usAmmoInClip );
@@ -170,8 +166,7 @@ bool CKeysyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
 
             if ( ucCurrentWeaponType != 0 )
             {
-                // Write his current state and ammo in clip
-                BitStream.Write ( pSourcePlayer->GetCurrentWeaponState () );
+                // Write his ammo in clip and aim directions
                 BitStream.Write ( pSourcePlayer->GetWeaponAmmoInClip () );
 				BitStream.Write ( pSourcePlayer->GetAimDirectionX () );
 				BitStream.Write ( pSourcePlayer->GetAimDirectionY () );

@@ -733,7 +733,7 @@ void CClientPed::AddKeysync ( unsigned long ulDelay, const CControllerState& Con
 }
 
 
-void CClientPed::AddChangeWeapon ( unsigned long ulDelay, unsigned char ucWeaponID, unsigned short usWeaponAmmo, unsigned char ucWeaponState )
+void CClientPed::AddChangeWeapon ( unsigned long ulDelay, unsigned char ucWeaponID, unsigned short usWeaponAmmo )
 {
     if ( !m_bIsLocalPlayer )
     {
@@ -742,7 +742,6 @@ void CClientPed::AddChangeWeapon ( unsigned long ulDelay, unsigned char ucWeapon
         pData->ucType = DELAYEDSYNC_CHANGEWEAPON;
         pData->ucWeaponID = ucWeaponID;
         pData->usWeaponAmmo = usWeaponAmmo;
-        pData->ucWeaponState = ucWeaponState;
 
         m_SyncBuffer.push_back ( pData );
     }
@@ -2616,8 +2615,8 @@ void CClientPed::UpdateKeysync ( void )
                                 if ( pPlayerWeapon )
                                 {
                                     pPlayerWeapon->SetAmmoTotal ( 9999 );
-                                    pPlayerWeapon->SetAmmoInClip ( pData->usWeaponAmmo );
-                                    pPlayerWeapon->SetState ( static_cast < eWeaponState > ( pData->ucWeaponState ) );
+                                    if ( pData->usWeaponAmmo < pPlayerWeapon->GetAmmoInClip () && pPlayerWeapon->GetState () != WEAPONSTATE_RELOADING )
+                                        pPlayerWeapon->SetAmmoInClip ( pData->usWeaponAmmo );
                                 }
                             }
                             else
@@ -3648,16 +3647,17 @@ void CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
 			// Always use the gun muzzle as origin
 			vecOrigin = vecGunMuzzle;
 
-            if ( HasAkimboPointingUpwards () )				// Upwards pointing akimbo's
+            if ( false && HasAkimboPointingUpwards () )				// Upwards pointing akimbo's
             {
+                // Disabled temporarily until we actually get working akimbos
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if ( Controller.RightShoulder1 == 255 )	// First-person weapons: gun muzzle as origin (assumed)
+            else if ( Controller.RightShoulder1 == 255 )	// First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
             }
-			else if ( pVehicle )							// Drive-by/vehicle weapons: camera origin as origin
+			else if ( pVehicle )							// Drive-by/vehicle weapons: camera origin as origin, performing collision tests
 			{
                 CColPoint* pCollision;
                 CMatrix mat;
@@ -3683,6 +3683,7 @@ void CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
 			}
             else
             {
+                // For shooting without the crosshair showing (just holding the fire button)
                 vecOrigin = vecGunMuzzle;
 
                 float fTemp = 6.283152f - fRotation;

@@ -750,7 +750,6 @@ void COMMAND_Foo ( const char* szCmdLine )
 
 #endif
 
-
 #if defined(MTA_DEBUG) || defined(MTA_DEBUG_COMMANDS)
 void COMMAND_ShowWepdata ( const char* szCmdLine )
 {

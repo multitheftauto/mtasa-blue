@@ -2390,7 +2390,6 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );
 }
 
-
 void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
 {
     CWeapon* pWeapon = pPlayer->GetWeapon ( pPlayer->GetCurrentWeaponSlot () );
@@ -2447,7 +2446,6 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
         }
     }
 }
-
 
 void CClientGame::UpdateMimics ( void )
 {
@@ -2574,7 +2572,7 @@ void CClientGame::UpdateMimics ( void )
                         pMimic->SetAimInterpolated ( TICK_RATE, fAimX, fAimY, bAkimboUp, cVehicleAimDirection );
                         pMimic->SetTargetTarget ( TICK_RATE, vecOrigin, vecTarget );                                
 
-                        pMimic->AddChangeWeapon ( TICK_RATE, ucWeaponType, (unsigned char) ulWeaponAmmoInClip, ucWeaponState );
+                        pMimic->AddChangeWeapon ( TICK_RATE, ucWeaponType, (unsigned char) ulWeaponAmmoInClip );
                     }
                     else
                     {

@@ -480,10 +480,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 ControllerState.ButtonCircle = 0;
             }
 
-            // Read out the weapon state
-            unsigned char ucWeaponState;
-            BitStream.Read ( ucWeaponState );
-
             // Read out the weapon ammo
             unsigned short usWeaponAmmo = 0;
             BitStream.Read ( usWeaponAmmo );
@@ -497,7 +493,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeaponType, usWeaponAmmo, ucWeaponState );
+                    pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeaponType, usWeaponAmmo );
                 }
             }
             else
@@ -508,7 +504,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0, 0 );
+                    pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
                 }
             }
 
@@ -551,7 +547,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         }
         else
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0, 0 );
+            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
         }
     }
 
@@ -631,9 +627,6 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
 
             if ( ucType != 0 )
             {
-                // Write the state
-                BitStream.Write ( static_cast < unsigned char > ( pPlayerWeapon->GetState () ) );
-
                  // Write the clip ammo
                 unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
                 BitStream.Write ( usAmmoInClip );
@@ -789,20 +782,18 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
             ControllerState.ButtonCircle = 0;
         }
 
-        // Read out the weapon state and ammo
-        unsigned char ucWeaponState;
+        // Read out the weapon ammo
         unsigned short usWeaponAmmo;
-        BitStream.Read ( ucWeaponState );
         BitStream.Read ( usWeaponAmmo );
 
         // Valid current weapon id?
         if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeapon, usWeaponAmmo, ucWeaponState );
+            pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeapon, usWeaponAmmo );
         }
         else
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0, 0 );
+            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
         }
 
 		// Make sure that if he doesn't have an akimbo weapon his hands up state is false
@@ -958,9 +949,6 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
 
         if ( ucWeaponType != 0 )
         {
-            // Write the weapon state
-            BitStream.Write ( static_cast < unsigned char > ( pPlayerWeapon->GetState () ) );
-
             // Write the ammo states
             unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
             BitStream.Write ( usAmmoInClip );
@@ -1162,10 +1150,8 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             ControllerState.ButtonCircle = 0;
         }
 
-        // Read out the weapon state and ammo
-        unsigned char ucWeaponState;
+        // Read out the weapon ammo
         unsigned short usWeaponAmmo;
-        BitStream.Read ( ucWeaponState );
         BitStream.Read ( usWeaponAmmo );
 
         // Valid current weapon id?
@@ -1183,12 +1169,11 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
                 }
             }
 
-            // Give it unlimited ammo, set the ammo in clip and weapon state
+            // Give it unlimited ammo and set the ammo in clip
             if ( pPlayerWeapon )
             {
                 pPlayerWeapon->SetAmmoTotal ( 9999 );
                 pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
-                pPlayerWeapon->SetState ( static_cast < eWeaponState > ( ucWeaponState ) );
             }
         }
 
@@ -1357,9 +1342,6 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.Write ( ucWeaponSlot );
         if ( ucWeaponType != 0 )
         {
-            // Write the weapon state
-            BitStream.Write ( static_cast < unsigned char > ( pPlayerWeapon->GetState () ) );
-
             // Write the ammo in clip
             unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
             BitStream.Write ( usAmmoInClip );
