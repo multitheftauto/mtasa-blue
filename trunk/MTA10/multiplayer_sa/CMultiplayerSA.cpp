@@ -40,6 +40,7 @@ unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
 unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
+unsigned long CMultiplayerSA::HOOKPOS_CVehicle_Render;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -120,6 +121,7 @@ VOID HOOK_Render3DStuff ();
 VOID HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 VOID HOOK_CPed_IsPlayer ();
 VOID HOOK_CTrain_ProcessControl_Derail ();
+VOID HOOK_CVehicle_Render ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -207,6 +209,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
+    HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -1999,6 +2002,47 @@ train_would_derail:
         }
     }
 }
+
+
+static CVehicleSAInterface* pRenderingVehicle = NULL;
+static void SetVehicleAlpha ()
+{
+    if ( pRenderingVehicle )
+    {
+        CVehicle* pVehicle = pRenderingVehicle->m_pVehicle;
+        DWORD dwFunc = FUNC_SetRwObjectAlpha;
+        DWORD dwAlpha = pVehicle->GetAlpha ();
+ 
+        _asm
+        {
+            mov     ecx, pRenderingVehicle
+            push    dwAlpha
+            call    dwFunc
+        }
+    }
+}
+
+VOID _declspec(naked) HOOK_CVehicle_Render ()
+{
+    _asm
+    {
+        pushad
+        mov         pRenderingVehicle, esi
+    }
+
+    SetVehicleAlpha ();
+
+    _asm
+    {
+        popad
+        mov         eax, 0x6D0E88
+        add         esp, 0x8
+        mov         ecx, esi
+        jmp         eax
+    }
+}
+
+
 
 void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
 {
