@@ -93,6 +93,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
 #endif
 
     #if defined (MTA_DEBUG) || defined (MTA_DEBUG_COMMANDS)
+        pCore->GetCommands ()->Add ( "showwepdata",			"shows the given player weapon data (nick)",		COMMAND_ShowWepdata );
         pCore->GetCommands ()->Add ( "showtasks",			"shows the local player tasks (nick)",				COMMAND_ShowTasks );
         pCore->GetCommands ()->Add ( "showplayer",			"shows extended player information (nick)",			COMMAND_ShowPlayer );
         pCore->GetCommands ()->Add ( "setmimic",			"enables player mimics (amount)",					COMMAND_SetMimic );

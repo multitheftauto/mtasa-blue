@@ -256,6 +256,7 @@ public:
 #endif
 
     #ifdef MTA_DEBUG
+    void                                ShowWepdata                     ( const char* szNick );
     void								ShowTasks                       ( const char* szNick );
     void                                ShowPlayer                      ( const char* szNick );
     void                                SetMimic                        ( unsigned int uiMimicCount );
@@ -363,6 +364,7 @@ private:
     void                                DrawPlayerDetails               ( CClientPlayer* pPlayer );
     void                                UpdateMimics                    ( void );
     void                                DoPaintballs                    ( void );
+    void                                DrawWeaponsyncData              ( CClientPlayer* pPlayer );
     #endif
 
     #ifdef MTA_WEPSYNCDBG
