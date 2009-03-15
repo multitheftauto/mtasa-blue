@@ -1881,6 +1881,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // CVector              (12)    - position
     // CVector              (12)    - rotation
     // unsigned short       (2)     - object model id
+    // unsigned char        (1)     - alpha
 
     // Pickups:
     // CVector              (12)    - position
@@ -2119,14 +2120,17 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::OBJECT:
                 {
                     unsigned short usObjectID;
-                    // Read out the position and the rotation
+                    unsigned char ucAlpha;
+
+                    // Read out the position, rotation, object ID and alpha value
                     if ( bitStream.Read ( vecPosition.fX ) &&
                          bitStream.Read ( vecPosition.fY ) &&
                          bitStream.Read ( vecPosition.fZ ) &&
                          bitStream.Read ( vecRotation.fX ) &&
                          bitStream.Read ( vecRotation.fY ) &&
                          bitStream.Read ( vecRotation.fZ ) &&
-                         bitStream.Read ( usObjectID ) )
+                         bitStream.Read ( usObjectID ) &&
+                         bitStream.Read ( ucAlpha ) )
                     {
                         // Valid object id?
                         if ( !CClientObjectManager::IsValidModel ( usObjectID ) )
@@ -2140,6 +2144,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         if ( pObject )
                         {
                             pObject->SetOrientation ( vecPosition, vecRotation );
+                            pObject->SetAlpha ( ucAlpha );
                         }
                         else
                         {
