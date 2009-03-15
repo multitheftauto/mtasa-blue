@@ -106,6 +106,8 @@ public:
     virtual bool                IsSirenOrAlarmActive        () = 0;
     virtual void                SetSirenOrAlarmActive       ( bool bActive ) = 0;
     virtual DWORD               * GetMemoryValue            ( DWORD dwOffset ) = 0;
+    virtual void                SetAlpha                    ( unsigned char ucAlpha ) = 0;
+    virtual unsigned char       GetAlpha                    () = 0;
 
     virtual void                BlowUp                      ( CEntity* pCreator, unsigned long ulUnknown ) = 0;
     virtual void                BlowUpCutSceneNoExtras      ( unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4 ) = 0;

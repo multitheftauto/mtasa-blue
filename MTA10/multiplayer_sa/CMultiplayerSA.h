@@ -133,6 +133,7 @@ private:
     static unsigned long        HOOKPOS_CRadar__DrawRadarGangOverlay;
     static unsigned long        HOOKPOS_CTaskComplexJump__CreateSubTask;
     static unsigned long        HOOKPOS_CTrain_ProcessControl_Derail;
+    static unsigned long        HOOKPOS_CVehicle_Render;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

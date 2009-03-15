@@ -423,9 +423,10 @@ private:
 	CDamageManagerSA		* damageManager;
     CHandlingEntrySA*       m_pHandlingData;
     bool                    m_bIsDerailable;
+    unsigned char           m_ucAlpha;
 
 public:
-								CVehicleSA                      ()      { };
+								CVehicleSA                      ();
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
 								CVehicleSA                      ( eVehicleTypes dwModelID );
 								~CVehicleSA                     ();
@@ -501,6 +502,8 @@ public:
 	void                        GetColor                        ( char * color1, char * color2, char * color3, char * color4 );
     bool                        IsSirenOrAlarmActive            ();
     void                        SetSirenOrAlarmActive           ( bool bActive );
+    inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
+    inline unsigned char        GetAlpha                        ( ) { return m_ucAlpha; }
 
 	void				        SetLandingGearDown              ( bool bLandingGearDown );
 	float				        GetLandingGearPosition          ();

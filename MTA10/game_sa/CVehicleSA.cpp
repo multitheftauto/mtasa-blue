@@ -16,6 +16,11 @@
 
 #include "StdInc.h"
 
+CVehicleSA::CVehicleSA ()
+    : m_ucAlpha ( 255 ), m_bIsDerailable ( true )
+{
+}
+
 /**
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
@@ -74,6 +79,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
     m_bIsDerailable = true;
+    m_ucAlpha = 255;
 }
 
 CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
@@ -95,6 +101,9 @@ CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
     this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+
+    m_bIsDerailable = true;
+    m_ucAlpha = 255;
 }
 
 // DESTRUCTOR
