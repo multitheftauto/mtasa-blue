@@ -75,7 +75,7 @@ public:
     virtual IDirect3DTexture9*      CreateTexture       ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight ) = 0;
     virtual IDirect3DTexture9*      LoadTexture         ( const char* szFile ) = 0;
     virtual IDirect3DTexture9*      LoadTexture         ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight ) = 0;
-    virtual void                    DrawTexture         ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, unsigned char ucAlpha = 255 ) = 0;
+    virtual void                    DrawTexture         ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, unsigned char ucAlpha = 255 ) = 0;
 
     // Queued up drawing
     virtual void                    DrawLineQueued      ( float fX1, float fY1,
