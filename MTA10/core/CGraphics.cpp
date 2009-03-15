@@ -778,7 +778,6 @@ void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, fl
     m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
     D3DSURFACE_DESC textureDesc;
     texture->GetLevelDesc( 0, &textureDesc );
-    g_pCore->GetConsole()->Printf ( "%d %d", textureDesc.Width, textureDesc.Height );
     D3DXMATRIX matrix;
     D3DXVECTOR2 scaling ( fScaleX, fScaleY );
     D3DXVECTOR2 rotationCenter  ( ( float ) textureDesc.Width * fCenterX, ( float ) textureDesc.Height * fCenterY );

@@ -44,10 +44,6 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_iVerticalMovement = 0;
     SetupMapVariables ();
 
-    // Set the blip sizes to default
-    m_fLocalPlayerBlipSize = ( m_fMapSize / m_ucZoom ) / 16.0f;
-    m_fStandardImageBlipSize = ( m_fMapSize / m_ucZoom ) / 16.0f;
-
     // Create the radar and local player blip images
     m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );

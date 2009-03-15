@@ -83,8 +83,6 @@ private:
     IDirect3DTexture9*                  m_pRadarImage;
 
     IDirect3DTexture9*                  m_pLocalPlayerBlip;
-    float                               m_fLocalPlayerBlipSize;
-    float                               m_fStandardImageBlipSize;
 
     unsigned int                        m_uiHeight;
     unsigned int                        m_uiWidth;
