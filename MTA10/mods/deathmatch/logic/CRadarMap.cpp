@@ -50,7 +50,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 
     // Create the radar and local player blip images
     m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\03.png")  );
+    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );
 
     // Create the text display for the mode text
     m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
@@ -119,18 +119,26 @@ void CRadarMap::DoPulse ( void )
                                                              static_cast < float > ( m_iMapMinY ),
                                                              m_fMapSize / RADAR_TEXTURE_WIDTH,
                                                              m_fMapSize / RADAR_TEXTURE_HEIGHT,
+                                                             0.0f, 0.0f, 0.0f,
                                                              RADAR_TEXTURE_ALPHA );
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
         CVector vecLocal;
+        CVector vecLocalRot;
         if ( m_pManager->GetCamera()->IsInFixedMode() )
+        {
             m_pManager->GetCamera()->GetPosition ( vecLocal );
+            m_pManager->GetCamera()->GetRotation ( vecLocalRot );
+        }
         else
+        {
             m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetPosition ( vecLocal );
+            m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetRotationDegrees ( vecLocalRot );
+        }
 
         CalculateEntityOnScreenPosition ( vecLocal, vecLocalPos, m_fLocalPlayerBlipSize, CVector2D ( 0.5f, 0.0f ) );
-        g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY );
+        g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
 
 
         // Now loop our radar areas
