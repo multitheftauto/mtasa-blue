@@ -717,6 +717,12 @@ void CMultiplayerSA::InitHooks()
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
     memset((void *)0x6F701D, 0x90, 6);
     *(BYTE *)0x6F7069 = 0xEB;
+
+    // The instanthit function for bullets ignores the first few bullets shot by
+    // remote players after reloading because some flag isn't set (no bullet impact
+    // graphics, no damage). Makes e.g. sawnoffs completely ineffective.
+    // Remove this check so that no bullets are ignored.
+    *(BYTE *)0x73FDF9 = 0xEB;
 }
 
 

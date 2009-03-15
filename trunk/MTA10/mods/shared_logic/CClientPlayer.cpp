@@ -86,7 +86,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     // Add us to the player list
     m_pManager->GetPlayerManager ()->AddToList ( this );
 
-#ifdef MTA_WEPSYNCDBG
+#ifdef MTA_DEBUG
     m_bShowingWepdata = false;
 #endif
 }

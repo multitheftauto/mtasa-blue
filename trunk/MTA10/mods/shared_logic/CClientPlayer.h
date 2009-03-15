@@ -155,12 +155,12 @@ private:
 
     bool                            m_bNetworkDead;
 
-#ifdef MTA_WEPSYNCDBG
+#ifdef MTA_DEBUG
 private:
-    bool m_bShowingWepdata;
+    bool                            m_bShowingWepdata;
 public:
-    inline void SetShowingWepdata ( bool bState ) { m_bShowingWepdata = bState; }
-    inline bool IsShowingWepdata ( ) const { return m_bShowingWepdata; }
+    inline void                     SetShowingWepdata       ( bool bState ) { m_bShowingWepdata = bState; }
+    inline bool                     IsShowingWepdata        ( ) const       { return m_bShowingWepdata; }
 #endif
 };
 
