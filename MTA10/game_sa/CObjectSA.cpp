@@ -35,6 +35,7 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
 {
 	DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
 	this->SetInterface(objectInterface);
+    m_ucAlpha = 255;
 }
 
 CObjectSA::CObjectSA( DWORD dwModel )
@@ -151,6 +152,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
     }
 #endif
 
+    m_ucAlpha = 255;
 }
 
 CObjectSA::~CObjectSA( )

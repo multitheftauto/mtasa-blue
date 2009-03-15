@@ -41,6 +41,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
 unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
 unsigned long CMultiplayerSA::HOOKPOS_CVehicle_Render;
+unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -122,6 +123,7 @@ VOID HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 VOID HOOK_CPed_IsPlayer ();
 VOID HOOK_CTrain_ProcessControl_Derail ();
 VOID HOOK_CVehicle_Render ();
+VOID HOOK_CObject_Render ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -210,6 +212,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
+    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 6);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -2048,6 +2051,47 @@ VOID _declspec(naked) HOOK_CVehicle_Render ()
     }
 }
 
+
+static CObjectSAInterface* pRenderingObject = NULL;
+static void SetObjectAlpha ()
+{
+    if ( pRenderingObject )
+    {
+        CObject* pObject = pGameInterface->GetPools()->GetObject ( (CObjectSAInterface *)pRenderingObject );
+        if ( pObject )
+        {
+            DWORD dwFunc = FUNC_SetRwObjectAlpha;
+            DWORD dwAlpha = pObject->GetAlpha ();
+ 
+            _asm
+            {
+                mov     ecx, pRenderingObject
+                push    dwAlpha
+                call    dwFunc
+            }
+        }
+    }
+}
+
+// Note: This hook is also called for world objects (light poles, wooden fences, etc).
+VOID _declspec(naked) HOOK_CObject_Render ()
+{
+    _asm
+    {
+        pushad
+        mov         pRenderingObject, esi
+    }
+
+    SetObjectAlpha ();
+
+    _asm
+    {
+        popad
+        mov         eax, 0x59F189
+        mov         ecx, [esi+0x140]
+        jmp         eax
+    }
+}
 
 
 void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )

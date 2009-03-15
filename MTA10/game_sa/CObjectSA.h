@@ -33,6 +33,7 @@ class CObjectSAInterface : public CPhysicalSAInterface // + 372 = burn time stop
 class CObjectSA : public virtual CObject, public virtual CPhysicalSA
 {
 private:
+    unsigned char               m_ucAlpha;
 
 public:
 	                            CObjectSA           ( CObjectSAInterface * objectInterface );
@@ -46,6 +47,9 @@ public:
     void                        SetHealth           ( float fHealth );
     float                       GetHealth           ( void );
     void                        SetModelIndex       ( unsigned long ulModel );
+
+    inline void                 SetAlpha            ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
+    inline unsigned char        GetAlpha            ( ) { return m_ucAlpha; }
 };
 
 /*

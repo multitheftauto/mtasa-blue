@@ -21,6 +21,7 @@
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
 
+
 #define FUNC_GetVehicle						0x54fff0
 #define FUNC_GetVehicleRef					0x54ffc0
 //#define FUNC_GetVehicleCount				0x429510
