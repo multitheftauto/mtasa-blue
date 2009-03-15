@@ -134,8 +134,6 @@ void CRadarMap::DoPulse ( void )
         }
 
         CalculateEntityOnScreenPosition ( vecLocal, vecLocalPos );
-        g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
-
 
         // Now loop our radar areas
         unsigned short usDimension = m_pRadarAreaManager->GetDimension ();
@@ -281,6 +279,9 @@ void CRadarMap::DoPulse ( void )
                 }
             }
         }
+
+        g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
+
         if ( !m_pModeText->IsVisible () )
             m_pModeText->SetVisible ( true );
     }
