@@ -285,10 +285,6 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
             unsigned char ucCurrentWeapon = pSourcePlayer->GetWeaponType ();
             if ( ucCurrentWeapon != 0 )
             {
-                // Read out the weapon state
-                BitStream.Read ( ucTemp );
-                pSourcePlayer->SetCurrentWeaponState ( ucTemp );
-
                 // Read out the ammo state
                 unsigned short usAmmoInClip;
                 BitStream.Read ( usAmmoInClip );
@@ -426,8 +422,7 @@ bool CVehiclePuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) co
             BitStream.Write ( ucWeaponType );
             if ( ucWeaponType != 0 )
             {
-                // Write the weapon state and ammo in clip
-                BitStream.Write ( pSourcePlayer->GetCurrentWeaponState () );
+                // Write the ammo in clip
                 BitStream.Write ( pSourcePlayer->GetWeaponAmmoInClip () );
 
                 // Write the aim directions

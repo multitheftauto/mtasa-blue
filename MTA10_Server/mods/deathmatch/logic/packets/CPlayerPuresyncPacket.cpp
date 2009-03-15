@@ -144,11 +144,6 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 
         if ( ucCurrentWeaponType != 0 )
         {
-            // Read out the weapon state
-            unsigned char ucWeaponState;
-            BitStream.Read ( ucWeaponState );
-            pSourcePlayer->SetCurrentWeaponState ( ucWeaponState );
-
             // Read out the ammo states
             unsigned short usAmmoInClip;
             BitStream.Read ( usAmmoInClip );
@@ -293,7 +288,6 @@ bool CPlayerPuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) con
         BitStream.Write ( ucWeaponType );
         if ( ucWeaponType != 0 )
         {
-            unsigned char ucWeaponState = pSourcePlayer->GetCurrentWeaponState ();
             unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
             float fAimDirectionX = pSourcePlayer->GetAimDirectionX ();
             float fAimDirectionY = pSourcePlayer->GetAimDirectionY ();
@@ -302,7 +296,6 @@ bool CPlayerPuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) con
             CVector vecTargetting;
             pSourcePlayer->GetTargettingVector ( vecTargetting );
 
-            BitStream.Write ( ucWeaponState );
             BitStream.Write ( usWeaponAmmoInClip );
 
 			BitStream.Write ( fAimDirectionX );
