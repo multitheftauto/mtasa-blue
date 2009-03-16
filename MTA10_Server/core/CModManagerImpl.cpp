@@ -12,6 +12,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CModManagerImpl.h"
 #include "Platform.h"
 #include <cstdio>

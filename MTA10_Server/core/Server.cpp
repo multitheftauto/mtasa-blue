@@ -10,6 +10,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CServerImpl.h"
 #include "CCriticalSection.h"
 

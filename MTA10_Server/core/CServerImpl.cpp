@@ -14,6 +14,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CServerImpl.h"
 #include "CCrashHandler.h"
 #include "Platform.h"

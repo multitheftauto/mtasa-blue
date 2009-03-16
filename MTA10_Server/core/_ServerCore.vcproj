@@ -26,8 +26,9 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;MTA_SERVER"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/Core.pch"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -40,7 +41,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib Imagehlp.lib"
 				OutputFile="..\output\core_d.dll"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="../dependencies"
 				IgnoreDefaultLibraryNames=""
@@ -94,9 +95,9 @@
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;MTA_RELEASE;MTA_SERVER"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough=""
-				PrecompiledHeaderFile=".\Release/Core.pch"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -116,77 +117,6 @@
 				ProgramDatabaseFile="C:/Symbols/Release_ServerCore.pdb"
 				GenerateMapFile="TRUE"
 				MapFileName="C:/Symbols/Release_ServerCore.map"
-				MapExports="TRUE"
-				MapLines="TRUE"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/Core.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="Beta|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="1"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="WIN32;MTA_BETA;MTA_SERVER"
-				StringPooling="TRUE"
-				RuntimeLibrary="4"
-				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/Core.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="3"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="xml/lib/mxml.lib wsock32.lib Imagehlp.lib"
-				OutputFile="..\output\core.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="../dependencies"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="C:/Symbols/Beta_ServerCore.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="C:/Symbols/Beta_ServerCore.map"
 				MapExports="TRUE"
 				MapLines="TRUE"
 				SubSystem="1"
@@ -239,8 +169,9 @@
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;MTA_RELEASE;MTA_SERVER"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/Core.pch"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				AssemblerListingLocation=""
 				ObjectFile="$(IntDir)/"
 				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
@@ -322,6 +253,27 @@
 			<File
 				RelativePath=".\Server.cpp">
 			</File>
+			<File
+				RelativePath=".\StdInc.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+			</File>
 			<Filter
 				Name="sockets"
 				Filter="">
@@ -365,6 +317,9 @@
 			</File>
 			<File
 				RelativePath=".\ErrorCodes.h">
+			</File>
+			<File
+				RelativePath=".\StdInc.h">
 			</File>
 			<Filter
 				Name="server"

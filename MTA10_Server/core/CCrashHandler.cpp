@@ -10,6 +10,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CCrashHandler.h"
 #include <string>
 
