@@ -488,6 +488,15 @@ CGUIListItem* CGUIGridList_Impl::GetSelectedItem ( void )
 }
 
 
+CGUIListItem* CGUIGridList_Impl::GetNextSelectedItem ( CGUIListItem* pItem )
+{
+    if ( pItem )
+        return GetListItem ( reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getNextSelected ( ( ( CGUIListItem_Impl* )pItem )->GetListItem() ) );
+    else
+        return GetListItem ( reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem () );
+}
+
+
 int CGUIGridList_Impl::GetSelectedItemRow ( void )
 {
 	CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem ();

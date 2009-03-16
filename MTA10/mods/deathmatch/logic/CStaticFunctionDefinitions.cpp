@@ -3594,6 +3594,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel ( CLuaMain& Lua
 	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
 	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
+	// set events
+	pGUIElement->SetEvents ( "onClientGUITabSwitched" );
+	static_cast < CGUITabPanel* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
+
 	return pGUIElement;
 }
 
@@ -3622,6 +3626,42 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab ( CLuaMain& LuaMain,
 	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
 	return pGUIElement;
+}
+
+
+CClientGUIElement* CStaticFunctionDefinitions::GUIGetSelectedTab ( CClientEntity& Element )
+{
+    if ( IS_GUI ( &Element ) )
+    {
+        CClientGUIElement& GUIPanel = static_cast < CClientGUIElement& > ( Element );
+        if ( IS_CGUIELEMENT_TABPANEL ( &GUIPanel ) )
+        {
+            CGUITab* pTab = static_cast < CGUITabPanel* > ( GUIPanel.GetCGUIElement () )->GetSelectedTab ();
+            if ( pTab )
+            {
+                return m_pGUIManager->Get ( static_cast < CGUIElement* > ( pTab ) );
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
+bool CStaticFunctionDefinitions::GUISetSelectedTab ( CClientEntity& Element, CClientEntity& Tab )
+{
+    if ( IS_GUI ( &Element ) && IS_GUI ( &Tab ) )
+    {
+        CClientGUIElement& GUIPanel = static_cast < CClientGUIElement& > ( Element );
+        CClientGUIElement& GUITab = static_cast < CClientGUIElement& > ( Tab );
+        if ( IS_CGUIELEMENT_TABPANEL ( &GUIPanel ) && IS_CGUIELEMENT_TAB ( &GUITab ) )
+        {
+            static_cast < CGUITabPanel* > ( GUIPanel.GetCGUIElement () )->SetSelectedTab ( static_cast < CGUITab* > ( GUITab.GetCGUIElement () ) );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 

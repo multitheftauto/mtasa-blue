@@ -39,6 +39,7 @@ public:
 	bool									Exists					( CGUIElement* pCGUIElement );
     inline unsigned int						Count                   ( void )									{ return static_cast < unsigned int > ( m_Elements.size () ); };
 
+    CClientGUIElement*                      Get                    ( CGUIElement* pCGUIElement );
 private:
     void            	                    Add 					( CClientGUIElement* pGUIElement );
 	void                                    Remove					( CClientGUIElement* pGUIElement );

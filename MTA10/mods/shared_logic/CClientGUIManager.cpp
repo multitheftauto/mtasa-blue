@@ -82,6 +82,25 @@ bool CClientGUIManager::Exists ( CGUIElement* pCGUIElement )
 }
 
 
+CClientGUIElement* CClientGUIManager::Get ( CGUIElement* pCGUIElement )
+{
+	if ( pCGUIElement ) {
+		// Find the object in the list
+		list < CClientGUIElement* > ::const_iterator iter = m_Elements.begin ();
+		for ( ; iter != m_Elements.end (); iter++ )
+		{
+			if ( (*iter)->GetCGUIElement () == pCGUIElement )
+			{
+				return *iter;
+			}
+		}
+	}
+
+    // Doesn't exist
+    return NULL;
+}
+
+
 void CClientGUIManager::Add ( CClientGUIElement* pElement )
 {
 	m_Elements.push_back ( pElement );

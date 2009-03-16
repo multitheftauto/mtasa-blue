@@ -31,16 +31,24 @@ public:
     CGUITab*                CreateTab               ( const char* szCaption );
     void                    DeleteTab               ( CGUITab* pTab );
 
-    size_t                  GetSelectedTabIndex     ( void );
+    CGUITab*                GetSelectedTab          ( void );
+    void                    SetSelectedTab          ( CGUITab* pTab );
 
     bool                    IsTabSelected           ( CGUITab* pTab );
 
 	eCGUIType				GetType					( void ) { return CGUI_TABPANEL; };
 
+    void                    SetSelectionHandler     ( GUI_CALLBACK Callback );
+
     #include "CGUIElement_Inc.h"
 
 private:
+
     class CGUI_Impl*        m_pGUI;
+
+    GUI_CALLBACK*           m_pOnSelectionChanged;
+
+    bool                    Event_OnSelectionChanged   ( const CEGUI::EventArgs& e );
 };
 
 #endif

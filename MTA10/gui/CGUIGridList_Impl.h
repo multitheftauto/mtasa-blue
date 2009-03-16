@@ -56,6 +56,7 @@ public:
     int                                 GetItemRowIndex			( CGUIListItem* pItem );
     int                                 GetSelectedCount        ( void );
     CGUIListItem*                       GetSelectedItem         ( void );
+    CGUIListItem*                       GetNextSelectedItem     ( CGUIListItem* pItem );
     int                                 GetSelectedItemRow      ( void );
 	int                                 GetSelectedItemColumn   ( void );
 	int									GetRowCount				( void );

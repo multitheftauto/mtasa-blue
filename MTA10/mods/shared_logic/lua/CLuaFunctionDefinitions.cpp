@@ -9826,6 +9826,64 @@ int CLuaFunctionDefinitions::GUICreateTab ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GUIGetSelectedTab ( lua_State* luaVM )
+{
+	if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+	{
+		CClientEntity* pPanel = lua_toelement ( luaVM, 1 );
+		if ( pPanel )
+        {
+            CClientGUIElement* pTab = NULL;
+            if ( pTab = CStaticFunctionDefinitions::GUIGetSelectedTab ( *pPanel ) )
+            {
+		        lua_pushelement ( luaVM, pTab );
+		        return 1;
+            }
+            else
+            {
+                lua_pushnil ( luaVM );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGetSelectedTab", "gui-element", 1 );
+	}
+
+	lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GUISetSelectedTab ( lua_State* luaVM )
+{
+	if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) )
+	{
+		CClientEntity* pPanel = lua_toelement ( luaVM, 1 );
+        CClientEntity* pTab = lua_toelement ( luaVM, 2 );
+		if ( pPanel )
+        {
+            if ( pTab )
+            {
+                if ( CStaticFunctionDefinitions::GUISetSelectedTab ( *pPanel, *pTab ) )
+                {
+		            lua_pushboolean ( luaVM, true );
+		            return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "guiSetSelectedTab", "gui-element", 2 );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiSetSelectedTab", "gui-element", 1 );
+	}
+
+	lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+
 int CLuaFunctionDefinitions::GUIDeleteTab ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -10826,6 +10884,65 @@ int CLuaFunctionDefinitions::GUIGridListGetSelectedItem ( lua_State* luaVM )
 	}
 
 	// error: bad arguments
+	lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GUIGridListGetSelectedItems ( lua_State* luaVM )
+{
+	if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+	{
+		CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
+        if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
+        {
+            CGUIGridList* pList = static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () );
+            CGUIListItem* pItem = NULL;
+
+            CLuaArguments list;
+            for ( int i = 1; i < pList->GetSelectedCount(); i++ )
+            {
+                pItem = pList->GetNextSelectedItem ( pItem );
+                if ( !pItem ) break;
+
+                CLuaArguments item;
+                item.PushString ( "column" );
+                item.PushNumber ( pList->GetItemColumnIndex ( pItem ) );
+                item.PushString ( "row" );
+                item.PushNumber ( pList->GetItemRowIndex ( pItem ) );
+                list.PushTable ( &item );
+            }
+
+            list.PushAsTable ( luaVM );
+
+		    return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListGetSelectedItems", "gui-element", 1 );
+	}
+
+	// error: bad arguments
+	lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GUIGridListGetSelectedCount ( lua_State* luaVM )
+{
+	if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+	{
+		CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
+        if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
+        {
+            int iCount = static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetSelectedCount ();
+            
+		    lua_pushnumber ( luaVM, iCount );
+		    return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListGetSelectedCount", "gui-element", 1 );
+	}
+
 	lua_pushboolean ( luaVM, false );
     return 1;
 }

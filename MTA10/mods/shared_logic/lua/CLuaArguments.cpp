@@ -321,6 +321,15 @@ CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument& Argument )
 }
 
 
+CLuaArgument* CLuaArguments::PushTable ( CLuaArguments * table )
+{
+    CLuaArgument* pArgument = new CLuaArgument (  );
+    pArgument->Read(table);
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
 void CLuaArguments::DeleteArguments ( void )
 {
     // Delete each item
