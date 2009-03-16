@@ -11,6 +11,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CDynamicLibrary.h"
 #include "Platform.h"
 

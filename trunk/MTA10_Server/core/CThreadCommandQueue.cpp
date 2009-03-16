@@ -10,6 +10,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #ifdef WIN32
 #include "CThreadCommandQueue.h"
 #include "CModManagerImpl.h"

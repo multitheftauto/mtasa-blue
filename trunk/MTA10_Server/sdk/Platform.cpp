@@ -9,6 +9,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "Platform.h"
 
 // Replacement functions

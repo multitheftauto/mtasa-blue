@@ -23,6 +23,7 @@ CONDITIONAL COMPILATION :
                               versions.
 ----------------------------------------------------------------------*/
 
+#include "StdInc.h"
 #include "CCrashHandlerAPI.h"
 
 #ifdef WIN32

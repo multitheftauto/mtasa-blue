@@ -44,6 +44,10 @@ public:
             (buffer)[(count)-1] = 0; \
     }
 
+#ifndef WIN32
+    #define _vsnprintf vsnprintf
+#endif
+
 
 //
 // Turns a relative MTASA path i.e. "MTA\file.dat"

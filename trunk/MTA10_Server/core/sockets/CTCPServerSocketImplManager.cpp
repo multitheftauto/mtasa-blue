@@ -10,6 +10,7 @@
 *
 *****************************************************************************/
 
+#include "StdInc.h"
 #include "CTCPServerSocketImpl.h"
 #include "CTCPServerSocketImplManager.h"
 
