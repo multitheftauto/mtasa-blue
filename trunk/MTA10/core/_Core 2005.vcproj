@@ -45,12 +45,14 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;IJS"
-				StringPooling="true"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
+				StringPooling="false"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="true"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -63,7 +65,7 @@
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings="4995;4996;4244"
+				DisableSpecificWarnings="4995;4996;4244;4482"
 				ShowIncludes="false"
 			/>
 			<Tool
@@ -85,7 +87,7 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
-				IgnoreDefaultLibraryNames=""
+				IgnoreDefaultLibraryNames="libcp"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/core_.pdb"
 				GenerateMapFile="false"
@@ -149,14 +151,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -168,7 +174,7 @@
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings="4995;4244"
+				DisableSpecificWarnings="4995;4996;4244;4482"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -188,7 +194,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				IgnoreDefaultLibraryNames="LIBCMT;libcp"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
 				GenerateMapFile="true"
@@ -196,6 +202,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary=".\Release/mta_blue.lib"
 				TargetMachine="1"
 			/>
@@ -255,15 +262,20 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				ExceptionHandling="1"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -275,7 +287,7 @@
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings="4995;4244"
+				DisableSpecificWarnings="4995;4996;4244;4482"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -295,7 +307,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				IgnoreDefaultLibraryNames="LIBCMT;libcp"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
 				GenerateMapFile="true"
@@ -303,6 +315,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary=".\Release/mta_blue.lib"
 				TargetMachine="1"
 			/>
@@ -622,6 +635,10 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\xfire.cpp"
+				>
 			</File>
 			<Filter
 				Name="d3d"
@@ -964,6 +981,10 @@
 				RelativePath=".\UtilityMacros.h"
 				>
 			</File>
+			<File
+				RelativePath=".\xfire.h"
+				>
+			</File>
 			<Filter
 				Name="tracking"
 				>
@@ -992,43 +1013,11 @@
 				Name="client"
 				>
 				<File
-					RelativePath=".\client\CClientBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CCommandsInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CConsoleInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CCoreInterface.h"
-					>
-				</File>
-				<File
 					RelativePath=".\CExceptionInformation_Impl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\client\CGraphicsInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CKeyBindsInterface.h"
-					>
-				</File>
-				<File
 					RelativePath=".\client\CMainConfigInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CModManagerInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\net\CNetHTTPDownloadManagerInterface.h"
 					>
 				</File>
 				<File
@@ -1073,6 +1062,94 @@
 				>
 				<File
 					RelativePath=".\client\utils\CMD5Hasher.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="sdk"
+				>
+				<Filter
+					Name="core"
+					>
+					<File
+						RelativePath="..\sdk\core\CClientBase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCommandsInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCommunityInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CConsoleInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCoreInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CCVarsInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CExceptionInformation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CGraphicsInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CKeyBindsInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CModManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="net"
+					>
+					<File
+						RelativePath="..\sdk\net\CNet.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\net\CNetHTTPDownloadManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_bitstream.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_common.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\net\net_packetenums.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="shared"
+				>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.hpp"
 					>
 				</File>
 			</Filter>

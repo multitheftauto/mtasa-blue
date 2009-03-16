@@ -339,14 +339,13 @@ bool CAccountManager::Save ( CXMLNode* pParent )
                             pAttribute->SetValue ( szSerial );
                     }
 
-                    list < CAccountData * > ::iterator iterData = NULL;
                     // Do we have any data to save?
                     if ( (*iter)->DataCount () > 0 )
                     {
                         // Sort our data into separate lists of each type
                         list < CAccountData * > nilList, boolList, stringList, numberList;
                         list < CAccountData * > * pDataList = NULL;
-                        iterData = (*iter)->DataBegin ();
+                        list < CAccountData * > ::iterator iterData = (*iter)->DataBegin ();
                         for ( ; iterData != (*iter)->DataEnd () ; iterData++ )
                         {
                             switch ( (*iterData)->GetValue ()->GetType () )

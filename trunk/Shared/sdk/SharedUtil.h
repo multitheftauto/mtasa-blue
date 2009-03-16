@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        ClientSharedUtil.h
+*  FILE:        SharedUtil.h
 *  PURPOSE:
 *  DEVELOPERS:  ccw <chris@codewave.co.uk>
 *
@@ -35,13 +35,6 @@ public:
 
 
 //
-// Turns a relative MTASA path i.e. "MTA\file.dat"
-// into an absolute MTASA path i.e. "C:\Program Files\MTA San Andreas\MTA\file.dat"
-//
-SString CalcMTASAPath ( const SString& strPath );
-
-
-//
 // _vsnprintf with buffer full check
 //
 #define _VSNPRINTF( buffer, count, format, argptr ) \
@@ -53,8 +46,9 @@ SString CalcMTASAPath ( const SString& strPath );
 
 
 //
-// Safely read a ushort sized string from a NetBitStreamInterface
+// Turns a relative MTASA path i.e. "MTA\file.dat"
+// into an absolute MTASA path i.e. "C:\Program Files\MTA San Andreas\MTA\file.dat"
 //
-bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& strOut );
+SString CalcMTASAPath ( const SString& strPath );
 
 

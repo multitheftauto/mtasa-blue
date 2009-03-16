@@ -21,6 +21,7 @@
 #include <xml/CXMLFile.h>
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
+#include "SharedUtil.h"
 
 // Packet includes
 #include "packets/CCameraSyncPacket.h"

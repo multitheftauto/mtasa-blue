@@ -22,7 +22,9 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 
 #ifdef WIN32
 
-#define WIN32_LEAN_AND_MEAN
+#ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #define BUGSUTIL_DLLINTERFACE
 

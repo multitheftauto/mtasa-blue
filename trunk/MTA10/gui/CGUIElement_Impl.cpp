@@ -461,7 +461,7 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin ( void )
 		return m_Properties.begin ();
 
 	} catch ( CEGUI::Exception e ) {
-		return NULL;
+		return *(CGUIPropertyIter*)NULL;
 	}
 }
 
@@ -477,7 +477,7 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd ( void )
 		return m_Properties.end ();
 
 	} catch ( CEGUI::Exception e ) {
-		return NULL;
+		return *(CGUIPropertyIter*)NULL;
 	}
 }
 

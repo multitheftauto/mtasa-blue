@@ -15,6 +15,7 @@
 // SDK includes
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
+#include "SharedUtil.h"
 
 // Multiplayer includes
 #include "multiplayersa_init.h"

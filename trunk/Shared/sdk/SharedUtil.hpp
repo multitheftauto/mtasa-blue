@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        ClientSharedUtil.hpp
+*  FILE:        SharedUtil.hpp
 *  PURPOSE:
 *  DEVELOPERS:  ccw <chris@codewave.co.uk>
 *
@@ -29,8 +29,10 @@ SString SString::Printf( const char* format, ... )
 }
 
 
+#ifdef WITH_CALC_PATH
 //
 // Get startup directory as saved in the registry by the launcher
+// Used in the Win32 Client only
 //
 SString GetMTASABaseDir()
 {
@@ -70,39 +72,8 @@ SString CalcMTASAPath ( const SString& strPath )
     return strNewPath;
 }
 
+#endif  // WITH_CALC_PATH
 
-//
-// Safely read a ushort sized string from a NetBitStreamInterface
-//
-bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& strOut )
-{
-    bool bResult = false;
-
-    // Read out the string length
-	unsigned short usLength;
-	if ( bitStream.Read ( usLength ) )
-	{
-        // Allocate a buffer and read the string into it
-        char* szValue = new char [ usLength + 1 ];
-        // String with a length of zero is considered a success
-        if ( !usLength || bitStream.Read ( szValue, usLength ) )
-        {
-            // Put it into us
-            szValue [ usLength ] = 0;
-			strOut = szValue;
-            bResult = true;
-        }
-
-        // Delete the buffer
-        delete [] szValue;
-	}
-
-    // Clear output on fail
-    if ( !bResult )
-        strOut = "";
-
-    return bResult;
-}
 
 
 

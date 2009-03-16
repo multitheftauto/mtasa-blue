@@ -19,7 +19,8 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
-#include "ClientSharedUtil.hpp"
+#define WITH_CALC_PATH
+#include "SharedUtil.hpp"
 
 static float fTest = 1;
 
