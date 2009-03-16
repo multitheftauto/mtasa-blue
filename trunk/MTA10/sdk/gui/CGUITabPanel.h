@@ -23,7 +23,10 @@ public:
 	virtual CGUITab*                CreateTab               ( const char* szCaption ) = 0;
 	virtual void                    DeleteTab               ( CGUITab* pTab ) = 0;
 
-    virtual size_t                  GetSelectedTabIndex     ( void ) = 0;
+    virtual CGUITab*                GetSelectedTab          ( void ) = 0;
+    virtual void                    SetSelectedTab          ( CGUITab* pTab ) = 0;
+
+    virtual void                    SetSelectionHandler     ( GUI_CALLBACK Callback ) = 0;
 
     virtual bool                    IsTabSelected           ( CGUITab* pTab ) = 0;
 };

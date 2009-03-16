@@ -290,6 +290,8 @@ public:
 	
 	static bool							GUIStaticImageLoadImage				( CClientEntity& Element, const char* szFile, const char* szDir );
 
+    static bool                         GUISetSelectedTab                   ( CClientEntity& Element, CClientEntity& Tab );
+    static CClientGUIElement*           GUIGetSelectedTab                   ( CClientEntity& Element );
 	static bool							GUIDeleteTab						( CLuaMain& LuaMain, CClientGUIElement *pTab, CClientGUIElement *pParent );
 
 	static void					        GUISetEnabled						( CClientEntity& Element, bool bFlag );

@@ -631,7 +631,9 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "guiCreateStaticImage", CLuaFunctionDefinitions::GUICreateStaticImage );
 
 	CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefinitions::GUIStaticImageLoadImage );
-	CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefinitions::GUIDeleteTab );
+    CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefinitions::GUIGetSelectedTab );
+    CLuaCFunctions::AddFunction ( "guiSetSelectedTab", CLuaFunctionDefinitions::GUISetSelectedTab );
+    CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefinitions::GUIDeleteTab );
 
 	CLuaCFunctions::AddFunction ( "guiGridListSetSortingEnabled", CLuaFunctionDefinitions::GUIGridListSetSortingEnabled );
 	CLuaCFunctions::AddFunction ( "guiGridListAddColumn", CLuaFunctionDefinitions::GUIGridListAddColumn );
@@ -650,6 +652,8 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "guiGridListGetItemData", CLuaFunctionDefinitions::GUIGridListGetItemData );
 	CLuaCFunctions::AddFunction ( "guiGridListSetSelectionMode", CLuaFunctionDefinitions::GUIGridListSetSelectionMode );
 	CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItem", CLuaFunctionDefinitions::GUIGridListGetSelectedItem );
+	CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItems", CLuaFunctionDefinitions::GUIGridListGetSelectedItems );
+	CLuaCFunctions::AddFunction ( "guiGridListGetSelectedCount", CLuaFunctionDefinitions::GUIGridListGetSelectedCount );
     CLuaCFunctions::AddFunction ( "guiGridListSetSelectedItem", CLuaFunctionDefinitions::GUIGridListSetSelectedItem );
 
 	CLuaCFunctions::AddFunction ( "guiScrollPaneSetScrollBars", CLuaFunctionDefinitions::GUIScrollPaneSetScrollBars );

@@ -459,6 +459,8 @@ public:
 	LUA_DECLARE ( GUICreateRadioButton );
 	LUA_DECLARE ( GUICreateStaticImage );
 	LUA_DECLARE ( GUIStaticImageLoadImage );
+    LUA_DECLARE ( GUIGetSelectedTab );
+    LUA_DECLARE ( GUISetSelectedTab );
 	LUA_DECLARE ( GUIDeleteTab );
 	LUA_DECLARE ( GUIScrollBarSetScrollPosition );
 	LUA_DECLARE ( GUIScrollBarGetScrollPosition );
@@ -479,6 +481,8 @@ public:
 	LUA_DECLARE ( GUIGridListGetItemData );
 	LUA_DECLARE ( GUIGridListSetSelectionMode );
 	LUA_DECLARE ( GUIGridListGetSelectedItem );
+    LUA_DECLARE ( GUIGridListGetSelectedItems );
+    LUA_DECLARE ( GUIGridListGetSelectedCount );
     LUA_DECLARE ( GUIGridListSetSelectedItem );
 	LUA_DECLARE ( GUIScrollPaneSetScrollBars );
 	LUA_DECLARE ( GUIScrollPaneSetHorizontalScrollPosition );

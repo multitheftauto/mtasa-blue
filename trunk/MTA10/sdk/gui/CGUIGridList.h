@@ -69,6 +69,7 @@ public:
     virtual int						GetItemRowIndex			( CGUIListItem* pItem ) = 0;
     virtual int                     GetSelectedCount        ( void ) = 0;
     virtual CGUIListItem*           GetSelectedItem         ( void ) = 0;
+    virtual CGUIListItem*           GetNextSelectedItem     ( CGUIListItem* pItem ) = 0;
     virtual int                     GetSelectedItemRow      ( void ) = 0;
 	virtual int                     GetSelectedItemColumn   ( void ) = 0;
 	virtual int						GetRowCount				( void ) = 0;
