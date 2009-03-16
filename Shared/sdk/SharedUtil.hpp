@@ -36,9 +36,9 @@ SString SString::Printf( const char* format, ... )
 //
 SString GetMTASABaseDir()
 {
-	static TCHAR szInstallRoot[MAX_PATH]=TEXT("");
-	if( !szInstallRoot[0] )
-	{
+    static TCHAR szInstallRoot[MAX_PATH]=TEXT("");
+    if( !szInstallRoot[0] )
+    {
         memset ( szInstallRoot, 0, MAX_PATH );
 
         HKEY hkey = NULL;
@@ -54,9 +54,10 @@ SString GetMTASABaseDir()
                 RegCloseKey ( hkey );
                 TerminateProcess ( GetCurrentProcess (), 9 );
             }
+            RegCloseKey ( hkey );
         }
-	}
-	return szInstallRoot;
+    }
+    return szInstallRoot;
 }
 
 

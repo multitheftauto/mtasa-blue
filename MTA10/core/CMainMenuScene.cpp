@@ -187,9 +187,6 @@ ID3DXConstantTable *			pPSHConstLighting = NULL;
 ID3DXConstantTable *			pPSHConstBloom = NULL;
 
 ID3DXMesh *						pMesh = NULL;
-D3DMATERIAL9 *					pMeshMaterials = NULL;
-LPDIRECT3DTEXTURE9 *			pMeshTextures = NULL;
-bool *							pbMeshTextures = NULL;
 
 ID3DXSprite *					pScreen = NULL;
 IDirect3DTexture9 *				pTexBloomSrc = NULL;
@@ -334,6 +331,10 @@ CMainMenuScene::CMainMenuScene ( CMainMenu * pMainMenu )
 	m_pGraphics = NULL;
 	m_pDevice = NULL;
 	m_pMainMenu = pMainMenu;
+
+	// Try to get the device. It should be available. 
+    if ( m_pGraphics = CGraphics::GetSingletonPtr () )
+        m_pDevice = m_pGraphics->GetDevice ();
 }
 
 
@@ -483,23 +484,22 @@ void CMainMenuScene::Destroy3DScene ( void )
 	// Destroy the mesh and it's resources
 	SAFE_RELEASE ( pMesh );
 	SAFE_RELEASE ( pScreen );
-	if ( pMeshMaterials ) {
-		delete [] pMeshMaterials;
-		pMeshMaterials = NULL;
-	}
-	if ( pMeshTextures ) {
-		delete [] pMeshTextures;
-		pMeshTextures = NULL;
-	}
-	if ( pbMeshTextures ) {
-		delete [] pbMeshTextures;
-		pbMeshTextures = NULL;
-	}
+
+	// Release all the mesh textures
+    for ( int i = 0 ; i < pMeshTextures.size () ; i++ )
+        SAFE_RELEASE ( pMeshTextures [i] )
+    pMeshTextures.empty ();
+    pbMeshTextures.empty ();
+    pMeshMaterials.empty ();
 }
 
 
 bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D vecScreenSize )
 {
+	// Check to avoid double allocation of all scene resources
+    if ( pMeshTextures.size () > 0 )
+        Destroy3DScene ();
+
 	CFilePathTranslator FileTranslator;
     string WorkingDirectory;
     char szCurDir [ MAX_PATH ];
@@ -629,6 +629,7 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
         SString strTexPath;
 
 		// Grab them from the screenshot class (directory)
+        iMaskAnimTextures = 0;
 		for ( unsigned int i = 0; i < i_num; i++ ) {
 			if ( i < i_own ) {
 				strTexPath = CScreenShot::GetScreenShotPath ( i + 1 );
@@ -651,9 +652,9 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 			break;
 		}
 		pMaterialStore = reinterpret_cast < D3DXMATERIAL* > ( pMaterials->GetBufferPointer () );
-		pMeshMaterials = new D3DMATERIAL9[dwMaterials];
-		pMeshTextures = new LPDIRECT3DTEXTURE9[dwMaterials];
-		pbMeshTextures = new bool[dwMaterials];
+        pMeshMaterials.resize ( dwMaterials, D3DMATERIAL9 () );
+        pMeshTextures.resize ( dwMaterials, NULL );
+        pbMeshTextures.resize ( dwMaterials, false );
 
 		// Copy the materials and textures
 		for ( DWORD i = 0; i < dwMaterials; i++ ) {

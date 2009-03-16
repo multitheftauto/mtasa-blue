@@ -39,9 +39,9 @@ public:
 //
 #define _VSNPRINTF( buffer, count, format, argptr ) \
     { \
-	    int iResult = _vsnprintf ( buffer, count, format, argptr ); \
+        int iResult = _vsnprintf ( buffer, count, format, argptr ); \
         if( iResult == -1 || iResult == (count) ) \
-	        (buffer)[(count)-1] = 0; \
+            (buffer)[(count)-1] = 0; \
     }
 
 
