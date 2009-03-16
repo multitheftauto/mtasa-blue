@@ -18,6 +18,7 @@
 #include <game/CGame.h>
 #include <game/CWanted.h>
 #include <ijsify.h>
+#include "SharedUtil.h"
 
 // Game includes
 #include "CEntitySA.h"

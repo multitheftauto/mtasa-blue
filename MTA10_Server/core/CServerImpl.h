@@ -21,6 +21,8 @@ class CServerImpl;
 
 #include "CCriticalSection.h"
 #include "Platform.h"
+#include <string>
+#include "SharedUtil.h"
 
 #include <core/CServerInterface.h>
 #include <net/CLanBroadcastInterface.h>

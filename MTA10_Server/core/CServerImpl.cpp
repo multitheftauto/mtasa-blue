@@ -19,6 +19,7 @@
 #include "Platform.h"
 #include "ErrorCodes.h"
 #include <cstdio>
+#include "SharedUtil.hpp"
 
 // Define libraries
 #ifdef WIN32
@@ -139,7 +140,7 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     {
         char szOutput [512];
         szOutput [511] = 0;
-        _vsnprintf ( szOutput, 511, szFormat, ap );
+        _VSNPRINTF ( szOutput, 511, szFormat, ap );
         m_fClientFeedback ( szOutput );
     }
     #endif

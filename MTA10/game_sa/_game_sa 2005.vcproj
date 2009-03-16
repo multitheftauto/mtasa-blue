@@ -50,15 +50,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="false"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;GAME_SA_EXPORTS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;GAME_SA_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
+				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -94,6 +97,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary=".\Release/game_sa.lib"
 				TargetMachine="1"
 			/>
@@ -157,10 +161,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;GAME_SA_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;GAME_SA_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
+				StringPooling="false"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -255,15 +262,19 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="false"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;GAME_SA_EXPORTS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;GAME_SA_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
+				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -299,6 +310,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary=".\Release/game_sa.lib"
 				TargetMachine="1"
 			/>
@@ -581,6 +593,10 @@
 			</File>
 			<File
 				RelativePath="CPedSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedSoundSA.cpp"
 				>
 			</File>
 			<File
@@ -1066,6 +1082,10 @@
 			</File>
 			<File
 				RelativePath="CPedSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedSoundSA.h"
 				>
 			</File>
 			<File

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Server - Core"
 	ProjectGUID="{0550C84E-8AC6-4C44-9686-241B0BB4BD7D}"
 	RootNamespace="_ServerCore 2005"
@@ -46,8 +46,11 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;MTA_SERVER"
+				StringPooling="false"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Debug/Core.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -138,15 +141,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;MTA_RELEASE;MTA_SERVER"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough=""
 				PrecompiledHeaderFile=".\Release/Core.pch"
@@ -156,6 +162,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -183,6 +190,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -338,14 +346,20 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;MTA_RELEASE;MTA_SERVER"
 				StringPooling="true"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				BufferSecurityCheck="true"
+				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Release/Core.pch"
 				AssemblerListingLocation=""
@@ -354,6 +368,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -381,6 +396,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

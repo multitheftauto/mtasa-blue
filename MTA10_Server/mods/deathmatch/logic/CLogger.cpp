@@ -33,7 +33,7 @@ void CLogger::LogPrintf ( const char* szFormat, ... )
         // Put the rest of the string sent to us into the rest of the buffer
         va_list marker;
         va_start ( marker, szFormat );
-	    _vsnprintf ( szBuffer + 11, MAX_STRING_LENGTH - 11, szFormat, marker );
+	    _VSNPRINTF ( szBuffer + 11, MAX_STRING_LENGTH - 11, szFormat, marker );
         va_end ( marker );
 
         // Print it in the console
@@ -65,7 +65,7 @@ void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
         char szBuffer [MAX_STRING_LENGTH];
         va_list marker;
         va_start ( marker, szFormat );
-	    _vsnprintf ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+	    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
         va_end ( marker );
 
         // Print it in the console
@@ -102,7 +102,7 @@ void CLogger::ErrorPrintf ( const char* szFormat, ... )
         // Convert it to a string
         va_list marker;
         va_start ( marker, szFormat );
-        _vsnprintf ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
+        _VSNPRINTF ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
         va_end ( marker );
 
         // Print it to the console
@@ -131,7 +131,7 @@ void CLogger::DebugPrintf ( const char* szFormat, ... )
         // Convert it to a string
         va_list marker;
         va_start ( marker, szFormat );
-        _vsnprintf ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
+        _VSNPRINTF ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
         va_end ( marker );
 
         // Print it to the console

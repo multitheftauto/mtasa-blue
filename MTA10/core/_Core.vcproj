@@ -24,7 +24,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
-				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;IJS"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -854,10 +854,10 @@
 				Name="shared"
 				Filter="">
 				<File
-					RelativePath="..\..\Shared\sdk\ClientSharedUtil.h">
+					RelativePath="..\..\Shared\sdk\SharedUtil.h">
 				</File>
 				<File
-					RelativePath="..\..\Shared\sdk\ClientSharedUtil.hpp">
+					RelativePath="..\..\Shared\sdk\SharedUtil.hpp">
 				</File>
 			</Filter>
 		</Filter>

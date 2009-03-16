@@ -22,7 +22,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;SERIALS"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="0"
@@ -91,7 +91,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;SERIALS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"

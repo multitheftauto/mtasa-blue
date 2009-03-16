@@ -49,9 +49,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL;_CRT_SECURE_NO_DEPRECATE"
+				StringPooling="false"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -62,6 +65,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -113,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll_d.dll&quot; &amp;&amp; copy /y xmll_d.dll &quot;..\..\MTA10_Server\output&quot;"
+				CommandLine="xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll_d.dll &quot;..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -151,17 +155,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
-				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
-				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -172,6 +177,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -197,6 +203,7 @@
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary="./Release/xmll.lib"
 				TargetMachine="1"
 			/>
@@ -223,7 +230,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\xmll.dll&quot; &amp;&amp; copy /y xmll.dll &quot;..\..\MTA10_Server\output&quot;"
+				CommandLine="xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -259,11 +266,19 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL"
-				BasicRuntimeChecks="0"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL"
+				StringPooling="true"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="true"
+				EnableFunctionLevelLinking="false"
+				FloatingPointModel="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
@@ -272,8 +287,9 @@
 				ObjectFile="$(IntDir)/"
 				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
 				WarningLevel="3"
-				SuppressStartupBanner="false"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -301,6 +317,9 @@
 				GenerateMapFile="true"
 				MapFileName="c:\Symbols\Nightly_ServerXML.map"
 				MapExports="true"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				ImportLibrary="./Release/xmll.lib"
 				TargetMachine="1"
 			/>
@@ -327,6 +346,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y xmll.dll &quot;..\..\output\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;..\..\output\server\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

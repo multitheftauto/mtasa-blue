@@ -21,6 +21,7 @@
 #include "CXMLFileImpl.h"
 #include "CXMLNodeImpl.h"
 #include "CXMLImpl.h"
+#include "SharedUtil.h"
 
 // XML includes
 #include <xml/CXMLCommon.h>

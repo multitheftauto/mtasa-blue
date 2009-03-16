@@ -9,6 +9,7 @@
 #include <renderers/directx9GUIRenderer/d3d9renderer.h>
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
+#include "SharedUtil.h"
 #include "CGUI_Impl.h"
 #include "CGUIButton_Impl.h"
 #include "CGUICheckBox_Impl.h"

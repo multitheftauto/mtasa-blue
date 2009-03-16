@@ -43,7 +43,7 @@
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="../dependencies/cegui/lib"
 				IgnoreAllDefaultLibraries="FALSE"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				IgnoreDefaultLibraryNames="LIBCMTD"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/gui.pdb"
 				SubSystem="2"

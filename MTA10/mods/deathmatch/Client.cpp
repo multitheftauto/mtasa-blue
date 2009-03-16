@@ -12,7 +12,8 @@
 *****************************************************************************/
 
 #include <StdInc.h>
-#include "ClientSharedUtil.hpp"
+#define WITH_CALC_PATH
+#include "SharedUtil.hpp"
 
 CClient* g_pClient = NULL;
 

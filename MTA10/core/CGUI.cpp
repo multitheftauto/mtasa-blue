@@ -381,8 +381,8 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         {
             m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
             m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
-            pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
-            pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
+            pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
+            pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
         }
         else
         {

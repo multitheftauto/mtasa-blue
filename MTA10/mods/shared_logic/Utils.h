@@ -205,7 +205,10 @@ bool            XMLColorToInt               ( const char* szColor, unsigned char
 // Utility network functions
 void            LongToDottedIP              ( unsigned long ulIP, char* szDottedIP );
 
+bool            BitStreamReadUsString       ( class NetBitStreamInterface& bitStream, SString& strOut );
+
 void            MakeSureDirExists           ( const char* szPath );
+
 
 // for debug
 #ifdef MTA_DEBUG

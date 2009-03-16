@@ -29,7 +29,7 @@
 #include <iomanip>
 
 // Core-level includes
-#include "ClientSharedUtil.h"
+#include "SharedUtil.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CCriticalSection.h"
