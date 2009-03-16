@@ -78,6 +78,8 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
 
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
+    this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
+
     m_bIsDerailable = true;
     m_ucAlpha = 255;
 }
@@ -101,6 +103,8 @@ CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
     this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+
+    this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
 
     m_bIsDerailable = true;
     m_ucAlpha = 255;
@@ -193,7 +197,7 @@ CVehicle * CVehicleSA::GetNextTrainCarriage ( void )
 {
     CVehicleSAInterface * pVehicle = GetNextCarriageInTrain();
     if ( pVehicle )
-        return pGame->GetPools()->GetVehicle ( pVehicle );
+        return pGame->GetPools()->GetVehicle ( (DWORD *)pVehicle );
     else
         return NULL;
 }
@@ -250,7 +254,7 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
 {
     CVehicleSAInterface * pVehicle = GetPreviousCarriageInTrain();
     if ( pVehicle )
-        return pGame->GetPools()->GetVehicle ( pVehicle );
+        return pGame->GetPools()->GetVehicle ( (DWORD *)pVehicle );
     else
         return NULL;
 }
@@ -1344,7 +1348,7 @@ CVehicle * CVehicleSA::GetTowedVehicle ( void )
 	DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface * pTowedVehicle = (CVehicleSAInterface *)*(DWORD *)((DWORD)this->GetInterface() + 1224);
     if ( pTowedVehicle )
-        return pGame->GetPools()->GetVehicle ( pTowedVehicle );
+        return pGame->GetPools()->GetVehicle ( (DWORD *)pTowedVehicle );
     return NULL;
 }
 
@@ -1353,7 +1357,7 @@ CVehicle * CVehicleSA::GetTowedByVehicle ( void )
 	DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface * pTowedVehicle = (CVehicleSAInterface *)*(DWORD *)((DWORD)this->GetInterface() + 1220);
     if ( pTowedVehicle )
-        return pGame->GetPools()->GetVehicle ( pTowedVehicle );
+        return pGame->GetPools()->GetVehicle ( (DWORD *)pTowedVehicle );
     return NULL;
 }
 
@@ -1432,10 +1436,10 @@ CPhysical * CVehicleSA::QueryPickedUpEntityWithWinch ( )
 		    physRet = (CPhysical *)pPools->GetPed((DWORD *)phys);
 		    break;
 	    case ENTITY_TYPE_VEHICLE:
-		    physRet = (CPhysical *)pGame->GetPools()->GetVehicle ( (CVehicleSAInterface *)phys );
+		    physRet = (CPhysical *)pGame->GetPools()->GetVehicle ( (DWORD *)phys );
             break;
 	    case ENTITY_TYPE_OBJECT:
-		    physRet = (CPhysical *)pPools->GetObject((CObjectSAInterface *)phys);
+		    physRet = (CPhysical *)pPools->GetObject( (DWORD *)phys );
 		    break;
 	    default:
 		    physRet = NULL;

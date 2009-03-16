@@ -209,14 +209,14 @@ CVehicle * CPedSA::GetVehicle()
     {
 	    CVehicleSAInterface * vehicle = (CVehicleSAInterface *)(((CPedSAInterface *)this->GetInterface())->CurrentObjective);
 	    if(vehicle)
-		    return ((CPoolsSA *)pGame->GetPools())->GetVehicle((CVehicleSAInterface *)vehicle);
+		    return ((CPoolsSA *)pGame->GetPools())->GetVehicle((DWORD *)vehicle);
     }
     return NULL;
 }
 
 void CPedSA::Respawn(CVector * position, bool bCameraCut)
 {
-    CPed * pLocalPlayer = pGame->GetPools()->GetPed ( 1 );
+    CPed * pLocalPlayer = pGame->GetPools()->GetPedFromRef ( (DWORD)1 );
 
     if ( !bCameraCut )
     {
@@ -469,7 +469,7 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
         thisPed->bCurrentWeaponSlot = weaponSlot;
 
         // is the player the local player?
-        CPed * pPed = pGame->GetPools()->GetPed ( 1 );
+        CPed * pPed = pGame->GetPools()->GetPedFromRef ( (DWORD)1 );
         //if ( pPed == this && thisPed->pPlayerInfo )
         //{
         
@@ -682,10 +682,10 @@ CEntity* CPedSA::GetContactEntity ( void )
 		switch ( pInterface->nType )
 		{
 			case ENTITY_TYPE_VEHICLE:
-				pReturn = (CEntity*)(pPools->GetVehicle((CVehicleSAInterface *)pInterface));
+				pReturn = (CEntity*)(pPools->GetVehicle((DWORD *)pInterface));
 				break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject ((CObjectSAInterface *)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject ((DWORD *)pInterface));
                 break;
 			default:
 				break;
@@ -714,10 +714,10 @@ CEntity* CPedSA::GetTargetedEntity ( void )
                 pReturn = (CEntity*)(pPools->GetPed((DWORD *)pInterface));
                 break;
 			case ENTITY_TYPE_VEHICLE:
-				pReturn = (CEntity*)(pPools->GetVehicle((CVehicleSAInterface *)pInterface));
+				pReturn = (CEntity*)(pPools->GetVehicle((DWORD *)pInterface));
 				break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject ((CObjectSAInterface *)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject ((DWORD *)pInterface));
                 break;
 			default:
 				break;

@@ -1280,7 +1280,7 @@ no_render:
 
 bool CallBreakTowLinkHandler ( CVehicleSAInterface * vehicle )
 {
-    CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( vehicle );
+    CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)vehicle );
     if ( pVehicle && m_pBreakTowLinkHandler )
     {
         return m_pBreakTowLinkHandler ( pVehicle );
@@ -1424,13 +1424,13 @@ bool CallExplosionHandler ( void )
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplosionCreator = pGameInterface->GetPools ()->GetVehicle ( (CVehicleSAInterface*) pInterface );
+                pExplosionCreator = pGameInterface->GetPools ()->GetVehicle ( (DWORD*) pInterface );
                 break;
             }
 
             case ENTITY_TYPE_OBJECT:
             {
-                //pExplosionCreator = pGameInterface->GetPools ()->GetObject ( (CObjectSAInterface*) pInterface );
+                //pExplosionCreator = pGameInterface->GetPools ()->GetObject ( (DWORD*) pInterface );
                 break;
             }
         }
@@ -1443,13 +1443,13 @@ bool CallExplosionHandler ( void )
         {
             case ENTITY_TYPE_PED:
             {
-                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetPed ( (DWORD*) pExplodingEntityInterface ) );
+                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetPed ( (DWORD *) pExplodingEntityInterface ) );
                 break;
             }
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetVehicle ( (CVehicleSAInterface*) pExplodingEntityInterface ) );
+                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetVehicle ( (DWORD *) pExplodingEntityInterface ) );
                 break;
             }
 
@@ -2058,7 +2058,7 @@ static void SetObjectAlpha ()
 {
     if ( pRenderingObject )
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject ( (CObjectSAInterface *)pRenderingObject );
+        CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)pRenderingObject );
         if ( pObject )
         {
             DWORD dwFunc = FUNC_SetRwObjectAlpha;

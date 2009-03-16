@@ -111,7 +111,7 @@ CShotSyncData * GetLocalPedShotSyncData ( )
 
 bool IsLocalPlayer ( CPed * pPed )
 {
-    CPed * pLocalPed = m_pools->GetPed ( 1 );
+    CPed * pLocalPed = m_pools->GetPedFromRef ( 1 );
     return ( pPed == pLocalPed );
 }
 
@@ -789,26 +789,40 @@ bool ProcessProjectileAdd ()
 {
     if ( m_pProjectileStopHandler )
     {
-        CPoolsSA * pPools = (CPoolsSA*)pGameInterface->GetPools();
+        CPools * pPools = pGameInterface->GetPools ();
         CEntity * pOwner = NULL;
         if ( pProjetileOwner )
         {
-            if ( pProjetileOwner->nType == ENTITY_TYPE_VEHICLE )
-                pOwner = pPools->GetVehicle ( (CVehicleSAInterface *)pProjetileOwner );
-            else if ( pProjetileOwner->nType == ENTITY_TYPE_PED )
-                pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
-            else if ( pProjetileOwner->nType == ENTITY_TYPE_OBJECT )
-                pOwner = NULL; //pPools->GetObject ( (DWORD *)event->inflictor );
+            switch ( pProjetileOwner->nType )
+            {
+                case ENTITY_TYPE_VEHICLE:
+                    pOwner = pPools->GetVehicle ( (DWORD *)pProjetileOwner );
+                    break;
+                case ENTITY_TYPE_PED:
+                    pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
+                    break;
+                case ENTITY_TYPE_OBJECT:
+                    //pPools->GetObject ( (DWORD *)event->inflictor );
+                default:
+                    pOwner = NULL;
+            }
         }
     
         if ( projectileTargetEntityInterface )
         {
-            if ( projectileTargetEntityInterface->nType == ENTITY_TYPE_VEHICLE )
-                projectileTargetEntity = pPools->GetVehicle ( (CVehicleSAInterface *)projectileTargetEntityInterface );
-            else if ( projectileTargetEntityInterface->nType == ENTITY_TYPE_PED )
-                projectileTargetEntity = pPools->GetPed ( (DWORD *)projectileTargetEntityInterface );
-            else if ( projectileTargetEntityInterface->nType == ENTITY_TYPE_OBJECT )
-                projectileTargetEntity = NULL; //pPools->GetObject ( (DWORD *)event->inflictor );
+            switch ( projectileTargetEntityInterface->nType )
+            {
+                case ENTITY_TYPE_VEHICLE:
+                    projectileTargetEntity = pPools->GetVehicle ( (DWORD *)projectileTargetEntityInterface );
+                    break;
+                case ENTITY_TYPE_PED:
+                    projectileTargetEntity = pPools->GetPed ( (DWORD *)projectileTargetEntityInterface );
+                    break;
+                case ENTITY_TYPE_OBJECT:
+                    //pPools->GetObject ( (DWORD *)event->inflictor );
+                default:
+                    projectileTargetEntity = NULL;
+            }
         }
         return m_pProjectileStopHandler ( pOwner, projectileWeaponType, projectileOrigin, projectileForce, projectileTarget, projectileTargetEntity );
     }
@@ -823,12 +837,19 @@ void ProcessProjectile ( )
         CEntity * pOwner = NULL;
         if ( pProjetileOwner )
         {
-            if ( pProjetileOwner->nType == ENTITY_TYPE_VEHICLE )
-                pOwner = pPools->GetVehicle ( (CVehicleSAInterface *)pProjetileOwner );
-            else if ( pProjetileOwner->nType == ENTITY_TYPE_PED )
-                pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
-            else if ( pProjetileOwner->nType == ENTITY_TYPE_OBJECT )
-                pOwner = NULL; //pPools->GetObject ( (DWORD *)event->inflictor );
+            switch ( pProjetileOwner->nType )
+            {
+                case ENTITY_TYPE_VEHICLE:
+                    pOwner = pPools->GetVehicle ( (DWORD *)pProjetileOwner );
+                    break;
+                case ENTITY_TYPE_PED:
+                    pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
+                    break;
+                case ENTITY_TYPE_OBJECT:
+                    //pPools->GetObject ( (DWORD *)event->inflictor );
+                default:
+                    pOwner = NULL;
+            }
         }
 
         CProjectileInfo * projectileInfo = pGameInterface->GetProjectileInfo()->GetProjectileInfo(dwProjectileInfoIndex);

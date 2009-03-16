@@ -152,6 +152,8 @@ CObjectSA::CObjectSA( DWORD dwModel )
     }
 #endif
 
+    this->internalID = pGame->GetPools ()->GetObjectRef ( (DWORD *)this->GetInterface () );
+
     m_ucAlpha = 255;
 }
 

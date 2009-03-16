@@ -50,8 +50,8 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     this->SetInterface((CEntitySAInterface *)dwPedPointer);
 
 	this->Init(); // init our interfaces 
-	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
-	this->internalID =  pools->GetPedRef((DWORD)this->GetInterface());
+	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools ( );
+	this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
 	CWorldSA * world = (CWorldSA *)pGame->GetWorld();
 	
 	this->SetModelIndex(pedType);
@@ -64,7 +64,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     m_pData = new CPlayerPedDataSAInterface;
 
     // Copy the local player data so we're defaulted to something good
-    CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pGame->GetPools ()->GetPed ( 1 ) );
+    CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( 1 ) );
 	if ( pLocalPlayerSA )
 		memcpy ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
 
@@ -101,7 +101,7 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
 
 	this->Init();
 	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
-	this->internalID =  pools->GetPedRef((DWORD)this->GetInterface());
+	this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
 	this->SetType ( PLAYER_PED );
 
     m_bIsLocal = true;

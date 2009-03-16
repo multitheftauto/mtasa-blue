@@ -236,7 +236,7 @@ VOID ReturnCotextToLocalPlayer()
 
 		bNotInLocalContext = false;
 
-        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPed ( 1 ); // the player
+        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( 1 ); // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast < CPedSA* > ( pLocalPlayerPed );
 		if ( pLocalPlayerPedSA )
 		{
@@ -281,7 +281,7 @@ void SwitchContext ( CPed* thePed )
     if ( !bNotInLocalContext )
     {
         // Grab the local ped and the local pad
-	    CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPed ( 1 ); // the player
+	    CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( 1 ); // the player
 	    CPad* pLocalPad = pGameInterface->GetPad ();
 	    CPadSAInterface* pLocalPadInterface = ( (CPadSA*) pLocalPad )->GetInterface ();
 
@@ -516,7 +516,7 @@ void SwitchContext ( CVehicleSAInterface* pVehicleInterface )
 {   
     // Grab the CVehicle for the given vehicle interface
 	CPoolsSA* pool = (CPoolsSA*) pGameInterface->GetPools ();
-	CVehicle* pVehicle = pool->GetVehicle ( pVehicleInterface );
+	CVehicle* pVehicle = pool->GetVehicle ( (DWORD *)pVehicleInterface );
 	if ( pVehicle )
 	{
         SwitchContext ( pVehicle );

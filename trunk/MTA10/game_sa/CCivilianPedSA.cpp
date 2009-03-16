@@ -40,7 +40,7 @@ CCivilianPedSA::CCivilianPedSA( ePedModel pedType )
 	this->SetInterface((CEntitySAInterface *)dwPedPointer);
 	this->Init(); // init our interfaces 
 	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
-	this->internalID =  pools->GetPedRef((DWORD)this->GetInterface());
+	this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
 	CWorldSA * world = (CWorldSA *)pGame->GetWorld();
 	world->Add(this->GetInterface());
 	this->SetModelIndex(pedType);

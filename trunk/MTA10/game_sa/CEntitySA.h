@@ -176,7 +176,7 @@ class CEntitySA : public virtual CEntity
 {
     friend COffsets;
 public:
-                                CEntitySA           ( void ) { m_pStoredPointer = NULL; m_ArrayID = 0; };
+                                CEntitySA           ( void ) { m_pStoredPointer = NULL; m_ulArrayID = 0; };
 
 	CEntitySAInterface*         m_pInterface;
 
@@ -249,14 +249,14 @@ public:
 
     void                        GetImmunities   ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof );
 
-    int                         GetArrayID      ( void )        { return m_ArrayID; }
-    void                        SetArrayID      ( int ID )      { m_ArrayID = ID; }
+    inline unsigned long        GetArrayID      ( void ) { return m_ulArrayID; }
+    inline void                 SetArrayID      ( unsigned long ulID ) { m_ulArrayID = ulID; }
 
 private:
     static unsigned long        FUNC_CClumpModelInfo__GetFrameFromId;
     static unsigned long        FUNC_RwFrameGetLTM;
 
-    int                         m_ArrayID;
+    unsigned long               m_ulArrayID;
 
 /*	VOID						InitFlags()
 	{
