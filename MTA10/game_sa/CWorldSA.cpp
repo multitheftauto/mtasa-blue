@@ -180,10 +180,10 @@ bool CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoin
                         *CollisionEntity = pPools->GetPed((DWORD *)targetEntity);
                         break;
                     case ENTITY_TYPE_OBJECT:
-                        *CollisionEntity = pPools->GetObject((CObjectSAInterface *)targetEntity);
+                        *CollisionEntity = pPools->GetObject((DWORD *)targetEntity);
                         break;
                     case ENTITY_TYPE_VEHICLE:
-                        *CollisionEntity = pPools->GetVehicle((CVehicleSAInterface *)targetEntity);
+                        *CollisionEntity = pPools->GetVehicle((DWORD *)targetEntity);
 				        break;
                 }
 

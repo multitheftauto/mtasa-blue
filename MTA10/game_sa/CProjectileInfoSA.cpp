@@ -171,19 +171,19 @@ CEntity* CProjectileInfoSA::GetTarget ( void )
         {
             case ENTITY_TYPE_PED:
             {
-                pTarget = pGame->GetPools ()->GetPed ( (DWORD*) pTargetInterface );
+                pTarget = pGame->GetPools ()->GetPed ( (DWORD *) pTargetInterface );
                 break;
             }
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pTarget = pGame->GetPools ()->GetVehicle ( (CVehicleSAInterface*) pTargetInterface );
+                pTarget = pGame->GetPools ()->GetVehicle ( (DWORD *) pTargetInterface );
                 break;
             }
 
             case ENTITY_TYPE_OBJECT:
             {
-                //pTarget = pGame->GetPools ()->GetObject ( (CObjectSAInterface*) pExplodingEntityInterface );
+                //pTarget = pGame->GetPools ()->GetObject ( (DWORD *) pExplodingEntityInterface );
                 break;
             }
         }

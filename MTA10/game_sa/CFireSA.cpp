@@ -74,16 +74,20 @@ CEntity * CFireSA::GetCreator (  )
 {
 	DEBUG_TRACE("CEntity * CFireSA::GetCreator (  )");
 	CEntity * creatorEntity = NULL;
-	CEntitySAInterface * createEntityVC = internalInterface->entityCreator;
+	CEntitySAInterface * createEntitySA = internalInterface->entityCreator;
 	CPoolsSA * pPools = ((CPoolsSA *)pGame->GetPools());
-	if ( pPools && createEntityVC )
+	if ( pPools && createEntitySA )
 	{
-		switch ( createEntityVC->nType )
+		switch ( createEntitySA->nType )
 		{
 		case ENTITY_TYPE_PED:
-			creatorEntity = pPools->GetPed((DWORD *)createEntityVC);
+			creatorEntity = pPools->GetPed((DWORD *)createEntitySA);
+            break;
 		case ENTITY_TYPE_VEHICLE:
-			creatorEntity = pPools->GetVehicle((CVehicleSAInterface *)createEntityVC);
+			creatorEntity = pPools->GetVehicle((DWORD *)createEntitySA);
+            break;
+        default:
+            creatorEntity = NULL;
 		}
 	}
 	return creatorEntity;
@@ -93,16 +97,20 @@ CEntity	* CFireSA::GetEntityOnFire (  )
 {
 	DEBUG_TRACE("CEntity * CFireSA::GetEntityOnFire (  )");
 	CEntity * TargetEntity = NULL;
-    CEntitySAInterface * TargetEntityVC = internalInterface->entityTarget;
+    CEntitySAInterface * TargetEntitySA = internalInterface->entityTarget;
 	CPoolsSA * pPools = ((CPoolsSA *)pGame->GetPools());
-	if ( pPools && TargetEntityVC )
+	if ( pPools && TargetEntitySA )
 	{
-		switch ( TargetEntityVC->nType )
+		switch ( TargetEntitySA->nType )
 		{
 		case ENTITY_TYPE_PED:
-			TargetEntity = pPools->GetPed((DWORD *)TargetEntityVC);
+			TargetEntity = pPools->GetPed((DWORD *)TargetEntitySA);
+            break;
 		case ENTITY_TYPE_VEHICLE:
-			TargetEntity = pPools->GetVehicle((CVehicleSAInterface *)TargetEntityVC);
+			TargetEntity = pPools->GetVehicle((DWORD *)TargetEntitySA);
+            break;
+        default:
+            TargetEntity = NULL;
 		}
 	}
 	return TargetEntity;

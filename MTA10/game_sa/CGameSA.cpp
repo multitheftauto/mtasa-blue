@@ -256,16 +256,18 @@ BOOL CGameSA::InitLocalPlayer(  )
     }
     bAlreadyInited = true;
 
-	CPoolsSA * pools = (CPoolsSA *)this->GetPools();
-	if(pools)
+	CPoolsSA * pools = (CPoolsSA *)this->GetPools ();
+	if ( pools )
 	{
 		//* HACKED IN HERE FOR NOW *//
-		CPedSAInterface * ped = pools->GetPedInterface(1);
-		if(ped)
-		{
-			pools->AddPed(ped);
-			return TRUE;
+        CPedSAInterface* pInterface = pools->GetPedInterface ( (DWORD)1 );
+
+        if ( pInterface )
+        {
+            pools->AddPed ( (DWORD*)pInterface );
+            return TRUE;
 		}
+
 		return FALSE;
 	}
 	return FALSE;

@@ -239,8 +239,8 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
         if ( ucPacketID == PACKET_ID_CORE_CONNECTED )
         {
             // Read out the mod to load
-            char szModName [256];
-            memset ( szModName, 0, 256 );
+            char* szModName = new char [ BitStream.GetNumberOfBytesUsed () + 1 ];
+            memset ( szModName, 0, BitStream.GetNumberOfBytesUsed () + 1 );
             if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
             {
                 // Populate the arguments to pass it (-c host port nick)
@@ -314,6 +314,8 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CCore::GetSingleton ().ShowMessageBox ( "Error", "Bad server response (2)", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
+
+            delete [] szModName;
         }
         else
         {

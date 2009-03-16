@@ -31,13 +31,13 @@ CEntity	* CEventSA::GetEntity (  )
 	switch(internalInterface->m_eEventEntity)
 	{
 	case ENTITY_EVENT_PED:
-		entity = (CEntity *)pPools->GetPed(internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetPedFromRef((DWORD)internalInterface->m_nEventEntityRef);
 		break;
 	case ENTITY_EVENT_VEHICLE:
-		entity = (CEntity *)pPools->GetVehicle(internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetVehicleFromRef((DWORD)internalInterface->m_nEventEntityRef);
 		break;
 	case ENTITY_EVENT_OBJECT:
-		entity = (CEntity *)pPools->GetObject(internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetObjectFromRef((DWORD)internalInterface->m_nEventEntityRef);
 		break;
 	default:
 		return NULL;

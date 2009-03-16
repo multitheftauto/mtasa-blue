@@ -182,13 +182,13 @@ CEntity * CPhysicalSA::GetAttachedEntity ( void )
 		switch ( pInterface->nType )
 		{
             case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD *)pInterface));
+                pReturn = (CEntity*)(pPools->GetPed( (DWORD *)pInterface ));
                 break;
 			case ENTITY_TYPE_VEHICLE:
-				pReturn = (CEntity*)(pPools->GetVehicle((CVehicleSAInterface *)pInterface));
+				pReturn = (CEntity*)(pPools->GetVehicle( (DWORD *)pInterface ));
 				break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject ((CObjectSAInterface *)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject ( (DWORD *)pInterface ));
                 break;
 			default:
 				break;

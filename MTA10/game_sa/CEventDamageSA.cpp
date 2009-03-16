@@ -25,10 +25,10 @@ CEntity * CEventDamageSA::GetInflictingEntity ( void )
 		        pReturn = pPools->GetPed((DWORD *)pInterface);
 		        break;
 	        case ENTITY_TYPE_VEHICLE:
-		        pReturn = pPools->GetVehicle ( (CVehicleSAInterface *)pInterface );
+		        pReturn = pPools->GetVehicle ( (DWORD *)pInterface );
                 break;
 	        case ENTITY_TYPE_OBJECT:
-		        pReturn = pPools->GetObject((CObjectSAInterface *)pInterface);
+		        pReturn = pPools->GetObject((DWORD *)pInterface);
 		        break;
 	        default: break;
 	    }
