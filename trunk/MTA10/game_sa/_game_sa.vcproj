@@ -101,7 +101,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../../vendor/sparsehash/1.3/src;../../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;GAME_SA_EXPORTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
