@@ -106,7 +106,7 @@ CCore::CCore ( void )
     if ( RegOpenKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
     {
         // Read out the MTA installpath
-        if ( RegQueryValueEx ( hkey, "temp", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
+        if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
              strlen ( m_szInstallRoot ) == 0 )
         {
             MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );

@@ -83,7 +83,11 @@ void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
     RegCreateKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, NULL );
 
     if ( hkey )
-        RegSetValueEx ( hkey, "temp", NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
+    {
+        RegSetValueEx ( hkey, "Last Run Location", NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
+        RegDeleteValue ( hkey, "temp" );
+        RegDeleteValue ( hkey, "Install Directory" );
+    }
 
     RegCloseKey ( hkey );
 }
