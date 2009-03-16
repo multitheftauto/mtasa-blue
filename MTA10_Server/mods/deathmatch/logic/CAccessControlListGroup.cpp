@@ -18,6 +18,8 @@ CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 {
     _snprintf ( m_szGroupName, 256, "%s", szGroupName );
     m_szGroupName[255] = '\0';
+
+    m_ObjectsById.set_deleted_key ( (unsigned int)0xFFFFFFFF );
 }
 
 
@@ -107,7 +109,6 @@ bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessCo
         // Delete, remove from list and return true
         delete ( iter->second );
         m_Objects.remove ( iter->second );
-        m_ObjectsById.set_deleted_key ( iter->first );
         m_ObjectsById.erase( iter );
 
         return true;
