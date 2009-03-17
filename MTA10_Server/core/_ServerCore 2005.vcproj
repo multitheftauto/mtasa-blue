@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Server - Core"
 	ProjectGUID="{0550C84E-8AC6-4C44-9686-241B0BB4BD7D}"
 	RootNamespace="_ServerCore 2005"
@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/1.3/src/windows;../../vendor/sparsehash/1.3/src"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;MTA_SERVER"
 				StringPooling="false"
 				MinimalRebuild="true"

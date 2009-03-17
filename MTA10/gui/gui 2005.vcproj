@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Client - GUI"
 	ProjectGUID="{485149E1-799C-4925-AA17-0FEA77C85418}"
 	RootNamespace="gui 2005"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include../dependencies/mxml/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -139,7 +139,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include../dependencies/mxml/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -240,7 +240,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include../dependencies/mxml/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				BasicRuntimeChecks="0"
