@@ -236,7 +236,7 @@ VOID ReturnCotextToLocalPlayer()
 
 		bNotInLocalContext = false;
 
-        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( 1 ); // the player
+        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 ); // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast < CPedSA* > ( pLocalPlayerPed );
 		if ( pLocalPlayerPedSA )
 		{
@@ -281,7 +281,7 @@ void SwitchContext ( CPed* thePed )
     if ( !bNotInLocalContext )
     {
         // Grab the local ped and the local pad
-	    CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( 1 ); // the player
+	    CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 ); // the player
 	    CPad* pLocalPad = pGameInterface->GetPad ();
 	    CPadSAInterface* pLocalPadInterface = ( (CPadSA*) pLocalPad )->GetInterface ();
 

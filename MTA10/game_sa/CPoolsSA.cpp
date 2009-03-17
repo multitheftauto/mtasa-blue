@@ -434,7 +434,6 @@ void CPoolsSA::RemoveObject ( unsigned long ulID, bool )
         objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pObjectSA->GetObjectInterface () );
         if ( iter != m_objectPool.map.end () )
         {
-            m_objectPool.map.set_deleted_key ( iter->first );
             m_objectPool.map.erase ( iter );
         }
 
@@ -727,7 +726,6 @@ void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )
         pedPool_t::mapType::iterator iter = m_pedPool.map.find ( pPedSA->GetPedInterface () );
         if ( iter != m_pedPool.map.end () )
         {
-            m_pedPool.map.set_deleted_key ( iter->first );
             m_pedPool.map.erase ( iter );
         }
 

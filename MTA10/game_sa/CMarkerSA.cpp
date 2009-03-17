@@ -129,7 +129,7 @@ VOID CMarkerSA::SetEntity ( CVehicle * vehicle )
 {	
 	DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CVehicle * vehicle )");
 	CPoolsSA * pPools = (CPoolsSA *)pGame->GetPools();
-	DWORD dwID = pPools->GetVehicleRef((DWORD*)vehicle);
+	DWORD dwID = pPools->GetVehicleRef((CVehicle*)vehicle);
 	internalInterface->PoolIndex = dwID;
 	internalInterface->BlipType = (BYTE)MARKER_TYPE_CAR;
 }
@@ -138,7 +138,7 @@ VOID CMarkerSA::SetEntity ( CPed * ped )
 {
 	DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CPed * ped )");
 	CPoolsSA * pPools = (CPoolsSA *)pGame->GetPools();
-	DWORD dwID = pPools->GetPedRef((DWORD*)ped);
+	DWORD dwID = pPools->GetPedRef((CPed*)ped);
 	internalInterface->PoolIndex = dwID;
 	internalInterface->BlipType = (BYTE)MARKER_TYPE_CHAR;
 }
@@ -147,7 +147,7 @@ VOID CMarkerSA::SetEntity ( CObject * object )
 {
 	DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CObject * object )");
 	CPoolsSA * pPools = (CPoolsSA *)pGame->GetPools();
-	DWORD dwID = pPools->GetObjectRef((DWORD*)object);
+	DWORD dwID = pPools->GetObjectRef((CObject*)object);
 	internalInterface->PoolIndex = dwID;
 	internalInterface->BlipType = (eMarkerType)MARKER_TYPE_OBJECT;
 }

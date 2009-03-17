@@ -89,7 +89,7 @@ VOID CPopulationSA::RemovePed ( CCivilianPed * ped )
 	if ( !pPedSA ) return;
 
 	ped->SetDoNotRemoveFromGameWhenDeleted ( true );
-	pGameInterface->GetPools()->RemovePed ( ped );
+	pGameInterface->GetPools()->RemovePed ( (CPed*)ped );
 	if ( !peds.empty () ) peds.remove ( pPedSA );
 	dwPedCount--;
 }
