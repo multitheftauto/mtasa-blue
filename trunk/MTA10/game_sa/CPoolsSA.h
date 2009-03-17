@@ -22,7 +22,7 @@
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
 
-#include <google/sparse_hash_map>
+#include <google/dense_hash_map>
 
 class CEntryInfoNodePoolSA : public CEntryInfoNodePool
 {
@@ -118,7 +118,7 @@ private:
     template < class T, class I, unsigned long MAX >
     struct SPoolData
     {
-        typedef         google::sparse_hash_map < I*, T* >  mapType;
+        typedef         google::dense_hash_map < I*, T* >  mapType;
         mapType         map;
         T*              array [ MAX ];
         unsigned long   ulCount;
@@ -127,8 +127,8 @@ private:
         friend class CPoolsSA;
 
         SPoolData ( )
+            : map ( MAX ), ulCount ( 0UL )
         {
-            ulCount = 0UL;
             for ( unsigned int i = 0; i < MAX; ++i )
             {
                 array [ i ] = NULL;

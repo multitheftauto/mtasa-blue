@@ -32,6 +32,9 @@ CPoolsSA::CPoolsSA()
     m_vehiclePool.map.set_deleted_key ( (CVehicleSAInterface *)0x9001 );
     m_objectPool.map.set_deleted_key ( (CObjectSAInterface *)0x9001 );
     m_pedPool.map.set_deleted_key ( (CPedSAInterface *)0x9001 );
+    m_vehiclePool.map.set_empty_key ( (CVehicleSAInterface *)NULL );
+    m_objectPool.map.set_empty_key ( (CObjectSAInterface *)NULL );
+    m_pedPool.map.set_empty_key ( (CPedSAInterface *)NULL );
 }
 
 CPoolsSA::~CPoolsSA ( void )

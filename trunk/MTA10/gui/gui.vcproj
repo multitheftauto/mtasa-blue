@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
