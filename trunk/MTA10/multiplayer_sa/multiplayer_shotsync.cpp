@@ -111,7 +111,7 @@ CShotSyncData * GetLocalPedShotSyncData ( )
 
 bool IsLocalPlayer ( CPed * pPed )
 {
-    CPed * pLocalPed = m_pools->GetPedFromRef ( 1 );
+    CPed * pLocalPed = m_pools->GetPedFromRef ( (DWORD)1 );
     return ( pPed == pLocalPed );
 }
 

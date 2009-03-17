@@ -142,7 +142,7 @@ CVehicleSA::~CVehicleSA()
 			}
 		}
 		this->BeingDeleted = true;
-		((CPoolsSA *)pGame->GetPools())->RemoveVehicle(this);
+		((CPoolsSA *)pGame->GetPools())->RemoveVehicle((CVehicle *)this);
 	}
 }
 
