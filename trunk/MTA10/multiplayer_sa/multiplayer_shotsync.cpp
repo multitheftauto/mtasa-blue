@@ -184,10 +184,6 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
                 *(DWORD *)vecTargetPos = dwPointerToVector;
                 if ( data->m_shotSyncData.m_bUseOrigin )
                     *origin = data->m_shotSyncData.m_vecShotOrigin;
-				
-				char buf[1024] = {0};
-				_snprintf(buf,1023,"WriteTargetDataForPed, target(%.3f,%.3f,%.3f)", data->m_shotSyncData.m_vecShotTarget.fX,data->m_shotSyncData.m_vecShotTarget.fY,data->m_shotSyncData.m_vecShotTarget.fZ);
-				OutputDebugString(buf);
             }
         }
     }
