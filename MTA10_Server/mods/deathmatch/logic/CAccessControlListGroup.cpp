@@ -15,11 +15,13 @@
 #include "StdInc.h"
 
 CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
+: m_ObjectsById ( 512 )
 {
     _snprintf ( m_szGroupName, 256, "%s", szGroupName );
     m_szGroupName[255] = '\0';
 
-    m_ObjectsById.set_deleted_key ( (unsigned int)0xFFFFFFFF );
+    m_ObjectsById.set_empty_key ( (unsigned int)0xFB170551 );
+    m_ObjectsById.set_deleted_key ( (unsigned int)0xF15AF001 );
 }
 
 
@@ -48,7 +50,7 @@ CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* 
 
     CAccessControlListGroupObject* pObject = new CAccessControlListGroupObject ( szObjectName, eObjectType );
     m_Objects.push_back ( pObject );
-    m_ObjectsById [ pObject->GetObjectHashId() ] = pObject;
+    m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectHashId(), pObject ) );
 
     return pObject;
 }

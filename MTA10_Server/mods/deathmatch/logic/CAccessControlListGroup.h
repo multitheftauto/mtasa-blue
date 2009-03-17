@@ -21,7 +21,7 @@ class CAccessControlListGroup;
 #include <xml/CXMLNode.h>
 #include <list>
 
-#include <google/sparse_hash_map>
+#include <google/dense_hash_map>
 
 using namespace std;
 
@@ -52,7 +52,7 @@ public:
                                         char szID [ 256 ];
                                         _snprintf ( szID, 256, "%s_%d", szName, (unsigned int) eObjectType );
                                         szID [ 255 ] = 0;
-                                        return HashString( szID );
+                                        return ( HashString( szID ) & (unsigned int)0x7FFFFFFF );
                                     }
 
     inline const char*              GetObjectName                       ( void )        { return m_szName; };
@@ -97,7 +97,7 @@ private:
     typedef std::list < class CAccessControlListGroupObject* >
                                                     ObjectList;
 
-    typedef google::sparse_hash_map < unsigned int, class CAccessControlListGroupObject* >
+    typedef google::dense_hash_map < unsigned int, class CAccessControlListGroupObject* >
                                                     ObjectMap;
 
     char                                            m_szGroupName               [ 256 ];
