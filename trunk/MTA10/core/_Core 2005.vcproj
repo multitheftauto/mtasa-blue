@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Client - Core"
 	ProjectGUID="{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
 	RootNamespace="Client - Core"
@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories=".;../dependencies;../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -156,7 +156,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories=".;../dependencies;../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -267,7 +267,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories=".;../dependencies;../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories=".;../dependencies;../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
 				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_WINDOWED;MTA_FULLSCREEN_WINDOWED;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				ExceptionHandling="1"

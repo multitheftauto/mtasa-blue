@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Client - Multiplayer SA"
 	ProjectGUID="{916D94E2-FB0B-4992-A52C-3698CCBB0A41}"
 	RootNamespace="_Multiplayer SA 2005"
@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/1.3/src/windows;../../vendor/sparsehash/1.3/src"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;MULTIPLAYERSA_EXPORTS;COMPILE_FOR_SA;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				MinimalRebuild="true"
