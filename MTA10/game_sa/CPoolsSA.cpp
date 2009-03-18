@@ -221,14 +221,19 @@ CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
 
-    // We don't need to look for the map here, since we
-    // include a pointer to the game_sa instance of the
-    // vehicle in the GTA interface.
-    CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
+    assert ( pGameInterface );
 
-    if ( pInterface )
+    if ( m_bGetVehicleEnabled )
     {
-        return pInterface->m_pVehicle;
+        // We don't need to look for the map here, since we
+        // include a pointer to the game_sa instance of the
+        // vehicle in the GTA interface.
+        CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
+
+        if ( pInterface )
+        {
+            return pInterface->m_pVehicle;
+        }
     }
 
     return NULL;
