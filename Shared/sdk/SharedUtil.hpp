@@ -15,7 +15,7 @@
 //
 SString SString::Printf( const char* format, ... )
 {
-    static char buffer[8192];
+    char buffer[8192];
     int count = sizeof(buffer) / sizeof(buffer[0]);
 
     va_list argptr;
