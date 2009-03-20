@@ -22,15 +22,17 @@ class SString : public string
 {
 public:
     // Constructors
-    SString ( ) : string () {}
-    SString ( const char* szText ) : string ( szText ? szText : "" ) {}
-    SString ( const string& strText ) : string ( strText ) {}
+                SString     ( ) : string () {}
+    explicit    SString     ( const char* szText ) : string ( szText ? szText : "" ) {}
+                SString     ( const char* szFormat, ... );
+                SString     ( const string& strText ) : string ( strText ) {}
+
+
+    int         Format      ( const char* szFormat, ... );
+    int         vFormat     ( const char* szFormat, va_list vl );
 
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
-
-    // Static functions
-    static SString Printf ( const char *format, ... );
 };
 
 

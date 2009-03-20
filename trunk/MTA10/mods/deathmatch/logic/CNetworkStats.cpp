@@ -64,7 +64,7 @@ void CNetworkStats::Draw ( void )
     SString strSendRate  = GetDataUnit ( ( m_uiBitsSent - m_uiLastBitsSent ) / 8 );
 
     // Populate a string to print
-    SString strBuffer = SString::Printf (
+    SString strBuffer (
                 "Ping: %u ms\n"
                 "Messages in send buffer: %u\n"
                 "Messages sent: %u\n"

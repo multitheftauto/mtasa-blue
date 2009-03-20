@@ -96,7 +96,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
         {
             gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
 
-            SString strMode = SString::Printf ( "%d: %lu x %lu x %lu %s %s",
+            SString strMode ( "%d: %lu x %lu x %lu %s %s",
                     vidMode, vidModemInfo.width, vidModemInfo.height,
                     vidModemInfo.depth,
                     vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE ?
@@ -208,7 +208,7 @@ void CCommandFuncs::Time ( const char* szParameters )
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
 	
-	SString strTimeAndDate = SString::Printf ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+	SString strTimeAndDate ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
     CCore::GetSingleton ().ChatEchoColor ( strTimeAndDate, 255, 100, 100 );
 }
 
@@ -370,7 +370,7 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
     CVARS_GET ( "port",         uiPort );
 
     // Restart the connection.
-    SString strTemp = SString::Printf ( "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
+    SString strTemp ( "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
 
     Connect ( strTemp );
 }

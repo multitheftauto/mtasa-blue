@@ -29,7 +29,7 @@ SString CScreenShot::PreScreenShot ()
 	g_pCore->SetChatVisible ( false );
 	g_pCore->SetDebugVisible ( false );
 
-    SString strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+    SString strScreenShotName ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
 
     OFSTRUCT ReOpenBuff;
     HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
@@ -38,7 +38,7 @@ SString CScreenShot::PreScreenShot ()
     {
         CloseHandle( (HANDLE)hFile );
         iNumberOfFiles++;
-        strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+        strScreenShotName = SString ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
         hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
     }
 
@@ -74,7 +74,7 @@ int CScreenShot::GetScreenShots ( void )
 	g_pCore->SetChatVisible ( false );
 	g_pCore->SetDebugVisible ( false );
 
-    SString strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+    SString strScreenShotName ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
 
     OFSTRUCT ReOpenBuff;
     HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
@@ -83,7 +83,7 @@ int CScreenShot::GetScreenShots ( void )
     {
         CloseHandle( (HANDLE)hFile );
         iNumberOfFiles++;
-        strScreenShotName = SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
+        strScreenShotName.Format ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
         hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
 	}
 
@@ -93,5 +93,5 @@ int CScreenShot::GetScreenShots ( void )
 SString CScreenShot::GetScreenShotPath ( int iNumber )
 {
 	// Get a random number
-	return SString::Printf ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumber );
+	return SString ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumber );
 }

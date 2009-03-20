@@ -194,7 +194,7 @@ void CQuickConnect::LoadData ( void )
     CVARS_GET ( "qc_host",      val );   m_pEditHost->SetText ( val.c_str () );
 
     CVARS_GET ( "qc_port",      uval );
-    m_pEditPort->SetText ( SString::Printf ( "%u", uval ) );
+    m_pEditPort->SetText ( SString ( "%u", uval ) );
 
     CVARS_GET ( "qc_password",  val );  m_pEditPass->SetText ( val.c_str () );
 }

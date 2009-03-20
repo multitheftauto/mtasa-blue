@@ -92,8 +92,7 @@ void CSyncDebug::OnDraw ( void )
     float fCurrentRotation = m_pPlayer->GetCurrentRotation ();
 
     // Write it to a string
-    SString strBuffer;
-    strBuffer = SString::Printf (
+    SString strBuffer (
                "== PLAYER ==\n"
                "Nick: %s\n"
                "Position: %f %f %f\n"
@@ -140,7 +139,7 @@ void CSyncDebug::OnDraw ( void )
                                         0x78000000 );
 
     // Populate a string to print
-    strBuffer = SString::Printf (
+    strBuffer.Format (
                "Ping: %u\n"
                "Fakelag: %u (%u)\n"
                "Packets recv: %u\n"

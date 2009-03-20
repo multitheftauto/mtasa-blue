@@ -885,12 +885,12 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
 		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
 			    // Create a messagebox to notify the user
 			    //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-			    SString strText = SString::Printf ( "Press a key to bind, or escape to clear" );
+			    SString strText = "Press a key to bind, or escape to clear";
 			    CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", strText, MB_ICON_QUESTION );
 		    } else {
 			    // Create a messagebox to notify the user
 			    //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-			    SString strText = SString::Printf ( "Press a key to bind, or escape to clear" );
+			    SString strText = "Press a key to bind, or escape to clear";
 			    CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", strText, MB_ICON_QUESTION );
 		    }
 	    }
@@ -1097,7 +1097,7 @@ void CSettings::Initialize ( void )
                         CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
                         if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
                         {
-                            strDescription = SString::Printf ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                            strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
                         }
                         else
                         {
@@ -1365,12 +1365,12 @@ void CSettings::LoadData ( void )
         
         if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
         {
-            SString strMode = SString::Printf ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
         }
         if ( vidMode == currentVidMode )
         {
-            SString strMode = SString::Printf ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+            SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             
             m_pComboResolution->SetText ( strMode );
         }

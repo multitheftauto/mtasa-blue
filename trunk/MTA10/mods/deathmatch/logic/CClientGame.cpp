@@ -842,7 +842,7 @@ void CClientGame::DoPulsePostFrame ( void )
                 vecPosition.fY += 0.03f;
                 pVehicle = *iter;
 
-                SString strBuffer = SString::Printf ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
+                SString strBuffer ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
 
                 m_pDisplayManager->DrawText2D ( strBuffer, vecPosition, 1.0f, 0xFFFFFFFF );
             }
@@ -2215,8 +2215,7 @@ void CClientGame::DrawFPS ( void )
     }
     else
         x++;
-    SString strBuffer = SString::Printf (
-        "FrameRate: %4.2f\n", fDisp);
+    SString strBuffer ( "FrameRate: %4.2f\n", fDisp );
 
     // Print it
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.23f, 0 ), 1.0f, 0xFFFFFFFF );
@@ -2244,48 +2243,48 @@ void CClientGame::DrawTasks ( CClientPlayer* pPlayer )
         SString strSubOutput;
 
         pTask = man->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        strOutput += SString::Printf ( "Physical Response: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Physical Response: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-        strOutput += SString::Printf ( "Event Response Temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Event Response Temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-        strOutput += SString::Printf ( "Event Response Non-temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Event Response Non-temp: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_PRIMARY );
-        strOutput += SString::Printf ( "Primary: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Primary: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTask ( TASK_PRIORITY_DEFAULT );
-        strOutput += SString::Printf ( "Default: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Default: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-        strOutput += SString::Printf ( "Secondary Attack: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary Attack: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_DUCK );
-        strOutput += SString::Printf ( "Secondary Duck: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary Duck: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_SAY );
-        strOutput += SString::Printf ( "Secondary Say: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary Say: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_FACIAL_COMPLEX );
-        strOutput += SString::Printf ( "Secondary Facial Complex: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary Facial Complex: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_PARTIAL_ANIM );
-        strOutput += SString::Printf ( "Secondary Partial Anim: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary Partial Anim: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         pTask = man->GetTaskSecondary ( TASK_SECONDARY_IK );
-        strOutput += SString::Printf ( "Secondary IK: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
-        strSubOutput += SString::Printf ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
+        strOutput += SString ( "Secondary IK: %s\n", pTask ? ( pTask->GetTaskName () ) : ( "N/A" ) );
+        strSubOutput += SString ( "%s\n", pTask && pTask->GetSubTask () ? ( pTask->GetSubTask ()->GetTaskName () ) : ( "N/A" ) );
 
         m_pDisplayManager->DrawText2D ( strOutput, CVector ( 0.05f, 0.5f,0 ), 1.0f );
         m_pDisplayManager->DrawText2D ( strSubOutput, CVector ( 0.5f, 0.5f,0 ), 1.0f );
@@ -2333,59 +2332,59 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     int iPrimaryTask = pPrimaryTask ? pPrimaryTask->GetTaskType () : -1;
 
     // Copy the stuff
-    SString strBuffer = SString::Printf ( "Orient:\n"
-                                "Position: %f %f %f\n"
-                                "Rotation/camera: %f %f\n"
-                                "Health: %f\n"
-                                "\n"
-                                "Keys:\n"
-                                "LeftShoulder1: %hi\n"
-                                "RightShoulder1: %hi\n"
-                                "ButtonSquare: %hi\n"
-                                "ButtonCross: %hi\n"
-                                "ButtonCircle: %hi\n"
-                                "ShockButtonL: %hi\n"
-                                "PedWalk: %hi\n"
-                                "VehicleMouseLook: %hi\n"
-                                "LeftStickX: %hi\n"
-                                "LeftStickY: %hi\n"
-                                "\n"
-                                "Misc:\n"
-                                "Primary task: %d\n"
-                                "Ducked: %u\n"
-                                "Goggles: %u\n"
-                                "In vehicle: %u\n"
-                                "Weapon: %u\n"
-                                "Weapon state: %u\n"
-                                "Weapon ammo: %u\n"
-                                "Aim: %f %f\n"
-                                "Aim source: %f %f %f\n"
-                                "Aim target: %f %f %f\n"
-                                "Driveby aim: %u\n",
-                                vecPosition.fX, vecPosition.fY, vecPosition.fZ,
-                                fRotation, fCameraRotation,
-                                fHealth,
-                                cs.LeftShoulder1,
-                                cs.RightShoulder1,
-                                cs.ButtonSquare,
-                                cs.ButtonCross,
-                                cs.ButtonCircle,
-                                cs.ShockButtonL,
-                                cs.m_bPedWalk,
-                                cs.m_bVehicleMouseLook,
-                                cs.LeftStickX,
-                                cs.LeftStickY,
-                                iPrimaryTask,
-                                bIsDucked,
-                                bWearingGoggles,
-                                bInVehicle,
-                                ucWeapon,
-                                ucWeaponState,
-                                usWeaponAmmo,
-                                fAimX, fAimY,
-                                vecAimSource.fX, vecAimSource.fY, vecAimSource.fZ,
-                                vecAimTarget.fX, vecAimTarget.fY, vecAimTarget.fZ,
-                                ucDrivebyAim );
+    SString strBuffer ( "Orient:\n"
+                        "Position: %f %f %f\n"
+                        "Rotation/camera: %f %f\n"
+                        "Health: %f\n"
+                        "\n"
+                        "Keys:\n"
+                        "LeftShoulder1: %hi\n"
+                        "RightShoulder1: %hi\n"
+                        "ButtonSquare: %hi\n"
+                        "ButtonCross: %hi\n"
+                        "ButtonCircle: %hi\n"
+                        "ShockButtonL: %hi\n"
+                        "PedWalk: %hi\n"
+                        "VehicleMouseLook: %hi\n"
+                        "LeftStickX: %hi\n"
+                        "LeftStickY: %hi\n"
+                        "\n"
+                        "Misc:\n"
+                        "Primary task: %d\n"
+                        "Ducked: %u\n"
+                        "Goggles: %u\n"
+                        "In vehicle: %u\n"
+                        "Weapon: %u\n"
+                        "Weapon state: %u\n"
+                        "Weapon ammo: %u\n"
+                        "Aim: %f %f\n"
+                        "Aim source: %f %f %f\n"
+                        "Aim target: %f %f %f\n"
+                        "Driveby aim: %u\n",
+                        vecPosition.fX, vecPosition.fY, vecPosition.fZ,
+                        fRotation, fCameraRotation,
+                        fHealth,
+                        cs.LeftShoulder1,
+                        cs.RightShoulder1,
+                        cs.ButtonSquare,
+                        cs.ButtonCross,
+                        cs.ButtonCircle,
+                        cs.ShockButtonL,
+                        cs.m_bPedWalk,
+                        cs.m_bVehicleMouseLook,
+                        cs.LeftStickX,
+                        cs.LeftStickY,
+                        iPrimaryTask,
+                        bIsDucked,
+                        bWearingGoggles,
+                        bInVehicle,
+                        ucWeapon,
+                        ucWeaponState,
+                        usWeaponAmmo,
+                        fAimX, fAimY,
+                        vecAimSource.fX, vecAimSource.fY, vecAimSource.fZ,
+                        vecAimTarget.fX, vecAimTarget.fY, vecAimTarget.fZ,
+                        ucDrivebyAim );
 
     // Draw it
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );

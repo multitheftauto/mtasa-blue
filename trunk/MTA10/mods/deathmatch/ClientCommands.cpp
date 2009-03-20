@@ -348,7 +348,7 @@ void COMMAND_MessageTarget ( const char* szCmdLine )
         const char * szNick = pTarget->GetNickPointer();
         if ( !szNick )
             return;
-        SString strParameters = SString::Printf ( "%s %s", pTarget->GetNickPointer (), szCmdLine );
+        SString strParameters ( "%s %s", pTarget->GetNickPointer (), szCmdLine );
         g_pCore->GetCommands ()->Execute ( "msg", strParameters );
     }
     else
@@ -647,7 +647,7 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
 void COMMAND_DumpPlayers ( const char* szCmdLine )
 {
     // Create a file to dump to
-    SString strBuffer = SString::Printf ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
+    SString strBuffer ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
     FILE* pFile = fopen ( strBuffer, "w+" );
     if ( pFile )
     {
