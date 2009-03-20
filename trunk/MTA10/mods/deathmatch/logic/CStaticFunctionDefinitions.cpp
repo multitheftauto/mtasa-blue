@@ -4700,6 +4700,47 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     return bSuccess;
 }
 
+bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource )
+{
+    assert ( szKey );
+    assert ( szHitState );
+
+    bool bSuccess = false;
+
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+    bool bKey = pKeyBinds->IsKey ( szKey );
+    if ( bKey )
+    {
+        bool bHitState = true;
+        //Check if its binded already (dont rebind)
+        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments ) )
+        {
+            pKeyBinds->SetCommandActive ( szCommandName, bHitState, szArguments, szResource, true );
+            return true;
+        }
+        if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
+             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
+        {
+            pKeyBinds->SetCommandActive ( szCommandName, bHitState, szArguments, szResource, true );
+            bSuccess = true;
+        }
+        bHitState = false;
+        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments ) )
+        {
+            pKeyBinds->SetCommandActive ( szCommandName, bHitState, szArguments, szResource, true );
+            return true;
+        }
+        if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
+             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
+        {
+            pKeyBinds->SetCommandActive ( szCommandName, bHitState, szArguments, szResource, true );
+            bSuccess = true;
+        }
+    }
+    return bSuccess;
+}
+
+
 
 bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction )
 {
@@ -4744,6 +4785,43 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMa
     return false;
 }
 
+bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource )
+{
+    assert ( szKey );
+    assert ( szHitState );
+
+    bool bSuccess = false;
+
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+    bool bKey = pKeyBinds->IsKey ( szKey );
+    if ( bKey )
+    {
+        bool bCheckHitState = false, bHitState = true;
+        if ( szHitState )
+        {
+            if ( stricmp ( szHitState, "down" ) == 0 )
+            {
+                bCheckHitState = true, bHitState = true;
+            }
+            else if ( stricmp ( szHitState, "up" ) == 0 )
+            {
+                bCheckHitState = true, bHitState = false;
+            }
+        }
+        if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
+             pKeyBinds->SetCommandActive ( szCommandName, bHitState, NULL, szResource, false ) )
+        {
+            bSuccess = true;
+        }
+        bHitState = false;
+        if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
+             pKeyBinds->SetCommandActive ( szCommandName, bHitState, NULL, szResource, false ) )
+        {
+            bSuccess = true;
+        }
+    }
+    return bSuccess;
+}
 
 bool CStaticFunctionDefinitions::GetKeyState ( const char* szKey, bool& bState )
 {

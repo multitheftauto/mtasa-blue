@@ -47,12 +47,13 @@ public:
 
 
     // Command-bind funcs
-    bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments = NULL, bool bState = true );
+    bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments = NULL, bool bState = true, const char* szResource = NULL );
     bool                    AddCommand                  ( const SBindableKey* pKey, const char* szCommand, const char* szArguments = NULL, bool bState = true );
-    bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true );
+    bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szResource = NULL );
     bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( void );
-    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true );
+    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL );
+    bool                    SetCommandActive            ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive );
     CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true );
     bool                    GetBoundCommands            ( const char* szCommand, list < CCommandBind * > & commandsList );
     

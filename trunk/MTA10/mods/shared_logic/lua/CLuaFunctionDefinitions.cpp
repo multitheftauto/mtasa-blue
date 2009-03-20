@@ -13220,29 +13220,44 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
     if ( pLuaMain )
     {
         if ( lua_type ( luaVM, 1 ) == LUA_TSTRING &&
-             lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-             lua_type ( luaVM, 3 ) == LUA_TFUNCTION ) 
+             lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
             const char* szKey = lua_tostring ( luaVM, 1 );
-            const char* szHitState = lua_tostring ( luaVM, 2 );  
-            // Jax: grab our arguments first, luaM_toref pops the stack!
-            CLuaArguments Arguments;
-		    Arguments.ReadArguments ( luaVM, 4 );
-			int iLuaFunction = luaM_toref ( luaVM, 3 );            
-                      
-			if ( VERIFY_FUNCTION ( iLuaFunction ) )
+            const char* szHitState = lua_tostring ( luaVM, 2 );
+            if ( lua_type ( luaVM, 3 ) == LUA_TFUNCTION )
+            { 
+                // Jax: grab our arguments first, luaM_toref pops the stack!
+                CLuaArguments Arguments;
+		        Arguments.ReadArguments ( luaVM, 4 );
+			    int iLuaFunction = luaM_toref ( luaVM, 3 );            
+                          
+			    if ( VERIFY_FUNCTION ( iLuaFunction ) )
+                {
+				    if ( CStaticFunctionDefinitions::BindKey ( szKey, szHitState, pLuaMain, iLuaFunction, Arguments ) )
+				    {
+					    lua_pushboolean ( luaVM, true );
+					    return 1;
+				    }
+			    }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 3 );
+            }
+            else if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             {
-				if ( CStaticFunctionDefinitions::BindKey ( szKey, szHitState, pLuaMain, iLuaFunction, Arguments ) )
-				{
-					lua_pushboolean ( luaVM, true );
+         		const char* szResource = pLuaMain->GetResource()->GetName();
+                const char* szCommand = lua_tostring ( luaVM, 3 );
+                const char* szArguments = "";
+                if  ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
+                    szArguments = lua_tostring ( luaVM, 4 );
+                if ( CStaticFunctionDefinitions::BindKey ( szKey, szHitState, szCommand, szArguments, szResource ) )
+			    {
+			        lua_pushboolean ( luaVM, true );
 					return 1;
-				}
-			}
+		        }  
+            }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 3 );
+                m_pScriptDebugging->LogBadType ( luaVM, "bindKey" );
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "bindKey" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -13259,16 +13274,30 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
         {
             const char* szKey = lua_tostring ( luaVM, 1 );
             const char* szHitState = NULL;
-            int iLuaFunction = 0;
 
             if ( lua_type ( luaVM, 2 ) )
                 szHitState = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TFUNCTION )
-                iLuaFunction = luaM_toref ( luaVM, 3 );
-
-            if ( iLuaFunction == 0 || VERIFY_FUNCTION ( iLuaFunction ) )
+            {   
+                int iLuaFunction = luaM_toref ( luaVM, 3 );
+                if ( iLuaFunction == 0 || VERIFY_FUNCTION ( iLuaFunction ) )
+                {
+			        if ( CStaticFunctionDefinitions::UnbindKey ( szKey, pLuaMain, szHitState, iLuaFunction ) )
+			        {
+				        lua_pushboolean ( luaVM, true );
+				        return 1;
+			        }
+                }
+                else
+                {
+                    m_pScriptDebugging->LogBadType ( luaVM, "unbindKey" );
+                }
+            }
+            else if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             {
-			    if ( CStaticFunctionDefinitions::UnbindKey ( szKey, pLuaMain, szHitState, iLuaFunction ) )
+                const char* szResource = pLuaMain->GetResource()->GetName();
+                const char* szCommand = lua_tostring ( luaVM, 3 );
+			    if ( CStaticFunctionDefinitions::UnbindKey ( szKey, szHitState, szCommand, szResource ) )
 			    {
 				    lua_pushboolean ( luaVM, true );
 				    return 1;

@@ -1047,6 +1047,7 @@ void CSettings::Initialize ( void )
 
     SListedCommand* listedCommands = new SListedCommand [ pKeyBinds->Count ( KEY_BIND_COMMAND ) + pKeyBinds->Count ( KEY_BIND_FUNCTION ) ];
     unsigned int uiNumListedCommands = 0;
+    std::map < const char*, int > iResourceItems;
     // Loop through all the bound commands
     list < CKeyBind* > ::const_iterator iter = pKeyBinds->IterBegin ();
     for ( unsigned int uiIndex = 0 ; iter != pKeyBinds->IterEnd (); iter++, uiIndex++ )
@@ -1095,6 +1096,17 @@ void CSettings::Initialize ( void )
                     if ( bindType == KEY_BIND_COMMAND )
                     {
                         CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
+                        if ( pCommandBind->bActive && pCommandBind->szResource )
+                        {
+                            const char* szResource = pCommandBind->szResource;
+                            if ( iResourceItems.count(szResource) == 0 )
+                            {
+                                iBind = m_pBindsList->InsertRowAfter ( m_pBindsList->GetRowCount() );
+                                m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
+                                iResourceItems.insert( make_pair(szResource, iBind ) );
+                            }
+                            row = iResourceItems[szResource];
+                        }
                         if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
                         {
                             strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
@@ -1129,6 +1141,7 @@ void CSettings::Initialize ( void )
             }
         }
     }
+
     delete [] listedCommands;
 }
 
