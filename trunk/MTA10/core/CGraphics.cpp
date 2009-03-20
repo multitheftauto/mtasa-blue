@@ -1077,7 +1077,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
         unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
-            info.texture->Release ();
+            SAFE_RELEASE ( info.texture );
             m_CachedTextureInfoMap.erase ( iter );
             iter = m_CachedTextureInfoMap.begin ();
         }
