@@ -111,7 +111,32 @@ void CClientMarker::UpdateAttachedPosition ( void )
     {
         CVector vecNewPosition;
         m_pAttachedToEntity->GetPosition ( vecNewPosition );   
-        vecNewPosition += m_vecAttachedPosition;
+        if ( m_vecAttachedPosition.fX == 0.0f && m_vecAttachedPosition.fY == 0.0f )
+        {
+            vecNewPosition += m_vecAttachedPosition;
+        }
+        else
+        {
+            CVector vecRotation;
+            switch ( m_pAttachedToEntity->GetType () )
+            {
+                case CCLIENTPED:
+                case CCLIENTPLAYER:
+                    vecRotation.fZ = static_cast < CClientPed* > ( m_pAttachedToEntity )->GetCurrentRotation ();
+                    break;
+                case CCLIENTVEHICLE:
+                    static_cast < CClientVehicle* > ( m_pAttachedToEntity )->GetRotationRadians ( vecRotation );
+                    break;
+                case CCLIENTOBJECT:
+                    static_cast < CClientObject* > ( m_pAttachedToEntity )->GetRotationRadians ( vecRotation );
+                    break;
+            }
+            float fRadius = sqrt ( m_vecAttachedPosition.fX*m_vecAttachedPosition.fX + m_vecAttachedPosition.fY*m_vecAttachedPosition.fY );
+            float fAngle = atan2 ( m_vecAttachedPosition.fY, m_vecAttachedPosition.fX );
+            vecNewPosition.fX += fRadius * cos ( vecRotation.fZ + fAngle );
+            vecNewPosition.fY += fRadius * sin ( vecRotation.fZ + fAngle );
+            vecNewPosition.fZ += m_vecAttachedPosition.fZ;
+        }
 
         // Grab our current position
         CVector vecCurrentPosition;
