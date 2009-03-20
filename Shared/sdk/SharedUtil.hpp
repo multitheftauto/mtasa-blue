@@ -31,7 +31,7 @@ SString::SString ( const char* szFormat, ... )
     #define va_copy(dest, orig) (dest) = (orig)
 #endif
 
-int SString::vFormat ( const char* szFormat, va_list vl )
+SString& SString::vFormat ( const char* szFormat, va_list vl )
 {
 #ifdef WIN32
 
@@ -87,7 +87,7 @@ int SString::vFormat ( const char* szFormat, va_list vl )
         std::string::assign ( szDest );
     }
 
-    return iSize;
+    return *this;
 
 #else
 
@@ -127,7 +127,7 @@ int SString::vFormat ( const char* szFormat, va_list vl )
     {
         // glibc 2.1 - Returns the required capacity.
         va_copy ( vlLocal, vl );
-        std::string::reserve ( iSize );
+        std::string::reserve ( iSize + 1 );
         curCapacity = std::string::capacity ();
         szDest = const_cast < char * > ( std::string::data () );
 
@@ -141,22 +141,22 @@ int SString::vFormat ( const char* szFormat, va_list vl )
         std::string::assign ( szDest );
     }
 
-    return iSize;
+    return *this;
 
 #endif
 
 }
 
 
-int SString::Format ( const char* szFormat, ... )
+SString& SString::Format ( const char* szFormat, ... )
 {
     va_list vl;
 
     va_start ( vl, szFormat );
-    int iSize = vFormat ( szFormat, vl );
+    SString& str = vFormat ( szFormat, vl );
     va_end ( vl );
 
-    return iSize;
+    return str;
 }
 
 

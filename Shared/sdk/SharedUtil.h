@@ -28,8 +28,8 @@ public:
                 SString     ( const string& strText ) : string ( strText ) {}
 
 
-    int         Format      ( const char* szFormat, ... );
-    int         vFormat     ( const char* szFormat, va_list vl );
+    SString&    Format      ( const char* szFormat, ... );
+    SString&    vFormat     ( const char* szFormat, va_list vl );
 
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
