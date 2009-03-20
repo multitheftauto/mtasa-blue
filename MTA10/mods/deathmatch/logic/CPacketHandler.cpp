@@ -343,7 +343,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
             bitStream.Read ( g_pClientGame->m_usHTTPDownloadPort );
             // TODO: Set m_szHTTPDownloadURL to the appropriate path based off of server ip / port
             unsigned long ulHTTPDownloadPort = g_pClientGame->m_usHTTPDownloadPort;
-            g_pClientGame->m_strHTTPDownloadURL = SString::Printf ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
+            g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
 
             // We are downloading from the internal HTTP Server, therefore disable multiple downloads
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
@@ -3906,7 +3906,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 }
 
                                 // Combine the HTTP Download URL, the Resource Name and the Resource File
-                                SString strHTTPDownloadURLFull = SString::Printf ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
+                                SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
                                 // Delete the file that already exists
                                 unlink ( pDownloadableResource->GetName () );

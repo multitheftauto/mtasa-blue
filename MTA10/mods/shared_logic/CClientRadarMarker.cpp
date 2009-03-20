@@ -201,7 +201,7 @@ void CClientRadarMarker::SetSprite ( unsigned long ulSprite )
 			m_pMapMarkerImage = NULL;
 		}
 
-	    SString strSprite = SString::Printf ( "MTA\\cgui\\images\\radarset\\%02u.png", ulSprite );
+	    SString strSprite ( "MTA\\cgui\\images\\radarset\\%02u.png", ulSprite );
         m_pMapMarkerImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath ( strSprite ) );
 	}
 }

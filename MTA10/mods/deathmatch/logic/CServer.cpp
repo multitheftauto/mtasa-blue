@@ -67,7 +67,7 @@ CServer::CServer ( void )
     strncat ( m_szServerRoot, "server/", MAX_PATH );
 
     // Append the server core dll name to it
-    m_strDLLFile = SString::Printf ( "%s%s", m_szServerRoot, SERVER_DLL_PATH );
+    m_strDLLFile.Format ( "%s%s", m_szServerRoot, SERVER_DLL_PATH );
 }
 
 

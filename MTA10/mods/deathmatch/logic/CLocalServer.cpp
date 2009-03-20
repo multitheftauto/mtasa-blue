@@ -175,7 +175,7 @@ bool CLocalServer::Load ( void )
     m_strServerPath = g_pCore->GetInstallRoot ();
     m_strServerPath += "/server/mods/deathmatch/";
 
-    m_strConfigPath = SString::Printf ( "%s%s", m_strServerPath.c_str (), m_strConfig.c_str () );
+    m_strConfigPath.Format ( "%s%s", m_strServerPath.c_str (), m_strConfig.c_str () );
     m_pConfig = g_pCore->GetXML ()->CreateXML ( m_strConfigPath );
     if ( m_pConfig && m_pConfig->Parse() )
     {
@@ -204,8 +204,8 @@ bool CLocalServer::Load ( void )
     }
     //
 
-    m_strResourceDirectoryPath = SString::Printf ( "%sresources/*", m_strServerPath.c_str () );
-    m_strResourceCachePath     = SString::Printf ( "%sresourcecache/", m_strServerPath.c_str () );
+    m_strResourceDirectoryPath.Format ( "%sresources/*", m_strServerPath.c_str () );
+    m_strResourceCachePath.Format ( "%sresourcecache/", m_strServerPath.c_str () );
 
     unsigned int uiCount = 0;
 

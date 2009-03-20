@@ -148,7 +148,7 @@ void RaiseFatalError ( unsigned int uiCode )
 #endif
 
     // Populate the message and show the box
-    SString strBuffer = SString::Printf ( "Fatal error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    SString strBuffer ( "Fatal error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
     g_pCore->ShowMessageBox ( "Fatal error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
 
     // Request the mod unload
@@ -163,7 +163,7 @@ void RaiseProtocolError ( unsigned int uiCode )
 //#endif
 
     // Populate the message and show the box
-    SString strBuffer = SString::Printf ( "Protocol error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
+    SString strBuffer ( "Protocol error (%u). If this problem persists, please check out mtasa.com for support.", uiCode );
     g_pCore->ShowMessageBox ( "Connection error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
 
     // Request the mod unload
@@ -243,39 +243,40 @@ SString GetDataUnit ( unsigned int uiInput )
     // Bytes per sec?
     if ( fInput < 1024 )
     {
-        return SString::Printf ( "%u B", uiInput );
+        return SString ( "%u B", uiInput );
     }
 
     // Kilobytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        return SString::Printf ( "%.2f kB", fInput );
+        return SString ( "%.2f kB", fInput );
     }
 
     // Megabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        return SString::Printf ( "%.2f MB", fInput );
+        return SString ( "%.2f MB", fInput );
     }
 
     // Gigabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        return SString::Printf ( "%.2f GB", fInput );
+        return SString ( "%.2f GB", fInput );
     }
 
     // Terrabytes per sec?
     fInput /= 1024;
     if ( fInput < 1024 )
     {
-        return SString::Printf ( "%.2f TB", fInput );
+        return SString ( "%.2f TB", fInput );
     }
 
     // Unknown
-    return SString::Printf ( "X" );
+    SString strUnknown = "X";
+    return strUnknown;
 }
 
 

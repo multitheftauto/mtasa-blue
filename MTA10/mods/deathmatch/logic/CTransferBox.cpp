@@ -48,7 +48,7 @@ CTransferBox::CTransferBox ( void )
 
 	// create the icons
 	for ( unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++ ) {
-		SString strIcon = SString::Printf ( "cgui\\images\\transferset\\%u.png", i+1 );
+		SString strIcon ( "cgui\\images\\transferset\\%u.png", i+1 );
 		m_pIcon[i] = g_pCore->GetGUI ()->CreateStaticImage ( m_pProgress );
 		m_pIcon[i]->SetFrameEnabled ( false );
 		m_pIcon[i]->SetPosition ( CVector2D ( TRANSFERBOX_DRAWXSTART, ((TRANSFERBOX_PROGRESSHEIGHT)/2)  - (TRANSFERBOX_ICONSIZE/2) ) );
@@ -102,7 +102,7 @@ void CTransferBox::SetInfoSingleDownload ( const char* szFileName, double dDownl
     SString strDownloadSizeNow   = GetDataUnit ( static_cast < unsigned int > ( dDownloadSizeNow ) );
     SString strDownloadSizeTotal = GetDataUnit ( static_cast < unsigned int > ( m_dTotalSize ) );
 
-    SString strBuffer = SString::Printf ( "Download Progress: %s of %s", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
+    SString strBuffer ( "Download Progress: %s of %s", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
 	m_pWindow->SetText ( strBuffer );
 
     m_pProgress->SetProgress ( (dDownloadSizeNow / m_dTotalSize) );
@@ -110,7 +110,7 @@ void CTransferBox::SetInfoSingleDownload ( const char* szFileName, double dDownl
 
 void CTransferBox::SetInfoMultipleDownload ( double dDownloadSizeNow, double dDownloadSizeTotal, int iDownloadsRemaining, int iDownloadsTotal )
 {
-    SString strBuffer = SString::Printf ( "Download Progress: %.2fMB of %.2fMB", (float) ( dDownloadSizeNow / 1048576.0 ), (float) ( dDownloadSizeTotal / 1048576.0 ) );
+    SString strBuffer ( "Download Progress: %.2fMB of %.2fMB", (float) ( dDownloadSizeNow / 1048576.0 ), (float) ( dDownloadSizeTotal / 1048576.0 ) );
 	m_pWindow->SetText ( strBuffer );
 
     m_pProgress->SetProgress ( (dDownloadSizeNow / dDownloadSizeTotal) );

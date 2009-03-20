@@ -491,12 +491,11 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 // Add a log entry.
-                SString strFilename =
-                SString::Printf ( "mta\\dumps\\client_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
-                                                                                  SystemTime.wDay,
-                                                                                  SystemTime.wYear,
-                                                                                  SystemTime.wHour,
-                                                                                  SystemTime.wMinute );
+                SString strFilename ( "mta\\dumps\\client_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
+                                                                                      SystemTime.wDay,
+                                                                                      SystemTime.wYear,
+                                                                                      SystemTime.wHour,
+                                                                                      SystemTime.wMinute );
 
                 // Copy the file
                 CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
@@ -561,7 +560,7 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     HANDLE hFind;
 
     // Allocate a string with length of path + 5 letters to store searchpath plus "\*.*"
-    SString strPathWildchars = SString::Printf( "%s*.*", szModFolderPath );
+    SString strPathWildchars ( "%s*.*", szModFolderPath );
 
     // Set the working directory to the MTA folder
     CFilePathTranslator pFilePathTranslator;
@@ -609,7 +608,7 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
          ( stricmp ( szName, "race" ) != 0 ) )
     {
         // Put together a modpath string and a MTA-relative path to Client(_d).dll
-        SString strClientDLL = SString::Printf ( "%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL );
+        SString strClientDLL ( "%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL );
 
         // Attempt to load the primary client DLL
         HMODULE hDLL = LoadLibrary ( strClientDLL );

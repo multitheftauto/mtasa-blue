@@ -3386,7 +3386,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
         if ( !pResource )
             pResource = LuaMain.GetResource ();
 
-		SString strPath = SString::Printf ( "%s\\resources\\%s\\", m_pClientGame->GetModRoot (), pResource->GetName () );
+		SString strPath ( "%s\\resources\\%s\\", m_pClientGame->GetModRoot (), pResource->GetName () );
 
 		// Load the image
 		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( szFile, strPath ) ) {

@@ -811,7 +811,7 @@ void CMainMenu::ChangeCommunityState ( bool bIn, std::string strUsername )
 {
     if ( bIn )
     {
-        SString strText = SString::Printf ( "Logged in as: %s", strUsername.c_str () );
+        SString strText ( "Logged in as: %s", strUsername.c_str () );
 
         m_pCommunityLabel->SetText ( strText );
 	    m_pCommunityLabel->AutoSize ( strText );

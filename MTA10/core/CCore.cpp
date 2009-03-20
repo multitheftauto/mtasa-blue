@@ -671,7 +671,7 @@ void CCore::SetOfflineMod ( bool bOffline )
 
 SString CCore::GetModInstallRoot ( char * szModName )
 {
-    return SString::Printf ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    return SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
 }
 
 
@@ -1187,7 +1187,7 @@ void CCore::DoPostFramePulse ( )
                         // Try to load the mod
                         if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
                         {
-                            SString strTemp = SString::Printf ( "Error running mod specified in command line ('%s')", szOptionValue );
+                            SString strTemp ( "Error running mod specified in command line ('%s')", szOptionValue );
                             ShowMessageBox ( "Error", strTemp, MB_BUTTON_OK | MB_ICON_ERROR );
                         }
                     }
@@ -1594,9 +1594,9 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     if ( strlen ( szHost ) > 0 )
     {
         if ( strlen ( szPassword ) > 0 )
-            strDest = SString::Printf ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
+            strDest.Format ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
         else
-            strDest = SString::Printf ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
+            strDest.Format ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
     }
 
     return strDest;

@@ -486,7 +486,7 @@ void CMainMenuScene::Destroy3DScene ( void )
 	SAFE_RELEASE ( pScreen );
 
 	// Release all the mesh textures
-    for ( int i = 0 ; i < pMeshTextures.size () ; i++ )
+    for ( unsigned int i = 0 ; i < pMeshTextures.size () ; i++ )
         SAFE_RELEASE ( pMeshTextures [i] )
     pMeshTextures.empty ();
     pbMeshTextures.empty ();
@@ -635,7 +635,7 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 				strTexPath = CScreenShot::GetScreenShotPath ( i + 1 );
 			} else {
 				// Add our default screenshots as well
-				strTexPath = SString::Printf ( "data\\default%u.png", i - i_own );
+                strTexPath.Format ( "data\\default%u.png", i - i_own );
 			}
 			D3DXCreateTextureFromFile ( m_pDevice, strTexPath, &pMaskAnimTexture[i] );
 			iMaskAnimTextures++;
@@ -668,7 +668,7 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 			}
 
 			// Get the correct path
-			SString strPath = SString::Printf ( CORE_MTA_TEXTURE_PATH, pMaterialStore[i].pTextureFilename );
+			SString strPath ( CORE_MTA_TEXTURE_PATH, pMaterialStore[i].pTextureFilename );
 			
 			// Create the texture, loading failure isn't fatal here (just a blank texture)
 			if ( FAILED ( D3DXCreateTextureFromFile ( m_pDevice, strPath, &pMeshTextures[i] ) ) ) {
@@ -734,7 +734,7 @@ void CMainMenuScene::Draw3DScene ( void )
 
 	// DEBUG START
 	dwTimerCurrent = dwTick - dwTimerStart;
-	SString buf = SString::Printf ( "inc rate: %.2f - time: %.2f\ncount: %u - (%u,%u,%u)",fInc,((float)dwTimerCurrent)/1000.0f,dwFrameCount,dwFrameStart,dwFrameMid,dwFrameStop);
+	SString buf ( "inc rate: %.2f - time: %.2f\ncount: %u - (%u,%u,%u)",fInc,((float)dwTimerCurrent)/1000.0f,dwFrameCount,dwFrameStart,dwFrameMid,dwFrameStop);
 	// DEBUG END
 
 	// Check if we have a video renderer

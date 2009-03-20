@@ -62,7 +62,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 	// Is the nick valid?
 	if ( !CheckNickProvided ( (char*) szNick ) )
 	{
-        SString strBuffer = SString::Printf ( "Connecting failed. Invalid nick provided!" );
+        SString strBuffer = "Connecting failed. Invalid nick provided!";
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
 		return false;
 	}
@@ -82,7 +82,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Try to start a network to connect
     if ( !pNet->StartNetwork ( szHost, usPort ) )
     {
-        SString strBuffer = SString::Printf ( "Connecting to %s at port %u failed!", szHost, usPort );
+        SString strBuffer ( "Connecting to %s at port %u failed!", szHost, usPort );
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
         return false;
     }
@@ -97,7 +97,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_tConnectStarted = time ( NULL );
 
     // Display the status box
-    SString strBuffer = SString::Printf ( "Connecting to %s:%u ...", m_strHost.c_str(), usPort );
+    SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), usPort );
     CCore::GetSingleton ().ShowMessageBox ( "Connecting", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
 
     return true;
@@ -244,8 +244,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
             {
                 // Populate the arguments to pass it (-c host port nick)
-                SString strArguments;
-                strArguments = SString::Printf ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
+                SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton ().RemoveMessageBox ();
@@ -303,7 +302,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 if ( !CModManager::GetSingleton ().Load ( szModName, strArguments ) )
                 {
                     // Failed loading the mod
-                    strArguments = SString::Printf ( "No such mod installed (%s)", szModName );
+                    strArguments.Format ( "No such mod installed (%s)", szModName );
                     CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
 					g_pConnectManager->Abort ();
                 }

@@ -344,11 +344,11 @@ bool CClientEntity::GetCustomDataString ( const char* szName, SString& strOut, b
         }
         else if ( iType == LUA_TNUMBER )
         {
-            strOut = SString::Printf ( "%f", pData->GetNumber () );
+            strOut.Format ( "%f", pData->GetNumber () );
         }
         else if ( iType == LUA_TBOOLEAN )
         {
-            strOut = SString::Printf ( "%u", pData->GetBoolean () );
+            strOut.Format ( "%u", pData->GetBoolean () );
         }
         else if ( iType == LUA_TNIL )
         {

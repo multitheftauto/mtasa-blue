@@ -629,7 +629,7 @@ int CLuaFunctionDefinitions::EngineLoadCOL ( lua_State* luaVM )
 	        if ( szFile && IsValidFilePath ( szFile ) )
             {
                 // Generate the full path to the file
-		        SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName (), szFile );
+		        SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName (), szFile );
 
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
@@ -685,7 +685,7 @@ int CLuaFunctionDefinitions::EngineLoadDFF ( lua_State* luaVM )
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
                     // Grab the path to resource root
-		            SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		            SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
@@ -740,7 +740,7 @@ int CLuaFunctionDefinitions::EngineLoadTXD ( lua_State* luaVM )
 	        if ( szFile && IsValidFilePath ( szFile ) )
             {
                 // Grab the path to resource root
-		        SString strPath = SString::Printf ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		        SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
@@ -1367,7 +1367,7 @@ int CLuaFunctionDefinitions::dxDrawImage ( lua_State* luaVM )
 	    if ( pResource && szFile && IsValidFilePath ( szFile ) )
         {
 		    // Get the correct directory
-		    SString strPath = SString::Printf ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
+		    SString strPath ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
 
             if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
             {
@@ -9775,7 +9775,7 @@ int CLuaFunctionDefinitions::GUIStaticImageLoadImage ( lua_State* luaVM )
 		    if ( IsValidFilePath ( szFile ) ) {
 
 			    // get the correct directory
-			    SString strPath = SString::Printf ( "%s/resources/%s/", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName () );
+			    SString strPath ( "%s/resources/%s/", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName () );
 
 			    // and attempt to load the image
 			    CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
@@ -11598,7 +11598,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         char* strText = new char [ strlen ( szText ) + 1 ];
         strcpy ( strText, szText );
 
-        SString strDelimiter = SString::Printf ( "%c", iDelimiter );
+        SString strDelimiter ( "%c", iDelimiter );
 
         unsigned int uiCount = 1;
         char* szToken = strtok ( strText, strDelimiter );
@@ -11652,7 +11652,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     char* strText = new char [ strlen ( szText ) + 1 ];
     strcpy ( strText, szText );
 
-    SString strDelimiter = SString::Printf ( "%c", iDelimiter );
+    SString strDelimiter ( "%c", iDelimiter );
 
     unsigned int uiCount = 0;
     char* szToken = strtok ( strText, strDelimiter );
@@ -13864,7 +13864,7 @@ int CLuaFunctionDefinitions::XMLLoadFile ( lua_State* luaVM )
         if ( luaMain )
         {
             //const char * szFilename = lua_tostring ( luaVM, 1 );
-            SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
+            SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
             //if ( IsValidFilePath ( szFilename ) ) // This would be checking the full path when we only need to check the user input
 		    if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
             {
@@ -14026,7 +14026,7 @@ int CLuaFunctionDefinitions::XMLCreateChild ( lua_State* luaVM )
 		CXMLNode* pXMLNode = lua_toxmlnode ( luaVM, 1 );
 		if ( pXMLNode )
 		{
-			SString strSubNodeName = SString::Printf ( "%s", lua_tostring ( luaVM, 2 ) );
+			SString strSubNodeName ( "%s", lua_tostring ( luaVM, 2 ) );
 			CXMLNode* pXMLSubNode = pXMLNode->CreateSubNode ( strSubNodeName );
 			lua_pushxmlnode ( luaVM, pXMLSubNode );
 			return 1;
@@ -14079,7 +14079,7 @@ int CLuaFunctionDefinitions::XMLCopyFile ( lua_State* luaVM )
              lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
             // Grab the full filepath of the copied xml and make sure its legal
-		    SString strFilename = SString::Printf ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
+		    SString strFilename ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
 		    if ( IsValidFilePath ( lua_tostring ( luaVM, 2 ) ) )
             {
                 // Grab the source node
@@ -15016,7 +15016,7 @@ int CLuaFunctionDefinitions::PlaySound ( lua_State* luaVM )
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-                SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+                SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
 		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
                 {
                     bool bLoop = false;
@@ -15061,7 +15061,7 @@ int CLuaFunctionDefinitions::PlaySound3D ( lua_State* luaVM )
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-                SString strFilename = SString::Printf ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
+                SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
 		        if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
                 {
                     bool bLoop = false;
