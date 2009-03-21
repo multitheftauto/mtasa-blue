@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.hpp"
 
 CGUI_Impl* g_pGUI = NULL;
 

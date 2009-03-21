@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.hpp"
 
 CXMLImpl* pXMLInterface = NULL;
 

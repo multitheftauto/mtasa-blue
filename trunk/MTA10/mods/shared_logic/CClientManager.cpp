@@ -12,7 +12,7 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 
 extern CClientGame* g_pClientGame;
 

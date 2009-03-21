@@ -18,7 +18,6 @@
 
 #include "StdInc.h"
 #include <stdio.h>
-#include "SharedUtil.hpp"
 
 // These includes have to be fixed!
 #include "..\game_sa\CCameraSA.h"
