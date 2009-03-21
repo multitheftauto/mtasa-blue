@@ -493,7 +493,7 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
         }
         if ( szResource )
         {
-            bind->szResource = new char [ strlen ( szArguments ) + 1 ];
+            bind->szResource = new char [ strlen ( szResource ) + 1 ];
             strcpy ( bind->szResource, szResource );
         }
         bind->bHitState = bState;
