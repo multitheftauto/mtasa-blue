@@ -33,10 +33,11 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_ulChatLineFadeOut = 0;
     m_bCssStyleText = false;
     m_bCssStyleBackground = false;
-    m_szCommand = NULL;
     m_bVisible = false;
     m_bInputVisible = false;
     m_uiNumLines = 7;
+    m_uiMostRecentLine = 0;
+    m_uiScrollOffset = 0;
     m_pFont = m_pManager->GetBoldFont ();
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = DEBUGVIEW_WIDTH;
@@ -58,9 +59,6 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
 
     m_pInput = NULL;
     m_pInputTexture = NULL;
-    m_pInputLine = NULL;
-    m_szInputText = NULL;
-    m_szCommand = NULL;   
 
     g_pChat = pChat;
 
