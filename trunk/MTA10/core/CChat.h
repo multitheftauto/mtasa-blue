@@ -15,90 +15,118 @@
 
 #include "CGUI.h"
 #include <core/CCoreInterface.h>
-#include <list>
-using namespace std;
 
 class CChatLineSection;
 
 #define CHAT_WIDTH              320                             // Chatbox default width
-#define CHAT_TEXT_COLOR         CColor(235, 221, 178, 255)      // Chatbox default text color
-#define CHAT_MAX_LINES          30                              // Chatbox maximum chat lines
+#define CHAT_TEXT_COLOR         CColor(235, 221, 178)           // Chatbox default text color
+#define CHAT_MAX_LINES          100                             // Chatbox maximum chat lines
 #define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
 #define CHAT_BUFFER             1024                            // Chatbox buffer size
+
+#define VK_BACKSPACE 0x8
+#define VK_RETURN 0xD
+#define VK_PGUP 0x21
+#define VK_PGDN 0x22
 
 class CColor
 {
 public:
     inline                      CColor              ( void )
     {
-        this->R = 255; this->G = 255; this->B = 255; this->A = 255;
+        R = G = B = A = 255;
     }
-    inline                      CColor              ( unsigned char R, unsigned char G, unsigned char B, unsigned char A )
+    inline                      CColor              ( unsigned char _R, unsigned char _G, unsigned char _B, unsigned char _A = 255 )
     {
-        this->R = R; this->G = G; this->B = B; this->A = A;
+        R = _R;
+        G = _G;
+        B = _B;
+        A = _A;
     }
-    inline CColor&              operator =          ( CColor& color )
+    inline                      CColor              ( const CColor& other )
     {
-        this->R = color.R; this->G = color.G; this->B = color.B; this->A = color.A;
+        *this = other;
+    }
+    inline                      CColor              ( unsigned long ulColor )
+    {
+        *this = ulColor;
+    }
+    inline CColor&              operator =          ( const CColor& color )
+    {
+        R = color.R;
+        G = color.G;
+        B = color.B;
+        A = color.A;
         return *this;
     }
+    inline CColor&              operator =          ( unsigned long ulColor )
+    {
+        R = (ulColor >> 16) & 0xFF;
+        G = (ulColor >>  8) & 0xFF;
+        B = (ulColor      ) & 0xFF;
+        return *this;
+    }
+
     unsigned char               R, G, B, A;
+};
+
+class CChatLineSection
+{
+public:
+    friend class CChatLine;
+
+                                CChatLineSection        ();
+                                CChatLineSection        ( const CChatLineSection& other );
+
+    CChatLineSection&           operator =              ( const CChatLineSection& other );
+
+    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
+    float                       GetWidth                ( void );
+    inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
+    void                        SetText                 ( const char* szText )  { m_strText = szText; }
+    inline void                 GetColor                ( CColor& color )   { color = m_Color; }
+    inline void                 SetColor                ( CColor& color )   { m_Color = color; }
+
+protected:
+    std::string                 m_strText;
+    CColor                      m_Color;
+    float                       m_fCachedWidth;
+    unsigned int                m_uiCachedLength;
 };
 
 class CChatLine
 {
 public:
                                 CChatLine               ( void );
-    virtual                     ~CChatLine              ( void );
 
-    static bool                 IsNumber                ( char c );
-    static unsigned char        GetNumber               ( char c );
-    virtual char*               Format                  ( char* szText, float fWidth, CColor& color, bool bColorCoded, unsigned int& uiCharsUsed );
+    static bool                 IsColorCode             ( const char* szColorCode );
+
+    virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
     virtual void                Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );    
-    virtual float               GetWidth                ( unsigned int uiLength = 0 );
-    virtual unsigned int        GetLength               ( void )    { return m_uiLength; }
+    virtual float               GetWidth                ( void );
+    bool                        IsActive                ( void )    { return m_bActive; }
+    void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
     
-    static SString              RemoveColorCode         ( const char* szText );
+    static void                 RemoveColorCode         ( const char* szText, std::string& strOut );
 
     inline unsigned long        GetCreationTime         ( void )    { return m_ulCreationTime; }
+    inline void                 UpdateCreationTime      ( void );
 
 protected:
-    virtual void                SetText                 ( char* szText );
-    virtual void                AddText                 ( char* szText );
 
-private:
-
-    char*                       m_szText;
-    list < CChatLineSection* >  m_Sections;
+    bool                        m_bActive;
+    vector < CChatLineSection > m_Sections;
     unsigned long               m_ulCreationTime;
-    unsigned int                m_uiLength;
-
-    struct SMarker
-    {
-        unsigned int            uiPosition;
-        CColor                  m_Color;
-    };
 };
 
 class CChatInputLine : public CChatLine
 {
 public:
-                                CChatInputLine          ( void );
-                                ~CChatInputLine         ( void );
-
-    char*                       Format                  ( char* szText, float fWidth, CColor& color, bool bColorCoded, unsigned int& uiCharsUsed );
     void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
     void                        Clear                   ( void );
-    inline unsigned int         GetEditPosition         ( void )                        { return m_uiEditPosition; }
-    void                        SetEditPosition         ( CVector2D& vecOrigin, unsigned int uiPosition );
 
-    CChatLineSection*           m_pPrefix;
-    CChatLineSection*           m_pText;
-    list < CChatLine* >         m_ExtraLines;
-
-protected:
-    unsigned int                m_uiEditPosition;
-    CVector2D                   m_vecEditPosition;
+    CChatLineSection            m_Prefix;
+    vector < CChatLine >        m_ExtraLines;
 };
 
 class CChat
@@ -113,8 +141,8 @@ public:
                                 ~CChat                  ( void );
 
     virtual void                Draw                    ( void );
-    virtual void                Output                  ( char* szText, bool bColorCoded = true );
-    virtual void                Outputf                 ( bool bColorCoded, char* szText, ... );
+    virtual void                Output                  ( const char* szText, bool bColorCoded = true );
+    virtual void                Outputf                 ( bool bColorCoded, const char* szFormat, ... );
     void                        Clear                   ( void );
     void                        ClearInput              ( void );
     bool                        CharacterKeyHandler     ( CGUIKeyEventArgs KeyboardArgs );
@@ -124,12 +152,12 @@ public:
     inline bool                 IsInputVisible          ( void )            { return m_bInputVisible; }
     void                        SetInputVisible         ( bool bVisible );
 
-    char*                       GetInputPrefix          ( void );
-    void                        SetInputPrefix          ( char* szPrefix );
-    char*                       GetInputText            ( void );
-    void                        SetInputText            ( char* szText );
-    inline char*                GetCommand              ( void );
-    void                        SetCommand              ( char* szCommand );
+    const char*                 GetInputPrefix          ( void );
+    void                        SetInputPrefix          ( const char* szPrefix );
+    const char*                 GetInputText            ( void )    { return m_strInputText.c_str (); }
+    void                        SetInputText            ( const char* szText );
+    const char*                 GetCommand              ( void )    { return m_strCommand.c_str (); }
+    void                        SetCommand              ( const char* szCommand );
 
     static float                GetFontHeight           ( float fScale = 1.0f );
     static float                GetCharacterWidth       ( int iChar, float fScale = 1.0f );
@@ -140,6 +168,8 @@ public:
     void                        SetInputColor           ( CColor& Color );
     void                        SetTextColor            ( CColor& Color )   { m_TextColor = Color; };
     void                        SetNumLines             ( unsigned int uiNumLines );
+    void                        ScrollUp                ( void );
+    void                        ScrollDown              ( void );
 
     void                        SetChatFont             ( eChatFont Font );
 
@@ -149,8 +179,10 @@ private:
 protected:
     void                        UpdateGUI               ( void );
 
-    list < CChatLine* >         m_Lines;
-    CChatInputLine*             m_pInputLine;
+    CChatLine                   m_Lines [ CHAT_MAX_LINES ];     // Circular buffer
+    unsigned int                m_uiMostRecentLine;
+    unsigned int                m_uiScrollOffset;
+    CChatInputLine              m_InputLine;
 
     CGUI*                       m_pManager;
     CGUIFont*                   m_pFont;
@@ -166,8 +198,8 @@ protected:
     CGUIStaticImage*            m_pBackground;
     CGUIStaticImage*            m_pInput;
 
-    char*                       m_szInputText;
-    char*                       m_szCommand;
+    std::string                 m_strInputText;
+    std::string                 m_strCommand;
 
     bool                        m_bVisible;
     bool                        m_bInputVisible;
@@ -176,6 +208,7 @@ protected:
     CColor                      m_Color;
     CColor                      m_TextColor;
     CColor                      m_InputColor;
+    CColor                      m_InputTextColor;
     bool                        m_bCssStyleText;
     bool                        m_bCssStyleBackground;
     unsigned long               m_ulChatLineLife;
@@ -186,26 +219,6 @@ protected:
 
     bool                        m_bCanChangeWidth;
     int                         m_iCVarsRevision;
-};
-
-class CChatLineSection
-{
-public:
-                                CChatLineSection        ( void );
-                                ~CChatLineSection       ( void );
-
-    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
-    float                       GetWidth                ( unsigned int uiLength = 0 );
-    inline char*                GetText                 ( void )            { return m_szText; }
-    void                        SetText                 ( char* szText );
-    inline void                 GetColor                ( CColor& color )   { color = m_Color; }
-    inline void                 SetColor                ( CColor& color )   { m_Color = color; }
-    inline unsigned int         GetLength               ( void )            { return m_uiLength; }
-
-protected:
-    char*                       m_szText;
-    CColor                      m_Color;
-    unsigned int                m_uiLength;
 };
 
 #endif

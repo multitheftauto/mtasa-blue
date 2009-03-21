@@ -374,7 +374,9 @@ void CCore::ChatEcho ( const char* szText, bool bColorCoded )
     m_pLocalGUI->EchoChat ( szText, bColorCoded );
     if ( bColorCoded )
     {
-        m_pLocalGUI->EchoConsole ( CChatLine::RemoveColorCode ( szText ) );
+        std::string strWithoutColorCodes;
+        CChatLine::RemoveColorCode ( szText, strWithoutColorCodes );
+        m_pLocalGUI->EchoConsole ( strWithoutColorCodes.c_str () );
     }
     else
         m_pLocalGUI->EchoConsole ( szText );
@@ -476,7 +478,9 @@ void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G
     m_pLocalGUI->EchoChat ( szText, bColorCoded );
     if ( bColorCoded )
     {
-        m_pLocalGUI->EchoConsole ( CChatLine::RemoveColorCode ( szText ) );
+        std::string strWithoutColorCodes;
+        CChatLine::RemoveColorCode ( szText, strWithoutColorCodes );
+        m_pLocalGUI->EchoConsole ( strWithoutColorCodes.c_str () );
     }
     else
         m_pLocalGUI->EchoConsole ( szText );
