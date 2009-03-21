@@ -113,6 +113,9 @@ public:
 
     void operator = ( const CGUICallback < Ret, Arguments > & copy )
     {
+        if ( &copy == this )
+            return;
+
         if ( m_pCallback )
         {
             delete m_pCallback;
@@ -121,7 +124,7 @@ public:
 
         if ( copy.m_pCallback )
         {
-		    m_pCallback = copy.m_pCallback->Copy();
+            m_pCallback = copy.m_pCallback->Copy();
         }
         else
         {
