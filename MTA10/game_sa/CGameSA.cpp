@@ -16,7 +16,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.hpp"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;

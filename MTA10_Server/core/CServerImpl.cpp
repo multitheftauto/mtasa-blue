@@ -20,7 +20,6 @@
 #include "Platform.h"
 #include "ErrorCodes.h"
 #include <cstdio>
-#include "SharedUtil.hpp"
 
 // Define libraries
 #ifdef WIN32

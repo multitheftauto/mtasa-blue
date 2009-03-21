@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.hpp"
 
 CServer* g_pServer = NULL;
 
