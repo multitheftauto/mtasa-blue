@@ -116,6 +116,7 @@ public:
         if ( m_pCallback )
         {
             delete m_pCallback;
+            m_pCallback = NULL;
         }
 
         if ( copy.m_pCallback )
