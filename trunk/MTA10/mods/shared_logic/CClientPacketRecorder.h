@@ -19,8 +19,6 @@ class CClientPacketRecorder;
 #include "CClientManager.h"
 #include <ctime>
 
-using namespace std;
-
 class CClientPacketRecorder
 {
     friend CClientManager;

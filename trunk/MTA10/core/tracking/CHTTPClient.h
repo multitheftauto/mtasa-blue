@@ -26,8 +26,6 @@
 // HTTP buffer size (for OnRead)
 #define HTTP_BUFFER_LENGTH      4096
 
-using namespace std;
-
 class CHTTPClient
 {
 public:

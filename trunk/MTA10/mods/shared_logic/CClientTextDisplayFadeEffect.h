@@ -15,8 +15,6 @@
 #include "CClientTextDisplayEffect.h"
 #include <ctime>
 
-using namespace std;
-
 enum
 {
     TEXTDISPLAY_FADE_IN = 1,

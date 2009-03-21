@@ -22,8 +22,6 @@ class CVehicleManager;
 #include <list>
 #include "lua/CLuaMain.h"
 
-using namespace std;
-
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
 #define VEHICLE_PASSENGERS_UNDEFINED	255
 

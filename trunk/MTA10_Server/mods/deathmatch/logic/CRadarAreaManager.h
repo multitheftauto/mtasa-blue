@@ -16,8 +16,6 @@
 #include "CRadarArea.h"
 #include <list>
 
-using namespace std;
-
 class CRadarAreaManager
 {
     friend class CRadarArea;

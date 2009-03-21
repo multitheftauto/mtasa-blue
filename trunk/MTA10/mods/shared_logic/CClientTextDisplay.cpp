@@ -11,7 +11,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 float CClientTextDisplay::m_fGlobalScale = 1.0f;
 

@@ -17,8 +17,6 @@
 #include "CPacket.h"
 #include <list>
 
-using namespace std;
-
 class CPlayerListPacket : public CPacket
 {
 public:
@@ -35,7 +33,7 @@ public:
     inline void                 SetShowInChat               ( bool bShowInChat )        { m_bShowInChat = bShowInChat; };
 
 private:
-    list < CPlayer* >           m_List;
+    std::list < CPlayer* >      m_List;
     bool                        m_bShowInChat;
     
 };

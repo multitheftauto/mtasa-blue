@@ -33,12 +33,12 @@ public:
     CTeam*                  Create              ( CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     CTeam*                  CreateFromXML       ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
 
-    list < CTeam* > ::const_iterator IterBegin  ( void )            { return m_List.begin (); }
-    list < CTeam* > ::const_iterator IterEnd    ( void )            { return m_List.end (); }
+    std::list < CTeam* > ::const_iterator IterBegin  ( void )            { return m_List.begin (); }
+    std::list < CTeam* > ::const_iterator IterEnd    ( void )            { return m_List.end (); }
 
 private:
-    list < CTeam* >     m_List;
-    bool                m_bRemoveFromList;
+    std::list < CTeam* >    m_List;
+    bool                    m_bRemoveFromList;
 };
 
 #endif

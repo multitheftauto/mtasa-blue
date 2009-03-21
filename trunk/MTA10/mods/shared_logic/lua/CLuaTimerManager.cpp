@@ -14,6 +14,8 @@
 
 #include <StdInc.h>
 
+using std::list;
+
 void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
     unsigned long ulCurrentTime = timeGetTime ();

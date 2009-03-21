@@ -23,7 +23,6 @@ class CSFXSynth;
 #define SFX_SYNTH_BUFFER_SIZE	2048
 
 #include <vector>
-using namespace std;
 
 class CSFX
 {
@@ -44,12 +43,12 @@ public:
 	void					Render			( float *pBuffer, unsigned long nLen );
 
 private:
-	void					Initialize		( void );
-	void					Destroy			( void );
+	void					    Initialize		( void );
+	void					    Destroy			( void );
 
-	float					m_fVolume;
+	float					    m_fVolume;
 
-	vector < CSFXSynth* >	m_Synths;
+	std::vector < CSFXSynth* >	m_Synths;
 };
 
 class CSFXSynth

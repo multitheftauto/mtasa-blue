@@ -20,8 +20,6 @@
 #include "CMapEvent.h"
 #include <list>
 
-using namespace std;
-
 class CMapEventManager
 {
 public:
@@ -43,11 +41,11 @@ public:
     bool                    Call                            ( const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis );
 
 private:
-    void                    TakeOutTheTrash                 ( void );
+    void                        TakeOutTheTrash                 ( void );
 
-    list < CMapEvent* >     m_Events;
-    list < CMapEvent* >     m_TrashCan;
-    bool                    m_bIteratingList;
+    std::list < CMapEvent* >    m_Events;
+    std::list < CMapEvent* >    m_TrashCan;
+    bool                        m_bIteratingList;
 };
 
 #endif

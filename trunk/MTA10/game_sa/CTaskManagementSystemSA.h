@@ -24,8 +24,6 @@ class CTaskManagementSystemSA;
 #include <game/CTaskManagementSystem.h>
 #include <list>
 
-using namespace std;
-
 #define FUNC_CTask_Operator_Delete          0x61A5B0
 
 class CTaskManagementSystemSA : public CTaskManagementSystem
@@ -46,7 +44,7 @@ private:
         CTaskSA*            pTaskSA;
     };
 
-    list < STaskListItem* >     m_TaskList;
+    std::list < STaskListItem* >     m_TaskList;
 };
 
 #endif

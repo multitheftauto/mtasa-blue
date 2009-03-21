@@ -17,8 +17,6 @@
 #include "CClientRadarArea.h"
 #include <list>
 
-using namespace std;
-
 class CClientRadarAreaManager
 {
     friend class CClientManager;
@@ -34,8 +32,8 @@ public:
     void                                                    Delete                              ( CClientRadarArea* pRadarArea );
     void                                                    DeleteAll                           ( void );
 
-    inline list < CClientRadarArea* > ::const_iterator      IterBegin                           ( void )                                { return m_List.begin (); };
-    inline list < CClientRadarArea* > ::const_iterator      IterEnd                             ( void )                                { return m_List.end (); };
+    inline std::list < CClientRadarArea* > ::const_iterator IterBegin                           ( void )                                { return m_List.begin (); };
+    inline std::list < CClientRadarArea* > ::const_iterator IterEnd                             ( void )                                { return m_List.end (); };
 
     static CClientRadarArea*                                Get                                 ( ElementID ID );
 
@@ -52,7 +50,7 @@ private:
 private:
     CClientManager*                                         m_pManager;
 
-    list < CClientRadarArea* >                              m_List;
+    std::list < CClientRadarArea* >                         m_List;
     bool                                                    m_bDontRemoveFromList;
     unsigned short                                          m_usDimension;
 

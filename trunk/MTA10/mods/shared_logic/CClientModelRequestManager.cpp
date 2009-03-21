@@ -10,7 +10,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 CClientModelRequestManager::CClientModelRequestManager ( void )
 {

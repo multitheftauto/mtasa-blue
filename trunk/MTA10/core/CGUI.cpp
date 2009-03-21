@@ -14,6 +14,8 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
+using std::string;
+
 template<> CLocalGUI * CSingleton < CLocalGUI >::m_pSingleton = NULL;
 
 #define HIWORD(l)           ((WORD)((DWORD_PTR)(l) >> 16))

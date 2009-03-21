@@ -27,7 +27,6 @@ class CMainConfig;
 #include "CConsole.h"
 #include "CXMLConfig.h"
 #include <list>
-using namespace std;
 
 #define MAX_MAP_NAME_LENGTH 64
 

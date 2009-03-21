@@ -10,8 +10,10 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 #include "CElementRPCs.h"
+
+using std::list;
 
 void CElementRPCs::LoadFunctions ( void )
 {

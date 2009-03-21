@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 CCore* g_pCore = NULL;
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)

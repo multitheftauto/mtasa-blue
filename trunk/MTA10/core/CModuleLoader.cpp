@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 CModuleLoader::CModuleLoader ( string ModuleName )
 {
     m_hLoadedModule = 0;

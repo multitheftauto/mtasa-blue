@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 void TrimWhiteSpace ( std::string & str )  
 {  
     unsigned long k = str.find_first_not_of(" \t");

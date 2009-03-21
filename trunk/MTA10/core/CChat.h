@@ -114,9 +114,9 @@ public:
 
 protected:
 
-    bool                        m_bActive;
-    vector < CChatLineSection > m_Sections;
-    unsigned long               m_ulCreationTime;
+    bool                                m_bActive;
+    std::vector < CChatLineSection >    m_Sections;
+    unsigned long                       m_ulCreationTime;
 };
 
 class CChatInputLine : public CChatLine
@@ -126,7 +126,7 @@ public:
     void                        Clear                   ( void );
 
     CChatLineSection            m_Prefix;
-    vector < CChatLine >        m_ExtraLines;
+    std::vector < CChatLine >   m_ExtraLines;
 };
 
 class CChat

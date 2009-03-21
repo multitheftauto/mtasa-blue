@@ -15,7 +15,6 @@
 
 #include "CCommon.h"
 #include <vector>
-using namespace std;
 #include <net/CNetServer.h>
 #include "CPlayerManager.h"
 
@@ -54,9 +53,9 @@ protected:
     DECLARE_RPC ( RequestStealthKill );
 
 protected:
-    static CPlayer *            m_pSourcePlayer;
+    static CPlayer *                m_pSourcePlayer;
 
-    vector < SRPCHandler * >    m_RPCHandlers;
+    std::vector < SRPCHandler * >   m_RPCHandlers;
 
     enum eRPCFunctions
     {

@@ -17,8 +17,6 @@
 #include "../Config.h"
 #include "CMapFile.h"
 
-using namespace std;
-
 class CMapFiles
 {
 public:

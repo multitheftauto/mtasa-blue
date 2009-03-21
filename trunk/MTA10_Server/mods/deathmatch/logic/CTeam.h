@@ -48,14 +48,14 @@ public:
 
     inline unsigned int     CountPlayers            ( void )                    { return static_cast < unsigned int > ( m_Players.size () ); }
 
-    list < CPlayer* > ::const_iterator PlayersBegin ( void )                    { return m_Players.begin (); }
-    list < CPlayer* > ::const_iterator PlayersEnd   ( void )                    { return m_Players.end (); }
+    std::list < CPlayer* > ::const_iterator PlayersBegin ( void )               { return m_Players.begin (); }
+    std::list < CPlayer* > ::const_iterator PlayersEnd   ( void )               { return m_Players.end (); }
 
 private:                        
     CTeamManager*           m_pTeamManager;
 
     char*                   m_szTeamName;
-    list < CPlayer* >       m_Players;
+    std::list < CPlayer* >       m_Players;
 
     unsigned char           m_ucRed;
     unsigned char           m_ucGreen;

@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 #define POLYENTRY_TYPE(entry) ( (entry)->m_wValue >> 14 )
 #define POLYENTRY_ID(entry) ( (entry)->m_wValue & 0x3FFF )
 #define MAKE_POLYENTRY(type, id) (WORD)( ((type) << 14) | (id) )

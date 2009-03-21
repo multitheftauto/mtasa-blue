@@ -23,8 +23,6 @@
 #include <CGeneric.h>
 #include <core/CServerInterface.h>
 
-using namespace std;
-
 // Globals
 extern CServerInterface* g_pServerInterface;
 extern CNetServer* g_pNetServer;

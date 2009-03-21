@@ -24,7 +24,6 @@ class CClientCivilianManager;
 #endif
 
 #include <list>
-using namespace std;
 
 class CClientCivilianManager
 {
@@ -42,12 +41,12 @@ public:
 
     static bool                     IsValidModel            ( unsigned int ulCivilianModel );
 
-    list < CClientCivilian* > ::iterator             IterGet             ( CClientCivilian* pCivilian );
-    list < CClientCivilian* > ::reverse_iterator     IterGetReverse      ( CClientCivilian* pCivilian );
-    inline list < CClientCivilian* > ::iterator      IterBegin           ( void )           { return m_Civilians.begin (); };
-    list < CClientCivilian* > ::iterator             IterEnd             ( void )           { return m_Civilians.end (); };
-    list < CClientCivilian* > ::reverse_iterator     IterReverseBegin    ( void )           { return m_Civilians.rbegin (); };
-    list < CClientCivilian* > ::reverse_iterator     IterReverseEnd      ( void )           { return m_Civilians.rend (); };
+    std::list < CClientCivilian* > ::iterator               IterGet             ( CClientCivilian* pCivilian );
+    std::list < CClientCivilian* > ::reverse_iterator       IterGetReverse      ( CClientCivilian* pCivilian );
+    inline std::list < CClientCivilian* > ::iterator        IterBegin           ( void )           { return m_Civilians.begin (); };
+    std::list < CClientCivilian* > ::iterator               IterEnd             ( void )           { return m_Civilians.end (); };
+    std::list < CClientCivilian* > ::reverse_iterator       IterReverseBegin    ( void )           { return m_Civilians.rbegin (); };
+    std::list < CClientCivilian* > ::reverse_iterator       IterReverseEnd      ( void )           { return m_Civilians.rend (); };
 
 private:
                                     CClientCivilianManager   ( class CClientManager* pManager );
@@ -58,7 +57,7 @@ private:
 
     class CClientManager*           m_pManager;
     bool                            m_bCanRemoveFromList;
-    list < CClientCivilian* >       m_Civilians;
+    std::list < CClientCivilian* >  m_Civilians;
 };
 
 #endif

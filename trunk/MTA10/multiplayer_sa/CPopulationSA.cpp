@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CPedSAInterface		* pPedStorage;
 CPopulationSA		* pSingleton;
 DWORD               pedVtable;

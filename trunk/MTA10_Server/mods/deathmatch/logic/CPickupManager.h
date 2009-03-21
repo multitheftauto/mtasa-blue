@@ -19,8 +19,6 @@ class CPickupManager;
 #include "CPickup.h"
 #include <list>
 
-using namespace std;
-
 class CPickupManager
 {
     friend class CPickup;

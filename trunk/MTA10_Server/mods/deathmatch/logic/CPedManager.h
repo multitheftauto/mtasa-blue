@@ -15,8 +15,6 @@ class CPedManager;
 #ifndef __CPedManager_H
 #define __CPedManager_H
 
-using namespace std;
-
 class CPedManager
 {
     friend class CPed;

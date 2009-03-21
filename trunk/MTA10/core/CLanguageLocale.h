@@ -17,8 +17,6 @@
 #include <string>
 #include "CSingleton.h"
 
-using namespace std;
-
 enum LANGUAGETYPE
 {
     LT_DEFAULT,
@@ -42,7 +40,7 @@ class CLanguageLocale : public CSingleton < CLanguageLocale >
 
     LANGUAGETYPE    GetLocalLanguageIdentifier      ( );
     VOID            SetDefaultLanguageIdentifier    ( LANGUAGETYPE Type );
-    BOOL            GetString                       ( LANGUAGETYPE Type, string& strOut );
+    BOOL            GetString                       ( LANGUAGETYPE Type, std::string& strOut );
     BOOL            LoadStringTable                 ( );
 
     private:

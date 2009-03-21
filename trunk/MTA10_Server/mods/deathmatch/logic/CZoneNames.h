@@ -15,7 +15,6 @@
 
 #include "CCommon.h"
 #include <list>
-using namespace std;
 
 #define MAX_ZONE_NAME 32
 

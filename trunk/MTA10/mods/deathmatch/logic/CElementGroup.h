@@ -22,7 +22,7 @@ class CElementGroup;
 class CElementGroup
 {
 private:
-    list<CClientEntity *>           m_elements;
+    std::list < CClientEntity* >    m_elements;
     class CResource *               m_pResource;
 public:
                                     CElementGroup ( CResource * resource )

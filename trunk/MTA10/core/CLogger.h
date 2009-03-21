@@ -16,7 +16,6 @@
 #include "CSingleton.h"
 #include <fstream>
 #include <string>
-using namespace std;
 
 #ifdef MTA_DEBUG
 #   define WriteDebugEvent( a ) CLogger::GetSingleton ( ).WriteDebugEventInt ( a )
@@ -32,10 +31,10 @@ class CLogger : public CSingleton < CLogger >
             CLogger ( );
            ~CLogger ( );
 
-    void    WriteEvent          ( string EventDescription );
-    void    WriteDebugEventInt  ( string EventDescription );
-    void    OutputDebugMessage  ( string DebugMessage ); 
-    void    WriteErrorEventInt  ( string ErrorMessage );
+    void    WriteEvent          ( std::string EventDescription );
+    void    WriteDebugEventInt  ( std::string EventDescription );
+    void    OutputDebugMessage  ( std::string DebugMessage ); 
+    void    WriteErrorEventInt  ( std::string ErrorMessage );
     void    ErrorPrintf         ( const char* szFormat, ... );
 
     private:

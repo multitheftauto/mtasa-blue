@@ -16,8 +16,6 @@
 
 #include <cstdlib>
 
-using namespace std;
-
 typedef unsigned long CRC32;
 
 class CClientCRC32Hasher

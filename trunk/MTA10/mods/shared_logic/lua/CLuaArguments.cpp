@@ -15,7 +15,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using namespace std;
 
 #ifndef VERIFY_ENTITY
 #define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity,true)&&!entity->IsBeingDeleted())

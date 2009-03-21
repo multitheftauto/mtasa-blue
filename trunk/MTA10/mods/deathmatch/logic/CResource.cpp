@@ -14,7 +14,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using namespace std;
 
 extern CClientGame* g_pClientGame;
 

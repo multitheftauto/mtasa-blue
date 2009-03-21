@@ -23,8 +23,6 @@ class CAccessControlListGroup;
 
 #include <google/dense_hash_map>
 
-using namespace std;
-
 class CAccessControlListGroupObject
 {
 public:

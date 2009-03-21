@@ -110,7 +110,7 @@ public:
 
     bool                DrawTextureQueued       ( float fX, float fY,
                                                   float fWidth, float fHeight,
-                                                  const string& strFilename,
+                                                  const std::string& strFilename,
                                                   float fRotation,
                                                   float fRotCenOffX,
                                                   float fRotCenOffY,
@@ -135,7 +135,7 @@ private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
-    IDirect3DTexture9*  CacheTexture            ( const string& strFilename );
+    IDirect3DTexture9*  CacheTexture            ( const std::string& strFilename );
     void                ExpireCachedTextures    ( bool bExpireAll = false );
 
     CLocalGUI*          m_pGUI;
@@ -247,7 +247,7 @@ private:
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
-        string              strText;
+        std::string         strText;
 
         // Queue item data based on the eType.
         union
@@ -279,7 +279,7 @@ private:
         unsigned long       ulTimeLastUsed;
     };
 
-    map < string, SCachedTextureInfo > m_CachedTextureInfoMap;
+    std::map < std::string, SCachedTextureInfo > m_CachedTextureInfoMap;
 
 };
 

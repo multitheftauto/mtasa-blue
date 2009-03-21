@@ -18,7 +18,6 @@ class CKeyBinds;
 #include <windows.h>
 #include <string.h>
 #include <list>
-using namespace std;
 
 #include <core/CCoreInterface.h>
 #include <core/CCommandsInterface.h>
@@ -42,8 +41,8 @@ public:
     void                    ClearCommandsAndControls    ( void );
     bool                    Call                        ( CKeyBind* pKeyBind );
     
-    list < CKeyBind* > ::const_iterator IterBegin       ( void )    { return m_pList->begin (); }
-    list < CKeyBind* > ::const_iterator IterEnd         ( void )    { return m_pList->end (); }
+    std::list < CKeyBind* > ::const_iterator IterBegin  ( void )    { return m_pList->begin (); }
+    std::list < CKeyBind* > ::const_iterator IterEnd    ( void )    { return m_pList->end (); }
 
 
     // Command-bind funcs
@@ -55,7 +54,7 @@ public:
     bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL );
     bool                    SetCommandActive            ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive );
     CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true );
-    bool                    GetBoundCommands            ( const char* szCommand, list < CCommandBind * > & commandsList );
+    bool                    GetBoundCommands            ( const char* szCommand, std::list < CCommandBind * > & commandsList );
     
     // Control-bind funcs
     bool                    AddGTAControl               ( const char* szKey, const char* szControl );
@@ -70,7 +69,7 @@ public:
     unsigned int            GTAControlsCount            ( void );
     void                    CallGTAControlBind          ( CGTAControlBind* pBind, bool bState );
     void                    CallAllGTAControlBinds      ( eControlType controlType, bool bState );
-    bool                    GetBoundControls            ( SBindableGTAControl * pControl, list < CGTAControlBind * > & controlsList );
+    bool                    GetBoundControls            ( SBindableGTAControl * pControl, std::list < CGTAControlBind * > & controlsList );
 
     // Control-bind extra funcs
     bool                    GetMultiGTAControlState     ( CGTAControlBind* pBind );
@@ -144,14 +143,14 @@ public:
     void                    RemoveAllSections           ( void );
 
 private:    
-    CCore*                  m_pCore;
+    CCore*                      m_pCore;
 
-    list < CKeyBind* >*     m_pList;
-    char*                   m_szFileName;
-    bool                    m_bMouseWheel;
-    bool                    m_bInVehicle;
-    CCommandBind*           m_pChatBoxBind;
-    bool                    m_bProcessingKeyStroke;
+    std::list < CKeyBind* >*    m_pList;
+    char*                       m_szFileName;
+    bool                        m_bMouseWheel;
+    bool                        m_bInVehicle;
+    CCommandBind*               m_pChatBoxBind;
+    bool                        m_bProcessingKeyStroke;
 };
 
 #endif

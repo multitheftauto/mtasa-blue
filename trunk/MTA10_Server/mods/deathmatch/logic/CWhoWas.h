@@ -16,8 +16,6 @@
 #include "../Config.h"
 #include <list>
 
-using namespace std;
-
 struct SWhoWasEntry
 {
     char            szNick [MAX_NICK_LENGTH + 1];
@@ -28,15 +26,15 @@ struct SWhoWasEntry
 class CWhoWas
 {
 public:
-    void                                            Add                 ( const char* szNick, unsigned long ulIP, unsigned short usPort );
-    inline void                                     Clear               ( void )        { m_List.clear (); };
+    void                                                Add                 ( const char* szNick, unsigned long ulIP, unsigned short usPort );
+    inline void                                         Clear               ( void )        { m_List.clear (); };
 
-    inline unsigned int                             Count               ( void )        { return m_List.size (); };
-    inline list < SWhoWasEntry > ::const_iterator   IterBegin           ( void )        { return m_List.begin (); };
-    inline list < SWhoWasEntry > ::const_iterator   IterEnd             ( void )        { return m_List.end (); };
+    inline unsigned int                                 Count               ( void )        { return m_List.size (); };
+    inline std::list < SWhoWasEntry > ::const_iterator  IterBegin           ( void )        { return m_List.begin (); };
+    inline std::list < SWhoWasEntry > ::const_iterator  IterEnd             ( void )        { return m_List.end (); };
 
 private:
-    list < SWhoWasEntry >                           m_List;
+    std::list < SWhoWasEntry >                          m_List;
 };
 
 #endif

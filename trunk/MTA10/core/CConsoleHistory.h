@@ -14,7 +14,6 @@
 #define __CCONSOLEHISTORY_H
 
 #include <list>
-using namespace std;
 
 class CConsoleHistory
 {
@@ -30,13 +29,13 @@ public:
     const char*     Get                         ( unsigned int uiIndex );
 
 private:
-    void            DeleteLastEntry             ( void );
+    void                    DeleteLastEntry             ( void );
 
-    list < char* >  m_History;
-    unsigned int    m_uiHistoryLength;
+    std::list < char* >     m_History;
+    unsigned int            m_uiHistoryLength;
 
-    std::string     m_strFilename;
-    FILE*           m_pFile;
+    std::string             m_strFilename;
+    FILE*                   m_pFile;
 };
 
 #endif

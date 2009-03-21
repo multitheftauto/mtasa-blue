@@ -75,9 +75,7 @@ CGenericManager notes by Oli:
 #include <stdio.h>
 #include <list>
 
-using namespace std;
-
-template < typename TManager, typename TManaged > class CGenericManager : protected list < TManaged* >
+template < typename TManager, typename TManaged > class CGenericManager : protected std::list < TManaged* >
 {
 public:
     explicit CGenericManager ( void )
@@ -106,7 +104,7 @@ public:
 
     virtual void RemoveAll ( void )
     {
-		typename list< TManaged* >::const_iterator iter;
+		typename std::list< TManaged* >::const_iterator iter;
 		m_bCanRemoveFromList = false;
 
         for ( iter = this->begin (); iter != this->end (); iter++ )

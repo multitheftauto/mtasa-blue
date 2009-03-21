@@ -19,8 +19,6 @@
 #include <list>
 #include "CWhoWas.h"
 
-using namespace std;
-
 class CConsole
 {
 public:

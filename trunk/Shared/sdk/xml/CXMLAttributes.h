@@ -17,8 +17,6 @@
 
 class CXMLAttribute;
 
-using namespace std;
-
 class CXMLAttributes
 {
 public:
@@ -30,9 +28,9 @@ public:
     virtual CXMLAttribute*              Create          ( const CXMLAttribute& Copy ) = 0;
     virtual void                        DeleteAll       ( void ) = 0;
 
-	virtual list < CXMLAttribute* >::iterator
+	virtual std::list < CXMLAttribute* >::iterator
                                         ListBegin ( void ) = 0;
-    virtual list < CXMLAttribute* >::iterator
+    virtual std::list < CXMLAttribute* >::iterator
                                         ListEnd   ( void ) = 0;
 };
 

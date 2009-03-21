@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CAnimManagerSA::CAnimManagerSA ( void )
 {
     memset ( m_pAnimAssocGroups, 0, sizeof ( m_pAnimAssocGroups ) );

@@ -539,7 +539,7 @@ private:
     #ifdef MTA_DEBUG
 	CClientPlayer*                      m_pShowPlayerTasks;
     CClientPlayer*                      m_pShowPlayer;
-    list < CClientPlayer* >             m_Mimics;
+    std::list < CClientPlayer* >        m_Mimics;
     bool                                m_bMimicLag;
     unsigned long                       m_ulLastMimicLag;
 	CVector								m_vecLastMimicPos;

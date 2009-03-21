@@ -9,7 +9,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 CClientWaterManager::CClientWaterManager ( CClientManager* pManager )
 {

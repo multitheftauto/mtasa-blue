@@ -10,7 +10,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 static unsigned short g_usWeaponModels [47] =
 {   0, 331, 333, 334, 335, 336, 337, 338, 339, 341,     // 9

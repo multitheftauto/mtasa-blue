@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using std::map;
+
 void CCustomData::Copy ( CCustomData* pCustomData )
 {
     map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();

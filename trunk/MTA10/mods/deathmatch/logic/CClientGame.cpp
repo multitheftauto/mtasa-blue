@@ -20,7 +20,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
 #pragma warning(disable:4312)

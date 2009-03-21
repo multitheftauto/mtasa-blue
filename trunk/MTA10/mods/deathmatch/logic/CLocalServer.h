@@ -37,7 +37,7 @@ public:
 
 private:
 
-    string                      m_strConfig;
+    std::string                 m_strConfig;
     CXMLFile*                   m_pConfig;
 
     SString                     m_strServerPath;

@@ -20,8 +20,6 @@ class CTextDisplay;
 #include "CPlayer.h"
 #include "CTextItem.h"
 
-using namespace std;
-
 class CTextDisplay
 {
 public:
@@ -39,8 +37,8 @@ public:
     void                                Remove                      ( CTextItem* pTextItem, bool bRemoveFromList = true );
 
 private:
-    list < CPlayerTextManager* >        m_observers;
-    list < CTextItem* >                 m_contents;
+    std::list < CPlayerTextManager* >   m_observers;
+    std::list < CTextItem* >            m_contents;
 };
 
 #endif

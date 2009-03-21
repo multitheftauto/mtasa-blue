@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 template<> CLanguageLocale * CSingleton< CLanguageLocale >::m_pSingleton = NULL;
 
 CLanguageLocale::CLanguageLocale ( )

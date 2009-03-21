@@ -14,7 +14,6 @@
 #define __CCONNECTHISTORY_H
 
 #include <list>
-using namespace std;
 
 struct CConnectHistoryItem
 {
@@ -26,18 +25,18 @@ struct CConnectHistoryItem
 class CConnectHistory
 {
 public:
-                                    CConnectHistory         ( void );
-                                    ~CConnectHistory        ( void );
+                                        CConnectHistory         ( void );
+                                        ~CConnectHistory        ( void );
 
-    bool                            IsFlooding              ( unsigned long ulIP );
+    bool                                IsFlooding              ( unsigned long ulIP );
 
-    CConnectHistoryItem*            Find                    ( unsigned long ulIP );
-    void                            Reset                   ( void );
+    CConnectHistoryItem*                Find                    ( unsigned long ulIP );
+    void                                Reset                   ( void );
 
 private:
-    void                            RemoveExpired           ( void );
+    void                                RemoveExpired           ( void );
 
-    list < CConnectHistoryItem* >   m_List;
+    std::list < CConnectHistoryItem* >  m_List;
 };
 
 #endif

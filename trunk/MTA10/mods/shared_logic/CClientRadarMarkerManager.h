@@ -19,29 +19,27 @@ class CClientRadarMarkerManager;
 #include "CClientRadarMarker.h"
 #include <list>
 
-using namespace std;
-
 class CClientRadarMarkerManager
 {
     friend class CClientRadarMarker;
 
 public:
-                                                            CClientRadarMarkerManager       ( class CClientManager* pManager );
-                                                            ~CClientRadarMarkerManager      ( void );
+                                                                CClientRadarMarkerManager       ( class CClientManager* pManager );
+                                                                ~CClientRadarMarkerManager      ( void );
 
-    void                                                    DoPulse                         ( void );
+    void                                                        DoPulse                         ( void );
 
-    void                                                    DeleteAll                       ( void );
+    void                                                        DeleteAll                       ( void );
 
-    static CClientRadarMarker*                              Get                             ( ElementID ID );
+    static CClientRadarMarker*                                  Get                             ( ElementID ID );
     
-    inline unsigned short                                   GetDimension                    ( void )                                    { return m_usDimension; }
-    void                                                    SetDimension                    ( unsigned short usDimension );
+    inline unsigned short                                       GetDimension                    ( void )                                    { return m_usDimension; }
+    void                                                        SetDimension                    ( unsigned short usDimension );
 
-    inline list < CClientRadarMarker* > ::const_iterator    IterBegin                       ( void )                                    { return m_Markers.begin (); };
-    inline list < CClientRadarMarker* > ::const_iterator    IterEnd                         ( void )                                    { return m_Markers.end (); };
+    inline std::list < CClientRadarMarker* > ::const_iterator   IterBegin                       ( void )                                    { return m_Markers.begin (); };
+    inline std::list < CClientRadarMarker* > ::const_iterator   IterEnd                         ( void )                                    { return m_Markers.end (); };
 
-    bool                                                    Exists                          ( CClientRadarMarker* pMarker );
+    bool                                                        Exists                          ( CClientRadarMarker* pMarker );
 
 private:
     inline void                                             AddToList                       ( CClientRadarMarker* pMarker )             { m_Markers.push_back ( pMarker ); };
@@ -52,7 +50,7 @@ private:
 
     class CClientManager*                                   m_pManager;
     bool                                                    m_bCanRemoveFromList;
-    list < CClientRadarMarker* >                            m_Markers;
+    std::list < CClientRadarMarker* >                       m_Markers;
 
     unsigned short                                          m_usDimension;
     bool                                                    m_bOrderOnPulse;

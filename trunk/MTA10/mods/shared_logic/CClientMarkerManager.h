@@ -16,8 +16,6 @@
 #include "CClientMarker.h"
 #include <list>
 
-using namespace std;
-
 class CClientMarkerManager
 {
     friend class CClientManager;
@@ -31,8 +29,8 @@ public:
     void                            Delete                              ( int ID );
     void                            DeleteAll                           ( void );
 
-    inline list < CClientMarker* > ::const_iterator IterBegin           ( void )                            { return m_Markers.begin (); };
-    inline list < CClientMarker* > ::const_iterator IterEnd             ( void )                            { return m_Markers.end (); };
+    inline std::list < CClientMarker* > ::const_iterator IterBegin      ( void )                            { return m_Markers.begin (); };
+    inline std::list < CClientMarker* > ::const_iterator IterEnd        ( void )                            { return m_Markers.end (); };
 
 
 private:
@@ -45,7 +43,7 @@ private:
     inline void                     RemoveFromList                      ( CClientMarker* pCheckpoint )      { if ( m_bCanRemoveFromList && !m_Markers.empty() ) m_Markers.remove ( pCheckpoint ); };
 
     class CClientManager*           m_pManager;
-    list < CClientMarker* >         m_Markers;
+    std::list < CClientMarker* >    m_Markers;
     bool                            m_bCanRemoveFromList;
 };
 

@@ -25,7 +25,6 @@
 #include "CElement.h"
 #include "ehs/ehs.h"
 #include <list>
-using namespace std;
 
 class CResource;
 

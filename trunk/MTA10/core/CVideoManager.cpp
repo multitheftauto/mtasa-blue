@@ -12,6 +12,9 @@
 
 #include "StdInc.h"
 
+using std::string;
+using std::list;
+
 template<> CVideoManager * CSingleton< CVideoManager >::m_pSingleton = NULL;
 
 // Codec paths

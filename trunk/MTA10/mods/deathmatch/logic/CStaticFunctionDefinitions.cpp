@@ -19,6 +19,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 static CLuaManager*                                 m_pLuaManager;
 static CEvents*                                     m_pEvents;
 static CCoreInterface*                              m_pCore;

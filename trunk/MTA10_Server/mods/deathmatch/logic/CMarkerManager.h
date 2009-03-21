@@ -20,8 +20,6 @@ class CMarkerManager;
 #include "CMarker.h"
 #include <list>
 
-using namespace std;
-
 class CMarkerManager
 {
     friend class CMarker;

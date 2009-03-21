@@ -124,8 +124,8 @@ public:
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );
 
-    list < CClientEntity* > ::const_iterator    IterBegin  ( void )                    { return m_Children.begin (); }
-    list < CClientEntity* > ::const_iterator    IterEnd    ( void )                    { return m_Children.end (); }
+    std::list < CClientEntity* > ::const_iterator IterBegin             ( void )                    { return m_Children.begin (); }
+    std::list < CClientEntity* > ::const_iterator IterEnd               ( void )                    { return m_Children.end (); }
 
     inline ElementID                            GetID                   ( void )                    { return m_ID; };
     void                                        SetID                   ( ElementID ID );
@@ -161,8 +161,8 @@ public:
     inline void                                 AddAttachedEntity       ( CClientEntity* pEntity )      { m_AttachedEntities.push_back ( pEntity ); }
     inline void                                 RemoveAttachedEntity    ( CClientEntity* pEntity )      { if ( !m_AttachedEntities.empty() ) m_AttachedEntities.remove ( pEntity ); }
     bool                                        IsEntityAttached        ( CClientEntity* pEntity );
-    list < CClientEntity* > ::const_iterator    AttachedEntitiesBegin   ( void )                        { return m_AttachedEntities.begin (); }
-    list < CClientEntity* > ::const_iterator    AttachedEntitiesEnd     ( void )                        { return m_AttachedEntities.end (); }
+    std::list < CClientEntity* > ::const_iterator AttachedEntitiesBegin ( void )                        { return m_AttachedEntities.begin (); }
+    std::list < CClientEntity* > ::const_iterator AttachedEntitiesEnd   ( void )                        { return m_AttachedEntities.end (); }
     void                                        ReattachEntities        ( void );
     virtual bool                                IsAttachable            ( void );
     virtual bool                                IsAttachToable          ( void );
@@ -193,8 +193,8 @@ public:
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( CClientColShape* pShape );
     void                                        RemoveAllCollisions         ( bool bNotify = false );
-    list < CClientColShape* > ::iterator        CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
-    list < CClientColShape* > ::iterator        CollisionsEnd               ( void )                        { return m_Collisions.end (); }
+    std::list < CClientColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
+    std::list < CClientColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 
     inline CElementGroup*                       GetElementGroup             ( void )                        { return m_pElementGroup; }
     inline void                                 SetElementGroup             ( CElementGroup * elementGroup ){ m_pElementGroup = elementGroup; }
@@ -227,7 +227,7 @@ public:
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
-    list < CClientEntity* >                     m_Children;
+    std::list < CClientEntity* >                m_Children;
     CCustomData*                                m_pCustomData;
 
     ElementID                                   m_ID;
@@ -246,17 +246,17 @@ protected:
     CClientEntity*                              m_pAttachedToEntity;
     CVector                                     m_vecAttachedPosition;
     CVector                                     m_vecAttachedRotation;
-    list < CClientEntity* >                     m_AttachedEntities;
+    std::list < CClientEntity* >                m_AttachedEntities;
 
     bool                                        m_bBeingDeleted;
     bool                                        m_bSystemEntity;
     CMapEventManager*                           m_pEventManager;
     CModelInfo*                                 m_pModelInfo;
-    list < class CClientColShape* >             m_Collisions;
+    std::list < class CClientColShape* >        m_Collisions;
     CElementGroup*                              m_pElementGroup;
     bool                                        m_bIsLocal;
-    list < CClientPed * >                       m_OriginSourceUsers;
-    list < CClientPed * >                       m_Contacts;
+    std::list < CClientPed * >                  m_OriginSourceUsers;
+    std::list < CClientPed * >                  m_Contacts;
     unsigned char                               m_ucInterior;
 
 private:

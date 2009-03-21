@@ -300,8 +300,8 @@ public:
 
     inline void                 AddProjectile               ( CClientProjectile * pProjectile )         { m_Projectiles.push_back ( pProjectile ); }
     inline void                 RemoveProjectile            ( CClientProjectile * pProjectile )         { m_Projectiles.remove ( pProjectile ); }
-    list < CClientProjectile* > ::iterator ProjectilesBegin ( void )                                    { return m_Projectiles.begin (); }
-    list < CClientProjectile* > ::iterator ProjectilesEnd   ( void )                                    { return m_Projectiles.end (); }
+    std::list < CClientProjectile* > ::iterator ProjectilesBegin ( void )                               { return m_Projectiles.begin (); }
+    std::list < CClientProjectile* > ::iterator ProjectilesEnd   ( void )                               { return m_Projectiles.end (); }
     unsigned int                CountProjectiles            ( eWeaponType weaponType = WEAPONTYPE_UNARMED );
 
     void                        RemoveAllProjectiles        ( void );
@@ -464,7 +464,7 @@ public:
     CVector                     m_vecTargetTargetAngle;
     CVector                     m_vecTargetInterpolateAngle;
     CClientEntity*              m_pTargetedEntity;
-    list < SDelayedSyncData* >  m_SyncBuffer;
+    std::list < SDelayedSyncData* >  m_SyncBuffer;
     bool                        m_bDucked;
     bool                        m_bWasDucked; //For knowing when to register standing up
     bool                        m_bIsChoking;
@@ -486,7 +486,7 @@ public:
     CClientPlayerClothes*       m_pClothes;
     eFightingStyle              m_FightingStyle;
     eMoveAnim                   m_MoveAnim;
-    list < CClientProjectile* > m_Projectiles;
+    std::list < CClientProjectile* > m_Projectiles;
     unsigned char               m_ucAlpha;
     CVector                     m_vecTargetPosition;
     CClientEntity*              m_pTargetOriginSource;

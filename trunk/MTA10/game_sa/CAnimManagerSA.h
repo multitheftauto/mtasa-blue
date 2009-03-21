@@ -20,7 +20,6 @@
 
 #include "Common.h"
 #include <list>
-using namespace std;
 
 #define FUNC_CAnimManager_Initialize                        0x5bf6b0
 #define FUNC_CAnimManager_Shutdown                          0x4d4130
@@ -152,7 +151,7 @@ private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
     CAnimBlendHierarchy *       m_pAnimations [ MAX_ANIMATIONS ];
     CAnimBlock *                m_pAnimBlocks [ MAX_ANIM_BLOCKS ];
-    list < CAnimBlendAssociation *  > m_Associations;
+    std::list < CAnimBlendAssociation *  > m_Associations;
 };
 
 #endif

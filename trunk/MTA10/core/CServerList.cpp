@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 extern CCore* g_pCore;
 
 CServerList::CServerList ( void )

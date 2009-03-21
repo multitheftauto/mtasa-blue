@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
+using std::list;
+
 SBindableKey g_bkKeys[] = 
 { 
     { "mouse1",  0x01,          GTA_KEY_LMOUSE,         DATA_NONE,              0 },

@@ -13,7 +13,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 #define MELEE_VISIBLE_RANGE         60.0f
 #define AIM_VISIBLE_RANGE           300.0f

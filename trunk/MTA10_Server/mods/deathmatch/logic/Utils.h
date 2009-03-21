@@ -23,8 +23,6 @@
 #include "CCommon.h"
 #include "CPad.h"
 
-using namespace std;
-
 #ifndef PI
 #define PI 3.14159265358979323846264338327950
 #endif

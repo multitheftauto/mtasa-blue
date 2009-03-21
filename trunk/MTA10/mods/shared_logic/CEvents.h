@@ -17,8 +17,6 @@
 #include <list>
 #include <vector>
 
-using namespace std;
-
 struct SEvent
 {
     class CLuaMain*     pLuaMain;
@@ -47,8 +45,10 @@ public:
     inline bool                 Exists              ( const char* szName )  { return Get ( szName ) != NULL; };
     SEvent*                     Get                 ( const char* szName );
 
-    list < SEvent* > ::const_iterator   IterBegin   ( void )                { return m_Events.begin (); };
-    list < SEvent* > ::const_iterator   IterEnd     ( void )                { return m_Events.end (); };
+    std::list < SEvent* > ::const_iterator
+                                IterBegin           ( void )                { return m_Events.begin (); };
+    std::list < SEvent* > ::const_iterator
+                                IterEnd             ( void )                { return m_Events.end (); };
 
     void                        PreEventPulse       ( void );
     void                        PostEventPulse      ( void );
@@ -60,12 +60,12 @@ public:
     bool                        IsExtinctEvent      ( const char * szName, char * szNewName, unsigned int uiLength );
 
 private:
-    void                        RemoveAllEvents     ( void );
-    list < SEvent* >            m_Events;
-    vector < int >              m_CancelledList;
-    bool                        m_bEventCancelled;
-    bool                        m_bWasEventCancelled;
-    list < SExtinctEvent * >    m_ExtinctEvents;
+    void                            RemoveAllEvents     ( void );
+    std::list < SEvent* >           m_Events;
+    std::vector < int >             m_CancelledList;
+    bool                            m_bEventCancelled;
+    bool                            m_bWasEventCancelled;
+    std::list < SExtinctEvent * >   m_ExtinctEvents;
 };
 
 #endif

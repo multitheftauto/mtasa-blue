@@ -18,7 +18,6 @@ class CVehicleSpawnPacket;
 #include "CPacket.h"
 #include <vector>
 
-using namespace std;
 class CVehicle;
 
 class CVehicleSpawnPacket : public CPacket
@@ -33,7 +32,7 @@ public:
     inline void                 Clear                   ( void )                        { m_List.clear (); };
 
 private:
-    vector <CVehicle* >         m_List;
+    std::vector <CVehicle* >    m_List;
 };
 
 #endif

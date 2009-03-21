@@ -20,8 +20,6 @@
 #include "CLinkedList.h"
 #include "CFileSystemMemoryHandleManager.h"
 
-using namespace std;
-
 typedef HANDLE	(__stdcall*pCreateFileA)        (LPCTSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,DWORD,HANDLE);
 typedef BOOL	(__stdcall*pReadFile)           (HANDLE,LPVOID,DWORD,LPDWORD,LPOVERLAPPED);
 typedef DWORD	(__stdcall*pGetFileSize)        (HANDLE,LPDWORD);
@@ -30,8 +28,8 @@ typedef BOOL	(__stdcall*pCloseHandle)        (HANDLE);
 
 typedef struct tagFILEREDIRECT
 {
-    string                          NativeFile;
-    string                          RedirectedFile;
+    std::string                     NativeFile;
+    std::string                     RedirectedFile;
     bool                            bRedirectToBuffer;
     void*                           pBuffer;
     size_t                          sizeBufferSize;
@@ -51,11 +49,11 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
             void            RemoveHook				( );
             void            ApplyHook				( );
 
-            void            RedirectFile			( string RedirectedFileName, string DestinationFile );
-            void            RedirectFile			( string RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
-            void            RemoveRedirect			( string RedirectedFileName );
+            void            RedirectFile			( std::string RedirectedFileName, std::string DestinationFile );
+            void            RedirectFile			( std::string RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
+            void            RemoveRedirect			( std::string RedirectedFileName );
 
-    static  HANDLE  WINAPI   API_CreateFileA			( LPCTSTR               lpFileName,
+    static  HANDLE  WINAPI   API_CreateFileA		( LPCTSTR               lpFileName,
 													  DWORD                 dwDesiredAccess,
 													  DWORD                 dwShareMode,
                                                       LPSECURITY_ATTRIBUTES lpSecurityAttributes,
@@ -87,8 +85,8 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
 
     private:
 
-            bool            GetRedirectedFile		( string                        NativeFileToCheck,
-                                                      string &                      RedirectedFileOut,
+            bool            GetRedirectedFile		( std::string                   NativeFileToCheck,
+                                                      std::string &                 RedirectedFileOut,
                                                       bool&                         bRedirectToFileBuffer,
                                                       void**                        pFilebufferOut,
                                                       size_t&                       size,

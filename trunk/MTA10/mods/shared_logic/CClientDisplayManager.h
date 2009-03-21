@@ -16,7 +16,6 @@ class CClientDisplayManager;
 
 #include "CClientManager.h"
 #include <list>
-using namespace std;
 
 class CClientDisplay;
 class CClientDisplayGroup;
@@ -45,9 +44,9 @@ public:
     void                            RemoveFromList                  ( CClientDisplay* pDisplay );
     void                            RemoveFromList                  ( CClientDisplayGroup* pGroup );
 
-    list < CClientDisplay* >        m_List;
-    list < CClientDisplayGroup* >   m_Groups;
-    bool                            m_bCanRemoveFromList;
+    std::list < CClientDisplay* >       m_List;
+    std::list < CClientDisplayGroup* >  m_Groups;
+    bool                                m_bCanRemoveFromList;
 };
 
 #endif

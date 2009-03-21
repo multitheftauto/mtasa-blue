@@ -9,7 +9,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 CClientTeam::CClientTeam ( CClientManager* pManager, ElementID ID, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue ): CClientEntity ( ID )
 {

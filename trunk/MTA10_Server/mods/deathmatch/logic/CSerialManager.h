@@ -17,8 +17,6 @@
 #include <list>
 #include "CPlayer.h"
 
-using namespace std;
-
 typedef void (*SERIALVERIFICATIONCALLBACK) ( CPlayer*, bool, char* );
 
 #define SERIAL_VERIFICATION_TIMEOUT 3000
@@ -79,6 +77,6 @@ public:
 	void                        DoPulse                     ( void );
 
 private:
-    list<CSerialVerification*>  m_calls;
+    std::list < CSerialVerification* > m_calls;
 };
 #endif

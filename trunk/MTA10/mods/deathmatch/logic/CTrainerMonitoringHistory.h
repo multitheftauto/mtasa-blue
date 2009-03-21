@@ -15,8 +15,6 @@
 
 #include <vector>
 
-using namespace std;
-
 struct STrainerMonitoringHistoryItem
 {
     unsigned long ulOffset;

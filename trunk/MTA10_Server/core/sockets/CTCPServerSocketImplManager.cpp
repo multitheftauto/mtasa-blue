@@ -14,6 +14,7 @@
 #include "CTCPServerSocketImpl.h"
 #include "CTCPServerSocketImplManager.h"
 
+using std::list;
 
 CTCPServerSocketImplManager::CTCPServerSocketImplManager ( void )
 {

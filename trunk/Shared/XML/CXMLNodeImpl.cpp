@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node ) :
     m_pNode ( &Node ),
     m_Attributes ( Node )

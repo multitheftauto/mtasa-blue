@@ -29,8 +29,10 @@ public:
     void                            RemovePed                           ( CClientPed* pPed );
     void                            ClearPeds                           ( void );
 
-    inline list < CClientPed* > ::const_iterator    IterBegin           ( void )    { return m_List.begin (); };
-    inline list < CClientPed* > ::const_iterator    IterEnd             ( void )    { return m_List.end (); };
+    inline std::list < CClientPed* > ::const_iterator
+                                    IterBegin                           ( void )    { return m_List.begin (); };
+    inline std::list < CClientPed* > ::const_iterator
+                                    IterEnd                             ( void )    { return m_List.end (); };
 
     bool                            Exists                              ( CClientPed * pPed );
 private:
@@ -42,7 +44,7 @@ private:
     void                            WritePedInformation                 ( NetBitStreamInterface* pBitStream, CClientPed* pPed );
 
     CClientPedManager*              m_pPedManager;
-    list < CClientPed* >            m_List;
+    std::list < CClientPed* >       m_List;
     unsigned long                   m_ulLastSyncTime;
 };
 

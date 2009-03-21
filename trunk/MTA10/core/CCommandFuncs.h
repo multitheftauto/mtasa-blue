@@ -18,7 +18,6 @@
 #define __CCOMMANDFUNCS_H
 
 #include <string>
-using namespace std;
 
 #define DECLARE_COMMAND_HANDLER(a) static void a ( const char * szParameters );
 

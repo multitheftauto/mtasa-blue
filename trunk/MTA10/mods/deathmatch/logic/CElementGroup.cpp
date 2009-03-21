@@ -18,7 +18,9 @@
 // only one CElementGroup at a time (though this will probably not 
 // be enforced at this level).
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 extern CClientGame * g_pClientGame;
 

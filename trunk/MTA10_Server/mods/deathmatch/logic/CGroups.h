@@ -17,8 +17,6 @@
 #include "CElement.h"
 #include <list>
 
-using namespace std;
-
 class CGroups
 {
     friend class CDummy;

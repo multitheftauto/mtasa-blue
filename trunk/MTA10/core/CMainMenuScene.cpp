@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 #include <libv2/libv2.h>
 #include <libv2/song.h>
 

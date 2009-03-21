@@ -16,8 +16,6 @@
 
 #include <list>
 
-using namespace std;
-
 #define MAX_REGISTERED_COMMAND_LENGTH 64
 #define MAX_REGISTERED_COMMANDHANDLER_LENGTH 64
 
@@ -45,14 +43,14 @@ public:
     bool                ProcessCommand                  ( const char* szKey, const char* szArguments );
 
 private:
-    SCommand*           GetCommand                      ( const char* szKey, class CLuaMain* pLuaMain = NULL );
-    void                CallCommandHandler              ( class CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments );
+    SCommand*               GetCommand                  ( const char* szKey, class CLuaMain* pLuaMain = NULL );
+    void                    CallCommandHandler          ( class CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments );
 
-    void                TakeOutTheTrash                 ( void );
+    void                    TakeOutTheTrash             ( void );
 
-    list < SCommand* >  m_Commands;
-    list < SCommand* >  m_TrashCan;
-    bool                m_bIteratingList;
+    std::list < SCommand* > m_Commands;
+    std::list < SCommand* > m_TrashCan;
+    bool                    m_bIteratingList;
 };
 
 #endif

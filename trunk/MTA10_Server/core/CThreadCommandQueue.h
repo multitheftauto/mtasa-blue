@@ -19,8 +19,6 @@
 #include <list>
 #include <string>
 
-using namespace std;
-
 class CThreadCommandQueue
 {
 public:
@@ -28,8 +26,8 @@ public:
     void                Process         ( bool& bRequestedQuit, class CModManagerImpl* pModManager );
 
 private:
-    list < string >     m_Commands;
-    CCriticalSection    m_Critical;
+    std::list < std::string >       m_Commands;
+    CCriticalSection                m_Critical;
 };
 
 #endif

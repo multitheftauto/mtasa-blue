@@ -34,6 +34,7 @@
 #include "StdInc.h"
 #include <game/CPad.h>
 
+using std::string;
 
 //////////////////////////////////////////////////////////
 //

@@ -14,6 +14,8 @@
 
 #include <StdInc.h>
 
+using std::list;
+
 CClientTeamManager::CClientTeamManager ( void )
 {
     m_bRemoveFromList = true;

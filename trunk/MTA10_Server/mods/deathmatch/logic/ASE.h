@@ -29,8 +29,6 @@ class ASE;
 
 #include <list>
 
-using namespace std;
-
 class CASERule;
 
 class ASE

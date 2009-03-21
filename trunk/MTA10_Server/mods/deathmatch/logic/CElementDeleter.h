@@ -16,20 +16,19 @@
 #define __CELEMENTDELETER_H
 
 #include <list>
-using namespace std;
 
 class CElementDeleter
 {
 public:
-    inline                      ~CElementDeleter        ( void )        { DoDeleteAll (); };
+    inline                          ~CElementDeleter        ( void )        { DoDeleteAll (); };
 
-    void                        Delete                  ( class CElement* pElement, bool bUnlink = true );
-    void                        DoDeleteAll             ( void );
+    void                            Delete                  ( class CElement* pElement, bool bUnlink = true );
+    void                            DoDeleteAll             ( void );
 
-    bool                        IsBeingDeleted          ( class CElement* pElement );
+    bool                            IsBeingDeleted          ( class CElement* pElement );
 
 private:
-    list < class CElement* >    m_List;
+    std::list < class CElement* >   m_List;
 };
 
 #endif

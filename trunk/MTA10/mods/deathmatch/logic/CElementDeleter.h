@@ -16,7 +16,6 @@
 #define __CELEMENTDELETER_H
 
 #include <list>
-using namespace std;
 
 class CElementDeleter
 {
@@ -38,8 +37,8 @@ public:
     bool                        CanBeDestroyed          ( void );
 
 private:
-    list < class CClientEntity* >   m_List;
-    bool                            m_bAllowUnreference;
+    std::list < class CClientEntity* >      m_List;
+    bool                                    m_bAllowUnreference;
 };
 
 #endif

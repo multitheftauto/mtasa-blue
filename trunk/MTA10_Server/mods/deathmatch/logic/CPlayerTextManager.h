@@ -27,11 +27,11 @@ class CPlayerTextManager
 
 private:
     CPlayer*                    m_pPlayer;
-    list<CTextItem *>           m_highQueue;
-    list<CTextItem *>           m_mediumQueue;
-    list<CTextItem *>           m_lowQueue;
+    std::list < CTextItem* >    m_highQueue;
+    std::list < CTextItem* >    m_mediumQueue;
+    std::list < CTextItem* >    m_lowQueue;
 
-    list<CTextDisplay*>         m_displays;
+    std::list < CTextDisplay* > m_displays;
 
     CTextItem *                 GetTextItemOnQueue ( CTextItem * textItem );
 

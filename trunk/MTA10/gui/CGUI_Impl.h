@@ -21,8 +21,6 @@ class CGUI_Impl;
 #include <list>
 #include <windows.h>
 
-using namespace std;
-
 #define CGUI_CHAR_SIZE 6
 
 class CGUIElement;
@@ -245,7 +243,7 @@ private:
 	CGUIFont_Impl*					m_pSAGothicFont;
 	CGUIFont_Impl*					m_pSansFont;
                 
-    list < CGUIElement* >           m_RedrawQueue;
+    std::list < CGUIElement* >      m_RedrawQueue;
 
 	unsigned long                   m_ulPreviousUnique;
 

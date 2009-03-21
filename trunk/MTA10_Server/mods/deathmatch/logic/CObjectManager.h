@@ -17,8 +17,6 @@
 #include "CObject.h"
 #include <list>
 
-using namespace std;
-
 class CObjectManager
 {
     friend class CObject;

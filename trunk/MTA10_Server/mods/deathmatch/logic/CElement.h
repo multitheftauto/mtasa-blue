@@ -27,8 +27,6 @@
 #include <cstring>
 #include "CElementGroup.h"
 
-using namespace std;
-
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
 #define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
@@ -99,7 +97,7 @@ public:
     CElement*                                   FindChildByType             ( const char* szType, unsigned int uiIndex, bool bRecursive );
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
-    list < CElement * >                         GetChildrenList             ( void )        { return m_Children; }
+    std::list < CElement * >                    GetChildrenList             ( void )        { return m_Children; }
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
 
@@ -133,10 +131,10 @@ public:
     void                                        CleanUpForVM                ( CLuaMain* pLuaMain, bool bRecursive );
 
     inline unsigned int                         CountChildren               ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
-    inline list < CElement* > ::const_iterator  IterBegin                   ( void )                        { return m_Children.begin (); };
-    inline list < CElement* > ::const_iterator  IterEnd                     ( void )                        { return m_Children.end (); };
-    inline list < CElement* > ::const_reverse_iterator  IterReverseBegin    ( void )                        { return m_Children.rbegin (); };
-    inline list < CElement* > ::const_reverse_iterator  IterReverseEnd      ( void )                        { return m_Children.rend (); };
+    inline std::list < CElement* > ::const_iterator          IterBegin           ( void )                   { return m_Children.begin (); };
+    inline std::list < CElement* > ::const_iterator          IterEnd             ( void )                   { return m_Children.end (); };
+    inline std::list < CElement* > ::const_reverse_iterator  IterReverseBegin    ( void )                   { return m_Children.rbegin (); };
+    inline std::list < CElement* > ::const_reverse_iterator  IterReverseEnd      ( void )                   { return m_Children.rend (); };
 
     inline int                                  GetType                     ( void )                        { return m_iType; };
     virtual bool                                IsEntity                    ( void )                        { return false; };
@@ -161,8 +159,8 @@ public:
     void                                        RemoveCollision             ( class CColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( class CColShape* pShape );
     void                                        RemoveAllCollisions         ( bool bNotify = false );
-    list < class CColShape* > ::iterator        CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
-    list < class CColShape* > ::iterator        CollisionsEnd               ( void )                        { return m_Collisions.end (); }
+    std::list < class CColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
+    std::list < class CColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 
     inline unsigned short                       GetDimension                ( void )                        { return m_usDimension; }
     inline void                                 SetDimension                ( unsigned short usDimension )  { m_usDimension = usDimension; }
@@ -175,8 +173,8 @@ public:
     virtual void                                SetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation );
     inline void                                 AddAttachedElement          ( CElement* pElement )          { m_AttachedElements.push_back ( pElement ); }
     inline void                                 RemoveAttachedElement       ( CElement* pElement )          { if ( !m_AttachedElements.empty() ) m_AttachedElements.remove ( pElement ); }
-    list < CElement* > ::iterator               AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
-    list < CElement* > ::iterator               AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
+    std::list < CElement* > ::iterator          AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
+    std::list < CElement* > ::iterator          AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
     inline char*                                GetAttachToID               ( void )                        { return m_szAttachToID; }
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
@@ -230,16 +228,16 @@ protected:
     unsigned int                                m_uiTypeHash;
     std::string                                 m_strTypeName;
     std::string                                 m_strName;
-    list < CElement* >                          m_Children;
+    std::list < CElement* >                     m_Children;
 
-    list < class CPerPlayerEntity* >            m_ElementReferenced;
-    list < class CColShape* >                   m_Collisions;
-    list < class CPlayerCamera* >               m_FollowingCameras;
+    std::list < class CPerPlayerEntity* >       m_ElementReferenced;
+    std::list < class CColShape* >              m_Collisions;
+    std::list < class CPlayerCamera* >          m_FollowingCameras;
 
     CElement*                                   m_pAttachedTo;
     CVector                                     m_vecAttachedPosition;
     CVector                                     m_vecAttachedRotation;
-    list < CElement* >                          m_AttachedElements;
+    std::list < CElement* >                     m_AttachedElements;
     char                                        m_szAttachToID [ MAX_ELEMENT_NAME_LENGTH + 1 ];
 
     CElementGroup*                              m_pElementGroup;
@@ -247,7 +245,7 @@ protected:
     unsigned short                              m_usDimension;
     unsigned char                               m_ucSyncTimeContext;
 
-    list < class CPed * >                       m_OriginSourceUsers;
+    std::list < class CPed * >                  m_OriginSourceUsers;
     unsigned char                               m_ucInterior;
     bool                                        m_bMapCreated;
 };

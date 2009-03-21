@@ -58,20 +58,20 @@ public:
     inline void             DetachEntity                ( CClientEntity* pEntity )      { if ( !m_List.empty() ) m_List.remove ( pEntity ); }
     bool                    IsEntityAttached            ( CClientEntity* pEntity );
 
-    inline list < CClientEntity* > ::iterator AttachedIterBegin ( void )                        { return m_List.begin (); }
-    inline list < CClientEntity* > ::iterator AttachedIterEnd   ( void )                        { return m_List.end (); }
+    inline std::list < CClientEntity* > ::iterator AttachedIterBegin ( void )                        { return m_List.begin (); }
+    inline std::list < CClientEntity* > ::iterator AttachedIterEnd   ( void )                        { return m_List.end (); }
  
 private:
-    CClientPathManager*     m_pPathManager;
+    CClientPathManager*         m_pPathManager;
 
-    CVector                 m_vecPosition;
-    CVector                 m_vecRotation;
-    int                     m_iTime;
-    ePathNodeStyle          m_Style;
-    ElementID               m_NextNodeID;
-    CClientPathNode         *m_pPreviousNode, *m_pNextNode;
+    CVector                     m_vecPosition;
+    CVector                     m_vecRotation;
+    int                         m_iTime;
+    ePathNodeStyle              m_Style;
+    ElementID                   m_NextNodeID;
+    CClientPathNode             *m_pPreviousNode, *m_pNextNode;
 
-    list < CClientEntity* > m_List;
+    std::list < CClientEntity* > m_List;
 };
 
 #endif

@@ -15,6 +15,8 @@
 #include "CThreadCommandQueue.h"
 #include "CModManagerImpl.h"
 
+using std::string;
+
 void CThreadCommandQueue::Add ( const char* szCommand )
 {
     // Lock the critical section, add it, then unlock

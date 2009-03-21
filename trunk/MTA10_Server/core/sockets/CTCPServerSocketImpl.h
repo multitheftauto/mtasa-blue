@@ -21,11 +21,6 @@ class CTCPServerSocketImpl;
 #include <stdio.h>
 #include <string.h>
 
-#include <list>
-
-using namespace std;
-
-
 class CTCPServerSocketImpl : public CTCPServerSocket
 {
 public:

@@ -60,22 +60,22 @@ public:
     inline bool             IsBeingDeleted          ( void )                            { return m_bDeletable; };
 
 private:
-    char *                  m_szText;
-    CVector2D               m_vecPosition;
-    unsigned char           m_ucRed;
-    unsigned char           m_ucGreen;
-    unsigned char           m_ucBlue;
-    unsigned char           m_ucAlpha;
-    float                   m_fScale;
-    unsigned char           m_ucFormat;
-    unsigned long           m_ulUniqueId;
-    eTextPriority           m_Priority;
-    bool                    m_bDeletable;
+    char *                      m_szText;
+    CVector2D                   m_vecPosition;
+    unsigned char               m_ucRed;
+    unsigned char               m_ucGreen;
+    unsigned char               m_ucBlue;
+    unsigned char               m_ucAlpha;
+    float                       m_fScale;
+    unsigned char               m_ucFormat;
+    unsigned long               m_ulUniqueId;
+    eTextPriority               m_Priority;
+    bool                        m_bDeletable;
 
-    list <CTextDisplay *>   m_Observers;
-    int                     m_iUsageCount;  // the number of CLIENTS that can see this. 
-                                            // Used when deleting to make sure it isn't destroyed until
-                                            // all clients have been informed
+    std::list <CTextDisplay *>  m_Observers;
+    int                         m_iUsageCount;  // the number of CLIENTS that can see this. 
+                                                // Used when deleting to make sure it isn't destroyed until
+                                                // all clients have been informed
 
     void                    AddObserver             ( CTextDisplay* pObserver );
     inline void             RemoveObserver          ( CTextDisplay* pObserver )   { if ( !m_Observers.empty() ) m_Observers.remove ( pObserver ); };
