@@ -11,7 +11,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 CClientRadarMarkerManager::CClientRadarMarkerManager ( CClientManager* pManager )
 {

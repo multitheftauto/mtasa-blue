@@ -31,14 +31,14 @@ public:
     static bool                     IsReplacableModel           ( unsigned short usModel );
     bool                            RestoreModel                ( unsigned short usModel );
 
-    list < CClientColModel* > ::const_iterator IterBegin        ( void )                    { return m_List.begin (); }
-    list < CClientColModel* > ::const_iterator IterEnd          ( void )                    { return m_List.end (); }
+    std::list < CClientColModel* > ::const_iterator IterBegin   ( void )                    { return m_List.begin (); }
+    std::list < CClientColModel* > ::const_iterator IterEnd     ( void )                    { return m_List.end (); }
 
 private:
     void                            AddToList                   ( CClientColModel* pCol )   { m_List.push_back ( pCol ); }
     void                            RemoveFromList              ( CClientColModel* pCol );
 
-    list < CClientColModel* >       m_List;
+    std::list < CClientColModel* >  m_List;
     bool                            m_bRemoveFromList;
 };
 

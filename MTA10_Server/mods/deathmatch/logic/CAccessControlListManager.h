@@ -23,9 +23,6 @@ class CAccessControlListManager;
 #include "CXMLConfig.h"
 #include "CAccountManager.h"
 
-using namespace std;
-
-
 class CAccessControlListManager : public CXMLConfig
 {
 public:

@@ -15,8 +15,6 @@
 #include <list>
 #include <string>
 
-using namespace std;
-
 enum
 {
     DOMCONFIG_EMPTY,
@@ -27,8 +25,8 @@ enum
 struct SDOMConfigLine
 {
     int                 iType;
-    string              Key;
-    string              Entry;
+    std::string         Key;
+    std::string         Entry;
 };
 
 class CDOMConfig
@@ -48,13 +46,15 @@ public:
 
     inline unsigned int     CountLines              ( void )                        { return static_cast < unsigned int > ( m_Lines.size () ); };
 
-    inline list < SDOMConfigLine* > ::const_iterator    IterBegin   ( void )        { return m_Lines.begin (); };
-    inline list < SDOMConfigLine* > ::const_iterator    IterEnd     ( void )        { return m_Lines.end (); };
+    inline std::list < SDOMConfigLine* > ::const_iterator
+                            IterBegin               ( void )        { return m_Lines.begin (); };
+    inline std::list < SDOMConfigLine* > ::const_iterator
+                            IterEnd                 ( void )        { return m_Lines.end (); };
 
 private:
     char*                   SkipWhitespace          ( char* szString );
 
-    list < SDOMConfigLine* >    m_Lines;
+    std::list < SDOMConfigLine* >  m_Lines;
 };
 
 #endif

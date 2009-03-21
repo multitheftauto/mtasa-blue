@@ -20,8 +20,6 @@
 #include <cstdio>
 #include <list>
 
-using namespace std;
-
 class CScriptDebugging
 {
 public:

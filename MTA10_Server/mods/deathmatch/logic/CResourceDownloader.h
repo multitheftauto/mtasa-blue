@@ -19,8 +19,6 @@
 #include <list>
 #include "CResource.h"
 
-using namespace std;
-
 // This represents one file that needs to be downloaded for a CResourceDownload
 class CResourceDownloadFile
 {

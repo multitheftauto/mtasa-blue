@@ -17,7 +17,6 @@
 #include "CClientMarkerCommon.h"
 #include <list>
 
-using namespace std;
 class CClientMarker;
 
 class CClientCheckpoint : public CClientMarkerCommon

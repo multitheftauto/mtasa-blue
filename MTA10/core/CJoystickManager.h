@@ -28,7 +28,7 @@ public:
     virtual bool        IsJoypadConnected           ( void ) = 0;
 
     // Settings
-    virtual string      GetControllerName           ( void ) = 0;
+    virtual std::string GetControllerName           ( void ) = 0;
     virtual int         GetDeadZone                 ( void ) = 0;
     virtual int         GetSaturation               ( void ) = 0;
     virtual void        SetDeadZone                 ( int iDeadZone ) = 0;
@@ -39,8 +39,8 @@ public:
 
     // Binding
     virtual int         GetOutputCount              ( void ) = 0;
-    virtual string      GetOutputName               ( int iOutputIndex ) = 0;
-    virtual string      GetOutputInputName          ( int iOutputIndex ) = 0;
+    virtual std::string GetOutputName               ( int iOutputIndex ) = 0;
+    virtual std::string GetOutputInputName          ( int iOutputIndex ) = 0;
     virtual bool        BindNextUsedAxisToOutput    ( int iOutputIndex ) = 0;
     virtual bool        IsAxisBindComplete          ( void ) = 0;
     virtual bool        IsCapturingAxis             ( void ) = 0;

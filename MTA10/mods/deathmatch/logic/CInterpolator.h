@@ -18,8 +18,6 @@
 #include <vector>
 #include "Utils.h"
 
-using namespace std;
-
 struct VecMap
 {
     unsigned long m_ulTimeStamp;
@@ -45,13 +43,13 @@ public:
     inline void                 Clear           ( void )            { m_vecVecList.clear (); };
     inline unsigned int         Count           ( void )            { return static_cast < unsigned int > ( m_vecVecList.size () ); };
 
-    inline vector <VecMap*>::const_iterator   IterBegin   ( void )    { return m_vecVecList.begin (); };
-    inline vector <VecMap*>::const_iterator   IterEnd     ( void )    { return m_vecVecList.end (); };
+    inline std::vector <VecMap*>::const_iterator   IterBegin   ( void )    { return m_vecVecList.begin (); };
+    inline std::vector <VecMap*>::const_iterator   IterEnd     ( void )    { return m_vecVecList.end (); };
 
 private:
 
 
-    vector <VecMap *>           m_vecVecList;
+    std::vector <VecMap *>      m_vecVecList;
     bool                        Eval( VecMap L, VecMap R, unsigned long ulTime, CVector &Vec );
 };
 

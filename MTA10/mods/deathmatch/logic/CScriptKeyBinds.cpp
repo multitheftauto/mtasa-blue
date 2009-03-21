@@ -13,7 +13,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 SScriptBindableKey g_bkKeys [ NUMBER_OF_KEYS ] = 
 { 

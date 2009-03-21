@@ -17,8 +17,6 @@
 #include "CClientEntity.h"
 #include <list>
 
-using namespace std;
-
 class CClientGroups
 {
     friend class CClientDummy;
@@ -33,7 +31,7 @@ private:
     inline void                             AddToList                       ( CClientDummy* pDummy )      { m_List.push_back ( pDummy ); };
     void                                    RemoveFromList                  ( CClientDummy* pDummy );
 
-    list < CClientDummy* >                  m_List;
+    std::list < CClientDummy* >             m_List;
     bool                                    m_bDontRemoveFromList;
 };
 

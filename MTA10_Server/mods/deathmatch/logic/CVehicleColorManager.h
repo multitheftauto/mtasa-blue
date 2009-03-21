@@ -16,7 +16,6 @@
 
 #include "CVehicleColor.h"
 #include <list>
-using namespace std;
 
 class CVehicleColors
 {

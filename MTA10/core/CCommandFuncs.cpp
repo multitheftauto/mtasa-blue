@@ -17,6 +17,8 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
+using std::list;
+
 extern CCore* g_pCore;
 extern bool g_bBoundsChecker;
 

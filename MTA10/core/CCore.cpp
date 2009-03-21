@@ -20,6 +20,8 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 
+using namespace std;
+
 static float fTest = 1;
 
 extern CCore* g_pCore;

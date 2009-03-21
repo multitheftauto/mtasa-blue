@@ -17,8 +17,6 @@
 #include "CPacket.h"
 #include <vector>
 
-using namespace std;
-
 class CPickupHideShowPacket : public CPacket
 {
 public:
@@ -38,7 +36,7 @@ public:
 
 private:
     bool                                    m_bShow;
-    vector < class CPickup* >               m_List;
+    std::vector < class CPickup* >          m_List;
 };
 
 #endif

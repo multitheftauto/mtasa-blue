@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 DWORD CPEHookUtils::GetIATAddress   ( string ModuleName,
                                       string FunctionName, 
                                       HANDLE hImgBase )

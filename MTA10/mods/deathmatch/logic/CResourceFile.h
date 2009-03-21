@@ -15,8 +15,6 @@
 
 #include "CDownloadableResource.h"
 
-using namespace std;
-
 class CResourceFile :
     public CDownloadableResource
 {

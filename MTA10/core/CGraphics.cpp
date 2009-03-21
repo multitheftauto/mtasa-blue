@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 template<> CGraphics * CSingleton< CGraphics >::m_pSingleton = NULL;
 
 const unsigned char g_szPixel [] = { 0x42, 0x4D, 0x3A, 0, 0, 0, 0, 0, 0, 0, 0x36, 0, 0, 0, 0x28, 0, 0,

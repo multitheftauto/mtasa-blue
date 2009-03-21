@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 CConsoleHistory::CConsoleHistory ( unsigned int uiHistoryLength )
 {
     m_uiHistoryLength = uiHistoryLength;

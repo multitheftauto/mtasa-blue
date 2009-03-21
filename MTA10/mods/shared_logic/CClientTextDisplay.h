@@ -22,8 +22,6 @@ class CClientTextDisplay;
 #include "CClientTime.h"
 #include <gui/CGUI.h>
 
-using namespace std;
-
 class CClientTextDisplay: public CClientDisplay
 {
     friend CClientDisplayManager;
@@ -66,7 +64,7 @@ private:
 
     unsigned long               m_ulFormat;
 
-    list < CClientTextDisplayEffect* >      m_EffectList;
+    std::list < CClientTextDisplayEffect* > m_EffectList;
     static float                m_fGlobalScale;
 };
 

@@ -13,7 +13,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 // Return the distance between two points ^ 2
 inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2 )

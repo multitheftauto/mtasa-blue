@@ -18,8 +18,6 @@
 #include "lua/CLuaArgument.h"
 #include <list>
 
-using namespace std;
-
 #define MAX_CUSTOMDATA_NAME_LENGTH 32
 
 struct SCustomData

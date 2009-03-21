@@ -15,7 +15,6 @@
 
 #include "CClientProjectile.h"
 #include <list>
-using namespace std;
 
 typedef void ( ProjectileInitiateHandler ) ( CClientProjectile * );
 class CClientManager;
@@ -49,15 +48,15 @@ protected:
 
     void                            TakeOutTheTrash                     ( void );
 private:
-    CClientManager *                m_pManager;
-    list < CClientProjectile* >     m_List;
-    ProjectileInitiateHandler *     m_pInitiateHandler;
+    CClientManager *                    m_pManager;
+    std::list < CClientProjectile* >    m_List;
+    ProjectileInitiateHandler *         m_pInitiateHandler;
 
-    bool                            m_bIsLocal;
-    CClientEntity *                 m_pCreator;
+    bool                                m_bIsLocal;
+    CClientEntity *                     m_pCreator;
 
-    bool                            m_bCreating;
-    CClientProjectile *             m_pLastCreated;
+    bool                                m_bCreating;
+    CClientProjectile *                 m_pLastCreated;
 };
 
 #endif

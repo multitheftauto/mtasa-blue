@@ -40,13 +40,13 @@ public:
 
     tagCOMMANDENTRY*    Get                         ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false );
 
-    list < COMMANDENTRY* > ::iterator IterBegin      ( void )                                        { return m_CommandList.begin (); }
-    list < COMMANDENTRY* > ::iterator IterEnd        ( void )                                        { return m_CommandList.end (); }
+    std::list < COMMANDENTRY* > ::iterator IterBegin( void )                                        { return m_CommandList.begin (); }
+    std::list < COMMANDENTRY* > ::iterator IterEnd  ( void )                                        { return m_CommandList.end (); }
 private:    
 
     void                ExecuteHandler              ( PFNCOMMAND pfnHandler, const char* szParameters );
 
-    list < COMMANDENTRY* >          m_CommandList;
+    std::list < COMMANDENTRY* >     m_CommandList;
 
     pfnExecuteCommandHandler        m_pfnExecuteHandler;
 };

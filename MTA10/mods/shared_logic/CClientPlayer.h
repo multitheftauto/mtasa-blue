@@ -34,8 +34,6 @@ class CClientPlayer;
 class CClientPlayerManager;
 class CClientTeam;
 
-using namespace std;
-
 class CClientPlayer : public CClientPed
 {
     friend CClientPlayerManager;

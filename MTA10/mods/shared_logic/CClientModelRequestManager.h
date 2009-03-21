@@ -45,12 +45,12 @@ public:
     void                            Cancel                          ( CClientEntity* pRequester );
 
 private:
-    void                            DoPulse                         ( void );
-    bool                            GetRequestEntry                 ( CClientEntity* pRequester, list < SClientModelRequest* > ::iterator& iter );
+    void                                DoPulse                     ( void );
+    bool                                GetRequestEntry             ( CClientEntity* pRequester, std::list < SClientModelRequest* > ::iterator& iter );
 
-    bool                            m_bDoingPulse;
-    list < SClientModelRequest* >   m_Requests;
-    list < CClientEntity* >         m_CancelQueue;
+    bool                                m_bDoingPulse;
+    std::list < SClientModelRequest* >  m_Requests;
+    std::list < CClientEntity* >        m_CancelQueue;
 };
 
 #endif

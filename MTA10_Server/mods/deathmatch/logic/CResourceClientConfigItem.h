@@ -18,8 +18,6 @@
 #include "CResourceFile.h"
 #include <list>
 
-using namespace std;
-
 class CResourceClientConfigItem : public CResourceFile
 {
     

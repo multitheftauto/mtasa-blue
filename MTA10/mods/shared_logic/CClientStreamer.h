@@ -38,11 +38,11 @@ public:
 
     unsigned int                            CountActiveElements         ( void )    { return ( unsigned int ) m_ActiveElements.size (); }
     bool                                    IsActiveElement             ( CClientStreamElement * pElement );
-    list < CClientStreamElement * > ::iterator  ActiveElementsBegin     ( void )    { return m_ActiveElements.begin (); }
-    list < CClientStreamElement * > ::iterator  ActiveElementsEnd       ( void )    { return m_ActiveElements.end (); }
+    std::list < CClientStreamElement * > ::iterator  ActiveElementsBegin( void )    { return m_ActiveElements.begin (); }
+    std::list < CClientStreamElement * > ::iterator  ActiveElementsEnd  ( void )    { return m_ActiveElements.end (); }
 
 private:
-    void                                    CreateSectors               ( list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );
+    void                                    CreateSectors               ( std::list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );
     void                                    ConnectSector               ( CClientStreamSector * pSector );
     void                                    ConnectRow                  ( CClientStreamSectorRow * pRow );
 
@@ -53,8 +53,8 @@ private:
     void                                    AddElement                  ( CClientStreamElement * pElement );
     void                                    RemoveElement               ( CClientStreamElement * pElement );
 
-    void                                    SetExpDistances             ( list < CClientStreamElement * > * pList );
-    void                                    AddToSortedList             ( list < CClientStreamElement * > * pList, CClientStreamElement * pElement );
+    void                                    SetExpDistances             ( std::list < CClientStreamElement * > * pList );
+    void                                    AddToSortedList             ( std::list < CClientStreamElement * > * pList, CClientStreamElement * pElement );
     
     void                                    Restream                    ( void );
     bool                                    ReachedLimit                ( void )    { return m_pLimitReachedFunc (); }
@@ -68,14 +68,14 @@ private:
     float                                   m_fMaxDistanceExp;
     float                                   m_fMaxDistanceThreshold;
     StreamerLimitReachedFunction*           m_pLimitReachedFunc;
-    list < CClientStreamSectorRow * >       m_WorldRows;
-    list < CClientStreamSectorRow * >       m_ExtraRows;
+    std::list < CClientStreamSectorRow * >  m_WorldRows;
+    std::list < CClientStreamSectorRow * >  m_ExtraRows;
     CClientStreamSectorRow *                m_pRow;
     CClientStreamSector *                   m_pSector;
     CVector                                 m_vecPosition;
     unsigned short                          m_usDimension;
-    list < CClientStreamElement * >         m_ActiveElements;
-    list < CClientStreamElement * >         m_ToStreamOut;
+    std::list < CClientStreamElement * >    m_ActiveElements;
+    std::list < CClientStreamElement * >    m_ToStreamOut;
 };
 
 #endif

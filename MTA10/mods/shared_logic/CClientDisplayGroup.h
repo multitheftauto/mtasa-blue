@@ -13,7 +13,6 @@
 #define __CClientDisplayGroup_H
 
 #include <list>
-using namespace std;
 
 class CClientDisplay;
 
@@ -27,7 +26,7 @@ public:
 
 
 protected:
-    list < CClientDisplay * >               m_List;
+    std::list < CClientDisplay * >          m_List;
     bool                                    m_bVisible;
 };
 

@@ -19,8 +19,6 @@
 
 #include <list>
 
-using namespace std;
-
 #ifndef __CMULTIPLAYER_POPULATION
 #define __CMULTIPLAYER_POPULATION
 
@@ -32,9 +30,9 @@ using namespace std;
 class CPopulationSA : public CPopulationMP
 {
 private:
-	list < CCivilianPedSA* >	peds;
-	list < CCivilianPedSA* > ::iterator	pedIter;
-	DWORD				dwPedCount;
+    std::list < CCivilianPedSA* >	            peds;
+    std::list < CCivilianPedSA* > ::iterator	pedIter;
+	DWORD				                        dwPedCount;
 public:
 						CPopulationSA();
 	VOID				AddPed ( CCivilianPed * ped );

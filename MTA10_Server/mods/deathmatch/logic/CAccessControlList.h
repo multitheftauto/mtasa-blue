@@ -19,8 +19,6 @@ class CAccessControlList;
 #include "CAccessControlListRight.h"
 #include <xml/CXMLNode.h>
 
-using namespace std;
-
 #define MAX_ACL_NAME_LENGTH 256
 
 class CAccessControlList

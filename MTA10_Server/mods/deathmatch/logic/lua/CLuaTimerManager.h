@@ -41,8 +41,8 @@ public:
 
     void                        TakeOutTheTrash                 ( void );
 private:
-    list < CLuaTimer* >         m_TimerList;
-    list < CLuaTimer* >         m_TrashCan;
+    std::list < CLuaTimer* >    m_TimerList;
+    std::list < CLuaTimer* >    m_TrashCan;
     bool                        m_bIteratingList;
 };
 

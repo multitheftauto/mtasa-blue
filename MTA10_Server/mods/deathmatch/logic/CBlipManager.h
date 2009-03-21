@@ -18,8 +18,6 @@ class CBlipManager;
 #include "CBlip.h"
 #include <list>
 
-using namespace std;
-
 class CBlipManager
 {
     friend class CBlip;

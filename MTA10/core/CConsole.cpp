@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 #define CONSOLE_HISTORY_LENGTH 64
 #define CONSOLE_SIZE 4096
 

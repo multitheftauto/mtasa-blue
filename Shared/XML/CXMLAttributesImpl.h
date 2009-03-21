@@ -18,8 +18,6 @@
 
 #include <list>
 
-using namespace std;
-
 class CXMLAttributesImpl : public CXMLAttributes
 {
 public:
@@ -39,9 +37,9 @@ public:
     class CXMLAttribute*			AddToList                   ( class CXMLAttribute* pAttribute );
     void                            RemoveFromList              ( class CXMLAttribute* pAttribute );
 
-	list < CXMLAttribute* > ::iterator
+	std::list < CXMLAttribute* > ::iterator
                                     ListBegin			        ( void )	{ return m_Attributes.begin (); }
-	list < CXMLAttribute* > ::iterator
+	std::list < CXMLAttribute* > ::iterator
                                     ListEnd				        ( void )	{ return m_Attributes.end (); }
 
 private:
@@ -50,7 +48,7 @@ private:
 
 	TiXmlElement&                   m_Node;
 
-    list < CXMLAttribute* >			m_Attributes;
+    std::list < CXMLAttribute* >    m_Attributes;
     bool                            m_bCanRemoveFromList;
 };
 

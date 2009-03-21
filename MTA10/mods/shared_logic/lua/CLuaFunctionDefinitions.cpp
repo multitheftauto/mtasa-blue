@@ -17,7 +17,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 #define MAX_STRING_LENGTH 2048
 

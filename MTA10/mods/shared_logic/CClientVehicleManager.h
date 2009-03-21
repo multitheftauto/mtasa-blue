@@ -59,14 +59,14 @@ public:
 
     static bool                     IsVehicleLimitReached   ( void );
 
-    list < CClientVehicle* > ::iterator             IterGet             ( CClientVehicle* pVehicle );
-    list < CClientVehicle* > ::reverse_iterator     IterGetReverse      ( CClientVehicle* pVehicle );
-    list < CClientVehicle* > ::iterator             IterBegin           ( void )    { return m_List.begin (); };
-    list < CClientVehicle* > ::iterator             IterEnd             ( void )    { return m_List.end (); };
-    list < CClientVehicle* > ::reverse_iterator     IterReverseBegin    ( void )    { return m_List.rbegin (); };
-    list < CClientVehicle* > ::reverse_iterator     IterReverseEnd      ( void )    { return m_List.rend (); };
-    list < CClientVehicle* > ::iterator             StreamedBegin       ( void )    { return m_StreamedIn.begin (); };
-    list < CClientVehicle* > ::iterator             StreamedEnd         ( void )    { return m_StreamedIn.end (); };
+    std::list < CClientVehicle* > ::iterator            IterGet             ( CClientVehicle* pVehicle );
+    std::list < CClientVehicle* > ::reverse_iterator    IterGetReverse      ( CClientVehicle* pVehicle );
+    std::list < CClientVehicle* > ::iterator            IterBegin           ( void )    { return m_List.begin (); };
+    std::list < CClientVehicle* > ::iterator            IterEnd             ( void )    { return m_List.end (); };
+    std::list < CClientVehicle* > ::reverse_iterator    IterReverseBegin    ( void )    { return m_List.rbegin (); };
+    std::list < CClientVehicle* > ::reverse_iterator    IterReverseEnd      ( void )    { return m_List.rend (); };
+    std::list < CClientVehicle* > ::iterator            StreamedBegin       ( void )    { return m_StreamedIn.begin (); };
+    std::list < CClientVehicle* > ::iterator            StreamedEnd         ( void )    { return m_StreamedIn.end (); };
     
 private:
                                     CClientVehicleManager   ( CClientManager* pManager );
@@ -80,9 +80,9 @@ private:
 
     CClientManager*                 m_pManager;
     bool                            m_bCanRemoveFromList;
-    list < CClientVehicle* >        m_List;
-    list < CClientVehicle* >        m_StreamedIn;
-    list < CClientVehicle* >        m_Attached;
+    std::list < CClientVehicle* >   m_List;
+    std::list < CClientVehicle* >   m_StreamedIn;
+    std::list < CClientVehicle* >   m_Attached;
 
 };
 

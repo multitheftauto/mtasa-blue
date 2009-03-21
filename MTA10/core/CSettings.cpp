@@ -18,6 +18,8 @@
 #include <game/CGame.h>
 #include <utils/CMD5Hasher.h>
 
+using namespace std;
+
 #define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
 #define CORE_SETTINGS_HEADERS           3
 #define CORE_SETTINGS_HEADER_GAME	    "GTA GAME CONTROLS"

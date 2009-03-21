@@ -30,8 +30,6 @@ class CPlayer;
 class CKeyBinds;
 class CPlayerCamera;
 
-using namespace std;
-
 enum
 {
     STATUS_CONNECTED,
@@ -123,16 +121,16 @@ public:
     void                                        RemoveAllSyncingVehicles    ( void );
 
     inline unsigned int                         CountSyncingVehicles        ( void )                        { return static_cast < unsigned int > ( m_SyncingVehicles.size () ); };
-    inline list < CVehicle* > ::const_iterator  IterSyncingVehicleBegin     ( void )                        { return m_SyncingVehicles.begin (); };
-    inline list < CVehicle* > ::const_iterator  IterSyncingVehicleEnd       ( void )                        { return m_SyncingVehicles.end (); };
+    inline std::list < CVehicle* > ::const_iterator IterSyncingVehicleBegin ( void )                        { return m_SyncingVehicles.begin (); };
+    inline std::list < CVehicle* > ::const_iterator IterSyncingVehicleEnd   ( void )                        { return m_SyncingVehicles.end (); };
 
     void                                        AddSyncingPed               ( CPed* pPed );
     void                                        RemoveSyncingPed            ( CPed* pPed );
     void                                        RemoveAllSyncingPeds         ( void );
 
     inline unsigned int                         CountSyncingPeds            ( void )                        { return static_cast < unsigned int > ( m_SyncingPeds.size () ); };
-    inline list < CPed* > ::const_iterator      IterSyncingPedBegin         ( void )                        { return m_SyncingPeds.begin (); };
-    inline list < CPed* > ::const_iterator      IterSyncingPedEnd           ( void )                        { return m_SyncingPeds.end (); };
+    inline std::list < CPed* > ::const_iterator IterSyncingPedBegin         ( void )                        { return m_SyncingPeds.begin (); };
+    inline std::list < CPed* > ::const_iterator IterSyncingPedEnd           ( void )                        { return m_SyncingPeds.end (); };
 
     inline unsigned int                         GetScriptDebugLevel         ( void )                        { return m_uiScriptDebugLevel; };
     bool                                        SetScriptDebugLevel         ( unsigned int uiLevel );
@@ -236,8 +234,8 @@ private:
 
     unsigned char                               m_ucLoginAttempts;
 
-    list < CVehicle* >                          m_SyncingVehicles;
-    list < CPed* >                              m_SyncingPeds;
+    std::list < CVehicle* >                     m_SyncingVehicles;
+    std::list < CPed* >                         m_SyncingPeds;
 
     unsigned int                                m_uiScriptDebugLevel;	
 
@@ -276,7 +274,7 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
-    list < sPlayerSyncData* >                   m_SyncTimes;
+    std::list < sPlayerSyncData* >              m_SyncTimes;
 
 };
 

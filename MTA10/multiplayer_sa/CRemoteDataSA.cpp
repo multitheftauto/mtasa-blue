@@ -17,6 +17,8 @@
 #include "../game_sa/CPedSA.h"
 #include "../game_sa/CVehicleSA.h"
 
+using std::list;
+
 // Our set of remote data
 list < CRemoteDataStorageSA* >          m_RemoteData;
 CPools *                                m_pPools;

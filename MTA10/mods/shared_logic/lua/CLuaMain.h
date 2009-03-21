@@ -28,7 +28,6 @@ class CLuaMain;
 #define MAX_SCRIPTNAME_LENGTH 64
 
 #include <list>
-using namespace std;
 
 class CSFXSynth;
 
@@ -118,7 +117,7 @@ private:
 
     class CResource*                m_pResource;
 
-    list < CXMLFile* >              m_XMLFiles;
+    std::list < CXMLFile* >         m_XMLFiles;
 
 	// Sound classes
 	CSFXSynth*						m_pSFXSynth;

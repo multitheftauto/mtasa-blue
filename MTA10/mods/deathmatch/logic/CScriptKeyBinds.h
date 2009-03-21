@@ -18,7 +18,6 @@
 
 #include "../../shared_logic/lua/CLuaMain.h"
 #include <list>
-using namespace std;
 
 #define NUMBER_OF_KEYS 123
 
@@ -99,8 +98,8 @@ public:
     void                        Call                    ( CScriptKeyBind* pKeyBind );
     bool                        ProcessKey              ( const char* szKey, bool bHitState, eScriptKeyBindType bindTypeconst );
 
-    list < CScriptKeyBind* > ::iterator IterBegin       ( void )            { return m_List.begin (); }
-    list < CScriptKeyBind* > ::iterator IterEnd         ( void )            { return m_List.end (); }
+    std::list < CScriptKeyBind* > ::iterator IterBegin  ( void )            { return m_List.begin (); }
+    std::list < CScriptKeyBind* > ::iterator IterEnd    ( void )            { return m_List.end (); }
 
     // Key-function bind funcs
     bool                        AddKeyFunction          ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
@@ -124,8 +123,8 @@ public:
     void                        RemoveDeletedBinds      ( void );
 
 protected:
-    list < CScriptKeyBind* >    m_List;
-    bool                        m_bProcessingKey;
+    std::list < CScriptKeyBind* >   m_List;
+    bool                            m_bProcessingKey;
 };
 
 #endif

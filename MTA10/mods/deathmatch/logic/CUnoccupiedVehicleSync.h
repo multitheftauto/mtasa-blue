@@ -33,8 +33,10 @@ public:
     void                            RemoveVehicle                       ( CDeathmatchVehicle* pVehicle );
     void                            ClearVehicles                       ( void );
 
-    inline list < CDeathmatchVehicle* > ::const_iterator    IterBegin   ( void )    { return m_List.begin (); };
-    inline list < CDeathmatchVehicle* > ::const_iterator    IterEnd     ( void )    { return m_List.end (); };
+    inline std::list < CDeathmatchVehicle* > ::const_iterator
+                                    IterBegin                           ( void )    { return m_List.begin (); };
+    inline std::list < CDeathmatchVehicle* > ::const_iterator
+                                    IterEnd                             ( void )    { return m_List.end (); };
 
     bool                            Exists                              ( CDeathmatchVehicle * pVehicle );
 private:
@@ -47,7 +49,7 @@ private:
     void                            WriteVehicleInformation             ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle );
 
     CClientVehicleManager*          m_pVehicleManager;
-    list < CDeathmatchVehicle* >    m_List;
+    std::list < CDeathmatchVehicle* > m_List;
     unsigned long                   m_ulLastSyncTime;
 };
 

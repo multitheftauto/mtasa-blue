@@ -15,7 +15,6 @@
 
 #include <windows.h>
 #include <string>
-using namespace std;
 
 typedef struct _section_info_t {
 	DWORD Address;
@@ -26,18 +25,18 @@ class CPEHookUtils
 {
     public:
 
-    DWORD               GetIATAddress   ( string ModuleName,
-                                          string FunctionName, 
+    DWORD               GetIATAddress   ( std::string ModuleName,
+                                          std::string FunctionName, 
                                           HANDLE hImgBase );
-    DWORD               WriteIATAddress ( string ModuleName,
-                                          string FunctionName,
+    DWORD               WriteIATAddress ( std::string ModuleName,
+                                          std::string FunctionName,
                                           HANDLE hImgBase,
                                           PVOID  pvNewProc );
     PVOID               HookVTableFunc  ( PVOID  pvInterface,
                                           int    nOffset,
                                           PVOID  pvHookFunc,
                                           int    nVtableSlot );
-    void                GetSectionHeader( string SectName,
+    void                GetSectionHeader( std::string SectName,
                                           const HANDLE hImgBase,
                                           PSECTIONINFO pSectionInfo );
 

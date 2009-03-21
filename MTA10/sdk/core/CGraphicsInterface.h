@@ -96,7 +96,7 @@ public:
 
     virtual bool                    DrawTextureQueued   ( float fX, float fY,
                                                           float fWidth, float fHeight,
-                                                          const string& strFilename,
+                                                          const std::string& strFilename,
                                                           float fRotation,
                                                           float fRotCenOffX,
                                                           float fRotCenOffY,

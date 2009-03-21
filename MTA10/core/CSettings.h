@@ -126,13 +126,13 @@ protected:
 	CGUIButton*		    m_pBindsDefButton;
 	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
-    CGUILabel*              m_pJoypadName;
-    CGUILabel*              m_pJoypadUnderline;
-    CGUIEdit*               m_pEditDeadzone;
-    CGUIEdit*               m_pEditSaturation;
-    vector < CGUILabel* >   m_pJoypadLabels;
-    vector < CGUIButton* >  m_pJoypadButtons;
-    int                     m_JoypadSettingsRevision;
+    CGUILabel*                  m_pJoypadName;
+    CGUILabel*                  m_pJoypadUnderline;
+    CGUIEdit*                   m_pEditDeadzone;
+    CGUIEdit*                   m_pEditSaturation;
+    std::vector < CGUILabel* >  m_pJoypadLabels;
+    std::vector < CGUIButton* > m_pJoypadButtons;
+    int                         m_JoypadSettingsRevision;
 
 	CGUILabel*			m_pLabelCommunity;
 	CGUILabel*			m_pLabelUser;
@@ -179,7 +179,7 @@ private:
 
 	DWORD			    m_dwFrameCount;
 
-    list < SKeyBindSection *>       m_pKeyBindSections;
+    std::list < SKeyBindSection *> m_pKeyBindSections;
 
 	enum eCheckBox {
 		CHECKBOX_MENU_DYNAMIC,

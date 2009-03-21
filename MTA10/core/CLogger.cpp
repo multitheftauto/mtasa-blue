@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 #define MAX_STRING_LENGTH 2048
 template<> CLogger * CSingleton< CLogger >::m_pSingleton = NULL;
 

@@ -12,7 +12,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 #ifdef MTA_DEBUG
 #include <Tlhelp32.h>

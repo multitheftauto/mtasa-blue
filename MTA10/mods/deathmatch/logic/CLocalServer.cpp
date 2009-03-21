@@ -10,7 +10,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 #ifndef snprintf
 #define snprintf _snprintf

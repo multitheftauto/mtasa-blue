@@ -34,12 +34,12 @@ public:
     static CClientTeam*     GetTeam                 ( ElementID ID );
     CClientTeam*            GetTeam                 ( const char* szName );
 
-    list < CClientTeam* > ::const_iterator IterBegin ( void )                    { return m_List.begin (); }
-    list < CClientTeam* > ::const_iterator IterEnd   ( void )                    { return m_List.end (); }
+    std::list < CClientTeam* > ::const_iterator IterBegin ( void )                    { return m_List.begin (); }
+    std::list < CClientTeam* > ::const_iterator IterEnd   ( void )                    { return m_List.end (); }
 
 private:
-    list < CClientTeam* >   m_List;
-    bool                    m_bRemoveFromList;
+    std::list < CClientTeam* >  m_List;
+    bool                        m_bRemoveFromList;
 };
 
 #endif

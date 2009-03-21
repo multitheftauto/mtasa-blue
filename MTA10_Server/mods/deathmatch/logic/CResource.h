@@ -41,7 +41,6 @@
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
 #define MAX_RESOURCE_VERSION_LENGTH 100
-using namespace std;
 
 struct SVersion
 {

@@ -24,6 +24,8 @@
 
 extern CMultiplayerSA* pMultiplayer;
 
+using std::list;
+
 list<CShotSyncData*>        ShotSyncData;
 CShotSyncData               LocalShotSyncData;
 

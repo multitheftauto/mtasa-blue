@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+using std::string;
+
 CFilePathTranslator::CFilePathTranslator ( )
 {
 }

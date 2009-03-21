@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 CHTTPClient::CHTTPClient ( void )
 {
 	m_usPort = 0;

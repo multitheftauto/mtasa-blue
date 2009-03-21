@@ -11,7 +11,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : CClientEntity ( ID )
 {

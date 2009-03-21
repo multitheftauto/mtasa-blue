@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::vector;
+
 extern CCore* g_pCore;
 
 CChat * g_pChat = NULL;

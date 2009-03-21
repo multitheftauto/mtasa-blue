@@ -14,7 +14,6 @@
 
 #include <list>
 #include "CClientCommon.h"
-using namespace std;
 
 #define MAX_ZONE_NAME 32
 
@@ -46,8 +45,8 @@ public:
     void                            ClearCities             ( void );
 
 protected:
-    list < SZone* >                 m_Zones;
-    list < SZone* >                 m_Cities;
+    std::list < SZone* >            m_Zones;
+    std::list < SZone* >            m_Cities;
 };
 
 #endif

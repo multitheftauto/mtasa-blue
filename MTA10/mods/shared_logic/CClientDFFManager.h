@@ -33,8 +33,8 @@ public:
     static bool                     IsReplacableModel       ( unsigned short usModel );
     bool                            RestoreModel            ( unsigned short usModel );
 
-    list < CClientDFF* > ::const_iterator IterBegin ( void )                    { return m_List.begin (); }
-    list < CClientDFF* > ::const_iterator IterEnd   ( void )                    { return m_List.end (); }
+    std::list < CClientDFF* > ::const_iterator IterBegin    ( void )                    { return m_List.begin (); }
+    std::list < CClientDFF* > ::const_iterator IterEnd      ( void )                    { return m_List.end (); }
 
 private:
     void                            AddToList               ( CClientDFF* pDFF )        { m_List.push_back ( pDFF ); }
@@ -46,7 +46,7 @@ private:
     class CClientObjectManager*     m_pObjectManager;
     class CClientVehicleManager*    m_pVehicleManager;
 
-    list < CClientDFF* >            m_List;
+    std::list < CClientDFF* >       m_List;
     bool                            m_bRemoveFromList;
 };
 

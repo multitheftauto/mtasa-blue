@@ -25,8 +25,6 @@ class CVideoManager;
 
 #include <list>
 
-using namespace std;
-
 // Codec GUIDs
 #include <initguid.h>
 DEFINE_GUID ( CLSID_XVID,		mmioFOURCC('x','v','i','d'), 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
@@ -57,7 +55,7 @@ private:
 	HRESULT                             LoadCodec               ( REFCLSID ClassID, const char * szPath, IClassFactory ** ppFactory );
 	HRESULT                             CreateCodec             ( REFCLSID ClassID, IClassFactory * pFactory, IBaseFilter ** ppFilter );
 
-	list < CVideoRenderer* >            m_List;
+    std::list < CVideoRenderer* >            m_List;
 	IClassFactory*                      m_pFactorySource;
 	IClassFactory*                      m_pFactoryXVID;
 	IClassFactory*                      m_pFactoryVorbis;

@@ -46,7 +46,7 @@ public:
     void                ActivateInput                   ( void );
 
     void                HandleTextAccepted              ( bool bHandled );
-    void                GetCommandInfo                  ( const string &strIn, string & strCmdOut, string & strCmdLineOut );
+    void                GetCommandInfo                  ( const std::string &strIn, std::string & strCmdOut, std::string & strCmdLineOut );
 
     void                SetNextHistoryText              ( void );
     void                SetPreviousHistoryText          ( void );
@@ -74,7 +74,7 @@ private:
 
     CConsoleHistory*    m_pConsoleHistory;
     int                 m_iHistoryIndex;
-    vector < int >      m_AutoCompleteList;
+    std::vector < int > m_AutoCompleteList;
     int                 m_iAutoCompleteIndex;
 
     CGUIWindow*         m_pWindow;

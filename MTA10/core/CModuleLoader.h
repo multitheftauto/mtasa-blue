@@ -15,20 +15,19 @@
 
 #include <windows.h>
 #include <string>
-using namespace std;
 
 class CModuleLoader
 {
     public:
     
-            CModuleLoader        ( string ModuleName );
+            CModuleLoader        ( std::string ModuleName );
             CModuleLoader        ( );
            ~CModuleLoader        ( ); 
 
-    bool    LoadModule           ( string ModuleName );
+    bool    LoadModule           ( std::string ModuleName );
     void    UnloadModule         ( );
     
-    PVOID   GetFunctionPointer   ( string FunctionName );
+    PVOID   GetFunctionPointer   ( std::string FunctionName );
 
     private:
 

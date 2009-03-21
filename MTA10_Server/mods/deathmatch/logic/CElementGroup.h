@@ -22,7 +22,7 @@ class CElementGroup;
 class CElementGroup
 {
 private:
-    list<CElement *>                m_elements;
+    std::list < CElement * >        m_elements;
     class CResource *               m_pResource;
 public:
                                     CElementGroup ( CResource * resource )
@@ -36,8 +36,8 @@ public:
     inline CResource *              GetResource ( void ) { return m_pResource; }
     unsigned int                    GetCount ( void );
 
-    list < CElement* > ::const_iterator IterBegin   ( void )    { return m_elements.begin (); };
-    list < CElement* > ::const_iterator IterEnd     ( void )    { return m_elements.end (); };
+    std::list < CElement* > ::const_iterator IterBegin   ( void )    { return m_elements.begin (); };
+    std::list < CElement* > ::const_iterator IterEnd     ( void )    { return m_elements.end (); };
 };
 
 #endif

@@ -15,7 +15,6 @@
 
 #include "CClientCommon.h"
 #include <list>
-using namespace std;
 
 class CClientColShape;
 class CClientEntity;
@@ -34,10 +33,10 @@ public:
     inline unsigned int         Count                       ( void )                            { return static_cast < unsigned int > ( m_List.size () ); }
 
 protected:
-    inline void                 AddToList                   ( CClientColShape* pShape )       { m_List.push_back ( pShape ); };
-    void                        RemoveFromList              ( CClientColShape* pShape );
+    inline void                     AddToList                   ( CClientColShape* pShape )       { m_List.push_back ( pShape ); };
+    void                            RemoveFromList              ( CClientColShape* pShape );
 
-    list < CClientColShape* >   m_List;
+    std::list < CClientColShape* >  m_List;
 };
 
 #endif

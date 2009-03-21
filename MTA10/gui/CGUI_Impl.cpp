@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 #define CGUI_MTA_DEFAULT_FONT		"tahoma.ttf"		// %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD	"tahomabd.ttf"		// %WINDIR%/font/<...>
 #define CGUI_MTA_CLEAR_FONT			"verdana.ttf"		// %WINDIR%/font/<...>

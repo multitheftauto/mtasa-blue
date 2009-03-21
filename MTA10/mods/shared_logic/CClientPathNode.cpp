@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CClientPathNode::CClientPathNode ( CClientManager* pManager, CVector& vecPosition,
                                    CVector& vecRotation, int iTime, ElementID ID, ePathNodeStyle PathStyle,
                                    CClientPathNode* pNextNode ) : CClientEntity ( ID )

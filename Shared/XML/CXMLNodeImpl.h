@@ -20,8 +20,6 @@
 #include <list>
 #include <string>
 
-using namespace std;
-
 class CXMLNodeImpl : public CXMLNode
 {
 public:
@@ -36,9 +34,9 @@ public:
     CXMLNode*               GetSubNode          ( unsigned int uiIndex );
     CXMLNode*               FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 );
 
-    list < CXMLNode* > ::iterator
+    std::list < CXMLNode* > ::iterator
                             ChildrenBegin       ( void ) { return m_Children.begin (); };
-    list < CXMLNode* > ::iterator
+    std::list < CXMLNode* > ::iterator
                             ChildrenEnd         ( void ) { return m_Children.end (); };
 
     CXMLAttributes&         GetAttributes       ( void );
@@ -83,7 +81,7 @@ private:
 	TiXmlElement*               m_pNode;
 	TiXmlDocument*              m_pDocument;
 
-    list < CXMLNode* >          m_Children;
+    std::list < CXMLNode* >     m_Children;
     bool                        m_bCanRemoveFromList;
 
     CXMLAttributesImpl          m_Attributes;

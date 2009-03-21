@@ -22,8 +22,6 @@ struct SGUIManagerListEntry;
 #include "CClientGUIElement.h"
 #include <gui/CGUI.h>
 
-using namespace std;
-
 class CClientGUIManager
 {
     friend class CClientManager;
@@ -46,7 +44,7 @@ private:
 
 private:
     bool                                    m_bCanRemoveFromList;
-    list < CClientGUIElement* >				m_Elements;
+    std::list < CClientGUIElement* >        m_Elements;
 };
 
 #endif

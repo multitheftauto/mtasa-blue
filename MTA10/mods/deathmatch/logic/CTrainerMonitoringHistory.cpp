@@ -10,7 +10,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::vector;
 
 CTrainerMonitoringHistory::CTrainerMonitoringHistory ( void )
 {

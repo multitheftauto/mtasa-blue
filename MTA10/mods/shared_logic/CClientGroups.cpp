@@ -12,6 +12,8 @@
 
 #include <StdInc.h>
 
+using std::list;
+
 void CClientGroups::DeleteAll ( void )
 {
     // Delete all the elements

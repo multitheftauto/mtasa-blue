@@ -15,31 +15,30 @@
 #define __CFILEPATHTRANSLATOR_H
 
 #include <string>
-using namespace std;
 
 class CFilePathTranslator 
 {
-    public:
+public:
                 CFilePathTranslator ( );
                ~CFilePathTranslator ( );
     
-    void        SetCurrentWorkingDirectory       ( string PathBasedOffModuleRoot );
+    void        SetCurrentWorkingDirectory       ( std::string PathBasedOffModuleRoot );
     void        UnSetCurrentWorkingDirectory     ( ); 
-    void        SetModPath                       ( string PathBasedOffWorkingDirectory );
+    void        SetModPath                       ( std::string PathBasedOffWorkingDirectory );
 
-    void        GetModPath                       ( string & ModPathOut );
-    void        GetCurrentWorkingDirectory       ( string & WorkingDirectoryOut );
+    void        GetModPath                       ( std::string & ModPathOut );
+    void        GetCurrentWorkingDirectory       ( std::string & WorkingDirectoryOut );
 
-    bool        GetFileFromModPath               ( string FileToGet, string & TranslatedFilePathOut );
-    bool        GetFileFromWorkingDirectory      ( string FileToGet, string & TranslatedFilePathOut );
+    bool        GetFileFromModPath               ( std::string FileToGet, std::string & TranslatedFilePathOut );
+    bool        GetFileFromWorkingDirectory      ( std::string FileToGet, std::string & TranslatedFilePathOut );
 
-    void        GetGTARootDirectory              ( string & ModuleRootDirOut );
-    void        GetMTASARootDirectory            ( string & InstallRootDirOut );
+    void        GetGTARootDirectory              ( std::string & ModuleRootDirOut );
+    void        GetMTASARootDirectory            ( std::string & InstallRootDirOut );
 
-    private:
+private:
 
-    string      m_ModPath;
-    string      m_WorkingDirectory;
+    std::string      m_ModPath;
+    std::string      m_WorkingDirectory;
 };
 
 #endif

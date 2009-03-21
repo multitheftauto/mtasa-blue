@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 extern CCore* g_pCore;
 
 template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;

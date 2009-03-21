@@ -16,21 +16,19 @@
 #include "CPacket.h"
 #include <vector>
 
-using namespace std;
-
 class CEntityRemovePacket : public CPacket
 {
 public:
-    inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_ENTITY_REMOVE; };
-    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_ENTITY_REMOVE; };
+    inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                        Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                            Write                       ( NetServerBitStreamInterface& BitStream ) const;
 
-    inline void                 Add                         ( class CElement* pElement )    { m_List.push_back ( pElement ); };
-    inline void                 Clear                       ( void )                        { m_List.clear (); };
+    inline void                     Add                         ( class CElement* pElement )    { m_List.push_back ( pElement ); };
+    inline void                     Clear                       ( void )                        { m_List.clear (); };
 
 private:
-    vector < class CElement* >  m_List;
+    std::vector < class CElement* > m_List;
 };
 
 #endif

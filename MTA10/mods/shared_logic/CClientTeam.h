@@ -46,8 +46,8 @@ public:
 
     bool                        Exists              ( CClientPlayer* pPlayer );
 
-    list < CClientPlayer* > ::const_iterator IterBegin ( void )         { return m_List.begin (); }
-    list < CClientPlayer* > ::const_iterator IterEnd   ( void )         { return m_List.end (); }
+    std::list < CClientPlayer* > ::const_iterator IterBegin ( void )         { return m_List.begin (); }
+    std::list < CClientPlayer* > ::const_iterator IterEnd   ( void )         { return m_List.end (); }
 
     void                        GetPosition         ( CVector& vecPosition ) const  { vecPosition = m_vecPosition; }
     void                        SetPosition         ( const CVector& vecPosition )  { m_vecPosition = vecPosition; }
@@ -66,7 +66,7 @@ protected:
 
     bool                        m_bFriendlyFire;
 
-    list < CClientPlayer* >     m_List;  
+    std::list < CClientPlayer* > m_List;  
 
     CVector                     m_vecPosition;
 };

@@ -16,8 +16,6 @@
 #include "CFileSystemMemoryHandle.h"
 #include <list>
 
-using namespace std;
-
 class CFileSystemMemoryHandleManager
 {
 public:
@@ -31,7 +29,7 @@ public:
     void                                Remove                                  ( HANDLE hFile );
 
 private:
-    list < CFileSystemMemoryHandle* >   m_List;
+    std::list < CFileSystemMemoryHandle* >      m_List;
 };
 
 #endif

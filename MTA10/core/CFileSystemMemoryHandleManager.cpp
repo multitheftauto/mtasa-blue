@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CFileSystemMemoryHandleManager::CFileSystemMemoryHandleManager ( void )
 {
 

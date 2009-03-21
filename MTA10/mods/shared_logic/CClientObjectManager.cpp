@@ -13,7 +13,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 static unsigned int g_uiValidObjectModels[] = {
     2, 0, 0, 0, 0, 0, 0, 0, 0, -4096, -1053185, 4194303, 16383, 0, 0, 0, 0, 0, 0, -128, 

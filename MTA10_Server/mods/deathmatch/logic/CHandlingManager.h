@@ -16,8 +16,6 @@
 #include "CHandling.h"
 #include <list>
 
-using namespace std;
-
 class CHandlingManager
 {
     friend class CHandling;

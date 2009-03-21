@@ -23,8 +23,6 @@
 #define MAX_PATH        260
 #endif
 
-using namespace std;
-
 class CResourceConfigItem :
     public CDownloadableResource
 {

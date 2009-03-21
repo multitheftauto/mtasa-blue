@@ -17,7 +17,6 @@
 #include <gui/CGUIElement.h>
 
 #include <list>
-using namespace std;
 
 namespace CEGUI {
     class Window;
@@ -119,20 +118,20 @@ protected:
 	bool                Event_OnMouseEnter          ( const CEGUI::EventArgs& e );
 	bool                Event_OnMouseLeave          ( const CEGUI::EventArgs& e );
 
-    CEGUI::Window*      m_pWindow;
-	CGUIElement*		m_pParent;
+    CEGUI::Window*              m_pWindow;
+	CGUIElement*		        m_pParent;
 
-	CGUI_Impl*			m_pManager;
+	CGUI_Impl*			        m_pManager;
 
-	void*				m_pData;
+	void*				        m_pData;
 
-	list<CGUIProperty*>	m_Properties;
+	std::list<CGUIProperty*>	m_Properties;
 
-	GUI_CALLBACK*		m_pOnClick;
-    GUI_CALLBACK*       m_pOnMoved;
-    GUI_CALLBACK*       m_pOnSized;
-	GUI_CALLBACK*       m_pOnMouseEnter;
-	GUI_CALLBACK*       m_pOnMouseLeave;
+	GUI_CALLBACK*		        m_pOnClick;
+    GUI_CALLBACK*               m_pOnMoved;
+    GUI_CALLBACK*               m_pOnSized;
+	GUI_CALLBACK*               m_pOnMouseEnter;
+	GUI_CALLBACK*               m_pOnMouseLeave;
 };
 
 #endif

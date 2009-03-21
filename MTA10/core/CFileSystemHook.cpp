@@ -14,6 +14,8 @@
 #include "StdInc.h"
 #include "detours/include/detours.h"
 
+using std::string;
+
 /*
 #define _UNICODE
 #include <tchar.h>

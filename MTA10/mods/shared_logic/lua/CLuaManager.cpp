@@ -16,7 +16,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using std::list;
 
 static int DummyPreCall ( lua_CFunction f, lua_State* L )
 {

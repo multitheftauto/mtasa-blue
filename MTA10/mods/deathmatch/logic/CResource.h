@@ -24,8 +24,6 @@
 #include "CElementGroup.h"
 #include <list>
 
-using namespace std;
-
 #define MAX_RESOURCE_NAME_LENGTH	255
 #define MAX_FUNCTION_NAME_LENGTH    50
 
@@ -63,8 +61,8 @@ public:
 
     CDownloadableResource*  AddConfigFile   ( char *szFileName, unsigned long ulServerCRC );
 
-    inline list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
-    inline list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
+    inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
+    inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
     CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
 
@@ -109,10 +107,10 @@ private:
 
     SString                 m_strResourceDirectoryPath; // stores the path to /mods/deathmatch/resources/resource_name
 
-    list < class CResourceFile* >           m_ResourceFiles;
-    list < class CResourceConfigItem* >     m_ConfigFiles;
-    list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
-	list<CExportedFunction *>   m_exportedFunctions;
+    std::list < class CResourceFile* >           m_ResourceFiles;
+    std::list < class CResourceConfigItem* >     m_ConfigFiles;
+    std::list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
+	std::list<CExportedFunction *>   m_exportedFunctions;
     CElementGroup *         m_pDefaultElementGroup;
 };
 

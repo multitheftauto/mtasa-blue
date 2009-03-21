@@ -18,8 +18,6 @@
 
 #include <list>
 
-using namespace std;
-
 class CPopulationSA : public CPopulation
 {
 

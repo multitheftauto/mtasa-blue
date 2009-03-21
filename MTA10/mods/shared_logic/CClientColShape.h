@@ -65,8 +65,8 @@ public:
     void                                RemoveCollider                  ( CClientEntity* pEntity )                          { if ( !m_Colliders.empty() ) m_Colliders.remove ( pEntity ); }
     bool                                ColliderExists                  ( CClientEntity* pEntity );
     void                                RemoveAllColliders              ( bool bNotify );
-    list < CClientEntity* > ::iterator  CollidersBegin                  ( void )                                            { return m_Colliders.begin (); }
-    list < CClientEntity* > ::iterator  CollidersEnd                    ( void )                                            { return m_Colliders.end (); }
+    std::list < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
+    std::list < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
 
 protected:
     CVector                             m_vecPosition;
@@ -78,7 +78,7 @@ private:
     class CClientColManager*            m_pColManager;
     CClientColCallback*                 m_pCallback;
     bool                                m_bAutoCallEvent;  
-    list < CClientEntity* >             m_Colliders;    
+    std::list < CClientEntity* >        m_Colliders;    
 };
 
 #endif

@@ -15,9 +15,6 @@
 
 #include <list>
 
-using namespace std;
-
-
 class CTCPServerSocketImplManager
 {
 public:
@@ -28,7 +25,7 @@ public:
     void                                    RemoveServer                        ( class CTCPServerSocketImpl* pServer );
 
 private:
-    list < class CTCPServerSocketImpl* >    m_Servers;
+    std::list < class CTCPServerSocketImpl* >    m_Servers;
 
 };
 

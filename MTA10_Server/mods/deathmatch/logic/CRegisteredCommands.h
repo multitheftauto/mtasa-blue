@@ -20,8 +20,6 @@
 
 #include <list>
 
-using namespace std;
-
 #define MAX_REGISTERED_COMMAND_LENGTH 64
 #define MAX_REGISTERED_COMMANDHANDLER_LENGTH 64
 

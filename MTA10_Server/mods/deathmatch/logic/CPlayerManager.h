@@ -47,13 +47,13 @@ public:
     CPlayer*                                    GetBefore                       ( ElementID PlayerID );
     CPlayer*                                    GetAfter                        ( ElementID PlayerID );
 
-    inline list < CPlayer* > ::const_iterator   IterBegin                       ( void )                                            { return m_Players.begin (); };
-    inline list < CPlayer* > ::const_iterator   IterEnd                         ( void )                                            { return m_Players.end (); };
-    inline list < CPlayer* > ::const_iterator   IterGet                         ( CPlayer* pPlayer );
-    inline list < CPlayer* > ::const_iterator   IterGet                         ( ElementID PlayerID );
+    inline std::list < CPlayer* > ::const_iterator  IterBegin                   ( void )                                            { return m_Players.begin (); };
+    inline std::list < CPlayer* > ::const_iterator  IterEnd                     ( void )                                            { return m_Players.end (); };
+    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
+    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
     void                                        Broadcast                       ( const CPacket& Packet, CPlayer* pSkip = NULL );
-	void                                        Broadcast                       ( const CPacket& Packet, list < CPlayer * > & playersList );
+	void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
@@ -69,7 +69,7 @@ private:
 
     class CScriptDebugging*                     m_pScriptDebugging;
 
-    list < CPlayer* >                           m_Players;
+    std::list < CPlayer* >                      m_Players;
     bool                                        m_bCanRemoveFromList;
 };
 

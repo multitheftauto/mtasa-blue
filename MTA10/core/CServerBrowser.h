@@ -27,8 +27,6 @@ class CServerBrowser;
 #include "CCommunityLogin.h"
 #include <ctime>
 
-using namespace std;
-
 // Amount of server lists/tabs (ServerBrowserType)
 #define SERVER_BROWSER_TYPE_COUNT           4
 
