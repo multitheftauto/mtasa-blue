@@ -1715,9 +1715,6 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     BitStream.Write ( ( unsigned char ) ( ( bFixed ) ? 1 : 0 ) );
     if ( bFixed )
     {
-#ifdef MTA_DEBUG
-        OutputDebugString ( "Sending fixed mode cam sync\n" );
-#endif
         // Write our position
         CVector vecPosition;
         pCamera->GetPosition ( vecPosition );
@@ -1734,9 +1731,6 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     }
     else
     {
-#ifdef MTA_DEBUG
-        OutputDebugString ( "Sending player mode cam sync\n" );
-#endif
         // Write our target
         CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
         if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();

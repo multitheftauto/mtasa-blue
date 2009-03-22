@@ -2974,16 +2974,7 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
             pProjectile->SetVelocity ( vecVelocity );
         }
 
-        #ifdef MTA_DEBUG
-            OutputDebugString ( "ProjectileInitiateHandler: sending projectile sync" );
-        #endif
         SendProjectileSync ( pProjectile );
-    }
-    else
-    {
-        #ifdef MTA_DEBUG
-            OutputDebugString ( "ProjectileInitiateHandler: nonlocal projectile initiated, not syncing" );
-        #endif
     }
 
     // Validate the projectile for our element tree

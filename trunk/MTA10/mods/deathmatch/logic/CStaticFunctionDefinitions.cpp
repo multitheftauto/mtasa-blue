@@ -3194,31 +3194,10 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVecto
 {
     CNetAPI* pNetAPI = m_pClientGame->GetNetAPI ();
 
-    //bool bNotifyServer = false;
     if ( !m_pCamera->IsInFixedMode () )        
     {
         m_pCamera->ToggleCameraFixedMode ( true );
-        //bNotifyServer = true;
     }
-
-    //if ( !bNotifyServer && pNetAPI->IsCameraSyncNeeded ( false ) ) bNotifyServer = true;
-
-    /*
-    if ( bNotifyServer )
-    {
-        // Tell the server we're in fixed mode
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            // Write our data
-            pNetAPI->WriteCameraSync ( *pBitStream );
-
-            // Send the packet and destroy it
-            g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
-    }
-    */
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
@@ -3255,20 +3234,6 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
         }
         default: return false;
     }
-
-    /*
-    // Tell the server we're NOT in fixed mode
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-    if ( pBitStream )
-    {
-        // Write our data
-        m_pClientGame->GetNetAPI ()->WriteCameraSync ( *pBitStream );
-
-        // Send the packet and destroy it
-        g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
-        g_pNet->DeallocateNetBitStream ( pBitStream );
-    }
-    */
 
     return true;
 }
