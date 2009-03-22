@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include <utils/CMD5Hasher.h>
 
+using SharedUtil::CalcMTASAPath;
 extern CCore* g_pCore;
 
 CCommunityRegistration::CCommunityRegistration ( void )

@@ -30,6 +30,7 @@
 
 // Core-level includes
 #include "SharedUtil.h"
+#include "SString.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CCriticalSection.h"

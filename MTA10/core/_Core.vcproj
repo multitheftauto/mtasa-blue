@@ -857,7 +857,7 @@
 					RelativePath="..\..\Shared\sdk\SharedUtil.h">
 				</File>
 				<File
-					RelativePath="..\..\Shared\sdk\SharedUtil.hpp">
+					RelativePath="..\..\Shared\sdk\SString.h">
 				</File>
 			</Filter>
 		</Filter>

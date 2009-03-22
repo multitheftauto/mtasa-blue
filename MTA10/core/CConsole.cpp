@@ -15,6 +15,7 @@
 
 #include "StdInc.h"
 
+using SharedUtil::CalcMTASAPath;
 using std::string;
 
 #define CONSOLE_HISTORY_LENGTH 64

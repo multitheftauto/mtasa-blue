@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using SharedUtil::CalcMTASAPath;
+
 extern CClientGame* g_pClientGame;
 
 #define CGUI_ICON_NETWORK_TROUBLE		"mta\\cgui\\images\\16-message-warn.png"

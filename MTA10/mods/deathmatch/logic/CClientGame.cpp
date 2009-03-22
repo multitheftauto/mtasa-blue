@@ -22,6 +22,7 @@
 
 #include "StdInc.h"
 
+using SharedUtil::CalcMTASAPath;
 using std::list;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
