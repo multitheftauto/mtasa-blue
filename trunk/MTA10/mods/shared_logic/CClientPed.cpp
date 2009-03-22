@@ -204,7 +204,7 @@ CClientPed::~CClientPed ( void )
 	AttachTo ( NULL );
 
     // Remove all our projectiles
-    RemoveAllProjectiles ();    
+    RemoveAllProjectiles ();
 
     // If this is the local player, give the player full health and put him at a safe location
     if ( m_bIsLocalPlayer )

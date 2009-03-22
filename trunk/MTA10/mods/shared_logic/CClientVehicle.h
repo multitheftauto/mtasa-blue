@@ -337,6 +337,13 @@ public:
     void                        Create                  ( void );
     void                        Destroy                 ( void );
 
+    inline void                 AddProjectile           ( CClientProjectile * pProjectile )         { m_Projectiles.push_back ( pProjectile ); }
+    inline void                 RemoveProjectile        ( CClientProjectile * pProjectile )         { m_Projectiles.remove ( pProjectile ); }
+    std::list < CClientProjectile* > ::iterator ProjectilesBegin ( void )                               { return m_Projectiles.begin (); }
+    std::list < CClientProjectile* > ::iterator ProjectilesEnd   ( void )                               { return m_Projectiles.end (); }
+
+    void                        RemoveAllProjectiles    ( void );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -445,6 +452,8 @@ protected:
 
     bool                        m_bBlown;
     bool                        m_bHasDamageModel;
+
+    std::list < CClientProjectile* > m_Projectiles;
 
 public:
     CClientPlayer *             m_pLastSyncer;
