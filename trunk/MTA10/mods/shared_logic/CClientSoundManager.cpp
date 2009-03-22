@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 
+using SharedUtil::CalcMTASAPath;
 using std::list;
 
 extern CCoreInterface* g_pCore;

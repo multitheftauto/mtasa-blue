@@ -20,6 +20,7 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 
+using SharedUtil::CalcMTASAPath;
 using namespace std;
 
 static float fTest = 1;

@@ -14,6 +14,8 @@
 #include <game/CGame.h>
 #include <shellapi.h>
 
+using SharedUtil::CalcMTASAPath;
+
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
 									CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
 									CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,

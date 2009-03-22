@@ -15,7 +15,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+
+using SharedUtil::CalcMTASAPath;
 
 CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID, short sOrdering, float fVisibleDistance ) : CClientEntity ( ID )
 {

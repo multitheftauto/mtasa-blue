@@ -19,6 +19,7 @@
 #include <game/CWanted.h>
 #include <ijsify.h>
 #include "SharedUtil.h"
+#include "SString.h"
 
 // Game includes
 #include "CEntitySA.h"

@@ -20,6 +20,7 @@
 
 // SDK includes
 #include "SharedUtil.h"
+#include "SString.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

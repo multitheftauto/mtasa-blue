@@ -15,6 +15,7 @@
 
 #include "StdInc.h"
 
+using SharedUtil::CalcMTASAPath;
 using std::list;
 
 CRadarMap::CRadarMap ( CClientManager* pManager )
