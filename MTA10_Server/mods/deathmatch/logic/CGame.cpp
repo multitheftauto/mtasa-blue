@@ -1749,30 +1749,16 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
             {
                 pSendPlayer = *iter;
 
-                /* We now tell the reporter to create the explosion too!
-                // Not the player we got the packet from?
-                if ( pSendPlayer != pPlayer )
-                */
-                {
-                    // Grab this player's camera position
-                    CVector vecCameraPosition;
-                    pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
+                // We tell the reporter to create the explosion too
+                // Grab this player's camera position
+                CVector vecCameraPosition;
+                pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
-                    // Is this players camera close enough to send?
-                    if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE ) )
-                    {
-                        // Send the packet to him
-                        pSendPlayer->Send ( Packet );
-                        #ifdef MTA_DEBUG
-                            OutputDebugString ( "Packet_ExplosionSync: sent packet to player" );
-                        #endif
-                    }
-                    else
-                    {
-                        #ifdef MTA_DEBUG
-                            OutputDebugString ( "Packet_ExplosionSync: NOT sending packet to player because he's too far" );
-                        #endif
-                    }
+                // Is this players camera close enough to send?
+                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE ) )
+                {
+                    // Send the packet to him
+                    pSendPlayer->Send ( Packet );
                 }
             }
         }
