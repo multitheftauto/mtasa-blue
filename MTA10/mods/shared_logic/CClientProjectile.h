@@ -25,6 +25,7 @@ class CVector;
 enum eWeaponType;
 class CClientProjectileManager;
 class CClientPed;
+class CClientVehicle;
 
 class CProjectileInitiateData
 {
@@ -50,6 +51,7 @@ class CClientProjectile : public CClientEntity
 {
     friend CClientProjectileManager;
     friend CClientPed;
+    friend CClientVehicle;
 public:
                                         CClientProjectile       ( class CClientManager* pManager,
                                                                   CProjectile* pProjectile,

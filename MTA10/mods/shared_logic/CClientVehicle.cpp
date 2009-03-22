@@ -161,6 +161,9 @@ CClientVehicle::~CClientVehicle ( void )
 
 	AttachTo ( NULL );
 
+    // Remove all our projectiles
+    RemoveAllProjectiles ();
+
     // Destroy the vehicle
     Destroy ();
 
@@ -2828,4 +2831,17 @@ bool CClientVehicle::IsEnterable ( void )
         }
     }
     return false;
+}
+
+void CClientVehicle::RemoveAllProjectiles ( void )
+{
+    CClientProjectile * pProjectile = NULL;
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    for ( ; iter != m_Projectiles.end () ; iter++ )
+    {
+        pProjectile = *iter;
+        pProjectile->m_pCreator = NULL;
+        g_pClientGame->GetElementDeleter ()->Delete ( pProjectile );        
+    }
+    m_Projectiles.clear ();
 }
