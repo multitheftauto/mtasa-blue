@@ -573,23 +573,48 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
                     {
+                        SString szClipboardText = ClipboardBuffer;
+                        size_t iNewlineIndex;
+
+                        // Remove the newlines inserting spaces instead
+                        do
+                        {
+                            iNewlineIndex = szClipboardText.find ( '\n' );
+                            if ( iNewlineIndex != SString::npos )
+                            {
+                                if ( iNewlineIndex > 0 && szClipboardText[ iNewlineIndex - 1 ] == '\r' )
+                                {
+                                    // \r\n
+                                    szClipboardText [ iNewlineIndex - 1 ] = ' ';
+                                    szClipboardText.replace ( iNewlineIndex, szClipboardText.length () - iNewlineIndex,
+                                                              (const std::string&)szClipboardText, iNewlineIndex + 1,
+                                                              szClipboardText.length () - iNewlineIndex - 1 );
+                                }
+                                else
+                                {
+                                    szClipboardText [ iNewlineIndex ] = ' ';
+                                }
+                            }
+                        } while ( iNewlineIndex != SString::npos );
+
 					    // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
 					    CEGUI::String tmp = WndEdit->getText ();
-					    if ( ( strlen ( ClipboardBuffer ) + tmp.length () ) < WndEdit->getMaxTextLength( ) )
+					    if ( ( szClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;
                             if ( WndEdit->getSelectionLength () > 0 )
                             {
                                 // Replace what's selected with the pasted buffer and set the new carat index
-                                tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (), ClipboardBuffer, strlen ( ClipboardBuffer ) );
-                                sizeCaratIndex = WndEdit->getSelectionStartIndex () + strlen ( ClipboardBuffer );
+                                tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (),
+                                              szClipboardText.c_str (), szClipboardText.length () );
+                                sizeCaratIndex = WndEdit->getSelectionStartIndex () + szClipboardText.length ();
                             }
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-						        tmp.insert ( WndEdit->getSelectionStartIndex (), ClipboardBuffer , strlen ( ClipboardBuffer ) );
-                                sizeCaratIndex = WndEdit->getCaratIndex () + strlen ( ClipboardBuffer );
+						        tmp.insert ( WndEdit->getSelectionStartIndex (), szClipboardText.c_str (), szClipboardText.length () );
+                                sizeCaratIndex = WndEdit->getCaratIndex () + szClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
