@@ -17,9 +17,10 @@ class CClientSound;
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
 
-#define MAX_SOUND_DISTANCE 100
-
 using namespace irrklang;
+
+//#define MAX_SOUND_DISTANCE 100
+#define SOUND_PAN_THRESHOLD 0.85f
 
 class CClientSound : public CClientEntity
 {
@@ -72,7 +73,6 @@ protected:
 private:
 
     float                   m_fVolume;
-    float                   m_fDistance;
     float                   m_fMinDistance;
 
     CVector                 m_vecPosition;
