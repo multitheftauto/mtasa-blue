@@ -32,6 +32,7 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
 
     m_ulLastPuresyncTime = 0;
     m_ulLastSyncReturnTime = 0;
+    m_bLastSentCameraMode = true;       // start out in fixed mode
     m_ulLastCameraSyncTime = 0;
     m_bStoredReturnSync = false;
 }
@@ -332,7 +333,7 @@ void CNetAPI::DoPulse ( void )
                     WriteCameraSync ( *pBitStream );
 
                     // Send the packet and destroy it
-                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_GAME );
+                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_GAME );
                     g_pNet->DeallocateNetBitStream ( pBitStream );
                 }
             }
@@ -430,11 +431,22 @@ bool CNetAPI::IsCameraSyncNeeded ( bool bDifferenceCheck )
             if ( ulCurrentTime >= m_ulLastCameraSyncTime + CAM_SYNC_RATE )
             {
                 m_ulLastCameraSyncTime = ulCurrentTime;
+                m_bLastSentCameraMode = true;
                 m_vecLastSentCameraPosition = vecPosition;
                 m_vecLastSentCameraLookAt = vecLookAt;
                 
                 return true;
             }
+        }
+    }
+    else
+    {
+        // We're in player mode.
+        if ( m_bLastSentCameraMode == true )
+        {
+            // We only just changed mode - tell the server
+            m_bLastSentCameraMode = false;
+            return true;
         }
     }
 
@@ -1703,6 +1715,9 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     BitStream.Write ( ( unsigned char ) ( ( bFixed ) ? 1 : 0 ) );
     if ( bFixed )
     {
+#ifdef MTA_DEBUG
+        OutputDebugString ( "Sending fixed mode cam sync\n" );
+#endif
         // Write our position
         CVector vecPosition;
         pCamera->GetPosition ( vecPosition );
@@ -1719,6 +1734,9 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     }
     else
     {
+#ifdef MTA_DEBUG
+        OutputDebugString ( "Sending player mode cam sync\n" );
+#endif
         // Write our target
         CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
         if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();

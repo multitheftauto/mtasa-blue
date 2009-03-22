@@ -95,6 +95,7 @@ private:
     CVector                 m_vecLastReturnRotation;
 
     unsigned long           m_ulLastCameraSyncTime;
+    bool                    m_bLastSentCameraMode;
     CVector                 m_vecLastSentCameraPosition;
     CVector                 m_vecLastSentCameraLookAt;
 

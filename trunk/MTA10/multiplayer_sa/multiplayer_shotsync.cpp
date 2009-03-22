@@ -36,7 +36,7 @@ CPedSAInterface * pPedInterfaceTemp;
 CPed * pPedTemp;
 CPed * pLocalPedTemp;
 CVector * vecOrigin;
-CEntitySAInterface * pProjetileOwner = 0;
+CEntitySAInterface * pProjectileOwner = 0;
 eWeaponType projectileWeaponType =WEAPONTYPE_UNARMED;
 CVector * projectileOrigin = NULL;
 float projectileForce = 0.0f;
@@ -789,15 +789,15 @@ bool ProcessProjectileAdd ()
     {
         CPools * pPools = pGameInterface->GetPools ();
         CEntity * pOwner = NULL;
-        if ( pProjetileOwner )
+        if ( pProjectileOwner )
         {
-            switch ( pProjetileOwner->nType )
+            switch ( pProjectileOwner->nType )
             {
                 case ENTITY_TYPE_VEHICLE:
-                    pOwner = pPools->GetVehicle ( (DWORD *)pProjetileOwner );
+                    pOwner = pPools->GetVehicle ( (DWORD *)pProjectileOwner );
                     break;
                 case ENTITY_TYPE_PED:
-                    pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
+                    pOwner = pPools->GetPed ( (DWORD *)pProjectileOwner );
                     break;
                 case ENTITY_TYPE_OBJECT:
                     //pPools->GetObject ( (DWORD *)event->inflictor );
@@ -833,15 +833,15 @@ void ProcessProjectile ( )
     {
         CPoolsSA * pPools = (CPoolsSA*)pGameInterface->GetPools();
         CEntity * pOwner = NULL;
-        if ( pProjetileOwner )
+        if ( pProjectileOwner )
         {
-            switch ( pProjetileOwner->nType )
+            switch ( pProjectileOwner->nType )
             {
                 case ENTITY_TYPE_VEHICLE:
-                    pOwner = pPools->GetVehicle ( (DWORD *)pProjetileOwner );
+                    pOwner = pPools->GetVehicle ( (DWORD *)pProjectileOwner );
                     break;
                 case ENTITY_TYPE_PED:
-                    pOwner = pPools->GetPed ( (DWORD *)pProjetileOwner );
+                    pOwner = pPools->GetPed ( (DWORD *)pProjectileOwner );
                     break;
                 case ENTITY_TYPE_OBJECT:
                     //pPools->GetObject ( (DWORD *)event->inflictor );
@@ -865,7 +865,7 @@ void _declspec(naked) HOOK_CProjectileInfo__AddProjectile()
     _asm
     {
         mov     edx, [esp+4]
-        mov     pProjetileOwner, edx
+        mov     pProjectileOwner, edx
 
         mov     edx, [esp+8]
         mov     projectileWeaponType, edx

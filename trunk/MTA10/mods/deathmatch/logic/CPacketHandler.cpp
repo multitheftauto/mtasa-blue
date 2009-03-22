@@ -3630,9 +3630,30 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
                 CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, vecOrigin, fForce, NULL, pTargetEntity );
                 if ( pProjectile )
                 {
+                    #ifdef MTA_DEBUG
+                        OutputDebugString ( "Packet_ProjectileSync: created projectile, initiating" );
+                    #endif
                     pProjectile->Initiate ( &vecOrigin, pvecRotation, pvecVelocity, 0 );
-                }              
+                }
+                else
+                {
+                    #ifdef MTA_DEBUG
+                        OutputDebugString ( "!! Packet_ProjectileSync: failed to create projectile" );
+                    #endif
+                }
             }
+            else
+            {
+                #ifdef MTA_DEBUG
+                    OutputDebugString ( "!! Packet_ProjectileSync: no creator for projectile" );
+                #endif
+            }
+        }
+        else
+        {
+            #ifdef MTA_DEBUG
+                OutputDebugString ( "!! Packet_ProjectileSync: bCreateProjectile == false" );
+            #endif
         }
     }
 }
