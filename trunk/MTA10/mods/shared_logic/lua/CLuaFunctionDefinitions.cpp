@@ -14764,6 +14764,26 @@ int CLuaFunctionDefinitions::GetWeaponNameFromID ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetSlotFromWeapon ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+        if ( cSlot >= 0 )
+            lua_pushnumber ( luaVM, cSlot );
+        else
+            lua_pushboolean ( luaVM, false );
+        //lua_pushnumber ( luaVM, CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getSlotFromWeapon" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GetWeaponIDFromName ( lua_State* luaVM )
 {

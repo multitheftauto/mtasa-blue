@@ -19,6 +19,10 @@ struct SWeaponName
 {
     char szName [32];
 };
+struct SWeaponSlot
+{
+    char cSlot;
+};
 
 SWeaponName WeaponNames [44] =
 { {"Melee"}, {"Brassknuckle"}, {"Golfclub"}, {"Nitestick"}, {"Knife"},
@@ -30,6 +34,12 @@ SWeaponName WeaponNames [44] =
 {"AK-47"}, {"M4"}, {"Tec-9"}, {"Rifle"}, {"Sniper"},
 {"Rocket Launcher"}, {"Rocket Launcher HS"}, {"Flamethrower"}, {"Minigun"}, {"Satchel"},
 {"Bomb"}, {"Spraycan"}, {"Fire Extinguisher"}, {"Camera"} };
+
+SWeaponSlot WeaponIDs [] =
+{{0},{0},{1},{1},{1},{1},{1},{1},{1},{1},{10},{10},{10},{-1},{10},{1},{8},{8},
+{8},{-1},{-1},{-1},{2},{2},{2},{3},{3},{3},{4},{4},{5},{5},{4},{6},{6},{7},
+{7},{7},{7},{8},{12},{9},{9},{9},{11},{11},{11},{-1}};
+
 
 unsigned char CWeaponNames::GetWeaponID ( const char* szName )
 {
@@ -57,4 +67,14 @@ const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
     }
 
     return szWeaponNameEmpty;
+}
+
+char CWeaponNames::GetSlotFromWeapon ( unsigned char ucID )
+{
+    if ( ucID < sizeof(WeaponIDs) )
+    {
+        return WeaponIDs [ucID].cSlot;
+    }
+
+    return -1;
 }

@@ -1098,28 +1098,40 @@ void CSettings::Initialize ( void )
                     if ( bindType == KEY_BIND_COMMAND )
                     {
                         CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
-                        if ( pCommandBind->bActive && pCommandBind->szResource )
+                        bSkip = false;
+                        if ( pCommandBind->szResource )
                         {
-                            const char* szResource = pCommandBind->szResource;
-                            std::string strResource = szResource;
-                            if ( iResourceItems.count(strResource) == 0 )
+                            if ( pCommandBind->bActive )
                             {
-                                iBind = m_pBindsList->InsertRowAfter ( m_pBindsList->GetRowCount() );
-                                m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
-                                iResourceItems.insert( make_pair(strResource, iBind ) );
+                                const char* szResource = pCommandBind->szResource;
+                                std::string strResource = szResource;
+                                if ( iResourceItems.count(strResource) == 0 )
+                                {
+                                    iBind = m_pBindsList->InsertRowAfter ( m_pBindsList->GetRowCount() );
+                                    m_pBindsList->SetItemText ( iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
+                                    
+                                    iBind = m_pBindsList->InsertRowAfter ( iBind );
+                                    m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
+                                    iResourceItems.insert( make_pair(strResource, iBind ) );
+                                }
+                                row = iResourceItems[strResource];
+                                iMultiplayerRowCount++;
                             }
-                            row = iResourceItems[strResource];
+                            else
+                            {
+                                bSkip = true;
+                            }
                         }
                         if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
                         {
                             strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                            iMultiplayerRowCount++;
                         }
                         else
                         {
                             strDescription = pCommandBind->szCommand;
+                            iMultiplayerRowCount++;
                         }
-                        iMultiplayerRowCount++;
-                        bSkip = false;
                     }                    
 
                     if ( !bSkip )

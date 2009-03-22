@@ -628,6 +628,7 @@ public:
     // Weapon funcs
     LUA_DECLARE ( GetWeaponNameFromID );
     LUA_DECLARE ( GetWeaponIDFromName );
+    LUA_DECLARE ( GetSlotFromWeapon );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

@@ -86,6 +86,7 @@ CResource::~CResource ( void )
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds ()->RemoveAllKeys ( m_pLuaVM );
+    g_pCore->GetKeyBinds()->SetAllCommandsActive ( m_szResourceName, false );
 
     // Destroy the txd root so all dff elements are deleted except those moved out
 	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
