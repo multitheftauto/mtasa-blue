@@ -90,7 +90,7 @@ private:
     unsigned long           m_ulLastSyncReturnTime;    
 
     bool                    m_bStoredReturnSync;
-    bool                    m_bValidVehicleLastReturnRotation;
+    bool                    m_bVehicleLastReturn;
     CVector                 m_vecLastReturnPosition;
     CVector                 m_vecLastReturnRotation;
 

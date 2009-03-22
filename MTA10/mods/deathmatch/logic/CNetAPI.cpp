@@ -140,7 +140,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 // Remember that position
                 m_vecLastReturnPosition = vecPosition;
                 m_vecLastReturnRotation = vecRotationDegrees;
-                m_bValidVehicleLastReturnRotation = true;
+                m_bVehicleLastReturn = true;
             }
             else
             {
@@ -164,7 +164,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 // Remember that position
                 m_vecLastReturnPosition = vecPosition;
                 m_vecLastReturnRotation = CVector ( 0.0f, 0.0f, 0.0f );
-                m_bValidVehicleLastReturnRotation = false;
+                m_bVehicleLastReturn = false;
             }
 
             // Remember the last return sync time
@@ -196,13 +196,13 @@ void CNetAPI::ResetReturnPosition ( void )
         {
             pVehicle->GetPosition ( m_vecLastReturnPosition );
             pVehicle->GetRotationDegrees ( m_vecLastReturnRotation );
-            m_bValidVehicleLastReturnRotation = true;
+            m_bVehicleLastReturn = true;
         }
         else
         {
             pPlayer->GetPosition ( m_vecLastReturnPosition );
             m_vecLastReturnRotation = CVector ( 0.0f, 0.0f, 0.0f );
-            m_bValidVehicleLastReturnRotation = false;
+            m_bVehicleLastReturn = false;
         }
     }
 }
@@ -358,9 +358,11 @@ void CNetAPI::DoPulse ( void )
                         // Freeze us at the last position
                         pVehicle->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
                         pVehicle->SetTurnSpeed ( CVector ( 0, 0, 0 ) );
-                        pVehicle->SetPosition ( m_vecLastReturnPosition );
-                        if ( m_bValidVehicleLastReturnRotation )
+                        if ( m_bVehicleLastReturn )
+                        {
+                            pVehicle->SetPosition ( m_vecLastReturnPosition );
                             pVehicle->SetRotationDegrees ( m_vecLastReturnRotation );
+                        }
                     }
                     else
                     {
