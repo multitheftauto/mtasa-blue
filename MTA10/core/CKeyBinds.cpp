@@ -653,7 +653,7 @@ bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool b
     return false;
 }
 
-bool CKeyBinds::SetCommandActive ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive )
+bool CKeyBinds::SetCommandActive ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
@@ -661,20 +661,39 @@ bool CKeyBinds::SetCommandActive ( const char* szCommand, bool bState, const cha
         if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
             CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
-            if ( strcmp ( pBind->szCommand, szCommand ) == 0 )
+            if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
             {
-                if ( pBind->bHitState == bState )
+                if ( !szCommand || ( strcmp ( pBind->szCommand, szCommand ) == 0 ) )
                 {
-                    if ( !szArguments || ( szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                    if ( !checkHitState || ( pBind->bHitState == bState ) )
                     {
-                        pBind->bActive = bActive;
-                        return true;
+                        if ( !szArguments || ( strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                        {
+                            pBind->bActive = bActive;
+                            return true;
+                        }
                     }
                 }
             }
         }
     }  
     return false;
+}
+
+void CKeyBinds::SetAllCommandsActive ( const char* szResource, bool bActive )
+{
+    list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
+    for ( ; iter != m_pList->end (); iter++ )
+    {
+        if ( (*iter)->GetType () == KEY_BIND_COMMAND )
+        {
+            CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
+            if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
+            {
+                pBind->bActive = bActive;
+            }
+        }
+    }  
 }
 
 
@@ -2171,7 +2190,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                                 {
                                     strResource = pAttribute->GetValue ();
                                     AddCommand ( strKey.c_str (), strCommand.c_str (), strArguments.c_str (), bState, strResource.c_str() );
-                                    SetCommandActive ( strCommand.c_str(), bState, strArguments.c_str(), strResource.c_str(), false );
+                                    SetCommandActive ( strCommand.c_str(), bState, strArguments.c_str(), strResource.c_str(), false, true );
                                 }
                                 else if ( !CommandExists ( strKey.c_str (), strCommand.c_str (), true, bState ) )
                                     AddCommand ( strKey.c_str (), strCommand.c_str (), strArguments.c_str (), bState );
@@ -2274,23 +2293,6 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
 						pA = pAttributes->Create ( "resource" );						
 						pA->SetValue ( szResource );
                     }
-                }
-                else if ( type == KEY_BIND_FUNCTION )
-                {
-                    // Create the key attribute
-                    const char* szKey = (*iter)->boundKey->szKey;
-                    if ( szKey )
-                    {
-						pA = pAttributes->Create ( "key" );
-						pA->SetValue ( szKey );
-                    }
-
-                    CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
-                    char* szState = ( pBind->bHitState ) ? "down" : "up";
-
-					pA = pAttributes->Create ( "state" );
-					pA->SetValue ( szState );
-                    
                 }
                 else if ( type == KEY_BIND_GTA_CONTROL )
                 {
