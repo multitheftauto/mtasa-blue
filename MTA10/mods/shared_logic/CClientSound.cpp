@@ -6,6 +6,7 @@
 *  FILE:        mods/shared_logic/CClientSound.h
 *  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               arc_
 *
 *****************************************************************************/
 
@@ -26,8 +27,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     RelateDimension ( pManager->GetSoundManager ()->GetDimension () );
 
     m_fVolume = 1.0f;
-    m_fDistance = 1.0f;
-    m_fMinDistance = 1.0f;
+    m_fMinDistance = 2.0f;
     m_usDimension = 0;
     m_b3D = false;
 }
@@ -64,6 +64,7 @@ bool CClientSound::Play3D ( const char* szPath, CVector vecPosition, bool bLoop 
     {
         m_b3D = true;
         m_pSound->setSoundStopEventReceiver ( m_pSoundManager );
+        m_pSound->setMinDistance ( m_fMinDistance );
         return true;
     }
     return false;
@@ -131,18 +132,18 @@ unsigned int CClientSound::GetLength ( void )
     return 0;
 }
 
-void CClientSound::SetVolume ( float fVolume )
-{
-    m_fVolume = fVolume;
-    if ( m_pSound && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
-    {
-        m_pSound->setVolume ( fVolume * m_fDistance );
-    }
-}
-
 float CClientSound::GetVolume ( void )
 {
     return m_fVolume;
+}
+
+void CClientSound::SetVolume ( float fVolume )
+{
+    m_fVolume = fVolume;
+    if ( m_pSound && !m_b3D && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
+    {
+        m_pSound->setVolume ( fVolume );
+    }
 }
 
 void CClientSound::SetPosition ( const CVector& vecPosition )
@@ -217,40 +218,42 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
     if ( m_pSound )
     {
         // Pan
-        float fLRot = 360.0f - ConvertRadiansToDegrees ( atan2 ( vecLookAt.fY - vecPosition.fY, vecLookAt.fX - vecPosition.fX ) );
-        float fSRot = 360.0f - ConvertRadiansToDegrees ( atan2 ( m_vecPosition.fY - vecPosition.fY, m_vecPosition.fX - vecPosition.fX ) );
+        CVector vecLook = vecLookAt - vecPosition;
+        CVector vecSound = m_vecPosition - vecPosition;
+        vecLook.fZ = vecSound.fZ = 0.0f;
+        vecLook.Normalize ();
+        vecSound.Normalize ();
 
-        float fDeg = fSRot - fLRot;
-        if ( fDeg > 90.0f ) fDeg = 180.0f - fDeg;
-        else if ( fDeg < -90.0f ) fDeg = -180.0f - fDeg;
+        vecLook.CrossProduct ( &vecSound );
+        // The length of the cross product (which is simply fZ in this case)
+        // is equal to the sine of the angle between the vectors
+        float fPan = vecLook.fZ;
+        if ( fPan < -1.0f + SOUND_PAN_THRESHOLD )
+            fPan = -1.0f + SOUND_PAN_THRESHOLD;
+        else if ( fPan > 1.0f - SOUND_PAN_THRESHOLD )
+            fPan = 1.0f - SOUND_PAN_THRESHOLD;
 
-        m_pSound->setPan ( -fDeg / 90.0f );
+        m_pSound->setPan ( fPan );
 
         // Volume
-
-        float fDistance = DistanceBetweenPoints2D ( vecPosition, m_vecPosition );
+        float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
+        float fSilenceDistance = m_fMinDistance * 20.0f;
         float fVolume = 1.0;
 
         if ( fDistance <= m_fMinDistance )
         {
             fVolume = 1.0f;
         }
-        else if ( fDistance >= MAX_SOUND_DISTANCE + m_fMinDistance )
+        else if ( fDistance >= fSilenceDistance )
         {
             fVolume = 0.0f;
         }
         else
         {
-            fVolume = 1.0f / ( ( fDistance - m_fMinDistance ) / 3.0f );
-
-            if ( fVolume > 1.0f ) fDistance = 1.0f;
-            else if ( fVolume < 0.0f ) fDistance = 0.0f;
+            float fLinear = (fSilenceDistance - fDistance) / fSilenceDistance;
+            fVolume = sqrt ( fLinear ) * fLinear;
         }
 
-        if ( m_fDistance != fVolume )
-        {
-            m_fDistance = fVolume;
-            SetVolume ( GetVolume () );
-        }
+        m_pSound->setVolume ( m_fVolume * fVolume );
     }
 }

@@ -32,13 +32,24 @@ public:
         fY = _fY;
     }
 
-    void Normalise( void ) 
+    float DotProduct ( CVector2D& other )
+    {
+        return fX*other.fX + fY*other.fY;
+    }
+
+    float Length ()
+    {
+        return sqrt ( fX * fX + fY * fY );
+    }
+
+    void Normalize ( void ) 
     { 
-        double t = sqrt ( fX * fX + fY * fY );
-        double fX2 = fX / t;
-        double fY2 = fY / t;
-        fX = static_cast < float > ( fX2 );
-        fY = static_cast < float > ( fY2 );
+        float fLength = Length ();
+        if ( fLength > 0.0f )
+        {
+            fX /= fLength;
+            fY /= fLength;
+        }
     }
 
     CVector2D operator + ( const CVector2D& vecRight ) const

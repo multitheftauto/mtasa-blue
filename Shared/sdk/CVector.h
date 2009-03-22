@@ -63,9 +63,10 @@ public:
 
     void CrossProduct ( CVector * param ) 
     { 
-        fX = fY * param->fZ - param->fY * fZ;
-        fY = fZ * param->fX - param->fZ * fX;
-        fZ = fX * param->fY - param->fX * fY;
+        float _fX = fX, _fY = fY, _fZ = fZ;
+        fX = _fY * param->fZ - param->fY * _fZ;
+        fY = _fZ * param->fX - param->fZ * _fX;
+        fZ = _fX * param->fY - param->fX * _fY;
     }
 
     CVector operator + ( const CVector& vecRight ) const

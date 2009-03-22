@@ -18,6 +18,8 @@ class CClientSoundManager;
 #include <irrKlang.h>
 #include "CClientSound.h"
 
+using namespace irrklang;
+
 class CClientSoundManager : public ISoundStopEventReceiver
 {
 public:
