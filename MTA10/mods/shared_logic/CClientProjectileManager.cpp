@@ -125,7 +125,18 @@ bool CClientProjectileManager::Hook_ProjectileAllow ( CEntity * pGameCreator, eW
     m_pCreator = m_pManager->FindEntity ( pGameCreator, true );
     m_bIsLocal = ( m_pCreator == pLocalPlayer || ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 && m_pCreator == pLocalPlayer->GetOccupiedVehicle () ) ); 
 
-    return ( m_bCreating || m_bIsLocal );
+    bool bAllowed = ( m_bCreating || m_bIsLocal );
+    #ifdef MTA_DEBUG
+        if ( bAllowed )
+        {
+            OutputDebugString ( "Hook_ProjectileAllow: projectile allowed" );
+        }
+        else
+        {
+            OutputDebugString ( "!! Hook_ProjectileAllow: projectile NOT allowed" );
+        }
+    #endif
+    return bAllowed;
 }
 
 

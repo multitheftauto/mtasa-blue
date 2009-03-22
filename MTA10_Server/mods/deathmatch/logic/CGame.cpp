@@ -1763,6 +1763,15 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                     {
                         // Send the packet to him
                         pSendPlayer->Send ( Packet );
+                        #ifdef MTA_DEBUG
+                            OutputDebugString ( "Packet_ExplosionSync: sent packet to player" );
+                        #endif
+                    }
+                    else
+                    {
+                        #ifdef MTA_DEBUG
+                            OutputDebugString ( "Packet_ExplosionSync: NOT sending packet to player because he's too far" );
+                        #endif
                     }
                 }
             }
