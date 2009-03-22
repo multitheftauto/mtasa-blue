@@ -444,9 +444,15 @@ bool CNetAPI::IsCameraSyncNeeded ( bool bDifferenceCheck )
         // We're in player mode.
         if ( m_bLastSentCameraMode == true )
         {
-            // We only just changed mode - tell the server
-            m_bLastSentCameraMode = false;
-            return true;
+            // We only just changed mode.
+            // Has it been long enough since our last sync?
+            unsigned long ulCurrentTime = CClientTime::GetTime ();
+            if ( ulCurrentTime >= m_ulLastCameraSyncTime + CAM_SYNC_RATE )
+            {
+                m_ulLastCameraSyncTime = ulCurrentTime;
+                m_bLastSentCameraMode = false;
+                return true;
+            }
         }
     }
 
