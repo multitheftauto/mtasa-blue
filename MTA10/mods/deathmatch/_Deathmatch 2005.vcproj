@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../dependencies/mxml/include;../sdk;../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				BasicRuntimeChecks="3"
