@@ -40,7 +40,7 @@ public:
     virtual void CleanupAfterDownloadingQueuedFiles ( void ) = 0;
 
     // Download a single file
-    virtual void DownloadFile ( const char* szURL, const char* szOutputFile, double dSize = 0, const char * szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL ) = 0;
+    virtual void DownloadFile ( const char* szURL, const char* szOutputFile, double dSize = 0, const char * szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false ) = 0;
 
     // Get some stats regarding the current download size now & total
     virtual double GetDownloadSizeNow ( void ) = 0;
@@ -64,7 +64,7 @@ public:
     virtual bool ProcessQueuedFiles ( void ) = 0;
 
     // Queue a file to download
-    virtual bool QueueFile ( const char* szURL, const char* szOutputFile, double dSize = 0, const char * szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL ) = 0;
+    virtual bool QueueFile ( const char* szURL, const char* szOutputFile, double dSize = 0, const char * szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false ) = 0;
 
     // Sets the single download option
     // If true, only one file will be downloaded at any given time, regardless of how many files have been queued.  When one file finishes, the next file will be started
