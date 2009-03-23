@@ -688,6 +688,10 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 	        *((BYTE *)( pPool [m_dwModelID ] + 0x13 )) |= 8;
 	        *((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
 
+			// Extra flags (3064) -- needs to be tested
+			m_pInterface->bDoWeOwnTheColModel = false;
+			m_pInterface->bCollisionWasStreamedWithModel = false;
+
             // Call SetColModel
             DWORD dwFunc = FUNC_SetColModel;
 	        DWORD ModelID = m_dwModelID;
