@@ -1315,7 +1315,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                                 if ( pJackedPlayer )
                                 {
                                     // Jax: have we already started to jack the other player?
-                                    if ( pVehicle->GetModel () == VT_RHINO || pJackedPlayer->IsGettingJacked () )
+                                    if ( pJackedPlayer->IsGettingJacked () )
                                     {
                                         bAlreadyStartedJacking = true;
                                     }

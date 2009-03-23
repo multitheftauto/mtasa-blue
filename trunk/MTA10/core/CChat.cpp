@@ -598,17 +598,15 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
     const char* szSectionEnd = szString;
     const char* szLastWrapPoint = szString;
     bool bLastSection = false;
-    bool bDoneColorCode = false;
     while ( !bLastSection )      // iterate over sections
     {
         m_Sections.resize ( m_Sections.size () + 1 );
         CChatLineSection& section = *(m_Sections.end () - 1);
         section.SetColor ( color );
 
-//      if ( szSectionEnd > szString && bColorCoded)      // If we've processed sections before
-        if ( bDoneColorCode )
-            szSectionEnd += 7;                            // skip the color code
-        bDoneColorCode = false;
+        if ( m_Sections.size () > 1 && bColorCoded)      // If we've processed sections before
+            szSectionEnd += 7;                           // skip the color code
+
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
 
@@ -625,7 +623,6 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
                 unsigned long ulColor = 0;
                 sscanf ( szSectionEnd + 1, "%06x", &ulColor );
                 color = ulColor;
-                bDoneColorCode = true;
                 break;
             }
             if ( isspace ( *szSectionEnd ) || ispunct ( *szSectionEnd ) )

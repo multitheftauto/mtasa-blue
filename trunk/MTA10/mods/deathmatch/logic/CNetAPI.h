@@ -77,7 +77,7 @@ private:
     void                    WriteFullVehicleSpecific        ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
 public:
-    bool                    IsCameraSyncNeeded              ( bool bDifferenceCheck );
+    bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );
 
     void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
@@ -96,6 +96,7 @@ private:
 
     unsigned long           m_ulLastCameraSyncTime;
     bool                    m_bLastSentCameraMode;
+    CClientEntity*          m_pLastSentCameraTarget;
     CVector                 m_vecLastSentCameraPosition;
     CVector                 m_vecLastSentCameraLookAt;
 
