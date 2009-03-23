@@ -19,6 +19,21 @@ typedef void (*PDOWNLOADPROGRESSCALLBACK) ( double, double, char*, size_t, void*
 class CNetHTTPDownloadManagerInterface
 {
 public:
+    enum eHTTPDownloadManagerError
+    {
+        UNKNOWN_ERROR,
+        INVALID_FILE_DESCRIPTORS,
+        INVALID_MAX_FILE_DESCRIPTOR,
+        INVALID_SELECT_RETURN,
+        INVALID_INITIAL_MULTI_PERFORM,
+        INVALID_MULTI_PERFORM_CODE,
+        INVALID_MULTI_PERFORM_CODE_NEW_DOWNLOADS,
+        UNEXPECTED_CURL_MESSAGE,
+        UNABLE_TO_CONNECT, // 8
+        UNABLE_TO_DOWNLOAD_FILE, // 9
+        FAILED_TO_INITIALIZE_DOWNLOAD
+    };
+
     // Cleanup after downloading the queued files
     // This should only be called after you finish the ProcessQueuedFiles loop
     virtual void CleanupAfterDownloadingQueuedFiles ( void ) = 0;
@@ -31,6 +46,7 @@ public:
     virtual double GetDownloadSizeTotal ( void ) = 0;
 
     // Get an error if one has been set
+    virtual eHTTPDownloadManagerError GetErrorNum ( void ) = 0;
     virtual const char* GetError ( void ) = 0;
     virtual char* GetErrorInfo ( void ) = 0;
 

@@ -12,3 +12,4 @@
 #include "Platform.h"
 #include <string>
 #include "SharedUtil.h"
+#include "SString.h"

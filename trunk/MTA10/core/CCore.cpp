@@ -975,7 +975,7 @@ void CCore::CreateNetwork ( )
     // Network module compatibility check
     typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
-    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( 0x0002 ) )
+    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_NET_MODULE_VERSION ) )
     {
         // net.dll doesn't like our version number
         MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
