@@ -70,8 +70,8 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay =                                  0x586650;
     CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask =                               0x67DABE;
     CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail =                                  0x6F8DBA;
-    CMultiplayerSA::HOOKPOS_CVehicle_Render =                                               0x6D0E83;
-    CMultiplayerSA::HOOKPOS_CObject_Render =                                                0x59F183;
+    CMultiplayerSA::HOOKPOS_CVehicle_Render =                                               0x6D0E89;
+    CMultiplayerSA::HOOKPOS_CObject_Render =                                                0x59F1ED;
 
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E670;
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x507030;

@@ -138,6 +138,7 @@ CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the stream
 #define FUNC_CWeapon_FireAreaEffect 0x53A450
 #define CALL_CBike_ProcessRiderAnims 0x6BF425   // @ CBike::ProcessDrivingAnims
 DWORD FUNC_CBike_ProcessRiderAnims = 0x6B7280;
+DWORD FUNC_CEntity_Render = 0x534310;
 
 
 CMultiplayerSA::CMultiplayerSA()
@@ -212,7 +213,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
-    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 6);
+    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -2013,62 +2014,78 @@ train_would_derail:
 }
 
 
-static CVehicleSAInterface* pRenderingVehicle = NULL;
-static void SetVehicleAlpha ()
+static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
 {
-    if ( pRenderingVehicle )
+    if ( dwEntity )
     {
-        CVehicle* pVehicle = pRenderingVehicle->m_pVehicle;
+        // Alpha setting of SetRwObjectAlpha function is done by
+        // iterating all materials of a clump and its atoms, and
+        // calling a given callback. We temporarily overwrite that
+        // callback with our own callback and then restore it.
+        *(DWORD *)(0x5332A2) = dwCallback;
+        *(DWORD *)(0x5332F3) = dwCallback;
+
+        // Call SetRwObjectAlpha
         DWORD dwFunc = FUNC_SetRwObjectAlpha;
-        DWORD dwAlpha = pVehicle->GetAlpha ();
- 
         _asm
         {
-            mov     ecx, pRenderingVehicle
+            mov     ecx, dwEntity
             push    dwAlpha
             call    dwFunc
         }
+
+        // Restore the GTA callbacks
+        *(DWORD *)(0x5332A2) = (DWORD)(0x533280);
+        *(DWORD *)(0x5332F3) = (DWORD)(0x533280);
     }
 }
+static RpMaterial* HOOK_SetMaterialColorAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+{
+    unsigned char* pPad = (unsigned char *)(&pMaterial->id);
+    if ( pPad [ 0 ] == 0 )
+    {
+        // Save in the structure padding the original alpha value for this material
+        pPad [ 0 ] = 1;
+        pPad [ 1 ] = pMaterial->color.a;
+    }
+
+    pMaterial->color.a = static_cast < unsigned char > ( pPad [ 1 ] * ((float)ucAlpha / 255.0f) );
+
+    return pMaterial;
+}
+
+static DWORD dwAlphaEntity = 0;
 
 VOID _declspec(naked) HOOK_CVehicle_Render ()
 {
     _asm
     {
         pushad
-        mov         pRenderingVehicle, esi
+        mov         dwAlphaEntity, ecx
     }
 
-    SetVehicleAlpha ();
+    SetEntityAlphaHooked ( dwAlphaEntity,
+                           (DWORD)HOOK_SetMaterialColorAlpha,
+                           ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha () );
 
     _asm
     {
         popad
-        mov         eax, 0x6D0E88
-        add         esp, 0x8
-        mov         ecx, esi
-        jmp         eax
+        jmp         FUNC_CEntity_Render
     }
 }
 
 
-static CObjectSAInterface* pRenderingObject = NULL;
 static void SetObjectAlpha ()
 {
-    if ( pRenderingObject )
+    if ( dwAlphaEntity )
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)pRenderingObject );
+        CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)dwAlphaEntity );
         if ( pObject )
         {
-            DWORD dwFunc = FUNC_SetRwObjectAlpha;
-            DWORD dwAlpha = pObject->GetAlpha ();
- 
-            _asm
-            {
-                mov     ecx, pRenderingObject
-                push    dwAlpha
-                call    dwFunc
-            }
+            SetEntityAlphaHooked ( dwAlphaEntity,
+                                   (DWORD)HOOK_SetMaterialColorAlpha,
+                                   pObject->GetAlpha () );
         }
     }
 }
@@ -2079,17 +2096,15 @@ VOID _declspec(naked) HOOK_CObject_Render ()
     _asm
     {
         pushad
-        mov         pRenderingObject, esi
+        mov         dwAlphaEntity, ecx
     }
 
-    SetObjectAlpha ();
+    SetObjectAlpha ( );
 
     _asm
     {
         popad
-        mov         eax, 0x59F189
-        mov         ecx, [esi+0x140]
-        jmp         eax
+        jmp         FUNC_CEntity_Render
     }
 }
 
