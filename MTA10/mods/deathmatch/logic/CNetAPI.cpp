@@ -33,6 +33,7 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
     m_ulLastPuresyncTime = 0;
     m_ulLastSyncReturnTime = 0;
     m_bLastSentCameraMode = true;       // start out in fixed mode
+    m_pLastSentCameraTarget = NULL;
     m_ulLastCameraSyncTime = 0;
     m_bStoredReturnSync = false;
 }
@@ -323,7 +324,7 @@ void CNetAPI::DoPulse ( void )
                 }
             }
 
-            if ( IsCameraSyncNeeded ( true ) )
+            if ( IsCameraSyncNeeded () )
             {
                 // Send a camera-sync packet
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -415,16 +416,16 @@ bool CNetAPI::IsPureSyncNeeded ( void )
 }
 
 
-bool CNetAPI::IsCameraSyncNeeded ( bool bDifferenceCheck )
+bool CNetAPI::IsCameraSyncNeeded ()
 {
     CClientCamera * pCamera = m_pManager->GetCamera ();
-    if ( m_pManager->GetCamera ()->IsInFixedMode () )
+    if ( pCamera->IsInFixedMode () )
     {
         CVector vecPosition, vecLookAt;
         pCamera->GetPosition ( vecPosition );
         pCamera->GetTarget ( vecLookAt );
         // Is the camera at a different place?
-        if ( !bDifferenceCheck || m_vecLastSentCameraPosition != vecPosition || m_vecLastSentCameraLookAt != vecLookAt )
+        if ( m_vecLastSentCameraPosition != vecPosition || m_vecLastSentCameraLookAt != vecLookAt )
         {
             // Has it been long enough since our last sync?
             unsigned long ulCurrentTime = CClientTime::GetTime ();
@@ -442,15 +443,17 @@ bool CNetAPI::IsCameraSyncNeeded ( bool bDifferenceCheck )
     else
     {
         // We're in player mode.
-        if ( m_bLastSentCameraMode == true )
+        if ( m_bLastSentCameraMode == true ||
+             pCamera->GetFocusedPlayer () != m_pLastSentCameraTarget )
         {
-            // We only just changed mode.
+            // Something changed (mode has become "player", or different target)
             // Has it been long enough since our last sync?
             unsigned long ulCurrentTime = CClientTime::GetTime ();
             if ( ulCurrentTime >= m_ulLastCameraSyncTime + CAM_SYNC_RATE )
             {
                 m_ulLastCameraSyncTime = ulCurrentTime;
                 m_bLastSentCameraMode = false;
+                m_pLastSentCameraTarget = pCamera->GetFocusedPlayer ();
                 return true;
             }
         }
