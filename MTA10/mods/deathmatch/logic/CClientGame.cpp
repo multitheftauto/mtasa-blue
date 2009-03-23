@@ -854,6 +854,10 @@ void CClientGame::DoPulses ( void )
         // If we weren't ingame last frame; call the on ingame event
         if ( !m_bGameLoaded )
         {
+            // Fix for gta not being focused sometimes
+            SetActiveWindow ( g_pCore->GetHookedWindow () );
+            SetFocus ( g_pCore->GetHookedWindow () );
+
             m_bGameLoaded = true;
             Event_OnIngame ();
         }
