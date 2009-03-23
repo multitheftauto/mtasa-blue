@@ -1213,6 +1213,11 @@ void CClientGame::UpdateVehicleInOut ( void )
                             pInOutVehicle->SetTyresCanBurst ( false );
                         }
                     }*/ 
+                    if ( pInOutVehicle )
+                    {
+                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag ();
+                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag ();
+                    }
 
                     // Reset the vehicle in out stuff so we're ready for another car entry/leave.
                     // Don't allow a new entry/leave until we've gotten the notify return packet
@@ -1282,6 +1287,12 @@ void CClientGame::UpdateVehicleInOut ( void )
                         pInOutVehicle->SetTyresCanBurst ( true );
                     }
                     */
+                    if ( pInOutVehicle )
+                    {
+                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag ();
+                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag ();
+                    }
+
                 }
                 else
                 {
@@ -1349,6 +1360,12 @@ void CClientGame::UpdateVehicleInOut ( void )
                         }
                     }
                     */
+                    if ( pInOutVehicle )
+                    {
+                        pInOutVehicle->CalcAndUpdateCanBeDamagedFlag ();
+                        pInOutVehicle->CalcAndUpdateTyresCanBurstFlag ();
+                    }
+
                 }
 
                 // Reset
