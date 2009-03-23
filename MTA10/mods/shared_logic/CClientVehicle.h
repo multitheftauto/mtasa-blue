@@ -167,11 +167,12 @@ public:
     void                        SetEngineOn             ( bool bEngineOn );
 
     bool                        CanBeDamaged            ( void );
-    void                        SetCanBeDamaged         ( bool bCanBeDamaged );
+    void                        CalcAndUpdateCanBeDamagedFlag     ( void );
     void                        SetScriptCanBeDamaged   ( bool bCanBeDamaged );
+    void                        SetSyncUnoccupiedDamage ( bool bCanBeDamaged );
 
     bool                        GetTyresCanBurst        ( void );
-    void                        SetTyresCanBurst        ( bool bTyresCanBurst );
+    void                        CalcAndUpdateTyresCanBurstFlag    ( void );
 
     float                       GetGasPedal             ( void );
 
@@ -403,6 +404,7 @@ protected:
     bool                        m_bCanBeTargettedByHeatSeekingMissiles;
     bool                        m_bCanBeDamaged;
     bool                        m_bScriptCanBeDamaged;
+    bool                        m_bSyncUnoccupiedDamage;
     bool                        m_bTyresCanBurst;
     unsigned char               m_ucDoorStates [MAX_DOORS];
     unsigned char               m_ucWheelStates [MAX_WHEELS];

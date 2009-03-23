@@ -38,18 +38,7 @@ CDeathmatchVehicle::~CDeathmatchVehicle ( void )
 void CDeathmatchVehicle::SetIsSyncing ( bool bIsSyncing )
 {
     m_bIsSyncing = bIsSyncing;
-
-    // Is the local player in it? Make it damagable always. If not make it only damagable if we're syncing it
-    if ( m_pDriver && m_pDriver->IsLocalPlayer () )
-    {
-        SetCanBeDamaged ( true );
-        SetTyresCanBurst ( true );
-    }
-    else
-    {
-        SetCanBeDamaged ( bIsSyncing );
-        SetTyresCanBurst ( bIsSyncing );
-    }
+	SetSyncUnoccupiedDamage( m_bIsSyncing );
 }
 
 

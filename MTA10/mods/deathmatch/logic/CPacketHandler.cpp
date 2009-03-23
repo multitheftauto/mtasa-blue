@@ -1371,6 +1371,9 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         // Remember that this player is working on entering a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_IN );
 
+                        pVehicle->CalcAndUpdateCanBeDamagedFlag ();
+                        pVehicle->CalcAndUpdateTyresCanBurstFlag ();
+
                         // Call the onClientVehicleStartEnter event
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pPlayer );     // player

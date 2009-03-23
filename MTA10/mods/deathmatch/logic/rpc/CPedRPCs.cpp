@@ -233,6 +233,9 @@ void CPedRPCs::WarpPedIntoVehicle ( NetBitStreamInterface& bitStream )
                 pPed->WarpIntoVehicle ( pVehicle, ucSeat );
                 pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
 
+                pVehicle->CalcAndUpdateCanBeDamagedFlag ();
+                pVehicle->CalcAndUpdateTyresCanBurstFlag ();
+
                 // Call the onClientPlayerEnterVehicle event
                 CLuaArguments Arguments;
                 Arguments.PushElement ( pVehicle );        // vehicle

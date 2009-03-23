@@ -102,6 +102,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
     memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
     m_bCanBeDamaged = true;
+    m_bSyncUnoccupiedDamage = false;
     m_bScriptCanBeDamaged = true;
     m_bTyresCanBurst = true;
     m_ucOverrideLights = 0;
@@ -717,7 +718,7 @@ void CClientVehicle::Blow ( bool bAllowMovement )
         }
 
         // Restore the old can be damaged state
-        m_pVehicle->SetCanBeDamaged ( m_bCanBeDamaged );
+        CalcAndUpdateCanBeDamagedFlag ();
     }
     m_fHealth = 0.0f;
     m_bBlown = true;
@@ -896,12 +897,27 @@ bool CClientVehicle::CanBeDamaged ( void )
 }
 
 
-void CClientVehicle::SetCanBeDamaged ( bool bCanBeDamaged )
+// This can be called frequently to ensure the correct setting gets to the SA vehicle
+void CClientVehicle::CalcAndUpdateCanBeDamagedFlag ( void )
 {
+     bool bCanBeDamaged = false;
+
+    // CanBeDamaged if local driver or syncing unoccupiedVehicle
+    if ( m_pDriver && m_pDriver->IsLocalPlayer () )
+        bCanBeDamaged = true;
+
+    if ( m_bSyncUnoccupiedDamage )
+        bCanBeDamaged = true;
+
+    // Script override
+    if ( !m_bScriptCanBeDamaged )
+        bCanBeDamaged = false;
+
     if ( m_pVehicle )
     {
-        m_pVehicle->SetCanBeDamaged ( bCanBeDamaged && m_bScriptCanBeDamaged );
+        m_pVehicle->SetCanBeDamaged ( bCanBeDamaged );
     }
+
     m_bCanBeDamaged = bCanBeDamaged;
 }
 
@@ -910,7 +926,16 @@ void CClientVehicle::SetScriptCanBeDamaged ( bool bCanBeDamaged )
 {
     // Needed so script doesn't interfere with syncing unoccupied vehicles
     m_bScriptCanBeDamaged = bCanBeDamaged;
-    SetCanBeDamaged ( m_bCanBeDamaged );
+    CalcAndUpdateCanBeDamagedFlag ();
+    CalcAndUpdateTyresCanBurstFlag ();
+}
+
+
+void CClientVehicle::SetSyncUnoccupiedDamage ( bool bCanBeDamaged )
+{
+    m_bSyncUnoccupiedDamage = bCanBeDamaged;
+    CalcAndUpdateCanBeDamagedFlag ();
+    CalcAndUpdateTyresCanBurstFlag ();
 }
 
 
@@ -925,8 +950,22 @@ bool CClientVehicle::GetTyresCanBurst ( void )
 }
 
 
-void CClientVehicle::SetTyresCanBurst ( bool bTyresCanBurst )
+// This can be called frequently to ensure the correct setting gets to the SA vehicle
+void CClientVehicle::CalcAndUpdateTyresCanBurstFlag ( void )
 {
+     bool bTyresCanBurst = false;
+
+    // TyresCanBurst if local driver or syncing unoccupiedVehicle
+    if ( m_pDriver && m_pDriver->IsLocalPlayer () )
+        bTyresCanBurst = true;
+
+    if ( m_bSyncUnoccupiedDamage )
+        bTyresCanBurst = true;
+
+    // Script override
+//    if ( !m_bScriptCanBeDamaged )
+//        bTyresCanBurst = false;
+
     if ( m_pVehicle )
     {
         m_pVehicle->SetTyresDontBurst ( !bTyresCanBurst );
@@ -1223,7 +1262,7 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
                 m_pVehicle->SetBikeWheelStatus ( ucWheel, ucStatus );
 
             // Restore our tyre-burst flag
-            m_pVehicle->SetTyresDontBurst ( !m_bTyresCanBurst );
+            CalcAndUpdateTyresCanBurstFlag ();
         }
         m_ucWheelStates [ucWheel] = ucStatus;
     }
@@ -1902,7 +1941,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
-        m_pVehicle->SetTyresDontBurst ( !m_bTyresCanBurst );
+        CalcAndUpdateTyresCanBurstFlag ();
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {
             m_pVehicle->SetDerailed ( m_bIsDerailed );
@@ -1947,7 +1986,7 @@ void CClientVehicle::Create ( void )
 
         if ( m_bBlown || m_fHealth == 0.0f ) m_bBlowNextFrame = true;
 
-        m_pVehicle->SetCanBeDamaged ( m_bCanBeDamaged && m_bScriptCanBeDamaged );
+        CalcAndUpdateCanBeDamagedFlag ();
 
         // Restore the color
         if ( m_bColorSaved )
