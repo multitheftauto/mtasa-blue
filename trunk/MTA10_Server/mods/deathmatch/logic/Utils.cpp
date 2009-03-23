@@ -52,33 +52,12 @@ const char* GetFilenameFromPath ( const char* szPath )
     return NULL;
 }
 
-char* SanityCheckNick ( char* szNick )
-{
-	unsigned int j = (unsigned int)strlen ( szNick );
-	for ( unsigned int i = 0; i < j; i++ )
-	{
-		switch ( szNick[i] )
-		{
-			case '%':
-				szNick[i] = ' ';
-			break;
-			case '\\':
-				szNick[i] = ' ';
-			break;
-			default:
-			break;
-		}
-	}
-	return szNick;
-}
-
 #ifndef WIN32
 #include <unistd.h>     // For access().
 #endif
 
 #include <sys/types.h>  // For stat().
 #include <sys/stat.h>   // For stat().
-
 
 bool DoesDirectoryExist ( const char* szPath )
 {
@@ -108,7 +87,7 @@ bool DoesDirectoryExist ( const char* szPath )
 }
 
 
-bool CheckNickProvided ( char* szNick )
+bool CheckNickProvided ( const char* szNick )
 {
     if ( stricmp ( szNick, "admin" ) == 0 )
         return false;

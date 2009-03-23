@@ -1196,14 +1196,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 {
 	// Grab the nick
     const char* szNick = Packet.GetNick ();
-    char szNickTemp [32];
     if ( szNick && szNick [0] != 0 )
     {
-        // Valid?
-        strncpy ( szNickTemp, szNick, sizeof ( szNickTemp ) );
-        szNickTemp [ 31 ] = 0;
-        szNick = SanityCheckNick ( szNickTemp );
-
         // Is the server passworded?
         bool bPasswordIsValid = true;
         if ( m_pMainConfig->HasPassword () )
@@ -1229,7 +1223,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         CPlayer* pPlayer = m_pPlayerManager->Create ( Packet.GetSourceSocket () );
         if ( pPlayer )
         {
-            if ( !CheckNickProvided ( szNickTemp ) ) // check the nick is valid
+            if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
                 char szIP [22];

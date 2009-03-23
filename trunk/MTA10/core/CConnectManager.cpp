@@ -334,7 +334,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 }
 
 
-bool CConnectManager::CheckNickProvided ( char* szNick )
+bool CConnectManager::CheckNickProvided ( const char* szNick )
 {
     if ( stricmp ( szNick, "admin" ) == 0 )
         return false;

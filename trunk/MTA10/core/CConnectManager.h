@@ -55,7 +55,7 @@ private:
 
     GUI_CALLBACK*   m_pOnCancelClick;
 
-	bool CheckNickProvided ( char* szNick );
+	bool CheckNickProvided ( const char* szNick );
 };
 
 #endif

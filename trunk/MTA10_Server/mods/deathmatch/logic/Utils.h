@@ -33,8 +33,7 @@
 unsigned long	GetTickCount				( void );
 #endif
 
-char*			SanityCheckNick				( char* szNick );
-bool            CheckNickProvided           ( char* szNick );
+bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 float           DistanceBetweenPoints3D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 bool            IsPointNearPoint2D          ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance );
