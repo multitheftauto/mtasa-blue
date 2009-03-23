@@ -3917,7 +3917,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL );
+                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL, g_pClientGame->IsLocalGame () );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;

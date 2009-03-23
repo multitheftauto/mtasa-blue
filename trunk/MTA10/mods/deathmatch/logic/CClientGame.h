@@ -187,6 +187,7 @@ public:
     bool                                StartLocalGame                  ( const char* szConfig, const char* szPassword = NULL );
     void                                SetupLocalGame                  ( const char* szConfig );
     //bool                                StartGame                       ( void );
+    inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
 
     void                                DoPulsePreFrame                 ( void );
     void                                DoPulsePostFrame                ( void );
