@@ -210,6 +210,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
+    g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -330,6 +331,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
+    g_pMultiplayer->SetGameProcessHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -678,6 +680,84 @@ void CClientGame::DoPulsePostFrame ( void )
         g_pCore->GetGraphics ()->DrawTextTTF ( 300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0 );
     #endif
 
+    if ( m_pManager->IsGameLoaded () )
+    {
+        // Pulse the nametags before anything that changes player positions, we'll be 1 frame behind, but so is the camera
+        // If nametags are enabled, pulse the nametag manager
+        if ( m_bShowNametags )
+        {
+            m_pNametags->DoPulse ();
+        }
+
+        // If we're supposed to show netstat, draw it
+        if ( m_bShowNetstat )
+        {
+            m_pNetworkStats->Draw ();
+        }
+
+        // Sync debug
+        m_pSyncDebug->OnPulse ();
+
+        // Also eventually draw FPS
+        if ( m_bShowFPS )
+        {
+            DrawFPS ();
+        }
+
+        // If we're in debug mode and are supposed to show task data, do it
+        #ifdef MTA_DEBUG
+        if ( m_pShowPlayerTasks )
+        {
+            DrawTasks ( m_pShowPlayerTasks );
+        }
+
+        if ( m_pShowPlayer )
+        {
+            DrawPlayerDetails ( m_pShowPlayer );
+        }
+
+        std::list < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+        {
+            CClientPlayer* pPlayer = *iter;
+            if ( pPlayer->IsStreamedIn () && pPlayer->IsShowingWepdata () )
+                DrawWeaponsyncData ( pPlayer );
+        }
+        #endif
+
+        #if defined (MTA_DEBUG) || defined (MTA_BETA)
+        if ( m_bShowSyncingInfo )
+        {
+            // Draw the header boxz
+            CVector vecPosition = CVector ( 0.05f, 0.32f, 0 );
+            m_pDisplayManager->DrawText2D ( "Syncing vehicles:", vecPosition, 1.0f, 0xFFFFFFFF );
+
+            // Print each vehicle we're syncing
+            CDeathmatchVehicle* pVehicle;
+            list < CDeathmatchVehicle* > ::const_iterator iter = m_pUnoccupiedVehicleSync->IterBegin ();
+            for ( ; iter != m_pUnoccupiedVehicleSync->IterEnd (); iter++ )
+            {
+                vecPosition.fY += 0.03f;
+                pVehicle = *iter;
+
+                SString strBuffer ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
+
+                m_pDisplayManager->DrawText2D ( strBuffer, vecPosition, 1.0f, 0xFFFFFFFF );
+            }
+        }
+        #endif
+    }
+
+    // If we are focused we do the pulsing here
+    if ( g_pCore->IsFocused () )
+    {
+        DoPulses ();
+    }
+}
+
+
+void CClientGame::DoPulses ( void )
+{
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
     {
 		g_pCore->GetConsole()->Printf("First playback frame, starting");
@@ -693,13 +773,6 @@ void CClientGame::DoPulsePostFrame ( void )
 
     if ( m_pManager->IsGameLoaded () )
     {
-        // Pulse the nametags before anything that changes player positions, we'll be 1 frame behind, but so is the camera
-        // If nametags are enabled, pulse the nametag manager
-        if ( m_bShowNametags )
-        {
-            m_pNametags->DoPulse ();
-        }
-
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
@@ -775,42 +848,6 @@ void CClientGame::DoPulsePostFrame ( void )
     // If the game is loaded ...
     if ( m_pManager->IsGameLoaded () )
     {
-        // If we're supposed to show netstat, draw it
-        if ( m_bShowNetstat )
-        {
-            m_pNetworkStats->Draw ();
-        }
-
-        // Sync debug
-        m_pSyncDebug->OnPulse ();
-
-        // Also eventually draw FPS
-        if ( m_bShowFPS )
-        {
-            DrawFPS ();
-        }
-
-        // If we're in debug mode and are supposed to show task data, do it
-        #ifdef MTA_DEBUG
-        if ( m_pShowPlayerTasks )
-        {
-            DrawTasks ( m_pShowPlayerTasks );
-        }
-
-        if ( m_pShowPlayer )
-        {
-            DrawPlayerDetails ( m_pShowPlayer );
-        }
-
-        std::list < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
-        {
-            CClientPlayer* pPlayer = *iter;
-            if ( pPlayer->IsStreamedIn () && pPlayer->IsShowingWepdata () )
-                DrawWeaponsyncData ( pPlayer );
-        }
-        #endif
-
         // Pulse the blended weather manager
         m_pBlendedWeather->DoPulse ();
 
@@ -829,28 +866,6 @@ void CClientGame::DoPulsePostFrame ( void )
 
         // Get rid of our deleted elements
         m_ElementDeleter.DoDeleteAll ();
-
-        #if defined (MTA_DEBUG) || defined (MTA_BETA)
-        if ( m_bShowSyncingInfo )
-        {
-            // Draw the header boxz
-            CVector vecPosition = CVector ( 0.05f, 0.32f, 0 );
-            m_pDisplayManager->DrawText2D ( "Syncing vehicles:", vecPosition, 1.0f, 0xFFFFFFFF );
-
-            // Print each vehicle we're syncing
-            CDeathmatchVehicle* pVehicle;
-            list < CDeathmatchVehicle* > ::const_iterator iter = m_pUnoccupiedVehicleSync->IterBegin ();
-            for ( ; iter != m_pUnoccupiedVehicleSync->IterEnd (); iter++ )
-            {
-                vecPosition.fY += 0.03f;
-                pVehicle = *iter;
-
-                SString strBuffer ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
-
-                m_pDisplayManager->DrawText2D ( strBuffer, vecPosition, 1.0f, 0xFFFFFFFF );
-            }
-        }
-        #endif
     }
 
     // Are we connecting?
@@ -1001,16 +1016,10 @@ void CClientGame::DoPulsePostFrame ( void )
     // stop players dying from starvation
     g_pGame->GetPlayerInfo()->SetLastTimeEaten ( 0 );
 
-    // Call onClientRender LUA event
-    if ( m_pManager->IsGameLoaded () )
-    {
-        CLuaArguments Arguments;
-        m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
-    }
-
     // Update streaming
     m_pManager->UpdateStreamers ();
 }
+
 
 void CClientGame::HandleException ( CExceptionInformation* pExceptionInformation )
 {
@@ -2184,7 +2193,6 @@ void CClientGame::AddBuiltInEvents ( void )
 	m_Events.AddEvent ( "onClientChatMessage", "test, r, g, b", NULL, false );
 
     // Game events
-    m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
 
     // Cursor events
@@ -2943,6 +2951,11 @@ void CClientGame::StaticRender3DStuffHandler ( void )
     g_pClientGame->Render3DStuffHandler ();
 }
 
+void CClientGame::StaticGameProcessHandler ( void )
+{
+    g_pClientGame->GameProcessHandler ();
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3006,10 +3019,23 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
 
 void CClientGame::Render3DStuffHandler ( void )
 {
+
+}
+
+
+void CClientGame::GameProcessHandler ( void )
+{
+    // If we are minimized we do the pulsing here
+    if ( !g_pCore->IsFocused() )
+    {
+        DoPulses ();
+    }
+
+    // Call onClientRender LUA event
     if ( m_pManager->IsGameLoaded () )
     {
         CLuaArguments Arguments;
-        m_pRootEntity->CallEvent ( "onClientPreRender", Arguments, false );
+        m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
     }
 }
 

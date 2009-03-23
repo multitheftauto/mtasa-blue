@@ -177,6 +177,9 @@ public:
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void					ChangeResolution                ( long width, long height, long depth );
 
+    void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
+    bool                    IsFocused                       ( void )                        { return m_bFocused; };
+
     // Pulse
     void                    DoPreFramePulse                 ( void );
     void                    DoPostFramePulse                ( void );
@@ -218,6 +221,8 @@ private:
     //CFileSystemHook *           m_pFileSystemHook;
 	CSetCursorPosHook *         m_pSetCursorPosHook;
 	CTCPManager *				m_pTCPManager;
+
+    bool                        m_bFocused;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;

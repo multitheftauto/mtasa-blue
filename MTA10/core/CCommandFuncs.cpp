@@ -127,7 +127,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
                 // Disable the thick frame so it can't be resized
                 LONG lLong = GetWindowLong ( hDeviceWindow, GWL_STYLE ) ^ WS_THICKFRAME;
                 lLong ^= WS_MAXIMIZEBOX;
-				lLong ^= WS_MINIMIZEBOX;
+				//lLong ^= WS_MINIMIZEBOX;
 				lLong ^= WS_SYSMENU;
 			    SetWindowLong ( hDeviceWindow, GWL_STYLE, lLong );
 

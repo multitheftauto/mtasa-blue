@@ -191,6 +191,7 @@ public:
 
     void                                DoPulsePreFrame                 ( void );
     void                                DoPulsePostFrame                ( void );
+    void                                DoPulses                        ( void );
 
     void                                HandleException                 ( CExceptionInformation* pExceptionInformation );
     static void                         HandleRadioNext                 ( CControlFunctionBind* );
@@ -388,12 +389,15 @@ private:
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
+    static void                         StaticGameProcessHandler        ( void );
+
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
+    void                                GameProcessHandler              ( void );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
