@@ -73,7 +73,18 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     // Get a pointer to ourself.
     pThis = CMessageLoopHook::GetSingletonPtr ( );
 
-    // Prevent gTA from knowing about kill focuses. Prevents pausing.
+    // Log our state
+    if ( uMsg == WM_KILLFOCUS ||
+         uMsg == WM_NCACTIVATE )
+    {
+        g_pCore->SetFocused ( false );
+    }
+    else if ( uMsg == WM_SETFOCUS )
+    {
+        g_pCore->SetFocused ( true );
+    }
+
+    // Prevent GTA from knowing about kill focuses. Prevents pausing.
     if ( uMsg == WM_KILLFOCUS )
     {
         return true;
@@ -222,6 +233,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 					return true; 
 				}
 
+                /*
 				// Prevent alt-tabbing
 				if ( uMsg == WM_ACTIVATE ||
 					uMsg == WM_ACTIVATEAPP ||
@@ -235,6 +247,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 						return true;
 					}
 				}
+
 				// Should not really ever get here, just in case. 
 				else if ( uMsg == WM_SIZE )
 				{
@@ -244,6 +257,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 						return true;
 					}
 				}
+                */
 
 
 				// Call GTA's window procedure.

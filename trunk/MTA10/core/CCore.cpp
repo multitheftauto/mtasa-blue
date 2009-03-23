@@ -181,6 +181,7 @@ CCore::CCore ( void )
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
+    m_bFocused = true;
 
     // Initialize time
     CClientTime::InitializeTime ();

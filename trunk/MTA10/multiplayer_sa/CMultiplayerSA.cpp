@@ -51,7 +51,6 @@ unsigned long CMultiplayerSA::ADDR_CursorHiding;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
-
 #define HOOKPOS_FxManager_CreateFxSystem 0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
 
@@ -94,6 +93,7 @@ FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
+GameProcessHandler* m_pGameProcessHandler = NULL;
 
 ExplosionHandler * m_pExplosionHandler; // stores our handler
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
@@ -124,6 +124,7 @@ VOID HOOK_CPed_IsPlayer ();
 VOID HOOK_CTrain_ProcessControl_Derail ();
 VOID HOOK_CVehicle_Render ();
 VOID HOOK_CObject_Render ();
+VOID HOOK_CGame_Process ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -137,6 +138,9 @@ CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the stream
 #define CALL_CWeapon_FireAreaEffect 0x73EBFE
 #define FUNC_CWeapon_FireAreaEffect 0x53A450
 #define CALL_CBike_ProcessRiderAnims 0x6BF425   // @ CBike::ProcessDrivingAnims
+
+#define CALL_CGame_Process 0x53E981
+
 DWORD FUNC_CBike_ProcessRiderAnims = 0x6B7280;
 DWORD FUNC_CEntity_Render = 0x534310;
 
@@ -215,9 +219,13 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 
+    HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
 	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
+
+    // Disable GTA setting g_bGotFocus to false when we minimize
+    *(BYTE *)0x748054 = 0x90;
 
     // Increase double link limit from 3200 ro 4000
     *(int*)0x00550F82 = 4000;
@@ -950,6 +958,11 @@ void CMultiplayerSA::SetFireHandler ( FireHandler * pFireHandler )
 void CMultiplayerSA::SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandler )
 {
     m_pProcessCamHandler = pProcessCamHandler;
+}
+
+void CMultiplayerSA::SetGameProcessHandler ( GameProcessHandler* pProcessHandler )
+{
+    m_pGameProcessHandler = pProcessHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -2413,4 +2426,16 @@ void CMultiplayerSA::SetCustomCameraRotationEnabled ( bool bEnabled )
 void CMultiplayerSA::SetDebugVars ( float f1, float f2, float f3 )
 {
 
+}
+
+VOID _declspec(naked) HOOK_CGame_Process ()
+{
+    if ( m_pGameProcessHandler )
+        m_pGameProcessHandler ();
+
+    _asm
+    {
+        mov eax, 0x53BEE0
+        jmp eax
+    }
 }
