@@ -182,15 +182,9 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             Arguments.PushElement ( pTowedByVehicle );
                             bool bContinue = pTrailer->CallEvent ( "onTrailerAttach", Arguments );
 
-                            if ( !bContinue ) {
-                                // Detach trailers, event was aborted
-                                CVehicleTrailerPacket DetachPacket ( pTowedByVehicle, pTrailer, false );
-                                g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( DetachPacket );
-							} else {
-								// Attach trailers, event succeeded
-								CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pTrailer, true );
-								g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( AttachPacket );
-							}
+                            // Attach or detach trailers depending on the event outcome
+                            CVehicleTrailerPacket TrailerPacket ( pTowedByVehicle, pTrailer, bContinue );
+                            g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( TrailerPacket );
                         }
                     }
                     else
