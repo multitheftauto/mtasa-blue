@@ -315,7 +315,7 @@ struct RpMaterialLighting
 };
 struct RpMaterial
 {
-	RwTexture           texture;
+	RwTexture*          texture;
 	RwColor             color;
 	void                *render;
 	RpMaterialLighting  lighting;
