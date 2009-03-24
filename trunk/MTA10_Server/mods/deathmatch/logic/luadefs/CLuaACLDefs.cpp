@@ -90,8 +90,6 @@ int CLuaACLDefs::aclCreate ( lua_State* luaVM )
             lua_pushacl ( luaVM, pACL );
             return 1;
 		}
-        else
-            CLogger::ErrorPrintf ( "Unable to create new ACL; ACL %s does already exist\n", szACLName );
 	}
 	else
 		m_pScriptDebugging->LogBadType ( luaVM, "aclCreate" );
@@ -142,8 +140,6 @@ int CLuaACLDefs::aclGet ( lua_State* luaVM )
             lua_pushacl ( luaVM, pACL );
             return 1;
 		}
-        else
-            CLogger::ErrorPrintf ( "Unable to get ACL; ACL %s does not exist", szACLName );
 	}
 	else
 		m_pScriptDebugging->LogBadType ( luaVM, "aclGet" );
@@ -468,8 +464,6 @@ int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
             lua_pushaclgroup ( luaVM, pGroup );
             return 1;
         }
-        else
-            CLogger::ErrorPrintf ( "Unable to create group; group named %s already exists", szGroup );
     }
 	else
 		m_pScriptDebugging->LogBadType ( luaVM, "aclCreateGroup" );
@@ -497,8 +491,6 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            CLogger::ErrorPrintf ( "aCLDestroyGroup: Invalid group specified, may be already deleted?" );
     }
 	else
 		m_pScriptDebugging->LogBadType ( luaVM, "aclDestroyGroup" );
@@ -524,8 +516,6 @@ int CLuaACLDefs::aclGetGroup ( lua_State* luaVM )
             lua_pushaclgroup ( luaVM, pGroup );
             return 1;
         }
-        else
-            CLogger::ErrorPrintf ( "Unable to get group; no group named %s exists", szGroup );
     }
 	else
 		m_pScriptDebugging->LogBadType ( luaVM, "aclGetGroup" );
@@ -714,8 +704,6 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
-            else
-                CLogger::ErrorPrintf ( "Unable to add object to ACL; object %s already exists\n", szObject );
         }
     }
 	else
