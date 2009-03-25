@@ -3094,8 +3094,10 @@ int CLuaFunctionDefinitions::SetElementParent ( lua_State* luaVM )
             CClientEntity* pParent = lua_toelement ( luaVM, 2 );
             if ( pParent )
             {
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
                 // Change the parent
-                if ( CStaticFunctionDefinitions::SetElementParent ( *pEntity, *pParent ) )
+                if ( CStaticFunctionDefinitions::SetElementParent ( *pEntity, *pParent, pLuaMain ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

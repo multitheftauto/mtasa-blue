@@ -3597,7 +3597,10 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
         {
             CLuaArguments Arguments;
             Arguments.PushNumber ( ucChannel );
-            CallEvent ( "onClientPlayerRadioSwitch", Arguments, true );
+            if ( !CallEvent ( "onClientPlayerRadioSwitch", Arguments, true ) )
+            {
+                return false;
+            }
         }
 
         m_ucRadioChannel = ucChannel;
