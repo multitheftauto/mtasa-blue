@@ -3558,14 +3558,7 @@ void CClientPed::NextRadioChannel ( void )
     // Is our radio on?
     if ( m_bRadioOn )
     {
-        // Next channel
-        m_ucRadioChannel += 1;
-        if ( m_ucRadioChannel > 12 )
-        {
-            m_ucRadioChannel = 0;
-        }
-
-        SetCurrentRadioChannel ( m_ucRadioChannel );
+        SetCurrentRadioChannel ( ( m_ucRadioChannel + 1 ) % 13 );
     }
 }
 
@@ -3575,15 +3568,12 @@ void CClientPed::PreviousRadioChannel ( void )
     // Is our radio on?
     if ( m_bRadioOn )
     {
-        // Previous channel
         if ( m_ucRadioChannel == 0 )
         {
             m_ucRadioChannel = 13;
         }
 
-        m_ucRadioChannel -= 1;
-
-        SetCurrentRadioChannel ( m_ucRadioChannel );
+        SetCurrentRadioChannel ( m_ucRadioChannel - 1 );
     }
 }
 
@@ -3605,10 +3595,9 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
 
         m_ucRadioChannel = ucChannel;
 
+        g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
         if ( m_ucRadioChannel == 0 )
             g_pGame->GetAudio ()->StopRadio ();
-        else
-            g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
 
         return true;
     }
