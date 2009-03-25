@@ -221,6 +221,21 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	#endif
     #endif
 
+
+    // Basic check for the data files
+    char szDataFile[MAX_PATH] = {'\0'};
+    _snprintf ( szDataFile, MAX_PATH, "%s\\mta\\libcurl.dll", szMTASAPath );
+
+    // Check if libcurl.dll exists)
+    if ( INVALID_HANDLE_VALUE == FindFirstFile ( szDataFile, &fdFileInfo ) )
+    {
+        MessageBox( NULL, "Load failed.  Please ensure that "
+                          "the data files have been installed "
+                          "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+        return 1;
+    }
+
+
     // Grab the MTA folder
     char szDir[MAX_PATH];
     char szGTAEXEPath[MAX_PATH];
