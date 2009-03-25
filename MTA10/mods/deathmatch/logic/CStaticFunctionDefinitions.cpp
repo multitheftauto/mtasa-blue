@@ -1087,6 +1087,19 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
 }
 
 
+bool CStaticFunctionDefinitions::SetRadioChannel ( unsigned char& ucChannel )
+{
+    return m_pPlayerManager->GetLocalPlayer ()->SetCurrentRadioChannel ( ucChannel );
+}
+
+
+bool CStaticFunctionDefinitions::GetRadioChannel ( unsigned char& ucChannel )
+{
+    ucChannel = m_pPlayerManager->GetLocalPlayer ()->GetCurrentRadioChannel ();
+    return true;
+}
+
+
 CClientPlayer* CStaticFunctionDefinitions::GetLocalPlayer ( void )
 {
     return m_pPlayerManager->GetLocalPlayer ();

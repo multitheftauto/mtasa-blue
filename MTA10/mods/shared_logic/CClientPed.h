@@ -286,6 +286,7 @@ public:
     bool                        IsRadioOn                   ( void ) { return m_bRadioOn; };
     void                        NextRadioChannel            ( void );
     void                        PreviousRadioChannel        ( void );
+    bool                        SetCurrentRadioChannel      ( unsigned char ucChannel );
     inline unsigned char        GetCurrentRadioChannel      ( void ) { return m_ucRadioChannel; };
 
     inline CTaskManager*        GetTaskManager              ( void ) { return m_pTaskManager; }

@@ -67,9 +67,6 @@ public:
     inline unsigned long            GetLastNametagShow      ( void )                                { return m_ulLastNametagShow; };
     inline void                     SetLastNametagShow      ( unsigned long ulTime )                { m_ulLastNametagShow = ulTime; };
 
-    inline void                     SetAdminLevel           ( unsigned char ucAdminLevel )      { m_ucAdminLevel = ucAdminLevel; };
-    inline unsigned char            GetAdminLevel           ( void )                            { return m_ucAdminLevel; };
-
     inline void                     SetIsExtrapolatingAim   ( bool m_bExtrap )                  { m_bDoExtrapolatingAim = m_bExtrap; };
     inline bool                     IsExtrapolatingAim      ( void )                            { return m_bDoExtrapolatingAim; };
     void                            UpdateAimPosition       ( const CVector &vecAim );
@@ -109,7 +106,6 @@ public:
 private:
     bool                            m_bIsLocalPlayer;
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
-    unsigned char                   m_ucAdminLevel;
 
     unsigned int                    m_uiPing;
 

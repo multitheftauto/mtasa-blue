@@ -88,6 +88,10 @@ public:
     static bool                         SetElementModel                     ( CClientEntity& Entity, unsigned short usModel );
     static bool                         SetElementCollisionsEnabled         ( CClientEntity& Entity, bool bEnabled );
 
+    // Radio funcs
+    static bool                         SetRadioChannel                     ( unsigned char& ucChannel );
+    static bool                         GetRadioChannel                     ( unsigned char& ucChannel );
+
     // Player get funcs
     static CClientPlayer*               GetLocalPlayer                      ( void );
     static CClientPlayer*               GetPlayerFromNick                   ( const char* szNick );
