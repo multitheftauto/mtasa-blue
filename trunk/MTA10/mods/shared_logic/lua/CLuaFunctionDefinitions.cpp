@@ -3519,6 +3519,40 @@ int CLuaFunctionDefinitions::SetElementStreamable ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::SetRadioChannel ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER ||
+         lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        unsigned char ucChannel = ( unsigned char ) lua_tonumber ( luaVM, 1 );
+        if ( CStaticFunctionDefinitions::SetRadioChannel ( ucChannel ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setRadioChannel" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetRadioChannel ( lua_State* luaVM )
+{
+    unsigned char ucChannel = 0;
+    if ( CStaticFunctionDefinitions::GetRadioChannel ( ucChannel ) )
+    {
+        lua_pushnumber ( luaVM, ucChannel );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetLocalPlayer ( lua_State* luaVM )
 {
     CClientPlayer* pPlayer = CStaticFunctionDefinitions::GetLocalPlayer ();

@@ -138,6 +138,10 @@ public:
     LUA_DECLARE ( SetElementStreamable );
     LUA_DECLARE ( SetElementModel );
 
+    // Radio functions
+    LUA_DECLARE ( SetRadioChannel );
+    LUA_DECLARE ( GetRadioChannel );
+
     // Player get functions
     LUA_DECLARE ( GetLocalPlayer );
     LUA_DECLARE ( GetPlayerName );

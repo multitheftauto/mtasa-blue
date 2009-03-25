@@ -3565,16 +3565,7 @@ void CClientPed::NextRadioChannel ( void )
             m_ucRadioChannel = 0;
         }
 
-        // Local player?
-        if ( m_bIsLocalPlayer )
-        {
-            // Turn it
-            g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
-
-            // Turn it off again if we're not on channel none (prevent the text from previous channel staying there)
-            if ( m_ucRadioChannel == 0 )
-                g_pGame->GetAudio ()->StopRadio ();
-        }
+        SetCurrentRadioChannel ( m_ucRadioChannel );
     }
 }
 
@@ -3592,17 +3583,33 @@ void CClientPed::PreviousRadioChannel ( void )
 
         m_ucRadioChannel -= 1;
 
-        // Local player?
-        if ( m_bIsLocalPlayer )
+        SetCurrentRadioChannel ( m_ucRadioChannel );
+    }
+}
+
+
+bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
+{
+    // Local player?
+    if ( m_bIsLocalPlayer && ucChannel >= 0 && ucChannel <= 12 )
+    {
+        if ( m_ucRadioChannel != ucChannel )
         {
-            // Turn it on       
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( ucChannel );
+            CallEvent ( "onClientPlayerRadioSwitch", Arguments, true );
+        }
+
+        m_ucRadioChannel = ucChannel;
+
+        if ( m_ucRadioChannel == 0 )
+            g_pGame->GetAudio ()->StopRadio ();
+        else
             g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
 
-            // Turn it off again if we're not on channel none (prevent the text from previous channel staying there)
-            if ( m_ucRadioChannel == 0 )
-                g_pGame->GetAudio ()->StopRadio ();
-        }
+        return true;
     }
+    return false;
 }
 
 

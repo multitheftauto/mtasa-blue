@@ -337,6 +337,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setSoundMaxDistance", CLuaFunctionDefinitions::SetSoundMaxDistance );
     CLuaCFunctions::AddFunction ( "getSoundMaxDistance", CLuaFunctionDefinitions::GetSoundMaxDistance );
 
+    // Radio funcs
+    CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefinitions::SetRadioChannel );
+    CLuaCFunctions::AddFunction ( "getRadioChannel", CLuaFunctionDefinitions::GetRadioChannel );
+
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getLocalPlayer", CLuaFunctionDefinitions::GetLocalPlayer );
     CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefinitions::GetPlayerName );
