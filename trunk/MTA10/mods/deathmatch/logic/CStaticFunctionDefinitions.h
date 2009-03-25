@@ -77,7 +77,7 @@ public:
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition );
     static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
-    static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent );
+    static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                         SetElementDimension                 ( CClientEntity& Entity, unsigned short usDimension );
     static bool                         AttachElements                      ( CClientEntity& Entity, CClientEntity& AttachedToEntity, CVector& vecPosition, CVector& vecRotation );

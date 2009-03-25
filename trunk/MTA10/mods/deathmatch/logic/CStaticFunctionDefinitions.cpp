@@ -825,13 +825,22 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClientEntity& Parent )
+bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClientEntity& Parent, CLuaMain* pLuaMain )
 {
-    // Only allow this for non-gui elements atm
-    if ( Entity.GetType () != CCLIENTGUI )
+    if ( &Entity != &Parent && !Entity.IsMyChild ( &Parent, true ) )
     {
-        // Make sure the new parent isn't the element and isn't a child of the entity
-        if ( &Entity != &Parent && !Entity.IsMyChild ( &Parent, true ) )
+        if ( Entity.GetType () == CCLIENTGUI )
+        {
+            if ( Parent.GetType () == CCLIENTGUI ||
+                 &Parent == pLuaMain->GetResource()->GetResourceGUIEntity() )
+            {
+                CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+	            GUIElement.SetParent ( &Parent );
+                return true;
+            }
+        }
+        else
         {
 			CClientEntity* pTemp = &Parent;
 			CClientEntity* pRoot = m_pRootEntity;
