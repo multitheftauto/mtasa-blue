@@ -226,7 +226,7 @@ void CMultiplayerSA::InitHooks()
 	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
-    memset ( (void *)ADDR_GotFocus, 0x90, 10 );
+    memset ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
     // Increase double link limit from 3200 ro 4000
     *(int*)0x00550F82 = 4000;
