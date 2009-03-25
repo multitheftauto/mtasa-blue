@@ -2157,7 +2157,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerWeaponSwitch", "previous, current", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStuntStart", "type", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStuntFinish", "type, time, distance", NULL, false );
-    m_Events.AddEvent ( "onClientPlayerAudioSwitch", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerRadioSwitch", "", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
