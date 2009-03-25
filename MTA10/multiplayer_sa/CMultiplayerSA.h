@@ -142,6 +142,7 @@ private:
     static unsigned long        FUNC_CHud_Draw;
 
     static unsigned long        ADDR_CursorHiding;
+    static unsigned long        ADDR_GotFocus;
 
     static unsigned long        FUNC_CPlayerInfoBase;
 };

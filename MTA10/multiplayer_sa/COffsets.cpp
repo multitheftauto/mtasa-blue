@@ -18,6 +18,7 @@ void COffsetsMP::Initialize10EU ( void )
     InitializeCommon10 ();
 
     CMultiplayerSA::ADDR_CursorHiding = 0x74821D;
+    CMultiplayerSA::ADDR_GotFocus = 0x74804E;
 }
 
 
@@ -26,6 +27,7 @@ void COffsetsMP::Initialize10US ( void )
     InitializeCommon10 ();
 
     CMultiplayerSA::ADDR_CursorHiding = 0x7481CD;
+    CMultiplayerSA::ADDR_GotFocus = 0x748054;
 }
 
 

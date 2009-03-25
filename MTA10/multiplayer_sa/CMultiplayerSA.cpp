@@ -48,6 +48,7 @@ unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
 unsigned long CMultiplayerSA::FUNC_CHud_Draw;
 
 unsigned long CMultiplayerSA::ADDR_CursorHiding;
+unsigned long CMultiplayerSA::ADDR_GotFocus;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
@@ -225,7 +226,7 @@ void CMultiplayerSA::InitHooks()
 	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
-    *(BYTE *)0x748054 = 0x90;
+    *(BYTE *)ADDR_GotFocus = 0x90;
 
     // Increase double link limit from 3200 ro 4000
     *(int*)0x00550F82 = 4000;
