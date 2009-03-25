@@ -2056,10 +2056,10 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
 static RpMaterial* HOOK_SetMaterialColorAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     unsigned char* pPad = (unsigned char *)(&pMaterial->id);
-    if ( pPad [ 0 ] == 0 || pPad [ 1 ] == 0 )
+    if ( pPad [ 0 ] != 123 )
     {
         // Save in the structure padding the original alpha value for this material
-        pPad [ 0 ] = 1;
+        pPad [ 0 ] = 123;
         pPad [ 1 ] = pMaterial->color.a;
     }
 
