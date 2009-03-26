@@ -3810,22 +3810,15 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceEntityID );
 	bitStream.Read ( ResourceDynamicEntityID );
 
-    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName );
+    // Get the resource entity
+    CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
+
+	// Get the resource dynamic entity
+	CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
+
+    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity );
     if ( pResource )
     {
-		// set the resource entity
-        CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
-        if ( pResourceEntity )
-        {
-            pResource->SetResourceEntity ( pResourceEntity );
-        }
-
-		// set the resource dynamic entity
-		CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
-		if ( pResourceDynamicEntity )
-		{
-			pResource->SetResourceDynamicEntity ( pResourceDynamicEntity );
-		}
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;

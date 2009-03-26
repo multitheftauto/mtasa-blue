@@ -22,7 +22,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usID, char* szResourceName )
+CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
     m_usID = usID;
 	m_bActive = false;
@@ -41,8 +41,8 @@ CResource::CResource ( unsigned short usID, char* szResourceName )
     m_pRootEntity = g_pClientGame->GetRootEntity ();
     m_pDefaultElementGroup = new CElementGroup ( this );
     m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
-    m_pResourceEntity = NULL;
-	m_pResourceDynamicEntity = NULL;
+    m_pResourceEntity = pResourceEntity;
+	m_pResourceDynamicEntity = pResourceDynamicEntity;
 
 	// Create our GUI root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
@@ -66,11 +66,10 @@ CResource::CResource ( unsigned short usID, char* szResourceName )
 
     m_strResourceDirectoryPath = SString ( "%s\\resources\\%s", g_pClientGame->GetModRoot (), m_szResourceName );
 
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine();
+    m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )
     {
         m_pLuaVM->SetScriptName ( szResourceName );
-        m_pLuaVM->SetResource ( this );
     }
 }
 

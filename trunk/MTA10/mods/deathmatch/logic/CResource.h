@@ -44,7 +44,7 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usID, char* szResourceName );
+                            CResource       ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
                             ~CResource      ( void );
 
     inline unsigned short   GetID           ( void )                { return m_usID; };

@@ -35,7 +35,7 @@ public:
 
     void                            StopScriptsOwnedBy      ( int iOwner );
 
-	CLuaMain*                       CreateVirtualMachine    ( void );
+	CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner );
     bool                            RemoveVirtualMachine    ( CLuaMain* vm );
     CLuaMain*                       GetVirtualMachine       ( lua_State* luaVM );
     CLuaMain*                       GetVirtualMachine       ( const char* szFilename );
