@@ -123,6 +123,8 @@ public:
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition );
 
+    void                        SetInterior                 ( unsigned char ucInterior );
+
     void                        GetRotationDegrees          ( CVector& vecRotation ) const;
     void                        GetRotationRadians          ( CVector& vecRotation ) const;
     void                        SetRotationDegrees          ( const CVector& vecRotation );
