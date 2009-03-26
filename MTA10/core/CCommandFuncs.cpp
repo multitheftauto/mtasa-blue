@@ -186,7 +186,11 @@ void CCommandFuncs::Window ( const char* szParameters )
                      vidModeInfo.height == currentModeInfo.height &&
                      vidModeInfo.depth == currentModeInfo.depth &&
                      ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) != ( currentModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) )
+                {
                         gameSettings->SetCurrentVideoMode ( vidMode );
+                        g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
+
+                }
             }
         }
         else

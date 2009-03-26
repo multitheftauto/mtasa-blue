@@ -90,7 +90,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	m_pFiller->LoadFromFile ( CORE_MTA_FILLER );
     m_pFiller->SetFrameEnabled ( false );
     m_pFiller->SetVisible ( false );
-	m_pFiller->SetSize ( ScreenSize );
     m_pFiller->MoveToBack ();
 	m_pFiller->SetVisible ( false );
 	m_pFiller->SetEnabled ( false );
@@ -101,12 +100,10 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	//m_pHeader->MoveToBack ();
 	m_pHeader->SetFrameEnabled ( false );
 	m_pHeader->SetVisible ( false );
-	m_pHeader->SetPosition ( CVector2D ( ScreenSize.fX/2 - CORE_MTA_HEADER_X/2, ScreenSize.fY/6 ), false );
 	m_pHeader->SetSize ( CVector2D ( CORE_MTA_HEADER_X, CORE_MTA_HEADER_Y ) );
 	m_pHeader->SetAlpha ( 0 );
 
 	m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pBackground, "Not logged in" ) );
-    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 	m_pCommunityLabel->AutoSize ( "Not logged in" );
     m_pCommunityLabel->SetAlwaysOnTop ( true );
     m_pCommunityLabel->SetAlpha ( 0.7f );
@@ -131,6 +128,9 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ),	"SETTINGS",				GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
     CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ),	"ABOUT",				GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
 	CreateItem ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ),	"QUIT",					GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
+
+    //Refresh all positions
+    RefreshPositions ( );
 
 	// Disable the disconnect item
 	DisableItem ( MENU_ITEM_DISCONNECT, true );
@@ -195,6 +195,26 @@ CMainMenu::~CMainMenu ( void )
 
 	// Destroy the scene
 	delete m_pMainMenuScene;
+}
+
+void CMainMenu::RefreshPositions ( void )
+{
+    CVector2D ScreenSize = m_pManager->GetResolution ();
+	m_pFiller->SetSize ( ScreenSize );
+    m_pHeader->SetPosition ( CVector2D ( ScreenSize.fX/2 - CORE_MTA_HEADER_X/2, ScreenSize.fY/6 ), false );
+    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
+
+    //Set our individual item positions
+    unsigned int uiItemStartY = ScreenSize.fY / 2;
+	unsigned int uiItemHeight = 30;
+	SetItemPosition ( MENU_ITEM_DISCONNECT,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY ), false );
+    SetItemPosition ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*1 ), false );
+    SetItemPosition ( MENU_ITEM_BROWSE_SERVERS, CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*2 ), false );
+    SetItemPosition ( MENU_ITEM_HOST_GAME,      CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*3 ), false );
+    SetItemPosition ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), false );
+    SetItemPosition ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), false );
+    SetItemPosition ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), false );
+	SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
 }
 
 void CMainMenu::Update ( void )
@@ -788,6 +808,15 @@ void CMainMenu::DisableItem ( unsigned int uiIndex, bool bHide )
 		}
 	}
 }
+
+void CMainMenu::SetItemPosition ( unsigned int uiIndex, CVector2D vecPosition, bool bRelative )
+{
+	if ( m_pItems[uiIndex] ) 
+    {
+        m_pItems[uiIndex]->SetPosition ( vecPosition, bRelative );
+	}
+}
+
 
 
 void CMainMenu::LoadMenuOptions ( void )
