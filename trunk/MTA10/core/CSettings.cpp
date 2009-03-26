@@ -1471,6 +1471,7 @@ void CSettings::SaveData ( void )
              selectedVidMode >= 0 )
         {
             gameSettings->SetCurrentVideoMode ( selectedVidMode );
+            g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
         }
     }
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );

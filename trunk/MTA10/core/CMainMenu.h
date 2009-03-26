@@ -45,6 +45,8 @@ public:
                         CMainMenu                       ( CGUI* pManager );
                         ~CMainMenu                      ( void );
 
+    void                RefreshPositions                ( void );
+
     void                Update                          ( void );
 
 	void				Show							( bool bOverlay );
@@ -75,6 +77,7 @@ private:
 	void				SetStaticBackground				( bool bEnabled );
 
 	void				CreateItem						( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler );
+    void				SetItemPosition					( unsigned int uiIndex, CVector2D vecPosition, bool bRelative = false );
 	void				EnableItem						( unsigned int uiIndex );
 	void				DisableItem						( unsigned int uiIndex, bool bHide = false );
 
