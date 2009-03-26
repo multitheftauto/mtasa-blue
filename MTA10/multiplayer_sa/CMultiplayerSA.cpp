@@ -737,9 +737,8 @@ void CMultiplayerSA::InitHooks()
     // Remove this check so that no bullets are ignored.
     *(BYTE *)0x73FDF9 = 0xEB;
 
-    // Keep Z-buffer writing enabled when rendering water (otherwise underwater trees
-    // and building LOD are drawn in front of it which looks fugly)
-    memset((void *)0x6EF8CE, 0x90, 3);
+    // Make sure water is always drawn after trees and LOD instead of before
+    *(WORD *)0x53DF55 = 0x9090;
 }
 
 
