@@ -9355,7 +9355,7 @@ int CLuaFunctionDefinitions::ExecuteSQLDropTable ( lua_State* luaVM )
 {
 	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
 	{
-        CStaticFunctionDefinitions::ExecuteSQLDropTable ( std::string ( lua_tostring ( luaVM, 1 ) ) );
+        CStaticFunctionDefinitions::ExecuteSQLDropTable ( lua_tostring ( luaVM, 1 ) );
 		lua_pushboolean ( luaVM, true );
 		return 1;
 	}
@@ -9437,7 +9437,9 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
                     CRegistryResultCell& cell = Result.Data[i][j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
-					lua_pushnumber ( luaVM, j + 1 );		        // push the column index
+
+                    // Push the column name
+                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
@@ -9500,7 +9502,9 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
                     CRegistryResultCell& cell = Result.Data[i][j];
                     if ( cell.nType == SQLITE_NULL )
                         continue;
-					lua_pushnumber ( luaVM, j + 1 );		        // push the column index
+
+                    // Push the column name
+                    lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:

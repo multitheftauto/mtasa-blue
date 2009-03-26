@@ -97,7 +97,7 @@ void CRegistry::DropTable ( std::string strTable )
 		return;
 	}
 
-    std::string strQuery = "DROP IF EXISTS " + strTable;
+    std::string strQuery = "DROP TABLE " + strTable;
 
 	CLogger::LogPrintf ( "Dropping DB table %s\n", strTable.c_str () );
 	sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
