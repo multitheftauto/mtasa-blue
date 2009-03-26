@@ -597,9 +597,6 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 		}
         m_bIsPersistent = false;
 
-		// Create the virtual machine for this resource
-        CreateVM();
-
 		// Create an element group for us
         m_pDefaultElementGroup = new CElementGroup ( this );
         m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
@@ -621,6 +618,9 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 
         // Set the Resource Element name
         m_pResourceElement->SetName ( m_strResourceName.c_str () );
+
+        // Create the virtual machine for this resource
+        CreateVM();
 
 		// We're now active
         m_bActive = true;

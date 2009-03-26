@@ -32,7 +32,7 @@ public:
                                 CResourceManager			( void );
                                 ~CResourceManager			( void );
 
-    CResource*                  Add							( unsigned short usID, char* szResourceName );
+    CResource*                  Add							( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
     CResource*                  GetResource					( const char* szResourceName );
     CResource*                  GetResource					( unsigned short usID );
     bool                        RemoveResource				( unsigned short usID );

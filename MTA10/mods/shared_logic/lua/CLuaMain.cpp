@@ -48,7 +48,7 @@ const char szPreloadedScript [] = ""\
     "exports = setmetatable({}, exportsMT)\n";
 
 
-CLuaMain::CLuaMain ( CLuaManager* pLuaManager )
+CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -62,7 +62,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager )
     m_szScriptName [0] = 0;
     m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
     
-    m_pResource = NULL;
+    m_pResource = pResourceOwner;
 
     // Add all our events and functions
     InitVM();
@@ -168,7 +168,17 @@ void CLuaMain::InitVM ( void )
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
     // Update global variables
-    UpdateGlobals ();
+    lua_pushelement ( m_luaVM, g_pClientGame->GetRootEntity () );
+	lua_setglobal ( m_luaVM, "root" );
+
+    lua_pushresource ( m_luaVM, m_pResource );
+	lua_setglobal ( m_luaVM, "resource" );
+
+	lua_pushelement ( m_luaVM, m_pResource->GetResourceEntity () );
+	lua_setglobal ( m_luaVM, "resourceRoot" );
+
+    lua_pushelement ( m_luaVM, m_pResource->GetResourceGUIEntity () );
+    lua_setglobal ( m_luaVM, "guiRoot" );
 
     // Load pre-loaded lua code
     LoadScript ( szPreloadedScript );
@@ -357,21 +367,5 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
                 break;
             }
         }
-    }
-}
-
-void CLuaMain::UpdateGlobals ( void )
-{
-    // Got a resource and a VM?
-    if ( m_luaVM && m_pResource )
-    {
-	    lua_pushelement ( m_luaVM, g_pClientGame->GetRootEntity() );
-	    lua_setglobal ( m_luaVM, "root" );
-
-        lua_pushresource ( m_luaVM, m_pResource );
-	    lua_setglobal ( m_luaVM, "resource" );
-
-	    lua_pushelement ( m_luaVM, m_pResource->GetResourceDynamicEntity() );
-	    lua_setglobal ( m_luaVM, "resourceRoot" );
     }
 }
