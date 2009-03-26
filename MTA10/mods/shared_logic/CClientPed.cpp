@@ -434,6 +434,29 @@ void CClientPed::SetPosition ( const CVector& vecPosition )
     }
 }
 
+
+void CClientPed::SetInterior ( unsigned char ucInterior )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        pEntity->SetAreaCode ( ucInterior );
+    }
+
+    // If local player
+    if ( m_bIsLocalPlayer )
+    {
+        // If our camera is in the same world as the player, move it
+        if ( g_pGame->GetWorld ()->GetCurrentArea() == m_ucInterior )
+        {
+            g_pGame->GetWorld ()->SetCurrentArea ( ucInterior );
+        }
+    }
+
+    m_ucInterior = ucInterior;
+}
+
+
 void CClientPed::Teleport ( const CVector& vecPosition )
 {
     // Don't allow a position change if we're frozen
