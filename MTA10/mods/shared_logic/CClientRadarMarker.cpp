@@ -396,7 +396,7 @@ bool CClientRadarMarker::IsInVisibleDistance ( void )
 void CClientRadarMarker::GetSquareTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( 255, 0, 0, 0 );
+    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
     DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
@@ -430,7 +430,7 @@ void CClientRadarMarker::GetSquareTexture ( DWORD dwBitMap[] )
 void CClientRadarMarker::GetUpTriangleTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( 255, 0, 0, 0 );
+    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
     DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
@@ -464,7 +464,7 @@ void CClientRadarMarker::GetUpTriangleTexture ( DWORD dwBitMap[] )
 void CClientRadarMarker::GetDownTriangleTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( 255, 0, 0, 0 );
+    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
     DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
