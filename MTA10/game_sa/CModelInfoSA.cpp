@@ -280,7 +280,15 @@ char * CModelInfoSA::GetNameIfVehicle ( )
 VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
 {
 	DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
-	if(IsLoaded()) return; // don't bother loading it if it already is
+	// don't bother loading it if it already is
+    if ( IsLoaded () )
+        return;
+
+    if ( m_dwModelID != 7 && !pGame->GetModelInfo ( 7 )->IsLoaded () )
+    {
+        // Skin 7 must be loaded in order for other skins to work. No, really. (#4010)
+        pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
+    }
 
 	DWORD dwFunction = FUNC_RequestModel;
 	DWORD ModelID = m_dwModelID;
