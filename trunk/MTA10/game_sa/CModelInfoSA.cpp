@@ -284,7 +284,7 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     if ( IsLoaded () )
         return;
 
-    if ( m_dwModelID != 7 && !pGame->GetModelInfo ( 7 )->IsLoaded () )
+    if ( m_dwModelID <= 288 && m_dwModelID != 7 && !pGame->GetModelInfo ( 7 )->IsLoaded () )
     {
         // Skin 7 must be loaded in order for other skins to work. No, really. (#4010)
         pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
@@ -584,7 +584,7 @@ bool CModelInfoSA::IsUpgradeAvailable ( eVehicleUpgradePosn posn )
     return bRet;
 }
 
-void CModelInfoSA::SetCustomCarPlateText ( char * szText )
+void CModelInfoSA::SetCustomCarPlateText ( const char * szText )
 {
     char * szStoredText;
     DWORD ModelID = m_dwModelID;
