@@ -13032,6 +13032,24 @@ int CLuaFunctionDefinitions::GetGarageBoundingBox ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetBlurLevel ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    {
+        if ( CStaticFunctionDefinitions::SetBlurLevel ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) ) ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlurLevel" );
+
+    // Return false
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::SetTime ( lua_State* luaVM )
 {

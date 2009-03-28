@@ -281,8 +281,8 @@ public:
     void                        SetRopeHeightForHeli    ( float fRopeHeight );
     CClientEntity*              GetPickedUpEntityWithWinch ( void );
 
-    inline char*                GetRegPlate             ( void )                            { return m_szRegPlate; }
-    void                        SetRegPlate             ( char* szPlate );
+    inline const char*          GetRegPlate             ( void )                            { return m_strRegPlate.empty () ? NULL : m_strRegPlate.c_str (); }
+    void                        SetRegPlate             ( const char* szPlate );
 
     unsigned char               GetPaintjob             ( void );
     void                        SetPaintjob             ( unsigned char ucPaintjob );
@@ -426,7 +426,7 @@ protected:
     CClientVehicle*             m_pTowedByVehicle;
     eWinchType                  m_eWinchType;
     CClientEntity*              m_pPickedUpWinchEntity;
-    char*                       m_szRegPlate;
+    std::string                 m_strRegPlate;
     unsigned char               m_ucPaintjob;
     float                       m_fDirtLevel;
     bool                        m_bSmokeTrail;

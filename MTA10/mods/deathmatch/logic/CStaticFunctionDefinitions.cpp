@@ -1919,7 +1919,7 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource,
 
             pVehicle->SetRotationDegrees ( vecRotation );
             if ( szRegPlate )
-                pVehicle->SetRegPlate ( const_cast < char * > ( szRegPlate ) );
+                pVehicle->SetRegPlate ( szRegPlate );
 
             return pVehicle;
         }
@@ -4515,6 +4515,12 @@ bool CStaticFunctionDefinitions::GetGarageBoundingBox ( unsigned char ucGarageID
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetBlurLevel ( unsigned char ucLevel )
+{
+    g_pGame->SetBlurLevel ( ucLevel );
+    return true;
 }
 
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )

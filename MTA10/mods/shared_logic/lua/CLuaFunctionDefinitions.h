@@ -577,6 +577,7 @@ public:
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
+    LUA_DECLARE ( SetBlurLevel );
 
     // Input functions
     LUA_DECLARE ( BindKey );

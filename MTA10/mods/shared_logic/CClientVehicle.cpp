@@ -110,7 +110,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_pTowedByVehicle = NULL;
     m_eWinchType = WINCH_NONE;
     m_pPickedUpWinchEntity = NULL;
-    m_szRegPlate = NULL;
     m_ucPaintjob = 0xFF;
     m_fDirtLevel = 0.0f;
     m_bSmokeTrail = false;
@@ -1885,8 +1884,8 @@ void CClientVehicle::Create ( void )
         // Might want to make this settable by users? Could just leave it like this, don't mind.
         // Doesn't appear to work with trucks - only cars - stored string is up to 8 chars, will be reset after
         // each vehicle spawned of this model type (i.e. after AddVehicle below)
-        if ( m_szRegPlate )
-            m_pModelInfo->SetCustomCarPlateText ( m_szRegPlate );
+        if ( !m_strRegPlate.empty () )
+            m_pModelInfo->SetCustomCarPlateText ( m_strRegPlate.c_str () );
 
         // Create the vehicle
         if ( CClientVehicleManager::IsTrainModel ( m_usModel ) )
@@ -2442,17 +2441,11 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch ( void )
 }
 
 
-void CClientVehicle::SetRegPlate ( char* szPlate )
+void CClientVehicle::SetRegPlate ( const char* szPlate )
 {
-    if ( m_szRegPlate )
-    {
-        delete [] m_szRegPlate;
-        m_szRegPlate = NULL;
-    }
     if ( szPlate )
     {
-        m_szRegPlate = new char [ strlen ( szPlate ) + 1 ];
-        strcpy ( m_szRegPlate, szPlate );
+        m_strRegPlate = szPlate;
     }
 }
 

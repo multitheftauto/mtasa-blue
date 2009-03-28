@@ -269,7 +269,7 @@ public:
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );
     bool                            IsUpgradeAvailable      ( eVehicleUpgradePosn posn );
-    void                            SetCustomCarPlateText   ( char * szText );
+    void                            SetCustomCarPlateText   ( const char * szText );
     unsigned int                    GetNumRemaps            ( void );
 
     // Upgrades only!
