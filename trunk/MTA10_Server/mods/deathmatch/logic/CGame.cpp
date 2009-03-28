@@ -2135,7 +2135,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Arguments.PushElement ( pPlayer );         // player
                                     Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                     Arguments.PushBoolean ( false );            // jacked
-                                    if ( pVehicle->CallEvent ( "onVehicleStartExit", Arguments ) )
+                                    if ( pVehicle->CallEvent ( "onVehicleStartExit", Arguments ) &&
+                                        pPlayer->GetOccupiedVehicle () == pVehicle )
                                     {
                                         // Mark him as exiting the vehicle
                                         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_EXITING );
@@ -2147,7 +2148,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     }
                                     else
                                     {
-                                        // Tell him he can't exit
+                                        // Tell him he can't exit (script denied it or he was
+                                        // already warped out)
                                         CVehicleInOutPacket Reply ( ID, 0, VEHICLE_ATTEMPT_FAILED );
                                         Reply.SetSourceElement ( pPlayer );
                                         pPlayer->Send ( Reply );
