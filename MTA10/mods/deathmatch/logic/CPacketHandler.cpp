@@ -2811,7 +2811,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                 bitStream.Read ( vecPoint.fY );
                                 pPolygon->AddPoint ( vecPoint );
                             }
-                            pEntity = pShape = pPolygon ;
+                            pEntity = pShape = pPolygon;
+                            break;
                         }
                         default:
                         {
