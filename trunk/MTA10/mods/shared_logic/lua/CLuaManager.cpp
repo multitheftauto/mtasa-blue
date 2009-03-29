@@ -760,6 +760,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGarageSize", CLuaFunctionDefinitions::GetGarageSize );
     CLuaCFunctions::AddFunction ( "getGarageBoundingBox", CLuaFunctionDefinitions::GetGarageBoundingBox );
     CLuaCFunctions::AddFunction ( "isWorldSpecialPropertyEnabled", CLuaFunctionDefinitions::IsWorldSpecialPropertyEnabled );
+    CLuaCFunctions::AddFunction ( "getBlurLevel", CLuaFunctionDefinitions::GetBlurLevel );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefinitions::SetTime );

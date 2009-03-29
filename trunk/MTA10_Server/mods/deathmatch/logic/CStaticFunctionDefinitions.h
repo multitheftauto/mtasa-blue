@@ -408,8 +408,10 @@ public:
     static bool                 SetPlayerTeam                       ( CPlayer* pPlayer, CTeam* pTeam );
     static bool                 SetTeamFriendlyFire                 ( CTeam* pTeam, bool bFriendlyFire );
 
-    // Water get funcs
+    // Water funcs
     static CWater*              CreateWater                         ( CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4 );
+    static bool                 SetWaterLevel                       ( CVector* pvecPosition, float fLevel, CResource* pResource );
+    static bool                 SetWaterLevel                       ( CWater* pWater, float fLevel, CResource* pResource );
     static bool                 GetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                 SetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
 

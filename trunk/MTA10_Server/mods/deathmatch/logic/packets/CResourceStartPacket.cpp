@@ -15,35 +15,23 @@
 
 #include "StdInc.h"
 
-CResourceStartPacket::CResourceStartPacket ( const char* szResourceName,
-                                             CResource* pResource )
+CResourceStartPacket::CResourceStartPacket ( const char* szResourceName, CResource* pResource )
 {
-    m_szResourceName = new char [ strlen ( szResourceName ) + 1 ];
-    strcpy ( m_szResourceName, szResourceName );
-  
+    m_strResourceName = szResourceName;
     m_pResource = pResource;
-}
-
-
-CResourceStartPacket::~CResourceStartPacket ( void )
-{
-    if ( m_szResourceName )
-    {
-        delete [] m_szResourceName;
-    }
 }
 
 
 bool CResourceStartPacket::Write ( NetServerBitStreamInterface& BitStream ) const
 {
-    if ( m_szResourceName )
+    if ( !m_strResourceName.empty () )
     {
-        // Write the map name
-        size_t sizeResourceName = strlen ( m_szResourceName );
+        // Write the resource name
+        size_t sizeResourceName = m_strResourceName.size ();
         BitStream.Write ( static_cast < unsigned char > ( sizeResourceName ) );
         if ( sizeResourceName > 0 )
         {
-            BitStream.Write ( m_szResourceName, sizeResourceName );
+            BitStream.Write ( m_strResourceName.c_str (), sizeResourceName );
         }
 
         // Write the resource id

@@ -6054,6 +6054,53 @@ CWater* CStaticFunctionDefinitions::CreateWater ( CResource* pResource, CVector*
     return NULL;
 }
 
+bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, CResource* pResource )
+{
+    if ( !pResource )
+        return false;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pResource->GetID () );
+    BitStream.pBitStream->Write ( fLevel );
+    if ( pvecPosition )
+    {
+        if ( pvecPosition->fX < -3000.0f || pvecPosition->fX > 3000.0f ||
+             pvecPosition->fY < -3000.0f || pvecPosition->fY > 3000.0f )
+             return false;
+
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) );
+        BitStream.pBitStream->Write ( static_cast < short > ( pvecPosition->fX ) );
+        BitStream.pBitStream->Write ( static_cast < short > ( pvecPosition->fY ) );
+        BitStream.pBitStream->Write ( pvecPosition->fZ );
+    }
+    else
+    {
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
+    }
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel, CResource* pResource )
+{
+    if ( !pResource )
+        return false;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pResource->GetID () );
+    BitStream.pBitStream->Write ( fLevel );
+    if ( pWater )
+    {
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 1 ) );
+        BitStream.pBitStream->Write ( pWater->GetID () );
+    }
+    else
+    {
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
+    }
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CWater* pWater, int iVertexIndex, CVector& vecPosition )
 {

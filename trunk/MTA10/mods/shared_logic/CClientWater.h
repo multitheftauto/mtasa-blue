@@ -26,12 +26,14 @@ public:
     void                       GetPosition            ( CVector& vecPosition ) const;
     bool                       GetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       SetPosition            ( const CVector& vecPosition );
-    bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
+    bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition, void* pChangeSource = NULL );
     void                       Unlink                 ();
 
 private:
     CWaterPoly*                m_pPoly;
     CClientWaterManager*       m_pManager;
+
+    friend CClientWaterManager;
 };
 
 #endif

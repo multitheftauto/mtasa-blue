@@ -563,6 +563,7 @@ public:
     LUA_DECLARE ( GetGarageSize );
     LUA_DECLARE ( GetGarageBoundingBox );
     LUA_DECLARE ( IsWorldSpecialPropertyEnabled );
+    LUA_DECLARE ( GetBlurLevel );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );

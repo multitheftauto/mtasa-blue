@@ -15,7 +15,66 @@
 
 void CWaterRPCs::LoadFunctions ( void )
 {
+    AddHandler ( SET_WATER_LEVEL, SetWaterLevel, "SetWaterLevel" );
     AddHandler ( SET_WATER_VERTEX_POSITION, SetWaterVertexPosition, "SetWaterVertexPosition" );
+}
+
+void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usResourceID;
+    CResource* pResource;
+    float fLevel;
+    unsigned char ucWhat;
+
+    if ( bitStream.Read ( usResourceID ) && bitStream.Read ( fLevel ) && bitStream.Read ( ucWhat ) )
+    {
+        pResource = g_pClientGame->GetResourceManager ()->GetResource ( usResourceID );
+        if ( !pResource )
+            return;
+
+        switch ( ucWhat )
+        {
+            case 0:
+            {
+                // (x, y, z, level)
+                short sX, sY;
+                CVector vecPos;
+                if ( bitStream.Read ( sX ) && bitStream.Read ( sY ) && bitStream.Read ( vecPos.fZ ) )
+                {
+                    vecPos.fX = sX;
+                    vecPos.fY = sY;
+                    m_pWaterManager->SetWaterLevel ( &vecPos, fLevel, pResource );
+                }
+                break;
+            }
+            case 1:
+            {
+                // (water, level)
+                ElementID waterID;
+                if ( bitStream.Read ( waterID ) )
+                {
+                    CClientWater* pWater = m_pWaterManager->Get ( waterID );
+                    if ( pWater )
+                    {
+                        CVector vecVertexPos;
+                        for ( int i = 0; i < pWater->GetNumVertices (); i++ )
+                        {
+                            pWater->GetVertexPosition ( i, vecVertexPos );
+                            vecVertexPos.fZ = fLevel;
+                            pWater->SetVertexPosition ( i, vecVertexPos, pResource );
+                        }
+                    }
+                }
+                break;
+            }
+            case 2:
+            {
+                // (level)
+                m_pWaterManager->SetWaterLevel ( (CVector *)NULL, fLevel, pResource );
+                break;
+            }
+        }
+    }
 }
 
 void CWaterRPCs::SetWaterVertexPosition ( NetBitStreamInterface& bitStream )

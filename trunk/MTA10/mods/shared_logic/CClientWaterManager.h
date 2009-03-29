@@ -29,6 +29,12 @@ public:
     void                                            DeleteAll                   ( void );
     bool                                            Exists                      ( CClientWater* pWater );
 
+    bool                                            GetWaterLevel               ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
+    bool                                            SetWaterLevel               ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
+    bool                                            SetWaterLevel               ( CClientWater* pWater, float fLevel, void* pChangeSource = NULL );
+    float                                           GetWaveLevel                ();
+    void                                            SetWaveLevel                ( float fWaveLevel );
+
     inline std::list < CClientWater* > ::const_iterator  IterBegin                   ( void )            { return m_List.begin (); };
     inline std::list < CClientWater* > ::const_iterator  IterEnd                     ( void )            { return m_List.end (); };
 

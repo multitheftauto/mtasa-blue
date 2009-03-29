@@ -13032,6 +13032,12 @@ int CLuaFunctionDefinitions::GetGarageBoundingBox ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetBlurLevel ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetBlurLevel () );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::SetBlurLevel ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );

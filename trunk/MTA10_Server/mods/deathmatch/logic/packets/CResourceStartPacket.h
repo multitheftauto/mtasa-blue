@@ -22,7 +22,6 @@ class CResourceStartPacket : public CPacket
 public:
                             CResourceStartPacket        ( const char* szResourceName,
                                                           class CResource* pResource );
-                            ~CResourceStartPacket       ( void );
 
     inline ePacketID        GetPacketID                 ( void ) const      { return PACKET_ID_RESOURCE_START; };
     inline unsigned long    GetFlags                    ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -30,8 +29,8 @@ public:
     bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
 
 private:
-    char*                           m_szResourceName;
-    CResource*                      m_pResource;
+    std::string             m_strResourceName;
+    CResource*              m_pResource;
 };
 
 #endif
