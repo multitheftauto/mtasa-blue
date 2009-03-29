@@ -96,7 +96,7 @@ void CClientWater::SetPosition ( const CVector& vecPosition )
     g_pGame->GetWaterManager ()->RebuildIndex ();
 }
 
-bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition )
+bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition, void* pChangeSource )
 {
     if ( !m_pPoly )
         return false;
@@ -105,7 +105,7 @@ bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition )
     if ( !pVertex )
         return false;
 
-    return pVertex->SetPosition ( vecPosition );
+    return pVertex->SetPosition ( vecPosition, pChangeSource );
 }
 
 void CClientWater::Unlink ()

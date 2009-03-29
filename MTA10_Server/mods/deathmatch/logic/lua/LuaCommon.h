@@ -217,9 +217,10 @@ enum eLuaNetworkDependantFunctions
 
     TOGGLE_DEBUGGER,
 
+    SET_WATER_LEVEL,
     SET_WATER_VERTEX_POSITION,
 
-    NUM_RPC_FUNCS,
+    NUM_RPC_FUNCS
 };
 
 enum

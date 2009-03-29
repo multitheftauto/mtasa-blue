@@ -81,3 +81,28 @@ void CClientWaterManager::RemoveFromList ( CClientWater* pWater )
         if ( !m_List.empty() ) m_List.remove ( pWater );
     }
 }
+
+bool CClientWaterManager::GetWaterLevel ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown )
+{
+    return g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, pfLevel, bCheckWaves, pvecUnknown );
+}
+
+bool CClientWaterManager::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
+{
+    return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
+}
+
+bool CClientWaterManager::SetWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+{
+    return g_pGame->GetWaterManager ()->SetWaterLevel ( pWater->m_pPoly, fLevel, pChangeSource );
+}
+
+float CClientWaterManager::GetWaveLevel ()
+{
+    return g_pGame->GetWaterManager ()->GetWaveLevel ();
+}
+
+void CClientWaterManager::SetWaveLevel ( float fWaveLevel )
+{
+    g_pGame->GetWaterManager ()->SetWaveLevel ( fWaveLevel );
+}

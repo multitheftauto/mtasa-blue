@@ -19,7 +19,6 @@ class CResourceStopPacket : public CPacket
 {
 public:
                             CResourceStopPacket         ( unsigned short usID );
-                            ~CResourceStopPacket        ( void );
 
     inline ePacketID        GetPacketID                 ( void ) const      { return PACKET_ID_RESOURCE_STOP; };
     inline unsigned long    GetFlags                    ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED; };

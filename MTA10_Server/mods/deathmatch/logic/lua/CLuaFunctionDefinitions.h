@@ -363,6 +363,7 @@ public:
 
     // Water funcs
     static int      CreateWater                         ( lua_State* luaVM );
+    static int      SetWaterLevel                       ( lua_State* luaVM );
     static int      GetWaterVertexPosition              ( lua_State* luaVM );
     static int      SetWaterVertexPosition              ( lua_State* luaVM );
 

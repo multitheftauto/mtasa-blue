@@ -18,21 +18,9 @@ CResourceStopPacket::CResourceStopPacket ( unsigned short usID )
 }
 
 
-CResourceStopPacket::~CResourceStopPacket ( void )
-{
-
-}
-
-
 bool CResourceStopPacket::Write ( NetServerBitStreamInterface& BitStream ) const
 {
-    if ( m_usID )
-    {
-        // Write the resource id
-        BitStream.Write ( m_usID );
-
-        return true;
-    }
-
-    return false;
+    // Write the resource id
+    BitStream.Write ( m_usID );
+    return true;
 }
