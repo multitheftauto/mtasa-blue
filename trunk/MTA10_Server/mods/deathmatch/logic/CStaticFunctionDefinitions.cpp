@@ -6911,7 +6911,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const cha
     assert ( szPassword );
 
     CAccount* pCurrentAccount = m_pAccountManager->Get ( szName );
-    if ( pCurrentAccount == NULL )
+    if ( pCurrentAccount == NULL && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword) <= MAX_PASSWORD_LENGTH )
     {
         CAccount* pAccount = new CAccount ( m_pAccountManager, true, szName );
 		pAccount->SetPassword ( szPassword );

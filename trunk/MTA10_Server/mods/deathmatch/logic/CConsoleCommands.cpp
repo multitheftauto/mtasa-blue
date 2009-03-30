@@ -1264,7 +1264,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
         if ( szNick && szPassword )
         {
             // Long enough strings?
-            if ( strlen ( szNick ) > 0 && strlen ( szPassword ) > 0 )
+            if ( strlen ( szNick ) > 0 && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
             {
                 // Try creating the account
                 if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
