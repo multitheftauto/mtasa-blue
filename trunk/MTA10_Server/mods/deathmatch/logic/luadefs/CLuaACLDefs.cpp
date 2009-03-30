@@ -36,7 +36,7 @@ void CLuaACLDefs::LoadFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "aclGetGroup", CLuaACLDefs::aclGetGroup );
     CLuaCFunctions::AddFunction ( "aclGroupList", CLuaACLDefs::aclGroupList );
-
+    
     CLuaCFunctions::AddFunction ( "aclGroupGetName", CLuaACLDefs::aclGroupGetName );
     CLuaCFunctions::AddFunction ( "aclGroupAddACL", CLuaACLDefs::aclGroupAddACL );
     CLuaCFunctions::AddFunction ( "aclGroupListACL", CLuaACLDefs::aclGroupListACL );
@@ -45,6 +45,7 @@ void CLuaACLDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "aclGroupListObjects", CLuaACLDefs::aclGroupListObjects );
     CLuaCFunctions::AddFunction ( "aclGroupRemoveObject", CLuaACLDefs::aclGroupRemoveObject );
 
+    CLuaCFunctions::AddFunction ( "isObjectInACLGroup", CLuaACLDefs::isObjectInACLGroup );
     CLuaCFunctions::AddFunction ( "hasObjectPermissionTo", CLuaACLDefs::hasObjectPermissionTo );
 }
 
@@ -545,7 +546,6 @@ int CLuaACLDefs::aclGroupList ( lua_State* luaVM )
     return 1;
 }
 
-
 int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
 {
     // Verify the arguents  
@@ -910,5 +910,42 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
 
     // Failed
     lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
+	{
+        const char* szObject = lua_tostring ( luaVM, 1 );
+        const char* szGroup = lua_tostring ( luaVM, 2 );
+        CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
+        CAccessControlListGroupObject::EObjectType GroupObjectType;
+
+        if ( m_pACLManager->VerifyGroup ( pGroup ) )
+        {
+            if ( StringBeginsWith ( szObject, "resource." ) ) {
+                szObject += 9;
+                GroupObjectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
+            }
+            else if ( StringBeginsWith ( szObject, "user." ) )
+            {
+                szObject += 5;
+                GroupObjectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
+            }
+            else
+            {
+                // Invalid group type
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+            if ( pGroup->FindObjectMatch ( szObject, GroupObjectType ) )
+            { 
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

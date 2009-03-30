@@ -50,6 +50,7 @@ public:
     static int		aclGroupListObjects                 ( lua_State* luaVM );
     static int		aclGroupRemoveObject                ( lua_State* luaVM );
 
+    static int      isObjectInACLGroup                  ( lua_State* luaVM );
     static int      hasObjectPermissionTo               ( lua_State* luaVM );
 };
 
