@@ -915,14 +915,13 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
 
 int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
 	{
         const char* szObject = lua_tostring ( luaVM, 1 );
-        const char* szGroup = lua_tostring ( luaVM, 2 );
-        CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
+        CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 2 );
         CAccessControlListGroupObject::EObjectType GroupObjectType;
 
-        if ( m_pACLManager->VerifyGroup ( pGroup ) )
+        if ( pGroup && m_pACLManager->VerifyGroup ( pGroup ) )
         {
             if ( StringBeginsWith ( szObject, "resource." ) ) {
                 szObject += 9;
