@@ -141,7 +141,7 @@ public:
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );
     LUA_DECLARE ( GetRadioChannel );
-
+	LUA_DECLARE ( GetRadioChannelName );
     // Player get functions
     LUA_DECLARE ( GetLocalPlayer );
     LUA_DECLARE ( GetPlayerName );

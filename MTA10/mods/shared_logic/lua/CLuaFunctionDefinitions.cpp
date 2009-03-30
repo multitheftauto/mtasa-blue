@@ -3554,6 +3554,23 @@ int CLuaFunctionDefinitions::GetRadioChannel ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetRadioChannelName ( lua_State* luaVM )
+{
+    static const char* szRadioStations[] = { "Radio off", "Playback FM", "K-Rose", "K-DST",
+        "Bounce FM", "SF-UR", "Radio Los Santos", "Radio X", "CSR 103.9", "K-Jah West",
+        "Master Sounds 98.3", "WCTR", "User Track Player" };
+
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        int iChannel = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
+        if ( iChannel >= 0 && iChannel < sizeof(szRadioStations)/sizeof(char *) ) {
+            lua_pushstring ( luaVM, szRadioStations [ iChannel ] );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::GetLocalPlayer ( lua_State* luaVM )
 {
