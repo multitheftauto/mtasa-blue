@@ -217,8 +217,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
-    HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
-    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
+//    HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
+//    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
