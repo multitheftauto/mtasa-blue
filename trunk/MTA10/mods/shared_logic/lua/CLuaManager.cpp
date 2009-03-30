@@ -340,6 +340,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Radio funcs
     CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefinitions::SetRadioChannel );
     CLuaCFunctions::AddFunction ( "getRadioChannel", CLuaFunctionDefinitions::GetRadioChannel );
+    CLuaCFunctions::AddFunction ( "getRadioChannelName", CLuaFunctionDefinitions::GetRadioChannelName );
 
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getLocalPlayer", CLuaFunctionDefinitions::GetLocalPlayer );
