@@ -89,12 +89,12 @@ Var CreateSMShortcuts
 ; Language files
 !insertmacro MUI_LANGUAGE							"English"
 LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
-LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA DM modification, allowing you to play online."
-LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA DM, allowing you to create and edit maps."
+LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing you to play online."
+LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
 LangString DESC_SectionGroupMods ${LANG_ENGLISH}	"Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
-LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA DM modification for the server."
+LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
 LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
 LangString DESC_Section8 ${LANG_ENGLISH}			"This is a preview of the new MTA editor. It is incomplete and partially non-functional."
@@ -829,7 +829,7 @@ Section Uninstall
 				Delete "$INSTDIR\server\libcurl.dll"
 			!endif
 
-			; server DM files
+			; server files
 			Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
