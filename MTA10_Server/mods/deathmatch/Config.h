@@ -48,6 +48,10 @@ public:
 #define MIN_NICK_LENGTH 1
 #define MAX_NICK_LENGTH 22
 
+// Min and max number of characters in passwords
+#define MIN_PASSWORD_LENGTH 0
+#define MAX_PASSWORD_LENGTH 30
+
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
 #define MAX_CHAT_LENGTH 96

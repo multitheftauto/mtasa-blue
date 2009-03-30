@@ -577,7 +577,13 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
             pEchoClient->SendEcho ( "login: Account in use" );
         return false;
     }
-
+    if ( strlen ( szPassword ) > MAX_PASSWORD_LENGTH )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "login: Bad password" );
+        CLogger::LogPrintf ( "LOGIN: %s tried to log in with a password greater than the specified limit.\n", szNick );
+        return false;
+    }
     // Compare the passwords
     if ( !pAccount->IsPassword ( szPassword ) )
     {
