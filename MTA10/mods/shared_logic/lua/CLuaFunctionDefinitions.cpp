@@ -10937,21 +10937,29 @@ int CLuaFunctionDefinitions::GUIGridListGetSelectedItems ( lua_State* luaVM )
             CGUIGridList* pList = static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () );
             CGUIListItem* pItem = NULL;
 
-            CLuaArguments list;
-            for ( int i = 1; i < pList->GetSelectedCount(); i++ )
+            lua_newtable ( luaVM );
+
+            for ( int i = 1; i <= pList->GetSelectedCount(); i++ )
             {
                 pItem = pList->GetNextSelectedItem ( pItem );
                 if ( !pItem ) break;
 
-                CLuaArguments item;
-                item.PushString ( "column" );
-                item.PushNumber ( pList->GetItemColumnIndex ( pItem ) );
-                item.PushString ( "row" );
-                item.PushNumber ( pList->GetItemRowIndex ( pItem ) );
-                list.PushTable ( &item );
-            }
+                lua_pushnumber ( luaVM, i );
+                lua_newtable ( luaVM );
 
-            list.PushAsTable ( luaVM );
+                // column
+                lua_pushstring ( luaVM, "column" );
+                lua_pushnumber ( luaVM, pList->GetItemColumnIndex ( pItem ) );
+                lua_settable ( luaVM, -3 );
+
+                // row
+                lua_pushstring ( luaVM, "row" );
+                lua_pushnumber ( luaVM, pList->GetItemRowIndex ( pItem ) );
+                lua_settable ( luaVM, -3 );
+
+                // push to main table
+                lua_settable ( luaVM, -3 );
+            }
 
 		    return 1;
         }
