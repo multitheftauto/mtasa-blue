@@ -99,3 +99,4 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CSFX.h"
+#include "logic/CPortScan.h"
