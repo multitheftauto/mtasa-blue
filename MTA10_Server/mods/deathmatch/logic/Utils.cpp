@@ -348,6 +348,9 @@ unsigned int HashString ( const char* szString )
 
 void InitializeTime ( void )
 {
+    // First call to GetServerUpSeconds() sets the base time
+    GetServerUpSeconds();
+
     #ifdef WIN32
         LARGE_INTEGER lFrequency;
         if ( QueryPerformanceFrequency ( &lFrequency ) )
@@ -366,7 +369,8 @@ void InitializeTime ( void )
 }
 
 
-double GetGameSeconds()
+// Retrieve the number of seconds since server launch
+double GetServerUpSeconds()
 {
     static double dCount = 0;
     static DWORD dwWas = GetTickCount ();

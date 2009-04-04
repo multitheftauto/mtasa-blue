@@ -5075,7 +5075,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
-    dCount = CClientTime::GetGameSeconds () * 1000.0;
+    dCount = CClientTime::GetClientConnectSeconds () * 1000.0;
     return true;
 }
 

@@ -22,12 +22,12 @@ class CClientTime
     friend class CClientManager;
 
 public:
-    static unsigned long    GetTime             ( void );
-	static double			GetTimeNano			( void );
-	static double			GetGameSeconds		( void );
+    static unsigned long    GetTime                 ( void );
+	static double			GetTimeNano			    ( void );
+	static double			GetClientConnectSeconds ( void );
 
 private:
-    static bool             InitializeTime      ( void );
+    static bool             InitializeTime          ( void );
 
     static bool             m_bUsePerformanceCounter;
     static LONGLONG         m_lTimeCounts;
