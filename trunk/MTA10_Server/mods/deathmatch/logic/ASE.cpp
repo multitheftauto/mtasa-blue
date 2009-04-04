@@ -3,10 +3,11 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/ASE.cpp
-*  PURPOSE:     All-Seeing Eye server query protocol handler class
+*  PURPOSE:     Game-Monitor server query protocol handler class
 *  DEVELOPERS:  Derek Abdine <>
 *               Christian Myhre Lundheim <>
 *               Jax <>
+*               Artem Karimov <skybon@live.ru>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -49,11 +50,11 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, int iPort, 
 
     if ( ASEQuery_initialize ( iPort, 1, szServerIP ) )
     {
-        CLogger::LogPrintf ( "All Seeing Eye listing enabled. Port %d (UDP) must be accessible\n           from the internet\n", iPort+123 );
+        CLogger::LogPrintf ( "Game-Monitor listing enabled. Port %d (UDP) must be accessible\n           from the internet\n", iPort+123 );
     }
     else
     {
-        CLogger::ErrorPrintf ( "ERROR: All Seeing Eye registration failed\n" );
+        CLogger::ErrorPrintf ( "ERROR: Game-Monitor registration failed\n" );
     }
 }
 
