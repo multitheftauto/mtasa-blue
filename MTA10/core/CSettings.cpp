@@ -1513,3 +1513,4 @@ void CSettings::AddKeyBindSection ( char* szSectionName )
 {
     m_pKeyBindSections.push_back ( new SKeyBindSection ( szSectionName ) ); 
 }
+
