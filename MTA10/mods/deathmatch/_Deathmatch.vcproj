@@ -40,7 +40,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="FALSE"
 				IgnoreImportLibrary="FALSE"
-				AdditionalDependencies="libv2.lib lua5.1sd.lib irrKlang.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd.lib"
+				AdditionalDependencies="libv2.lib lua5.1sd.lib irrKlang.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd.lib Iphlpapi.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
@@ -349,6 +349,9 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.cpp">
+				</File>
+				<File
+					RelativePath=".\logic\CPortScan.cpp">
 				</File>
 				<File
 					RelativePath=".\logic\CRadarMap.cpp">
@@ -913,6 +916,9 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.h">
+				</File>
+				<File
+					RelativePath=".\logic\CPortScan.h">
 				</File>
 				<File
 					RelativePath=".\logic\CRadarMap.h">
