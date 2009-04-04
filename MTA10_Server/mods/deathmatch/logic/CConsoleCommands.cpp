@@ -1730,9 +1730,11 @@ bool CConsoleCommands::Sudo ( CConsole* pConsole, const char* szArguments, CClie
 
     return false;
 }
+/* idiot.
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+*/
 
 bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {

@@ -45,3 +45,10 @@ typedef unsigned long ElementID;
 // LAN packet broadcasting string
 #define SERVER_LIST_CLIENT_BROADCAST_STR    "MTA-CLIENT"
 #define SERVER_LIST_SERVER_BROADCAST_STR    "MTA-SERVER"
+
+// Windows Specific stuff
+#ifdef WIN32
+#define _DECLSPEC_EX extern "C" _declspec(dllexport) 
+#else
+#define _DECLSPEC_EX extern "C" 
+#endif

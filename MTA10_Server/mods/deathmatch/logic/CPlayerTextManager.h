@@ -15,7 +15,7 @@ class CPlayerTextManager;
 #ifndef __CPLAYERTEXTMANAGER_H
 #define __CPLAYERTEXTMANAGER_H
 
-#include <queue>
+//#include <queue>
 #include <list>
 #include "CTextItem.h"
 #include "CPlayer.h"

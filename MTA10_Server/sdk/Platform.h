@@ -96,7 +96,7 @@ extern "C" bool g_bSilent;
 
 // This function should be used instead of mkdir to preserve multiplatform
 // compatibility
-int mymkdir ( const char* dirname );
+extern int mymkdir ( const char* dirname );
 
 // s_systemtypes stuff
 // Setup the Operating System

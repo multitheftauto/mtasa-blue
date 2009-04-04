@@ -80,8 +80,8 @@ bool CAccount::IsPassword ( const char* szPassword )
         }
         HashPassword ( szPassword, strPassword );
         // Lower case, we dont need a case sensetive comparsion on hashes
-        std::transform ( strPassword.begin(), strPassword.end(), strPassword.begin(), tolower );
-        std::transform ( m_strPassword.begin(), m_strPassword.end(), m_strPassword.begin(), tolower );
+        std::transform ( strPassword.begin(), strPassword.end(), strPassword.begin(), ::tolower );
+        std::transform ( m_strPassword.begin(), m_strPassword.end(), m_strPassword.begin(), ::tolower );
         return m_strPassword == strPassword;
     }
 

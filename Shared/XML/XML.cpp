@@ -14,15 +14,13 @@
 
 CXMLImpl* pXMLInterface = NULL;
 
-extern "C" _declspec(dllexport)
-CXML* InitXMLInterface()
+_DECLSPEC_EX CXML* InitXMLInterface()
 {
     pXMLInterface = new CXMLImpl;
 	return pXMLInterface;
 }
 
-extern "C" _declspec(dllexport)
-void ReleaseXMLInterface()
+_DECLSPEC_EX void ReleaseXMLInterface()
 {
 	if ( pXMLInterface )
 	{

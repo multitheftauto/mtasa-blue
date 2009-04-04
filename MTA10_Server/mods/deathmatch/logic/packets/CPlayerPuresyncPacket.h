@@ -17,7 +17,7 @@
 #define __CPLAYERPURESYNCPACKET_H
 
 #include "CPacket.h"
-#include "..\CPlayer.h"
+#include "CPlayer.h"
 
 class CPlayerPuresyncPacket : public CPacket
 {

@@ -197,7 +197,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
                     else
                     {
                         cell.pVal = new unsigned char [ cell.nLength ];
-                        memcpy ( cell.pVal, sqlite3_column_blob, cell.nLength );
+                        memcpy ( cell.pVal, (const void *)sqlite3_column_blob, cell.nLength );
                     }
                     break;
                 default:

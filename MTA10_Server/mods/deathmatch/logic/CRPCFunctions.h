@@ -26,7 +26,7 @@ class CGame;
 class CRPCFunctions
 {
 protected:
-    enum eRPCFunctions;
+//    enum eRPCFunctions;
 
 private:
     typedef void (*pfnRPCHandler) ( NetServerBitStreamInterface& bitStream );

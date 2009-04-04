@@ -14,7 +14,11 @@
 #define CRESOURCECHECKER_H
 
 #include "../utils/zip/unzip.h"
+#ifdef WIN32
 #include "../utils/zip/iowin32.h"
+#else
+#include "../utils/zip/ioapi.h"
+#endif
 #include "../utils/zip/zip.h"
 
 
