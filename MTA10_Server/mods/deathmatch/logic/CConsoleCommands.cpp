@@ -194,7 +194,7 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
                     }
                     else
                     {
-                        _snprintf ( szResponse, 256, "start: Failed to start resource '%s'", szArguments );
+                        _snprintf ( szResponse, 256, "start: Resource '%s' start was requested", szArguments );
                     }
                 }
                 else

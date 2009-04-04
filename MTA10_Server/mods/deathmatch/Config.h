@@ -41,7 +41,7 @@ public:
 // Version stuff
 #define MTA_DM_VERSION 0x0100
 #define MTA_DM_VERSIONSTRING "1.0"
-#define MTA_DM_FULL_STRING "MTA Deathmatch Server"
+#define MTA_DM_FULL_STRING "MTA:SA Server"
 #define MTA_DM_NETCODE_VERSION 0x012A
 
 // Min and max number of characters in player nicknames (this must match the client's)
