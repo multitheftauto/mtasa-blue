@@ -42,7 +42,7 @@ public:
 
     bool                        IsVisibleToPlayer               ( class CPlayer& Player );
 
-    list < CPlayer * >          GetPlayersList                  ( void )                    { return m_Players; }
+    list < CPlayer * >          &GetPlayersList                  ( void )                    { return m_Players; }
 
 protected:
     virtual void                CreateEntity                    ( CPlayer* pPlayer );

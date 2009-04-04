@@ -1,11 +1,14 @@
+#ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
 #include <windows.h>
+#include <winsock.h>
+#include <mmsystem.h>
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include <mmsystem.h>
-#include <winsock.h>
 #include <pthread.h>
 
 #include <list>
@@ -14,8 +17,12 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <sstream>
+
+#include <google/sparse_hash_map>
 
 // SDK includes
+#include "Platform.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>

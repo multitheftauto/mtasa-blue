@@ -738,7 +738,11 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 {
 	// open source and destination file
 	zlib_filefunc_def ffunc;
+	#ifdef WIN32
 	fill_win32_filefunc(&ffunc);
+	#else
+	fill_fopen_filefunc(&ffunc);
+	#endif
 
 	zipFile szip = unzOpen2(strOrigZip.c_str(), &ffunc);
 	if (szip==NULL) { /*free(tmp_name);*/ return 0; }
@@ -769,7 +773,9 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 		char dos_fn[MAX_PATH];
 		if (unzGetCurrentFileInfo(szip, &unzfi, dos_fn, MAX_PATH, NULL, 0, NULL, 0) != UNZ_OK) break;
 		char fn[MAX_PATH];
+		#ifdef WIN32
 		OemToChar(dos_fn, fn);
+		#endif
 
 		// See if file should be replaced
         string fullPathReplacement;

@@ -15,9 +15,9 @@
 #ifndef __PACKETS_CVEHICLEPURESYNCPACKET_H
 #define __PACKETS_CVEHICLEPURESYNCPACKET_H
 
-#include "../CCommon.h"
+#include "CCommon.h"
 #include "CPacket.h"
-#include "..\CPlayer.h"
+#include "CPlayer.h"
 
 class CVehicle;
 

@@ -39,15 +39,15 @@ public:
 
 	void                    DoPulse             ( void );
 
-    inline static ASE*      GetInstance         ( void )                { return _instance; }
+    static ASE*      GetInstance         ( void )                { return _instance; }
     
-    inline char*            GetGameType         ( void )                { return m_szGameType; }
-    inline void             SetGameType         ( const char * szGameType );
-    inline char*            GetMapName          ( void )                { return m_szMapName; }
-    inline void             SetMapName          ( const char * szMapName );
+    char*            GetGameType         ( void )                { return m_szGameType; }
+    void             SetGameType         ( const char * szGameType );
+    char*            GetMapName          ( void )                { return m_szMapName; }
+    void             SetMapName          ( const char * szMapName );
 
-    inline CMainConfig*     GetMainConfig       ( void )                { return m_pMainConfig; };
-    inline CPlayerManager*  GetPlayerManager    ( void )                { return m_pPlayerManager; };
+    CMainConfig*     GetMainConfig       ( void )                { return m_pMainConfig; };
+    CPlayerManager*  GetPlayerManager    ( void )                { return m_pPlayerManager; };
 
     char*                   GetRuleValue        ( char* szKey );
     void                    SetRuleValue        ( char* szKey, char* szValue );

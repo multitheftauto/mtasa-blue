@@ -19,8 +19,8 @@
 #include <vector>
 #include <algorithm>
 #include <CVector.h>
-#include <CGenericManager.h>
-#include <CGeneric.h>
+#include <common/CGenericManager.h>
+#include <common/CGeneric.h>
 #include <core/CServerInterface.h>
 
 // Globals

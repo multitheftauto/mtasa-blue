@@ -6,6 +6,8 @@
 #ifndef _CRCGENERATOR_H
 #define _CRCGENERATOR_H
 
+#include <cstring>
+
 class CRCGenerator
 {
 public:

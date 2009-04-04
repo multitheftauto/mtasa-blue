@@ -77,7 +77,7 @@ bool CCommandFile::Parse ( char* szLine )
         } 
 
         // Is it @echo?
-        if ( strnicmp ( szLine, "@echo", 5 ) == 0 )
+        if ( strncmp ( szLine, "@echo", 5 ) == 0 )
         {
             // Skip whitespace again from the end of @echo
             const char* szEchoMode = SkipWhitespace ( szLine + 5 );

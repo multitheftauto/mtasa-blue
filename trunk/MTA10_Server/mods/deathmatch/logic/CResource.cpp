@@ -22,6 +22,9 @@
 //#define RESOURCE_DEBUG_MESSAGES // show info about where the actual files are coming from
 
 #include "StdInc.h"
+#ifndef WIN32
+#include <utime.h>
+#endif
 
 #ifndef MAX_PATH
 #define MAX_PATH 260

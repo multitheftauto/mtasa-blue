@@ -12,8 +12,8 @@
 #ifndef __CSERVERINTERFACE_H
 #define __CSERVERINTERFACE_H
 
-#include "../net/cnetserver.h"
-#include "../net/CLanBroadcastInterface.h"
+#include "net/CNetServer.h"
+#include "net/CLanBroadcastInterface.h"
 #include "CTCP.h"
 #include "CModManager.h"
 #include <xml/CXML.h>

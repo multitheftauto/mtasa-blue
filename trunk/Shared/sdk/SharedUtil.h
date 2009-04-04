@@ -37,6 +37,7 @@ namespace SharedUtil
     //
     static SString GetMTASABaseDir()
     {
+	#ifdef WIN32
         static TCHAR szInstallRoot[MAX_PATH]=TEXT("");
         if( !szInstallRoot[0] )
         {
@@ -59,6 +60,7 @@ namespace SharedUtil
             }
         }
         return szInstallRoot;
+	#endif
     }
 
     //

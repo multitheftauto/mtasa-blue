@@ -12,7 +12,10 @@
 #ifndef __CVector_H
 #define __CVector_H
 
+#ifdef WIN32
 #include <windows.h>
+#endif
+
 #include <math.h>
 
 /**

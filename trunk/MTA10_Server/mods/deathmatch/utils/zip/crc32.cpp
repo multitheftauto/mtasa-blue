@@ -5,6 +5,7 @@
 
 #include "crc32.h"
 #include <stdio.h>
+#include <cstring>
 #include "zlib.h"
 
 unsigned long CRCGenerator::GetCRCFromBuffer ( const char* pBuf, size_t sizeBuffer )

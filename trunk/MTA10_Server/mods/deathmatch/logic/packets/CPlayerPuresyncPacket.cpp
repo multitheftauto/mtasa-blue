@@ -40,7 +40,7 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
         pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
         unsigned short usFlags;
-        BitStream.Read ( (unsigned short) usFlags );
+        BitStream.Read ( (unsigned short &) usFlags );
         pSourcePlayer->SetInWater ( ( usFlags & 0x01 ) ? true:false );
         pSourcePlayer->SetOnGround ( ( usFlags & 0x02 ) ? true:false );
         pSourcePlayer->SetHasJetPack ( ( usFlags & 0x04 ) ? true:false );

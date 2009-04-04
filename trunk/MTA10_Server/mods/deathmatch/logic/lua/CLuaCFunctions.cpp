@@ -47,8 +47,8 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName, lua_CFunction f
 {
     // Grab a function of the given name and type
     unsigned long ulBucket = GET_LUACFUNCTION_ADDR(f) & FUNCTIONVECTOR_BUCKETMASK;
-    std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions[ ulBucket ].begin();
-    std::vector < CLuaCFunction* > ::const_iterator & iterEnd = m_sFunctions[ ulBucket ].end();
+    std::vector < CLuaCFunction* > ::iterator iter = m_sFunctions[ ulBucket ].begin();
+    std::vector < CLuaCFunction* > ::iterator iterEnd = m_sFunctions[ ulBucket ].end();
     for ( ; iter != iterEnd; iter++ )
     {
         if ( (*iter)->GetFunctionAddress () == f &&
@@ -67,7 +67,7 @@ bool CLuaCFunctions::GetFunctionName ( lua_CFunction f, bool& bRestricted, std::
     // Return the function name of the given C address
     unsigned long ulBucket = GET_LUACFUNCTION_ADDR(f) & FUNCTIONVECTOR_BUCKETMASK;
     std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions[ ulBucket ].begin();
-    std::vector < CLuaCFunction* > ::const_iterator & iterEnd = m_sFunctions[ ulBucket ].end();
+    std::vector < CLuaCFunction* > ::const_iterator iterEnd = m_sFunctions[ ulBucket ].end();
 
     for ( ; iter != iterEnd; iter++ )
     {
@@ -90,7 +90,7 @@ bool CLuaCFunctions::IsRestricted ( const char* szName )
     for ( unsigned long i = 0 ; i < FUNCTIONVECTOR_BUCKETS ; i++ )
     {
         std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions[i].begin ();
-        std::vector < CLuaCFunction* > ::const_iterator & iterEnd = m_sFunctions[i].end ();
+        std::vector < CLuaCFunction* > ::const_iterator iterEnd = m_sFunctions[i].end ();
         for ( ; iter != iterEnd; iter++ )
         {
             if ( strcmp ( (*iter)->GetFunctionName ().c_str (), szName ) == 0 )
@@ -111,7 +111,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
     for ( unsigned long i = 0 ; i < FUNCTIONVECTOR_BUCKETS ; i++ )
     {
         std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions[i].begin ();
-        std::vector < CLuaCFunction* > ::const_iterator & iterEnd = m_sFunctions[i].end ();
+        std::vector < CLuaCFunction* > ::const_iterator iterEnd = m_sFunctions[i].end ();
         for ( ; iter != iterEnd; iter++ )
         {
             lua_register ( luaVM, (*iter)->GetFunctionName ().c_str (), (*iter)->GetFunctionAddress () );
