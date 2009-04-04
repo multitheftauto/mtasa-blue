@@ -584,6 +584,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 {
     if ( m_bLoaded && !m_bActive )
     {
+        CLuaArguments PreStartArguments;
+        PreStartArguments.PushResource ( this );
+        if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onResourcePreStart", PreStartArguments ) )
+        {
+			// Start cancelled by another resource
+			return false;
+        }
+
 		m_bStarting = true;
 
 		// Check the included resources are linked

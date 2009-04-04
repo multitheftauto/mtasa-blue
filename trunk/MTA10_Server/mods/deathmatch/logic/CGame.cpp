@@ -1060,6 +1060,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 void CGame::AddBuiltInEvents ( void )
 {
 	// Resource events
+	m_Events.AddEvent ( "onResourcePreStart", "resource", NULL, false );
 	m_Events.AddEvent ( "onResourceStart", "resource", NULL, false );
 	m_Events.AddEvent ( "onResourceStop", "resource", NULL, false );
 
