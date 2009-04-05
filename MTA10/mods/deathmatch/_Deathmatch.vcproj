@@ -351,9 +351,6 @@
 					RelativePath=".\logic\CPedSync.cpp">
 				</File>
 				<File
-					RelativePath=".\logic\CPortScan.cpp">
-				</File>
-				<File
 					RelativePath=".\logic\CRadarMap.cpp">
 				</File>
 				<File
@@ -916,9 +913,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.h">
-				</File>
-				<File
-					RelativePath=".\logic\CPortScan.h">
 				</File>
 				<File
 					RelativePath=".\logic\CRadarMap.h">
