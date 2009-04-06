@@ -36,6 +36,9 @@ CLocalGUI::CLocalGUI ( void )
 
 	m_bVisibleWindows = false;
 	m_iVisibleWindows = 0;
+
+    m_ModMouseClickHandler = NULL;
+    m_ModMouseDoubleClickHandler = NULL;
 }
 
 
@@ -381,15 +384,21 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
         if ( bVisible )
         {
-            m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
-            m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
+            if ( m_ModMouseClickHandler == NULL )
+                m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
+            if ( m_ModMouseDoubleClickHandler == NULL )
+                m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
             pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
             pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
         }
         else
         {
-            pGUI->SetMouseClickHandler ( m_ModMouseClickHandler );
-            pGUI->SetMouseDoubleClickHandler ( m_ModMouseDoubleClickHandler );
+            if ( m_ModMouseClickHandler )
+                pGUI->SetMouseClickHandler ( m_ModMouseClickHandler );
+            if ( m_ModMouseDoubleClickHandler )
+                pGUI->SetMouseDoubleClickHandler ( m_ModMouseDoubleClickHandler );
+            m_ModMouseClickHandler = NULL;
+            m_ModMouseDoubleClickHandler = NULL;
         }
     }
     else
