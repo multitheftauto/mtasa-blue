@@ -97,6 +97,7 @@ void CClientStreamer::CreateSectors ( list < CClientStreamSectorRow * > * pList,
             fX += vecSize.fX;
         }
         pPrevious = NULL;
+        pCurrent = NULL;
         pPreviousRow = pCurrentRow;
         pPreviousRowSector = pPreviousRow->Front ();
         fX = vecBottomLeft.fX;
