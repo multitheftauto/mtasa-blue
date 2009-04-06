@@ -164,13 +164,13 @@ public:
     void                             Reset             ();
 
 private:
-    std::vector < CWaterVertexSA >   m_Vertices;
-    std::vector < CWaterQuadSA >     m_Quads;
-    std::vector < CWaterTriangleSA > m_Triangles;
-    std::vector < CWaterZoneSA >     m_Zones;
+    CWaterVertexSA                   m_Vertices [NUM_NewWaterVertices];
+    CWaterQuadSA                     m_Quads    [NUM_NewWaterQuads];
+    CWaterTriangleSA                 m_Triangles[NUM_NewWaterTriangles];
+    CWaterZoneSA                     m_Zones    [NUM_WaterZones];
 
-    CWaterVertexSAInterface          m_VertexPool[NUM_NewWaterVertices];
-    CWaterQuadSAInterface            m_QuadPool[NUM_NewWaterQuads];
+    CWaterVertexSAInterface          m_VertexPool  [NUM_NewWaterVertices];
+    CWaterQuadSAInterface            m_QuadPool    [NUM_NewWaterQuads];
     CWaterTriangleSAInterface        m_TrianglePool[NUM_NewWaterTriangles];
     CWaterPolyEntrySAInterface       m_ZonePolyPool[NUM_NewWaterZonePolys];
 

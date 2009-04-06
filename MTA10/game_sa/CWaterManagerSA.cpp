@@ -325,14 +325,22 @@ void CWaterChangeVertexMove::Undo ( void* pChangedObject )
 // Manager
 
 CWaterManagerSA::CWaterManagerSA ()
-    : m_Vertices  ( NUM_DefWaterVertices ),
-      m_Quads     ( NUM_DefWaterQuads ),
-      m_Triangles ( NUM_DefWaterTriangles ),
-      m_Zones     ( NUM_WaterZones )
 {
     g_pWaterManager = this;
     RelocatePools ();
     InstallHooks ();
+
+    for ( DWORD i = 0; i < NUM_WaterZones; i++ )
+        m_Zones [ i ].SetInterface ( &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ i ] );
+
+    for ( DWORD i = 0; i < NUM_NewWaterVertices; i++ )
+        m_Vertices [ i ].SetInterface ( &m_VertexPool [ i ] );
+
+    for ( DWORD i = 0; i < NUM_NewWaterQuads; i++ )
+        m_Quads [ i ].SetInterface ( &m_QuadPool [ i ] );
+
+    for ( DWORD i = 0; i < NUM_NewWaterTriangles; i++ )
+        m_Triangles [ i ].SetInterface ( &m_TrianglePool [ i ] );
 }
 
 CWaterManagerSA::~CWaterManagerSA ()
@@ -482,11 +490,6 @@ void CWaterManagerSA::GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3
 CWaterVertex* CWaterManagerSA::CreateVertex ( CVector& vecPosition )
 {
     WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.2f, 0.1f, 0 );
-    if ( wID + 1 > static_cast < WORD > ( m_Vertices.size () ) )
-    {
-        m_Vertices.resize ( wID + 1 );
-        m_Vertices [ wID ].SetInterface ( &m_VertexPool [ wID ] );
-    }
     return &m_Vertices [ wID ];
 }
 
@@ -512,6 +515,9 @@ CWaterPoly* CWaterManagerSA::GetPolyAtPoint ( CVector& vecPosition )
 
 CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow )
 {
+    if ( *(DWORD *)VAR_NumWaterQuads >= NUM_NewWaterQuads )
+        return NULL;
+
     if ( vecTL.fX >= vecTR.fX || vecBL.fX >= vecBR.fX ||
          vecTL.fY <= vecBL.fY || vecTR.fY <= vecBR.fY ||
          vecTL.fX < -3000.0f || vecTL.fX > 3000.0f || vecTL.fY < -3000.0f || vecTL.fY > 3000.0f ||
@@ -552,16 +558,15 @@ CWaterPoly* CWaterManagerSA::CreateQuad ( CVector& vecBL, CVector& vecBR, CVecto
         (*it)->AddPoly ( WATER_POLY_QUAD, wID );
 
     (*(DWORD *)VAR_NumWaterQuads)++;
-    if ( g_pWaterManager->m_Quads.size () < *(DWORD *)VAR_NumWaterQuads )
-        g_pWaterManager->m_Quads.resize ( *(DWORD *)VAR_NumWaterQuads );
     CWaterQuadSA* pPoly = &g_pWaterManager->m_Quads [ wID ];
-    pPoly->SetInterface ( pInterface );
-
     return pPoly;
 }
 
 CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow )
 {
+    if ( *(DWORD *)VAR_NumWaterVertices >= NUM_NewWaterVertices )
+        return NULL;
+
     if ( vec1.fX >= vec2.fX || vec1.fY == vec3.fY || vec2.fY == vec3.fY ||
          (vec1.fY < vec3.fY) != (vec2.fY < vec3.fY) ||
          vec1.fX < -3000.0f || vec1.fX > 3000.0f || vec1.fY < -3000.0f || vec1.fY > 3000.0f ||
@@ -599,11 +604,7 @@ CWaterPoly* CWaterManagerSA::CreateTriangle ( CVector& vec1, CVector& vec2, CVec
         (*it)->AddPoly ( WATER_POLY_TRIANGLE, wID );
 
     (*(DWORD *)VAR_NumWaterTriangles)++;
-    if ( g_pWaterManager->m_Triangles.size () < *(DWORD *)VAR_NumWaterTriangles )
-        g_pWaterManager->m_Triangles.resize ( *(DWORD *)VAR_NumWaterTriangles );
     CWaterTriangleSA* pPoly = &g_pWaterManager->m_Triangles [ wID ];
-    pPoly->SetInterface ( pInterface );
-
     return pPoly;
 }
 
@@ -786,22 +787,6 @@ void CWaterManagerSA::Reset ()
     memset ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
 
     ( (ReadWaterConfiguration_t) FUNC_ReadWaterConfiguration )();
-
-    m_Zones.resize ( NUM_WaterZones );
-    for ( DWORD i = 0; i < NUM_WaterZones; i++ )
-        m_Zones [ i ].SetInterface ( &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ i ] );
-
-    m_Vertices.resize ( NUM_DefWaterVertices );
-    for ( DWORD i = 0; i < NUM_DefWaterVertices; i++ )
-        m_Vertices [ i ].SetInterface ( &m_VertexPool [ i ] );
-
-    m_Quads.resize ( NUM_DefWaterQuads );
-    for ( DWORD i = 0; i < NUM_DefWaterQuads; i++ )
-        m_Quads [ i ].SetInterface ( &m_QuadPool [ i ] );
-
-    m_Triangles.resize ( NUM_DefWaterTriangles );
-    for ( DWORD i = 0; i < NUM_DefWaterTriangles; i++ )
-        m_Triangles [ i ].SetInterface ( &m_TrianglePool [ i ] );
 
     SetWaveLevel ( DEFAULT_WAVE_LEVEL );
 }
