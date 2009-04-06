@@ -636,6 +636,11 @@ bool CMainMenu::OnAboutButtonClick ( CGUIElement* pElement )
 	if ( m_bIsIngame || m_bStaticBackground ) {
 		m_Credits.SetVisible ( true );
 	} else {
+        if ( CModManager::GetSingleton ().IsLoaded () )
+        {
+            CModManager::GetSingleton ().RequestUnload ();    // Hide host game menu
+            return false;
+        }
 		Hide ();
 		m_bFadeToCredits = true;
 		SetVisible ( false );
