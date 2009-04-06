@@ -870,7 +870,7 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
 	}
 }
 
-void CVehicleSA::SetColor ( char color1, char color2, char color3, char color4 )
+void CVehicleSA::SetColor ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 )
 {
 	((CVehicleSAInterface *)(this->GetInterface()))->m_colour1 = color1;
 	((CVehicleSAInterface *)(this->GetInterface()))->m_colour2 = color2;
@@ -878,11 +878,11 @@ void CVehicleSA::SetColor ( char color1, char color2, char color3, char color4 )
 	((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 = color4;
 }
 
-void CVehicleSA::GetColor ( char * color1, char * color2, char * color3, char * color4 )
+void CVehicleSA::GetColor ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 )
 {
 	*color1 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour1;
 	*color2 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2;
-	*color3= ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3;
+	*color3 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3;
 	*color4 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour4;
 }
 
@@ -1543,4 +1543,19 @@ void CVehicleSA::SetBikeWheelStatus ( BYTE bWheel, BYTE bStatus )
 {
     if ( bWheel == 0 ) * ( BYTE * ) ( (DWORD)this->GetInterface() + 0x65C ) = bStatus;
     else if ( bWheel == 1 ) * ( BYTE * ) ( (DWORD)this->GetInterface() + 0x65D ) = bStatus;
+}
+
+void CVehicleSA::SetTaxiLight ( bool bLightOn )
+{
+	DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");
+    DWORD dwThis = (DWORD) GetInterface();
+    DWORD dwState = (DWORD) bLightOn;
+    DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
+
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwState
+        call    dwFunc
+    }
 }

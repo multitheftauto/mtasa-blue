@@ -340,7 +340,7 @@ public:
 	CVehicleFlags m_nVehicleFlags; // +1064?
 	unsigned int m_TimeOfCreation; // GetTimeInMilliseconds when this vehicle was created.
 
-	unsigned char m_colour1, m_colour2, m_colour3, m_colour4; // red/gren/blue/alpha?
+	unsigned char m_colour1, m_colour2, m_colour3, m_colour4;
 	char m_comp1, m_comp2;
 	short m_upgrades[MAX_UPGRADES_ATTACHED]; // 1082
 	float m_wheelScale;//1112
@@ -498,8 +498,8 @@ public:
 
 	void                        PlaceBikeOnRoadProperly         ();
 	void                        PlaceAutomobileOnRoadProperly   ();
-	void                        SetColor                        ( char color1, char color2, char color3, char color4 );
-	void                        GetColor                        ( char * color1, char * color2, char * color3, char * color4 );
+	void                        SetColor                        ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 );
+	void                        GetColor                        ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 );
     bool                        IsSirenOrAlarmActive            ();
     void                        SetSirenOrAlarmActive           ( bool bActive );
     inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
@@ -570,6 +570,7 @@ public:
     void                        SetHandbrakeOn                          ( bool bHandbrakeOn )               { GetVehicleInterface ()->m_nVehicleFlags.bIsHandbrakeOn = bHandbrakeOn; };
     void                        SetLightsOn                             ( bool bLightsOn )                  { GetVehicleInterface ()->m_nVehicleFlags.bLightsOn = bLightsOn; };
     void                        SetOverrideLights                       ( unsigned int uiOverrideLights )   { GetVehicleInterface ()->OverrideLights = uiOverrideLights; }
+    void                        SetTaxiLight                            ( bool bLightOn );
     void                        SetTakeLessDamage                       ( bool bTakeLessDamage )            { GetVehicleInterface ()->m_nVehicleFlags.bTakeLessDamage = bTakeLessDamage; };
     void                        SetTyresDontBurst                       ( bool bTyresDontBurst )            { GetVehicleInterface ()->m_nVehicleFlags.bTyresDontBurst = bTyresDontBurst; };
     void                        SetAdjustablePropertyValue              ( unsigned short usAdjustableProperty ) { *reinterpret_cast < unsigned short* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 2156 ) = usAdjustableProperty; };

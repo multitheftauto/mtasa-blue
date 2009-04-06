@@ -151,8 +151,8 @@ public:
     void                        Fix                     ( void );
     void                        Blow                    ( bool bAllowMovement = false );
 
-    void                        GetColor                ( char& ucColor1, char& ucColor2, char& ucColor3, char& ucColor4 );
-	void						SetColor				( char ucColor1, char ucColor2, char ucColor3, char ucColor4 );
+    void                        GetColor                ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
+	void						SetColor				( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );
 
 	void						GetTurretRotation		( float& fHorizontal, float& fVertical );
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
@@ -263,7 +263,8 @@ public:
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
-
+    bool                        SetTaxiLight            ( bool bLightOn );
+    bool                        GetTaxiLight            ( ) { return m_bTaxiLightOn; }
     inline CVehicle*            GetGameVehicle          ( void )                            { return m_pVehicle; };
 	inline CEntity   *          GetGameEntity           ( void )                                    { return m_pVehicle; }
     inline CVehicleUpgrades*	GetUpgrades				( void )							{ return m_pUpgrades; }
@@ -413,10 +414,10 @@ protected:
 	bool						m_bJustBlewUp;
     eEntityStatus				m_NormalStatus;
     bool                        m_bColorSaved;
-    char                        m_ucColor1;
-    char                        m_ucColor2;
-    char                        m_ucColor3;
-    char                        m_ucColor4;
+    unsigned char               m_ucColor1;
+    unsigned char               m_ucColor2;
+    unsigned char               m_ucColor3;
+    unsigned char               m_ucColor4;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
     CMatrix                     m_matFrozen;
@@ -455,6 +456,7 @@ protected:
     bool                        m_bBlown;
     bool                        m_bHasDamageModel;
 
+    bool                        m_bTaxiLightOn;
     std::list < CClientProjectile* > m_Projectiles;
 
 public:

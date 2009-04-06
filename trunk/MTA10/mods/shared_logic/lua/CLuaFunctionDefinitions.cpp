@@ -5590,6 +5590,52 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
 	return 1;
 }
 
+int CLuaFunctionDefinitions::GetVehicleTaxiLightOn ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
+            {
+                bool bLightState = pVehicle->GetTaxiLight ();
+                if ( bLightState )
+                {
+                    lua_pushboolean ( luaVM, bLightState );
+                    return 1;
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTaxiLightOn", "vehicle", 1 );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetVehicleTaxiLightOn ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+	{
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
+	        {
+                bool bLightState = ( lua_toboolean ( luaVM, 2 ) ? true : false );
+                pVehicle->SetTaxiLight ( bLightState );
+	            lua_pushboolean ( luaVM, true );
+		        return 1;
+            }
+	    }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleTaxiLightOn", "vehicle", 1 );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::GetVehicleColor ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -5601,11 +5647,7 @@ int CLuaFunctionDefinitions::GetVehicleColor ( lua_State* luaVM )
             unsigned char ucColor2;
             unsigned char ucColor3;
             unsigned char ucColor4;
-            // TODO: Clean up, pretty sure this is supposed to be unsigned
-            pVehicle->GetColor ( reinterpret_cast < char& > ( ucColor1 ),
-                                 reinterpret_cast < char& > ( ucColor2 ),
-                                 reinterpret_cast < char& > ( ucColor3 ),
-                                 reinterpret_cast < char& > ( ucColor4 ) );
+            pVehicle->GetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
 
             lua_pushnumber ( luaVM, ucColor1 );
             lua_pushnumber ( luaVM, ucColor2 );
@@ -15503,7 +15545,7 @@ int CLuaFunctionDefinitions::SetWorldSpecialPropertyEnabled ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
     {
         lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled (
-            lua_tostring ( luaVM, 1 ), lua_toboolean ( luaVM, 2 ) ) );
+            lua_tostring ( luaVM, 1 ), (lua_toboolean ( luaVM, 2 ) ) ? true : false) );
         return 1;
     }
     else
