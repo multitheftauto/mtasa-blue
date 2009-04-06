@@ -127,6 +127,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bIsDerailable = true;
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
+    m_bTaxiLightOn = false;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -425,6 +426,16 @@ void CClientVehicle::ReportMissionAudioEvent ( unsigned short usSound )
     }
 }
 
+bool CClientVehicle::SetTaxiLight ( bool bLightOn )
+{
+    m_bTaxiLightOn = bLightOn;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetTaxiLight ( bLightOn );
+        return true;
+    }
+    return false;
+}
 
 float CClientVehicle::GetDistanceFromCentreOfMassToBaseOfModel ( void )
 {
@@ -724,7 +735,7 @@ void CClientVehicle::Blow ( bool bAllowMovement )
 }
 
 
-void CClientVehicle::GetColor ( char& ucColor1, char& ucColor2, char& ucColor3, char& ucColor4 )
+void CClientVehicle::GetColor ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 )
 {
     if ( m_pVehicle )
     {
@@ -740,7 +751,7 @@ void CClientVehicle::GetColor ( char& ucColor1, char& ucColor2, char& ucColor3, 
 }
 
 
-void CClientVehicle::SetColor ( char ucColor1, char ucColor2, char ucColor3, char ucColor4 )
+void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 )
 {
     if ( m_pVehicle )
     {
@@ -1939,6 +1950,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
+        m_pVehicle->SetTaxiLight ( m_bTaxiLightOn );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         CalcAndUpdateTyresCanBurstFlag ();
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
@@ -1966,7 +1978,7 @@ void CClientVehicle::Create ( void )
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved && m_ucPaintjob != 0xFF )
         {
-            char ucColor1, ucColor2, ucColor3, ucColor4;
+            unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
             m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
             if ( ucColor1 != m_ucColor1 || ucColor2 != m_ucColor2 ||
                  ucColor3 != m_ucColor3 || ucColor4 != m_ucColor4 )

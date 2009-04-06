@@ -738,7 +738,9 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x73FDF9 = 0xEB;
 
     // Make sure water is always drawn after trees and LOD instead of before
-    *(WORD *)0x53DF55 = 0x9090;
+    // Disabled for now... Works fine for trees/LOD but *always* draws in front of
+    // high grass which is annoying
+    //*(WORD *)0x53DF55 = 0x9090;
 
     // Disallow spraying gang tags
     memset ( (void *)0x565C5C, 0x90, 10 );
