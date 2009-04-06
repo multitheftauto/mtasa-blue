@@ -126,10 +126,6 @@ public:
         {
             m_pCallback = copy.m_pCallback->Copy();
         }
-        else
-        {
-            m_pCallback = NULL;
-        }
     }
 
     // Destructor

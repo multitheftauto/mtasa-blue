@@ -36,9 +36,6 @@ CLocalGUI::CLocalGUI ( void )
 
 	m_bVisibleWindows = false;
 	m_iVisibleWindows = 0;
-
-    m_ModMouseClickHandler = NULL;
-    m_ModMouseDoubleClickHandler = NULL;
 }
 
 
@@ -380,14 +377,19 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         // This is needed to prevent a crash when double clicking a server in the server browser
         // while already ingame: the mod module gets unloaded while its doubleclick handler is
         // still running.
+
+        bool bWasAlreadyFading = m_pMainMenu->IsFading ();
         m_pMainMenu->SetVisible ( bVisible );
+        
+        // Only allow the code below to be called once per menu visibility toggle
+        if ( bWasAlreadyFading )
+            return;
+
         CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
         if ( bVisible )
         {
-            if ( m_ModMouseClickHandler == NULL )
-                m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
-            if ( m_ModMouseDoubleClickHandler == NULL )
-                m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
+            m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
+            m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
             pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
             pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
         }
@@ -397,8 +399,6 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
                 pGUI->SetMouseClickHandler ( m_ModMouseClickHandler );
             if ( m_ModMouseDoubleClickHandler )
                 pGUI->SetMouseDoubleClickHandler ( m_ModMouseDoubleClickHandler );
-            m_ModMouseClickHandler = NULL;
-            m_ModMouseDoubleClickHandler = NULL;
         }
     }
     else
