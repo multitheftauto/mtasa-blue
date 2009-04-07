@@ -427,7 +427,7 @@ void CClientStreamer::Restream ( void )
             {
                 // Too far away? Stop here.
                 if ( fElementDistanceExp > m_fMaxDistanceExp )
-                    break;
+                    continue;
 
                 // Not room to stream in more elements?
                 if ( bReachedLimit )
