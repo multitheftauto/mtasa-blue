@@ -118,20 +118,14 @@ void CDeathmatchObject::UpdateMovement ( void )
             GetPosition ( vecPreviousPosition );
             vecPosition = m_vecStartPosition + vecDeltaPosition;
 
+            CVector vecPreviousRotation;
+            GetRotationRadians ( vecPreviousRotation );
+
             // Plus the position with our new interpolated delta position and set it
             SetOrientation ( vecPosition, m_vecStartRotation + vecRotation );
         
             // Update our contact players
-            CVector vecPlayerPosition;
-            CClientPed * pPed = NULL;
-            list < CClientPed * > ::iterator iter = m_Contacts.begin ();
-            for ( ; iter != m_Contacts.end () ; iter++ )
-            {
-                pPed = *iter;
-                pPed->GetPosition ( vecPlayerPosition );
-                vecPlayerPosition = vecPosition + ( vecPlayerPosition - vecPreviousPosition );
-                pPed->SetPosition ( vecPlayerPosition );
-            }
+            UpdateContacting( vecPreviousPosition, vecPosition - vecPreviousPosition, ( m_vecStartRotation + vecRotation ) - vecPreviousRotation );
         }
         else
         {
@@ -139,3 +133,64 @@ void CDeathmatchObject::UpdateMovement ( void )
         }
     }
 }
+
+
+void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation )
+{
+    bool bHasRotation    = ( vecFrameRotation.fX != 0 || vecFrameRotation.fY != 0 || vecFrameRotation.fZ != 0 );
+    bool bHasTranslation = ( vecFrameTranslation.fX != 0 || vecFrameTranslation.fY != 0 || vecFrameTranslation.fZ != 0 );
+
+    // Early out if no orientation change here
+    if ( !bHasRotation && !bHasTranslation )
+        return;
+
+    // Step through each contacting ped
+    list < CClientPed * > ::iterator iter = m_Contacts.begin ();
+    for ( ; iter != m_Contacts.end () ; iter++ )
+    {
+        CClientPed* pPed = *iter;
+
+        // Get ped start position
+        CVector vecPlayerPosition;
+        pPed->GetPosition ( vecPlayerPosition );
+
+        // Apply rotation effect on position
+        if ( bHasRotation )
+        {
+            vecPlayerPosition -= vecCenterOfRotation;
+            RotateVector ( vecPlayerPosition, CVector(vecFrameRotation.fY, -vecFrameRotation.fX, -vecFrameRotation.fZ ) );
+            vecPlayerPosition += vecCenterOfRotation;
+        }
+
+        // Apply translation
+        vecPlayerPosition += vecFrameTranslation;
+        pPed->SetPosition ( vecPlayerPosition );
+
+        // Also change ped facing direction
+        if ( vecFrameRotation.fZ != 0 )
+        {
+            float fRotationZ = pPed->GetCurrentRotation ();
+            pPed->SetCurrentRotation ( fRotationZ + vecFrameRotation.fZ );
+        }
+    }
+
+    // Look in attached objects for more ped contacts
+    list < CClientEntity * > ::iterator itera = m_AttachedEntities.begin ();
+    for ( ; itera != m_AttachedEntities.end () ; itera++ )
+    {
+        CClientEntity* pEntity = *itera;
+        if ( IS_OBJECT ( pEntity ) )
+        {
+            CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( pEntity );
+            pObject->UpdateContacting( vecCenterOfRotation, vecFrameTranslation, vecFrameRotation );
+        }
+    }
+}
+
+
+
+
+
+
+
+

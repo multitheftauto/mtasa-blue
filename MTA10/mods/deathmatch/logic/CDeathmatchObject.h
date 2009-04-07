@@ -34,6 +34,7 @@ public:
     void                                StopMovement                    ( void );
     void                                FinishMovement                  ( void );
     void                                UpdateMovement                  ( void );
+    void                                UpdateContacting                ( const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation );
 
     inline bool                         IsMoving                        ( void )        { return m_ulStartTime != 0; };
 
