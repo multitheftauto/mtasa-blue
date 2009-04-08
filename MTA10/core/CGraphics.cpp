@@ -395,6 +395,12 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
     if ( !pDXFont )
         pDXFont = GetFont ();
 
+    if ( fScale > 1.1f )
+    {
+        pDXFont = GetBigFont ( pDXFont );
+        fScale /= 4.0f;
+    }
+
 	if ( pDXFont )
     {
         D3DXFONT_DESC desc;
@@ -409,6 +415,12 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
 {
     if ( !pDXFont )
         pDXFont = GetFont ();
+
+    if ( fScale > 1.1f )
+    {
+        pDXFont = GetBigFont ( pDXFont );
+        fScale /= 4.0f;
+    }
 
 	if ( pDXFont )
     {
@@ -426,6 +438,12 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
 {
     if ( !pDXFont )
         pDXFont = GetFont ();
+
+    if ( fScale > 1.1f )
+    {
+        pDXFont = GetBigFont ( pDXFont );
+        fScale /= 4.0f;
+    }
 
 	if ( pDXFont )
     {
@@ -860,7 +878,7 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
             {
                 bSpriteMode = IsDrawQueueItemSprite ( *iter );
                 if ( bSpriteMode )
-                    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+                    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
                 else
                     m_pDXSprite->End ();
             }
