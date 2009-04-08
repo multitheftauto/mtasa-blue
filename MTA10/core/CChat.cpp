@@ -294,7 +294,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
         // Check if it's a special key like enter and backspace, if not, add it as a character to the message
         switch ( KeyboardArgs.codepoint )
         {
-            case VK_BACKSPACE:
+            case VK_BACK:
             {
                 if ( m_strInputText.size () > 0 )
                 {

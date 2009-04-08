@@ -69,7 +69,7 @@ public:
 
 	// DirectX font functions
     ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
-    eFontType           GetFontType             ( char * szFontName );
+    eFontType           GetFontType             ( const char* szFontName );
 
 	bool				LoadFonts				( void );
 	bool				DestroyFonts			( void );
@@ -137,6 +137,7 @@ private:
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
     IDirect3DTexture9*  CacheTexture            ( const std::string& strFilename );
     void                ExpireCachedTextures    ( bool bExpireAll = false );
+    ID3DXFont*          GetBigFont              ( ID3DXFont* pDXFont );
 
     CLocalGUI*          m_pGUI;
     CGUIFont*			m_pFont;
@@ -153,8 +154,11 @@ private:
 	IDirect3DDevice9 *	m_pDevice;
 
 	// Fonts
+    ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
+    ID3DXFont*          m_pBigDXFonts [ NUM_FONTS ];
+
+    /*
     ID3DXFont *         m_pDXDefaultFont;
-    ID3DXFont *         m_pDXBigDefaultFont;
     ID3DXFont *         m_pDXDefaultBoldFont;
     ID3DXFont *         m_pDXClearFont;
     ID3DXFont *         m_pDXArialFont;
@@ -163,6 +167,9 @@ private:
     ID3DXFont *         m_pDXBankGothicFont;
 	ID3DXFont *         m_pDXDiplomaFont;
 	ID3DXFont *         m_pDXBeckettFont;
+
+    ID3DXFont *         m_pDXBigDefaultFont;
+    */
 
     // ******* Drawing queue code ***********
     // Used by client scripts to draw DX stuff. Rather than drawing immediately,
@@ -261,12 +268,22 @@ private:
         };
     };
 
-    // Drawing queues
-    std::list < sDrawQueueItem >        m_PreGUIQueue;
-    std::list < sDrawQueueItem >        m_PostGUIQueue;
 
+    struct sFontInfo
+    {
+        const char* szName;
+        unsigned int uiHeight;
+        unsigned int uiWeight;
+    };
+
+    // Drawing queues
+    std::vector < sDrawQueueItem >      m_PreGUIQueue;
+    std::vector < sDrawQueueItem >      m_PostGUIQueue;
+
+    bool                                IsDrawQueueItemSprite   ( const sDrawQueueItem& Item );
     void                                AddQueueItem            ( const sDrawQueueItem& Item, bool bPostGUI );
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
+    void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;

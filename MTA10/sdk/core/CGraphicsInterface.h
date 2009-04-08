@@ -28,7 +28,8 @@ enum eFontType
     FONT_PRICEDOWN,
 	FONT_BANKGOTHIC,
 	FONT_DIPLOMA,
-	FONT_BECKETT
+	FONT_BECKETT,
+    NUM_FONTS
 };
 
 class CGraphicsInterface
@@ -70,7 +71,7 @@ public:
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT ) = 0;
-    virtual eFontType               GetFontType         ( char * szFontName ) = 0;
+    virtual eFontType               GetFontType         ( const char* szFontName ) = 0;
 
     virtual IDirect3DTexture9*      CreateTexture       ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight ) = 0;
     virtual IDirect3DTexture9*      LoadTexture         ( const char* szFile ) = 0;
