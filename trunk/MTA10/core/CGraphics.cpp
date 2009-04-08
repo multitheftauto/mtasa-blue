@@ -28,18 +28,11 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 {
     m_pGUI = pGUI;
     m_pFont = NULL;
-    m_pDXDefaultFont = NULL;
-    m_pDXBigDefaultFont = NULL;
-    m_pDXDefaultBoldFont = NULL;
-    m_pDXClearFont = NULL;
-    m_pDXArialFont = NULL;
-    m_pDXSansFont = NULL;
-    m_pDXPricedownFont = NULL;
-	m_pDXBankGothicFont = NULL;
-	m_pDXDiplomaFont = NULL;
-	m_pDXBeckettFont = NULL;
+    memset ( m_pDXFonts, 0, sizeof ( m_pDXFonts ) );
+    memset ( m_pBigDXFonts, 0, sizeof ( m_pBigDXFonts ) );
 	m_pDevice = NULL;
     m_pLineInterface = NULL;
+    m_pDXSprite = NULL;
 
 	m_pRenderTarget = NULL;
 	m_pOriginalTarget = NULL;
@@ -122,12 +115,13 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 		return;
     
 	// If no font was specified, use the default font
-	if ( !pDXFont ) pDXFont = GetFont ();
+	if ( !pDXFont )
+        pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( pDXFont == m_pDXDefaultFont && ( fScaleX > 1.1f || fScaleY > 1.1f ) )
+    if ( fScaleX > 1.1f || fScaleY > 1.1f )
     {
-        pDXFont = m_pDXBigDefaultFont;
+        pDXFont = GetBigFont ( pDXFont );
         fScaleX /= 4.0f;
         fScaleY /= 4.0f;
     }
@@ -398,14 +392,8 @@ unsigned int CGraphics::GetViewportHeight ( void )
 
 float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
 {
-    if ( !pDXFont ) pDXFont = GetFont ();
-
-    // We're using a big font to keep it looking nice, so get the actual scale
-    if ( pDXFont == m_pDXDefaultFont && fScale > 1.1f )
-    {
-        pDXFont = m_pDXBigDefaultFont;
-        fScale /= 4.0f;
-    }
+    if ( !pDXFont )
+        pDXFont = GetFont ();
 
 	if ( pDXFont )
     {
@@ -419,14 +407,8 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
 
 float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont )
 {
-    if ( !pDXFont ) pDXFont = GetFont ();
-
-    // We're using a big font to keep it looking nice, so get the actual scale
-    if ( pDXFont == m_pDXDefaultFont && fScale > 1.1f )
-    {
-        pDXFont = m_pDXBigDefaultFont;
-        fScale /= 4.0f;
-    }
+    if ( !pDXFont )
+        pDXFont = GetFont ();
 
 	if ( pDXFont )
     {
@@ -442,15 +424,8 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
 
 float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont )
 {
-    if ( !pDXFont ) pDXFont = GetFont ();
-
-    // We're using a big font to keep it looking nice, so get the actual scale
-    if ( pDXFont == m_pDXDefaultFont && fScale > 1.1f )
-    {
-        pDXFont = m_pDXBigDefaultFont;
-        fScale /= 4.0f;
-    }
-
+    if ( !pDXFont )
+        pDXFont = GetFont ();
 
 	if ( pDXFont )
     {
@@ -465,23 +440,14 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
 
 ID3DXFont * CGraphics::GetFont ( eFontType fontType )
 {
-    switch ( fontType )
-    {
-        case FONT_DEFAULT_BOLD:	return m_pDXDefaultBoldFont; break;
-        case FONT_CLEAR:		return m_pDXClearFont; break;
-        case FONT_ARIAL:		return m_pDXArialFont; break;
-        case FONT_SANS:			return m_pDXSansFont; break;
-        case FONT_PRICEDOWN:	return m_pDXPricedownFont; break;
-		case FONT_BANKGOTHIC:	return m_pDXBankGothicFont; break;
-		case FONT_DIPLOMA:		return m_pDXDiplomaFont; break;
-		case FONT_BECKETT:		return m_pDXBeckettFont; break;
-        default:				break;
-    }
-    return m_pDXDefaultFont;
+    if ( fontType < 0 || fontType >= NUM_FONTS )
+        return m_pDXFonts [ FONT_DEFAULT ];
+
+    return m_pDXFonts [ fontType ];
 }
 
 
-eFontType CGraphics::GetFontType ( char * szFontName )
+eFontType CGraphics::GetFontType ( const char* szFontName )
 {
     assert ( szFontName );
     if ( !stricmp ( szFontName, "default" ) )		return FONT_DEFAULT;
@@ -646,12 +612,12 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 	if ( !pDXFont ) pDXFont = GetFont ();
 
 	// We're using a big font to keep it looking nice, so get the actual scale
-	if ( pDXFont == m_pDXDefaultFont && ( fScaleX > 1.1f || fScaleY > 1.1f ) )
-	{
-		pDXFont = m_pDXBigDefaultFont;
-		fScaleX /= 4.0f;
-		fScaleY /= 4.0f;
-	}
+    if ( fScaleX > 1.1f || fScaleY > 1.1f )
+    {
+        pDXFont = GetBigFont ( pDXFont );
+        fScaleX /= 4.0f;
+        fScaleY /= 4.0f;
+    }
 
 
 	if ( pDXFont )
@@ -697,19 +663,33 @@ bool CGraphics::LoadFonts ( void )
 	iLoaded += AddFontResourceEx ( std::string ( strFontPath + "sagothic.ttf" ).c_str (), FR_PRIVATE, 0 );
 
 	// Create DirectX font and sprite objects
-    return
-		(	SUCCEEDED (D3DXCreateFont ( m_pDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "tahoma", &m_pDXDefaultFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 60, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "tahoma", &m_pDXBigDefaultFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "tahomabd", &m_pDXDefaultBoldFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "verdana", &m_pDXClearFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "arial", &m_pDXArialFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 15, 0, FW_BOLD, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "microsoft sans serif", &m_pDXSansFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 30, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "pricedown", &m_pDXPricedownFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 30, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "bankgothic md bt", &m_pDXBankGothicFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 30, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "diploma", &m_pDXDiplomaFont ))
-		&&	SUCCEEDED (D3DXCreateFont ( m_pDevice, 30, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "beckett", &m_pDXBeckettFont ))
-		&&	SUCCEEDED (D3DXCreateSprite ( m_pDevice, &m_pDXSprite ))
-		&&	SUCCEEDED (iLoaded == 4) );
+    static const sFontInfo fontInfos[] = {
+        { "tahoma",               15, FW_NORMAL },
+        { "tahomabd",             15, FW_BOLD   },
+        { "verdana",              15, FW_NORMAL },
+        { "arial",                15, FW_NORMAL },
+        { "microsoft sans serif", 15, FW_BOLD   },
+        { "pricedown",            30, FW_NORMAL },
+        { "bankgothic md bt",     30, FW_NORMAL },
+        { "diploma",              30, FW_NORMAL },
+        { "beckett",              30, FW_NORMAL }
+    };
+
+    bool bSuccess = true;
+    for ( int i = 0; bSuccess && i < NUM_FONTS; i++ )
+    {
+        // Normal size
+        bSuccess &= SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
+            FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
+            &m_pDXFonts[i] ) );
+
+        // Big size (4x)
+        bSuccess &= SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
+            FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
+            &m_pBigDXFonts[i] ) );
+    }
+
+    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 4 );
 }
 
 bool CGraphics::DestroyFonts ( void )
@@ -811,35 +791,11 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 {
 	SAFE_RELEASE ( m_pOriginalTarget );
 
-	if ( m_pDXDefaultFont )
-        m_pDXDefaultFont->OnLostDevice ();
-
-    if ( m_pDXBigDefaultFont )
-        m_pDXBigDefaultFont->OnLostDevice ();
-
-    if ( m_pDXDefaultBoldFont )
-        m_pDXDefaultBoldFont->OnLostDevice ();
-
-    if ( m_pDXClearFont )
-        m_pDXClearFont->OnLostDevice ();
-
-    if ( m_pDXArialFont )
-        m_pDXArialFont->OnLostDevice ();
-
-    if ( m_pDXSansFont )
-        m_pDXSansFont->OnLostDevice ();
-
-    if ( m_pDXPricedownFont )
-        m_pDXPricedownFont->OnLostDevice ();
-
-    if ( m_pDXBankGothicFont )
-        m_pDXBankGothicFont->OnLostDevice ();
-
-	if ( m_pDXDiplomaFont )
-        m_pDXDiplomaFont->OnLostDevice ();
-
-	if ( m_pDXBeckettFont )
-		m_pDXBeckettFont->OnLostDevice ();
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        m_pDXFonts[i]->OnLostDevice ();
+        m_pBigDXFonts[i]->OnLostDevice ();
+    }
 
 	if ( m_pDXSprite )
         m_pDXSprite->OnLostDevice ();
@@ -854,26 +810,11 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 	// Get the original render target
 	m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget );
 
-    if ( m_pDXDefaultFont )
-        m_pDXDefaultFont->OnResetDevice ();
-
-    if ( m_pDXBigDefaultFont )
-        m_pDXBigDefaultFont->OnResetDevice ();
-
-    if ( m_pDXDefaultBoldFont )
-        m_pDXDefaultBoldFont->OnResetDevice ();
-
-    if ( m_pDXClearFont )
-        m_pDXClearFont->OnResetDevice ();
-
-    if ( m_pDXArialFont )
-        m_pDXArialFont->OnResetDevice ();
-
-    if ( m_pDXSansFont )
-        m_pDXSansFont->OnResetDevice ();
-
-    if ( m_pDXPricedownFont )
-        m_pDXPricedownFont->OnResetDevice ();
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        m_pDXFonts[i]->OnResetDevice ();
+        m_pBigDXFonts[i]->OnResetDevice ();
+    }
 
     if ( m_pDXSprite )
         m_pDXSprite->OnResetDevice ();
@@ -885,50 +826,55 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::DrawPreGUIQueue ( void )
 {
-    // Items to draw?
-    if ( m_PreGUIQueue.size () > 0 )
-    {
-		BeginSingleDrawing ();
-
-		// Loop through it
-        std::list < sDrawQueueItem > ::iterator iter = m_PreGUIQueue.begin ();
-        for ( ; iter != m_PreGUIQueue.end (); iter++ )
-        {
-            // Draw the item
-            DrawQueueItem ( *iter );
-        }
-
-		EndSingleDrawing ();
-
-		// Clear the list
-        m_PreGUIQueue.clear ();
-    }
+    DrawQueue ( m_PreGUIQueue );
 }
 
 
 void CGraphics::DrawPostGUIQueue ( void )
 {
+    DrawQueue ( m_PostGUIQueue );
+
+    // Clean out unused textures here
+    ExpireCachedTextures ();
+}
+
+bool CGraphics::IsDrawQueueItemSprite ( const sDrawQueueItem& Item )
+{
+    return Item.eType == QUEUE_LINE || Item.eType == QUEUE_TEXT || Item.eType == QUEUE_RECT ||
+           Item.eType == QUEUE_CIRCLE || Item.eType == QUEUE_TEXTURE;
+}
+
+void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
+{
     // Items to draw?
-    if ( m_PostGUIQueue.size () > 0 )
+    if ( Queue.size () > 0 )
     {
 		BeginSingleDrawing ();
 
         // Loop through it
-        std::list < sDrawQueueItem > ::iterator iter = m_PostGUIQueue.begin ();
-        for ( ; iter != m_PostGUIQueue.end (); iter++ )
+        bool bSpriteMode = false;
+        std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
+        for ( ; iter != Queue.end (); iter++ )
         {
+            if ( IsDrawQueueItemSprite ( *iter ) != bSpriteMode )
+            {
+                bSpriteMode = IsDrawQueueItemSprite ( *iter );
+                if ( bSpriteMode )
+                    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+                else
+                    m_pDXSprite->End ();
+            }
             // Draw the item
             DrawQueueItem ( *iter );
         }
+        if ( bSpriteMode )
+            m_pDXSprite->End ();
 
 		EndSingleDrawing ();
 
         // Clear the list
-        m_PostGUIQueue.clear ();
+        Queue.clear ();
     }
-
-    // Clean out unused textures here
-    ExpireCachedTextures ();
 }
 
 
@@ -944,9 +890,6 @@ void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 
 void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 {
-    // TODO: Optimize using the Begin / End calls for our DX interfaces. Maybe sort the list?
-
-    // Line type?
     switch ( Item.eType )
     {
         // Line type?
@@ -987,7 +930,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 		// Rectangle type?
 		case QUEUE_RECT:
 		{
-            m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
 			D3DXMATRIX matrix;
 			D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
 			D3DXVECTOR2 scaling ( Item.Rect.fWidth, Item.Rect.fHeight );
@@ -995,12 +937,10 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 			D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
 			m_pDXSprite->SetTransform ( &matrix );
 			m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, Item.Rect.ulColor );
-            m_pDXSprite->End ();
 			break;
 		};
 		case QUEUE_TEXT:
 		{
-            m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
 			RECT rect;        
 			SetRect ( &rect, Item.Text.iLeft, Item.Text.iTop, Item.Text.iRight, Item.Text.iBottom );  
 			D3DXMATRIX matrix;
@@ -1009,12 +949,10 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 			D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
 			m_pDXSprite->SetTransform ( &matrix );        
 			Item.Text.pDXFont->DrawText ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
-            m_pDXSprite->End ();
 			break;
 		}
         case QUEUE_TEXTURE:
         {
-            m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
             D3DSURFACE_DESC texureDesc;
             Item.Texture.texture->GetLevelDesc( 0, &texureDesc );
             float texureWidth   = texureDesc.Width;
@@ -1027,7 +965,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 			D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
             m_pDXSprite->SetTransform ( &matrix );
             m_pDXSprite->Draw ( Item.Texture.texture, NULL, NULL, NULL, Item.Texture.ulColor );
-            m_pDXSprite->End ();
             break;
         }
         // Circle type?
@@ -1086,3 +1023,12 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
     }
 }
 
+ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
+{
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        if ( m_pDXFonts [ i ] == pDXFont )
+            return m_pBigDXFonts [ i ];
+    }
+    return pDXFont;
+}

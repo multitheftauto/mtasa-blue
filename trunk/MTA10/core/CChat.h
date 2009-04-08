@@ -24,11 +24,6 @@ class CChatLineSection;
 #define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
 #define CHAT_BUFFER             1024                            // Chatbox buffer size
 
-#define VK_BACKSPACE 0x8
-#define VK_RETURN 0xD
-#define VK_PGUP 0x21
-#define VK_PGDN 0x22
-
 class CColor
 {
 public:
