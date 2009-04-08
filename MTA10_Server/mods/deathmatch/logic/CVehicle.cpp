@@ -268,7 +268,7 @@ bool CVehicle::ReadSpecialData ( void )
             else
             {
                 bool bTemp = true;
-                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, " " ) )
+                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, "," ) )
                 {
                     bTemp = false;
                     unsigned short usUpgrade = static_cast < unsigned short > ( atoi ( token ) );
