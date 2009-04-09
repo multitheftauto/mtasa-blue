@@ -35,9 +35,10 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
 #define VEHICLE_HAS_LANDING_GEARS       0x004UL //4
 #define VEHICLE_HAS_ADJUSTABLE_PROPERTY 0x008UL //8
 #define VEHICLE_HAS_SMOKE_TRAIL         0x010UL //16
+#define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 unsigned long g_ulVehicleAttributes [] = {
-  0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0,    // 400-424
-  0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
+  0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
+  0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
   0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 475-499
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8, // 500-524
@@ -174,6 +175,11 @@ bool CVehicleManager::HasSirens ( unsigned int uiModel )
              ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_SIRENES ) );
 }
 
+bool CVehicleManager::HasTaxiLight ( unsigned int uiModel )
+{
+    return ( IsValidModel ( uiModel ) &&
+             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_TAXI_LIGHTS ) );
+}
 
 bool CVehicleManager::HasLandingGears ( unsigned int uiModel )
 {

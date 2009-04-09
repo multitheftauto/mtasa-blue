@@ -42,6 +42,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAIN_DERAILABLE, SetTrainDerailable, "SetTrainDerailable" );
     AddHandler ( SET_TRAIN_DIRECTION, SetTrainDirection, "SetTrainDirection" );
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
+    AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
 }
 
 
@@ -226,6 +227,19 @@ void CVehicleRPCs::SetVehicleSireneOn ( NetBitStreamInterface& bitStream )
     }
 }
 
+void CVehicleRPCs::SetVehicleTaxiLightOn ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    unsigned char ucTaxiLightOn;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucTaxiLightOn ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            pVehicle->SetTaxiLightOn ( ucTaxiLightOn != 0 );
+        }
+    }
+}
 
 void CVehicleRPCs::SetVehicleLandingGearDown ( NetBitStreamInterface& bitStream )
 {

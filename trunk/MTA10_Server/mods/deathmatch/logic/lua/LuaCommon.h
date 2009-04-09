@@ -139,6 +139,7 @@ enum eLuaNetworkDependantFunctions
     SET_TRAIN_DERAILABLE,
     SET_TRAIN_DIRECTION,
     SET_TRAIN_SPEED,
+    SET_TAXI_LIGHT_ON,
 
     GIVE_WEAPON,
     TAKE_WEAPON,

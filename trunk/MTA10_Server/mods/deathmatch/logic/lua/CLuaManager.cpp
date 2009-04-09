@@ -386,6 +386,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleLocked", CLuaFunctionDefinitions::SetVehicleLocked );
     CLuaCFunctions::AddFunction ( "setVehicleDoorsUndamageable", CLuaFunctionDefinitions::SetVehicleDoorsUndamageable );
     CLuaCFunctions::AddFunction ( "setVehicleSirensOn", CLuaFunctionDefinitions::SetVehicleSirensOn );
+    CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefinitions::SetVehicleTaxiLightOn );
+    CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefinitions::IsVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "addVehicleUpgrade", CLuaFunctionDefinitions::AddVehicleUpgrade );
     CLuaCFunctions::AddFunction ( "removeVehicleUpgrade", CLuaFunctionDefinitions::RemoveVehicleUpgrade );
     CLuaCFunctions::AddFunction ( "setVehicleDoorState", CLuaFunctionDefinitions::SetVehicleDoorState );

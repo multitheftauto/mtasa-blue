@@ -159,7 +159,9 @@ public:
     void                            SetTurretPosition       ( float fPositionX, float fPositionY );
 
     inline bool                     IsSirenActive           ( void )                        { return m_bSirenActive; };
-    inline void                     SetSirenActive          ( bool bSirenActive )          { m_bSirenActive = bSirenActive; };
+    inline void                     SetSirenActive          ( bool bSirenActive )           { m_bSirenActive = bSirenActive; };
+    inline void                     SetTaxiLightOn          ( bool bTaxiLightState )        { m_bTaxiLightState = bTaxiLightState; };
+    inline bool                     IsTaxiLightOn           ( void )                        { return m_bTaxiLightState; };
 
     inline bool                     IsLandingGearDown       ( void )                        { return m_bLandingGearDown; };
     inline void                     SetLandingGearDown      ( bool bLandingGearDown )       { m_bLandingGearDown = bLandingGearDown; };
@@ -310,6 +312,7 @@ private:
     float                           m_fTurretPositionX;
     float                           m_fTurretPositionY;
     bool                            m_bSirenActive;
+    bool                            m_bTaxiLightState;
     bool                            m_bLandingGearDown;
     unsigned short                  m_usAdjustableProperty;
 

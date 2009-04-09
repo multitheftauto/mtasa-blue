@@ -45,6 +45,7 @@ public:
     static unsigned int                 GetMaxPassengers            ( unsigned int uiVehicleModel );
     static bool                         HasTurret                   ( unsigned int uiVehicleModel );
     static bool                         HasSirens                   ( unsigned int uiVehicleModel );
+    static bool                         HasTaxiLight                ( unsigned int uiVehicleModel );
     static bool                         HasLandingGears             ( unsigned int uiVehicleModel );
     static bool                         HasAdjustableProperty       ( unsigned int uiVehicleModel );
     static bool                         HasSmokeTrail               ( unsigned int uiVehicleModel );

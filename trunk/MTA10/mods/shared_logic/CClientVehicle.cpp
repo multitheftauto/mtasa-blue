@@ -426,12 +426,12 @@ void CClientVehicle::ReportMissionAudioEvent ( unsigned short usSound )
     }
 }
 
-bool CClientVehicle::SetTaxiLight ( bool bLightOn )
+bool CClientVehicle::SetTaxiLightOn ( bool bLightOn )
 {
     m_bTaxiLightOn = bLightOn;
     if ( m_pVehicle )
     {
-        m_pVehicle->SetTaxiLight ( bLightOn );
+        m_pVehicle->SetTaxiLightOn ( bLightOn );
         return true;
     }
     return false;
@@ -1950,7 +1950,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
-        m_pVehicle->SetTaxiLight ( m_bTaxiLightOn );
+        m_pVehicle->SetTaxiLightOn ( m_bTaxiLightOn );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         CalcAndUpdateTyresCanBurstFlag ();
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )

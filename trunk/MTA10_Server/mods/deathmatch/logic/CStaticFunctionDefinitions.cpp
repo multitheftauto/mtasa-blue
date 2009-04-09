@@ -3857,7 +3857,29 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CElement* pElement, bool b
 
     return false;
 }
+bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn ( CElement* pElement, bool bTaxiLightState )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetVehicleTaxiLightOn ( *iter, bTaxiLightState );
 
+    if ( IS_VEHICLE ( pElement ) )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+
+        if ( CVehicleManager::HasTaxiLight ( pVehicle->GetModel () ) && bTaxiLightState != pVehicle->IsTaxiLightOn() )
+        {
+            pVehicle->SetTaxiLightOn ( bTaxiLightState );
+            CBitStream BitStream;
+            unsigned char ucTaxiLightState = bTaxiLightState ? 1 : 0;
+            BitStream.pBitStream->Write ( pVehicle->GetID () );
+            BitStream.pBitStream->Write ( ucTaxiLightState );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TAXI_LIGHT_ON, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity ( CElement* pElement, const CVector& vecTurnVelocity )
 {
@@ -4054,7 +4076,6 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, uns
 
 	return false;
 }
-
 
 bool CStaticFunctionDefinitions::SetVehicleLightState ( CElement* pElement, unsigned char ucLight, unsigned char ucState )
 {

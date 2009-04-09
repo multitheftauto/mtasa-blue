@@ -5590,7 +5590,7 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
 	return 1;
 }
 
-int CLuaFunctionDefinitions::GetVehicleTaxiLightOn ( lua_State* luaVM )
+int CLuaFunctionDefinitions::IsVehicleTaxiLightOn ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
 	{
@@ -5599,7 +5599,7 @@ int CLuaFunctionDefinitions::GetVehicleTaxiLightOn ( lua_State* luaVM )
         {
             if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
             {
-                bool bLightState = pVehicle->GetTaxiLight ();
+                bool bLightState = pVehicle->IsTaxiLightOn ();
                 if ( bLightState )
                 {
                     lua_pushboolean ( luaVM, bLightState );
@@ -5608,7 +5608,7 @@ int CLuaFunctionDefinitions::GetVehicleTaxiLightOn ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTaxiLightOn", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleTaxiLightOn", "vehicle", 1 );
     }
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -5624,7 +5624,7 @@ int CLuaFunctionDefinitions::SetVehicleTaxiLightOn ( lua_State* luaVM )
             if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
 	        {
                 bool bLightState = ( lua_toboolean ( luaVM, 2 ) ? true : false );
-                pVehicle->SetTaxiLight ( bLightState );
+                pVehicle->SetTaxiLightOn ( bLightState );
 	            lua_pushboolean ( luaVM, true );
 		        return 1;
             }

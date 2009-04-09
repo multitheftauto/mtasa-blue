@@ -219,6 +219,8 @@ public:
     static int      SetVehicleModel                     ( lua_State* luaVM );
     static int      SetVehicleDoorsUndamageable         ( lua_State* luaVM );
     static int      SetVehicleSirensOn                  ( lua_State* luaVM );
+    static int      SetVehicleTaxiLightOn               ( lua_State* luaVM );
+	static int      IsVehicleTaxiLightOn                ( lua_State* luaVM );
 	static int		AddVehicleUpgrade					( lua_State* luaVM );
 	static int		RemoveVehicleUpgrade				( lua_State* luaVM );
 	static int		SetVehicleDoorState					( lua_State* luaVM );
