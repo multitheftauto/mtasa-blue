@@ -304,6 +304,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     bool bDerailed = pVehicle->IsDerailed ();
                     bool bIsDerailable = pVehicle->IsDerailable ();
                     bool bTrainDirection = pVehicle->GetTrainDirection ();
+                    bool bTaxiLightOn = pVehicle->IsTaxiLightOn ();
 
                     // Put them in a byte
                     unsigned short usFlags = 0;
@@ -318,6 +319,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     if ( bDerailed )            usFlags |= 0x0100;
                     if ( bIsDerailable )        usFlags |= 0x0200;
                     if ( bTrainDirection )      usFlags |= 0x0400;
+                    if ( bTaxiLightOn )         usFlags |= 0x0800;
 
                     // Write the flags
                     BitStream.Write ( usFlags );

@@ -248,6 +248,7 @@ public:
     static bool                 SetVehicleDoorsUndamageable         ( CElement* pElement, bool bDoorsUndamageable );
     static bool                 SetVehicleRotation                  ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetVehicleSirensOn                  ( CElement* pElement, bool bSirensOn );
+    static bool                 SetVehicleTaxiLightOn               ( CElement* pElement, bool bTaxiLightState );
     static bool                 SetVehicleTurnVelocity              ( CElement* pElement, const CVector& vecTurnVelocity );
 	static bool					AddVehicleUpgrade					( CElement* pElement, unsigned short usUpgrade );
     static bool                 AddAllVehicleUpgrades               ( CElement* pElement );

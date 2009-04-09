@@ -48,6 +48,7 @@ public:
     DECLARE_RPC ( SetTrainDerailable );
     DECLARE_RPC ( SetTrainDirection );
     DECLARE_RPC ( SetTrainSpeed );
+    DECLARE_RPC ( SetVehicleTaxiLightOn );
 };
 
 #endif

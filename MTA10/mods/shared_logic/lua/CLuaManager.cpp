@@ -492,7 +492,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefinitions::SetVehicleTaxiLightOn );
-    CLuaCFunctions::AddFunction ( "getVehicleTaxiLightOn", CLuaFunctionDefinitions::GetVehicleTaxiLightOn );
+    CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefinitions::IsVehicleTaxiLightOn );
 
 
     // Object create/destroy funcs

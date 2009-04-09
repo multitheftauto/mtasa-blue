@@ -292,7 +292,7 @@ public:
     LUA_DECLARE ( RespawnVehicle );
     LUA_DECLARE ( SetVehicleOverrideLights );
     LUA_DECLARE ( SetVehicleTaxiLightOn );
-    LUA_DECLARE ( GetVehicleTaxiLightOn );
+    LUA_DECLARE ( IsVehicleTaxiLightOn );
     LUA_DECLARE ( AttachTrailerToVehicle );
     LUA_DECLARE ( DetachTrailerFromVehicle );
     LUA_DECLARE ( SetVehicleEngineState );

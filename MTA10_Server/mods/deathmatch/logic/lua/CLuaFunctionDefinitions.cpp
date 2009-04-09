@@ -4530,7 +4530,54 @@ int CLuaFunctionDefinitions::SetVehicleLandingGearDown ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+int CLuaFunctionDefinitions::IsVehicleTaxiLightOn ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            lua_pushboolean ( luaVM, pVehicle->IsTaxiLightOn() );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleTaxiLightOn", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleTaxiLightOn" );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+int CLuaFunctionDefinitions::SetVehicleTaxiLightOn ( lua_State* luaVM )
+{
+    // Verify the two arguments
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( iArgument1 == LUA_TLIGHTUSERDATA && iArgument2 == LUA_TBOOLEAN )
+    {
+        // Grab the element and verify it
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        bool bTaxiLightOn = lua_toboolean ( luaVM, 2 ) ? true:false;
+        if ( pElement )
+        {
+            // Do it
+            if ( CStaticFunctionDefinitions::SetVehicleTaxiLightOn ( pElement, bTaxiLightOn ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleTaxiLightOn", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleTaxiLightOn" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::SetVehicleSirensOn ( lua_State* luaVM )
 {

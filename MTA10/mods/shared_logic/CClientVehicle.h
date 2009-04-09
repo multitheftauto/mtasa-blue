@@ -263,8 +263,8 @@ public:
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
-    bool                        SetTaxiLight            ( bool bLightOn );
-    bool                        GetTaxiLight            ( ) { return m_bTaxiLightOn; }
+    bool                        SetTaxiLightOn          ( bool bLightOn );
+    bool                        IsTaxiLightOn           ( ) { return m_bTaxiLightOn; }
     inline CVehicle*            GetGameVehicle          ( void )                            { return m_pVehicle; };
 	inline CEntity   *          GetGameEntity           ( void )                                    { return m_pVehicle; }
     inline CVehicleUpgrades*	GetUpgrades				( void )							{ return m_pUpgrades; }

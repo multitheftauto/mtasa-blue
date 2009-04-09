@@ -52,6 +52,7 @@ public:
     static bool                     HasLandingGears         ( unsigned long ulModel );
     static bool                     HasAdjustableProperty   ( unsigned long ulModel );
     static bool                     HasSmokeTrail           ( unsigned long ulModel );
+    static bool                     HasTaxiLight            ( unsigned long ulModel );
     static bool                     HasDamageModel          ( unsigned long ulModel );
     static bool                     HasDamageModel          ( enum eClientVehicleType Type );
 

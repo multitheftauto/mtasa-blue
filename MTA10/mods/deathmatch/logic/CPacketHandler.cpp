@@ -2382,6 +2382,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bool bDerailed          = ( usFlags & 0x0100 ) ? true : false;
                     bool bIsDerailable      = ( usFlags & 0x0200 ) ? true : false;
                     bool bTrainDirection    = ( usFlags & 0x0400 ) ? true : false;
+                    bool bTaxiLightState    = ( usFlags & 0x0800 ) ? true : false;
 
                     // If the vehicle has a landing gear, set landing gear state
                     if ( CClientVehicleManager::HasLandingGears ( usModel ) )
@@ -2394,7 +2395,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     {
                         pVehicle->SetSirenOrAlarmActive ( bSirenesActive );
                     }
-
+                    //Set the taxi light state
+                    if ( CClientVehicleManager::HasTaxiLight ( usModel ) )
+                    {
+                        pVehicle->SetTaxiLightOn ( bTaxiLightState );
+                    }
                     // Set the general vehicle flags
                     pVehicle->SetCanShootPetrolTank ( bPetrolTankWeak );
                     pVehicle->SetEngineOn ( bEngineOn );

@@ -1545,7 +1545,7 @@ void CVehicleSA::SetBikeWheelStatus ( BYTE bWheel, BYTE bStatus )
     else if ( bWheel == 1 ) * ( BYTE * ) ( (DWORD)this->GetInterface() + 0x65D ) = bStatus;
 }
 
-void CVehicleSA::SetTaxiLight ( bool bLightOn )
+void CVehicleSA::SetTaxiLightOn ( bool bLightOn )
 {
 	DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");
     DWORD dwThis = (DWORD) GetInterface();
