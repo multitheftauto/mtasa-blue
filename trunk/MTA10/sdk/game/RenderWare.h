@@ -193,7 +193,7 @@ struct RwTexDictionary
 };
 struct RwTexture
 {
-	void               *raster;
+	RwRaster           *raster;
 	RwTexDictionary    *txd;
 	RwListEntry        TXDList;
 	char               name[RW_TEXTURE_NAME_LENGTH];
@@ -208,17 +208,17 @@ struct RwTextureCoordinates
 struct RwRaster
 {
     RwRaster        *parent;               // 0
-    unsigned char   *buffer;               // 4
-    unsigned char   *buffer2;              // 8
+    unsigned char   *pixels;               // 4
+    unsigned char   *palette;              // 8
     int             width, height, depth;  // 12, 16 / 0x10, 20
     int             stride;                // 24 / 0x18
     short           u, v;
     unsigned char   type;
     unsigned char   flags;
-    unsigned char   unknown1;
-    unsigned char   unknown2;
-    unsigned char   *buffer3;
-    int             a,b,c;
+    unsigned char   privateFlags;
+    unsigned char   format;
+    unsigned char   *origPixels;
+    int             origWidth, origHeight, origDepth;
 };
 struct RwColorFloat
 {

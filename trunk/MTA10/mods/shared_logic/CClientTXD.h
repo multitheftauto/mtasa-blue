@@ -13,7 +13,6 @@
 #ifndef __CCLIENTTXD_H
 #define __CCLIENTTXD_H
 
-#include <list>
 #include "CClientEntity.h"
 
 class CClientTXD: public CClientEntity
@@ -26,7 +25,7 @@ public:
 
     bool                            LoadTXD                 ( const char* szFile );
     void                            UnloadTXD               ( void );
-    inline bool                     IsLoaded                ( void )                    { return m_pTexture != NULL; };
+    inline bool                     IsLoaded                ( void )                    { return !m_Textures.empty (); }
 
     bool                            Import                  ( unsigned short usModel );
     bool                            IsImported              ( unsigned short usModel );
@@ -44,8 +43,10 @@ public:
 private:
     void                            InternalRemove          ( unsigned short usModel );
 
-    RwTexDictionary*                m_pTexture;
-    std::list < unsigned short >    m_Imported;
+    std::list < RwTexture* >        m_Textures;
+    unsigned short                  m_usMainModel;      // This model contains our primary textures
+                                                        // rather than copies
+    std::list < unsigned short >    m_ImportedModels;
 };
 
 

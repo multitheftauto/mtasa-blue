@@ -154,54 +154,6 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data) {
 	return atomic;
 }
 
-// RwTexDictionaryForAllTextures callback used for debugging purposes
-static RwTexture* DebugCB (RwTexture * texture, RwTexDictionary * data ) {
-	// Increase the texture refcount just to be sure
-	texture->refs++;
-
-	return texture;
-}
-
-// RwTexDictionaryForAllTextures callback used to add all textures from a TXD to the specified TXD
-static RwTexture* AddAllTexturesCB (RwTexture * texture, RwTexDictionary * data ) {
-	/*
-	// Make a copy of this texture, so it isn't removed from our source TXD
-	RwRaster *raster_src = (RwRaster *)(texture->raster);
-	RwRaster *raster_dst = RwRasterCreate ( raster_src->width, raster_src->height, raster_src->depth, raster_src->flags );
-
-	// Lock the src and dst rasters for r/w operations
-	RwRasterLock ( raster_src, 0, RASTER_LOCK_READ );
-	RwRasterLock ( raster_dst, 0, RASTER_LOCK_WRITE );
-
-	// Copy the pixel data
-	memcpy ( raster_dst, raster_src, raster_src->stride * raster_src->height ); 
-
-	// Unlock the rasters
-	RwRasterUnlock ( raster_src );
-	RwRasterUnlock ( raster_dst );
-
-	RwTexture *texcopy = RwTextureCreate ( raster_dst );
-
-	//RwTexture *texcopy = CClothesBuilder_CopyTexture ( texture );
-
-	// Only add the texture if it isn't already inside the TXD
-	//if ( RwTexDictionaryFindNamedTexture ( data, texture->name ) == NULL )
-		RwTexDictionaryAddTexture ( data, texcopy );
-	*/
-	RwTexDictionaryAddTexture ( data, texture );
-	return texture;
-}
-
-// RwTexDictionaryForAllTextures callback used to remove all textures from a TXD
-static RwTexture* DeleteAllTexturesCB (RwTexture * texture, RwTexDictionary * removefrom ) {
-	// If we can find the texture (with the same name, obviously inserted before) in the TXD
-	// we remove the found texture (which is not the same instance as the texture argument)
-	RwTexture *texinstance = RwTexDictionaryFindNamedTexture ( removefrom, texture->name );
-	if ( texinstance )
-		RwTextureDestroy ( texinstance );
-	return texture;
-}
-
 CRenderWareSA::CRenderWareSA ( eGameVersion version )
 {
     // Version dependant addresses
@@ -374,54 +326,93 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// Imports a TXD (pSource) into a TXD that was assigned to a CModelInfo identified by the object id (usModelID)
-void CRenderWareSA::ModelInfoImportTXD ( RwTexDictionary * pSource, unsigned short usModelID ) {
-	// CModelInfo stores some kind of TXD id at +Ah
-	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-	unsigned short usTXDId = *( ( unsigned short * ) ( pPool[usModelID] + 0xA ) );
+// Adds texture into the TXD of a model, eventually making a copy of each texture first 
+void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy )
+{
+	// Get the CModelInfo's TXD ID
+    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
 
-	// Preload the model, just to be sure that all the textures are present
-	//pGame->GetModelInfo ( usModelID )->Request ( TRUE, TRUE );
+    // Get the TXD corresponding to this ID
+    SetTextureDict ( usTxdId );
+    pGame->GetModelInfo ( usModelID )->Request ( true, true );
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
 
-	SetTextureDict ( usTXDId );
+	if ( pTXD )
+    {
+        std::list < RwTexture* >::iterator it;
+        for ( it = textures.begin (); it != textures.end (); it++ )
+        {
+            // Only add the texture if it isn't already inside the TXD
+	        if ( RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name ) != NULL )
+                continue;
 
-	// Get the Txd associated with the CTXDStore
-	RwTexDictionary * pTXD = CTxdStore_GetTxd ( usTXDId );
-    //assert ( pTXD != NULL );
+            RwTexture* pTex = *it;
 
-//	RwTexDictionarySetCurrent ( pTxd );
-	if ( pTXD ) {
-		RwTexDictionaryForAllTextures ( pTXD, ( void* ) DebugCB, NULL );
-		RwTexDictionaryForAllTextures ( pSource, ( void* ) DebugCB, NULL );
-		RwTexDictionaryForAllTextures ( pSource, ( void* ) AddAllTexturesCB, pTXD );
+            if ( bMakeCopy )
+            {
+                // Reuse the given texture's raster
+                RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
+
+                // Copy over additional properties
+                memcpy ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
+                memcpy ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
+                pNewTex->flags = pTex->flags;
+                
+                pTex = pNewTex;
+            }
+
+            // Add the texture
+            RwTexDictionaryAddTexture ( pTXD, pTex );
+        }
 	}
 
 	// Add a reference to the TXD to make sure it doesn't get destroyed
-	CTxdStore_AddRef ( usTXDId );
+	//CTxdStore_AddRef ( usTxdId );
 }
 
-// Removes a TXD from another TXD that was imported by ModelInfoImportTXD
-void CRenderWareSA::ModelInfoRemoveTXD ( RwTexDictionary * pSource, unsigned short usModelID ) {
-	// CModelInfo stores some kind of TXD id at +Ah
-	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-	unsigned short usTxdId = *( ( unsigned short * ) ( pPool[usModelID] + 0xA ) );
+// Removes textures from the TXD of a model, eventually destroying each texture
+void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster )
+{
+	// Get the CModelInfo's TXD ID
+	unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
 
-	// Get the Txd associated with the CTXDStore
-	RwTexDictionary * pTxd = CTxdStore_GetTxd ( usTxdId );
+	// Get the TXD corresponding to this ID
+	RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
 
-	if ( pTxd ) {
-		RwTexDictionaryForAllTextures ( pSource, ( void* ) DeleteAllTexturesCB, pTxd );
+	if ( pTXD )
+    {
+        std::list < RwTexture* >::iterator it;
+        for ( it = textures.begin (); it != textures.end (); it++ )
+        {
+            // Don't remove the passed texture itself, rather any texture with the same name
+	        RwTexture* pTex = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
+            if ( pTex )
+            {
+                if ( bDestroy )
+                {
+                    // Destroy the texture
+                    if ( bKeepRaster )
+                        pTex->raster = NULL;
+                    RwTextureDestroy ( pTex );
+                }
+                else
+                {
+                    // Only remove the texture from the txd
+                    pTex->TXDList.next->prev = pTex->TXDList.prev;
+                    pTex->TXDList.prev->next = pTex->TXDList.next;
+                    pTex->txd = NULL;
+                }
+            }
+        }
 	}
 
-	// Delete the reference we made earlier
+	// Delete the reference we made in ModelInfoTXDAddTextures
 	CTxdStore_RemoveRef ( usTxdId );
 }
 
 
 // Reads and parses a TXD file specified by a path (szTXD)
 RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD ) {
-//	g_pCore->GetConsole ()->Printf ( "Reading TXD file %s", szTXD );
-
 	// open the stream
 	RwStream * streamTexture = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szTXD );
 
@@ -447,8 +438,6 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD ) {
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // usModelID == 0 means no collisions will be loaded (be careful! seems crashy!)
 RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID ) {
-//	g_pCore->GetConsole ()->Printf ( "Reading DFF file %s into %u", szDFF, usModelID );
-
 	// open the stream
 	RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szDFF );
 
@@ -460,8 +449,8 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID )
 		return NULL;
 
 	// force a load of the model, if this is a vehicle
-	if ( usModelID != 0 )
-		pGame->GetModelInfo ( usModelID ) -> Request ( TRUE, TRUE );
+	//if ( usModelID != 0 )
+	//	pGame->GetModelInfo ( usModelID )->Request ( true, true );
 
 	// DFF header id: 0x10
 	// find our dff chunk
@@ -479,13 +468,6 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID )
 	// reset collision hack
 	if ( usModelID != 0 )
 		RpPrtStdGlobalDataSetStreamEmbedded ( NULL );
-
-	//
-	/*
-	DWORD test = ((DWORD)(*((DWORD*)pPool[usModelID]))) + 0x4C;
-	BYTE* some = (BYTE*)test;
-	*some = 2;
-	*/
 
 	// close the stream
 	RwStreamClose ( streamModel, NULL );
@@ -592,8 +574,6 @@ bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelI
 
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
 unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * pAtomics ) {
-//	g_pCore->GetConsole ()->Printf ( "Loading all atomics in specified clump" );
-
 	// iterate through all atomics in the clump
 	SLoadAtomics data = {0};
 	data.pReplacements = pAtomics;
@@ -604,23 +584,39 @@ unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * 
 }
 
 // Replaces all atomics for a specific model
+typedef struct
+{
+    unsigned short usTxdID;
+    RpClump* pClump;
+} SAtomicsReplacer;
+RpAtomic* AtomicsReplacer ( RpAtomic* pAtomic, SAtomicsReplacer* pData )
+{
+    ( (void (*)(RpAtomic*, void*))FUNC_AtomicsReplacer ) ( pAtomic, pData->pClump );
+    // The above function adds a reference to the model's TXD. Remove it again.
+    CTxdStore_RemoveRef ( pData->usTxdID );
+    return pAtomic;
+}
+
 void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pSrc, unsigned short usModelID )
 {
 	// Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
 	RpClump * pCopy = RpClumpClone ( pSrc );
 
 	// Replace the atomics
+    SAtomicsReplacer data;
+    data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+    data.pClump = pCopy;
+
 	*((DWORD*)DWORD_AtomicsReplacerModelID) = usModelID;
-	RpClumpForAllAtomics ( pCopy, (void *) FUNC_AtomicsReplacer, pCopy );
+	RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
 
 	// Get rid of the now empty copied clump
 	RpClumpDestroy ( pCopy );
 }
 
 // Replaces all atomics in a vehicle
-void CRenderWareSA::ReplaceAllAtomicsInClump ( RpClump * pDst, RpAtomicContainer * pAtomics, unsigned int uiAtomics ) {
-//	g_pCore->GetConsole ()->Printf ( "Replacing all matching atomics in specified clump (%u replacements)", uiAtomics );
-
+void CRenderWareSA::ReplaceAllAtomicsInClump ( RpClump * pDst, RpAtomicContainer * pAtomics, unsigned int uiAtomics )
+{
 	SReplaceAll data;
 	data.pClump = pDst;
 	data.pReplacements = pAtomics;
@@ -629,9 +625,8 @@ void CRenderWareSA::ReplaceAllAtomicsInClump ( RpClump * pDst, RpAtomicContainer
 }
 
 // Replaces the wheels in a vehicle
-void CRenderWareSA::ReplaceWheels ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szWheel ) {
-//	g_pCore->GetConsole ()->Printf ( "Replacing all wheel-related atomics with %s in specified clump (%u replacements)", szWheel, uiAtomics );
-
+void CRenderWareSA::ReplaceWheels ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szWheel )
+{
 	// get the clump's frame
 	RwFrame * pFrame = RpGetFrame ( pClump );
 
@@ -644,26 +639,23 @@ void CRenderWareSA::ReplaceWheels ( RpClump * pClump, RpAtomicContainer * pAtomi
 }
 
 // Repositions an atomic
-void CRenderWareSA::RepositionAtomic ( RpClump * pDst, RpClump * pSrc, const char * szName ) {
-//	g_pCore->GetConsole ()->Printf ( "Copying frame from source to destination clump for atomic %s", szName );
-
+void CRenderWareSA::RepositionAtomic ( RpClump * pDst, RpClump * pSrc, const char * szName )
+{
 	RwFrame * pDstFrame = RpGetFrame ( pDst );
 	RwFrame * pSrcFrame = RpGetFrame ( pSrc );
 	RwFrameCopyMatrix ( RwFrameFindFrame ( pDstFrame, szName ), RwFrameFindFrame ( pSrcFrame, szName ) );
 }
 
 // Adds the atomics from a source clump (pSrc) to a destination clump (pDst)
-void CRenderWareSA::AddAllAtomics ( RpClump * pDst, RpClump * pSrc ) {
-//	g_pCore->GetConsole ()->Printf ( "Adding atomic %s from source to desination clump ", szName );
-
+void CRenderWareSA::AddAllAtomics ( RpClump * pDst, RpClump * pSrc )
+{
 	RpClumpForAllAtomics ( pSrc, AddAllAtomicsCB, pDst );
 }
 
 // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
 // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
-bool CRenderWareSA::ReplacePartModels ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) {
-//	g_pCore->GetConsole ()->Printf ( "Replacing (damageable) vehicle clump %s", szName );
-
+bool CRenderWareSA::ReplacePartModels ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName )
+{
 	// get the part's dummy name
 	char szDummyName[16] = {0};
 	_snprintf ( &szDummyName[0], 16, "%s_dummy", szName );
@@ -707,13 +699,20 @@ void CRenderWareSA::ReplaceCollisions ( CColModel* pCol, unsigned short usModelI
 // Destroys a DFF instance
 void CRenderWareSA::DestroyDFF ( RpClump * pClump )
 {
-	if ( pClump == NULL ) return;
-	RpClumpDestroy ( pClump );
+	if ( pClump )
+	    RpClumpDestroy ( pClump );
 }
 
-// Destroys a DFF instance
+// Destroys a TXD instance
 void CRenderWareSA::DestroyTXD ( RwTexDictionary * pTXD )
 {
-	if ( pTXD == NULL ) return;
-	RwTexDictionaryDestroy ( pTXD );
+	if ( pTXD )
+	    RwTexDictionaryDestroy ( pTXD );
+}
+
+// Destroys a texture instance
+void CRenderWareSA::DestroyTexture ( RwTexture* pTex )
+{
+    if ( pTex )
+        RwTextureDestroy ( pTex );
 }
