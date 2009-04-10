@@ -659,10 +659,10 @@ void CModelInfoSA::RestoreOriginalModel ( void )
         // Enable the unloaded state for this model so the original gets reloaded on request
 		// and our custom clump isnt destroyed
 		BYTE *ModelLoaded = (BYTE*)ARRAY_ModelLoaded;
-		ModelLoaded[(m_dwModelID+m_dwModelID*4)<<2] = 0;
+		ModelLoaded [ 20*m_dwModelID ] = 0;
 
         // Load the original model
-		Request ( TRUE, TRUE );
+		//Request ( true, true );
     }
 
 	// Reset the stored custom vehicle clump

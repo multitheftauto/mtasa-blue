@@ -27,11 +27,12 @@ class CRenderWareSA : public CRenderWare {
 	public:
 						CRenderWareSA				( enum eGameVersion version );
 						~CRenderWareSA				( void ) {};
-	// Imports a TXD (pSource) into a TXD that was assigned to a CModelInfo identified by the object id (uiModelId)
-	void				ModelInfoImportTXD			( RwTexDictionary * pSource, unsigned short usModelID );
 
-	// Removes a TXD from another TXD that was imported by ModelInfoImportTXD
-	void				ModelInfoRemoveTXD			( RwTexDictionary * pSource, unsigned short usModelID );
+	// Adds textures into the TXD of a model, eventually making a copy of each texture first
+    void				ModelInfoTXDAddTextures		( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy );
+
+	// Removes texture from the TXD of a model, eventually destroying each texture
+    void				ModelInfoTXDRemoveTextures	( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster = false );
 
 	// Reads and parses a TXD file specified by a path (szTXD)
 	RwTexDictionary *	ReadTXD						( const char *szTXD );
@@ -43,8 +44,11 @@ class CRenderWareSA : public CRenderWare {
 	// Destroys a DFF instance
 	void				DestroyDFF					( RpClump * pClump );
 
-	// Destroys a DFF instance
+	// Destroys a TXD instance
 	void				DestroyTXD					( RwTexDictionary * pTXD );
+
+    // Destroys a texture
+    void                DestroyTexture              ( RwTexture* pTex );
 
 	// Reads and parses a COL3 file with an optional collision key name
 	CColModel *			ReadCOL						( const char * szCOL, const char * szKeyName = NULL );
