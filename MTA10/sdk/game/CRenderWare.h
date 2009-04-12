@@ -13,6 +13,7 @@
 #define __CRENDERWARE
 
 #include "RenderWare.h"
+#include <list>
 
 #define MAX_ATOMICS_PER_CLUMP	128
 
