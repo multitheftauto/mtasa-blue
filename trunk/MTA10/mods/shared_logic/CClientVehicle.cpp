@@ -2509,8 +2509,8 @@ void CClientVehicle::SetDirtLevel ( float fDirtLevel )
     }
     m_fDirtLevel = fDirtLevel;
 }
-bool CClientVehicle::IsInWater2 ( void )
-{    //fix for vehicles that float on water >_<
+bool CClientVehicle::IsOnWater ( void )
+{
     float fWaterLevel;
     CVector vecPosition, vecTemp;
     GetPosition ( vecPosition );

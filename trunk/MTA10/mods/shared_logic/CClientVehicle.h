@@ -294,7 +294,7 @@ public:
     void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
     bool                        IsInWater               ( void );
     bool                        IsOnGround              ( void );
-    bool                        IsInWater2              ( void );
+    bool                        IsOnWater               ( void );
 	void						LockSteering			( bool bLock );
 
     bool                        IsSmokeTrailEnabled     ( void );

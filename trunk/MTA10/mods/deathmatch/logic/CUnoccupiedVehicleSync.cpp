@@ -341,7 +341,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) usFlags |= 0x020;
     if ( pVehicle->IsEngineOn () ) usFlags |= 0x040;
     if ( pVehicle->IsDerailed () ) usFlags |= 0x080;
-    if ( pVehicle->IsInWater2 () ) usFlags |= 0x100; //Fix for skimmer bug
+    if ( pVehicle->IsOnWater () ) usFlags |= 0x100; 
 
     // If nothing has changed we dont sync the vehicle
     if ( usFlags == 0 ) return;
