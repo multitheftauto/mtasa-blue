@@ -348,7 +348,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Derailed state
                         pVehicle->SetDerailed ( ( pData->usFlags & 0x80 ) ? true : false );
                         
-                        //In water state (Fix for skimmer warping)
+                        //In water state
                         pVehicle->SetInWater( ( pData->usFlags & 0x100 ) ? true : false );
 
                         // Run colpoint checks on vehicle
