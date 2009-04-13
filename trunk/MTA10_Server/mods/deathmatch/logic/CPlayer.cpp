@@ -213,6 +213,12 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
         // Write the content to it and send it
         if ( Packet.Write ( *pBitStream ) )
         {
+            if ( Reliability == PACKET_RELIABILITY_RELIABLE_ORDERED && Packet.GetPacketID () == PACKET_ID_ENTITY_ADD )
+            {
+                CEntityNextPacketInfo NextPacketInfo( Packet.GetPacketID (), pBitStream->GetNumberOfBytesUsed () );
+                Send ( NextPacketInfo, packetOrdering );
+            }
+
             g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, packetOrdering );
         }
 

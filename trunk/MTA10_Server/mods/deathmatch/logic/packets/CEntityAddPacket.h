@@ -41,4 +41,20 @@ private:
     std::vector < class CElement* > m_Entities;
 };
 
+
+class CEntityNextPacketInfo : public CPacket
+{
+public:
+                                    CEntityNextPacketInfo       ( ePacketID eID, unsigned long ulSize );
+
+    inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_NEXT_PACKET_INFO; };
+    inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+
+    bool                            Write                       ( NetServerBitStreamInterface& BitStream ) const;
+
+private:
+    BYTE                            m_bytePacketID;
+    unsigned long                   m_ulSize;
+};
+
 #endif

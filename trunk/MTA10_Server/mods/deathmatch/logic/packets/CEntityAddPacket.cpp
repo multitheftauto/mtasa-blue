@@ -869,3 +869,20 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
 
     return false;
 }
+
+
+CEntityNextPacketInfo::CEntityNextPacketInfo ( ePacketID eID, unsigned long ulSize )
+    : m_bytePacketID ( eID )
+    , m_ulSize ( ulSize )
+{
+}
+
+
+bool CEntityNextPacketInfo::Write ( NetServerBitStreamInterface& BitStream ) const
+{
+    // Write the number of entities
+    BitStream.Write ( m_bytePacketID );
+    BitStream.Write ( m_ulSize );
+    return true;
+}
+
