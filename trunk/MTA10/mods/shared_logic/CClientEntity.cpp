@@ -63,6 +63,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_bBeingDeleted = false;
 
     m_pElementGroup = NULL;
+    m_pModelInfo = NULL;
 }
 
 

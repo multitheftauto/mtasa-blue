@@ -134,6 +134,10 @@ void CClientStreamSector::AddElements ( list < CClientStreamElement * > * pList 
     list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
     for ( ; iter != m_Elements.end () ; iter++ )
     {
+        // Don't add if already in the list
+        if ( ListContains ( *pList, *iter ) )
+            continue;
+
         pList->push_back ( *iter );
     }
 }

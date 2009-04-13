@@ -77,7 +77,7 @@ void CClientStreamElement::InternalStreamOut ( void )
             CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
             if ( attachedElement )
             {
-                attachedElement->StreamOut();
+                attachedElement->InternalStreamOut();
             }
         }
 
@@ -122,12 +122,12 @@ void CClientStreamElement::RemoveStreamReference ( bool bScript )
     if ( (*pRefs) > 0 )
     {    
         (*pRefs)--;
+    }
 
-        // Have we removed the last reference?
-        if ( (*pRefs) == 0 )
-        {
-            m_pStreamer->OnElementForceStreamOut ( this );
-        }
+    // Have we removed the last reference?
+    if ( ( m_usStreamReferences + m_usStreamReferencesScript ) == 0 )
+    {
+        m_pStreamer->OnElementForceStreamOut ( this );
     }
 }
 

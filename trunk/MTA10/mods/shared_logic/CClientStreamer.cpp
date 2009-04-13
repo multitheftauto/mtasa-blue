@@ -341,6 +341,10 @@ void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, 
     float fDistance = ExpDistanceBetweenPoints ( pElement->GetStreamPosition (), m_vecPosition );
     pElement->SetExpDistance ( fDistance );
 
+    // Don't add if already in the list
+    if ( ListContains ( *pList, pElement ) )
+        return;
+
     // Search through our list. Add it behind the first item further away than this
     CClientStreamElement * pTemp = NULL;
     list < CClientStreamElement* > :: iterator iter = pList->begin ();
@@ -395,7 +399,7 @@ void CClientStreamer::Restream ( void )
             // Stream out 1 of them per frame
             pElement->InternalStreamOut ();
         }
-        m_ToStreamOut.pop_front ();
+        m_ToStreamOut.remove ( pElement );
     }
 
     CClientStreamElement * pFurthestStreamed = NULL;
@@ -429,6 +433,11 @@ void CClientStreamer::Restream ( void )
                 if ( fElementDistanceExp > m_fMaxDistanceExp )
                     continue;
 
+                // If attached and attached-to is streamed out, don't consider for streaming in
+                CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
+                if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
+                    continue;
+
                 // Not room to stream in more elements?
                 if ( bReachedLimit )
                 {                 
@@ -437,13 +446,9 @@ void CClientStreamer::Restream ( void )
                 }
                 else
                 {
-                    CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
-                    if ( !pAttachedTo || pAttachedTo->IsStreamedIn() )
-                    {
-                        // Stream in the new element. Don't do it instantly.
-                        pElement->InternalStreamIn ( false );
-                        bReachedLimit = ReachedLimit ();
-                    }
+                    // Stream in the new element. Don't do it instantly.
+                    pElement->InternalStreamIn ( false );
+                    bReachedLimit = ReachedLimit ();
                 }
             }            
         }
@@ -560,7 +565,7 @@ void CClientStreamer::OnElementEnterSector ( CClientStreamElement * pElement, CC
         else
         {
             // Should we activate this sector?
-            if ( pSector->IsExtra () && m_pSector->IsMySurroundingSector ( pSector ) )
+            if ( pSector->IsExtra () && ( m_pSector->IsMySurroundingSector ( pSector ) || m_pSector == pSector ) )
             {
                 pSector->AddElements ( &m_ActiveElements );
                 pSector->SetActivated ( true );
