@@ -2511,14 +2511,17 @@ void CClientVehicle::SetDirtLevel ( float fDirtLevel )
 }
 bool CClientVehicle::IsOnWater ( void )
 {
-    float fWaterLevel;
-    CVector vecPosition, vecTemp;
-    GetPosition ( vecPosition );
-    float fDistToBaseOfModel = vecPosition.fZ - m_pVehicle->GetDistanceFromCentreOfMassToBaseOfModel();
-    if ( g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, true, &vecTemp ) )
+    if ( m_pVehicle )
     {
-        if (fDistToBaseOfModel <= fWaterLevel) {
-            return true;
+        float fWaterLevel;
+        CVector vecPosition, vecTemp;
+        GetPosition ( vecPosition );
+        float fDistToBaseOfModel = vecPosition.fZ - m_pVehicle->GetDistanceFromCentreOfMassToBaseOfModel();
+        if ( g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, true, &vecTemp ) )
+        {
+            if (fDistToBaseOfModel <= fWaterLevel) {
+                return true;
+            }
         }
     }
     return false;
