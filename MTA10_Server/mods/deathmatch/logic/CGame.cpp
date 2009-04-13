@@ -1854,7 +1854,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         float fCutoffDistance = 50.0f;
                                         bool bWarpIn = false;
                                         // Jax: is he in water and trying to get in a floating vehicle
-                                        if ( pPlayer->IsInWater () && ( usVehicleModel == VT_SKIMMER ||
+                                        // Cazomino05: changed to check if the vehicle is in water not player
+                                        if ( pVehicle->IsInWater () && ( usVehicleModel == VT_SKIMMER ||
                                                                         usVehicleModel == VT_SEASPAR ||
                                                                         usVehicleModel == VT_LEVIATHN ||
                                                                         usVehicleModel == VT_VORTEX ) )

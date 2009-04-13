@@ -2509,7 +2509,20 @@ void CClientVehicle::SetDirtLevel ( float fDirtLevel )
     }
     m_fDirtLevel = fDirtLevel;
 }
-
+bool CClientVehicle::IsInWater2 ( void )
+{    //fix for vehicles that float on water >_<
+    float fWaterLevel;
+    CVector vecPosition, vecTemp;
+    GetPosition ( vecPosition );
+    float fDistToBaseOfModel = vecPosition.fZ - m_pVehicle->GetDistanceFromCentreOfMassToBaseOfModel();
+    if ( g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, &fWaterLevel, true, &vecTemp ) )
+    {
+        if (fDistToBaseOfModel <= fWaterLevel) {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CClientVehicle::IsInWater ( void )
 {
