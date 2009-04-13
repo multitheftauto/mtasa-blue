@@ -262,7 +262,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                 pVehicle->SetEngineOn ( ( usFlags & 0x40 ) ? true : false );
                 if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
                     pVehicle->SetDerailed ( ( usFlags & 0x80 ) ? true : false );
-                if ( usFlags & 0x100 ) pVehicle->SetInWater( ( usFlags & 0x100 ) ? true : false );
+                pVehicle->SetInWater( ( usFlags & 0x100 ) ? true : false );
 #ifdef MTA_DEBUG
 				pVehicle->m_pLastSyncer = NULL;
 				pVehicle->m_ulLastSyncTime = GetTickCount ();
