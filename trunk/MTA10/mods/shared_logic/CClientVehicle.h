@@ -291,9 +291,10 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 
+    void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
     bool                        IsInWater               ( void );
     bool                        IsOnGround              ( void );
-
+    bool                        IsInWater2              ( void );
 	void						LockSteering			( bool bLock );
 
     bool                        IsSmokeTrailEnabled     ( void );
@@ -459,6 +460,7 @@ protected:
     bool                        m_bTaxiLightOn;
     std::list < CClientProjectile* > m_Projectiles;
 
+    bool                        m_bIsInWater;
 public:
     CClientPlayer *             m_pLastSyncer;
     unsigned long               m_ulLastSyncTime;

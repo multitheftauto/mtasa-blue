@@ -228,13 +228,13 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                     if ( !pOccupant || !IS_PLAYER ( pOccupant ) )
                     {
                         // Apply the data to the vehicle
-                        if ( pData->ucFlags & 0x01 ) pVehicle->SetPosition ( pData->vecPosition );
-                        if ( pData->ucFlags & 0x02 ) pVehicle->SetRotationDegrees ( pData->vecRotationDegrees );
-                        if ( pData->ucFlags & 0x04 ) pVehicle->SetVelocity ( pData->vecVelocity );
-                        if ( pData->ucFlags & 0x08 ) pVehicle->SetTurnSpeed ( pData->vecTurnSpeed );
+                        if ( pData->usFlags & 0x01 ) pVehicle->SetPosition ( pData->vecPosition );
+                        if ( pData->usFlags & 0x02 ) pVehicle->SetRotationDegrees ( pData->vecRotationDegrees );
+                        if ( pData->usFlags & 0x04 ) pVehicle->SetVelocity ( pData->vecVelocity );
+                        if ( pData->usFlags & 0x08 ) pVehicle->SetTurnSpeed ( pData->vecTurnSpeed );
 
                         // Less health than last time?
-                        if ( pData->ucFlags & 0x10 )
+                        if ( pData->usFlags & 0x10 )
                         {
                             float fPreviousHealth = pVehicle->GetHealth ();
                             pVehicle->SetHealth ( pData->fHealth );
@@ -254,7 +254,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             }
                         }
 
-                        if ( pData->ucFlags & 0x20 )
+                        if ( pData->usFlags & 0x20 )
                         {
                             CVehicle* pTrailer = NULL;
                             ElementID TrailerID = pData->TrailerID;
@@ -343,12 +343,15 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             }
                         }
                         // Turn the engine on if it's on
-                        pVehicle->SetEngineOn ( ( pData->ucFlags & 0x40 ) ? true : false );
+                        pVehicle->SetEngineOn ( ( pData->usFlags & 0x40 ) ? true : false );
 
                         // Derailed state
-                        pVehicle->SetDerailed ( ( pData->ucFlags & 0x80 ) ? true : false );
+                        pVehicle->SetDerailed ( ( pData->usFlags & 0x80 ) ? true : false );
+                        
+                        //In water state (Fix for skimmer warping)
+                        pVehicle->SetInWater( ( pData->usFlags & 0x100 ) ? true : false );
 
-					    // Run colpoint checks on vehicle
+                        // Run colpoint checks on vehicle
 					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );  
 
                         // Send this sync
