@@ -65,7 +65,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DisableSpecificWarnings="4996"
+				DisableSpecificWarnings="4996;4482"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
