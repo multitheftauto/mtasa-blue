@@ -68,7 +68,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4409;4250;4996"
+				DisableSpecificWarnings="4409;4250;4996;4482"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
