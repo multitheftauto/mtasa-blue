@@ -1,6 +1,6 @@
 INCLUDES += -I ../pme
 # Build EHS library
-lib_LTLIBRARIES=libehs.la
+noinst_LTLIBRARIES=libehs.la
 
 # Sources for building EHS library
 libehs_la_SOURCES= \
