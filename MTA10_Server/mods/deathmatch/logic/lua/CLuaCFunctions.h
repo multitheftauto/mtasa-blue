@@ -6,7 +6,7 @@
 *  PURPOSE:     Lua C-function extension class
 *  DEVELOPERS:  Oliver Brown <>
 *               Christian Myhre Lundheim <>
-*               Alberto Alonso <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

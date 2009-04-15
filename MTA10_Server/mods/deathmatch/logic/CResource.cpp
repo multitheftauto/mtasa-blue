@@ -10,7 +10,7 @@
 *               Kevin Whiteside <>
 *               Jax <>
 *               Cecill Etheredge <>
-*               Alberto Alonso <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

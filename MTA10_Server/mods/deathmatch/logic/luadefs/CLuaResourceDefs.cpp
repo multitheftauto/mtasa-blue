@@ -8,7 +8,7 @@
 *               Jax <>
 *               Cecill Etheredge <>
 *               lil_Toady <>
-*               Alberto Alonso <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
