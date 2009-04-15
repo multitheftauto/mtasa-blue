@@ -410,13 +410,15 @@ void CKeyBinds::Clear ( void )
 void CKeyBinds::RemoveDeletedBinds ( void )
 {
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    for ( ; iter != m_pList->end (); iter++ )
+    while ( iter != m_pList->end () )
     {
         if ( (*iter)->IsBeingDeleted () )
         {
             delete *iter;
             iter = m_pList->erase ( iter );
         }
+		else
+			++iter;
     }
 }
 
@@ -551,7 +553,7 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                     {
                         if ( !pBind->szResource )
                         {
-                          if ( m_bProcessingKeyStroke )
+                            if ( m_bProcessingKeyStroke )
                             {
                                 pBind->beingDeleted = true;
                             }
@@ -617,9 +619,9 @@ bool CKeyBinds::RemoveAllCommands ( void )
             delete *iter;
             iter = m_pList->erase ( iter );
             bFound = true;
-            continue;
         }
-        iter++;
+		else
+			++iter;
     }
 
     return bFound;
@@ -897,9 +899,9 @@ bool CKeyBinds::RemoveAllGTAControls ( void )
             delete *iter;
             iter = m_pList->erase ( iter );
             bFound = true;
-            continue;
         }
-        iter++;
+		else
+			++iter;
     }
 
     return bFound;

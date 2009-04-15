@@ -22,7 +22,7 @@ void CMovingObjectsManager::DoPulse ( void )
     bool bRemoved = false;
     CDeathmatchObject* pObject;
     list < CDeathmatchObject* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    while ( iter != m_List.end () )
     {
         pObject = *iter;
         pObject->UpdateMovement ();
@@ -33,5 +33,7 @@ void CMovingObjectsManager::DoPulse ( void )
 			// Remove from list
             iter = m_List.erase ( iter );
         }
+		else
+			++iter;
     }
 }

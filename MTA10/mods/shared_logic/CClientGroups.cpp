@@ -28,11 +28,7 @@ void CClientGroups::DeleteAll ( void )
             {
                 delete pDummy;
             }
-
-            iter = m_List.erase ( iter );
         }
-
-        // Just in case
         m_List.clear ();
     }
 

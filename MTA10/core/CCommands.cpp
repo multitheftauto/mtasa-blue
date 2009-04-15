@@ -174,19 +174,17 @@ void CCommands::Delete ( const char* szCommand )
 {
     // Find the entry we're looking for
     list < COMMANDENTRY* > ::iterator iter = m_CommandList.begin ();
-    for ( ; iter != m_CommandList.end () ; iter++ )
+    while ( iter != m_CommandList.end () )
     {
         // Check to see if this is the variable
         if ( stricmp ( szCommand, (*iter)->szCommandName ) == 0 ) 
         { 
             // It is, so remove it
             delete *iter;
-            m_CommandList.erase ( iter );
-
-			// Restart iterating, unless the list is empty
-			if ( m_CommandList.empty() ) return;
-			iter = m_CommandList.begin ();
-        }    
+            iter = m_CommandList.erase ( iter );
+        }
+		else
+			++iter;
 	}
 }
 

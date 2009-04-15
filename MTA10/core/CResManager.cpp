@@ -35,7 +35,7 @@ CResManager::~CResManager()
 	// clean out the list of DeviceModes
 	if (m_stdDeviceModes.size() > 0)
 	{
-		m_stdDeviceModes.erase(m_stdDeviceModes.begin(), m_stdDeviceModes.end());
+		m_stdDeviceModes.clear ();
 	}
 }
 

@@ -42,10 +42,13 @@ CSFXSynth* CSFX::CreateSynth ( void )
 void CSFX::DeleteSynth ( CSFXSynth* pSynth )
 {
 	dsLock ();
-	for ( unsigned int i = 0; i < m_Synths.size(); i++) {
-		if ( m_Synths[i] == pSynth ) {
-			m_Synths.erase ( m_Synths.begin () + i );
-		}
+	std::vector < CSFXSynth * >::iterator iter = m_Synths.begin ();
+	while ( iter != m_Synths.end () )
+	{
+		if ( *iter == pSynth )
+			iter = m_Synths.erase ( iter );
+		else
+			++iter;
 	}
 	delete pSynth;
 	dsUnlock ();
