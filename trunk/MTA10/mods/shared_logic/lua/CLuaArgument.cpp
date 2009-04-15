@@ -329,7 +329,7 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void
             case LUA_TFUNCTION:
             {
                 // TODO: add function reading (has to work inside tables too)
-                m_iType = LUA_TNONE;
+                m_iType = LUA_TNIL;
                 break;
             }
 
