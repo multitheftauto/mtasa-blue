@@ -169,12 +169,6 @@ void CLuaTimerManager::TakeOutTheTrash ( void )
             if ( !m_TimerList.empty() ) m_TimerList.remove ( pTimer );
             delete pTimer;
         }
-
-		// Remove from the list
-        m_TrashCan.erase ( iter );
-
-		// Continue from the beginning, unless the list is empty
-		if ( m_TrashCan.empty () ) break;
-        iter = m_TrashCan.begin ();
     }
+	m_TrashCan.clear ();
 }

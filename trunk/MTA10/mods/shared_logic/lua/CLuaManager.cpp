@@ -55,7 +55,7 @@ void CLuaManager::StopScriptsOwnedBy ( int iOwner )
 {
     // Delete all the scripts by the given owner
     list < CLuaMain* > ::iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
+    while ( iter != m_virtualMachines.end () )
     {
         if ( (*iter)->GetOwner () == iOwner )
         {
@@ -63,12 +63,10 @@ void CLuaManager::StopScriptsOwnedBy ( int iOwner )
             delete *iter;
 
 			// Remove from list
-			m_virtualMachines.erase ( iter );
-
-			// Continue from the beginning, unless the list is empty
-			if ( m_virtualMachines.empty () ) break;
-			iter = m_virtualMachines.begin ();
+			iter = m_virtualMachines.erase ( iter );
         }
+		else
+			++iter;
     }
 }
 

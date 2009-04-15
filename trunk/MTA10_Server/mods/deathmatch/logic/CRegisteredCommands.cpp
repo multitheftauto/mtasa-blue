@@ -88,16 +88,17 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey,
             if ( m_bIteratingList )
             {
                 m_TrashCan.push_back ( *iter );
+				++iter;
             }
             else
             {
                 delete *iter;
-                m_Commands.erase ( iter );
-			    iter = m_Commands.begin ();
+                iter = m_Commands.erase ( iter );
             }
 			bFound = true;
         }
-		iter++;
+		else
+			++iter;
     }
 
     return bFound;
@@ -124,7 +125,7 @@ void CRegisteredCommands::CleanUpForVM ( CLuaMain* pLuaMain )
 
     // Delete every command that matches
     list < SCommand* > ::iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); )
+    while ( iter != m_Commands.end () )
     {
         // Matching VM's?
         if ( (*iter)->pLuaMain == pLuaMain )

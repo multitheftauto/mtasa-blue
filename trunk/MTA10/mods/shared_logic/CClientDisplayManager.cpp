@@ -101,7 +101,7 @@ void CClientDisplayManager::DoPulse ( void )
     // Render all our displays
     m_bCanRemoveFromList = false;
     list < CClientDisplay* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    while ( iter != m_List.end () )
     {
         CClientDisplay* pObject = *iter;
         if ( pObject->IsExpired () )
@@ -112,6 +112,7 @@ void CClientDisplayManager::DoPulse ( void )
         }
         else
         {
+			++iter;
             pObject->Render ( true );
         }
     }

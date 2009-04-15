@@ -128,9 +128,9 @@ void CKeyBinds::Clear ( eKeyBindType bindType )
         {
             delete *iter;
             iter = m_List.erase ( iter );
-            continue;
         }
-        iter++;
+		else
+			++iter;
     }
 }
 
@@ -515,10 +515,7 @@ void CKeyBinds::TakeOutTheTrash ( void )
 
 		// Delete the object
 		delete *iter;
-
-        if ( m_TrashCan.empty () ) break;
-		
-        iter = m_TrashCan.erase ( iter );        
     }
+	m_TrashCan.clear ();
 }
 

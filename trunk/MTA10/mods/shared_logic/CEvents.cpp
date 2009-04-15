@@ -86,7 +86,7 @@ void CEvents::RemoveAllEvents ( class CLuaMain* pMain )
 {
     // Delete all items
     list < SEvent* > ::iterator iter = m_Events.begin ();
-    for ( ; iter != m_Events.end (); iter++ )
+    while ( iter != m_Events.end () )
     {
         // If they match, delete it null it and set the bool
         if ( (*iter)->pLuaMain == pMain )
@@ -95,12 +95,10 @@ void CEvents::RemoveAllEvents ( class CLuaMain* pMain )
             delete *iter;
 
 			// Remove from list
-			m_Events.erase(iter);
-
-			// Continue from the beginning, unless the list is empty
-			if ( m_Events.empty() ) return;
-			iter = m_Events.begin ();
+			iter = m_Events.erase(iter);
         }
+		else
+			++iter;
     }
 }
 

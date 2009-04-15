@@ -511,13 +511,15 @@ bool CScriptKeyBinds::ControlFunctionExists ( SScriptBindableGTAControl* pContro
 void CScriptKeyBinds::RemoveDeletedBinds ( void )
 {
     list < CScriptKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ;iter++ )
+    while ( iter != m_List.end () )
     {
         if ( (*iter)->IsBeingDeleted () )
         {
             delete *iter;
             iter = m_List.erase ( iter );
         }
+		else
+			++iter;
     }
 }
 

@@ -92,7 +92,7 @@ void CConnectHistory::RemoveExpired ( void )
     // Check if any items are too old (2 min)
     unsigned long ulCurrentTime = GetTime ();
     list < CConnectHistoryItem* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    while ( iter != m_List.end () )
     {
         if ( ulCurrentTime > (*iter)->ulTime + 40000 )
         {
@@ -100,11 +100,9 @@ void CConnectHistory::RemoveExpired ( void )
             delete *iter;
 
 			// Remove from list
-			m_List.erase ( iter );
-
-			// Continue from the beginning, unless the list is empty
-			if ( m_List.empty () ) break;
-			iter = m_List.begin ();
+			iter = m_List.erase ( iter );
         }
+		else
+			++iter;
     }
 }

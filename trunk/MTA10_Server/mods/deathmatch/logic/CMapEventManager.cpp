@@ -174,11 +174,9 @@ void CMapEventManager::DeleteAll ( void )
         {
             delete *iter;
             iter = m_Events.erase ( iter );
-            continue;
         }
-
-        // Increment iterator
-        ++iter;
+		else
+	        ++iter;
     }
 }
 

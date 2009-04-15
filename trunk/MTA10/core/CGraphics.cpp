@@ -1028,16 +1028,17 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
     unsigned long ulMaxAgeSeconds   = max( 1, 15 - (ulNumTextures * 15 / 100) );
 
     map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
-    for ( ; iter != m_CachedTextureInfoMap.end (); iter++ )
+    while ( iter != m_CachedTextureInfoMap.end () )
     {
         SCachedTextureInfo& info    = iter->second;
         unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
             SAFE_RELEASE ( info.texture );
-            m_CachedTextureInfoMap.erase ( iter );
-            iter = m_CachedTextureInfoMap.begin ();
+            iter = m_CachedTextureInfoMap.erase ( iter );
         }
+		else
+			++iter;
     }
 }
 
