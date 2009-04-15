@@ -549,9 +549,10 @@ ShowUnInstDetails show
 			File "${FILES_ROOT}\MTA San Andreas\mta\net.dll"
 
 			!ifndef LIGHTBUILD
-				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_33.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\msvcp71.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\msvcr71.dll"
+				File "${FILES_ROOT}\redist\msvcp90.dll"
+				File "${FILES_ROOT}\redist\msvcr90.dll"
+				File "${FILES_ROOT}\redist\Microsoft.VC90.CRT.manifest"
+				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\lua5.1.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
@@ -622,8 +623,9 @@ ShowUnInstDetails show
 		File "${SERVER_FILES_ROOT}\xmll.dll"
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
-		File "${SERVER_FILES_ROOT}\msvcp71.dll"
-		File "${SERVER_FILES_ROOT}\msvcr71.dll"
+		File "${FILES_ROOT}\redist\msvcp90.dll"
+		File "${FILES_ROOT}\redist\msvcr90.dll"
+		File "${FILES_ROOT}\redist\Microsoft.VC90.CRT.manifest"
 
 		!ifndef LIGHTBUILD
 			File "${SERVER_FILES_ROOT}\libcurl.dll"
