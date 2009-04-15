@@ -8,7 +8,7 @@
 *               Ed Lyons <>
 *               Jax <>
 *               Oliver Brown <>
-*               Alberto Alonso <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *               lil_Toady <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

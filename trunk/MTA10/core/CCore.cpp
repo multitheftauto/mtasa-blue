@@ -971,7 +971,16 @@ void CCore::CreateNetwork ( )
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
     // Load approrpiate compilation-specific library.
+#ifdef _DEBUG
+    m_NetModule.LoadModule ( "net_d.dll" );
+#else
     m_NetModule.LoadModule ( "net.dll" );
+#endif
+	if ( m_NetModule.IsOk () == false )
+    {
+        MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        TerminateProcess ( GetCurrentProcess (), 0 );
+    }
 
     // Network module compatibility check
     typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );

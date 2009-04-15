@@ -24,7 +24,7 @@
 // Define libraries
 #ifdef WIN32
     #ifdef _DEBUG
-        char szNetworkLibName[] = "net.dll";
+        char szNetworkLibName[] = "net_d.dll";
         char szXMLLibName[]     = "xmll_d.dll";
     #else
         char szNetworkLibName[] = "net.dll";

@@ -6,7 +6,7 @@
 *  PURPOSE:     Vehicle entity manager class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
-*               Alberto Alonso <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
