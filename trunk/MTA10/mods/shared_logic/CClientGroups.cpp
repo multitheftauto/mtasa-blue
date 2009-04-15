@@ -21,7 +21,7 @@ void CClientGroups::DeleteAll ( void )
 
     if ( !m_List.empty () )
     {
-        for ( list < CClientDummy* >::iterator iter = m_List.begin () ; iter != m_List.end () ; )
+        for ( list < CClientDummy* >::iterator iter = m_List.begin () ; iter != m_List.end () ; ++iter )
         {
             CClientDummy* pDummy = *iter;
             if ( pDummy )
