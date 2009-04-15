@@ -4,6 +4,8 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        sdk/net/ns_playerid.h
 *  PURPOSE:     Net server player ID interface
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,51 +20,68 @@
 class NetServerPlayerID
 {
 public:
-	ULONG           m_uiBinaryAddress;
-	USHORT          m_usPort;
-    std::string     m_strSerial;
+    ULONG           m_uiBinaryAddress;
+    USHORT          m_usPort;
+    char            m_szSerial [ 64 ];
 
 public:
-	NetServerPlayerID ( void )
-	{
-		m_uiBinaryAddress = 0xFFFFFFFF;
-		m_usPort = 0xFFFF;
-	};
+    NetServerPlayerID ( void )
+    {
+        m_uiBinaryAddress = 0xFFFFFFFF;
+        m_usPort = 0xFFFF;
+        m_szSerial [ 0 ] = '\0';
+    };
 
-	NetServerPlayerID ( const NetServerPlayerID& PlayerID )
-	{
-		m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
+    NetServerPlayerID ( const NetServerPlayerID& PlayerID )
+    {
+        m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
         m_usPort = PlayerID.m_usPort;
-        m_strSerial = PlayerID.m_strSerial;
-	};
+        SetSerial ( PlayerID.m_szSerial );
+    };
 
-	~NetServerPlayerID ( void )
-	{
-	};
+    ~NetServerPlayerID ( void )
+    {
+    };
 
-	NetServerPlayerID& operator = ( const NetServerPlayerID& PlayerID )
-	{
-		m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
-		m_usPort = PlayerID.m_usPort;
-        m_strSerial = PlayerID.m_strSerial;
-		return *this;
-	};
+    inline NetServerPlayerID& operator = ( const NetServerPlayerID& PlayerID )
+    {
+    	m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
+    	m_usPort = PlayerID.m_usPort;
+        SetSerial ( PlayerID.m_szSerial );
+        return *this;
+    };
 
-	friend int operator == ( const NetServerPlayerID& left, const NetServerPlayerID& right )
-	{
-		return left.m_uiBinaryAddress == right.m_uiBinaryAddress && left.m_usPort == right.m_usPort;
-	};
+    friend inline int operator == ( const NetServerPlayerID& left, const NetServerPlayerID& right )
+    {
+        return left.m_uiBinaryAddress == right.m_uiBinaryAddress && left.m_usPort == right.m_usPort;
+    };
 
-	friend int operator != ( const NetServerPlayerID& left, const NetServerPlayerID& right )
-	{
-		return ((left.m_uiBinaryAddress != right.m_uiBinaryAddress) || (left.m_usPort != right.m_usPort));
-	};
+    friend inline int operator != ( const NetServerPlayerID& left, const NetServerPlayerID& right )
+    {
+        return ((left.m_uiBinaryAddress != right.m_uiBinaryAddress) || (left.m_usPort != right.m_usPort));
+    };
 
-	ULONG       GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
-	USHORT      GetPort             ( void ) const                      { return m_usPort; };
+    inline ULONG        GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
+    inline USHORT       GetPort             ( void ) const                      { return m_usPort; };
     
-    void        GetSerial           ( std::string & strSerial ) const   { strSerial = m_strSerial; };
-    void        SetSerial           ( std::string strSerial )           { m_strSerial = strSerial; };
+    inline void         GetSerial           ( std::string & strSerial ) const   { strSerial = m_szSerial; };
+    inline void         SetSerial           ( std::string strSerial )           { SetSerial ( strSerial.c_str() ); };
+
+    inline void         SetSerial           ( const char* szSerial )
+    {
+        if ( szSerial )
+        {
+            size_t length = strlen ( szSerial );
+            if ( length >= sizeof ( m_szSerial ) )
+            {
+                length = sizeof ( m_szSerial ) - 1;
+            }
+            strncpy ( m_szSerial, szSerial, length );
+            m_szSerial [ length ] = '\0';
+        }
+        else
+            m_szSerial [ 0 ] = '\0';
+    };
 };
 
 #endif
