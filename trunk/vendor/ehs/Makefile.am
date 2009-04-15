@@ -1,9 +1,9 @@
 INCLUDES += -I ../pme
 # Build EHS library
-noinst_LTLIBRARIES=libehs.la
+noinst_LIBRARIES=libehs.a
 
 # Sources for building EHS library
-libehs_la_SOURCES= \
+libehs_a_SOURCES= \
 	ehs.cpp \
 	dynamicssllocking.cpp \
 	securesocket.cpp \
@@ -14,11 +14,3 @@ libehs_la_SOURCES= \
 	httpresponse.cpp \
 	httprequest.cpp
 	
-libehs_la_LDDFLAGS=-avoid-version
-
-# headers to be installed with the library
-#ehsinclude_HEADERS=ehs.h networkabstraction.h socket.h securesocket.h\
-#sslerror.h staticssllocking.h threadabstractionlayer.h dynamicssllocking.h\
-#datum.h httpresponse.h httprequest.h ehstypes.h formvalue.h\
-#contentdisposition.h
-
