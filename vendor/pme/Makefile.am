@@ -1,9 +1,8 @@
-noinst_LTLIBRARIES=libpme.la
+noinst_LIBRARIES=libpme.a
 
-libpme_la_SOURCES = pme.cpp
-libpme_la_LIBADD = @PCRE_LIBS@
-libpme_la_LDFLAGS = -avoid-version
-
+libpme_a_SOURCES = pme.cpp
+#libpme_a_LIBADD = @PCRE_LIBS@
+#libpme_a_LDFLAGS = -avoid-version
 #pmeincludedir=./
 #pmeinclude_HEADERS=pme.h
 

@@ -223,10 +223,11 @@ libdeathmatch_la_SOURCES = \
 	StdInc.cpp
 
 libdeathmatch_la_LIBADD = \
-	-lplatform \
-	-lsqlite3 \
+	@PCRE_LIBS@ \
 	-lehs \
 	-lpme \
+	-lplatform \
+	-lsqlite3 \
 	-llua \
 	-ljson-c
 
