@@ -58,7 +58,7 @@ CGame::CGame ( void )
     g_pGame = this;
 
     // Initialize random number generator and time
-    srand ( time ( NULL ) );
+    srand ( (unsigned int) time ( NULL ) );
     InitializeTime ();
 
 	m_bBeingDeleted = false;

@@ -38,7 +38,9 @@ list < CResource* > CResource::m_StartedResources;
 extern CServerInterface* g_pServerInterface;
 extern CGame* g_pGame;
 
+#ifdef NO_ERRNO_H
 extern int errno;
+#endif
 
 // (IJs) This class contains very nasty unchecked and unproper code. Please revise.
 

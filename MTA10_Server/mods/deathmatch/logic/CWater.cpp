@@ -48,7 +48,7 @@ const CVector& CWater::GetPosition ()
     {
         m_vecPosition += m_Vertices [ i ];
     }
-    m_vecPosition /= GetNumVertices ();
+    m_vecPosition /= static_cast < float >( GetNumVertices () );
     return m_vecPosition;
 }
 

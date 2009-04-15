@@ -61,8 +61,6 @@ bool CKeysyncPacket::Read ( NetServerBitStreamInterface& BitStream )
             // Did he have a weapon?
             if ( ucCurrentWeaponType != 0 )
             {
-                unsigned char ucTemp;
-
                 // And ammo in clip
                 unsigned short usAmmoInClip;
                 BitStream.Read ( usAmmoInClip );
