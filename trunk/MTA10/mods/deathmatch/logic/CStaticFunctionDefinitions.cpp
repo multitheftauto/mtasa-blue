@@ -4699,10 +4699,6 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     return bSuccess;
 }
 
-/*
-
-// This function was used by an undocumented syntax variant of bindKey()
-
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource )
 {
     assert ( szKey );
@@ -4742,8 +4738,6 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     }
     return bSuccess;
 }
-*/
-
 
 bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction )
 {
@@ -4783,7 +4777,7 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMa
          (
            pControl &&
            ( m_pScriptKeyBinds->RemoveControlFunction ( pScriptControl, pLuaMain, bCheckHitState, bHitState, iLuaFunction ) ||
-             pKeyBinds->RemoveControlFunction ( pControl, CClientGame::StaticProcessClientControlBind, bCheckHitState, bHitState ) )
+             pKeyBinds->RemoveControlFunction ( pControl, CClientGame::StaticProcessClientControlBind, true, bHitState ) )
          )
        )
     {
@@ -4792,10 +4786,6 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMa
 
     return false;
 }
-
-/*
-
-// This function was used by an undocumented syntax variant of unbindKey()
 
 bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource )
 {
@@ -4834,7 +4824,6 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, const char* szHi
     }
     return bSuccess;
 }
-*/
 
 bool CStaticFunctionDefinitions::GetKeyState ( const char* szKey, bool& bState )
 {
