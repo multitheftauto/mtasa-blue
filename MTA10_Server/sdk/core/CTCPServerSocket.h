@@ -34,7 +34,7 @@
 	#define CloseSocket close
 #endif
 
-#include "../Platform.h"
+#include "../MTAPlatform.h"
 #include "CTCPSocket.h"
 
 class CTCPServerSocket : public CTCPSocket

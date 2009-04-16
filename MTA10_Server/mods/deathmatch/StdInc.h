@@ -22,7 +22,7 @@
 #include <google/sparse_hash_map>
 
 // SDK includes
-#include "Platform.h"
+#include "MTAPlatform.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>

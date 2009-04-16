@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/Platform.cpp
+*  FILE:        sdk/MTAPlatform.cpp
 *  PURPOSE:     Platform-specific defines and methods
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "Platform.h"
+#include "MTAPlatform.h"
 
 // Replacement functions
 int mymkdir ( const char* dirname )

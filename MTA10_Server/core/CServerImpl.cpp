@@ -17,7 +17,7 @@
 #include "StdInc.h"
 #include "CServerImpl.h"
 #include "CCrashHandler.h"
-#include "Platform.h"
+#include "MTAPlatform.h"
 #include "ErrorCodes.h"
 #include <cstdio>
 

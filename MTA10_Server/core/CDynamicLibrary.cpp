@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 #include "CDynamicLibrary.h"
-#include "Platform.h"
+#include "MTAPlatform.h"
 
 #ifdef WIN32
 #include <stdio.h>

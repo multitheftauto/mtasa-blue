@@ -14,7 +14,7 @@
 #ifndef __NS_PLAYERID_H
 #define __NS_PLAYERID_H
 
-#include <Platform.h>
+#include <MTAPlatform.h>
 #include <string>
 
 class NetServerPlayerID
