@@ -880,8 +880,9 @@ CEntityNextPacketInfo::CEntityNextPacketInfo ( ePacketID eID, unsigned long ulSi
 
 bool CEntityNextPacketInfo::Write ( NetServerBitStreamInterface& BitStream ) const
 {
-    // Write the number of entities
+    // Write the next packet ID
     BitStream.Write ( m_bytePacketID );
+    // Write the next packet size
     BitStream.Write ( m_ulSize );
     return true;
 }

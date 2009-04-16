@@ -102,6 +102,11 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_MapInfo ( bitStream );
             return true;
 
+        // Contains info about the next packet
+        case PACKET_ID_NEXT_PACKET_INFO:
+            Packet_NextPacketInfo ( bitStream );
+            return true;
+
         // Adds a new entity of any type to the world streamer.
         case PACKET_ID_ENTITY_ADD:
             Packet_EntityAdd ( bitStream );
@@ -1840,7 +1845,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     unsigned int iVal;
     g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
 
-	if ( iVal > sFPSLimit )
+	if ( iVal > ( unsigned long ) sFPSLimit )
     {
 		// For some reason it needs that kind of hacky precision
 		g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
@@ -1864,6 +1869,20 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         {
             pGarage->SetOpen ( (ucGarageState == 1) );
         }
+    }
+}
+
+
+void CPacketHandler::Packet_NextPacketInfo ( NetBitStreamInterface& bitStream )
+{
+    BYTE            bytePacketID;
+    unsigned long   ulSize;
+
+    if ( bitStream.Read ( bytePacketID ) &&
+        bitStream.Read ( ulSize ) )
+    {
+        if ( g_pClientGame )
+            g_pClientGame->NotifyNextPacketInfo ( bytePacketID, ulSize );
     }
 }
 

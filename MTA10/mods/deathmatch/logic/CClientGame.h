@@ -328,6 +328,8 @@ public:
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
+    void                                NotifyNextPacketInfo            ( BYTE bytePacketID, unsigned long ulSize );
+    void                                UpdateBigPacketProgress         ( void );
 
 private:
     #ifdef MTA_VOICE
@@ -536,6 +538,11 @@ private:
     eHTTPDownloadType                   m_ucHTTPDownloadType;
     unsigned short                      m_usHTTPDownloadPort;
     SString                             m_strHTTPDownloadURL;
+
+    bool                                m_bReceivingBigPacket;
+    unsigned long                       m_ulBigPacketSize;
+    unsigned long                       m_ulBigPacketBytesReceivedBase;
+    CTransferBox*                       m_pBigPacketTransferBox;
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     bool                                m_bShowSyncingInfo;
