@@ -79,7 +79,9 @@ void CNetworkStats::Draw ( void )
                 "Bytes recv: %s\n"
                 "Bytes sent: %s\n"
                 "Datarate: %s/s / %s/s\n"
-                "Packet rate: %u / %u",
+                "Packet rate: %u / %u\n"
+                "Compression ratio: %.3f%%\n"
+                "Decompression ratio: %.3f%%",
 
                 g_pNet->GetPing (),
 
@@ -101,7 +103,10 @@ void CNetworkStats::Draw ( void )
                 strRecvRate.c_str (),
                 strSendRate.c_str (),
                 m_uiPacketsReceived - m_uiLastPacketsReceived,
-                m_uiPacketsSent - m_uiLastPacketsSent );
+                m_uiPacketsSent - m_uiLastPacketsSent,
+                
+                g_pNet->GetCompressionRatio () * 100.0f,
+                g_pNet->GetDecompressionRatio () * 100.0f );
 
     // Print it
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.31f, 0 ), 1.0f, 0xFFFFFFFF );
