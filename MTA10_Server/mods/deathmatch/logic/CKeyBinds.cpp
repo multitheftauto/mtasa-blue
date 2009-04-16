@@ -507,7 +507,7 @@ bool CKeyBinds::IsMouse ( SBindableKey* pKey )
 void CKeyBinds::TakeOutTheTrash ( void )
 {
     list < CKeyBind* > ::iterator iter = m_TrashCan.begin ();
-    while ( iter != m_TrashCan.end () )
+    for ( ; iter != m_TrashCan.end () ; iter++ )
     {
 		// Remove from the main list
 		CKeyBind* pBind = *iter;
