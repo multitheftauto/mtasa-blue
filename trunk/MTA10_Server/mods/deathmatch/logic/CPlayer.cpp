@@ -215,7 +215,8 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
         {
             if ( Reliability == PACKET_RELIABILITY_RELIABLE_ORDERED && Packet.GetPacketID () == PACKET_ID_ENTITY_ADD )
             {
-                CEntityNextPacketInfo NextPacketInfo( Packet.GetPacketID (), pBitStream->GetNumberOfBytesUsed () );
+                // Send packet info before EntityAdd packets
+                CNextPacketInfoPacket NextPacketInfo( Packet.GetPacketID (), pBitStream->GetNumberOfBytesUsed () );
                 Send ( NextPacketInfo, packetOrdering );
             }
 
