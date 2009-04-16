@@ -10,6 +10,7 @@
 *               Kevin Whiteside <>
 *               Cecill Etheredge <>
 *               Chris McArthur <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -231,8 +232,11 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     // Health as float
                     BitStream.Write ( pVehicle->GetHealth () );
 
-                    // Color as an unsigned long
-                    BitStream.Write ( pVehicle->GetColor ().GetColor () );
+                    // Color as 4 unsigned chars
+                    BitStream.Write ( pVehicle->GetColor ().GetColor1 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor2 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor3 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor4 () );
 
                     // Paintjob
                     BitStream.Write ( pVehicle->GetPaintjob () );

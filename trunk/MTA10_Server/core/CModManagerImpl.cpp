@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 #include "CModManagerImpl.h"
-#include "Platform.h"
+#include "MTAPlatform.h"
 #include <cstdio>
 
 using namespace std;

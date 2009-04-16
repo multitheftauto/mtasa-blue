@@ -159,14 +159,15 @@ void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
 void CLuaTimerManager::TakeOutTheTrash ( void )
 {
     list < CLuaTimer* > ::iterator iter = m_TrashCan.begin ();
-	for ( ; iter != m_TrashCan.end () ; iter++ )
+    for ( ; iter != m_TrashCan.end () ; iter++ )
     {
         CLuaTimer* pTimer = *iter;
 
 		// Clean up the timer
         if ( Exists ( pTimer ) )
         {
-            if ( !m_TimerList.empty() ) m_TimerList.remove ( pTimer );
+            if ( !m_TimerList.empty() )
+                m_TimerList.remove ( pTimer );
             delete pTimer;
         }
     }

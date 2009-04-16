@@ -138,6 +138,8 @@ enum
 	ID_FILE_LIST_TRANSFER_HEADER,
 	/// FileListTransfer plugin - A file
 	ID_FILE_LIST_TRANSFER_FILE,
+	// Ack for reference push, to send more of the file
+	ID_FILE_LIST_REFERENCE_PUSH_ACK,
 
 	/// DirectoryDeltaTransfer plugin - Request from a remote system for a download of a directory
 	ID_DDT_DOWNLOAD_REQUEST,
@@ -201,18 +203,27 @@ enum
 	/// Autopatcher plugin - Returned to the user: You must restart the application to finish patching.
 	ID_AUTOPATCHER_RESTART_APPLICATION,
 
-	/// NATPunchthrough plugin - Intermediary got a request to help punch through a nat
+	/// NATPunchthrough plugin: internal
 	ID_NAT_PUNCHTHROUGH_REQUEST,
-	/// NATPunchthrough plugin - Intermediary cannot complete the request because the target system is not connected
-	ID_NAT_TARGET_NOT_CONNECTED,
-	/// NATPunchthrough plugin - While attempting to connect, we lost the connection to the target system
-	ID_NAT_TARGET_CONNECTION_LOST,
-	/// NATPunchthrough plugin - Internal message to connect at a certain time
+	/// NATPunchthrough plugin: internal
 	ID_NAT_CONNECT_AT_TIME,
-	/// NATPunchthrough plugin - Internal message to send a message (to punch through the nat) at a certain time
-	ID_NAT_SEND_OFFLINE_MESSAGE_AT_TIME,
-	/// NATPunchthrough plugin - The facilitator is already attempting this connection
-	ID_NAT_IN_PROGRESS,
+	/// NATPunchthrough plugin: internal
+	ID_NAT_GET_MOST_RECENT_PORT,
+	/// NATPunchthrough plugin: internal
+	ID_NAT_CLIENT_READY,
+
+	/// NATPunchthrough plugin: Destination system is not connected to the server. Bytes starting at offset 1 contains the destination field of NatPunchthroughClient::OpenNAT().
+	ID_NAT_TARGET_NOT_CONNECTED,
+	/// NATPunchthrough plugin: Destination system is not responding to the plugin messages. Possibly the plugin is not installed. Bytes starting at offset 1 contains the destination field of NatPunchthroughClient::OpenNAT().
+	ID_NAT_TARGET_UNRESPONSIVE,
+	/// NATPunchthrough plugin: The server lost the connection to the destination system while setting up punchthrough. Possibly the plugin is not installed. Bytes starting at offset 1 contains the destination field of NatPunchthroughClient::OpenNAT().
+	ID_NAT_CONNECTION_TO_TARGET_LOST,
+	/// NATPunchthrough plugin: This punchthrough is already in progress. Possibly the plugin is not installed. Bytes starting at offset 1 contains the destination field of NatPunchthroughClient::OpenNAT().
+	ID_NAT_ALREADY_IN_PROGRESS,
+	/// NATPunchthrough plugin: This message is generated on the local system, and does not come from the network. packet::guid contains the destination field of NatPunchthroughClient::OpenNAT().
+	ID_NAT_PUNCHTHROUGH_FAILED,
+	/// NATPunchthrough plugin: Punchthrough suceeded. See packet::systemAddress and packet::guid. You can now use RakPeer::Connect() or other calls to communicate with this system.
+	ID_NAT_PUNCHTHROUGH_SUCCEEDED,
 
 	/// LightweightDatabase plugin - Query
 	ID_DATABASE_QUERY_REQUEST,
@@ -258,14 +269,26 @@ enum
 	/// Force the ready event to all set
 	ID_READY_EVENT_FORCE_ALL_SET,
 
-	// Rooms function
+	/// Rooms function
 	ID_ROOMS_EXECUTE_FUNC,
 	ID_ROOMS_LOGON_STATUS,
 	ID_ROOMS_HANDLE_CHANGE,
 
-	// Lobby2 message
+	/// Lobby2 message
 	ID_LOBBY2_SEND_MESSAGE,
 	ID_LOBBY2_SERVER_ERROR,
+
+	// RAKNET_PROTOCOL_VERSION in RakNetVersion.h does not match on the remote system what we have on our system
+	// This means the two systems cannot communicate.
+	// The 2nd byte of the message contains the value of RAKNET_PROTOCOL_VERSION for the remote system
+	ID_INCOMPATIBLE_PROTOCOL_VERSION,
+
+	ID_FCM_HOST_QUERY,
+	ID_FCM_HOST_UNKNOWN,
+	ID_FCM_HOST_NOTIFICATION,
+	ID_FCM_HOST_PARTICIPANT_LIST_TRANSMIT,
+	ID_FCM_HOST_PARTICIPANT_LIST_MATCH,
+	ID_FCM_HOST_STATE_CHANGE_NOTIFICATION,
 
 	// For the user to use.  Start your first enumeration at this value.
 	ID_USER_PACKET_ENUM,

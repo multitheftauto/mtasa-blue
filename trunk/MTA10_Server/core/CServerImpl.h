@@ -20,7 +20,7 @@ class CServerImpl;
 #define __CSERVERIMPL_H
 
 #include "CCriticalSection.h"
-#include "Platform.h"
+#include "MTAPlatform.h"
 #include <string>
 
 #include <core/CServerInterface.h>
