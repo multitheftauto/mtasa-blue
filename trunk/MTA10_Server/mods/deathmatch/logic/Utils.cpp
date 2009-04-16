@@ -22,7 +22,7 @@
     struct timeval     g_tvInitialTime;
 #endif
 
-#ifndef strupr
+#ifndef WIN32
 	char * strupr (char* a) {
 		char *ret = a;
 		while (*a != '\0')

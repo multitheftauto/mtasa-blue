@@ -190,8 +190,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pCore->SetScreenShotPath ( strScreenShotPath );
 	*/
 
-    // Create the transfer box (GUI)
+    // Create the transfer boxes (GUI)
     m_pTransferBox = new CTransferBox ();
+    m_pBigPacketTransferBox = new CTransferBox ();
 
     // Store the time we started on
     if ( bLocalPlay )
@@ -235,6 +236,11 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Key-bind for fire-key (for handling satchels and stealth-kills)
     g_pCore->GetKeyBinds ()->AddControlFunction ( "fire", CClientGame::StaticUpdateFireKey, true );
+
+    // Init big packet progress vars
+    m_bReceivingBigPacket           = false;
+    m_ulBigPacketSize               = 0;
+    m_ulBigPacketBytesReceivedBase  = 0;
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     m_bShowSyncingInfo = false;
@@ -305,6 +311,7 @@ CClientGame::~CClientGame ( void )
 
     // Hide the transfer box incase it is showing
     m_pTransferBox->Hide();
+    m_pBigPacketTransferBox->Hide();
 
     #ifdef MTA_VOICE
     if ( m_pVoice )
@@ -370,8 +377,9 @@ CClientGame::~CClientGame ( void )
     // Delete the scriptdebugger
     delete m_pScriptDebugging;
 
-    // Delete the transfer box
+    // Delete the transfer boxes
     delete m_pTransferBox;
+    delete m_pBigPacketTransferBox;
 
     if ( m_pLocalServer )
     {
@@ -694,6 +702,9 @@ void CClientGame::DoPulsePostFrame ( void )
         {
             m_pNetworkStats->Draw ();
         }
+
+        // If we have a big packet coming in, show the progress
+        UpdateBigPacketProgress ();
 
         // Sync debug
         m_pSyncDebug->OnPulse ();
@@ -4206,3 +4217,61 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
 }
 
 #endif
+
+
+//
+// Called when the client receives notification from the server about the next network packet
+//
+void CClientGame::NotifyNextPacketInfo ( BYTE bytePacketID, unsigned long ulSize )
+{
+    if ( ulSize < 50000 )
+        return;
+
+    if ( m_bReceivingBigPacket )
+    {
+        m_bReceivingBigPacket = false;
+        m_pBigPacketTransferBox->Hide ();
+    }
+
+    m_bReceivingBigPacket           = true;
+    m_ulBigPacketSize               = ulSize;
+    m_ulBigPacketBytesReceivedBase  = g_pNet->GetBitsReceived () / 8;
+    m_pBigPacketTransferBox->AddToTotalSize ( m_ulBigPacketSize );
+    m_pBigPacketTransferBox->Show ();
+}
+
+
+//
+// Display a progress dialog if a big packet is coming in
+//
+void CClientGame::UpdateBigPacketProgress ()
+{
+    if ( !m_bReceivingBigPacket )
+        return;
+
+    // Calc bytes read
+    unsigned long ulBytesReceived = ( g_pNet->GetBitsReceived () / 8 ) - m_ulBigPacketBytesReceivedBase;
+
+	// At end?
+    if ( ulBytesReceived > m_ulBigPacketSize * 101 / 100 )
+    {
+        m_bReceivingBigPacket = false;
+        m_pBigPacketTransferBox->Hide ();
+        return;
+    }
+
+    // Convert to unit value
+    float fAmountDone = ulBytesReceived / (float)m_ulBigPacketSize;
+
+    // Bias start to be faster
+    float fTemp = 1 - fAmountDone;
+    fAmountDone = 1 - fTemp * fTemp * ( fTemp > 0 ? 1 : -1 );
+
+    // Convert back to bytes
+    ulBytesReceived = m_ulBigPacketSize * fAmountDone;
+
+    // Update progress indicator
+    m_pBigPacketTransferBox->DoPulse ();
+    m_pBigPacketTransferBox->SetInfoSingleDownload ( "", min ( m_ulBigPacketSize, ulBytesReceived ) );
+}
+
