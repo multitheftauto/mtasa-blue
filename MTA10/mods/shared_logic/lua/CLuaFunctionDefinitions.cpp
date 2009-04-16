@@ -13371,19 +13371,6 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
                 else
                     m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 3 );
             }
-            else if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-            {
-         		const char* szResource = pLuaMain->GetResource()->GetName();
-                const char* szCommand = lua_tostring ( luaVM, 3 );
-                const char* szArguments = "";
-                if  ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
-                    szArguments = lua_tostring ( luaVM, 4 );
-                if ( CStaticFunctionDefinitions::BindKey ( szKey, szHitState, szCommand, szArguments, szResource ) )
-			    {
-			        lua_pushboolean ( luaVM, true );
-					return 1;
-		        }  
-            }
             else
                 m_pScriptDebugging->LogBadType ( luaVM, "bindKey" );
         }
@@ -13404,33 +13391,20 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
             const char* szKey = lua_tostring ( luaVM, 1 );
             const char* szHitState = NULL;
 
-            if ( lua_type ( luaVM, 2 ) )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
                 szHitState = lua_tostring ( luaVM, 2 );
+
+            int iLuaFunction = 0;
             if ( lua_type ( luaVM, 3 ) == LUA_TFUNCTION )
-            {   
-                int iLuaFunction = luaM_toref ( luaVM, 3 );
-                if ( iLuaFunction == 0 || VERIFY_FUNCTION ( iLuaFunction ) )
-                {
-			        if ( CStaticFunctionDefinitions::UnbindKey ( szKey, pLuaMain, szHitState, iLuaFunction ) )
-			        {
-				        lua_pushboolean ( luaVM, true );
-				        return 1;
-			        }
-                }
-                else
-                {
-                    m_pScriptDebugging->LogBadType ( luaVM, "unbindKey" );
-                }
-            }
-            else if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+                iLuaFunction = luaM_toref ( luaVM, 3 );
+
+            if ( iLuaFunction == 0 || VERIFY_FUNCTION ( iLuaFunction ) )
             {
-                const char* szResource = pLuaMain->GetResource()->GetName();
-                const char* szCommand = lua_tostring ( luaVM, 3 );
-			    if ( CStaticFunctionDefinitions::UnbindKey ( szKey, szHitState, szCommand, szResource ) )
-			    {
-				    lua_pushboolean ( luaVM, true );
-				    return 1;
-			    }
+		        if ( CStaticFunctionDefinitions::UnbindKey ( szKey, pLuaMain, szHitState, iLuaFunction ) )
+		        {
+			        lua_pushboolean ( luaVM, true );
+			        return 1;
+		        }
             }
             else
             {
