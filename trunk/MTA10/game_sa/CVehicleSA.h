@@ -413,6 +413,11 @@ public:
 
     //1472
     BYTE m_ucRailTrackID;
+
+    BYTE padding9002[803];
+
+    // 2276
+    float m_fBurningTime;
 };
 
 

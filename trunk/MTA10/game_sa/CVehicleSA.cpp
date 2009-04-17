@@ -1152,6 +1152,8 @@ void CVehicleSA::SetHealth( FLOAT fHealth )
 {
 	CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
 	vehicle->m_nHealth = fHealth;
+    if ( fHealth >= 250.0f )
+        vehicle->m_fBurningTime = 0.0f;
 }
 
 // SHould be plane funcs
