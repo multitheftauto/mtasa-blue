@@ -178,24 +178,27 @@ void RotateVector ( CVector& vecLine, const CVector& vecRotation )
     // [ 0   cos a   sin a   0 ]
     // [ 0  -sin a   cos a   0 ]
 
-    vecLine.fY = cos ( vecRotation.fX ) * vecLine.fY + sin ( vecRotation.fX ) * vecLine.fZ;
-    vecLine.fZ = -sin ( vecRotation.fX ) * vecLine.fY + cos ( vecRotation.fX ) * vecLine.fZ;
+    float fLineY = vecLine.fY;
+    vecLine.fY = cos ( vecRotation.fX ) * fLineY  + sin ( vecRotation.fX ) * vecLine.fZ;
+    vecLine.fZ = -sin ( vecRotation.fX ) * fLineY + cos ( vecRotation.fX ) * vecLine.fZ;
 
     // Rotate it along the Y axis
     // [ cos a   0   -sin a   0 ]
     // [   0     1     0      0 ]
     // [ sin a   0    cos a   0 ]
 
-    vecLine.fX = cos ( vecRotation.fY ) * vecLine.fX - sin ( vecRotation.fY ) * vecLine.fZ;
-    vecLine.fZ = sin ( vecRotation.fY ) * vecLine.fX + cos ( vecRotation.fY ) * vecLine.fZ;
+    float fLineX = vecLine.fX;
+    vecLine.fX = cos ( vecRotation.fY ) * fLineX - sin ( vecRotation.fY ) * vecLine.fZ;
+    vecLine.fZ = sin ( vecRotation.fY ) * fLineX + cos ( vecRotation.fY ) * vecLine.fZ;
 
     // Rotate it along the Z axis
     // [  cos a   sin a   0   0 ]
     // [ -sin a   cos a   0   0 ]
     // [    0       0     1   0 ]
 
-    vecLine.fX = cos ( vecRotation.fZ ) * vecLine.fX + sin ( vecRotation.fZ ) * vecLine.fY;
-    vecLine.fY = -sin ( vecRotation.fZ ) * vecLine.fX + cos ( vecRotation.fZ ) * vecLine.fY;
+    fLineX = vecLine.fX;
+    vecLine.fX = cos ( vecRotation.fZ ) * fLineX  + sin ( vecRotation.fZ ) * vecLine.fY;
+    vecLine.fY = -sin ( vecRotation.fZ ) * fLineX + cos ( vecRotation.fZ ) * vecLine.fY;
 }
 
 
