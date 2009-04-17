@@ -19,7 +19,7 @@
 #include "net_bitstream.h"
 #include "net_packetenums.h"
 
-#define MTA_DM_NET_MODULE_VERSION   0x00005
+#define MTA_DM_NET_MODULE_VERSION   0x00006
 
 #define CNET_DOWNLOAD_INVALID		65535
 
