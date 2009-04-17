@@ -108,6 +108,7 @@ public:
 	int					GetVisibleWindows			( );
 	void				SetVisibleWindows			( bool bEnable );
 
+    void                OnModUnload                 ( void );
 
 private:
     void                    UpdateCursor                ( void );

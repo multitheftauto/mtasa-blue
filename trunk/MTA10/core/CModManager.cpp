@@ -85,6 +85,7 @@ void CModManager::RequestUnload ( void )
 {
     RequestLoad ( NULL, NULL );
 	CCore::GetSingletonPtr () -> OnModUnload ();
+    CLocalGUI::GetSingleton ().OnModUnload ();
 }
 
 
@@ -198,6 +199,7 @@ void CModManager::Unload ( void )
 
         // Call the on mod unload func
         CCore::GetSingletonPtr () -> OnModUnload ();
+        CLocalGUI::GetSingleton ().OnModUnload ();
 
         // Reset chatbox status (so it won't prevent further input), and clear it
         /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
