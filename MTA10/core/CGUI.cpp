@@ -971,3 +971,12 @@ void CLocalGUI::KeyDownHandler ( bool bHandled )
 	*/
 	return;
 }
+
+
+// Called after MOD is unloaded
+void CLocalGUI::OnModUnload ( )
+{
+	// Clear invalid pointers
+    m_ModMouseClickHandler = GUI_CALLBACK_MOUSE ();
+    m_ModMouseDoubleClickHandler = GUI_CALLBACK_MOUSE ();
+}
