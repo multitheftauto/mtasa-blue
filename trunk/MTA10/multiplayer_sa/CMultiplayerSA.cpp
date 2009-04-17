@@ -744,6 +744,9 @@ void CMultiplayerSA::InitHooks()
 
     // Disallow spraying gang tags
     memset ( (void *)0x565C5C, 0x90, 10 );
+
+    // Allow turning on vehicle lights even if the engine is off
+    memset ( (void *)0x6E1DBC, 0x90, 8 );
 }
 
 
