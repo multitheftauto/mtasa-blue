@@ -40,7 +40,8 @@ unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
 unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_Render;
+unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
+unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
 unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
@@ -123,7 +124,8 @@ VOID HOOK_Render3DStuff ();
 VOID HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 VOID HOOK_CPed_IsPlayer ();
 VOID HOOK_CTrain_ProcessControl_Derail ();
-VOID HOOK_CVehicle_Render ();
+VOID HOOK_CVehicle_SetupRender ();
+VOID HOOK_CVehicle_ResetAfterRender();
 VOID HOOK_CObject_Render ();
 VOID HOOK_CGame_Process ();
 
@@ -217,7 +219,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
-//    HookInstall(HOOKPOS_CVehicle_Render, (DWORD)HOOK_CVehicle_Render, 5);
+    HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
+    HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
 //    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
@@ -2042,6 +2045,10 @@ train_would_derail:
 }
 
 
+/**
+ ** Per-entity alpha
+ **/
+static DWORD dwAlphaEntity = 0;
 static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
 {
     if ( dwEntity )
@@ -2067,43 +2074,99 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
         *(DWORD *)(0x5332F3) = (DWORD)(0x533280);
     }
 }
-static RpMaterial* HOOK_SetMaterialColorAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
-{
-    unsigned char* pPad = (unsigned char *)(&pMaterial->id);
-    if ( pPad [ 0 ] != 123 )
-    {
-        // Save in the structure padding the original alpha value for this material
-        pPad [ 0 ] = 123;
-        pPad [ 1 ] = pMaterial->color.a;
-    }
 
-    pMaterial->color.a = static_cast < unsigned char > ( pPad [ 1 ] * ((float)ucAlpha / 255.0f) );
+
+/**
+ ** Vehicles
+ **/
+static unsigned char ucCurrentVehicleAlpha [ 1024 ];
+static unsigned char* pCurVehicleAlpha = ucCurrentVehicleAlpha;
+static bool bVehicleHasAlpha = false;
+
+static RpMaterial* HOOK_GetVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+{
+    *pCurVehicleAlpha = pMaterial->color.a;
+    pCurVehicleAlpha++;
+
+    return pMaterial;
+}
+static RpMaterial* HOOK_SetVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+{
+    pMaterial->color.a = static_cast < unsigned char > ( (float)(pMaterial->color.a) * (float)ucAlpha / 255.0f );
+
+    return pMaterial;
+}
+static RpMaterial* HOOK_RestoreVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+{
+    pMaterial->color.a = *pCurVehicleAlpha;
+    pCurVehicleAlpha++;
 
     return pMaterial;
 }
 
-static DWORD dwAlphaEntity = 0;
+static void GetVehicleAlphaAndSetNewValues ()
+{
+    unsigned char ucAlpha = ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha ();
+    if ( ucAlpha < 255 )
+    {
+        bVehicleHasAlpha = true;
+        pCurVehicleAlpha = ucCurrentVehicleAlpha;
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetVehicleAlpha, 0 );
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetVehicleAlpha, ucAlpha );
+    }
+    else
+        bVehicleHasAlpha = false;
+}
+static void RestoreVehicleAlpha ()
+{
+    pCurVehicleAlpha = ucCurrentVehicleAlpha;
+    SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreVehicleAlpha, 0 );
+}
 
-VOID _declspec(naked) HOOK_CVehicle_Render ()
+static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
+VOID _declspec(naked) HOOK_CVehicle_SetupRender()
 {
     _asm
     {
+        mov dwAlphaEntity, esi
         pushad
-        mov         dwAlphaEntity, ecx
     }
 
-    SetEntityAlphaHooked ( dwAlphaEntity,
-                           (DWORD)HOOK_SetMaterialColorAlpha,
-                           ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha () );
+    GetVehicleAlphaAndSetNewValues ();
 
     _asm
     {
         popad
-        jmp         FUNC_CEntity_Render
+        add esp, 0x8
+        test eax, eax
+        jmp dwCVehicle_SetupRender_ret
+    }
+}
+
+static DWORD dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
+VOID _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if ( bVehicleHasAlpha )
+        RestoreVehicleAlpha ();
+
+    _asm
+    {
+        popad
+        add esp, 0x0C
+        test eax, eax
+        jmp dwCVehicle_ResetAfterRender_ret
     }
 }
 
 
+/**
+ ** Objects
+ **/
 static void SetObjectAlpha ()
 {
     if ( dwAlphaEntity )
@@ -2111,9 +2174,9 @@ static void SetObjectAlpha ()
         CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)dwAlphaEntity );
         if ( pObject )
         {
-            SetEntityAlphaHooked ( dwAlphaEntity,
-                                   (DWORD)HOOK_SetMaterialColorAlpha,
-                                   pObject->GetAlpha () );
+ //           SetEntityAlphaHooked ( dwAlphaEntity,
+ //                                  (DWORD)HOOK_SetMaterialColorAlpha,
+ //                                  pObject->GetAlpha () );
         }
     }
 }
