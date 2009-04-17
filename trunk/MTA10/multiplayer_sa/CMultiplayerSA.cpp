@@ -747,6 +747,9 @@ void CMultiplayerSA::InitHooks()
 
     // Allow turning on vehicle lights even if the engine is off
     memset ( (void *)0x6E1DBC, 0x90, 8 );
+
+    // Fix vehicle back lights both using light state 3 (SA bug)
+    *(BYTE *)0x6E1D4F = 2;
 }
 
 
