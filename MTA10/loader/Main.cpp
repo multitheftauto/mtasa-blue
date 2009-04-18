@@ -345,6 +345,20 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
+
+    // Check if the core can be loaded - failure may mean msvcr90.dll etc is not installed
+    // http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2
+    HMODULE hCoreModule = LoadLibrary( szCoreDLL );
+    if ( hCoreModule == NULL )
+    {
+        MessageBox( NULL, "Load failed.  Please ensure that \n"
+                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "is correctly installed.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+        // Kill GTA and return errorcode
+        TerminateProcess ( piLoadee.hProcess, 1 );
+        return 1;
+    }
+
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, szCoreDLL );
     
