@@ -14,9 +14,18 @@ Var Install_Dir
 
 
 ; ###########################################################################################################
+; How to update easily:
+; 1. Run the previous version of the data files installer .exe and install into a temp dir
+;		i.e. C:\Program Files\MTA San Andreas temp\
+; 2. Copy this script into the same directory
+;		i.e. C:\Program Files\MTA San Andreas temp\data files.nsi
+; 3. Change the files as you want
+; 4. Update the script to reflect the changes
+; 5. Run the script
+; ###########################################################################################################
 ; Assumes the folder 'MTA San Andreas' containing the data files is in the same directory as this script
 !define FILES_ROOT "."
-!define BUILD_NUMBER "407"
+!define BUILD_NUMBER "636"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "multitheftauto_data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -130,7 +139,7 @@ Section "Data files" SEC01
 	SetOverwrite on
 
 	SetOutPath "$INSTDIR\MTA"
-	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_33.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"

@@ -440,11 +440,15 @@ UAC_Success:
 	${EndIf} ; end of fix for #3743
 
 	!ifdef CLIENT_SETUP
-		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
 		StrCmp $2 "" trynext cont
 		trynext:
 		ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
 		cont:
+		StrCmp $2 "" trynext2 cont2
+		trynext2:
+		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+		cont2:
 		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
 		strcpy $3 '"'
 		!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
@@ -457,7 +461,7 @@ FunctionEnd
 
 Function .onInstSuccess
 	!ifdef CLIENT_SETUP
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
+		WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
 
 		; Add the protocol handler
@@ -535,7 +539,7 @@ ShowUnInstDetails show
 		Section "Core components" SEC01
 			SectionIn 1 RO ; section is required
 
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
+			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
 
 			SetOutPath "$INSTDIR\MTA"
@@ -788,7 +792,7 @@ FunctionEnd
 
 Section Uninstall
 	!ifdef CLIENT_SETUP
-		ReadRegStr $GTA_DIR HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+		ReadRegStr $GTA_DIR HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
 		IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
 		IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
 		IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
@@ -847,6 +851,7 @@ Section Uninstall
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas"
+		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas"
 		
 		; Delete shortcuts
 		Delete "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk"
