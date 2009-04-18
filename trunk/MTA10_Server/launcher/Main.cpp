@@ -56,6 +56,8 @@ int main ( int argc, char* argv [] )
     else
     {
         printf ( "ERROR: Could not load %s\n", LIB_CORE );
+        printf ( "* Check installed data files.\n" );
+        printf ( "* Check installed Microsoft Visual C++ 2008 SP1 Redistributable Package (x86).\n" );
     }
 
     // Wait for a key then exit
