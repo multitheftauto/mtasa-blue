@@ -45,13 +45,13 @@ public:
     void                            GetRotationDegrees      ( CVector& vecRotation ) const;
     void                            GetRotationRadians      ( CVector& vecRotation ) const;
     void                            SetRotationDegrees      ( const CVector& vecRotation );
-    void                            SetRotationRadians      ( const CVector& vecRotation );
+    virtual void                    SetRotationRadians      ( const CVector& vecRotation );
 
     void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
 
     void                            GetOrientation          ( CVector& vecPosition, CVector& vecRotationRadians );
-    void                            SetOrientation          ( const CVector& vecPosition, const CVector& vecRotationRadians );
+    virtual void                    SetOrientation          ( const CVector& vecPosition, const CVector& vecRotationRadians );
 
     void                            ModelRequestCallback    ( CModelInfo* pModelInfo );
 
