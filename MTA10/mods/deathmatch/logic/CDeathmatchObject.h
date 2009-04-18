@@ -22,6 +22,14 @@ public:
                                         CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel );
                                         ~CDeathmatchObject              ( void );
 
+    // CClientEntity interface
+    void                                SetPosition                     ( const CVector& vecPosition );
+
+    // CClientObject interface
+    void                                SetRotationRadians              ( const CVector& vecRotation );
+    void                                SetOrientation                  ( const CVector& vecPosition, const CVector& vecRotationRadians );
+
+    // CDeathmatchObject functions
     inline const CVector&               GetStartPosition                ( void )        { return m_vecStartPosition; };
     inline const CVector&               GetStartRotation                ( void )        { return m_vecStartRotation; };
     inline const CVector&               GetTargetPosition               ( void )        { return m_vecTargetPosition; };
@@ -34,6 +42,7 @@ public:
     void                                StopMovement                    ( void );
     void                                FinishMovement                  ( void );
     void                                UpdateMovement                  ( void );
+    void                                UpdateContactingBegin           ( const CVector& vecPreviousPosition, const CVector& vecPreviousRotation );
     void                                UpdateContacting                ( const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation );
 
     inline bool                         IsMoving                        ( void )        { return m_ulStartTime != 0; };

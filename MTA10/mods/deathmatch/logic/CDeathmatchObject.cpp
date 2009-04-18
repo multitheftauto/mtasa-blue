@@ -114,18 +114,10 @@ void CDeathmatchObject::UpdateMovement ( void )
             vecRotation /= fDuration;
             vecRotation *= fTimePassed;
 
-            CVector vecPreviousPosition, vecPosition;
-            GetPosition ( vecPreviousPosition );
-            vecPosition = m_vecStartPosition + vecDeltaPosition;
-
-            CVector vecPreviousRotation;
-            GetRotationRadians ( vecPreviousRotation );
+            CVector vecPosition = m_vecStartPosition + vecDeltaPosition;
 
             // Plus the position with our new interpolated delta position and set it
             SetOrientation ( vecPosition, m_vecStartRotation + vecRotation );
-        
-            // Update our contact players
-            UpdateContacting( vecPreviousPosition, vecPosition - vecPreviousPosition, ( m_vecStartRotation + vecRotation ) - vecPreviousRotation );
         }
         else
         {
@@ -135,6 +127,74 @@ void CDeathmatchObject::UpdateMovement ( void )
 }
 
 
+//
+// SetPosition with update of contacting peds
+//
+void CDeathmatchObject::SetPosition ( const CVector& vecPosition )
+{
+    CVector vecPreviousPosition = m_vecPosition;
+    CVector vecPreviousRotation = m_vecRotation;
+
+    // Call original
+    CClientObject::SetPosition( vecPosition );
+
+    // Update our contact players
+    UpdateContactingBegin( vecPreviousPosition, vecPreviousRotation );
+}
+
+
+//
+// SetRotationRadians with update of contacting peds
+//
+void CDeathmatchObject::SetRotationRadians ( const CVector& vecRotationRadians )
+{
+    CVector vecPreviousPosition = m_vecPosition;
+    CVector vecPreviousRotation = m_vecRotation;
+
+    // Call original
+    CClientObject::SetRotationRadians( vecRotationRadians );
+
+    // Update our contact players
+    UpdateContactingBegin( vecPreviousPosition, vecPreviousRotation );
+}
+
+
+//
+// SetOrientation with update of contacting peds
+//
+void CDeathmatchObject::SetOrientation ( const CVector& vecPosition, const CVector& vecRotationRadians )
+{
+    CVector vecPreviousPosition = m_vecPosition;
+    CVector vecPreviousRotation = m_vecRotation;
+
+    // Call original
+    CClientObject::SetOrientation( vecPosition, vecRotationRadians );
+
+    // Update our contact players
+    UpdateContactingBegin( vecPreviousPosition, vecPreviousRotation );
+}
+
+
+//
+// Prepare vars for UpdateContacting
+//
+void CDeathmatchObject::UpdateContactingBegin ( const CVector& vecPreviousPosition, const CVector& vecPreviousRotation )
+{
+    // Calc frame delta
+    CVector vecFrameRotation    = m_vecRotation - vecPreviousRotation;
+    CVector vecFrameTranslation = m_vecPosition - vecPreviousPosition;
+    CVector vecCenterOfRotation = m_vecPosition;
+
+    // Rotate frame rotation x/y by absolute rotation z, for some reason
+    RotateVector ( vecFrameRotation, CVector(0, 0, -vecPreviousRotation.fZ ) );
+
+    UpdateContacting ( vecCenterOfRotation, vecFrameTranslation, vecFrameRotation );
+}
+
+
+//
+// Apply object movement to contacting peds
+//
 void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation )
 {
     bool bHasRotation    = ( vecFrameRotation.fX != 0 || vecFrameRotation.fY != 0 || vecFrameRotation.fZ != 0 );
@@ -158,7 +218,7 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
         if ( bHasRotation )
         {
             vecPlayerPosition -= vecCenterOfRotation;
-            RotateVector ( vecPlayerPosition, CVector(vecFrameRotation.fY, -vecFrameRotation.fX, -vecFrameRotation.fZ ) );
+            RotateVector ( vecPlayerPosition, CVector(-vecFrameRotation.fX, -vecFrameRotation.fY, -vecFrameRotation.fZ ) );
             vecPlayerPosition += vecCenterOfRotation;
         }
 
