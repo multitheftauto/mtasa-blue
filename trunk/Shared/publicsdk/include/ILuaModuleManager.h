@@ -22,6 +22,7 @@ extern "C"
     #include "lualib.h"
     #include "lauxlib.h"
 }
+#include <string>
 
 /* Interface for modules until DP2.3 */
 class ILuaModuleManager
