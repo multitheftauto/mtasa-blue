@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="_ServerDeathmatch 2005"
@@ -360,32 +360,8 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdk\Platform.cpp"
+				RelativePath="..\..\sdk\MTAPlatform.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Nightly|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="Server.cpp"
@@ -929,6 +905,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CNextPacketInfoPacket.cpp"
 						>
 					</File>
 					<File
@@ -1946,6 +1926,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CNextPacketInfoPacket.h"
 						>
 					</File>
 					<File
