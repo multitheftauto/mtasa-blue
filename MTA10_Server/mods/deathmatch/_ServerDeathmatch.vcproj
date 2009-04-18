@@ -250,7 +250,7 @@
 				RelativePath="CServer.cpp">
 			</File>
 			<File
-				RelativePath="..\..\sdk\Platform.cpp">
+				RelativePath="..\..\sdk\MTAPlatform.cpp">
 			</File>
 			<File
 				RelativePath="Server.cpp">
@@ -662,6 +662,9 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.cpp">
+					</File>
+					<File
+						RelativePath=".\logic\packets\CNextPacketInfoPacket.cpp">
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPacket.cpp">
@@ -1431,6 +1434,9 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.h">
+					</File>
+					<File
+						RelativePath=".\logic\packets\CNextPacketInfoPacket.h">
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPacket.h">
