@@ -221,7 +221,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
     HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
-//    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
+    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -2049,6 +2049,10 @@ train_would_derail:
  ** Per-entity alpha
  **/
 static DWORD dwAlphaEntity = 0;
+static bool bEntityHasAlpha = false;
+static unsigned char ucCurrentAlpha [ 1024 ];
+static unsigned char* pCurAlpha = ucCurrentAlpha;
+
 static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
 {
     if ( dwEntity )
@@ -2075,71 +2079,69 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
     }
 }
 
-
-/**
- ** Vehicles
- **/
-static unsigned char ucCurrentVehicleAlpha [ 1024 ];
-static unsigned char* pCurVehicleAlpha = ucCurrentVehicleAlpha;
-static bool bVehicleHasAlpha = false;
-
-static RpMaterial* HOOK_GetVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    *pCurVehicleAlpha = pMaterial->color.a;
-    pCurVehicleAlpha++;
+    *pCurAlpha = pMaterial->color.a;
+    pCurAlpha++;
 
     return pMaterial;
 }
-static RpMaterial* HOOK_SetVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     pMaterial->color.a = static_cast < unsigned char > ( (float)(pMaterial->color.a) * (float)ucAlpha / 255.0f );
 
     return pMaterial;
 }
-static RpMaterial* HOOK_RestoreVehicleAlpha ( RpMaterial* pMaterial, unsigned char ucAlpha )
+static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
-    pMaterial->color.a = *pCurVehicleAlpha;
-    pCurVehicleAlpha++;
+    pMaterial->color.a = *pCurAlpha;
+    pCurAlpha++;
 
     return pMaterial;
 }
 
-static void GetVehicleAlphaAndSetNewValues ()
+static void GetAlphaAndSetNewValues ( unsigned char ucAlpha )
 {
-    unsigned char ucAlpha = ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha ();
     if ( ucAlpha < 255 )
     {
-        bVehicleHasAlpha = true;
-        pCurVehicleAlpha = ucCurrentVehicleAlpha;
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetVehicleAlpha, 0 );
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetVehicleAlpha, ucAlpha );
+        bEntityHasAlpha = true;
+        pCurAlpha = ucCurrentAlpha;
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, ucAlpha );
     }
     else
-        bVehicleHasAlpha = false;
+        bEntityHasAlpha = false;
 }
-static void RestoreVehicleAlpha ()
+static void RestoreAlphaValues ()
 {
-    pCurVehicleAlpha = ucCurrentVehicleAlpha;
-    SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreVehicleAlpha, 0 );
+    if ( bEntityHasAlpha )
+    {
+        pCurAlpha = ucCurrentAlpha;
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreAlphaValues, 0 );
+    }
 }
 
+
+/**
+ ** Vehicles
+ **/
 static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
 VOID _declspec(naked) HOOK_CVehicle_SetupRender()
 {
     _asm
     {
-        mov dwAlphaEntity, esi
+        mov     dwAlphaEntity, esi
         pushad
     }
 
-    GetVehicleAlphaAndSetNewValues ();
+    GetAlphaAndSetNewValues ( ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha () );
 
     _asm
     {
         popad
-        add esp, 0x8
-        test eax, eax
-        jmp dwCVehicle_SetupRender_ret
+        add     esp, 0x8
+        test    eax, eax
+        jmp     dwCVehicle_SetupRender_ret
     }
 }
 
@@ -2151,15 +2153,14 @@ VOID _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
         pushad
     }
 
-    if ( bVehicleHasAlpha )
-        RestoreVehicleAlpha ();
+    RestoreAlphaValues ();
 
     _asm
     {
         popad
-        add esp, 0x0C
-        test eax, eax
-        jmp dwCVehicle_ResetAfterRender_ret
+        add     esp, 0x0C
+        test    eax, eax
+        jmp     dwCVehicle_ResetAfterRender_ret
     }
 }
 
@@ -2169,14 +2170,14 @@ VOID _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
  **/
 static void SetObjectAlpha ()
 {
+    bEntityHasAlpha = false;
+
     if ( dwAlphaEntity )
     {
         CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)dwAlphaEntity );
         if ( pObject )
         {
- //           SetEntityAlphaHooked ( dwAlphaEntity,
- //                                  (DWORD)HOOK_SetMaterialColorAlpha,
- //                                  pObject->GetAlpha () );
+            GetAlphaAndSetNewValues ( pObject->GetAlpha () );
         }
     }
 }
@@ -2186,8 +2187,8 @@ VOID _declspec(naked) HOOK_CObject_Render ()
 {
     _asm
     {
-        pushad
         mov         dwAlphaEntity, ecx
+        pushad 
     }
 
     SetObjectAlpha ( );
@@ -2195,9 +2196,20 @@ VOID _declspec(naked) HOOK_CObject_Render ()
     _asm
     {
         popad
-        jmp         FUNC_CEntity_Render
+        call         FUNC_CEntity_Render
+        pushad
+    }
+
+    RestoreAlphaValues ( );
+
+    _asm
+    {
+        popad
+        ret
     }
 }
+
+
 
 
 void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
