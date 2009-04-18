@@ -106,7 +106,7 @@ void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
         HKEY hkey = NULL;
         DWORD dwBufferSize = MAX_PATH;
         DWORD dwType = 0;
-        if ( RegOpenKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
+        if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
         {
             // Read out the MTA installpath
             if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||

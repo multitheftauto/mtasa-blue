@@ -70,6 +70,77 @@ bool TerminateGTAIfRunning ( void )
     return true;
 }
 
+//
+// Read a registry string value
+//
+bool ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, char* szBuffer=NULL, DWORD dwBufferSize=0 )
+{
+    // Clear output
+    if ( szBuffer && dwBufferSize )
+        szBuffer[0] = 0;
+
+    bool bResult = false;
+    HKEY hkTemp = NULL;
+    if ( RegOpenKeyEx ( hkRoot, szSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
+    {
+        if ( RegQueryValueEx ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
+        {
+            bResult = true;
+        }
+        RegCloseKey ( hkTemp );
+    }
+    return bResult;
+}
+
+//
+// Write a registry string value
+//
+void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, char* szBuffer )
+{
+    HKEY hkTemp;
+    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
+    if ( hkTemp )
+    {
+        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
+        RegCloseKey ( hkTemp );
+    }
+}
+
+
+//
+// UpgradeRegistryKeys
+//
+//                              Orig    New
+//  "GTA:SA Path"               HKLM >> HKCU
+//  "Last Run Location"         HKLM >> HKCU
+//  "Last Install Location"     HKLM
+//  "Serial"                    HKLM
+//  "Username"                  HKLM
+//
+void UpgradeRegistryKeys ( void )
+{
+    char szSourceValue[MAX_PATH];
+    bool bSourceExists;
+    bool bDestExists;
+
+    // Copy if source exists and destination does not
+
+    // Upgrade "GTA:SA Path"
+    bSourceExists = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szSourceValue, MAX_PATH - 1 ) && strlen ( szSourceValue );
+    bDestExists   = ReadRegistryStringValue ( HKEY_CURRENT_USER,  "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path" );
+
+    if ( bSourceExists && !bDestExists )
+        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szSourceValue );
+
+    // Upgrade "Last Run Location"
+    bSourceExists = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szSourceValue, MAX_PATH - 1 ) && strlen ( szSourceValue );
+    bDestExists   = ReadRegistryStringValue ( HKEY_CURRENT_USER,  "Software\\Multi Theft Auto: San Andreas", "Last Run Location" );
+
+    if ( bSourceExists && !bDestExists )
+        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szSourceValue );
+}
+
+
 void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
 {
     // Get current module full path
@@ -79,46 +150,30 @@ void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
     PathRemoveFileSpec ( szBuffer );
 
     // Save to a temp registry key
-    HKEY hkey;
-    RegCreateKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, NULL );
-
-    if ( hkey )
-    {
-        RegSetValueEx ( hkey, "Last Run Location", NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
-        RegDeleteValue ( hkey, "temp" );
-        RegDeleteValue ( hkey, "Install Directory" );
-    }
-
-    RegCloseKey ( hkey );
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
 }
 
 
 int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
 {
     WIN32_FIND_DATA fdFileInfo;
-    HKEY hkey;
-    DWORD dwBufferSize = MAX_PATH;
     char szRegBuffer[MAX_PATH];
-    DWORD dwType = 0;
-    RegCreateKeyEx ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, NULL );
+    ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szRegBuffer, MAX_PATH - 1 );
+
     if ( GetAsyncKeyState ( VK_CONTROL ) == 0 )
     {
-        if ( hkey )
+        if ( strlen( szRegBuffer ) )
         {
-            if ( RegQueryValueEx ( hkey, "GTA:SA Path", NULL, &dwType, (LPBYTE)szRegBuffer, &dwBufferSize ) == ERROR_SUCCESS )
-            {
-				// Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-				if ( strchr ( szRegBuffer, '?' ) > 0 )
-					return -1;
+			// Check for replacement characters (?), to see if there are any (unsupported) unicode characters
+			if ( strchr ( szRegBuffer, '?' ) > 0 )
+				return -1;
 
-                char szExePath[MAX_PATH];
-                sprintf ( szExePath, "%s\\%s", szRegBuffer, MTA_GTAEXE_NAME );
-                if ( INVALID_HANDLE_VALUE != FindFirstFile( szExePath, &fdFileInfo ) )
-                {
-                    _snprintf ( szBuffer, sizeBufferSize, "%s", szRegBuffer );
-                    RegCloseKey ( hkey );
-                    return 1;
-                }
+            char szExePath[MAX_PATH];
+            sprintf ( szExePath, "%s\\%s", szRegBuffer, MTA_GTAEXE_NAME );
+            if ( INVALID_HANDLE_VALUE != FindFirstFile( szExePath, &fdFileInfo ) )
+            {
+                _snprintf ( szBuffer, sizeBufferSize, "%s", szRegBuffer );
+                return 1;
             }
         }
     }
@@ -146,8 +201,7 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
         sprintf ( szExePath, "%s\\gta_sa.exe", szBuffer );
         if ( INVALID_HANDLE_VALUE != FindFirstFile( szExePath, &fdFileInfo ) )
         {
-            if ( hkey )
-                RegSetValueEx ( hkey, "GTA:SA Path", NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
+            WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szBuffer );
         }
         else
         {
@@ -157,16 +211,13 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
             }
             else
             {
-                RegCloseKey ( hkey );
                 return 0;
             }
         }
-        RegCloseKey ( hkey );
         return 1;
     }
     else
     {
-        RegCloseKey ( hkey );
         return 0;
     }
 }
@@ -191,6 +242,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     char szGTAPath[MAX_PATH];
 
 	int iResult;
+
+    UpgradeRegistryKeys ();
 
 	iResult = GetGamePath ( szGTAPath, MAX_PATH );
 	if ( iResult == 0 ) {

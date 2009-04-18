@@ -524,7 +524,7 @@ void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
     char szGTASARoot [MAX_PATH];
     szGTASARoot [0] = 0;
     DWORD dwType = 0;
-    RegOpenKey ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", &hkey );
+    RegOpenKey ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", &hkey );
     if ( hkey ) 
     {
         RegQueryValueEx ( hkey, "GTA:SA Path", NULL, &dwType, (LPBYTE)szGTASARoot, &dwBufferSize );
