@@ -92,7 +92,7 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
         }
         else
         {
-            // Otherwize just return false
+            // Otherwise just return false
             m_pScriptDebugging->LogBadAccess ( luaVM, szFunction );
             lua_pushboolean ( luaVM, false );
             return false;
@@ -109,10 +109,11 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     // Grab the function name we're calling. If it's one of our functions, see if we can use it.
     bool bRestricted;
     std::string strFunction;
-    CLuaCFunctions::GetFunctionName ( f, bRestricted, strFunction );
-    if ( !strFunction.empty () )
+    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
+    if ( pFunction )
     {
-        return static_cast < BOOL > ( CLuaDefs::CanUseFunction ( strFunction.c_str (), luaVM, bRestricted ) );
+        return static_cast < BOOL > ( CLuaDefs::CanUseFunction (
+            pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) );
     }
 
     // It's one of lua's functions, allow this

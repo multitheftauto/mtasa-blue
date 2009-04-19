@@ -25,12 +25,12 @@ class CLuaCFunction
 public:
                                 CLuaCFunction       ( const char* szName, lua_CFunction f, bool bRestricted );
 
-    inline lua_CFunction        GetFunctionAddress  ( void )                    { return m_Function; };
+    lua_CFunction               GetAddress          ( void )                    { return m_Function; }
 
-    inline const std::string&   GetFunctionName     ( void )                    { return m_strName; };
-    void                        SetFunctionName     ( std::string strName )     { m_strName = strName; };
+    const std::string&          GetName             ( void )                    { return m_strName; }
+    void                        SetName             ( std::string& strName )    { m_strName = strName; }
 
-    bool                        IsRestricted        ( void )                    { return m_bRestricted; };
+    bool                        IsRestricted        ( void )                    { return m_bRestricted; }
 
 private:
     lua_CFunction               m_Function;
@@ -42,17 +42,16 @@ private:
 class CLuaCFunctions
 {
 public:
-    static CLuaCFunction*               AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
+    static CLuaCFunction*       AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
+    static CLuaCFunction*       GetFunction                 ( lua_CFunction f );
+    static CLuaCFunction*       GetFunction                 ( const char* szName );
 
-    static CLuaCFunction*               GetFunction                 ( const char* szName, lua_CFunction f );
-    static bool                         GetFunctionName             ( lua_CFunction f, bool& bRestricted, std::string &strName );
+    static void                 RegisterFunctionsWithVM     ( lua_State* luaVM );
 
-    static bool                         IsRestricted                ( const char* szName );
+    static void                 RemoveAllFunctions          ( void );
 
-    static void                         RegisterFunctionsWithVM     ( lua_State* luaVM );
-
-    static void                         RemoveAllFunctions          ( void );
-
+private:
+    static stdext::hash_map < lua_CFunction, CLuaCFunction* > ms_Functions;
 };
 
 #endif
