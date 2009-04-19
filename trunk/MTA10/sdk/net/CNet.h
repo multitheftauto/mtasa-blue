@@ -62,7 +62,7 @@ public:
     virtual bool                        SetMTUSize                  ( unsigned int uiSize ) = 0;
 
 	virtual const char *				GetLocalIP					( void ) = 0;
-    virtual void                        GetSerial                   ( std::string & strSerial ) = 0;
+    virtual void                        GetSerial                   ( char* szSerial, size_t maxLength ) = 0;
 
     virtual unsigned char               GetConnectionError          ( void ) = 0;
     virtual void                        SetConnectionError          ( unsigned char ucConnectionError ) = 0;
