@@ -79,15 +79,14 @@ void CCommunity::Login ( VERIFICATIONCALLBACK pCallBack, void* pObject )
     }
 
     // Get our serial number
-    std::string strSerial;
-    g_pCore->GetNetwork ()->GetSerial ( strSerial );
+    char szSerial [ 64 ];
+    g_pCore->GetNetwork ()->GetSerial ( szSerial, sizeof ( szSerial ) );
 
     // Create the URL
-    std::string strURL =
-        std::string ( VERIFICATION_URL ) +
-        "?username=" + m_strUsername + 
-        "&password=" + m_strPassword +
-        "&serial=" + strSerial;
+    SString strURL ( VERIFICATION_URL "?username=%s&password=%s&serial=%s",
+                     m_strUsername.c_str(),
+                     m_strPassword.c_str(),
+                     szSerial );
 
     // Perform the HTTP request
     memset ( m_szBuffer, 0, VERIFICATION_DATA_BUFFER_SIZE );
