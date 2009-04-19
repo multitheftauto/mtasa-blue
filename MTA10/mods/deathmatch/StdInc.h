@@ -10,6 +10,7 @@
 #include <mmsystem.h>
 #include <winsock.h>
 
+#include <algorithm>
 #include <list>
 #include <map>
 #include <set>

@@ -132,12 +132,6 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-	// Disable unsafe native lua functions
-    // The package module had to be loaded in linit.c in order to load the JIT optimizer.
-    // We disable it again here
-    lua_pushnil ( m_luaVM );
-    lua_setglobal ( m_luaVM, "package" );
-
 	lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
 	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
 	lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
@@ -156,17 +150,11 @@ void CLuaMain::InitVM ( void )
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
 
     // Load LUA libraries
-    luaL_openlibs ( m_luaVM );
-
-    // Start the JIT optimizer
-    #include <opt.lua.c>
-    #include <opt_inline.lua.c>
-    lua_getglobal ( m_luaVM, "require" );
-    lua_pushliteral ( m_luaVM, "jit.opt" );
-    lua_pcall ( m_luaVM, 1, 1, 0 );
-    lua_getfield ( m_luaVM, -1, "start" );
-    lua_pcall ( m_luaVM, 0, 0, 0 );
-    lua_pop ( m_luaVM, 1 );
+    luaopen_base ( m_luaVM );
+    luaopen_math ( m_luaVM );
+    luaopen_string ( m_luaVM );
+    luaopen_table ( m_luaVM );
+    luaopen_debug ( m_luaVM );
 
 	// Create the callback table (at location 1 in the registry)
     lua_pushnumber ( m_luaVM, 1 );

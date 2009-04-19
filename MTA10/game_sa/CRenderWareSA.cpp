@@ -326,15 +326,31 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+
 // Adds texture into the TXD of a model, eventually making a copy of each texture first 
-void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy )
+void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy, std::list < RwTexture* >* pReplacedTextures, std::list < RwTexture* >* pAddedTextures, bool bAddRef )
 {
 	// Get the CModelInfo's TXD ID
     unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
 
     // Get the TXD corresponding to this ID
     SetTextureDict ( usTxdId );
-    pGame->GetModelInfo ( usModelID )->Request ( true, true );
+
+    if ( bAddRef )
+    {
+        if ( pGame->GetModelInfo ( usModelID )->IsLoaded () )
+            CTxdStore_AddRef ( usTxdId );
+        else
+            pGame->GetModelInfo ( usModelID )->Request ( true, true );
+    }
+    else
+    {
+        if ( pGame->GetModelInfo ( usModelID )->IsLoaded () )
+            CTxdStore_AddRef ( usTxdId );
+        else
+            return;
+    }
     RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
 
 	if ( pTXD )
@@ -342,9 +358,26 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
         std::list < RwTexture* >::iterator it;
         for ( it = textures.begin (); it != textures.end (); it++ )
         {
-            // Only add the texture if it isn't already inside the TXD
-	        if ( RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name ) != NULL )
-                continue;
+            // Does a texture by this name already exist?
+	        RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
+            if ( pExistingTexture )
+            {
+                // Is it a custom texture?
+                if ( ( pAddedTextures && ListContainsNamedTexture ( *pAddedTextures, (*it)->name ) ) ||
+                     ( pReplacedTextures && ListContainsNamedTexture ( *pReplacedTextures, (*it)->name ) ) )
+                {
+                    continue;
+                }
+                // If not, we can replace it
+                RwTexDictionaryRemoveTexture ( pTXD, pExistingTexture );
+                if ( pReplacedTextures )
+                    pReplacedTextures->push_back ( pExistingTexture );
+            }
+            else
+            {
+                if ( pAddedTextures )
+                    pAddedTextures->push_back ( *it );
+            }
 
             RwTexture* pTex = *it;
 
@@ -364,14 +397,11 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
             // Add the texture
             RwTexDictionaryAddTexture ( pTXD, pTex );
         }
-	}
-
-	// Add a reference to the TXD to make sure it doesn't get destroyed
-	//CTxdStore_AddRef ( usTxdId );
+    }
 }
 
 // Removes textures from the TXD of a model, eventually destroying each texture
-void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster )
+void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster, bool bRemoveRef )
 {
 	// Get the CModelInfo's TXD ID
 	unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
@@ -398,16 +428,15 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textu
                 else
                 {
                     // Only remove the texture from the txd
-                    pTex->TXDList.next->prev = pTex->TXDList.prev;
-                    pTex->TXDList.prev->next = pTex->TXDList.next;
-                    pTex->txd = NULL;
+                    RwTexDictionaryRemoveTexture ( pTXD, pTex );
                 }
             }
         }
 	}
 
 	// Delete the reference we made in ModelInfoTXDAddTextures
-	CTxdStore_RemoveRef ( usTxdId );
+    if ( bRemoveRef )
+	    CTxdStore_RemoveRef ( usTxdId );
 }
 
 
@@ -496,14 +525,11 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
 {
 	// get the modelinfo array
 	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-//	unsigned short usTxdId = *( ( unsigned short * ) ( pPool[usModelID] + 0xA ) );
-
-//	char buf[64]={0};
-//	MessageBox(0,itoa((int)RwTexDictionaryFindNamedTexture ( CTxdStore_GetTxd ( usTxdId ), "MGBod" ),buf,16),"X",MB_OK);
 
 	DWORD dwFunc = FUNC_LoadVehicleModel;
 	DWORD dwThis = (DWORD)(pPool[usModelID]);
-	__asm {
+	__asm
+    {
 		mov		ecx, dwThis
 		push	pNew
 		call	dwFunc
@@ -513,7 +539,8 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
 // Reads and parses a COL3 file
 CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName )
 {
-	if ( !szCOL ) return NULL;
+	if ( !szCOL )
+        return NULL;
 
 	// Read the file
 	FILE * fileCol = fopen ( szCOL, "rb" );
@@ -535,7 +562,8 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 	CColModelSA * pColModel = new CColModelSA ();
 
 	// Check if this is a COL3 file
-	if ( szData[0] != 'C' || szData[1] != 'O' || szData[2] != 'L' || szData[3] != '3' ) return NULL;
+	if ( szData[0] != 'C' || szData[1] != 'O' || szData[2] != 'L' || szData[3] != '3' )
+        return NULL;
 
 	// Call GTA's COL3 loader (we strip the header off first)
 	LoadCollisionModelVer3 ( szData + COL3_HEADER_SIZE, uiFileSize - COL3_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
@@ -551,9 +579,8 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 
 // Positions the front seat by reading out the vector from the 'ped_frontseat' atomic in the clump (RpClump*)
 // and changing the vector in the CModelInfo class identified by the model id (usModelID)
-bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelID ) {
-//	g_pCore->GetConsole ()->Printf ( "Repositioning front seat for %u", usModelID );
-
+bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelID )
+{
 	// get the modelinfo array (+5Ch contains a pointer to vehicle specific dummy data)
 	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
 	DWORD *pVehicleDummies = ( DWORD* ) ( pPool[usModelID] + 0x5C );
@@ -715,4 +742,25 @@ void CRenderWareSA::DestroyTexture ( RwTexture* pTex )
 {
     if ( pTex )
         RwTextureDestroy ( pTex );
+}
+
+void CRenderWareSA::RwTexDictionaryRemoveTexture ( RwTexDictionary* pTXD, RwTexture* pTex )
+{
+    if ( pTex->txd != pTXD )
+        return;
+
+    pTex->TXDList.next->prev = pTex->TXDList.prev;
+    pTex->TXDList.prev->next = pTex->TXDList.next;
+    pTex->txd = NULL;
+}
+
+bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, const char* szTexName )
+{
+    std::list < RwTexture* >::iterator it;
+    for ( it = list.begin (); it != list.end (); it++ )
+    {
+        if ( !stricmp ( szTexName, (*it)->name ) )
+            return true;
+    }
+    return false;
 }

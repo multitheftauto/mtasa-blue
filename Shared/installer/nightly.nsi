@@ -554,7 +554,6 @@ ShowUnInstDetails show
 
 			!ifndef LIGHTBUILD
 				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\lua5.1.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
 				File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
@@ -607,6 +606,7 @@ ShowUnInstDetails show
 			SectionIn 1 RO
 			SetOutPath "$INSTDIR\mods\deathmatch"
 			File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1.dll"
 			SetOutPath "$INSTDIR\mods\deathmatch\resources"
 		SectionEnd
 	SectionGroupEnd

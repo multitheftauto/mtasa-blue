@@ -57,7 +57,6 @@ typedef int (*lua_CFunction) (lua_State *L);
 typedef int (*lua_PreCallHook) ( lua_CFunction f, lua_State* L );
 void lua_registerPreCallHook ( lua_PreCallHook f );
 
-
 /*
 ** functions that read/write blocks when loading/dumping Lua chunks
 */
@@ -118,7 +117,6 @@ LUA_API void       (lua_close) (lua_State *L);
 LUA_API lua_State *(lua_newthread) (lua_State *L);
 
 LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);
-
 
 // MTA Specific functions.
 // ChrML: Added function to get the main state from a lua state that is a coroutine
@@ -303,6 +301,9 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 #define lua_Chunkreader		lua_Reader
 #define lua_Chunkwriter		lua_Writer
 
+
+/* hack */
+LUA_API void lua_setlevel	(lua_State *from, lua_State *to);
 
 
 /*
