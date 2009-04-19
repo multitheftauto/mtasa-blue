@@ -81,8 +81,8 @@ void CSerialManager::Remove ( CPlayer* pPlayer )
     {
 		if ( (*iter)->GetPlayer() == pPlayer )
 		{
+            delete *iter;
             iter = m_calls.erase ( iter );
-			delete *iter;
 		}
         else
             ++iter;
