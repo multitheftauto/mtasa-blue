@@ -78,6 +78,7 @@ public:
 	virtual BYTE			GetFlags                () = 0;
 	virtual CBoundingBox	* GetBoundingBox        () = 0;
 	virtual bool			IsValid                 () = 0;
+    virtual unsigned short  GetTextureDictionaryID  () = 0;
 
 	virtual void			AddRef                  ( bool bWaitForLoad ) = 0;
 	virtual void			RemoveRef               () = 0;

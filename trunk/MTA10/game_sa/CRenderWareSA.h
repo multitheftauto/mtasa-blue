@@ -29,10 +29,10 @@ class CRenderWareSA : public CRenderWare {
 						~CRenderWareSA				( void ) {};
 
 	// Adds textures into the TXD of a model, eventually making a copy of each texture first
-    void				ModelInfoTXDAddTextures		( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy );
+    void				ModelInfoTXDAddTextures		( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy = true, std::list < RwTexture* >* pReplacedTextures = NULL, std::list < RwTexture* >* pAddedTextures = NULL, bool bAddRef = true );
 
 	// Removes texture from the TXD of a model, eventually destroying each texture
-    void				ModelInfoTXDRemoveTextures	( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster = false );
+    void				ModelInfoTXDRemoveTextures	( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true );
 
 	// Reads and parses a TXD file specified by a path (szTXD)
 	RwTexDictionary *	ReadTXD						( const char *szTXD );
@@ -84,6 +84,10 @@ class CRenderWareSA : public CRenderWare {
 	// Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
 	// szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
 	bool				ReplacePartModels			( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
+
+private:
+    void                RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
+    static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
 };
 
 #endif

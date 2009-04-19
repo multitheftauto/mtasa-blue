@@ -27,7 +27,6 @@ template<> CModManager * CSingleton < CModManager > ::m_pSingleton = NULL;
 CModManager::CModManager ( void )
 {
     // Init
-    m_pHeadMod = NULL;
     m_hClientDLL = NULL;
     m_pClientBase = NULL;
     m_bUnloadRequested = false;
@@ -49,8 +48,8 @@ CModManager::~CModManager ( void )
     // Unload the current loaded mod (if loaded)
     Unload ();
 
-    // Free up the modlist
-    FreeModList ();
+    // Clear the modlist
+    Clear ();
 
 }
 
@@ -117,25 +116,36 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     Unload ();
 
     // Get the entry for the given name
-    CModManagerMod* pMod = FindEntry ( szName );
-    if ( pMod == NULL )
+    std::map < std::string, std::string >::iterator itMod = m_ModDLLFiles.find ( szName );
+    if ( itMod == m_ModDLLFiles.end () )
     {
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s (unknown mod)", szName );
         return NULL;
     }
 
-    // Change the current directory
-    GetCurrentDirectory ( 255, szOriginalDirectory );
+    // Change the search path and current directory
+    char szOrigPath [ 1024 ];
+    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, sizeof(szOrigPath) );
+    if ( dwGetPathResult == 0 || dwGetPathResult >= sizeof(szOrigPath) )
+    {
+        CCore::GetSingleton ().GetConsole ()->Print ( "Error getting Path environment variable" );
+        return NULL;
+    }
+    SString strPath ( "%s;%s\\%s", szOrigPath, CalcMTASAPath("mods").c_str (), szName );
+    SetEnvironmentVariable ( "Path", strPath );
+
+    GetCurrentDirectory ( sizeof(szOriginalDirectory), szOriginalDirectory );
     strMTADirectory = CalcMTASAPath ( "mta" );
     SetCurrentDirectory ( strMTADirectory );
     
     // Load the library
-    m_hClientDLL = LoadLibrary ( pMod->szClientDLLPath );
+    m_hClientDLL = LoadLibrary ( itMod->second.c_str () );
     if ( !m_hClientDLL )
     {
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: )", szName, GetLastError () );
 
-        // Return the current directory to its normal
+        // Return the search path and current directory to its normal
+        SetEnvironmentVariable ( "Path", szOrigPath );
         SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
@@ -154,7 +164,8 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         return NULL;
     }
 
-    // Return the current directory to its normal
+    // Return the search path and current directory to its normal
+    SetEnvironmentVariable ( "Path", szOrigPath );
     SetCurrentDirectory ( szOriginalDirectory );
 
     // Call InitClient and store the Client interface in m_pClientBase
@@ -293,27 +304,6 @@ CClientBase* CModManager::GetCurrentMod ( void )
 {
     return m_pClientBase;
 }
-
-
-bool CModManager::EnumerateModsStart ( CModManagerMod** pResult )
-{
-    // Put the first item in our modlist into the passed pointer
-    *pResult = m_pHeadMod;
-
-    // If the pointer is NULL, we return false, otherwize true
-    return ( m_pHeadMod != NULL );
-}
-
-
-bool CModManager::EnumerateModsNext ( CModManagerMod** pResult )
-{
-    // Put the next item in the list into the passed pointer
-    *pResult = (*pResult)->pNext;
-
-    // If the pointer was NULL, we return false, otherwize true
-    return ( *pResult != NULL );
-}
-
 
 void CModManager::RefreshMods ( void )
 {
@@ -567,8 +557,8 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     SString strPathWildchars ( "%s*.*", szModFolderPath );
 
     // Set the working directory to the MTA folder
-    CFilePathTranslator pFilePathTranslator;
-    pFilePathTranslator.SetCurrentWorkingDirectory ( "mta" );
+    CFilePathTranslator filePathTranslator;
+    filePathTranslator.SetCurrentWorkingDirectory ( "mta" );
 
     // Create a search
     hFind = FindFirstFile ( strPathWildchars, &FindData );
@@ -590,21 +580,19 @@ void CModManager::InitializeModList ( const char* szModFolderPath )
     }
 
     // Reset the working directory
-    pFilePathTranslator.UnSetCurrentWorkingDirectory ();
+    filePathTranslator.UnSetCurrentWorkingDirectory ();
 }
 
 
-void CModManager::FreeModList ( void )
+void CModManager::Clear ( void )
 {
     // Clear the list
-    Clear ();
+    m_ModDLLFiles.clear ();
 }
 
 
 void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* szName )
 {
-    char szDebugString[255] = {'\0'};
-
     // Name musn't be a . or .. link or we might load unwanted libraries
     // Hack: Also skip race for now as it will crash the game!
     if ( ( strcmp ( szName, "." ) != 0) && 
@@ -615,14 +603,14 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
         SString strClientDLL ( "%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL );
 
         // Attempt to load the primary client DLL
-        HMODULE hDLL = LoadLibrary ( strClientDLL );
+        HMODULE hDLL = LoadLibraryEx ( strClientDLL, NULL, DONT_RESOLVE_DLL_REFERENCES );
         if (hDLL != 0)
         {
             // Check if InitClient symbol exists
             if ( GetProcAddress ( hDLL, "InitClient" ) != NULL )
             {
                 // Add it to the list
-                AddEntry ( szName, strClientDLL );
+                m_ModDLLFiles [ szName ] = strClientDLL;
             }
             else
             {
@@ -637,81 +625,4 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
             CLogger::GetSingleton ().ErrorPrintf ( "Invalid mod DLL: %s (reason: %d)", szName, GetLastError() );
         }
     }
-}
-
-
-void CModManager::AddEntry ( const char* szName, const char* szClientDLLPath )
-{
-    // Create a CModManagerMod instance and initialize it
-    CModManagerMod* pMod = new CModManagerMod;
-    pMod->szName = new char [ strlen ( szName ) + 1 ];
-    pMod->szClientDLLPath = new char [ strlen ( szClientDLLPath ) + 1 ];
-    pMod->pNext = NULL;
-
-    // Copy over name and path
-    strcpy ( pMod->szName, szName );
-    strcpy ( pMod->szClientDLLPath, szClientDLLPath );
-
-    // Add it to the linked list
-    if ( m_pHeadMod != NULL )
-    {
-        CModManagerMod* pCurrent = m_pHeadMod;
-        
-        while ( pCurrent->pNext != NULL )
-        {
-            pCurrent = pCurrent->pNext;
-        }
-
-        pCurrent->pNext = pMod;
-    }
-    else
-    {
-        m_pHeadMod = pMod;
-    }
-}
-
-
-CModManagerMod* CModManager::FindEntry ( const char* szName )
-{
-    // Go through the list until szName matches an item's name or we reach the end
-    CModManagerMod* pCurrent = m_pHeadMod;
-    
-    while ( ( pCurrent != NULL) && ( stricmp ( pCurrent->szName, szName ) != 0 ) )
-    {
-        pCurrent = pCurrent->pNext;
-    }
-
-    // If we didn't reach the end, we found our match
-    if ( pCurrent != NULL )
-    {
-        return pCurrent;
-    }
-    else
-    {
-        return NULL;
-    }
-
-}
-
-
-void CModManager::Clear ( void ) 
-{
-    // Temp variables
-    CModManagerMod* pCurrent = m_pHeadMod;
-    CModManagerMod* pNext = NULL;
-    
-    // Clear all mod structures and strings in the linked list
-    while ( pCurrent != NULL )
-    {
-        pNext = pCurrent->pNext;
-
-        delete [] pCurrent->szName;
-        delete [] pCurrent->szClientDLLPath;
-        delete pCurrent;
-
-        pCurrent = pNext;
-    }
-
-    // If InitializeModList is called after this (if refreshing), AddMod () will crash if this isn't set to NULL
-    m_pHeadMod = NULL;
 }

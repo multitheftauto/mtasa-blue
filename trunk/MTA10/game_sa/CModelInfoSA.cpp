@@ -502,6 +502,11 @@ skip:
 	return fReturn;
 }
 
+unsigned short CModelInfoSA::GetTextureDictionaryID ()
+{
+    return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[m_dwModelID]->usTextureDictionary;
+}
+
 void CModelInfoSA::AddRef ( bool bWaitForLoad )
 {
 	// Are we not loaded?
@@ -630,7 +635,8 @@ void CModelInfoSA::RequestVehicleUpgrade ( void )
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )
 {
     // Error
-	if ( pClump == NULL ) return;
+	if ( pClump == NULL )
+        return;
 
     // Store the custom clump
 	m_pCustomClump = pClump;

@@ -24,13 +24,6 @@
     #define CMODMANAGER_CLIENTDLL "client.dll"
 #endif
 
-struct CModManagerMod
-{
-    char*               szName;
-    char*               szClientDLLPath;
-    CModManagerMod*     pNext;
-};
-
 class CModManager : public CModManagerInterface, public CSingleton < CModManager >
 {
 public:
@@ -52,8 +45,6 @@ public:
 
     CClientBase*        GetCurrentMod           ( void );
 
-    bool                EnumerateModsStart      ( CModManagerMod** pResult );
-    bool                EnumerateModsNext       ( CModManagerMod** pResult );
     void                RefreshMods             ( void );
 
     static long WINAPI  HandleExceptionGlobal   ( _EXCEPTION_POINTERS* pException );
@@ -63,18 +54,15 @@ public:
 
 private:
     void                InitializeModList       ( const char* szModFolderPath );
-    void                FreeModList             ( void );
-
-    void                VerifyAndAddEntry       ( const char* szModFolderPath, const char* szName );
-    void                AddEntry                ( const char* szName, const char* szClientDLLPath );
-    CModManagerMod*     FindEntry               ( const char* szName );
     void                Clear                   ( void );
 
-    CModManagerMod*     m_pHeadMod;
+    void                VerifyAndAddEntry       ( const char* szModFolderPath, const char* szName );
+
+    std::map < std::string, std::string > m_ModDLLFiles;
     HMODULE             m_hClientDLL;
     CClientBase*        m_pClientBase;
 
-    SString              m_strDefaultModName;
+    SString             m_strDefaultModName;
 
     bool                m_bUnloadRequested;
     SString             m_strRequestedMod;

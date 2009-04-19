@@ -18,7 +18,9 @@ using std::string;
 
 template<> CLocalGUI * CSingleton < CLocalGUI >::m_pSingleton = NULL;
 
-#define HIWORD(l)           ((WORD)((DWORD_PTR)(l) >> 16))
+#ifndef HIWORD
+    #define HIWORD(l)           ((WORD)((DWORD_PTR)(l) >> 16))
+#endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
 CLocalGUI::CLocalGUI ( void )

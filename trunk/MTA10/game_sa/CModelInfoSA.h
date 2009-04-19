@@ -261,6 +261,7 @@ public:
 	CBoundingBox *                  GetBoundingBox          ( void );
 	bool			                IsValid                 ( void );
 	float			                GetDistanceFromCentreOfMassToBaseOfModel ( void );
+    unsigned short                  GetTextureDictionaryID  ( void );
 
 	void			                AddRef                  ( bool bWaitForLoad );
     int                             GetRefCount             ( void );
@@ -290,7 +291,7 @@ public:
 
     inline void                     SetModelID			    ( DWORD dwModelID ) { m_dwModelID = dwModelID; };
 
-    inline RwObject*                GetRwObject             ( void ) { return m_pInterface->pRwObject; }
+    inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 };
 
 #endif
