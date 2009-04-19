@@ -19,6 +19,7 @@ class CClientDFFManager;
 
 class CClientDFFManager
 {
+    friend class CClientTXD;
     friend class CClientDFF;
 
 public:

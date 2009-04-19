@@ -164,8 +164,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         return;
 
     // Restore all the models we replaced.
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->RestoreOriginalModel ();
+    g_pGame->GetModelInfo ( usModel )->RestoreOriginalModel ();
 }
 
 

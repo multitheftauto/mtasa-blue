@@ -7,6 +7,7 @@
 *  PURPOSE:     TXD manager class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               arc_
 *
 *****************************************************************************/
 

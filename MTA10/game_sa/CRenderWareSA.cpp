@@ -6,6 +6,7 @@
 *  PURPOSE:     RenderWare mapping to Grand Theft Auto: San Andreas
 *               and miscellaneous rendering functions
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               arc_
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -18,13 +19,15 @@
 extern CGameSA * pGame;
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
-struct SReplaceParts {
-	const char *szName;							// name of the part you want to replace (e.g. 'door_lf' or 'door_rf')
-	unsigned char ucIndex;						// index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
-	RpAtomicContainer *pReplacements;		// replacement atomics
-	unsigned int uiReplacements;				// number of replacements
+struct SReplaceParts
+{
+	const char *szName;                         // name of the part you want to replace (e.g. 'door_lf' or 'door_rf')
+	unsigned char ucIndex;                      // index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
+	RpAtomicContainer *pReplacements;		    // replacement atomics
+	unsigned int uiReplacements;                // number of replacements
 };
-static RwObject* ReplacePartsCB ( RwObject * object, SReplaceParts * data ) {
+static RwObject* ReplacePartsCB ( RwObject * object, SReplaceParts * data )
+{
 	RpAtomic * Atomic = (RpAtomic*) object;
 	char szAtomicName[16] = {0};
 
@@ -53,7 +56,8 @@ static RwObject* ReplacePartsCB ( RwObject * object, SReplaceParts * data ) {
 }
 
 // RpClumpForAllAtomics callback used to add atomics to a vehicle
-static RpAtomic* AddAllAtomicsCB (RpAtomic * atomic, RpClump * data) {
+static RpAtomic* AddAllAtomicsCB (RpAtomic * atomic, RpClump * data)
+{
 	RwFrame * pFrame = RpGetFrame ( data );
 
 	// add the atomic to the frame
@@ -64,13 +68,15 @@ static RpAtomic* AddAllAtomicsCB (RpAtomic * atomic, RpClump * data) {
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all wheels with a given wheel model
-struct SReplaceWheels {
-	const char *szName;							// name of the new wheel model
-	RpClump *pClump;							// the vehicle's clump
-	RpAtomicContainer *pReplacements;		// replacement atomics
-	unsigned int uiReplacements;				// number of replacements
+struct SReplaceWheels
+{
+	const char *szName;                         // name of the new wheel model
+	RpClump *pClump;                            // the vehicle's clump
+	RpAtomicContainer *pReplacements;           // replacement atomics
+	unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* ReplaceWheelsCB (RpAtomic * atomic, SReplaceWheels * data) {
+static RpAtomic* ReplaceWheelsCB (RpAtomic * atomic, SReplaceWheels * data)
+{
 	RwFrame * Frame = RpGetFrame ( atomic );
 
 	// find our wheel atomics
@@ -99,12 +105,14 @@ static RpAtomic* ReplaceWheelsCB (RpAtomic * atomic, SReplaceWheels * data) {
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all atomics for a vehicle
-struct SReplaceAll {
-	RpClump *pClump;							// the vehicle's clump
-	RpAtomicContainer *pReplacements;		// replacement atomics
-	unsigned int uiReplacements;				// number of replacements
+struct SReplaceAll
+{
+	RpClump *pClump;                            // the vehicle's clump
+	RpAtomicContainer *pReplacements;           // replacement atomics
+	unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* ReplaceAllCB (RpAtomic * atomic, SReplaceAll * data) {
+static RpAtomic* ReplaceAllCB (RpAtomic * atomic, SReplaceAll * data)
+{
 	RwFrame * Frame = RpGetFrame ( atomic );
 	if ( Frame == NULL ) return atomic;
 
@@ -137,11 +145,13 @@ static RpAtomic* ReplaceAllCB (RpAtomic * atomic, SReplaceAll * data) {
 }
 
 // RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
-struct SLoadAtomics {
-	RpAtomicContainer *pReplacements;		// replacement atomics
-	unsigned int uiReplacements;				// number of replacements
+struct SLoadAtomics
+{
+	RpAtomicContainer *pReplacements;           // replacement atomics
+	unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data) {
+static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
+{
 	RwFrame * Frame = RpGetFrame(atomic);
 
 	// add the atomic to the container
@@ -337,21 +347,21 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
     // Get the TXD corresponding to this ID
     SetTextureDict ( usTxdId );
 
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
     if ( bAddRef )
     {
-        if ( pGame->GetModelInfo ( usModelID )->IsLoaded () )
-            CTxdStore_AddRef ( usTxdId );
-        else
+        if ( !pTXD )
+        {
             pGame->GetModelInfo ( usModelID )->Request ( true, true );
-    }
-    else
-    {
-        if ( pGame->GetModelInfo ( usModelID )->IsLoaded () )
             CTxdStore_AddRef ( usTxdId );
+            ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelID );
+            pTXD = CTxdStore_GetTxd ( usTxdId );
+        }
         else
-            return;
+        {
+            CTxdStore_AddRef ( usTxdId );
+        }
     }
-    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
 
 	if ( pTXD )
     {
@@ -441,7 +451,8 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textu
 
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD ) {
+RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
+{
 	// open the stream
 	RwStream * streamTexture = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szTXD );
 
@@ -466,7 +477,8 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD ) {
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // usModelID == 0 means no collisions will be loaded (be careful! seems crashy!)
-RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID ) {
+RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID )
+{
 	// open the stream
 	RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szDFF );
 
@@ -600,7 +612,8 @@ bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelI
 }
 
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
-unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * pAtomics ) {
+unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * pAtomics )
+{
 	// iterate through all atomics in the clump
 	SLoadAtomics data = {0};
 	data.pReplacements = pAtomics;
@@ -752,6 +765,11 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture ( RwTexDictionary* pTXD, RwText
     pTex->TXDList.next->prev = pTex->TXDList.prev;
     pTex->TXDList.prev->next = pTex->TXDList.next;
     pTex->txd = NULL;
+}
+
+short CRenderWareSA::CTxdStore_GetTxdRefcount ( unsigned short usTxdID )
+{
+    return *(short *)( *(*(DWORD **)0xC8800C) + 0xC*usTxdID + 4 );
 }
 
 bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, const char* szTexName )

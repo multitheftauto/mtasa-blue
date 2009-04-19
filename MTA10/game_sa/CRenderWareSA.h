@@ -86,7 +86,8 @@ class CRenderWareSA : public CRenderWare {
 	bool				ReplacePartModels			( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
 
 private:
-    void                RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
+    static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
+    static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
     static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
 };
 

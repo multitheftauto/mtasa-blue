@@ -662,13 +662,7 @@ void CModelInfoSA::RestoreOriginalModel ( void )
     // Are we loaded?
     if ( IsLoaded () )
     {
-        // Enable the unloaded state for this model so the original gets reloaded on request
-		// and our custom clump isnt destroyed
-		BYTE *ModelLoaded = (BYTE*)ARRAY_ModelLoaded;
-		ModelLoaded [ 20*m_dwModelID ] = 0;
-
-        // Load the original model
-		//Request ( true, true );
+        ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( static_cast < unsigned short > ( m_dwModelID ) );
     }
 
 	// Reset the stored custom vehicle clump
