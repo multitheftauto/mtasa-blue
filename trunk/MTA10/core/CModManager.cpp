@@ -142,7 +142,22 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     m_hClientDLL = LoadLibrary ( itMod->second.c_str () );
     if ( !m_hClientDLL )
     {
-        CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: )", szName, GetLastError () );
+        DWORD dwError = GetLastError ();
+        char szError [ 2048 ];
+        char* p;
+
+        FormatMessage ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+                        NULL, dwError, LANG_NEUTRAL, szError, sizeof ( szError ), NULL );
+
+        // Remove newlines from the error message
+        p = szError + strlen ( szError ) - 1;
+        while ( p >= szError && (*p == '\r' || *p == '\n' ) )
+        {
+            *p = '\0';
+            --p;
+        }
+
+        CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: %s)", szName, szError );
 
         // Return the search path and current directory to its normal
         SetEnvironmentVariable ( "Path", szOrigPath );
