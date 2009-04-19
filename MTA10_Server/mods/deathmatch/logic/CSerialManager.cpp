@@ -77,14 +77,15 @@ void CSerialManager::DoPulse ( void )
 void CSerialManager::Remove ( CPlayer* pPlayer )
 {
     list< CSerialVerification* >::iterator iter = m_calls.begin ();
-    for ( ; iter != m_calls.end (); iter++ )
+    while ( iter != m_calls.end () )
     {
 		if ( (*iter)->GetPlayer() == pPlayer )
 		{
+            iter = m_calls.erase ( iter );
 			delete *iter;
-			m_calls.remove ( *iter );
-			iter = m_calls.begin ();
 		}
+        else
+            ++iter;
     }
 }
 
