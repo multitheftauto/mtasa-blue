@@ -3207,6 +3207,8 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             if ( !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) )
             {
                 // Stop here if they cancelEvent it
+                pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
+                pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
                 return false;
             }
 
