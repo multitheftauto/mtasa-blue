@@ -21,6 +21,8 @@ CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : CClien
     // Init
     m_pManager = pManager;
     m_usMainModel = 0xFFFF;
+
+    SetTypeName ( "txd" );
 }
 
 
@@ -99,7 +101,6 @@ bool CClientTXD::Import ( unsigned short usModelID )
         m_ImportedModels.push_back ( usModelID );
         if ( m_usMainModel == 0xFFFF )
             m_usMainModel = usModelID;
-
         return true;
     }
 

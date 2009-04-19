@@ -999,7 +999,10 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
         // Is this an internal function that's restricted? To make sure you can't
         // call an MTA function in an external resource that's restricted and not
         // defined in ACL.
-        bool bRestricted = CLuaCFunctions::IsRestricted ( szFunctionName );
+        bool bRestricted = false;
+        CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( szFunctionName );
+        if ( pFunction )
+            bRestricted = pFunction->IsRestricted ();
 
         // Check this resource can use the function call to the called resource
         if ( !CanUseFunction ( szFunctionName, luaVM, bRestricted ) )
