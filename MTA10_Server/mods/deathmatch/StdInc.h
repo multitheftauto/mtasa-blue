@@ -20,6 +20,7 @@
 #include <ctime>
 #include <sstream>
 
+#include <google/dense_hash_map>
 #include <google/sparse_hash_map>
 
 // SDK includes

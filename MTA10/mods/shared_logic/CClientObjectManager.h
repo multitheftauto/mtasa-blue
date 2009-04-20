@@ -47,6 +47,8 @@ public:
 
     static bool                             IsObjectLimitReached        ( void );
 
+    void                                    RestreamObjects             ( unsigned short usModel );
+
     std::list < CClientObject* > ::const_iterator           IterGet             ( CClientObject* pObject );
     std::list < CClientObject* > ::const_reverse_iterator   IterGetReverse      ( CClientObject* pObject );
     std::list < CClientObject* > ::const_iterator           IterBegin           ( void )                        { return m_Objects.begin (); };
@@ -55,16 +57,16 @@ public:
     std::list < CClientObject* > ::const_reverse_iterator   IterReverseEnd      ( void )                        { return m_Objects.rend (); };
 
 private:
-                                            CClientObjectManager    ( class CClientManager* pManager );
-                                            ~CClientObjectManager   ( void );
+                                            CClientObjectManager        ( class CClientManager* pManager );
+                                            ~CClientObjectManager       ( void );
 
-    inline void                             AddToList               ( CClientObject* pObject )      { m_Objects.push_back ( pObject ); };
-    void                                    RemoveFromList          ( CClientObject* pObject );
+    inline void                             AddToList                   ( CClientObject* pObject )      { m_Objects.push_back ( pObject ); };
+    void                                    RemoveFromList              ( CClientObject* pObject );
 
-    void                                    OnCreation              ( CClientObject * pObject );
-    void                                    OnDestruction           ( CClientObject * pObject );
+    void                                    OnCreation                  ( CClientObject * pObject );
+    void                                    OnDestruction               ( CClientObject * pObject );
 
-    void                                    UpdateLimitInfo         ( void );
+    void                                    UpdateLimitInfo             ( void );
 
     static int                              m_iEntryInfoNodeEntries;
     static int                              m_iPointerNodeSingleLinkEntries;

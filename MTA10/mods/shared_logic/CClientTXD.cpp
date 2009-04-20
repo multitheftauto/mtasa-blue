@@ -101,6 +101,8 @@ bool CClientTXD::Import ( unsigned short usModelID )
         m_ImportedModels.push_back ( usModelID );
         if ( m_usMainModel == 0xFFFF )
             m_usMainModel = usModelID;
+
+        Restream ( usModelID );
         return true;
     }
 
@@ -114,19 +116,19 @@ bool CClientTXD::IsImported ( unsigned short usModelID )
 }
 
 
-void CClientTXD::Remove ( unsigned short usModel )
+void CClientTXD::Remove ( unsigned short usModelID )
 {
-    if ( IsImported ( usModel ) )
+    if ( IsImported ( usModelID ) )
     {
         // Remove the model
-        InternalRemove ( usModel );
+        InternalRemove ( usModelID );
 
         // Remove it from the list
-        m_ImportedModels.remove ( usModel );
+        m_ImportedModels.remove ( usModelID );
 
         // If we just removed ourselves from our main model, we are free again to use our main
         // textures in a model directly
-        if ( usModel == m_usMainModel )
+        if ( usModelID == m_usMainModel )
             m_usMainModel = 0xFFFF;
     }
 }
@@ -195,6 +197,8 @@ void CClientTXD::InternalRemove ( unsigned short usModelID )
         if ( it->second.empty () )
             ms_AddedTXDTextures.erase ( it );
     }
+
+    Restream ( usModelID );
 }
 
 RwTexture* CClientTXD::FindNamedTextureInList ( std::list < RwTexture* >& list, const char* szTexName )
@@ -206,4 +210,17 @@ RwTexture* CClientTXD::FindNamedTextureInList ( std::list < RwTexture* >& list, 
             return *it;
     }
     return NULL;
+}
+
+void CClientTXD::Restream ( unsigned short usModelID )
+{
+    if ( CClientVehicleManager::IsValidModel ( usModelID ) )
+    {
+        m_pManager->GetVehicleManager ()->RestreamVehicles ( usModelID );
+    }
+    else if ( CClientObjectManager::IsValidModel ( usModelID ) )
+    {
+        m_pManager->GetObjectManager ()->RestreamObjects ( usModelID );
+    }
+    g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
 }

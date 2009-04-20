@@ -451,3 +451,22 @@ void CClientVehicleManager::OnDestruction ( CClientVehicle * pVehicle )
 {
     m_StreamedIn.remove ( pVehicle );
 }
+
+void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
+{
+    // Store the affected vehicles
+    CClientVehicle* pVehicle;
+    std::list < CClientVehicle* > ::iterator iter = IterBegin ();
+    for ( ; iter != IterEnd (); iter++ )
+    {
+        pVehicle = *iter;
+
+        // Streamed in and same vehicle ID?
+		if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pVehicle->StreamOutForABit ();
+        }
+    }
+}

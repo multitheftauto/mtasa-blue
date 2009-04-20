@@ -416,7 +416,7 @@ BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 BOOL CModelInfoSA::IsLoaded ( )
 {
 	DEBUG_TRACE("BOOL CModelInfoSA::IsLoaded ( )");
-	//return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + ((dwModelID + m_dwModelID * 4)*4));
+	//return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
 	DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
 	DWORD ModelID = m_dwModelID;
 
@@ -505,6 +505,73 @@ skip:
 unsigned short CModelInfoSA::GetTextureDictionaryID ()
 {
     return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[m_dwModelID]->usTextureDictionary;
+}
+
+void CModelInfoSA::RestreamIPL ()
+{
+    // This function restreams all instances of the model *that are from the default SA world (ipl)*.
+    // In other words, it does not affect elements created by MTA.
+    // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
+
+    ( (void (*)())FUNC_FlushRequestList )();
+
+    unsigned short usTxdID = GetTextureDictionaryID ();
+    std::set < unsigned short > removedModels;
+    
+    for ( int i = 0; i < 2*NUM_StreamSectorRows*NUM_StreamSectorCols; i++ )
+    {
+        DWORD* pSectorEntry = ((DWORD **)ARRAY_StreamSectors) [ i ];
+        while ( pSectorEntry )
+        {
+            CEntitySAInterface* pEntity = (CEntitySAInterface *)pSectorEntry [ 0 ];
+
+            if ( pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () == usTxdID )
+            {
+                if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
+                {
+                    __asm
+                    {
+                        mov ecx, pEntity
+                        mov eax, [ecx]
+                        call dword ptr [eax+20h]
+                    }
+                    removedModels.insert ( pEntity->m_nModelIndex );
+                }
+            }
+            
+            pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
+        }
+    }
+
+    for ( int i = 0; i < NUM_StreamRepeatSectorRows*NUM_StreamRepeatSectorCols; i++ )
+    {
+        DWORD* pSectorEntry = ((DWORD **)ARRAY_StreamRepeatSectors) [ 3*i + 2 ];
+        while ( pSectorEntry )
+        {
+            CEntitySAInterface* pEntity = (CEntitySAInterface *)pSectorEntry [ 0 ];
+            if (  pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () == usTxdID )
+            {
+                if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
+                {
+                    __asm
+                    {
+                        mov ecx, pEntity
+                        mov eax, [ecx]
+                        call dword ptr [eax+20h]
+                    }
+                    removedModels.insert ( pEntity->m_nModelIndex );
+                }
+            }
+            pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
+        }
+    }
+
+    std::set < unsigned short >::iterator it;
+    for ( it = removedModels.begin (); it != removedModels.end (); it++ )
+    {
+        ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( *it );
+        *(BYTE *)(ARRAY_ModelLoaded + 20*(*it)) = 0;    
+    }
 }
 
 void CModelInfoSA::AddRef ( bool bWaitForLoad )

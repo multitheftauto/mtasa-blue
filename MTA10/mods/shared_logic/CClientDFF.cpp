@@ -149,7 +149,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         // Stream the vehicles of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pDFFManager->ReStreamVehicles ( usModel );
+        m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
     }
 
     // Is this an object ID?
@@ -158,7 +158,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         // Stream the objects of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
-        m_pDFFManager->ReStreamObjects ( usModel );
+        m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
     }
     else
         return;
@@ -173,7 +173,8 @@ bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
     // Stream out all the vehicle models with matching ID.
     // Streamer will stream them back in async after a frame
     // or so.
-    m_pDFFManager->ReStreamObjects ( usModel );
+    m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+    g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
@@ -192,7 +193,7 @@ bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
     // Stream out all the vehicle models with matching ID.
     // Streamer will stream them back in async after a frame
     // or so.
-    m_pDFFManager->ReStreamVehicles ( usModel );
+    m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );

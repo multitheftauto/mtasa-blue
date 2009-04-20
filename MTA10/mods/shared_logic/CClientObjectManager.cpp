@@ -307,6 +307,26 @@ bool CClientObjectManager::IsObjectLimitReached ( void )
 }
 
 
+void CClientObjectManager::RestreamObjects ( unsigned short usModel )
+{
+    // Store the affected vehicles
+    CClientObject* pObject;
+    std::list < CClientObject* > ::const_iterator iter = IterBegin ();
+    for ( ; iter != IterEnd (); iter++ )
+    {
+        pObject = *iter;
+
+        // Streamed in and same vehicle ID?
+		if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pObject->StreamOutForABit ();
+        }
+    }
+}
+
+
 list < CClientObject* > ::const_iterator CClientObjectManager::IterGet ( CClientObject* pObject )
 {
     // Find it in our list
