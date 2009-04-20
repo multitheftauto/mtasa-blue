@@ -111,6 +111,27 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
             }
             // Request a new explosion
             g_pClientGame->SendExplosionSync ( vecPosition, explosionType, pOriginSource );
+
+            // If caused by the local player in a fast vehicle then play it locally, and ignore when the server sends it back
+            if ( pLocalPlayer && pLocalPlayer->GetOccupiedVehicle () )
+            {
+                CVector vecVelocity;
+                pLocalPlayer->GetOccupiedVehicle ()->GetMoveSpeedMeters ( vecVelocity );
+
+                // Check vehicle speed
+                if ( vecVelocity.Length () > 10 )
+                {
+                    // Remember what the explosion looks like, so we can ignore it when the server sends it back
+                    SIgnoreItem ignoreItem;
+                    ignoreItem.fExpireTime   = CClientTime::GetClientConnectSeconds () + 2.0f;
+                    ignoreItem.vecPosition   = vecPosition;
+                    ignoreItem.explosionType = explosionType;
+                    m_IgnoreList.push_back( ignoreItem );
+
+                    // Play it locally
+                    return true;
+                }
+            }
         }
     }
 
@@ -121,6 +142,27 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
 
 CExplosion * CClientExplosionManager::Create ( eExplosionType explosionType, CVector & vecPosition, CClientEntity * pCreator, bool bMakeSound, float fCamShake, bool bNoDamage, eWeaponType responsibleWeapon )
 {
+    // See if this explosion should be ignored
+    std::vector < SIgnoreItem >::iterator iter = m_IgnoreList.begin ();
+    while ( iter != m_IgnoreList.end () )
+    {
+        // Found match?
+        if ( iter->vecPosition == vecPosition && iter->explosionType == explosionType )
+        {
+            iter = m_IgnoreList.erase ( iter );
+            return NULL;
+        }
+
+        // Item too old ?
+        if ( iter->fExpireTime < CClientTime::GetClientConnectSeconds () )
+        {
+            iter = m_IgnoreList.erase ( iter );
+            continue;
+        }
+        iter++;
+    }
+    
+
     CEntity * pGameCreator = NULL;
     if ( pCreator ) pGameCreator = pCreator->GetGameEntity ();
 
