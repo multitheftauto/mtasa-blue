@@ -258,6 +258,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     GetMTASAPath ( szMTASAPath, MAX_PATH );
 
     // If we aren't compiling in debug-mode...
+    HWND hwndSplash = NULL;
     #ifndef MTA_DEBUG
 	#ifndef MTA_ALLOW_DEBUG
         // Are we debugged? Quit... if not compiled debug
@@ -268,9 +269,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
 
         // Show the splash and wait 2 seconds
-        HWND hwndSplash;
-        hwndSplash =  CreateDialog( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, 0 );
-        Sleep(1000);
+        hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, 0 );
+        Sleep ( 1000 );
 	#endif
     #endif
 
@@ -282,6 +282,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Check if libcurl.dll exists)
     if ( INVALID_HANDLE_VALUE == FindFirstFile ( szDataFile, &fdFileInfo ) )
     {
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
         MessageBox( NULL, "Load failed.  Please ensure that "
                           "the data files have been installed "
                           "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
@@ -302,9 +304,11 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SetCurrentDirectory ( szGTAPath );
     if ( INVALID_HANDLE_VALUE == FindFirstFile( szGTAEXEPath, &fdFileInfo ) )
     {
-        char szOutput[2*MAX_PATH];
-        sprintf ( szOutput, "Load failed. Could not find gta_sa.exe in %s.", szGTAPath );
-        MessageBox( 0,  szOutput, "Error!", MB_ICONEXCLAMATION|MB_OK );
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
+        char szMsg [ 2*MAX_PATH ];
+        _snprintf ( szMsg, sizeof(szMsg), "Load failed. Could not find gta_sa.exe in %s.", szGTAPath );
+        MessageBox( 0, szMsg, "Error!", MB_ICONEXCLAMATION|MB_OK );
         return 1;
     }
 
@@ -325,6 +329,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                               &siLoadee,
                               &piLoadee ) )
     {
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
         MessageBox( NULL, "Could not start Grand Theft Auto: San Andreas.  "
                           "Please try restarting, or if the problem persists,"
                           "contact MTA at www.multitheftauto.com.", "Error!", MB_ICONEXCLAMATION|MB_OK );
@@ -337,6 +343,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
     if ( INVALID_HANDLE_VALUE == FindFirstFile ( szCoreDLL, &fdFileInfo ) )
     {
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
         MessageBox( NULL, "Load failed.  Please ensure that "
                           "the file core.dll is in the modules "
                            "directory within the MTA root directory.", "Error!", MB_ICONEXCLAMATION|MB_OK );
@@ -351,6 +359,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     HMODULE hCoreModule = LoadLibrary( szCoreDLL );
     if ( hCoreModule == NULL )
     {
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
         MessageBox( NULL, "Load failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
                             "is correctly installed.", "Error!", MB_ICONEXCLAMATION|MB_OK );
@@ -362,23 +372,19 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, szCoreDLL );
     
-    // If we aren't debugging, we destroy the splash we created
-    #ifndef MTA_DEBUG
-	#ifndef MTA_ALLOW_DEBUG
-        DestroyWindow( hwndSplash );
-	#endif
-    #endif
-    
     // Resume execution for the game.
-    ResumeThread( piLoadee.hThread );
+    ResumeThread ( piLoadee.hThread );
+
+    if ( hwndSplash )
+        DestroyWindow ( hwndSplash );
 
 	#ifdef MTA_DEBUG
 	WaitForSingleObject ( piLoadee.hProcess, INFINITE );
 	#endif
 
     // Cleanup and exit.
-    CloseHandle( piLoadee.hProcess );
-    CloseHandle( piLoadee.hThread );
+    CloseHandle ( piLoadee.hProcess );
+    CloseHandle ( piLoadee.hThread );
 
     // Success
     return 0;
