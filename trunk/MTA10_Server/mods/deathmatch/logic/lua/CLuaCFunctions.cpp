@@ -15,8 +15,10 @@
 
 #include "StdInc.h"
 
-stdext::hash_map < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
-stdext::hash_map < std::string, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
+using namespace google;
+
+sparse_hash_map < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
+sparse_hash_map < std::string, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
 
 CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -25,6 +27,15 @@ CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestri
     m_bRestricted = bRestricted;
 }
 
+CLuaCFunctions::CLuaCFunctions ()
+{
+    
+}
+
+CLuaCFunctions::~CLuaCFunctions ()
+{
+    RemoveAllFunctions ();
+}
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -47,7 +58,7 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
-    stdext::hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
+    sparse_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
     it = ms_Functions.find ( f );
     if ( it == ms_Functions.end () )
         return NULL;
@@ -58,7 +69,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 {
-    stdext::hash_map < std::string, CLuaCFunction* >::iterator it;
+    sparse_hash_map < std::string, CLuaCFunction* >::iterator it;
     it = ms_FunctionsByName.find ( szName );
     if ( it == ms_FunctionsByName.end () )
         return NULL;
@@ -70,7 +81,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
-    stdext::hash_map < std::string, CLuaCFunction* >::iterator it;
+    sparse_hash_map < std::string, CLuaCFunction* >::iterator it;
     for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
     {
         lua_register ( luaVM, it->first.c_str (), it->second->GetAddress () );
@@ -81,7 +92,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 void CLuaCFunctions::RemoveAllFunctions ( void )
 {
     // Delete all functions
-    stdext::hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
+    sparse_hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
     for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
     {
         delete it->second;

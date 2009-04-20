@@ -19,7 +19,6 @@ class CClientDFFManager;
 
 class CClientDFFManager
 {
-    friend class CClientTXD;
     friend class CClientDFF;
 
 public:
@@ -40,9 +39,6 @@ public:
 private:
     void                            AddToList               ( CClientDFF* pDFF )        { m_List.push_back ( pDFF ); }
     void                            RemoveFromList          ( CClientDFF* pDFF );
-
-    void                            ReStreamObjects         ( unsigned short usModel );
-    void                            ReStreamVehicles        ( unsigned short usModel );
 
     class CClientObjectManager*     m_pObjectManager;
     class CClientVehicleManager*    m_pVehicleManager;

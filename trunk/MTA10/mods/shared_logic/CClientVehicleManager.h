@@ -60,6 +60,8 @@ public:
 
     static bool                     IsVehicleLimitReached   ( void );
 
+    void                            RestreamVehicles        ( unsigned short usModel );
+
     std::list < CClientVehicle* > ::iterator            IterGet             ( CClientVehicle* pVehicle );
     std::list < CClientVehicle* > ::reverse_iterator    IterGetReverse      ( CClientVehicle* pVehicle );
     std::list < CClientVehicle* > ::iterator            IterBegin           ( void )    { return m_List.begin (); };

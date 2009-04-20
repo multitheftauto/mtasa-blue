@@ -33,6 +33,12 @@
 
 #define VAR_IgnoredEntity									0xB7CD68 // ##SA##
 #define VAR_currArea                                        0xB72914 // ##SA##
+#define ARRAY_StreamSectors                                 0xB7D0B8
+#define NUM_StreamSectorRows                                120
+#define NUM_StreamSectorCols                                120
+#define ARRAY_StreamRepeatSectors                           0xB992B8
+#define NUM_StreamRepeatSectorRows                          16
+#define NUM_StreamRepeatSectorCols                          16
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"

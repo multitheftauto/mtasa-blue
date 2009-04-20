@@ -56,6 +56,7 @@ class CPedModelInfoSAInterface;
 #define		FUNC_RequestModel				0x4087e0
 #define		FUNC_RemoveModel				0x4089a0
 #define		FUNC_LoadAllRequestedModels		0x40ea10
+#define     FUNC_FlushRequestList           0x40E4E0
 
 #define     FUNC_HasVehicleUpgradeLoaded    0x407820
 #define     FUNC_RequestVehicleUpgrade      0x408C70
@@ -262,6 +263,7 @@ public:
 	bool			                IsValid                 ( void );
 	float			                GetDistanceFromCentreOfMassToBaseOfModel ( void );
     unsigned short                  GetTextureDictionaryID  ( void );
+    void                            RestreamIPL             ( void );
 
 	void			                AddRef                  ( bool bWaitForLoad );
     int                             GetRefCount             ( void );

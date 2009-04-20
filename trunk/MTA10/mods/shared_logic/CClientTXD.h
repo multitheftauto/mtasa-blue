@@ -42,6 +42,7 @@ public:
 
 private:
     void                            InternalRemove          ( unsigned short usModel );
+    void                            Restream                ( unsigned short usModel );
     static RwTexture*               FindNamedTextureInList ( std::list < RwTexture* >& list, const char* szTexName );
 
     std::list < RwTexture* >        m_Textures;
