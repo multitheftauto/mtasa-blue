@@ -16,6 +16,7 @@
 #include "StdInc.h"
 
 stdext::hash_map < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
+stdext::hash_map < std::string, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
 
 CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -27,14 +28,19 @@ CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestri
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
-    // See if we already have it added. Eventually just return it instead of adding it twice
-    CLuaCFunction* pExistingFunction = GetFunction ( f );
-    if ( pExistingFunction )
-        return pExistingFunction;
+    // Already have a function by this name?
+    CLuaCFunction* pFunction = GetFunction ( szName );
+    if ( pFunction )
+        return pFunction;
 
-    // Create it, add to list and return
-    CLuaCFunction* pFunction = new CLuaCFunction ( szName, f, bRestricted );
-    ms_Functions [ f ] = pFunction;
+    // Already have a function by this address?
+    pFunction = GetFunction ( f );
+    if ( !pFunction )
+    {
+        pFunction = new CLuaCFunction ( szName, f, bRestricted );
+        ms_Functions [ f ] = pFunction;
+    }
+    ms_FunctionsByName [ szName ] = pFunction;
     return pFunction;
 }
 
@@ -52,23 +58,22 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 
 CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 {
-    stdext::hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
-    for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
-    {
-        if ( !strcmp ( it->second->GetName ().c_str (), szName ) )
-            return it->second;
-    }
-    return NULL;
+    stdext::hash_map < std::string, CLuaCFunction* >::iterator it;
+    it = ms_FunctionsByName.find ( szName );
+    if ( it == ms_FunctionsByName.end () )
+        return NULL;
+
+    return it->second;
 }
 
 
 void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
 {
     // Register all our functions to a lua VM
-    stdext::hash_map < lua_CFunction, CLuaCFunction* >::iterator it;
-    for ( it = ms_Functions.begin (); it != ms_Functions.end (); it++ )
+    stdext::hash_map < std::string, CLuaCFunction* >::iterator it;
+    for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
     {
-        lua_register ( luaVM, it->second->GetName ().c_str (), it->second->GetAddress () );
+        lua_register ( luaVM, it->first.c_str (), it->second->GetAddress () );
     }
 }
 
@@ -82,4 +87,5 @@ void CLuaCFunctions::RemoveAllFunctions ( void )
         delete it->second;
     }
     ms_Functions.clear ();
+    ms_FunctionsByName.clear ();
 }

@@ -52,6 +52,7 @@ public:
 
 private:
     static stdext::hash_map < lua_CFunction, CLuaCFunction* > ms_Functions;
+    static stdext::hash_map < std::string, CLuaCFunction* > ms_FunctionsByName;
 };
 
 #endif
