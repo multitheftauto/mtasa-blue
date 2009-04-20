@@ -13,6 +13,7 @@ SetCompressor /SOLID lzma
 Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
+Var RedistInstalled
 
 ; ###########################################################################################################
 ;!define FILES_ROOT "C:\Build\output"
@@ -431,7 +432,16 @@ UAC_Success:
 	MessageBox mb_iconstop "This installer requires admin access, try again"
 	goto UAC_Elevate
 
-
+	; Check if we must install the Microsoft Visual Studio 2008 SP1 redistributable
+	ClearErrors
+	ReadRegDWORD $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-30C0-39D9-BD6F-21E6EC160475}" "Version"
+	IfErrors 0 DontInstallVC9Redist
+	StrCpy $RedistInstalled "0"
+	Goto PostVC90Check
+DontInstallVC9Redist:
+	StrCpy $RedistInstalled "1"
+PostVC90Check:
+	
 	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" ; start of fix for #3743
 	${If} $Install_Dir == '' 
 		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas"
@@ -538,6 +548,12 @@ ShowUnInstDetails show
 	SectionGroup /e "Game client" SECGCLIENT
 		Section "Core components" SEC01
 			SectionIn 1 RO ; section is required
+			
+			StrCmp "$RedistInstalled" "1" DontInstallRedist
+			Call InstallVC90Redistributable
+			StrCmp "$RedistInstalled" "1" DontInstallRedist
+			Abort
+DontInstallRedist:
 
 			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
@@ -618,6 +634,13 @@ ShowUnInstDetails show
 	!endif
 	Section "Core components" SEC04
 	SectionIn 1 2 RO ; section is required
+	
+	StrCmp "$RedistInstalled" "1" DontInstallRedist
+	Call InstallVC90Redistributable
+	StrCmp "$RedistInstalled" "1" DontInstallRedist
+	Abort
+DontInstallRedist:
+
 		SetOutPath "$INSTDIR\server"
 		SetOverwrite on
 		File "${SERVER_FILES_ROOT}\core.dll"
@@ -876,4 +899,38 @@ Function SkipDirectoryPage
 	IntOp $R0 $R0 & ${SF_SELECTED}
 	IntCmp $R0 ${SF_SELECTED} +2 0
 	Abort
+FunctionEnd
+
+Var REDIST
+
+Function InstallVC90Redistributable
+	DetailPrint "Installing Microsoft Visual Studio 2008 SP1 redistributable ..."
+	StrCpy $REDIST "$TEMP\vcredist_x86.exe"
+	NSISdl::download "http://download.microsoft.com/download/d/d/9/dd9a82d0-52ef-40db-8dab-795376989c03/vcredist_x86.exe" $REDIST
+	Pop $0
+	StrCmp "$0" "success" DownloadSuccessful
+	
+	DetailPrint "* Download of Microsoft Visual Studio 2008 SP1 redistributable failed:"
+	DetailPrint "* $0"
+	DetailPrint "* Installation aborted"
+	MessageBox MB_ICONSTOP "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
+	Goto InstallEnd
+	
+DownloadSuccessful:
+	ExecWait '"$REDIST"'
+	ClearErrors
+	ReadRegDWORD $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-30C0-39D9-BD6F-21E6EC160475}" "Version"
+	IfErrors VC90RedistInstallFailed
+	
+	StrCpy $RedistInstalled "1"
+	Goto InstallEnd
+
+VC90RedistInstallFailed:
+	StrCpy $RedistInstalled "0"
+	DetailPrint "* Some error occured installing Microsoft Visual Studio 2008 SP1 redistributable"
+	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+	DetailPrint "* Installation aborted"
+	MessageBox MB_ICONSTOP "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
+
+InstallEnd:
 FunctionEnd
