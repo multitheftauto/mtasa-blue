@@ -137,6 +137,9 @@ int CLuaFunctionDefinitions::Call ( lua_State* luaVM )
                 CResource* pResource = lua_toresource ( luaVM, 1 );
                 if ( pResource )
                 {
+                    //Get the target Lua VM
+                    lua_State* targetLuaVM = pResource->GetVM()->GetVM();
+
                     // The function name
                     const char* szFunctionName = lua_tostring ( luaVM, 2 );
 
@@ -144,16 +147,43 @@ int CLuaFunctionDefinitions::Call ( lua_State* luaVM )
                     CLuaArguments args;
                     args.ReadArguments ( luaVM, 3 );
                     CLuaArguments returns;
+					
+                    //Lets grab the original hidden variables so we can restore them later
+                    lua_getglobal ( targetLuaVM, "sourceResource" );
+                    CLuaArgument OldResource ( luaVM, -1 );
+
+                    lua_getglobal ( targetLuaVM, "sourceResourceRoot" );
+                    CLuaArgument OldResourceRoot ( luaVM, -1 );
+
+                    //Set the new values for the current sourceResource, and sourceResourceRoot
+                    lua_pushresource ( targetLuaVM, pThisResource );
+                    lua_setglobal ( targetLuaVM, "sourceResource" );
+
+                    lua_pushelement ( targetLuaVM, pThisResource->GetResourceEntity() );
+                    lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
 
                     // Call the exported function with the given name and the args
                     if ( pResource->CallExportedFunction ( szFunctionName, args, returns, *pThisResource ) )
                     {
                         // Push return arguments
                         returns.PushArguments ( luaVM );
+                        //Restore the old variables
+                        OldResource.Push ( targetLuaVM );
+                        lua_setglobal ( targetLuaVM, "sourceResource" );
+
+                        OldResourceRoot.Push ( targetLuaVM );
+                        lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
+
                         return returns.Count ();
                     }
                     else
 				    {
+						//Restore the old variables
+						OldResource.Push ( targetLuaVM );
+						lua_setglobal ( targetLuaVM, "sourceResource" );
+
+						OldResourceRoot.Push ( targetLuaVM );
+						lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
                         m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", pResource->GetName (), szFunctionName );
 				    }
                 }
