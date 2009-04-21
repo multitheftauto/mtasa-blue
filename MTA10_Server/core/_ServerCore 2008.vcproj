@@ -497,7 +497,7 @@
 				Name="sdk"
 				>
 				<File
-					RelativePath="..\sdk\Platform.h"
+					RelativePath="..\sdk\MTAPlatform.h"
 					>
 				</File>
 				<Filter

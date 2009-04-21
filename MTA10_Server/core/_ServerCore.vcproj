@@ -248,7 +248,7 @@
 				RelativePath=".\CThreadCommandQueue.cpp">
 			</File>
 			<File
-				RelativePath="..\sdk\Platform.cpp">
+				RelativePath="..\sdk\MTAPlatform.cpp">
 			</File>
 			<File
 				RelativePath=".\Server.cpp">
@@ -366,7 +366,7 @@
 				Name="sdk"
 				Filter="">
 				<File
-					RelativePath="..\sdk\Platform.h">
+					RelativePath="..\sdk\MTAPlatform.h">
 				</File>
 				<Filter
 					Name="core"
