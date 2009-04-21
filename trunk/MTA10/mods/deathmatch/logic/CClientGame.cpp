@@ -3023,6 +3023,13 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
         SendProjectileSync ( pProjectile );
     }
 
+	// Renew the interior and dimension
+	if ( pProjectile->GetCreator() )
+	{
+		pProjectile->SetInterior ( pProjectile->GetCreator()->GetInterior() );
+		pProjectile->SetDimension ( pProjectile->GetCreator()->GetDimension() );
+	}
+
     // Validate the projectile for our element tree
     pProjectile->SetParent ( m_pRootEntity );
 
