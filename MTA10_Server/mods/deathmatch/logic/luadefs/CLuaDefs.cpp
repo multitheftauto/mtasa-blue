@@ -107,7 +107,6 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
 int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 {
     // Grab the function name we're calling. If it's one of our functions, see if we can use it.
-    bool bRestricted;
     std::string strFunction;
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
     if ( pFunction )
