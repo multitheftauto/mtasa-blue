@@ -360,7 +360,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\sdk\Platform.cpp"
+				RelativePath="..\sdk\MTAPlatform.cpp"
 				>
 			</File>
 			<File
