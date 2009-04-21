@@ -1855,7 +1855,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         bool bWarpIn = false;
                                         // Jax: is he in water and trying to get in a floating vehicle
                                         // Cazomino05: changed to check if the vehicle is in water not player
-                                        if ( pVehicle->IsInWater () && ( usVehicleModel == VT_SKIMMER ||
+                                        if ( (pPlayer->IsInWater() || pVehicle->IsInWater ()) && ( usVehicleModel == VT_SKIMMER ||
                                                                         usVehicleModel == VT_SEASPAR ||
                                                                         usVehicleModel == VT_LEVIATHN ||
                                                                         usVehicleModel == VT_VORTEX ) )
