@@ -1354,7 +1354,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     if ( pVehicle->IsSmokeTrailEnabled () ) ucFlags |= 0x08;
     if ( pVehicle->IsLandingGearDown () ) ucFlags |= 0x10;
     if ( pVehicle->IsOnGround () ) ucFlags |= 0x20;
-    if ( pVehicle->IsInWater () ) ucFlags |= 0x40;
+    if ( pVehicle->IsInWater () || pVehicle->IsOnWater() ) ucFlags |= 0x40;
     if ( pVehicle->IsDerailed () ) ucFlags |= 0x80;
 
     // Write the flags
