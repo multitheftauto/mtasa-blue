@@ -2010,9 +2010,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED );
                                                                 Reply.SetSourceElement ( pPlayer );
                                                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
-
-                                                                bFailed = false;
                                                             }
+                                                            bFailed = false;
                                                         }
                                                     }
                                                     else
