@@ -38,39 +38,39 @@ bool CUnoccupiedVehicleSyncPacket::Read ( NetServerBitStreamInterface& BitStream
         // Read the sync time context
         BitStream.Read ( pData->ucSyncTimeContext );
 
-        BitStream.Read ( pData->usFlags );
+        BitStream.Read ( pData->ucFlags );
 
-        if ( pData->usFlags & 0x01 )
+        if ( pData->ucFlags & 0x01 )
         {
             BitStream.Read ( pData->vecPosition.fX );
             BitStream.Read ( pData->vecPosition.fY );
             BitStream.Read ( pData->vecPosition.fZ );
         }
 
-        if ( pData->usFlags & 0x02 )
+        if ( pData->ucFlags & 0x02 )
         {
             BitStream.Read ( pData->vecRotationDegrees.fX );
             BitStream.Read ( pData->vecRotationDegrees.fY );
             BitStream.Read ( pData->vecRotationDegrees.fZ );
         }
 
-        if ( pData->usFlags & 0x04 )
+        if ( pData->ucFlags & 0x04 )
         {
             BitStream.Read ( pData->vecVelocity.fX );
             BitStream.Read ( pData->vecVelocity.fY );
             BitStream.Read ( pData->vecVelocity.fZ );
         }
 
-        if ( pData->usFlags & 0x08 )
+        if ( pData->ucFlags & 0x08 )
         {
             BitStream.Read ( pData->vecTurnSpeed.fX );
             BitStream.Read ( pData->vecTurnSpeed.fY );
             BitStream.Read ( pData->vecTurnSpeed.fZ );
         }
 
-        if ( pData->usFlags & 0x10 ) BitStream.Read ( pData->fHealth );
+        if ( pData->ucFlags & 0x10 ) BitStream.Read ( pData->fHealth );
 
-        if ( pData->usFlags & 0x20 ) BitStream.Read ( pData->TrailerID );  
+        if ( pData->ucFlags & 0x20 ) BitStream.Read ( pData->TrailerID );  
 
         // Add it to our list. We no longer check if it's valid here
         // because CUnoccupiedVehicleSync does and it won't write bad ID's
@@ -100,17 +100,17 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStrea
             BitStream.Write ( pData->ucSyncTimeContext );
 
             // Write packet flags
-            BitStream.Write ( pData->usFlags );
+            BitStream.Write ( pData->ucFlags );
 
             // Position and rotation
-            if ( pData->usFlags & 0x01 )
+            if ( pData->ucFlags & 0x01 )
             {
                 BitStream.Write ( pData->vecPosition.fX );
                 BitStream.Write ( pData->vecPosition.fY );
                 BitStream.Write ( pData->vecPosition.fZ );
             }
 
-            if ( pData->usFlags & 0x02 )
+            if ( pData->ucFlags & 0x02 )
             {
                 BitStream.Write ( pData->vecRotationDegrees.fX );
                 BitStream.Write ( pData->vecRotationDegrees.fY );
@@ -118,7 +118,7 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStrea
             }
 
             // Velocity
-            if ( pData->usFlags & 0x04 )
+            if ( pData->ucFlags & 0x04 )
             {
                 BitStream.Write ( pData->vecVelocity.fX );
                 BitStream.Write ( pData->vecVelocity.fY );
@@ -126,7 +126,7 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStrea
             }
 
             // Turnspeed
-            if ( pData->usFlags & 0x08 )
+            if ( pData->ucFlags & 0x08 )
             {
                 BitStream.Write ( pData->vecTurnSpeed.fX );
                 BitStream.Write ( pData->vecTurnSpeed.fY );
@@ -134,7 +134,7 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStrea
             }
 
             // Health
-            if ( pData->usFlags & 0x10 ) BitStream.Write ( pData->fHealth );
+            if ( pData->ucFlags & 0x10 ) BitStream.Write ( pData->fHealth );
 
             // We've sent atleast one sync
             bSent = true;

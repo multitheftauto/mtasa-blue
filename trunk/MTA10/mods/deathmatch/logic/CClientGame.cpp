@@ -3487,6 +3487,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                 pBitStream->Write ( pVehicle->GetID () );
                                                 pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_REQUEST_IN ) );
                                                 pBitStream->Write ( static_cast < unsigned char > ( uiDoor ) );
+                                                pBitStream->Write ( static_cast < unsigned char > ( pVehicle->IsOnWater() ) );
 
                                                 // Send and destroy it
                                                 g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );

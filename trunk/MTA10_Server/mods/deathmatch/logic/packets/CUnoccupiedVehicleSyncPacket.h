@@ -25,7 +25,7 @@ public:
     {
         bool                    bSend;
         ElementID               Model;
-        unsigned short          usFlags;
+        unsigned char           ucFlags;
         unsigned char           ucSyncTimeContext;
         CVector                 vecPosition;
         CVector                 vecRotationDegrees;
