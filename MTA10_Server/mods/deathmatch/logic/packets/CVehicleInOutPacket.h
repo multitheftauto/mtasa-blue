@@ -37,6 +37,7 @@ public:
     bool                    Read                        ( NetServerBitStreamInterface& BitStream );
     bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
 
+    inline bool             GetOnWater                  ( void )                        { return m_ucOnWater ? true : false; };
     inline ElementID        GetID                ( void )                        { return m_ID; };
     inline unsigned char    GetSeat                     ( void )                        { return m_ucSeat; };
     inline unsigned char    GetAction                   ( void )                        { return m_ucAction; };
@@ -61,6 +62,7 @@ private:
     unsigned char           m_ucStartedJacking;
     unsigned char           m_ucFailReason;
     CVector *               m_pCorrectVector;
+    unsigned char           m_ucOnWater;
 };
 
 #endif

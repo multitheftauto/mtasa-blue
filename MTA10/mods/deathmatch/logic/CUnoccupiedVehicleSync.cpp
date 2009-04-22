@@ -208,14 +208,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             unsigned char ucSyncTimeContext = 0;
             BitStream.Read ( ucSyncTimeContext );
 
-            unsigned short usFlags = 0;
-            BitStream.Read ( usFlags );
+            unsigned char ucFlags = 0;
+            BitStream.Read ( ucFlags );
 
             // Read out the position
             CVector vecPosition, vecRotationDegrees, vecMoveSpeed, vecTurnSpeed;
             float fHealth;
 
-            if ( usFlags & 0x01 )
+            if ( ucFlags & 0x01 )
             {
                 BitStream.Read ( vecPosition.fX );
                 BitStream.Read ( vecPosition.fY );
@@ -223,7 +223,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             }
 
             // And rotation
-            if ( usFlags & 0x02 )
+            if ( ucFlags & 0x02 )
             {
                 BitStream.Read ( vecRotationDegrees.fX );
                 BitStream.Read ( vecRotationDegrees.fY );
@@ -231,14 +231,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             }
 
             // And the move and turn speed
-            if ( usFlags & 0x04 )
+            if ( ucFlags & 0x04 )
             {
                 BitStream.Read ( vecMoveSpeed.fX );
                 BitStream.Read ( vecMoveSpeed.fY );
                 BitStream.Read ( vecMoveSpeed.fZ );
             }
 
-            if ( usFlags & 0x08 )
+            if ( ucFlags & 0x08 )
             {
                 BitStream.Read ( vecTurnSpeed.fX );
                 BitStream.Read ( vecTurnSpeed.fY );
@@ -246,7 +246,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             }
 
             // And health
-            if ( usFlags & 0x10 )
+            if ( ucFlags & 0x10 )
             {
                 BitStream.Read ( fHealth );
             }
@@ -254,15 +254,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
             if ( pVehicle && pVehicle->CanUpdateSync ( ucSyncTimeContext ) )
             {
-                if ( usFlags & 0x01 )pVehicle->SetTargetPosition ( vecPosition );
-                if ( usFlags & 0x02 ) pVehicle->SetTargetRotation ( vecRotationDegrees );
-                if ( usFlags & 0x04 ) pVehicle->SetMoveSpeed ( vecMoveSpeed );
-                if ( usFlags & 0x08 ) pVehicle->SetTurnSpeed ( vecTurnSpeed );
-                if ( usFlags & 0x10 ) pVehicle->SetHealth ( fHealth );
-                pVehicle->SetEngineOn ( ( usFlags & 0x40 ) ? true : false );
+                if ( ucFlags & 0x01 )pVehicle->SetTargetPosition ( vecPosition );
+                if ( ucFlags & 0x02 ) pVehicle->SetTargetRotation ( vecRotationDegrees );
+                if ( ucFlags & 0x04 ) pVehicle->SetMoveSpeed ( vecMoveSpeed );
+                if ( ucFlags & 0x08 ) pVehicle->SetTurnSpeed ( vecTurnSpeed );
+                if ( ucFlags & 0x10 ) pVehicle->SetHealth ( fHealth );
+                pVehicle->SetEngineOn ( ( ucFlags & 0x40 ) ? true : false );
                 if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
-                    pVehicle->SetDerailed ( ( usFlags & 0x80 ) ? true : false );
-                pVehicle->SetInWater( ( usFlags & 0x100 ) ? true : false );
+                    pVehicle->SetDerailed ( ( ucFlags & 0x80 ) ? true : false );
 #ifdef MTA_DEBUG
 				pVehicle->m_pLastSyncer = NULL;
 				pVehicle->m_ulLastSyncTime = GetTickCount ();
@@ -332,19 +331,18 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     else
         Trailer = static_cast < ElementID > ( INVALID_ELEMENT_ID );
 
-    unsigned short usFlags = 0;
-    if ( pVehicle->m_LastSyncedData->vecPosition != vecPosition ) usFlags |= 0x01;
-    if ( pVehicle->m_LastSyncedData->vecRotation != vecRotation ) usFlags |= 0x02;
-    if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vecMoveSpeed ) usFlags |= 0x04;
-    if ( pVehicle->m_LastSyncedData->vecTurnSpeed != vecTurnSpeed ) usFlags |= 0x08;
-    if ( pVehicle->m_LastSyncedData->fHealth != pVehicle->GetHealth() ) usFlags |= 0x010;
-    if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) usFlags |= 0x020;
-    if ( pVehicle->IsEngineOn () ) usFlags |= 0x040;
-    if ( pVehicle->IsDerailed () ) usFlags |= 0x080;
-    if ( pVehicle->IsOnWater () ) usFlags |= 0x100; 
+    unsigned char ucFlags = 0;
+    if ( pVehicle->m_LastSyncedData->vecPosition != vecPosition ) ucFlags |= 0x01;
+    if ( pVehicle->m_LastSyncedData->vecRotation != vecRotation ) ucFlags |= 0x02;
+    if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vecMoveSpeed ) ucFlags |= 0x04;
+    if ( pVehicle->m_LastSyncedData->vecTurnSpeed != vecTurnSpeed ) ucFlags |= 0x08;
+    if ( pVehicle->m_LastSyncedData->fHealth != pVehicle->GetHealth() ) ucFlags |= 0x010;
+    if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) ucFlags |= 0x020;
+    if ( pVehicle->IsEngineOn () ) ucFlags |= 0x040;
+    if ( pVehicle->IsDerailed () ) ucFlags |= 0x080;
 
     // If nothing has changed we dont sync the vehicle
-    if ( usFlags == 0 ) return;
+    if ( ucFlags == 0 ) return;
 
     // Write the vehicle id
     pBitStream->Write ( pVehicle->GetID () );
@@ -353,10 +351,10 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     pBitStream->Write ( pVehicle->GetSyncTimeContext () );
 
     // Write flags
-    pBitStream->Write ( usFlags );
+    pBitStream->Write ( ucFlags );
 
     // Write it
-    if ( usFlags & 0x01 )
+    if ( ucFlags & 0x01 )
     {
         pBitStream->Write ( vecPosition.fX );
         pBitStream->Write ( vecPosition.fY );
@@ -364,7 +362,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         pVehicle->m_LastSyncedData->vecPosition = vecPosition;
     }
 
-    if ( usFlags & 0x02 )
+    if ( ucFlags & 0x02 )
     {
         pBitStream->Write ( vecRotation.fX );
         pBitStream->Write ( vecRotation.fY );
@@ -373,7 +371,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     }
 
     // Write movespeed
-    if ( usFlags & 0x04 )
+    if ( ucFlags & 0x04 )
     {
         pBitStream->Write ( vecMoveSpeed.fX );
         pBitStream->Write ( vecMoveSpeed.fY );
@@ -381,7 +379,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         pVehicle->m_LastSyncedData->vecMoveSpeed = vecMoveSpeed;
     }
 
-    if ( usFlags & 0x08 )
+    if ( ucFlags & 0x08 )
     {
         pBitStream->Write ( vecTurnSpeed.fX );
         pBitStream->Write ( vecTurnSpeed.fY );
@@ -390,14 +388,14 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     }
 
     // And health
-    if ( usFlags & 0x10 )
+    if ( ucFlags & 0x10 )
     {
         pBitStream->Write ( pVehicle->GetHealth () );
         pVehicle->m_LastSyncedData->fHealth = pVehicle->GetHealth();
     }
 
     // And trailer
-    if ( usFlags & 0x20 )
+    if ( ucFlags & 0x20 )
     {
         pBitStream->Write ( Trailer );
         pVehicle->m_LastSyncedData->Trailer = Trailer;
