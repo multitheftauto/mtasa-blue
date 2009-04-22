@@ -2182,6 +2182,24 @@ static void SetObjectAlpha ()
     }
 }
 
+DWORD dwCObjectRenderRet = 0;
+VOID _declspec(naked) HOOK_CObject_PostRender ()
+{
+	_asm
+	{
+        pushad
+    }
+
+    RestoreAlphaValues ( );
+
+    _asm
+    {
+        popad
+		mov			edx, dwCObjectRenderRet
+        jmp			edx
+	}
+}
+
 // Note: This hook is also called for world objects (light poles, wooden fences, etc).
 VOID _declspec(naked) HOOK_CObject_Render ()
 {
@@ -2196,17 +2214,12 @@ VOID _declspec(naked) HOOK_CObject_Render ()
     _asm
     {
         popad
-        call         FUNC_CEntity_Render
-        pushad
-    }
-
-    RestoreAlphaValues ( );
-
-    _asm
-    {
-        popad
-        ret
-    }
+		mov			edx, [esp]
+		mov			dwCObjectRenderRet, edx
+		mov			edx, HOOK_CObject_PostRender
+		mov			[esp], edx
+        jmp         FUNC_CEntity_Render
+	}
 }
 
 
