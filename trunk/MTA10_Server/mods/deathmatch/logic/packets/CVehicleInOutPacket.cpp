@@ -21,6 +21,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( void )
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
     m_ucOnWater = 0xFF;
+    m_ucDoor = 0;
 }
 
 
@@ -34,6 +35,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
     m_ucOnWater = 0xFF;
+    m_ucDoor = 0;
 }
 
 
@@ -52,6 +54,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
     m_ucOnWater = 0xFF;
+    m_ucDoor = 0;
 }
 
 
@@ -84,6 +87,7 @@ bool CVehicleInOutPacket::Read ( NetServerBitStreamInterface& BitStream )
     {
         BitStream.Read ( m_ucSeat );    
         BitStream.Read ( m_ucOnWater );
+        BitStream.Read ( m_ucDoor );
     }
     else if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_ABORT )
     {

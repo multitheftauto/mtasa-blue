@@ -1873,6 +1873,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         if ( IsPointNearPoint3D ( pPlayer->GetPosition (), pVehicle->GetPosition (), fCutoffDistance ) )
                                         {
                                             unsigned char ucSeat = Packet.GetSeat ();
+                                            unsigned char ucDoor = Packet.GetDoor();
                                             // Going for driver?
                                             if ( ucSeat == 0 )
                                             {
@@ -1888,6 +1889,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     Arguments.PushElement ( pPlayer );     // player
                                                     Arguments.PushNumber ( 0 );             // seat
                                                     Arguments.PushBoolean ( false );        // jacked
+                                                    Arguments.PushNumber ( ucDoor );        // Door
                                                     if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) )   
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
@@ -1935,6 +1937,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         EnterArguments.PushElement ( pPlayer );     // player
                                                         EnterArguments.PushNumber ( 0 );             // seat
                                                         EnterArguments.PushElement ( pOccupant );   // jacked
+                                                        EnterArguments.PushNumber ( ucDoor );       // Door
                                                         if ( pVehicle->CallEvent ( "onVehicleStartEnter", EnterArguments ) )
                                                         {
                                                             // HACK?: check the player's vehicle-action is still the same (not warped in?)
@@ -1995,6 +1998,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     Arguments.PushElement ( pPlayer );         // player
                                                     Arguments.PushNumber ( ucSeat );            // seat
                                                     Arguments.PushBoolean ( false );            // jacked
+                                                    Arguments.PushNumber ( ucDoor );            // Door
                                                     if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) )
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
