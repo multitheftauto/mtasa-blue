@@ -411,7 +411,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedDoingGangDriveby", CLuaFunctionDefinitions::SetPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "setPedLookAt", CLuaFunctionDefinitions::SetPedLookAt );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefinitions::SetPedHeadless );
-	//CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefinitions::SetPedCameraRotation );
+	CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefinitions::SetPedCameraRotation );
 
 	// Clothes and body functions
 	CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefinitions::GetBodyPartName );
