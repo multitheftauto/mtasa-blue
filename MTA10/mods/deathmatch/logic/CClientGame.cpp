@@ -3467,12 +3467,12 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                     // Grab the closest vehicle
                                     unsigned int uiDoor = 0;
                                     CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, &uiDoor, NULL, 20.0f );
-
+                                    unsigned int uiSeat = uiDoor;
                                     // Make sure the door is not 0 if we're going for passenger, or 0 if we're going for driver
                                     if ( bPassenger && uiDoor == 0 )
-                                        uiDoor = 1;
+                                        uiSeat = 1;
                                     else if ( !bPassenger )
-                                        uiDoor = 0;
+                                        uiSeat = 0;
 
                                     if ( pVehicle && pVehicle->IsEnterable () )
                                     {
@@ -3486,8 +3486,9 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                 // Write the vehicle id to it and that we're requesting to get into it
                                                 pBitStream->Write ( pVehicle->GetID () );
                                                 pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_REQUEST_IN ) );
-                                                pBitStream->Write ( static_cast < unsigned char > ( uiDoor ) );
+                                                pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
                                                 pBitStream->Write ( static_cast < unsigned char > ( pVehicle->IsOnWater() ) );
+                                                pBitStream->Write ( static_cast < unsigned char > ( uiDoor ) );
 
                                                 // Send and destroy it
                                                 g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
