@@ -27,6 +27,10 @@ public:
                             CVehicleInOutPacket         ( ElementID ID,
                                                           unsigned char ucSeat,
                                                           unsigned char ucAction,
+                                                          unsigned char ucDoor );
+                            CVehicleInOutPacket         ( ElementID ID,
+                                                          unsigned char ucSeat,
+                                                          unsigned char ucAction,
                                                           ElementID PlayerIn,
                                                           ElementID PlayerOut );
     virtual                 ~CVehicleInOutPacket        ( void );

@@ -984,7 +984,7 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClos
             if ( bCheckDriverDoor )
             {
                 // If they're different, find the closest
-                if ( iFrontDoor != iPassengerDoor )
+                if ( iFrontDoor != iPassengerDoor && iPassengerDoor < 2 )
                 {
                     float fDistanceFromFront = DistanceBetweenPoints3D ( vecPosition, vecFrontPos );
                     float fDistanceFromPassenger = DistanceBetweenPoints3D ( vecPosition, vecPassengerPos );

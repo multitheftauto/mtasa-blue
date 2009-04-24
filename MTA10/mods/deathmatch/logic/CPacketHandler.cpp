@@ -1356,6 +1356,8 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                 {
                     case CClientGame::VEHICLE_REQUEST_IN_CONFIRMED:
                     {
+                        unsigned char ucDoor = 0xFF;
+                        bitStream.Read ( ucDoor );
                         // If it's the local player, set some stuff
                         if ( pPlayer->IsLocalPlayer () )
                         {
@@ -1383,6 +1385,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pPlayer );     // player
                         Arguments.PushNumber ( ucSeat );        // seat
+                        Arguments.PushNumber ( ucDoor );        // Door
                         pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
                         break;
                     }
@@ -1537,6 +1540,8 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_REQUEST_JACK_CONFIRMED:
                     {
+                        unsigned char ucDoor = 0xFF;
+                        bitStream.Read ( ucDoor );
                         // Grab the player model getting jacked
                         CClientPed* pJacked = pVehicle->GetOccupant ( ucSeat );
 
@@ -1572,6 +1577,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pPlayer );     // player
                         Arguments.PushNumber ( ucSeat );        // seat
+                        Arguments.PushNumber ( ucDoor );        // Door
                         pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
 
                         CLuaArguments Arguments2;

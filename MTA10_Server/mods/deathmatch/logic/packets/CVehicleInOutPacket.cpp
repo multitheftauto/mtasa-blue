@@ -27,7 +27,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( void )
 
 CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
                                            unsigned char ucSeat,
-                                           unsigned char ucAction )
+                                           unsigned char ucAction)
 {
     m_ID = ID;
     m_ucSeat = ucSeat;
@@ -38,6 +38,19 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucDoor = 0;
 }
 
+CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
+                                           unsigned char ucSeat,
+                                           unsigned char ucAction,
+                                           unsigned char ucDoor)
+{
+    m_ID = ID;
+    m_ucSeat = ucSeat;
+    m_ucAction = ucAction;
+    m_ucFailReason = 0xFF;
+    m_pCorrectVector = NULL;
+    m_ucOnWater = 0xFF;
+    m_ucDoor = ucDoor;
+}
 
 CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
                                            unsigned char ucSeat,
@@ -109,6 +122,10 @@ bool CVehicleInOutPacket::Write ( NetServerBitStreamInterface& BitStream ) const
         BitStream.Write ( m_ucSeat );
         BitStream.Write ( m_ucAction );
 
+        if ( m_ucAction == CGame::VEHICLE_REQUEST_IN_CONFIRMED || m_ucAction == CGame::VEHICLE_REQUEST_JACK_CONFIRMED )
+        {
+            BitStream.Write ( m_ucDoor );
+        }
         // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out player chars aswell
         if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_RETURN )
         {
