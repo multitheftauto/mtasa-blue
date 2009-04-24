@@ -196,12 +196,12 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             pEntry->dwTimeRequested = timeGetTime ();
             m_Requests.push_back ( pEntry );
 
-            // Return false. Callee needs to wait.
+            // Return false. Caller needs to wait.
             return false;
         }
     }
 
-    // Error, model is bad. Callee should not do this.
+    // Error, model is bad. Caller should not do this.
     return false;
 }
 
