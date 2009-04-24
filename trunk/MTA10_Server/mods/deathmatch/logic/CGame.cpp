@@ -1905,7 +1905,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                             else
                                                             {
                                                                 // Tell everyone he can start entering the vehicle from his current position
-                                                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_IN_CONFIRMED );
+                                                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
                                                                 Reply.SetSourceElement ( pPlayer );
                                                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );                                                                
                                                             }
@@ -1959,7 +1959,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                         */
 
                                                                         // Broadcast a jack message (tells him he can get in, but he must jack it)
-                                                                        CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_JACK_CONFIRMED );
+                                                                        CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_JACK_CONFIRMED, ucDoor );
                                                                         Reply.SetSourceElement ( pPlayer );
                                                                         m_pPlayerManager->BroadcastOnlyJoined ( Reply );
 
@@ -2011,7 +2011,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                             else
                                                             {
                                                                 // Tell everyone he can start entering the vehicle from his current position
-                                                                CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED );
+                                                                CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
                                                                 Reply.SetSourceElement ( pPlayer );
                                                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
                                                             }
