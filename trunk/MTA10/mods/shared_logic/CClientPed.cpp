@@ -3390,6 +3390,19 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     m_pOccupyingVehicle = pVehicle;
     m_uiOccupyingSeat = uiSeat;
 
+    //Check for swimming task and warp to door.
+    CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+    unsigned short usVehicleModel = pVehicle->GetModel();
+    if ( ((pTask && pTask->GetTaskType () == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) && ( usVehicleModel == VT_SKIMMER ||
+                                                                                                   usVehicleModel == VT_SEASPAR ||
+                                                                                                   usVehicleModel == VT_LEVIATHN ||
+                                                                                                   usVehicleModel == VT_VORTEX ) )
+    {
+        CVector vecDoorPos;
+        unsigned int uiDoor;
+        GetClosestDoor( pVehicle, uiSeat == 0, uiSeat != 0, uiDoor, &vecDoorPos );
+        Teleport(vecDoorPos);
+    }
     // Driverseat
     if ( uiSeat == 0 )
     {
