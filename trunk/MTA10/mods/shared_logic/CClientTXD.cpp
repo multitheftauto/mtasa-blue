@@ -58,6 +58,8 @@ bool CClientTXD::LoadTXD ( const char* szFile )
                 RwTexture* pTex = (RwTexture *)( (BYTE *)pTexLink - offsetof(RwTexture, TXDList) );
                 m_Textures.push_back ( pTex );
                 pTex->txd = NULL;
+                pTex->flags = 0x1102;       // Enable filtering (otherwise textures are pixely)
+
                 pTexLink = pTexLink->next;
             }
 
