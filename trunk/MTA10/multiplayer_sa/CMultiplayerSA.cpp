@@ -753,6 +753,12 @@ void CMultiplayerSA::InitHooks()
 
     // Fix vehicle back lights both using light state 3 (SA bug)
     *(BYTE *)0x6E1D4F = 2;
+
+    // Fix for sliding over objects and vehicles (ice floor)
+    *(BYTE *)0x5E1E72 = 0xE9;
+    *(BYTE *)0x5E1E73 = 0xB9;
+    *(BYTE *)0x5E1E74 = 0x00;
+    *(BYTE *)0x5E1E77 = 0x90;
 }
 
 
