@@ -6751,7 +6751,27 @@ int CLuaFunctionDefinitions::BlowVehicle ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+int CLuaFunctionDefinitions::IsVehicleBlown ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle ) {
+            bool bBlown;
+            if ( CStaticFunctionDefinitions::IsVehicleBlown(*pVehicle, bBlown) ) {
+                lua_pushboolean ( luaVM, bBlown );
+                return 1;
+            }
+        } 
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleBlown", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleBlown" );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::SetVehicleTurnVelocity ( lua_State* luaVM )
 {

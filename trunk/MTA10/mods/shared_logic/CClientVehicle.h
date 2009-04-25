@@ -150,6 +150,7 @@ public:
     void                        SetHealth               ( float fHealth );
     void                        Fix                     ( void );
     void                        Blow                    ( bool bAllowMovement = false );
+    inline bool                 IsVehicleBlown          ( void ) { return m_bBlown; };
 
     void                        GetColor                ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
 	void						SetColor				( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );

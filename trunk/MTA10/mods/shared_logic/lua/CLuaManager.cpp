@@ -456,6 +456,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefinitions::IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefinitions::GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefinitions::GetTrainSpeed );
+    CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefinitions::IsVehicleBlown );
 
 
     // Vehicle set funcs
