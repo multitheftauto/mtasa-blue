@@ -3391,7 +3391,9 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     m_uiOccupyingSeat = uiSeat;
 
     //Check for swimming task and warp to door.
-    CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+    CTask* pTask = 0;
+    if ( m_pTaskManager )
+        pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
     unsigned short usVehicleModel = pVehicle->GetModel();
     if ( ((pTask && pTask->GetTaskType () == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) && ( usVehicleModel == VT_SKIMMER ||
                                                                                                    usVehicleModel == VT_SEASPAR ||
