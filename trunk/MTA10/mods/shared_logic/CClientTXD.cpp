@@ -153,7 +153,8 @@ bool CClientTXD::IsImportableModel ( unsigned short usModelID )
 {
     // Currently we work on vehicles and objects
     return CClientObjectManager::IsValidModel ( usModelID ) ||
-           CClientVehicleManager::IsValidModel ( usModelID );
+           CClientVehicleManager::IsValidModel ( usModelID ) ||
+           CClientPlayerManager::IsValidModel( usModelID );
 }
 
 
