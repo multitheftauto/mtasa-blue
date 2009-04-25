@@ -3516,24 +3516,35 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         eExplosionType explosionType = ( eExplosionType ) ucType;       
 
         
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( vecPosition.fX );
+        Arguments.PushNumber ( vecPosition.fY );
+        Arguments.PushNumber ( vecPosition.fZ );
+        Arguments.PushNumber ( explosionType );
+		bool bCancelExplosion = false;
+        if ( pCreator )
+        {
+            bCancelExplosion = !pCreator->CallEvent ( "onClientExplosion", Arguments, true );
+        }
+        else
+        {
+            bCancelExplosion = !g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
+        }
+
         // Is it a vehicle explosion?
         if ( pOrigin && pOrigin->GetType () == CCLIENTVEHICLE && ( ucType == EXP_TYPE_BOAT || ucType == EXP_TYPE_CAR || ucType == EXP_TYPE_CAR_QUICK || ucType == EXP_TYPE_HELI ) )
         {            
             // Make sure the vehicle's blown
             CClientVehicle * pExplodingVehicle = static_cast < CClientVehicle * > ( pOrigin );
             pExplodingVehicle->Blow ( false );
-            g_pClientGame->m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, pCreator, true, -1.0f, false, WEAPONTYPE_EXPLOSION );
+            if ( !bCancelExplosion )
+				g_pClientGame->m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, pCreator, true, -1.0f, false, WEAPONTYPE_EXPLOSION );
         }
         else
-            g_pClientGame->m_pManager->GetExplosionManager ()->Create ( explosionType, vecPosition, pCreator );       
-
-        CLuaArguments Arguments;
-        Arguments.PushNumber ( vecPosition.fX );
-        Arguments.PushNumber ( vecPosition.fY );
-        Arguments.PushNumber ( vecPosition.fZ );
-        Arguments.PushNumber ( explosionType );
-        if ( pCreator ) pCreator->CallEvent ( "onClientExplosion", Arguments, true );
-        else g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
+        {
+            if ( !bCancelExplosion )
+				g_pClientGame->m_pManager->GetExplosionManager ()->Create ( explosionType, vecPosition, pCreator );       
+        }
     }
 }
 
