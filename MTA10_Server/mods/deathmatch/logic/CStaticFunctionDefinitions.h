@@ -238,6 +238,7 @@ public:
     static bool                 IsTrainDerailable                   ( CVehicle* pVehicle, bool& bDerailable );
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
+    static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );

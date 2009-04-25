@@ -162,6 +162,7 @@ public:
     static bool                         IsTrainDerailable                   ( CClientVehicle& Vehicle, bool& bIsDerailable );
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
+    static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );

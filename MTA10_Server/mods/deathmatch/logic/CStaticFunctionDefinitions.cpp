@@ -3692,6 +3692,11 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
 
     return false;
 }
+bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
+{
+    assert ( pVehicle );
+    return pVehicle->GetBlowTime() != 0;
+}
 
 
 bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )

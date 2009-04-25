@@ -1961,6 +1961,11 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExpl
 
     return false;
 }
+bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool& bBlown )
+{
+    bBlown = Vehicle.IsVehicleBlown();
+    return true;
+}
 
 
 bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )

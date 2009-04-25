@@ -265,6 +265,7 @@ public:
     LUA_DECLARE ( IsTrainDerailable );
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
+    LUA_DECLARE ( IsVehicleBlown );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
