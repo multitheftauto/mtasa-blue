@@ -881,6 +881,10 @@ void CClientGame::DoPulses ( void )
 
         // Get rid of our deleted elements
         m_ElementDeleter.DoDeleteAll ();
+
+        // Call onClientRender LUA event
+        CLuaArguments Arguments;
+        m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
     }
 
     // Are we connecting?
@@ -3052,13 +3056,6 @@ void CClientGame::GameProcessHandler ( void )
     if ( !g_pCore->IsFocused() )
     {
         DoPulses ();
-    }
-
-    // Call onClientRender LUA event
-    if ( m_pManager->IsGameLoaded () )
-    {
-        CLuaArguments Arguments;
-        m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
     }
 }
 
