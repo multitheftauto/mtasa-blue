@@ -17,7 +17,6 @@
 CGUIProgressBar_Impl::CGUIProgressBar_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
 	m_pManager = pGUI;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -49,13 +48,7 @@ CGUIProgressBar_Impl::CGUIProgressBar_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
 
 CGUIProgressBar_Impl::~CGUIProgressBar_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 

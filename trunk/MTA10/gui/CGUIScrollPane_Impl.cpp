@@ -18,7 +18,6 @@
 CGUIScrollPane_Impl::CGUIScrollPane_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
 	m_pManager = pGUI;
-	m_pData = NULL;
 
 	// Initialize
 	m_pGUI = pGUI;
@@ -52,13 +51,7 @@ CGUIScrollPane_Impl::CGUIScrollPane_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent
 
 CGUIScrollPane_Impl::~CGUIScrollPane_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 

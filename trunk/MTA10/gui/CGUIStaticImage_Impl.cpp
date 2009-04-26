@@ -23,12 +23,9 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     m_pImageset         = NULL;
     m_pImage            = NULL;
     m_pGUI              = pGUI;
-    m_bLoaded           = false;
-	m_pData = NULL;
 	m_pManager = pGUI;
-
-    // Create the texture
-    m_pTexture = new CGUITexture_Impl ( pGUI );
+    m_pTexture = NULL;
+    m_bCreatedTexture = false;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -37,7 +34,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     // Create the control and set default properties
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUISTATICIMAGE_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0, 0, 1.0, 1.0 ) );
+    m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect ( 0.0f, 0.0f, 1.0f, 1.0f ) );
 	reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setBackgroundEnabled ( false );
 
 	// Store the pointer to this CGUI element in the CEGUI element
@@ -63,31 +60,24 @@ CGUIStaticImage_Impl::~CGUIStaticImage_Impl ( void )
     // Clear the image
     Clear ();
 
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
 bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename, const char* szDirectory )
 {
-	char szPath [ MAX_PATH + 1 ] = {0};
-
-	unsigned int uiFilenameLen = ( unsigned int ) strlen ( szFilename );
-	strncpy ( szPath, szDirectory ? szDirectory : m_pGUI->GetWorkingDirectory (), MAX_PATH );
-	
-	// Check if the path fits in the buffer
-	if ( strlen ( szPath ) + uiFilenameLen > MAX_PATH ) return false;
-
-	// Tail the filename to the path
-	strncat ( szPath, szFilename, MAX_PATH );
+    std::string strPath = szDirectory ? szDirectory : m_pGUI->GetWorkingDirectory ();
+    strPath += szFilename;
 
     // Load texture
-    if ( !m_pTexture->LoadFromFile ( szPath ) ) return false;
+    if ( !m_pTexture )
+    {
+        m_pTexture = new CGUITexture_Impl ( m_pGUI );
+        m_bCreatedTexture = true;
+    }
+
+    if ( !m_pTexture->LoadFromFile ( strPath.c_str () ) )
+        return false;
 
     // Load image
     return LoadFromTexture ( m_pTexture );
@@ -96,43 +86,39 @@ bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename, const char* sz
 
 bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 {
-    // Get CEGUI texture
-    CEGUI::Texture* pCEGUITexture = ((CGUITexture_Impl*)pTexture)->GetTexture ();
 
-    // Get an unique identifier for CEGUI for the imageset and the image
+    if ( m_pImageset || m_pImage )
+        return false;
+
+    if ( m_pTexture && pTexture != m_pTexture )
+    {
+        delete m_pTexture;
+        m_bCreatedTexture = false;
+    }
+    
+    m_pTexture = (CGUITexture_Impl *)pTexture;
+
+    // Get CEGUI texture
+    CEGUI::Texture* pCEGUITexture = m_pTexture->GetTexture ();
+
+    // Get an unique identifier for CEGUI for the imageset
     char szUnique [CGUI_CHAR_SIZE];
     m_pGUI->GetUniqueName ( szUnique );
 
     // Create an imageset
-    try
-    {
-        m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture );
-    }
-    catch ( CEGUI::Exception& )
-    {
-        return false;
-    };
+    m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture );
 
     // Get an unique identifier for CEGUI for the image
     m_pGUI->GetUniqueName ( szUnique );
     
-    // TODO: Fix memory leaks
-    try
-    {
-        // Define an image and get it's pointer
-        m_pImageset->defineImage ( szUnique, CEGUI::Point ( 0, 0 ), CEGUI::Size ( pCEGUITexture->getWidth (), pCEGUITexture->getHeight () ), CEGUI::Point ( 0, 0 ) );
-        m_pImage = &m_pImageset->getImage ( szUnique );
+    // Define an image and get its pointer
+    m_pImageset->defineImage ( szUnique, CEGUI::Point ( 0, 0 ), CEGUI::Size ( pCEGUITexture->getWidth (), pCEGUITexture->getHeight () ), CEGUI::Point ( 0, 0 ) );
+    m_pImage = &m_pImageset->getImage ( szUnique );
 
-        // Set the image just loaded as the image to be drawn for the widget
-        reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setImage ( m_pImage );
-    }
-    catch ( CEGUI::Exception& )
-    {
-        return false;
-    };
+    // Set the image just loaded as the image to be drawn for the widget
+    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( m_pImage );
 
     // Success
-    m_bLoaded = true;
     return true;
 }
 
@@ -140,22 +126,23 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 void CGUIStaticImage_Impl::Clear ( void )
 {
     // Stop the control from using it
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setImage ( NULL);
+    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( NULL );
 
     // Kill the images
     if ( m_pImageset )
     {
         m_pImageset->undefineAllImages ();
+        // The line below also destroys the CEGUITexture
+        m_pImagesetManager->destroyImageset ( m_pImageset );
+        m_pTexture->SetTexture ( NULL );
+        if ( m_bCreatedTexture )
+        {
+            delete m_pTexture;
+            m_pTexture = NULL;
+        }
+        m_pImage = NULL;
+        m_pImageset = NULL;
     }
-
-    // FIXME: We have a memoryleak here... can't figure out why this cause a crash:
-    //m_pImagesetManager->destroyImageset ( m_pImageset );
-
-    // Unload the texture
-    m_pTexture->Clear ();
-
-    // Update the loaded status boolean
-    m_bLoaded = false;
 }
 
 

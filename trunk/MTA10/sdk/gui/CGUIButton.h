@@ -19,10 +19,6 @@ class CGUIButton : public CGUIElement
 {
 public:
     virtual                     ~CGUIButton         ( void ) {};
-
-    virtual void                Click               ( void ) = 0;
-
-    virtual void                SetOnClickHandler   ( const GUI_CALLBACK & Callback ) = 0;
 };
 
 #endif

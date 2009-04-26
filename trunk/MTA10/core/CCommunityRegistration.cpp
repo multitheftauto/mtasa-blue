@@ -95,8 +95,8 @@ void CCommunityRegistration::CreateWindows ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 270.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
 
-    m_pButtonRegister->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
+    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
 
     m_pWindow->SetAlpha ( 0.9f );
 }

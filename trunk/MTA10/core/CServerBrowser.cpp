@@ -71,7 +71,7 @@ CServerBrowser::CServerBrowser ( void )
 	m_pSerialIcon->LoadFromFile ( "cgui\\images\\shield.png" );
 
     //Set necessary handlers
-    m_pButtonBack->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
+    m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
     m_pWindow->SetSizedHandler ( GUI_CALLBACK ( &CServerBrowser::OnWindowSize, this ) );
 
     // Create the tabs
@@ -84,7 +84,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pButtonFavouritesByIP = reinterpret_cast < CGUIButton * > ( pManager->CreateButton ( m_pTab [ ServerBrowserType::FAVOURITES ], "Add by host/port" ) );
     m_pButtonFavouritesByIP->SetPosition ( CVector2D ( 0.30f, 0.93f ), true );
     m_pButtonFavouritesByIP->SetSize ( CVector2D ( 0.25f, 0.04f ), true );
-    m_pButtonFavouritesByIP->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPClick, this ) );
+    m_pButtonFavouritesByIP->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPClick, this ) );
 
     // Create the "Add to favourites by IP" dialog
     m_pFavouritesAddByIP.SetCallback ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPAddClick, this ) );
@@ -135,21 +135,21 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Filters
     m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Empty", true ) );
     m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.02f, 0.05f ), true );
-    m_pIncludeEmpty [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeEmptyClick, this ) );
+    m_pIncludeEmpty [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeEmptyClick, this ) );
 
     m_pIncludeFull [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Full", true ) );
     m_pIncludeFull [ type ]->SetPosition ( CVector2D ( 0.18f, 0.05f ), true );
-    m_pIncludeFull [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeFullClick, this ) );
+    m_pIncludeFull [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeFullClick, this ) );
 
     m_pIncludeLocked [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Locked", true ) );
     m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( 0.32f, 0.05f ), true );
-    m_pIncludeLocked [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
+    m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
 
     if ( type != ServerBrowserType::INTERNET && type != ServerBrowserType::LAN )
     {
         m_pIncludeOffline [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Offline", true ) );
         m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( 0.48f, 0.05f ), true );
-        m_pIncludeOffline [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
+        m_pIncludeOffline [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
     }
     else
     {
@@ -196,9 +196,9 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditPassword [ type ]->SetMasked ( true );
 
     // Set up event handlers
-    m_pButtonConnect [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
-    m_pButtonRefresh [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnRefreshClick, this ) );
-    m_pButtonFavourites [ type ]->SetOnClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesClick, this ) );
+    m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
+    m_pButtonRefresh [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnRefreshClick, this ) );
+    m_pButtonFavourites [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesClick, this ) );
 
     // Server List Columns
     m_hSerial [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );

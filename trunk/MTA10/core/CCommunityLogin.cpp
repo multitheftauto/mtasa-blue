@@ -63,8 +63,8 @@ CCommunityLogin::CCommunityLogin ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 120.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
 
-    m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
+    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
 }
 
 CCommunityLogin::~CCommunityLogin ( void )

@@ -77,8 +77,8 @@ CQuickConnect::CQuickConnect ( void )
     m_pButtonBack->SetSize ( CVector2D ( 112.0f, 24.0f ) );
 
     // Set up event handlers
-    m_pButtonConnect->SetOnClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnConnectButtonClick, this ) );
-    m_pButtonBack->SetOnClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnBackButtonClick, this ) );
+    m_pButtonConnect->SetClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnConnectButtonClick, this ) );
+    m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnBackButtonClick, this ) );
 }
 
 

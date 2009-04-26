@@ -23,18 +23,12 @@ public:
                                 CGUIButton_Impl             ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
                                 ~CGUIButton_Impl            ( void );
 
-    void                        Click                       ( void );
-
-    void                        SetOnClickHandler           ( const GUI_CALLBACK & Callback );
-
 	eCGUIType					GetType						( void ) { return CGUI_BUTTON; };
 
     #include "CGUIElement_Inc.h"
 
 protected:
     bool                        Event_OnClick               ( const CEGUI::EventArgs& e );
-
-    GUI_CALLBACK*	m_pOnClick;
 };
 
 #endif

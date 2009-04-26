@@ -45,7 +45,7 @@ public:
 private:
 	bool        Event_TextChanged       ( const CEGUI::EventArgs& e );
 
-	GUI_CALLBACK*	m_pTextChanged;
+	GUI_CALLBACK	m_TextChanged;
 };
 
 #endif

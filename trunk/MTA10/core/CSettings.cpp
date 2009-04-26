@@ -92,7 +92,7 @@ CSettings::CSettings ( void )
 	m_pBindsList->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
 
 	m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
-	m_pBindsDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
+	m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
 	m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
 
     /**
@@ -189,7 +189,7 @@ CSettings::CSettings ( void )
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
-	    pJoyDefButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
+	    pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
 	    pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
@@ -221,7 +221,7 @@ CSettings::CSettings ( void )
             pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
 	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
-	        pButton->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
+	        pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
             pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.085f ), true );
@@ -411,13 +411,13 @@ CSettings::CSettings ( void )
 	m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
 	
     // Set up the events
-    m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
-	m_pButtonLogin->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
-    m_pButtonRegister->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
-    m_pCheckBoxMenuDynamic->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
-    m_pCheckBoxMenuVideo->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
-    m_pCheckBoxMenuPostEffects->SetOnClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
+    m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
+	m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
+    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
+    m_pCheckBoxMenuDynamic->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
+    m_pCheckBoxMenuVideo->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
+    m_pCheckBoxMenuPostEffects->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );

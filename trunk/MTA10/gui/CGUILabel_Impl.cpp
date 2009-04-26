@@ -18,7 +18,6 @@
 CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szText )
 {
     m_pManager = pGUI;
-	m_pData = NULL;
     m_pFont = pGUI->GetDefaultFont ();
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
@@ -61,13 +60,7 @@ CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const ch
 
 CGUILabel_Impl::~CGUILabel_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 

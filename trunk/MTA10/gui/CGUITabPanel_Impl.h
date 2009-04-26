@@ -46,7 +46,7 @@ private:
 
     class CGUI_Impl*        m_pGUI;
 
-    GUI_CALLBACK*           m_pOnSelectionChanged;
+    GUI_CALLBACK            m_OnSelectionChanged;
 
     bool                    Event_OnSelectionChanged   ( const CEGUI::EventArgs& e );
 };

@@ -19,8 +19,6 @@
 CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
 	m_pManager = pGUI;
-	m_pOnClick = NULL;
-	m_pData = NULL;
 
 	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -53,18 +51,9 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 
 CGUIComboBox_Impl::~CGUIComboBox_Impl ( void )
 {
-	if ( m_pOnClick != NULL )
-		delete m_pOnClick;
-
     Clear ();
 
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -96,20 +85,10 @@ void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )
 }
 
 
-void CGUIComboBox_Impl::Click ( void )
-{
-}
-
-
-void CGUIComboBox_Impl::SetOnClickHandler ( const GUI_CALLBACK & Callback )
-{
-    m_pOnClick = new GUI_CALLBACK ( Callback );
-}
-
-
 bool CGUIComboBox_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
 {
-    (*m_pOnClick) ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnClick )
+        m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

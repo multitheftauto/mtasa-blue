@@ -18,9 +18,6 @@
 CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit )
 {
 	m_pManager = pGUI;
-	m_pOnTextAccepted = NULL;
-	m_pOnTextChanged = NULL;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -54,18 +51,7 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
 
 CGUIEdit_Impl::~CGUIEdit_Impl ( void )
 {
-	if ( m_pOnTextAccepted != NULL )
-		delete m_pOnTextAccepted;
-	if ( m_pOnTextChanged != NULL )
-		delete m_pOnTextChanged;
-
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -155,27 +141,27 @@ unsigned int CGUIEdit_Impl::GetCaratIndex ( void )
 
 void CGUIEdit_Impl::SetTextAcceptedHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnTextAccepted = new GUI_CALLBACK ( Callback );
+    m_OnTextAccepted = Callback;
 }
 
 
 void CGUIEdit_Impl::SetTextChangedHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnTextChanged = new GUI_CALLBACK ( Callback );
+    m_OnTextChanged = Callback;
 }
 
 
 bool CGUIEdit_Impl::Event_OnTextAccepted ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnTextAccepted )
-		(*m_pOnTextAccepted) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnTextAccepted )
+		m_OnTextAccepted ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIEdit_Impl::Event_OnTextChanged ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnTextChanged )
-		(*m_pOnTextChanged) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnTextChanged )
+		m_OnTextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }

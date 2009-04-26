@@ -106,6 +106,8 @@ public:
 	void				SetMouseLeaveHandler		( GUI_CALLBACK Callback );
 
 protected:
+    void                DestroyElement              ( void );
+
     void                CorrectEdges                ( void );
 	void				FillProperties				( void );
 	void				EmptyProperties				( void );
@@ -127,11 +129,11 @@ protected:
 
 	std::list<CGUIProperty*>	m_Properties;
 
-	GUI_CALLBACK*		        m_pOnClick;
-    GUI_CALLBACK*               m_pOnMoved;
-    GUI_CALLBACK*               m_pOnSized;
-	GUI_CALLBACK*               m_pOnMouseEnter;
-	GUI_CALLBACK*               m_pOnMouseLeave;
+	GUI_CALLBACK               m_OnClick;
+    GUI_CALLBACK               m_OnMoved;
+    GUI_CALLBACK               m_OnSized;
+	GUI_CALLBACK               m_OnMouseEnter;
+	GUI_CALLBACK               m_OnMouseLeave;
 };
 
 #endif

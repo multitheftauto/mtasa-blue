@@ -70,7 +70,7 @@ CFavouritesAddByIP::CFavouritesAddByIP ( void )
     m_pButtonBack->SetSize ( CVector2D ( fButtonWidth, 20.0f ), false );
 
     // Register button events
-    m_pButtonBack->SetOnClickHandler ( GUI_CALLBACK ( &CFavouritesAddByIP::OnButtonBackClick, this ) );
+    m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CFavouritesAddByIP::OnButtonBackClick, this ) );
 }
 
 CFavouritesAddByIP::~CFavouritesAddByIP ( void )
@@ -104,7 +104,7 @@ void CFavouritesAddByIP::Reset ( void )
 
 void CFavouritesAddByIP::SetCallback ( const GUI_CALLBACK & Callback )
 {
-    m_pButtonAdd->SetOnClickHandler ( Callback );
+    m_pButtonAdd->SetClickHandler ( Callback );
 }
 
 void CFavouritesAddByIP::GetHost ( std::string &strHost )

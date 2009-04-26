@@ -115,10 +115,10 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pButtonCancel->SetPosition ( CVector2D ( 0.65f, 0.93f ), true );
     m_pButtonCancel->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
 
-    m_pResourceAdd->SetOnClickHandler ( GUI_CALLBACK ( &CLocalServer::OnAddButtonClick, this ) );
-    m_pResourceDel->SetOnClickHandler ( GUI_CALLBACK ( &CLocalServer::OnDelButtonClick, this ) );
-    m_pButtonStart->SetOnClickHandler ( GUI_CALLBACK ( &CLocalServer::OnStartButtonClick, this ) );
-    m_pButtonCancel->SetOnClickHandler ( GUI_CALLBACK ( &CLocalServer::OnCancelButtonClick, this ) );
+    m_pResourceAdd->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnAddButtonClick, this ) );
+    m_pResourceDel->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnDelButtonClick, this ) );
+    m_pButtonStart->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnStartButtonClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnCancelButtonClick, this ) );
 
     Load();
 }

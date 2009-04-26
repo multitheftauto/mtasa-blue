@@ -18,9 +18,6 @@
 CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
 	m_pManager = pGUI;
-	m_pOnCloseClick = NULL;
-	m_pOnKeyDown = NULL;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -70,18 +67,7 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
 
 CGUIWindow_Impl::~CGUIWindow_Impl ( void )
 {
-	if ( m_pOnCloseClick != NULL )
-		delete m_pOnCloseClick;
-	if ( m_pOnKeyDown != NULL )
-		delete m_pOnKeyDown;
-
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -147,27 +133,27 @@ bool CGUIWindow_Impl::IsTitlebarEnabled ( void )
 
 void CGUIWindow_Impl::SetCloseClickHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnCloseClick = new GUI_CALLBACK ( Callback );
+    m_OnCloseClick = Callback;
 }
 
 
 void CGUIWindow_Impl::SetKeyDownHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnKeyDown = new GUI_CALLBACK ( Callback );
+    m_OnKeyDown = Callback;
 }
 
 
 bool CGUIWindow_Impl::Event_OnCloseClick ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnCloseClick )
-		(*m_pOnCloseClick) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnCloseClick )
+		m_OnCloseClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIWindow_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnKeyDown )
-		(*m_pOnKeyDown) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnKeyDown )
+		m_OnKeyDown ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }

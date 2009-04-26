@@ -28,8 +28,6 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
     // Initialize
     m_hUniqueHandle = 0;
 	m_iIndex = 0;
-	m_pOnSortColumn = NULL;
-	m_pData = NULL;
     m_bIgnoreTextSpacer = false;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
@@ -72,18 +70,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
 
 CGUIGridList_Impl::~CGUIGridList_Impl ( void )
 {
-	if ( m_pOnSortColumn != NULL )
-    {
-		delete m_pOnSortColumn;
-    }
-
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -570,14 +557,14 @@ void CGUIGridList_Impl::Sort ( unsigned int uiColumn, SortDirection direction )
 
 void CGUIGridList_Impl::SetSortColumnHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnSortColumn = new GUI_CALLBACK ( Callback );
+    m_OnSortColumn = Callback;
 }
 
 
 bool CGUIGridList_Impl::Event_OnSortColumn ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnSortColumn )
-		(*m_pOnSortColumn) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnSortColumn )
+		m_OnSortColumn ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
