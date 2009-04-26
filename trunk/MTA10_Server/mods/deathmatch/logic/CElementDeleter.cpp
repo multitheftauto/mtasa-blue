@@ -48,7 +48,6 @@ void CElementDeleter::DoDeleteAll ( void )
     for ( ; iter != m_List.end (); iter++ )
     {
         CElement* pElement = *iter;
-        memset ( pElement, 0, sizeof ( CElement ) );
         delete pElement;
     }
 

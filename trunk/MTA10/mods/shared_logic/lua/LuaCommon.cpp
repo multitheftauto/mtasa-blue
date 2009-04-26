@@ -73,7 +73,10 @@ CClientEntity* lua_toelement ( lua_State* luaVM, int iArgument )
     if ( lua_type ( luaVM, iArgument ) == LUA_TLIGHTUSERDATA )
     {
         ElementID ID = TO_ELEMENTID ( lua_touserdata ( luaVM, iArgument ) );
-        return CElementIDs::GetElement ( ID );
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( !pEntity || pEntity->IsBeingDeleted () )
+            return NULL;
+        return pEntity;
     }
 
     return NULL;
