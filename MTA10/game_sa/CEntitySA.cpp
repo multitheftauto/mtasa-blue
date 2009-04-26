@@ -251,7 +251,7 @@ void CEntitySA::SetWas ( CVector * vecWas )
 }
 
 
-CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )
+CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix ) const
 {
 	DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )

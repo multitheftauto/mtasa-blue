@@ -120,9 +120,10 @@ void CClientCamera::DoPulse ( void )
 }
 
 
-void CClientCamera::GetMatrix ( CMatrix& Matrix ) const
+bool CClientCamera::GetMatrix ( CMatrix& Matrix ) const
 {
     m_pCamera->GetMatrix ( &Matrix );
+    return true;
 }
 
 

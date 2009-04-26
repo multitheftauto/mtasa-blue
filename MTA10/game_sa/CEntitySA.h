@@ -202,7 +202,7 @@ public:
 	bool						GetUnderwater ( void );
 
 	CVector						* GetPosition (  );
-	CMatrix						* GetMatrix ( CMatrix * matrix );
+	CMatrix						* GetMatrix ( CMatrix * matrix ) const;
 	VOID						SetMatrix ( CMatrix * matrix );
 	WORD						GetModelIndex ();
 	eEntityType					GetEntityType ();

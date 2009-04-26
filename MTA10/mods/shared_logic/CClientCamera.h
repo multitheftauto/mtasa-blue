@@ -38,7 +38,7 @@ public:
 
     inline eClientEntityType    GetType                     ( void ) const                  { return CCLIENTCAMERA; };
 
-    void                        GetMatrix                   ( CMatrix& Matrix ) const;
+    bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        GetRotation                 ( CVector& vecRotation ) const;
     void                        SetPosition                 ( const CVector& vecPosition );

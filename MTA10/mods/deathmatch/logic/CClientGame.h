@@ -247,6 +247,7 @@ public:
 
     // Status toggles
     void                                ShowNetstat                     ( bool bShow );
+    void                                ShowEaeg                        ( bool bShow );
     inline void                         ShowFPS                         ( bool bShow )  { m_bShowFPS = bShow; };
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)

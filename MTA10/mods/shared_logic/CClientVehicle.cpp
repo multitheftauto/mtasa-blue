@@ -446,7 +446,7 @@ float CClientVehicle::GetDistanceFromCentreOfMassToBaseOfModel ( void )
     return 0.0f;
 }
 
-void CClientVehicle::GetMatrix ( CMatrix& Matrix ) const
+bool CClientVehicle::GetMatrix ( CMatrix& Matrix ) const
 {
     if ( m_bIsFrozen )
     {
@@ -463,10 +463,12 @@ void CClientVehicle::GetMatrix ( CMatrix& Matrix ) const
             Matrix = m_Matrix;
         }
     }
+
+    return true;
 }
 
 
-void CClientVehicle::SetMatrix ( const CMatrix& Matrix )
+bool CClientVehicle::SetMatrix ( const CMatrix& Matrix )
 {
     if ( m_pVehicle )
     {
@@ -499,6 +501,8 @@ void CClientVehicle::SetMatrix ( const CMatrix& Matrix )
             m_pPassengers [ i ]->SetPosition ( m_Matrix.vPos );
         }
     }
+
+    return true;
 }
 
 
