@@ -724,7 +724,7 @@ void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned i
 
 	// Create the message box
 	m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
-	if ( ResponseHandler ) m_pMessageBox->SetOnClickHandler ( *ResponseHandler );
+	if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
 
     // Restore current directory
     SetCurrentDirectory ( szCurDir );

@@ -16,7 +16,6 @@
 CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const char* szCaption )
 {
 	m_pManager = pGUI;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -24,7 +23,7 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
 	
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( "DefaultWindow", szUnique );
-    m_pWindow->setDestroyedByParent ( true );
+    m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setText ( szCaption );
 
 	// Store the pointer to this CGUI element in the CEGUI element
@@ -50,13 +49,7 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
 
 CGUITab_Impl::~CGUITab_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 

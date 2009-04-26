@@ -882,6 +882,9 @@ void CClientGame::DoPulses ( void )
         // Get rid of our deleted elements
         m_ElementDeleter.DoDeleteAll ();
 
+        // Get rid of deleted GUI elements
+        g_pCore->GetGUI ()->CleanDeadPool ();
+
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );

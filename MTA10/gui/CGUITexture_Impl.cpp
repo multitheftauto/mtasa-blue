@@ -28,7 +28,8 @@ CGUITexture_Impl::CGUITexture_Impl ( CGUI_Impl* pGUI )
 
 CGUITexture_Impl::~CGUITexture_Impl ( void )
 {
-    m_pRenderer->destroyTexture ( m_pTexture );
+    if ( m_pTexture )
+        m_pRenderer->destroyTexture ( m_pTexture );
 }
 
 
@@ -77,6 +78,10 @@ CEGUI::Texture* CGUITexture_Impl::GetTexture ( void )
     return m_pTexture;
 }
 
+void CGUITexture_Impl::SetTexture ( CEGUI::Texture* pTexture )
+{
+    m_pTexture = pTexture;
+}
 
 LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture ( void )
 {

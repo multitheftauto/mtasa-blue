@@ -3462,7 +3462,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMa
   
 	// set events
 	pGUIElement->SetEvents ( "onClientGUIClicked" );
-	static_cast < CGUIButton* > ( pElement ) -> SetOnClickHandler ( pGUIElement->GetCallback1 () );
+	static_cast < CGUIButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
 	return pGUIElement;
 }
@@ -3512,7 +3512,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox ( CLuaMain& Lua
   
 	// set events
 	pGUIElement->SetEvents ( "onClientGUIStateChanged" );
-	static_cast < CGUICheckBox* > ( pElement ) -> SetOnClickHandler ( pGUIElement->GetCallback1 () );
+	static_cast < CGUICheckBox* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
 	return pGUIElement;
 }
@@ -3530,7 +3530,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton ( CLuaMain& 
   
 	// set events
 	pGUIElement->SetEvents ( "onClientGUIStateChanged" );
-	static_cast < CGUIRadioButton* > ( pElement ) -> SetOnClickHandler ( pGUIElement->GetCallback1 () );
+	static_cast < CGUIRadioButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
 	return pGUIElement;
 }

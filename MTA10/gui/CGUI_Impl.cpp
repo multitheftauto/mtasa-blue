@@ -1176,3 +1176,9 @@ CGUIComboBox* CGUI_Impl::CreateComboBox ( CGUIComboBox* pParent, const char* szC
     CGUIComboBox_Impl* wnd = reinterpret_cast < CGUIComboBox_Impl* > ( pParent );
     return _CreateComboBox ( wnd, szCaption );
 }
+
+void CGUI_Impl::CleanDeadPool ()
+{
+    if ( m_pWindowManager )
+        m_pWindowManager->cleanDeadPool ();
+}

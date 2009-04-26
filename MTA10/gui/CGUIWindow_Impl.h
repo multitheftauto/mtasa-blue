@@ -45,8 +45,8 @@ protected:
     bool                Event_OnCloseClick      ( const CEGUI::EventArgs& e );
     bool                Event_OnKeyDown         ( const CEGUI::EventArgs& e );
 
-    GUI_CALLBACK*         m_pOnCloseClick;
-    GUI_CALLBACK*         m_pOnKeyDown;
+    GUI_CALLBACK        m_OnCloseClick;
+    GUI_CALLBACK        m_OnKeyDown;
 };
 
 #endif

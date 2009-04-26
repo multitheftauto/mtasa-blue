@@ -19,7 +19,6 @@
 CGUITabPanel_Impl::CGUITabPanel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
 	m_pManager = pGUI;
-	m_pData = NULL;
 
 	// Initialize
 	m_pGUI = pGUI;
@@ -37,7 +36,6 @@ CGUITabPanel_Impl::CGUITabPanel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 	// Store the pointer to this CGUI element in the CEGUI element
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
-    m_pOnSelectionChanged = NULL;
     m_pWindow->subscribeEvent ( CEGUI::TabControl::EventSelectionChanged, CEGUI::Event::Subscriber ( &CGUITabPanel_Impl::Event_OnSelectionChanged, this ) );
     AddEvents ();
 
@@ -55,13 +53,7 @@ CGUITabPanel_Impl::CGUITabPanel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 
 CGUITabPanel_Impl::~CGUITabPanel_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -116,16 +108,14 @@ bool CGUITabPanel_Impl::IsTabSelected ( CGUITab* pTab )
 
 void CGUITabPanel_Impl::SetSelectionHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnSelectionChanged = new GUI_CALLBACK ( Callback );
+    m_OnSelectionChanged = Callback;
 }
 
 
 bool CGUITabPanel_Impl::Event_OnSelectionChanged ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnSelectionChanged )
-    {
-		(*m_pOnSelectionChanged) ( reinterpret_cast < CGUIElement* > ( GetSelectedTab() ) );
-    }
+	if ( m_OnSelectionChanged )
+		m_OnSelectionChanged ( reinterpret_cast < CGUIElement* > ( GetSelectedTab() ) );
     return true;
 }
 

@@ -25,10 +25,6 @@ public:
                                 CGUIComboBox_Impl           ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
                                 ~CGUIComboBox_Impl          ( void );
 
-    void                        Click                       ( void );
-
-    void                        SetOnClickHandler           ( const GUI_CALLBACK & Callback );
-
 	eCGUIType					GetType						( void ) { return CGUI_COMBOBOX; };
 
     CGUIListItem*               AddItem                     ( const char* szText );
@@ -46,8 +42,6 @@ protected:
     CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
 
     bool                        Event_OnClick               ( const CEGUI::EventArgs& e );
-
-    GUI_CALLBACK*				m_pOnClick;
 };
 
 #endif

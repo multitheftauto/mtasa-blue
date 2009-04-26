@@ -18,8 +18,6 @@
 CGUIMemo_Impl::CGUIMemo_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit )
 {
 	m_pManager = pGUI;
-	m_pTextChanged = NULL;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -53,16 +51,7 @@ CGUIMemo_Impl::CGUIMemo_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
 
 CGUIMemo_Impl::~CGUIMemo_Impl ( void )
 {
-	if ( m_pTextChanged != NULL )
-		delete m_pTextChanged;
-
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -145,13 +134,13 @@ float CGUIMemo_Impl::GetScrollbarPageSize ( void )
 
 void CGUIMemo_Impl::SetTextChangedHandler ( const GUI_CALLBACK & Callback )
 {
-    m_pTextChanged = new GUI_CALLBACK ( Callback );
+    m_TextChanged = Callback;
 }
 
 
 bool CGUIMemo_Impl::Event_TextChanged ( const CEGUI::EventArgs& e )
 {
-	if ( m_pTextChanged )
-		(*m_pTextChanged) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_TextChanged )
+		m_TextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }

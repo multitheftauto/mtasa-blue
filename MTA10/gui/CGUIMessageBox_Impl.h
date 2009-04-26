@@ -31,7 +31,7 @@ public:
     void					SetVisible                  ( bool bVisible );
     bool					IsVisible                   ( void );
 
-	void					SetOnClickHandler			( GUI_CALLBACK Callback );
+	void					SetClickHandler             ( GUI_CALLBACK Callback );
 
 	CGUIWindow*				GetWindow					( void );
 private:

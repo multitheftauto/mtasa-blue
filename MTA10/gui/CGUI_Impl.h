@@ -208,20 +208,22 @@ public:
     void                            AddToRedrawQueue            ( CGUIElement* pWindow );
     void                            RemoveFromRedrawQueue       ( CGUIElement* pWindow );
 
+    void                            CleanDeadPool               ( void );
+
 private:
-    CGUIButton*                     _CreateButton                ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
-    CGUICheckBox*                   _CreateCheckBox              ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false );
-    CGUIRadioButton*                _CreateRadioButton           ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
-    CGUIEdit*                       _CreateEdit                  ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
-    CGUIGridList*                   _CreateGridList              ( CGUIElement_Impl* pParent = NULL, bool bFrame = true );
-    CGUILabel*                      _CreateLabel                 ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
-	CGUIProgressBar*				_CreateProgressBar			 ( CGUIElement_Impl* pParent = NULL );
-    CGUIMemo*                       _CreateMemo                  ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
-    CGUIStaticImage*                _CreateStaticImage           ( CGUIElement_Impl* pParent = NULL );
-    CGUITabPanel*                   _CreateTabPanel              ( CGUIElement_Impl* pParent = NULL );
-	CGUIScrollPane*                 _CreateScrollPane            ( CGUIElement_Impl* pParent = NULL );
-	CGUIScrollBar*                  _CreateScrollBar             ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
-    CGUIComboBox*                   _CreateComboBox              ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
+    CGUIButton*                     _CreateButton               ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
+    CGUICheckBox*                   _CreateCheckBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false );
+    CGUIRadioButton*                _CreateRadioButton          ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
+    CGUIEdit*                       _CreateEdit                 ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
+    CGUIGridList*                   _CreateGridList             ( CGUIElement_Impl* pParent = NULL, bool bFrame = true );
+    CGUILabel*                      _CreateLabel                ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
+	CGUIProgressBar*				_CreateProgressBar			( CGUIElement_Impl* pParent = NULL );
+    CGUIMemo*                       _CreateMemo                 ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
+    CGUIStaticImage*                _CreateStaticImage          ( CGUIElement_Impl* pParent = NULL );
+    CGUITabPanel*                   _CreateTabPanel             ( CGUIElement_Impl* pParent = NULL );
+	CGUIScrollPane*                 _CreateScrollPane           ( CGUIElement_Impl* pParent = NULL );
+	CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
+    CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 
     IDirect3DDevice9*               m_pDevice;
 

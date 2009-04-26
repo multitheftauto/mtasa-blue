@@ -70,7 +70,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
 		m_pButton->SetPosition ( CVector2D ( 0.35f, 0.76f ), true );
 		m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
 
-		SetOnClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
+		SetClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
     }
 
 	// Set the KeyDown handler
@@ -97,9 +97,9 @@ CGUIMessageBox_Impl::~CGUIMessageBox_Impl ( void )
 }
 
 
-void CGUIMessageBox_Impl::SetOnClickHandler ( GUI_CALLBACK ResponseHandler )
+void CGUIMessageBox_Impl::SetClickHandler ( GUI_CALLBACK ResponseHandler )
 {
-	m_pButton->SetOnClickHandler ( ResponseHandler );
+	m_pButton->SetClickHandler ( ResponseHandler );
 }
 
 

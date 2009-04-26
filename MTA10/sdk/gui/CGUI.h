@@ -175,6 +175,8 @@ public:
 
     virtual bool                IsTransferBoxVisible        ( void ) = 0;
     virtual void                SetTransferBoxVisible       ( bool bVisible ) = 0;
+
+    virtual void                CleanDeadPool               ( void ) = 0;
 };
 
 #endif

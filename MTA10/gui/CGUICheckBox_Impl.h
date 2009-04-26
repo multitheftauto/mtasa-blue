@@ -22,10 +22,6 @@ public:
                             CGUICheckBox_Impl        ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", bool bChecked = false );
                             ~CGUICheckBox_Impl       ( void );
 
-    void                    Click                    ( void );
-
-    void                    SetOnClickHandler        ( const GUI_CALLBACK & Callback );
-
 	void					SetSelected				 ( bool bChecked );
 	bool					GetSelected				 ( void );
 
@@ -35,8 +31,6 @@ public:
 
 protected:
     bool                    Event_OnClick            ( const CEGUI::EventArgs& e );
-
-    GUI_CALLBACK*	m_pOnClick;
 };
 
 #endif

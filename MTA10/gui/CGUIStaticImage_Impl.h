@@ -16,7 +16,7 @@
 #define __CGUISTATICIMAGE_IMPL_H
 
 #include <gui/CGUIStaticImage.h>
-#include "CGUIElement_Impl.h"
+#include "CGUITexture_Impl.h"
 
 class CGUITexture;
 class CGUITexture_Impl;
@@ -38,16 +38,15 @@ public:
 
     void                        Render                  ( void );
 
-	eCGUIType					GetType					( void ) { return CGUI_STATICIMAGE; };
+	eCGUIType					GetType					( void ) { return CGUI_STATICIMAGE; }
 
 private:
     class CGUI_Impl*            m_pGUI;
+    bool                        m_bCreatedTexture;
     CGUITexture_Impl*           m_pTexture;
     CEGUI::ImagesetManager*     m_pImagesetManager;
     CEGUI::Imageset*            m_pImageset;
     const CEGUI::Image*         m_pImage;
-
-    bool                        m_bLoaded;
 
     #include "CGUIElement_Inc.h"
 };

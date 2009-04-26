@@ -18,8 +18,6 @@
 CGUIScrollBar_Impl::CGUIScrollBar_Impl ( CGUI_Impl* pGUI, bool bHorizontal, CGUIElement* pParent )
 {
 	m_pManager = pGUI;
-	m_pOnScroll = NULL;
-	m_pData = NULL;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -51,13 +49,7 @@ CGUIScrollBar_Impl::CGUIScrollBar_Impl ( CGUI_Impl* pGUI, bool bHorizontal, CGUI
 
 CGUIScrollBar_Impl::~CGUIScrollBar_Impl ( void )
 {
-    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
-
-    // Destroy the control
-    m_pWindow->destroy ();
-
-	// Destroy the properties list
-	EmptyProperties ();
+    DestroyElement ();
 }
 
 
@@ -75,13 +67,13 @@ float CGUIScrollBar_Impl::GetScrollPosition ( void )
 
 void CGUIScrollBar_Impl::SetOnScrollHandler ( const GUI_CALLBACK & Callback )
 {
-    m_pOnScroll = new GUI_CALLBACK ( Callback );
+    m_OnScroll = Callback;
 }
 
 
 bool CGUIScrollBar_Impl::Event_OnScroll ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnScroll )
-		(*m_pOnScroll) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnScroll )
+		m_OnScroll ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }

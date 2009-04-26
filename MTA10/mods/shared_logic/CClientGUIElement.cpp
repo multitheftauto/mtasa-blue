@@ -23,13 +23,9 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
 	m_pGUIManager = pManager->GetGUIManager ();
 	m_pCGUIElement = pCGUIElement;
 	m_pLuaMain = pLuaMain;
-	m_bParentDestroyed = false;
 
 	memset ( &_szCallbackFunc1[0], NULL, sizeof ( _szCallbackFunc1 ) );
 	memset ( &_szCallbackFunc2[0], NULL, sizeof ( _szCallbackFunc2 ) );
-
-	// Store the parent flag now since m_pCGUIElement may be deleted already when we call the destructor
-	m_bHasParent = (m_pCGUIElement->GetParent() != NULL);
 
 	// Store the this-pointer in the userdata variable
 	CGUI_SET_CCLIENTGUIELEMENT ( pCGUIElement, this );
@@ -94,31 +90,15 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
 CClientGUIElement::~CClientGUIElement ( void )
 {
     // Remove us from the list in the manager
-    m_pGUIManager->Remove ( this );
+    Unlink ();
 
-	// Only delete if it doesn't have a parent (otherwise it'll be automatically deleted by CEGUI)
-	if ( m_pCGUIElement && !m_bParentDestroyed )
+	if ( m_pCGUIElement )
 		delete m_pCGUIElement;
-
-	SetParentDestroyed(); // we tell all our children that their parent has been destroyed, so the 
-                          // internal representation in cgui will be destroyed too.
-}
-
-void CClientGUIElement::SetParentDestroyed ( void )
-{
-	m_bParentDestroyed = true;
-	list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-		if ( (*iter)->GetType() == CCLIENTGUI ) {
-			CClientGUIElement * childElement = static_cast < CClientGUIElement *> ( (*iter) );
-			childElement->SetParentDestroyed ();
-		}
-	}
 }
 
 void CClientGUIElement::Unlink ( void )
 {
+    m_pGUIManager->Remove ( this );
 }
 
 

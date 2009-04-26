@@ -34,7 +34,7 @@ public:
 private:
 	bool					Event_OnScroll				( const CEGUI::EventArgs& e );
 
-	GUI_CALLBACK*			m_pOnScroll;
+    GUI_CALLBACK            m_OnScroll;
 };
 
 #endif

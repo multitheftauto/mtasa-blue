@@ -74,8 +74,6 @@ public:
 	// cgui element access
 	inline CGUIElement*			GetCGUIElement				( void )						{ return m_pCGUIElement; };
 	inline void					SetCGUIElement				( CGUIElement *pCGUIElement )	{ m_pCGUIElement = pCGUIElement; };
-
-	void						SetParentDestroyed			( void );
 private:
 	bool						_CallbackEvent1				( CGUIElement *pCGUIElement );
 	bool						_CallbackEvent2				( CGUIElement *pCGUIElement );
@@ -84,11 +82,9 @@ private:
 	char						_szCallbackFunc2[MAX_EVENT_NAME];
 
     const char*					m_szCGUITypeName;
-	bool						m_bHasParent;
     CClientGUIManager*			m_pGUIManager;
 	CGUIElement*				m_pCGUIElement;
 	CLuaMain*					m_pLuaMain;
-	bool						m_bParentDestroyed;
 };
 
 #endif

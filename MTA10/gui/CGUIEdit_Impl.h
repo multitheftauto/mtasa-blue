@@ -52,8 +52,8 @@ protected:
     bool                Event_OnTextAccepted    ( const CEGUI::EventArgs& e );
     bool                Event_OnTextChanged     ( const CEGUI::EventArgs& e );
 
-    GUI_CALLBACK*     m_pOnTextAccepted;
-    GUI_CALLBACK*     m_pOnTextChanged;
+    GUI_CALLBACK        m_OnTextAccepted;
+    GUI_CALLBACK        m_OnTextChanged;
 };
 
 #endif

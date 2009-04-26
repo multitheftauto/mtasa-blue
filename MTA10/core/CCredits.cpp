@@ -213,7 +213,7 @@ CCredits::CCredits ( void )
     m_pButtonOK->SetVisible ( true );
 
     // Set up the event handlers
-    m_pButtonOK->SetOnClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
+    m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
 }
 
 

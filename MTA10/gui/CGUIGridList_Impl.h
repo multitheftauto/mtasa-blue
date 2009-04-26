@@ -87,7 +87,7 @@ private:
 
     std::list < CGUIListItem_Impl* >    m_Items;
 
-    GUI_CALLBACK*                       m_pOnSortColumn;
+    GUI_CALLBACK                        m_OnSortColumn;
 
     bool                                m_bIgnoreTextSpacer;
 };

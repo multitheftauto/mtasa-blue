@@ -20,10 +20,6 @@ class CGUICheckBox : public CGUIElement
 public:
     virtual                     ~CGUICheckBox       ( void ) {};
 
-    virtual void                Click               ( void ) = 0;
-
-    virtual void                SetOnClickHandler   ( const GUI_CALLBACK & Callback ) = 0;
-
 	virtual void				SetSelected			( bool bSelected ) = 0;
 	virtual bool				GetSelected			( void ) = 0;
 };

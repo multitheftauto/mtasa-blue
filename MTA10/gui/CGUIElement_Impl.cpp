@@ -22,13 +22,19 @@
 
 CGUIElement_Impl::CGUIElement_Impl ( void )
 {
-    m_pOnMoved = NULL;
-    m_pOnSized = NULL;
-	m_pOnClick = NULL;
-	m_pOnMouseEnter = NULL;
-	m_pOnMouseLeave = NULL;
+    m_pData = NULL;
 }
 
+void CGUIElement_Impl::DestroyElement ( void )
+{
+    m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
+
+    // Destroy the control
+    m_pManager->GetWindowManager ()->destroyWindow ( m_pWindow );
+
+	// Destroy the properties list
+	EmptyProperties ();
+}
 
 void CGUIElement_Impl::SetVisible ( bool bVisible )
 {
@@ -484,31 +490,31 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd ( void )
 
 void CGUIElement_Impl::SetMovedHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnMoved = new GUI_CALLBACK ( Callback );
+    m_OnMoved = Callback;
 }
 
 
 void CGUIElement_Impl::SetSizedHandler ( GUI_CALLBACK Callback )
 {
-    m_pOnSized = new GUI_CALLBACK ( Callback );
+    m_OnSized = Callback;
 }
 
 
 void CGUIElement_Impl::SetClickHandler ( GUI_CALLBACK Callback )
 {
-	m_pOnClick = new GUI_CALLBACK ( Callback );
+	m_OnClick = Callback;
 }
 
 
 void CGUIElement_Impl::SetMouseEnterHandler ( GUI_CALLBACK Callback )
 {
-	m_pOnMouseEnter = new GUI_CALLBACK ( Callback );
+	m_OnMouseEnter = Callback;
 }
 
 
 void CGUIElement_Impl::SetMouseLeaveHandler ( GUI_CALLBACK Callback )
 {
-	m_pOnMouseLeave = new GUI_CALLBACK ( Callback );
+	m_OnMouseLeave = Callback;
 }
 
 
@@ -525,40 +531,40 @@ void CGUIElement_Impl::AddEvents ( void )
 
 bool CGUIElement_Impl::Event_OnMoved ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnMoved )
-		(*m_pOnMoved) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnMoved )
+		m_OnMoved ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnSized ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnSized )
-		(*m_pOnSized) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnSized )
+		m_OnSized ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnClick )
-		(*m_pOnClick) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnClick )
+		m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnMouseEnter ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnMouseEnter )
-		(*m_pOnMouseEnter) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnMouseEnter )
+		m_OnMouseEnter ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnMouseLeave ( const CEGUI::EventArgs& e )
 {
-	if ( m_pOnMouseLeave )
-		(*m_pOnMouseLeave) ( reinterpret_cast < CGUIElement* > ( this ) );
+	if ( m_OnMouseLeave )
+		m_OnMouseLeave ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
