@@ -23,7 +23,10 @@ CElement* lua_toelement ( lua_State* luaVM, int iArgument )
     if ( lua_type ( luaVM, iArgument ) == LUA_TLIGHTUSERDATA )
     {
         ElementID ID = TO_ELEMENTID ( lua_touserdata ( luaVM, iArgument ) );
-        return CElementIDs::GetElement ( ID );
+        CElement* pElement = CElementIDs::GetElement ( ID );
+        if ( !pElement || pElement->IsBeingDeleted () )
+            return NULL;
+        return pElement;
     }
 
     return NULL;
