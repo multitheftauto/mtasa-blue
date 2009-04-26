@@ -346,7 +346,7 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
                 {
                     std::string strResourceName = resource->GetName ();
 
-					if ( !m_pResourceManager->StartResource ( resource, NULL, true, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles ) )
+					if ( !m_pResourceManager->StartResource ( resource, NULL, bPersistent, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles ) )
                     {
 						CLogger::LogPrintf ( "start: Failed to start resource '%s'\n", strResourceName.c_str () );
                         lua_pushboolean ( luaVM, false );

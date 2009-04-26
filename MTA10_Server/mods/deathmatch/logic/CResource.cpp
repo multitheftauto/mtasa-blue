@@ -803,7 +803,7 @@ bool CResource::StopAllResourceItems ( void )
 bool CResource::Stop ( bool bStopManually )
 {
 	// If we're loaded and active
-	if ( !m_bStopping && m_bLoaded && m_bActive && ( ( m_bStartedManually && bStopManually ) || !m_bStartedManually )  )
+	if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
     {
 		m_bHasStarted = false;
 		m_bStopping = true;
@@ -2905,12 +2905,12 @@ bool CResource::CheckState ( void )
 {
     if ( m_dependents.size() == 0 && m_bIsPersistent == false )
     {
-        Stop ( true );
+        Stop ( false );
         return false;
     }
     else
     {
-        return Start ();
+        return Start ( );
     }
 }
 
