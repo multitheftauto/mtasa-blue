@@ -3756,7 +3756,9 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
         CVector vecOrigin = *pProjectile->GetOrigin ();        
 
         // Is this a heatseaking missile with a target? sync it relative to the target
-        if ( weaponType == WEAPONTYPE_ROCKET_HS && pTarget ) pOriginSource = pTarget;
+        if ( weaponType == WEAPONTYPE_ROCKET_HS && pTarget && !pTarget->IsLocalEntity () )
+            pOriginSource = pTarget;
+
         if ( pOriginSource )
         {
             CVector vecTemp;
