@@ -1771,7 +1771,8 @@ void CGame::Packet_ProjectileSync ( CProjectileSyncPacket& Packet )
         if ( Packet.m_OriginID != INVALID_ELEMENT_ID )
         {
             CElement * pOriginSource = CElementIDs::GetElement ( Packet.m_OriginID );
-            vecPosition += pOriginSource->GetPosition ();
+            if ( pOriginSource )
+                vecPosition += pOriginSource->GetPosition ();
         }
 
         // Loop through all the players
