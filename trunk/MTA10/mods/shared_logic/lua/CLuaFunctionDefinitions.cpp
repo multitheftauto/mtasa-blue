@@ -1858,8 +1858,10 @@ int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
             if ( CStaticFunctionDefinitions::GetElementMatrix ( *pEntity, matrix ) )
             {            
                 // Return it
-                lua_createtable ( luaVM, 16, 0 );
+                lua_createtable ( luaVM, 4, 0 );
 
+                // First row
+                lua_createtable ( luaVM, 4, 0 );
                 lua_pushnumber ( luaVM, matrix.vRoll.fX );
                 lua_rawseti ( luaVM, -2, 1 );
                 lua_pushnumber ( luaVM, matrix.vRoll.fY );
@@ -1868,7 +1870,10 @@ int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 3 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 4 );
+                lua_rawseti ( luaVM, -2, 1 );
 
+                // Second row
+                lua_createtable ( luaVM, 4, 0 );
                 lua_pushnumber ( luaVM, matrix.vDirection.fX );
                 lua_rawseti ( luaVM, -2, 5 );
                 lua_pushnumber ( luaVM, matrix.vDirection.fY );
@@ -1877,7 +1882,10 @@ int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 7 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 8 );
+                lua_rawseti ( luaVM, -2, 2 );
 
+                // Third row
+                lua_createtable ( luaVM, 4, 0 );
                 lua_pushnumber ( luaVM, matrix.vWas.fX );
                 lua_rawseti ( luaVM, -2, 9 );
                 lua_pushnumber ( luaVM, matrix.vWas.fY );
@@ -1886,7 +1894,10 @@ int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 11 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 12 );
+                lua_rawseti ( luaVM, -2, 3 );
 
+                // Fourth row
+                lua_createtable ( luaVM, 4, 0 );
                 lua_pushnumber ( luaVM, matrix.vPos.fX );
                 lua_rawseti ( luaVM, -2, 13 );
                 lua_pushnumber ( luaVM, matrix.vPos.fY );
@@ -1895,6 +1906,7 @@ int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 15 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 16 );
+                lua_rawseti ( luaVM, -2, 4 );
 
                 return 1;
             }

@@ -113,12 +113,13 @@ public:
     virtual eClientEntityType   GetType                     ( void ) const                              { return CCLIENTPED; }
 	
 	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
-    inline CEntity   *          GetGameEntity               ( void )                                    { return m_pPlayerPed; }
+    inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
+    inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
 
     inline bool                 IsLocalPlayer               ( void )                                    { return m_bIsLocalPlayer; }
 
-    void                        GetMatrix                   ( CMatrix& Matrix ) const;
-    void                        SetMatrix                   ( const CMatrix& Matrix );
+    bool                        GetMatrix                   ( CMatrix& Matrix ) const;
+    bool                        SetMatrix                   ( const CMatrix& Matrix );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition );

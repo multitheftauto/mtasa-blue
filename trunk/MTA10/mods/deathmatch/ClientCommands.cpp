@@ -171,6 +171,10 @@ void COMMAND_ShowNetstat ( const char* szCmdLine )
 	}
 }
 
+void COMMAND_Eaeg ( const char* szCmdLine )
+{
+    g_pClientGame->ShowEaeg ( true );
+}
 
 void COMMAND_EnterPassenger ( const char* szCmdLine )
 {

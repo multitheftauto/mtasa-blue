@@ -290,7 +290,8 @@ void CClientPed::SetStat ( unsigned short usStat, float fValue )
 {
     if ( m_bIsLocalPlayer )
     {
-        g_pGame->GetStats()->SetStatValue ( usStat, fValue );
+        if ( usStat < MAX_INT_FLOAT_STATS )
+            g_pGame->GetStats()->SetStatValue ( usStat, fValue );
         g_pMultiplayer->SetLocalStatValue ( usStat, fValue );
     }
     else
@@ -337,7 +338,7 @@ void CClientPed::ResetStats ( void )
 }
 
 
-void CClientPed::GetMatrix ( CMatrix& Matrix ) const
+bool CClientPed::GetMatrix ( CMatrix& Matrix ) const
 {
     if ( m_pPlayerPed )
     {
@@ -347,10 +348,12 @@ void CClientPed::GetMatrix ( CMatrix& Matrix ) const
     {
         Matrix = m_Matrix;
     }
+
+    return true;
 }
 
 
-void CClientPed::SetMatrix ( const CMatrix& Matrix )
+bool CClientPed::SetMatrix ( const CMatrix& Matrix )
 {
     if ( m_pPlayerPed )
     {
@@ -362,6 +365,8 @@ void CClientPed::SetMatrix ( const CMatrix& Matrix )
         UpdateStreamPosition ( Matrix.vPos );
     }
     m_Matrix = Matrix;
+
+    return true;
 }
 
 

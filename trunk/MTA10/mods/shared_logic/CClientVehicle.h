@@ -128,8 +128,8 @@ public:
 
     float                       GetDistanceFromCentreOfMassToBaseOfModel ( void );
 
-    void                        GetMatrix               ( CMatrix& Matrix ) const;
-    void                        SetMatrix               ( const CMatrix& Matrix );
+    bool                        GetMatrix               ( CMatrix& Matrix ) const;
+    bool                        SetMatrix               ( const CMatrix& Matrix );
 
    	void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
 	void						GetMoveSpeedMeters		( CVector& vecMoveSpeed ) const;
@@ -266,10 +266,11 @@ public:
     void                        SetOverrideLights       ( unsigned char ucOverrideLights );
     bool                        SetTaxiLightOn          ( bool bLightOn );
     bool                        IsTaxiLightOn           ( ) { return m_bTaxiLightOn; }
-    inline CVehicle*            GetGameVehicle          ( void )                            { return m_pVehicle; };
-	inline CEntity   *          GetGameEntity           ( void )                                    { return m_pVehicle; }
-    inline CVehicleUpgrades*	GetUpgrades				( void )							{ return m_pUpgrades; }
-	inline CModelInfo*			GetModelInfo			( void )							{ return m_pModelInfo; }
+    inline CVehicle*            GetGameVehicle          ( void )                            { return m_pVehicle; }
+    inline CEntity*             GetGameEntity           ( void )                            { return m_pVehicle; }
+    inline const CEntity*       GetGameEntity           ( void ) const                      { return m_pVehicle; }
+    inline CVehicleUpgrades*    GetUpgrades             ( void )                            { return m_pUpgrades; }
+	inline CModelInfo*          GetModelInfo            ( void )                            { return m_pModelInfo; }
 
     CClientVehicle*             GetTowedVehicle         ( void );
     CClientVehicle*             GetRealTowedVehicle     ( void );

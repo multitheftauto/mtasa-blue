@@ -146,15 +146,17 @@ float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel ( void )
 }
 
 
-void CClientCivilian::GetMatrix ( CMatrix& Matrix ) const
+bool CClientCivilian::GetMatrix ( CMatrix& Matrix ) const
 {
     m_pCivilianPed->GetMatrix ( &Matrix );
+    return true;
 }
 
 
-void CClientCivilian::SetMatrix ( const CMatrix& Matrix )
+bool CClientCivilian::SetMatrix ( const CMatrix& Matrix )
 {
     m_pCivilianPed->SetMatrix ( const_cast < CMatrix* > ( &Matrix ) );
+    return true;
 }
 
 

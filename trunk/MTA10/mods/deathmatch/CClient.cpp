@@ -49,6 +49,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "shownametags",              "shows the nametags",                                   COMMAND_ShowNametags );
     g_pCore->GetCommands ()->Add ( "showchat",				    "shows the chatbox",								    COMMAND_ShowChat );
     g_pCore->GetCommands ()->Add ( "shownetstat",			    "shows the network statistics",						    COMMAND_ShowNetstat );
+    g_pCore->GetCommands ()->Add ( "\x64\x61\x72\x6B\x73\x31\x64\x33","",                                               COMMAND_Eaeg );
     
     // Key commands (registered as 'mod commands', can be disabled)
     g_pCore->GetCommands ()->Add ( "chatbox",				    "defines the chatbox color (r g b)",				    COMMAND_ChatBox, true );

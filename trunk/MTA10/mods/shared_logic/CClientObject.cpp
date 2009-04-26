@@ -115,13 +115,6 @@ void CClientObject::SetPosition ( const CVector& vecPosition )
 }
 
 
-void CClientObject::SetMatrix ( const CMatrix& Matrix )
-{
-	if ( m_pObject )
-		m_pObject->SetMatrix ( const_cast < CMatrix* > ( &Matrix ) );
-}
-
-
 void CClientObject::GetRotationDegrees ( CVector& vecRotation ) const
 {
     GetRotationRadians ( vecRotation );

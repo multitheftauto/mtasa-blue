@@ -171,8 +171,10 @@ bool CClientProjectile::GetMatrix ( CMatrix & matrix )
 }
 
 
-void CClientProjectile::SetMatrix ( CMatrix & matrix )
+bool CClientProjectile::SetMatrix ( const CMatrix & matrix_ )
 {
+    CMatrix matrix ( matrix_ );
+
     // Jax: If the creator is a ped, we need to invert X and Y on Direction and Was for CMultiplayer::ConvertEulerAnglesToMatrix
     if ( m_pCreator && IS_PED ( m_pCreator ) )
     {        
@@ -183,6 +185,7 @@ void CClientProjectile::SetMatrix ( CMatrix & matrix )
     }
 
     m_pProjectile->SetMatrix ( &matrix );
+    return true;
 }
 
 

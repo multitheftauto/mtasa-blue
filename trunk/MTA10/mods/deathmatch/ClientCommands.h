@@ -23,6 +23,7 @@ void COMMAND_FrameSkip              ( const char* szCmdLine );
 void COMMAND_ShowNametags           ( const char* szCmdLine );
 void COMMAND_ShowChat               ( const char* szCmdLine );
 void COMMAND_ShowNetstat            ( const char* szCmdLine );
+void COMMAND_Eaeg                   ( const char* szCmdLine );
 void COMMAND_EnterPassenger         ( const char* szCmdLine );
 void COMMAND_RadioNext              ( const char* szCmdLine );
 void COMMAND_RadioPrevious          ( const char* szCmdLine );

@@ -50,8 +50,8 @@ public:
 
     float                           GetDistanceFromCentreOfMassToBaseOfModel ( void );
 
-    void                            GetMatrix               ( CMatrix& Matrix ) const;
-    void                            SetMatrix               ( const CMatrix& Matrix );
+    bool                            GetMatrix               ( CMatrix& Matrix ) const;
+    bool                            SetMatrix               ( const CMatrix& Matrix );
 
    	void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );

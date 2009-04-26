@@ -141,7 +141,7 @@ public:
     bool                                        DeleteCustomData        ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData     ( CLuaMain* pLuaMain, bool bRecursive );
 
-    virtual bool                                GetMatrix               ( CMatrix& matrix );
+    virtual bool                                GetMatrix               ( CMatrix& matrix ) const;
 
     virtual void                                GetPosition             ( CVector& vecPosition ) const = 0;
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
@@ -217,7 +217,8 @@ public:
     inline void                                 AddContact                  ( CClientPed * pModel )   { m_Contacts.push_back ( pModel ); }
     inline void                                 RemoveContact               ( CClientPed * pModel )   { m_Contacts.remove ( pModel ); }
 
-    virtual CEntity *                           GetGameEntity               ( void )                  { return NULL; }
+    virtual CEntity*                            GetGameEntity               ( void )                  { return NULL; }
+    virtual const CEntity*                      GetGameEntity               ( void ) const            { return NULL; }
 
     // Game layer functions for CEntity/CPhysical
     virtual void                                InternalAttachTo            ( CClientEntity * pEntity );

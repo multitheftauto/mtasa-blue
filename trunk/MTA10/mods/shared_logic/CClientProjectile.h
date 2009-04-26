@@ -66,7 +66,8 @@ public:
                                         ~CClientProjectile      ( void );
 
     eClientEntityType                   GetType                 ( void ) const                      { return CCLIENTPROJECTILE; }
-    inline CEntity   *                  GetGameEntity           ( void )                            { return m_pProjectile; }
+    inline CEntity*                     GetGameEntity           ( void )                            { return m_pProjectile; }
+    inline const CEntity*               GetGameEntity           ( void ) const                      { return m_pProjectile; }
     void                                Unlink                  ( void );
 
 
@@ -76,7 +77,7 @@ public:
 
     bool                                IsActive                ( void );
     bool                                GetMatrix               ( CMatrix & matrix );
-    void                                SetMatrix               ( CMatrix & matrix );
+    bool                                SetMatrix               ( const CMatrix & matrix );
     void                                GetPosition             ( CVector & vecPosition ) const;
     void                                SetPosition             ( const CVector & vecPosition );
     void                                GetRotation             ( CVector & vecRotation );

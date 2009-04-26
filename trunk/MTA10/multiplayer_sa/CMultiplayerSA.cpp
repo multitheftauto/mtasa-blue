@@ -76,6 +76,7 @@ bool bHideRadar;
 bool bHasProcessedScript;
 float fX, fY, fZ;
 DWORD RoadSignFixTemp;
+DWORD dwEAEG = 0;
 bool m_bExplosionsDisabled;
 float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
@@ -2131,6 +2132,50 @@ static void RestoreAlphaValues ()
 /**
  ** Vehicles
  **/
+static RpAtomic* CVehicle_EAEG ( RpAtomic* pAtomic, void* )
+{
+    RwFrame* pFrame = ((RwFrame*)(((RwObject *)(pAtomic))->parent));
+    if ( pFrame )
+    {
+        switch ( pFrame->szName[0] )
+        {
+            case '\0': case 'h': break;
+            default:
+                DWORD dwFunc = (DWORD)0x533290;
+                DWORD dwAtomic = (DWORD)pAtomic;
+                _asm
+                {
+                    push    0
+                    push    dwAtomic
+                    call    dwFunc
+                    add     esp, 0x8
+                }
+        }
+    }
+
+    return pAtomic;
+}
+
+static void SetVehicleAlpha ( )
+{
+    CVehicleSAInterface* pInterface = ((CVehicleSAInterface *)dwAlphaEntity);
+    unsigned char ucAlpha = pInterface->m_pVehicle->GetAlpha ();
+
+    if ( ucAlpha < 255 )
+        GetAlphaAndSetNewValues ( ucAlpha );
+    else if ( dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A )
+    {
+        bEntityHasAlpha = true;
+        pCurAlpha = ucCurrentAlpha;
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
+        *(DWORD *)(0x5332D6) = (DWORD)CVehicle_EAEG;
+        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );
+        *(DWORD *)(0x5332D6) = 0x533290;
+    }
+    else
+        bEntityHasAlpha = false;
+}
+
 static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
 VOID _declspec(naked) HOOK_CVehicle_SetupRender()
 {
@@ -2140,7 +2185,7 @@ VOID _declspec(naked) HOOK_CVehicle_SetupRender()
         pushad
     }
 
-    GetAlphaAndSetNewValues ( ((CVehicleSAInterface *)dwAlphaEntity)->m_pVehicle->GetAlpha () );
+    SetVehicleAlpha ( );
 
     _asm
     {
@@ -2221,7 +2266,7 @@ VOID _declspec(naked) HOOK_CObject_Render ()
     {
         popad
         mov         edx, [esp]
-        mov	        dwCObjectRenderRet, edx
+        mov         dwCObjectRenderRet, edx
         mov         edx, HOOK_CObject_PostRender
         mov         [esp], edx
         jmp         FUNC_CEntity_Render
@@ -2505,6 +2550,8 @@ void CMultiplayerSA::SetLocalStatValue ( unsigned short usStat, float fValue )
         localStatsData.StatTypesFloat [ usStat ] = fValue;
     else if ( usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS )
         localStatsData.StatTypesInt [ usStat - STATS_OFFSET ] = (int)fValue;
+    else if ( usStat == 0x2329 )
+        dwEAEG = !dwEAEG;
 }
 
 

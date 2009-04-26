@@ -1105,6 +1105,12 @@ void CClientGame::ShowNetstat ( bool bShow )
     m_bShowNetstat = bShow;
 }
 
+void CClientGame::ShowEaeg ( bool )
+{
+    if ( m_pLocalPlayer )
+        m_pLocalPlayer->SetStat ( 0x2329, 1.0f );
+}
+
 #ifdef MTA_WEPSYNCDBG
 void CClientGame::ShowWepdata ( const char* szNick )
 {

@@ -32,13 +32,12 @@ public:
     
     inline eClientEntityType        GetType                 ( void ) const                      { return CCLIENTOBJECT; };
 
-	inline CObject *				GetGameObject			( void )							{ return m_pObject; }
+    inline CObject *                GetGameObject           ( void )                            { return m_pObject; }
     inline CEntity *                GetGameEntity           ( void )                            { return m_pObject; }
+    inline const CEntity*           GetGameEntity           ( void ) const                      { return m_pObject; }
 
     void                            GetPosition             ( CVector& vecPosition ) const;
     void                            SetPosition             ( const CVector& vecPosition );
-
-	void							SetMatrix				( const CMatrix& Matrix );
 
 	void							AttachTo                ( CClientEntity* pEntity );
 
