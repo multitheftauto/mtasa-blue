@@ -47,7 +47,9 @@ void CElementDeleter::DoDeleteAll ( void )
     list < CElement* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
-        delete *iter;
+        CElement* pElement = *iter;
+        memset ( pElement, 0, sizeof ( CElement ) );
+        delete pElement;
     }
 
     // Clear the list
