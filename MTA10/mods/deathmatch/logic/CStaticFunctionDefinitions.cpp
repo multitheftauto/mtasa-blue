@@ -272,6 +272,12 @@ CClientEntity* CStaticFunctionDefinitions::GetElementChild ( CClientEntity& Enti
 }
 
 
+bool CStaticFunctionDefinitions::GetElementMatrix ( CClientEntity& Entity, CMatrix& matrix )
+{
+    return Entity.GetMatrix ( matrix );
+}
+
+
 bool CStaticFunctionDefinitions::GetElementPosition ( CClientEntity& Entity, CVector& vecPosition )
 {
     Entity.GetPosition ( vecPosition );

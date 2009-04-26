@@ -1844,6 +1844,72 @@ int CLuaFunctionDefinitions::GetElementData ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetElementMatrix ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab the element, verify it
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            // Grab the position
+            CMatrix matrix;
+            if ( CStaticFunctionDefinitions::GetElementMatrix ( *pEntity, matrix ) )
+            {            
+                // Return it
+                lua_createtable ( luaVM, 16, 0 );
+
+                lua_pushnumber ( luaVM, matrix.vRoll.fX );
+                lua_rawseti ( luaVM, -2, 1 );
+                lua_pushnumber ( luaVM, matrix.vRoll.fY );
+                lua_rawseti ( luaVM, -2, 2 );
+                lua_pushnumber ( luaVM, matrix.vRoll.fZ );
+                lua_rawseti ( luaVM, -2, 3 );
+                lua_pushnumber ( luaVM, 1.0f );
+                lua_rawseti ( luaVM, -2, 4 );
+
+                lua_pushnumber ( luaVM, matrix.vDirection.fX );
+                lua_rawseti ( luaVM, -2, 5 );
+                lua_pushnumber ( luaVM, matrix.vDirection.fY );
+                lua_rawseti ( luaVM, -2, 6 );
+                lua_pushnumber ( luaVM, matrix.vDirection.fZ );
+                lua_rawseti ( luaVM, -2, 7 );
+                lua_pushnumber ( luaVM, 1.0f );
+                lua_rawseti ( luaVM, -2, 8 );
+
+                lua_pushnumber ( luaVM, matrix.vWas.fX );
+                lua_rawseti ( luaVM, -2, 9 );
+                lua_pushnumber ( luaVM, matrix.vWas.fY );
+                lua_rawseti ( luaVM, -2, 10 );
+                lua_pushnumber ( luaVM, matrix.vWas.fZ );
+                lua_rawseti ( luaVM, -2, 11 );
+                lua_pushnumber ( luaVM, 1.0f );
+                lua_rawseti ( luaVM, -2, 12 );
+
+                lua_pushnumber ( luaVM, matrix.vPos.fX );
+                lua_rawseti ( luaVM, -2, 13 );
+                lua_pushnumber ( luaVM, matrix.vPos.fY );
+                lua_rawseti ( luaVM, -2, 14 );
+                lua_pushnumber ( luaVM, matrix.vPos.fZ );
+                lua_rawseti ( luaVM, -2, 15 );
+                lua_pushnumber ( luaVM, 1.0f );
+                lua_rawseti ( luaVM, -2, 16 );
+
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementMatrix", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementMatrix" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GetElementPosition ( lua_State* luaVM )
 {

@@ -54,6 +54,7 @@ public:
     static CClientEntity*               GetElementByID                      ( const char* szID, unsigned int uiIndex );
     static CClientEntity*               GetElementByIndex                   ( const char* szType, unsigned int uiIndex );
     static CClientEntity*               GetElementChild                     ( CClientEntity& Entity, unsigned int uiIndex );
+    static bool                         GetElementMatrix                    ( CClientEntity& Entity, CMatrix& matrix );
     static bool                         GetElementPosition                  ( CClientEntity& Entity, CVector & vecPosition );
     static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );

@@ -150,18 +150,24 @@ bool CClientProjectile::IsActive ( void )
 }
 
 
-void CClientProjectile::GetMatrix ( CMatrix & matrix )
+bool CClientProjectile::GetMatrix ( CMatrix & matrix )
 {
-    m_pProjectile->GetMatrix ( &matrix );
-
-    // Jax: If the creator is a ped, we need to invert X and Y on Direction and Was for CMultiplayer::ConvertMatrixToEulerAngles
-    if ( m_pCreator && IS_PED ( m_pCreator ) )
+    if ( m_pProjectile )
     {
-        matrix.vDirection.fX = 0.0f - matrix.vDirection.fX;
-        matrix.vDirection.fY = 0.0f - matrix.vDirection.fY;
-        matrix.vWas.fX = 0.0f - matrix.vWas.fX;
-        matrix.vWas.fY = 0.0f - matrix.vWas.fY;
+        if ( m_pProjectile->GetMatrix ( &matrix ) )
+        {
+            // Jax: If the creator is a ped, we need to invert X and Y on Direction and Was for CMultiplayer::ConvertMatrixToEulerAngles
+            if ( m_pCreator && IS_PED ( m_pCreator ) )
+            {
+                matrix.vDirection.fX = 0.0f - matrix.vDirection.fX;
+                matrix.vDirection.fY = 0.0f - matrix.vDirection.fY;
+                matrix.vWas.fX = 0.0f - matrix.vWas.fX;
+                matrix.vWas.fY = 0.0f - matrix.vWas.fY;
+            }
+            return true;
+        }
     }
+    return false;
 }
 
 

@@ -90,6 +90,7 @@ public:
     LUA_DECLARE ( GetElementByIndex );
     LUA_DECLARE ( GetElementData );
     LUA_DECLARE ( GetElementParent );
+    LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
     LUA_DECLARE ( GetElementVelocity );

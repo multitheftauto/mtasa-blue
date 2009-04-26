@@ -11,6 +11,7 @@
 *               Jax <>
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *****************************************************************************/
 
@@ -139,6 +140,8 @@ public:
     void                                        SetCustomData           ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain );
     bool                                        DeleteCustomData        ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData     ( CLuaMain* pLuaMain, bool bRecursive );
+
+    virtual bool                                GetMatrix               ( CMatrix& matrix );
 
     virtual void                                GetPosition             ( CVector& vecPosition ) const = 0;
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
