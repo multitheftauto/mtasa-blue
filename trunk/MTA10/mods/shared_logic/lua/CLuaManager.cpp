@@ -266,6 +266,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementByID", CLuaFunctionDefinitions::GetElementByID );
     CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaFunctionDefinitions::GetElementByIndex );
     CLuaCFunctions::AddFunction ( "getElementData", CLuaFunctionDefinitions::GetElementData );
+    CLuaCFunctions::AddFunction ( "getElementMatrix", CLuaFunctionDefinitions::GetElementMatrix );
     CLuaCFunctions::AddFunction ( "getElementPosition", CLuaFunctionDefinitions::GetElementPosition );
     CLuaCFunctions::AddFunction ( "getElementRotation", CLuaFunctionDefinitions::GetElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaFunctionDefinitions::GetElementVelocity );

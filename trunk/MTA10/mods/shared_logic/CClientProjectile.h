@@ -75,7 +75,7 @@ public:
     void                                Destroy                 ( void );
 
     bool                                IsActive                ( void );
-    void                                GetMatrix               ( CMatrix & matrix );
+    bool                                GetMatrix               ( CMatrix & matrix );
     void                                SetMatrix               ( CMatrix & matrix );
     void                                GetPosition             ( CVector & vecPosition ) const;
     void                                SetPosition             ( const CVector & vecPosition );
