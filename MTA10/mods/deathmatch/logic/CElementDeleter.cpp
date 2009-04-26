@@ -93,6 +93,7 @@ void CElementDeleter::DoDeleteAll ( void )
         if ( pEntity->CanBeDeleted () )
         {
             // Delete the entity and put the next element in the list in the iterator
+            memset ( pEntity, 0, sizeof ( CClientEntity ) );
             delete pEntity;
             iter = m_List.erase ( iter );
         }
