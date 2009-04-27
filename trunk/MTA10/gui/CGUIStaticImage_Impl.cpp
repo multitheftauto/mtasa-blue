@@ -132,9 +132,7 @@ void CGUIStaticImage_Impl::Clear ( void )
     if ( m_pImageset )
     {
         m_pImageset->undefineAllImages ();
-        // The line below also destroys the CEGUITexture
         m_pImagesetManager->destroyImageset ( m_pImageset );
-        m_pTexture->SetTexture ( NULL );
         if ( m_bCreatedTexture )
         {
             delete m_pTexture;
