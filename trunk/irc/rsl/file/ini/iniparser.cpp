@@ -125,6 +125,7 @@ bool IniParser::SetFilename(const char* filename)
         section->name = new char[len - 2];
         strcpy(section->name, line + 1);
         section->next = m_sections;
+        section->entries = 0;
         m_sections = section;
         inSection = true;
       }
