@@ -24,7 +24,6 @@ template < typename Ret, typename Arguments >
 class CGUICallbackInterface
 {
 public:
-	virtual CGUICallbackInterface* Copy ( void ) = 0;
     virtual Ret     operator ()                 ( Arguments ) const = 0;
 };
 
@@ -33,23 +32,18 @@ public:
 template < typename Ret, typename Arguments >
 class CGUICallbackFree : public CGUICallbackInterface < Ret, Arguments > 
 {
-    typedef Ret ( *CallbackFunction )( Arguments );
+    typedef Ret ( *F )( Arguments );
 
 public:
-    CGUICallbackFree ( CallbackFunction f ) : m_fnCallback (f) {}
+    CGUICallbackFree ( F f ) : m_fnCallback ( f ) {}
 
     virtual Ret operator() ( Arguments Args ) const
     {
-        return m_fnCallback ( Args );
+        return m_pfnCallback ( Args );
     }
 
-	virtual CGUICallbackInterface < Ret, Arguments > * Copy ( )
-	{
-		return new CGUICallbackFree ( m_fnCallback );
-	}
-
 protected:
-    CallbackFunction    m_fnCallback;
+    F    m_pfnCallback;
 };
 
 
@@ -60,21 +54,16 @@ class CGUICallbackMethod : public CGUICallbackInterface < Ret, Arguments >
     typedef Ret ( T::*F )( Arguments );
 
 public:
-    CGUICallbackMethod ( F pfnMethod, T* pClass ) : m_pfnMethod ( pfnMethod ), m_pClass ( pClass ) {};
+    CGUICallbackMethod ( F pfnMethod, T* pObj ) : m_pfnMethod ( pfnMethod ), m_pObj ( pObj ) {}
 
     virtual Ret operator () ( Arguments Args ) const
     {
-        return ( m_pClass->*m_pfnMethod )( Args );
+        return ( m_pObj->*m_pfnMethod )( Args );
     }
-
-	virtual CGUICallbackInterface<Ret,Arguments>* Copy ( void )
-	{
-		return new CGUICallbackMethod ( m_pfnMethod, m_pClass );
-	}
 
 protected:
     F   m_pfnMethod;
-    T*  m_pClass;
+    T*  m_pObj;
 };
 
 
@@ -82,78 +71,56 @@ protected:
 template < typename Ret, typename Arguments >
 class CGUICallback
 {
-    typedef Ret ( *CallbackFunction )( Arguments );
-
 public:
     // Default constructor
     CGUICallback ( void )
     {
-        m_pCallback = NULL;
+        memset ( m_Callback, 0, sizeof(m_Callback) );
     }
 
     // Construct from a static function pointer
-    CGUICallback ( CallbackFunction pfnCallback )
+    CGUICallback ( Ret ( *pF )( Arguments ) )
     {
-		m_pCallback = pfnCallback ? new CGUICallbackFree < Ret, Arguments > ( pfnCallback ) : NULL;
+		if ( pF )
+        {
+            new(m_Callback) GUICallbackFree < Ret, Arguments > ( pF );
+        }
     }
 
     // Construct from a method with a 'this' pointer
     template < class T >
-    CGUICallback ( Ret ( T::*f )( Arguments ), T* pClass )
+    CGUICallback ( Ret ( T::*pF )( Arguments ), T* pObj )
     {
-        m_pCallback = new CGUICallbackMethod < T, Ret, Arguments > ( f, pClass );
+        if ( pF )
+        {
+            new(m_Callback) CGUICallbackMethod < T, Ret, Arguments > ( pF, pObj );
+        }
     }
 
     // Copy constructor
 	CGUICallback ( const CGUICallback < Ret, Arguments > & copy )
 	{
-        m_pCallback = NULL;
         *this = copy;
 	}
 
     void operator = ( const CGUICallback < Ret, Arguments > & copy )
     {
-        if ( &copy == this )
-            return;
-
-        if ( m_pCallback )
-        {
-            delete m_pCallback;
-            m_pCallback = NULL;
-        }
-
-        if ( copy.m_pCallback )
-        {
-            m_pCallback = copy.m_pCallback->Copy();
-        }
-    }
-
-    // Destructor
-    ~CGUICallback ( void )
-    {
-        if ( m_pCallback )
-        {
-            delete m_pCallback;
-        }
+        memcpy ( m_Callback, copy.m_Callback, sizeof(m_Callback) );
     }
 
     // Call operator
     Ret operator () ( Arguments Args ) const
     {
-        if ( m_pCallback )
-        {
-            return ( *m_pCallback )( Args );
-        }
-		return false;
+        return ( *(CGUICallbackInterface < Ret, Arguments > *)m_Callback )( Args );
     }
 
     operator bool () const
     {
-        return m_pCallback != NULL;
+        return *(DWORD *)m_Callback != NULL;
     }
 
 protected:
-    CGUICallbackInterface < Ret, Arguments >*      m_pCallback;
+    char m_Callback [ 4 + 4 + 20 ];       // vtable + pObj + pMemFn
 };
 
 #endif
