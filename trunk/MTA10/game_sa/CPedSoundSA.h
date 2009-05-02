@@ -45,6 +45,7 @@ public:
     BYTE ucPad1[0x92];
     short m_sVoiceType;
     short m_sVoiceID;
+    short m_bIsFemale;
 };
 
 class CPedSoundSA

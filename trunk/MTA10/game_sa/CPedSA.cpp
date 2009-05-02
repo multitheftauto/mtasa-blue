@@ -85,6 +85,12 @@ void CPedSA::SetModelIndex ( DWORD dwModelIndex )
 		push	dwModelIndex
 		call	dwFunction
 	}
+
+    // Also set the voice gender
+    CPedModelInfoSAInterface* pModelInfo = (CPedModelInfoSAInterface *)pGame->GetModelInfo (
+        dwModelIndex )->GetInterface ();
+    DWORD dwType = pModelInfo->pedType;
+    GetPedInterface ()->pedSound.m_bIsFemale = ( dwType == 5 || dwType == 22 );
 }
 
 bool CPedSA::IsInWater ( void )
