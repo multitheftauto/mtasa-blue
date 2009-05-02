@@ -33,7 +33,6 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::RadioButton::EventSelectStateChanged, CEGUI::Event::Subscriber ( &CGUIRadioButton_Impl::Event_OnClick, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -52,13 +51,6 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
 CGUIRadioButton_Impl::~CGUIRadioButton_Impl ( void )
 {
 	DestroyElement ();
-}
-
-bool CGUIRadioButton_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
-{
-	if ( m_OnClick )
-		m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
 }
 
 

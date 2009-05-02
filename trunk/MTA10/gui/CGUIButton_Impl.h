@@ -26,9 +26,6 @@ public:
 	eCGUIType					GetType						( void ) { return CGUI_BUTTON; };
 
     #include "CGUIElement_Inc.h"
-
-protected:
-    bool                        Event_OnClick               ( const CEGUI::EventArgs& e );
 };
 
 #endif

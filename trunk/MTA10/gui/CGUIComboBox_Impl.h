@@ -40,8 +40,6 @@ protected:
     std::list < CGUIListItem_Impl* >    m_Items;
 
     CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
-
-    bool                        Event_OnClick               ( const CEGUI::EventArgs& e );
 };
 
 #endif
