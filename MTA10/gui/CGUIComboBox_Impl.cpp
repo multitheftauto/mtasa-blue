@@ -85,13 +85,6 @@ void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )
 }
 
 
-bool CGUIComboBox_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
-{
-    if ( m_OnClick )
-        m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
-}
-
 CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 {
     // Find the item in our list

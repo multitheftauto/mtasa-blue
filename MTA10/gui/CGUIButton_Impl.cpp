@@ -33,8 +33,6 @@ CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
 	// Store the pointer to this CGUI element in the CEGUI element
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
-	// Subscribe the clicked event
-    m_pWindow->subscribeEvent ( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber ( &CGUIButton_Impl::Event_OnClick, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -54,12 +52,3 @@ CGUIButton_Impl::~CGUIButton_Impl ( void )
 {
 	DestroyElement ();
 }
-
-
-bool CGUIButton_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
-{
-    if ( m_OnClick )
-        m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
-}
-

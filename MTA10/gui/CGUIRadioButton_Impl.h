@@ -29,9 +29,6 @@ public:
 
     #include "CGUIElement_Inc.h"
 
-protected:
-    bool                    Event_OnClick               ( const CEGUI::EventArgs& e );
-
 private:
 };
 

@@ -33,7 +33,6 @@ CGUICheckBox_Impl::CGUICheckBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::Checkbox::EventCheckStateChanged, CEGUI::Event::Subscriber ( &CGUICheckBox_Impl::Event_OnClick, this ) );
     AddEvents ();
 
 	// Set selected state
@@ -57,14 +56,6 @@ CGUICheckBox_Impl::~CGUICheckBox_Impl ( void )
 	DestroyElement ();
 }
 
-
-bool CGUICheckBox_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
-{
-	if ( m_OnClick )
-		m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
-
-    return true;
-}
 
 void CGUICheckBox_Impl::SetSelected ( bool bChecked )
 {
