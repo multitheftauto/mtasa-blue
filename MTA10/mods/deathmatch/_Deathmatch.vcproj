@@ -31,7 +31,6 @@
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="1"
 				WarnAsError="FALSE"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4290"/>
 			<Tool

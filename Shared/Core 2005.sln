@@ -9,6 +9,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Game SA", "..\MTA10\game_sa\_game_sa 2005.vcproj", "{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - GUI", "..\MTA10\gui\gui 2005.vcproj", "{485149E1-799C-4925-AA17-0FEA77C85418}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7582B608-D92F-4FCB-B682-2214B48D1596} = {7582B608-D92F-4FCB-B682-2214B48D1596}
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989} = {04E4A944-225A-4BFB-B7B5-F23AEE884989}
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Loader", "..\MTA10\loader\_Loader 2005.vcproj", "{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
 EndProject
@@ -19,6 +24,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Deathmatch", "..\MTA10_Server\mods\deathmatch\_ServerDeathmatch 2005.vcproj", "{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared - XML", "XML\_XML 2005.vcproj", "{E28A87BB-7417-4DD7-ADF4-88F918CF055C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CEGUI", "CEGUI", "{2BCD3C73-9E91-4B46-B31E-ED05627C4B74}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - Base", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\BaseSystem\BaseSystem 2005.vcproj", "{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - DirectX9GUIRenderer", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\Renderers\DirectX9Renderer\DirectX9GUIRenderer 2005.vcproj", "{7582B608-D92F-4FCB-B682-2214B48D1596}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - Falagard", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\WidgetSets\Falagard\Falagard 2005.vcproj", "{04E4A944-225A-4BFB-B7B5-F23AEE884989}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,9 +100,32 @@ Global
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Nightly|Win32.Build.0 = Nightly|Win32
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Release|Win32.ActiveCfg = Release|Win32
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Release|Win32.Build.0 = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug|Win32.Build.0 = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Nightly|Win32.Build.0 = Nightly|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release|Win32.ActiveCfg = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release|Win32.Build.0 = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug|Win32.Build.0 = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Nightly|Win32.Build.0 = Nightly|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release|Win32.ActiveCfg = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release|Win32.Build.0 = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug|Win32.Build.0 = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Nightly|Win32.Build.0 = Nightly|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.ActiveCfg = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {2BCD3C73-9E91-4B46-B31E-ED05627C4B74}
+		{7582B608-D92F-4FCB-B682-2214B48D1596} = {2BCD3C73-9E91-4B46-B31E-ED05627C4B74}
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989} = {2BCD3C73-9E91-4B46-B31E-ED05627C4B74}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
