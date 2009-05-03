@@ -1862,7 +1862,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                         usVehicleModel == VT_VORTEX ) )
                                         {
                                             fCutoffDistance = 10.0f;
-                                            //bWarpIn = true;
+                                            bWarpIn = true;
                                         }
 
                                         CPed* pOccupant = pVehicle->GetOccupant ( 0 );
