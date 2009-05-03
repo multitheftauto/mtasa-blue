@@ -792,24 +792,24 @@ void RemoveFxSystemPointer ( DWORD* pPointer )
     }
 }
 
-
-CRemoteDataStorage * CMultiplayerSA::AddRemoteDataStorage ( CPlayerPed * player )
+CRemoteDataStorage * CMultiplayerSA::CreateRemoteDataStorage ()
 {
-    // Create the remote data storage and add it to the list. Return it if success
-    CRemoteDataStorageSA * data = new CRemoteDataStorageSA ( player );
-    if ( CRemoteDataSA::AddRemoteDataStorage ( data ) )
-        return data;
-
-    // Otherwize delete it and return NULL
-    delete data;
-    return NULL;
+    return new CRemoteDataStorageSA ();
 }
 
-void CMultiplayerSA::RemoveRemoteDataStorage ( CRemoteDataStorage * data )
+void CMultiplayerSA::DestroyRemoteDataStorage ( CRemoteDataStorage* pData )
 {
-    // Remove it from the list and delete it
-    CRemoteDataSA::RemoveRemoteDataStorage ( data );
-    delete (CRemoteDataStorageSA*)data;
+    delete (CRemoteDataStorageSA *)pData;
+}
+
+void CMultiplayerSA::AddRemoteDataStorage ( CPlayerPed* pPed, CRemoteDataStorage* pData )
+{
+    CRemoteDataSA::AddRemoteDataStorage ( pPed, pData );
+}
+
+void CMultiplayerSA::RemoveRemoteDataStorage ( CPlayerPed* pPed )
+{
+    CRemoteDataSA::RemoveRemoteDataStorage ( pPed );
 }
 
 CPed * CMultiplayerSA::GetContextSwitchedPed ( void )

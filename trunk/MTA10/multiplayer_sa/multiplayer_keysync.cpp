@@ -71,38 +71,15 @@ VOID InitKeysyncHooks()
 	
 	// not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo
 	//00609FF2     EB 1F          JMP SHORT gta_sa_u.0060A013
-	DWORD oldProt, oldProt2;
-
-	VirtualProtect((LPVOID)0x609FF2,5,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x609FF2, 0xEB, 1);
 	memset((void *)0x609FF3, 0x1F, 1);
 	memset((void *)0x609FF4, 0x90, 1);
 	memset((void *)0x609FF5, 0x90, 1);
 	memset((void *)0x609FF6, 0x90, 1);
-	VirtualProtect((LPVOID)0x609FF2,5,oldProt,&oldProt2);	
 	
 	// and this is to fix bike sync (I hope)
 	//006BC9EB   9090               NOP NOP
-	VirtualProtect((LPVOID)0x6BC9EB,2,PAGE_EXECUTE_READWRITE,&oldProt);		
 	memset((void *)0x6BC9EB, 0x90, 2);
-	VirtualProtect((LPVOID)0x6BC9EB,2,oldProt,&oldProt2);
-
-
-    // Set the memory areas we change during context switching to read, write, execute
-    VirtualProtect((LPVOID)0x60D850,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x609C80,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x50BFB0,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x50AB10,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x687099,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x742BF0,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x50BFF0,3,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x50237C,5,PAGE_EXECUTE_READWRITE,&oldProt);
-	VirtualProtect((LPVOID)0x5023A3,5,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x6AEA25,2,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x50230C,1,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x73811C,2,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x4C03F0,15,PAGE_EXECUTE_READWRITE,&oldProt);
-    VirtualProtect((LPVOID)0x60f273,2,PAGE_EXECUTE_READWRITE,&oldProt);
 }
 
 extern CPed* pContextSwitchedPed;
@@ -212,7 +189,7 @@ void PostContextSwitch ( void )
     memcpy ( (void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
 }
 
-VOID ReturnCotextToLocalPlayer()
+VOID ReturnContextToLocalPlayer()
 {	
 	if ( bNotInLocalContext )
 	{
@@ -286,8 +263,8 @@ void SwitchContext ( CPed* thePed )
 	    CPadSAInterface* pLocalPadInterface = ( (CPadSA*) pLocalPad )->GetInterface ();
 
         // We're not switching to local player
-	    if ( pLocalPlayerPed != thePed ) 
-	    {            
+	    if ( thePed != pLocalPlayerPed )
+	    {
             // Store the local pad
             pLocalPad->Store (); // store a copy of the local pad internally
 
@@ -543,7 +520,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 
 	_asm
     {
@@ -572,7 +549,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer ();
+	ReturnContextToLocalPlayer ();
 	
 	_asm
     {
@@ -601,7 +578,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -630,7 +607,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -659,7 +636,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -688,7 +665,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -717,7 +694,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -746,7 +723,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -775,7 +752,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -804,7 +781,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
@@ -833,7 +810,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 		pushad
 	}
 
-	ReturnCotextToLocalPlayer();
+	ReturnContextToLocalPlayer();
 	
 	_asm
     {
