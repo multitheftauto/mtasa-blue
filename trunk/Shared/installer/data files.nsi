@@ -15,17 +15,16 @@ Var Install_Dir
 
 ; ###########################################################################################################
 ; How to update easily:
-; 1. Run the previous version of the data files installer .exe and install into a temp dir
-;		i.e. C:\Program Files\MTA San Andreas temp\
-; 2. Copy this script into the same directory
-;		i.e. C:\Program Files\MTA San Andreas temp\data files.nsi
-; 3. Change the files as you want
-; 4. Update the script to reflect the changes
+; 1. Run the previous version of the data files installer .exe and install into sub directory 'MTA San Andreas' of
+;    wherever this script is on your drive.
+;		i.e. C:\SVN\multitheftauto\Shared\installer\MTA San Andreas\
+; 2. Change the files as you want
+; 3. Update the script to reflect the file changes
+; 4. Update BUILD_NUMBER
 ; 5. Run the script
 ; ###########################################################################################################
-; Assumes the folder 'MTA San Andreas' containing the data files is in the same directory as this script
 !define FILES_ROOT "."
-!define BUILD_NUMBER "636"
+!define BUILD_NUMBER "713"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "multitheftauto_data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -143,7 +142,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\lua5.1.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkunicode.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkzlib.dll"
