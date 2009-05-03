@@ -276,20 +276,53 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 
     // Basic check for the data files
-    char szDataFile[MAX_PATH] = {'\0'};
-    _snprintf ( szDataFile, MAX_PATH, "%s\\mta\\libcurl.dll", szMTASAPath );
-
-    // Check if libcurl.dll exists)
-    if ( INVALID_HANDLE_VALUE == FindFirstFile ( szDataFile, &fdFileInfo ) )
     {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        MessageBox( NULL, "Load failed.  Please ensure that "
-                          "the data files have been installed "
-                          "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
-        return 1;
+        char szFileName[MAX_PATH] = {'\0'};
+        _snprintf ( szFileName, MAX_PATH, "%s\\mta\\libcurl.dll", szMTASAPath );
+
+        // Check if libcurl.dll exists
+        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
+        {
+            if ( hwndSplash )
+                DestroyWindow ( hwndSplash );
+            MessageBox( NULL, "Load failed.  Please ensure that "
+                              "the data files have been installed "
+                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+            return 1;
+        }
     }
 
+    // Check for client file
+    {
+        char szFileName[MAX_PATH] = {'\0'};
+        _snprintf ( szFileName, MAX_PATH, "%s\\%s", szMTASAPath, CHECK_DM_CLIENT_NAME );
+
+        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
+        {
+            if ( hwndSplash )
+                DestroyWindow ( hwndSplash );
+            MessageBox( NULL, "Load failed.  Please ensure that '"
+                              CHECK_DM_CLIENT_NAME "' is installed "
+                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+            return 1;
+        }
+    }
+
+    // Check for lua file
+    {
+        char szFileName[MAX_PATH] = {'\0'};
+        _snprintf ( szFileName, MAX_PATH, "%s\\%s", szMTASAPath, CHECK_DM_LUA_NAME );
+
+        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
+        {
+            if ( hwndSplash )
+                DestroyWindow ( hwndSplash );
+            MessageBox( NULL, "Load failed.  Please ensure that '"
+                              CHECK_DM_LUA_NAME "' is installed "
+                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+            return 1;
+        }
+    }
 
     // Grab the MTA folder
     char szDir[MAX_PATH];
