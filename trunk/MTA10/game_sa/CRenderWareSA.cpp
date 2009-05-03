@@ -556,17 +556,20 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 
 	// Read the file
 	FILE * fileCol = fopen ( szCOL, "rb" );
-	if ( !fileCol ) return NULL;
-	fseek ( fileCol, 0, SEEK_END );
+	if ( !fileCol )
+        return NULL;
 
 	// Get the file size
+    fseek ( fileCol, 0, SEEK_END );
 	unsigned int uiFileSize = ftell ( fileCol );
 	rewind ( fileCol );
 	
 	// Create a buffer and read in the file data
 	unsigned char *szData = new unsigned char [ uiFileSize ];
-	if ( fread ( szData, 1, uiFileSize, fileCol ) != uiFileSize ) {
-		delete [] szData;
+	if ( fread ( szData, 1, uiFileSize, fileCol ) != uiFileSize )
+    {
+		delete[] szData;
+        fclose ( fileCol );
 		return NULL;
 	}
 
@@ -575,15 +578,20 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 
 	// Check if this is a COL3 file
 	if ( szData[0] != 'C' || szData[1] != 'O' || szData[2] != 'L' || szData[3] != '3' )
+    {
+        delete[] szData;
+        fclose ( fileCol );
         return NULL;
+    }
 
 	// Call GTA's COL3 loader (we strip the header off first)
 	LoadCollisionModelVer3 ( szData + COL3_HEADER_SIZE, uiFileSize - COL3_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
 
 	// Do some checking on the CColModel here, cause LoadCollisionModelVer3 doesn't return a bool?
 
-	// Delete the buffer
-	delete [] szData;
+	// Delete the buffer and close the file
+	delete[] szData;
+    fclose ( fileCol );
 
 	// Return the collision model
 	return pColModel;

@@ -13329,6 +13329,55 @@ int CLuaFunctionDefinitions::ResetSkyGradient ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::SetWaterColor ( lua_State* luaVM )
+{
+    // Verify the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&    
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+    {
+        unsigned char ucWaterRed = 0;
+        unsigned char ucWaterGreen = 0;
+        unsigned char ucWaterBlue = 0;
+        unsigned char ucWaterAlpha = 200;
+
+        ucWaterRed   = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        ucWaterGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+        ucWaterBlue  = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+            ucWaterAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+
+        // Set the new water colour
+        if ( CStaticFunctionDefinitions::SetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::ResetWaterColor ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetWaterColor () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetWeather ( lua_State* luaVM )
 {
     // Verify the argument types

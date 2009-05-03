@@ -4554,6 +4554,20 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
+{
+    g_pMultiplayer->SetWaterColor ( fWaterRed, fWaterGreen, fWaterBlue, fWaterAlpha );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetWaterColor ( void )
+{
+    g_pMultiplayer->ResetWater ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 {

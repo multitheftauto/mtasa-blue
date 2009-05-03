@@ -572,6 +572,8 @@ public:
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );
     LUA_DECLARE ( ResetSkyGradient );
+    LUA_DECLARE ( SetWaterColor );
+    LUA_DECLARE ( ResetWaterColor );
     LUA_DECLARE ( SetWeather );
     LUA_DECLARE ( SetWeatherBlended );
     LUA_DECLARE ( SetGravity );
