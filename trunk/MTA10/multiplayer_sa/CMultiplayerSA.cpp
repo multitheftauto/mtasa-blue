@@ -941,18 +941,31 @@ void CMultiplayerSA::ResetSky ( void )
 	bUsingCustomSkyGradient = false;
 }
 
-void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha)
+void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
 {
 	bUsingCustomWaterColor = true;
+    // Water surface
 	fWaterColorR = fWaterRed;
 	fWaterColorG = fWaterGreen;
 	fWaterColorB = fWaterBlue;
 	fWaterColorA = fWaterAlpha;
+    // Underwater
+    *(BYTE *)0x8D5140 = (BYTE)fWaterRed;
+    *(BYTE *)0x8D5141 = (BYTE)fWaterGreen;
+    *(BYTE *)0x8D5142 = (BYTE)fWaterBlue;
+    *(BYTE *)0x8D5143 = (BYTE)fWaterAlpha;
+    *(BYTE *)0x7051A7 = 20;          // These numbers are added to r,g,b
+    *(float *)0x872660 = 20.0f;
+    *(BYTE *)0x7051D7 = 20;
 }
 
 void CMultiplayerSA::ResetWater ( void )
 {
 	bUsingCustomWaterColor = false;
+    *(DWORD *)0x8D5140 = 0x40404040;
+    *(BYTE *)0x7051A7 = 184;
+    *(float *)0x872660 = 184.0f;
+    *(BYTE *)0x7051D7 = 184;
 }
 
 bool CMultiplayerSA::GetExplosionsDisabled ( void )
