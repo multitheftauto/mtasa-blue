@@ -168,7 +168,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     else
     {
         // Add our shotsync data
-        m_remoteDataStorage = g_pMultiplayer->AddRemoteDataStorage ( NULL );        
+        m_remoteDataStorage = g_pMultiplayer->CreateRemoteDataStorage ();
         m_shotSyncData = m_remoteDataStorage->ShotSyncData ( );
         m_currentControllerState = m_remoteDataStorage->CurrentControllerState ( );
         m_lastControllerState = m_remoteDataStorage->LastControllerState ( );
@@ -221,7 +221,9 @@ CClientPed::~CClientPed ( void )
     else
     {
         // Remove our shotsync data
-        g_pMultiplayer->RemoveRemoteDataStorage ( m_remoteDataStorage );
+        g_pMultiplayer->RemoveRemoteDataStorage ( m_pPlayerPed );
+        g_pMultiplayer->DestroyRemoteDataStorage ( m_remoteDataStorage );
+        m_remoteDataStorage = NULL;
     }
 
     // We have a player model?
@@ -2702,7 +2704,8 @@ void CClientPed::_CreateModel ( void )
 	{
 		// Put our pointer in the stored data and update the remote data with the new model pointer
 		m_pPlayerPed->SetStoredPointer ( this );
-		m_remoteDataStorage->SetPlayer ( m_pPlayerPed );
+
+        g_pMultiplayer->AddRemoteDataStorage ( m_pPlayerPed, m_remoteDataStorage );
 
 		// Grab the task manager
 		m_pTaskManager = m_pPlayerPed->GetPedIntelligence ()->GetTaskManager ();
@@ -2868,6 +2871,8 @@ void CClientPed::_DestroyModel ()
             InternalRemoveFromVehicle ( pGameVehicle );
         }
     }
+
+    g_pMultiplayer->RemoveRemoteDataStorage ( m_pPlayerPed );
 
     // Invalidate
     m_pManager->InvalidateEntity ( this );

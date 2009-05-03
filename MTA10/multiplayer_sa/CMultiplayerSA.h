@@ -33,77 +33,79 @@ private:
 	CPopulationSA				* Population;
 public:
 	CMultiplayerSA();
-	VOID						InitHooks();
-    CRemoteDataStorage *        AddRemoteDataStorage ( CPlayerPed * player );
-    void                        RemoveRemoteDataStorage ( CRemoteDataStorage * data );
+	void                        InitHooks();
+    CRemoteDataStorage *        CreateRemoteDataStorage     ();
+    void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
+    void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
+    void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
 
-    CPed *                      GetContextSwitchedPed ( void );
+    CPed *                      GetContextSwitchedPed       ( void );
 
-	CPopulationMP				* GetPopulationMP() { return Population; };
-	void						PreventLeavingVehicles();
-	void						HideRadar ( bool bHide );
-	void						SetCenterOfWorld(CEntity * entity, CVector * vecPosition, FLOAT fHeading);
-	void						DisablePadHandler( bool bDisabled );
-    void                        DisableEnterExitVehicleKey( bool bDisabled );
-	void						DisableHeatHazeEffect ( bool bDisable );
-    void                        DisableAllVehicleWeapons ( bool bDisable );
+	CPopulationMP				* GetPopulationMP           () { return Population; }
+	void						PreventLeavingVehicles      ();
+	void						HideRadar                   ( bool bHide );
+	void						SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
+	void						DisablePadHandler           ( bool bDisabled );
+    void                        DisableEnterExitVehicleKey  ( bool bDisabled );
+	void						DisableHeatHazeEffect       ( bool bDisable );
+    void                        DisableAllVehicleWeapons    ( bool bDisable );
 
-    bool                        GetExplosionsDisabled ( void );
-    void                        DisableExplosions ( bool bDisabled );
-	void						SetExplosionHandler ( ExplosionHandler * pExplosionHandler );
-    void                        SetDamageHandler ( DamageHandler * pDamageHandler );
-    void                        SetProjectileHandler ( ProjectileHandler * pProjectileHandler );
-    void                        SetProjectileStopHandler ( ProjectileStopHandler * pProjectileHandler );
-    void                        SetFireHandler ( FireHandler * pFireHandler );
-    void                        SetBreakTowLinkHandler ( BreakTowLinkHandler * pBreakTowLinkHandler );
-    void                        SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandler );
-    void                        SetGameProcessHandler ( GameProcessHandler* pProcessHandler );
+    bool                        GetExplosionsDisabled       ();
+    void                        DisableExplosions           ( bool bDisabled );
+	void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
+    void                        SetDamageHandler            ( DamageHandler * pDamageHandler );
+    void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler );
+    void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler );
+    void                        SetFireHandler              ( FireHandler * pFireHandler );
+    void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
+    void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
+    void                        SetGameProcessHandler       ( GameProcessHandler* pProcessHandler );
 
-    void                        AllowMouseMovement ( bool bAllow );
-    void                        DoSoundHacksOnLostFocus ( bool bLostFocus );
-    void                        DisableZoneNames ( bool bDisabled );
-    void                        DisableBirds ( bool bDisabled );
-    void                        SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
-    void                        ResetSky ( void );
-    void                        DisableClouds ( bool bDisabled );
-    void                        RebuildMultiplayerPlayer ( CPed * player );
+    void                        AllowMouseMovement          ( bool bAllow );
+    void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
+    void                        DisableZoneNames            ( bool bDisabled );
+    void                        DisableBirds                ( bool bDisabled );
+    void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
+    void                        ResetSky                    ();
+    void                        DisableClouds               ( bool bDisabled );
+    void                        RebuildMultiplayerPlayer    ( CPed * player );
 
-    void                        AllowWindowsCursorShowing ( bool bAllow );
+    void                        AllowWindowsCursorShowing   ( bool bAllow );
 
-    CShotSyncData *             GetLocalShotSyncData ( void );
+    CShotSyncData *             GetLocalShotSyncData        ();
 
-    void                        SetPreContextSwitchHandler ( PreContextSwitchHandler* pHandler );
+    void                        SetPreContextSwitchHandler  ( PreContextSwitchHandler* pHandler );
     void                        SetPostContextSwitchHandler ( PostContextSwitchHandler* pHandler );
-    void                        SetPreWeaponFireHandler ( PreWeaponFireHandler* pHandler );
-    void                        SetPostWeaponFireHandler ( PostWeaponFireHandler* pHandler );
-    void                        SetDrawRadarAreasHandler ( DrawRadarAreasHandler * pRadarAreasHandler );
-    void                        SetRender3DStuffHandler ( Render3DStuffHandler * pHandler );
+    void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
+    void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
+    void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
+    void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 
-    void                        Reset                           ( void );
+    void                        Reset                       ();
 
-    void                        ConvertEulerAnglesToMatrix ( CMatrix& Matrix, float fX, float fY, float fZ );
-    void                        ConvertMatrixToEulerAngles ( const CMatrix& Matrix, float& fX, float& fY, float& fZ );
+    void                        ConvertEulerAnglesToMatrix  ( CMatrix& Matrix, float fX, float fY, float fZ );
+    void                        ConvertMatrixToEulerAngles  ( const CMatrix& Matrix, float& fX, float& fY, float& fZ );
 
-    float                       GetGlobalGravity ( void );
-    void                        SetGlobalGravity ( float fGravity );
+    float                       GetGlobalGravity            ();
+    void                        SetGlobalGravity            ( float fGravity );
 
-    float                       GetLocalPlayerGravity ( void );
-    void                        SetLocalPlayerGravity ( float fGravity );
+    float                       GetLocalPlayerGravity       ();
+    void                        SetLocalPlayerGravity       ( float fGravity );
 
-    void                        SetLocalStatValue ( unsigned short usStat, float fValue );
-    void                        SetLocalStatsStatic ( bool bStatic );
+    void                        SetLocalStatValue           ( unsigned short usStat, float fValue );
+    void                        SetLocalStatsStatic         ( bool bStatic );
 
-    void                        SetLocalCameraRotation ( float fRotation );
-    bool                        IsCustomCameraRotationEnabled ( void );
-    void                        SetCustomCameraRotationEnabled ( bool bEnabled );
+    void                        SetLocalCameraRotation      ( float fRotation );
+    bool                        IsCustomCameraRotationEnabled   ();
+    void                        SetCustomCameraRotationEnabled  ( bool bEnabled );
 
-    void                        SetDebugVars ( float f1, float f2, float f3 );
+    void                        SetDebugVars                ( float f1, float f2, float f3 );
 
-    CVector&                    GetAkimboTarget     ( void ) { return m_vecAkimboTarget; };
-    bool                        GetAkimboTargetUp   ( void ) { return m_bAkimboTargetUp; };
+    CVector&                    GetAkimboTarget             () { return m_vecAkimboTarget; };
+    bool                        GetAkimboTargetUp           () { return m_bAkimboTargetUp; };
 
-    void                        SetAkimboTarget     ( const CVector& vecTarget ) { m_vecAkimboTarget = vecTarget; };
-    void                        SetAkimboTargetUp   ( bool bUp ) { m_bAkimboTargetUp = bUp; };
+    void                        SetAkimboTarget             ( const CVector& vecTarget ) { m_vecAkimboTarget = vecTarget; };
+    void                        SetAkimboTargetUp           ( bool bUp ) { m_bAkimboTargetUp = bUp; };
     
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
