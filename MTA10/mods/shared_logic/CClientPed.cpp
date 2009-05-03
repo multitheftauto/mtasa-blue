@@ -966,7 +966,7 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClos
         if ( !pGameVehicle && bGetPositionFromClosestDoor ) continue;
 
         // Should we take the position from the closest door instead of center of vehicle
-        if ( bGetPositionFromClosestDoor )
+        if ( bGetPositionFromClosestDoor && pTempVehicle->GetModel() != VT_RCBARON )
         {
             // Get the closest front-door
             CVector vecFrontPos;
