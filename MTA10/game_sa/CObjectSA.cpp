@@ -237,12 +237,12 @@ void CObjectSA::SetScale( float faScale )
 
 void CObjectSA::SetHealth ( float fHealth )
 {
-    *(float *)(this->GetInterface() + 340) = fHealth;
+    *(float *)( (DWORD)this->GetInterface () + 340 ) = fHealth;
 }
 
 float CObjectSA::GetHealth ( void )
 {
-    return *(float *)(this->GetInterface() + 340);
+    return *(float *)( (DWORD)this->GetInterface () + 340 );
 }
 
 void CObjectSA::SetModelIndex ( unsigned long ulModel )

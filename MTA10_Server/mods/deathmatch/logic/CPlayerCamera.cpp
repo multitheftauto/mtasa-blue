@@ -70,9 +70,8 @@ void CPlayerCamera::GetPosition ( CVector & vecPosition )
     {
         vecPosition = m_vecPosition;
     }
-    else
+    else if ( m_pTarget )
     {
-        // Use the position of our target (we should always have one)
         vecPosition = m_pTarget->GetPosition ();
     }
 }
