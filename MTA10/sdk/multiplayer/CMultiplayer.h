@@ -116,6 +116,8 @@ public:
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
     virtual void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue ) = 0;
     virtual void                        ResetSky                    () = 0;
+    virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
+    virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        DisableClouds               ( bool bDisabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 

@@ -3869,6 +3869,9 @@ void CClientGame::ResetMapInfo ( void )
     // Sky-gradient
     g_pMultiplayer->ResetSky ();
 
+    // Water-colour
+    g_pMultiplayer->ResetWater ();
+
     // Water
     g_pGame->GetWaterManager ()->UndoChanges ();
 

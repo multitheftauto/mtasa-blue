@@ -75,6 +75,7 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_CVehicle_SetupRender =                                          0x6D6512;
     CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender =                                     0x6D0E3E;
     CMultiplayerSA::HOOKPOS_CObject_Render =                                                0x59F1ED;
+    CMultiplayerSA::HOOKPOS_EndWorldColors =                                                0x561795;
 
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E670;
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x507030;

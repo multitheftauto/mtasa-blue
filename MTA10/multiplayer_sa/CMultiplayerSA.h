@@ -67,6 +67,8 @@ public:
     void                        DisableBirds                ( bool bDisabled );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
     void                        ResetSky                    ();
+    void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
+    void                        ResetWater                  ();
     void                        DisableClouds               ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
 
@@ -139,6 +141,7 @@ private:
     static unsigned long        HOOKPOS_CVehicle_SetupRender;
     static unsigned long        HOOKPOS_CVehicle_ResetAfterRender;
     static unsigned long        HOOKPOS_CObject_Render;
+    static unsigned long        HOOKPOS_EndWorldColors;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

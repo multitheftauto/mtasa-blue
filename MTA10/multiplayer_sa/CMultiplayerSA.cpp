@@ -43,6 +43,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
 unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
 unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
 unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
+unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -82,6 +83,19 @@ float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
 float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
+
+bool bUsingCustomSkyGradient = false;
+BYTE ucSkyGradientTopR = 0;
+BYTE ucSkyGradientTopG = 0;
+BYTE ucSkyGradientTopB = 0;
+BYTE ucSkyGradientBottomR = 0;
+BYTE ucSkyGradientBottomG = 0;
+BYTE ucSkyGradientBottomB = 0;
+bool bUsingCustomWaterColor = false;
+float fWaterColorR = 0.0F;
+float fWaterColorG = 0.0F;
+float fWaterColorB = 0.0F;
+float fWaterColorA = 0.0F;
 
 CStatsData localStatsData;
 bool bLocalStatsStatic = true;
@@ -128,6 +142,7 @@ VOID HOOK_CTrain_ProcessControl_Derail ();
 VOID HOOK_CVehicle_SetupRender ();
 VOID HOOK_CVehicle_ResetAfterRender();
 VOID HOOK_CObject_Render ();
+VOID HOOK_EndWorldColors ();
 VOID HOOK_CGame_Process ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
@@ -223,6 +238,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
     HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
+	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -911,20 +927,32 @@ void CMultiplayerSA::DisableClouds ( bool bDisabled )
 
 void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue )
 {
-	*(BYTE *)0x561760 = 0xC3;
-
-    *(BYTE *)0xB7C4C4 = TopRed;
-    *(BYTE *)0xB7C4C6 = TopGreen;
-    *(BYTE *)0xB7C4C8 = TopBlue;
-
-    *(BYTE *)0xB7C4CA = BottomRed;
-    *(BYTE *)0xB7C4CC = BottomGreen;
-    *(BYTE *)0xB7C4CE = BottomBlue;
+	bUsingCustomSkyGradient = true;
+	ucSkyGradientTopR = TopRed;
+	ucSkyGradientTopG = TopGreen;
+	ucSkyGradientTopB = TopBlue;
+	ucSkyGradientBottomR = BottomRed;
+	ucSkyGradientBottomG = BottomGreen;
+	ucSkyGradientBottomB = BottomBlue;
 }
 
 void CMultiplayerSA::ResetSky ( void )
 {
-	*(BYTE *)0x561760 = 0xA1;
+	bUsingCustomSkyGradient = false;
+}
+
+void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha)
+{
+	bUsingCustomWaterColor = true;
+	fWaterColorR = fWaterRed;
+	fWaterColorG = fWaterGreen;
+	fWaterColorB = fWaterBlue;
+	fWaterColorA = fWaterAlpha;
+}
+
+void CMultiplayerSA::ResetWater ( void )
+{
+	bUsingCustomWaterColor = false;
 }
 
 bool CMultiplayerSA::GetExplosionsDisabled ( void )
@@ -2270,6 +2298,32 @@ VOID _declspec(naked) HOOK_CObject_Render ()
         mov         edx, HOOK_CObject_PostRender
         mov         [esp], edx
         jmp         FUNC_CEntity_Render
+    }
+}
+
+// Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
+VOID _declspec(naked) HOOK_EndWorldColors ()
+{
+    if ( bUsingCustomSkyGradient )
+    {
+	    *(BYTE *)0xB7C4C4 = ucSkyGradientTopR;
+	    *(BYTE *)0xB7C4C6 = ucSkyGradientTopG;
+	    *(BYTE *)0xB7C4C8 = ucSkyGradientTopB;
+
+	    *(BYTE *)0xB7C4CA = ucSkyGradientBottomR;
+	    *(BYTE *)0xB7C4CC = ucSkyGradientBottomG;
+	    *(BYTE *)0xB7C4CE = ucSkyGradientBottomB;
+    }
+    if ( bUsingCustomWaterColor )
+    {
+        *(float *)0xB7C508 = fWaterColorR;
+        *(float *)0xB7C50C = fWaterColorG;
+        *(float *)0xB7C510 = fWaterColorB;
+        *(float *)0xB7C514 = fWaterColorA;
+    }
+	 _asm
+    {
+        ret
     }
 }
 
