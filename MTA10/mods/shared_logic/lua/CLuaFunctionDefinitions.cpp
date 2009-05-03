@@ -13341,9 +13341,9 @@ int CLuaFunctionDefinitions::SetWaterColor ( lua_State* luaVM )
          ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&    
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
     {
-        unsigned char ucWaterRed = 0;
+        unsigned char ucWaterRed   = 0;
         unsigned char ucWaterGreen = 0;
-        unsigned char ucWaterBlue = 0;
+        unsigned char ucWaterBlue  = 0;
         unsigned char ucWaterAlpha = 200;
 
         ucWaterRed   = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
