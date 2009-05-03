@@ -11,6 +11,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Core", "..\MTA10_Server\core\_ServerCore 2008.vcproj", "{0550C84E-8AC6-4C44-9686-241B0BB4BD7D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - GUI", "..\MTA10\gui\gui 2008.vcproj", "{485149E1-799C-4925-AA17-0FEA77C85418}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7582B608-D92F-4FCB-B682-2214B48D1596} = {7582B608-D92F-4FCB-B682-2214B48D1596}
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989} = {04E4A944-225A-4BFB-B7B5-F23AEE884989}
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Deathmatch", "..\MTA10\mods\deathmatch\_Deathmatch 2008.vcproj", "{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 EndProject
@@ -19,6 +24,20 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Launcher", "..\MTA10_Server\launcher\_launcher 2008.vcproj", "{0EAA9107-413A-47C4-B6E7-41B10208FBA1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared - XML Module", "XML\_XML 2008.vcproj", "{E28A87BB-7417-4DD7-ADF4-88F918CF055C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CEGUI", "CEGUI", "{4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - Base", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\BaseSystem\BaseSystem 2008.vcproj", "{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - DirectX9GUIRenderer", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\Renderers\DirectX9Renderer\DirectX9GUIRenderer 2008.vcproj", "{7582B608-D92F-4FCB-B682-2214B48D1596}"
+	ProjectSection(ProjectDependencies) = postProject
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - FalagardBase", "..\vendor\cegui-0.4.0-custom\makefiles\win32\VC++7.1\WidgetSets\Falagard\Falagard 2008.vcproj", "{04E4A944-225A-4BFB-B7B5-F23AEE884989}"
+	ProjectSection(ProjectDependencies) = postProject
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,9 +106,32 @@ Global
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Nightly|Win32.Build.0 = Nightly|Win32
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Release|Win32.ActiveCfg = Release|Win32
 		{E28A87BB-7417-4DD7-ADF4-88F918CF055C}.Release|Win32.Build.0 = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug|Win32.Build.0 = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Nightly|Win32.Build.0 = Nightly|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release|Win32.ActiveCfg = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release|Win32.Build.0 = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug|Win32.Build.0 = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Nightly|Win32.Build.0 = Nightly|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release|Win32.ActiveCfg = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release|Win32.Build.0 = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug|Win32.Build.0 = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Nightly|Win32.Build.0 = Nightly|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.ActiveCfg = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}
+		{7582B608-D92F-4FCB-B682-2214B48D1596} = {4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989} = {4C0157CE-9DD9-4729-8CDF-F5B9D2D71D2B}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;&quot;../../vendor/cegui-0.4.0-custom/include&quot;;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -29,7 +29,6 @@
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"
 				ShowIncludes="FALSE"/>
 			<Tool
@@ -41,7 +40,7 @@
 				OutputFile="C:\Program Files\MTA San Andreas\mta\cgui_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="../dependencies/cegui/lib"
+				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="LIBCMTD"
 				GenerateDebugInformation="TRUE"
@@ -85,7 +84,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;&quot;../../vendor/cegui-0.4.0-custom/include&quot;;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -93,7 +92,6 @@
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -103,7 +101,7 @@
 				OutputFile="C:\Program Files\MTA San Andreas\MTA\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="../dependencies/cegui/lib"
+				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="TRUE"
 				AssemblyDebug="0"
@@ -153,7 +151,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../dependencies/cegui/include;../../vendor/sparsehash/1.3/src;../../vendor/sparsehash/1.3/src/windows"
+				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;&quot;../../vendor/cegui-0.4.0-custom/include&quot;;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -161,7 +159,6 @@
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -171,7 +168,7 @@
 				OutputFile="..\..\output\MTA San Andreas\mta\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="../dependencies/cegui/lib"
+				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="TRUE"
 				AssemblyDebug="0"
