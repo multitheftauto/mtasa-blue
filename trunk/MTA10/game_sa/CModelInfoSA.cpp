@@ -755,41 +755,37 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 	    // If no collision model has been set before, store the original in case we want to restore it
 	    if ( m_pOriginalColModel == NULL ) m_pOriginalColModel = pCurrentInterface;
 
-        // Are we setting a different model than we have now?
-        if ( pCurrentInterface != pInterface )
-        {
-	        // Apply some low-level hacks (copies the old col area and sets a flag)
-	        DWORD pColModelInterface = (DWORD)pInterface;
-	        DWORD pOldColModelInterface = (DWORD) m_pOriginalColModel;
-	        *((BYTE *)( pPool [m_dwModelID ] + 0x13 )) |= 8;
-	        *((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
+		// Apply some low-level hacks (copies the old col area and sets a flag)
+		DWORD pColModelInterface = (DWORD)pInterface;
+		DWORD pOldColModelInterface = (DWORD) m_pOriginalColModel;
+		*((BYTE *)( pPool [m_dwModelID ] + 0x13 )) |= 8;
+		*((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
 
-			// Extra flags (3064) -- needs to be tested
-			m_pInterface->bDoWeOwnTheColModel = false;
-			m_pInterface->bCollisionWasStreamedWithModel = false;
+		// Extra flags (3064) -- needs to be tested
+		m_pInterface->bDoWeOwnTheColModel = false;
+		m_pInterface->bCollisionWasStreamedWithModel = false;
 
-            // Call SetColModel
-            DWORD dwFunc = FUNC_SetColModel;
-	        DWORD ModelID = m_dwModelID;
-            _asm
-            {
-                mov     ecx, ModelID
-                mov     ecx, ARRAY_ModelInfo[ecx*4]
-                push    1
-                push    pInterface
-                call    dwFunc
-            }
+		// Call SetColModel
+		DWORD dwFunc = FUNC_SetColModel;
+		DWORD ModelID = m_dwModelID;
+		_asm
+		{
+			mov     ecx, ModelID
+			mov     ecx, ARRAY_ModelInfo[ecx*4]
+			push    1
+			push    pInterface
+			call    dwFunc
+		}
 
-	        // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
-	        DWORD func = 0x5B2C20;
-	        __asm {
-		        push	pInterface
-		        push	ModelID
-		        call	func
-		        add		esp, 8
-	        }
-	        #pragma message(__LOC__ "(IJs) Document this function some time.")
-        }
+		// public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
+		DWORD func = 0x5B2C20;
+		__asm {
+			push	pInterface
+			push	ModelID
+			call	func
+			add		esp, 8
+		}
+		#pragma message(__LOC__ "(IJs) Document this function some time.")
     }
 }
 
