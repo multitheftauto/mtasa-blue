@@ -1864,6 +1864,10 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                             fCutoffDistance = 10.0f;
                                             bWarpIn = true;
                                         }
+                                        if (usVehicleModel == VT_RCBARON) { // warp in for rc baron.
+                                            fCutoffDistance = 10.0f;
+                                            bWarpIn = true;
+                                        }
 
                                         CPed* pOccupant = pVehicle->GetOccupant ( 0 );
                                         // If he's going to be jacking this vehicle, lets make sure he's very close to it
