@@ -954,9 +954,9 @@ void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float f
     *(BYTE *)0x8D5141 = (BYTE)fWaterGreen;
     *(BYTE *)0x8D5142 = (BYTE)fWaterBlue;
     *(BYTE *)0x8D5143 = (BYTE)fWaterAlpha;
-    *(BYTE *)0x7051A7 = 20;          // These numbers are added to r,g,b
-    *(float *)0x872660 = 20.0f;
-    *(BYTE *)0x7051D7 = 20;
+    *(BYTE *)0x7051A7 = 255-(BYTE)fWaterAlpha;          // These numbers are added to r,g,b
+    *(float *)0x872660 = 255-fWaterAlpha;
+    *(BYTE *)0x7051D7 = 255-(BYTE)fWaterAlpha;
 }
 
 void CMultiplayerSA::ResetWater ( void )
