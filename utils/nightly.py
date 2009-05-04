@@ -23,5 +23,5 @@ def writeVersion (filePath):
 		versionFile.writelines(newLines)
 		versionFile.close()
 
-writeVersion("../../MTA10/version.h")
-writeVersion("../../MTA10_Server/version.h")
+writeVersion("../MTA10/version.h")
+writeVersion("../MTA10_Server/version.h")
