@@ -125,7 +125,6 @@ public:
     static bool                         GetPedAnimation                     ( CClientPed& Ped, char * szBlockName, char * szAnimName, unsigned int uiLength );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
-    static bool                         GetPedFootBlood                     ( CClientPed& Ped, unsigned int & uiFootBlood );
 	static bool                         GetPedCameraRotation                ( CClientPed& Ped, float & fRotation );
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
 
@@ -140,7 +139,6 @@ public:
     static bool                         SetPedDoingGangDriveby              ( CClientEntity& Entity, bool bGangDriveby );
     static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
-    static bool                         SetPedFootBlood                     ( CClientEntity& Entity, unsigned int uiFootBlood );
 	static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
 

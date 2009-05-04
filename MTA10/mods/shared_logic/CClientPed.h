@@ -363,9 +363,6 @@ public:
     inline bool                 IsHeadless              ( void )                                        { return m_bHeadless; }
     void                        SetHeadless             ( bool bHeadless );
 
-    void                        SetFootBlood            ( unsigned int uiFootBlood );
-    unsigned int                GetFootBlood            ( void );
-
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
 

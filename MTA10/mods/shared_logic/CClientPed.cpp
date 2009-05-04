@@ -590,7 +590,6 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     SetHasJetPack ( false );
     SetMoveSpeed ( CVector () );
     SetInterior ( ucInterior );
-    SetFootBlood ( 0 );
 }
 
 
@@ -4537,24 +4536,6 @@ void CClientPed::SetHeadless ( bool bHeadless )
         m_pPlayerPed->RemoveBodyPart ( ( bHeadless ) ? 2 : 1, 0 );
     }
     m_bHeadless = bHeadless;
-}
-
-
-void CClientPed::SetFootBlood ( unsigned int uiFootBlood )
-{
-    if ( m_pPlayerPed )
-    {
-		m_pPlayerPed->SetFootBlood(uiFootBlood);
-    }
-}
-
-unsigned int CClientPed::GetFootBlood ( void )
-{
-    if ( m_pPlayerPed )
-    {
-		return m_pPlayerPed->GetFootBlood();
-    }
-    return 0;
 }
 
 void CClientPed::SetOnFire ( bool bIsOnFire )

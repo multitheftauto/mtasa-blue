@@ -399,7 +399,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefinitions::GetPedAnimation );
     //CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefinitions::GetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefinitions::IsPedHeadless );
-    CLuaCFunctions::AddFunction ( "getPedFootBlood", CLuaFunctionDefinitions::GetPedFootBlood );
 	CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefinitions::GetPedCameraRotation );
 
     CLuaCFunctions::AddFunction ( "setPedWeaponSlot", CLuaFunctionDefinitions::SetPedWeaponSlot );
@@ -413,7 +412,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedDoingGangDriveby", CLuaFunctionDefinitions::SetPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "setPedLookAt", CLuaFunctionDefinitions::SetPedLookAt );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefinitions::SetPedHeadless );
-    CLuaCFunctions::AddFunction ( "setPedFootBlood", CLuaFunctionDefinitions::SetPedFootBlood );
 	CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefinitions::SetPedCameraRotation );
 
 	// Clothes and body functions
