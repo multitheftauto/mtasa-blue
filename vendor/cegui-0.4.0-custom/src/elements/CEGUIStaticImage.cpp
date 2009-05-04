@@ -229,12 +229,12 @@ void StaticImage::onStaticFrameChanged(WindowEventArgs& e)
 /*************************************************************************
 	Add properties for static image
 *************************************************************************/
-void StaticImage::addStaticImageProperties(void)
+void StaticImage::addStaticImageProperties( bool bCommon )
 {
-	addProperty(&d_imageProperty);
-	addProperty(&d_imageColoursProperty);
-	addProperty(&d_vertFormattingProperty);
-	addProperty(&d_horzFormattingProperty);
+	if ( bCommon == false )   addProperty(&d_imageProperty);
+	if ( bCommon == false )   addProperty(&d_imageColoursProperty);
+	if ( bCommon == false )   addProperty(&d_vertFormattingProperty);
+	if ( bCommon == false )   addProperty(&d_horzFormattingProperty);
 }
 
 

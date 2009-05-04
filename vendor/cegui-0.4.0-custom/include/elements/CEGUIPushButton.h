@@ -268,7 +268,8 @@ protected:
 	\brief
 		Add button specific events
 	*/
-	void	addPushButtonEvents(void);
+	void	addPushButtonEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addPushButtonEvents(false); }
 
 
 	/*!
@@ -322,7 +323,9 @@ private:
     /*************************************************************************
         Private methods
     *************************************************************************/
-    void	addPushButtonProperties(void);
+    void	addPushButtonProperties( bool bCommon = true );
+protected:
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addPushButtonProperties(false); }
 };
 
 

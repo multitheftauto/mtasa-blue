@@ -830,14 +830,14 @@ ListboxItem* Listbox::getItemAtPoint(const Point& pt) const
 /*************************************************************************
 	Add list box specific events
 *************************************************************************/
-void Listbox::addListboxEvents(void)
+void Listbox::addListboxEvents(bool bCommon)
 {
-	addEvent(EventListContentsChanged);
-	addEvent(EventSelectionChanged);
-	addEvent(EventSortModeChanged);
-	addEvent(EventMultiselectModeChanged);
-	addEvent(EventVertScrollbarModeChanged);
-	addEvent(EventHorzScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventListContentsChanged);
+	if ( bCommon == false )	addEvent(EventSelectionChanged);
+	if ( bCommon == false )	addEvent(EventSortModeChanged);
+	if ( bCommon == false )	addEvent(EventMultiselectModeChanged);
+	if ( bCommon == false )	addEvent(EventVertScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventHorzScrollbarModeChanged);
 }
 
 
@@ -1116,13 +1116,13 @@ bool Listbox::isHorzScrollbarAlwaysShown(void) const
 /*************************************************************************
 	Add properties for this class
 *************************************************************************/
-void Listbox::addListboxProperties(void)
+void Listbox::addListboxProperties( bool bCommon )
 {
-	addProperty(&d_sortProperty);
-	addProperty(&d_multiSelectProperty);
-	addProperty(&d_forceHorzProperty);
-	addProperty(&d_forceVertProperty);
-	addProperty(&d_itemTooltipsProperty);
+	if ( bCommon == false )   addProperty(&d_sortProperty);
+	if ( bCommon == false )   addProperty(&d_multiSelectProperty);
+	if ( bCommon == false )   addProperty(&d_forceHorzProperty);
+	if ( bCommon == false )   addProperty(&d_forceVertProperty);
+	if ( bCommon == false )   addProperty(&d_itemTooltipsProperty);
 }
 
 

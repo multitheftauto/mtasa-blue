@@ -1757,7 +1757,7 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
                         if ( bPreRightShift != bState )
                         {
                             // If our actual rshift state is the same as bState
-                            if ( ( ( GetAsyncKeyState ( VK_RSHIFT ) ) ? true:false ) == bState )
+                            if ( ( ( GetAsyncKeyState ( VK_RSHIFT ) & 0x8000 ) ? true:false ) == bState )
                             {
                                 // Return the right-shift bindable instead
                                 return &g_bkKeys [ 10 ];
@@ -1956,8 +1956,8 @@ void CKeyBinds::DoPreFramePulse ( void )
     }
 
     // HACK: shift keys
-    bool bLeftShift = ( GetAsyncKeyState ( VK_LSHIFT ) != 0 );
-    bool bRightShift = ( GetAsyncKeyState ( VK_RSHIFT ) != 0 );
+    bool bLeftShift = ( GetAsyncKeyState ( VK_LSHIFT ) & 0x8000 ) != 0;
+    bool bRightShift = ( GetAsyncKeyState ( VK_RSHIFT ) & 0x8000 ) != 0;
 
     if ( bLeftShift != bPreLeftShift )
     {

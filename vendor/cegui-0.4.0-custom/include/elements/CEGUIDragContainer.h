@@ -253,8 +253,9 @@ namespace CEGUI
         \return
             Nothing.
         */
-        void addDragContainerEvents(void);
-
+        void addDragContainerEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addDragContainerEvents(false); }
+    
         /*!
         \brief
             Return whether the required minimum movement threshold before initiating dragging
@@ -463,7 +464,8 @@ namespace CEGUI
         \return
             Nothing.
         */
-        void addDragContainerProperties(void);
+        void addDragContainerProperties( bool bCommon = true );
+		void addUncommonProperties( void )							{ __super::addUncommonProperties(); addDragContainerProperties(false); }
     };
 
     /*!

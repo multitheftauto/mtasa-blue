@@ -315,7 +315,8 @@ protected:
 	\brief
 		Add scroll bar specific events
 	*/
-	void	addScrollbarEvents(void);
+	void	addScrollbarEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addScrollbarEvents(false); }
 
 
 	/*!
@@ -500,7 +501,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addScrollbarProperties(void);
+	void	addScrollbarProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addScrollbarProperties(false); }
 };
 
 

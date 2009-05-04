@@ -19,6 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include "SharedUtil.hpp"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;

@@ -123,7 +123,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
                 {
                     // Remember what the explosion looks like, so we can ignore it when the server sends it back
                     SIgnoreItem ignoreItem;
-                    ignoreItem.fExpireTime   = CClientTime::GetClientConnectSeconds () + 2.0f;
+                    ignoreItem.fExpireTime   = GetSecondCount () + 2.0f;
                     ignoreItem.vecPosition   = vecPosition;
                     ignoreItem.explosionType = explosionType;
                     m_IgnoreList.push_back( ignoreItem );
@@ -154,7 +154,7 @@ CExplosion * CClientExplosionManager::Create ( eExplosionType explosionType, CVe
         }
 
         // Item too old ?
-        if ( iter->fExpireTime < CClientTime::GetClientConnectSeconds () )
+        if ( iter->fExpireTime < GetSecondCount () )
         {
             iter = m_IgnoreList.erase ( iter );
             continue;

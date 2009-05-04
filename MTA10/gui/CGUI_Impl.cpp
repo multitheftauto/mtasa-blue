@@ -53,8 +53,12 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     m_pSchemeManager = CEGUI::SchemeManager::getSingletonPtr ();
     m_pWindowManager = CEGUI::WindowManager::getSingletonPtr ();
 
-	// Set logging to standard
-	CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Insane );
+	// Set logging to Informative for debug and Standard for release
+#if _DEBUG
+	CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
+#else
+	CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
+#endif
 	CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
 
 	// Load our fonts

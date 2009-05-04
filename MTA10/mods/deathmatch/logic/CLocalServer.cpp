@@ -126,6 +126,8 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
 CLocalServer::~CLocalServer ( void )
 {
+    if ( m_pConfig )
+        delete m_pConfig;
     delete m_pWindow;
 }
 
@@ -310,7 +312,7 @@ bool CLocalServer::Load ( void )
 
 bool CLocalServer::Save ( void )
 {
-    if ( m_pConfig )
+    if ( m_pConfig && m_pConfig->GetRootNode() )
     {
         StoreConfigValue ( "servername", ( m_pEditName->GetText().length() > 0 ) ? m_pEditName->GetText().c_str() : "MTA Local Server" );
         StoreConfigValue ( "maxplayers", ( atoi ( m_pEditPlayers->GetText().c_str() ) ) ? m_pEditPlayers->GetText().c_str() : "32" );

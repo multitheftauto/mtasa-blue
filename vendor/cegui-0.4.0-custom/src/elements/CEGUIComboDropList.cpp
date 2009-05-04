@@ -81,9 +81,9 @@ void ComboDropList::initialise(void)
 /*************************************************************************
 	Add drop-list specific events
 *************************************************************************/
-void ComboDropList::addComboDropListEvents(void)
+void ComboDropList::addComboDropListEvents(bool bCommon)
 {
-	addEvent(EventListSelectionAccepted);
+	if ( bCommon == true )	addEvent(EventListSelectionAccepted);
 }
 
 

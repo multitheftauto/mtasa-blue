@@ -208,9 +208,9 @@ void PushButton::setTextXOffset(float offset)
 /*************************************************************************
 	Add button specific events	
 *************************************************************************/
-void PushButton::addPushButtonEvents(void)
+void PushButton::addPushButtonEvents(bool bCommon)
 {
-	addEvent(EventClicked);
+	if ( bCommon == true )	addEvent(EventClicked);
 }
 
 
@@ -270,14 +270,14 @@ void PushButton::onSized(WindowEventArgs& e)
 
 }
 
-void PushButton::addPushButtonProperties(void)
+void PushButton::addPushButtonProperties( bool bCommon )
 {
-    addProperty(&d_normalImageProperty);
-    addProperty(&d_pushedImageProperty);
-    addProperty(&d_hoverImageProperty);
-    addProperty(&d_disabledImageProperty);
-    addProperty(&d_useStandardImageryProperty);
-    addProperty(&d_textXOffsetProperty);
+    if ( bCommon == true )   addProperty(&d_normalImageProperty);
+    if ( bCommon == true )   addProperty(&d_pushedImageProperty);
+    if ( bCommon == true )   addProperty(&d_hoverImageProperty);
+    if ( bCommon == false )   addProperty(&d_disabledImageProperty);
+    if ( bCommon == true )   addProperty(&d_useStandardImageryProperty);
+    if ( bCommon == false )   addProperty(&d_textXOffsetProperty);
 }
 
 } // End of  CEGUI namespace section

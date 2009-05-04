@@ -343,20 +343,20 @@ namespace CEGUI
         }
     }
 
-    void Tooltip::addTooltipEvents(void)
+    void Tooltip::addTooltipEvents(bool bCommon)
     {
-        addEvent(EventHoverTimeChanged);
-        addEvent(EventDisplayTimeChanged);
-        addEvent(EventFadeTimeChanged);
-        addEvent(EventTooltipActive);
-        addEvent(EventTooltipInactive);
+        if ( bCommon == false )	addEvent(EventHoverTimeChanged);
+        if ( bCommon == false )	addEvent(EventDisplayTimeChanged);
+        if ( bCommon == false )	addEvent(EventFadeTimeChanged);
+        if ( bCommon == false )	addEvent(EventTooltipActive);
+        if ( bCommon == false )	addEvent(EventTooltipInactive);
     }
 
-    void Tooltip::addTooltipProperties(void)
+    void Tooltip::addTooltipProperties( bool bCommon )
     {
-        addProperty(&d_hoverTimeProperty);
-        addProperty(&d_displayTimeProperty);
-        addProperty(&d_fadeTimeProperty);
+        if ( bCommon == false )   addProperty(&d_hoverTimeProperty);
+        if ( bCommon == false )   addProperty(&d_displayTimeProperty);
+        if ( bCommon == false )   addProperty(&d_fadeTimeProperty);
     }
 
     void Tooltip::onMouseEnters(MouseEventArgs& e)

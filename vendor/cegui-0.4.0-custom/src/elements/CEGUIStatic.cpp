@@ -402,21 +402,21 @@ void Static::setImageForFrameLocation(FrameLocation location, const Image* image
 /*************************************************************************
 	Adds properties for the static widget base class
 *************************************************************************/
-void Static::addStaticProperties(void)
+void Static::addStaticProperties( bool bCommon )
 {
-	addProperty(&d_frameEnabledProperty);
-	addProperty(&d_backgroundEnabledProperty);
-	addProperty(&d_frameColoursProperty);
-	addProperty(&d_backgroundColoursProperty);
-	addProperty(&d_backgroundImageProperty);
-	addProperty(&d_topLeftFrameProperty);
-	addProperty(&d_topRightFrameProperty);
-	addProperty(&d_bottomLeftFrameProperty);
-	addProperty(&d_bottomRightFrameProperty);
-	addProperty(&d_leftFrameProperty);
-	addProperty(&d_topFrameProperty);
-	addProperty(&d_rightFrameProperty);
-	addProperty(&d_bottomFrameProperty);
+	if ( bCommon == true )   addProperty(&d_frameEnabledProperty);
+	if ( bCommon == true )   addProperty(&d_backgroundEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_frameColoursProperty);
+	if ( bCommon == false )   addProperty(&d_backgroundColoursProperty);
+	if ( bCommon == false )   addProperty(&d_backgroundImageProperty);
+	if ( bCommon == false )   addProperty(&d_topLeftFrameProperty);
+	if ( bCommon == false )   addProperty(&d_topRightFrameProperty);
+	if ( bCommon == false )   addProperty(&d_bottomLeftFrameProperty);
+	if ( bCommon == false )   addProperty(&d_bottomRightFrameProperty);
+	if ( bCommon == false )   addProperty(&d_leftFrameProperty);
+	if ( bCommon == false )   addProperty(&d_topFrameProperty);
+	if ( bCommon == false )   addProperty(&d_rightFrameProperty);
+	if ( bCommon == false )   addProperty(&d_bottomFrameProperty);
 }
 
 } // End of  CEGUI namespace section

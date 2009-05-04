@@ -214,7 +214,6 @@ private:
         int				iRight;
         int				iBottom;
         unsigned long	ulColor;
-        //char*			szText;
 		float			fScaleX;
 		float			fScaleY;
 		unsigned long	ulFormat;

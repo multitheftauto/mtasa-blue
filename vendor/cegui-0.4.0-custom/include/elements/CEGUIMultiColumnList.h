@@ -1292,7 +1292,8 @@ protected:
 	\brief
 		Add multi column list box specific events
 	*/
-	void	addMultiColumnListboxEvents(void);
+	void	addMultiColumnListboxEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addMultiColumnListboxEvents(false); }
 
     // overridden from base class.
 	virtual	void populateRenderCache();
@@ -1594,7 +1595,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addMultiColumnListProperties(void);
+	void	addMultiColumnListProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addMultiColumnListProperties(false); }
 };
 
 } // End of  CEGUI namespace section

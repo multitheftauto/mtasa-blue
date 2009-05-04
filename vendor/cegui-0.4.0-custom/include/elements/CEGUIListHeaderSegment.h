@@ -228,7 +228,8 @@ protected:
 	\brief
 		Add list header segment specific events
 	*/
-	void	addHeaderSegmentEvents(void);
+	void	addHeaderSegmentEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addHeaderSegmentEvents(false); }
 
 
 	/*!
@@ -430,7 +431,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addHeaderSegmentProperties(void);
+	void	addHeaderSegmentProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addHeaderSegmentProperties(false); }
 };
 
 } // End of  CEGUI namespace section

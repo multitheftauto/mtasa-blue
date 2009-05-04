@@ -149,7 +149,8 @@ protected:
 	\brief
 		Add drop-list specific events
 	*/
-	void	addComboDropListEvents(void);
+	void	addComboDropListEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addComboDropListEvents(false); }
 
 
 	/*!

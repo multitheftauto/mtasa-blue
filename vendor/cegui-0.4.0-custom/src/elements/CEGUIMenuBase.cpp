@@ -112,10 +112,10 @@ void MenuBase::changePopupMenuItem(MenuItem* item)
 /*************************************************************************
 	Add MenuBase specific events	
 *************************************************************************/
-void MenuBase::addMenuBaseEvents(void)
+void MenuBase::addMenuBaseEvents(bool bCommon)
 {
-	addEvent(EventPopupOpened);
-	addEvent(EventPopupClosed);
+	if ( bCommon == false )	addEvent(EventPopupOpened);
+	if ( bCommon == false )	addEvent(EventPopupClosed);
 }
 
 
@@ -139,14 +139,14 @@ void MenuBase::onPopupClosed(WindowEventArgs& e)
 }
 
 
-void MenuBase::addMenuBaseProperties(void)
+void MenuBase::addMenuBaseProperties( bool bCommon )
 {
-	addProperty(&d_itemSpacingProperty);
-    addProperty(&d_horzPaddingProperty);
-    addProperty(&d_vertPaddingProperty);
-    addProperty(&d_borderWidthProperty);
-    addProperty(&d_backgroundColoursProperty);
-    addProperty(&d_allowMultiplePopupsProperty);
+	if ( bCommon == false )   addProperty(&d_itemSpacingProperty);
+    if ( bCommon == false )   addProperty(&d_horzPaddingProperty);
+    if ( bCommon == false )   addProperty(&d_vertPaddingProperty);
+    if ( bCommon == false )   addProperty(&d_borderWidthProperty);
+    if ( bCommon == false )   addProperty(&d_backgroundColoursProperty);
+    if ( bCommon == false )   addProperty(&d_allowMultiplePopupsProperty);
 }
 
 } // End of  CEGUI namespace section

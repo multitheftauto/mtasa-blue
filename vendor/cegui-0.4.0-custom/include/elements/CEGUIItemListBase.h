@@ -339,7 +339,8 @@ protected:
 	\brief
 		Add list box specific events
 	*/
-	void	addItemListBaseEvents(void);
+	void	addItemListBaseEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addItemListBaseEvents(false); }
 
 
 	/*!
@@ -407,8 +408,10 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addItemListBaseProperties(void);
-
+	void	addItemListBaseProperties( bool bCommon = true );
+protected:
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addItemListBaseProperties(false); }
+private:
 
 	/*!
 	\brief

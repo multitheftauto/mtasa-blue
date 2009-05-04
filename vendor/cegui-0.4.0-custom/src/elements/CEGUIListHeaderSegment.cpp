@@ -168,18 +168,18 @@ void ListHeaderSegment::setClickable(bool setting)
 /*************************************************************************
 	Add list header segment specific events
 *************************************************************************/
-void ListHeaderSegment::addHeaderSegmentEvents(void)
+void ListHeaderSegment::addHeaderSegmentEvents(bool bCommon)
 {
-	addEvent(EventSortDirectionChanged);
-	addEvent(EventSizingSettingChanged);
-	addEvent(EventSplitterDoubleClicked);
-	addEvent(EventSegmentClicked);
-	addEvent(EventSegmentDragStart);
-	addEvent(EventSegmentDragStop);
-	addEvent(EventSegmentDragPositionChanged);
-	addEvent(EventMovableSettingChanged);
-	addEvent(EventSegmentSized);
-	addEvent(EventClickableSettingChanged);
+	if ( bCommon == true )	addEvent(EventSortDirectionChanged);
+	if ( bCommon == false )	addEvent(EventSizingSettingChanged);
+	if ( bCommon == true )	addEvent(EventSplitterDoubleClicked);
+	if ( bCommon == true )	addEvent(EventSegmentClicked);
+	if ( bCommon == false )	addEvent(EventSegmentDragStart);
+	if ( bCommon == true )	addEvent(EventSegmentDragStop);
+	if ( bCommon == true )	addEvent(EventSegmentDragPositionChanged);
+	if ( bCommon == false )	addEvent(EventMovableSettingChanged);
+	if ( bCommon == true )	addEvent(EventSegmentSized);
+	if ( bCommon == false )	addEvent(EventClickableSettingChanged);
 }
 
 
@@ -645,12 +645,12 @@ void ListHeaderSegment::onCaptureLost(WindowEventArgs& e)
 /*************************************************************************
 	adds properties for the class
 *************************************************************************/
-void ListHeaderSegment::addHeaderSegmentProperties(void)
+void ListHeaderSegment::addHeaderSegmentProperties( bool bCommon )
 {
-	addProperty(&d_clickableProperty);
-	addProperty(&d_sizableProperty);
-	addProperty(&d_dragableProperty);
-	addProperty(&d_sortDirectionProperty);
+	if ( bCommon == false )   addProperty(&d_clickableProperty);
+	if ( bCommon == false )   addProperty(&d_sizableProperty);
+	if ( bCommon == false )   addProperty(&d_dragableProperty);
+	if ( bCommon == false )   addProperty(&d_sortDirectionProperty);
 }
 
 

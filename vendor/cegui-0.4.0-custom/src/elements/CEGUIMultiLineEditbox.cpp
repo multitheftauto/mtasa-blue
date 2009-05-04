@@ -179,16 +179,16 @@ size_t MultiLineEditbox::getSelectionLength(void) const
 /*************************************************************************
 	Add multi-line edit box specific events	
 *************************************************************************/
-void MultiLineEditbox::addMultiLineEditboxEvents(void)
+void MultiLineEditbox::addMultiLineEditboxEvents(bool bCommon)
 {
-	addEvent(EventReadOnlyModeChanged);
-	addEvent(EventWordWrapModeChanged);
-	addEvent(EventMaximumTextLengthChanged);
-	addEvent(EventCaratMoved);
-	addEvent(EventTextSelectionChanged);
-	addEvent(EventEditboxFull);
-	addEvent(EventVertScrollbarModeChanged);
-	addEvent(EventHorzScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventReadOnlyModeChanged);
+	if ( bCommon == false )	addEvent(EventWordWrapModeChanged);
+	if ( bCommon == false )	addEvent(EventMaximumTextLengthChanged);
+	if ( bCommon == false )	addEvent(EventCaratMoved);
+	if ( bCommon == false )	addEvent(EventTextSelectionChanged);
+	if ( bCommon == false )	addEvent(EventEditboxFull);
+	if ( bCommon == false )	addEvent(EventVertScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventHorzScrollbarModeChanged);
 }
 
 
@@ -1643,18 +1643,18 @@ bool MultiLineEditbox::isWordWrapped(void) const
 /*************************************************************************
 	Add new properties for this class
 *************************************************************************/
-void MultiLineEditbox::addMultiLineEditboxProperties(void)
+void MultiLineEditbox::addMultiLineEditboxProperties( bool bCommon )
 {
-	addProperty(&d_readOnlyProperty);
-	addProperty(&d_wordWrapProperty);
-	addProperty(&d_caratIndexProperty);
-	addProperty(&d_selectionStartProperty);
-	addProperty(&d_selectionLengthProperty);
-	addProperty(&d_maxTextLengthProperty);
-	addProperty(&d_normalTextColourProperty);
-	addProperty(&d_selectedTextColourProperty);
-	addProperty(&d_activeSelectionColourProperty);
-	addProperty(&d_inactiveSelectionColourProperty);
+	if ( bCommon == true )   addProperty(&d_readOnlyProperty);
+	if ( bCommon == false )   addProperty(&d_wordWrapProperty);
+	if ( bCommon == false )   addProperty(&d_caratIndexProperty);
+	if ( bCommon == false )   addProperty(&d_selectionStartProperty);
+	if ( bCommon == false )   addProperty(&d_selectionLengthProperty);
+	if ( bCommon == false )   addProperty(&d_maxTextLengthProperty);
+	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_selectedTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_activeSelectionColourProperty);
+	if ( bCommon == true )   addProperty(&d_inactiveSelectionColourProperty);
 }
 
 /*************************************************************************
