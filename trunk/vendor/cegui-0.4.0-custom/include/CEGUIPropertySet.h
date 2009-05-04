@@ -52,7 +52,7 @@ public:
 	\brief
 		Constructs a new PropertySet object
 	*/
-	PropertySet(void) {}
+	PropertySet(void) : d_addedUncommonProperties(false) {}
 
 
 	/*!
@@ -193,8 +193,14 @@ private:
 	typedef std::map<String, Property*>	PropertyRegistry;
 	PropertyRegistry	d_properties;
 
-
+    bool                    d_addedUncommonProperties;
+    void                    maybeAddUncommonProperties( const String& name ) const;
+    void                    maybeAddUncommonProperties( const String& name );
 public:
+    virtual void	        addUncommonProperties( void )							{}
+	virtual const String&   getType(void) const  = 0;
+
+
 	/*************************************************************************
 		Iterator stuff
 	*************************************************************************/

@@ -109,9 +109,9 @@ void RadioButton::setGroupID(ulong group)
 /*************************************************************************
 	Add radio button specific events	
 *************************************************************************/
-void RadioButton::addRadioButtonEvents(void)
+void RadioButton::addRadioButtonEvents(bool bCommon)
 {
-	addEvent(EventSelectStateChanged);
+	if ( bCommon == true )	addEvent(EventSelectStateChanged);
 }
 
 
@@ -226,10 +226,10 @@ RadioButton* RadioButton::getSelectedButtonInGroup(void) const
 /*************************************************************************
 	Add properties for radio button
 *************************************************************************/
-void RadioButton::addRadioButtonProperties(void)
+void RadioButton::addRadioButtonProperties( bool bCommon )
 {
-	addProperty(&d_selectedProperty);
-	addProperty(&d_groupIDProperty);
+	if ( bCommon == false )   addProperty(&d_selectedProperty);
+	if ( bCommon == false )   addProperty(&d_groupIDProperty);
 }
 
 

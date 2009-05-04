@@ -142,11 +142,11 @@ void Thumb::setHorzRange(float min, float max)
 /*************************************************************************
 	Add thumb specific events	
 *************************************************************************/
-void Thumb::addThumbEvents(void)
+void Thumb::addThumbEvents(bool bCommon)
 {
-	addEvent(EventThumbPositionChanged);
-	addEvent(EventThumbTrackStarted);
-	addEvent(EventThumbTrackEnded);
+	if ( bCommon == true )	addEvent(EventThumbPositionChanged);
+	if ( bCommon == true )	addEvent(EventThumbTrackStarted);
+	if ( bCommon == true )	addEvent(EventThumbTrackEnded);
 }
 
 
@@ -331,13 +331,13 @@ std::pair<float, float>	Thumb::getHorzRange(void) const
 /*************************************************************************
 	Add thumb specifiec properties
 *************************************************************************/
-void Thumb::addThumbProperties(void)
+void Thumb::addThumbProperties( bool bCommon )
 {
-	addProperty(&d_hotTrackedProperty);
-	addProperty(&d_vertFreeProperty);
-	addProperty(&d_horzFreeProperty);
-	addProperty(&d_vertRangeProperty);
-	addProperty(&d_horzRangeProperty);
+	if ( bCommon == false )   addProperty(&d_hotTrackedProperty);
+	if ( bCommon == true )   addProperty(&d_vertFreeProperty);
+	if ( bCommon == true )   addProperty(&d_horzFreeProperty);
+	if ( bCommon == false )   addProperty(&d_vertRangeProperty);
+	if ( bCommon == false )   addProperty(&d_horzRangeProperty);
 }
 
 

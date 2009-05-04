@@ -3885,7 +3885,8 @@ protected:
 	\brief
 		Add standard CEGUI::Window events
 	*/
-	void	addStandardEvents(void);
+	void	addStandardEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addStandardEvents(false); }
 
 	/*!
 	\brief
@@ -3916,7 +3917,8 @@ protected:
 	\brief
 		Add standard CEGUI::Window properties.
 	*/
-	void	addStandardProperties(void);
+	void	addStandardProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addStandardProperties(false); }
 
 
     /*!

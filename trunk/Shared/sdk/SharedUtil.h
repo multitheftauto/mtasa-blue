@@ -35,43 +35,29 @@ namespace SharedUtil
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
-    static SString GetMTASABaseDir()
-    {
-	#ifdef WIN32
-        static TCHAR szInstallRoot[MAX_PATH]=TEXT("");
-        if( !szInstallRoot[0] )
-        {
-            memset ( szInstallRoot, 0, MAX_PATH );
-
-            HKEY hkey = NULL;
-            DWORD dwBufferSize = MAX_PATH;
-            DWORD dwType = 0;
-            if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
-            {
-                // Read out the MTA installpath
-                if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-                    strlen ( szInstallRoot ) == 0 )
-                {
-                    MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
-                    RegCloseKey ( hkey );
-                    TerminateProcess ( GetCurrentProcess (), 9 );
-                }
-                RegCloseKey ( hkey );
-            }
-        }
-        return szInstallRoot;
-	#endif
-    }
+    SString GetMTASABaseDir();
 
     //
     // Turns a relative MTASA path i.e. "MTA\file.dat"
     // into an absolute MTASA path i.e. "C:\Program Files\MTA San Andreas\MTA\file.dat"
     //
-    static SString CalcMTASAPath ( const SString& strPath )
-    {
-        SString strNewPath = GetMTASABaseDir();
-        strNewPath += '\\';
-        strNewPath += strPath;
-        return strNewPath;
-    }
+    SString CalcMTASAPath ( const SString& strPath );
+
+    //
+    // Retrieves the number of milliseconds that have elapsed since the system was started.
+    //
+    // GetTickCount64() exists on Vista and up and is like GetTickCount() except it returns
+    // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
+    // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
+    // 
+    long long GetTickCount64_ ( void );
+
+    //
+    // Retrieves the number of seconds that have elapsed since the system was started.
+    //
+    double GetSecondCount ( void );
+
 };
+
+using namespace SharedUtil;
+

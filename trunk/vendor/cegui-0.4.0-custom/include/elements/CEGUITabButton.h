@@ -142,7 +142,8 @@ protected:
 	\brief
 		Add button specific events
 	*/
-	void	addTabButtonEvents(void);
+	void	addTabButtonEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addTabButtonEvents(false); }
 	/*!
 	\brief
 		Perform the rendering for this widget.

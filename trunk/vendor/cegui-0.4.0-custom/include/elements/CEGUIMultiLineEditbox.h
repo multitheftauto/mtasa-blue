@@ -441,7 +441,8 @@ public:
 	\brief
 		Add multi-line edit box specific events
 	*/
-	void	addMultiLineEditboxEvents(void);
+	void	addMultiLineEditboxEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addMultiLineEditboxEvents(false); }
 
 
 	/*!
@@ -781,7 +782,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addMultiLineEditboxProperties(void);
+	void	addMultiLineEditboxProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addMultiLineEditboxProperties(false); }
 };
 
 } // End of  CEGUI namespace section

@@ -61,9 +61,9 @@ TabButton::~TabButton(void)
 /*************************************************************************
 	Add button specific events	
 *************************************************************************/
-void TabButton::addTabButtonEvents(void)
+void TabButton::addTabButtonEvents(bool bCommon)
 {
-	addEvent(EventClicked);
+	if ( bCommon == true )	addEvent(EventClicked);
 }
 
 

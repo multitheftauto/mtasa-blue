@@ -280,9 +280,9 @@ void ItemListBase::handleUpdatedItemData(void)
 /*************************************************************************
 	Add list box specific events
 *************************************************************************/
-void ItemListBase::addItemListBaseEvents(void)
+void ItemListBase::addItemListBaseEvents(bool bCommon)
 {
-	addEvent(EventListContentsChanged);
+	if ( bCommon == false )	addEvent(EventListContentsChanged);
 }
 
 
@@ -350,9 +350,9 @@ bool ItemListBase::resetList_impl(void)
 /*************************************************************************
 	Add ItemListBase specific properties
 *************************************************************************/
-void ItemListBase::addItemListBaseProperties(void)
+void ItemListBase::addItemListBaseProperties( bool bCommon )
 {
-    addProperty(&d_autoResizeEnabledProperty);
+    if ( bCommon == false )   addProperty(&d_autoResizeEnabledProperty);
 }
 
 

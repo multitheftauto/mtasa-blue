@@ -1315,14 +1315,19 @@ void MultiColumnList::setColumnHeaderWidth(uint col_idx, float width, bool relat
 /*************************************************************************
 	Add multi column list box specific events	
 *************************************************************************/
-void MultiColumnList::addMultiColumnListboxEvents(void)
+void MultiColumnList::addMultiColumnListboxEvents(bool bCommon)
 {
-	addEvent(EventSelectionModeChanged);			addEvent(EventNominatedSelectColumnChanged);
-	addEvent(EventNominatedSelectRowChanged);		addEvent(EventVertScrollbarModeChanged);
-	addEvent(EventHorzScrollbarModeChanged);		addEvent(EventSelectionChanged);
-	addEvent(EventListContentsChanged);				addEvent(EventSortColumnChanged);
-	addEvent(EventSortDirectionChanged);			addEvent(EventListColumnMoved);
-	addEvent(EventListColumnSized);
+	if ( bCommon == false )	addEvent(EventSelectionModeChanged);
+	if ( bCommon == false )	addEvent(EventNominatedSelectColumnChanged);
+	if ( bCommon == false )	addEvent(EventNominatedSelectRowChanged);
+	if ( bCommon == false )	addEvent(EventVertScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventHorzScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventSelectionChanged);
+	if ( bCommon == false )	addEvent(EventListContentsChanged);
+	if ( bCommon == true )	addEvent(EventSortColumnChanged);
+	if ( bCommon == true )	addEvent(EventSortDirectionChanged);
+	if ( bCommon == false )	addEvent(EventListColumnMoved);
+	if ( bCommon == false )	addEvent(EventListColumnSized);
 }
 
 
@@ -2285,20 +2290,20 @@ bool MultiColumnList::isHorzScrollbarAlwaysShown(void) const
 /*************************************************************************
 	Adds properties for MCL
 *************************************************************************/
-void MultiColumnList::addMultiColumnListProperties(void)
+void MultiColumnList::addMultiColumnListProperties( bool bCommon )
 {
-	addProperty(&d_columnsSizableProperty);
-	addProperty(&d_columnsMovableProperty);
-	addProperty(&d_forceHorzScrollProperty);
-	addProperty(&d_forceVertScrollProperty);
-	addProperty(&d_nominatedSelectColProperty);
-	addProperty(&d_nominatedSelectRowProperty);
-	addProperty(&d_selectModeProperty);
-	addProperty(&d_sortColumnIDProperty);
-	addProperty(&d_sortDirectionProperty);
-	addProperty(&d_sortSettingProperty);
-	addProperty(&d_columnHeaderProperty);
-	addProperty(&d_rowCountProperty);
+	if ( bCommon == false )   addProperty(&d_columnsSizableProperty);
+	if ( bCommon == false )   addProperty(&d_columnsMovableProperty);
+	if ( bCommon == false )   addProperty(&d_forceHorzScrollProperty);
+	if ( bCommon == false )   addProperty(&d_forceVertScrollProperty);
+	if ( bCommon == false )   addProperty(&d_nominatedSelectColProperty);
+	if ( bCommon == false )   addProperty(&d_nominatedSelectRowProperty);
+	if ( bCommon == false )   addProperty(&d_selectModeProperty);
+	if ( bCommon == false )   addProperty(&d_sortColumnIDProperty);
+	if ( bCommon == false )   addProperty(&d_sortDirectionProperty);
+	if ( bCommon == false )   addProperty(&d_sortSettingProperty);
+	if ( bCommon == false )   addProperty(&d_columnHeaderProperty);
+	if ( bCommon == false )   addProperty(&d_rowCountProperty);
 }
 
 

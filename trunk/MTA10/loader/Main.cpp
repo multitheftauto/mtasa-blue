@@ -160,7 +160,7 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
     char szRegBuffer[MAX_PATH];
     ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szRegBuffer, MAX_PATH - 1 );
 
-    if ( GetAsyncKeyState ( VK_CONTROL ) == 0 )
+    if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
         if ( strlen( szRegBuffer ) )
         {
@@ -387,8 +387,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
 
-    // Check if the core can be loaded - failure may mean msvcr90.dll etc is not installed
-    // http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2
+    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( szCoreDLL );
     if ( hCoreModule == NULL )
     {
@@ -396,7 +395,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             DestroyWindow ( hwndSplash );
         MessageBox( NULL, "Load failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "is correctly installed.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+                            "and the latest DirectX is correctly installed.", "Error!", MB_ICONEXCLAMATION|MB_OK );
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;

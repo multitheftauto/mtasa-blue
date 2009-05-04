@@ -95,10 +95,10 @@ void ProgressBar::setProgress(float progress)
 /*************************************************************************
 	Add progress bar specific events to the window	
 *************************************************************************/
-void ProgressBar::addProgressBarEvents(void)
+void ProgressBar::addProgressBarEvents(bool bCommon)
 {
-	addEvent(EventProgressChanged);
-	addEvent(EventProgressDone);
+	if ( bCommon == false )	addEvent(EventProgressChanged);
+	if ( bCommon == false )	addEvent(EventProgressDone);
 }
 
 /*************************************************************************
@@ -123,10 +123,10 @@ void ProgressBar::onProgressDone(WindowEventArgs& e)
 /*************************************************************************
 	add properties defined for this class
 *************************************************************************/
-void ProgressBar::addProgressBarProperties(void)
+void ProgressBar::addProgressBarProperties( bool bCommon )
 {
-	addProperty(&d_stepSizeProperty);
-	addProperty(&d_currentProgressProperty);
+	if ( bCommon == false )   addProperty(&d_stepSizeProperty);
+	if ( bCommon == false )   addProperty(&d_currentProgressProperty);
 }
 
 

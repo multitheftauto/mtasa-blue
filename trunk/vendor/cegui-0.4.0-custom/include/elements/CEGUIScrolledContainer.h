@@ -140,7 +140,8 @@ namespace CEGUI
         \brief
             Adds events for this widget type.
         */
-        void addScrolledContainerEvents(void);
+        void addScrolledContainerEvents(bool bCommon=true);
+	    void addUncommonEvents( void )							{ __super::addUncommonEvents(); addScrolledContainerEvents(false); }
 
 
 		/*!
@@ -234,7 +235,8 @@ namespace CEGUI
 	    /*************************************************************************
 		    Private methods
 	    *************************************************************************/
-	    void addScrolledContainerProperties(void);
+	    void addScrolledContainerProperties( bool bCommon = true );
+		void addUncommonProperties( void )							{ __super::addUncommonProperties(); addScrolledContainerProperties(false); }
     };
 
     /*!

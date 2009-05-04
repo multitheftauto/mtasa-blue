@@ -36,21 +36,6 @@ unsigned long CClientTime::GetTime ( void )
     }
 }
 
-// Retrieve the number of seconds the client has been connected to the current server
-double CClientTime::GetClientConnectSeconds ( void )
-{
-    static double dCount = 0;
-    static DWORD dwWas = GetTickCount ();
-    DWORD dwNow = GetTickCount ();
-    DWORD dwDelta = dwNow - dwWas;
-    dwWas = dwNow;
-
-    if( dwDelta < 0x40000000 )      // Avoid negative leaps
-        dCount += dwDelta * 0.001;  // Accumulate delta
-    return dCount;
-}
-
-
 double CClientTime::GetTimeNano ( void )
 {
     // Use the performance counter if initialize succeeded to initiate using it
@@ -79,9 +64,6 @@ double CClientTime::GetTimeNano ( void )
 
 bool CClientTime::InitializeTime ( void )
 {
-    // First call to GetClientConnectSeconds() sets the base time
-    CClientTime::GetClientConnectSeconds();
-
 	#pragma message(__LOC__"Add protection for SMP (dual-core) fucking up here. It's really not hard.")
 
     // Try to initialize using the performance counter

@@ -573,10 +573,10 @@ void FrameWindow::moveBottomEdge(float delta)
 /*************************************************************************
 	Add frame window specific events	
 *************************************************************************/
-void FrameWindow::addFrameWindowEvents(void)
+void FrameWindow::addFrameWindowEvents(bool bCommon)
 {
-	addEvent(EventRollupToggled);
-	addEvent(EventCloseClicked);
+	if ( bCommon == false )	addEvent(EventRollupToggled);
+	if ( bCommon == true )	addEvent(EventCloseClicked);
 }
 
 
@@ -858,22 +858,22 @@ const Font* FrameWindow::getTitlebarFont(void) const
 /*************************************************************************
 	Add properties for this class
 *************************************************************************/
-void FrameWindow::addFrameWindowProperties(void)
+void FrameWindow::addFrameWindowProperties( bool bCommon )
 {
-	addProperty(&d_sizingEnabledProperty);
-	addProperty(&d_frameEnabledProperty);
-	addProperty(&d_titlebarEnabledProperty);
-	addProperty(&d_closeButtonEnabledProperty);
-	addProperty(&d_rollUpEnabledProperty);
-	addProperty(&d_rollUpStateProperty);
-	addProperty(&d_dragMovingEnabledProperty);
-	addProperty(&d_sizingBorderThicknessProperty);
-	addProperty(&d_titlebarFontProperty);
-	addProperty(&d_captionColourProperty);
-    addProperty(&d_nsSizingCursorProperty);
-    addProperty(&d_ewSizingCursorProperty);
-    addProperty(&d_nwseSizingCursorProperty);
-    addProperty(&d_neswSizingCursorProperty);
+	if ( bCommon == false )   addProperty(&d_sizingEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_frameEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_titlebarEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_closeButtonEnabledProperty);
+	if ( bCommon == true )   addProperty(&d_rollUpEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_rollUpStateProperty);
+	if ( bCommon == false )   addProperty(&d_dragMovingEnabledProperty);
+	if ( bCommon == false )   addProperty(&d_sizingBorderThicknessProperty);
+	if ( bCommon == false )   addProperty(&d_titlebarFontProperty);
+	if ( bCommon == false )   addProperty(&d_captionColourProperty);
+    if ( bCommon == true )   addProperty(&d_nsSizingCursorProperty);
+    if ( bCommon == true )   addProperty(&d_ewSizingCursorProperty);
+    if ( bCommon == true )   addProperty(&d_nwseSizingCursorProperty);
+    if ( bCommon == true )   addProperty(&d_neswSizingCursorProperty);
 }
 
 

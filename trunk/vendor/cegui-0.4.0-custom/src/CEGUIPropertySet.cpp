@@ -88,7 +88,12 @@ const String& PropertySet::getPropertyHelp(const String& name) const
 
 	if (pos == d_properties.end())
 	{
-		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
+        // See if we should initialize all properties for this instance
+        maybeAddUncommonProperties ( name );
+        // Re-check for match
+        pos = d_properties.find ( name );
+	    if ( pos == d_properties.end () )
+    		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
 	}
 
 	return pos->second->getHelp();
@@ -103,7 +108,12 @@ String PropertySet::getProperty(const String& name) const
 
 	if (pos == d_properties.end())
 	{
-		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
+        // See if we should initialize all properties for this instance
+        maybeAddUncommonProperties ( name );
+        // Re-check for match
+        pos = d_properties.find ( name );
+	    if ( pos == d_properties.end () )
+		    throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
 	}
 
 	return pos->second->get(this);
@@ -118,7 +128,13 @@ void PropertySet::setProperty(const String& name,const String& value)
 
 	if (pos == d_properties.end())
 	{
-		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
+        // See if we should initialize all properties for this instance
+        maybeAddUncommonProperties ( name );
+        // Re-check for match
+        pos = d_properties.find ( name );
+	    if ( pos == d_properties.end () )
+            return;
+//		    throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
 	}
 
 	pos->second->set(this, value);
@@ -131,6 +147,7 @@ void PropertySet::setProperty(const String& name,const String& value)
 *************************************************************************/
 PropertySet::PropertyIterator PropertySet::getIterator(void) const
 {
+	maybeAddUncommonProperties ( "getIterator" );
 	return PropertyIterator(d_properties.begin(), d_properties.end());
 }
 
@@ -144,7 +161,12 @@ bool PropertySet::isPropertyDefault(const String& name) const
 
 	if (pos == d_properties.end())
 	{
-		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
+        // See if we should initialize all properties for this instance
+        maybeAddUncommonProperties ( name );
+        // Re-check for match
+        pos = d_properties.find ( name );
+	    if ( pos == d_properties.end () )
+    		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
 	}
 
 	return pos->second->isDefault(this);
@@ -160,10 +182,65 @@ String PropertySet::getPropertyDefault(const String& name) const
 
 	if (pos == d_properties.end())
 	{
-		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
+        // See if we should initialize all properties for this instance
+        maybeAddUncommonProperties ( name );
+        // Re-check for match
+        pos = d_properties.find ( name );
+	    if ( pos == d_properties.end () )
+    		throw UnknownObjectException((utf8*)"There is no Property named '" + name + (utf8*)"' available in the set.");
 	}
 
 	return pos->second->getDefault(this);
 }
+
+
+namespace
+{
+    // Global to store list of unknown properties
+    std::map < String, int >    g_UnknownPropertiesMap;
+}
+
+/*************************************************************************
+	Try to find a propery.	
+*************************************************************************/
+void PropertySet::maybeAddUncommonProperties ( const String& name ) const
+{
+    // Const cast hack
+    const_cast < PropertySet* > ( this )->maybeAddUncommonProperties ( name );
+}
+
+/*************************************************************************
+	Try to find a propery.	
+*************************************************************************/
+void PropertySet::maybeAddUncommonProperties ( const String& name )
+{
+    if ( g_UnknownPropertiesMap.find( getType () + name ) != g_UnknownPropertiesMap.end () )
+    {
+        // Early out on unknown type/property combo
+        Logger::getSingleton ().logEvent( SString ( "** Early out on unknown property %s-%s", getType ().c_str (), name.c_str () ), Informative);
+        return;
+    }
+
+    if ( !d_addedUncommonProperties )
+    {
+        // Add uncommon properties for this object, to find missing property 'name'
+        Logger::getSingleton ().logEvent ( SString ( "** Adding uncommon properties for a %s, to find missing property %s", getType ().c_str (), name.c_str() ), Informative);
+        d_addedUncommonProperties = true;
+        addUncommonProperties ();
+
+        // See if property there now
+        if ( d_properties.find ( name ) != d_properties.end () )
+        {
+            return;
+        }
+    }
+
+    // Add type / name to unknown properties list
+    g_UnknownPropertiesMap[ getType() + name ] = 1;
+    Logger::getSingleton ().logEvent ( SString ( "** Unknown property %s-%s", getType ().c_str (), name.c_str () ), Informative);
+    return;
+}
+
+
 
 } // End of  CEGUI namespace section

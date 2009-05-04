@@ -313,7 +313,8 @@ protected:
 	\brief
 		Add tab control specific events
 	*/
-	void	addTabControlEvents(void);
+	void	addTabControlEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addTabControlEvents(false); }
 
     /*!
     \brief
@@ -455,7 +456,8 @@ protected:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addTabControlProperties(void);
+	void	addTabControlProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addTabControlProperties(false); }
 
     void    addChild_impl(Window* wnd);
     void    removeChild_impl(Window* wnd);

@@ -16,6 +16,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#include "SharedUtil.hpp"
 
 CCoreInterface* g_pCore = NULL;
 CGame* g_pGame = NULL;

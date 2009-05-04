@@ -53,7 +53,6 @@ bool            IsNumericString             ( const char* szString, size_t sizeS
 unsigned int    HashString                  ( const char* szString );
 
 void            InitializeTime              ( void );
-double          GetServerUpSeconds          ( void );
 
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );

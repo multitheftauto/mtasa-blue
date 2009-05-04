@@ -235,7 +235,8 @@ protected:
 	\brief
 		Add MenuBase specific events
 	*/
-	void	addMenuBaseEvents(void);
+	void	addMenuBaseEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addMenuBaseEvents(false); }
 
 
 	/*!
@@ -283,7 +284,9 @@ private:
 	/*************************************************************************
 	Private methods
 	*************************************************************************/
-	void	addMenuBaseProperties(void);
+	void	addMenuBaseProperties( bool bCommon = true );
+protected:
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addMenuBaseProperties(false); }
 };
 
 } // End of  CEGUI namespace section

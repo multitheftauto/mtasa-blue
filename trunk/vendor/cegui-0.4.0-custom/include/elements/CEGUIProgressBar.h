@@ -154,7 +154,8 @@ protected:
 	\brief
 		Add progress bar specific events to the window
 	*/
-	void	addProgressBarEvents(void);
+	void	addProgressBarEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addProgressBarEvents(false); }
 
 
 	/*!
@@ -209,7 +210,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addProgressBarProperties(void);
+	void	addProgressBarProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addProgressBarProperties(false); }
 };
 
 

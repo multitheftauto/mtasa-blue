@@ -121,11 +121,11 @@ Size TextItem::getItemPixelSize()
 /*************************************************************************
 	Add TextItem specific properties
 *************************************************************************/
-void TextItem::addTextItemProperties(void)
+void TextItem::addTextItemProperties( bool bCommon )
 {
-	addProperty(&d_textColourProperty);
-	addProperty(&d_textFormattingProperty);
-	addProperty(&d_textXOffsetProperty);
+	if ( bCommon == false )   addProperty(&d_textColourProperty);
+	if ( bCommon == false )   addProperty(&d_textFormattingProperty);
+	if ( bCommon == false )   addProperty(&d_textXOffsetProperty);
 }
 
 } // End of  CEGUI namespace section

@@ -662,7 +662,8 @@ protected:
 	\brief
 		Add frame window specific events
 	*/
-	void	addFrameWindowEvents(void);
+	void	addFrameWindowEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addFrameWindowEvents(false); }
 
 
 	/*!
@@ -785,7 +786,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addFrameWindowProperties(void);
+	void	addFrameWindowProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addFrameWindowProperties(false); }
 };
 
 } // End of  CEGUI namespace section

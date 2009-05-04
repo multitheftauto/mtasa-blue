@@ -359,9 +359,9 @@ void MenuItem::closeAllMenuItemPopups()
 /*************************************************************************
 	Add menuitem specific events	
 *************************************************************************/
-void MenuItem::addMenuItemEvents(void)
+void MenuItem::addMenuItemEvents(bool bCommon)
 {
-	addEvent(EventClicked);
+	if ( bCommon == true )	addEvent(EventClicked);
 }
 
 
@@ -501,13 +501,13 @@ void MenuItem::addChild_impl(Window* wnd)
 /*************************************************************************
 	Add MenuItem specific properties
 *************************************************************************/
-void MenuItem::addMenuItemProperties(void)
+void MenuItem::addMenuItemProperties( bool bCommon )
 {
-	addProperty(&d_hoverColourProperty);
-	addProperty(&d_pushedColourProperty);
-	addProperty(&d_openedColourProperty);
-	addProperty(&d_normalTextColourProperty);
-	addProperty(&d_disabledTextColourProperty);
+	if ( bCommon == false )   addProperty(&d_hoverColourProperty);
+	if ( bCommon == false )   addProperty(&d_pushedColourProperty);
+	if ( bCommon == false )   addProperty(&d_openedColourProperty);
+	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_disabledTextColourProperty);
 }
 
 } // End of  CEGUI namespace section

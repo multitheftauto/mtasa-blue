@@ -123,17 +123,17 @@ void Checkbox::onMouseButtonUp(MouseEventArgs& e)
 /*************************************************************************
 	Add check-box specific events
 *************************************************************************/
-void Checkbox::addCheckboxEvents(void)
+void Checkbox::addCheckboxEvents(bool bCommon)
 {
-	addEvent(EventCheckStateChanged);
+	if ( bCommon == true )	addEvent(EventCheckStateChanged);
 }
 
 /*************************************************************************
 	Add properties
 *************************************************************************/
-void Checkbox::addCheckboxProperties(void)
+void Checkbox::addCheckboxProperties( bool bCommon )
 {
-	addProperty(&d_selectedProperty);
+	if ( bCommon == false )   addProperty(&d_selectedProperty);
 }
 
 

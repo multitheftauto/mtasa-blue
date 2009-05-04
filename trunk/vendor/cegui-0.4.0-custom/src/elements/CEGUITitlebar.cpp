@@ -245,10 +245,10 @@ void Titlebar::onFontChanged(WindowEventArgs& e)
 /*************************************************************************
 	Add title bar specific properties
 *************************************************************************/
-void Titlebar::addTitlebarProperties(void)
+void Titlebar::addTitlebarProperties( bool bCommon )
 {
-	addProperty(&d_dragEnabledProperty);
-	addProperty(&d_captionColourProperty);
+	if ( bCommon == false )   addProperty(&d_dragEnabledProperty);
+	if ( bCommon == true )   addProperty(&d_captionColourProperty);
 }
 
 

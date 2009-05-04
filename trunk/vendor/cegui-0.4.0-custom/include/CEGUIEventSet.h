@@ -248,7 +248,13 @@ protected:
 
 	bool	d_muted;	//!< true if events for this EventSet have been muted.
 
+    void                    maybeAddUncommonEvents( const String& name ) const;
+    void                    maybeAddUncommonEvents( const String& name );
+    bool                    d_addedUncommonEvents;
 public:
+    virtual void            addUncommonEvents(void) {}
+	virtual const String&   getType(void) const;
+
 	/*************************************************************************
 		Iterator stuff
 	*************************************************************************/

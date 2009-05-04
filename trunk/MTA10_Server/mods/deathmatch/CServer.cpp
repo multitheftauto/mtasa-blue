@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.hpp"
 
 CServerInterface* g_pServerInterface = NULL;
 CNetServer* g_pNetServer = NULL;

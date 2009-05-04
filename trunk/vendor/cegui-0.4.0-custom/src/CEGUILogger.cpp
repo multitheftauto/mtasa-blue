@@ -73,6 +73,10 @@ namespace CEGUI
     {
         using namespace std;
 
+		// Early out if not relevant
+        if ( d_level < level && !d_caching )
+            return;
+
         time_t  et;
         time(&et);
         tm* etm = localtime(&et);

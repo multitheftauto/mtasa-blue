@@ -242,7 +242,7 @@ void CCredits::Update ( void )
     if ( m_pWindow->IsVisible () )
     {
         // Speed it up if control is being held
-        if ( GetAsyncKeyState ( VK_CONTROL ) != 0 )
+        if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0 )
         {
             m_clkStart -= 50;
         }

@@ -564,17 +564,25 @@ void Combobox::handleUpdatedListItemData(void)
 /*************************************************************************
 	Add combo box specific events
 *************************************************************************/
-void Combobox::addComboboxEvents(void)
+void Combobox::addComboboxEvents(bool bCommon)
 {
-	addEvent(EventReadOnlyModeChanged);			addEvent(EventValidationStringChanged);
-	addEvent(EventMaximumTextLengthChanged);	addEvent(EventTextInvalidated);
-	addEvent(EventInvalidEntryAttempted);		addEvent(EventCaratMoved);
-	addEvent(EventTextSelectionChanged);		addEvent(EventEditboxFull);
-	addEvent(EventTextAccepted);				addEvent(EventListContentsChanged);
-	addEvent(EventListSelectionChanged);		addEvent(EventSortModeChanged);
-	addEvent(EventVertScrollbarModeChanged);	addEvent(EventHorzScrollbarModeChanged);
-	addEvent(EventDropListDisplayed);			addEvent(EventDropListRemoved);
-	addEvent(EventListSelectionAccepted);
+	if ( bCommon == false )	addEvent(EventReadOnlyModeChanged);
+	if ( bCommon == false )	addEvent(EventValidationStringChanged);
+	if ( bCommon == false )	addEvent(EventMaximumTextLengthChanged);
+	if ( bCommon == false )	addEvent(EventTextInvalidated);
+	if ( bCommon == false )	addEvent(EventInvalidEntryAttempted);
+	if ( bCommon == false )	addEvent(EventCaratMoved);
+	if ( bCommon == false )	addEvent(EventTextSelectionChanged);
+	if ( bCommon == false )	addEvent(EventEditboxFull);
+	if ( bCommon == true )	addEvent(EventTextAccepted);
+	if ( bCommon == false )	addEvent(EventListContentsChanged);
+	if ( bCommon == false )	addEvent(EventListSelectionChanged);
+	if ( bCommon == false )	addEvent(EventSortModeChanged);
+	if ( bCommon == false )	addEvent(EventVertScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventHorzScrollbarModeChanged);
+	if ( bCommon == false )	addEvent(EventDropListDisplayed);
+	if ( bCommon == false )	addEvent(EventDropListRemoved);
+	if ( bCommon == false )	addEvent(EventListSelectionAccepted);
 }
 
 
@@ -891,22 +899,22 @@ bool Combobox::isHorzScrollbarAlwaysShown(void) const
 /*************************************************************************
 	Add properties for this class
 *************************************************************************/
-void Combobox::addComboboxProperties(void)
+void Combobox::addComboboxProperties( bool bCommon )
 {
-	addProperty(&d_sortProperty);
-	addProperty(&d_forceHorzProperty);
-	addProperty(&d_forceVertProperty);
-	addProperty(&d_readOnlyProperty);
-	addProperty(&d_validationStringProperty);
-	addProperty(&d_maxTextLengthProperty);
-	addProperty(&d_selStartProperty);
-	addProperty(&d_selLengthProperty);
-	addProperty(&d_normalTextColourProperty);
-	addProperty(&d_selectedTextColourProperty);
-	addProperty(&d_activeSelectionColourProperty);
-	addProperty(&d_inactiveSelectionColourProperty);
-	addProperty(&d_caratIndexProperty);
-	addProperty(&d_singleClickOperationProperty);
+	if ( bCommon == false )   addProperty(&d_sortProperty);
+	if ( bCommon == false )   addProperty(&d_forceHorzProperty);
+	if ( bCommon == false )   addProperty(&d_forceVertProperty);
+	if ( bCommon == false )   addProperty(&d_readOnlyProperty);
+	if ( bCommon == false )   addProperty(&d_validationStringProperty);
+	if ( bCommon == false )   addProperty(&d_maxTextLengthProperty);
+	if ( bCommon == false )   addProperty(&d_selStartProperty);
+	if ( bCommon == false )   addProperty(&d_selLengthProperty);
+	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
+	if ( bCommon == false )   addProperty(&d_selectedTextColourProperty);
+	if ( bCommon == false )   addProperty(&d_activeSelectionColourProperty);
+	if ( bCommon == false )   addProperty(&d_inactiveSelectionColourProperty);
+	if ( bCommon == false )   addProperty(&d_caratIndexProperty);
+	if ( bCommon == false )   addProperty(&d_singleClickOperationProperty);
 }
 
 

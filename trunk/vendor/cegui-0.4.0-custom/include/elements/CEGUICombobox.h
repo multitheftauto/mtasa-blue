@@ -805,7 +805,8 @@ protected:
 	\brief
 		Add combo box specific events
 	*/
-	void	addComboboxEvents(void);
+	void	addComboboxEvents(bool bCommon=true);
+	void	addUncommonEvents( void )							{ __super::addUncommonEvents(); addComboboxEvents(false); }
 
 
 	/*!
@@ -1070,7 +1071,8 @@ private:
 	/*************************************************************************
 		Private methods
 	*************************************************************************/
-	void	addComboboxProperties(void);
+	void	addComboboxProperties( bool bCommon = true );
+	void	addUncommonProperties( void )							{ __super::addUncommonProperties(); addComboboxProperties(false); }
 };
 
 } // End of  CEGUI namespace section

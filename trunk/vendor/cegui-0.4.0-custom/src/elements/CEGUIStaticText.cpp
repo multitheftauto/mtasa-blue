@@ -205,13 +205,13 @@ void StaticText::populateRenderCache()
 /*************************************************************************
 	Add properties for static text
 *************************************************************************/
-void StaticText::addStaticTextProperties(void)
+void StaticText::addStaticTextProperties( bool bCommon )
 {
-	addProperty(&d_textColoursProperty);
-	addProperty(&d_vertFormattingProperty);
-	addProperty(&d_horzFormattingProperty);
-	addProperty(&d_vertScrollbarProperty);
-	addProperty(&d_horzScrollbarProperty);
+	if ( bCommon == true )   addProperty(&d_textColoursProperty);
+	if ( bCommon == false )   addProperty(&d_vertFormattingProperty);
+	if ( bCommon == false )   addProperty(&d_horzFormattingProperty);
+	if ( bCommon == false )   addProperty(&d_vertScrollbarProperty);
+	if ( bCommon == false )   addProperty(&d_horzScrollbarProperty);
 }
 
 

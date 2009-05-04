@@ -292,12 +292,12 @@ void ButtonBase::onMouseLeaves(MouseEventArgs& e)
 /*************************************************************************
 	Add properties for this class
 *************************************************************************/
-void ButtonBase::addButtonBaseProperties(void)
+void ButtonBase::addButtonBaseProperties( bool bCommon )
 {
-	addProperty(&d_normalTextColourProperty);
-	addProperty(&d_hoverTextColourProperty);
-	addProperty(&d_pushedTextColourProperty);
-	addProperty(&d_disabledTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_hoverTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_pushedTextColourProperty);
+	if ( bCommon == true )   addProperty(&d_disabledTextColourProperty);
 }
 
 } // End of  CEGUI namespace section

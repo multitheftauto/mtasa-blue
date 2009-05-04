@@ -1133,6 +1133,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SString.h"
 					>
 				</File>
