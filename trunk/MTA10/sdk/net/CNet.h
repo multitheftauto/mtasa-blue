@@ -54,6 +54,7 @@ public:
     virtual unsigned int                GetBitsReceived             ( void ) = 0;
     virtual float                       GetCompressionRatio         ( void ) = 0;
     virtual float                       GetDecompressionRatio       ( void ) = 0;
+    virtual void                        GetAveragePacketSizes       ( float* fPacketSizes ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long		        GetTime			            ( void ) = 0;

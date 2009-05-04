@@ -859,7 +859,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPlayerMapVisible", CLuaFunctionDefinitions::IsPlayerMapVisible );
     CLuaCFunctions::AddFunction ( "getPlayerMapBoundingBox", CLuaFunctionDefinitions::GetPlayerMapBoundingBox );
 
+    // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
+    CLuaCFunctions::AddFunction ( "getAveragePacketSizes", CLuaFunctionDefinitions::GetAveragePacketSizes );
 
 #ifdef MTA_VOICE
     // Voice funcs

@@ -15701,6 +15701,21 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetAveragePacketSizes ( lua_State* luaVM )
+{
+    float fSizes [ 256 ];
+    g_pNet->GetAveragePacketSizes ( fSizes );
+    lua_createtable ( luaVM, 256, 1 );
+
+    for ( unsigned int i = 0; i < 256; ++i )
+    {
+        lua_pushnumber ( luaVM, fSizes [ i ] );
+        lua_rawseti ( luaVM, -2, i );
+    }
+
+    return 1;
+}
+
 int CLuaFunctionDefinitions::IsWorldSpecialPropertyEnabled ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
