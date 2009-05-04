@@ -53,8 +53,11 @@ public:
     static void                 RemoveAllFunctions          ( void );
 
 private:
-    static google::sparse_hash_map < lua_CFunction, CLuaCFunction* > ms_Functions;
-    static google::sparse_hash_map < std::string, CLuaCFunction* > ms_FunctionsByName;
+    static google::dense_hash_map < lua_CFunction, CLuaCFunction* >     ms_Functions;
+    static google::dense_hash_map < std::string, CLuaCFunction* >       ms_FunctionsByName;
+    static bool                                                         ms_bMapsInitialized;
+public:
+    static void                 InitializeHashMaps          ( );
 };
 
 #endif
