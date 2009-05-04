@@ -2724,6 +2724,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     if ( pVehicle ) pPed->WarpIntoVehicle ( pVehicle, ucSeat );
                     pPed->SetHasJetPack ( bHasJetPack );
 
+                    // Alpha
+                    unsigned char ucAlpha;
+                    bitStream.Read ( ucAlpha );
+                    pPed->SetAlpha ( ucAlpha );
+
                     break;
                 }
 
