@@ -84,7 +84,7 @@ private:
     CGUIListItem_Impl*                  GetListItem             ( CEGUI::ListboxItem* pItem );
     unsigned int                        m_hUniqueHandle;
 
-    google::sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
+    google::dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
     GUI_CALLBACK                        m_OnSortColumn;
 

@@ -9,7 +9,7 @@
 #include <vector>
 
 
-#include <google/sparse_hash_map>
+#include <google/dense_hash_map>
 
 #include <d3dx9.h>
 #include <renderers/directx9GUIRenderer/d3d9renderer.h>
