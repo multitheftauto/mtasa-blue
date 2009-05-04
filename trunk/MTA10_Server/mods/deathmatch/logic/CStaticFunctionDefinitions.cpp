@@ -974,7 +974,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition )
+bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp )
 {
     assert ( pElement );
     RUN_CHILDREN SetElementPosition ( *iter, vecPosition );
@@ -995,8 +995,10 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
     BitStream.pBitStream->Write ( vecPosition.fY );
     BitStream.pBitStream->Write ( vecPosition.fZ );
     BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
+    if ( IS_PLAYER ( pElement ) && !bWarp )
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) );
 
-    // Tell only the relavant clients about this elements new position
+    // Tell only the relevant clients about this elements new position
     if ( IS_PERPLAYER_ENTITY ( pElement ) )
     {
         m_pPlayerManager->Broadcast ( CLuaPacket ( SET_ELEMENT_POSITION, *BitStream.pBitStream ), static_cast < CPerPlayerEntity * > ( pElement )->GetPlayersList () );

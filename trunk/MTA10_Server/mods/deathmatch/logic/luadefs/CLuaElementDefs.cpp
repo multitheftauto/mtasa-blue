@@ -1257,8 +1257,13 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
                 CVector vecPosition = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+
+                bool bWarp = true;
+                if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
+                    bWarp = lua_toboolean ( luaVM, 5 ) ? true : false;
+
                 // Set the position
-                if ( CStaticFunctionDefinitions::SetElementPosition ( pElement, vecPosition ) )
+                if ( CStaticFunctionDefinitions::SetElementPosition ( pElement, vecPosition, bWarp ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

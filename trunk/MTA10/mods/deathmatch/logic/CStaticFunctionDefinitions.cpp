@@ -741,11 +741,14 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CClientEntity& Entity, cons
 
 
 
-bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, const CVector& vecPosition )
+bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp )
 {
     RUN_CHILDREN SetElementPosition ( **iter, vecPosition );
 
-	Entity.Teleport ( vecPosition );
+    if ( bWarp )
+	    Entity.Teleport ( vecPosition );
+    else
+        Entity.SetPosition ( vecPosition );
 
     return true;
 }
