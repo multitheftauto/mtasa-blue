@@ -1770,7 +1770,7 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
             pBitStream->ResetReadPointer ();
         }
 
-        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, packetOrdering );
+        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
 }
