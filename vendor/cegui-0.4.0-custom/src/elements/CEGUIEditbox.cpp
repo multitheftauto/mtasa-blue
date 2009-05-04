@@ -945,17 +945,23 @@ void Editbox::handleEnd(uint sysKeys)
 *************************************************************************/
 void Editbox::addEditboxEvents(bool bCommon)
 {
-	if ( bCommon == true )	addEvent(EventReadOnlyModeChanged);
-	if ( bCommon == false )	addEvent(EventMaskedRenderingModeChanged);
-	if ( bCommon == false )	addEvent(EventMaskCodePointChanged);
-	if ( bCommon == false )	addEvent(EventValidationStringChanged);
-	if ( bCommon == false )	addEvent(EventMaximumTextLengthChanged);
-	if ( bCommon == false )	addEvent(EventTextInvalidated);
-	if ( bCommon == false )	addEvent(EventInvalidEntryAttempted);
-	if ( bCommon == false )	addEvent(EventCaratMoved);
-	if ( bCommon == false )	addEvent(EventTextSelectionChanged);
-	if ( bCommon == false )	addEvent(EventEditboxFull);
-	if ( bCommon == true )	addEvent(EventTextAccepted);
+    if ( bCommon == false )
+    {
+        addEvent(EventMaskedRenderingModeChanged);
+        addEvent(EventMaskCodePointChanged);
+        addEvent(EventValidationStringChanged);
+        addEvent(EventMaximumTextLengthChanged);
+        addEvent(EventTextInvalidated);
+        addEvent(EventInvalidEntryAttempted);
+        addEvent(EventCaratMoved);
+        addEvent(EventTextSelectionChanged);
+        addEvent(EventEditboxFull);
+    }
+    else
+    {
+        addEvent(EventReadOnlyModeChanged);
+        addEvent(EventTextAccepted);
+    }
 }
 
 
@@ -1145,18 +1151,24 @@ void Editbox::onTextChanged(WindowEventArgs& e)
 *************************************************************************/
 void Editbox::addEditboxProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_readOnlyProperty);
-	if ( bCommon == false )   addProperty(&d_maskTextProperty);
-	if ( bCommon == false )   addProperty(&d_maskCodepointProperty);
-	if ( bCommon == false )   addProperty(&d_validationStringProperty);
-	if ( bCommon == false )   addProperty(&d_caratIndexProperty);
-	if ( bCommon == false )   addProperty(&d_selectionStartProperty);
-	if ( bCommon == false )   addProperty(&d_selectionLengthProperty);
-	if ( bCommon == false )   addProperty(&d_maxTextLengthProperty);
-	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
-	if ( bCommon == true )   addProperty(&d_selectedTextColourProperty);
-	if ( bCommon == true )   addProperty(&d_activeSelectionColourProperty);
-	if ( bCommon == true )   addProperty(&d_inactiveSelectionColourProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_readOnlyProperty);
+        addProperty(&d_maskTextProperty);
+        addProperty(&d_maskCodepointProperty);
+        addProperty(&d_validationStringProperty);
+        addProperty(&d_caratIndexProperty);
+        addProperty(&d_selectionStartProperty);
+        addProperty(&d_selectionLengthProperty);
+        addProperty(&d_maxTextLengthProperty);
+    }
+    else
+    {
+        addProperty(&d_normalTextColourProperty);
+        addProperty(&d_selectedTextColourProperty);
+        addProperty(&d_activeSelectionColourProperty);
+        addProperty(&d_inactiveSelectionColourProperty);
+    }
 }
 
 

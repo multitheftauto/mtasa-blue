@@ -157,22 +157,28 @@ namespace CEGUI
 
     void DragContainer::addDragContainerEvents(bool bCommon)
     {
-        if ( bCommon == false )	addEvent(EventDragStarted);
-        if ( bCommon == false )	addEvent(EventDragEnded);
-        if ( bCommon == false )	addEvent(EventDragPositionChanged);
-        if ( bCommon == false )	addEvent(EventDragEnabledChanged);
-        if ( bCommon == false )	addEvent(EventDragAlphaChanged);
-        if ( bCommon == false )	addEvent(EventDragMouseCursorChanged);
-        if ( bCommon == false )	addEvent(EventDragThresholdChanged);
-        if ( bCommon == false )	addEvent(EventDragDropTargetChanged);
+        if ( bCommon == false )
+        {
+            addEvent(EventDragStarted);
+            addEvent(EventDragEnded);
+            addEvent(EventDragPositionChanged);
+            addEvent(EventDragEnabledChanged);
+            addEvent(EventDragAlphaChanged);
+            addEvent(EventDragMouseCursorChanged);
+            addEvent(EventDragThresholdChanged);
+            addEvent(EventDragDropTargetChanged);
+        }
     }
 
     void DragContainer::addDragContainerProperties( bool bCommon )
     {
-        if ( bCommon == false )   addProperty(&d_dragEnabledProperty);
-        if ( bCommon == false )   addProperty(&d_dragAlphaProperty);
-        if ( bCommon == false )   addProperty(&d_dragThresholdProperty);
-        if ( bCommon == false )   addProperty(&d_dragCursorImageProperty);
+        if ( bCommon == false )
+        {
+            addProperty(&d_dragEnabledProperty);
+            addProperty(&d_dragAlphaProperty);
+            addProperty(&d_dragThresholdProperty);
+            addProperty(&d_dragCursorImageProperty);
+        }
     }
 
     bool DragContainer::isDraggingThresholdExceeded(const Point& local_mouse)

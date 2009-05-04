@@ -199,10 +199,16 @@ void Scrollbar::setScrollPosition(float position)
 *************************************************************************/
 void Scrollbar::addScrollbarEvents(bool bCommon)
 {
-	if ( bCommon == true )	addEvent(EventScrollPositionChanged);
-	if ( bCommon == true )	addEvent(EventThumbTrackStarted);
-	if ( bCommon == true )	addEvent(EventThumbTrackEnded);
-	if ( bCommon == false )	addEvent(EventScrollConfigChanged);
+    if ( bCommon == false )
+    {
+        addEvent(EventScrollConfigChanged);
+    }
+    else
+    {
+        addEvent(EventScrollPositionChanged);
+        addEvent(EventThumbTrackStarted);
+        addEvent(EventThumbTrackEnded);
+    }
 }
 
 
@@ -366,11 +372,17 @@ bool Scrollbar::handleThumbTrackEnded(const EventArgs& e)
 *************************************************************************/
 void Scrollbar::addScrollbarProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_documentSizeProperty);
-	if ( bCommon == false )   addProperty(&d_pageSizeProperty);
-	if ( bCommon == true )   addProperty(&d_stepSizeProperty);
-	if ( bCommon == false )   addProperty(&d_overlapSizeProperty);
-	if ( bCommon == false )   addProperty(&d_scrollPositionProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_documentSizeProperty);
+        addProperty(&d_pageSizeProperty);
+        addProperty(&d_overlapSizeProperty);
+        addProperty(&d_scrollPositionProperty);
+    }
+    else
+    {
+        addProperty(&d_stepSizeProperty);
+    }
 }
 
 

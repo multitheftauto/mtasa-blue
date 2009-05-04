@@ -2054,56 +2054,64 @@ Size Window::getParentSize(void) const
 *************************************************************************/
 void Window::addStandardEvents( bool bCommon )
 {
-	// window events
-	if ( bCommon == true )  addEvent(EventSized);
-	if ( bCommon == true )	addEvent(EventMoved);
-	if ( bCommon == true )	addEvent(EventTextChanged);
-	if ( bCommon == false )	addEvent(EventFontChanged);
-	if ( bCommon == false )	addEvent(EventAlphaChanged);
-	if ( bCommon == false )	addEvent(EventIDChanged);
-	if ( bCommon == false )	addEvent(EventActivated);
-	if ( bCommon == false )	addEvent(EventDeactivated);
-	if ( bCommon == false )	addEvent(EventShown);
-	if ( bCommon == false )	addEvent(EventHidden);
-	if ( bCommon == false )	addEvent(EventEnabled);
-	if ( bCommon == false )	addEvent(EventDisabled);
-	if ( bCommon == false )	addEvent(EventMetricsModeChanged);
-	if ( bCommon == false )	addEvent(EventClippedByParentChanged);
-	if ( bCommon == false )	addEvent(EventDestroyedByParentChanged);
-	if ( bCommon == false )	addEvent(EventInheritsAlphaChanged);
-	if ( bCommon == false )	addEvent(EventAlwaysOnTopChanged);
-	if ( bCommon == false )	addEvent(EventInputCaptureGained);
-	if ( bCommon == false )	addEvent(EventInputCaptureLost);
-	if ( bCommon == false )	addEvent(EventRenderingStarted);
-	if ( bCommon == false )	addEvent(EventRenderingEnded);
-	if ( bCommon == false )	addEvent(EventChildAdded);
-	if ( bCommon == false )	addEvent(EventChildRemoved);
-	if ( bCommon == false )	addEvent(EventDestructionStarted);
-	if ( bCommon == false )	addEvent(EventZOrderChanged);
-	if ( bCommon == false )	addEvent(EventParentSized);
-	if ( bCommon == false )	addEvent(EventDragDropItemEnters);
-    if ( bCommon == false )	addEvent(EventDragDropItemLeaves);
-	if ( bCommon == false )	addEvent(EventDragDropItemDropped);
-	if ( bCommon == false )	addEvent(EventVerticalAlignmentChanged);
-    if ( bCommon == false )	addEvent(EventHorizontalAlignmentChanged);
+    if ( bCommon == false )
+    {
+        // window events
+        addEvent(EventFontChanged);
+        addEvent(EventAlphaChanged);
+        addEvent(EventIDChanged);
+        addEvent(EventActivated);
+        addEvent(EventDeactivated);
+        addEvent(EventShown);
+        addEvent(EventHidden);
+        addEvent(EventEnabled);
+        addEvent(EventDisabled);
+        addEvent(EventMetricsModeChanged);
+        addEvent(EventClippedByParentChanged);
+        addEvent(EventDestroyedByParentChanged);
+        addEvent(EventInheritsAlphaChanged);
+        addEvent(EventAlwaysOnTopChanged);
+        addEvent(EventInputCaptureGained);
+        addEvent(EventInputCaptureLost);
+        addEvent(EventRenderingStarted);
+        addEvent(EventRenderingEnded);
+        addEvent(EventChildAdded);
+        addEvent(EventChildRemoved);
+        addEvent(EventDestructionStarted);
+        addEvent(EventZOrderChanged);
+        addEvent(EventParentSized);
+        addEvent(EventDragDropItemEnters);
+        addEvent(EventDragDropItemLeaves);
+        addEvent(EventDragDropItemDropped);
+        addEvent(EventVerticalAlignmentChanged);
+        addEvent(EventHorizontalAlignmentChanged);
 
-	// general input handling
-	if ( bCommon == true )	addEvent(EventMouseEnters);
-	if ( bCommon == true )	addEvent(EventMouseLeaves);
-	if ( bCommon == false )	addEvent(EventMouseMove);
-	if ( bCommon == false )	addEvent(EventMouseWheel);
-	if ( bCommon == true )	addEvent(EventMouseButtonDown);
-	if ( bCommon == false )	addEvent(EventMouseButtonUp);
-	if ( bCommon == true )	addEvent(EventMouseClick);
-	if ( bCommon == false )	addEvent(EventMouseDoubleClick);
-	if ( bCommon == false )	addEvent(EventMouseTripleClick);
-	if ( bCommon == true )	addEvent(EventKeyDown);
-	if ( bCommon == false )	addEvent(EventKeyUp);
-	if ( bCommon == false )	addEvent(EventCharacterKey);
+        // general input handling
+        addEvent(EventMouseMove);
+        addEvent(EventMouseWheel);
+        addEvent(EventMouseButtonUp);
+        addEvent(EventMouseDoubleClick);
+        addEvent(EventMouseTripleClick);
+        addEvent(EventKeyUp);
+        addEvent(EventCharacterKey);
 
-    // MTA event
-    if ( bCommon == false )	addEvent(EventRedrawRequested);
+        // MTA event
+        addEvent(EventRedrawRequested);
+    }
+    else
+    {
+        // window events
+        addEvent(EventSized);
+        addEvent(EventMoved);
+        addEvent(EventTextChanged);
 
+        // general input handling
+        addEvent(EventMouseEnters);
+        addEvent(EventMouseLeaves);
+        addEvent(EventMouseButtonDown);
+        addEvent(EventMouseClick);
+        addEvent(EventKeyDown);
+    }
 }
 
 
@@ -2833,66 +2841,72 @@ void Window::generateAutoRepeatEvent(MouseButton button)
 *************************************************************************/
 void Window::addStandardProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_absHeightProperty);
-	if ( bCommon == false )   addProperty(&d_absMaxSizeProperty);
-	if ( bCommon == false )   addProperty(&d_absMinSizeProperty);
-	if ( bCommon == false )   addProperty(&d_absPositionProperty);
-	if ( bCommon == false )   addProperty(&d_absRectProperty);
-	if ( bCommon == false )   addProperty(&d_absSizeProperty);
-	if ( bCommon == false )   addProperty(&d_absWidthProperty);
-	if ( bCommon == false )   addProperty(&d_absXPosProperty);
-	if ( bCommon == false )   addProperty(&d_absYPosProperty);
-	if ( bCommon == false )   addProperty(&d_alphaProperty);
-	if ( bCommon == true )   addProperty(&d_alwaysOnTopProperty);
-	if ( bCommon == false )   addProperty(&d_clippedByParentProperty);
-	if ( bCommon == false )   addProperty(&d_destroyedByParentProperty);
-	if ( bCommon == true )   addProperty(&d_disabledProperty);
-	if ( bCommon == false )   addProperty(&d_fontProperty);
-	if ( bCommon == false )   addProperty(&d_heightProperty);
-	if ( bCommon == false )   addProperty(&d_IDProperty);
-	if ( bCommon == false )   addProperty(&d_inheritsAlphaProperty);
-	if ( bCommon == false )   addProperty(&d_metricsModeProperty);
-	if ( bCommon == false )   addProperty(&d_mouseCursorProperty);
-	if ( bCommon == false )   addProperty(&d_positionProperty);
-	if ( bCommon == false )   addProperty(&d_rectProperty);
-	if ( bCommon == false )   addProperty(&d_relHeightProperty);
-	if ( bCommon == false )   addProperty(&d_relMaxSizeProperty);
-	if ( bCommon == false )   addProperty(&d_relMinSizeProperty);
-	if ( bCommon == false )   addProperty(&d_relPositionProperty);
-	if ( bCommon == false )   addProperty(&d_relRectProperty);
-	if ( bCommon == false )   addProperty(&d_relSizeProperty);
-	if ( bCommon == false )   addProperty(&d_relWidthProperty);
-	if ( bCommon == false )   addProperty(&d_relXPosProperty);
-	if ( bCommon == false )   addProperty(&d_relYPosProperty);
-	if ( bCommon == false )   addProperty(&d_restoreOldCaptureProperty);
-	if ( bCommon == false )   addProperty(&d_sizeProperty);
-	if ( bCommon == false )   addProperty(&d_textProperty);
-	if ( bCommon == false )   addProperty(&d_visibleProperty);
-	if ( bCommon == false )   addProperty(&d_widthProperty);
-	if ( bCommon == false )   addProperty(&d_xPosProperty);
-	if ( bCommon == false )   addProperty(&d_yPosProperty);
-	if ( bCommon == false )   addProperty(&d_zOrderChangeProperty);
-    if ( bCommon == true )   addProperty(&d_wantsMultiClicksProperty);
-    if ( bCommon == false )   addProperty(&d_autoRepeatProperty);
-    if ( bCommon == false )   addProperty(&d_autoRepeatDelayProperty);
-    if ( bCommon == false )   addProperty(&d_autoRepeatRateProperty);
-    if ( bCommon == false )   addProperty(&d_distInputsProperty);
-    if ( bCommon == false )   addProperty(&d_tooltipTypeProperty);
-    if ( bCommon == false )   addProperty(&d_tooltipProperty);
-    if ( bCommon == false )   addProperty(&d_inheritsTooltipProperty);
-    if ( bCommon == false )   addProperty(&d_riseOnClickProperty);
-    if ( bCommon == false )   addProperty(&d_vertAlignProperty);
-    if ( bCommon == false )   addProperty(&d_horzAlignProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedAreaRectProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedPositionProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedXPositionProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedYPositionProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedSizeProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedWidthProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedHeightProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedMinSizeProperty);
-    if ( bCommon == false )   addProperty(&d_unifiedMaxSizeProperty);
-    if ( bCommon == false )   addProperty(&d_mousePassThroughEnabledProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_absHeightProperty);
+        addProperty(&d_absMaxSizeProperty);
+        addProperty(&d_absMinSizeProperty);
+        addProperty(&d_absPositionProperty);
+        addProperty(&d_absRectProperty);
+        addProperty(&d_absSizeProperty);
+        addProperty(&d_absWidthProperty);
+        addProperty(&d_absXPosProperty);
+        addProperty(&d_absYPosProperty);
+        addProperty(&d_alphaProperty);
+        addProperty(&d_clippedByParentProperty);
+        addProperty(&d_destroyedByParentProperty);
+        addProperty(&d_fontProperty);
+        addProperty(&d_heightProperty);
+        addProperty(&d_IDProperty);
+        addProperty(&d_inheritsAlphaProperty);
+        addProperty(&d_metricsModeProperty);
+        addProperty(&d_mouseCursorProperty);
+        addProperty(&d_positionProperty);
+        addProperty(&d_rectProperty);
+        addProperty(&d_relHeightProperty);
+        addProperty(&d_relMaxSizeProperty);
+        addProperty(&d_relMinSizeProperty);
+        addProperty(&d_relPositionProperty);
+        addProperty(&d_relRectProperty);
+        addProperty(&d_relSizeProperty);
+        addProperty(&d_relWidthProperty);
+        addProperty(&d_relXPosProperty);
+        addProperty(&d_relYPosProperty);
+        addProperty(&d_restoreOldCaptureProperty);
+        addProperty(&d_sizeProperty);
+        addProperty(&d_textProperty);
+        addProperty(&d_visibleProperty);
+        addProperty(&d_widthProperty);
+        addProperty(&d_xPosProperty);
+        addProperty(&d_yPosProperty);
+        addProperty(&d_zOrderChangeProperty);
+        addProperty(&d_autoRepeatProperty);
+        addProperty(&d_autoRepeatDelayProperty);
+        addProperty(&d_autoRepeatRateProperty);
+        addProperty(&d_distInputsProperty);
+        addProperty(&d_tooltipTypeProperty);
+        addProperty(&d_tooltipProperty);
+        addProperty(&d_inheritsTooltipProperty);
+        addProperty(&d_riseOnClickProperty);
+        addProperty(&d_vertAlignProperty);
+        addProperty(&d_horzAlignProperty);
+        addProperty(&d_unifiedAreaRectProperty);
+        addProperty(&d_unifiedPositionProperty);
+        addProperty(&d_unifiedXPositionProperty);
+        addProperty(&d_unifiedYPositionProperty);
+        addProperty(&d_unifiedSizeProperty);
+        addProperty(&d_unifiedWidthProperty);
+        addProperty(&d_unifiedHeightProperty);
+        addProperty(&d_unifiedMinSizeProperty);
+        addProperty(&d_unifiedMaxSizeProperty);
+        addProperty(&d_mousePassThroughEnabledProperty);
+    }
+    else
+    {
+        addProperty(&d_alwaysOnTopProperty);
+        addProperty(&d_disabledProperty);
+        addProperty(&d_wantsMultiClicksProperty);
+    }
 }
 
 

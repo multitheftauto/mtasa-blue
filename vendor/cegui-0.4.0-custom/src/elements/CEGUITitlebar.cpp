@@ -247,8 +247,14 @@ void Titlebar::onFontChanged(WindowEventArgs& e)
 *************************************************************************/
 void Titlebar::addTitlebarProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_dragEnabledProperty);
-	if ( bCommon == true )   addProperty(&d_captionColourProperty);
+	if ( bCommon == false )
+    {
+        addProperty(&d_dragEnabledProperty);
+    }
+    else
+    {
+	    addProperty(&d_captionColourProperty);
+    }
 }
 
 

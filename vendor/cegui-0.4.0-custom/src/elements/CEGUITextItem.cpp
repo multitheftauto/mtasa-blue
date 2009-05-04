@@ -123,9 +123,12 @@ Size TextItem::getItemPixelSize()
 *************************************************************************/
 void TextItem::addTextItemProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_textColourProperty);
-	if ( bCommon == false )   addProperty(&d_textFormattingProperty);
-	if ( bCommon == false )   addProperty(&d_textXOffsetProperty);
+	if ( bCommon == false )
+    {
+        addProperty(&d_textColourProperty);
+	    addProperty(&d_textFormattingProperty);
+	    addProperty(&d_textXOffsetProperty);
+    }
 }
 
 } // End of  CEGUI namespace section

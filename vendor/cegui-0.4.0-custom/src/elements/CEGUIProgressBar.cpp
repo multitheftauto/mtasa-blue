@@ -97,8 +97,11 @@ void ProgressBar::setProgress(float progress)
 *************************************************************************/
 void ProgressBar::addProgressBarEvents(bool bCommon)
 {
-	if ( bCommon == false )	addEvent(EventProgressChanged);
-	if ( bCommon == false )	addEvent(EventProgressDone);
+    if ( bCommon == false )
+    {
+        addEvent(EventProgressChanged);
+        addEvent(EventProgressDone);
+    }
 }
 
 /*************************************************************************
@@ -125,8 +128,11 @@ void ProgressBar::onProgressDone(WindowEventArgs& e)
 *************************************************************************/
 void ProgressBar::addProgressBarProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_stepSizeProperty);
-	if ( bCommon == false )   addProperty(&d_currentProgressProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_stepSizeProperty);
+        addProperty(&d_currentProgressProperty);
+    }
 }
 
 

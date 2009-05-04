@@ -143,9 +143,15 @@ void Slider::setCurrentValue(float value)
 *************************************************************************/
 void Slider::addSliderEvents(bool bCommon)
 {
-	if ( bCommon == false )	addEvent(EventValueChanged);
-	if ( bCommon == true )	addEvent(EventThumbTrackStarted);
-	if ( bCommon == true )	addEvent(EventThumbTrackEnded);
+    if ( bCommon == false )
+    {
+        addEvent(EventValueChanged);
+    }
+    else
+    {
+        addEvent(EventThumbTrackStarted);
+        addEvent(EventThumbTrackEnded);
+    }
 }
 
 
@@ -258,9 +264,12 @@ bool Slider::handleThumbTrackEnded(const EventArgs& e)
 *************************************************************************/
 void Slider::addSliderProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_currentValueProperty);
-	if ( bCommon == false )   addProperty(&d_clickStepSizeProperty);
-	if ( bCommon == false )   addProperty(&d_maximumValueProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_currentValueProperty);
+        addProperty(&d_clickStepSizeProperty);
+        addProperty(&d_maximumValueProperty);
+    }
 }
 
 

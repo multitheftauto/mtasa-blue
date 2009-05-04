@@ -328,8 +328,11 @@ void PopupMenu::onAlphaChanged(WindowEventArgs& e)
 *************************************************************************/
 void PopupMenu::addPopupMenuProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_fadeInTimeProperty);
-    if ( bCommon == false )   addProperty(&d_fadeOutTimeProperty);
+	if ( bCommon == false )
+    {
+        addProperty(&d_fadeInTimeProperty);
+        addProperty(&d_fadeOutTimeProperty);
+    }
 }
 
 } // End of  CEGUI namespace section
