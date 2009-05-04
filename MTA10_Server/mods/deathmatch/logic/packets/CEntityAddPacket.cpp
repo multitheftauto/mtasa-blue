@@ -531,6 +531,9 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     if ( pPed->IsSyncable () ) ucFlags |= 0x2;
                     BitStream.Write ( ucFlags );
 
+                    // alpha
+                    BitStream.Write ( pPed->GetAlpha () );
+
                     break;
                 }
 
