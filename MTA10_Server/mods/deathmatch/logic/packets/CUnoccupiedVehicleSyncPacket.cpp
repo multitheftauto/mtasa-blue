@@ -33,12 +33,12 @@ bool CUnoccupiedVehicleSyncPacket::Read ( NetServerBitStreamInterface& BitStream
         SyncData* pData = new SyncData;
         pData->bSend = false;
 
-        BitStream.Read ( pData->Model );
+        BitStream.ReadCompressed ( pData->Model );
 
         // Read the sync time context
-        BitStream.Read ( pData->ucSyncTimeContext );
+        BitStream.ReadCompressed ( pData->ucSyncTimeContext );
 
-        BitStream.Read ( pData->ucFlags );
+        BitStream.ReadCompressed ( pData->ucFlags );
 
         if ( pData->ucFlags & 0x01 )
         {
@@ -70,7 +70,7 @@ bool CUnoccupiedVehicleSyncPacket::Read ( NetServerBitStreamInterface& BitStream
 
         if ( pData->ucFlags & 0x10 ) BitStream.Read ( pData->fHealth );
 
-        if ( pData->ucFlags & 0x20 ) BitStream.Read ( pData->TrailerID );  
+        if ( pData->ucFlags & 0x20 ) BitStream.ReadCompressed ( pData->TrailerID );  
 
         // Add it to our list. We no longer check if it's valid here
         // because CUnoccupiedVehicleSync does and it won't write bad ID's
@@ -94,13 +94,13 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStrea
         if ( pData->bSend )
         {
             // Write vehicle ID
-            BitStream.Write ( pData->Model );
+            BitStream.WriteCompressed ( pData->Model );
 
             // Write the sync time context
-            BitStream.Write ( pData->ucSyncTimeContext );
+            BitStream.WriteCompressed ( pData->ucSyncTimeContext );
 
             // Write packet flags
-            BitStream.Write ( pData->ucFlags );
+            BitStream.WriteCompressed ( pData->ucFlags );
 
             // Position and rotation
             if ( pData->ucFlags & 0x01 )
