@@ -36,7 +36,7 @@ public:
 
 protected:
 
-    google::sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
+    google::dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
     CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
 };

@@ -22,6 +22,7 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 {
 	m_pManager = pGUI;
     m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
+    m_Items.set_empty_key ( (CEGUI::ListboxItem *)0x00000000 );
 
 	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -79,7 +80,7 @@ void CGUIComboBox_Impl::Clear ( void )
 {
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> getDropList () -> resetList ();
 
-    sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     for ( it = m_Items.begin (); it != m_Items.end (); it++ )
     {
         delete it->second;
@@ -96,7 +97,7 @@ void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )
 
 CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 {
-    sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
     it = m_Items.find ( pItem );
     if ( it == m_Items.end () )
         return NULL;
