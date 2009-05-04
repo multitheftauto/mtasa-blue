@@ -659,7 +659,9 @@ public:
     LUA_DECLARE ( IsPlayerMapVisible );
     LUA_DECLARE ( GetPlayerMapBoundingBox );
 
+    // Utility
     LUA_DECLARE ( Md5 );
+    LUA_DECLARE ( GetAveragePacketSizes );
 
 #ifdef MTA_VOICE
 	// Voice funcs
