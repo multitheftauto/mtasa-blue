@@ -534,86 +534,90 @@ void MultiLineEditbox::cacheTextLines(const Rect& dest_area)
         for (size_t i = 0; i < d_lines.size(); ++i)
         {
             Rect lineRect(drawArea);
-            const LineInfo& currLine = d_lines[i];
-            String lineText(d_text.substr(currLine.d_startIdx, currLine.d_length));
-
-            // if it is a simple 'no selection area' case
-            if ((currLine.d_startIdx >= d_selectionEnd) ||
-                ((currLine.d_startIdx + currLine.d_length) <= d_selectionStart) ||
-                (d_selectionBrush == NULL))
+            // Check line is within the dest_area
+            if ( lineRect.d_top < dest_area.d_bottom && lineRect.d_top > dest_area.d_top + 25 )
             {
-                colours.setColours(normalTextCol);
-                // render the complete line.
-                d_renderCache.cacheText(lineText, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
-            }
-            // we have at least some selection highlighting to do
-            else
-            {
-                // Start of actual rendering section.
-                String sect;
-                size_t sectIdx = 0, sectLen;
-                float selStartOffset = 0.0f, selAreaWidth = 0.0f;
+                const LineInfo& currLine = d_lines[i];
+                String lineText(d_text.substr(currLine.d_startIdx, currLine.d_length));
 
-                // render any text prior to selected region of line.
-                if (currLine.d_startIdx < d_selectionStart)
+                // if it is a simple 'no selection area' case
+                if ((currLine.d_startIdx >= d_selectionEnd) ||
+                    ((currLine.d_startIdx + currLine.d_length) <= d_selectionStart) ||
+                    (d_selectionBrush == NULL))
                 {
-                    // calculate length of text section
-                    sectLen = d_selectionStart - currLine.d_startIdx;
-
-                    // get text for this section
-                    sect = lineText.substr(sectIdx, sectLen);
-                    sectIdx += sectLen;
-
-                    // get the pixel offset to the beginning of the selection area highlight.
-                    selStartOffset = fnt->getTextExtent(sect);
-
-                    // draw this portion of the text
                     colours.setColours(normalTextCol);
-                    d_renderCache.cacheText(sect, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
-
-                    // set position ready for next portion of text
-                    lineRect.d_left += selStartOffset;
+                    // render the complete line.
+                    d_renderCache.cacheText(lineText, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
                 }
-
-                // calculate the length of the selected section
-                sectLen = ceguimin(d_selectionEnd - currLine.d_startIdx, currLine.d_length) - sectIdx;
-
-                // get the text for this section
-                sect = lineText.substr(sectIdx, sectLen);
-                sectIdx += sectLen;
-
-                // get the extent to use as the width of the selection area highlight
-                selAreaWidth = fnt->getTextExtent(sect);
-
-                // draw the text for this section
-                colours.setColours(selectTextCol);
-                d_renderCache.cacheText(sect, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
-
-                // render any text beyond selected region of line
-                if (sectIdx < currLine.d_length)
+                // we have at least some selection highlighting to do
+                else
                 {
-                    // update render position to the end of the selected area.
-                    lineRect.d_left += selAreaWidth;
+                    // Start of actual rendering section.
+                    String sect;
+                    size_t sectIdx = 0, sectLen;
+                    float selStartOffset = 0.0f, selAreaWidth = 0.0f;
 
-                    // calculate length of this section
-                    sectLen = currLine.d_length - sectIdx;
+                    // render any text prior to selected region of line.
+                    if (currLine.d_startIdx < d_selectionStart)
+                    {
+                        // calculate length of text section
+                        sectLen = d_selectionStart - currLine.d_startIdx;
+
+                        // get text for this section
+                        sect = lineText.substr(sectIdx, sectLen);
+                        sectIdx += sectLen;
+
+                        // get the pixel offset to the beginning of the selection area highlight.
+                        selStartOffset = fnt->getTextExtent(sect);
+
+                        // draw this portion of the text
+                        colours.setColours(normalTextCol);
+                        d_renderCache.cacheText(sect, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
+
+                        // set position ready for next portion of text
+                        lineRect.d_left += selStartOffset;
+                    }
+
+                    // calculate the length of the selected section
+                    sectLen = ceguimin(d_selectionEnd - currLine.d_startIdx, currLine.d_length) - sectIdx;
 
                     // get the text for this section
                     sect = lineText.substr(sectIdx, sectLen);
+                    sectIdx += sectLen;
 
-                    // render the text for this section.
-                    colours.setColours(normalTextCol);
+                    // get the extent to use as the width of the selection area highlight
+                    selAreaWidth = fnt->getTextExtent(sect);
+
+                    // draw the text for this section
+                    colours.setColours(selectTextCol);
                     d_renderCache.cacheText(sect, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
+
+                    // render any text beyond selected region of line
+                    if (sectIdx < currLine.d_length)
+                    {
+                        // update render position to the end of the selected area.
+                        lineRect.d_left += selAreaWidth;
+
+                        // calculate length of this section
+                        sectLen = currLine.d_length - sectIdx;
+
+                        // get the text for this section
+                        sect = lineText.substr(sectIdx, sectLen);
+
+                        // render the text for this section.
+                        colours.setColours(normalTextCol);
+                        d_renderCache.cacheText(sect, fnt, LeftAligned, lineRect, textZ, colours, &dest_area);
+                    }
+
+                    // calculate area for the selection brush on this line
+                    lineRect.d_left = drawArea.d_left + selStartOffset;
+                    lineRect.d_right = lineRect.d_left + selAreaWidth;
+                    lineRect.d_bottom = lineRect.d_top + fnt->getLineSpacing();
+
+                    // render the selection area brush for this line
+                    colours.setColours(selectBrushCol);
+                    d_renderCache.cacheImage(*d_selectionBrush, lineRect, selZ, colours, &dest_area);
                 }
-
-                // calculate area for the selection brush on this line
-                lineRect.d_left = drawArea.d_left + selStartOffset;
-                lineRect.d_right = lineRect.d_left + selAreaWidth;
-                lineRect.d_bottom = lineRect.d_top + fnt->getLineSpacing();
-
-                // render the selection area brush for this line
-                colours.setColours(selectBrushCol);
-                d_renderCache.cacheImage(*d_selectionBrush, lineRect, selZ, colours, &dest_area);
             }
 
             // update master position for next line in paragraph.
