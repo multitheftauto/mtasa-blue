@@ -506,12 +506,15 @@ Add tab control properties
 *************************************************************************/
 void TabControl::addTabControlProperties( bool bCommon )
 {
-    if ( bCommon == false )   addProperty(&d_tabHeightProperty);
-    if ( bCommon == false )   addProperty(&d_relativeTabHeightProperty);
-    if ( bCommon == false )   addProperty(&d_absoluteTabHeightProperty);
-    if ( bCommon == false )   addProperty(&d_tabTextPaddingProperty);
-    if ( bCommon == false )   addProperty(&d_relativeTabTextPaddingProperty);
-    if ( bCommon == false )   addProperty(&d_absoluteTabTextPaddingProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_tabHeightProperty);
+        addProperty(&d_relativeTabHeightProperty);
+        addProperty(&d_absoluteTabHeightProperty);
+        addProperty(&d_tabTextPaddingProperty);
+        addProperty(&d_relativeTabTextPaddingProperty);
+        addProperty(&d_absoluteTabTextPaddingProperty);
+    }
 }
 /*************************************************************************
 Internal version of adding a child window

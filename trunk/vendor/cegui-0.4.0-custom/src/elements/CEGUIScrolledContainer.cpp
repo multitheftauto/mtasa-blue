@@ -91,8 +91,11 @@ namespace CEGUI
 
     void ScrolledContainer::addScrolledContainerEvents(bool bCommon)
     {
-        if ( bCommon == true )	addEvent(EventContentChanged);
-        if ( bCommon == true )	addEvent(EventAutoSizeSettingChanged);
+        if ( bCommon == true )
+        {
+            addEvent(EventContentChanged);
+            addEvent(EventAutoSizeSettingChanged);
+        }
     }
 
     Rect ScrolledContainer::getChildExtentsArea(void) const
@@ -223,9 +226,12 @@ namespace CEGUI
 
     void ScrolledContainer::addScrolledContainerProperties( bool bCommon )
     {
-        if ( bCommon == false )   addProperty(&d_autoSizedProperty);
-        if ( bCommon == false )   addProperty(&d_contentAreaProperty);
-        if ( bCommon == false )   addProperty(&d_childExtentsAreaProperty);
+        if ( bCommon == false )
+        {
+            addProperty(&d_autoSizedProperty);
+            addProperty(&d_contentAreaProperty);
+            addProperty(&d_childExtentsAreaProperty);
+        }
     }
 
 } // End of  CEGUI namespace section

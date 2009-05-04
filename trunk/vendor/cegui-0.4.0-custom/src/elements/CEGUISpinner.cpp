@@ -206,20 +206,26 @@ namespace CEGUI
 
     void Spinner::addSpinnerEvents(bool bCommon)
     {
-        if ( bCommon == false )	addEvent(EventValueChanged);
-        if ( bCommon == false )	addEvent(EventStepChanged);
-        if ( bCommon == false )	addEvent(EventMaximumValueChanged);
-        if ( bCommon == false )	addEvent(EventMinimumValueChanged);
-        if ( bCommon == false )	addEvent(EventTextInputModeChanged);
+        if ( bCommon == false )
+        {
+            addEvent(EventValueChanged);
+            addEvent(EventStepChanged);
+            addEvent(EventMaximumValueChanged);
+            addEvent(EventMinimumValueChanged);
+            addEvent(EventTextInputModeChanged);
+        }
     }
 
     void Spinner::addSpinnerProperties( bool bCommon )
     {
-        if ( bCommon == false )   addProperty(&d_currentValueProperty);
-        if ( bCommon == false )   addProperty(&d_stepSizeProperty);
-        if ( bCommon == false )   addProperty(&d_maxValueProperty);
-        if ( bCommon == false )   addProperty(&d_minValueProperty);
-        if ( bCommon == false )   addProperty(&d_textInputModeProperty);
+        if ( bCommon == false )
+        {
+            addProperty(&d_currentValueProperty);
+            addProperty(&d_stepSizeProperty);
+            addProperty(&d_maxValueProperty);
+            addProperty(&d_minValueProperty);
+            addProperty(&d_textInputModeProperty);
+        }
     }
 
     float Spinner::getValueFromText(void) const

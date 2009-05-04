@@ -860,20 +860,26 @@ const Font* FrameWindow::getTitlebarFont(void) const
 *************************************************************************/
 void FrameWindow::addFrameWindowProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_sizingEnabledProperty);
-	if ( bCommon == false )   addProperty(&d_frameEnabledProperty);
-	if ( bCommon == false )   addProperty(&d_titlebarEnabledProperty);
-	if ( bCommon == false )   addProperty(&d_closeButtonEnabledProperty);
-	if ( bCommon == true )   addProperty(&d_rollUpEnabledProperty);
-	if ( bCommon == false )   addProperty(&d_rollUpStateProperty);
-	if ( bCommon == false )   addProperty(&d_dragMovingEnabledProperty);
-	if ( bCommon == false )   addProperty(&d_sizingBorderThicknessProperty);
-	if ( bCommon == false )   addProperty(&d_titlebarFontProperty);
-	if ( bCommon == false )   addProperty(&d_captionColourProperty);
-    if ( bCommon == true )   addProperty(&d_nsSizingCursorProperty);
-    if ( bCommon == true )   addProperty(&d_ewSizingCursorProperty);
-    if ( bCommon == true )   addProperty(&d_nwseSizingCursorProperty);
-    if ( bCommon == true )   addProperty(&d_neswSizingCursorProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_sizingEnabledProperty);
+        addProperty(&d_frameEnabledProperty);
+        addProperty(&d_titlebarEnabledProperty);
+        addProperty(&d_closeButtonEnabledProperty);
+        addProperty(&d_rollUpStateProperty);
+        addProperty(&d_dragMovingEnabledProperty);
+        addProperty(&d_sizingBorderThicknessProperty);
+        addProperty(&d_titlebarFontProperty);
+        addProperty(&d_captionColourProperty);
+    }
+    else
+    {
+        addProperty(&d_rollUpEnabledProperty);
+        addProperty(&d_nsSizingCursorProperty);
+        addProperty(&d_ewSizingCursorProperty);
+        addProperty(&d_nwseSizingCursorProperty);
+        addProperty(&d_neswSizingCursorProperty);
+    }
 }
 
 

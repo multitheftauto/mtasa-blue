@@ -1048,18 +1048,24 @@ bool ListHeader::segmentDragHandler(const EventArgs& e)
 *************************************************************************/
 void ListHeader::addListHeaderEvents(bool bCommon)
 {
-	if ( bCommon == true )	addEvent(EventSortColumnChanged);
-	if ( bCommon == true )	addEvent(EventSortDirectionChanged);
-	if ( bCommon == true )	addEvent(EventSegmentSized);
-	if ( bCommon == true )	addEvent(EventSegmentClicked);
-	if ( bCommon == true )	addEvent(EventSplitterDoubleClicked);
-	if ( bCommon == true )	addEvent(EventSegmentSequenceChanged);
-	if ( bCommon == false )	addEvent(EventSegmentAdded);
-	if ( bCommon == false )	addEvent(EventSegmentRemoved);
-	if ( bCommon == false )	addEvent(EventSortSettingChanged);
-	if ( bCommon == false )	addEvent(EventDragMoveSettingChanged);
-	if ( bCommon == false )	addEvent(EventDragSizeSettingChanged);
-	if ( bCommon == true )	addEvent(EventSegmentRenderOffsetChanged);
+    if ( bCommon == true )
+    {
+        addEvent(EventSortColumnChanged);
+        addEvent(EventSortDirectionChanged);
+        addEvent(EventSegmentSized);
+        addEvent(EventSegmentClicked);
+        addEvent(EventSplitterDoubleClicked);
+        addEvent(EventSegmentSequenceChanged);
+        addEvent(EventSegmentRenderOffsetChanged);
+    }
+    else
+    {
+        addEvent(EventSegmentAdded);
+        addEvent(EventSegmentRemoved);
+        addEvent(EventSortSettingChanged);
+        addEvent(EventDragMoveSettingChanged);
+        addEvent(EventDragSizeSettingChanged);
+    }
 }
 
 /*************************************************************************
@@ -1067,11 +1073,14 @@ void ListHeader::addListHeaderEvents(bool bCommon)
 *************************************************************************/
 void ListHeader::addHeaderProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_sizableProperty);
-	if ( bCommon == false )   addProperty(&d_movableProperty);
-	if ( bCommon == false )   addProperty(&d_sortSettingProperty);
-	if ( bCommon == false )   addProperty(&d_sortColumnIDProperty);
-	if ( bCommon == false )   addProperty(&d_sortDirectionProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_sizableProperty);
+        addProperty(&d_movableProperty);
+        addProperty(&d_sortSettingProperty);
+        addProperty(&d_sortColumnIDProperty);
+        addProperty(&d_sortDirectionProperty);
+    }
 }
 
 

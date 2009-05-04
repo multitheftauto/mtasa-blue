@@ -261,11 +261,14 @@ namespace CEGUI
 
     void ScrollablePane::addScrollablePaneEvents(bool bCommon)
     {
-        if ( bCommon == false )	addEvent(EventAutoSizeSettingChanged);
-        if ( bCommon == false )	addEvent(EventContentPaneChanged);
-        if ( bCommon == false )	addEvent(EventHorzScrollbarModeChanged);
-        if ( bCommon == false )	addEvent(EventVertScrollbarModeChanged);
-        if ( bCommon == false )	addEvent(EventContentPaneScrolled);
+        if ( bCommon == false )
+        {
+            addEvent(EventAutoSizeSettingChanged);
+            addEvent(EventContentPaneChanged);
+            addEvent(EventHorzScrollbarModeChanged);
+            addEvent(EventVertScrollbarModeChanged);
+            addEvent(EventContentPaneScrolled);
+        }
     }
 
     void ScrollablePane::configureScrollbars(void)
@@ -485,16 +488,22 @@ namespace CEGUI
 
     void ScrollablePane::addScrollablePaneProperties( bool bCommon )
     {
-        if ( bCommon == false )   addProperty(&d_horzScrollbarProperty);
-        if ( bCommon == false )   addProperty(&d_vertScrollbarProperty);
-        if ( bCommon == true )   addProperty(&d_autoSizedProperty);
-        if ( bCommon == true )   addProperty(&d_contentAreaProperty);
-        if ( bCommon == false )   addProperty(&d_horzStepProperty);
-        if ( bCommon == false )   addProperty(&d_horzOverlapProperty);
-        if ( bCommon == false )   addProperty(&d_horzScrollPositionProperty);
-        if ( bCommon == true )   addProperty(&d_vertStepProperty);
-        if ( bCommon == false )   addProperty(&d_vertOverlapProperty);
-        if ( bCommon == false )   addProperty(&d_vertScrollPositionProperty);
+        if ( bCommon == false )
+        {
+            addProperty(&d_horzScrollbarProperty);
+            addProperty(&d_vertScrollbarProperty);
+            addProperty(&d_horzStepProperty);
+            addProperty(&d_horzOverlapProperty);
+            addProperty(&d_horzScrollPositionProperty);
+            addProperty(&d_vertOverlapProperty);
+            addProperty(&d_vertScrollPositionProperty);
+        }
+        else
+        {
+            addProperty(&d_autoSizedProperty);
+            addProperty(&d_contentAreaProperty);
+            addProperty(&d_vertStepProperty);
+        }
     }
 
 } // End of  CEGUI namespace section

@@ -503,11 +503,17 @@ void MenuItem::addChild_impl(Window* wnd)
 *************************************************************************/
 void MenuItem::addMenuItemProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_hoverColourProperty);
-	if ( bCommon == false )   addProperty(&d_pushedColourProperty);
-	if ( bCommon == false )   addProperty(&d_openedColourProperty);
-	if ( bCommon == true )   addProperty(&d_normalTextColourProperty);
-	if ( bCommon == true )   addProperty(&d_disabledTextColourProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_hoverColourProperty);
+        addProperty(&d_pushedColourProperty);
+        addProperty(&d_openedColourProperty);
+    }
+    else
+    {
+        addProperty(&d_normalTextColourProperty);
+        addProperty(&d_disabledTextColourProperty);
+    }
 }
 
 } // End of  CEGUI namespace section

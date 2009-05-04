@@ -272,12 +272,18 @@ void PushButton::onSized(WindowEventArgs& e)
 
 void PushButton::addPushButtonProperties( bool bCommon )
 {
-    if ( bCommon == true )   addProperty(&d_normalImageProperty);
-    if ( bCommon == true )   addProperty(&d_pushedImageProperty);
-    if ( bCommon == true )   addProperty(&d_hoverImageProperty);
-    if ( bCommon == false )   addProperty(&d_disabledImageProperty);
-    if ( bCommon == true )   addProperty(&d_useStandardImageryProperty);
-    if ( bCommon == false )   addProperty(&d_textXOffsetProperty);
+    if ( bCommon == true )
+    {
+        addProperty(&d_normalImageProperty);
+        addProperty(&d_pushedImageProperty);
+        addProperty(&d_hoverImageProperty);
+        addProperty(&d_useStandardImageryProperty);
+    }
+    else
+    {
+        addProperty(&d_disabledImageProperty);
+        addProperty(&d_textXOffsetProperty);
+    }
 }
 
 } // End of  CEGUI namespace section

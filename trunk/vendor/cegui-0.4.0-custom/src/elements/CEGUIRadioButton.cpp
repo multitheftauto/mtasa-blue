@@ -228,8 +228,11 @@ RadioButton* RadioButton::getSelectedButtonInGroup(void) const
 *************************************************************************/
 void RadioButton::addRadioButtonProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_selectedProperty);
-	if ( bCommon == false )   addProperty(&d_groupIDProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_selectedProperty);
+        addProperty(&d_groupIDProperty);
+    }
 }
 
 

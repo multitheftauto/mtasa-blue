@@ -170,16 +170,22 @@ void ListHeaderSegment::setClickable(bool setting)
 *************************************************************************/
 void ListHeaderSegment::addHeaderSegmentEvents(bool bCommon)
 {
-	if ( bCommon == true )	addEvent(EventSortDirectionChanged);
-	if ( bCommon == false )	addEvent(EventSizingSettingChanged);
-	if ( bCommon == true )	addEvent(EventSplitterDoubleClicked);
-	if ( bCommon == true )	addEvent(EventSegmentClicked);
-	if ( bCommon == false )	addEvent(EventSegmentDragStart);
-	if ( bCommon == true )	addEvent(EventSegmentDragStop);
-	if ( bCommon == true )	addEvent(EventSegmentDragPositionChanged);
-	if ( bCommon == false )	addEvent(EventMovableSettingChanged);
-	if ( bCommon == true )	addEvent(EventSegmentSized);
-	if ( bCommon == false )	addEvent(EventClickableSettingChanged);
+    if ( bCommon == false )
+    {
+        addEvent(EventSizingSettingChanged);
+        addEvent(EventSegmentDragStart);
+        addEvent(EventMovableSettingChanged);
+        addEvent(EventClickableSettingChanged);
+    }
+    else
+    {
+        addEvent(EventSortDirectionChanged);
+        addEvent(EventSegmentSized);
+        addEvent(EventSegmentDragStop);
+        addEvent(EventSegmentDragPositionChanged);
+        addEvent(EventSplitterDoubleClicked);
+        addEvent(EventSegmentClicked);
+    }
 }
 
 
@@ -647,10 +653,13 @@ void ListHeaderSegment::onCaptureLost(WindowEventArgs& e)
 *************************************************************************/
 void ListHeaderSegment::addHeaderSegmentProperties( bool bCommon )
 {
-	if ( bCommon == false )   addProperty(&d_clickableProperty);
-	if ( bCommon == false )   addProperty(&d_sizableProperty);
-	if ( bCommon == false )   addProperty(&d_dragableProperty);
-	if ( bCommon == false )   addProperty(&d_sortDirectionProperty);
+    if ( bCommon == false )
+    {
+        addProperty(&d_clickableProperty);
+        addProperty(&d_sizableProperty);
+        addProperty(&d_dragableProperty);
+        addProperty(&d_sortDirectionProperty);
+    }
 }
 
 
