@@ -252,3 +252,4 @@
 // Module includes
 #include "CServer.h"
 #include "Config.h"
+#include "../../version.h"

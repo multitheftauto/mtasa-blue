@@ -479,6 +479,7 @@ public:
     static unsigned long                GetVersion                          ( );
     static const char*                  GetVersionString                    ( );
     static const char*                  GetVersionName                      ( );
+    static const char*                  GetVersionBuildType                 ( );
     static unsigned long                GetNetcodeVersion                   ( );
     static const char*                  GetOperatingSystemName              ( );
 };

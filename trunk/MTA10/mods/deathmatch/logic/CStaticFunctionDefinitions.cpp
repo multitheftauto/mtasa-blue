@@ -5390,6 +5390,11 @@ const char* CStaticFunctionDefinitions::GetVersionName ()
     return MTA_DM_FULL_STRING;
 }
 
+const char* CStaticFunctionDefinitions::GetVersionBuildType ()
+{
+    return MTA_DM_BUILDTYPE;
+}
+
 unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
 {
     return MTA_DM_NETCODE_VERSION;
