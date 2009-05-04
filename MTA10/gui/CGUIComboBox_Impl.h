@@ -17,7 +17,6 @@
 
 #include "CGUIElement_Impl.h"
 #include "CGUIListItem_Impl.h"
-#include <list>
 
 class CGUIComboBox_Impl : public CGUIComboBox, public CGUIElement_Impl
 {
@@ -37,7 +36,7 @@ public:
 
 protected:
 
-    std::list < CGUIListItem_Impl* >    m_Items;
+    google::sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
     CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
 };

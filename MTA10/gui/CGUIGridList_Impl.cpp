@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 
+using namespace google;
+
 #define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
 #define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList"	//MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
@@ -29,6 +31,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
     m_hUniqueHandle = 0;
 	m_iIndex = 0;
     m_bIgnoreTextSpacer = false;
+    m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -70,6 +73,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
 
 CGUIGridList_Impl::~CGUIGridList_Impl ( void )
 {
+    Clear ();
     DestroyElement ();
 }
 
@@ -198,6 +202,12 @@ void CGUIGridList_Impl::Clear ( void )
 	    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( 0 );
 	    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> resetList ();
+
+        sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+        for ( it = m_Items.begin (); it != m_Items.end (); it++ )
+        {
+            delete it->second;
+        }
         m_Items.clear ();
     }
     catch ( CEGUI::Exception )
@@ -324,14 +334,13 @@ void CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText,
 			// If it doesn't, create it and set it in the gridlist
 			CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, bNumber );
 
-
 			CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
             CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
             //DWORD start = timeGetTime();
 			win-> setItem ( pListboxItem, hColumn, iRow, bFast );
 
-			// Push our class onto the list
-			m_Items.push_back ( pNewItem );
+			// Put our new item into the map
+			m_Items [ pNewItem->GetListItem () ] = pNewItem;
 
 			if ( bSection ) {
 				// Set section properties
@@ -397,8 +406,8 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
         CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setItem ( pListboxItem, hColumn, iRow );
 
-        // Push our class onto the list
-		m_Items.push_back ( pNewItem );
+        // Put our new item in the map
+		m_Items [ pNewItem->GetListItem () ] = pNewItem;
     }
 }
 
@@ -577,17 +586,10 @@ unsigned int CGUIGridList_Impl::GetUniqueHandle ( void )
 
 CGUIListItem_Impl* CGUIGridList_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 {
-    // Find the item in our list
-    std::list < CGUIListItem_Impl* > ::const_iterator iter = m_Items.begin ();
-    for ( ; iter != m_Items.end (); iter++ )
-    {
-        // Matching CEGUI class?
-        if ( (*iter)->GetListItem () == pItem )
-        {
-            return *iter;
-        }
-    }
+    sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    it = m_Items.find ( pItem );
+    if ( it == m_Items.end () )
+        return NULL;
 
-    // Doesn't exist
-    return NULL;
+    return it->second;
 }

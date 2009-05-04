@@ -14,11 +14,14 @@
 
 #include "StdInc.h"
 
+using namespace google;
+
 #define CGUICOMBOBOX_NAME "CGUI/Combobox"
 
 CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
 	m_pManager = pGUI;
+    m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
 
 	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -52,7 +55,6 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 CGUIComboBox_Impl::~CGUIComboBox_Impl ( void )
 {
     Clear ();
-
     DestroyElement ();
 }
 
@@ -62,7 +64,7 @@ CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
 	CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, CGUIListItem_Impl::Type::TextItem, NULL );
     CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
-    m_Items.push_back ( pNewItem );
+    m_Items [ pNewItem->GetListItem () ] = pNewItem;
     return pNewItem;
 }
 
@@ -76,6 +78,13 @@ CGUIListItem* CGUIComboBox_Impl::GetSelectedItem ( void )
 void CGUIComboBox_Impl::Clear ( void )
 {
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> getDropList () -> resetList ();
+
+    sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    for ( it = m_Items.begin (); it != m_Items.end (); it++ )
+    {
+        delete it->second;
+    }
+
     m_Items.clear ();
 }
 
@@ -87,17 +96,10 @@ void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )
 
 CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 {
-    // Find the item in our list
-    std::list < CGUIListItem_Impl* > ::const_iterator iter = m_Items.begin ();
-    for ( ; iter != m_Items.end (); iter++ )
-    {
-        // Matching CEGUI class?
-        if ( (*iter)->GetListItem () == pItem )
-        {
-            return *iter;
-        }
-    }
+    sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
+    it = m_Items.find ( pItem );
+    if ( it == m_Items.end () )
+        return NULL;
 
-    // Doesn't exist
-    return NULL;
+    return it->second;
 }

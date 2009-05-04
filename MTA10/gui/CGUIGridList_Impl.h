@@ -18,7 +18,6 @@
 
 #include <gui/CGUIGridList.h>
 #include "CGUIElement_Impl.h"
-#include <list>
 
 class CGUIListItem_Impl;
 
@@ -85,7 +84,7 @@ private:
     CGUIListItem_Impl*                  GetListItem             ( CEGUI::ListboxItem* pItem );
     unsigned int                        m_hUniqueHandle;
 
-    std::list < CGUIListItem_Impl* >    m_Items;
+    google::sparse_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
     GUI_CALLBACK                        m_OnSortColumn;
 
