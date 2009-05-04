@@ -530,12 +530,15 @@ void MultiLineEditbox::cacheTextLines(const Rect& dest_area)
         colour selectBrushCol = hasInputFocus() ? d_selectBrushColour : d_inactiveSelectBrushColour;
         selectBrushCol.setAlpha(selectBrushCol.getAlpha() * alpha);
 
+        // Cache font info
+        const float fLineSpacing = fnt->getLineSpacing ();
+
         // for each formatted line.
         for (size_t i = 0; i < d_lines.size(); ++i)
         {
             Rect lineRect(drawArea);
             // Check line is within the dest_area
-            if ( lineRect.d_top < dest_area.d_bottom && lineRect.d_top > dest_area.d_top + 25 )
+            if ( lineRect.d_top < dest_area.d_bottom && lineRect.d_top + fLineSpacing > dest_area.d_top )
             {
                 const LineInfo& currLine = d_lines[i];
                 String lineText(d_text.substr(currLine.d_startIdx, currLine.d_length));
@@ -612,7 +615,7 @@ void MultiLineEditbox::cacheTextLines(const Rect& dest_area)
                     // calculate area for the selection brush on this line
                     lineRect.d_left = drawArea.d_left + selStartOffset;
                     lineRect.d_right = lineRect.d_left + selAreaWidth;
-                    lineRect.d_bottom = lineRect.d_top + fnt->getLineSpacing();
+                    lineRect.d_bottom = lineRect.d_top + fLineSpacing;
 
                     // render the selection area brush for this line
                     colours.setColours(selectBrushCol);
@@ -621,7 +624,7 @@ void MultiLineEditbox::cacheTextLines(const Rect& dest_area)
             }
 
             // update master position for next line in paragraph.
-            drawArea.d_top += fnt->getLineSpacing();
+            drawArea.d_top += fLineSpacing;
         }
     }
 }
