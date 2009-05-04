@@ -222,6 +222,17 @@ void CRadarMap::DoPulse ( void )
                         // Set the size, position etc and show it here
                         g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
                     }
+                    else
+                    {
+                        // The image has not yet been created, let's create it
+                        (*markerIter)->SetSprite ( (*markerIter)->GetSprite () );
+
+                        // Retrieve the newly created image from the marker element
+                        pImage = (*markerIter)->GetMapMarkerImage ();
+
+                        // Set the size, position etc and show it here
+                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
+                    }
                 }
                 else
                 {
