@@ -23,10 +23,11 @@ public:
     inline CStack ( void )
     {
         m_ulBlipStackPosition = MAX_STACK_SIZE;
+        m_usBlipIDStack [ 0 ] = INVALID_STACK_ID;
 
-        for ( T i = 0; i < MAX_STACK_SIZE; i++ )
+        for ( T i = 1; i < MAX_STACK_SIZE; ++i )
         {
-            m_usBlipIDStack [i] = i;
+            m_usBlipIDStack [ i ] = MAX_STACK_SIZE - i;
         }
     }
 

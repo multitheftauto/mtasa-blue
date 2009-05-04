@@ -202,14 +202,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
     {
         // Read out the vehicle id
         ElementID ID;
-        if ( BitStream.Read ( ID ) )
+        if ( BitStream.ReadCompressed ( ID ) )
         {
             // Read out the sync time context. See CClientEntity for documentation on that.
             unsigned char ucSyncTimeContext = 0;
-            BitStream.Read ( ucSyncTimeContext );
+            BitStream.ReadCompressed ( ucSyncTimeContext );
 
             unsigned char ucFlags = 0;
-            BitStream.Read ( ucFlags );
+            BitStream.ReadCompressed ( ucFlags );
 
             // Read out the position
             CVector vecPosition, vecRotationDegrees, vecMoveSpeed, vecTurnSpeed;
@@ -336,7 +336,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( pVehicle->m_LastSyncedData->vecRotation != vecRotation ) ucFlags |= 0x02;
     if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vecMoveSpeed ) ucFlags |= 0x04;
     if ( pVehicle->m_LastSyncedData->vecTurnSpeed != vecTurnSpeed ) ucFlags |= 0x08;
-    if ( pVehicle->m_LastSyncedData->fHealth != pVehicle->GetHealth() ) ucFlags |= 0x010;
+    if ( abs ( pVehicle->m_LastSyncedData->fHealth - pVehicle->GetHealth() ) > FLOAT_EPSILON ) ucFlags |= 0x010;
     if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) ucFlags |= 0x020;
     if ( pVehicle->IsEngineOn () ) ucFlags |= 0x040;
     if ( pVehicle->IsDerailed () ) ucFlags |= 0x080;
@@ -345,13 +345,13 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( ucFlags == 0 ) return;
 
     // Write the vehicle id
-    pBitStream->Write ( pVehicle->GetID () );
+    pBitStream->WriteCompressed ( pVehicle->GetID () );
 
     // Write the sync time context
-    pBitStream->Write ( pVehicle->GetSyncTimeContext () );
+    pBitStream->WriteCompressed ( pVehicle->GetSyncTimeContext () );
 
     // Write flags
-    pBitStream->Write ( ucFlags );
+    pBitStream->WriteCompressed ( ucFlags );
 
     // Write it
     if ( ucFlags & 0x01 )
@@ -397,7 +397,7 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     // And trailer
     if ( ucFlags & 0x20 )
     {
-        pBitStream->Write ( Trailer );
+        pBitStream->WriteCompressed ( Trailer );
         pVehicle->m_LastSyncedData->Trailer = Trailer;
     }
 }

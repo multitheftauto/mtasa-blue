@@ -18,6 +18,8 @@
 
 #include <math.h>
 
+#define FLOAT_EPSILON 0.0001f
+
 /**
  * CVector Structure used to store a 3D vertex.
  */
@@ -26,7 +28,7 @@ class CVector
 public:
 	FLOAT fX, fY, fZ;
 	
-	CVector() 
+	CVector()
 	{
 		this->fX = 0;
 		this->fY = 0;
@@ -40,7 +42,7 @@ public:
 		this->fZ = fZ;
 	}
 
-    void Normalize ( void ) 
+    float Normalize ( void ) 
     { 
         double t = sqrt(fX*fX + fY*fY + fZ*fZ);
         if ( t > 0 )
@@ -52,6 +54,7 @@ public:
             fY = (float)fY2;
             fZ = (float)fZ2;
         }
+        return static_cast < float > ( t );
     }
 
 	float Length ( void ) const
@@ -155,12 +158,16 @@ public:
 
     bool operator== ( const CVector& param ) const
     {
-        return (fX == param.fX && fY == param.fY && fZ == param.fZ);
+        return ( ( abs ( fX - param.fX ) < FLOAT_EPSILON ) ||
+                 ( abs ( fY - param.fY ) < FLOAT_EPSILON ) ||
+                 ( abs ( fZ - param.fZ ) < FLOAT_EPSILON ) );
     }
 
     bool operator!= ( const CVector& param ) const
     {
-        return (fX != param.fX || fY != param.fY || fZ != param.fZ);
+        return ( ( abs ( fX - param.fX ) >= FLOAT_EPSILON ) ||
+                 ( abs ( fY - param.fY ) >= FLOAT_EPSILON ) ||
+                 ( abs ( fZ - param.fZ ) >= FLOAT_EPSILON ) );
     }
 };
 
