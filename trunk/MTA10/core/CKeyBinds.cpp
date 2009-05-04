@@ -499,6 +499,9 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
         {
             bind->szResource = new char [ strlen ( szResource ) + 1 ];
             strcpy ( bind->szResource, szResource );
+
+            bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
+            strcpy ( bind->szDefaultKey, szKey );
         }
         bind->bHitState = bState;
         bind->bState = false;
@@ -2294,6 +2297,12 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     {
 						pA = pAttributes->Create ( "resource" );						
 						pA->SetValue ( szResource );
+
+                        //If its still the default key dont bother saving it
+                        if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
+                        {
+                             pNode->GetParent()->DeleteSubNode(pNode);
+                        }
                     }
                 }
                 else if ( type == KEY_BIND_GTA_CONTROL )
