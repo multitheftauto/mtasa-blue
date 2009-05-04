@@ -3084,11 +3084,15 @@ int CLuaFunctionDefinitions::SetElementPosition ( lua_State* luaVM )
                               static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                               static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
 
+        bool bWarp = true;
+        if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
+            bWarp = lua_toboolean ( luaVM, 5 ) ? true : false;
+
         // Valid?
         if ( pEntity )
         {
             // Try to set the position
-            if ( CStaticFunctionDefinitions::SetElementPosition ( *pEntity, vecPosition ) )
+            if ( CStaticFunctionDefinitions::SetElementPosition ( *pEntity, vecPosition, bWarp ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

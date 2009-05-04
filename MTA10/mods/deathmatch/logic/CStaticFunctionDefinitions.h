@@ -75,7 +75,7 @@ public:
     static bool                         DestroyElement                      ( CClientEntity& Entity );
     static bool                         SetElementData                      ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize );
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
-    static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition );
+    static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
     static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );

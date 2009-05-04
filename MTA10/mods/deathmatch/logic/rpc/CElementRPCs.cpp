@@ -133,10 +133,20 @@ void CElementRPCs::SetElementPosition ( NetBitStreamInterface& bitStream )
             // If it's a player, use Teleport
             if ( pEntity->GetType () == CCLIENTPLAYER )
             {
+                unsigned char ucWarp = 1;
+                bitStream.Read ( ucWarp );
+
                 CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( pEntity );
 
-                pPlayer->Teleport ( vecPosition );
-                pPlayer->ResetInterpolation ();
+                if ( ucWarp )
+                {
+                    pPlayer->Teleport ( vecPosition );
+                    pPlayer->ResetInterpolation ();
+                }
+                else
+                {
+                    pPlayer->SetPosition ( vecPosition );
+                }
 
                 // If local player, reset return position (so we can't warp back if connection fails)
                 if ( pPlayer->IsLocalPlayer () )
