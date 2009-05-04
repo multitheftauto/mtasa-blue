@@ -1270,13 +1270,6 @@ bool CStaticFunctionDefinitions::IsPedHeadless ( CClientPed & Ped, bool & bHeadl
 }
 
 
-bool CStaticFunctionDefinitions::GetPedFootBlood ( CClientPed & Ped, unsigned int & uiFootBlood )
-{
-    uiFootBlood = Ped.GetFootBlood ();
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetPedCameraRotation ( CClientPed & Ped, float & fRotation )
 {
 	fRotation = ConvertRadiansToDegrees ( Ped.GetCameraRotation() );
@@ -1692,19 +1685,6 @@ bool CStaticFunctionDefinitions::SetPedHeadless ( CClientEntity & Entity, bool b
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         Ped.SetHeadless ( bHeadless );
-        return true;
-    }
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetPedFootBlood ( CClientEntity & Entity, unsigned int uiFootBlood )
-{
-    RUN_CHILDREN SetPedFootBlood ( **iter, uiFootBlood );
-    if ( IS_PED ( &Entity ) )
-    {
-        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.SetFootBlood ( uiFootBlood );
         return true;
     }
     return false;

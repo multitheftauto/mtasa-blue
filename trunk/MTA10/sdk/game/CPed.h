@@ -215,9 +215,6 @@ public:
     virtual void            SetOccupiedSeat ( BYTE seat ) = 0;
 
     virtual void            RemoveBodyPart ( int i, char c ) = 0;
-	
-    virtual void            SetFootBlood ( unsigned int uiFootBlood ) = 0;
-    virtual unsigned int    GetFootBlood ( ) = 0;
 
     virtual bool            IsOnFire ( void ) = 0;
     virtual void            SetOnFire ( bool bOnFire ) = 0;
