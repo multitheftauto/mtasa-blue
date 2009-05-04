@@ -5107,7 +5107,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
-    dCount = GetSecondCount () * 1000.0;
+    dCount = GetTickCount64_();
     return true;
 }
 
