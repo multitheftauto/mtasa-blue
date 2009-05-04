@@ -201,6 +201,7 @@ public:
     LUA_DECLARE ( GetPedAnimation );
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
+    LUA_DECLARE ( GetPedFootBlood );
 	LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
 
@@ -216,6 +217,7 @@ public:
     LUA_DECLARE ( SetPedDoingGangDriveby );
     LUA_DECLARE ( SetPedLookAt );
     LUA_DECLARE ( SetPedHeadless );
+    LUA_DECLARE ( SetPedFootBlood );
 	LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedOnFire );
 

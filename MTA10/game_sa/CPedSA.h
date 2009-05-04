@@ -409,6 +409,9 @@ public:
 
     void                RemoveBodyPart ( int i, char c );
 
+	void                SetFootBlood ( unsigned int uiFootBlood );
+	unsigned int        GetFootBlood ( );
+
     bool                IsOnFire ( void );
     void                SetOnFire ( bool bOnFire );
 
