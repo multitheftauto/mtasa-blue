@@ -494,8 +494,9 @@ public:
 	static int		Get									( lua_State* luaVM );
 	static int		Set									( lua_State* luaVM );
 
+    // Utility
     static int      Md5                                 ( lua_State* luaVM );
-
+    static int      GetAveragePacketSizes               ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );
 };
 

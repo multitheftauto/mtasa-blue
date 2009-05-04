@@ -10753,6 +10753,22 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetAveragePacketSizes ( lua_State* luaVM )
+{
+    float fSizes [ 256 ];
+    g_pNetServer->GetAveragePacketSizes ( fSizes );
+    lua_createtable ( luaVM, 256, 1 );
+
+    for ( unsigned int i = 0; i < 256; ++i )
+    {
+        lua_pushnumber ( luaVM, fSizes [ i ] );
+        lua_rawseti ( luaVM, -2, i );
+    }
+
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 {
     lua_createtable ( luaVM, 0, 5 );

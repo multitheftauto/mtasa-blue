@@ -686,7 +686,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "get", CLuaFunctionDefinitions::Get );
     CLuaCFunctions::AddFunction ( "set", CLuaFunctionDefinitions::Set );
 
+    // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
-
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
+    CLuaCFunctions::AddFunction ( "getAveragePacketSizes", CLuaFunctionDefinitions::GetAveragePacketSizes );
 }
