@@ -120,7 +120,7 @@ public:
 #define MTA_DM_VERSION 0x0100
 #define MTA_DM_VERSIONSTRING "1.0"
 #define MTA_DM_FULL_STRING "MTA:SA Client"
-#define MTA_DM_NETCODE_VERSION 0x012E
+#define MTA_DM_NETCODE_VERSION 0x012F
 
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
