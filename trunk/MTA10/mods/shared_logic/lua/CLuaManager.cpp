@@ -820,6 +820,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Projectile funcs
     CLuaCFunctions::AddFunction ( "createProjectile", CLuaFunctionDefinitions::CreateProjectile );
+    CLuaCFunctions::AddFunction ( "getProjectileType", CLuaFunctionDefinitions::GetProjectileType );
 
     // Shape create funcs
     CLuaCFunctions::AddFunction ( "createColCircle", CLuaFunctionDefinitions::CreateColCircle );

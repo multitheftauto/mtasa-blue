@@ -150,6 +150,17 @@ CClientPlayer* lua_toplayer ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
+CClientProjectile* lua_toprojectile ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTPROJECTILE )
+    {
+        return static_cast < CClientProjectile* > ( pElement );
+    }
+
+    return NULL;
+}
+
 CLuaTimer* lua_totimer ( lua_State* luaVM, int iArgument )
 {
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );

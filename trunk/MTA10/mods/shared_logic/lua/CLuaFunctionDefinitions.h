@@ -620,6 +620,7 @@ public:
 
     // Projectile funcs
     LUA_DECLARE ( CreateProjectile );
+    LUA_DECLARE ( GetProjectileType );
 
     // Shape create funcs
     LUA_DECLARE ( CreateColCircle );
