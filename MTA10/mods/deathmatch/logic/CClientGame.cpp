@@ -2247,7 +2247,6 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Projectile events
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
-    m_Events.AddEvent ( "onClientProjectileDestruction", "", NULL, false );
 }
 
 
