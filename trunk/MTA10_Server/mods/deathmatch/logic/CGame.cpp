@@ -623,31 +623,35 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // If ASE is enabled
-    if ( m_pMainConfig->GetASEEnabled () )
+    if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
     {
 		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
-		// Query Wojjie's game-monitor.com
-        CTCPImpl * pTCP = new CTCPImpl;
-        pTCP->Initialize ();
 
-		char szURL[256] = { '\0' };
-        CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-		sprintf ( szURL, QUERY_URL_GAME_MONITOR, usServerPort + 123);
+		if ( m_pMainConfig->GetASEEnabled () )
+		{
+			// Query Wojjie's game-monitor.com
+			CTCPImpl * pTCP = new CTCPImpl;
+			pTCP->Initialize ();
 
-		CHTTPRequest * request = new CHTTPRequest ( szURL );
-        CHTTPResponse * response = request->Send ( pTCP );
-        if ( !response )
-			CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-		else if ( response->GetErrorCode () != 200 )
-			CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-		else
-			CLogger::LogPrintfNoStamp ( "success!\n");
+			char szURL[256] = { '\0' };
+			CLogger::LogPrint ( "Querying game-monitor.com master server... " );
+			sprintf ( szURL, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
-		delete pTCP;
-		delete request;
+			CHTTPRequest * request = new CHTTPRequest ( szURL );
+			CHTTPResponse * response = request->Send ( pTCP );
+			if ( !response )
+				CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+			else if ( response->GetErrorCode () != 200 )
+				CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+			else
+				CLogger::LogPrintfNoStamp ( "success!\n");
+
+			delete pTCP;
+			delete request;
+		}
     }
 
     // Is the script debug log enabled?
