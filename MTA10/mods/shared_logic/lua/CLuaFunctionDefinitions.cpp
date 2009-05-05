@@ -14597,6 +14597,29 @@ int CLuaFunctionDefinitions::CreateProjectile ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetProjectileType ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientProjectile* pProjectile = lua_toprojectile ( luaVM, 1 );
+        if ( pProjectile )
+        {
+            unsigned char ucWeapon = pProjectile->GetWeaponType();
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeapon ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileType", "pickup", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileType" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 
 
 int CLuaFunctionDefinitions::CreateColCircle ( lua_State* luaVM )
