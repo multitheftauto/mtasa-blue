@@ -44,6 +44,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
 unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
 unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
+unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -144,6 +145,7 @@ VOID HOOK_CVehicle_ResetAfterRender();
 VOID HOOK_CObject_Render ();
 VOID HOOK_EndWorldColors ();
 VOID HOOK_CGame_Process ();
+VOID HOOK_CWorld_ProcessVerticalLineSectorList ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -239,6 +241,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
+    HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -779,6 +782,9 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x5E1E73 = 0xB9;
     *(BYTE *)0x5E1E74 = 0x00;
     *(BYTE *)0x5E1E77 = 0x90;
+
+    // Make all created objects to have a control code, so they can be checked for vertical line test HOOK
+    memset ( (void *)0x59FABC, 0x90, 90 );
 }
 
 
@@ -2343,6 +2349,39 @@ VOID _declspec(naked) HOOK_EndWorldColors ()
     }
 }
 
+
+// This hook modified the code in CWorld::ProcessVerticalLineSectorList to
+// force it to also check the world objects, so we can get a reliable ground
+// position on custom object maps. This will make getGroundPosition, jetpacks
+// and molotovs to work.
+static DWORD dwObjectsChecked = 0;
+static DWORD dwProcessVerticalKeepLooping = 0x5632D1;
+static DWORD dwProcessVerticalEndLooping = 0x56335F;
+static DWORD dwGlobalListOfObjects = 0xB9ACCC;
+VOID _declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList ( )
+{
+    _asm
+    {
+        test    ebp, ebp
+        jz      end_of_entities_list
+        jmp     dwProcessVerticalKeepLooping
+
+end_of_entities_list:
+        mov     eax, dwObjectsChecked
+        test    eax, eax
+        jnz     stop_looping
+        mov     dwObjectsChecked, 1
+        mov     ebp, dwGlobalListOfObjects
+        mov     ebp, [ebp]
+        test    ebp, ebp
+        jz      stop_looping
+        jmp     dwProcessVerticalKeepLooping
+
+stop_looping:
+        mov     dwObjectsChecked, 0
+        jmp     dwProcessVerticalEndLooping
+    }
+}
 
 
 

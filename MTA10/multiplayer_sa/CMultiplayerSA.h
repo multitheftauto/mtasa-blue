@@ -142,6 +142,7 @@ private:
     static unsigned long        HOOKPOS_CVehicle_ResetAfterRender;
     static unsigned long        HOOKPOS_CObject_Render;
     static unsigned long        HOOKPOS_EndWorldColors;
+    static unsigned long        HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;
