@@ -585,6 +585,7 @@ public:
     LUA_DECLARE ( SetGarageOpen );
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
     LUA_DECLARE ( SetBlurLevel );
+    LUA_DECLARE ( SetJetpackMaxHeight );
 
     // Input functions
     LUA_DECLARE ( BindKey );

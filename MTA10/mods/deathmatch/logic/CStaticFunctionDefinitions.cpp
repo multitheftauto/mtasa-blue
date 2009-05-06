@@ -4538,6 +4538,12 @@ bool CStaticFunctionDefinitions::SetBlurLevel ( unsigned char ucLevel )
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
+{
+    g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
 {
     return g_pGame->IsCheatEnabled ( szPropName );

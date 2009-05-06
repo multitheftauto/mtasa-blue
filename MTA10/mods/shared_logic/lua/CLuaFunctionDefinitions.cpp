@@ -13523,6 +13523,23 @@ int CLuaFunctionDefinitions::SetGarageOpen ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetJetpackMaxHeight ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        if ( CStaticFunctionDefinitions::SetJetpackMaxHeight ( fHeight ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setJetpackMaxHeight" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
 {

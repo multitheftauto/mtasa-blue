@@ -2350,7 +2350,7 @@ VOID _declspec(naked) HOOK_EndWorldColors ()
 }
 
 
-// This hook modified the code in CWorld::ProcessVerticalLineSectorList to
+// This hook modifies the code in CWorld::ProcessVerticalLineSectorList to
 // force it to also check the world objects, so we can get a reliable ground
 // position on custom object maps. This will make getGroundPosition, jetpacks
 // and molotovs to work.
