@@ -785,6 +785,9 @@ void CMultiplayerSA::InitHooks()
 
     // Make all created objects to have a control code, so they can be checked for vertical line test HOOK
     memset ( (void *)0x59FABC, 0x90, 90 );
+
+    // Avoid GTA setting vehicle first color to white after changing the paintjob
+    memset ( (void *)0x6D65C5, 0x90, 11 );
 }
 
 
