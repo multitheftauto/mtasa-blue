@@ -1552,6 +1552,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
 
+        if ( IS_PLAYER ( &Entity ) && !Ped.IsLocalPlayer() )
+            return false;
+
         Ped.SetCanBeKnockedOffBike ( bCanBeKnockedOffBike );
         return true;
     }
