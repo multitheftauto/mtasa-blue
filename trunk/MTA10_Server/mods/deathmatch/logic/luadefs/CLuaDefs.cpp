@@ -94,7 +94,6 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
         {
             // Otherwise just return false
             m_pScriptDebugging->LogBadAccess ( luaVM, szFunction );
-            lua_pushboolean ( luaVM, false );
             return false;
         }
     }
