@@ -783,6 +783,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaFunctionDefinitions::SetGarageOpen );
     CLuaCFunctions::AddFunction ( "setWorldSpecialPropertyEnabled", CLuaFunctionDefinitions::SetWorldSpecialPropertyEnabled );
     CLuaCFunctions::AddFunction ( "setBlurLevel", CLuaFunctionDefinitions::SetBlurLevel );
+    CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefinitions::SetJetpackMaxHeight );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefinitions::BindKey );

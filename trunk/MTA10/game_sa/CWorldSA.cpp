@@ -377,3 +377,8 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
         add     esp, 4
     }
 }
+
+void CWorldSA::SetJetpackMaxHeight ( float fHeight )
+{
+    *(float *)(VAR_fJetpackMaxHeight) = fHeight;
+}

@@ -39,6 +39,7 @@
 #define ARRAY_StreamRepeatSectors                           0xB992B8
 #define NUM_StreamRepeatSectorRows                          16
 #define NUM_StreamRepeatSectorCols                          16
+#define VAR_fJetpackMaxHeight                               0x8703D8
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
@@ -63,6 +64,7 @@ public:
     bool        HasCollisionBeenLoaded    ( CVector * vecPosition );
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
+    void        SetJetpackMaxHeight       ( float fHeight );
 
 	/**
 	 * \todo Add FindObjectsKindaColliding (see 0x430577)

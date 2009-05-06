@@ -33,6 +33,7 @@ public:
     virtual bool        HasCollisionBeenLoaded      ( CVector * vecPosition ) = 0;
     virtual DWORD       GetCurrentArea              ( void ) = 0;
     virtual void        SetCurrentArea              ( DWORD dwArea ) = 0;
+    virtual void        SetJetpackMaxHeight         ( float fHeight ) = 0;
 };
 
 #endif
