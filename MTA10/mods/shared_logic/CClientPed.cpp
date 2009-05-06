@@ -2738,7 +2738,10 @@ void CClientPed::_CreateModel ( void )
 		m_pPlayerPed->SetHealth ( m_fHealth );
 		m_pPlayerPed->SetArmor ( m_fArmor );
 		WorldIgnore ( m_bWorldIgnored );
-		SetCanBeKnockedOffBike ( m_bCanBeKnockedOffBike );
+        if ( m_bIsLocalPlayer )
+		    SetCanBeKnockedOffBike ( m_bCanBeKnockedOffBike );
+        else
+            SetCanBeKnockedOffBike ( false );
 		for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
 			GiveWeapon ( m_WeaponTypes [ i ], 1000 );   // TODO: store ammo for each weapon
 		m_pPlayerPed->SetCurrentWeaponSlot ( m_CurrentWeaponSlot );
