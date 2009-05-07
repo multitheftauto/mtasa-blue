@@ -75,6 +75,7 @@ bool CPlayerListPacket::Write ( NetServerBitStreamInterface& BitStream ) const
         bool bHasJetpack = pPlayer->HasJetPack ();
         bool bNametagShowing = pPlayer->IsNametagShowing ();
         bool bNametagColorOverridden = pPlayer->IsNametagColorOverridden ();
+        bool bIsHeadless = pPlayer->IsHeadless();
 
         // Collect the flags into a byte
         unsigned char ucFlags = 0;
@@ -84,7 +85,7 @@ bool CPlayerListPacket::Write ( NetServerBitStreamInterface& BitStream ) const
         ucFlags |= bHasJetpack << 3;
         ucFlags |= bNametagShowing << 4;
         ucFlags |= bNametagColorOverridden << 5;
-
+        ucFlags |= bIsHeadless << 6;
         // Write the flags
         BitStream.Write ( ucFlags );
 

@@ -44,6 +44,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_pClothes = new CPlayerClothes;
     m_pClothes->DefaultClothes ();
     m_bHasJetPack = false;
+    m_bHeadless = false;
     m_bInWater = false;
     m_bOnGround = true;
     m_bIsPlayer = false;

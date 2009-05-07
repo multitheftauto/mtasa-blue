@@ -529,6 +529,7 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                     unsigned char ucFlags = 0;
                     if ( pPed->HasJetPack () ) ucFlags |= 0x1;
                     if ( pPed->IsSyncable () ) ucFlags |= 0x2;
+                    if ( pPed->IsHeadless () ) ucFlags |= 0x4;
                     BitStream.Write ( ucFlags );
 
                     // alpha
