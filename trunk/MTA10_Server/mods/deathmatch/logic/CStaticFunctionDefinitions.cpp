@@ -6104,6 +6104,7 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fL
     else
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
+        g_pGame->SetWaterLevel ( fLevel );
     }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;
@@ -6125,6 +6126,7 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel, C
     else
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
+        g_pGame->SetWaterLevel ( fLevel );
     }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;

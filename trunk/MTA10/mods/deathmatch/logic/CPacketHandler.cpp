@@ -1845,6 +1845,10 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     bitStream.Read ( fWaveHeight );
     g_pGame->GetWaterManager ()->SetWaveLevel ( fWaveHeight );
 
+    float fWaterLevel = 0.0f;
+    bitStream.Read ( fWaterLevel );
+    g_pGame->GetWaterManager ()->SetWaterLevel ((CVector *)NULL, fWaterLevel );
+
 	short sFPSLimit = 36;
 	bitStream.Read ( sFPSLimit );
 
