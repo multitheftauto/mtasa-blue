@@ -500,11 +500,12 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 // Add a log entry.
-                SString strFilename ( "mta\\dumps\\client_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
-                                                                                      SystemTime.wDay,
-                                                                                      SystemTime.wYear,
-                                                                                      SystemTime.wHour,
-                                                                                      SystemTime.wMinute );
+                SString strFilename ( "mta\\dumps\\client_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTYPE,
+                                                                                         SystemTime.wMonth,
+                                                                                         SystemTime.wDay,
+                                                                                         SystemTime.wYear,
+                                                                                         SystemTime.wHour,
+                                                                                         SystemTime.wMinute );
 
                 // Copy the file
                 CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
