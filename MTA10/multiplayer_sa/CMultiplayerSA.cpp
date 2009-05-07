@@ -769,7 +769,12 @@ void CMultiplayerSA::InitHooks()
     //*(WORD *)0x53DF55 = 0x9090;
 
     // Disallow spraying gang tags
-    memset ( (void *)0x565C5C, 0x90, 10 );
+    // Nop the whole CTagManager::IsTag function and replace it's body with:
+    // xor eax, eax
+    // ret
+    // to make it always return false
+    memset ( (void *)0x49CCE0, 0x90, 74 );
+    *(DWORD *)(0x49CCE0) = 0x90C3C033;
 
     // Allow turning on vehicle lights even if the engine is off
     memset ( (void *)0x6E1DBC, 0x90, 8 );
