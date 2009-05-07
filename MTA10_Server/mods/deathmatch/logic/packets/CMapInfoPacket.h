@@ -32,6 +32,7 @@ public:
                                                       float fGravity,
                                                       float fGameSpeed,
                                                       float fWaveHeight,
+                                                      float fWaterLevel,
                                                       bool bHasSkyGradient,
                                                       bool* pbGarageStates,
                                                       unsigned char ucSkyGradientTR = 0,
@@ -59,6 +60,7 @@ private:
     float                   m_fGravity;
     float                   m_fGameSpeed;
     float                   m_fWaveHeight;
+    float                   m_fWaterLevel;
     bool                    m_bHasSkyGradient;
     unsigned char           m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;

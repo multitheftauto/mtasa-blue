@@ -221,6 +221,9 @@ public:
     inline float                GetWaveHeight               ( void )        { return m_fWaveHeight; }
     inline void                 SetWaveHeight               ( float fWaveHeight )  { m_fWaveHeight = fWaveHeight; }
 
+    inline float                GetWaterLevel               ( void )        { return m_fWaterLevel; }
+    inline void                 SetWaterLevel               ( float fWaterLevel )  { m_fWaterLevel = fWaterLevel; }
+
     inline bool                 HasSkyGradient              ( void )        { return m_bHasSkyGradient; }
     inline void                 SetHasSkyGradient           ( bool bHasSkyGradient ) { m_bHasSkyGradient = bHasSkyGradient; }
 
@@ -326,6 +329,7 @@ private:
     float                       m_fGravity;
     float                       m_fGameSpeed;
     float                       m_fWaveHeight;
+    float                       m_fWaterLevel;
 
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
