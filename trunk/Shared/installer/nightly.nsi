@@ -667,6 +667,7 @@ DontInstallRedist:
 		SetOverwrite off
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\acl.xml"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\banlist.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
