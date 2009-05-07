@@ -757,9 +757,9 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
 		// Apply some low-level hacks (copies the old col area and sets a flag)
 		DWORD pColModelInterface = (DWORD)pInterface;
-		DWORD pOldColModelInterface = (DWORD) m_pOriginalColModel;
+		//DWORD pOldColModelInterface = (DWORD) m_pOriginalColModel;
 		*((BYTE *)( pPool [m_dwModelID ] + 0x13 )) |= 8;
-		*((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
+		*((BYTE *)( pColModelInterface + 40 )) = 0xA9; //*((BYTE *)( pOldColModelInterface + 40 ));
 
 		// Extra flags (3064) -- needs to be tested
 		m_pInterface->bDoWeOwnTheColModel = false;
