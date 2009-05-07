@@ -518,6 +518,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineRestoreCOL", CLuaFunctionDefinitions::EngineRestoreCOL );
 	CLuaCFunctions::AddFunction ( "engineReplaceModel", CLuaFunctionDefinitions::EngineReplaceModel );
     CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefinitions::EngineRestoreModel );
+    CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefinitions::EngineSetModelLODDistance );
 
 	CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefinitions::EngineLoadTXD );
 	CLuaCFunctions::AddFunction ( "engineImportTXD", CLuaFunctionDefinitions::EngineImportTXD );
