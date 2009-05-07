@@ -775,6 +775,10 @@ void CMultiplayerSA::InitHooks()
     // to make it always return false
     memset ( (void *)0x49CCE0, 0x90, 74 );
     *(DWORD *)(0x49CCE0) = 0x90C3C033;
+    // Remove also some hardcoded and inlined checks for if it's a tag
+    memset ( (void *)0x53374A, 0x90, 56 );
+    *(BYTE *)(0x4C4403) = 0xEB;
+
 
     // Allow turning on vehicle lights even if the engine is off
     memset ( (void *)0x6E1DBC, 0x90, 8 );
