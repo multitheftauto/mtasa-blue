@@ -34,11 +34,13 @@
       <acl name="RPC"/>
    </group>
    <group name="MapEditor">
+      <acl name="Default"/>
       <acl name="MapEditor"/>
       <object name="resource.editor_main"/>
       <object name="resource.edf"/>
    </group>
    <group name="raceACLGroup">
+	  <acl name="Default"/>
       <acl name="raceACL"/>
       <object name="resource.race"/>
    </group>
