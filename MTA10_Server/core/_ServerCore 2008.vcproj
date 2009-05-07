@@ -441,6 +441,10 @@
 				RelativePath=".\StdInc.h"
 				>
 			</File>
+			<File
+				RelativePath="..\version.h"
+				>
+			</File>
 			<Filter
 				Name="server"
 				>
