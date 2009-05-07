@@ -83,11 +83,12 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
             // Add a log entry.
             char szFilename [256];
-            sprintf ( szFilename, "dumps/server_%02d%02d%04d_%02d%02d.dmp", SystemTime.wMonth,
-                                                                            SystemTime.wDay,
-                                                                            SystemTime.wYear,
-                                                                            SystemTime.wHour,
-                                                                            SystemTime.wMinute );
+            sprintf ( szFilename, "dumps/server_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTYPE,
+                                                                               SystemTime.wMonth,
+                                                                               SystemTime.wDay,
+                                                                               SystemTime.wYear,
+                                                                               SystemTime.wHour,
+                                                                               SystemTime.wMinute );
 
 			// Create the file
 			HANDLE hFile = CreateFile ( szFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
