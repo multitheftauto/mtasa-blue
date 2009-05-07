@@ -419,6 +419,7 @@ public:
 	LUA_DECLARE ( EnginePositionSeats );
 	LUA_DECLARE ( EngineAddAllAtomics );
 	LUA_DECLARE ( EngineReplaceVehiclePart );
+    LUA_DECLARE ( EngineSetModelLODDistance );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

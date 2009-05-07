@@ -507,6 +507,20 @@ unsigned short CModelInfoSA::GetTextureDictionaryID ()
     return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[m_dwModelID]->usTextureDictionary;
 }
 
+float CModelInfoSA::GetLODDistance ()
+{
+    if ( m_pInterface )
+        return m_pInterface->fLodDistanceUnscaled;
+
+    return 0.0f;
+}
+
+void CModelInfoSA::SetLODDistance ( float fDistance )
+{
+    if ( m_pInterface )
+        m_pInterface->fLodDistanceUnscaled = fDistance;
+}
+
 void CModelInfoSA::RestreamIPL ()
 {
     // This function restreams all instances of the model *that are from the default SA world (ipl)*.

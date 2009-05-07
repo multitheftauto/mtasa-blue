@@ -79,6 +79,8 @@ public:
 	virtual CBoundingBox	* GetBoundingBox        () = 0;
 	virtual bool			IsValid                 () = 0;
     virtual unsigned short  GetTextureDictionaryID  () = 0;
+    virtual float           GetLODDistance          () = 0;
+    virtual void            SetLODDistance          ( float fDistance ) = 0;
     virtual void            RestreamIPL             () = 0;
 
 	virtual void			AddRef                  ( bool bWaitForLoad ) = 0;

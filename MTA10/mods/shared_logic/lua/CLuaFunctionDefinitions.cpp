@@ -952,6 +952,28 @@ int CLuaFunctionDefinitions::EngineRestoreModel ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::EngineSetModelLODDistance ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+        float fDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
+        if ( pModelInfo && fDistance > 0.0f )
+        {
+            pModelInfo->SetLODDistance ( fDistance );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 // TODO: int CLuaFunctionDefinitions::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 int CLuaFunctionDefinitions::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 {

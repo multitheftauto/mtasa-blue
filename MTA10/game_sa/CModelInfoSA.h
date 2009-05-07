@@ -264,6 +264,8 @@ public:
 	bool			                IsValid                 ( void );
 	float			                GetDistanceFromCentreOfMassToBaseOfModel ( void );
     unsigned short                  GetTextureDictionaryID  ( void );
+    float                           GetLODDistance          ( void );
+    void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
 
 	void			                AddRef                  ( bool bWaitForLoad );
