@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/lua/CLuaFunctionDefinitions.h
+*  FILE:        mods/shared_logic/lua/CLuaFunctionDefs.h
 *  PURPOSE:     Lua function definitions class header
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
@@ -26,12 +26,15 @@ class CLuaFunctionDefinitions;
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
 
+class CRegisteredCommands;
+class CSFX;
+
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 
-class CLuaFunctionDefinitions
+class CLuaFunctionDefs
 {
 public:
-    CLuaFunctionDefinitions ( class CLuaManager* pLuaManager,
+    static void Initialize ( class CLuaManager* pLuaManager,
                               class CScriptDebugging* pScriptDebugging,
 							  class CClientGame* pClientGame );
 
@@ -673,6 +676,30 @@ public:
 #endif
 
     LUA_DECLARE ( GetVersion );
+
+private:
+    // Static references to objects
+    static CLuaManager*			        m_pLuaManager;
+    static CScriptDebugging*            m_pScriptDebugging;
+    static CClientGame*			        m_pClientGame;
+    static CClientManager*              m_pManager;
+    static CClientEntity*		        m_pRootEntity;
+    static CClientGUIManager*	        m_pGUIManager;
+    static CClientPedManager*           m_pPedManager;
+    static CClientPlayerManager*        m_pPlayerManager;
+    static CClientRadarMarkerManager*   m_pRadarMarkerManager;
+    static CResourceManager*            m_pResourceManager;
+    static CClientVehicleManager*       m_pVehicleManager;
+    static CClientColManager*           m_pColManager;
+    static CClientObjectManager*        m_pObjectManager;
+    static CClientTeamManager*          m_pTeamManager;
+    static CRenderWare*					m_pRenderWare;
+    static CClientMarkerManager*        m_pMarkerManager;
+    static CClientPickupManager*        m_pPickupManager;
+    static CClientDFFManager*           m_pDFFManager;
+    static CClientColModelManager*      m_pColModelManager;
+    static CRegisteredCommands*         m_pRegisteredCommands;
+    static CSFX*						m_pSFX;
 };
 
 #endif

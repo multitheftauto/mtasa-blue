@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
+	RootNamespace="Client - Deathmatch"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -1027,7 +1028,119 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\lua\CLuaFunctionDefinitions.cpp"
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Audio.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Camera.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Element.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Ped.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Radar.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Team.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Vehicle.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Weapon.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.World.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.XML.cpp"
 						>
 					</File>
 					<File
@@ -1773,7 +1886,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\shared_logic\lua\CLuaFunctionDefinitions.h"
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.h"
 						>
 					</File>
 					<File
