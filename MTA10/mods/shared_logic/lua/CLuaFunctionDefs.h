@@ -49,6 +49,7 @@ public:
     LUA_DECLARE ( GetResourceFromName );
     LUA_DECLARE ( GetResourceRootElement );
 	LUA_DECLARE ( GetResourceGUIElement );
+	LUA_DECLARE ( GetResourceDynamicElementRoot );
 
     // Event functions
     LUA_DECLARE ( AddEvent );
