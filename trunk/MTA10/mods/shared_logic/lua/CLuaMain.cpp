@@ -96,12 +96,12 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-	lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "getfenv", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
+	lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "getfenv", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
 

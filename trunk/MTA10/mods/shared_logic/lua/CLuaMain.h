@@ -18,10 +18,9 @@ class CLuaMain;
 #ifndef __CLUAMAIN_H
 #define __CLUAMAIN_H
 
-#include "CLuaFunctionDefinitions.h"
 #include "CLuaTimerManager.h"
 
-#include "CLuaFunctionDefinitions.h"
+#include "CLuaFunctionDefs.h"
 
 #include <xml/CXMLFile.h>
 

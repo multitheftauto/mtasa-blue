@@ -225,7 +225,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions::CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
-    CLuaFunctionDefinitions::CLuaFunctionDefinitions ( m_pLuaManager, m_pScriptDebugging, this );
+    CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
