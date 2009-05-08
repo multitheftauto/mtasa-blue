@@ -40,17 +40,23 @@ public:
     bool                        GetVertex               ( int index, CVector& vecPosition );
     void                        SetVertex               ( int index, CVector& vecPosition );
 
+    void                        SetLevel                ( float fLevel ) { m_fWaterLevel = fLevel; };
+    float                       GetLevel                () { return m_fWaterLevel; };
     bool                        Valid                   ();
+    bool                        HasWaterLevelChanged    () { return m_bWaterChanged; };
+    void                        SetWaterLevelChanged    ( bool bChanged ) { m_bWaterChanged = bChanged; };
 
 private:
     void                        RoundVertices           ();
     void                        RoundVertex             ( int index );
     bool                        IsVertexWithinWorld     ( int index );
 
+    bool                        m_bWaterChanged;
     CWaterManager*              m_pWaterManager;
 
     CVector                     m_Vertices [ 4 ];
     EWaterType                  m_WaterType;
+    float                       m_fWaterLevel;
 };
 
 #endif

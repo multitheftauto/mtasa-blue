@@ -104,13 +104,7 @@ CGame::CGame ( void )
 #endif
 
     m_pASE = NULL;
-    m_fGravity = 0.008f; // default
-    m_fGameSpeed = 1.0f; // default
-    m_fWaveHeight = 0.0f; // default - weather controlled
-    m_fWaterLevel = 0.0f;
-    m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
-    m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
-    m_bHasSkyGradient = false;
+    ResetMapInfo();
 	m_usFPS = 0;
 	m_usFrames = 0;
 	m_ulLastFPSTime = 0;
@@ -125,8 +119,17 @@ CGame::CGame ( void )
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
 }
-
-
+void CGame::ResetMapInfo ( void )
+{
+    //Add variables to get reset in resetMapInfo here
+    m_fGravity = 0.008f; // default
+    m_fGameSpeed = 1.0f; // default
+    m_fWaveHeight = 0.0f; // default - weather controlled
+    m_fWaterLevel = 0.0f;
+    m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
+    m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
+    m_bHasSkyGradient = false;
+}
 CGame::~CGame ( void )
 {
 	m_bBeingDeleted = true;
