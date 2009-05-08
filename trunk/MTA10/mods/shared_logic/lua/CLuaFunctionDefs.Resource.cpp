@@ -324,4 +324,30 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CResource* pResource = lua_toresource ( luaVM, 1 );
+        if ( pResource )
+        {
+            CClientEntity* pEntity = pResource->GetResourceDynamicEntity();
+            if ( pEntity )
+            {
+                lua_pushelement ( luaVM, pEntity );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogError ( luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName() );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceDynamicElementRoot", "resource", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceDynamicElementRoot" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
