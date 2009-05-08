@@ -37,6 +37,9 @@ CResourceHTMLItem::~CResourceHTMLItem ( void )
 
 ResponseCode CResourceHTMLItem::Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, CAccount * account )
 {
+    if ( !m_pVM )
+        Start ();
+
     if ( m_bIsBeingRequested )
     {
         ipoHttpResponse->SetBody("Busy!", strlen("Busy!"));
