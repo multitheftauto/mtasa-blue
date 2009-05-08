@@ -6122,6 +6122,8 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel, C
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 1 ) );
         BitStream.pBitStream->Write ( pWater->GetID () );
+        pWater->SetLevel( fLevel );
+        pWater->SetWaterLevelChanged ( true );
     }
     else
     {
@@ -7461,7 +7463,7 @@ bool CStaticFunctionDefinitions::ResetMapInfo ( CElement* pElement )
     {
         CBitStream BitStream;
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_MAP_INFO, *BitStream.pBitStream ) );
-
+        g_pGame->ResetMapInfo();
         return true;
     }
 

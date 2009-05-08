@@ -28,6 +28,7 @@ CWater::CWater ( CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNod
 
     if ( m_pWaterManager )
         m_pWaterManager->AddToList ( this );
+    m_bWaterChanged = false;
 }
 
 CWater::~CWater ()

@@ -236,6 +236,7 @@ public:
     void                        Unlock                      ( void );
 
     inline bool                 IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
+    inline void                 ResetMapInfo                ( void );
 private:
     void                        AddBuiltInEvents            ( void );
     void                        SendPings                   ( void );

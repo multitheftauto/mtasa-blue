@@ -1849,7 +1849,8 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     float fWaterLevel = 0.0f;
     bitStream.Read ( fWaterLevel );
-    //g_pGame->GetWaterManager ()->SetWaterLevel ((CVector *)NULL, fWaterLevel );  Temporarily Disabled due to problems with setWaterLevel
+    if (fWaterLevel != 0.0f)        
+        g_pGame->GetWaterManager ()->SetWaterLevel ((CVector *)NULL, fWaterLevel ); 
 
 	short sFPSLimit = 36;
 	bitStream.Read ( sFPSLimit );
@@ -3177,6 +3178,21 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     {
                         delete pWater;
                         pWater = NULL;
+                    }
+                    else
+                    {
+                        unsigned char ucFlags = 0;
+                        bitStream.Read ( ucFlags );
+                        bool bWaterChanged = ucFlags & 0x01;
+                        if ( bWaterChanged ) {
+                            float fWaterLevel = 0.0f;
+                            bitStream.Read ( fWaterLevel );
+                            CVector vecPosition;
+                            pWater->GetPosition(vecPosition);
+                            CWaterPoly* pPoly = g_pGame->GetWaterManager()->GetPolyAtPoint ( vecPosition );
+                            if ( pPoly )
+                               g_pGame->GetWaterManager()->SetWaterLevel ( pPoly, fWaterLevel );
+                        }
                     }
                     pEntity = pWater;
                     break;

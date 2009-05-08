@@ -7934,7 +7934,7 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
                      ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
                 {
                     // (x, y, z, level)
-                    CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                    /*CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
                                           static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                           static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
                     float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
@@ -7942,7 +7942,9 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
-                    }
+                    }*/
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
                 }
                 else
                 {

@@ -860,6 +860,13 @@ bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
                         BitStream.Write ( (short)vecVertex.fY );
                         BitStream.Write ( vecVertex.fZ );
                     }
+                    unsigned char ucFlags = 0;
+                    bool bWaterChanged = pWater->HasWaterLevelChanged();
+                    if ( bWaterChanged ) ucFlags |= 0x1;
+                    BitStream.Write ( ucFlags );
+                    if ( bWaterChanged ) {
+                        BitStream.Write( pWater->GetLevel() );
+                    }
                     break;
                 }
 
