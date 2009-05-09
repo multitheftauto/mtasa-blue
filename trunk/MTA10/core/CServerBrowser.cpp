@@ -643,6 +643,7 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 
     m_pWindow->SetVisible ( false );
     m_pFavouritesAddByIP.SetVisible ( false );
+    pMainMenu->m_bIsInSubWindow = false;
 
     return true;
 }
