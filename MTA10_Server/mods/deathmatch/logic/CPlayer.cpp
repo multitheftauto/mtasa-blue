@@ -378,7 +378,7 @@ void CPlayer::Reset ( void )
     m_pKeyBinds->Clear ();
     m_bCursorShowing = false;
     SetNametagText ( NULL );
-    m_ucAlpha = 0;
+    m_ucAlpha = 255;
 
     // Make sure the nametag color is no longer overridden
     RemoveNametagOverrideColor ();
