@@ -15,6 +15,9 @@
 CWaterManager::CWaterManager ()
 {
     m_bDontRemoveFromList = false;
+
+    m_fGlobalWaterLevel = 0.0f;
+    m_fGlobalWaveHeight = 0.0f;
 }
 
 CWaterManager::~CWaterManager ()
@@ -71,7 +74,7 @@ void CWaterManager::RemoveFromList ( CWater* pWater )
 
 bool CWaterManager::Exists ( CWater* pWater )
 {
-    // Try to find the Ped ID in the list
+    // Try to find the water ID in the list
     std::list < CWater* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {

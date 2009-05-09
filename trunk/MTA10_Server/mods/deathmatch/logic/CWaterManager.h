@@ -27,11 +27,16 @@ public:
     CWater*                         CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
     void                            DeleteAll                   ();
 
-    inline unsigned int             Count                       ()                            { return static_cast < unsigned int > ( m_List.size () ); };
+    inline unsigned int             Count                       ()          { return static_cast < unsigned int > ( m_List.size () ); };
     bool                            Exists                      ( CWater* pWater );
 
-    std::list < CWater* > ::const_iterator IterBegin            ()                            { return m_List.begin (); }
-    std::list < CWater* > ::const_iterator IterEnd              ()                            { return m_List.end (); }
+    float                           GetGlobalWaterLevel         () const            { return m_fGlobalWaterLevel; }
+    float                           GetGlobalWaveHeight         () const            { return m_fGlobalWaveHeight; }
+    void                            SetGlobalWaterLevel         ( float fLevel )    { m_fGlobalWaterLevel = fLevel; }
+    void                            SetGlobalWaveHeight         ( float fHeight )   { m_fGlobalWaveHeight = fHeight; }
+
+    std::list < CWater* > ::const_iterator IterBegin            ()          { return m_List.begin (); }
+    std::list < CWater* > ::const_iterator IterEnd              ()          { return m_List.end (); }
 
 protected:
     inline void                     AddToList                   ( CWater* pWater )              { m_List.push_back ( pWater ); }
@@ -39,6 +44,9 @@ protected:
 
     bool                            m_bDontRemoveFromList;
     std::list < CWater* >           m_List;
+
+    float                           m_fGlobalWaterLevel;
+    float                           m_fGlobalWaveHeight;
 };
 
 #endif

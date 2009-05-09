@@ -3872,7 +3872,7 @@ void CClientGame::ResetMapInfo ( void )
     g_pMultiplayer->ResetWater ();
 
     // Water
-    g_pGame->GetWaterManager ()->UndoChanges ();
+    g_pGame->GetWaterManager ()->Reset ();
 
     // Cheats
     g_pGame->ResetCheats ();

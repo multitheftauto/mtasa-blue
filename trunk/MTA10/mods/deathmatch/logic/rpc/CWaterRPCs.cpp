@@ -21,17 +21,11 @@ void CWaterRPCs::LoadFunctions ( void )
 
 void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
 {
-    unsigned short usResourceID;
-    CResource* pResource;
     float fLevel;
     unsigned char ucWhat;
 
-    if ( bitStream.Read ( usResourceID ) && bitStream.Read ( fLevel ) && bitStream.Read ( ucWhat ) )
+    if ( bitStream.Read ( fLevel ) && bitStream.Read ( ucWhat ) )
     {
-        pResource = g_pClientGame->GetResourceManager ()->GetResource ( usResourceID );
-        if ( !pResource )
-            return;
-
         switch ( ucWhat )
         {
             case 0:
@@ -43,7 +37,7 @@ void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
                 {
                     vecPos.fX = sX;
                     vecPos.fY = sY;
-                    m_pWaterManager->SetWaterLevel ( &vecPos, fLevel, pResource );
+                    m_pWaterManager->SetWaterLevel ( &vecPos, fLevel );
                 }
                 break;
             }
@@ -61,7 +55,7 @@ void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
                         {
                             pWater->GetVertexPosition ( i, vecVertexPos );
                             vecVertexPos.fZ = fLevel;
-                            pWater->SetVertexPosition ( i, vecVertexPos, pResource );
+                            pWater->SetVertexPosition ( i, vecVertexPos );
                         }
                     }
                 }
@@ -70,7 +64,7 @@ void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
             case 2:
             {
                 // (level)
-                m_pWaterManager->SetWaterLevel ( (CVector *)NULL, fLevel, pResource );
+                m_pWaterManager->SetWaterLevel ( (CVector *)NULL, fLevel );
                 break;
             }
         }

@@ -18,6 +18,8 @@ using namespace std;
 #define POLYENTRY_ID(entry) ( (entry)->m_wValue & 0x3FFF )
 #define MAKE_POLYENTRY(type, id) (WORD)( ((type) << 14) | (id) )
 
+// These are code references in SA to the various data pools. We relocate these pools
+// to our own buffers to have more space, and thus have to update all references.
 DWORD CWaterManagerSA::m_VertexXrefs[] = {
     0x6E5B6E, 0x6E5BC3, 0x6E5BF7, 0x6E5EA3, 0x6E5ED7, 0x6E5F84, 0x6E5F8B, 0x6E6487,
 	0x6E64A7, 0x6E65E4, 0x6E6608, 0x6E7B9B, 0x6E7BBC, 0x6E7C51, 0x6E7C73, 0x6E7E11,
@@ -175,6 +177,10 @@ CWaterZoneSA::iterator CWaterZoneSA::end ()
 
 // -----------------------------------------------------
 // Water zones
+//   SA divides the world in 500x500 squares, each of these squares is called a "zone"
+//   here. These zones are used for quickly finding the water polygons near a given
+//   point (e.g. the player for swimming, the camera for underwater post effects)
+//   Each zone has a list of water polygons that partially or completely overlap it.
 
 CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( CWaterPoly* pPoly )
 {
@@ -367,6 +373,11 @@ void CWaterManagerSA::RelocatePools ()
     }
 }
 
+// The following hooks change the way SA iterates over water polygons.
+// Normally it simply iterates over the first NumPolies slots in the
+// pool; however in MTA, we can dynamically delete water polys,
+// creating gaps. These hooks make SA skip empty pool slots.
+
 DWORD dwHook6E9E23continue = 0x6E9E29;
 void __declspec(naked) Hook6E9E23 ()
 {
@@ -376,7 +387,7 @@ check:
         mov eax, dword ptr [edi]
         test eax, eax
         jnz cont
-        add edi, 0xA        ; sizeof(CWaterQuadSAInterface)
+        add edi, 0xA        // sizeof(CWaterQuadSAInterface)
         jmp check
 cont:
         movsx eax, word ptr [edi]
@@ -396,7 +407,7 @@ void __declspec(naked) Hook6EFCD7 ()
         jz check
         jmp dwHook6EFCD7skip
 check:
-        add esi, 0xA        ; sizeof(CWaterQuadSAInterface)
+        add esi, 0xA        // sizeof(CWaterQuadSAInterface)
         mov eax, dword ptr [esi-4]
         test eax, eax
         jz check
@@ -677,20 +688,20 @@ bool CWaterManagerSA::SetWaterLevel ( CWaterPoly* pPoly, float fLevel, void* pCh
 
 float CWaterManagerSA::GetWaveLevel ()
 {
-    return *(float *)0xC812E8;
+    return *(float *)VAR_WaveLevel;
 }
 
 void CWaterManagerSA::SetWaveLevel ( float fWaveLevel )
 {
     if ( fWaveLevel >= 0.0f )
     {
-        // DISABLE the game reseting the wave level
+        // DISABLE the game resetting the wave level
         *(BYTE *)0x72C665 = 0xDD;
         *(BYTE *)0x72C666 = 0xD8;
         memset( (void*)0x72C667, 0x90, 4 );
         memset( (void*)0x72C659, 0x90, 10 );
 
-        *(float *)0xC812E8 = fWaveLevel;
+        *(float *)VAR_WaveLevel = fWaveLevel;
     }
     else
     {
@@ -712,7 +723,7 @@ void CWaterManagerSA::SetWaveLevel ( float fWaveLevel )
         *(BYTE *)0x72C661 = 0x80;
         *(BYTE *)0x72C662 = 0x3F;
 
-        *(float *)0xC812E8 = 0.6f;
+        *(float *)VAR_WaveLevel = 0.6f;
     }
 }
 
@@ -774,6 +785,7 @@ void CWaterManagerSA::UndoChanges ( void* pChangeSource )
 
 void CWaterManagerSA::RebuildIndex ()
 {
+    // Rebuilds the list of polygons of each zone
     memset ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
     *(DWORD *)VAR_NumWaterZonePolys = 0;
     ( (BuildWaterIndex_t) FUNC_BuildWaterIndex ) ();
@@ -781,6 +793,7 @@ void CWaterManagerSA::RebuildIndex ()
 
 void CWaterManagerSA::Reset ()
 {
+    // Resets all water to the original single player configuration
     UndoChanges ();
 
     memset ( m_QuadPool, 0, sizeof ( m_QuadPool ) );

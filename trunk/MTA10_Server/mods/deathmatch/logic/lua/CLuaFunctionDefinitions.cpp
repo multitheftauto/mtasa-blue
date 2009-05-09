@@ -7950,7 +7950,7 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
                 {
                     // (level)
                     float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-                    if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel, pResource ) )
+                    if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
@@ -7965,7 +7965,7 @@ int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
                 float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
                 if ( pWater )
                 {
-                    if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel, pResource ) )
+                    if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
