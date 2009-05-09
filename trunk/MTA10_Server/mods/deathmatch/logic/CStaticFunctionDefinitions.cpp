@@ -7455,6 +7455,7 @@ bool CStaticFunctionDefinitions::ResetMapInfo ( CElement* pElement )
 
             CBitStream BitStream;
             pPlayer->Send ( CLuaPacket ( RESET_MAP_INFO, *BitStream.pBitStream ) );
+            pPlayer->Reset();
 
             return true;
         }
@@ -7464,6 +7465,7 @@ bool CStaticFunctionDefinitions::ResetMapInfo ( CElement* pElement )
         CBitStream BitStream;
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_MAP_INFO, *BitStream.pBitStream ) );
         g_pGame->ResetMapInfo();
+        m_pPlayerManager->ResetAll();
         return true;
     }
 
