@@ -285,6 +285,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                         pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );
 
                                         pVehicle->SetTowedVehicle ( NULL );
+                                        pCurrentTrailer->SetTowedByVehicle ( NULL );
                                     }
 
                                     // If something else is towing this trailer
@@ -301,9 +302,11 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                         pTrailer->CallEvent ( "onTrailerDetach", Arguments );
 
                                         pCurrentVehicle->SetTowedVehicle ( NULL );
+                                        pTrailer->SetTowedByVehicle ( NULL );
                                     }
 
                                     pVehicle->SetTowedVehicle ( pTrailer );
+                                    pTrailer->SetTowedByVehicle ( pVehicle );
 
                                     // Tell everyone to attach the new one
                                     CVehicleTrailerPacket AttachPacket ( pVehicle, pTrailer, true );
@@ -317,6 +320,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     if ( !bContinue )
                                     {
                                         // Detach them
+                                        pVehicle->SetTowedVehicle ( NULL );
+                                        pTrailer->SetTowedByVehicle ( NULL );
+
                                         CVehicleTrailerPacket DetachPacket ( pVehicle, pTrailer, false );
                                         DetachPacket.SetSourceElement ( pPlayer );
                                         m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
@@ -330,6 +336,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 if ( pCurrentTrailer )
                                 {
                                     pVehicle->SetTowedVehicle ( NULL );
+                                    pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                                     // Tell everyone else to detach them
                                     CVehicleTrailerPacket AttachPacket ( pVehicle, pCurrentTrailer, false );

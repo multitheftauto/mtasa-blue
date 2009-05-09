@@ -2261,12 +2261,16 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle ( void )
 
 bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle )
 {
+    if ( pVehicle == m_pTowedVehicle )
+        return true;
+
     // Do we already have a towed vehicle?
     if ( m_pTowedVehicle && pVehicle != m_pTowedVehicle )
     {
         // Remove it
         CVehicle * pGameVehicle = m_pTowedVehicle->GetGameVehicle ();
-        if ( pGameVehicle && m_pVehicle ) pGameVehicle->BreakTowLink ();
+        if ( pGameVehicle && m_pVehicle )
+            pGameVehicle->BreakTowLink ();
         m_pTowedVehicle->m_pTowedByVehicle = NULL;
         m_pTowedVehicle = NULL;
     }

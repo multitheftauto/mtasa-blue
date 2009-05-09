@@ -32,7 +32,8 @@ public:
     static void             OnLoginCallback     ( bool bResult, char* szError, void* obj );
 
 private:
-    bool                    OnButtonBackClick   ( CGUIElement* pElement );
+    bool                    OnButtonLoginClick  ( CGUIElement* pElement );
+    bool                    OnButtonCancelClick ( CGUIElement* pElement );
 
     BROWSERLOGINCALLBACK    m_pCallBack;
 
