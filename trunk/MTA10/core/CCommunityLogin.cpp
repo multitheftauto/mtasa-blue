@@ -63,8 +63,8 @@ CCommunityLogin::CCommunityLogin ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 120.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
 
-    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
-    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonBackClick, this ) );
+    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonLoginClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonCancelClick, this ) );
 }
 
 CCommunityLogin::~CCommunityLogin ( void )
@@ -91,40 +91,38 @@ bool CCommunityLogin::IsVisible ( void )
     return m_pWindow->IsVisible ();
 }
 
-bool CCommunityLogin::OnButtonBackClick ( CGUIElement* pElement )
+bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
 {
-    if ( pElement == m_pButtonCancel )
+    if ( m_pEditUsername->GetText().empty() ||
+        m_pEditPassword->GetText().empty() )
     {
-        SetVisible ( false );
+        g_pCore->ShowMessageBox ( "Serial Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+        return true;
     }
-    else if ( pElement == m_pButtonLogin )
-    {
-        if ( m_pEditUsername->GetText().empty() ||
-            m_pEditPassword->GetText().empty() )
-        {
-            g_pCore->ShowMessageBox ( "Serial Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
-            return true;
-        }
-        // Hash password
-        char szPassword[33];
-        std::string strPassword;
-	    MD5 Password;
-	    CMD5Hasher Hasher;
-	    Hasher.Calculate ( m_pEditPassword->GetText ().c_str(), m_pEditPassword->GetText().length(), Password );
-	    Hasher.ConvertToHex ( Password, szPassword );
-        strPassword = std::string ( szPassword );
+    // Hash password
+    char szPassword[33];
+    std::string strPassword;
+    MD5 Password;
+    CMD5Hasher Hasher;
+    Hasher.Calculate ( m_pEditPassword->GetText ().c_str(), m_pEditPassword->GetText().length(), Password );
+    Hasher.ConvertToHex ( Password, szPassword );
+    strPassword = std::string ( szPassword );
 
-        // Store the user/pass and log in using community
-        CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
-        pCommunity->SetUsername ( m_pEditUsername->GetText () );
-        pCommunity->SetPassword ( strPassword );
-	    CVARS_SET ( "community_username", m_pEditUsername->GetText () );
-        CVARS_SET ( "community_password", strPassword );
-        pCommunity->Login ( OnLoginCallback, this );
-    }
+    // Store the user/pass and log in using community
+    CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
+    pCommunity->SetUsername ( m_pEditUsername->GetText () );
+    pCommunity->SetPassword ( strPassword );
+    CVARS_SET ( "community_username", m_pEditUsername->GetText () );
+    CVARS_SET ( "community_password", strPassword );
+    pCommunity->Login ( OnLoginCallback, this );
     return true;
 }
 
+bool CCommunityLogin::OnButtonCancelClick ( CGUIElement* pElement )
+{
+    SetVisible ( false );
+    return true;
+}
 
 void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
 {

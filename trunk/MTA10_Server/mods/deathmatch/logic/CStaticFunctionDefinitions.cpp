@@ -4363,7 +4363,7 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
         if ( pTrailer->GetTowedByVehicle () == NULL )
         {
             // Attach them
-            if ( !pVehicle->SetTowedVehicle ( pTrailer ) )
+            if ( !pVehicle->SetTowedVehicle ( pTrailer ) || !pTrailer->SetTowedByVehicle ( pVehicle ) )
                 return false;
 
             // Tell everyone to attach them
@@ -4378,6 +4378,9 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
             if ( !bContinue )
             {
                 // Detach them
+                pVehicle->SetTowedVehicle ( NULL );
+                pTrailer->SetTowedByVehicle ( NULL );
+
                 CVehicleTrailerPacket DetachPacket ( pVehicle, pTrailer, false );
                 m_pPlayerManager->BroadcastOnlyJoined ( DetachPacket );
             }
