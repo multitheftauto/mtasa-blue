@@ -148,6 +148,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             if ( pCurrentTrailer )
                             {
                                 pTowedByVehicle->SetTowedVehicle ( NULL );
+                                pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                                 // Tell everyone to detach them
                                 CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );
@@ -164,6 +165,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             if ( pCurrentVehicle )
                             {
                                 pCurrentVehicle->SetTowedVehicle ( NULL );
+                                pTrailer->SetTowedByVehicle ( NULL );
 
                                 // Tell everyone to detach them
                                 CVehicleTrailerPacket AttachPacket ( pCurrentVehicle, pTrailer, false );
@@ -176,6 +178,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                             }
 
                             pTowedByVehicle->SetTowedVehicle ( pTrailer );
+                            pTrailer->SetTowedByVehicle ( pTowedByVehicle );
 
                             // Execute the attach trailer script function
                             CLuaArguments Arguments;
@@ -201,6 +204,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
                 if ( pCurrentTrailer )
                 {
                     pTowedByVehicle->SetTowedVehicle ( NULL );
+                    pCurrentTrailer->SetTowedByVehicle ( NULL );
 
                     // Tell everyone else to detach them
                     CVehicleTrailerPacket AttachPacket ( pTowedByVehicle, pCurrentTrailer, false );
