@@ -51,7 +51,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pManager = pManager;
     m_bIsVisible = false;
     m_bIsIngame = true;
-//    m_bIsInSubWindow = false;
 	m_bInitialized = false;
 	m_bStarted = false;
 	m_bStaticBackground = false;
@@ -80,10 +79,9 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	// Scene background image
     m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
 	m_pBackground->LoadFromFile ( CGUI_IMAGE_BACKGROUND );
-    m_pBackground->MoveToBack ();
+    m_pBackground->BringToFront ();
     m_pBackground->SetVisible ( false );
 	m_pBackground->SetAlpha ( 0 );
-    m_pBackground->SetZOrderingEnabled ( false );
 
 	// Filler background image
     m_pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -393,18 +391,6 @@ void CMainMenu::Update ( void )
 			m_pHeader->SetVisible ( false );
 			*/
         }
-
-        // If we're in a submenu, hide the mainmenu dialog, if not, show it
-		/*
-        if ( m_bIsInSubWindow )
-        {
-            m_pWindow->SetVisible ( false );
-        }
-        else
-        {
-            m_pWindow->SetVisible ( true );
-        }
-		*/
     }
     else
     {
@@ -450,6 +436,15 @@ void CMainMenu::Hide ( void )
 }
 
 
+void CMainMenu::HideSubWindows ( void )
+{
+    m_QuickConnect.SetVisible ( false );
+    m_ServerBrowser.SetVisible ( false );
+    m_Settings.SetVisible ( false );
+    m_Credits.SetVisible ( false );
+}
+
+
 void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
 {
     CMultiplayer* pMultiplayer = CCore::GetSingleton ().GetMultiplayer ();
@@ -464,15 +459,11 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
     // If we're hiding, hide any subwindows we might've had (prevent escaping hiding mousecursor issue)
     if ( !bVisible )
     {
-        m_QuickConnect.SetVisible ( false );
-        m_ServerBrowser.SetVisible ( false );
-        m_Settings.SetVisible ( false );
-        m_Credits.SetVisible ( false );
+        HideSubWindows ();
         m_pCommunityLabel->SetVisible ( false );
-
-//        m_bIsInSubWindow = false;
 	} else {
 		m_pBackground->SetVisible ( true );
+        m_pBackground->BringToFront ();
 		m_pHeader->SetVisible ( true );
 		m_pFiller->SetVisible ( !bOverlay );
         m_pCommunityLabel->SetVisible ( true );
@@ -529,20 +520,17 @@ bool CMainMenu::GetIsIngame ( void )
 void CMainMenu::SetServerBrowserVisible ( bool bVisible )
 {
     m_ServerBrowser.SetVisible ( bVisible );
-//    m_bIsInSubWindow = bVisible;
 }
 
 
 bool CMainMenu::OnQuickConnectButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
-//    if ( !m_bIsInSubWindow )
-    {
-        m_QuickConnect.SetVisible ( true );
-//        m_bIsInSubWindow = true;
-    }
+    HideSubWindows ();
+    m_QuickConnect.SetVisible ( true );
 
     return true;
 }
@@ -551,7 +539,8 @@ bool CMainMenu::OnQuickConnectButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnResumeButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
     SetVisible ( false );
     return true;
@@ -561,13 +550,11 @@ bool CMainMenu::OnResumeButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnBrowseServersButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
-//    if ( !m_bIsInSubWindow )
-    {
-        m_ServerBrowser.SetVisible ( true );
-//        m_bIsInSubWindow = true;
-    }
+    HideSubWindows ();
+    m_ServerBrowser.SetVisible ( true );
 
     return true;
 }
@@ -588,9 +575,11 @@ bool CMainMenu::OnDisconnectButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnHostGameButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
     // Load deathmatch, but with local play
+    HideSubWindows ();
     CModManager::GetSingleton ().RequestLoad ( "deathmatch", "local" );
 
     return true;
@@ -600,9 +589,11 @@ bool CMainMenu::OnHostGameButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnEditorButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
     // Load deathmatch, but with local play
+    HideSubWindows ();
     CModManager::GetSingleton ().RequestLoad ( "deathmatch", "editor" );
 
     return true;
@@ -612,15 +603,11 @@ bool CMainMenu::OnEditorButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnSettingsButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
-//    if ( !m_bIsInSubWindow )
-    {
-        m_Settings.SetVisible ( true );
-
-        // Jax: not sure why this was commented, need it here if our main-menu is set to AlwaysOnTop
-//        m_bIsInSubWindow = true;
-    }  
+    HideSubWindows ();
+    m_Settings.SetVisible ( true );
 
     return true;
 }
@@ -629,10 +616,12 @@ bool CMainMenu::OnSettingsButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnAboutButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
 	// Determine if we're ingame or if the background is set to static
 	// If so, show the old credits dialog
+    HideSubWindows ();
 	if ( m_bIsIngame || m_bStaticBackground ) {
 		m_Credits.SetVisible ( true );
 	} else {
@@ -653,7 +642,8 @@ bool CMainMenu::OnAboutButtonClick ( CGUIElement* pElement )
 bool CMainMenu::OnQuitButtonClick ( CGUIElement* pElement )
 {
 	// Return if we haven't faded in yet
-	if ( m_ucFade != FADE_VISIBLE ) return false;
+	if ( m_ucFade != FADE_VISIBLE )
+        return false;
 
     // Send "exit" command to the command handler
     CCommands::GetSingleton ().Execute ( "exit", "" );
@@ -664,9 +654,11 @@ bool CMainMenu::OnQuitButtonClick ( CGUIElement* pElement )
 
 void CMainMenu::OnInvalidate ( IDirect3DDevice9 * pDevice )
 {
-	if ( !m_bInitialized ) return;
+	if ( !m_bInitialized )
+        return;
 
-	if ( m_pRenderTarget && !m_bStaticBackground ) {
+	if ( m_pRenderTarget && !m_bStaticBackground )
+    {
 		delete m_pRenderTarget;
 		m_pRenderTarget = NULL;
 	}
@@ -679,7 +671,8 @@ void CMainMenu::OnInvalidate ( IDirect3DDevice9 * pDevice )
 
 void CMainMenu::OnRestore ( IDirect3DDevice9 * pDevice )
 {
-	if ( !m_bInitialized ) return;
+	if ( !m_bInitialized )
+        return;
 
 	//CVector2D ScreenSize = m_pManager->GetResolution ();
 	D3DVIEWPORT9 Viewport;
@@ -760,7 +753,7 @@ void CMainMenu::SetStaticBackground ( bool bEnabled )
 			// Enable the static background
 			m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
             m_pBackground->SetAlwaysOnTop ( true );
-            m_pBackground->MoveToBack ();   // ChrML: Put it on top, but move it to the back of the "always on top" order
+            m_pBackground->BringToFront ();
 		
 			// Destroy the dynamic scene
 			m_pMainMenuScene->Destroy3DScene ();
@@ -854,3 +847,4 @@ void CMainMenu::ChangeCommunityState ( bool bIn, std::string strUsername )
     m_pCommunityLabel->SetText ( "Not logged in" );
 	m_pCommunityLabel->AutoSize ( "Not logged in" );
 }
+

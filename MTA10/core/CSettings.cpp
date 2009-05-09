@@ -1251,7 +1251,6 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
 
     // Close the window
     m_pWindow->SetVisible ( false );
-    pMainMenu->m_bIsInSubWindow = false;
 
 	return true;
 }
@@ -1262,7 +1261,6 @@ bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
     m_pWindow->SetVisible ( false );
-    pMainMenu->m_bIsInSubWindow = false;
 
     return true;
 }

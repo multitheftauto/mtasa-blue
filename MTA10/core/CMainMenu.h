@@ -82,6 +82,8 @@ private:
 	void				EnableItem						( unsigned int uiIndex );
 	void				DisableItem						( unsigned int uiIndex, bool bHide = false );
 
+    void                HideSubWindows                  ( void );
+
 	bool                OnQuickConnectButtonClick       ( CGUIElement* pElement );
     bool                OnResumeButtonClick             ( CGUIElement* pElement );
     bool                OnBrowseServersButtonClick      ( CGUIElement* pElement );
@@ -115,7 +117,6 @@ private:
 	// Properties
     bool                m_bIsIngame;
     bool                m_bIsVisible;
-    bool                m_bIsInSubWindow;
 
 	int					m_iButtons;
 	float				m_fWindowX;

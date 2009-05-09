@@ -106,13 +106,8 @@ void CQuickConnect::SetVisible ( bool bVisible )
 
     if ( bVisible )
     {
-        pMainMenu->m_bIsInSubWindow = true;
         m_pWindow->Activate ();
-        LoadData ();
-    }
-    else
-    {
-        pMainMenu->m_bIsInSubWindow = false;        
+        LoadData ();    
     }
 }
 

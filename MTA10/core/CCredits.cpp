@@ -288,7 +288,6 @@ bool CCredits::OnOKButtonClick ( CGUIElement* pElement )
 
     // Close the window
     m_pWindow->SetVisible ( false );
-    pMainMenu->m_bIsInSubWindow = false;
 
     return true;
 }
