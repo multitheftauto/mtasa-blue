@@ -31,32 +31,28 @@ public:
 
     const CVector&              GetPosition             ();
     void                        SetPosition             ( const CVector& vecPosition );
+    float                       GetLevel                () const;
+    void                        SetLevel                ( float fLevel );
 
     void                        Unlink                  ();
     bool                        ReadSpecialData         ();
 
-    EWaterType                  GetWaterType            ()  { return m_WaterType; }
-    int                         GetNumVertices          ()  { return m_WaterType == TRIANGLE ? 3 : 4; }
-    bool                        GetVertex               ( int index, CVector& vecPosition );
+    EWaterType                  GetWaterType            () const  { return m_WaterType; }
+    int                         GetNumVertices          () const  { return m_WaterType == TRIANGLE ? 3 : 4; }
+    bool                        GetVertex               ( int index, CVector& vecPosition ) const;
     void                        SetVertex               ( int index, CVector& vecPosition );
 
-    void                        SetLevel                ( float fLevel ) { m_fWaterLevel = fLevel; };
-    float                       GetLevel                () { return m_fWaterLevel; };
     bool                        Valid                   ();
-    bool                        HasWaterLevelChanged    () { return m_bWaterChanged; };
-    void                        SetWaterLevelChanged    ( bool bChanged ) { m_bWaterChanged = bChanged; };
 
 private:
     void                        RoundVertices           ();
     void                        RoundVertex             ( int index );
     bool                        IsVertexWithinWorld     ( int index );
 
-    bool                        m_bWaterChanged;
     CWaterManager*              m_pWaterManager;
 
     CVector                     m_Vertices [ 4 ];
     EWaterType                  m_WaterType;
-    float                       m_fWaterLevel;
 };
 
 #endif

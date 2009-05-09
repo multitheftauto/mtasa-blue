@@ -412,8 +412,8 @@ public:
 
     // Water funcs
     static CWater*              CreateWater                         ( CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4 );
-    static bool                 SetWaterLevel                       ( CVector* pvecPosition, float fLevel, CResource* pResource );
-    static bool                 SetWaterLevel                       ( CWater* pWater, float fLevel, CResource* pResource );
+    static bool                 SetWaterLevel                       ( CVector* pvecPosition, float fLevel );
+    static bool                 SetWaterLevel                       ( CWater* pWater, float fLevel );
     static bool                 GetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                 SetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
 

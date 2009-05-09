@@ -6082,13 +6082,9 @@ CWater* CStaticFunctionDefinitions::CreateWater ( CResource* pResource, CVector*
     return NULL;
 }
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, CResource* pResource )
+bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel )
 {
-    if ( !pResource )
-        return false;
-
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pResource->GetID () );
     BitStream.pBitStream->Write ( fLevel );
     if ( pvecPosition )
     {
@@ -6104,31 +6100,26 @@ bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fL
     else
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
-        g_pGame->SetWaterLevel ( fLevel );
+        g_pGame->GetWaterManager ()->SetGlobalWaterLevel ( fLevel );
     }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel, CResource* pResource )
+bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel )
 {
-    if ( !pResource )
-        return false;
-
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pResource->GetID () );
     BitStream.pBitStream->Write ( fLevel );
     if ( pWater )
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 1 ) );
         BitStream.pBitStream->Write ( pWater->GetID () );
-        pWater->SetLevel( fLevel );
-        pWater->SetWaterLevelChanged ( true );
+        pWater->SetLevel ( fLevel );
     }
     else
     {
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( 2 ) );
-        g_pGame->SetWaterLevel ( fLevel );
+        g_pGame->GetWaterManager ()->SetGlobalWaterLevel ( fLevel );
     }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;
@@ -6491,7 +6482,7 @@ bool CStaticFunctionDefinitions::GetGameSpeed ( float& fSpeed )
 
 bool CStaticFunctionDefinitions::GetWaveHeight ( float& fHeight )
 {
-    fHeight = g_pGame->GetWaveHeight ();
+    fHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     return true;
 }
 
@@ -6634,7 +6625,7 @@ bool CStaticFunctionDefinitions::SetWaveHeight ( float fHeight )
 {
     if ( fHeight >= -1.0f && fHeight <= 100.0f )
     {
-        g_pGame->SetWaveHeight ( fHeight );
+        g_pGame->GetWaterManager ()->SetGlobalWaveHeight ( fHeight );
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( fHeight );

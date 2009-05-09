@@ -36,6 +36,7 @@ typedef bool (__cdecl *GetWaterLevel_t)(float fX, float fY, float fZ, float* pfL
 #define VAR_NumWaterQuads                  0xC22888
 #define VAR_NumWaterTriangles              0xC22884
 #define VAR_NumWaterZonePolys              0xC215F0
+#define VAR_WaveLevel                      0xC812E8
 
 #define NUM_DefWaterVertices               0x3FD        // Sizes of pools reserved in gta_sa.exe
 #define NUM_DefWaterQuads                  0x12D
