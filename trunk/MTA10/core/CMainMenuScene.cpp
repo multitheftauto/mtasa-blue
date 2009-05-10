@@ -21,6 +21,14 @@ extern CCore* g_pCore;
 
 template<> CMainMenuScene * CSingleton< CMainMenuScene >::m_pSingleton = NULL;
 
+//
+// Since the "MTA Team" thing doesn't really apply any longer now that we've
+// open-sourced, we can skip everything and jump right into the credits roll.
+//
+// Maybe eventually someone can think of something creative to do with the
+// old rendering code below.
+//
+
 #define CHECK_REF(x,y) if(x){x->AddRef();y=x->Release();assert(y>=1);}
 
 // Frame limiter
@@ -28,7 +36,7 @@ template<> CMainMenuScene * CSingleton< CMainMenuScene >::m_pSingleton = NULL;
 #define CORE_MTA_SCENE_FRAME_TICK			45
 
 // Data file definitions
-#define CORE_MTA_VIDEO						"data\\menu.mkv"
+//#define CORE_MTA_VIDEO						"data\\menu.mkv"
 #define CORE_MTA_MASK						"data\\mask.png"
 #define CORE_MTA_ROLL						"data\\roll.png"
 #define CORE_MTA_FALLBACK					"data\\fallback.png"
@@ -44,6 +52,7 @@ template<> CMainMenuScene * CSingleton< CMainMenuScene >::m_pSingleton = NULL;
 #define CORE_MTA_ROLL_WIDTH					800		// Roll native resolution
 #define CORE_MTA_ROLL_HEIGHT				600
 
+/*
 // Time definitions (in REFERENCE_TIME format, 100ns)
 #define CORE_MTA_VIDEO_LOOP_START			0//50000000
 #define CORE_MTA_VIDEO_LOOP_END				500000000
@@ -53,6 +62,7 @@ template<> CMainMenuScene * CSingleton< CMainMenuScene >::m_pSingleton = NULL;
 #define CORE_MTA_VIDEO_LIGHTB				57580000
 #define CORE_MTA_VIDEO_LIGHTC				65940000
 #define CORE_MTA_VIDEO_LIGHTD				79110000
+*/
 
 // Sigmoid S-curve phase points (-6 to 6)
 #define SIGMOID_START_CUT					-4						// Cuts off some of the units to speed up the incrementation
@@ -98,7 +108,6 @@ DWORD dwTimerCurrent = 0;
 // DEBUG END
 
 bool bEnablePostProcessing = true;
-bool bEnableVideo = true;
 bool bInitialized = false;
 
 bool bSafe = false;
@@ -329,7 +338,6 @@ unsigned char *szTune;
 
 CMainMenuScene::CMainMenuScene ( CMainMenu * pMainMenu )
 {
-	m_pVideoRenderer = NULL;
 	m_pGraphics = NULL;
 	m_pDevice = NULL;
 	m_pMainMenu = pMainMenu;
@@ -379,24 +387,17 @@ void CMainMenuScene::PreStartCredits ( void )
 
 	memset ( pMaskAnim, 0, sizeof(pMaskAnim) );
 
-
 	dwTimerStart = CClientTime::GetTime ();
-
-	// Mute video
-	// if ( m_pVideoRenderer ) {
-	//	m_pVideoRenderer->Mute ();
-	//}
 
 	// Start in the wait state
 	sState = STATE_WAIT;
 	sSubState = INVALID;
 
-	// Stop the video
-	StopVideo ();
-
 	// Enable music
-//	ssInit ( s_ucSong, GetForegroundWindow () );
-//	ssPlay ();
+	/* ACHTUNG: Disabled. libv2 was upgraded to 1.5 and needs a new song file.
+	ssInit ( s_ucSong, GetForegroundWindow () );
+	ssPlay ();
+	*/
 }
 
 
@@ -409,17 +410,11 @@ void CMainMenuScene::StartCredits ( void )
 
 void CMainMenuScene::StopCredits ( void )
 {
-	// Start the credits
-	PlayVideo ();
-
 	// Disable music
-//	ssStop ();
-//	ssClose ();
-
-	// Enable video audio
-	//if ( m_pVideoRenderer ) {
-	//	m_pVideoRenderer->Unmute ();
-	//}
+	/* ACHTUNG: Disabled. libv2 was upgraded to 1.5 and needs a new song file.
+	ssStop ();
+	ssClose ();
+	*/
 
 	// Reset variables
 	fSplash =        0;
@@ -454,12 +449,6 @@ void CMainMenuScene::StopCredits ( void )
 
 void CMainMenuScene::Destroy3DScene ( void )
 {
-// Destroy the video renderer
-	if ( m_pVideoRenderer ) {
-		CVideoManager::GetSingletonPtr ()->DestroyRenderer ( m_pVideoRenderer );
-		m_pVideoRenderer = NULL;
-	}
-
 	// Destroy the (unmanaged) rendertarget textures we've used
 	DestroyRenderTargets ();
 
@@ -590,22 +579,13 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 		// Create a texture to be associated with the background
 		pTexCGUI = pRenderTarget;
 
-		// Initialize the video graph
-		CCore::GetSingleton ().GetConsole ()->Printf ( "Initializing video renderer" );
-		if ( !bEnableVideo || !InitVideo () ) {    // If the video init failed, or we disabled it
-			// Video renderer couldn't initialize, so fall back to a static texture
-			if ( D3DXCreateTextureFromFile ( m_pDevice, CORE_MTA_FALLBACK, &pFallbackTexture ) != S_OK ) {
-				// Could not load the texture, so abort
-				break;
-			}
-
-			// Update the config
-			int iMenuOptions;
-            CVARS_GET ( "menu_options", iMenuOptions );
-			CVARS_SET ( "menu_options", (unsigned int)( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) );
-		}
-
 		CCore::GetSingleton ().GetConsole ()->Printf ( "Creating textures" );
+
+		// Wall texture
+		if ( D3DXCreateTextureFromFile ( m_pDevice, CORE_MTA_FALLBACK, &pFallbackTexture ) != S_OK ) {
+			// Could not load the texture, so abort
+			break;
+		}
 
 		// Roll texture
 		if ( D3DXCreateTextureFromFile ( m_pDevice, CORE_MTA_ROLL, &pTexRoll ) != S_OK ) {
@@ -716,9 +696,6 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 
 void CMainMenuScene::Draw3DScene ( void )
 {
-	LONGLONG VideoTimeCurrent, VideoTimeDuration;
-	IDirect3DTexture9 * pVideoTexture = NULL;
-
 	// Frame limiter
 	DWORD dwTick = CClientTime::GetTime ();
 	DWORD dwTickDiff = dwTick - dwTickLast;
@@ -729,7 +706,9 @@ void CMainMenuScene::Draw3DScene ( void )
 	dwTickLast = dwTick;
 
 	// Sound tick
-//	ssDoTick ();
+	/* ACHTUNG: Disabled. libv2 was upgraded to 1.5 and needs a new song file.
+	ssDoTick ();
+	*/
 
 	// Calculate the increment rate, based on the native FPS, to use time-based animations
 	fInc = (float)dwTickDiff / (float)CORE_MTA_SCENE_FRAME_TICK;
@@ -738,32 +717,6 @@ void CMainMenuScene::Draw3DScene ( void )
 	dwTimerCurrent = dwTick - dwTimerStart;
 	SString buf ( "inc rate: %.2f - time: %.2f\ncount: %u - (%u,%u,%u)",fInc,((float)dwTimerCurrent)/1000.0f,dwFrameCount,dwFrameStart,dwFrameMid,dwFrameStop);
 	// DEBUG END
-
-	// Check if we have a video renderer
-	if ( m_pVideoRenderer ) {
-		// Check if we need to loop the video (every 20 frames)
-		m_pVideoRenderer->GetPositions ( VideoTimeCurrent, VideoTimeDuration );
-		if ( VideoTimeCurrent >= CORE_MTA_VIDEO_LOOP_END ) {
-			m_pVideoRenderer->SetPosition ( CORE_MTA_VIDEO_LOOP_START );
-		}
-
-		// Light sequence
-		/*
-		if ( VideoTimeCurrent >= CORE_MTA_VIDEO_LIGHTA )
-			fLightDimA = 1.0f;
-		if ( VideoTimeCurrent >= CORE_MTA_VIDEO_LIGHTB )
-			fLightDimB = 1.0f;
-		if ( VideoTimeCurrent >= CORE_MTA_VIDEO_LIGHTC )
-			fLightDimC = 1.0f;
-		if ( VideoTimeCurrent >= CORE_MTA_VIDEO_LIGHTD ) {
-			fLightDimD = 1.0f;
-		}
-		*/
-
-		// Lock the renderer and get the video texture
-		m_pVideoRenderer->Lock ();
-		pVideoTexture = m_pVideoRenderer->GetVideoTexture ();
-	}
 
 	// If we use a fallback texture, we don't need a light sequence
 //	if ( pFallbackTexture ) {
@@ -1083,8 +1036,6 @@ void CMainMenuScene::Draw3DScene ( void )
 					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pFallbackTexture );
 				else if ( sState != STATE_MAINMENU )
 					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pTexMaskAnim );
-				else
-					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pVideoTexture );
 				m_pDevice->SetTexture ( cTextureMask.RegisterIndex, pTexMask );
 
 				// Render the vertex buffer contents
@@ -1598,8 +1549,6 @@ void CMainMenuScene::Draw3DScene ( void )
 					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pFallbackTexture );
 				else if ( sState != STATE_MAINMENU )
 					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pTexMaskAnim );
-				else
-					m_pDevice->SetTexture ( cTextureVideo.RegisterIndex, pVideoTexture );
 				m_pDevice->SetTexture ( cTextureMask.RegisterIndex, pTexMask );
 
 				// Render the vertex buffer contents
@@ -1836,47 +1785,6 @@ void CMainMenuScene::Draw3DScene ( void )
 		SAFE_RELEASE ( pD3DBloomTarget );
 		SAFE_RELEASE ( pD3DMonitor );
 	}
-
-	// Release the video texture
-	if ( pVideoTexture ) {
-		m_pVideoRenderer->Unlock ();
-		pVideoTexture->Release ();
-	}
-}
-
-
-void CMainMenuScene::PlayVideo ( void )
-{
-	// Start the video renderer playback
-	if ( m_pVideoRenderer ) {
-		m_pVideoRenderer->Play ();
-	}
-}
-
-
-void CMainMenuScene::StopVideo ( void )
-{
-	// Stop the video renderer playback
-	if ( m_pVideoRenderer ) {
-		m_pVideoRenderer->Stop ();
-	}
-}
-
-
-bool CMainMenuScene::InitVideo ( void )
-{
-	// If we already have a VMR9 video renderer (e.g. after a mode change), destroy it
-	if ( m_pVideoRenderer )
-		CVideoManager::GetSingletonPtr ()->DestroyRenderer ( m_pVideoRenderer );
-
-	// Initialize the VMR9 video renderer
-	if ( CVideoManager::GetSingletonPtr ()->CreateRenderer ( &m_pVideoRenderer, CORE_MTA_VIDEO ) == false )
-		return false;
-
-	// Start the video renderer playback
-//	m_pVideoRenderer->Play ();
-
-	return true;
 }
 
 
@@ -2180,6 +2088,7 @@ void CMainMenuScene::SetPostProcessingEnabled ( bool bEnabled )
 	bEnablePostProcessing = bEnabled;
 }
 
+/*
 bool CMainMenuScene::SetVideoEnabled ( bool bEnabled )
 {
 	if ( bEnableVideo == bEnabled ) return true;
@@ -2248,3 +2157,4 @@ bool CMainMenuScene::SetVideoEnabled ( bool bEnabled )
 
 	return bResult;
 }
+*/

@@ -45,7 +45,6 @@ class CCore;
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
 #include "CScreenShot.h"
-#include "CVideoManager.h"
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
@@ -90,7 +89,6 @@ public:
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CLocalGUI*              GetLocalGUI                     ( void );
-	CVideoManager*			GetVMR9Manager					( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
 
     void                    SaveConfig                      ( void );
@@ -233,9 +231,6 @@ private:
 
     // Mod manager
     CModManager*                m_pModManager; 
-
-	// VMR9 manager
-	CVideoManager*				m_pVMR9Manager;
 
     // Resolution manager
     CResManager*                m_pResManager;

@@ -61,7 +61,7 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
 	WriteDebugEvent ( "CDirect3DEvents9::OnInvalidate" );
 
 	// Invalidate the VMR9 Manager
-	CVideoManager::GetSingleton ().OnLostDevice ();
+	//CVideoManager::GetSingleton ().OnLostDevice ();
 
 	// Invalidate the main menu
 	CLocalGUI::GetSingleton().GetMainMenu ()->OnInvalidate ( pDevice );
@@ -96,7 +96,7 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 	}
 
 	// Restore the VMR9 manager
-	CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
+	//CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
 
 	// Restore the main menu
 	CLocalGUI::GetSingleton().GetMainMenu ()->OnRestore ( pDevice );

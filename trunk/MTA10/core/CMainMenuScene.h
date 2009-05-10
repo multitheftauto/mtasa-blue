@@ -17,10 +17,6 @@ class CMainMenuScene;
 
 #include "CCore.h"
 #include "CSingleton.h"
-#include "CVideoRenderer.h"
-
-#include <dshow.h>
-#include <vmr9.h>
 
 class CMainMenuScene : public CSingleton < CMainMenuScene >
 {
@@ -40,15 +36,11 @@ protected:
 	void				Destroy3DScene					( void );
 	void				Draw3DScene						( void );
 
-	void				PlayVideo						( void );
-	void				StopVideo						( void );
-
 	void				PreStartCredits					( void );
 	void				StartCredits					( void );
 	void				StopCredits						( void );
 	bool				IsCreditsPlaying				( void );
 
-	bool				SetVideoEnabled					( bool bEnabled );
 	void				SetPostProcessingEnabled		( bool bEnabled );
 
 private:
@@ -62,13 +54,9 @@ private:
 	void				DestroyShaders					( void );
 	void				DestroyRenderTargets			( void );
 
-	bool				InitVideo						( void );
-
 	void				CreateCylinder					( IDirect3DDevice9 * pDevice );
 
 	CD3DMGEng *			m_pGFX;
-
-	CVideoRenderer *	m_pVideoRenderer;
 
 	CVector2D			m_vecScreenSize;
 
