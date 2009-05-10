@@ -348,23 +348,12 @@ void CMainMenu::Update ( void )
 					// If the scene initialisation failed, we need to use a static background
 					SetStaticBackground ( true );
 				}
-
-				// If we are already past the fading, play the video
-				if ( WaitForMenu >= 250 ) {
-					m_pMainMenuScene->PlayVideo ();
-				}
 			}
 		}
 
         // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
 		if ( WaitForMenu >= 250 ) {
             m_bIsVisible = true;
-
-			// Start the video
-			if ( !m_bStarted ) {
-				m_bStarted = true;
-				m_pMainMenuScene->PlayVideo ();
-			}
 		} else
             WaitForMenu++;
     }
@@ -500,9 +489,6 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
 
 		// If we're in-game
 		if ( bIsIngame ) {
-			// Stop the video
-			m_pMainMenuScene->StopVideo ();
-
 			// Load and enable the static background
 			SetStaticBackground ( true );
 
@@ -833,10 +819,6 @@ void CMainMenu::LoadMenuOptions ( void )
 	SetStaticBackground                            ( !(iMenuOptions & eMenuOptions::MENU_DYNAMIC) );            // Dynamic or static
 	if ( !m_bStaticBackground ) {
 		m_pMainMenuScene->SetPostProcessingEnabled ( (iMenuOptions & eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0 );   // Post-effects
-		if ( !m_pMainMenuScene->SetVideoEnabled    ( (iMenuOptions & eMenuOptions::MENU_VIDEO_ENABLED) > 0 )) {       // Video
-			// Fatal error, switch back to static
-			SetStaticBackground ( true );
-		}
 	}
 }
 

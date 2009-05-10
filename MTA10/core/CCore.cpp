@@ -208,9 +208,6 @@ CCore::CCore ( void )
     // Setup our hooks.
     ApplyHooks ( );
 
-	// Create the VMR9 manager
-	m_pVMR9Manager = new CVideoManager ();
-
 	// Reset the screenshot flag
 	bScreenShot = false;
 }
@@ -256,9 +253,6 @@ CCore::~CCore ( void )
     // Delete the GUI manager    
     delete m_pLocalGUI;
     delete m_pGraphics;
-
-	// Delete the VMR9 manager
-	delete m_pVMR9Manager;
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -349,11 +343,6 @@ CLocalGUI* CCore::GetLocalGUI ( void )
     return m_pLocalGUI;
 }
 
-
-CVideoManager* CCore::GetVMR9Manager ( void )
-{
-	return m_pVMR9Manager;
-}
 
 void CCore::SaveConfig ( void )
 {

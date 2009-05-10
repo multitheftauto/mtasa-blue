@@ -80,12 +80,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib TextureRenderer_d.lib zlibd.lib libpngd.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd.lib libpngd.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
+				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/zlib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/core_.pdb"
@@ -183,11 +183,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib TextureRenderer.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
+				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/zlib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
@@ -288,11 +288,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib TextureRenderer.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/texturerenderer;../dependencies/zlib"
+				AdditionalLibraryDirectories="../../Shared/XML;../dependencies/libv2;../dependencies/detours/lib;../dependencies/libpng;../dependencies/zlib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
@@ -582,14 +582,6 @@
 			</File>
 			<File
 				RelativePath=".\CText.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CVideoManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CVideoRenderer.cpp"
 				>
 			</File>
 			<File
@@ -943,18 +935,6 @@
 			</File>
 			<File
 				RelativePath=".\CText.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CVideoManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CVideoRenderer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CVideoUtils.h"
 				>
 			</File>
 			<File
