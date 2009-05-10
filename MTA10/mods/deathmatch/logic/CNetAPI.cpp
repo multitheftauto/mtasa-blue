@@ -905,7 +905,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
     WriteFullKeysync ( ControllerState, BitStream );
 
     CClientEntity* pContactEntity = pPlayerModel->GetContactEntity ();
-    bool bInContact = ( pContactEntity && pContactEntity->GetID () != INVALID_ELEMENT_ID );
+    bool bInContact = ( pContactEntity && pContactEntity->GetID () != INVALID_ELEMENT_ID && !pContactEntity->IsLocalEntity() );
 
     unsigned short usFlags = 0;
     if ( pPlayerModel->IsInWater () ) usFlags |= 0x01;
