@@ -33,8 +33,8 @@ CClientColModel::~CClientColModel ( void )
     // Unreplace our cols
     RestoreAll ();
 
-    // Unload our col
-    UnloadCol ();
+    if ( m_pColModel )
+        delete m_pColModel;
 }
 
 
@@ -52,12 +52,6 @@ bool CClientColModel::LoadCol ( const char* szFile )
 
     // Failed. Already loaded
     return false;
-}
-
-
-void CClientColModel::UnloadCol ( void )
-{
-    // TODO: UnloadCol should unload the collision file
 }
 
 

@@ -738,7 +738,7 @@ void CChatInputLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool 
         for ( ; iter != m_ExtraLines.end () ; iter++ )
         {
             vecPosition.fY += fLineDifference;
-            (*iter).Draw ( vecPosition, g_pChat->m_InputTextColor.A, bShadow );        
+            (*iter).Draw ( vecPosition, g_pChat->m_InputTextColor.A, bShadow );
         }
     }
 }
