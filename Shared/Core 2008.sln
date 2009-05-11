@@ -39,6 +39,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - FalagardBase", "..\
 		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Network", "..\MTA10\net\_Network 2008.vcproj", "{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Network", "..\MTA10_Server\net\_ServerNetwork 2008.vcproj", "{990626CA-67A7-420D-B2E2-3F773465A1CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -124,6 +128,18 @@ Global
 		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Nightly|Win32.Build.0 = Nightly|Win32
 		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.ActiveCfg = Release|Win32
 		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release|Win32.Build.0 = Release|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Debug|Win32.Build.0 = Debug|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Nightly|Win32.Build.0 = Nightly|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Release|Win32.ActiveCfg = Release|Win32
+		{A9DFD2B2-2CD1-444A-B0D2-BD928308E12A}.Release|Win32.Build.0 = Release|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Debug|Win32.Build.0 = Debug|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly|Win32.Build.0 = Nightly|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Release|Win32.ActiveCfg = Release|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
