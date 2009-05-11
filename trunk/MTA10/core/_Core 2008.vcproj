@@ -946,10 +946,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\version.h"
-				>
-			</File>
-			<File
 				RelativePath=".\xfire.h"
 				>
 			</File>
