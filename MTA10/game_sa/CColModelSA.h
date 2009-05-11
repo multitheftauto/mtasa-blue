@@ -18,24 +18,26 @@
 
 #define FUNC_CColModel_operator_new		0x40FC30
 #define FUNC_CColModel_constructor		0x40FB60
+#define FUNC_CColModel_destructor       0x40F700
+#define FUNC_CColModel_operator_delete  0x40FC40
 
 #define SIZEOF_CColModel				0x30
 
 class CColModelSAInterface
 {
-
+    BYTE                            pad [ SIZEOF_CColModel ];
 };
 
 class CColModelSA : public CColModel
 {
 private:
-	CColModelSAInterface		* internalInterface;
+	CColModelSAInterface		    m_Interface;
+
 public:
-									CColModelSA		( CColModelSAInterface * objectInterface );
 									CColModelSA		( void );
 									~CColModelSA	( void );
 
-	inline CColModelSAInterface *	GetColModel		( void ) { return this->internalInterface; };
+	inline CColModelSAInterface *	GetColModel		( void ) { return &m_Interface; }
 };
 
 #endif

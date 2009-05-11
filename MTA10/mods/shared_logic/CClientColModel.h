@@ -24,7 +24,6 @@ public:
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTCOL; }
 
     bool                            LoadCol                 ( const char* szFile );
-    void                            UnloadCol               ( void );
     inline bool                     IsLoaded                ( void )                    { return m_pColModel != NULL; };
 
     bool                            Replace                 ( unsigned short usModel );
