@@ -4245,6 +4245,12 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
 //
 void CClientGame::NotifyNextPacketInfo ( BYTE bytePacketID, unsigned long ulSize )
 {
+    if ( ulSize == 0 )
+    {
+        m_bReceivingBigPacket = false;
+        m_pBigPacketTransferBox->Hide ();
+    }
+
     if ( ulSize < 50000 )
         return;
 
