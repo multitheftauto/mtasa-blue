@@ -81,7 +81,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre.lib json.lib"
+				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre.lib json2008.lib"
 				OutputFile="../../output/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -184,7 +184,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd.lib ehsd_2008.lib pthreadVC2d.lib pmed_2008.lib pcre.lib jsonD.lib"
+				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2d.lib pmed_2008.lib pcre.lib jsonD2008.lib"
 				OutputFile="../../output/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -285,7 +285,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ASEQuerySDK.lib lua5.1.lib wsock32.lib sqlite3.lib zlib.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre.lib json.lib"
+				AdditionalDependencies="ASEQuerySDK.lib lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre.lib json2008.lib"
 				OutputFile="../../../output/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
