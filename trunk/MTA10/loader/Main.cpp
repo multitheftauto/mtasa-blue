@@ -18,6 +18,10 @@
 #include <shlwapi.h>
 #include <stdio.h>
 
+#include "SharedUtil.h"
+#include "SharedUtil.hpp"
+using SharedUtil::CalcMTASAPath;
+
 #ifndef _WINDOWS_
 #define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce executable size
 #define _WIN32_WINNT 0x0400     // So we can use IsDebuggerPresent()
@@ -386,6 +390,22 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
+
+    // Change the search path and current directory
+    char szOrigPath [ 1024 ];
+    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, sizeof(szOrigPath) );
+    if ( dwGetPathResult == 0 || dwGetPathResult >= sizeof(szOrigPath) )
+    {
+        if ( hwndSplash )
+            DestroyWindow ( hwndSplash );
+        MessageBox( NULL, "Load failed.  Unable to get the current Path environment variable.",
+                          "Error!", MB_ICONEXCLAMATION|MB_OK );
+        // Kill GTA and return errorcode
+        TerminateProcess ( piLoadee.hProcess, 1 );
+        return 1;
+    }
+    SString strPath ( "%s;%s", szOrigPath, CalcMTASAPath("mta").c_str () );
+    SetEnvironmentVariable ( "Path", strPath );
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( szCoreDLL );

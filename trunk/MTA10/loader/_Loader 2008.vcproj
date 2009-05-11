@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Loader"
 	ProjectGUID="{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
 	TargetFrameworkVersion="131072"
@@ -249,6 +249,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
