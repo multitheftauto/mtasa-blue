@@ -1902,6 +1902,10 @@ void CPacketHandler::Packet_NextPacketInfo ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 {
+    // Ensure map download progress bar is hidden
+    if ( g_pClientGame )
+        g_pClientGame->NotifyNextPacketInfo ( PACKET_ID_ENTITY_ADD, 0 );
+
     // This packet contains a list over entities to add to the world.
     // There's a byte seperating the entities saying what type it is (vehicle spawn,object,weapon pickup)
 
