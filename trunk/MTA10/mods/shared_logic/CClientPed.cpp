@@ -3936,6 +3936,7 @@ bool CClientPed::IsGettingIntoVehicle ( void )
                         case TASK_SIMPLE_CAR_GET_IN:
                         case TASK_SIMPLE_CAR_CLOSE_DOOR_FROM_INSIDE:
                         case TASK_SIMPLE_CAR_SHUFFLE:
+                        case TASK_COMPLEX_ENTER_BOAT_AS_DRIVER:
                         {
                             return true;
                             break;
