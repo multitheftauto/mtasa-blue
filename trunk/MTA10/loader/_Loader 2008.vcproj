@@ -48,6 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -146,6 +147,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
