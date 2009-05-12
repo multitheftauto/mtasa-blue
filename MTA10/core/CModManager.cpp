@@ -131,7 +131,7 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         CCore::GetSingleton ().GetConsole ()->Print ( "Error getting Path environment variable" );
         return NULL;
     }
-    SString strPath ( "%s;%s\\%s", szOrigPath, CalcMTASAPath("mods").c_str (), szName );
+    SString strPath ( "%s\\%s;%s", CalcMTASAPath("mods").c_str (), szName, szOrigPath );
     SetEnvironmentVariable ( "Path", strPath );
 
     GetCurrentDirectory ( sizeof(szOriginalDirectory), szOriginalDirectory );
