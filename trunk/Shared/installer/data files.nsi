@@ -24,7 +24,7 @@ Var Install_Dir
 ; 5. Run the script
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "812"
+!define BUILD_NUMBER "817"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "multitheftauto_data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -145,12 +145,10 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkunicode.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkzlib.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\msvcp71.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\msvcr71.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
 	File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
 	File "${FILES_ROOT}\MTA San Andreas\mta\xvidcore.dll"
-
+	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.is.xml"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.lnf.xml"
