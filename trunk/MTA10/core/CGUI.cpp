@@ -631,26 +631,23 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         }
     }
 
-    // Test - Use Ctrl-PageUp and Ctrl-PageDown to scroll chat box
+    // Test - Use PageUp and PageDown to scroll chat box
     switch ( uMsg )
     {
         case WM_KEYDOWN:
         {
-            if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0 )
-            {
-                extern CChat* g_pChat;
+            extern CChat* g_pChat;
 
-                if ( wParam == VK_PRIOR )
-                {
-                    if ( g_pChat )
-                        g_pChat->ScrollUp ();
-                }
-                else
-                if ( wParam == VK_NEXT )
-                {
-                    if ( g_pChat )
-                        g_pChat->ScrollDown ();
-                }
+            if ( wParam == VK_PRIOR )
+            {
+                if ( g_pChat )
+                    g_pChat->ScrollUp ();
+            }
+            else
+            if ( wParam == VK_NEXT )
+            {
+                if ( g_pChat )
+                    g_pChat->ScrollDown ();
             }
         }
     }
