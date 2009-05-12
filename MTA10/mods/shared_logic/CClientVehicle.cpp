@@ -2110,7 +2110,6 @@ void CClientVehicle::Destroy ( void )
     // If the vehicle exists
     if ( m_pVehicle )
     {
-
         #ifdef MTA_DEBUG
             g_pCore->GetConsole ()->Printf ( "CClientVehicle::Destroy %d", GetModel() );
         #endif
