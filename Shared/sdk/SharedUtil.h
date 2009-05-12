@@ -57,6 +57,29 @@ namespace SharedUtil
     //
     double GetSecondCount ( void );
 
+
+    //
+    // Some templates
+    //
+    template < class T >
+    T Min ( const T& a, const T& b )
+    {
+        return a < b ? a : b;
+    }
+
+    template < class T >
+    T Max ( const T& a, const T& b )
+    {
+        return a > b ? a : b;
+    }
+
+    // Clamps a value between two other values ( min < a < max )
+    template < class T >
+    T Clamp ( const T& min, const T& a, const T& max )
+    {
+        return a < min ? min : a > max ? max : a;
+    }
+
 };
 
 using namespace SharedUtil;

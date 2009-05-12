@@ -53,24 +53,6 @@ using std::string;
     void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
 
-template<class T>
-T Min ( const T& a, const T& b )
-{
-    return a < b ? a : b;
-}
-
-template<class T>
-T Max ( const T& a, const T& b )
-{
-    return a > b ? a : b;
-}
-
-template<class T>
-T Clamp ( const T& min, const T& value, const T& max )
-{
-    return value < min ? min : value > max ? max : value;
-}
-
 static int Round ( float value )
 {
 	return (int)floor(value + 0.5f);

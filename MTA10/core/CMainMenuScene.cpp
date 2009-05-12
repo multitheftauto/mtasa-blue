@@ -296,13 +296,6 @@ int iMaskAnimTextures = 0;
 bool bMaskAnimSwitch = true;
 float fMaskAnim = 0;
 
-// Clamps a value between two other values ( min < x < max )
-inline float Clamp( float min, float x, float max )
-{
-    if ( x < min ) return min; else
-    if ( x > max ) return max;
-    return x;
-}
 
 // Processes a bezier curve in a linear fashion as function of t (0 < t < 1)
 inline void ProcessLinear ( D3DXVECTOR3& vecPos, D3DXVECTOR3* vecBezier, float fT )
@@ -801,7 +794,7 @@ void CMainMenuScene::Draw3DScene ( void )
 					pMaskAnim[i].fB *= usFontDY;
 				}
 
-				float fZ = Clamp ( 0, sinf ( pMaskAnim[i].fC ), pMaskAnim[i].fF );
+				float fZ = Clamp ( 0.f, sinf ( pMaskAnim[i].fC ), pMaskAnim[i].fF );
 
 				m_pGFX->Render2DSprite ( pMaskAnimTexture[pMaskAnim[i].ucIndex],
 					&D3DXVECTOR2(pMaskAnim[i].fE,pMaskAnim[i].fE),
@@ -1542,7 +1535,7 @@ void CMainMenuScene::Draw3DScene ( void )
 				m_pDevice->SetTextureStageState ( cTextureMask.RegisterIndex, D3DTSS_ALPHAOP,		D3DTOP_DISABLE );
 				m_pDevice->SetTextureStageState ( cTextureMask.RegisterIndex, D3DTSS_ALPHAARG2,	D3DTA_CURRENT );
 
-				pPSHConstMask->SetFloat ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "Alpha" ), Clamp ( 0, fBlend, 1 ) );
+				pPSHConstMask->SetFloat ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "Alpha" ), Clamp ( 0.f, fBlend, 1.f ) );
 
 				// Set the texture
 				if ( pFallbackTexture )
@@ -1595,7 +1588,7 @@ void CMainMenuScene::Draw3DScene ( void )
 				pPSHConstLighting->SetFloatArray ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "LightPosD" ), &lightPosD[0], 4 );
 
 				// Set scene blending (alpha)
-				pPSHConstLighting->SetFloat ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "Alpha" ), Clamp ( 0, fBlend, 1 ) );
+				pPSHConstLighting->SetFloat ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "Alpha" ), Clamp ( 0.f, fBlend, 1.f ) );
 
 				// Set light strength
 				pPSHConstLighting->SetFloat ( m_pDevice, pPSHConstLighting->GetConstantByName ( 0, "LightPowerA" ), fFlickerA );

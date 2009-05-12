@@ -75,7 +75,7 @@ public:
 
     CChatLineSection&           operator =              ( const CChatLineSection& other );
 
-    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
+    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );
     float                       GetWidth                ( void );
     inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
     void                        SetText                 ( const char* szText )  { m_strText = szText; }
@@ -97,7 +97,7 @@ public:
     static bool                 IsColorCode             ( const char* szColorCode );
 
     virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
-    virtual void                Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );    
+    virtual void                Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
     virtual float               GetWidth                ( void );
     bool                        IsActive                ( void )    { return m_bActive; }
     void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
@@ -157,7 +157,7 @@ public:
     static float                GetFontHeight           ( float fScale = 1.0f );
     static float                GetCharacterWidth       ( int iChar, float fScale = 1.0f );
     static float                GetTextExtent           ( const char * szText, float fScale = 1.0f );
-    static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
+    static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY, const CRect2D& RenderBounds );
 
     void                        SetColor                ( CColor& Color );
     void                        SetInputColor           ( CColor& Color );
@@ -173,10 +173,15 @@ private:
 
 protected:
     void                        UpdateGUI               ( void );
+    void                        UpdateSmoothScroll      ( float* pfPixelScroll, int *piLineScroll );
 
     CChatLine                   m_Lines [ CHAT_MAX_LINES ];     // Circular buffer
     unsigned int                m_uiMostRecentLine;
     unsigned int                m_uiScrollOffset;
+    float                       m_fSmoothScroll;
+    float                       m_fSmoothLastTimeSeconds;
+    float                       m_fSmoothAllowAfter;
+    float                       m_fSmoothScrollResetTime;
     CChatInputLine              m_InputLine;
 
     CGUI*                       m_pManager;
