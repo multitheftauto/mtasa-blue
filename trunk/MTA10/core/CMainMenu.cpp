@@ -37,14 +37,6 @@
 
 static short WaitForMenu = 0;
 
-// Clamps a value between two other values ( min < x < max )
-inline float Clamp( float min, float x, float max )
-{
-    if ( x < min ) return min; else
-    if ( x > max ) return max;
-    return x;
-}
-
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
     // Initialize
@@ -244,9 +236,9 @@ void CMainMenu::Update ( void )
 			}
 
 			// Set the alpha value
-			if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0, m_fFader, fMax ) );
+			if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
 		}
-		m_pBackground->SetAlpha ( Clamp ( 0, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+		m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
 		m_pHeader->SetAlpha ( m_fFader );
 
 		// Increment the fader (use the other define if we're fading to the credits)
@@ -287,9 +279,9 @@ void CMainMenu::Update ( void )
 			}
 
 			// Set the alpha value
-			if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0, m_fFader, fMax ) );
+			if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
 		}
-		m_pBackground->SetAlpha ( Clamp ( 0, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+		m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
 		m_pHeader->SetAlpha ( m_fFader );
 
 		m_fFader -= CORE_MTA_FADER;
