@@ -50,6 +50,12 @@ CGameSA::CGameSA()
         case VERSION_20:    COffsets::Initialize20 (); break;
     }
 
+    // Set the model ids for all the CModelInfoSA instances
+    for ( int i = 0; i < MODELINFO_MAX; i++ )
+    {
+        ModelInfo [i].SetModelID ( i );
+    }
+
 	DEBUG_TRACE("CGameSA::CGameSA()");
 	this->m_pAudio					= new CAudioSA();
 	this->m_pWorld					= new CWorldSA();
@@ -94,17 +100,6 @@ CGameSA::CGameSA()
 
 	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
 		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), (eWeaponType)i);
-
-    /*
-	for(int c = 0;c < MAX_MODELS;c++)
-		ModelInfo[c] = new CModelInfoSA(c);
-    */
-
-    // Set the model ids for all the CModelInfoSA instances
-    for ( int i = 0; i < MODELINFO_MAX; i++ )
-    {
-        ModelInfo [i].SetModelID ( i );
-    }
 
 	m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
 
