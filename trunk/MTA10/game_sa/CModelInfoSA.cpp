@@ -439,19 +439,7 @@ CBoundingBox * CModelInfoSA::GetBoundingBox ( )
 
 bool CModelInfoSA::IsValid ( )
 {
-	DWORD dwModelInfo = 0;
-	DWORD ModelID = m_dwModelID;
-    _asm
-    {
-        mov     eax, ModelID
-        mov     eax, ARRAY_ModelInfo[eax*4]
-        mov     dwModelInfo, eax
-    }
-
-	if ( dwModelInfo )
-		return true;
-	else
-		return false;
+    return ppModelInfo [ m_dwModelID ] != 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel ( )
@@ -477,11 +465,16 @@ skip:
 
 unsigned short CModelInfoSA::GetTextureDictionaryID ()
 {
-    return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[m_dwModelID]->usTextureDictionary;
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if ( m_pInterface )
+        return m_pInterface->usTextureDictionary;
+
+    return 0;
 }
 
 float CModelInfoSA::GetLODDistance ()
 {
+    m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         return m_pInterface->fLodDistanceUnscaled;
 
@@ -490,6 +483,7 @@ float CModelInfoSA::GetLODDistance ()
 
 void CModelInfoSA::SetLODDistance ( float fDistance )
 {
+    m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;
 }
