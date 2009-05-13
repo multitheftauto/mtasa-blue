@@ -173,6 +173,8 @@ RwTextureCreate_t						RwTextureCreate							= (RwTextureCreate_t)						0xDEAD;
 typedef bool				(__cdecl *SetTextureDict_t)					(unsigned short id);
 typedef bool				(__cdecl *LoadClumpFile_t)					(RwStream *stream, unsigned int id);		// (stream, model id)
 typedef bool				(__cdecl *LoadModel_t)						(RwBuffer *filename, unsigned int id);		// (memory chunk, model id)
+typedef void				(__cdecl *LoadCollisionModel_t) 			(unsigned char*, CColModelSAInterface*, const char*);
+typedef void				(__cdecl *LoadCollisionModelVer2_t)			(unsigned char*, unsigned int, CColModelSAInterface*, const char*);
 typedef void				(__cdecl *LoadCollisionModelVer3_t)			(unsigned char*, unsigned int, CColModelSAInterface*, const char*);	// buf, bufsize, ccolmodel&, keyname
 typedef bool				(__cdecl *CTxdStore_LoadTxd_t)				(unsigned int id, RwStream *filename);
 typedef void				(__cdecl *CTxdStore_RemoveTxd_t)			(unsigned int id);
@@ -184,6 +186,8 @@ typedef RwTexture*			(__cdecl *CClothesBuilder_CopyTexture_t)	(RwTexture *textur
 SetTextureDict_t				SetTextureDict					= (SetTextureDict_t)				0xDEAD;
 LoadClumpFile_t					LoadClumpFile					= (LoadClumpFile_t)					0xDEAD;
 LoadModel_t						LoadModel						= (LoadModel_t)						0xDEAD;
+LoadCollisionModel_t    		LoadCollisionModel	    		= (LoadCollisionModel_t)    		0xDEAD;
+LoadCollisionModelVer2_t		LoadCollisionModelVer2			= (LoadCollisionModelVer2_t)		0xDEAD;
 LoadCollisionModelVer3_t		LoadCollisionModelVer3			= (LoadCollisionModelVer3_t)		0xDEAD;
 CTxdStore_LoadTxd_t				CTxdStore_LoadTxd				= (CTxdStore_LoadTxd_t)				0xDEAD;
 CTxdStore_GetTxd_t				CTxdStore_GetTxd				= (CTxdStore_GetTxd_t)				0xDEAD;
@@ -192,7 +196,7 @@ CTxdStore_RemoveRef_t			CTxdStore_RemoveRef				= (CTxdStore_RemoveRef_t)			0xDEA
 CTxdStore_AddRef_t				CTxdStore_AddRef				= (CTxdStore_AddRef_t)				0xDEAD;
 CClothesBuilder_CopyTexture_t	CClothesBuilder_CopyTexture		= (CClothesBuilder_CopyTexture_t)	0xDEAD;
 
-#define			COL3_HEADER_SIZE	32
+#define			COL_HEADER_SIZE	32
 
 /*****************************************************************************/
 /** Function inlines                                                        **/

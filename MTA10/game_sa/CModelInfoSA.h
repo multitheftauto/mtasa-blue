@@ -227,9 +227,8 @@ protected:
     CBaseModelInfoSAInterface *     m_pInterface;
 	DWORD						    m_dwModelID;
 	DWORD						    m_dwReferences;
-    CColModel*		                m_pColModel;
-	CColModelSAInterface*		    m_pColModelInterface;
-    CColModelSAInterface*		    m_pOriginalColModel;
+    CColModel*		                m_pCustomColModel;
+    CColModelSAInterface*		    m_pOriginalColModelInterface;
 	RpClump*					    m_pCustomClump;
 
 public:
@@ -294,7 +293,7 @@ public:
 	void			                RestoreColModel		    ( void );
     void                            MakeCustomModel         ( void );
 
-    inline void                     SetModelID			    ( DWORD dwModelID ) { m_dwModelID = dwModelID; };
+    inline void                     SetModelID			    ( DWORD dwModelID ) { m_dwModelID = dwModelID; }
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 };

@@ -24,10 +24,9 @@ CModelInfoSA::CModelInfoSA ( void )
     m_pInterface = NULL;
     this->m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
-    m_pOriginalColModel = NULL;
+    m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
-    m_pColModelInterface = NULL;
-    m_pColModel = NULL;
+    m_pCustomColModel = NULL;
 }
 
 
@@ -36,10 +35,9 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
     this->m_dwModelID = dwModelID;
     m_pInterface = ppModelInfo [ m_dwModelID ];
     m_dwReferences = 0;
-    m_pOriginalColModel = NULL;
+    m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
-    m_pColModelInterface = NULL;
-    m_pColModel = NULL;
+    m_pCustomColModel = NULL;
 }
 
 
@@ -342,32 +340,7 @@ VOID CModelInfoSA::Remove ( )
         else
         {
             // Make our collision model original again before we unload.
-	        if ( m_pOriginalColModel && m_pColModel )
-	        {
-                // SetColModel it back to original
-                DWORD dwOriginalColModelInterface = (DWORD) m_pOriginalColModel;
-                DWORD ModelID = m_dwModelID;
-                DWORD dwFunc = FUNC_SetColModel;
-		        _asm
-		        {
-			        mov     ecx, ModelID
-			        mov     ecx, ARRAY_ModelInfo[ecx*4]
-			        push    1
-			        push    dwOriginalColModelInterface
-			        call    dwFunc
-		        }
-
-                // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
-		        DWORD func = 0x5B2C20;
-		        __asm
-                {
-			        push	dwOriginalColModelInterface
-			        push	ModelID
-			        call	func
-			        add		esp, 8
-		        }
-		        #pragma message(__LOC__ "(IJs) Document this function some time.")
-	        }
+	        RestoreColModel ();
 
             // Remove the model.
 	        DWORD dwFunction = FUNC_RemoveModel;
@@ -430,7 +403,7 @@ BOOL CModelInfoSA::IsLoaded ( )
 		pop		eax
 	}
 
-    m_pInterface = ( bReturn ) ? m_pInterface = ppModelInfo [ m_dwModelID ] : NULL;
+    m_pInterface = ppModelInfo [ m_dwModelID ];
 	return bReturn;
 }
 
@@ -753,27 +726,22 @@ void CModelInfoSA::RestoreOriginalModel ( void )
 void CModelInfoSA::SetColModel ( CColModel* pColModel )
 {
     // Grab the interfaces
-	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
 	CColModelSAInterface* pInterface = ((CColModelSA*)pColModel)->GetColModel ();
 
     // Store the col model we set
-    m_pColModel = pColModel;
-    m_pColModelInterface = pInterface;
+    m_pCustomColModel = pColModel;
 
     // Do the following only if we're loaded
-    if ( IsLoaded () )
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if ( m_pInterface )
     {
-        // Grab the current collision interface
-        CColModelSAInterface* pCurrentInterface = m_pInterface->pColModel;
-
 	    // If no collision model has been set before, store the original in case we want to restore it
-	    if ( m_pOriginalColModel == NULL ) m_pOriginalColModel = pCurrentInterface;
+	    if ( !m_pOriginalColModelInterface )
+            m_pOriginalColModelInterface = m_pInterface->pColModel;
 
-		// Apply some low-level hacks (copies the old col area and sets a flag)
-		DWORD pColModelInterface = (DWORD)pInterface;
-		//DWORD pOldColModelInterface = (DWORD) m_pOriginalColModel;
-		*((BYTE *)( pPool [m_dwModelID ] + 0x13 )) |= 8;
-		*((BYTE *)( pColModelInterface + 40 )) = 0xA9; //*((BYTE *)( pOldColModelInterface + 40 ));
+		// Apply some low-level hacks
+		*( (BYTE *) ppModelInfo [ m_dwModelID ] + 0x13 ) |= 8;
+		*( (BYTE *) pInterface + 40 ) = 0xA9;
 
 		// Extra flags (3064) -- needs to be tested
 		m_pInterface->bDoWeOwnTheColModel = false;
@@ -805,18 +773,16 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
 void CModelInfoSA::RestoreColModel ( void )
 {
-    // Remember that the current col model is the original
-    m_pColModelInterface = m_pOriginalColModel;
-
     // Are we loaded?
-    if ( IsLoaded () )
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if ( m_pInterface )
     {
 	    // We only have to store if the collision model was set
         // Also only if we have a col model set
-	    if ( m_pOriginalColModel && m_pColModel )
+	    if ( m_pOriginalColModelInterface && m_pCustomColModel )
 	    {
             DWORD dwFunc = FUNC_SetColModel;
-            DWORD dwOriginalColModelInterface = (DWORD) m_pOriginalColModel;
+            DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
             DWORD ModelID = m_dwModelID;
 		    _asm
 		    {
@@ -840,7 +806,7 @@ void CModelInfoSA::RestoreColModel ( void )
     }
 
     // We currently have no custom model loaded
-    m_pColModel = NULL;
+    m_pCustomColModel = NULL;
 }
 
 
@@ -853,10 +819,9 @@ void CModelInfoSA::MakeCustomModel ( void )
     }
 
     // Custom collision model is not NULL and it's different from the original?
-    if ( m_pColModel != NULL &&
-         m_pColModelInterface != NULL )
+    if ( m_pCustomColModel )
     {
-        SetColModel ( m_pColModel );
+        SetColModel ( m_pCustomColModel );
     }
 }
 

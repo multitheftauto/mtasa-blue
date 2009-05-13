@@ -239,6 +239,8 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             SetTextureDict					    = (SetTextureDict_t)				        0x007319C0;
             LoadClumpFile					    = (LoadClumpFile_t)					        0x005371F0;
             LoadModel						    = (LoadModel_t)						        0x0040C6B0;
+            LoadCollisionModel	    		    = (LoadCollisionModel_t)    		        0x00537580;
+            LoadCollisionModelVer2			    = (LoadCollisionModelVer2_t)		        0x00537EE0;
             LoadCollisionModelVer3			    = (LoadCollisionModelVer3_t)		        0x00537CE0;
             CTxdStore_LoadTxd				    = (CTxdStore_LoadTxd_t)				        0x00731DD0;
             CTxdStore_GetTxd				    = (CTxdStore_GetTxd_t)				        0x00408340;
@@ -320,6 +322,8 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             SetTextureDict					    = (SetTextureDict_t)				        0x007319C0;
             LoadClumpFile					    = (LoadClumpFile_t)					        0x005371F0;
             LoadModel						    = (LoadModel_t)						        0x0040C6B0;
+            LoadCollisionModel	    		    = (LoadCollisionModel_t)    		        0x00537580;
+            LoadCollisionModelVer2			    = (LoadCollisionModelVer2_t)		        0x00537EE0;
             LoadCollisionModelVer3			    = (LoadCollisionModelVer3_t)		        0x00537CE0;
             CTxdStore_LoadTxd				    = (CTxdStore_LoadTxd_t)				        0x00731DD0;
             CTxdStore_GetTxd				    = (CTxdStore_GetTxd_t)				        0x00408340;
@@ -577,15 +581,42 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 	CColModelSA * pColModel = new CColModelSA ();
 
 	// Check if this is a COL3 file
-	if ( szData[0] != 'C' || szData[1] != 'O' || szData[2] != 'L' || szData[3] != '3' )
+
+
+	// Call GTA's COL3 loader (we strip the header off first)
+	if ( szData[0] == 'C' && szData[1] == 'O' && szData[2] == 'L' )
+    {
+        if ( szData[3] == 'L' )
+        {
+            szData += COL_HEADER_SIZE;
+            uiFileSize -= COL_HEADER_SIZE;
+            LoadCollisionModel ( szData, pColModel->GetColModel (), szKeyName );
+        }
+        else if ( szData[3] == '2' )
+        {
+            szData += COL_HEADER_SIZE;
+            uiFileSize -= COL_HEADER_SIZE;
+            LoadCollisionModelVer2 ( szData, uiFileSize, pColModel->GetColModel (), szKeyName );
+        }
+        else if ( szData[3] == '3' )
+        {
+            szData += COL_HEADER_SIZE;
+            uiFileSize -= COL_HEADER_SIZE;
+	        LoadCollisionModelVer3 ( szData, uiFileSize, pColModel->GetColModel (), szKeyName );
+        }
+        else
+        {
+            delete[] szData;
+            fclose ( fileCol );
+            return NULL;
+        }
+    }
+    else
     {
         delete[] szData;
         fclose ( fileCol );
         return NULL;
     }
-
-	// Call GTA's COL3 loader (we strip the header off first)
-	LoadCollisionModelVer3 ( szData + COL3_HEADER_SIZE, uiFileSize - COL3_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
 
 	// Do some checking on the CColModel here, cause LoadCollisionModelVer3 doesn't return a bool?
 
