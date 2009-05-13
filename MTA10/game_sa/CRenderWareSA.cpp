@@ -580,34 +580,26 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
 	// Create a new CColModel
 	CColModelSA * pColModel = new CColModelSA ();
 
-	// Check if this is a COL3 file
-
-
-	// Call GTA's COL3 loader (we strip the header off first)
+    // Load the col file
 	if ( szData[0] == 'C' && szData[1] == 'O' && szData[2] == 'L' )
     {
         if ( szData[3] == 'L' )
         {
-            szData += COL_HEADER_SIZE;
-            uiFileSize -= COL_HEADER_SIZE;
-            LoadCollisionModel ( szData, pColModel->GetColModel (), szKeyName );
+            LoadCollisionModel ( szData + COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
         }
         else if ( szData[3] == '2' )
         {
-            szData += COL_HEADER_SIZE;
-            uiFileSize -= COL_HEADER_SIZE;
-            LoadCollisionModelVer2 ( szData, uiFileSize, pColModel->GetColModel (), szKeyName );
+            LoadCollisionModelVer2 ( szData + COL_HEADER_SIZE, uiFileSize - COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
         }
         else if ( szData[3] == '3' )
         {
-            szData += COL_HEADER_SIZE;
-            uiFileSize -= COL_HEADER_SIZE;
-	        LoadCollisionModelVer3 ( szData, uiFileSize, pColModel->GetColModel (), szKeyName );
+	        LoadCollisionModelVer3 ( szData + COL_HEADER_SIZE, uiFileSize - COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
         }
         else
         {
             delete[] szData;
             fclose ( fileCol );
+            delete pColModel;
             return NULL;
         }
     }
@@ -615,10 +607,9 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName 
     {
         delete[] szData;
         fclose ( fileCol );
+        delete pColModel;
         return NULL;
     }
-
-	// Do some checking on the CColModel here, cause LoadCollisionModelVer3 doesn't return a bool?
 
 	// Delete the buffer and close the file
 	delete[] szData;
