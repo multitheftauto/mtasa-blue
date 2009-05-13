@@ -10305,7 +10305,7 @@ int CLuaFunctionDefinitions::RemoveBan ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "unbanSerial" );
+        m_pScriptDebugging->LogBadType ( luaVM, "removeBan" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
