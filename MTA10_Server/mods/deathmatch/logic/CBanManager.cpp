@@ -41,16 +41,23 @@ void CBanManager::DoPulse ( void )
     if ( tTime > m_tUpdate )
     {
         list < CBan* > ::const_iterator iter = m_BanManager.begin ();
-        for ( ; iter != m_BanManager.end (); iter++ )
+        while ( iter != m_BanManager.end () )
         {
             if ( (*iter)->GetTimeOfUnban () > 0 )
             {
                 if ( tTime >= (*iter)->GetTimeOfUnban () )
                 {
+                    // Trigger the event
+                    CLuaArguments Arguments;
+                    Arguments.PushUserData ( *iter );
+                    g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onUnban", Arguments );
+
                     RemoveBan ( *iter );
                     iter = m_BanManager.begin ();
+                    continue;
                 }
             }
+            iter++;
         }
         m_tUpdate = tTime + 1;
     }
