@@ -82,7 +82,7 @@
 				SuppressStartupBanner="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../libcurl2008_imp.lib"
+				ImportLibrary="../lib/libcurl2008_imp.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -177,7 +177,7 @@
 				SuppressStartupBanner="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../libcurl2008_imp.lib"
+				ImportLibrary="../lib/libcurl2008_imp.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -276,7 +276,7 @@
 				MapFileName=".\DLL-Debug/libcurld.map"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../libcurld2008_imp.lib"
+				ImportLibrary="../lib/libcurld2008_imp.lib"
 				TargetMachine="1"
 			/>
 			<Tool

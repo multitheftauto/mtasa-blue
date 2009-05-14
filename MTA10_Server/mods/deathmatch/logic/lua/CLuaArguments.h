@@ -24,7 +24,7 @@ extern "C"
 #include "CLuaArgument.h"
 #include <vector>
 #include "../common/CBitStream.h"
-#include "json/json.h"
+#include "json.h"
 
 class CAccessControlList;
 class CAccessControlListGroup;

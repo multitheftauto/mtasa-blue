@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ehs"
 	ProjectGUID="{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D}"
+	RootNamespace="ehs"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -72,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\ehs_2008.lib"
+				OutputFile="../lib/ehs_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -148,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\ehsd_2008.lib"
+				OutputFile="../lib/ehsd_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -226,7 +227,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\ehs_2008.lib"
+				OutputFile="../lib/ehs_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>

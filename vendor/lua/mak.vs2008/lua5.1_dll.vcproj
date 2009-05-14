@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="lua5.1_dll"
 	ProjectGUID="{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
+	RootNamespace="lua5.1_dll"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -17,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../"
+			OutputDirectory="../lib"
 			IntermediateDirectory="../obj/lua5.1_dll/Debug"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -76,7 +77,7 @@
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../lua5.1d.lib"
+				ImportLibrary="../lib/lua5.1d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -104,7 +105,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="../../"
+			OutputDirectory="../lib"
 			IntermediateDirectory="../obj/lua5.1_dll/Release"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -163,7 +164,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../lua5.1.lib"
+				ImportLibrary="../lib/lua5.1.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -191,7 +192,7 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="../../"
+			OutputDirectory="../lib"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -250,7 +251,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="../../lua5.1.lib"
+				ImportLibrary="../lib/lua5.1.lib"
 				TargetMachine="1"
 			/>
 			<Tool
