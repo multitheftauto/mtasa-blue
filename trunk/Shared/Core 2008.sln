@@ -60,29 +60,27 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUI - FalagardBase", "..\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{F99764D6-7D93-4557-8474-EA06D4BD3801}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\dependencies\zlib\zlib 2008.vcproj", "{CCABBC2E-172D-46FD-BC43-5A9FCD295112}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\vendor\zlib\zlib 2008.vcproj", "{CCABBC2E-172D-46FD-BC43-5A9FCD295112}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "..\dependencies\bzip2\libbz2 2008.vcproj", "{0A6CF716-5FFC-49AA-9001-3777CDC5EC8E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "..\vendor\bzip2\libbz2 2008.vcproj", "{0A6CF716-5FFC-49AA-9001-3777CDC5EC8E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "..\dependencies\pcre\pcre 2008.vcproj", "{39452ACC-FF12-488D-94B6-301B4EFBB606}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "..\vendor\pcre\pcre 2008.vcproj", "{39452ACC-FF12-488D-94B6-301B4EFBB606}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcurl", "..\dependencies\curl\lib\libcurl 2008.vcproj", "{2B98A079-89D3-4970-B0C2-39996636BAE6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcurl", "..\vendor\curl\lib\libcurl 2008.vcproj", "{2B98A079-89D3-4970-B0C2-39996636BAE6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ehs", "..\dependencies\ehs\vs2008\ehs 2008.vcproj", "{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ehs", "..\vendor\ehs\vs2008\ehs 2008.vcproj", "{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "json", "..\dependencies\json\json 2008.vcproj", "{38D753E1-5341-42E1-94AD-B2C503F1FC37}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "json", "..\vendor\json-c\json 2008.vcproj", "{38D753E1-5341-42E1-94AD-B2C503F1FC37}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\dependencies\libpng\projects\vs2008\libpng.vcproj", "{0008960E-E0DD-41A6-8265-00B31DDB4C21}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\vendor\libpng\projects\vs2008\libpng.vcproj", "{0008960E-E0DD-41A6-8265-00B31DDB4C21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_dll", "..\dependencies\lua\mak.vs2008\lua5.1_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_dll", "..\vendor\lua\mak.vs2008\lua5.1_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "..\dependencies\lua\mak.vs2008\lua5.1_lib.vcproj", "{E2629417-52DF-854E-B510-C15A87AB4BE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "..\vendor\lua\mak.vs2008\lua5.1_lib.vcproj", "{E2629417-52DF-854E-B510-C15A87AB4BE3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pme", "..\dependencies\pme\vs2008\pme 2008.vcproj", "{35DC1C50-0CDF-4F3A-B847-2D76DE134053}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pme", "..\vendor\pme\vs2008\pme 2008.vcproj", "{35DC1C50-0CDF-4F3A-B847-2D76DE134053}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RakNet 2008", "..\dependencies\RakNet\RakNet 2008.vcproj", "{DB0E9442-3928-4DB2-879D-92C0670B9236}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite", "..\dependencies\sqlite\sqlite.vcproj", "{71C9B848-4138-4D4A-B131-1A42E7AC66B6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite", "..\vendor\sqlite\sqlite.vcproj", "{71C9B848-4138-4D4A-B131-1A42E7AC66B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -229,12 +227,6 @@ Global
 		{35DC1C50-0CDF-4F3A-B847-2D76DE134053}.Nightly|Win32.Build.0 = Nightly|Win32
 		{35DC1C50-0CDF-4F3A-B847-2D76DE134053}.Release|Win32.ActiveCfg = Release|Win32
 		{35DC1C50-0CDF-4F3A-B847-2D76DE134053}.Release|Win32.Build.0 = Release|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Debug|Win32.Build.0 = Debug|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Nightly|Win32.ActiveCfg = Nightly|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Nightly|Win32.Build.0 = Nightly|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Release|Win32.ActiveCfg = Release|Win32
-		{DB0E9442-3928-4DB2-879D-92C0670B9236}.Release|Win32.Build.0 = Release|Win32
 		{71C9B848-4138-4D4A-B131-1A42E7AC66B6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{71C9B848-4138-4D4A-B131-1A42E7AC66B6}.Debug|Win32.Build.0 = Debug|Win32
 		{71C9B848-4138-4D4A-B131-1A42E7AC66B6}.Nightly|Win32.ActiveCfg = Nightly|Win32
@@ -259,7 +251,6 @@ Global
 		{8EEECEE6-A6EC-BC48-8E76-22B87825444B} = {F99764D6-7D93-4557-8474-EA06D4BD3801}
 		{E2629417-52DF-854E-B510-C15A87AB4BE3} = {F99764D6-7D93-4557-8474-EA06D4BD3801}
 		{35DC1C50-0CDF-4F3A-B847-2D76DE134053} = {F99764D6-7D93-4557-8474-EA06D4BD3801}
-		{DB0E9442-3928-4DB2-879D-92C0670B9236} = {F99764D6-7D93-4557-8474-EA06D4BD3801}
 		{71C9B848-4138-4D4A-B131-1A42E7AC66B6} = {F99764D6-7D93-4557-8474-EA06D4BD3801}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
