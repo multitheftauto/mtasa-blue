@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_dll", "lua5.1_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "lua5.1_lib.vcproj", "{E2629417-52DF-854E-B510-C15A87AB4BE3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Debug.ActiveCfg = Debug|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Debug.Build.0 = Debug|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Release.ActiveCfg = Release|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Release.Build.0 = Release|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Debug.ActiveCfg = Debug|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Debug.Build.0 = Debug|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Release.ActiveCfg = Release|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

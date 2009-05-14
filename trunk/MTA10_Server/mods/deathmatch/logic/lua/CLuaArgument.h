@@ -22,7 +22,7 @@ extern "C"
     #include "lua.h"
 }
 #include "../common/CBitStream.h"
-#include "json.h"
+#include "json/json.h"
 
 class CElement;
 class CLuaArguments;
