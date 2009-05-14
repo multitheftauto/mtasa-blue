@@ -122,7 +122,7 @@
 				RuntimeLibrary="3"
 				EnableEnhancedInstructionSet="0"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="png.h"
+				PrecompiledHeaderThrough=""
 				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				DebugInformationFormat="3"
