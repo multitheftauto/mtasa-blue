@@ -6988,8 +6988,15 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
         CClient* pClient = pAccount->GetClient ();
         if ( pClient )
         {
-            CAccount* pGuestAccount = new CAccount ( m_pAccountManager, false, "guest" );
-            pClient->SetAccount ( pGuestAccount );
+            g_pGame->GetAccountManager ()->LogOut ( pClient, NULL );
+
+            char szMessage [128];
+            szMessage[0] = '\0';
+
+            _snprintf ( szMessage, 128, "You were logged out of your account due to it being deleted" );
+            szMessage[127] = '\0';
+
+            pClient->SendEcho ( szMessage );
         }
         delete pAccount;
         return true;

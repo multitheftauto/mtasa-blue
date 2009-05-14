@@ -1322,6 +1322,21 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
         CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
         if ( pAccount )
         {
+            CClient *pAccountClient = pAccount->GetClient ();
+
+            if ( pAccountClient )
+            {
+                g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL );
+
+                char szClientMessage [128];
+                szClientMessage[0] = '\0';
+
+                _snprintf ( szClientMessage, 128, "logout: You were logged out of account '%s' due to it being deleted", szArguments );
+                szClientMessage[127] = '\0';
+
+                pAccountClient->SendEcho ( szClientMessage );
+            }
+
             // Tell the client
             char szMessage [128];
             szMessage[0] = '\0';
