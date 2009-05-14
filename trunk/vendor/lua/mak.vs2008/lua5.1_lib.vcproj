@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="lua5.1_lib"
 	ProjectGUID="{E2629417-52DF-854E-B510-C15A87AB4BE3}"
+	RootNamespace="lua5.1_lib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -66,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lua5.1sd_2008.lib"
+				OutputFile="../lib/lua5.1sd_2008.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool
@@ -139,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lua5.1s_2008.lib"
+				OutputFile="../lib/lua5.1s_2008.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool
@@ -212,7 +213,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lua5.1s_2008.lib"
+				OutputFile="../lib/lua5.1s_2008.lib"
 				IgnoreAllDefaultLibraries="true"
 			/>
 			<Tool

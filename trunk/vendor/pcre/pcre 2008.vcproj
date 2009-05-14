@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../pcre3d.dll"
-				ImportLibrary="../pcred_2008.lib"
+				ImportLibrary="lib/pcred_2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -136,7 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../pcre3.dll"
-				ImportLibrary="../pcre_2008.lib"
+				ImportLibrary="lib/pcre_2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -209,7 +209,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../pcre3.dll"
-				ImportLibrary="../pcre_2008.lib"
+				ImportLibrary="lib/pcre_2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

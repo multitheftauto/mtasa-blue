@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="json"
 	ProjectGUID="{38D753E1-5341-42E1-94AD-B2C503F1FC37}"
 	RootNamespace="json2008"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../jsonD2008.lib"
+				OutputFile="lib/jsonD2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -125,7 +125,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../json2008.lib"
+				OutputFile="lib/json2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -189,7 +189,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../json2008.lib"
+				OutputFile="lib/json2008.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

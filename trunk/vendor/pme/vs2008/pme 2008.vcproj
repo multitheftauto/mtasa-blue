@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="pme"
 	ProjectGUID="{35DC1C50-0CDF-4F3A-B847-2D76DE134053}"
+	RootNamespace="pme"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -72,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\pme_2008.lib"
+				OutputFile="../lib/pme_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -147,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\pmed_2008.lib"
+				OutputFile="../lib/pmed_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
@@ -225,7 +226,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\pme_2008.lib"
+				OutputFile="../lib/pme_2008.lib"
 				SuppressStartupBanner="true"
 				IgnoreAllDefaultLibraries="true"
 			/>
