@@ -764,10 +764,7 @@ int CLuaResourceDefs::getResourceLastStartTime ( lua_State* luaVM )
             time_t timestarted = resource->GetTimeStarted();
             if ( timestarted )
             {
-                char * thetime = asctime(localtime((const time_t *)&timestarted));
-                if ( thetime ) // remove terminating new line... wtf?
-                    thetime[strlen(thetime)-1] = '\0';
-                lua_pushstring ( luaVM, thetime );
+                lua_pushnumber ( luaVM, ( double ) timestarted );
             }
             else
                 lua_pushstring ( luaVM, "never" );
@@ -793,10 +790,7 @@ int CLuaResourceDefs::getResourceLoadTime ( lua_State* luaVM )
             time_t timeloaded = resource->GetTimeLoaded();
             if ( timeloaded )
             {
-                char * thetime = asctime(localtime((const time_t *)&timeloaded));
-                if ( thetime ) // remove terminating new line... wtf?
-                    thetime[strlen(thetime)-1] = '\0';
-                lua_pushstring ( luaVM, thetime );
+                lua_pushnumber ( luaVM, ( double ) timeloaded );
             }
             else
                 lua_pushboolean ( luaVM, false );
