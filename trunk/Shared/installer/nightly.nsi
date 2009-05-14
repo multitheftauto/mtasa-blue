@@ -567,10 +567,10 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\net.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 
 			!ifndef LIGHTBUILD
 				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
 				File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
 				File "${FILES_ROOT}\MTA San Andreas\mta\xvidcore.dll"
@@ -647,10 +647,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\xmll.dll"
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
-
-		!ifndef LIGHTBUILD
-			File "${SERVER_FILES_ROOT}\libcurl.dll"
-		!endif
+		File "${SERVER_FILES_ROOT}\libcurl.dll"
 	SectionEnd
 
 	Section "Game module" SEC05
@@ -846,12 +843,7 @@ Section Uninstall
 			Delete "$INSTDIR\server\net.dll"
 			Delete "$INSTDIR\server\msvcp71.dll"
 			Delete "$INSTDIR\server\msvcr71.dll"
-			!ifndef LIGHTBUILD
-				Delete "$INSTDIR\server\pcre3.dll"
-				Delete "$INSTDIR\server\pthreadVC2.dll"
-				Delete "$INSTDIR\server\sqlite3.dll"
-				Delete "$INSTDIR\server\libcurl.dll"
-			!endif
+			Delete "$INSTDIR\server\libcurl.dll"
 
 			; server files
 			Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
