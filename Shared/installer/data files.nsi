@@ -141,7 +141,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkunicode.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\mkzlib.dll"
@@ -185,9 +184,6 @@ Section "Data files" SEC01
 
 	SetOutPath "$INSTDIR\MTA\data\textures"
 	File "${FILES_ROOT}\MTA San Andreas\mta\data\textures\*.png"
-
-	SetOutPath "$INSTDIR\server"
-	File "${FILES_ROOT}\MTA San Andreas\server\libcurl.dll"
 
 SectionEnd
 
