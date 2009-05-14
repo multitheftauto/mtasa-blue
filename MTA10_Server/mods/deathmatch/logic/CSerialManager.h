@@ -13,7 +13,7 @@
 #ifndef __CSERIALMANAGER_H
 #define __CSERIALMANAGER_H
 
-#include "json.h"
+#include "json/json.h"
 #include <list>
 #include "CPlayer.h"
 
