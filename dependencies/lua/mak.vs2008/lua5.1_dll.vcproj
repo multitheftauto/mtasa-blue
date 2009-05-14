@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="lua5.1_dll"
 	ProjectGUID="{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
 	Keyword="Win32Proj"
@@ -42,6 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
+				PreprocessorDefinitions="FORCE_BUILD=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -98,6 +99,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1d.dll &quot;..\..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -127,6 +129,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
+				PreprocessorDefinitions="FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -183,6 +186,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;..\..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -212,6 +216,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
+				PreprocessorDefinitions="FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -268,6 +273,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>
