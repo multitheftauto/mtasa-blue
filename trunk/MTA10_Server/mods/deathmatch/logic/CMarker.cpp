@@ -351,14 +351,16 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
     if ( m_ucType != ucOldType )
     {
         // Are we becomming a checkpoint? Make the col object a circle. If we're becomming something and we were a checkpoint, make the col object a sphere.
+
+        // lil_Toady: Simply deleting the colshape may cause a dangling pointer in CColManager if we're in DoHitDetection loop
         if ( m_ucType == CMarker::TYPE_CHECKPOINT )
         {
-            delete m_pCollision;
+            g_pGame->GetElementDeleter()->Delete ( m_pCollision );
             m_pCollision = new CColCircle ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL );
         }
         else if ( ucOldType == CMarker::TYPE_CHECKPOINT )
         {
-            delete m_pCollision;
+            g_pGame->GetElementDeleter()->Delete ( m_pCollision );
             m_pCollision = new CColSphere ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL );
         }
 
