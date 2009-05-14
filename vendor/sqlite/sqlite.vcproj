@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=3"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y lib\sqlite3d.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3d.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=3"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -164,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y lib\sqlite3.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -194,7 +194,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=3"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -241,7 +241,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y lib\sqlite3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>
