@@ -2416,11 +2416,11 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Reply.SetSourceElement ( pPlayer );
                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
 
-                                // Did he already start jacking him? (we're trusting the client here!)
-                                if ( Packet.GetStartedJacking () == 1 )
+                                // The jacked is still inside?
+                                if ( pJacked )
                                 {
-                                    // The jacked is still inside?
-                                    if ( pJacked )
+                                    // Did he already start jacking him? (we're trusting the client here!)
+                                    if ( Packet.GetStartedJacking () == 1 )
                                     {
                                         // Get the jacked out
                                         pJacked->SetOccupiedVehicle ( NULL, 0 );
@@ -2433,8 +2433,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         JackedReply.SetSourceElement ( pJacked );
                                         m_pPlayerManager->BroadcastOnlyJoined ( JackedReply );
                                     }
+                                    pJacked->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                 }
-                                pJacked->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
                                 // If it's empty, set the idle time
                                 if ( pVehicle->GetFirstOccupant () == NULL )
