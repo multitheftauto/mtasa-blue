@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libcurl"
 	ProjectGUID="{2B98A079-89D3-4970-B0C2-39996636BAE6}"
 	RootNamespace="libcurl"
@@ -51,7 +51,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories=".,..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL"
+				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL;FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -107,6 +107,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -145,7 +146,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories=".,..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL"
+				PreprocessorDefinitions="WIN32;NDEBUG;BUILDING_LIBCURL;FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -201,6 +202,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\libcurl.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -238,7 +240,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".,..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;BUILDING_LIBCURL"
+				PreprocessorDefinitions="WIN32;_DEBUG;BUILDING_LIBCURL;FORCE_BUILD=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -299,6 +301,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\..\libcurld.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurld.dll &quot;..\..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="pcre"
 	ProjectGUID="{39452ACC-FF12-488D-94B6-301B4EFBB606}"
 	RootNamespace="pcre2008"
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="HAVE_CONFIG_H"
+				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -85,6 +85,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\pcre3d.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -115,7 +116,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="HAVE_CONFIG_H"
+				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -157,6 +158,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -187,7 +189,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="HAVE_CONFIG_H"
+				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -229,6 +231,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>
