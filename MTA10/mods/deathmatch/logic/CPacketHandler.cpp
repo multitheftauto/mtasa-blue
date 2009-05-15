@@ -1537,6 +1537,19 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         if ( ucSeat == 0 )
                             pVehicle->RemoveTargetPosition ();
+
+                        CLuaArguments Arguments;
+                        Arguments.PushElement ( pVehicle );        // vehicle
+                        Arguments.PushNumber ( ucSeat );            // seat
+                        Arguments.PushBoolean ( false );            // jacker
+                        pPlayer->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
+
+                        // Call the onClientVehicleExit event
+                        CLuaArguments Arguments2;
+                        Arguments2.PushElement ( pPlayer );         // player
+                        Arguments2.PushNumber ( ucSeat );           // seat
+                        Arguments2.PushBoolean ( false );            // jacker
+                        pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
                         break;
                     }
 
