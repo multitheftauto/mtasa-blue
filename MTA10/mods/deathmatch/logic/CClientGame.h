@@ -329,8 +329,7 @@ public:
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
-    void                                NotifyNextPacketInfo            ( BYTE bytePacketID, unsigned long ulSize );
-    void                                UpdateBigPacketProgress         ( void );
+    void                                NotifyBigPacketProgress         ( unsigned long ulBytesReceived, unsigned long ulTotalSize );
 
 private:
     #ifdef MTA_VOICE

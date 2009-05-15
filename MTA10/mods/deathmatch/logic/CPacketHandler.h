@@ -51,7 +51,7 @@ public:
     void                Packet_Vehicle_InOut            ( NetBitStreamInterface& bitStream );
     void                Packet_VehicleTrailer           ( NetBitStreamInterface& bitStream );
     void                Packet_MapInfo                  ( NetBitStreamInterface& bitStream );
-    void                Packet_NextPacketInfo           ( NetBitStreamInterface& bitStream );
+    void                Packet_PartialPacketInfo        ( NetBitStreamInterface& bitStream );
     void                Packet_EntityAdd                ( NetBitStreamInterface& bitStream );
     void                Packet_EntityRemove             ( NetBitStreamInterface& bitStream );
     void                Packet_PickupHideShow           ( NetBitStreamInterface& bitStream );

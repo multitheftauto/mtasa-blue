@@ -166,6 +166,7 @@ CCore::CCore ( void )
     // Create the GUI manager and the graphics lib wrapper
     m_pLocalGUI                 = new CLocalGUI;
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
+    m_pGUI                      = NULL;
 
 	// Create the mod manager
     m_pModManager               = new CModManager;
