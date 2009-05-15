@@ -703,9 +703,6 @@ void CClientGame::DoPulsePostFrame ( void )
             m_pNetworkStats->Draw ();
         }
 
-        // If we have a big packet coming in, show the progress
-        UpdateBigPacketProgress ();
-
         // Sync debug
         m_pSyncDebug->OnPulse ();
 
@@ -4241,64 +4238,32 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
 
 
 //
-// Called when the client receives notification from the server about the next network packet
-//
-void CClientGame::NotifyNextPacketInfo ( BYTE bytePacketID, unsigned long ulSize )
-{
-    if ( ulSize == 0 )
-    {
-        m_bReceivingBigPacket = false;
-        m_pBigPacketTransferBox->Hide ();
-    }
-
-    if ( ulSize < 50000 )
-        return;
-
-    if ( m_bReceivingBigPacket )
-    {
-        m_bReceivingBigPacket = false;
-        m_pBigPacketTransferBox->Hide ();
-    }
-
-    m_bReceivingBigPacket           = true;
-    m_ulBigPacketSize               = ulSize;
-    m_ulBigPacketBytesReceivedBase  = g_pNet->GetBitsReceived () / 8;
-    m_pBigPacketTransferBox->AddToTotalSize ( m_ulBigPacketSize );
-    m_pBigPacketTransferBox->Show ();
-}
-
-
-//
 // Display a progress dialog if a big packet is coming in
 //
-void CClientGame::UpdateBigPacketProgress ()
+void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsigned long ulTotalSize )
 {
-    if ( !m_bReceivingBigPacket )
-        return;
-
-    // Calc bytes read
-    unsigned long ulBytesReceived = ( g_pNet->GetBitsReceived () / 8 ) - m_ulBigPacketBytesReceivedBase;
-
-	// At end?
-    if ( ulBytesReceived > m_ulBigPacketSize * 101 / 100 )
+    // Should display progress box?
+    if ( ulBytesReceived >= ulTotalSize || ulTotalSize < 50000 )
     {
-        m_bReceivingBigPacket = false;
-        m_pBigPacketTransferBox->Hide ();
+        if ( m_bReceivingBigPacket )
+        {
+            // Switch off progress box
+            m_bReceivingBigPacket = false;
+            m_pBigPacketTransferBox->Hide ();
+        }
         return;
     }
 
-    // Convert to unit value
-    float fAmountDone = ulBytesReceived / (float)m_ulBigPacketSize;
+    // Update progress box
+    if ( !m_bReceivingBigPacket || m_ulBigPacketSize != ulTotalSize )
+    {
+        m_bReceivingBigPacket = true;
+        m_ulBigPacketSize = ulTotalSize;
+        m_pBigPacketTransferBox->Hide ();
+        m_pBigPacketTransferBox->AddToTotalSize ( ulTotalSize );
+        m_pBigPacketTransferBox->Show ();
+    }
 
-    // Bias start to be faster
-    float fTemp = 1 - fAmountDone;
-    fAmountDone = 1 - fTemp * fTemp * ( fTemp > 0 ? 1 : -1 );
-
-    // Convert back to bytes
-    ulBytesReceived = m_ulBigPacketSize * fAmountDone;
-
-    // Update progress indicator
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfoSingleDownload ( "", min ( m_ulBigPacketSize, ulBytesReceived ) );
+    m_pBigPacketTransferBox->SetInfoSingleDownload ( "", Min ( ulTotalSize, ulBytesReceived ) );
 }
-

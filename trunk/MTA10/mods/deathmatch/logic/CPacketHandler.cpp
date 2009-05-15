@@ -102,9 +102,9 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_MapInfo ( bitStream );
             return true;
 
-        // Contains info about the next packet
-        case PACKET_ID_NEXT_PACKET_INFO:
-            Packet_NextPacketInfo ( bitStream );
+        // Contains info for progress of a large packet
+        case PACKET_ID_PACKET_PROGRESS:
+            Packet_PartialPacketInfo ( bitStream );
             return true;
 
         // Adds a new entity of any type to the world streamer.
@@ -1886,25 +1886,37 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPacketHandler::Packet_NextPacketInfo ( NetBitStreamInterface& bitStream )
+void CPacketHandler::Packet_PartialPacketInfo ( NetBitStreamInterface& bitStream )
 {
-    BYTE            bytePacketID;
-    unsigned long   ulSize;
+    unsigned long   partCount;
+    unsigned long   partTotal;
+    unsigned long   partLength;
+    BYTE            byteMTAPacketID;
 
-    if ( bitStream.Read ( bytePacketID ) &&
-        bitStream.Read ( ulSize ) )
+    if ( bitStream.Read ( partCount ) &&
+         bitStream.Read ( partTotal ) &&
+         bitStream.Read ( partLength ) &&
+         bitStream.Read ( byteMTAPacketID ) )
     {
-        if ( g_pClientGame )
-            g_pClientGame->NotifyNextPacketInfo ( bytePacketID, ulSize );
+        if ( byteMTAPacketID == RAKNET_PACKET_COUNT + PACKET_ID_ENTITY_ADD )
+        {
+            if ( g_pClientGame )
+            {
+                if ( partCount < partTotal - 1 )
+                    g_pClientGame->NotifyBigPacketProgress ( partCount * 1400, partTotal * 1400 );
+                else
+                    g_pClientGame->NotifyBigPacketProgress ( 0, 0 );
+            }
+        }
     }
 }
 
 
 void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 {
-    // Ensure map download progress bar is hidden
+    // Ensure big packet progress bar is no longer displayed at this point. (It shouldn't be anyway)
     if ( g_pClientGame )
-        g_pClientGame->NotifyNextPacketInfo ( PACKET_ID_ENTITY_ADD, 0 );
+        g_pClientGame->NotifyBigPacketProgress ( 0, 0 );
 
     // This packet contains a list over entities to add to the world.
     // There's a byte seperating the entities saying what type it is (vehicle spawn,object,weapon pickup)

@@ -24,7 +24,7 @@ Var Install_Dir
 ; 5. Run the script
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "817"
+!define BUILD_NUMBER "842"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "multitheftauto_data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################

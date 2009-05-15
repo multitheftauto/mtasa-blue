@@ -890,10 +890,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CNextPacketInfoPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CPacket.cpp"
 						>
 					</File>
@@ -1912,10 +1908,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CNextPacketInfoPacket.h"
 						>
 					</File>
 					<File

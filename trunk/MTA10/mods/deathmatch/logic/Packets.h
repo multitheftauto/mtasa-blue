@@ -119,9 +119,6 @@ enum
 
     // Camera related packets
     PACKET_ID_CAMERA_SYNC,
-
-    // Info for the following packet
-    PACKET_ID_NEXT_PACKET_INFO,
 };
 
 #endif

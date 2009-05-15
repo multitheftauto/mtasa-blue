@@ -49,7 +49,6 @@
 #include "packets/CLuaEventPacket.h"
 #include "packets/CLuaPacket.h"
 #include "packets/CMapInfoPacket.h"
-#include "packets/CNextPacketInfoPacket.h"
 #include "packets/CPacket.h"
 #include "packets/CPedStartSyncPacket.h"
 #include "packets/CPedStopSyncPacket.h"
