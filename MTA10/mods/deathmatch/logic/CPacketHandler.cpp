@@ -901,8 +901,10 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             if ( ucBodyPart != 0xFF ) Arguments.PushNumber ( ucBodyPart );
             else Arguments.PushBoolean ( false );
 			Arguments.PushBoolean ( ( ucStealth == 1 ) );
-
-            pPed->CallEvent ( "onClientPedWasted", Arguments, true );
+            if ( IS_PLAYER ( pPed ) )
+                pPed->CallEvent ( "onClientPlayerWasted", Arguments, true );
+            else
+                pPed->CallEvent ( "onClientPedWasted", Arguments, true );
         }
     }
     else
