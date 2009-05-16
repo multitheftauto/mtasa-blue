@@ -3268,7 +3268,9 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     pEvent->ComputeDeathAnim ( pDamagePed, true );
                     AssocGroupId animGroup = pEvent->GetAnimGroup ();
                     AnimationId animID = pEvent->GetAnimId ();
-                    m_DamagerID = pInflictingEntity->GetID ();
+                    m_DamagerID = INVALID_ELEMENT_ID;
+                    if (pInflictingEntity)
+                        m_DamagerID = pInflictingEntity->GetID ();
                     // Check if we're dead
                     SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
                 }
