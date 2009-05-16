@@ -9858,9 +9858,10 @@ int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
             const char* szName = lua_tostring ( luaVM, 1 );
             const char* szPassword = lua_tostring ( luaVM, 2 );
 
-            if ( CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) )
+            CAccount* pAccount;
+            if ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) )
             {
-                lua_pushboolean ( luaVM, true );
+                lua_pushaccount ( luaVM, pAccount );
                 return 1;
             }
         }
