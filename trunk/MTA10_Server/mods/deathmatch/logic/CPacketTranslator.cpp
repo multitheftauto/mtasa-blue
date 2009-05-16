@@ -41,8 +41,8 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CPlayerJoinDataPacket;
             break;
 
-        case PACKET_ID_PLAYER_WASTED:
-            pTemp = new CPlayerWastedPacket;
+        case PACKET_ID_PED_WASTED:
+            pTemp = new CPedWastedPacket;
             break;
 
         case PACKET_ID_PLAYER_QUIT:

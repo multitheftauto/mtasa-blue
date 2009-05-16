@@ -36,8 +36,8 @@ class CGame;
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
 #include "packets/CProjectileSyncPacket.h"
+#include "packets/CPedWastedPacket.h"
 #include "packets/CPlayerJoinDataPacket.h"
-#include "packets/CPlayerWastedPacket.h"
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
@@ -237,7 +237,7 @@ private:
 
     void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
-    void                        Packet_PlayerWasted         ( class CPlayerWastedPacket& Packet );
+    void                        Packet_PedWasted            ( class CPedWastedPacket& Packet );
     void                        Packet_PlayerQuit           ( class CPlayerQuitPacket& Packet );
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );
