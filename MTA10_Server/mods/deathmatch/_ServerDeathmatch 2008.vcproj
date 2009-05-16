@@ -902,6 +902,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPedWastedPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPickupHideShowPacket.cpp"
 						>
 					</File>
@@ -963,10 +967,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTimeoutPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CPlayerWastedPacket.cpp"
 						>
 					</File>
 					<File
@@ -1927,6 +1927,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPedWastedPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPhysicsSyncPacket.h"
 						>
 					</File>
@@ -1992,10 +1996,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTimeoutPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CPlayerWastedPacket.h"
 						>
 					</File>
 					<File

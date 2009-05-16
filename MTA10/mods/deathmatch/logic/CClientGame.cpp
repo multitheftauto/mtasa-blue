@@ -3270,7 +3270,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     AnimationId animID = pEvent->GetAnimId ();
                     m_DamagerID = pInflictingEntity->GetID ();
                     // Check if we're dead
-                    IsPedWasted ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
+                    SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
                 }
             }
         }
@@ -3919,9 +3919,9 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
-void CClientGame::IsPedWasted( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
+void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
-    if ( Ped )
+    if ( Ped && Ped->GetHealth () == 0.0f )
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( pBitStream )
@@ -3949,7 +3949,7 @@ void CClientGame::IsPedWasted( CClientPed* Ped, ElementID damagerID, unsigned ch
 
             pBitStream->Write ( Ped->GetID() );
             // Send the packet
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
@@ -3987,7 +3987,7 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             
             pBitStream->Write ( INVALID_ELEMENT_ID );
             // Send the packet
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }

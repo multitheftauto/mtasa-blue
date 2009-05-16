@@ -57,7 +57,7 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PlayerSpawn ( bitStream );
             return true;
 
-        case PACKET_ID_PLAYER_WASTED:
+        case PACKET_ID_PED_WASTED:
             Packet_PlayerWasted ( bitStream );
             return true;
 
