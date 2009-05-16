@@ -3262,8 +3262,16 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     // Don't let GTA start the death task
                     return false;            
                 }
-                else
+                else {
                     pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
+                    // Grab our death animation
+                    pEvent->ComputeDeathAnim ( pDamagePed, true );
+                    AssocGroupId animGroup = pEvent->GetAnimGroup ();
+                    AnimationId animID = pEvent->GetAnimId ();
+                    m_DamagerID = pInflictingEntity->GetID ();
+                    // Check if we're dead
+                    IsPedWasted ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
+                }
             }
         }
     }       
@@ -3911,7 +3919,41 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
+void CClientGame::IsPedWasted( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
+{
+    if ( Ped )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            // Write some death info
+            pBitStream->Write ( animGroup );
+            pBitStream->Write ( animID );
 
+            pBitStream->Write ( damagerID );
+            pBitStream->Write ( ucWeapon );
+            pBitStream->Write ( ucBodyPiece );
+
+            // Write the position we died in
+            CVector vecPosition;
+            Ped->GetPosition ( vecPosition );
+            pBitStream->Write ( vecPosition.fX );
+            pBitStream->Write ( vecPosition.fY );
+            pBitStream->Write ( vecPosition.fZ );
+
+            // The ammo in our weapon and write the ammo total
+            CWeapon* pPlayerWeapon = Ped->GetWeapon();
+            unsigned short usAmmo = 0;
+            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
+            pBitStream->Write ( usAmmo );
+
+            pBitStream->Write ( Ped->GetID() );
+            // Send the packet
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+        }
+    }
+}
 
 void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
@@ -3942,7 +3984,8 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             unsigned short usAmmo = 0;
             if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
             pBitStream->Write ( usAmmo );
-
+            
+            pBitStream->Write ( INVALID_ELEMENT_ID );
             // Send the packet
             g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );

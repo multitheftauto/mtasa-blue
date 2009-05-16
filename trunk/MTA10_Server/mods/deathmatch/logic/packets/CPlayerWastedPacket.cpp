@@ -50,7 +50,7 @@ bool CPlayerWastedPacket::Read ( NetServerBitStreamInterface& BitStream )
     BitStream.Read ( m_vecPosition.fY );
     BitStream.Read ( m_vecPosition.fZ );
     BitStream.Read ( m_usAmmo );
-
+    BitStream.Read ( m_PlayerID );
     return true;
 }
 
