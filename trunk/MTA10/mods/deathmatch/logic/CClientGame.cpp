@@ -2151,10 +2151,6 @@ void CClientGame::SetMoney ( long lMoney )
 
 void CClientGame::AddBuiltInEvents ( void )
 {
-    // * BACKWARDS COMPATIBILITY EVENTS */
-    m_Events.AddExtinctEvent ( "onClientPlayerDamage", "onClientPedDamage" );
-    m_Events.AddExtinctEvent ( "onClientPlayerWeaponFire", "onClientPedWeaponFire" );
-    m_Events.AddExtinctEvent ( "onClientPlayerWasted", "onClientPedWasted" );
 
     // Resource events
     m_Events.AddEvent ( "onClientResourceStart", "resource", NULL, false );
@@ -2179,6 +2175,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerStuntStart", "type", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStuntFinish", "type, time, distance", NULL, false );
     m_Events.AddEvent ( "onClientPlayerRadioSwitch", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerWasted", "", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
@@ -3213,7 +3212,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             Arguments.PushNumber ( fDamage );
 
             // Call our event
-            if ( !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) )
+            if ( ( IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
             {
                 // Stop here if they cancelEvent it
                 pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
@@ -3646,7 +3645,10 @@ void CClientGame::PostWeaponFire ( void )
                     Arguments.PushElement ( pCollisionEntity );
                 else
                     Arguments.PushNil ();
-                pPed->CallEvent ( "onClientPedWeaponFire", Arguments, true );
+                if (IS_PLAYER(pPed))
+                    pPed->CallEvent ( "onClientPlayerWeaponFire", Arguments, true );
+                else
+                    pPed->CallEvent ( "onClientPedWeaponFire", Arguments, true );
             }
 
 #ifdef MTA_DEBUG
