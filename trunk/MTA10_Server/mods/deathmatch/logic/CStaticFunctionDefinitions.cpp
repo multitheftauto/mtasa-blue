@@ -2849,10 +2849,26 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
 
         // Grab his occupied vehicle
         CVehicle* pVehicle = pPed->GetOccupiedVehicle ();
+        unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat ();
         if ( pVehicle )
         {
-            // Remove him from the vehicle
-            pVehicle->SetOccupant ( NULL, pPed->GetOccupiedVehicleSeat () );
+            CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+            if ( pPlayer && IS_PLAYER( pElement ) ) {
+                CLuaArguments Arguments;
+                Arguments.PushElement ( pVehicle );        // vehicle
+                Arguments.PushNumber ( ucOccupiedSeat );    // seat
+                Arguments.PushBoolean ( false );            // jacker
+                pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
+
+                // Call the vehicle->player event
+                CLuaArguments Arguments2;
+                Arguments2.PushElement ( pPlayer );         // player
+                Arguments2.PushNumber ( ucOccupiedSeat );    // seat
+                Arguments2.PushBoolean ( false );            // jacker
+                pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
+            }
+             // Remove him from the vehicle
+            pVehicle->SetOccupant ( NULL, ucOccupiedSeat );
             pPed->SetOccupiedVehicle ( NULL, 0 );
             pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
