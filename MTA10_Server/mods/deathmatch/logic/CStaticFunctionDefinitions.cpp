@@ -2435,8 +2435,11 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
             else Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( bStealth );
             // TODO: change to onPedWasted
-            pPed->CallEvent ( "onPlayerWasted", Arguments );
-
+            if (IS_PLAYER(pPed))
+                pPed->CallEvent ( "onPlayerWasted", Arguments );
+            else
+                pPed->CallEvent ( "onPedWasted", Arguments );
+    
             return true;
         }
     }
