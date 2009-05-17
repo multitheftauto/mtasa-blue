@@ -1018,7 +1018,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
 }
 
 
-void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole )
+void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, SString strKickReason )
 {
     // Grab quit reaason
     char* szReason = "Unknown";
@@ -1048,6 +1048,11 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         // Tell our scripts the player has quit, but only if the scripts got told he joined
         CLuaArguments Arguments;
         Arguments.PushString ( szReason );
+        if ((Reason == CClient::QUIT_BAN || Reason == CClient::QUIT_KICK) && strKickReason.size() > 0)
+            Arguments.PushString ( strKickReason );
+        else
+            Arguments.PushBoolean ( false );
+
         Player.CallEvent ( "onPlayerQuit", Arguments );
 
         // Tell the map manager

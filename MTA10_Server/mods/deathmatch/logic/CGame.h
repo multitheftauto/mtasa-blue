@@ -208,7 +208,7 @@ public:
 #endif
 
     void                        JoinPlayer                  ( CPlayer& Player );
-    void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true );
+    void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, SString strKickReason = "None"  );
 
     inline class CLuaManager*   GetLuaManager               ( void )        { return m_pLuaManager; };
 
