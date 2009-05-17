@@ -1018,7 +1018,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
 }
 
 
-void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, SString strKickReason )
+void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, SString strKickReason, SString strResponsiblePlayer )
 {
     // Grab quit reaason
     char* szReason = "Unknown";
@@ -1048,10 +1048,23 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         // Tell our scripts the player has quit, but only if the scripts got told he joined
         CLuaArguments Arguments;
         Arguments.PushString ( szReason );
-        if ((Reason == CClient::QUIT_BAN || Reason == CClient::QUIT_KICK) && strKickReason.size() > 0)
-            Arguments.PushString ( strKickReason );
-        else
+        if ((Reason == CClient::QUIT_BAN || Reason == CClient::QUIT_KICK))
+        {
+            if (strKickReason.size() > 0)
+                Arguments.PushString ( strKickReason );
+            else
+                Arguments.PushBoolean ( false );
+            //Arguments.PushUserData ( strResponsiblePlayer != "Console" ? m_pPlayerManager->Get ( strResponsiblePlayer, true ) : static_cast < CConsoleClient* > (m_pConsoleClient) );
+            if (strResponsiblePlayer == "Console") 
+                Arguments.PushElement ( m_pConsoleClient );
+            else
+                Arguments.PushElement ( m_pPlayerManager->Get ( strResponsiblePlayer, true ) );
+        }
+        else 
+        {
             Arguments.PushBoolean ( false );
+            Arguments.PushBoolean ( false );
+        }
 
         Player.CallEvent ( "onPlayerQuit", Arguments );
 
