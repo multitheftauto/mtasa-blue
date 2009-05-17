@@ -75,7 +75,7 @@ static CAccountManager*                                 m_pAccountManager = NULL
 static CColManager*                                     m_pColManager = NULL;
 static CResourceManager*                                m_pResourceManager = NULL;
 static CAccessControlListManager*                       m_pACLManager = NULL;
-
+static CLuaModuleManager*                               m_pLuaModuleManager = NULL;
 #define type(number,type) (lua_type(luaVM,number) == type)
 #define VERIFY_FUNCTION(func) (func!=LUA_REFNIL)
 
@@ -89,6 +89,7 @@ void CLuaFunctionDefinitions::SetBlipManager ( CBlipManager* pBlipManager )
 void CLuaFunctionDefinitions::SetLuaManager ( CLuaManager* pLuaManager )
 {
     m_pLuaManager = pLuaManager;
+    m_pLuaModuleManager = pLuaManager->GetLuaModuleManager();
 }
 
 
@@ -10810,5 +10811,54 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildType () );
     lua_settable   ( luaVM, -3 );
 
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
+{
+    if (lua_type( luaVM, 1 ) == LUA_TSTRING && lua_type( luaVM, 2 ) == LUA_TSTRING) {
+        vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+        vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
+        SString strAttribute = lua_tostring( luaVM, 2 );
+        SString strModuleName = lua_tostring( luaVM, 1 );
+        for ( ; iter != func_LoadedModules.end (); iter++ )
+        {
+            if ( stricmp ( strModuleName, (*iter).szFileName ) == 0 ) {
+                if (stricmp (strAttribute, "Name") == 0)
+                    lua_pushstring ( luaVM, (*iter).szModuleName );
+                else if (stricmp (strAttribute, "Author") == 0)
+                    lua_pushstring ( luaVM, (*iter).szAuthor );
+                else if (stricmp (strAttribute, "Version") == 0) {
+                    SString strVersion ( "%.2f", (*iter).fVersion );
+                    lua_pushstring ( luaVM, strVersion );
+                }
+                else {
+                    lua_pushboolean ( luaVM, false );
+                    m_pScriptDebugging->LogBadType ( luaVM, "getModuleInfo" );
+                }
+                return 1;
+            }
+        }
+        lua_pushboolean ( luaVM, false );
+    }
+    else {
+        m_pScriptDebugging->LogBadType ( luaVM, "getModuleInfo" );
+        lua_pushboolean ( luaVM, false );
+    }
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
+{
+    lua_newtable ( luaVM );
+    vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+    vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
+    unsigned int uiIndex = 1;
+    for ( ; iter != func_LoadedModules.end (); iter++ )
+    {
+        lua_pushnumber ( luaVM, uiIndex++ );
+        lua_pushstring ( luaVM, (*iter).szFileName );
+        lua_settable ( luaVM, -3 );
+    }
     return 1;
 }

@@ -251,6 +251,7 @@ bool CLuaModuleManager::_LoadModule ( const char *szShortFileName, const char *s
 		CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", szShortFileName );
 		return false;
 	}
+    fi.szFileName = SString ("%s",szShortFileName);
 	fi.DoPulse = ( DefaultModuleFunc ) ( GetProcAddress ( hModule, "DoPulse" ) );
 	fi.ShutdownModule = ( DefaultModuleFunc ) ( GetProcAddress ( hModule, "ShutdownModule" ) );
 	fi.RegisterFunctions = ( RegisterModuleFunc ) ( GetProcAddress ( hModule, "RegisterFunctions" ) );
