@@ -46,7 +46,7 @@ private:
 
     void                            UpdateDamageModels                  ( void );
     void                            UpdateStates                        ( void );
-    void                            WriteVehicleInformation             ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle );
+    bool                            WriteVehicleInformation             ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle );
 
     CClientVehicleManager*          m_pVehicleManager;
     std::list < CDeathmatchVehicle* > m_List;

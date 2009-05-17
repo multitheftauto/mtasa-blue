@@ -299,21 +299,24 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
         if ( pBitStream )
         {
             // Write each vehicle to it
+            bool bAnyVehicleAdded = false;
             list < CDeathmatchVehicle* > ::iterator iter = m_List.begin ();
             for ( ; iter != m_List.end (); iter++ )
             {
-                WriteVehicleInformation ( pBitStream, *iter );
+                if ( WriteVehicleInformation ( pBitStream, *iter ) )
+                    bAnyVehicleAdded = true;
             }
 
             // Send and destroy the packet
-            g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+            if ( bAnyVehicleAdded )
+                g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
 }
 
 
-void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle )
+bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle )
 {
     CVector vecPosition, vecRotation, vecMoveSpeed, vecTurnSpeed;
     pVehicle->GetPosition ( vecPosition );
@@ -342,7 +345,8 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     if ( pVehicle->IsDerailed () ) ucFlags |= 0x080;
 
     // If nothing has changed we dont sync the vehicle
-    if ( ucFlags == 0 ) return;
+    if ( ucFlags == 0 )
+        return false;
 
     // Write the vehicle id
     pBitStream->WriteCompressed ( pVehicle->GetID () );
@@ -400,4 +404,6 @@ void CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         pBitStream->WriteCompressed ( Trailer );
         pVehicle->m_LastSyncedData->Trailer = Trailer;
     }
+
+    return true;
 }
