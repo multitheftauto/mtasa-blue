@@ -13,7 +13,7 @@
 #define __NS_COMMON_H
 
 #include "ns_bitstream.h"
-#include "ns_packetenums.h"
+#include "net/packetenums.h"
 #include "ns_playerid.h"
 
 #define MTA_DM_NET_MODULE_VERSION   0x0000B
