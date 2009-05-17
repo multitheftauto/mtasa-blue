@@ -12,7 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <net/net_packetenums.h>
+#include "net/packetenums.h"
 using namespace std;
 
 static CConnectManager* g_pConnectManager = NULL;
@@ -236,7 +236,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
     if ( g_pConnectManager->m_bIsConnecting )
     {
         // The packet we're expecting?
-        if ( ucPacketID == PACKET_ID_CORE_CONNECTED )
+        if ( ucPacketID == PACKET_ID_MOD_NAME )
         {
             // Read out the mod to load
             char* szModName = new char [ BitStream.GetNumberOfBytesUsed () + 1 ];

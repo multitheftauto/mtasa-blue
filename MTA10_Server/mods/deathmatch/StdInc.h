@@ -34,6 +34,7 @@
 #include "SString.h"
 
 // Packet includes
+#include "net/Packets.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "packets/CCommandPacket.h"

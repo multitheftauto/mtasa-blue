@@ -33,7 +33,7 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
     // Can we handle it?
     switch ( ucPacketID )
     {
-        case PACKET_ID_SERVER_CONNECTED:
+        case PACKET_ID_SERVER_JOIN_COMPLETE:
             Packet_ServerConnected ( bitStream );
             return true;
 

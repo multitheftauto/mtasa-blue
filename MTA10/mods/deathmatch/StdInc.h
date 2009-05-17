@@ -30,7 +30,7 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include <net/CNet.h>
-#include <net/net_packetenums.h>
+#include <net/packetenums.h>
 #include <game/CGame.h>
 #include <CVector.h>
 #include <CMatrix4.h>
@@ -95,7 +95,7 @@
 #include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
-#include "logic/Packets.h"
+#include "net/Packets.h"
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
