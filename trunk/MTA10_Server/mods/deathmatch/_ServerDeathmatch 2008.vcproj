@@ -2102,6 +2102,10 @@
 						RelativePath=".\logic\lua\CLuaTimerManager.h"
 						>
 					</File>
+					<File
+						RelativePath="..\..\..\Shared\sdk\net\rpc_enums.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="common"
