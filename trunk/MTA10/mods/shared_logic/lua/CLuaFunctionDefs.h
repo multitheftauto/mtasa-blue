@@ -668,7 +668,7 @@ public:
 
     // Utility
     LUA_DECLARE ( Md5 );
-    LUA_DECLARE ( GetAveragePacketSizes );
+    LUA_DECLARE ( GetPacketInfo );
 
 #ifdef MTA_VOICE
 	// Voice funcs

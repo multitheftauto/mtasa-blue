@@ -44,7 +44,7 @@ public:
 	virtual void                            RemoveBan                       ( const char* szIP ) = 0;
 	virtual bool                            IsBanned                        ( const char* szIP ) = 0;
 
-    virtual void                            GetAveragePacketSizes           ( float* fPacketSizes ) = 0;
+    virtual void                            GetPacketLogData                ( unsigned long* ulBytes, unsigned long* ulCount ) = 0;
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 

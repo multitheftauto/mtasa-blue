@@ -411,15 +411,25 @@ int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetAveragePacketSizes ( lua_State* luaVM )
+int CLuaFunctionDefs::GetPacketInfo ( lua_State* luaVM )
 {
-    float fSizes [ 256 ];
-    g_pNet->GetAveragePacketSizes ( fSizes );
+    unsigned long ulBytes [ 256 ];
+    unsigned long ulCount [ 256 ];
+    g_pNet->GetPacketLogData ( ulBytes, ulCount );
     lua_createtable ( luaVM, 256, 1 );
 
     for ( unsigned int i = 0; i < 256; ++i )
     {
-        lua_pushnumber ( luaVM, fSizes [ i ] );
+        lua_createtable ( luaVM, 0, 2 );
+
+        lua_pushstring ( luaVM, "bytes" );
+        lua_pushnumber ( luaVM, ulBytes [ i ] );
+        lua_rawset ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "count" );
+        lua_pushnumber ( luaVM, ulCount [ i ] );
+        lua_rawset ( luaVM, -3 );
+
         lua_rawseti ( luaVM, -2, i );
     }
 
