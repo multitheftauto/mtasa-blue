@@ -37,6 +37,7 @@ struct FunctionInfo
 	char				szModuleName[MAX_INFO_LENGTH];
 	char				szAuthor[MAX_INFO_LENGTH];
 	float				fVersion;
+	SString				szFileName;
 
 	// module function pointers
 	DefaultModuleFunc	ShutdownModule;
@@ -79,6 +80,7 @@ public:
 	void					_ResourceStopping		( lua_State * luaVM );
 	void					_ResourceStopped		( lua_State * luaVM );
 
+    vector < FunctionInfo > GetLoadedModules        ( void ) { return m_Functions; };
 private:
 	vector < FunctionInfo > m_Functions;
 	CScriptDebugging*		m_pScriptDebugging;
