@@ -371,6 +371,8 @@ public:
     void                        SetVoice                ( short sVoiceType, short sVoiceID );
     void                        SetVoice                ( const char* szVoiceType, const char* szVoice );
 
+    void                        PostWeaponFire          ( void );
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer );
@@ -437,6 +439,7 @@ public:
     CControllerState*           m_currentControllerState;
     CControllerState*           m_lastControllerState;
     CRemoteDataStorage*         m_remoteDataStorage;
+    unsigned long               m_ulLastTimeFired;
     unsigned long               m_ulLastTimeAimed;
     unsigned long               m_ulLastTimeBeganCrouch;
     unsigned long               m_ulLastTimeBeganStand;

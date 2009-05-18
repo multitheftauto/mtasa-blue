@@ -169,7 +169,12 @@ public:
         QUIT_CONNECTION_DESYNC,
         QUIT_TIMEOUT,
     };   
-
+    enum 
+    {
+        GLITCH_QUICKRELOAD,
+        GLITCH_FASTFIRE,
+        GLITCH_FASTMOVE,
+    };
     class CStoredWeaponSlot
     {
     public:
@@ -311,6 +316,8 @@ public:
     inline long                         GetMoney                        ( void )                        { return m_lMoney; }
     void                                SetMoney                        ( long lMoney );
 
+    void                                ResetAmmoInClip                 ( void ) { memset(m_wasWeaponAmmoInClip,0,sizeof(m_wasWeaponAmmoInClip)); }
+
     void                                ResetMapInfo                    ( void );
 
     void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15 );
@@ -326,6 +333,11 @@ public:
 
     inline bool                         GetHudAreaNameDisabled          ( void )                        { return m_bHudAreaNameDisabled; };
     inline void                         SetHudAreaNameDisabled          ( bool bDisabled )              { m_bHudAreaNameDisabled = bDisabled; };
+
+    bool                                SetGlitchEnabled                ( char cGlitch, bool bEnabled );
+    bool                                SetGlitchEnabled                ( std::string strGlitch, bool bEnabled );
+    bool                                IsGlitchEnabled                 ( char cGlitch );
+    bool                                IsGlitchEnabled                 ( std::string cGlitch );
 
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
@@ -519,6 +531,7 @@ private:
 	bool								m_bTransferReset;
 
 	eWeaponSlot							m_lastWeaponSlot;
+    DWORD                               m_wasWeaponAmmoInClip[WEAPONSLOT_MAX + 1];
 
     bool                                m_bCursorEventsEnabled;
     bool                                m_bLocalPlay;
@@ -531,6 +544,9 @@ private:
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
+
+    bool                                m_Glitches[2];
+    std::map<std::string,char>          m_GlitchNames;
 
 	unsigned long						m_ulMinuteDuration;
 
