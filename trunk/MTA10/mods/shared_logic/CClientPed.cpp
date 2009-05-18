@@ -2183,14 +2183,14 @@ void CClientPed::StreamedInPulse ( void )
                 {
                     Current.ButtonSquare = 0;
                     Current.ButtonCross = 0;
-                    //Disable the fire keys whilst crouching as well
-                    Current.ButtonCircle = 0;
-                    Current.LeftShoulder1 = 0;
-                    if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
-                    {
-                        //Disable double crouching (another anim cut)
-                        Current.ShockButtonL = 0;
-                    }
+                }
+                //Disable the fire keys whilst crouching as well
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+                if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
+                {
+                    //Disable double crouching (another anim cut)
+                    Current.ShockButtonL = 0;
                 }
             }
         }

@@ -114,6 +114,16 @@ CGame::CGame ( void )
     m_pConsoleClient = NULL;
     m_bIsFinished = false;     
 
+    //Setup game glitch defaults ( false = disabled )
+    m_Glitches [ GLITCH_QUICKRELOAD ] = false;
+    m_Glitches [ GLITCH_FASTFIRE ] = false;
+    m_Glitches [ GLITCH_FASTMOVE ] = false;
+
+    //Glitch names (for Lua interface)
+    m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
+    m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
+    m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
+
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex
@@ -2751,4 +2761,16 @@ void CGame::Lock ( void )
 void CGame::Unlock ( void )
 {
     pthread_mutex_unlock ( &mutexhttp );
+}
+
+void CGame::SetGlitchEnabled ( std::string strGlitch, bool bEnabled )
+{
+    char cGlitch = m_GlitchNames[strGlitch];
+    m_Glitches[cGlitch] = bEnabled;
+}
+
+bool CGame::IsGlitchEnabled ( std::string strGlitch )
+{
+    char cGlitch = m_GlitchNames[strGlitch];
+    return m_Glitches[cGlitch] ? true : false;
 }

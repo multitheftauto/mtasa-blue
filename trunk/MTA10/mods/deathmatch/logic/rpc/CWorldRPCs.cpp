@@ -31,6 +31,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESET_MAP_INFO, ResetMapInfo, "ResetMapInfo" );
     AddHandler ( SET_FPS_LIMIT, SetFPSLimit, "SetFPSLimit" );
     AddHandler ( SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen" );
+    AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
 }
 
 
@@ -198,4 +199,13 @@ void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )
             pGarage->SetOpen ( ( ucIsOpen == 1 ) );
         }
     }
+}
+
+void CWorldRPCs::SetGlitchEnabled ( NetBitStreamInterface& bitStream )
+{
+	char eGlitch;
+    unsigned char ucIsEnabled;
+	bitStream.Read ( eGlitch );
+    bitStream.Read ( ucIsEnabled );
+    g_pClientGame->SetGlitchEnabled ( eGlitch, ( ucIsEnabled == 1 ) );
 }

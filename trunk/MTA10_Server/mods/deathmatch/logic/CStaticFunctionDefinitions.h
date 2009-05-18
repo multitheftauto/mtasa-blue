@@ -445,6 +445,8 @@ public:
 	static bool                 SetFPSLimit							( unsigned short usLimit );
 	static bool					SetMinuteDuration					( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
+    static bool                 SetGlitchEnabled                    ( std::string strGlitchName, bool bEnabled );
+    static bool                 IsGlitchEnabled                     ( std::string strGlitchName, bool& bEnabled );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

@@ -6740,6 +6740,36 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetGlitchEnabled ( std::string strGlitchName, bool bEnabled )
+{
+    if ( g_pGame->IsGlitch ( strGlitchName ) )
+    {
+        if ( g_pGame->IsGlitchEnabled ( strGlitchName ) != bEnabled )
+        {
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( g_pGame->GetGlitchIndex(strGlitchName) );
+            BitStream.pBitStream->Write ( bEnabled );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_GLITCH_ENABLED, *BitStream.pBitStream ) );
+            
+            g_pGame->SetGlitchEnabled ( strGlitchName, bEnabled );
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsGlitchEnabled ( std::string strGlitchName, bool& bEnabled )
+{
+    if ( g_pGame->IsGlitch ( strGlitchName ) )
+    {
+        bEnabled = g_pGame->IsGlitchEnabled ( strGlitchName );
+        return true;
+    }
+    return false;
+}
+
+
 
 CElement* CStaticFunctionDefinitions::GetRootElement ( void )
 {

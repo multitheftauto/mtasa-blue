@@ -32,6 +32,7 @@ public:
 	static int		getFPSLimit							( lua_State* luaVM );
 	static int		getMinuteDuration					( lua_State* luaVM );
     static int      isGarageOpen                        ( lua_State* luaVM );
+    static int      isGlitchEnabled                     ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );
@@ -45,6 +46,7 @@ public:
 	static int		setFPSLimit							( lua_State* luaVM );
 	static int		setMinuteDuration					( lua_State* luaVM );
     static int      setGarageOpen                       ( lua_State* luaVM );
+    static int      setGlitchEnabled                    ( lua_State* luaVM );
 };
 
 #endif

@@ -36,6 +36,7 @@ public:
     DECLARE_RPC ( ResetMapInfo );
     DECLARE_RPC ( SetFPSLimit );
     DECLARE_RPC ( SetGarageOpen );
+    DECLARE_RPC ( SetGlitchEnabled );
 };
 
 #endif
