@@ -769,7 +769,7 @@ void CMultiplayerSA::InitHooks()
     //*(WORD *)0x53DF55 = 0x9090;
 
     // Disallow spraying gang tags
-    // Nop the whole CTagManager::IsTag function and replace it's body with:
+    // Nop the whole CTagManager::IsTag function and replace its body with:
     // xor eax, eax
     // ret
     // to make it always return false
@@ -797,6 +797,9 @@ void CMultiplayerSA::InitHooks()
 
     // Avoid GTA setting vehicle first color to white after changing the paintjob
     memset ( (void *)0x6D65C5, 0x90, 11 );
+
+    // Disable idle cam
+    *(BYTE *)0x522C80 = 0xC3;
 }
 
 

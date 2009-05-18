@@ -44,7 +44,7 @@ public:
     bool                                LoadSubNodes                    ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
     CElement*                           LoadNode                        ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
 
-    bool                                LoadMap                         ( char * szMapFilename );
+    bool                                LoadMap                         ( const char * szMapFilename );
 
     bool                                Start                           ( void );
     bool                                Stop                            ( void );

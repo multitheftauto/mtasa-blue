@@ -23,7 +23,8 @@
 #include <windows.h>
 #include <stdio.h>
 
-class CRenderWareSA : public CRenderWare {
+class CRenderWareSA : public CRenderWare
+{
 	public:
 						CRenderWareSA				( enum eGameVersion version );
 						~CRenderWareSA				( void ) {};
@@ -51,7 +52,7 @@ class CRenderWareSA : public CRenderWare {
     void                DestroyTexture              ( RwTexture* pTex );
 
 	// Reads and parses a COL3 file with an optional collision key name
-	CColModel *			ReadCOL						( const char * szCOL, const char * szKeyName = NULL );
+	CColModel *			ReadCOL						( const char * szCOLFile );
 
 	// Replaces a CColModel for a specific object identified by the object id (usModelID)
 	void				ReplaceCollisions			( CColModel * pColModel, unsigned short usModelID );

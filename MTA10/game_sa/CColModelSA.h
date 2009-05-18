@@ -23,6 +23,13 @@
 
 #define SIZEOF_CColModel				0x30
 
+typedef struct
+{
+    char version[4];
+    DWORD size;
+    char name[0x18];
+} ColModelFileHeader;
+
 class CColModelSAInterface
 {
     BYTE                            pad [ SIZEOF_CColModel ];

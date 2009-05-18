@@ -37,8 +37,10 @@ int CLuaHTTPDefs::httpWrite ( lua_State* luaVM )
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
                 unsigned long length = NULL;
                 if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
-                     length = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
-                char* szBuffer = (char *) lua_tolstring ( luaVM, 1, NULL );
+                    length = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
+                else
+                    length = lua_objlen ( luaVM, 1 );
+                const char* szBuffer = lua_tolstring ( luaVM, 1, NULL );
                 html->AppendToPageBuffer ( szBuffer, length );
                 lua_pushboolean ( luaVM, true );
                 return 1;

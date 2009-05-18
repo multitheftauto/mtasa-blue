@@ -21,33 +21,24 @@
 
 CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes ) 
 { 
-    m_szResourceFileName = new char [ strlen ( szResourceFileName ) + 1 ];
-    strcpy ( m_szResourceFileName, szResourceFileName ); 
+    m_strResourceFileName = szResourceFileName; 
 
     // Stupid hack to automatically change all forward slashes to back slashes to get around internal http sub dir issue
-    size_t sizeShortName = strlen ( szShortName );
-
-    m_szShortName = new char [ sizeShortName + 1 ];
-    strcpy ( m_szShortName, szShortName ); 
-    m_szShortName [ sizeShortName ] = '\0';
-    
-    for ( size_t i = 0 ; i < sizeShortName ; i++ )
+    m_strShortName = szShortName;
+    for ( size_t i = 0; i < m_strShortName.size (); i++ )
     {
-        if ( m_szShortName[ i ] == '\\' )
+        if ( m_strShortName[ i ] == '\\' )
         {
-            m_szShortName[ i ] = '/';
+            m_strShortName[ i ] = '/';
         }
     }
 
-    m_szWindowsName = new char [ sizeShortName + 1 ];
-    strcpy ( m_szWindowsName, szShortName ); 
-    m_szWindowsName [ sizeShortName ] = '\0';
-    
-    for ( size_t i = 0 ; i < sizeShortName ; i++ )
+    m_strWindowsName = m_strShortName;
+    for ( size_t i = 0; i < m_strWindowsName.size (); i++ )
     {
-        if ( m_szWindowsName[ i ] == '/' )
+        if ( m_strWindowsName[ i ] == '/' )
         {
-            m_szWindowsName[ i ] = '\\';
+            m_strWindowsName[ i ] = '\\';
         }
     }
 
@@ -64,11 +55,7 @@ CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, co
 
 CResourceFile::~CResourceFile ( void )
 {
-    if ( m_szResourceFileName ) 
-        delete [] m_szResourceFileName;
-
-    if ( m_szShortName )
-        delete [] m_szShortName;
+    
 }
 
 
@@ -76,7 +63,7 @@ double CResourceFile::GetSize ( void )
 {
     double dSize = 0.0;
 
-    FILE * file = fopen ( m_szResourceFileName, "rb" );
+    FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
     if ( file )
     {
         fseek ( file, 0, SEEK_END );
@@ -91,7 +78,7 @@ double CResourceFile::GetSize ( void )
 ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
     // its a raw page
-    FILE * file = fopen ( m_szResourceFileName, "rb" );
+    FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
     if ( file )
     {
         // Grab the filesize. Don't use the above method because it doesn't account for a changing

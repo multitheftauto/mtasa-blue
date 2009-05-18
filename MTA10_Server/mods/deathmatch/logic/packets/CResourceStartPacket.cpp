@@ -27,8 +27,8 @@ bool CResourceStartPacket::Write ( NetServerBitStreamInterface& BitStream ) cons
     if ( !m_strResourceName.empty () )
     {
         // Write the resource name
-        size_t sizeResourceName = m_strResourceName.size ();
-        BitStream.Write ( static_cast < unsigned char > ( sizeResourceName ) );
+        unsigned char sizeResourceName = static_cast < unsigned char > ( m_strResourceName.size () );
+        BitStream.Write ( sizeResourceName );
         if ( sizeResourceName > 0 )
         {
             BitStream.Write ( m_strResourceName.c_str (), sizeResourceName );
@@ -54,7 +54,7 @@ bool CResourceStartPacket::Write ( NetServerBitStreamInterface& BitStream ) cons
 				BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
 
                 // Write the map name
-                char* szFileName = ( *iter )->GetWindowsName();
+                const char* szFileName = ( *iter )->GetWindowsName();
                 size_t sizeFileName = strlen ( szFileName );
 
                 // Make sure we don't have any backslashes in the name

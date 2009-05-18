@@ -65,7 +65,7 @@ bool CResourceMapItem::Start ( void )
         m_pVM = m_resource->GetVirtualMachine ();
         m_pElementGroup = new CElementGroup ( m_resource );
 
-        LoadMap ( m_szResourceFileName );
+        LoadMap ( m_strResourceFileName.c_str () );
         return true;
     }
 
@@ -94,7 +94,7 @@ bool CResourceMapItem::Stop ( void )
     return true;
 }
 
-bool CResourceMapItem::LoadMap ( char * szMapFilename )
+bool CResourceMapItem::LoadMap ( const char * szMapFilename )
 { 
     assert ( szMapFilename );
     assert ( strlen ( szMapFilename ) > 0 );
@@ -108,7 +108,7 @@ bool CResourceMapItem::LoadMap ( char * szMapFilename )
         // Create Map Element
         m_pMapElement = new CDummy ( g_pGame->GetGroups(), m_resource->GetResourceRootElement () );
         m_pMapElement->SetTypeName ( "map" );
-        m_pMapElement->SetName ( m_szShortName );
+        m_pMapElement->SetName ( m_strShortName.c_str () );
 
         // Load and parse it
         m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( szMapFilename );
