@@ -10816,7 +10816,7 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
 {
-    if (lua_type( luaVM, 1 ) == LUA_TSTRING && lua_type( luaVM, 2 ) == LUA_TSTRING) {
+    if (lua_type( luaVM, 1 ) == LUA_TSTRING) {
         vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
         vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
         SString strAttribute = lua_tostring( luaVM, 2 );
@@ -10824,27 +10824,27 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
         for ( ; iter != func_LoadedModules.end (); iter++ )
         {
             if ( stricmp ( strModuleName, (*iter).szFileName ) == 0 ) {
-                if (stricmp (strAttribute, "Name") == 0)
-                    lua_pushstring ( luaVM, (*iter).szModuleName );
-                else if (stricmp (strAttribute, "Author") == 0)
-                    lua_pushstring ( luaVM, (*iter).szAuthor );
-                else if (stricmp (strAttribute, "Version") == 0) {
-                    SString strVersion ( "%.2f", (*iter).fVersion );
-                    lua_pushstring ( luaVM, strVersion );
-                }
-                else {
-                    lua_pushboolean ( luaVM, false );
-                    m_pScriptDebugging->LogBadType ( luaVM, "getModuleInfo" );
-                }
+                lua_newtable ( luaVM );
+
+                lua_pushstring ( luaVM, "Name" );
+                lua_pushstring ( luaVM, (*iter).szModuleName );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "Author" );
+                lua_pushstring ( luaVM, (*iter).szAuthor );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "Version" );
+                SString strVersion ( "%.2f", (*iter).fVersion );
+                lua_pushstring ( luaVM, strVersion );
+                lua_settable ( luaVM, -3 );
+
                 return 1;
             }
         }
-        lua_pushboolean ( luaVM, false );
     }
-    else {
-        m_pScriptDebugging->LogBadType ( luaVM, "getModuleInfo" );
-        lua_pushboolean ( luaVM, false );
-    }
+    lua_pushboolean ( luaVM, false );
+    m_pScriptDebugging->LogBadType ( luaVM, "getModuleInfo" );
     return 1;
 }
 
