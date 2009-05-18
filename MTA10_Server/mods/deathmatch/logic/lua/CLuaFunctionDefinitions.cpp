@@ -10826,15 +10826,15 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
             if ( stricmp ( strModuleName, (*iter).szFileName ) == 0 ) {
                 lua_newtable ( luaVM );
 
-                lua_pushstring ( luaVM, "Name" );
+                lua_pushstring ( luaVM, "name" );
                 lua_pushstring ( luaVM, (*iter).szModuleName );
                 lua_settable ( luaVM, -3 );
 
-                lua_pushstring ( luaVM, "Author" );
+                lua_pushstring ( luaVM, "author" );
                 lua_pushstring ( luaVM, (*iter).szAuthor );
                 lua_settable ( luaVM, -3 );
 
-                lua_pushstring ( luaVM, "Version" );
+                lua_pushstring ( luaVM, "version" );
                 SString strVersion ( "%.2f", (*iter).fVersion );
                 lua_pushstring ( luaVM, strVersion );
                 lua_settable ( luaVM, -3 );
