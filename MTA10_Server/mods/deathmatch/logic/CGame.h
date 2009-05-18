@@ -150,7 +150,12 @@ public:
         VEHICLE_NOTIFY_JACK_RETURN,
         VEHICLE_ATTEMPT_FAILED,
     };
-
+    enum 
+    {
+        GLITCH_QUICKRELOAD,
+        GLITCH_FASTFIRE,
+        GLITCH_FASTMOVE,
+    };
 public:
                                 CGame                       ( void );
                                 ~CGame                      ( void );
@@ -231,6 +236,12 @@ public:
 
     inline bool                 IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
     inline void                 ResetMapInfo                ( void );
+
+    void                        SetGlitchEnabled            ( std::string strGlitch, bool bEnabled );
+    bool                        IsGlitchEnabled             ( std::string strGlitch );
+    char                        GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
+    bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        SendPings                   ( void );
@@ -334,6 +345,8 @@ private:
 	unsigned long				m_ulLastFPSTime;
 	unsigned short				m_usFrames;
 	unsigned short				m_usFPS;
+    std::map<std::string,char>  m_GlitchNames;
+    bool                        m_Glitches[2];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

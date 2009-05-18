@@ -39,6 +39,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
 	CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
 	CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaWorldDefs::setMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaWorldDefs::setGarageOpen );
+    CLuaCFunctions::AddFunction ( "setGlitchEnabled", CLuaWorldDefs::setGlitchEnabled );
+    CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
 }
 
 
@@ -439,5 +441,53 @@ int CLuaWorldDefs::setGarageOpen ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "setGarageOpen" );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setGlitchEnabled ( lua_State* luaVM )
+{
+    int iArgument = lua_type ( luaVM, 1 );
+    if ( iArgument == LUA_TSTRING )
+    {
+        iArgument = lua_type ( luaVM, 2 );
+        if ( iArgument == LUA_TBOOLEAN )
+        {
+            std::string szGlitchName = lua_tostring ( luaVM, 1 );
+            bool bEnabled = ( (lua_toboolean ( luaVM, 2 ) == 0) ? true : false);
+            if ( CStaticFunctionDefinitions::SetGlitchEnabled ( szGlitchName, bEnabled ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
+{
+    int iArgument = lua_type ( luaVM, 1 );
+    if ( iArgument == LUA_TSTRING )
+    {
+        std::string szGlitchName = lua_tostring ( luaVM, 1 );
+        bool bEnabled;
+        if ( CStaticFunctionDefinitions::IsGlitchEnabled ( szGlitchName, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isGlitchEnabled" );
+
+    lua_pushnil ( luaVM );
     return 1;
 }

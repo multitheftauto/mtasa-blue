@@ -335,9 +335,7 @@ public:
     inline void                         SetHudAreaNameDisabled          ( bool bDisabled )              { m_bHudAreaNameDisabled = bDisabled; };
 
     bool                                SetGlitchEnabled                ( char cGlitch, bool bEnabled );
-    bool                                SetGlitchEnabled                ( std::string strGlitch, bool bEnabled );
     bool                                IsGlitchEnabled                 ( char cGlitch );
-    bool                                IsGlitchEnabled                 ( std::string cGlitch );
 
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
@@ -546,7 +544,6 @@ private:
     long                                m_lMoney;
 
     bool                                m_Glitches[2];
-    std::map<std::string,char>          m_GlitchNames;
 
 	unsigned long						m_ulMinuteDuration;
 
