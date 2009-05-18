@@ -553,67 +553,50 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
 }
 
 // Reads and parses a COL3 file
-CColModel * CRenderWareSA::ReadCOL ( const char * szCOL, const char * szKeyName )
+CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
 {
-	if ( !szCOL )
+	if ( !szCOLFile )
         return NULL;
 
 	// Read the file
-	FILE * fileCol = fopen ( szCOL, "rb" );
-	if ( !fileCol )
+	FILE* pFile = fopen ( szCOLFile, "rb" );
+	if ( !pFile )
         return NULL;
 
-	// Get the file size
-    fseek ( fileCol, 0, SEEK_END );
-	unsigned int uiFileSize = ftell ( fileCol );
-	rewind ( fileCol );
-	
-	// Create a buffer and read in the file data
-	unsigned char *szData = new unsigned char [ uiFileSize ];
-	if ( fread ( szData, 1, uiFileSize, fileCol ) != uiFileSize )
-    {
-		delete[] szData;
-        fclose ( fileCol );
-		return NULL;
-	}
-
 	// Create a new CColModel
-	CColModelSA * pColModel = new CColModelSA ();
+	CColModelSA* pColModel = new CColModelSA ();
 
-    // Load the col file
-	if ( szData[0] == 'C' && szData[1] == 'O' && szData[2] == 'L' )
+    ColModelFileHeader header;
+    while ( fread ( &header, sizeof(ColModelFileHeader), 1, pFile ) )
     {
-        if ( szData[3] == 'L' )
+        // Load the col model
+	    if ( header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L' )
         {
-            LoadCollisionModel ( szData + COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
-        }
-        else if ( szData[3] == '2' )
-        {
-            LoadCollisionModelVer2 ( szData + COL_HEADER_SIZE, uiFileSize - COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
-        }
-        else if ( szData[3] == '3' )
-        {
-	        LoadCollisionModelVer3 ( szData + COL_HEADER_SIZE, uiFileSize - COL_HEADER_SIZE, pColModel->GetColModel (), szKeyName );
+            unsigned char* pModelData = new unsigned char [ header.size - 0x18 ];
+            fread ( pModelData, header.size - 0x18, 1, pFile );
+
+            if ( header.version[3] == 'L' )
+            {
+                LoadCollisionModel ( pModelData, pColModel->GetColModel (), header.name );
+            }
+            else if ( header.version[3] == '2' )
+            {
+                LoadCollisionModelVer2 ( pModelData, header.size - 0x18, pColModel->GetColModel (), header.name );
+            }
+            else if ( header.version[3] == '3' )
+            {
+	            LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetColModel (), header.name );
+            }
+
+            delete[] pModelData;
         }
         else
         {
-            delete[] szData;
-            fclose ( fileCol );
-            delete pColModel;
-            return NULL;
+            break;
         }
     }
-    else
-    {
-        delete[] szData;
-        fclose ( fileCol );
-        delete pColModel;
-        return NULL;
-    }
 
-	// Delete the buffer and close the file
-	delete[] szData;
-    fclose ( fileCol );
+    fclose ( pFile );
 
 	// Return the collision model
 	return pColModel;

@@ -2316,39 +2316,24 @@ ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpRespon
     }*/
     g_pGame->Lock(); // get the mutex (blocking)
 
-    char szURL[512];
-    memset(szURL, 0, 512);
-    strncpy ( szURL, ipoHttpRequest->sOriginalUri.c_str(), 510 );
-    
-    char szAccessType[512];
-    int i = 1;
-    int j = 0;
-    if ( strlen ( szURL ) > 1 )
+    std::string strAccessType;
+    const char* szRequest = ipoHttpRequest->sOriginalUri.c_str();
+    if ( *szRequest )
     {
-        while ( szURL[i] != '/' )
+        const char* szSlash1 = strchr ( szRequest + 1, '/' );
+        if ( szSlash1 )
         {
-            i++;
-            if ( szURL[i] == '\0' )
-            {
-                i = 0;
-                break;
-            }
-        }
-        i++;
-        while ( szURL[i] != '\0' && szURL[i] != '/' )
-        {
-            szAccessType[j] = szURL[i];
-            i++;
-            j++;
+            const char* szSlash2 = strchr ( szSlash1 + 1, '/' );
+            if ( szSlash2 )
+                strAccessType.assign ( szSlash1 + 1, szSlash2 - (szSlash1 + 1) );
         }
     }
-    szAccessType[j] = '\0';
     
     CAccount * account = g_pGame->GetHTTPD()->CheckAuthentication ( ipoHttpRequest );
     if ( account )
     {
         ResponseCode response;
-        if ( strcmp ( szAccessType, "call" ) == 0 )
+        if ( strAccessType == "call" )
             response = HandleRequestCall ( ipoHttpRequest, ipoHttpResponse, account );
         else
             response = HandleRequestActive ( ipoHttpRequest, ipoHttpResponse, account );
@@ -2361,55 +2346,28 @@ ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpRespon
     
 }
 
-char * Unescape ( char * szIn, char * szOut, long bufferSize )
+void Unescape ( std::string& str )
 {
-    size_t length = strlen ( szIn );
-    expanding_char unescaped ( 10 );
-    size_t i = 0;
-    for ( ; i < length; i++)
+    const char* pPercent = strchr ( str.c_str (), '%' );
+    while ( pPercent )
     {
-        if ( szIn[i] == '%' )
+        if ( pPercent[1] && pPercent[2] )
         {
-            i++;
-            expanding_char szNumberBuffer(5);
-            for ( ; i < length; i++ )
-            {
-                char szLetter[2];
-                szLetter[0] = szIn[i];
-                szLetter[1] = '\0';
-                if ( szIn[i] == '0' || atoi(szLetter) != 0 || (szIn[i] >= 'A' && szIn[i] <= 'F') )
-                    szNumberBuffer += szIn[i];
-                else
-                {
-                    break;
-                }
-            }
-
-            if ( szNumberBuffer.GetLength() == 0 ) // a % sign with nothing after?
-            {
-                unescaped += '%';
-                i--;
-            }
-            else
-            {
-                char szHexString[6];
-                sprintf ( szHexString, "0X%s", szNumberBuffer.GetValue() );
-                unescaped += (char)strtol(szHexString, NULL, 16);
-                i--;
-            }
+            int iCharCode = 0;
+            sscanf ( &pPercent[1], "%02X", &iCharCode );
+            str.replace ( pPercent - str.c_str (), 3, (char *)&iCharCode );
+            pPercent = strchr ( pPercent + 3, '%' );
         }
         else
-            unescaped += (char)szIn[i];
+        {
+            break;
+        }
     }
-    unescaped += '\0';
-    strncpy ( szOut, unescaped.GetValue(), bufferSize );
-    return szOut;
 }
-
 
 ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, CAccount* account )
 {
-    static int AlreadyCalling = false; // a mini-mutex flag, seems to work :) 
+    static int bAlreadyCalling = false; // a mini-mutex flag, seems to work :) 
     // This code runs multithreaded, we need to make sure multiple server requests don't overlap each other... (slows the server down quite a bit)
 
     // Check for http general and if we have access to this resource
@@ -2427,7 +2385,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 											CAccessControlListRight::RIGHT_TYPE_GENERAL,
 											true ) )
     {
-        AlreadyCalling = false;
+        bAlreadyCalling = false;
         return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
     }
 
@@ -2440,364 +2398,258 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
         return HTTPRESPONSECODE_200_OK;
     }
 
-    
     const char * szQueryString = ipoHttpRequest->sUri.c_str();
-    if ( strlen ( szQueryString ) != 0 )
-    {
-        size_t length = strlen ( szQueryString );
-
-    //   printf ( "%s\n", szUnescapedQueryString );
-        char szFunctionName[255];
-        size_t i = 0;
-        for ( ; i < length && szQueryString[i] != '?'; i++ )
-        {
-            szFunctionName[i] = szQueryString[i];
-        }
-        szFunctionName[i] = '\0';
-
-        char* keyName = NULL;
-        char* values[MAX_INPUT_VARIABLES];
-        memset ( values, 0, sizeof ( char * ) * MAX_INPUT_VARIABLES );
-        if ( length != i )
-        {
-            char * lpstr = (char *)&szQueryString[i + 1];
-            if ( lpstr[0] != '\0' )
-            {
-                int	cequal = 0;	// Location of a '='.
-                int	cand = -1;	// Location of a '&' (first at lpstr[-1]).
-                int	keysize = 0;	// Size of Key part.
-                int	valuesize = 0;	// Size of Value part.
-                int key = 0;
-                int i = 0;
-                bool bSkip = false;
-                do
-                {
-                    if((lpstr[i] == '&') || (lpstr[i] == '\0'))
-                    {
-                        if(cequal < cand)
-                        {
-                            valuesize = 0;	// no '=' in last key=value.
-                            keysize = i - cand - 1;
-                        }
-                        else
-                        {
-                            valuesize = i - cequal - 1;
-                            keysize = cequal - cand - 1;	
-                        }
-
-                        // allocate space for the key
-                        keyName = new char[keysize + 1];
-
-                        // copy the key and value.
-                        strncpy(keyName, lpstr + cand + 1, keysize);
-                        keyName[keysize] = '\0';
-
-                        bSkip = false;
-                        if ( keysize == 1 && keyName[0] == '0' )
-                            key = 0;
-                        else
-                        {
-                            key = atoi ( keyName ); // if this returns 0, its an error
-                            if ( errno == ERANGE || key <= 0 || key >= MAX_INPUT_VARIABLES  )
-                                bSkip = true;
-                        }
-
-                        delete[] keyName;
-
-                        if ( !bSkip )
-                        {
-                            values[key] = new char[valuesize + 1];
-                            strncpy(values[key], lpstr + cequal + 1, valuesize);
-                            values[key][valuesize] = '\0';
-                            char * szUnescaped = new char [ valuesize + 2 ];
-                            Unescape ( values[key], szUnescaped, valuesize + 1 );
-                            strncpy(values[key], szUnescaped, valuesize );
-                            delete[] szUnescaped;
-                        }
-
-                        cand = i;			
-                    }
-                    else if(lpstr[i] == '=')
-                    {
-                        cequal = i;
-                    }
-                }
-                while(lpstr[i++]);
-            }
-        }
-
-        char szFunctionNameUnescaped[255];
-        Unescape ( szFunctionName, szFunctionNameUnescaped, strlen ( szFunctionName ) + 1 );
-        strncpy ( szFunctionName, szFunctionNameUnescaped, 255 );
-
-        list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
-        for ( ; iter != m_exportedFunctions.end (); iter++ )
-        {
-            if ( strcmp ( szFunctionName, (*iter)->GetFunctionName ().c_str () ) == 0 )
-            {
-                if ( (*iter)->IsHTTPAccessible() )
-                {
-                    CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-                    char szResourceFunctionName[512];
-                    _snprintf ( szResourceFunctionName, 512, "%s.function.%s", m_strResourceName.c_str (), szFunctionName );
-                    // @@@@@ Deal with this the new way
-                    if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-						                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-														szResourceFunctionName,
-														CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-														true ) )
-                    {
-                        CLuaArguments args;
-                        if ( ipoHttpRequest->nRequestMethod == REQUESTMETHOD_GET )
-                        {
-                            for ( int i = 0; i < MAX_INPUT_VARIABLES && values[i] != NULL; i++ )
-                            {
-                                char * szString = values[i];
-                                if ( strlen(szString) > 3 && szString[0] == '^' && szString[2] == '^' && szString[1] != '^' )
-                                {
-                                    switch ( szString[1] )
-                                    {
-                                    case 'E': // element
-                                    {
-                                        int id = atoi(szString+3);
-                                        CElement * element = NULL;
-                                        if ( id != INT_MAX && id != INT_MIN && id != 0 )
-                                            element = CElementIDs::GetElement(id);
-                                        if ( element )
-                                            args.PushElement ( element );
-
-                                        else 
-                                        {
-                                            g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified." );
-                                            args.PushNil ();
-                                        }
-                                        break;
-                                    }
-                                    case 'R': // resource
-                                        {
-                                            CResource * resource = g_pGame->GetResourceManager()->GetResource(szString+3);
-                                            if ( resource )
-                                                args.PushResource ( resource );
-                                            else 
-                                            {
-                                                g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid resource specified." );
-                                                args.PushNil ();
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                    args.PushString ( values[i] );
-
-                                delete[] values[i];
-                            }
-                        }
-                        else if ( ipoHttpRequest->nRequestMethod = REQUESTMETHOD_POST )
-                        {
-                            const char * requestBody = ipoHttpRequest->sBody.c_str();
-                            args.ReadFromJSONString ( (char *)requestBody );
-                        }
-
-                        CLuaArguments returnsLua;
-                        
-                        args.CallGlobal ( m_pVM, szFunctionName, &returnsLua );
-                        //g_pGame->Unlock(); // release the mutex
-
-                        std::string strJSON;
-                        returnsLua.WriteToJSONString ( strJSON, true );
-                        
-                        ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
-                        AlreadyCalling = false;
-                        return HTTPRESPONSECODE_200_OK;
-                    }
-                    else
-                    {
-                        AlreadyCalling = false;
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
-                    }
-                }
-                else
-                {
-                    AlreadyCalling = false;
-                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
-                }
-            }
-        }
-    }
-    else
+    if ( !*szQueryString )
     {
         char * szError = "error: invalid function name";
         ipoHttpResponse->SetBody ( szError, strlen(szError) );
-        AlreadyCalling = false;
+        bAlreadyCalling = false;
         return HTTPRESPONSECODE_200_OK;
     }
 
-    char * szError = "error: not found";
+    std::string strFuncName;
+    std::vector < std::string > arguments;
+    const char* pQueryArg = strchr ( szQueryString, '?' );
+    if ( !pQueryArg )
+    {
+        strFuncName = szQueryString;
+    }
+    else
+    {
+        strFuncName.assign ( szQueryString, pQueryArg - szQueryString );
+        pQueryArg++;
+
+        const char* pEqual = NULL;
+        const char* pAnd = NULL;
+
+        while ( *pQueryArg )
+        {
+            pAnd = strchr ( pQueryArg, '&' );
+            if ( !pAnd )
+                pAnd = pQueryArg + strlen ( pQueryArg );
+
+            pEqual = strchr ( pQueryArg, '=' );
+            if ( pEqual && pEqual < pAnd )
+            {
+                std::string strKey ( pQueryArg, pEqual - pQueryArg );
+                int iKey = atoi ( strKey.c_str () );
+                if ( iKey >= 0 && iKey < MAX_INPUT_VARIABLES )
+                {
+                    std::string strValue ( pEqual + 1, pAnd - (pEqual + 1) );
+                    Unescape ( strValue );
+                    if ( iKey + 1 > arguments.size () )
+                        arguments.resize ( iKey + 1 );
+                    arguments [ iKey ] = strValue;
+                }
+            }
+
+            if ( *pAnd )
+                pQueryArg = pAnd + 1;
+            else
+                break;
+        }
+    }
+    Unescape ( strFuncName );
+
+    list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
+    for ( ; iter != m_exportedFunctions.end (); iter++ )
+    {
+        if ( strFuncName == (*iter)->GetFunctionName () )
+        {
+            if ( (*iter)->IsHTTPAccessible() )
+            {
+                CAccessControlListManager * aclManager = g_pGame->GetACLManager();
+                SString strResourceFuncName ( "%s.function.%s", m_strResourceName.c_str (), strFuncName.c_str () );
+
+                // @@@@@ Deal with this the new way
+                if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
+					                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
+													strResourceFuncName.c_str (),
+													CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+													true ) )
+                {
+                    CLuaArguments luaArgs;
+                    if ( ipoHttpRequest->nRequestMethod == REQUESTMETHOD_GET )
+                    {
+                        std::vector < std::string >::iterator it;
+                        for ( it = arguments.begin (); it != arguments.end (); it++ )
+                        {
+                            const char* szArg = (*it).c_str ();
+                            if ( strlen(szArg) > 3 && szArg[0] == '^' && szArg[2] == '^' && szArg[1] != '^' )
+                            {
+                                switch ( szArg[1] )
+                                {
+                                    case 'E':   // element
+                                    {
+                                        int id = atoi ( szArg + 3 );
+                                        CElement* pElement = NULL;
+                                        if ( id != INT_MAX && id != INT_MIN && id != 0 )
+                                            pElement = CElementIDs::GetElement ( id );
+
+                                        if ( pElement )
+                                        {
+                                            luaArgs.PushElement ( pElement );
+                                        }
+                                        else 
+                                        {
+                                            g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified." );
+                                            luaArgs.PushNil ();
+                                        }
+                                        break;
+                                    }
+                                    case 'R':   // resource
+                                    {
+                                        CResource* pResource = g_pGame->GetResourceManager()->GetResource ( szArg + 3 );
+                                        if ( pResource )
+                                        {
+                                            luaArgs.PushResource ( pResource );
+                                        }
+                                        else 
+                                        {
+                                            g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid resource specified." );
+                                            luaArgs.PushNil ();
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                luaArgs.PushString ( szArg );
+                            }
+                        }
+                    }
+                    else if ( ipoHttpRequest->nRequestMethod = REQUESTMETHOD_POST )
+                    {
+                        const char* szRequestBody = ipoHttpRequest->sBody.c_str();
+                        luaArgs.ReadFromJSONString ( szRequestBody );
+                    }
+
+                    CLuaArguments luaReturns;
+                    
+                    luaArgs.CallGlobal ( m_pVM, strFuncName.c_str (), &luaReturns );
+                    //g_pGame->Unlock(); // release the mutex
+
+                    std::string strJSON;
+                    luaReturns.WriteToJSONString ( strJSON, true );
+                    
+                    ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
+                    bAlreadyCalling = false;
+                    return HTTPRESPONSECODE_200_OK;
+                }
+                else
+                {
+                    bAlreadyCalling = false;
+                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                }
+            }
+            else
+            {
+                bAlreadyCalling = false;
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+            }
+        }
+    }
+
+    const char* szError = "error: not found";
     ipoHttpResponse->SetBody ( szError, strlen(szError) );
-    AlreadyCalling = false;
+    bAlreadyCalling = false;
     return HTTPRESPONSECODE_200_OK;
 }
 
 ResponseCode CResource::HandleRequestInfo ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
     char szDebug[4024];
-    DisplayInfoHTML( szDebug , 4024 );
+    DisplayInfoHTML ( szDebug, 4024 );
     ipoHttpResponse->SetBody ( szDebug, strlen(szDebug) );
     return HTTPRESPONSECODE_200_OK;
 }
 
-// Stolen from curl_easy_unescape ... how fucking ugly is this code?
-// I really should clean it up like I did EscapeURL in the HTTP Download Manager, but I can't be bothered
-#define ISXDIGIT(x) (isxdigit((int) ((unsigned char)x)))
-char *unescape(const char *string, int length,
-                         int *olen)
-{
-  int alloc = (length?length:(int)strlen(string))+1;
-  char *ns = (char*)malloc(alloc);
-  unsigned char in;
-  int strindex=0;
-  long hex;
-
-  if( !ns )
-    return NULL;
-
-  while(--alloc > 0) {
-    in = *string;
-    if(('%' == in) && ISXDIGIT(string[1]) && ISXDIGIT(string[2])) {
-      /* this is two hexadecimal digits following a '%' */
-      char hexstr[3];
-      char *ptr;
-      hexstr[0] = string[1];
-      hexstr[1] = string[2];
-      hexstr[2] = 0;
-
-      hex = strtol(hexstr, &ptr, 16);
-
-      in = (unsigned char)hex; /* this long is never bigger than 255 anyway */
-
-      string+=2;
-      alloc-=2;
-    }
-
-    ns[strindex++] = in;
-    string++;
-  }
-  ns[strindex]=0; /* terminate it */
-
-  if(olen)
-    /* store output size */
-    *olen = strindex;
-  return ns;
-}
-
 ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, CAccount* account )
 {
-    const char * szURLPathC = ipoHttpRequest->sOriginalUri.c_str();
-    char szURLPath[512];
-
-    unsigned int szURLLength = strlen(szURLPathC);
-    for ( unsigned int i = (szURLPathC[0] == '/'?1:0); i < szURLLength; i++ )
-        if ( szURLPathC[i] == '/' ) {
-            strncpy ( szURLPath, szURLPathC + i + 1, 511 );
-            break;
-        }
-    
-    szURLPath[511] = '\0';
-
-    if ( szURLPath )
+    const char* szUrl = ipoHttpRequest->sOriginalUri.c_str ();
+    std::string strFile;
+    if ( szUrl[0] )
     {
-        // find the begining of the query string and cut it off
-        for ( unsigned int i = 0; i < strlen(szURLPath); i++ )
+        const char* pFileFrom = strchr ( szUrl[0] == '/' ? &szUrl[1] : szUrl, '/' );
+        if ( pFileFrom )
         {
-            if ( szURLPath[i] == '?' )
-            {
-                szURLPath[i] = '\0';
-                break;
-            }
+            pFileFrom++;
+            const char* pFileTo = strchr ( pFileFrom, '?' );
+            if ( pFileTo )
+                strFile.assign ( pFileFrom, pFileTo - pFileFrom );
+            else
+                strFile = pFileFrom;
         }
     }
 
-    int sizeURLPathUnescaped = 0;
-    char* szURLPathUnescaped = unescape ( szURLPath, strlen ( szURLPath ), &sizeURLPathUnescaped );
-    ReplaceSlashes(szURLPathUnescaped);
+    Unescape ( strFile );
 
-    //printf ( "%s\n", szURLPathUnescaped );
     list < CResourceFile* > ::iterator iter =  m_resourceFiles.begin ();
     for ( ; iter != m_resourceFiles.end (); iter++ )
     {
-        CResourceFile * file = (*iter);
-        CResourceHTMLItem * html = (CResourceHTMLItem *) file;
-        if ( szURLPathUnescaped && szURLPathUnescaped[0] != '\0' )
+        CResourceFile* pFile = *iter;
+        if ( !strFile.empty () )
         {
-            if ( strcmp( file->GetName(), szURLPathUnescaped ) == 0 )
+            if ( strcmp( pFile->GetName(), strFile.c_str () ) == 0 )
             {
-                if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
+                if ( pFile->GetType () == CResourceFile::RESOURCE_FILE_TYPE_HTML )
                 {
+                    CResourceHTMLItem* pHtml = (CResourceHTMLItem *) pFile;
+
                     // We need to be active if downloading a HTML file
                     if ( m_bActive )
                     {  
                         // Check for http general and if we have access to this resource
-                        // if we're trying to return a http file. Otherwize it's the MTA
+                        // if we're trying to return a http file. Otherwise it's the MTA
                         // client trying to download files.
                         CAccessControlListManager * aclManager = g_pGame->GetACLManager();
                         if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-			                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-													        m_strResourceName.c_str (),
-													        CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													        true ) && 
+		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+												            m_strResourceName.c_str (),
+												            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+												            true ) && 
                             aclManager->CanObjectUseRight ( account->GetName().c_str (),
-			                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
+		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                             "http",
-													        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													        true ) )
+												            CAccessControlListRight::RIGHT_TYPE_GENERAL,
+												            true ) )
                         {
-                            char szResourceFileName[512];
-                            _snprintf ( szResourceFileName, 512, "%s.file.%s", m_strResourceName.c_str (), file->GetName() );
-
+                            SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pHtml->GetName() );
 
                             if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-							                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
-															    szResourceFileName,
-															    CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-															    !html->IsRestricted () ) )
+						                                        CAccessControlListGroupObject::OBJECT_TYPE_USER,
+														        strResourceFileName.c_str (),
+														        CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+														        !pHtml->IsRestricted () ) )
                             {
-                                if ( szURLPathUnescaped )
-                                    free ( szURLPathUnescaped );
-                                return html->Request ( ipoHttpRequest, ipoHttpResponse, account );
+                                return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                             }
                             else
                             {
-                                if ( szURLPathUnescaped )
-                                    free ( szURLPathUnescaped );
-                                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                             }
                         }
                         else
                         {
-                            if ( szURLPathUnescaped )
-                                free ( szURLPathUnescaped );
-                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                         }
                     }
                     else
                     {
-                        char szDebug[512];
-                        _snprintf ( szDebug, 511, "Resource %s is not running.", m_strResourceName.c_str () );
-                        ipoHttpResponse->SetBody ( szDebug, strlen(szDebug) );
+                        SString err ( "Resource %s is not running.", m_strResourceName.c_str () );
+                        ipoHttpResponse->SetBody ( err.c_str (), err.size () );
                         return HTTPRESPONSECODE_401_UNAUTHORIZED;
                     }
-                }
 
-                // Send back any clientfile. Otherwize keep looking for server files matching
+                }
+                // Send back any clientfile. Otherwise keep looking for server files matching
                 // this filename. If none match, the file not found will be sent back.
-                else if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
-                            file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
-                            file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE )
+                else if ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                          pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                          pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE )
                 {
-                    if ( szURLPathUnescaped )
-                        free ( szURLPathUnescaped );
-                    return file->Request ( ipoHttpRequest, ipoHttpResponse ); // sends back any file in the resource
+                    return pFile->Request ( ipoHttpRequest, ipoHttpResponse ); // sends back any file in the resource
                 }
             }
         }
@@ -2813,20 +2665,19 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
 													CAccessControlListRight::RIGHT_TYPE_GENERAL,
 													true ) )
             {
-                if ( szURLPathUnescaped )
-                    free ( szURLPathUnescaped );
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
 
 
-            if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
+            if ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
             {
-                if ( html->IsDefaultPage() )
+                CResourceHTMLItem* pHtml = (CResourceHTMLItem *) pFile;
+
+                if ( pHtml->IsDefaultPage() )
                 {
                     CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-                    char szResourceFileName[512];
                     
-                    _snprintf ( szResourceFileName, 512, "%s.file.%s", m_strResourceName.c_str (), file->GetName() );
+                    SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pFile->GetName() );
                     if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
 			                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
 													        m_strResourceName.c_str (),
@@ -2834,31 +2685,23 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
 													        true ) && 
                         aclManager->CanObjectUseRight ( account->GetName().c_str (),
 							                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-															szResourceFileName,
+															strResourceFileName.c_str (),
 															CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-															!html->IsRestricted () ) )
+															!pHtml->IsRestricted () ) )
                     {
-                        if ( szURLPathUnescaped )
-                            free ( szURLPathUnescaped );
-                        return html->Request ( ipoHttpRequest, ipoHttpResponse, account );
+                        return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                     }
                     else
                     {
-                        if ( szURLPathUnescaped )
-                            free ( szURLPathUnescaped );
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                     }
                 }
             }
         }
     }
 
-    char szDebug[712];  
-    memset(szDebug, 0, 712);
-    _snprintf ( szDebug, 711, "Cannot find a resource file named '%s' in the resource %s.", szURLPathUnescaped, m_strResourceName.c_str () );
-    ipoHttpResponse->SetBody ( szDebug, strlen(szDebug) );
-    if ( szURLPathUnescaped )
-        free ( szURLPathUnescaped );
+    SString err ( "Cannot find a resource file named '%s' in the resource %s.", strFile.c_str (), m_strResourceName.c_str () );
+    ipoHttpResponse->SetBody ( err.c_str (), err.size () );
     return HTTPRESPONSECODE_404_NOTFOUND;
 }
 

@@ -48,7 +48,7 @@ bool CResourceConfigItem::Start ( void )
     }
 
     // Create the XML
-    m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( m_szResourceFileName );
+    m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( m_strResourceFileName.c_str () );
     if ( m_pXMLFile )
     {
         // Parse it
@@ -60,7 +60,7 @@ bool CResourceConfigItem::Start ( void )
         }
         else
         {
-            CLogger::ErrorPrintf ( "Couldn't parse config %s in resource %s\n", m_szShortName, m_resource->GetName().c_str () );
+            CLogger::ErrorPrintf ( "Couldn't parse config %s in resource %s\n", m_strShortName.c_str (), m_resource->GetName().c_str () );
         }
 
         // Delete the XML again, invalid
@@ -68,7 +68,7 @@ bool CResourceConfigItem::Start ( void )
         m_pXMLFile = NULL;
     }
     else
-        CLogger::ErrorPrintf ( "Couldn't load config %s in resource %s\n", m_szShortName, m_resource->GetName().c_str () );
+        CLogger::ErrorPrintf ( "Couldn't load config %s in resource %s\n", m_strShortName.c_str (), m_resource->GetName().c_str () );
 
     return !m_bInvalid;
 }

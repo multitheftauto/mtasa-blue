@@ -30,7 +30,7 @@ CResourceScriptItem::~CResourceScriptItem ( void )
 bool CResourceScriptItem::Start ( void )
 {
     m_pVM = m_resource->GetVirtualMachine();
-    m_pVM->LoadScriptFromFile ( m_szResourceFileName );
+    m_pVM->LoadScriptFromFile ( m_strResourceFileName.c_str () );
     return true;
 }
 

@@ -246,7 +246,6 @@
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
 #include "utils/base64.h"
-#include "utils/expanding_string.h"
 #include "utils/zip/crc32.h"
 
 // Module includes

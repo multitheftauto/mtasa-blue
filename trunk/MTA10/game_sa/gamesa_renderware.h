@@ -196,8 +196,6 @@ CTxdStore_RemoveRef_t			CTxdStore_RemoveRef				= (CTxdStore_RemoveRef_t)			0xDEA
 CTxdStore_AddRef_t				CTxdStore_AddRef				= (CTxdStore_AddRef_t)				0xDEAD;
 CClothesBuilder_CopyTexture_t	CClothesBuilder_CopyTexture		= (CClothesBuilder_CopyTexture_t)	0xDEAD;
 
-#define			COL_HEADER_SIZE	32
-
 /*****************************************************************************/
 /** Function inlines                                                        **/
 /*****************************************************************************/

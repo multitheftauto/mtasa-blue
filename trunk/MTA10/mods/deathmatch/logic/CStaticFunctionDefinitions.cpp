@@ -167,17 +167,21 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
 {
     assert ( szName );
 
+    if ( CallWithEntity.IsLocalEntity ()  )
+        return false;
+
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
     {
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         pBitStream->Write ( usNameLength );
         pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
-        if ( CallWithEntity.IsLocalEntity ()  )
-            return false;
         pBitStream->Write ( CallWithEntity.GetID () );
         if ( !Arguments.WriteToBitStream ( *pBitStream ) )
+        {
+            g_pNet->DeallocateNetBitStream ( pBitStream );
             return false;
+        }
         g_pNet->SendPacket ( PACKET_ID_LUA_EVENT, pBitStream );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
