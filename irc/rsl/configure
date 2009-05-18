@@ -885,62 +885,41 @@ DX_DOCDIR
 DX_ENV
 DX_FLAG_doc
 DX_DOXYGEN
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_PERL
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_doc_TRUE
 DX_COND_doc_FALSE
 DX_FLAG_dot
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_DOT
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_dot_TRUE
 DX_COND_dot_FALSE
 DX_FLAG_man
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_man_TRUE
 DX_COND_man_FALSE
 DX_FLAG_rtf
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_rtf_TRUE
 DX_COND_rtf_FALSE
 DX_FLAG_xml
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_xml_TRUE
 DX_COND_xml_FALSE
 DX_FLAG_chm
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_HHC
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_chm_TRUE
 DX_COND_chm_FALSE
 DX_FLAG_chi
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_chi_TRUE
 DX_COND_chi_FALSE
 DX_FLAG_html
-DX_FLAG_[]DX_CURRENT_FEATURE
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_html_TRUE
 DX_COND_html_FALSE
 DX_FLAG_ps
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_LATEX
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_MAKEINDEX
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_DVIPS
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_EGREP
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_ps_TRUE
 DX_COND_ps_FALSE
 DX_FLAG_pdf
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_PDFLATEX
-DX_FLAG_[]DX_CURRENT_FEATURE
-DX_FLAG_[]DX_CURRENT_FEATURE
-DX_FLAG_[]DX_CURRENT_FEATURE
 DX_COND_pdf_TRUE
 DX_COND_pdf_FALSE
 DX_COND_latex_TRUE
@@ -4757,7 +4736,7 @@ linux* | k*bsd*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd* | netbsdelf*-gnu)
+netbsd*)
   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -4878,7 +4857,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4881 "configure"' > conftest.$ac_ext
+  echo '#line 4860 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7390,6 +7369,67 @@ fi
 
 test -z "$pic_mode" && pic_mode=default
 
+# Check if we have a version mismatch between libtool.m4 and ltmain.sh.
+#
+# Note:  This should be in AC_LIBTOOL_SETUP, _after_ $ltmain have been defined.
+#        We also should do it _before_ AC_LIBTOOL_LANG_C_CONFIG that actually
+#        calls AC_LIBTOOL_CONFIG and creates libtool.
+#
+{ echo "$as_me:$LINENO: checking for correct ltmain.sh version" >&5
+echo $ECHO_N "checking for correct ltmain.sh version... $ECHO_C" >&6; }
+if test "x$ltmain" = "x" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+  { { echo "$as_me:$LINENO: error:
+
+*** [Gentoo] sanity check failed! ***
+*** \$ltmain is not defined, please check the patch for consistency! ***
+" >&5
+echo "$as_me: error:
+
+*** [Gentoo] sanity check failed! ***
+*** \$ltmain is not defined, please check the patch for consistency! ***
+" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+gentoo_lt_version="1.5.26"
+gentoo_ltmain_version=`sed -n '/^[ 	]*VERSION=/{s/^[ 	]*VERSION=//;p;q;}' "$ltmain"`
+if test "x$gentoo_lt_version" != "x$gentoo_ltmain_version" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+  { { echo "$as_me:$LINENO: error:
+
+*** [Gentoo] sanity check failed! ***
+*** libtool.m4 and ltmain.sh have a version mismatch! ***
+*** (libtool.m4 = $gentoo_lt_version, ltmain.sh = $gentoo_ltmain_version) ***
+
+Please run:
+
+  libtoolize --copy --force
+
+if appropriate, please contact the maintainer of this
+package (or your distribution) for help.
+" >&5
+echo "$as_me: error:
+
+*** [Gentoo] sanity check failed! ***
+*** libtool.m4 and ltmain.sh have a version mismatch! ***
+*** (libtool.m4 = $gentoo_lt_version, ltmain.sh = $gentoo_ltmain_version) ***
+
+Please run:
+
+  libtoolize --copy --force
+
+if appropriate, please contact the maintainer of this
+package (or your distribution) for help.
+" >&2;}
+   { (exit 1); exit 1; }; }
+else
+  { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+fi
+
+
 # Use C for the default configuration in the libtool script
 tagname=
 lt_save_CC="$CC"
@@ -7463,11 +7503,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7466: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7506: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7470: \$? = $ac_status" >&5
+   echo "$as_me:7510: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7753,11 +7793,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7756: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7796: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7760: \$? = $ac_status" >&5
+   echo "$as_me:7800: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7857,11 +7897,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7860: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7900: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7864: \$? = $ac_status" >&5
+   echo "$as_me:7904: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8122,13 +8162,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs=no
       else
 	ld_shlibs=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -8671,7 +8710,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -9209,7 +9248,14 @@ freebsd* | dragonfly*)
     *) objformat=elf ;;
     esac
   fi
-  version_type=freebsd-$objformat
+  # Handle Gentoo/FreeBSD as it was Linux
+  case $host_vendor in
+    gentoo)
+      version_type=linux ;;
+    *)
+      version_type=freebsd-$objformat ;;
+  esac
+
   case $version_type in
     freebsd-elf*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext} $libname${shared_ext}'
@@ -9219,6 +9265,12 @@ freebsd* | dragonfly*)
     freebsd-*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix $libname${shared_ext}$versuffix'
       need_version=yes
+      ;;
+    linux)
+      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+      soname_spec='${libname}${release}${shared_ext}$major'
+      need_lib_prefix=no
+      need_version=no
       ;;
   esac
   shlibpath_var=LD_LIBRARY_PATH
@@ -9380,18 +9432,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -10234,7 +10274,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10237 "configure"
+#line 10277 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10334,7 +10374,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10337 "configure"
+#line 10377 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11922,7 +11962,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	;;
     esac
     ;;
-  netbsd* | netbsdelf*-gnu)
+  netbsd*)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds_CXX='$LD -Bshareable  -o $lib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags'
       wlarc=
@@ -12626,7 +12666,7 @@ echo $ECHO_N "checking for $compiler option to produce PIC... $ECHO_C" >&6; }
 	    ;;
 	esac
 	;;
-      netbsd* | netbsdelf*-gnu)
+      netbsd*)
 	;;
       osf3* | osf4* | osf5*)
 	case $cc_basename in
@@ -12735,11 +12775,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12738: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12778: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12742: \$? = $ac_status" >&5
+   echo "$as_me:12782: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12839,11 +12879,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12842: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12882: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12846: \$? = $ac_status" >&5
+   echo "$as_me:12886: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12910,9 +12950,6 @@ echo $ECHO_N "checking whether the $compiler linker ($LD) supports shared librar
   ;;
   cygwin* | mingw*)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1 DATA/;/^.*[ ]__nm__/s/^.*[ ]__nm__\([^ ]*\)[ ][^ ]*/\1 DATA/;/^I[ ]/d;/^[AITW][ ]/s/.*[ ]//'\'' | sort | uniq > $export_symbols'
-  ;;
-  linux* | k*bsd*-gnu)
-    link_all_deplibs_CXX=no
   ;;
   *)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
@@ -13187,7 +13224,14 @@ freebsd* | dragonfly*)
     *) objformat=elf ;;
     esac
   fi
-  version_type=freebsd-$objformat
+  # Handle Gentoo/FreeBSD as it was Linux
+  case $host_vendor in
+    gentoo)
+      version_type=linux ;;
+    *)
+      version_type=freebsd-$objformat ;;
+  esac
+
   case $version_type in
     freebsd-elf*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext} $libname${shared_ext}'
@@ -13197,6 +13241,12 @@ freebsd* | dragonfly*)
     freebsd-*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix $libname${shared_ext}$versuffix'
       need_version=yes
+      ;;
+    linux)
+      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+      soname_spec='${libname}${release}${shared_ext}$major'
+      need_lib_prefix=no
+      need_version=no
       ;;
   esac
   shlibpath_var=LD_LIBRARY_PATH
@@ -13358,18 +13408,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -14437,11 +14475,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14440: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14478: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14444: \$? = $ac_status" >&5
+   echo "$as_me:14482: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14541,11 +14579,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14544: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14582: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14548: \$? = $ac_status" >&5
+   echo "$as_me:14586: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14806,13 +14844,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs_F77=no
       else
 	ld_shlibs_F77=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_F77='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -15335,7 +15372,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs_F77=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_F77='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -15821,7 +15858,14 @@ freebsd* | dragonfly*)
     *) objformat=elf ;;
     esac
   fi
-  version_type=freebsd-$objformat
+  # Handle Gentoo/FreeBSD as it was Linux
+  case $host_vendor in
+    gentoo)
+      version_type=linux ;;
+    *)
+      version_type=freebsd-$objformat ;;
+  esac
+
   case $version_type in
     freebsd-elf*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext} $libname${shared_ext}'
@@ -15831,6 +15875,12 @@ freebsd* | dragonfly*)
     freebsd-*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix $libname${shared_ext}$versuffix'
       need_version=yes
+      ;;
+    linux)
+      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+      soname_spec='${libname}${release}${shared_ext}$major'
+      need_lib_prefix=no
+      need_version=no
       ;;
   esac
   shlibpath_var=LD_LIBRARY_PATH
@@ -15992,18 +16042,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -16761,11 +16799,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16764: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16802: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16768: \$? = $ac_status" >&5
+   echo "$as_me:16806: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17051,11 +17089,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17054: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17092: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17058: \$? = $ac_status" >&5
+   echo "$as_me:17096: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17155,11 +17193,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17158: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17196: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17162: \$? = $ac_status" >&5
+   echo "$as_me:17200: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17420,13 +17458,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs_GCJ=no
       else
 	ld_shlibs_GCJ=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_GCJ='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -17969,7 +18006,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs_GCJ=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_GCJ='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -18455,7 +18492,14 @@ freebsd* | dragonfly*)
     *) objformat=elf ;;
     esac
   fi
-  version_type=freebsd-$objformat
+  # Handle Gentoo/FreeBSD as it was Linux
+  case $host_vendor in
+    gentoo)
+      version_type=linux ;;
+    *)
+      version_type=freebsd-$objformat ;;
+  esac
+
   case $version_type in
     freebsd-elf*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext} $libname${shared_ext}'
@@ -18465,6 +18509,12 @@ freebsd* | dragonfly*)
     freebsd-*)
       library_names_spec='${libname}${release}${shared_ext}$versuffix $libname${shared_ext}$versuffix'
       need_version=yes
+      ;;
+    linux)
+      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+      soname_spec='${libname}${release}${shared_ext}$major'
+      need_lib_prefix=no
+      need_version=no
       ;;
   esac
   shlibpath_var=LD_LIBRARY_PATH
@@ -18626,18 +18676,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -20858,7 +20896,7 @@ else
   DX_DOXYGEN="$ac_cv_path_DX_DOXYGEN"
 fi
 
-if test "$DX_FLAG_doc$DX_DOXYGEN" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_DOXYGEN" = 1; then
     { echo "$as_me:$LINENO: WARNING: doxygen not found - will not generate any doxygen documentation" >&5
 echo "$as_me: WARNING: doxygen not found - will not generate any doxygen documentation" >&2;}
     DX_FLAG_doc=0
@@ -20968,7 +21006,7 @@ else
   DX_PERL="$ac_cv_path_DX_PERL"
 fi
 
-if test "$DX_FLAG_doc$DX_PERL" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_PERL" = 1; then
     { echo "$as_me:$LINENO: WARNING: perl not found - will not generate any doxygen documentation" >&5
 echo "$as_me: WARNING: perl not found - will not generate any doxygen documentation" >&2;}
     DX_FLAG_doc=0
@@ -21148,7 +21186,7 @@ else
   DX_DOT="$ac_cv_path_DX_DOT"
 fi
 
-if test "$DX_FLAG_dot$DX_DOT" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_DOT" = 1; then
     { echo "$as_me:$LINENO: WARNING: dot not found - will not generate graphics for doxygen documentation" >&5
 echo "$as_me: WARNING: dot not found - will not generate graphics for doxygen documentation" >&2;}
     DX_FLAG_dot=0
@@ -21547,7 +21585,7 @@ else
   DX_HHC="$ac_cv_path_DX_HHC"
 fi
 
-if test "$DX_FLAG_chm$DX_HHC" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_HHC" = 1; then
     { echo "$as_me:$LINENO: WARNING: hhc not found - will not generate doxygen compressed HTML help documentation" >&5
 echo "$as_me: WARNING: hhc not found - will not generate doxygen compressed HTML help documentation" >&2;}
     DX_FLAG_chm=0
@@ -21884,7 +21922,7 @@ else
   DX_LATEX="$ac_cv_path_DX_LATEX"
 fi
 
-if test "$DX_FLAG_ps$DX_LATEX" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_LATEX" = 1; then
     { echo "$as_me:$LINENO: WARNING: latex not found - will not generate doxygen PostScript documentation" >&5
 echo "$as_me: WARNING: latex not found - will not generate doxygen PostScript documentation" >&2;}
     DX_FLAG_ps=0
@@ -21994,7 +22032,7 @@ else
   DX_MAKEINDEX="$ac_cv_path_DX_MAKEINDEX"
 fi
 
-if test "$DX_FLAG_ps$DX_MAKEINDEX" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_MAKEINDEX" = 1; then
     { echo "$as_me:$LINENO: WARNING: makeindex not found - will not generate doxygen PostScript documentation" >&5
 echo "$as_me: WARNING: makeindex not found - will not generate doxygen PostScript documentation" >&2;}
     DX_FLAG_ps=0
@@ -22104,7 +22142,7 @@ else
   DX_DVIPS="$ac_cv_path_DX_DVIPS"
 fi
 
-if test "$DX_FLAG_ps$DX_DVIPS" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_DVIPS" = 1; then
     { echo "$as_me:$LINENO: WARNING: dvips not found - will not generate doxygen PostScript documentation" >&5
 echo "$as_me: WARNING: dvips not found - will not generate doxygen PostScript documentation" >&2;}
     DX_FLAG_ps=0
@@ -22214,7 +22252,7 @@ else
   DX_EGREP="$ac_cv_path_DX_EGREP"
 fi
 
-if test "$DX_FLAG_ps$DX_EGREP" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_EGREP" = 1; then
     { echo "$as_me:$LINENO: WARNING: egrep not found - will not generate doxygen PostScript documentation" >&5
 echo "$as_me: WARNING: egrep not found - will not generate doxygen PostScript documentation" >&2;}
     DX_FLAG_ps=0
@@ -22393,7 +22431,7 @@ else
   DX_PDFLATEX="$ac_cv_path_DX_PDFLATEX"
 fi
 
-if test "$DX_FLAG_pdf$DX_PDFLATEX" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_PDFLATEX" = 1; then
     { echo "$as_me:$LINENO: WARNING: pdflatex not found - will not generate doxygen PDF documentation" >&5
 echo "$as_me: WARNING: pdflatex not found - will not generate doxygen PDF documentation" >&2;}
     DX_FLAG_pdf=0
@@ -22503,7 +22541,7 @@ else
   DX_MAKEINDEX="$ac_cv_path_DX_MAKEINDEX"
 fi
 
-if test "$DX_FLAG_pdf$DX_MAKEINDEX" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_MAKEINDEX" = 1; then
     { echo "$as_me:$LINENO: WARNING: makeindex not found - will not generate doxygen PDF documentation" >&5
 echo "$as_me: WARNING: makeindex not found - will not generate doxygen PDF documentation" >&2;}
     DX_FLAG_pdf=0
@@ -22613,7 +22651,7 @@ else
   DX_EGREP="$ac_cv_path_DX_EGREP"
 fi
 
-if test "$DX_FLAG_pdf$DX_EGREP" = 1; then
+if test "$DX_FLAG_$DX_CURRENT_FEATURE$DX_EGREP" = 1; then
     { echo "$as_me:$LINENO: WARNING: egrep not found - will not generate doxygen PDF documentation" >&5
 echo "$as_me: WARNING: egrep not found - will not generate doxygen PDF documentation" >&2;}
     DX_FLAG_pdf=0
@@ -23693,62 +23731,41 @@ DX_DOCDIR!$DX_DOCDIR$ac_delim
 DX_ENV!$DX_ENV$ac_delim
 DX_FLAG_doc!$DX_FLAG_doc$ac_delim
 DX_DOXYGEN!$DX_DOXYGEN$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_PERL!$DX_PERL$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_doc_TRUE!$DX_COND_doc_TRUE$ac_delim
 DX_COND_doc_FALSE!$DX_COND_doc_FALSE$ac_delim
 DX_FLAG_dot!$DX_FLAG_dot$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_DOT!$DX_DOT$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_dot_TRUE!$DX_COND_dot_TRUE$ac_delim
 DX_COND_dot_FALSE!$DX_COND_dot_FALSE$ac_delim
 DX_FLAG_man!$DX_FLAG_man$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_man_TRUE!$DX_COND_man_TRUE$ac_delim
 DX_COND_man_FALSE!$DX_COND_man_FALSE$ac_delim
 DX_FLAG_rtf!$DX_FLAG_rtf$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_rtf_TRUE!$DX_COND_rtf_TRUE$ac_delim
 DX_COND_rtf_FALSE!$DX_COND_rtf_FALSE$ac_delim
 DX_FLAG_xml!$DX_FLAG_xml$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_xml_TRUE!$DX_COND_xml_TRUE$ac_delim
 DX_COND_xml_FALSE!$DX_COND_xml_FALSE$ac_delim
 DX_FLAG_chm!$DX_FLAG_chm$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_HHC!$DX_HHC$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_chm_TRUE!$DX_COND_chm_TRUE$ac_delim
 DX_COND_chm_FALSE!$DX_COND_chm_FALSE$ac_delim
 DX_FLAG_chi!$DX_FLAG_chi$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_chi_TRUE!$DX_COND_chi_TRUE$ac_delim
 DX_COND_chi_FALSE!$DX_COND_chi_FALSE$ac_delim
 DX_FLAG_html!$DX_FLAG_html$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_html_TRUE!$DX_COND_html_TRUE$ac_delim
 DX_COND_html_FALSE!$DX_COND_html_FALSE$ac_delim
 DX_FLAG_ps!$DX_FLAG_ps$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_LATEX!$DX_LATEX$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_MAKEINDEX!$DX_MAKEINDEX$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_DVIPS!$DX_DVIPS$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_EGREP!$DX_EGREP$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_ps_TRUE!$DX_COND_ps_TRUE$ac_delim
 DX_COND_ps_FALSE!$DX_COND_ps_FALSE$ac_delim
 DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_PDFLATEX!$DX_PDFLATEX$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
-DX_FLAG_pdf!$DX_FLAG_pdf$ac_delim
 DX_COND_pdf_TRUE!$DX_COND_pdf_TRUE$ac_delim
 DX_COND_pdf_FALSE!$DX_COND_pdf_FALSE$ac_delim
 DX_COND_latex_TRUE!$DX_COND_latex_TRUE$ac_delim
@@ -23758,7 +23775,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 82; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 61; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
