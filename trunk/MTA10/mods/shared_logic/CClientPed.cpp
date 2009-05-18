@@ -1767,6 +1767,10 @@ void CClientPed::RemoveWeapon ( eWeaponType weaponType )
 
 void CClientPed::RemoveAllWeapons ( void )
 {
+    if ( m_bIsLocalPlayer )
+    {
+        g_pClientGame->ResetAmmoInClip();
+    }
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->ClearWeapons ();
@@ -2136,10 +2140,13 @@ void CClientPed::StreamedInPulse ( void )
             }
             if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
             {
-                //Disable movement keys.  This stops an exploit where players can run
-                //with guns shortly after standing
-                Current.LeftStickX = 0;
-                Current.LeftStickY = 0;
+                if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+                {
+                    //Disable movement keys.  This stops an exploit where players can run
+                    //with guns shortly after standing
+                    Current.LeftStickX = 0;
+                    Current.LeftStickY = 0;
+                }
             }
         }
         else
@@ -2172,23 +2179,30 @@ void CClientPed::StreamedInPulse ( void )
         {
             if ( m_ulLastTimeBeganCrouch >= ulNow - 600.0f*fSpeedRatio )
             {
-                Current.ButtonSquare = 0;
-                Current.ButtonCross = 0;
-                //Disable the fire keys whilst crouching as well
-                Current.ButtonCircle = 0;
-                Current.LeftShoulder1 = 0;
-                if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
+                if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTFIRE ) )
                 {
-                    //Disable double crouching (another anim cut)
-                    Current.ShockButtonL = 0;
+                    Current.ButtonSquare = 0;
+                    Current.ButtonCross = 0;
+                    //Disable the fire keys whilst crouching as well
+                    Current.ButtonCircle = 0;
+                    Current.LeftShoulder1 = 0;
+                    if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
+                    {
+                        //Disable double crouching (another anim cut)
+                        Current.ShockButtonL = 0;
+                    }
                 }
             }
         }
         // If we just started aiming, make sure they dont try and crouch
-        else if ( m_ulLastTimeAimed != 0 &&
-             m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio )
+        else if ( (m_ulLastTimeAimed != 0 &&
+                  m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio) || 
+                  (ulNow - m_ulLastTimeFired) <= 300.0f*fSpeedRatio )
         {
-            Current.ShockButtonL = 0;
+            if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
+            {
+                Current.ShockButtonL = 0;
+            }
         }
 
         // Are we working on entering a vehicle?
@@ -4518,6 +4532,10 @@ void CClientPed::KillAnimation ( void )
     m_bRequestedAnimation = false;
 }
 
+void CClientPed::PostWeaponFire ( void )
+{
+    m_ulLastTimeFired = CClientTime::GetTime ();
+}
 
 bool CClientPed::IsUsingGun ( void )
 {
