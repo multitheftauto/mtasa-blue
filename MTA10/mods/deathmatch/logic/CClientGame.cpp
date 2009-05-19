@@ -3956,6 +3956,10 @@ void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, uns
             pBitStream->Write ( animGroup );
             pBitStream->Write ( animID );
 
+            pBitStream->Write ( damagerID );
+            pBitStream->Write ( ucWeapon );
+            pBitStream->Write ( ucBodyPiece );
+
             // Write the position we died in
             CVector vecPosition;
             Ped->GetPosition ( vecPosition );
