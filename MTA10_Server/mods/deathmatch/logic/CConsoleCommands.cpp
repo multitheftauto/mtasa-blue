@@ -261,6 +261,12 @@ bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArgu
     return true;
 }
 
+bool CConsoleCommands::RefreshAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    g_pGame->GetResourceManager()->Refresh(true);
+    return true;
+}
+
 bool CConsoleCommands::ListResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     g_pGame->GetResourceManager()->ListResourcesLoaded();

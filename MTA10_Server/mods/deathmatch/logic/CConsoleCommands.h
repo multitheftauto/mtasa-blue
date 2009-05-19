@@ -21,16 +21,17 @@
 class CConsoleCommands
 {
 public:
-    static bool         Update          ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         StartResource   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         StopResource    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-	static bool         StopAllResources( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         RestartResource ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         RefreshResources( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         ListResources   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         ResourceInfo    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         InstallResource ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         UpgradeResources( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         Update              ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         StartResource       ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         StopResource        ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+	static bool         StopAllResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         RestartResource     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         RefreshResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         RefreshAllResources ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         ListResources       ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         ResourceInfo        ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         InstallResource     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         UpgradeResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         Say             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         TeamSay         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
