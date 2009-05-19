@@ -1898,6 +1898,11 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             pGarage->SetOpen ( (ucGarageState == 1) );
         }
     }
+    unsigned char ucFunBugs;
+    bitStream.Read ( ucFunBugs );
+    g_pClientGame->m_Glitches[0] = ( ucFunBugs & 0x01 ) ? true:false;
+    g_pClientGame->m_Glitches[1] = ( ucFunBugs & 0x02 ) ? true:false;
+    g_pClientGame->m_Glitches[2] = ( ucFunBugs & 0x03 ) ? true:false;
 }
 
 
