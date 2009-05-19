@@ -346,7 +346,7 @@ private:
 	unsigned short				m_usFrames;
 	unsigned short				m_usFPS;
     std::map<std::string,char>  m_GlitchNames;
-    bool                        m_Glitches[2];
+    bool                        m_Glitches[3];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

@@ -453,7 +453,7 @@ int CLuaWorldDefs::setGlitchEnabled ( lua_State* luaVM )
         if ( iArgument == LUA_TBOOLEAN )
         {
             std::string szGlitchName = lua_tostring ( luaVM, 1 );
-            bool bEnabled = ( (lua_toboolean ( luaVM, 2 ) == 0) ? true : false);
+            bool bEnabled = (lua_toboolean ( luaVM, 2 ) == 1);
             if ( CStaticFunctionDefinitions::SetGlitchEnabled ( szGlitchName, bEnabled ) )
             {
                 lua_pushboolean ( luaVM, true );
