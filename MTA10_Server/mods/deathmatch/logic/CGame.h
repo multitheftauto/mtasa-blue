@@ -239,6 +239,7 @@ public:
 
     void                        SetGlitchEnabled            ( std::string strGlitch, bool bEnabled );
     bool                        IsGlitchEnabled             ( std::string strGlitch );
+    bool                        IsGlitchEnabled             ( char cGlitch );
     char                        GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
     bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
 

@@ -2774,3 +2774,7 @@ bool CGame::IsGlitchEnabled ( std::string strGlitch )
     char cGlitch = m_GlitchNames[strGlitch];
     return m_Glitches[cGlitch] ? true : false;
 }
+bool CGame::IsGlitchEnabled ( char cGlitch )
+{
+    return m_Glitches[cGlitch] || false;
+}
