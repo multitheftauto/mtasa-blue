@@ -3284,16 +3284,18 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     return false;            
                 }
                 else {
-                    pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
-                    // Grab our death animation
-                    pEvent->ComputeDeathAnim ( pDamagePed, true );
-                    AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                    AnimationId animID = pEvent->GetAnimId ();
-                    m_DamagerID = INVALID_ELEMENT_ID;
-                    if (pInflictingEntity)
-                        m_DamagerID = pInflictingEntity->GetID ();
-                    // Check if we're dead
-                    SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
+                    if (pDamagedPed->IsLocalEntity() == false) {
+                        pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
+                        // Grab our death animation
+                        pEvent->ComputeDeathAnim ( pDamagePed, true );
+                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
+                        AnimationId animID = pEvent->GetAnimId ();
+                        m_DamagerID = INVALID_ELEMENT_ID;
+                        if (pInflictingEntity)
+                            m_DamagerID = pInflictingEntity->GetID ();
+                        // Check if we're dead
+                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
+                    }
                 }
             }
         }
