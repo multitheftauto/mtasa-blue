@@ -70,7 +70,7 @@ public:
     void                        CheckResourceDependencies       ( void );
     void                        ListResourcesLoaded             ( void );
     list <CResource *>*         GetLoadedResources              ( void );
-    bool                        Refresh                         ( void );
+    bool                        Refresh                         ( bool bRefreshAll = false );
     void                        Upgrade                         ( void );
     inline unsigned int         GetResourceLoadedCount          ( void )            { return m_uiResourceLoadedCount; }
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }

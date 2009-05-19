@@ -54,7 +54,8 @@ CResourceManager::~CResourceManager ( void )
 
 // Load the complete list of resources and create their objects
 // DOES NOT reload already loaded resources, we need a special function for lua for that (e.g. reloadResource)
-bool CResourceManager::Refresh ( void )
+// Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
+bool CResourceManager::Refresh ( bool bRefreshAll )
 {
     
     char szBuffer [MAX_PATH];
@@ -84,7 +85,8 @@ bool CResourceManager::Refresh ( void )
                         FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
                     }
 
-                    if ( extn == NULL || strcmp ( extn, "zip" ) == 0 )
+                    if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+                         ( bRefreshAll || !GetResource ( FindData.cFileName ) ) ) 
                     {
                         // Add the resource
                         Load ( FindData.cFileName );
@@ -157,7 +159,8 @@ bool CResourceManager::Refresh ( void )
 					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
 					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
 				        }
-                        if ( extn == NULL || strcmp ( extn, "zip" ) == 0 )
+                        if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+                             ( bRefreshAll || !GetResource ( FindData.cFileName ) ) )
                         {
                             // Add the resource
                             Load ( DirEntry->d_name );
