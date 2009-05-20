@@ -566,34 +566,35 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
 	// Create a new CColModel
 	CColModelSA* pColModel = new CColModelSA ();
 
-    ColModelFileHeader header;
-    while ( fread ( &header, sizeof(ColModelFileHeader), 1, pFile ) )
+    ColModelFileHeader header = { 0 };
+    fread ( &header, sizeof(ColModelFileHeader), 1, pFile );
+    
+    // Load the col model
+    if ( header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L' )
     {
-        // Load the col model
-	    if ( header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L' )
-        {
-            unsigned char* pModelData = new unsigned char [ header.size - 0x18 ];
-            fread ( pModelData, header.size - 0x18, 1, pFile );
+        unsigned char* pModelData = new unsigned char [ header.size - 0x18 ];
+        fread ( pModelData, header.size - 0x18, 1, pFile );
 
-            if ( header.version[3] == 'L' )
-            {
-                LoadCollisionModel ( pModelData, pColModel->GetColModel (), header.name );
-            }
-            else if ( header.version[3] == '2' )
-            {
-                LoadCollisionModelVer2 ( pModelData, header.size - 0x18, pColModel->GetColModel (), header.name );
-            }
-            else if ( header.version[3] == '3' )
-            {
-	            LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetColModel (), header.name );
-            }
-
-            delete[] pModelData;
-        }
-        else
+        if ( header.version[3] == 'L' )
         {
-            break;
+            LoadCollisionModel ( pModelData, pColModel->GetColModel (), NULL );
         }
+        else if ( header.version[3] == '2' )
+        {
+            LoadCollisionModelVer2 ( pModelData, header.size - 0x18, pColModel->GetColModel (), NULL );
+        }
+        else if ( header.version[3] == '3' )
+        {
+            LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetColModel (), NULL );
+        }
+
+        delete[] pModelData;
+    }
+    else
+    {
+        delete pColModel;
+        fclose ( pFile );
+        return NULL;
     }
 
     fclose ( pFile );

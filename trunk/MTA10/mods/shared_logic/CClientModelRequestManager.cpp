@@ -152,9 +152,6 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                 // Is it loaded?
                 if ( pInfo->IsLoaded () )
                 {
-                    // Make sure custom things are replaced
-                    pInfo->MakeCustomModel ();
-
                     // Delete it, remove the it from the list and return true.
                     delete pEntry;
                     m_Requests.erase ( iter );
@@ -180,9 +177,6 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             // Already loaded? Don't bother adding to the list.
             if ( pInfo->IsLoaded () )
             {
-                // Make sure custom things are replaced
-                pInfo->MakeCustomModel ();
-
                 return true;
             }
 
