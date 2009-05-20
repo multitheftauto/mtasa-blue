@@ -110,7 +110,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_pTowedByVehicle = NULL;
     m_eWinchType = WINCH_NONE;
     m_pPickedUpWinchEntity = NULL;
-    m_ucPaintjob = 0xFF;
+    m_ucPaintjob = 3;
     m_fDirtLevel = 0.0f;
     m_bSmokeTrail = false;
 	m_bJustBlewUp = false;
@@ -1970,17 +1970,14 @@ void CClientVehicle::Create ( void )
             m_pUpgrades->ReAddAll ();
 
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
-
-        if ( m_ucPaintjob != 0xFF )
-            m_pVehicle->SetRemap ( static_cast < unsigned int > ( m_ucPaintjob ) );
-
+        m_pVehicle->SetRemap ( static_cast < unsigned int > ( m_ucPaintjob ) );
         m_pVehicle->SetBodyDirtLevel ( m_fDirtLevel );
         m_pVehicle->SetEngineOn ( m_bEngineOn );
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
 
         // Check the paintjob hasn't reset our colors
-        if ( m_bColorSaved && m_ucPaintjob != 0xFF )
+        if ( m_bColorSaved )
         {
             unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
             m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
@@ -2473,7 +2470,8 @@ unsigned char CClientVehicle::GetPaintjob ( void )
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->GetRemapIndex ();
+        int iRemap = m_pVehicle->GetRemapIndex ();
+        return (iRemap == -1) ? 3 : iRemap;
     }
     
     return m_ucPaintjob;
@@ -2486,10 +2484,7 @@ void CClientVehicle::SetPaintjob ( unsigned char ucPaintjob )
     {
         if ( m_pVehicle )
         {
-            if ( ucPaintjob != 0xFF )
-            {
-                m_pVehicle->SetRemap ( static_cast < unsigned int > ( ucPaintjob ) );
-            }
+            m_pVehicle->SetRemap ( static_cast < unsigned int > ( ucPaintjob ) );
         }
         m_ucPaintjob = ucPaintjob;
         m_bColorSaved = false;

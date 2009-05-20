@@ -42,7 +42,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
-    m_ucPaintjob = 0xFF;
+    m_ucPaintjob = 3;
 	m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
 
     m_bRespawnInfoChanged = false;
