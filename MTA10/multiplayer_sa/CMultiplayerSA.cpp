@@ -792,9 +792,6 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x5E1E74 = 0x00;
     *(BYTE *)0x5E1E77 = 0x90;
 
-    // Make all created objects to have a control code, so they can be checked for vertical line test HOOK
-    memset ( (void *)0x59FABC, 0x90, 90 );
-
     // Avoid GTA setting vehicle first color to white after changing the paintjob
     memset ( (void *)0x6D65C5, 0x90, 11 );
 
@@ -2717,5 +2714,34 @@ VOID _declspec(naked) HOOK_CGame_Process ()
     {
         mov eax, 0x53BEE0
         jmp eax
+    }
+}
+
+
+// Allowing a created object into the vertical line test makes getGroundPosition, jetpacks and molotovs to work.
+// Not allowing a created object into the vertical line test makes the breakable animation work.
+void CMultiplayerSA::AllowCreatedObjectsInVerticalLineTest ( bool bOn )
+{
+    static BYTE bufOriginalData[90] = {0};
+    static bool bState = false;
+
+    // Change required?
+    if ( bState != bOn )
+    {
+        // Done initialization?
+        if ( bufOriginalData[0] == 0 )
+            memcpy ( bufOriginalData, (void *)0x59FABC, 90 );
+
+        bState = bOn;
+        if ( bOn )
+        {
+            // Make created objects to have a control code, so they can be checked for vertical line test HOOK
+            memset ( (void *)0x59FABC, 0x90, 90 );
+        }
+        else
+        {
+            // Make created objects not be checked for vertical line test HOOK
+            memcpy ( (void *)0x59FABC, bufOriginalData, 90 );
+        }
     }
 }

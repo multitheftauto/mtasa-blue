@@ -361,8 +361,15 @@ void CClientObject::Create ( void )
             // Add a reference to the object
             m_pModelInfo->AddRef ( true );
 
+            // If the new object is not breakable, allow it into the vertical line test
+            g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
+
             // Create the object
             m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel );
+
+            // Restore default behaviour
+            g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
+
             if ( m_pObject )
             {                
                 // Put our pointer in its stored pointer

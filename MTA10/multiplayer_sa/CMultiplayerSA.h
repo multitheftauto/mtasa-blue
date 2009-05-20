@@ -108,6 +108,8 @@ public:
 
     void                        SetAkimboTarget             ( const CVector& vecTarget ) { m_vecAkimboTarget = vecTarget; };
     void                        SetAkimboTargetUp           ( bool bUp ) { m_bAkimboTargetUp = bUp; };
+
+    void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn );
     
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
