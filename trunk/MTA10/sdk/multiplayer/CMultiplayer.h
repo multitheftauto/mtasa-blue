@@ -159,6 +159,8 @@ public:
 
     virtual void                        SetAkimboTarget             ( const CVector& vecTarget ) = 0;
     virtual void                        SetAkimboTargetUp           ( bool bUp ) = 0;
+
+    virtual void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn ) = 0;
 };
 
 #endif
