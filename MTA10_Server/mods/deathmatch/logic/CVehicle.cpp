@@ -598,10 +598,6 @@ void CVehicle::GenerateRegPlate ( void )
 void CVehicle::SetPaintjob ( unsigned char ucPaintjob )
 {
     m_ucPaintjob = ucPaintjob;
-    m_Color.SetColor1 ( 1 );
-    m_Color.SetColor2 ( 1 );
-    m_Color.SetColor3 ( 1 );
-    m_Color.SetColor4 ( 1 );
 }
 
 
