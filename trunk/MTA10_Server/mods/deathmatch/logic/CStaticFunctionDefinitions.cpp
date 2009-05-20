@@ -4670,6 +4670,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const 
             // Make him visible to the given element
             if ( pVisibleTo )
             {
+                pMarker->RemoveVisibleToReference ( m_pMapManager->GetRootElement() );
                 pMarker->AddVisibleToReference ( pVisibleTo );
             }
 
@@ -4868,6 +4869,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
             // Make him visible to the given element
             if ( pVisibleTo )
             {
+                pBlip->RemoveVisibleToReference ( m_pMapManager->GetRootElement() );
                 pBlip->AddVisibleToReference ( pVisibleTo );
             }
 
@@ -4897,8 +4899,12 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
             pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
             pBlip->m_sOrdering = sOrdering;
 
-            // Set his visible to to the root
-            pBlip->AddVisibleToReference ( pVisibleTo );
+            // Set his visible to element
+            if ( pVisibleTo )
+            {
+                pBlip->RemoveVisibleToReference ( m_pMapManager->GetRootElement() );
+                pBlip->AddVisibleToReference ( pVisibleTo );
+            }
             pBlip->AttachTo ( pElement );
 
             // Tell everyone about it
@@ -5218,6 +5224,7 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource* pResource, 
         // Make him visible to the root
         if ( pVisibleTo )
         {
+            pRadarArea->RemoveVisibleToReference ( m_pMapManager->GetRootElement() );
             pRadarArea->AddVisibleToReference ( pVisibleTo );
         }
 
