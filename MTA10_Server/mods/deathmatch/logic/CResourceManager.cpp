@@ -85,8 +85,14 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                         FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
                     }
 
+                    CResource* pResource = GetResource  ( FindData.cFileName );
+
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                         ( bRefreshAll || !GetResource ( FindData.cFileName ) ) ) 
+                         ( bRefreshAll || 
+                           !GetResource ( FindData.cFileName ) ||
+                           !pResource->CheckIfStartable()       
+                          )
+                        ) 
                     {
                         // Add the resource
                         Load ( FindData.cFileName );
@@ -160,8 +166,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
 				        }
                         if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                             ( bRefreshAll || !GetResource ( FindData.cFileName ) ) )
-                        {
+                             ( bRefreshAll || 
+                               !GetResource ( FindData.cFileName ) ||
+                               !pResource->CheckIfStartable()            
+                              ) 
+                           ) 
                             // Add the resource
                             Load ( DirEntry->d_name );
 
