@@ -2138,7 +2138,8 @@ bool CResource::CheckIfStartable ( void )
 #ifdef RESOURCE_DEBUG_MESSAGES
         CLogger::LogPrintf ( "  Checking if %s is loaded\n", (*iterr)->GetName().c_str () );
 #endif
-        if ( !(*iterr)->GetResource()->CheckIfStartable() )
+        CResource* pResource = (*iterr)->GetResource();
+        if ( !pResource || !pResource->CheckIfStartable() )
         {
             m_bLoaded = false;
             return false;

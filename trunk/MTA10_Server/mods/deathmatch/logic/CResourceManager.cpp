@@ -89,7 +89,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
                          ( bRefreshAll || 
-                           !GetResource ( FindData.cFileName ) ||
+                           !pResource ||
                            !pResource->CheckIfStartable()       
                           )
                         ) 
