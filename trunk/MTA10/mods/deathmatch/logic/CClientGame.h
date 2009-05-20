@@ -543,7 +543,7 @@ private:
     float                               m_fGameSpeed;
     long                                m_lMoney;
 
-    bool                                m_Glitches[2];
+    bool                                m_Glitches[3];
 
 	unsigned long						m_ulMinuteDuration;
 

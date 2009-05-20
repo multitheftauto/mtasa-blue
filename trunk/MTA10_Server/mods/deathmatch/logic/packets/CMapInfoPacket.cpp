@@ -108,9 +108,9 @@ bool CMapInfoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
     }
 
     unsigned char ucFunBugs = 0;
-    ucFunBugs |= g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKRELOAD) ? 1:0;
-    ucFunBugs |= g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTFIRE) ? 1:0;
-    ucFunBugs |= g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE) ? 1:0;
+    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKRELOAD)) ucFunBugs |= 0x1;
+    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTFIRE)) ucFunBugs |= 0x2;
+    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE)) ucFunBugs |= 0x4;
     BitStream.Write ( ucFunBugs );
 
     return true;
