@@ -165,12 +165,12 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
 					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
 				        }
-                        if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                             ( bRefreshAll || 
-                               !GetResource ( FindData.cFileName ) ||
-                               !pResource->CheckIfStartable()            
-                              ) 
-                           ) 
+						if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+							 ( bRefreshAll || 
+							   !pResource ||
+							   !pResource->CheckIfStartable()       
+							  )
+							) 
                             // Add the resource
                             Load ( DirEntry->d_name );
 
