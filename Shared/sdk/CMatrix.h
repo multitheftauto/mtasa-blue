@@ -20,6 +20,15 @@
 class CMatrix
 {
 public:
+    CMatrix ( )
+    {
+        // Load the identity matrix
+        vRoll       = CVector ( 1.0f, 0.0f, 0.0f );
+        vDirection  = CVector ( 0.0f, 1.0f, 0.0f );
+        vWas        = CVector ( 0.0f, 0.0f, 1.0f );
+        vPos        = CVector ( 0.0f, 0.0f, 0.0f );
+    }
+
 	CVector vRoll;
 	CVector vDirection;
 	CVector vWas;
