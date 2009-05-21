@@ -221,6 +221,7 @@ public:
     LUA_DECLARE ( SetPedLookAt );
     LUA_DECLARE ( SetPedHeadless );
 	LUA_DECLARE ( SetPedCameraRotation );
+    LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
 
 	// Clothes and body functions

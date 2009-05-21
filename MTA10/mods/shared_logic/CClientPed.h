@@ -344,6 +344,7 @@ public:
     void                        SetSunbathing           ( bool bSunbathing, bool bStartStanding = true );
 
     bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, CClientEntity * pEntity = NULL );
+    bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
 	static char*				GetBodyPartName			( unsigned char ucID );

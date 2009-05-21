@@ -140,6 +140,7 @@ public:
     static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
 	static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
+    static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
 
 	// Extra Clothes functions
