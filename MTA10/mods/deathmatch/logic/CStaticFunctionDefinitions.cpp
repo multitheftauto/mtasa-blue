@@ -1540,7 +1540,7 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float f
         float fRadians = ConvertDegreesToRadians ( fRotation );
         Ped.SetCurrentRotation ( fRadians );
         if ( !IS_PLAYER ( &Entity ) )
-            Ped.SetCameraRotation ( fRadians );
+            Ped.SetCameraRotation ( -fRadians );
         return true;
     }
 
