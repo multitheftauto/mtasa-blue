@@ -169,11 +169,11 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     {
         // Add our shotsync data
         m_remoteDataStorage = g_pMultiplayer->CreateRemoteDataStorage ();
+        m_remoteDataStorage->SetProcessPlayerWeapon ( true );
         m_shotSyncData = m_remoteDataStorage->ShotSyncData ( );
         m_currentControllerState = m_remoteDataStorage->CurrentControllerState ( );
         m_lastControllerState = m_remoteDataStorage->LastControllerState ( );
         m_stats = m_remoteDataStorage->Stats ( );        
-
         // ### remember if you want to set Int flags, subtract STATS_OFFSET from the enum ID ###
 
         SetStat ( MAX_HEALTH, 569.0f );     // Default max_health stat
@@ -4381,6 +4381,24 @@ bool CClientPed::LookAt ( CVector vecOffset, int iTime, CClientEntity * pEntity 
         CEntity * pGameEntity = NULL;
         if ( pEntity ) pGameEntity = pEntity->GetGameEntity ();
         CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset );
+        if ( pTask )
+        {
+            pTask->SetAsSecondaryPedTask ( m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM );
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CClientPed::UseGun ( CVector vecTarget, CClientEntity * pEntity )
+{   
+    if ( m_pPlayerPed )
+    {          
+        CEntity * pGameEntity = NULL;
+        if ( pEntity ) pGameEntity = pEntity->GetGameEntity ();
+        CTaskSimpleUseGun * pTask = g_pGame->GetTasks ()->CreateTaskSimpleUseGun ( pGameEntity, vecTarget, 0, 1, false );
         if ( pTask )
         {
             pTask->SetAsSecondaryPedTask ( m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM );

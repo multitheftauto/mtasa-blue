@@ -1286,6 +1286,42 @@ int CLuaFunctionDefs::SetPedCameraRotation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetPedAimTarget ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+
+        if ( pEntity )
+        {
+            CVector vecTarget;
+            vecTarget.fX = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+            vecTarget.fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+            vecTarget.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+
+            if ( CStaticFunctionDefinitions::SetPedAimTarget ( *pEntity, vecTarget ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAimTarget", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAimTarget" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetPedRotation ( lua_State* luaVM )
 {
     // Check types
