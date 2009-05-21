@@ -468,8 +468,11 @@ bool CPlayer::IsTimeToSendSyncFrom ( CPlayer& Player, unsigned long ulTimeNow )
                 // The camera must also be too far away.
                 CVector vecCameraPosition;
                 m_pCamera->GetPosition ( vecCameraPosition );
-                if ( ( DistanceBetweenPoints3D ( m_Matrix.vPos, Player.m_Matrix.vPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) &&
-                     ( DistanceBetweenPoints3D ( vecCameraPosition, Player.m_Matrix.vPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) )
+                const CVector& vecRemotePlayerPos = Player.GetPosition ();
+                const CVector& vecLocalPlayerPos = GetPosition ();
+
+                if ( ( DistanceBetweenPoints3D ( vecLocalPlayerPos, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) &&
+                     ( DistanceBetweenPoints3D ( vecCameraPosition, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) )
                 {
                     // Don't send
                     return false;
