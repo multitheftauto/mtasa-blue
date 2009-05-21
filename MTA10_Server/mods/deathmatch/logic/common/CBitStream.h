@@ -21,7 +21,7 @@ public:
     inline                          CBitStream  ( void )    { pBitStream = g_pNetServer->AllocateNetServerBitStream (); };
     inline                          ~CBitStream ( void )    { g_pNetServer->DeallocateNetServerBitStream ( pBitStream ); };
 
-    NetServerBitStreamInterface*    pBitStream;
+    NetBitStreamInterface*          pBitStream;
 };
 
 #endif

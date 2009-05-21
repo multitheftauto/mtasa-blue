@@ -645,8 +645,18 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 pPlayer->SetDimension ( usDimension );
                 pPlayer->SetFightingStyle ( ( eFightingStyle ) ucFightingStyle );
                 pPlayer->SetAlpha ( ucAlpha );
-
                 pPlayer->SetInterior ( ucInterior );
+
+                // Read the weapon slots
+                for ( unsigned int i = 0; i < 16; ++i )
+                {
+                    if ( bitStream.ReadBit () == true )
+                    {
+                        unsigned char ucWeaponType;
+                        bitStream.Read ( ucWeaponType );
+                        pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponType ), 1 );
+                    }
+                }
             }
 
             // Print the join message in the chat
@@ -805,6 +815,9 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
 
         // He's no longer dead
         pPlayer->SetDeadOnNetwork ( false );
+
+        // Reset weapons
+        pPlayer->RemoveAllWeapons ();
 
         // Spawn him
         pPlayer->Spawn ( vecPosition,
@@ -1032,8 +1045,8 @@ void CPacketHandler::Packet_PlayerPings ( NetBitStreamInterface& bitStream )
             // Read out the data
             ElementID PlayerID;
             unsigned short usPing;
-            if ( bitStream.Read ( PlayerID ) &&
-                 bitStream.Read ( usPing ) )
+            if ( bitStream.ReadCompressed ( PlayerID ) &&
+                 bitStream.ReadCompressed ( usPing ) )
             {
                 // Grab the player
                 CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
@@ -3521,7 +3534,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
     CVector vecPosition;
     unsigned char ucType;
     if ( bitStream.Read ( CreatorID ) &&
-         bitStream.Read ( usLatency ) &&
+         bitStream.ReadCompressed ( usLatency ) &&
          bitStream.Read ( OriginID ) &&
          bitStream.Read ( vecPosition.fX ) &&
          bitStream.Read ( vecPosition.fY ) &&
@@ -3607,7 +3620,7 @@ void CPacketHandler::Packet_FireSync ( NetBitStreamInterface& bitStream )
     CVector vecPosition;
     float fSize;
     if ( bitStream.Read ( Creator ) &&
-         bitStream.Read ( usLatency ) &&
+         bitStream.ReadCompressed ( usLatency ) &&
          bitStream.Read ( vecPosition.fX ) &&
          bitStream.Read ( vecPosition.fY ) &&
          bitStream.Read ( vecPosition.fZ ) &&
@@ -3636,7 +3649,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
     CVector vecOrigin;
     unsigned char ucWeaponType;
     if ( bitStream.Read ( CreatorID ) &&
-         bitStream.Read ( usLatency ) &&
+         bitStream.ReadCompressed ( usLatency ) &&
          bitStream.Read ( OriginID ) &&         
          bitStream.Read ( vecOrigin.fX ) &&
          bitStream.Read ( vecOrigin.fY ) &&
@@ -4081,7 +4094,7 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
     unsigned short usLatency;
 
     if ( bitStream.Read ( Player ) &&
-         bitStream.Read ( usLatency ) )
+         bitStream.ReadCompressed ( usLatency ) )
     {
         // Grab the player
         if ( Player != INVALID_ELEMENT_ID )

@@ -59,7 +59,7 @@ private:
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
-    void                    WritePlayerPuresync             ( CClientPed* pPed, NetBitStreamInterface& BitStream );
+    void                    WritePlayerPuresync             ( CClientPlayer* pPed, NetBitStreamInterface& BitStream );
 
     void                    ReadVehiclePuresync             ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
     void                    WriteVehiclePuresync            ( CClientPed* pPed, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );

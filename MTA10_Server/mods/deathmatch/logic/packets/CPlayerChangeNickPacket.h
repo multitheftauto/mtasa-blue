@@ -25,7 +25,7 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const          { return PACKET_ID_PLAYER_CHANGE_NICK; };
     inline unsigned long    GetFlags                    ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline const char*      GetNewNick                  ( void )                    { return m_szNewNick; };
     inline void             SetNewNick                  ( const char* szNewNick )   { strncpy ( m_szNewNick, szNewNick, MAX_NICK_LENGTH ); };

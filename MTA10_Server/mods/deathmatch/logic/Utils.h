@@ -18,7 +18,7 @@
 
 #include <CVector.h>
 #include <CVector2D.h>
-#include <net/ns_bitstream.h>
+#include <net/bitstream.h>
 #include <cmath>
 #include "CCommon.h"
 #include "CPad.h"
@@ -168,10 +168,10 @@ inline void ConvertDegreesToRadiansNoWrap ( CVector& vecRotation )
 // Escapes the HTML characters <, >, &, " and '. Don't forget to remove your buffer to avoid memory leaks.
 const char* HTMLEscapeString ( const char *szSource );
 
-bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetServerBitStreamInterface& BitStream );
-void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetServerBitStreamInterface& BitStream );
-bool ReadFullKeysync ( CControllerState& ControllerState, NetServerBitStreamInterface& BitStream );
-void WriteFullKeysync ( const CControllerState& ControllerState, NetServerBitStreamInterface& BitStream );
+bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+bool ReadFullKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 
 
 // Validation funcs

@@ -26,8 +26,8 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_LUA_EVENT; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                        ( NetBitStreamInterface& BitStream );
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline char*            GetName                     ( void )                    { return m_szName; }
     inline ElementID        GetElementID                ( void )                    { return m_ElementID; }

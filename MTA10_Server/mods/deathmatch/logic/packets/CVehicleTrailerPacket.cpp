@@ -25,7 +25,7 @@ CVehicleTrailerPacket::CVehicleTrailerPacket ( CVehicle* pVehicle,
     m_vecTurnSpeed = pTrailer->GetTurnSpeed ();
 }
 
-bool CVehicleTrailerPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CVehicleTrailerPacket::Read ( NetBitStreamInterface& BitStream )
 {
     return ( BitStream.Read ( m_Vehicle ) &&
              BitStream.Read ( m_AttachedVehicle ) &&
@@ -43,7 +43,7 @@ bool CVehicleTrailerPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CVehicleTrailerPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVehicleTrailerPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     BitStream.Write ( m_Vehicle );
     BitStream.Write ( m_AttachedVehicle );

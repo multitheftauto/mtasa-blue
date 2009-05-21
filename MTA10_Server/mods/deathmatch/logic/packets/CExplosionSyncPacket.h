@@ -43,8 +43,8 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_EXPLOSION; };
     inline unsigned long    GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                        ( NetBitStreamInterface& BitStream );
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     ElementID               m_OriginID;
     CVector                 m_vecPosition;

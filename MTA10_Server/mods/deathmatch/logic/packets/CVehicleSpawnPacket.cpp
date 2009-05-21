@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CVehicleSpawnPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVehicleSpawnPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // unsigned short   (2)     - vehicle id
     // CVector          (12)    - position

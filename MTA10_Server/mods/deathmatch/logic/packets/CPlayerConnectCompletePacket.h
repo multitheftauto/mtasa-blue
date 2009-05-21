@@ -27,8 +27,8 @@ public:
     inline ePacketID        GetPacketID                     ( void ) const      { return static_cast < ePacketID > ( PACKET_ID_SERVER_JOIN_COMPLETE ); };
     inline unsigned long    GetFlags                        ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool            Write                           ( NetServerBitStreamInterface& BitStream ) const;
-    bool            Read                            ( NetServerBitStreamInterface& bitStream );
+    bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
+    bool                    Read                            ( NetBitStreamInterface& bitStream );
 private:
     char m_szConnText[MAX_CONN_TEXT_LEN];
 };

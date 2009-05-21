@@ -3176,6 +3176,35 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
             CPed* pPed = static_cast < CPed* > ( pElement );
             if ( pPed->IsSpawned () )
             {
+                unsigned char ucCurrentWeapon = pPed->GetWeaponType ();
+                if ( ucCurrentWeapon != ucWeaponID )
+                {
+                    // Call our weapon switch command
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber ( ucCurrentWeapon );
+                    Arguments.PushNumber ( ucWeaponID );
+                    bool bEventRet;
+                    if ( IS_PLAYER ( pElement ) )
+                        bEventRet = pPed->CallEvent ( "onPlayerWeaponSwitch", Arguments );
+                    else
+                        bEventRet = pPed->CallEvent ( "onPedWeaponSwitch", Arguments );
+
+                    if ( !bEventRet )
+                        bSetAsCurrent = false;
+                }
+
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                pPed->SetWeaponType ( ucWeaponID, ucWeaponSlot );
+                if ( bSetAsCurrent )
+                    pPed->SetWeaponSlot ( ucWeaponSlot );
+
+                unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+                if ( (unsigned int)usTotalAmmo + usAmmo > 0xFFFF )
+                    usTotalAmmo = 0xFFFF;
+                else
+                    usTotalAmmo += usAmmo;
+                pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
+
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( pPed->GetID () );
                 BitStream.pBitStream->Write ( ucWeaponID );

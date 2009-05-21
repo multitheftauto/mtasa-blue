@@ -21,6 +21,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/SyncStructures.h>
 
 using SharedUtil::CalcMTASAPath;
 using std::list;
@@ -1553,42 +1554,68 @@ void CClientGame::UpdatePlayerWeapons ( void )
     eWeaponSlot currentSlot = m_pLocalPlayer->GetCurrentWeaponSlot ();
     if ( currentSlot != m_lastWeaponSlot )
     {
-        CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );      
-        if ( pWeapon )
-        {
-            int iLastSlot = (int)m_lastWeaponSlot;
-            int iCurrentSlot = (int)currentSlot;
-            //Prevent quickreload
-            if ( !IsGlitchEnabled ( GLITCH_QUICKRELOAD ) )
-            {
-                m_wasWeaponAmmoInClip[iLastSlot] = pWeapon->GetAmmoInClip();
-                if ( m_wasWeaponAmmoInClip[iCurrentSlot] != 0 )
-                {
-                    m_pLocalPlayer->GetWeapon()->SetAmmoInClip ( m_wasWeaponAmmoInClip[iCurrentSlot] );
-                }
-            }
-
-            if ( iLastSlot != WEAPONSLOT_MAX )
-            {
-                /* Send a packet to the server with info about the old weapon,
-                   so the server stays in sync reliably */        
-                CBitStream bitStream;
-                bitStream.pBitStream->Write ( pWeapon->GetSlot () );
-                bitStream.pBitStream->Write ( pWeapon->GetType () );
-                if ( pWeapon->GetType () != 0 )
-                    bitStream.pBitStream->Write ( pWeapon->GetAmmoTotal () );
-                if ( pWeapon->GetAmmoTotal () != 0 )
-                    bitStream.pBitStream->Write ( pWeapon->GetAmmoInClip () );
-                m_pNetAPI->RPC ( PLAYER_WEAPON, bitStream.pBitStream );
-            }
-        }
-
         CLuaArguments Arguments;
         Arguments.PushNumber ( m_lastWeaponSlot );
         Arguments.PushNumber ( currentSlot );
-        m_pLocalPlayer->CallEvent ( "onClientPlayerWeaponSwitch", Arguments, true );
+        bool bCancelled = !m_pLocalPlayer->CallEvent ( "onClientPlayerWeaponSwitch", Arguments, true );
 
-        m_lastWeaponSlot = m_pLocalPlayer->GetCurrentWeaponSlot ();
+        if ( bCancelled )
+        {
+            // Save the current ammo in clip
+            unsigned short usAmmoInClip = 0;
+            CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
+            if ( pWeapon )
+                usAmmoInClip = pWeapon->GetAmmoInClip ();
+
+            // Force it back to the old slot
+            m_pLocalPlayer->SetCurrentWeaponSlot ( m_lastWeaponSlot );
+
+            // Restore the ammo in clip that there was in that slot
+            if ( usAmmoInClip > 0 )
+                m_pLocalPlayer->GetWeapon ()->SetAmmoInClip ( usAmmoInClip );
+        }
+        else
+        {
+            CBitStream bitStream;
+            CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ();
+            NetBitStreamInterface& BitStream = *(bitStream.pBitStream);
+            SWeaponSlotSync slot;
+
+            if ( pWeapon )
+            {
+                unsigned int uiSlot = static_cast < unsigned int > ( pWeapon->GetSlot () );
+
+                if ( !IsGlitchEnabled ( GLITCH_QUICKRELOAD ) )
+                {
+                    m_wasWeaponAmmoInClip [ m_lastWeaponSlot ] = pWeapon->GetAmmoInClip();
+                    if ( m_wasWeaponAmmoInClip [ uiSlot ] > 0 )
+                    {
+                        m_pLocalPlayer->GetWeapon()->SetAmmoInClip ( m_wasWeaponAmmoInClip [ uiSlot ] );
+                    }
+                }
+
+                /* Send a packet to the server with info about the NEW weapon,
+                   so the server stays in sync reliably */        
+                slot.data.uiSlot = uiSlot;
+                BitStream.Write ( &slot );
+
+                if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
+                {
+                    SWeaponAmmoSync ammo ( pWeapon->GetType (), true, true );
+                    ammo.data.usAmmoInClip = pWeapon->GetAmmoInClip ();
+                    ammo.data.usTotalAmmo = pWeapon->GetAmmoTotal ();
+                    BitStream.Write ( &ammo );
+                }
+            }
+            else
+            {
+                slot.data.uiSlot = 0;
+                BitStream.Write ( &slot );
+            }
+
+            m_pNetAPI->RPC ( PLAYER_WEAPON, bitStream.pBitStream );
+            m_lastWeaponSlot = m_pLocalPlayer->GetCurrentWeaponSlot ();
+        }
     }
 }
 
@@ -2382,6 +2409,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     bool bIsDucked = pPlayer->IsDucked ();
     bool bWearingGoggles = pPlayer->IsWearingGoggles ();
     bool bInVehicle = pPlayer->GetOccupiedVehicle () != NULL;
+    float fWeaponRange = 0.0f;
 
     unsigned char ucWeapon = 0;
     unsigned char ucWeaponState = 0;
@@ -2392,6 +2420,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
         ucWeapon = static_cast < unsigned char > ( pWeapon->GetType () );
         ucWeaponState = static_cast < unsigned char > ( pWeapon->GetState () );
         usWeaponAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoInClip () );
+        fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
     }
 
     float fAimX, fAimY;
@@ -2431,6 +2460,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
                         "Weapon: %u\n"
                         "Weapon state: %u\n"
                         "Weapon ammo: %u\n"
+                        "Weapon range: %f\n"
                         "Aim: %f %f\n"
                         "Aim source: %f %f %f\n"
                         "Aim target: %f %f %f\n"
@@ -2455,6 +2485,7 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
                         ucWeapon,
                         ucWeaponState,
                         usWeaponAmmo,
+                        fWeaponRange,
                         fAimX, fAimY,
                         vecAimSource.fX, vecAimSource.fY, vecAimSource.fZ,
                         vecAimTarget.fX, vecAimTarget.fY, vecAimTarget.fZ,
@@ -2529,12 +2560,14 @@ void CClientGame::UpdateMimics ( void )
         unsigned char ucWeaponType = 0;
         unsigned char ucWeaponState = 0;
         unsigned long ulWeaponAmmoInClip = 0;
+        eWeaponSlot weaponSlot = WEAPONSLOT_TYPE_UNARMED;
 
         CWeapon* pPlayerWeapon = m_pLocalPlayer->GetWeapon ( m_pLocalPlayer->GetCurrentWeaponSlot () );
         if ( pPlayerWeapon )
         {
             ucWeaponType = static_cast < unsigned char > ( pPlayerWeapon->GetType () );
             ucWeaponState = static_cast < unsigned char > ( pPlayerWeapon->GetState () );
+            weaponSlot = pPlayerWeapon->GetSlot ();
             ulWeaponAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
         }
 
@@ -2646,7 +2679,7 @@ void CClientGame::UpdateMimics ( void )
                         pMimic->SetAimInterpolated ( TICK_RATE, fAimX, fAimY, bAkimboUp, cVehicleAimDirection );
                         pMimic->SetTargetTarget ( TICK_RATE, vecOrigin, vecTarget );                                
 
-                        pMimic->AddChangeWeapon ( TICK_RATE, ucWeaponType, (unsigned char) ulWeaponAmmoInClip );
+                        pMimic->AddChangeWeapon ( TICK_RATE, weaponSlot, (unsigned char) ulWeaponAmmoInClip );
                     }
                     else
                     {
@@ -2673,7 +2706,7 @@ void CClientGame::UpdateMimics ( void )
                 }
                 else
                 {
-                    pMimic->SetCurrentWeaponSlot ( static_cast < eWeaponSlot > ( 0 ) );
+                    pMimic->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
                 }
 
                 CClientVehicle* pMimicVehicle = pMimic->GetOccupiedVehicle ();

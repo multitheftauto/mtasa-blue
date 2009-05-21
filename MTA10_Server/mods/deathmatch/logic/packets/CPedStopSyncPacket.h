@@ -23,7 +23,7 @@ public:
     inline ePacketID        GetPacketID                             ( void ) const                                      { return PACKET_ID_PED_STOPSYNC; };
     inline unsigned long    GetFlags                                ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Write                                   ( NetServerBitStreamInterface& BitStream ) const    { BitStream.Write ( m_ID ); return true; };
+    inline bool             Write                                   ( NetBitStreamInterface& BitStream ) const          { BitStream.Write ( m_ID ); return true; };
 
 private:
     ElementID               m_ID;

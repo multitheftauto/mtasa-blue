@@ -26,7 +26,7 @@ CCustomDataPacket::~CCustomDataPacket ( void )
 }
 
 
-bool CCustomDataPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CCustomDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
     unsigned short usNameLength;
     if ( BitStream.Read ( m_ElementID ) &&
@@ -48,7 +48,7 @@ bool CCustomDataPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CCustomDataPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CCustomDataPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     return true;
 }

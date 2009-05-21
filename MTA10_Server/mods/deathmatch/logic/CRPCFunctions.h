@@ -21,7 +21,7 @@
 class CPlayer;
 class CGame;
 
-#define DECLARE_RPC(a) static void a ( NetServerBitStreamInterface& bitStream );
+#define DECLARE_RPC(a) static void a ( NetBitStreamInterface& bitStream );
 
 class CRPCFunctions
 {
@@ -29,7 +29,7 @@ protected:
 //    enum eRPCFunctions;
 
 private:
-    typedef void (*pfnRPCHandler) ( NetServerBitStreamInterface& bitStream );
+    typedef void (*pfnRPCHandler) ( NetBitStreamInterface& bitStream );
     struct SRPCHandler
     {
         unsigned char ID;
@@ -42,7 +42,7 @@ public:
 
     void                        AddHandlers                             ( void );
     static void                 AddHandler                              ( unsigned char ucID, pfnRPCHandler Callback );
-    void                        ProcessPacket                           ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream );
+    void                        ProcessPacket                           ( NetServerPlayerID& Socket, NetBitStreamInterface& bitStream );
 
 protected:
     DECLARE_RPC ( PlayerInGameNotice );

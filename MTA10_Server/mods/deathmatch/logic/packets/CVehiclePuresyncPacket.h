@@ -30,12 +30,12 @@ public:
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
     inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
-    bool                        Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                        Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                        Read                        ( NetBitStreamInterface& BitStream );
+    bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
 private:
-    void                        ReadVehicleSpecific         ( class CVehicle* pVehicle, NetServerBitStreamInterface& BitStream );
-    void                        WriteVehicleSpecific        ( class CVehicle* pVehicle, NetServerBitStreamInterface& BitStream ) const;
+    void                        ReadVehicleSpecific         ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                        WriteVehicleSpecific        ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream ) const;
 };
 
 #endif

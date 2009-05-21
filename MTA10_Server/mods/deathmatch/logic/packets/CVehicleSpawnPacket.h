@@ -26,7 +26,7 @@ public:
     inline ePacketID            GetPacketID             ( void ) const                  { return PACKET_ID_VEHICLE_SPAWN; };
     inline unsigned long        GetFlags                ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                        Write                   ( NetServerBitStreamInterface& BitStream ) const;
+    bool                        Write                   ( NetBitStreamInterface& BitStream ) const;
 
     inline void                 Add                     ( CVehicle* pVehicle )          { m_List.push_back ( pVehicle ); };
     inline void                 Clear                   ( void )                        { m_List.clear (); };

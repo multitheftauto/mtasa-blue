@@ -25,7 +25,7 @@ CPlayerClothesPacket::~CPlayerClothesPacket ( void )
 }
 
 
-bool CPlayerClothesPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerClothesPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the source player.
     if ( m_pSourceElement )

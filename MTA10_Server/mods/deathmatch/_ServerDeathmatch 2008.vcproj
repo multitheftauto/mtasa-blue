@@ -1840,6 +1840,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Shared\sdk\net\SyncStructures.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\TaskNames.h"
 					>
 				</File>

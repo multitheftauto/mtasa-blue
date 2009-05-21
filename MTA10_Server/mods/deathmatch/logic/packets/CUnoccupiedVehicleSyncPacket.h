@@ -42,8 +42,8 @@ public:
     inline ePacketID        GetPacketID                             ( void ) const                  { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
     inline unsigned long    GetFlags                                ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
-    bool                    Read                                    ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                                   ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                                    ( NetBitStreamInterface& BitStream );
+    bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 
     inline std::vector < SyncData* > ::const_iterator     IterBegin       ( void )                        { return m_Syncs.begin (); };
     inline std::vector < SyncData* > ::const_iterator     IterEnd         ( void )                        { return m_Syncs.end (); };

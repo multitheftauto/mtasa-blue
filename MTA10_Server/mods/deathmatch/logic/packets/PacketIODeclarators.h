@@ -12,7 +12,7 @@
 #ifndef __PACKETIODECLARATORS_H
 #define __PACKETIODECLARATORS_H
 
-class NetServerBitStreamInterface;
+class NetBitStreamInterface;
 
 typedef unsigned short IO_STRINGTYPE;
 
@@ -74,7 +74,7 @@ typedef struct __iocontext_t
     (IOCONTEXT_WRITE == ctx.type) ? bitStream.Write(intval) : bitStream.Read(intval) 
 
 inline bool io_variable_string_write_max(
-    NetServerBitStreamInterface& bitStream, 
+    NetBitStreamInterface& bitStream, 
     const char * string, 
     IO_STRINGTYPE len,
     IO_STRINGTYPE maxlen)
@@ -86,7 +86,7 @@ inline bool io_variable_string_write_max(
 }
 
 inline bool io_variable_string_read_max(
-    NetServerBitStreamInterface& bitStream,
+    NetBitStreamInterface& bitStream,
     const char * string,
     IO_STRINGTYPE maxlen)
 {
@@ -115,12 +115,12 @@ inline bool io_variable_string_read_max(
  * Note that we will be basically duplicating code here.
  */
 #define IO_DECLARE_FUNCTION(class_name,code) \
-    bool class_name::Write(NetServerBitStreamInterface& bitStream) const\
+    bool class_name::Write(NetBitStreamInterface& bitStream) const\
     { \
         IOCONTEXT ctx = { IOCONTEXT_WRITE, #class_name }; \
         code \
     } \
-    bool class_name::Read(NetServerBitStreamInterface& bitStream) \
+    bool class_name::Read(NetBitStreamInterface& bitStream) \
     { \
         IOCONTEXT ctx = { IOCONTEXT_READ, #class_name }; \
         code \

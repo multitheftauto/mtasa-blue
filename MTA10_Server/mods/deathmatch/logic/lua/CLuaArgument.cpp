@@ -72,7 +72,7 @@ CLuaArgument::CLuaArgument ( const CLuaArgument& Argument, std::map < CLuaArgume
 }
 
 
-CLuaArgument::CLuaArgument ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
+CLuaArgument::CLuaArgument ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     m_pTableData = NULL;
     ReadFromBitStream ( bitStream, pKnownTables );
@@ -485,7 +485,7 @@ bool CLuaArgument::GetAsString ( char * szBuffer, unsigned int uiLength )
 }
 
 
-bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
+bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     DeleteTableData ();
 
@@ -590,7 +590,7 @@ bool CLuaArgument::ReadFromBitStream ( NetServerBitStreamInterface& bitStream, s
 }
 
 
-bool CLuaArgument::WriteToBitStream ( NetServerBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
+bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
     switch ( GetType () )
     {

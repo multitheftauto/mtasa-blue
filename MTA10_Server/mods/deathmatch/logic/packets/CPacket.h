@@ -40,8 +40,8 @@ public:
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
     virtual unsigned long               GetFlags            ( void ) const = 0;
 
-    virtual bool                        Read                ( NetServerBitStreamInterface& BitStream )          { return false; };
-    virtual bool                        Write               ( NetServerBitStreamInterface& BitStream ) const    { return false; };
+    virtual bool                        Read                ( NetBitStreamInterface& BitStream )                { return false; };
+    virtual bool                        Write               ( NetBitStreamInterface& BitStream ) const          { return false; };
 
     inline void                         SetSourceElement    ( CElement* pSource )                               { m_pSourceElement = pSource; };
     inline CElement*                    GetSourceElement    ( void ) const                                      { return m_pSourceElement; };

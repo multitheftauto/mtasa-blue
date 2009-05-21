@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-bool CPlayerListPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // bool                  - show the "X has joined the game" messages?
     // [ following repeats <number of players joined> times ]
@@ -144,6 +144,19 @@ bool CPlayerListPacket::Write ( NetServerBitStreamInterface& BitStream ) const
             BitStream.Write ( pPlayer->GetFightingStyle () );
             BitStream.Write ( pPlayer->GetAlpha () );
             BitStream.Write ( pPlayer->GetInterior () );
+
+            // Write the weapons of the player weapon slots
+            for ( unsigned int i = 0; i < 16; ++i )
+            {
+                CWeapon* pWeapon = pPlayer->GetWeapon ( i );
+                if ( pWeapon && pWeapon->ucType != 0 )
+                {
+                    BitStream.WriteBit ( true );
+                    BitStream.Write ( pWeapon->ucType );
+                }
+                else
+                    BitStream.WriteBit ( false );
+            }
         }
     }
 

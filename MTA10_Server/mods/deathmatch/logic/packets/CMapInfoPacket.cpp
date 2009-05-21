@@ -61,7 +61,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
 }
 
 
-bool CMapInfoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the map weather
     BitStream.Write ( m_ucWeather );

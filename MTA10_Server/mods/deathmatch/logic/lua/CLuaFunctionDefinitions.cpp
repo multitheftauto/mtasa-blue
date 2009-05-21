@@ -1061,7 +1061,7 @@ int CLuaFunctionDefinitions::SetPlayerAmmo ( lua_State* luaVM )
             if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
             ucSlot = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
             int iArgument4 = lua_type ( luaVM, 4 );
-            unsigned short usAmmoInClip = NULL;
+            unsigned short usAmmoInClip = 0;
             if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
             {
                 usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
@@ -3134,7 +3134,7 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-        unsigned short usAmmoInClip = NULL;
+        unsigned short usAmmoInClip = 0;
         if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
         {
             usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
@@ -10759,17 +10759,17 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPacketInfo ( lua_State* luaVM )
 {
-    unsigned long ulBytes [ 256 ];
+    unsigned long ulBits [ 256 ];
     unsigned long ulCount [ 256 ];
-    g_pNetServer->GetPacketLogData ( ulBytes, ulCount );
+    g_pNetServer->GetPacketLogData ( ulBits, ulCount );
     lua_createtable ( luaVM, 256, 1 );
 
     for ( unsigned int i = 0; i < 256; ++i )
     {
         lua_createtable ( luaVM, 0, 2 );
 
-        lua_pushstring ( luaVM, "bytes" );
-        lua_pushnumber ( luaVM, ulBytes [ i ] );
+        lua_pushstring ( luaVM, "bits" );
+        lua_pushnumber ( luaVM, ulBits [ i ] );
         lua_rawset ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "count" );

@@ -30,6 +30,7 @@
 #include <xml/CXMLFile.h>
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
+#include "CVector.h"
 #include "SharedUtil.h"
 #include "SString.h"
 

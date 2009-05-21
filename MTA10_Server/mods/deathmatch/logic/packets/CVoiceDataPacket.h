@@ -24,8 +24,8 @@ public:
     ePacketID               GetPacketID                 ( void ) const;
     unsigned long           GetFlags                    ( void ) const;
 
-    bool                    Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                        ( NetBitStreamInterface& BitStream );
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     ElementID               GetPlayer                   ( void );
     void                    SetPlayer                   ( ElementID PlayerID );

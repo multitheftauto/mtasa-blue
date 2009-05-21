@@ -766,14 +766,14 @@ void CClientPed::AddKeysync ( unsigned long ulDelay, const CControllerState& Con
 }
 
 
-void CClientPed::AddChangeWeapon ( unsigned long ulDelay, unsigned char ucWeaponID, unsigned short usWeaponAmmo )
+void CClientPed::AddChangeWeapon ( unsigned long ulDelay, eWeaponSlot slot, unsigned short usWeaponAmmo )
 {
     if ( !m_bIsLocalPlayer )
     {
         SDelayedSyncData* pData = new SDelayedSyncData;
         pData->ulTime = CClientTime::GetTime () + ulDelay;
         pData->ucType = DELAYEDSYNC_CHANGEWEAPON;
-        pData->ucWeaponID = ucWeaponID;
+        pData->slot = slot;
         pData->usWeaponAmmo = usWeaponAmmo;
 
         m_SyncBuffer.push_back ( pData );
@@ -1667,7 +1667,6 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     return pWeapon;
 }
 
-
 void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
@@ -1692,7 +1691,6 @@ void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                 newWeapon->SetAmmoInClip(ammoInClip);
                 newWeapon->SetAmmoTotal(ammoInTotal);
             }
-
             m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
         }
         m_CurrentWeaponSlot = weaponSlot;
@@ -2644,17 +2642,21 @@ void CClientPed::UpdateKeysync ( void )
                         }
                         case DELAYEDSYNC_CHANGEWEAPON:
                         {
-                            if ( pData->ucWeaponID > 0 )
+                            if ( pData->slot > WEAPONSLOT_TYPE_UNARMED )
                             {
                                 // Grab the current weapon the player has
                                 CWeapon* pPlayerWeapon = GetWeapon ();
-                                eWeaponType eCurrentWeapon = static_cast < eWeaponType > ( pData->ucWeaponID );
-                                if ( ( pPlayerWeapon && pPlayerWeapon->GetType () != eCurrentWeapon ) || !pPlayerWeapon || GetRealOccupiedVehicle () )
+                                eWeaponSlot eCurrentSlot = pData->slot;
+                                if ( !pPlayerWeapon || pPlayerWeapon->GetSlot () != eCurrentSlot || GetRealOccupiedVehicle () )
                                 {
-                                    pPlayerWeapon = GiveWeapon ( eCurrentWeapon, pData->usWeaponAmmo );
-                                    if ( pPlayerWeapon )
+                                    CWeapon* pSlotWeapon = GetWeapon ( eCurrentSlot );
+                                    if ( pSlotWeapon )
                                     {
-                                        pPlayerWeapon->SetAsCurrentWeapon ();
+                                        pPlayerWeapon = GiveWeapon ( pSlotWeapon->GetType (), pData->usWeaponAmmo );
+                                        if ( pPlayerWeapon )
+                                        {
+                                            pPlayerWeapon->SetAsCurrentWeapon ();
+                                        }
                                     }
                                 }
 
@@ -2668,7 +2670,7 @@ void CClientPed::UpdateKeysync ( void )
                             }
                             else
                             {
-                                RemoveAllWeapons ();
+                                SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
                             }
                             break;
                         }
@@ -2712,20 +2714,20 @@ void CClientPed::_CreateModel ( void )
     m_pLoadedModelInfo = m_pModelInfo;
     m_pLoadedModelInfo->AddRef ( true );
 
-	// Create the new ped
-	m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->AddPed ( static_cast < ePedModel > ( m_ulModel ) ) );
-	if ( m_pPlayerPed )
-	{
-		// Put our pointer in the stored data and update the remote data with the new model pointer
-		m_pPlayerPed->SetStoredPointer ( this );
+    // Create the new ped
+    m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->AddPed ( static_cast < ePedModel > ( m_ulModel ) ) );
+    if ( m_pPlayerPed )
+    {
+        // Put our pointer in the stored data and update the remote data with the new model pointer
+        m_pPlayerPed->SetStoredPointer ( this );
 
         g_pMultiplayer->AddRemoteDataStorage ( m_pPlayerPed, m_remoteDataStorage );
 
-		// Grab the task manager
-		m_pTaskManager = m_pPlayerPed->GetPedIntelligence ()->GetTaskManager ();
+        // Grab the task manager
+        m_pTaskManager = m_pPlayerPed->GetPedIntelligence ()->GetTaskManager ();
 
-		// Validate
-		m_pManager->RestoreEntity ( this );                
+        // Validate
+        m_pManager->RestoreEntity ( this );                
 
         // Jump straight to the target position if we have one
         if ( m_bHasTargetPosition )
@@ -2739,30 +2741,38 @@ void CClientPed::_CreateModel ( void )
             }
         }
 
-		// Restore any settings	
-		m_pPlayerPed->SetMatrix ( &m_Matrix );
+        // Restore any settings	
+        m_pPlayerPed->SetMatrix ( &m_Matrix );
         m_pPlayerPed->SetCurrentRotation ( m_fCurrentRotation );
-		m_pPlayerPed->SetTargetRotation ( m_fTargetRotation );
+        m_pPlayerPed->SetTargetRotation ( m_fTargetRotation );
         m_pPlayerPed->SetMoveSpeed ( &m_vecMoveSpeed );
-		m_pPlayerPed->SetTurnSpeed ( &m_vecTurnSpeed );
-		Duck ( m_bDucked );
-		SetWearingGoggles ( m_bWearingGoggles );
-		m_pPlayerPed->SetVisible ( m_bVisible );
+        m_pPlayerPed->SetTurnSpeed ( &m_vecTurnSpeed );
+        Duck ( m_bDucked );
+        SetWearingGoggles ( m_bWearingGoggles );
+        m_pPlayerPed->SetVisible ( m_bVisible );
         m_pPlayerPed->SetUsesCollision ( m_bUsesCollision );
-		m_pPlayerPed->SetHealth ( m_fHealth );
-		m_pPlayerPed->SetArmor ( m_fArmor );
-		WorldIgnore ( m_bWorldIgnored );
+        m_pPlayerPed->SetHealth ( m_fHealth );
+        m_pPlayerPed->SetArmor ( m_fArmor );
+        WorldIgnore ( m_bWorldIgnored );
+
+        // Set remote players to not fall off bikes locally, let them decide
         if ( m_bIsLocalPlayer )
-		    SetCanBeKnockedOffBike ( m_bCanBeKnockedOffBike );
+            SetCanBeKnockedOffBike ( m_bCanBeKnockedOffBike );
         else
             SetCanBeKnockedOffBike ( false );
-		for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
-			GiveWeapon ( m_WeaponTypes [ i ], 1000 );   // TODO: store ammo for each weapon
-		m_pPlayerPed->SetCurrentWeaponSlot ( m_CurrentWeaponSlot );
-		m_pPlayerPed->SetFightingStyle ( m_FightingStyle, 6 );  
+
+        // Restore their weapons
+        for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
+        {
+            if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
+                GiveWeapon ( m_WeaponTypes [ i ], 1 );   // TODO: store ammo for each weapon
+        }
+
+        m_pPlayerPed->SetCurrentWeaponSlot ( m_CurrentWeaponSlot );
+        m_pPlayerPed->SetFightingStyle ( m_FightingStyle, 6 );  
         m_pPlayerPed->SetMoveAnim ( m_MoveAnim );
-		SetHasJetPack ( m_bHasJetPack );                
-		SetInterior ( m_ucInterior );
+        SetHasJetPack ( m_bHasJetPack );                
+        SetInterior ( m_ucInterior );
         SetAlpha ( m_ucAlpha );
         SetChoking ( m_bIsChoking );
         SetSunbathing ( m_bSunbathing, false );
@@ -2770,14 +2780,14 @@ void CClientPed::_CreateModel ( void )
         SetOnFire ( m_bIsOnFire );
 
         // Rebuild the player if it's CJ. So we get the clothes.
-		RebuildModel ();
+        RebuildModel ();
 
         // Reattach to an entity + any entities attached to this
         ReattachEntities ();
 
-		// Warp it into a vehicle, if necessary
-		if ( m_pOccupiedVehicle )
-			WarpIntoVehicle ( m_pOccupiedVehicle, m_uiOccupiedVehicleSeat );      
+        // Warp it into a vehicle, if necessary
+        if ( m_pOccupiedVehicle )
+            WarpIntoVehicle ( m_pOccupiedVehicle, m_uiOccupiedVehicleSeat );      
 
         // Are we dead?
         if ( m_fHealth == 0.0f )
@@ -2804,7 +2814,7 @@ void CClientPed::_CreateModel ( void )
 
         // Tell the streamer we created the player
         NotifyCreate ();
-	}
+    }
     else
     {
         // Remove the reference again

@@ -20,7 +20,7 @@ extern "C"
 {
     #include "lua.h"
 }
-#include <net/net_bitstream.h>
+#include <net/bitstream.h>
 #include <string>
 
 class CClientEntity;

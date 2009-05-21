@@ -44,7 +44,7 @@ void CEntityAddPacket::Add ( CElement * pElement )
 }
 
 
-bool CEntityAddPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 {    
     // Check that we have any entities
     if ( m_Entities.size () > 0 )

@@ -29,8 +29,8 @@ public:
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_VEHICLE_TRAILER; };
     inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                            Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                            Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                            Read                        ( NetBitStreamInterface& BitStream );
+    bool                            Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline ElementID                GetVehicle                  ( void )                    { return m_Vehicle; };
     inline ElementID                GetAttachedVehicle          ( void )                    { return m_AttachedVehicle; };

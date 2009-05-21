@@ -24,7 +24,7 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_SERVER_DISCONNECTED; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Write                       ( NetServerBitStreamInterface& BitStream ) const    { BitStream.Write ( const_cast < char* > ( m_szReason ), strlen ( m_szReason ) ); return true; };
+    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const    { BitStream.Write ( const_cast < char* > ( m_szReason ), strlen ( m_szReason ) ); return true; };
 
     inline const char*      GetReason                   ( void )                    { return m_szReason; };
     inline void             SetReason                   ( const char* szReason )    { strncpy ( m_szReason, szReason, sizeof ( m_szReason ) ); };

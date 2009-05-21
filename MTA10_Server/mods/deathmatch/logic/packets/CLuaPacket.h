@@ -19,16 +19,16 @@
 class CLuaPacket : public CPacket
 {
 public:
-                                    CLuaPacket          ( unsigned char ucActionID, NetServerBitStreamInterface& BitStream ) : m_ucActionID ( ucActionID ), m_BitStream ( BitStream ) {};
+                                    CLuaPacket          ( unsigned char ucActionID, NetBitStreamInterface& BitStream ) : m_ucActionID ( ucActionID ), m_BitStream ( BitStream ) {};
 
     inline ePacketID                GetPacketID         ( void ) const  { return PACKET_ID_LUA; };
     inline unsigned long            GetFlags            ( void ) const  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                            Write               ( NetServerBitStreamInterface& BitStream ) const;
+    bool                            Write               ( NetBitStreamInterface& BitStream ) const;
 
 private:
     unsigned char                   m_ucActionID;
-    NetServerBitStreamInterface&    m_BitStream;
+    NetBitStreamInterface&          m_BitStream;
 };
 
 #endif

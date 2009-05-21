@@ -45,7 +45,7 @@ public:
     float Normalize ( void ) 
     { 
         double t = sqrt(fX*fX + fY*fY + fZ*fZ);
-        if ( t > 0 )
+        if ( t > FLOAT_EPSILON )
         {
             double fX2 = fX / t;
             double fY2 = fY / t;
@@ -54,6 +54,8 @@ public:
             fY = (float)fY2;
             fZ = (float)fZ2;
         }
+        else
+            t = 0;
         return static_cast < float > ( t );
     }
 

@@ -41,7 +41,7 @@ CPlayerSpawnPacket::CPlayerSpawnPacket ( ElementID PlayerID,
 }
 
 
-bool CPlayerSpawnPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerSpawnPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     BitStream.Write ( m_PlayerID );
 

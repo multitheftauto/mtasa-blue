@@ -25,7 +25,7 @@ public:
     inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_PINGS; };
     inline unsigned long            GetFlags                    ( void ) const                  { return 0; };
 
-    bool                            Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                            Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline void                     AddPlayer                   ( CPlayer* pPlayer )            { m_List.push_back ( pPlayer ); };
     inline void                     RemovePlayer                ( CPlayer* pPlayer )            { if ( !m_List.empty() ) m_List.remove ( pPlayer ); };

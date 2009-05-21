@@ -117,7 +117,7 @@ public:
 
     CWeapon*                                    GetWeapon                   ( unsigned char ucSlot = 0xFF );
     inline unsigned char                        GetWeaponSlot               ( void )                            { return m_ucWeaponSlot; }
-    inline void                                 SetWeaponSlot               ( unsigned char ucSlot )            { m_ucWeaponSlot = ucSlot; }
+    void                                        SetWeaponSlot               ( unsigned char ucSlot );
     inline unsigned char                        GetCurrentWeaponState       ( void )                            { return m_ucCurrentWeaponState; };
     inline void                                 SetCurrentWeaponState       ( unsigned char ucWeaponState )     { m_ucCurrentWeaponState = ucWeaponState; };
     unsigned char                               GetWeaponType               ( unsigned char ucSlot = 0xFF );
@@ -126,6 +126,7 @@ public:
     void                                        SetWeaponAmmoInClip         ( unsigned short uscAmmoInClip, unsigned char ucSlot = 0xFF );
     unsigned short                              GetWeaponTotalAmmo          ( unsigned char ucSlot = 0xFF );
     void                                        SetWeaponTotalAmmo          ( unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF );
+    float                                       GetWeaponRange              ( unsigned char ucSlot = 0xFF );
 
     float                                       GetMaxHealth                ( void );
     inline float                                GetHealth                   ( void )                            { return m_fHealth; }

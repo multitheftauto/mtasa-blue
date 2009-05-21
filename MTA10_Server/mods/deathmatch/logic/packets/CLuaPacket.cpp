@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-bool CLuaPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CLuaPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the action ID
     BitStream.Write ( m_ucActionID );

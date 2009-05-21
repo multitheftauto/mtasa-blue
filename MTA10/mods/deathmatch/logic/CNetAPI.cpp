@@ -19,6 +19,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#include <net/SyncStructures.h>
 
 extern CClientGame* g_pClientGame;
 
@@ -47,7 +48,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         {
             // Read out the player ID
             ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            if ( BitStream.ReadCompressed ( PlayerID ) )
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
@@ -88,7 +89,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         {
             // Read out the player ID
             ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            if ( BitStream.ReadCompressed ( PlayerID ) )
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
@@ -104,12 +105,8 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         
         case PACKET_ID_RETURN_SYNC:
         {
-            // Flags
-            unsigned char ucFlags;
-            BitStream.Read ( ucFlags );
-
             // Grab the in vehicle flag
-            bool bInVehicle = ucFlags & 0x01;
+            bool bInVehicle = BitStream.ReadBit ();
 
             // Are we in a vehicle?
             if ( bInVehicle )
@@ -466,7 +463,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
 {
     // Read out the time it took for the packet to go from the remote client to the server and to us
     unsigned short usLatency;
-    BitStream.Read ( usLatency );
+    BitStream.ReadCompressed ( usLatency );
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
 
     // Grab the old controller state
@@ -478,13 +475,8 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     ReadSmallKeysync ( ControllerState, LastControllerState, BitStream );
 
     // Flags
-    unsigned char ucFlags;
-    BitStream.Read ( ucFlags );
-
-    // Decode the flags
-    bool bDucked = ( ucFlags & 0x01 ) ? true:false;;
-    bool bChoking = ( ucFlags & 0x02 ) ? true:false;;
-    bool bAimAkimboUp = ( ucFlags & 0x04 ) ? true:false;;
+    SKeysyncFlags flags;
+    BitStream.Read ( &flags );
 
     // Grab the occupied vehicle
     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
@@ -493,15 +485,23 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     // If he's shooting
     if ( ControllerState.ButtonCircle )
     {
-        // Read out his current weapon
-        unsigned char ucCurrentWeaponSlot;
-        unsigned char ucCurrentWeaponType;
+        // Read out his current weapon slot
+        SWeaponSlotSync slot;
+        BitStream.Read ( &slot );
+        unsigned int uiSlot = slot.data.uiSlot;
 
-        BitStream.Read ( ucCurrentWeaponSlot );
-        BitStream.Read ( ucCurrentWeaponType );
-
-        if ( ucCurrentWeaponType != 0 )
+        if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
+            CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+            unsigned char ucCurrentWeaponType = 0;
+            float fWeaponRange = 1.6f;
+
+            if ( pWeapon )
+            {
+                ucCurrentWeaponType = pWeapon->GetType ();
+                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+            }
+
             // Is the current weapon a goggle (44 or 45) or a camera (43), detonator (40), don't apply the fire key
             if ( ucCurrentWeaponType == 44 || ucCurrentWeaponType == 45 || ucCurrentWeaponType == 43 || ucCurrentWeaponType == 40 )
             {
@@ -509,19 +509,20 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             }
 
             // Read out the weapon ammo
-            unsigned short usWeaponAmmo = 0;
-            BitStream.Read ( usWeaponAmmo );
+            SWeaponAmmoSync ammo ( ucCurrentWeaponType, false, true );
+            BitStream.Read ( &ammo );
+            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
 
             // Valid current weapon id? Add it to the change weapon queue
             if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeaponType ) )
             {
                 if ( pVehicle )
                 {
-
+                    // TODO?
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeaponType, usWeaponAmmo );
+                    pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
                 }
             }
             else
@@ -532,14 +533,14 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
+                    pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 1 );
                 }
             }
 
 			// Make sure that if he doesn't have an akimbo weapon his hands up state is false
 			if ( !IsWeaponIDAkimbo ( ucCurrentWeaponType ) )
 			{
-				bAimAkimboUp = false;
+                flags.data.bAkimboTargetUp = false;
 			}
 
             // Read out the aim directions
@@ -547,16 +548,9 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
 			BitStream.Read ( fArmX );
 			BitStream.Read ( fArmY );
 
-            CVector vecSource;
-            BitStream.Read ( vecSource.fX );
-            BitStream.Read ( vecSource.fY );
-            BitStream.Read ( vecSource.fZ );
-
-            // Read out the target vector and set it
-            CVector vecTemp;
-            BitStream.Read ( vecTemp.fX );
-            BitStream.Read ( vecTemp.fY );
-            BitStream.Read ( vecTemp.fZ );
+            // Read the weapon aim data
+            SWeaponAimSync aim ( fWeaponRange );
+            BitStream.Read ( &aim );
 
             // Read out the driveby direction
             unsigned char ucDriveByAim;
@@ -565,17 +559,21 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             // Set the aim data (immediately if in vehicle, otherwize delayed/interpolated)
             if ( pVehicle )
             {
-                pPlayer->SetAimingData ( TICK_RATE, vecTemp, fArmX, fArmY, ucDriveByAim, &vecSource, false );
+                pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, fArmX, fArmY, ucDriveByAim, &(aim.data.vecOrigin), false );
             }
             else
             {
-                pPlayer->SetTargetTarget ( TICK_RATE, vecSource, vecTemp );
-                pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, bAimAkimboUp, ucDriveByAim );
+                pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
+                pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, flags.data.bAkimboTargetUp, ucDriveByAim );
             }
+        }
+        else if ( uiSlot != 0 )
+        {
+            pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), 1 );
         }
         else
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
+            pPlayer->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
         }
     }
 
@@ -610,8 +608,8 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         // null out the crouch key or it will conflict with the crouch syncing
         ControllerState.ShockButtonL = 0;
         pPlayer->SetControllerState ( ControllerState );
-        pPlayer->Duck ( bDucked );   
-        pPlayer->SetChoking ( bChoking );       
+        pPlayer->Duck ( flags.data.bIsDucked );   
+        pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
 
     // Increment keysync counter
@@ -631,13 +629,13 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     WriteSmallKeysync ( ControllerState, LastControllerState, BitStream );
 
     // Flags
-    unsigned char ucFlags = 0;
-    ucFlags |= pPlayerModel->IsDucked () ? 1:0;
-    ucFlags |= pPlayerModel->IsChoking () << 1;
-    ucFlags |= g_pMultiplayer->GetAkimboTargetUp () << 2;
+    SKeysyncFlags flags;
+    flags.data.bIsDucked        = ( pPlayerModel->IsDucked () == true );
+    flags.data.bIsChoking       = ( pPlayerModel->IsChoking () == true );
+    flags.data.bAkimboTargetUp  = ( g_pMultiplayer->GetAkimboTargetUp () == true );
 
     // Write the flags
-    BitStream.Write ( ucFlags );
+    BitStream.Write ( &flags );
 
     // Are we shooting?
     if ( ControllerState.ButtonCircle )
@@ -646,36 +644,30 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon ();
         if ( pPlayerWeapon )
         {
+            BitStream.WriteBit ( true );
+
             // Write the type
-            unsigned char ucSlot = static_cast < unsigned char > ( pPlayerWeapon->GetSlot () );
-            unsigned char ucType = static_cast < unsigned char > ( pPlayerWeapon->GetType () );
+            unsigned int uiSlot = pPlayerWeapon->GetSlot ();
+            SWeaponSlotSync slot;
+            slot.data.uiSlot = uiSlot;
+            BitStream.Write ( &slot );
 
-            BitStream.Write ( ucSlot );
-            BitStream.Write ( ucType );
-
-            if ( ucType != 0 )
+            if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
                  // Write the clip ammo
-                unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
-                BitStream.Write ( usAmmoInClip );
+                SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
+                ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                BitStream.Write ( &ammo );
 
                 // Grab his aim directions and sync them if he's not using an akimbo
 				CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
 				BitStream.Write ( pShotsyncData->m_fArmDirectionX );
 				BitStream.Write ( pShotsyncData->m_fArmDirectionY );
 
-                CVector vecOrigin, vecTarget;
-                pPlayerModel->GetShotData ( &vecOrigin, &vecTarget );
-
-                // Write the origin
-                BitStream.Write ( vecOrigin.fX );
-                BitStream.Write ( vecOrigin.fY );
-                BitStream.Write ( vecOrigin.fZ );
-
-                // Write the gun's target vector
-                BitStream.Write ( vecTarget.fX );
-                BitStream.Write ( vecTarget.fY );
-                BitStream.Write ( vecTarget.fZ );
+                // Write the aim data
+                SWeaponAimSync aim ( pPlayerWeapon->GetInfo ()->GetWeaponRange () );
+                pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget );
+                BitStream.Write ( &aim );
 
                 // Write the driveby direction
                 BitStream.Write ( pShotsyncData->m_cInVehicleAimDirection );
@@ -683,8 +675,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         }
         else
         {
-            BitStream.Write ( static_cast < unsigned char > ( 0 ) ); // Slot
-            BitStream.Write ( static_cast < unsigned char > ( 0 ) ); // Type
+            BitStream.WriteBit ( false );
         }
     }
 
@@ -722,7 +713,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
 
     // Read out the time it took for the packet to go from the remote client to the server and to us
     unsigned short usLatency;
-    BitStream.Read ( usLatency );
+    BitStream.ReadCompressed ( usLatency );
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
 
     // Read out the keysync data
@@ -730,30 +721,19 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     ReadFullKeysync ( ControllerState, BitStream );
 
     // Read out puresync flags
-    unsigned short usFlags = 0;
-    BitStream.Read ( ( unsigned short )usFlags );
-
-    // Convert them to bools
-    bool bInWater = ( usFlags & 0x01 ) ? true:false;
-    bool bOnGround = ( usFlags & 0x02 ) ? true:false;
-    bool bHasJetPack = ( usFlags & 0x04 ) ? true:false;
-    bool bDucked = ( usFlags & 0x08 ) ? true:false;
-    bool bWearingGoggles = ( usFlags & 0x10 ) ? true:false;
-    bool bInContact = ( usFlags & 0x20 ) ? true:false;
-    bool bIsChoking = ( usFlags & 0x40 ) ? true:false;
-    bool bAimAkimboUp = ( usFlags & 0x80 ) ? true:false;
-    bool bIsOnFire = ( usFlags & 0x100 ) ? true:false;
+    SPlayerPuresyncFlags flags;
+    BitStream.Read ( &flags );
 
     // Set the jetpack and google states
-    if ( bHasJetPack != pPlayer->HasJetPack () )
-        pPlayer->SetHasJetPack ( bHasJetPack );
-    pPlayer->SetWearingGoggles ( bWearingGoggles );
+    if ( flags.data.bHasJetPack != pPlayer->HasJetPack () )
+        pPlayer->SetHasJetPack ( flags.data.bHasJetPack );
+    pPlayer->SetWearingGoggles ( flags.data.bWearsGoogles );
 
     CClientEntity* pContactEntity = NULL;
-    if ( bInContact )
+    if ( flags.data.bHasContact )
     {
         ElementID Temp;
-        BitStream.Read ( Temp );
+        BitStream.ReadCompressed ( Temp );
         pContactEntity = CElementIDs::GetElement ( Temp );
     }
         
@@ -776,10 +756,12 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     BitStream.Read ( fRotation );
 
     // Move speed vector
-    CVector vecMoveSpeed;
-    BitStream.Read ( vecMoveSpeed.fX );
-    BitStream.Read ( vecMoveSpeed.fY );
-    BitStream.Read ( vecMoveSpeed.fZ );    
+    if ( flags.data.bSyncingVelocity )
+    {
+        SVelocitySync velocity;
+        if ( BitStream.Read ( &velocity ) )
+            pPlayer->SetMoveSpeed ( velocity.data.vecVelocity );
+    }
 
     // Health
     unsigned char ucHealth;
@@ -800,64 +782,78 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     BitStream.Read ( fCameraRotation );    
 
     // Current weapon id
-    unsigned char ucCurrentWeapon = 0;
-    BitStream.Read ( ucCurrentWeapon );
-    if ( ucCurrentWeapon != 0 )
+    if ( flags.data.bHasAWeapon )
     {
-        // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
-        if ( ucCurrentWeapon == 44 || ucCurrentWeapon == 45 || ucCurrentWeapon == 43 || ucCurrentWeapon == 40 )
-        {
-            ControllerState.ButtonCircle = 0;
-        }
+        SWeaponSlotSync slot;
+        BitStream.Read ( &slot );
 
-        // Read out the weapon ammo
-        unsigned short usWeaponAmmo;
-        BitStream.Read ( usWeaponAmmo );
+        unsigned int uiSlot = slot.data.uiSlot;
 
-        // Valid current weapon id?
-        if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
+        if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, ucCurrentWeapon, usWeaponAmmo );
+            CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+            unsigned char ucCurrentWeapon = 0;
+            float fWeaponRange = 0.01f;
+            if ( pWeapon )
+            {
+                ucCurrentWeapon = pWeapon->GetType ();
+                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+            }
+
+            // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
+            if ( ucCurrentWeapon == 44 || ucCurrentWeapon == 45 || ucCurrentWeapon == 43 || ucCurrentWeapon == 40 )
+            {
+                ControllerState.ButtonCircle = 0;
+            }
+
+            // Read out the weapon ammo
+            SWeaponAmmoSync ammo ( ucCurrentWeapon, false, true );
+            BitStream.Read ( &ammo );
+            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
+
+            // Valid current weapon id?
+            if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
+            {
+                pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
+            }
+            else
+            {
+                pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 0 );
+            }
+
+    		// Make sure that if he doesn't have an akimbo weapon his hands up state is false
+	    	if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
+		    {
+                flags.data.bAkimboTargetUp = false;
+		    }
+
+            // Read out the aim directions
+            float fArmX, fArmY;
+		    BitStream.Read ( fArmX );
+		    BitStream.Read ( fArmY );
+
+            // Interpolate the aiming
+            pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, flags.data.bAkimboTargetUp, 0 );
+
+            // Read the aim data only if he's shooting or aiming
+            if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
+            {
+                SWeaponAimSync aim ( fWeaponRange );
+                BitStream.Read ( &aim );
+                // Interpolate the source/target vectors
+                pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
+            }
         }
         else
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, 0, 0 );
+            pPlayer->SetCurrentWeaponSlot ( static_cast < eWeaponSlot > ( slot.data.uiSlot ) );
         }
-
-		// Make sure that if he doesn't have an akimbo weapon his hands up state is false
-		if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
-		{
-			bAimAkimboUp = false;
-		}
-
-        // Read out the aim directions
-        float fArmX, fArmY;
-		BitStream.Read ( fArmX );
-		BitStream.Read ( fArmY );
-
-        // Read out source vector
-        CVector vecSource;
-        BitStream.Read ( vecSource.fX );
-        BitStream.Read ( vecSource.fY );
-        BitStream.Read ( vecSource.fZ );
-
-        // Read out the target vector and set it
-        CVector vecTemp;
-        BitStream.Read ( vecTemp.fX );
-        BitStream.Read ( vecTemp.fY );
-        BitStream.Read ( vecTemp.fZ );
-
-        // Interpolate the aiming
-        pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, bAimAkimboUp, 0 );
-
-        // Interpolate the source/target vectors
-        pPlayer->SetTargetTarget ( TICK_RATE, vecSource, vecTemp );
     }
     else
     {
         // Make him empty-handed
-        pPlayer->SetCurrentWeaponSlot ( static_cast < eWeaponSlot > ( 0 ) );
-    }    
+        pPlayer->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+    }
 
      // null out the crouch bit or it'll conflict with the crouched syncing
     ControllerState.ShockButtonL = 0;    
@@ -880,12 +876,11 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Set move speed, controller state and camera rotation + duck state
-    pPlayer->SetMoveSpeed ( vecMoveSpeed );
     pPlayer->SetControllerState ( ControllerState );
     pPlayer->SetCameraRotation ( fCameraRotation );
-    pPlayer->Duck ( bDucked );
-    pPlayer->SetChoking ( bIsChoking );
-    pPlayer->SetOnFire ( bIsOnFire );
+    pPlayer->Duck ( flags.data.bIsDucked );
+    pPlayer->SetChoking ( flags.data.bIsChoking );
+    pPlayer->SetOnFire ( flags.data.bIsOnFire );
 
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
@@ -894,7 +889,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
 }
 
 
-void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterface& BitStream )
+void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInterface& BitStream )
 {
     // Write our sync context.
     BitStream.Write ( pPlayerModel->GetSyncTimeContext () );
@@ -904,20 +899,31 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
     pPlayerModel->GetControllerState ( ControllerState );
     WriteFullKeysync ( ControllerState, BitStream );
 
+    // Get the contact entity
     CClientEntity* pContactEntity = pPlayerModel->GetContactEntity ();
     bool bInContact = ( pContactEntity && pContactEntity->GetID () != INVALID_ELEMENT_ID && !pContactEntity->IsLocalEntity() );
 
-    unsigned short usFlags = 0;
-    if ( pPlayerModel->IsInWater () ) usFlags |= 0x01;
-    if ( pPlayerModel->IsOnGround () ) usFlags |= 0x02;
-    if ( pPlayerModel->HasJetPack () ) usFlags |= 0x04;
-    if ( pPlayerModel->IsDucked () ) usFlags |= 0x08;
-    if ( pPlayerModel->IsWearingGoggles () ) usFlags |= 0x10;
-    if ( bInContact ) usFlags |= 0x20;
-    if ( pPlayerModel->IsChoking () ) usFlags |= 0x40;
-    if ( g_pMultiplayer->GetAkimboTargetUp () ) usFlags |= 0x80;
-    if ( pPlayerModel->IsOnFire () ) usFlags |= 0x100;
-    BitStream.Write ( (unsigned short) usFlags );
+    // Grab the current weapon
+    CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon();
+
+    // Write the flags
+    SPlayerPuresyncFlags flags;
+    flags.data.bIsInWater       = ( pPlayerModel->IsInWater () == true );
+    flags.data.bIsOnGround      = ( pPlayerModel->IsOnGround () == true );
+    flags.data.bHasJetPack      = ( pPlayerModel->HasJetPack () == true );
+    flags.data.bIsDucked        = ( pPlayerModel->IsDucked () == true );
+    flags.data.bWearsGoogles    = ( pPlayerModel->IsWearingGoggles () == true );
+    flags.data.bHasContact      = bInContact;
+    flags.data.bIsChoking       = ( pPlayerModel->IsChoking () == true );
+    flags.data.bAkimboTargetUp  = ( g_pMultiplayer->GetAkimboTargetUp () == true );
+    flags.data.bIsOnFire        = ( pPlayerModel->IsOnFire () == true );
+    flags.data.bHasAWeapon      = ( pPlayerWeapon != NULL );
+    flags.data.bSyncingVelocity = ( !flags.data.bIsOnGround || ( pPlayerModel->GetPlayerSyncCount () % 4 ) == 0 );
+
+    if ( pPlayerWeapon->GetSlot () > 15 )
+        flags.data.bHasAWeapon = false;
+
+    BitStream.Write ( &flags );
 
     // Player position
     CVector vecActualPosition;
@@ -927,11 +933,11 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
     // If the player is in contact with a object/vehicle, make that the origin    
     if ( bInContact )
     {
-        BitStream.Write ( pContactEntity->GetID () );
+        BitStream.WriteCompressed ( pContactEntity->GetID () );
 
         CVector vecOrigin;
         pContactEntity->GetPosition ( vecOrigin );
-        vecPosition -= vecOrigin;        
+        vecPosition -= vecOrigin;
     }
 
     BitStream.Write ( vecPosition.fX );
@@ -943,12 +949,12 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
     BitStream.Write ( fCurrentRotation );
 
     // Move speed vector
-    CVector vecMoveSpeed;
-    pPlayerModel->GetMoveSpeed ( vecMoveSpeed );
-
-    BitStream.Write ( vecMoveSpeed.fX );
-    BitStream.Write ( vecMoveSpeed.fY );
-    BitStream.Write ( vecMoveSpeed.fZ );
+    if ( flags.data.bSyncingVelocity )
+    {
+        SVelocitySync velocity;
+        pPlayerModel->GetMoveSpeed ( velocity.data.vecVelocity );
+        BitStream.Write ( &velocity );
+    }
 
     // Health (scaled from 0.0f-100.0f to 0-250 to save three bytes)
     float fHealth = pPlayerModel->GetHealth ();
@@ -965,48 +971,34 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
     // Write the camera rotation
     BitStream.Write ( g_pGame->GetCamera ()->GetCameraRotation () );
 
-    // Grab the current weapon
-    CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon();
-    if ( pPlayerWeapon )
+    if ( flags.data.bHasAWeapon )
     {
         // Write the weapon slot
-        unsigned char ucWeaponSlot = static_cast < unsigned char > ( pPlayerWeapon->GetSlot () );
-        unsigned char ucWeaponType = static_cast < unsigned char > ( pPlayerWeapon->GetType () );
-        BitStream.Write ( ucWeaponSlot );
-		BitStream.Write ( ucWeaponType );
+        unsigned int uiSlot = pPlayerWeapon->GetSlot ();
+        SWeaponSlotSync slot;
+        slot.data.uiSlot = uiSlot;
+        BitStream.Write ( &slot );
 
-        if ( ucWeaponType != 0 )
+        if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
             // Write the ammo states
-            unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
-            BitStream.Write ( usAmmoInClip );
-            unsigned short usTotalAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
-            BitStream.Write ( usTotalAmmo );
+            SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), true, true );
+            ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+            ammo.data.usTotalAmmo = pPlayerWeapon->GetAmmoTotal ();
+            BitStream.Write ( &ammo );
 
 			CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
 			BitStream.Write ( pShotsyncData->m_fArmDirectionX );
 			BitStream.Write ( pShotsyncData->m_fArmDirectionY );
 
-            // Grab the shot origin and target.
-            CVector vecOrigin, vecTarget;
-
-            pPlayerModel->GetShotData ( &vecOrigin, &vecTarget );
-
-            // Write the source vector
-            BitStream.Write ( vecOrigin.fX );
-            BitStream.Write ( vecOrigin.fY );
-            BitStream.Write ( vecOrigin.fZ );
-
-            // Write the gun's target vector
-            BitStream.Write ( vecTarget.fX );
-            BitStream.Write ( vecTarget.fY );
-            BitStream.Write ( vecTarget.fZ );
+            // Write the aim data only if he's aiming or shooting
+            if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
+            {
+                SWeaponAimSync aim ( 0.0f );
+                pPlayerModel->GetShotData ( &(aim.data.vecOrigin), &(aim.data.vecTarget) );
+                BitStream.Write ( &aim );
+            }
         }
-    }
-    else
-    {
-        BitStream.Write ( static_cast < unsigned char > ( 0 ) );
-        BitStream.Write ( static_cast < unsigned char > ( 0 ) );
     }
 
     // Write our damage info if different from last time
@@ -1017,15 +1009,27 @@ void CNetAPI::WritePlayerPuresync ( CClientPed* pPlayerModel, NetBitStreamInterf
 
         DamagerID = g_pClientGame->GetDamagerID ();
     }
-    BitStream.Write ( DamagerID );
     if ( DamagerID != RESERVED_ELEMENT_ID )
     {
-        BitStream.Write ( g_pClientGame->GetDamageWeapon () );
-        BitStream.Write ( g_pClientGame->GetDamageBodyPiece () );
+        BitStream.WriteBit ( true );
+        BitStream.WriteCompressed ( DamagerID );
+        
+        SWeaponTypeSync weaponType;
+        weaponType.data.uiWeaponType = g_pClientGame->GetDamageWeapon ();
+        BitStream.Write ( &weaponType );
+
+        SBodypartSync bodypart;
+        bodypart.data.uiBodypart = g_pClientGame->GetDamageBodyPiece ();
+        BitStream.Write ( &bodypart );
     }    
+    else
+        BitStream.WriteBit ( false );
 
     // Write the sent position to the interpolator
     AddInterpolation ( vecActualPosition );
+
+    // Increment the puresync count
+    pPlayerModel->IncrementPlayerSync ();
 }
 
 
@@ -1046,7 +1050,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
 
     // Read out the time it took for the packet to go from the remote client to the server and to us
     unsigned short usLatency;
-    BitStream.Read ( usLatency );
+    BitStream.ReadCompressed ( usLatency );
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
 
     // Read out the keysync
@@ -1232,7 +1236,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     else
     {
         // Make him empty-handed
-        pPlayer->SetCurrentWeaponSlot ( static_cast < eWeaponSlot > ( 0 ) );
+        pPlayer->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
     }
 
     // Read out vehicle specific data if he's the driver
@@ -1414,216 +1418,97 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
 bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
 {
-    // Read out the byte with keysyncs
-    unsigned char ucKeys;
-    if ( !BitStream.Read ( ucKeys ) )
-    {
+    SSmallKeysyncSync keys;
+    if ( !BitStream.Read ( &keys ) )
         return false;
-    }
 
     // Put the result into the controllerstate
-    if ( ( ucKeys & 0x01 ) ? true:false )
-        ControllerState.LeftShoulder1 = 255;
+    ControllerState.LeftShoulder1   = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1  = 255 * keys.data.bRightShoulder1;
+    ControllerState.ButtonSquare    = 255 * keys.data.bButtonSquare;
+    ControllerState.ButtonCross     = 255 * keys.data.bButtonCross;
+    ControllerState.ButtonCircle    = 255 * keys.data.bButtonCircle;
+    ControllerState.ButtonTriangle  = 255 * keys.data.bButtonTriangle;
+    ControllerState.ShockButtonL    = 255 * keys.data.bShockButtonL;
+    ControllerState.m_bPedWalk      = 255 * keys.data.bPedWalk;
+
+    if ( keys.data.bLeftStickXChanged )
+        ControllerState.LeftStickX  = keys.data.sLeftStickX;
     else
-        ControllerState.LeftShoulder1 = 0;
+        ControllerState.LeftStickX  = LastControllerState.LeftStickX;
 
-    if ( ( ucKeys & 0x02 ) ? true:false )
-        ControllerState.RightShoulder1 = 255;
+    if ( keys.data.bLeftStickYChanged )
+        ControllerState.LeftStickY  = keys.data.sLeftStickY;
     else
-        ControllerState.RightShoulder1 = 0;
+        ControllerState.LeftStickY  = LastControllerState.LeftStickY;
 
-    if ( ( ucKeys & 0x04 ) ? true:false )
-        ControllerState.ButtonSquare = 255;
-    else
-        ControllerState.ButtonSquare = 0;
-
-    if ( ( ucKeys & 0x08 ) ? true:false )
-        ControllerState.ButtonCross = 255;
-    else
-        ControllerState.ButtonCross = 0;
-
-    if ( ( ucKeys & 0x10 ) ? true:false )
-        ControllerState.ButtonCircle = 255;
-    else
-        ControllerState.ButtonCircle = 0;
-
-    if ( ( ucKeys & 0x20 ) ? true:false )
-        ControllerState.ButtonTriangle = 255;
-    else
-        ControllerState.ButtonTriangle = 0;
-
-    if ( ( ucKeys & 0x40 ) ? true:false )
-        ControllerState.ShockButtonL = 255;
-    else
-        ControllerState.ShockButtonL = 0;
-
-    if ( ( ucKeys & 0x80 ) ? true:false )
-        ControllerState.m_bPedWalk = 255;
-    else
-        ControllerState.m_bPedWalk = 0;
-
-    // Read out a byte indicating if left or right key changed
-    // TODO: Move this out so that these bools come from an another byte with free bits in it
-    unsigned char ucChangeFlags;
-    if ( !BitStream.Read ( ucChangeFlags ) )
-    {
-        return false;
-    }
-
-    // Read out changed flags
-    bool bLeftStickXChanged = ( ucChangeFlags & 0x01 ) ? true:false;
-    bool bLeftStickYChanged = ( ucChangeFlags & 0x02 ) ? true:false;
-
-    // Left stick X changed?
-    if ( bLeftStickXChanged )
-    {
-        // Read out stick X
-	    if ( !BitStream.Read ( ControllerState.LeftStickX ) )
-        {
-            return false;
-        }
-    }
-    else
-    {
-	    ControllerState.LeftStickX = LastControllerState.LeftStickX;
-    }
-
-    // Left stick X changed?
-    if ( bLeftStickYChanged )
-    {
-        // Read out stick Y
-	    if ( !BitStream.Read ( ControllerState.LeftStickY ) )
-        {
-            return false;
-        }
-    }
-    else
-    {
-	    ControllerState.LeftStickY = LastControllerState.LeftStickY;
-    }
-
-    // Success
     return true;
 }
 
 
 void CNetAPI::WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
 {
-    // Put the controllerstate bools into a key byte
-    unsigned char ucKeys = 0;
-    ucKeys |= ( ControllerState.LeftShoulder1 ? true:false ) ? 1:0;          // Action / Secondary-Fire
-    ucKeys |= ( ControllerState.RightShoulder1 ? true:false ) << 1;          // Aim-Weapon / Handbrake
-    ucKeys |= ( ControllerState.ButtonSquare ? true:false ) << 2;            // Jump / Reverse
-    ucKeys |= ( ControllerState.ButtonCross ? true:false ) << 3;             // Sprint / Accelerate
-    ucKeys |= ( ControllerState.ButtonCircle ? true:false ) << 4;            // Fire // Fire
-    ucKeys |= ( ControllerState.ButtonTriangle ? true:false ) << 5;          // Enter/Exit/Special-Attack / Enter/exit
-    ucKeys |= ( ControllerState.ShockButtonL ? true:false ) << 6;            // Crouch / Horn
-    ucKeys |= ( ControllerState.m_bPedWalk ? true:false ) << 7;              // Walk / -
+    SSmallKeysyncSync keys;
+    keys.data.bLeftShoulder1    = ( ControllerState.LeftShoulder1 != 0 );       // Action / Secondary-Fire
+    keys.data.bRightShoulder1   = ( ControllerState.RightShoulder1 != 0 );      // Aim-Weapon / Handbrake
+    keys.data.bButtonSquare     = ( ControllerState.ButtonSquare != 0 );        // Jump / Reverse
+    keys.data.bButtonCross      = ( ControllerState.ButtonCross != 0 );         // Sprint / Accelerate
+    keys.data.bButtonCircle     = ( ControllerState.ButtonCircle != 0 );        // Fire // Fire
+    keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
+    keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
+    keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
+
+    keys.data.bLeftStickXChanged    = ( ControllerState.LeftStickX != LastControllerState.LeftStickX );
+    keys.data.bLeftStickYChanged    = ( ControllerState.LeftStickY != LastControllerState.LeftStickY );
+    keys.data.sLeftStickX           = ControllerState.LeftStickX;
+    keys.data.sLeftStickY           = ControllerState.LeftStickY;
 
     // Write it
-    BitStream.Write ( ucKeys );
-
-    // Did the leftstick x/y's change?
-    bool bLeftStickXChange = ( ControllerState.LeftStickX != LastControllerState.LeftStickX );
-    bool bLeftStickYChange = ( ControllerState.LeftStickY != LastControllerState.LeftStickY );
-
-    // Put it in a byte and write it
-    unsigned char ucChanged = 0;
-    ucChanged |= bLeftStickXChange ? 1:0;
-    ucChanged |= bLeftStickYChange << 1;
-
-    // Write the byte
-    BitStream.Write ( ucChanged );
-
-    // Write the left stick X
-    if ( bLeftStickXChange )
-    {
-	    BitStream.Write ( ControllerState.LeftStickX );
-    }
-
-    // Write the left stick Y
-    if ( bLeftStickYChange )
-    {
-	    BitStream.Write( ControllerState.LeftStickY );
-    }
+    BitStream.Write ( &keys );
 }
 
 
 bool CNetAPI::ReadFullKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
-    // Read out the byte with keysyncs
-    unsigned char ucKeys;
-    if ( !BitStream.Read ( ucKeys ) )
-    {
+    // Read the key sync
+    SFullKeysyncSync keys;
+    if ( !BitStream.Read ( &keys ) )
         return false;
-    }
 
     // Put the result into the controllerstate
-    if ( ( ucKeys & 0x01 ) ? true:false )
-        ControllerState.LeftShoulder1 = 255;
-    else
-        ControllerState.LeftShoulder1 = 0;
+    ControllerState.LeftShoulder1   = 255 * keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1  = 255 * keys.data.bRightShoulder1;
+    ControllerState.ButtonSquare    = 255 * keys.data.bButtonSquare;
+    ControllerState.ButtonCross     = 255 * keys.data.bButtonCross;
+    ControllerState.ButtonCircle    = 255 * keys.data.bButtonCircle;
+    ControllerState.ButtonTriangle  = 255 * keys.data.bButtonTriangle;
+    ControllerState.ShockButtonL    = 255 * keys.data.bShockButtonL;
+    ControllerState.m_bPedWalk      = 255 * keys.data.bPedWalk;
 
-    if ( ( ucKeys & 0x02 ) ? true:false )
-        ControllerState.RightShoulder1 = 255;
-    else
-        ControllerState.RightShoulder1 = 0;
+    ControllerState.LeftStickX      = keys.data.sLeftStickX;
+    ControllerState.LeftStickY      = keys.data.sLeftStickY;
 
-    if ( ( ucKeys & 0x04 ) ? true:false )
-        ControllerState.ButtonSquare = 255;
-    else
-        ControllerState.ButtonSquare = 0;
-
-    if ( ( ucKeys & 0x08 ) ? true:false )
-        ControllerState.ButtonCross = 255;
-    else
-        ControllerState.ButtonCross = 0;
-
-    if ( ( ucKeys & 0x10 ) ? true:false )
-        ControllerState.ButtonCircle = 255;
-    else
-        ControllerState.ButtonCircle = 0;
-
-    if ( ( ucKeys & 0x20 ) ? true:false )
-        ControllerState.ButtonTriangle = 255;
-    else
-        ControllerState.ButtonTriangle = 0;
-
-    if ( ( ucKeys & 0x40 ) ? true:false )
-        ControllerState.ShockButtonL = 255;
-    else
-        ControllerState.ShockButtonL = 0;
-
-    if ( ( ucKeys & 0x80 ) ? true:false )
-        ControllerState.m_bPedWalk = 255;
-    else
-        ControllerState.m_bPedWalk = 0;
-
-    // Apply leftstick X and Y
-    return ( BitStream.Read ( ControllerState.LeftStickX ) &&
-	         BitStream.Read ( ControllerState.LeftStickY ) );
+    return true;
 }
 
 
 void CNetAPI::WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     // Put the controllerstate bools into a key byte
-    unsigned char ucKeys = 0;
-    ucKeys |= ( ControllerState.LeftShoulder1 ? true:false ) ? 1:0;
-    ucKeys |= ( ControllerState.RightShoulder1 ? true:false ) << 1;
-    ucKeys |= ( ControllerState.ButtonSquare ? true:false ) << 2;
-    ucKeys |= ( ControllerState.ButtonCross ? true:false ) << 3;
-    ucKeys |= ( ControllerState.ButtonCircle ? true:false ) << 4;
-    ucKeys |= ( ControllerState.ButtonTriangle ? true:false ) << 5;
-    ucKeys |= ( ControllerState.ShockButtonL ? true:false ) << 6;
-    ucKeys |= ( ControllerState.m_bPedWalk ? true:false ) << 7;
+    SFullKeysyncSync keys;
+    keys.data.bLeftShoulder1    = ( ControllerState.LeftShoulder1 != 0 );
+    keys.data.bRightShoulder1   = ( ControllerState.RightShoulder1 != 0 );
+    keys.data.bButtonSquare     = ( ControllerState.ButtonSquare != 0 );
+    keys.data.bButtonCross      = ( ControllerState.ButtonCross != 0 );
+    keys.data.bButtonCircle     = ( ControllerState.ButtonCircle != 0 );
+    keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );
+    keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );
+    keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );
+    keys.data.sLeftStickX       = ControllerState.LeftStickX;
+    keys.data.sLeftStickY       = ControllerState.LeftStickY;
 
     // Write it
-    BitStream.Write ( ucKeys );
-
-    // Write the left stick X and Y
-	BitStream.Write ( ControllerState.LeftStickX );
-	BitStream.Write ( ControllerState.LeftStickY );
+    BitStream.Write ( &keys );
 }
 
 
