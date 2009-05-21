@@ -71,6 +71,8 @@ void CPedRPCs::SetPedRotation ( NetBitStreamInterface& bitStream )
         if ( pPed )
         {
             pPed->SetCurrentRotation ( fRotation );
+            if ( !IS_PLAYER ( pPed ) )
+                pPed->SetCameraRotation ( fRotation );
             pPed->SetSyncTimeContext ( ucTimeContext );
         }
     }
