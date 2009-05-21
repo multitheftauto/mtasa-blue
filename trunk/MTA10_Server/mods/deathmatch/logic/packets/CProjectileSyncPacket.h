@@ -24,8 +24,8 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_PROJECTILE; };
     inline unsigned long    GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Read                        ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                        ( NetBitStreamInterface& BitStream );
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     unsigned char           m_ucWeaponType;
     ElementID               m_OriginID;

@@ -14,10 +14,11 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 extern CGame* g_pGame;
 
-bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     if ( m_pSourceElement )
     {
@@ -39,24 +40,25 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
         ReadFullKeysync ( ControllerState, BitStream );
         pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
-        unsigned short usFlags;
-        BitStream.Read ( (unsigned short &) usFlags );
-        pSourcePlayer->SetInWater ( ( usFlags & 0x01 ) ? true:false );
-        pSourcePlayer->SetOnGround ( ( usFlags & 0x02 ) ? true:false );
-        pSourcePlayer->SetHasJetPack ( ( usFlags & 0x04 ) ? true:false );
-        pSourcePlayer->SetDucked ( ( usFlags & 0x08 ) ? true:false );
-        pSourcePlayer->SetWearingGoggles ( ( usFlags & 0x10 ) ? true:false );
-        bool bInContact = ( usFlags & 0x20 ) ? true:false;
-        pSourcePlayer->SetChoking ( ( usFlags & 0x40 ) ? true:false );
-        pSourcePlayer->SetAkimboArmUp ( ( usFlags & 0x80 ) ? true:false );
-        pSourcePlayer->SetOnFire ( ( usFlags & 0x100 ) ? true:false );
+        // Read the flags
+        SPlayerPuresyncFlags flags;
+        BitStream.Read ( &flags );
+
+        pSourcePlayer->SetInWater ( flags.data.bIsInWater );
+        pSourcePlayer->SetOnGround ( flags.data.bIsOnGround );
+        pSourcePlayer->SetHasJetPack ( flags.data.bHasJetPack );
+        pSourcePlayer->SetDucked ( flags.data.bIsDucked );
+        pSourcePlayer->SetWearingGoggles ( flags.data.bWearsGoogles );
+        pSourcePlayer->SetChoking ( flags.data.bIsChoking );
+        pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
+        pSourcePlayer->SetOnFire ( flags.data.bIsOnFire );
 
         // Contact element
         CElement* pContactElement = NULL;
-        if ( bInContact )
+        if ( flags.data.bHasContact )
         {            
             ElementID Temp;
-            BitStream.Read ( Temp );
+            BitStream.ReadCompressed ( Temp );
             pContactElement = CElementIDs::GetElement ( Temp );
         }        
         CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();        
@@ -99,14 +101,16 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
         pSourcePlayer->SetRotation ( fRotation );
 
         // Move speed vector
-        BitStream.Read ( vecTemp.fX );
-        BitStream.Read ( vecTemp.fY );
-        BitStream.Read ( vecTemp.fZ );
-        pSourcePlayer->SetVelocity ( vecTemp );
+        if ( flags.data.bSyncingVelocity )
+        {
+            SVelocitySync velocity;
+            if ( BitStream.Read ( &velocity ) )
+                pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
+        }
 
         // Health ( stored with damage )
         unsigned char ucHealth;
-	    BitStream.Read ( ucHealth );
+        BitStream.Read ( ucHealth );
 
         // Armor
         unsigned char ucArmor;
@@ -114,7 +118,7 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 
         float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
         float fOldArmor = pSourcePlayer->GetArmor ();
-		float fArmorLoss = fOldArmor - fArmor;
+        float fArmorLoss = fOldArmor - fArmor;
         
         pSourcePlayer->SetArmor ( fArmor );
 
@@ -123,71 +127,68 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
         BitStream.Read ( fCameraRotation );
         pSourcePlayer->SetCameraRotation ( fCameraRotation );        
 
-        // Current weapon slot
-        unsigned char ucPreviousWeaponType = pSourcePlayer->GetWeaponType ();
-        unsigned char ucCurrentWeaponSlot, ucCurrentWeaponType;
-        BitStream.Read ( ucCurrentWeaponSlot );
-		BitStream.Read ( ucCurrentWeaponType );
-
-		if ( ucCurrentWeaponType != ucPreviousWeaponType )
+        if ( flags.data.bHasAWeapon )
         {
-            // Call our weapon switch command
-            CLuaArguments Arguments;
-            Arguments.PushNumber ( ucPreviousWeaponType );
-            Arguments.PushNumber ( ucCurrentWeaponType );
-            bool bContinue = pSourcePlayer->CallEvent ( "onPlayerWeaponSwitch", Arguments );
+            // Current weapon slot
+            SWeaponSlotSync slot;
+            BitStream.Read ( &slot );
+            unsigned int uiSlot = slot.data.uiSlot;
 
-			// Set the weapon type and slot
-			pSourcePlayer->SetWeaponType ( ucCurrentWeaponType );
-			pSourcePlayer->SetWeaponSlot ( ucCurrentWeaponSlot );
+            pSourcePlayer->SetWeaponSlot ( uiSlot );
+
+            if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
+            {
+                // Read out the ammo states
+                SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), true, true );
+                BitStream.Read ( &ammo );
+                pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
+                pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
+
+                // Read out the aim directions
+                float fArmX, fArmY;
+                BitStream.Read ( fArmX );
+                BitStream.Read ( fArmY );
+
+                // Set the arm directions and whether or not arms are up
+                pSourcePlayer->SetAimDirections ( fArmX, fArmY );
+
+                // Read the aim data only if he's shooting or aiming
+                if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
+                {
+                    SWeaponAimSync sync ( pSourcePlayer->GetWeaponRange () );
+                    BitStream.Read ( &sync );
+                    pSourcePlayer->SetSniperSourceVector ( sync.data.vecOrigin );
+                    pSourcePlayer->SetTargettingVector ( sync.data.vecTarget );
+                }
+            }
+            else
+            {
+                pSourcePlayer->SetWeaponAmmoInClip ( 1 );
+                pSourcePlayer->SetWeaponTotalAmmo ( 1 );
+            }
         }
-
-        if ( ucCurrentWeaponType != 0 )
+        else
         {
-            // Read out the ammo states
-            unsigned short usAmmoInClip;
-            BitStream.Read ( usAmmoInClip );
-            pSourcePlayer->SetWeaponAmmoInClip ( usAmmoInClip );
-            
-            unsigned short usTotalAmmo;
-            BitStream.Read ( usTotalAmmo );
-            pSourcePlayer->SetWeaponTotalAmmo ( usTotalAmmo );
-
-            // Read out the aim directions
-            float fArmX, fArmY;
-			BitStream.Read ( fArmX );
-			BitStream.Read ( fArmY );
-
-			// Set the arm directions and whether or not arms are up
-			pSourcePlayer->SetAimDirections ( fArmX, fArmY );
-
-            // Source vector
-            BitStream.Read ( vecTemp.fX );
-            BitStream.Read ( vecTemp.fY );
-            BitStream.Read ( vecTemp.fZ );
-            pSourcePlayer->SetSniperSourceVector ( vecTemp );
-
-            // Target vector
-            BitStream.Read ( vecTemp.fX );
-            BitStream.Read ( vecTemp.fY );
-            BitStream.Read ( vecTemp.fZ );
-            pSourcePlayer->SetTargettingVector ( vecTemp );
+            pSourcePlayer->SetWeaponSlot ( 0 );
+            pSourcePlayer->SetWeaponAmmoInClip ( 1 );
+            pSourcePlayer->SetWeaponTotalAmmo ( 1 );
         }
 
         // Read out damage info if changed
-        ElementID DamagerID;
-        BitStream.Read ( DamagerID );
+        if ( BitStream.ReadBit () == true )
+        {
+            ElementID DamagerID;
+            BitStream.ReadCompressed ( DamagerID );
         
-        // If it's different, carry on reading
-        if ( DamagerID != RESERVED_ELEMENT_ID )
-        {            
             CElement* pElement = CElementIDs::GetElement ( DamagerID );
 
-            unsigned char ucWeapon, ucBodyPart;
-            BitStream.Read ( ucWeapon );
-            BitStream.Read ( ucBodyPart );
+            SWeaponTypeSync weaponType;
+            BitStream.Read ( &weaponType );
 
-            pSourcePlayer->SetDamageInfo ( pElement, ucWeapon, ucBodyPart );
+            SBodypartSync bodyPart;
+            BitStream.Read ( &bodyPart );
+
+            pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.uiWeaponType, bodyPart.data.uiBodypart );
         }
 
         float fHealth = static_cast < float > ( ucHealth ) / 1.25f;
@@ -226,8 +227,17 @@ bool CPlayerPuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
     return false;
 }
 
+/*
+template < class T >
+bool CompareAndSet ( const T& current, T& previous )
+{
+    bool bChanged = current != previous;
+    previous = current;
+    return bChanged;
+}
+*/
 
-bool CPlayerPuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_pSourceElement )
     {
@@ -238,76 +248,135 @@ bool CPlayerPuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) con
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
         CElement* pContactElement = pSourcePlayer->GetContactElement ();
 
+        // Get current weapon slot
+        unsigned char ucWeaponSlot = pSourcePlayer->GetWeaponSlot ();
+
         // Flags
-        unsigned short usFlags = 0;
-        if ( pSourcePlayer->IsInWater () ) usFlags |= 0x01;
-        if ( pSourcePlayer->IsOnGround () ) usFlags |= 0x02;
-        if ( pSourcePlayer->HasJetPack () ) usFlags |= 0x04;
-        if ( pSourcePlayer->IsDucked () ) usFlags |= 0x08;
-        if ( pSourcePlayer->IsWearingGoggles () ) usFlags |= 0x10;
-        if ( pContactElement ) usFlags |= 0x20;
-        if ( pSourcePlayer->IsChoking () ) usFlags |= 0x40;
-        if ( pSourcePlayer->IsAkimboArmUp () ) usFlags |= 0x80;
-        if ( pSourcePlayer->IsOnFire () ) usFlags |= 0x100;
+        SPlayerPuresyncFlags flags;
+        flags.data.bIsInWater       = ( pSourcePlayer->IsInWater () == true );
+        flags.data.bIsOnGround      = ( pSourcePlayer->IsOnGround () == true );
+        flags.data.bHasJetPack      = ( pSourcePlayer->HasJetPack () == true );
+        flags.data.bIsDucked        = ( pSourcePlayer->IsDucked () == true );
+        flags.data.bWearsGoogles    = ( pSourcePlayer->IsWearingGoggles () == true );
+        flags.data.bHasContact      = ( pContactElement != NULL );
+        flags.data.bIsChoking       = ( pSourcePlayer->IsChoking () == true );
+        flags.data.bAkimboTargetUp  = ( pSourcePlayer->IsAkimboArmUp () == true );
+        flags.data.bIsOnFire        = ( pSourcePlayer->IsOnFire () == true );
+        flags.data.bHasAWeapon      = ( ucWeaponSlot != 0 );
+        flags.data.bSyncingVelocity = ( !flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity () );
 
         CVector vecPosition = pSourcePlayer->GetPosition ();
         if ( pContactElement )
             pSourcePlayer->GetContactPosition ( vecPosition );
         float fRotation = pSourcePlayer->GetRotation ();
-        CVector vecVelocity;
-        pSourcePlayer->GetVelocity ( vecVelocity );
         unsigned char ucHealth = static_cast < unsigned char > ( pSourcePlayer->GetHealth () * 1.25f );
         unsigned char ucArmor = static_cast < unsigned char > ( pSourcePlayer->GetArmor () * 1.25f );
         float fCameraRotation = pSourcePlayer->GetCameraRotation ();
-        unsigned char ucWeaponType = pSourcePlayer->GetWeaponType ();
 
-        BitStream.Write ( PlayerID );
+        BitStream.WriteCompressed ( PlayerID );
 
         // Write the time context
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );
 
-        BitStream.Write ( usLatency );
+        BitStream.WriteCompressed ( usLatency );
         WriteFullKeysync ( ControllerState, BitStream );   
-        BitStream.Write ( usFlags );
+/*
+        // Figure out what to send
+        SPlayerPuresyncSentHeader sent;
+        sent.bFlags             = CompareAndSet ( usFlags,          pSourcePlayer->lastSent.usFlags );
+        sent.bPosition          = CompareAndSet ( vecPosition,      pSourcePlayer->lastSent.vecPosition );
+        sent.bRotation          = CompareAndSet ( fRotation,        pSourcePlayer->lastSent.fRotation );
+        sent.bVelocity          = CompareAndSet ( vecVelocity,      pSourcePlayer->lastSent.vecVelocity );
+        sent.bHealth            = CompareAndSet ( ucHealth,         pSourcePlayer->lastSent.ucHealth );
+        sent.bArmor             = CompareAndSet ( ucArmor,          pSourcePlayer->lastSent.ucArmor );
+        sent.bCameraRotation    = CompareAndSet ( fCameraRotation,  pSourcePlayer->lastSent.fCameraRotation );
+        sent.bWeaponType        = CompareAndSet ( ucWeaponType,     pSourcePlayer->lastSent.ucWeaponType );
+        sent.Write ( BitStream );
+
+        if ( sent.bPosition )
+        {
+            BitStream.Write ( vecPosition.fX );
+            BitStream.Write ( vecPosition.fY );
+            BitStream.Write ( vecPosition.fZ ); 
+        }
+
+        if ( sent.bRotation )
+            BitStream.Write ( fRotation );    
+
+        etc... Could also do a 'sent' header in WriteFullKeysync
+*/
+        BitStream.Write ( &flags );
         
         if ( pContactElement )
-            BitStream.Write ( pContactElement->GetID () );            
+            BitStream.WriteCompressed ( pContactElement->GetID () );            
 
         BitStream.Write ( vecPosition.fX );
         BitStream.Write ( vecPosition.fY );
         BitStream.Write ( vecPosition.fZ ); 
 
         BitStream.Write ( fRotation );       
-        BitStream.Write ( vecVelocity.fX );
-        BitStream.Write ( vecVelocity.fY );
-        BitStream.Write ( vecVelocity.fZ );            
+
+        if ( flags.data.bSyncingVelocity )
+        {
+            SVelocitySync velocity;
+            pSourcePlayer->GetVelocity ( velocity.data.vecVelocity );
+            BitStream.Write ( &velocity );
+        }
+
 	    BitStream.Write ( ucHealth );
         BitStream.Write ( ucArmor );
         BitStream.Write ( fCameraRotation );
 
-        BitStream.Write ( ucWeaponType );
-        if ( ucWeaponType != 0 )
+        if ( flags.data.bHasAWeapon )
         {
-            unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
-            float fAimDirectionX = pSourcePlayer->GetAimDirectionX ();
-            float fAimDirectionY = pSourcePlayer->GetAimDirectionY ();
-			bool bArmUp = pSourcePlayer->IsAkimboArmUp ();
-            CVector vecSniperSource = pSourcePlayer->GetSniperSourceVector ();
-            CVector vecTargetting;
-            pSourcePlayer->GetTargettingVector ( vecTargetting );
+            unsigned int uiSlot = ucWeaponSlot;
+            SWeaponSlotSync slot;
+            slot.data.uiSlot = uiSlot;
+            BitStream.Write ( &slot );
 
-            BitStream.Write ( usWeaponAmmoInClip );
+            if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
+            {
+                unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
+                float fAimDirectionX = pSourcePlayer->GetAimDirectionX ();
+                float fAimDirectionY = pSourcePlayer->GetAimDirectionY ();
+			    bool bArmUp = pSourcePlayer->IsAkimboArmUp ();
+/*
+            // Figure out what to send
+            SPlayerPuresyncWeaponSentHeader sent;
+            sent.bWeaponAmmoInClip      = CompareAndSet ( usWeaponAmmoInClip,   pSourcePlayer->lastSent.usWeaponAmmoInClip );
+            sent.bAimDirectionX         = CompareAndSet ( fAimDirectionX,       pSourcePlayer->lastSent.fAimDirectionX );
+            sent.bAimDirectionY         = CompareAndSet ( fAimDirectionY,       pSourcePlayer->lastSent.fAimDirectionY );
+            sent.bSniperSource          = CompareAndSet ( vecSniperSource,      pSourcePlayer->lastSent.vecSniperSource );
+            sent.bTargetting            = CompareAndSet ( vecTargetting,        pSourcePlayer->lastSent.vecTargetting );
+            sent.Write ( BitStream );
 
-			BitStream.Write ( fAimDirectionX );
-			BitStream.Write ( fAimDirectionY );
+            if ( sent.bWeaponAmmoInClip )
+                BitStream.Write ( usWeaponAmmoInClip );
 
-            BitStream.Write ( vecSniperSource.fX );
-            BitStream.Write ( vecSniperSource.fY );
-            BitStream.Write ( vecSniperSource.fZ );
-            BitStream.Write ( vecTargetting.fX );
-            BitStream.Write ( vecTargetting.fY );
-            BitStream.Write ( vecTargetting.fZ );
-        }        
+            if ( sent.bAimDirectionX )
+			    BitStream.Write ( fAimDirectionX );
+            if ( sent.bAimDirectionY )
+			    BitStream.Write ( fAimDirectionY );
+
+            etc...
+*/
+                SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
+                ammo.data.usAmmoInClip = usWeaponAmmoInClip;
+                BitStream.Write ( &ammo );
+
+			    BitStream.Write ( fAimDirectionX );
+			    BitStream.Write ( fAimDirectionY );
+
+                // Write the aim data only if he's aiming or shooting
+                if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
+                {
+                    SWeaponAimSync aim ( 0.0f );
+                    aim.data.vecOrigin = pSourcePlayer->GetSniperSourceVector ();
+                    pSourcePlayer->GetTargettingVector ( aim.data.vecTarget );
+                    BitStream.Write ( &aim );
+                }
+            }
+        }
 
         // Success
         return true;

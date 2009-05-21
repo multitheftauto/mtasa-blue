@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CConsoleEchoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CConsoleEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Not too short?
     size_t sizeMessage = strlen ( m_szMessage );

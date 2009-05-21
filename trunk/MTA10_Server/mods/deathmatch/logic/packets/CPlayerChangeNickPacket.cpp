@@ -20,7 +20,7 @@ CPlayerChangeNickPacket::CPlayerChangeNickPacket ( const char* szNewNick )
 }
 
 
-bool CPlayerChangeNickPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerChangeNickPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_pSourceElement )
     {

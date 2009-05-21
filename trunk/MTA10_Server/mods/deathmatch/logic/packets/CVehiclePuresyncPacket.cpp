@@ -16,7 +16,7 @@
 
 extern CGame* g_pGame;
 
-bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Got a player to read?
     if ( m_pSourceElement )
@@ -334,7 +334,7 @@ bool CVehiclePuresyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CVehiclePuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Got a player to send?
     if ( m_pSourceElement )
@@ -354,7 +354,7 @@ bool CVehiclePuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) co
 
             // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
             unsigned short usLatency = pSourcePlayer->GetPing ();
-            BitStream.Write ( usLatency );
+            BitStream.WriteCompressed ( usLatency );
 
             // Write the keysync data
             CControllerState ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
@@ -457,7 +457,7 @@ bool CVehiclePuresyncPacket::Write ( NetServerBitStreamInterface& BitStream ) co
 }
 
 
-void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetServerBitStreamInterface& BitStream )
+void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInterface& BitStream )
 {
     // Turret data
     unsigned short usModel = pVehicle->GetModel ();
@@ -485,7 +485,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetServer
 }
 
 
-void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetServerBitStreamInterface& BitStream ) const
+void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInterface& BitStream ) const
 {
     // Turret states
     unsigned short usModel = pVehicle->GetModel ();

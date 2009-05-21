@@ -28,8 +28,8 @@ public:
     inline ePacketID        GetPacketID                     ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
     inline unsigned long    GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
-    bool                    Read                            ( NetServerBitStreamInterface& BitStream );
-    bool                    Write                           ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Read                            ( NetBitStreamInterface& BitStream );
+    bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
 };
 
 #endif

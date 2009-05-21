@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 CRPCFunctions * g_pRPCFunctions = NULL;
 extern CGame * g_pGame;
@@ -61,7 +62,7 @@ void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback )
 }
 
 
-void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetServerBitStreamInterface& bitStream )
+void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetBitStreamInterface& bitStream )
 {
     m_pSourcePlayer = m_pPlayerManager->Get ( Socket );
     if ( m_pSourcePlayer && !m_pSourcePlayer->IsBeingDeleted () )
@@ -84,7 +85,7 @@ void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetServerBitStrea
 }
 
 
-void CRPCFunctions::PlayerInGameNotice ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::PlayerInGameNotice ( NetBitStreamInterface & bitStream )
 {
     // Already ingame? Protocol error
     if ( m_pSourcePlayer->IsIngame () )
@@ -99,7 +100,7 @@ void CRPCFunctions::PlayerInGameNotice ( NetServerBitStreamInterface & bitStream
 }
 
 
-void CRPCFunctions::PlayerTarget ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::PlayerTarget ( NetBitStreamInterface & bitStream )
 {
     if ( m_pSourcePlayer->IsJoined () )
     {
@@ -120,30 +121,38 @@ void CRPCFunctions::PlayerTarget ( NetServerBitStreamInterface & bitStream )
 }
 
 
-void CRPCFunctions::PlayerWeapon ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
 {
     if ( m_pSourcePlayer->IsJoined () && m_pSourcePlayer->IsSpawned () )
     {
-        unsigned char ucSlot, ucType;
-        bitStream.Read ( ucSlot );
-        bitStream.Read ( ucType );
-        unsigned short usAmmo = 0;
-        if ( ucType != 0 ) bitStream.Read ( usAmmo );
-        unsigned short usAmmoInClip = 0;
-        if ( usAmmo != 0 ) bitStream.Read ( usAmmoInClip );
+        SWeaponSlotSync slot;
+        bitStream.Read ( &slot );
+        unsigned int uiSlot = slot.data.uiSlot;
 
-        CWeapon* pWeapon = m_pSourcePlayer->GetWeapon ( ucSlot );
-        if ( pWeapon )
+        m_pSourcePlayer->SetWeaponSlot ( uiSlot );
+        CWeapon* pWeapon = m_pSourcePlayer->GetWeapon ( uiSlot );
+
+        if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            pWeapon->ucType = ucType;
-            pWeapon->usAmmo = usAmmo;
-            pWeapon->usAmmoInClip = usAmmoInClip;
+            if ( pWeapon )
+            {
+                SWeaponAmmoSync ammo ( pWeapon->ucType, true, true );
+                bitStream.Read ( &ammo );
+
+                pWeapon->usAmmo = ammo.data.usTotalAmmo;
+                pWeapon->usAmmoInClip = ammo.data.usAmmoInClip;
+            }
+        }
+        else if ( pWeapon )
+        {
+            pWeapon->usAmmo = 1;
+            pWeapon->usAmmoInClip = 1;
         }
     }
 }
 
 
-void CRPCFunctions::KeyBind ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 {
     unsigned char ucType, ucKeyLength, ucHitState;
     bitStream.Read ( ucType );
@@ -160,7 +169,7 @@ void CRPCFunctions::KeyBind ( NetServerBitStreamInterface & bitStream )
 }
 
 
-void CRPCFunctions::CursorEvent ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
 {
     unsigned char ucButton;
     CVector2D vecCursorPosition;
@@ -233,7 +242,7 @@ void CRPCFunctions::CursorEvent ( NetServerBitStreamInterface & bitStream )
 }
 
 
-void CRPCFunctions::RequestStealthKill ( NetServerBitStreamInterface & bitStream )
+void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
 {
     ElementID ID;
     bitStream.Read ( ID );

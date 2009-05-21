@@ -45,7 +45,7 @@ CServerTextItemPacket::~CServerTextItemPacket ( void )
 }
 
 
-bool CServerTextItemPacket::Write ( NetServerBitStreamInterface &BitStream  ) const
+bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
 {
     BitStream.Write ( m_ulUniqueId );
 

@@ -23,7 +23,7 @@ public:
     inline ePacketID        GetPacketID             ( void ) const          { return static_cast < ePacketID > ( PACKET_ID_COMMAND ); };
     inline unsigned long    GetFlags                ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Read                    ( NetServerBitStreamInterface& BitStream );
+    bool                    Read                    ( NetBitStreamInterface& BitStream );
 
     inline const char*      GetCommand              ( void ) const          { return m_szCommand; };
 

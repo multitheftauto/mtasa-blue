@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CCameraSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CCameraSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     unsigned char ucTemp;
     BitStream.Read ( ucTemp );

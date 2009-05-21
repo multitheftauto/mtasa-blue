@@ -13,7 +13,7 @@
 #define __CNETSERVER_H
 
 #include "ns_common.h"
-#include "ns_bitstream.h"
+#include "net/bitstream.h"
 #include "ns_playerid.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
@@ -34,9 +34,9 @@ public:
 
 	virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
 
-	virtual NetServerBitStreamInterface*    AllocateNetServerBitStream      ( void ) = 0;
-	virtual void                            DeallocateNetServerBitStream    ( NetServerBitStreamInterface* bitStream ) = 0;
-	virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetServerBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
+	virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( void ) = 0;
+	virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
+	virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
 
 	virtual void                            GetPlayerIP                     ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort ) = 0;
 
@@ -44,7 +44,7 @@ public:
 	virtual void                            RemoveBan                       ( const char* szIP ) = 0;
 	virtual bool                            IsBanned                        ( const char* szIP ) = 0;
 
-    virtual void                            GetPacketLogData                ( unsigned long* ulBytes, unsigned long* ulCount ) = 0;
+    virtual void                            GetPacketLogData                ( unsigned long* ulBits, unsigned long* ulCount ) = 0;
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 

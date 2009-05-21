@@ -16,7 +16,7 @@
 #include <windows.h>
 #endif
 
-#include "net_bitstream.h"
+#include "net/bitstream.h"
 #include "net/packetenums.h"
 
 #define MTA_DM_NET_MODULE_VERSION   0x0000B

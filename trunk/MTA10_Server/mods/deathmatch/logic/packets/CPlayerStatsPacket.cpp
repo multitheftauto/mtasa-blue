@@ -23,7 +23,7 @@ CPlayerStatsPacket::~CPlayerStatsPacket ( void )
 }
 
 
-bool CPlayerStatsPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the source player.
     if ( m_pSourceElement )

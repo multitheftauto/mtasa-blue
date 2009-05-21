@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CCommandPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CCommandPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the command
     int iNumberOfBytesUsed = BitStream.GetNumberOfBytesUsed ();

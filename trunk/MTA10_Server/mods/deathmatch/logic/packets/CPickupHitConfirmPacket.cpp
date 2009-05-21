@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CPickupHitConfirmPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPickupHitConfirmPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // unsigned short   (2)     - pickup id
     // bool                     - hide it?

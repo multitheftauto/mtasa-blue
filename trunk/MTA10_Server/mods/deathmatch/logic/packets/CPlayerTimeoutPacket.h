@@ -21,8 +21,8 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const                                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_TIMEOUT ); };
     inline unsigned long    GetFlags                    ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Read                        ( NetServerBitStreamInterface& BitStream )          { return true; };
-    inline bool             Write                       ( NetServerBitStreamInterface& BitStream ) const    { return true; };
+    inline bool             Read                        ( NetBitStreamInterface& BitStream )                { return true; };
+    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const          { return true; };
 };
 
 #endif

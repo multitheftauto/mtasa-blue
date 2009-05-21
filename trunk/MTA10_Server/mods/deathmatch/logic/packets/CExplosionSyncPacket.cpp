@@ -28,7 +28,7 @@ CExplosionSyncPacket::CExplosionSyncPacket ( const CVector& vecPosition, unsigne
 }
 
 
-bool CExplosionSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CExplosionSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     return  ( BitStream.Read ( m_OriginID ) &&
               BitStream.Read ( m_vecPosition.fX ) &&
@@ -38,7 +38,7 @@ bool CExplosionSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CExplosionSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CExplosionSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the source player and latency if any. Otherwize 0
     if ( m_pSourceElement )
@@ -47,7 +47,7 @@ bool CExplosionSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) cons
         BitStream.Write ( ID );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
-        BitStream.Write ( usLatency );
+        BitStream.WriteCompressed ( usLatency );
     }
     else
     {

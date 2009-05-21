@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-bool CPickupHideShowPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPickupHideShowPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Got more than zero pickups added?
     if ( m_List.size () > 0 )

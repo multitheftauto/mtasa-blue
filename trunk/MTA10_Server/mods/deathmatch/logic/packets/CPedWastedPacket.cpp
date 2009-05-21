@@ -40,7 +40,7 @@ CPedWastedPacket::CPedWastedPacket ( CPed * pPed, CElement * pKiller, unsigned c
 }
 
 
-bool CPedWastedPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CPedWastedPacket::Read ( NetBitStreamInterface& BitStream )
 {
     BitStream.Read ( m_AnimGroup );
     BitStream.Read ( m_AnimID );
@@ -56,7 +56,7 @@ bool CPedWastedPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CPedWastedPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPedWastedPacket::Write ( NetBitStreamInterface& BitStream ) const
 {    
     BitStream.Write ( m_PedID );
     BitStream.Write ( m_Killer );

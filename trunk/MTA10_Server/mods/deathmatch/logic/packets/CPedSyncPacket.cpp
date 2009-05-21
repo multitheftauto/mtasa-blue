@@ -23,7 +23,7 @@ CPedSyncPacket::~CPedSyncPacket ( void )
 }
 
 
-bool CPedSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CPedSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of bytes
     while ( BitStream.GetNumberOfUnreadBits () > 32 )
@@ -77,7 +77,7 @@ bool CPedSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CPedSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPedSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // While we're not out of syncs to write
     bool bSent = false;

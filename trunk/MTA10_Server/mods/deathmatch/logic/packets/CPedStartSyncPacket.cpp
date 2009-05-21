@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CPedStartSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPedStartSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( !m_pPed ) return false;
 

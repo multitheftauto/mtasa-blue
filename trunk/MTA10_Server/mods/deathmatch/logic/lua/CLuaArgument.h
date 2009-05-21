@@ -38,7 +38,7 @@ public:
                             CLuaArgument        ( const char* szString );
                             CLuaArgument        ( CElement* pElement );
                             CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
-                            CLuaArgument        ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+                            CLuaArgument        ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
                             ~CLuaArgument       ( void );
 
@@ -66,8 +66,8 @@ public:
     CElement*               GetElement          ( void ) const;
     bool                    GetAsString         ( char * szBuffer, unsigned int uiLength );
 
-    bool                    ReadFromBitStream   ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
-    bool                    WriteToBitStream    ( NetServerBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
     json_object*            WriteToJSONObject   ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
     bool                    ReadFromJSONObject  ( json_object* object, std::vector < CLuaArguments* > * pKnownTables = NULL );
     char *                  WriteToString       ( char * szBuffer, int length );

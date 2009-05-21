@@ -198,6 +198,12 @@ public:
     void                                        ClearSyncTime               ( CPlayer& Player );
     void                                        ClearSyncTimes              ( void );    
 
+    // Sync stuff
+    inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
+    inline bool                                 IsSyncingVelocity           ( void ) const                  { return m_bSyncingVelocity; }
+    inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
+    inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -276,6 +282,9 @@ private:
 
     std::list < sPlayerSyncData* >              m_SyncTimes;
 
+    // Sync stuff
+    bool                                        m_bSyncingVelocity;
+    unsigned int                                m_uiPuresyncPackets;
 };
 
 #endif

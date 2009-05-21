@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CChatEchoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the color
     BitStream.Write ( m_ucRed );

@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CEntityRemovePacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CEntityRemovePacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write each entity type then id to it
     vector < CElement* > ::const_iterator iter = m_List.begin ();

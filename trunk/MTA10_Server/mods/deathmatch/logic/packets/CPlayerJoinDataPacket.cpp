@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-bool CPlayerJoinDataPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
     m_szNick [ MAX_NICK_LENGTH ] = 0;
     m_szSerialUser [MAX_SERIAL_LENGTH] = 0;

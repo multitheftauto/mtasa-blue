@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-bool CDebugEchoPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CDebugEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Write the level
     BitStream.Write ( static_cast < unsigned char > ( m_uiLevel ) );

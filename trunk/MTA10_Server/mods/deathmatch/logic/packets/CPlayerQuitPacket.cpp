@@ -20,7 +20,7 @@ CPlayerQuitPacket::CPlayerQuitPacket ( void )
 }
 
 
-bool CPlayerQuitPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerQuitPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     BitStream.Write ( m_PlayerID );
     BitStream.Write ( m_ucQuitReason );

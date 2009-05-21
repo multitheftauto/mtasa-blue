@@ -40,7 +40,7 @@ unsigned long CVoiceDataPacket::GetFlags ( void ) const
 }
 
 
-bool CVoiceDataPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CVoiceDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
     if ( m_pbDataBuffer )
     {
@@ -57,7 +57,7 @@ bool CVoiceDataPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CVoiceDataPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVoiceDataPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_usActualDataLength )
     {

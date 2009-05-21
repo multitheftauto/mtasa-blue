@@ -1394,6 +1394,10 @@
 					RelativePath="..\..\..\Shared\sdk\net\Packets.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\sdk\net\SyncStructures.h"
+					>
+				</File>
 				<Filter
 					Name="rpc"
 					>

@@ -25,7 +25,7 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_JOINDATA ); };
     inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Read                        ( NetServerBitStreamInterface& BitStream );
+    bool                    Read                        ( NetBitStreamInterface& BitStream );
 
     inline unsigned short   GetNetVersion               ( void )                            { return m_usNetVersion; };
     inline unsigned char    GetGameVersion              ( void )                            { return m_ucGameVersion; };

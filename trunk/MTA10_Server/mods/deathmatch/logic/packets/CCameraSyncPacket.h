@@ -24,7 +24,7 @@ public:
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_CAMERA_SYNC; };
     unsigned long                           GetFlags                    ( void ) const                  { return PACKET_SEQUENCED; };
 
-    bool                                    Read                        ( NetServerBitStreamInterface& BitStream );
+    bool                                    Read                        ( NetBitStreamInterface& BitStream );
 
     bool                                    m_bFixed;
     CVector                                 m_vecPosition, m_vecLookAt;

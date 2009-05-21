@@ -22,7 +22,7 @@ CResourceStartPacket::CResourceStartPacket ( const char* szResourceName, CResour
 }
 
 
-bool CResourceStartPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( !m_strResourceName.empty () )
     {

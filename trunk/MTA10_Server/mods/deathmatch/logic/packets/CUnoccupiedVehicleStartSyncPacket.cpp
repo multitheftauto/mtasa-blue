@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-bool CUnoccupiedVehicleStartSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CUnoccupiedVehicleStartSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( !m_pVehicle ) return false;
 

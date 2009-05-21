@@ -42,7 +42,7 @@ class CLuaArguments
 public:
                                                         CLuaArguments       ( void )                { }
                                                         CLuaArguments       ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
-														CLuaArguments		( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+														CLuaArguments		( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
                                                         ~CLuaArguments      ( void )                { DeleteArguments (); };
 
     void                                                CopyRecursive       ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
@@ -79,9 +79,9 @@ public:
 
     void                                                DeleteArguments     ( void );
 
-    bool                                                ReadFromBitStream   ( NetServerBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                                                ReadFromJSONString  ( const char* szJSON );
-    bool                                                WriteToBitStream    ( NetServerBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
     std::vector < char * > *                            WriteToCharVector   ( std::vector < char * > * values );
     bool                                                WriteToJSONString   ( std::string& strJSON, bool bSerialize = false );
     json_object *                                       WriteTableToJSONObject ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );

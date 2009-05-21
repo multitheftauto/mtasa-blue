@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-bool CVehicleDamageSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CVehicleDamageSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     return ( BitStream.Read ( m_Vehicle ) &&
              BitStream.Read ( (char*) m_ucDoorStates, MAX_DOORS ) &&
@@ -23,7 +23,7 @@ bool CVehicleDamageSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CVehicleDamageSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVehicleDamageSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     BitStream.Write ( m_Vehicle );
     BitStream.Write ( (char*) m_ucDoorStates, MAX_DOORS );

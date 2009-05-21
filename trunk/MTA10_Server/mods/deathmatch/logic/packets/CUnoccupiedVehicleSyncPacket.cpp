@@ -24,7 +24,7 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket ( void )
 }
 
 
-bool CUnoccupiedVehicleSyncPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CUnoccupiedVehicleSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of bytes
     while ( BitStream.GetNumberOfUnreadBits () > 32 )
@@ -82,7 +82,7 @@ bool CUnoccupiedVehicleSyncPacket::Read ( NetServerBitStreamInterface& BitStream
 }
 
 
-bool CUnoccupiedVehicleSyncPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CUnoccupiedVehicleSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // While we're not out of syncs to write
     bool bSent = false;

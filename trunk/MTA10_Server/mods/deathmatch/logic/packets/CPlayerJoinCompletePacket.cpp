@@ -47,7 +47,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsig
 }
 
 
-bool CPlayerJoinCompletePacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     BitStream.Write ( m_PlayerID );
     BitStream.Write ( m_ucNumberOfPlayers );

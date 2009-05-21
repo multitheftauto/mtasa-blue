@@ -14,7 +14,7 @@
 
 #include <string>
 #include "net_common.h"
-#include "net_bitstream.h"
+#include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
 class CNet

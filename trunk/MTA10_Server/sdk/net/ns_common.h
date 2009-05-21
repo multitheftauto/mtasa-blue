@@ -12,7 +12,7 @@
 #ifndef __NS_COMMON_H
 #define __NS_COMMON_H
 
-#include "ns_bitstream.h"
+#include "net/bitstream.h"
 #include "net/packetenums.h"
 #include "ns_playerid.h"
 
@@ -35,7 +35,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, NetServerPlayerID&, NetServerBitStreamInterface& );
+typedef bool (*PPACKETHANDLER) ( unsigned char, NetServerPlayerID&, NetBitStreamInterface& );
 
 enum NetServerPacketPriority
 {

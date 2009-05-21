@@ -83,7 +83,11 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_ucNametagB = 0xFF;
     m_bNametagShowing = true;        
 
-    m_ucBlurLevel = 36; // Default    
+    m_ucBlurLevel = 36; // Default
+
+    // Sync stuff
+    m_bSyncingVelocity = false;
+    m_uiPuresyncPackets = 0;
 
     // Add us to the manager
     pPlayerManager->AddToList ( this );
@@ -207,7 +211,7 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
     }
 
     // Allocate a bitstream for it
-    NetServerBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ();
+    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ();
     if ( pBitStream )
     {
         // Write the content to it and send it

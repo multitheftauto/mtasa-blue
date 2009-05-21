@@ -75,7 +75,7 @@ struct SDelayedSyncData
     unsigned char       ucType;
     CControllerState    State;
     bool                bDucking;
-    unsigned char       ucWeaponID;
+    eWeaponSlot         slot;
     unsigned short      usWeaponAmmo;
     CVector             vecTarget;
     bool                bUseSource;
@@ -163,7 +163,7 @@ public:
     void                        SetControllerState          ( const CControllerState& ControllerState );
 
     void                        AddKeysync                  ( unsigned long ulDelay, const CControllerState& ControllerState, bool bDucking );
-    void                        AddChangeWeapon             ( unsigned long ulDelay, unsigned char ucWeaponID, unsigned short usWeaponAmmo );
+    void                        AddChangeWeapon             ( unsigned long ulDelay, eWeaponSlot slot, unsigned short usWeaponAmmo );
     void                        AddMoveSpeed                ( unsigned long ulDelay, const CVector& vecMoveSpeed );
 
     void                        SetTargetTarget             ( unsigned long ulDelay, const CVector& vecSource, const CVector& vecTarget );

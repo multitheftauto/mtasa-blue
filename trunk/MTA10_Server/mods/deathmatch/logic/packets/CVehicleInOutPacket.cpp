@@ -81,7 +81,7 @@ CVehicleInOutPacket::~CVehicleInOutPacket ( void )
 }
 
 
-bool CVehicleInOutPacket::Read ( NetServerBitStreamInterface& BitStream )
+bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the vehicle id
     m_ID = INVALID_ELEMENT_ID;
@@ -111,7 +111,7 @@ bool CVehicleInOutPacket::Read ( NetServerBitStreamInterface& BitStream )
 }
 
 
-bool CVehicleInOutPacket::Write ( NetServerBitStreamInterface& BitStream ) const
+bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_pSourceElement && m_ID )
     {

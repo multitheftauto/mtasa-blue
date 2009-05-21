@@ -41,7 +41,7 @@ void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
         if ( pPed )
         {
             // Don't change remote players weapons (affects sync)
-            if ( pPed->GetType () == CCLIENTPED || ( CClientPlayer * ) pPed == m_pPlayerManager->GetLocalPlayer () )
+            if ( pPed->GetType () == CCLIENTPED || pPed->GetType () == CCLIENTPLAYER )
             {
                 // Valid weapon id?
                 if ( ucWeaponID == 0 || CClientPickupManager::IsValidWeaponID ( ucWeaponID ) )
@@ -63,33 +63,44 @@ void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
                         // For some stupid reason, going from brassknuckles to unarmed causes the knuckles to remain 
                         // on display but unusable. So, what we do is switch to a MELEE weapon (creating one if necessary)
                         // then switch back to unarmed from there, which works fine.
-                        eWeaponType unarmedWeapon = pPed->GetWeapon (WEAPONSLOT_TYPE_UNARMED)->GetType();
-                        pPed->RemoveWeapon ( unarmedWeapon );
-                        if ( ucGiveWeapon == 1 || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
+                        CWeapon* oldWeapon = pPed->GetWeapon (WEAPONSLOT_TYPE_UNARMED);
+                        if ( oldWeapon )
                         {
-                            CWeapon * oldWeapon = NULL;
-                            if ( unarmedWeapon == WEAPONTYPE_BRASSKNUCKLE )
+                            eWeaponType unarmedWeapon = oldWeapon->GetType();
+                            pPed->RemoveWeapon ( unarmedWeapon );
+                            if ( ucGiveWeapon == 1 || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
                             {
-                                oldWeapon = pPed->GetWeapon(WEAPONSLOT_TYPE_MELEE);
-                                if ( oldWeapon && oldWeapon->GetType() == WEAPONTYPE_UNARMED )
+                                oldWeapon = NULL;
+                                if ( unarmedWeapon == WEAPONTYPE_BRASSKNUCKLE )
                                 {
-                                    oldWeapon = pPed->GiveWeapon(WEAPONTYPE_GOLFCLUB, 100);
+                                    oldWeapon = pPed->GetWeapon(WEAPONSLOT_TYPE_MELEE);
+                                    if ( oldWeapon && oldWeapon->GetType() == WEAPONTYPE_UNARMED )
+                                    {
+                                        oldWeapon = pPed->GiveWeapon(WEAPONTYPE_GOLFCLUB, 100);
+                                    }
+                                    else
+                                    {
+                                        oldWeapon = NULL;
+                                    }
+                                    pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_MELEE );
                                 }
-                                else
+
+                                // switch to the unarmed slot
+                                pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+
+                                // if we created a special MELEE weapon just for this, remove it now
+                                if ( oldWeapon )
                                 {
-                                    oldWeapon = NULL;
+                                    oldWeapon->Remove();
                                 }
-                                pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_MELEE );
                             }
-
-                            // switch to the unarmed slot
-                            pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
-
-                            // if we created a special MELEE weapon just for this, remove it now
-                            if ( oldWeapon )
-                            {
-                                oldWeapon->Remove();
-                            }
+                        }
+                        else
+                        {
+                            // Probably the ped is streamed out
+                            pPed->GiveWeapon ( WEAPONTYPE_UNARMED, 1 );
+                            if ( ucGiveWeapon == 1 )
+                                pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
                         }
                     }
                 }

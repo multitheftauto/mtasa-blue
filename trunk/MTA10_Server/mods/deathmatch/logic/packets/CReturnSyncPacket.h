@@ -24,7 +24,7 @@ public:
     inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_RETURN_SYNC; };
     inline unsigned long    GetFlags                    ( void ) const                  { return 0; };
 
-    bool                    Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 };
 
 #endif

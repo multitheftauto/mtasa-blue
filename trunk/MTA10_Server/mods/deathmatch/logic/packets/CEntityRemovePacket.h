@@ -22,7 +22,7 @@ public:
     inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_ENTITY_REMOVE; };
     inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                            Write                       ( NetServerBitStreamInterface& BitStream ) const;
+    bool                            Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline void                     Add                         ( class CElement* pElement )    { m_List.push_back ( pElement ); };
     inline void                     Clear                       ( void )                        { m_List.clear (); };
