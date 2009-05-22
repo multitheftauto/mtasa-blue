@@ -60,6 +60,7 @@ public:
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetGameProcessHandler       ( GameProcessHandler* pProcessHandler );
+    void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -145,6 +146,7 @@ private:
     static unsigned long        HOOKPOS_CObject_Render;
     static unsigned long        HOOKPOS_EndWorldColors;
     static unsigned long        HOOKPOS_CWorld_ProcessVerticalLineSectorList;
+    static unsigned long        HOOKPOS_ComputeDamageResponse_StartChoking;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

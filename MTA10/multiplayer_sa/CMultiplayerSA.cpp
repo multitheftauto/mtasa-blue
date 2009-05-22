@@ -45,6 +45,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
 unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
+unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -112,6 +113,7 @@ ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
 GameProcessHandler* m_pGameProcessHandler = NULL;
+ChokingHandler* m_pChokingHandler = NULL;
 
 ExplosionHandler * m_pExplosionHandler; // stores our handler
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
@@ -146,6 +148,7 @@ VOID HOOK_CObject_Render ();
 VOID HOOK_EndWorldColors ();
 VOID HOOK_CGame_Process ();
 VOID HOOK_CWorld_ProcessVerticalLineSectorList ();
+VOID HOOK_ComputeDamageResponse_StartChoking ();
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -242,6 +245,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
 	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
+    HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -1050,6 +1054,11 @@ void CMultiplayerSA::SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandle
 void CMultiplayerSA::SetGameProcessHandler ( GameProcessHandler* pProcessHandler )
 {
     m_pGameProcessHandler = pProcessHandler;
+}
+
+void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
+{
+    m_pChokingHandler = pChokingHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -2394,6 +2403,38 @@ stop_looping:
         jmp     dwProcessVerticalEndLooping
     }
 }
+
+
+
+// Hook to detect when a player is choking
+static DWORD dwChokingChoke = 0x4C05C1;
+static DWORD dwChokingDontchoke = 0x4C0620;
+static unsigned char ucChokingWeaponType = 0;
+VOID _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
+{
+    _asm
+    {
+        pushad
+        mov     al, [esp+0x8C]
+        mov     ucChokingWeaponType, al
+    }
+
+    if ( m_pChokingHandler && m_pChokingHandler ( ucChokingWeaponType ) == false )
+        goto dont_choke;
+
+    _asm
+    {
+        popad
+        mov     ecx, [edi]
+        mov     eax, [ecx+0x47C]
+        jmp     dwChokingChoke
+dont_choke:
+        popad
+        jmp     dwChokingDontchoke
+    }
+}
+
+
 
 
 
