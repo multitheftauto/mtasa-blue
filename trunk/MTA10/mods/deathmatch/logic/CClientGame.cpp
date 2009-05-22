@@ -3332,7 +3332,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     return false;            
                 }
                 else {
-                    if (pDamagedPed->IsLocalEntity() == false && fPreviousHealth > 0.0f) {
+                    if (pDamagedPed->IsLocalEntity() && fPreviousHealth > 0.0f) {
+                        pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
+                        pEvent->ComputeDeathAnim ( pDamagePed, true );
+                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
+                        AnimationId animID = pEvent->GetAnimId ();
+                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
+                        return true;
+                    }
+                    if (fPreviousHealth > 0.0f) {
                         // Grab our death animation
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
