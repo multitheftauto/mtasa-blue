@@ -16,6 +16,9 @@
 // -------------------------------
 // SA interfaces
 
+#pragma pack(push)
+#pragma pack(1)
+
 class CWaterVertexSAInterface
 {
 public:
@@ -47,6 +50,8 @@ class CWaterTriangleSAInterface : public CWaterPolySAInterface
 public:
     WORD m_wFlags;
 };
+
+#pragma pack(pop)
 
 // -------------------------------
 // Interface wrappers

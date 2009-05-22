@@ -27,7 +27,7 @@
 #define FUNC_TestLineAgainstWater          0x6E61B0
 
 typedef void (__cdecl *ReadWaterConfiguration_t)();
-typedef WORD (__cdecl *CreateWaterVertex_t)(short sX, short sY, float fZ, float fUnknown, float fHeight, WORD wFlow);
+typedef WORD (__cdecl *CreateWaterVertex_t)(long lX, long lY, float fZ, float fUnknown, float fHeight, WORD wFlow);
 typedef void (__cdecl *BuildWaterIndex_t)();
 typedef bool (__cdecl *TestLineAgainstWater_t)(float fStartX, float fStartY, float fStartZ, float fEndX, float fEndY, float fEndZ, CVector* pvecCollision);
 typedef bool (__cdecl *GetWaterLevel_t)(float fX, float fY, float fZ, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);

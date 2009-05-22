@@ -543,13 +543,16 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
 	DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
 
 	DWORD dwFunc = FUNC_LoadVehicleModel;
-	DWORD dwThis = (DWORD)(pPool[usModelID]);
-	__asm
+	DWORD dwThis = pPool[usModelID];
+    if ( dwThis && pNew != (RpClump *)((CBaseModelInfoSAInterface *)dwThis)->pRwObject )
     {
-		mov		ecx, dwThis
-		push	pNew
-		call	dwFunc
-	}
+	    __asm
+        {
+		    mov		ecx, dwThis
+		    push	pNew
+		    call	dwFunc
+	    }
+    }
 }
 
 // Reads and parses a COL3 file
