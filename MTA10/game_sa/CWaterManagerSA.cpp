@@ -500,7 +500,7 @@ void CWaterManagerSA::GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3
 
 CWaterVertex* CWaterManagerSA::CreateVertex ( CVector& vecPosition )
 {
-    WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( ((short)vecPosition.fX) & ~1, ((short)vecPosition.fY) & ~1, vecPosition.fZ, 0.2f, 0.1f, 0 );
+    WORD wID = ( (CreateWaterVertex_t) FUNC_CreateWaterVertex )( (long)vecPosition.fX & ~1, (long)vecPosition.fY & ~1, vecPosition.fZ, 0.2f, 0.1f, 0 );
     return &m_Vertices [ wID ];
 }
 
