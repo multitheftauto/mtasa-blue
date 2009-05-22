@@ -77,6 +77,7 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_CObject_Render =                                                0x59F1ED;
     CMultiplayerSA::HOOKPOS_EndWorldColors =                                                0x561795;
     CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList =                          0x563357;
+    CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking =                            0x4C05B9;
 
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E670;
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x507030;

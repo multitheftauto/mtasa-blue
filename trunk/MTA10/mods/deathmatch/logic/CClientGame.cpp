@@ -219,6 +219,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
+    g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -346,6 +347,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetGameProcessHandler ( NULL );
+    g_pMultiplayer->SetChokingHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -2227,6 +2229,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false );
     m_Events.AddEvent ( "onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
     m_Events.AddEvent ( "onClientPlayerWasted", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
@@ -3035,6 +3038,11 @@ void CClientGame::StaticGameProcessHandler ( void )
     g_pClientGame->GameProcessHandler ();
 }
 
+bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
+{
+    return g_pClientGame->ChokingHandler ( ucWeaponType );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3116,6 +3124,13 @@ void CClientGame::GameProcessHandler ( void )
     {
         DoPulses ();
     }
+}
+
+bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
+{
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( ucWeaponType );
+    return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
 
