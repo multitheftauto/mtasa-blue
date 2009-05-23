@@ -738,6 +738,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefs::SetTimer );
 	CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefs::KillTimer );
 	CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefs::GetTimers );
+	CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefs::IsTimer );
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefs::GetTickCount_ );
     CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefs::GetCTime );
     CLuaCFunctions::AddFunction ( "tocolor", CLuaFunctionDefs::tocolor );

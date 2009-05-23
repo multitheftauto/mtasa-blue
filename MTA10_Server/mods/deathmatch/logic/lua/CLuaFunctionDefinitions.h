@@ -410,6 +410,7 @@ public:
     static int      SetTimer                            ( lua_State* luaVM );
 	static int		KillTimer							( lua_State* luaVM );
 	static int		GetTimers							( lua_State* luaVM );
+	static int		IsTimer								( lua_State* luaVM );
     static int      GetColorFromString                  ( lua_State* luaVM );
     static int      Reference                           ( lua_State* luaVM );
     static int      Dereference                         ( lua_State* luaVM );
