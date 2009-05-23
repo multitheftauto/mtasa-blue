@@ -110,6 +110,7 @@ public:
     {
         // Initialize variables
         bScanned = false;
+        bSkipped = false;
         bSerials = false;
         m_ulQueryStart = 0;
         
@@ -132,6 +133,7 @@ public:
     bool                bPassworded;    // Password protected
     bool                bSerials;       // Serial verification on
     bool                bScanned;
+    bool                bSkipped;
 
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version
@@ -176,6 +178,7 @@ protected:
     bool                                    m_bUpdated;
     int                                     m_iPass;
     unsigned int                            m_nScanned;
+    unsigned int                            m_nSkipped;
     std::list < CServerListItem* >          m_Servers;
     std::string                             m_strStatus;
 };

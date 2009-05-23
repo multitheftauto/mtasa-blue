@@ -23,6 +23,7 @@ CServerList::CServerList ( void )
     m_iPass = 0;
     m_strStatus = "Idle";
     m_nScanned = 0;
+    m_nSkipped = 0;
 }
 
 
@@ -39,6 +40,7 @@ void CServerList::Clear ( void )
         delete *i;
     m_Servers.clear ();
     m_nScanned = 0;
+    m_nSkipped = 0;
 }
 
 
@@ -47,6 +49,7 @@ void CServerList::Pulse ( void )
     unsigned int n = m_Servers.size ();
     unsigned int uiQueriesSent = 0;
     unsigned int uiRepliesParsed = 0;
+    unsigned int uiNoReplies = 0;
 
     // Scan all servers in our list, and keep the value of scanned servers
     for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ ) {
@@ -57,24 +60,28 @@ void CServerList::Pulse ( void )
         else
         if ( strResult == "ParsedQuery" )
             uiRepliesParsed++;
-            
+        else
+        if ( strResult == "NoReply" )
+            uiNoReplies++;
+           
         if ( uiQueriesSent >= SERVER_LIST_QUERIES_PER_PULSE ) break;
     }
 
     // If we queried any new servers, we should toggle the GUI update flag
-    m_bUpdated = m_bUpdated || ( uiRepliesParsed > 0 );
+    m_bUpdated = m_bUpdated || ( uiRepliesParsed > 0 ) || ( uiNoReplies > 0 );
 
     // Check whether we are done scanning
     std::stringstream ss;
 
     // Store the new number of scanned servers
     m_nScanned += uiRepliesParsed;
-    if ( m_nScanned == n ) {
-        ss << "Found " << m_nScanned << " servers";
+    m_nSkipped += uiNoReplies;
+    if ( m_nScanned + m_nSkipped == n ) {
+        ss << "Found " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
         // We are no longer refreshing
         m_iPass = 0;
     } else {
-        ss << "Scanned " << m_nScanned << " servers";
+        ss << "Scanned " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
     }
 
     // Update our status message
@@ -262,7 +269,7 @@ void CServerListLAN::Discover ( void )
 std::string CServerListItem::Pulse ( void )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
-    if ( bScanned ) return "AlreadyScanned";
+    if ( bScanned || bSkipped ) return "Done";
 
     char szBuffer[SERVER_LIST_QUERY_BUFFER] = {0};
 
@@ -280,6 +287,13 @@ std::string CServerListItem::Pulse ( void )
             ParseQuery ( szBuffer, len );
             return "ParsedQuery";
         }
+
+        if ( CClientTime::GetTime () - m_ulQueryStart > 2000 )
+        {
+            bSkipped = true;
+            return "NoReply";
+        }
+
         return "WaitingReply";
     }
 }
