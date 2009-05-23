@@ -442,6 +442,7 @@ public:
     LUA_DECLARE ( SetTimer );
 	LUA_DECLARE ( KillTimer );
 	LUA_DECLARE ( GetTimers );
+	LUA_DECLARE ( IsTimer );
     LUA_DECLARE ( GetTickCount_ );
     LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( tocolor );

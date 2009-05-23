@@ -194,6 +194,24 @@ int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsTimer ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
+        if ( pLuaTimer )
+        {
+            lua_pushboolean ( luaVM, pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) );
+            return 1;
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 {
     double dCount;
