@@ -322,7 +322,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     g_pCore->GetConsole()->Printf ( "Got server %s", szIP );
 
     // Calculate the ping/latency
-    nPing           = CClientTime::GetTime () - m_ulQueryStart;
+    nPing           = ( CClientTime::GetTime () - m_ulQueryStart ) / 2;
 
     // Parse relevant data
     strGame         = _STR;
