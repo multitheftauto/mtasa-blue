@@ -44,23 +44,31 @@ void CServerList::Clear ( void )
 
 void CServerList::Pulse ( void )
 {
-    unsigned int j = 0, n = m_Servers.size ();
+    unsigned int n = m_Servers.size ();
+    unsigned int uiQueriesSent = 0;
+    unsigned int uiRepliesParsed = 0;
 
     // Scan all servers in our list, and keep the value of scanned servers
     for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ ) {
         CServerListItem * pServer = *i;
-        if ( pServer->Pulse () ) j++;
-        if ( j >= SERVER_LIST_QUERIES_PER_PULSE ) break;
+        std::string strResult = pServer->Pulse ();
+        if ( strResult == "SentQuery" )
+            uiQueriesSent++;
+        else
+        if ( strResult == "ParsedQuery" )
+            uiRepliesParsed++;
+            
+        if ( uiQueriesSent >= SERVER_LIST_QUERIES_PER_PULSE ) break;
     }
 
     // If we queried any new servers, we should toggle the GUI update flag
-    m_bUpdated = m_bUpdated || ( j > 0 );
+    m_bUpdated = m_bUpdated || ( uiRepliesParsed > 0 );
 
     // Check whether we are done scanning
     std::stringstream ss;
 
     // Store the new number of scanned servers
-    m_nScanned += j;
+    m_nScanned += uiRepliesParsed;
     if ( m_nScanned == n ) {
         ss << "Found " << m_nScanned << " servers";
         // We are no longer refreshing
@@ -159,11 +167,11 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
 
     // Read out the server count
     if ( nLength < 2 ) return false;
-    unsigned int uiCount = htons ( *((unsigned short*)&szBuffer[0]) );
+    unsigned int uiCount = ntohs ( *((unsigned short*)&szBuffer[0]) );
     i = 2;
 
     // Add all servers until we hit the count or nLength
-    while ( i < ( nLength - 6 ) ) {
+    while ( i < ( nLength - 6 ) && uiCount-- ) {
         CServerListItem item;
 
         // Read the IPv4-address
@@ -173,7 +181,7 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
         item.Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
 
         // Read the query port
-        item.usQueryPort = htons ( *((unsigned short*)(&szBuffer[i+4])) );
+        item.usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
 
         // Add the server
         Add ( item );
@@ -251,15 +259,16 @@ void CServerListLAN::Discover ( void )
 }
 
 
-bool CServerListItem::Pulse ( void )
+std::string CServerListItem::Pulse ( void )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
-    if ( bScanned ) return false;
+    if ( bScanned ) return "AlreadyScanned";
 
     char szBuffer[SERVER_LIST_QUERY_BUFFER] = {0};
 
     if ( m_ulQueryStart == 0 ) {
         Query ();
+        return "SentQuery";
     } else {
         // Poll the socket
         sockaddr_in clntAddr;
@@ -269,11 +278,10 @@ bool CServerListItem::Pulse ( void )
         if ( len >= 0 ) {
             // Parse data
             ParseQuery ( szBuffer, len );
-            return true;
+            return "ParsedQuery";
         }
+        return "WaitingReply";
     }
-
-    return false;
 }
 
 

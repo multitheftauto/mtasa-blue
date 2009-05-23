@@ -78,6 +78,11 @@ public:
         Init ();
     }
 
+    ~CServerListItem ( void )
+    {
+        closesocket ( m_Socket );
+    }
+
     static bool         Parse           ( const char* szAddress, in_addr& Address )
     {
         DWORD dwIP = inet_addr ( szAddress );
@@ -116,7 +121,7 @@ public:
 
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
-    bool                Pulse           ( void );
+    std::string         Pulse           ( void );
 
     in_addr             Address;        // IP-address
     unsigned short      usQueryPort;    // Query port
