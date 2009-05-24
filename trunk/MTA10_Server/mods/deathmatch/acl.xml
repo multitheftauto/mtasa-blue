@@ -207,5 +207,7 @@
    <acl name="raceACL">
       <right name="general.ModifyOtherObjects" access="true"/>
       <right name="function.xmlLoadFile" access="true"/>
-   </acl>
+      <right name="function.startResource" access="true"/>
+      <right name="function.stopResource" access="true"/>
+    </acl>
 </acl>
