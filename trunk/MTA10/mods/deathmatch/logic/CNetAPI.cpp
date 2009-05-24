@@ -213,7 +213,7 @@ void CNetAPI::AddInterpolation ( const CVector& vecPosition )
     unsigned long ulCurrentTime = CClientTime::GetTime ();
     m_Interpolator.Push ( vecPosition.fX, vecPosition.fY, vecPosition.fZ, ulCurrentTime );
     CVector vecTemp;
-    if ( m_Interpolator.GetOldestEntry ( vecTemp ) < ulCurrentTime - 2500 )
+    while ( m_Interpolator.GetOldestEntry ( vecTemp ) < ulCurrentTime - 2500 )
     {
         m_Interpolator.Pop ();
     }
