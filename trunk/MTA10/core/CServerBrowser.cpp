@@ -343,7 +343,11 @@ void CServerBrowser::SetVisible ( bool bVisible )
     {
         // Start refreshing all servers
         for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-            GetServerList ( (ServerBrowserType)i )->Refresh ();          
+        {
+            m_pEditPassword [ i ]->SetText( "" );
+            m_iSelectedServer [ i ] = -1;
+            GetServerList ( (ServerBrowserType)i )->Refresh ();
+        }
     }
     else
     {
@@ -484,20 +488,31 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
                     int k = m_pServerPlayerList [ Type ]->AddRow ();
                     m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[k].strName.c_str () );
                 }
-            }
-            bool bSavedPasswords;
-            CVARS_GET ( "serverbrowser_size", bSavedPasswords );
-            if ( pServer->bPassworded && bSavedPasswords )
-            {
-                    m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
+
+                // It's not the same server as was selected before, so we update the password
+                if ( iSelectedIndex != m_iSelectedServer[ Type ] )
+                {
+                    bool bSavedPasswords;
+                    CVARS_GET ( "serverbrowser_size", bSavedPasswords );
+                    if ( pServer->bPassworded && bSavedPasswords )
+                    {
+                        m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
+                    }
+                    else
+                    {
+                        m_pEditPassword [ Type ]->SetText ( "" );
+                    }
+                }
             }
         }
+
+        // save the selected server
+        m_iSelectedServer [ Type ] = iSelectedIndex;
     }
     else
     {
         m_pEditPassword [ Type ]->SetText ( "" );
     }
-
     return true;
 }
 

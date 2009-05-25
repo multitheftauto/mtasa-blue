@@ -76,6 +76,8 @@ protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
 	bool				OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
+    int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
+
     // Window widgets
     CGUIWindow*         m_pWindow;
 	CGUITabPanel*		m_pTabs;
