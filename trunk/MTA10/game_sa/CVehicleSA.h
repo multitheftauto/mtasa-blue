@@ -409,7 +409,18 @@ public:
     //1448
     float m_fTrainRailDistance;    // Distance along rail starting from first rail node (determines train position when on rails)
     
-    long padding9001[5];
+    //1452
+    DWORD padding214[3];
+
+    //1464
+    char unknown1;
+    bool bIsDerailed : 1;
+    char bUnknownFlags2 : 7;
+    char unknown3;
+    char unknown4;
+
+    //1468
+    DWORD padding215[1];
 
     //1472
     BYTE m_ucRailTrackID;

@@ -262,7 +262,8 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
 
 bool CVehicleSA::IsDerailed ( void )
 {
-    return * ( BYTE * ) ( ( DWORD ) this->GetInterface () + 1465 ) & 1;
+    CVehicleSAInterface* pInterface = GetVehicleInterface ();
+    return pInterface->bIsDerailed;
 }
 
 
@@ -271,16 +272,17 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
     WORD wModelID = GetModelIndex();
     if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
     {
-        DWORD dwThis = (DWORD) GetInterface ();
+        CVehicleSAInterface* pInterface = GetVehicleInterface ();
+        DWORD dwThis = (DWORD)pInterface;
 
         if ( bDerailed )
         {
-            * ( BYTE * ) ( dwThis + 1465 ) |= ( BYTE ) 1;
+            pInterface->bIsDerailed = true;
             * ( DWORD * ) ( dwThis + 64 ) &= ( DWORD ) 0xFFFDFFFB;
         }
         else
         {
-            * ( BYTE * ) ( dwThis + 1465 ) &= ( BYTE ) ~1;
+            pInterface->bIsDerailed = false;
             * ( DWORD * ) ( dwThis + 64 ) |= ( DWORD ) 0x20004;
 
             // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)

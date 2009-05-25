@@ -1633,21 +1633,29 @@ void CClientVehicle::SetNextTrainCarriage ( CClientVehicle* pNext )
 
 bool CClientVehicle::IsDerailed ( void )
 {
-    if ( m_pVehicle )
+    if ( GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
-        return m_pVehicle->IsDerailed ();
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->IsDerailed ();
+        }
+        return m_bIsDerailed;
     }
-    return m_bIsDerailed;
+    else
+        return false;
 }
 
 
 void CClientVehicle::SetDerailed ( bool bDerailed )
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN && bDerailed != IsDerailed () )
+    if ( GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
-        m_pVehicle->SetDerailed ( bDerailed );
+        if ( m_pVehicle && bDerailed != IsDerailed () )
+        {
+            m_pVehicle->SetDerailed ( bDerailed );
+        }
+        m_bIsDerailed = bDerailed;
     }
-    m_bIsDerailed = bDerailed;
 }
 
 bool CClientVehicle::IsDerailable ( void )
