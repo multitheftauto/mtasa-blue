@@ -1589,7 +1589,11 @@ void CClientGame::UpdatePlayerWeapons ( void )
 
                 if ( !IsGlitchEnabled ( GLITCH_QUICKRELOAD ) )
                 {
-                    m_wasWeaponAmmoInClip [ m_lastWeaponSlot ] = pWeapon->GetAmmoInClip();
+					CWeapon* pPreviousWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
+					if ( pPreviousWeapon )
+					{
+						m_wasWeaponAmmoInClip [ m_lastWeaponSlot ] = pPreviousWeapon->GetAmmoInClip();
+					}
                     if ( m_wasWeaponAmmoInClip [ uiSlot ] > 0 )
                     {
                         m_pLocalPlayer->GetWeapon()->SetAmmoInClip ( m_wasWeaponAmmoInClip [ uiSlot ] );
