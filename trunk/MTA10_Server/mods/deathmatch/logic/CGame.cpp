@@ -721,9 +721,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // inside CServer.cpp in deathmatch mod aswell.
     CLogger::LogPrint ( "Server started and is ready to accept connections!\n" );
 
-    //Remove before release
-    CLogger::LogPrint ( "WARNING: The onClientPedDamage,onClientPedWasted And\r\nonClientPedWeaponFire events are now only called for peds, See wiki for the\r\nplayer equivalents.\r\n" );
-    
     return true;
 }
 

@@ -527,9 +527,6 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         ////////////////////////////////////////////////////
 
         // Client events. (from the C++ code)
-        hashClient["onClientPedDamage"]      = "Replaced|onClientPlayerDamage";
-        hashClient["onClientPedWeaponFire"]  = "Replaced|onClientPlayerWeaponFire";
-        hashClient["onClientPedWasted"]      = "Replaced|onClientPlayerWasted";
 
         // Client functions. (from the C++ code)
         hashClient["getPlayerRotation"]         = "Replaced|getPedRotation";
