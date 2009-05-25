@@ -194,6 +194,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditPassword [ type ]->SetPosition ( CVector2D ( 0.83f, 0.21f ), true ); 
     m_pEditPassword [ type ]->SetSize ( CVector2D ( 0.15f, 0.055f ), true );
     m_pEditPassword [ type ]->SetMasked ( true );
+    m_pEditPassword [ type ]->SetTextAcceptedHandler( GUI_CALLBACK( &CServerBrowser::OnConnectClick, this ) );
 
     // Set up event handlers
     m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
@@ -493,7 +494,7 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
                 if ( iSelectedIndex != m_iSelectedServer[ Type ] )
                 {
                     bool bSavedPasswords;
-                    CVARS_GET ( "serverbrowser_size", bSavedPasswords );
+                    CVARS_GET ( "save_server_passwords", bSavedPasswords );
                     if ( pServer->bPassworded && bSavedPasswords )
                     {
                         m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
@@ -577,7 +578,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
                 strncpy ( szPassword, m_pEditPassword [ Type ]->GetText ().c_str (), 47 );
                 
                 bool bSavedPasswords;
-                CVARS_GET ( "serverbrowser_size", bSavedPasswords );
+                CVARS_GET ( "save_server_passwords", bSavedPasswords );
                 if ( pServer->bPassworded && bSavedPasswords )
                 {
                     SetServerPassword ( strEndpoint, ( std::string )szPassword );

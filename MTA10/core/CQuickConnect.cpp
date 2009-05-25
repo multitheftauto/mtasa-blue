@@ -43,6 +43,7 @@ CQuickConnect::CQuickConnect ( void )
     m_pEditHost->SetPosition ( CVector2D ( 0.17f, 0.2f ), true );
     m_pEditHost->SetSize ( CVector2D ( 154.0f, 24.0f ) );
     m_pEditHost->SetMaxLength ( 128 );          // Just to prevent entering a huge hostname size.. no-one has a hostname over 128 chars i believe
+    m_pEditHost->SetTextAcceptedHandler( GUI_CALLBACK( &CQuickConnect::OnConnectButtonClick, this ) );
 
     //  Port label
     m_pLabelPort = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, ":" ) );
@@ -54,6 +55,7 @@ CQuickConnect::CQuickConnect ( void )
     m_pEditPort->SetPosition ( CVector2D ( 0.75f, 0.2f ), true );
     m_pEditPort->SetSize ( CVector2D ( 59.0f, 24.0f ) );
     m_pEditPort->SetMaxLength ( 5 );
+    m_pEditPort->SetTextAcceptedHandler( GUI_CALLBACK( &CQuickConnect::OnConnectButtonClick, this ) );
 
     //  Pass label
     m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Pass:" ) );
@@ -65,6 +67,7 @@ CQuickConnect::CQuickConnect ( void )
     m_pEditPass->SetPosition ( CVector2D ( 0.17f, 0.44f ), true );
     m_pEditPass->SetSize ( CVector2D ( 221.0f, 24.0f ) );
     m_pEditPass->SetMasked ( true );
+    m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CQuickConnect::OnConnectButtonClick, this ) );
 
     //  Connect button
     m_pButtonConnect = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Connect" ) );
