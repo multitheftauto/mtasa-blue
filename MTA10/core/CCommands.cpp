@@ -137,7 +137,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
     std::string val = std::string ( szCommand ) + " " + std::string ( szParameters ? szParameters : "" );
     unsigned int nOpIndex = val.find ( '=' );
     std::string key = val.substr ( 0, nOpIndex );
-    if (val.find(" = ") != -1) {
+    if (val.find(" = ") != std::string::npos) {
         key = val.substr ( 0, nOpIndex-1 );
     }
     if ( CClientVariables::GetSingleton ().Exists ( key ) ) {
