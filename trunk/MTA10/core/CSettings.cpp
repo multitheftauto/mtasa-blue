@@ -276,6 +276,7 @@ CSettings::CSettings ( void )
     m_pEditUser->SetPosition ( CVector2D ( 0.16f, 0.45f ), true );
 	m_pEditUser->GetPosition ( vecTemp, false );
     m_pEditUser->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pEditUser->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
 //    m_pEditUser->SetMaxLength ( 64 );
 
     m_pEditPass = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
@@ -284,6 +285,7 @@ CSettings::CSettings ( void )
     m_pEditPass->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 //    m_pEditPass->SetMaxLength ( 64 );
 	m_pEditPass->SetMasked ( true );
+    m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
 
 	m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Login" ) );
 	m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
