@@ -107,6 +107,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         {
             // Grab the in vehicle flag
             bool bInVehicle = BitStream.ReadBit ();
+            SPositionSync position ( false );
 
             // Are we in a vehicle?
             if ( bInVehicle )
@@ -125,10 +126,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
 #endif
 
                 // Read out position
-                CVector vecPosition;
-                BitStream.Read ( vecPosition.fX );
-                BitStream.Read ( vecPosition.fY );
-                BitStream.Read ( vecPosition.fZ );
+                BitStream.Read ( &position );
 
                 // And rotation
                 CVector vecRotationDegrees;
@@ -137,17 +135,14 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 BitStream.Read ( vecRotationDegrees.fZ );
 
                 // Remember that position
-                m_vecLastReturnPosition = vecPosition;
+                m_vecLastReturnPosition = position.data.vecPosition;
                 m_vecLastReturnRotation = vecRotationDegrees;
                 m_bVehicleLastReturn = true;
             }
             else
             {
                 // Read out the position
-                CVector vecPosition;
-                BitStream.Read ( vecPosition.fX );
-                BitStream.Read ( vecPosition.fY );
-                BitStream.Read ( vecPosition.fZ );
+                BitStream.Read ( &position );
                 
                 /* Test code:
                 CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
@@ -161,7 +156,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 }*/
 
                 // Remember that position
-                m_vecLastReturnPosition = vecPosition;
+                m_vecLastReturnPosition = position.data.vecPosition;
                 m_vecLastReturnRotation = CVector ( 0.0f, 0.0f, 0.0f );
                 m_bVehicleLastReturn = false;
             }
@@ -461,11 +456,6 @@ bool CNetAPI::IsCameraSyncNeeded ()
 
 void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
 {
-    // Read out the time it took for the packet to go from the remote client to the server and to us
-    unsigned short usLatency;
-    BitStream.ReadCompressed ( usLatency );
-    pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
-
     // Grab the old controller state
     CControllerState LastControllerState;
     pPlayer->GetLastControllerState ( LastControllerState );
@@ -489,10 +479,14 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         SWeaponSlotSync slot;
         BitStream.Read ( &slot );
         unsigned int uiSlot = slot.data.uiSlot;
+        CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+
+        // Is the current weapon a goggle (44 or 45) or a camera (43), detonator (40), don't apply the fire key
+        if ( uiSlot == 11 || uiSlot == 12 || ( pWeapon && pWeapon->GetType () == 43 ) )
+            ControllerState.ButtonCircle = 0;
 
         if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
             unsigned char ucCurrentWeaponType = 0;
             float fWeaponRange = 1.6f;
 
@@ -500,12 +494,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             {
                 ucCurrentWeaponType = pWeapon->GetType ();
                 fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
-            }
-
-            // Is the current weapon a goggle (44 or 45) or a camera (43), detonator (40), don't apply the fire key
-            if ( ucCurrentWeaponType == 44 || ucCurrentWeaponType == 45 || ucCurrentWeaponType == 43 || ucCurrentWeaponType == 40 )
-            {
-                ControllerState.ButtonCircle = 0;
             }
 
             // Read out the weapon ammo
@@ -543,11 +531,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 flags.data.bAkimboTargetUp = false;
 			}
 
-            // Read out the aim directions
-            float fArmX, fArmY;
-			BitStream.Read ( fArmX );
-			BitStream.Read ( fArmY );
-
             // Read the weapon aim data
             SWeaponAimSync aim ( fWeaponRange );
             BitStream.Read ( &aim );
@@ -559,12 +542,12 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             // Set the aim data (immediately if in vehicle, otherwize delayed/interpolated)
             if ( pVehicle )
             {
-                pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, fArmX, fArmY, ucDriveByAim, &(aim.data.vecOrigin), false );
+                pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, ucDriveByAim, &(aim.data.vecOrigin), false );
             }
             else
             {
                 pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
-                pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, flags.data.bAkimboTargetUp, ucDriveByAim );
+                pPlayer->SetAimInterpolated ( TICK_RATE, pPlayer->GetCurrentRotation (), aim.data.fArm, flags.data.bAkimboTargetUp, ucDriveByAim );
             }
         }
         else if ( uiSlot != 0 )
@@ -624,6 +607,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     CControllerState LastControllerState;
     pPlayerModel->GetControllerState ( ControllerState );
     pPlayerModel->GetLastControllerState ( LastControllerState );
+    CClientVehicle* pVehicle = pPlayerModel->GetOccupiedVehicle ();
 
     // Write them to the bitstream
     WriteSmallKeysync ( ControllerState, LastControllerState, BitStream );
@@ -659,17 +643,16 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
                 ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
                 BitStream.Write ( &ammo );
 
-                // Grab his aim directions and sync them if he's not using an akimbo
-				CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
-				BitStream.Write ( pShotsyncData->m_fArmDirectionX );
-				BitStream.Write ( pShotsyncData->m_fArmDirectionY );
-
                 // Write the aim data
                 SWeaponAimSync aim ( pPlayerWeapon->GetInfo ()->GetWeaponRange () );
-                pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget );
+                if ( pVehicle )
+                    pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget, NULL, NULL, &aim.data.fArm );
+                else
+                    pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget, NULL, NULL, NULL, &aim.data.fArm );
                 BitStream.Write ( &aim );
 
                 // Write the driveby direction
+                CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
                 BitStream.Write ( pShotsyncData->m_cInVehicleAimDirection );
             }
         }
@@ -679,8 +662,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         }
     }
 
-    // Grab the occupied vehicle. Eventually write vehicle specific stuff.
-    CClientVehicle* pVehicle = pPlayerModel->GetOccupiedVehicle ();
+    // Eventually write vehicle specific stuff.
     if ( pVehicle && pPlayerModel->GetOccupiedVehicleSeat () == 0 )
     {
         WriteSmallVehicleSpecific ( pVehicle, BitStream );
@@ -715,6 +697,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     unsigned short usLatency;
     BitStream.ReadCompressed ( usLatency );
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
+    pPlayer->SetPing ( usLatency );
 
     // Read out the keysync data
     CControllerState ControllerState;
@@ -738,22 +721,20 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
         
     // Player position
-    CVector vecPos;
-    BitStream.Read ( vecPos.fX );
-    BitStream.Read ( vecPos.fY );
-    BitStream.Read ( vecPos.fZ );
+    SPositionSync position ( false );
+    BitStream.Read ( &position );
 
     // If the players in contact with an object/vehicle, make that the origin
     if ( pContactEntity )
     {
         CVector vecTempPos;
         pContactEntity->GetPosition ( vecTempPos );
-        vecPos += vecTempPos;
+        position.data.vecPosition += vecTempPos;
     }
 
     // Player rotation
-    float fRotation = 0.0f;
-    BitStream.Read ( fRotation );
+    SPedRotationSync rotation;
+    BitStream.Read ( &rotation );
 
     // Move speed vector
     if ( flags.data.bSyncingVelocity )
@@ -788,22 +769,22 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
         BitStream.Read ( &slot );
 
         unsigned int uiSlot = slot.data.uiSlot;
+        CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+
+        // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
+        if ( uiSlot == 11 || uiSlot == 12 || ( pWeapon && pWeapon->GetType () == 43 ) )
+            ControllerState.ButtonCircle = 0;
+
 
         if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+            
             unsigned char ucCurrentWeapon = 0;
             float fWeaponRange = 0.01f;
             if ( pWeapon )
             {
                 ucCurrentWeapon = pWeapon->GetType ();
                 fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
-            }
-
-            // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
-            if ( ucCurrentWeapon == 44 || ucCurrentWeapon == 45 || ucCurrentWeapon == 43 || ucCurrentWeapon == 40 )
-            {
-                ControllerState.ButtonCircle = 0;
             }
 
             // Read out the weapon ammo
@@ -828,18 +809,15 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
 		    }
 
             // Read out the aim directions
-            float fArmX, fArmY;
-		    BitStream.Read ( fArmX );
-		    BitStream.Read ( fArmY );
+            SWeaponAimSync aim ( fWeaponRange, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
+            BitStream.Read ( &aim );
 
             // Interpolate the aiming
-            pPlayer->SetAimInterpolated ( TICK_RATE, fArmX, fArmY, flags.data.bAkimboTargetUp, 0 );
+            pPlayer->SetAimInterpolated ( TICK_RATE, rotation.data.fRotation, aim.data.fArm, flags.data.bAkimboTargetUp, 0 );
 
             // Read the aim data only if he's shooting or aiming
-            if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
+            if ( aim.isFull() )
             {
-                SWeaponAimSync aim ( fWeaponRange );
-                BitStream.Read ( &aim );
                 // Interpolate the source/target vectors
                 pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
             }
@@ -863,7 +841,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     {
         CVector vecTempPos;
         pContactEntity->GetPosition ( vecTempPos );
-        vecPos -= vecTempPos;
+        position.data.vecPosition -= vecTempPos;
     }
 
     // If the player is working on leaving a vehicle, don't set any target position
@@ -871,8 +849,8 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_GETTING_IN ||
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_JACKING )
     {
-        pPlayer->SetTargetPosition ( vecPos, pContactEntity );
-        pPlayer->SetTargetRotation ( fRotation );
+        pPlayer->SetTargetPosition ( position.data.vecPosition, pContactEntity );
+        pPlayer->SetTargetRotation ( rotation.data.fRotation );
     }
 
     // Set move speed, controller state and camera rotation + duck state
@@ -884,7 +862,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
 
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
-    pPlayer->SetLastPuresyncPosition ( vecPos );
+    pPlayer->SetLastPuresyncPosition ( position.data.vecPosition );
     pPlayer->IncrementPlayerSync ();
 }
 
@@ -940,13 +918,14 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
         vecPosition -= vecOrigin;
     }
 
-    BitStream.Write ( vecPosition.fX );
-    BitStream.Write ( vecPosition.fY );
-    BitStream.Write ( vecPosition.fZ );
+    SPositionSync position ( false );
+    position.data.vecPosition = vecPosition;
+    BitStream.Write ( &position );
 
     // Player rotation
-    float fCurrentRotation = pPlayerModel->GetCurrentRotation ();
-    BitStream.Write ( fCurrentRotation );
+    SPedRotationSync rotation;
+    rotation.data.fRotation = pPlayerModel->GetCurrentRotation ();
+    BitStream.Write ( &rotation );
 
     // Move speed vector
     if ( flags.data.bSyncingVelocity )
@@ -987,17 +966,17 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
             ammo.data.usTotalAmmo = pPlayerWeapon->GetAmmoTotal ();
             BitStream.Write ( &ammo );
 
-			CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
-			BitStream.Write ( pShotsyncData->m_fArmDirectionX );
-			BitStream.Write ( pShotsyncData->m_fArmDirectionY );
+            // Sync aim data
+            CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
+            SWeaponAimSync aim ( 0.0f, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
+            aim.data.fArm = pShotsyncData->m_fArmDirectionY;
 
-            // Write the aim data only if he's aiming or shooting
+            // Write the vectors data only if he's aiming or shooting
             if ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle )
             {
-                SWeaponAimSync aim ( 0.0f );
                 pPlayerModel->GetShotData ( &(aim.data.vecOrigin), &(aim.data.vecTarget) );
-                BitStream.Write ( &aim );
             }
+            BitStream.Write ( &aim );
         }
     }
 
@@ -1052,6 +1031,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     unsigned short usLatency;
     BitStream.ReadCompressed ( usLatency );
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
+    pPlayer->SetPing ( usLatency );
 
     // Read out the keysync
     CControllerState ControllerState;
@@ -1186,6 +1166,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         unsigned short usWeaponAmmo;
         BitStream.Read ( usWeaponAmmo );
 
+        float fWeaponRange = 1.6f;
         // Valid current weapon id?
         if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
         {
@@ -1206,32 +1187,20 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             {
                 pPlayerWeapon->SetAmmoTotal ( 9999 );
                 pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
+                fWeaponRange = pPlayerWeapon->GetInfo()->GetWeaponRange();
             }
         }
 
-        // Read out the aim directions
-        float fArmX, fArmY;
-        BitStream.Read ( fArmX );
-        BitStream.Read ( fArmY );
-
-        // Read out the origin vector
-        CVector vecOrigin;
-        BitStream.Read ( vecOrigin.fX );
-        BitStream.Read ( vecOrigin.fY );
-        BitStream.Read ( vecOrigin.fZ );
-
-        // Read out the target vector
-        CVector vecTarget;
-        BitStream.Read ( vecTarget.fX );
-        BitStream.Read ( vecTarget.fY );
-        BitStream.Read ( vecTarget.fZ );
+        // Read the weapon aim data
+        SWeaponAimSync aim ( fWeaponRange );
+        BitStream.Read ( &aim );
 
         // Read out the driveby direction
         unsigned char ucDriveByAim;
         BitStream.Read ( ucDriveByAim );
 
         // Set the aiming data
-        pPlayer->SetAimingData ( TICK_RATE, vecTarget, fArmX, fArmY, ucDriveByAim, &vecOrigin, false );
+        pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, ucDriveByAim, &aim.data.vecOrigin, false );
     }
     else
     {
@@ -1378,25 +1347,13 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
             unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
             BitStream.Write ( usAmmoInClip );
 
-            // Grab his aim directions and sync them
-            CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
-            BitStream.Write ( pShotsyncData->m_fArmDirectionX );
-            BitStream.Write ( pShotsyncData->m_fArmDirectionY );
-
-            CVector vecOrigin, vecTarget;
-            pPlayerModel->GetShotData ( &vecOrigin, &vecTarget );  
-
-            // Write the gun's origin vector
-            BitStream.Write ( vecOrigin.fX );
-            BitStream.Write ( vecOrigin.fY );
-            BitStream.Write ( vecOrigin.fZ );
-
-            // Write the gun's target vector
-            BitStream.Write ( vecTarget.fX );
-            BitStream.Write ( vecTarget.fY );
-            BitStream.Write ( vecTarget.fZ );
+            // Sync aim data
+            SWeaponAimSync aim ( 0.0f );
+            pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget, NULL, NULL, &aim.data.fArm );
+            BitStream.Write ( &aim );
 
             // Write the driveby direction
+            CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
             BitStream.Write ( pShotsyncData->m_cInVehicleAimDirection );
         }
     }
@@ -1518,14 +1475,10 @@ void CNetAPI::ReadSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        // Read out the turret position
-        float fHorizontal;
-        float fVertical;
-        BitStream.Read ( fHorizontal );
-        BitStream.Read ( fVertical );
-        
-        // Set it
-        pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        BitStream.Read ( &vehicle );
+
+        pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
     }
 }
 
@@ -1536,14 +1489,10 @@ void CNetAPI::WriteSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStream
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        // Grab the turret position
-        float fHorizontal;
-        float fVertical;
-        pVehicle->GetTurretRotation ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
-        // Write it
-        BitStream.Write ( fHorizontal );
-        BitStream.Write ( fVertical );
+        BitStream.Write ( &vehicle );
     }
 }
 
@@ -1554,14 +1503,10 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        // Read out the turret position
-        float fHorizontal;
-        float fVertical;
-        BitStream.Read ( fHorizontal );
-        BitStream.Read ( fVertical );
-        
-        // Set it
-        pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        BitStream.Read ( &vehicle );
+
+        pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
     }
 
     // Adjustable property
@@ -1583,13 +1528,10 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
         // Grab the turret position
-        float fHorizontal;
-        float fVertical;
-        pVehicle->GetTurretRotation ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
-        // Write it
-        BitStream.Write ( fHorizontal );
-        BitStream.Write ( fVertical );
+        BitStream.Write ( &vehicle );
     }
 
     // Adjustable property

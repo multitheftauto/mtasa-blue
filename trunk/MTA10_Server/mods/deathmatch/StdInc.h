@@ -66,7 +66,6 @@
 #include "packets/CPlayerJoinDataPacket.h"
 #include "packets/CPlayerJoinPacket.h"
 #include "packets/CPlayerListPacket.h"
-#include "packets/CPlayerPingsPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerSpawnPacket.h"

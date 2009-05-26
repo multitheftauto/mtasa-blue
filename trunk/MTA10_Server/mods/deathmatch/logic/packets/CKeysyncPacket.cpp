@@ -63,20 +63,15 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                     BitStream.Read ( &ammo );
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
 
-				    // Read out the aim directions
-				    float fArmX, fArmY;
-				    BitStream.Read ( fArmX );
-				    BitStream.Read ( fArmY );
-
-				    // Set the arm directions and whether or not arms are up
-				    pSourcePlayer->SetAimDirections ( fArmX, fArmY );
-                    pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
-
                     // Read the aim data
                     SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
                     BitStream.Read ( &aim );
                     pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
                     pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
+
+				    // Set the arm directions and whether or not arms are up
+				    pSourcePlayer->SetAimDirection ( aim.data.fArm );
+                    pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
 
                     // Read out the driveby direction
                     unsigned char ucDriveByDirection;
@@ -128,10 +123,6 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         ElementID PlayerID = pSourcePlayer->GetID ();
         BitStream.WriteCompressed ( PlayerID );
 
-        // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
-        unsigned short usLatency = pSourcePlayer->GetPing ();
-        BitStream.WriteCompressed ( usLatency );
-
         // Write the keysync data
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
         const CControllerState& LastControllerState = pSourcePlayer->GetPad ()->GetLastControllerState ();
@@ -162,14 +153,11 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 ammo.data.usAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
                 BitStream.Write ( &ammo );
 
-                // Write aim directions
-                BitStream.Write ( pSourcePlayer->GetAimDirectionX () );
-				BitStream.Write ( pSourcePlayer->GetAimDirectionY () );
-
                 // Write the weapon aim data
                 SWeaponAimSync aim ( 0.0f );
                 aim.data.vecOrigin = pSourcePlayer->GetSniperSourceVector ();
                 pSourcePlayer->GetTargettingVector ( aim.data.vecTarget );
+                aim.data.fArm = pSourcePlayer->GetAimDirection ();
                 BitStream.Write ( &aim );
 
                 // Write the driveby aim directoin
@@ -209,13 +197,11 @@ void CKeysyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInter
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Read out the turret position
-        float fHorizontal;
-        float fVertical;
-        BitStream.Read ( fHorizontal );
-        BitStream.Read ( fVertical );
-        
-        // Set it
-        pVehicle->SetTurretPosition ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        BitStream.Read ( &vehicle );
+
+        // Set the data
+        pVehicle->SetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
     }
 }
 
@@ -227,12 +213,9 @@ void CKeysyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInte
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Grab the turret position
-        float fHorizontal;
-        float fVertical;
-        pVehicle->GetTurretPosition ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
-        // Write it
-        BitStream.Write ( fHorizontal );
-        BitStream.Write ( fVertical );
+        BitStream.Write ( &vehicle );
     }
 }

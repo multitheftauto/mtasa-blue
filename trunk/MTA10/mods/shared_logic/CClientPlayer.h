@@ -44,35 +44,35 @@ public:
 
     void                            Unlink                  ( void );
 
-    eClientEntityType               GetType                 ( void ) const                      { return CCLIENTPLAYER; };
+    eClientEntityType               GetType                 ( void ) const                          { return CCLIENTPLAYER; };
 
     void                            GetNick                 ( char* szBuffer, unsigned int uiBufferLength ) const;
-    inline const char*              GetNickPointer          ( void ) const                      { return m_szNick; };
+    inline const char*              GetNickPointer          ( void ) const                          { return m_szNick; };
     void                            SetNick                 ( const char* szNick );
     int                             GetNickLength           ( void ) const;
 
-    inline unsigned int             GetPing                 ( void )                    { return m_uiPing; };
-    inline void                     SetPing                 ( unsigned int uiPing )     { m_uiPing = uiPing; };
+    inline unsigned int             GetPing                 ( void )                                { return ( m_bIsLocalPlayer ) ? g_pNet->GetPing () : m_uiPing; };
+    inline void                     SetPing                 ( unsigned int uiPing )                 { m_uiPing = uiPing; };
 
     void                            GetNametagColor         ( unsigned char& ucR, unsigned char& ucG, unsigned char& ucB );
     void                            SetNametagOverrideColor ( unsigned char ucR, unsigned char ucG, unsigned char ucB );
     void                            RemoveNametagOverrideColor  ( void );
-    inline bool                     IsNametagColorOverridden( void )                                                            { return m_bNametagColorOverridden; };
+    inline bool                     IsNametagColorOverridden( void )                                { return m_bNametagColorOverridden; };
 
-    inline const char*              GetNametagText          ( void )															{ return m_szNametag; }
+    inline const char*              GetNametagText          ( void )								{ return m_szNametag; }
 	inline void                     SetNametagText          ( const char* szText );
-    inline bool                     IsNametagShowing        ( void )															{ return m_bNametagShowing; }
-    inline void                     SetNametagShowing       ( bool bShowing )													{ m_bNametagShowing = bShowing; }
-	inline CGUIStaticImage*			GetStatusIcon			( void )															{ return m_pStatusIcon; }
+    inline bool                     IsNametagShowing        ( void )								{ return m_bNametagShowing; }
+    inline void                     SetNametagShowing       ( bool bShowing )						{ m_bNametagShowing = bShowing; }
+	inline CGUIStaticImage*			GetStatusIcon			( void )								{ return m_pStatusIcon; }
     inline unsigned long            GetLastNametagShow      ( void )                                { return m_ulLastNametagShow; };
     inline void                     SetLastNametagShow      ( unsigned long ulTime )                { m_ulLastNametagShow = ulTime; };
 
-    inline void                     SetIsExtrapolatingAim   ( bool m_bExtrap )                  { m_bDoExtrapolatingAim = m_bExtrap; };
-    inline bool                     IsExtrapolatingAim      ( void )                            { return m_bDoExtrapolatingAim; };
+    inline void                     SetIsExtrapolatingAim   ( bool m_bExtrap )                      { m_bDoExtrapolatingAim = m_bExtrap; };
+    inline bool                     IsExtrapolatingAim      ( void )                                { return m_bDoExtrapolatingAim; };
     void                            UpdateAimPosition       ( const CVector &vecAim );
 
-    inline unsigned short           GetLatency              ( void )                            { return m_usLatency; };
-    inline void                     SetLatency              ( unsigned short usLatency )        { m_usLatency = (m_usLatency + usLatency) / 2; };
+    inline unsigned short           GetLatency              ( void )                                { return m_usLatency; };
+    inline void                     SetLatency              ( unsigned short usLatency )            { m_usLatency = (m_usLatency + usLatency) / 2; };
 
     inline unsigned long            GetLastPuresyncTime     ( void )                                { return m_ulLastPuresyncTime; };
     inline void                     SetLastPuresyncTime     ( unsigned long ulLastPuresyncTime )    { m_ulLastPuresyncTime = ulLastPuresyncTime; };

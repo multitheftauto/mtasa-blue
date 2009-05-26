@@ -206,13 +206,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Apply the data for each vehicle in the packet
-        vector < CUnoccupiedVehicleSyncPacket::SyncData* > ::const_iterator iter = Packet.IterBegin ();
+        vector < CUnoccupiedVehicleSyncPacket::SyncData > ::iterator iter = Packet.IterBegin ();
         for ( ; iter != Packet.IterEnd (); iter++ )
         {
-            CUnoccupiedVehicleSyncPacket::SyncData* pData = *iter;
+            CUnoccupiedVehicleSyncPacket::SyncData& data = *iter;
+            SUnoccupiedVehicleSync& vehicle = data.syncStructure;
 
             // Grab the vehicle this packet is for
-            CElement* pVehicleElement = CElementIDs::GetElement ( pData->Model );
+            CElement* pVehicleElement = CElementIDs::GetElement ( vehicle.data.vehicleID );
             if ( pVehicleElement && IS_VEHICLE ( pVehicleElement ) )
             {
                 // Convert to a CVehicle
@@ -221,30 +222,30 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                 // Is the player syncing this vehicle and there is no driver? Also only process
                 // this packet if the time context matches.
                 if ( pVehicle->GetSyncer () == pPlayer &&
-                     pVehicle->CanUpdateSync ( pData->ucSyncTimeContext ) )
+                     pVehicle->CanUpdateSync ( vehicle.data.ucTimeContext ) )
                 {
                     // Is there no player driver?
                     CPed * pOccupant = pVehicle->GetOccupant ( 0 );
                     if ( !pOccupant || !IS_PLAYER ( pOccupant ) )
                     {
                         // Apply the data to the vehicle
-                        if ( pData->ucFlags & 0x01 ) pVehicle->SetPosition ( pData->vecPosition );
-                        if ( pData->ucFlags & 0x02 ) pVehicle->SetRotationDegrees ( pData->vecRotationDegrees );
-                        if ( pData->ucFlags & 0x04 ) pVehicle->SetVelocity ( pData->vecVelocity );
-                        if ( pData->ucFlags & 0x08 ) pVehicle->SetTurnSpeed ( pData->vecTurnSpeed );
+                        if ( vehicle.data.bSyncPosition ) pVehicle->SetPosition ( vehicle.data.vecPosition );
+                        if ( vehicle.data.bSyncRotation ) pVehicle->SetRotationDegrees ( vehicle.data.vecRotation );
+                        if ( vehicle.data.bSyncVelocity ) pVehicle->SetVelocity ( vehicle.data.vecVelocity );
+                        if ( vehicle.data.bSyncTurnVelocity ) pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
 
                         // Less health than last time?
-                        if ( pData->ucFlags & 0x10 )
+                        if ( vehicle.data.bSyncHealth )
                         {
                             float fPreviousHealth = pVehicle->GetHealth ();
-                            pVehicle->SetHealth ( pData->fHealth );
+                            pVehicle->SetHealth ( vehicle.data.fHealth );
 
-                            if ( pData->fHealth < fPreviousHealth )
+                            if ( vehicle.data.fHealth < fPreviousHealth )
                             {
                                 // Grab the delta health
-                                float fDeltaHealth = fPreviousHealth - pData->fHealth;
+                                float fDeltaHealth = fPreviousHealth - vehicle.data.fHealth;
 
-						        if ( fDeltaHealth > 0.0f )
+						        if ( fDeltaHealth > FLOAT_EPSILON )
 						        {
 							        // Call the onVehicleDamage event
 							        CLuaArguments Arguments;
@@ -254,10 +255,10 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             }
                         }
 
-                        if ( pData->ucFlags & 0x20 )
+                        if ( vehicle.data.bSyncTrailer )
                         {
                             CVehicle* pTrailer = NULL;
-                            ElementID TrailerID = pData->TrailerID;
+                            ElementID TrailerID = vehicle.data.trailer;
                             if ( TrailerID != INVALID_ELEMENT_ID )
                             {
                                 CElement* pElement = CElementIDs::GetElement ( TrailerID );
@@ -350,16 +351,16 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             }
                         }
                         // Turn the engine on if it's on
-                        pVehicle->SetEngineOn ( ( pData->ucFlags & 0x40 ) ? true : false );
+                        pVehicle->SetEngineOn ( vehicle.data.bEngineOn );
 
                         // Derailed state
-                        pVehicle->SetDerailed ( ( pData->ucFlags & 0x80 ) ? true : false );
+                        pVehicle->SetDerailed ( vehicle.data.bDerailed );
                         
                         // Run colpoint checks on vehicle
 					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );  
 
                         // Send this sync
-                        pData->bSend = true;
+                        data.bSend = true;
                     }
                 }
             }

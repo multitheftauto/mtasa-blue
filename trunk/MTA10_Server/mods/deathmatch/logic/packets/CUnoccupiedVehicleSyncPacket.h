@@ -17,6 +17,7 @@
 #include <CVector.h>
 #include "CPacket.h"
 #include <vector>
+#include "net/SyncStructures.h"
 
 class CUnoccupiedVehicleSyncPacket : public CPacket
 {
@@ -24,15 +25,7 @@ public:
     struct SyncData
     {
         bool                    bSend;
-        ElementID               Model;
-        unsigned char           ucFlags;
-        unsigned char           ucSyncTimeContext;
-        CVector                 vecPosition;
-        CVector                 vecRotationDegrees;
-        CVector                 vecVelocity;
-        CVector                 vecTurnSpeed;
-        float                   fHealth;
-        ElementID               TrailerID;
+        SUnoccupiedVehicleSync  syncStructure;
     };
 
 public:
@@ -45,10 +38,10 @@ public:
     bool                    Read                                    ( NetBitStreamInterface& BitStream );
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 
-    inline std::vector < SyncData* > ::const_iterator     IterBegin       ( void )                        { return m_Syncs.begin (); };
-    inline std::vector < SyncData* > ::const_iterator     IterEnd         ( void )                        { return m_Syncs.end (); };
+    inline std::vector < SyncData > ::iterator          IterBegin       ( void )                        { return m_Syncs.begin (); };
+    inline std::vector < SyncData > ::iterator          IterEnd         ( void )                        { return m_Syncs.end (); };
 
-    std::vector < SyncData* > m_Syncs;
+    std::vector < SyncData > m_Syncs;
 };
 
 #endif

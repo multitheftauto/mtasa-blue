@@ -1484,6 +1484,18 @@
 				</Filter>
 			</Filter>
 			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\core\client\utils\CMD5Hasher.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\sdk\ieee754.h"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="shared_logic"
 				>
 				<File
@@ -1954,14 +1966,6 @@
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="utils"
-				>
-				<File
-					RelativePath="..\..\core\client\utils\CMD5Hasher.h"
-					>
-				</File>
 			</Filter>
 		</Filter>
 	</Files>

@@ -946,10 +946,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CPlayerPingsPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.cpp"
 						>
 					</File>
@@ -1979,10 +1975,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CPlayerPingsPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.h"
 						>
 					</File>
@@ -2193,6 +2185,10 @@
 				</File>
 				<File
 					RelativePath=".\utils\CHTTPResponse.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\sdk\ieee754.h"
 					>
 				</File>
 				<Filter

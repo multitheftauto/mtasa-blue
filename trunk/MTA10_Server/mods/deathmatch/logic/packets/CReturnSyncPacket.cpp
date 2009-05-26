@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 CReturnSyncPacket::CReturnSyncPacket ( CPlayer * pPlayer )
 {
@@ -28,6 +29,8 @@ bool CReturnSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Grab eventual vehicle
         CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle ();
 
+        SPositionSync position ( false );
+
         // Flags
         BitStream.WriteBit ( pVehicle != NULL );
 
@@ -35,10 +38,8 @@ bool CReturnSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( pVehicle )
         {
             // Write its position
-            const CVector& vecPosition = pVehicle->GetPosition ();
-            BitStream.Write ( vecPosition.fX );
-            BitStream.Write ( vecPosition.fY );
-            BitStream.Write ( vecPosition.fZ );
+            position.data.vecPosition = pVehicle->GetPosition ();
+            BitStream.Write ( &position );
 
             // And rotation
             CVector vecRotationDegrees;
@@ -51,10 +52,8 @@ bool CReturnSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         else
         {
             // Write his position
-            CVector vecTemp = pSourcePlayer->GetPosition ();
-            BitStream.Write ( vecTemp.fX );
-            BitStream.Write ( vecTemp.fY );
-            BitStream.Write ( vecTemp.fZ );
+            position.data.vecPosition = pSourcePlayer->GetPosition ();
+            BitStream.Write ( &position );
         }
 
         return true;
