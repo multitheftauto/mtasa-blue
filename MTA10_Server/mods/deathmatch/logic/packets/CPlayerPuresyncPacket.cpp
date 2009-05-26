@@ -185,7 +185,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             SBodypartSync bodyPart;
             BitStream.Read ( &bodyPart );
 
-            pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.uiWeaponType, bodyPart.data.uiBodypart );
+            pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
         }
 
         float fHealth = static_cast < float > ( ucHealth ) / 1.25f;

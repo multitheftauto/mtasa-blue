@@ -994,7 +994,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
         BitStream.WriteCompressed ( DamagerID );
         
         SWeaponTypeSync weaponType;
-        weaponType.data.uiWeaponType = g_pClientGame->GetDamageWeapon ();
+        weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon ();
         BitStream.Write ( &weaponType );
 
         SBodypartSync bodypart;
@@ -1588,11 +1588,17 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
         {
             // Copy each byte from the bitstream we have to this one
             unsigned char ucTemp;
-            int iLength = pBitStream->GetNumberOfBytesUsed ();
-            for ( int i = 0; i < iLength; i++ )
+            int iLength = pBitStream->GetNumberOfBitsUsed ();
+            while ( iLength > 8 )
             {
                 pBitStream->Read ( ucTemp );
                 pRPCBitStream->Write ( ucTemp );
+                iLength -= 8;
+            }
+            if ( iLength > 0 )
+            {
+                pBitStream->ReadBits ( &ucTemp, iLength );
+                pRPCBitStream->WriteBits ( &ucTemp, iLength );
             }
             pBitStream->ResetReadPointer ();
         }

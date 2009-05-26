@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "Common.h"
+
 struct ISyncStructure;
 
 class NetBitStreamInterface

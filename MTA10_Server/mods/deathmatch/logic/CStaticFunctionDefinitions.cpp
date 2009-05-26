@@ -2756,8 +2756,12 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CElement * pElement, unsigne
         if ( pPed->IsSpawned () )
         {
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
-            BitStream.pBitStream->Write ( ucWeaponSlot );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+
+            SWeaponSlotSync slot;
+            slot.data.uiSlot = ucWeaponSlot;
+            BitStream.pBitStream->Write ( &slot );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_SLOT, *BitStream.pBitStream ) );
             
             return true;
@@ -3206,10 +3210,18 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
                 pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( ucWeaponID );
-                BitStream.pBitStream->Write ( usAmmo );
-                BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bSetAsCurrent ) ? 1 : 0 ) );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+
+                SWeaponTypeSync weaponType;
+                weaponType.data.ucWeaponType = ucWeaponID;
+                BitStream.pBitStream->Write ( &weaponType );
+
+                SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+                ammo.data.usTotalAmmo = usAmmo;
+                BitStream.pBitStream->Write ( &ammo );
+
+                BitStream.pBitStream->WriteBit ( bSetAsCurrent );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_WEAPON, *BitStream.pBitStream ) );
 
                 return true;
@@ -3234,8 +3246,12 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
             if ( pPed->IsSpawned () )
             {
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );                
-                BitStream.pBitStream->Write ( ucWeaponID );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );         
+
+                SWeaponTypeSync weaponType;
+                weaponType.data.ucWeaponType = ucWeaponID;
+                BitStream.pBitStream->Write ( &weaponType );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON, *BitStream.pBitStream ) );
 
                 return true;
@@ -3258,7 +3274,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons ( CElement* pElement )
         if ( pPed->IsSpawned () )
         {
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_ALL_WEAPONS, *BitStream.pBitStream ) );
 
 		    return true;
@@ -3280,9 +3296,16 @@ bool CStaticFunctionDefinitions::GiveWeaponAmmo ( CElement* pElement, unsigned c
         if ( pPed->IsSpawned () )
         {
 		    CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
-		    BitStream.pBitStream->Write ( ucWeaponID );
-            BitStream.pBitStream->Write ( usAmmo );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+
+            SWeaponTypeSync weaponType;
+            weaponType.data.ucWeaponType = ucWeaponID;
+		    BitStream.pBitStream->Write ( &weaponType );
+
+            SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+            ammo.data.usTotalAmmo = usAmmo;
+            BitStream.pBitStream->Write ( &ammo );
+
 		    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_WEAPON_AMMO, *BitStream.pBitStream ) );
 
 		    return true;
@@ -3304,9 +3327,16 @@ bool CStaticFunctionDefinitions::TakeWeaponAmmo ( CElement* pElement, unsigned c
         if ( pPed->IsSpawned () )
         {
 		    CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
-		    BitStream.pBitStream->Write ( ucWeaponID );
-            BitStream.pBitStream->Write ( usAmmo );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+
+            SWeaponTypeSync weaponType;
+            weaponType.data.ucWeaponType = ucWeaponID;
+		    BitStream.pBitStream->Write ( &weaponType );
+
+            SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+            ammo.data.usTotalAmmo = usAmmo;
+            BitStream.pBitStream->Write ( &ammo );
+
 		    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON_AMMO, *BitStream.pBitStream ) );
 
 		    return true;
@@ -3328,10 +3358,16 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
         if ( pPed->IsSpawned () )
         {
 		    CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
-		    BitStream.pBitStream->Write ( ucWeaponID );
-            BitStream.pBitStream->Write ( usAmmo );
-            BitStream.pBitStream->Write ( usAmmoInClip );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+
+            SWeaponTypeSync weaponType;
+            weaponType.data.ucWeaponType = ucWeaponID;
+		    BitStream.pBitStream->Write ( &weaponType );
+
+            SWeaponAmmoSync ammo ( ucWeaponID, true, true );
+            ammo.data.usTotalAmmo = usAmmo;
+            ammo.data.usAmmoInClip = usAmmoInClip;
+            BitStream.pBitStream->Write ( &ammo );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
 
