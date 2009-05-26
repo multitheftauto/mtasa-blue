@@ -15,11 +15,6 @@
 
 CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket ( void )
 {
-    vector < SyncData* > ::const_iterator iter = m_Syncs.begin ();
-    for ( ; iter != m_Syncs.end (); iter++ )
-    {
-        delete *iter;
-    }
     m_Syncs.clear ();
 }
 
@@ -27,55 +22,20 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket ( void )
 bool CUnoccupiedVehicleSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of bytes
-    while ( BitStream.GetNumberOfUnreadBits () > 32 )
+    while ( BitStream.GetNumberOfUnreadBits () > 0 )
     {
         // Read out the sync data
-        SyncData* pData = new SyncData;
-        pData->bSend = false;
+        SyncData data;
+        data.bSend = false;
 
-        BitStream.ReadCompressed ( pData->Model );
-
-        // Read the sync time context
-        BitStream.ReadCompressed ( pData->ucSyncTimeContext );
-
-        BitStream.ReadCompressed ( pData->ucFlags );
-
-        if ( pData->ucFlags & 0x01 )
-        {
-            BitStream.Read ( pData->vecPosition.fX );
-            BitStream.Read ( pData->vecPosition.fY );
-            BitStream.Read ( pData->vecPosition.fZ );
-        }
-
-        if ( pData->ucFlags & 0x02 )
-        {
-            BitStream.Read ( pData->vecRotationDegrees.fX );
-            BitStream.Read ( pData->vecRotationDegrees.fY );
-            BitStream.Read ( pData->vecRotationDegrees.fZ );
-        }
-
-        if ( pData->ucFlags & 0x04 )
-        {
-            BitStream.Read ( pData->vecVelocity.fX );
-            BitStream.Read ( pData->vecVelocity.fY );
-            BitStream.Read ( pData->vecVelocity.fZ );
-        }
-
-        if ( pData->ucFlags & 0x08 )
-        {
-            BitStream.Read ( pData->vecTurnSpeed.fX );
-            BitStream.Read ( pData->vecTurnSpeed.fY );
-            BitStream.Read ( pData->vecTurnSpeed.fZ );
-        }
-
-        if ( pData->ucFlags & 0x10 ) BitStream.Read ( pData->fHealth );
-
-        if ( pData->ucFlags & 0x20 ) BitStream.ReadCompressed ( pData->TrailerID );  
+        SUnoccupiedVehicleSync vehicle;
+        BitStream.Read ( &vehicle );
+        data.syncStructure = vehicle;
 
         // Add it to our list. We no longer check if it's valid here
         // because CUnoccupiedVehicleSync does and it won't write bad ID's
         // back to clients.
-        m_Syncs.push_back ( pData );
+        m_Syncs.push_back ( data );
     }
 
     return m_Syncs.size () > 0;
@@ -86,55 +46,15 @@ bool CUnoccupiedVehicleSyncPacket::Write ( NetBitStreamInterface& BitStream ) co
 {
     // While we're not out of syncs to write
     bool bSent = false;
-    vector < SyncData* > ::const_iterator iter = m_Syncs.begin ();
-    for ( ; iter != m_Syncs.end (); iter++ )
+    vector < SyncData > ::const_iterator iter = m_Syncs.begin ();
+    for ( ; iter != m_Syncs.end (); ++iter )
     {
         // If we're not supposed to ignore the packet
-        SyncData* pData = *iter;
-        if ( pData->bSend )
+        const SyncData* data = &( *iter );
+
+        if ( data->bSend )
         {
-            // Write vehicle ID
-            BitStream.WriteCompressed ( pData->Model );
-
-            // Write the sync time context
-            BitStream.WriteCompressed ( pData->ucSyncTimeContext );
-
-            // Write packet flags
-            BitStream.WriteCompressed ( pData->ucFlags );
-
-            // Position and rotation
-            if ( pData->ucFlags & 0x01 )
-            {
-                BitStream.Write ( pData->vecPosition.fX );
-                BitStream.Write ( pData->vecPosition.fY );
-                BitStream.Write ( pData->vecPosition.fZ );
-            }
-
-            if ( pData->ucFlags & 0x02 )
-            {
-                BitStream.Write ( pData->vecRotationDegrees.fX );
-                BitStream.Write ( pData->vecRotationDegrees.fY );
-                BitStream.Write ( pData->vecRotationDegrees.fZ );
-            }
-
-            // Velocity
-            if ( pData->ucFlags & 0x04 )
-            {
-                BitStream.Write ( pData->vecVelocity.fX );
-                BitStream.Write ( pData->vecVelocity.fY );
-                BitStream.Write ( pData->vecVelocity.fZ );
-            }
-
-            // Turnspeed
-            if ( pData->ucFlags & 0x08 )
-            {
-                BitStream.Write ( pData->vecTurnSpeed.fX );
-                BitStream.Write ( pData->vecTurnSpeed.fY );
-                BitStream.Write ( pData->vecTurnSpeed.fZ );
-            }
-
-            // Health
-            if ( pData->ucFlags & 0x10 ) BitStream.Write ( pData->fHealth );
+            BitStream.Write ( &(data->syncStructure) );
 
             // We've sent atleast one sync
             bSent = true;

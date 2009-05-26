@@ -245,7 +245,6 @@ public:
 
 private:
     void                        AddBuiltInEvents            ( void );
-    void                        SendPings                   ( void );
 
     void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
@@ -324,9 +323,6 @@ private:
 #ifdef MTA_VOICE
     CVoiceServer*               m_pVoiceServer;
 #endif
-
-    unsigned long               m_ulNextPingTime;
-    ElementID                   m_LastPingPlayer;
 
 	char*						m_szCurrentFileName;
 

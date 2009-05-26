@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 extern CGame* g_pGame;
 
@@ -287,23 +288,13 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 BitStream.Read ( usAmmoInClip );
                 pSourcePlayer->SetWeaponAmmoInClip ( usAmmoInClip );
 
-                // Read out the aim directions
-                float fArmX, fArmY;
-                BitStream.Read ( fArmX );
-                BitStream.Read ( fArmY );
-                pSourcePlayer->SetAimDirections ( fArmX, fArmY );
+                // Read out aim data
+                SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
+                BitStream.Read ( &aim );
 
-                // Source vector
-                BitStream.Read ( vecTemp.fX );
-                BitStream.Read ( vecTemp.fY );
-                BitStream.Read ( vecTemp.fZ );
-                pSourcePlayer->SetSniperSourceVector ( vecTemp );
-
-                // Target vector
-                BitStream.Read ( vecTemp.fX );
-                BitStream.Read ( vecTemp.fY );
-                BitStream.Read ( vecTemp.fZ );
-                pSourcePlayer->SetTargettingVector ( vecTemp );
+                pSourcePlayer->SetAimDirection ( aim.data.fArm );
+                pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
+                pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
                 // Read out the driveby direction
                 unsigned char ucDriveByDirection;
@@ -422,21 +413,12 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 // Write the ammo in clip
                 BitStream.Write ( pSourcePlayer->GetWeaponAmmoInClip () );
 
-                // Write the aim directions
-                BitStream.Write ( pSourcePlayer->GetAimDirectionX () );
-                BitStream.Write ( pSourcePlayer->GetAimDirectionY () );
-
-                 // Source vector
-                vecTemp = pSourcePlayer->GetSniperSourceVector ();
-                BitStream.Write ( vecTemp.fX );
-                BitStream.Write ( vecTemp.fY );
-                BitStream.Write ( vecTemp.fZ );
-
-                // Targetting vector
-                pSourcePlayer->GetTargettingVector ( vecTemp );
-                BitStream.Write ( vecTemp.fX );
-                BitStream.Write ( vecTemp.fY );
-                BitStream.Write ( vecTemp.fZ );
+                // Write the weapon aim data
+                SWeaponAimSync aim ( 0.0f );
+                aim.data.vecOrigin = pSourcePlayer->GetSniperSourceVector ();
+                pSourcePlayer->GetTargettingVector ( aim.data.vecTarget );
+                aim.data.fArm = pSourcePlayer->GetAimDirection ();
+                BitStream.Write ( &aim );
 
                 // Write the driveby aim directoin
                 BitStream.Write ( pSourcePlayer->GetDriveByDirection () );
@@ -464,13 +446,11 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     if ( CVehicleManager::HasTurret ( usModel ) ) 
     {
         // Read out the turret position
-        float fTurretX;
-        float fTurretY;
-        BitStream.Read ( fTurretX );
-        BitStream.Read ( fTurretY );
+        SVehicleSpecific vehicle;
+        BitStream.Read ( &vehicle );
 
         // Set the data
-        pVehicle->SetTurretPosition ( fTurretX, fTurretY );
+        pVehicle->SetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
     }
 
     // Adjustable property value
@@ -491,14 +471,10 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     unsigned short usModel = pVehicle->GetModel ();
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
-        // Grab the turret position
-        float fHorizontal;
-        float fVertical;
-        pVehicle->GetTurretPosition ( fHorizontal, fVertical );
+        SVehicleSpecific vehicle;
+        pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
-        // Write it
-        BitStream.Write ( fHorizontal );
-        BitStream.Write ( fVertical );
+        BitStream.Write ( &vehicle );
     }
 
     // Adjustable property value

@@ -42,7 +42,6 @@ public:
     void                Packet_PlayerSpawn              ( NetBitStreamInterface& bitStream );
     void                Packet_PlayerWasted             ( NetBitStreamInterface& bitStream );
     void                Packet_PlayerChangeNick         ( NetBitStreamInterface& bitStream );
-    void                Packet_PlayerPings              ( NetBitStreamInterface& bitStream );
     void                Packet_ChatEcho                 ( NetBitStreamInterface& bitStream );
     void                Packet_ConsoleEcho              ( NetBitStreamInterface& bitStream );
     void                Packet_DebugEcho                ( NetBitStreamInterface& bitStream );

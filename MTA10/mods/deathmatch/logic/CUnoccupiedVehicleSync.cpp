@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 using std::list;
 
@@ -198,70 +199,22 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStopSync ( NetBitStreamInte
 void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of vehicles
-    while ( BitStream.GetNumberOfUnreadBits () > 32 )
+    while ( BitStream.GetNumberOfUnreadBits () > 0 )
     {
-        // Read out the vehicle id
-        ElementID ID;
-        if ( BitStream.ReadCompressed ( ID ) )
+        SUnoccupiedVehicleSync vehicle;
+        if ( BitStream.Read ( &vehicle ) )
         {
-            // Read out the sync time context. See CClientEntity for documentation on that.
-            unsigned char ucSyncTimeContext = 0;
-            BitStream.ReadCompressed ( ucSyncTimeContext );
-
-            unsigned char ucFlags = 0;
-            BitStream.ReadCompressed ( ucFlags );
-
-            // Read out the position
-            CVector vecPosition, vecRotationDegrees, vecMoveSpeed, vecTurnSpeed;
-            float fHealth;
-
-            if ( ucFlags & 0x01 )
+            CClientVehicle* pVehicle = m_pVehicleManager->Get ( vehicle.data.vehicleID );
+            if ( pVehicle && pVehicle->CanUpdateSync ( vehicle.data.ucTimeContext ) )
             {
-                BitStream.Read ( vecPosition.fX );
-                BitStream.Read ( vecPosition.fY );
-                BitStream.Read ( vecPosition.fZ );
-            }
-
-            // And rotation
-            if ( ucFlags & 0x02 )
-            {
-                BitStream.Read ( vecRotationDegrees.fX );
-                BitStream.Read ( vecRotationDegrees.fY );
-                BitStream.Read ( vecRotationDegrees.fZ );
-            }
-
-            // And the move and turn speed
-            if ( ucFlags & 0x04 )
-            {
-                BitStream.Read ( vecMoveSpeed.fX );
-                BitStream.Read ( vecMoveSpeed.fY );
-                BitStream.Read ( vecMoveSpeed.fZ );
-            }
-
-            if ( ucFlags & 0x08 )
-            {
-                BitStream.Read ( vecTurnSpeed.fX );
-                BitStream.Read ( vecTurnSpeed.fY );
-                BitStream.Read ( vecTurnSpeed.fZ );
-            }
-
-            // And health
-            if ( ucFlags & 0x10 )
-            {
-                BitStream.Read ( fHealth );
-            }
-
-            CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
-            if ( pVehicle && pVehicle->CanUpdateSync ( ucSyncTimeContext ) )
-            {
-                if ( ucFlags & 0x01 )pVehicle->SetTargetPosition ( vecPosition );
-                if ( ucFlags & 0x02 ) pVehicle->SetTargetRotation ( vecRotationDegrees );
-                if ( ucFlags & 0x04 ) pVehicle->SetMoveSpeed ( vecMoveSpeed );
-                if ( ucFlags & 0x08 ) pVehicle->SetTurnSpeed ( vecTurnSpeed );
-                if ( ucFlags & 0x10 ) pVehicle->SetHealth ( fHealth );
-                pVehicle->SetEngineOn ( ( ucFlags & 0x40 ) ? true : false );
+                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition );
+                if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation );
+                if ( vehicle.data.bSyncVelocity )       pVehicle->SetMoveSpeed ( vehicle.data.vecVelocity );
+                if ( vehicle.data.bSyncTurnVelocity )   pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
+                if ( vehicle.data.bSyncHealth )         pVehicle->SetHealth ( vehicle.data.fHealth );
+                                                        pVehicle->SetEngineOn ( vehicle.data.bEngineOn );
                 if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
-                    pVehicle->SetDerailed ( ( ucFlags & 0x80 ) ? true : false );
+                                                        pVehicle->SetDerailed ( vehicle.data.bDerailed );
 #ifdef MTA_DEBUG
 				pVehicle->m_pLastSyncer = NULL;
 				pVehicle->m_ulLastSyncTime = GetTickCount ();
@@ -269,7 +222,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
 #endif
             }
         }
-        else break;
+        else
+            break;
     }
 }
 
@@ -318,92 +272,122 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
 
 bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle )
 {
-    CVector vecPosition, vecRotation, vecMoveSpeed, vecTurnSpeed;
-    pVehicle->GetPosition ( vecPosition );
-    pVehicle->GetRotationDegrees ( vecRotation );
+    bool bSyncVehicle = false;
+    SUnoccupiedVehicleSync vehicle;
+
+    // Copy the vehicle data into the sync structures
+    vehicle.data.vehicleID = pVehicle->GetID ();
+    vehicle.data.ucTimeContext = pVehicle->GetSyncTimeContext ();
+
+    pVehicle->GetPosition ( vehicle.data.vecPosition );
+    pVehicle->GetRotationDegrees ( vehicle.data.vecRotation );
     if ( pVehicle->GetGameVehicle () )
     {
-        pVehicle->GetMoveSpeed ( vecMoveSpeed );
-        pVehicle->GetTurnSpeed ( vecTurnSpeed );
+        pVehicle->GetMoveSpeed ( vehicle.data.vecVelocity );
+        pVehicle->GetTurnSpeed ( vehicle.data.vecTurnVelocity );
     }
 
-    ElementID Trailer = NULL;
+    vehicle.data.fHealth = pVehicle->GetHealth ();
+
     CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
     if ( pTrailer )
-        Trailer = pTrailer->GetID ();
+        vehicle.data.trailer = pTrailer->GetID ();
     else
-        Trailer = static_cast < ElementID > ( INVALID_ELEMENT_ID );
+        vehicle.data.trailer = static_cast < ElementID > ( INVALID_ELEMENT_ID );
 
-    unsigned char ucFlags = 0;
-    if ( pVehicle->m_LastSyncedData->vecPosition != vecPosition ) ucFlags |= 0x01;
-    if ( pVehicle->m_LastSyncedData->vecRotation != vecRotation ) ucFlags |= 0x02;
-    if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vecMoveSpeed ) ucFlags |= 0x04;
-    if ( pVehicle->m_LastSyncedData->vecTurnSpeed != vecTurnSpeed ) ucFlags |= 0x08;
-    if ( abs ( pVehicle->m_LastSyncedData->fHealth - pVehicle->GetHealth() ) > FLOAT_EPSILON ) ucFlags |= 0x010;
-    if ( pVehicle->m_LastSyncedData->Trailer != Trailer ) ucFlags |= 0x020;
-    if ( pVehicle->IsEngineOn () ) ucFlags |= 0x040;
-    if ( pVehicle->IsDerailed () ) ucFlags |= 0x080;
+
+    // Adjust the sync flags
+    if ( pVehicle->GetModelInfo ()->IsBoat () )
+    {
+        // Boats vary their z height a bit when on water due to the wave effect
+        // It's not needed to sync these tiny changes.
+        const CVector& vecLastPosition = pVehicle->m_LastSyncedData->vecPosition;
+        if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) > FLOAT_EPSILON ||
+             fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) > FLOAT_EPSILON ||
+             fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) > 1.2f )
+        {
+            bSyncVehicle = true;
+            vehicle.data.bSyncPosition = true;
+            pVehicle->m_LastSyncedData->vecPosition = vehicle.data.vecPosition;
+        }
+
+        const CVector& vecLastVelocity = pVehicle->m_LastSyncedData->vecMoveSpeed;
+        if ( vecLastVelocity != vehicle.data.vecVelocity &&
+             (
+               fabs ( vehicle.data.vecVelocity.fX ) > FLOAT_EPSILON ||
+               fabs ( vehicle.data.vecVelocity.fY ) > FLOAT_EPSILON ||
+               fabs ( vehicle.data.vecVelocity.fZ ) > FLOAT_EPSILON
+             )
+           )
+        {
+            bSyncVehicle = true;
+            vehicle.data.bSyncVelocity = true;
+            pVehicle->m_LastSyncedData->vecMoveSpeed = vehicle.data.vecVelocity;
+        }
+    }
+    else
+    {
+        if ( pVehicle->m_LastSyncedData->vecPosition != vehicle.data.vecPosition )
+        {
+            bSyncVehicle = true;
+            vehicle.data.bSyncPosition = true;
+            pVehicle->m_LastSyncedData->vecPosition = vehicle.data.vecPosition;
+        }
+
+        if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vehicle.data.vecVelocity )
+        {
+            bSyncVehicle = true;
+            vehicle.data.bSyncVelocity = true;
+            pVehicle->m_LastSyncedData->vecMoveSpeed = vehicle.data.vecVelocity;
+        }
+    }
+
+    if ( pVehicle->m_LastSyncedData->vecRotation != vehicle.data.vecRotation )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bSyncRotation = true;
+        pVehicle->m_LastSyncedData->vecRotation = vehicle.data.vecRotation;
+    }
+
+    if ( pVehicle->m_LastSyncedData->vecTurnSpeed != vehicle.data.vecTurnVelocity )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bSyncTurnVelocity = true;
+        pVehicle->m_LastSyncedData->vecTurnSpeed = vehicle.data.vecTurnVelocity;
+    }
+
+    if ( abs ( pVehicle->m_LastSyncedData->fHealth - vehicle.data.fHealth ) > FLOAT_EPSILON )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bSyncHealth = true;
+        pVehicle->m_LastSyncedData->fHealth = vehicle.data.fHealth;
+    }
+
+    if ( pVehicle->m_LastSyncedData->Trailer != vehicle.data.trailer )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bSyncTrailer = true;
+        pVehicle->m_LastSyncedData->Trailer = vehicle.data.trailer;
+    }
+
+    if ( pVehicle->IsEngineOn () )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bEngineOn = true;
+    }
+
+    if ( pVehicle->IsDerailed () )
+    {
+        bSyncVehicle = true;
+        vehicle.data.bDerailed = true;
+    }
 
     // If nothing has changed we dont sync the vehicle
-    if ( ucFlags == 0 )
+    if ( !bSyncVehicle )
         return false;
 
-    // Write the vehicle id
-    pBitStream->WriteCompressed ( pVehicle->GetID () );
-
-    // Write the sync time context
-    pBitStream->WriteCompressed ( pVehicle->GetSyncTimeContext () );
-
-    // Write flags
-    pBitStream->WriteCompressed ( ucFlags );
-
-    // Write it
-    if ( ucFlags & 0x01 )
-    {
-        pBitStream->Write ( vecPosition.fX );
-        pBitStream->Write ( vecPosition.fY );
-        pBitStream->Write ( vecPosition.fZ );
-        pVehicle->m_LastSyncedData->vecPosition = vecPosition;
-    }
-
-    if ( ucFlags & 0x02 )
-    {
-        pBitStream->Write ( vecRotation.fX );
-        pBitStream->Write ( vecRotation.fY );
-        pBitStream->Write ( vecRotation.fZ );
-        pVehicle->m_LastSyncedData->vecRotation = vecRotation;
-    }
-
-    // Write movespeed
-    if ( ucFlags & 0x04 )
-    {
-        pBitStream->Write ( vecMoveSpeed.fX );
-        pBitStream->Write ( vecMoveSpeed.fY );
-        pBitStream->Write ( vecMoveSpeed.fZ );
-        pVehicle->m_LastSyncedData->vecMoveSpeed = vecMoveSpeed;
-    }
-
-    if ( ucFlags & 0x08 )
-    {
-        pBitStream->Write ( vecTurnSpeed.fX );
-        pBitStream->Write ( vecTurnSpeed.fY );
-        pBitStream->Write ( vecTurnSpeed.fZ );
-        pVehicle->m_LastSyncedData->vecTurnSpeed = vecTurnSpeed;
-    }
-
-    // And health
-    if ( ucFlags & 0x10 )
-    {
-        pBitStream->Write ( pVehicle->GetHealth () );
-        pVehicle->m_LastSyncedData->fHealth = pVehicle->GetHealth();
-    }
-
-    // And trailer
-    if ( ucFlags & 0x20 )
-    {
-        pBitStream->WriteCompressed ( Trailer );
-        pVehicle->m_LastSyncedData->Trailer = Trailer;
-    }
+    // Write the data
+    pBitStream->Write ( &vehicle );
 
     return true;
 }

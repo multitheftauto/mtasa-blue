@@ -65,10 +65,6 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PlayerChangeNick ( bitStream );
             return true;
 
-        case PACKET_ID_PLAYER_PINGS:
-            Packet_PlayerPings ( bitStream );
-            return true;
-
         case PACKET_ID_CHAT_ECHO:
             Packet_ChatEcho ( bitStream );
             return true;
@@ -1027,37 +1023,6 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
      * Cleanup.
      */
     delete [] szOldNickCopy;
-}
-
-
-void CPacketHandler::Packet_PlayerPings ( NetBitStreamInterface& bitStream )
-{
-    // unsigned char    (1) - player id
-    // unsigned char    (1) - player ping (only a 4th of the real ping)
-    // ...
-
-    // We should be ingame
-    if ( g_pClientGame->m_Status == CClientGame::STATUS_JOINED )
-    {
-        // Read out each ping
-        while ( bitStream.GetReadOffsetAsBits () < bitStream.GetNumberOfBitsUsed () )
-        {
-            // Read out the data
-            ElementID PlayerID;
-            unsigned short usPing;
-            if ( bitStream.ReadCompressed ( PlayerID ) &&
-                 bitStream.ReadCompressed ( usPing ) )
-            {
-                // Grab the player
-                CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
-                if ( pPlayer )
-                {
-                    // Set the new ping
-                    pPlayer->SetPing ( usPing );
-                }
-            }
-        }
-    }
 }
 
 

@@ -18,8 +18,6 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
-#include "CClientCommon.h"
-
 #ifndef PI
 #define PI 3.14159265358979323846264338327950f
 #endif

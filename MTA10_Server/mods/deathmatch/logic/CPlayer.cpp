@@ -38,8 +38,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_iStatus = STATUS_CONNECTED;
 
     m_fRotation = 0.0f;
-    m_fAimDirectionX = 0;
-    m_fAimDirectionY = 0;
+    m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
 	m_bAkimboArmUp = false;    
     

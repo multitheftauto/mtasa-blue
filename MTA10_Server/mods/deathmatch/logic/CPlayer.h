@@ -90,9 +90,8 @@ public:
     inline void                                 SetSniperSourceVector       ( const CVector& vecSource )    { m_vecSniperSource = vecSource; };
     inline void                                 GetTargettingVector         ( CVector& vecTarget )          { vecTarget = m_vecTargetting; };
     inline void                                 SetTargettingVector         ( const CVector& vecTarget )    { m_vecTargetting = vecTarget; };
-    inline float                                GetAimDirectionX            ( void )                        { return m_fAimDirectionX; };
-    inline float                                GetAimDirectionY            ( void )                        { return m_fAimDirectionY; };
-    inline void                                 SetAimDirections            ( float fX, float fY )          { m_fAimDirectionX = fX; m_fAimDirectionY = fY; };
+    inline float                                GetAimDirection             ( void )                        { return m_fAimDirection; };
+    inline void                                 SetAimDirection             ( float fDirection )            { m_fAimDirection = fDirection; };
     inline unsigned char                        GetDriveByDirection         ( void )                        { return m_ucDriveByDirection; };
     inline void                                 SetDriveByDirection         ( unsigned char ucDirection )   { m_ucDriveByDirection = ucDirection; };
 	inline bool									IsAkimboArmUp				( void )						{ return m_bAkimboArmUp; };
@@ -226,8 +225,7 @@ private:
     long                                        m_lMoney;    
     CVector                                     m_vecSniperSource;
     CVector                                     m_vecTargetting;
-    float                                       m_fAimDirectionX;
-    float                                       m_fAimDirectionY;
+    float                                       m_fAimDirection;
     unsigned char                               m_ucDriveByDirection;   
     
 	bool										m_bAkimboArmUp;
