@@ -702,7 +702,7 @@ void CKeyBinds::SetAllCommandsActive ( const char* szResource, bool bActive )
 }
 
 
-CCommandBind* CKeyBinds::GetBindFromCommand ( const char* szCommand, const char* szArguments, bool bMatchCase )
+CCommandBind* CKeyBinds::GetBindFromCommand ( const char* szCommand, const char* szArguments, bool bMatchCase, const char* szKey, bool bCheckHitState, bool bState )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
@@ -720,7 +720,15 @@ CCommandBind* CKeyBinds::GetBindFromCommand ( const char* szCommand, const char*
                              ( bMatchCase && strcmp ( szBindArguments, szArguments ) == 0 ) ||
                              ( !bMatchCase && stricmp ( szBindArguments, szArguments ) == 0 ) ) )
                 {
-                    return pBind;
+                    if ( ( szKey == NULL ) ||
+                         ( stricmp ( pBind->boundKey->szKey, szKey ) == 0 ) )
+                    {
+                        if ( ( !bCheckHitState ) ||
+                             ( bState == pBind->bHitState ) )
+                        {
+                            return pBind;
+                        }
+                    }
                 }
             }
         }

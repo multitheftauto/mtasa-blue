@@ -732,11 +732,24 @@ void CSettings::ProcessKeyBinds ( void )
                 {
 					// If the primary key is different than the original one
 					if ( pPriKey != pBind->boundKey ) {
+                        // Did we have any keys with the same "up" state?
+                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        if ( pUpBind )
+                        {
+                            pUpBind->boundKey = pPriKey;
+                        }
+
 						pBind->boundKey = pPriKey;
 					}
                 }
 				// If the primary key field was empty, we can remove the keybind
 				else {
+                    // Remove any matching "up" state binds we may have
+                    CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                    if ( pUpBind )
+                    {
+                        pKeyBinds->Remove ( pUpBind );
+                    }
                     pKeyBinds->Remove ( pBind );
 				}
             }
@@ -757,15 +770,40 @@ void CSettings::ProcessKeyBinds ( void )
                     if ( pSecKeys[k] )
                     {
 					    if ( pSecKeys[k] != pBind->boundKey )
+                        {
+                            // Did we have any keys with the same "up" state?
+                            CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                            if ( pUpBind )
+                            {
+                                pUpBind->boundKey = pSecKeys[k];
+                            }
                             pBind->boundKey = pSecKeys[k];
+                        }
                     }
 				    // If the secondary key field was empty, we should remove the keybind
 				    else
+                    {
+                        // Remove any matching "up" state binds we may have
+                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        if ( pUpBind )
+                        {
+                             pKeyBinds->Remove ( pUpBind );
+                        }
                         pKeyBinds->Remove ( pBind );
+                    }
                 }
 			    // If this key bind didn't exist, create it
                 else if ( pSecKeys[k] )
+                {
 				    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
+                    // Also add a matching "up" state if applicable
+                    CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
+                    if ( pUpBind )
+                    {
+                        g_pCore->GetConsole()->Printf ( "HERE %s", pUpBind->bHitState ? "true" : "false" );
+                            pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
+                    }
+                }
             }
         }
         else if ( ucType == KEY_BIND_FUNCTION ) // keys bound to script functions
