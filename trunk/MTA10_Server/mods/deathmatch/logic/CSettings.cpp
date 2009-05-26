@@ -193,7 +193,7 @@ CXMLNode* CSettings::Get ( const char *szLocalResource, const char *szSetting, b
             if ( bDeleteNode )
             {
                 SettingStatus eMetaStatus = NotFound;
-                CXMLNode* pMetaNode = Get ( pSource, pStorage, pResource->GetName ().c_str (), szLocalResource, szSetting, bDeleteNode, eStatus, pNode );
+                CXMLNode* pMetaNode = Get ( pSource, pStorage, pResource->GetName ().c_str (), szLocalResource, szSetting, bDeleteNode, eMetaStatus, pNode );
                 if ( eMetaStatus == Found )
                 {
                     eStatus = eMetaStatus;
