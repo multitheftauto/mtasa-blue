@@ -1823,6 +1823,10 @@ void MultiColumnList::populateRenderCache()
                 itemRect.setSize(itemSize);
                 itemClipper = itemRect.getIntersection(itemsArea);
 
+                // Leave a gap between columns
+                if ( j < getColumnCount() - 1 )
+                    itemClipper.setWidth( Max ( 0.f, itemClipper.getWidth() - 5 ) );
+
                 // skip this item if totally clipped
                 if (itemClipper.getWidth() == 0)
                 {
