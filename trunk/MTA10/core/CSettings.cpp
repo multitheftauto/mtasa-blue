@@ -800,8 +800,7 @@ void CSettings::ProcessKeyBinds ( void )
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
                     {
-                        g_pCore->GetConsole()->Printf ( "HERE %s", pUpBind->bHitState ? "true" : "false" );
-                            pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
                     }
                 }
             }
