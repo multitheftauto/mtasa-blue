@@ -56,18 +56,37 @@ unsigned long CMultiplayerSA::ADDR_GotFocus;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
-#define HOOKPOS_FxManager_CreateFxSystem 0x4A9BE0
-#define HOOKPOS_FxManager_DestroyFxSystem 0x4A9810
+#define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
+#define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
 
-DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
-DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
+DWORD RETURN_FxManager_CreateFxSystem =                     0x4A9BE8;
+DWORD RETURN_FxManager_DestroyFxSystem =                    0x4A9817;
 
-#define HOOKPOS_CCam_ProcessFixed 0x051D470
+#define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
-#define HOOKPOS_CPed_IsPlayer 0x5DF8F0
+#define HOOKPOS_CPed_IsPlayer                               0x5DF8F0
 
-DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0x6859A7;
-DWORD RETURN_CPed_IsPlayer = 0x5DF8F6;
+DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon =  0x6859A7;
+DWORD RETURN_CPed_IsPlayer =                                0x5DF8F6;
+
+#define VAR_CollisionStreamRead_ModelInfo                   0x9689E0
+#define HOOKPOS_CollisionStreamRead                         0x41B1D0
+DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
+
+#define CALL_Render3DStuff                                  0x53EABF
+#define FUNC_Render3DStuff                                  0x53DF40
+
+#define CALL_CRenderer_Render                               0x53EA12
+#define FUNC_CRenderer_Render                               0x727140
+
+#define CALL_CWeapon_FireAreaEffect                         0x73EBFE
+#define FUNC_CWeapon_FireAreaEffect                         0x53A450
+#define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
+
+#define CALL_CGame_Process                                  0x53E981
+
+DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
+DWORD FUNC_CEntity_Render =                                 0x534310;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -120,54 +139,38 @@ BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
 
-
-VOID HOOK_FindPlayerCoors();
-VOID HOOK_FindPlayerCentreOfWorld();
-VOID HOOK_FindPlayerHeading();
-VOID HOOK_CStreaming_Update_Caller();
-VOID HOOK_CHud_Draw_Caller();
-VOID HOOK_CRunningScript_Process();
-VOID HOOK_CExplosion_AddExplosion();
-VOID HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
-VOID HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
-VOID HOOK_Trailer_BreakTowLink();
-VOID HOOK_CRadar__DrawRadarGangOverlay();
-VOID HOOK_CTaskComplexJump__CreateSubTask();
-VOID HOOK_CWeapon_FireAreaEffect();
-VOID HOOK_CBike_ProcessRiderAnims();
-VOID HOOK_FxManager_CreateFxSystem ();
-VOID HOOK_FxManager_DestroyFxSystem ();
-VOID HOOK_CCam_ProcessFixed ();
-VOID HOOK_Render3DStuff ();
-VOID HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
-VOID HOOK_CPed_IsPlayer ();
-VOID HOOK_CTrain_ProcessControl_Derail ();
-VOID HOOK_CVehicle_SetupRender ();
-VOID HOOK_CVehicle_ResetAfterRender();
-VOID HOOK_CObject_Render ();
-VOID HOOK_EndWorldColors ();
-VOID HOOK_CGame_Process ();
-VOID HOOK_CWorld_ProcessVerticalLineSectorList ();
-VOID HOOK_ComputeDamageResponse_StartChoking ();
-
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
-#define CALL_Render3DStuff 0x53EABF
-#define FUNC_Render3DStuff 0x53DF40
-
-#define CALL_CRenderer_Render 0x53EA12
-#define FUNC_CRenderer_Render 0x727140
-
-#define CALL_CWeapon_FireAreaEffect 0x73EBFE
-#define FUNC_CWeapon_FireAreaEffect 0x53A450
-#define CALL_CBike_ProcessRiderAnims 0x6BF425   // @ CBike::ProcessDrivingAnims
-
-#define CALL_CGame_Process 0x53E981
-
-DWORD FUNC_CBike_ProcessRiderAnims = 0x6B7280;
-DWORD FUNC_CEntity_Render = 0x534310;
-
+void HOOK_FindPlayerCoors();
+void HOOK_FindPlayerCentreOfWorld();
+void HOOK_FindPlayerHeading();
+void HOOK_CStreaming_Update_Caller();
+void HOOK_CHud_Draw_Caller();
+void HOOK_CRunningScript_Process();
+void HOOK_CExplosion_AddExplosion();
+void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
+void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
+void HOOK_Trailer_BreakTowLink();
+void HOOK_CRadar__DrawRadarGangOverlay();
+void HOOK_CTaskComplexJump__CreateSubTask();
+void HOOK_CWeapon_FireAreaEffect();
+void HOOK_CBike_ProcessRiderAnims();
+void HOOK_FxManager_CreateFxSystem ();
+void HOOK_FxManager_DestroyFxSystem ();
+void HOOK_CCam_ProcessFixed ();
+void HOOK_Render3DStuff ();
+void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
+void HOOK_CPed_IsPlayer ();
+void HOOK_CTrain_ProcessControl_Derail ();
+void HOOK_CVehicle_SetupRender ();
+void HOOK_CVehicle_ResetAfterRender();
+void HOOK_CObject_Render ();
+void HOOK_EndWorldColors ();
+void HOOK_CGame_Process ();
+void HOOK_CWorld_ProcessVerticalLineSectorList ();
+void HOOK_ComputeDamageResponse_StartChoking ();
+void HOOK_CollisionStreamRead ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -246,6 +249,7 @@ void CMultiplayerSA::InitHooks()
 	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
+    HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -1139,7 +1143,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity * entity, CVector * vecPosition, F
 	}
 }
 
-VOID _declspec(naked) HOOK_FindPlayerCoors()
+void _declspec(naked) HOOK_FindPlayerCoors()
 {
     _asm
     {
@@ -1175,7 +1179,7 @@ VOID _declspec(naked) HOOK_FindPlayerCoors()
 	}
 }
 
-VOID _declspec(naked) HOOK_CStreaming_Update_Caller()
+void _declspec(naked) HOOK_CStreaming_Update_Caller()
 {
 	/*
 	0053BF09   8BF8             MOV EDI,EAX
@@ -1240,7 +1244,7 @@ VOID _declspec(naked) HOOK_CStreaming_Update_Caller()
     }
 }
 
-VOID _declspec(naked) HOOK_CHud_Draw_Caller()
+void _declspec(naked) HOOK_CHud_Draw_Caller()
 {
 	/*
 	0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
@@ -1307,7 +1311,7 @@ VOID _declspec(naked) HOOK_CHud_Draw_Caller()
 	}
 }
 
-VOID _declspec(naked) HOOK_FindPlayerCentreOfWorld()
+void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
 {
 	/*
 	0056E250  /$ 8B4424 04      MOV EAX,DWORD PTR SS:[ESP+4]
@@ -1335,7 +1339,7 @@ VOID _declspec(naked) HOOK_FindPlayerCentreOfWorld()
 	
 }
 
-VOID _declspec(naked) HOOK_FindPlayerHeading()
+void _declspec(naked) HOOK_FindPlayerHeading()
 {
 	/*
 	0056E450  /$ 8B4C24 04      MOV ECX,DWORD PTR SS:[ESP+4]
@@ -1368,7 +1372,7 @@ VOID _declspec(naked) HOOK_FindPlayerHeading()
 }
 
 // this hook adds a null check to prevent the game crashing when objects are placed really high up (issue 517)
-VOID _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
+void _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
 {
     _asm
     {
@@ -1573,7 +1577,7 @@ bool CallExplosionHandler ( void )
 	return m_pExplosionHandler ( pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType );
 }
 
-VOID _declspec(naked) HOOK_CExplosion_AddExplosion()
+void _declspec(naked) HOOK_CExplosion_AddExplosion()
 {
     _asm
     {
@@ -1652,7 +1656,7 @@ VOID _declspec(naked) HOOK_CExplosion_AddExplosion()
 }
 
 
-VOID _declspec(naked) HOOK_CRealTimeShadowManager__ReturnRealTimeShadow()
+void _declspec(naked) HOOK_CRealTimeShadowManager__ReturnRealTimeShadow()
 {
     _asm
     {
@@ -1690,7 +1694,7 @@ bool processGrab () {
 }
 
 //0x67DABE
-VOID _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
+void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 {
     _asm
     {
@@ -2070,7 +2074,7 @@ void CRunningScript_Process ( void )
 	}
 }
 
-VOID _declspec(naked) HOOK_CRunningScript_Process()
+void _declspec(naked) HOOK_CRunningScript_Process()
 {
     _asm
     {
@@ -2087,7 +2091,7 @@ VOID _declspec(naked) HOOK_CRunningScript_Process()
 }
 
 static CVehicleSAInterface* pDerailingTrain = NULL;
-VOID _declspec(naked) HOOK_CTrain_ProcessControl_Derail()
+void _declspec(naked) HOOK_CTrain_ProcessControl_Derail()
 {
     // If the train wouldn't derail, don't modify anything
     _asm
@@ -2248,7 +2252,7 @@ static void SetVehicleAlpha ( )
 }
 
 static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
-VOID _declspec(naked) HOOK_CVehicle_SetupRender()
+void _declspec(naked) HOOK_CVehicle_SetupRender()
 {
     _asm
     {
@@ -2268,7 +2272,7 @@ VOID _declspec(naked) HOOK_CVehicle_SetupRender()
 }
 
 static DWORD dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
-VOID _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
+void _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
 {
     _asm
     {
@@ -2305,7 +2309,7 @@ static void SetObjectAlpha ()
 }
 
 DWORD dwCObjectRenderRet = 0;
-VOID _declspec(naked) HOOK_CObject_PostRender ()
+void _declspec(naked) HOOK_CObject_PostRender ()
 {
     _asm
     {
@@ -2323,7 +2327,7 @@ VOID _declspec(naked) HOOK_CObject_PostRender ()
 }
 
 // Note: This hook is also called for world objects (light poles, wooden fences, etc).
-VOID _declspec(naked) HOOK_CObject_Render ()
+void _declspec(naked) HOOK_CObject_Render ()
 {
     _asm
     {
@@ -2345,7 +2349,7 @@ VOID _declspec(naked) HOOK_CObject_Render ()
 }
 
 // Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
-VOID _declspec(naked) HOOK_EndWorldColors ()
+void _declspec(naked) HOOK_EndWorldColors ()
 {
     if ( bUsingCustomSkyGradient )
     {
@@ -2379,7 +2383,7 @@ static DWORD dwObjectsChecked = 0;
 static DWORD dwProcessVerticalKeepLooping = 0x5632D1;
 static DWORD dwProcessVerticalEndLooping = 0x56335F;
 static DWORD dwGlobalListOfObjects = 0xB9ACCC;
-VOID _declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList ( )
+void _declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList ( )
 {
     _asm
     {
@@ -2410,7 +2414,7 @@ stop_looping:
 static DWORD dwChokingChoke = 0x4C05C1;
 static DWORD dwChokingDontchoke = 0x4C0620;
 static unsigned char ucChokingWeaponType = 0;
-VOID _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
+void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
 {
     _asm
     {
@@ -2521,48 +2525,48 @@ void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
 
 void CMultiplayerSA::PreventLeavingVehicles()
 {
-	memset((VOID *)0x6B5A10, 0xC3, 1);
+	memset((void *)0x6B5A10, 0xC3, 1);
 
 	//006B7449     E9 FF000000    JMP gta_sa.006B754D
-	memset((VOID *)0x6B7449, 0xE9, 1);
-	memset((VOID *)(0x6B7449+1), 0xFF, 1);
-	memset((VOID *)(0x6B7449+2), 0x00, 1);
+	memset((void *)0x6B7449, 0xE9, 1);
+	memset((void *)(0x6B7449+1), 0xFF, 1);
+	memset((void *)(0x6B7449+2), 0x00, 1);
 
 	//006B763C     E9 01010000    JMP gta_sa.006B7742
-	memset((VOID *)0x6B763C, 0xE9, 1);
-	memset((VOID *)(0x6B763C+1), 0x01, 1);
-	memset((VOID *)(0x6B763C+2), 0x01, 1);
-	memset((VOID *)(0x6B763C+3), 0x00, 1);
+	memset((void *)0x6B763C, 0xE9, 1);
+	memset((void *)(0x6B763C+1), 0x01, 1);
+	memset((void *)(0x6B763C+2), 0x01, 1);
+	memset((void *)(0x6B763C+3), 0x00, 1);
 
 	//006B7617     E9 26010000    JMP gta_sa.006B7742
-	memset((VOID *)0x6B7617, 0xE9, 1);
-	memset((VOID *)(0x6B7617+1), 0x26, 1);
-	memset((VOID *)(0x6B7617+2), 0x01, 1);
-	memset((VOID *)(0x6B7617+3), 0x00, 1);
-	memset((VOID *)(0x6B7617+4), 0x00, 1);
+	memset((void *)0x6B7617, 0xE9, 1);
+	memset((void *)(0x6B7617+1), 0x26, 1);
+	memset((void *)(0x6B7617+2), 0x01, 1);
+	memset((void *)(0x6B7617+3), 0x00, 1);
+	memset((void *)(0x6B7617+4), 0x00, 1);
 
 	//006B62A7     EB 74          JMP SHORT gta_sa.006B631D
-	memset((VOID *)0x6B62A7, 0xEB, 1);
+	memset((void *)0x6B62A7, 0xEB, 1);
 
 	//006B7642     E9 FB000000    JMP gta_sa_u.006B7742
-	memset((VOID *)0x6B7642, 0xE9, 1);
-	memset((VOID *)(0x6B7642+1), 0xFB, 1);
-	memset((VOID *)(0x6B7642+2), 0x00, 1);
-	memset((VOID *)(0x6B7642+3), 0x00, 1);
-	memset((VOID *)(0x6B7642+4), 0x00, 1);
+	memset((void *)0x6B7642, 0xE9, 1);
+	memset((void *)(0x6B7642+1), 0xFB, 1);
+	memset((void *)(0x6B7642+2), 0x00, 1);
+	memset((void *)(0x6B7642+3), 0x00, 1);
+	memset((void *)(0x6B7642+4), 0x00, 1);
 
 	//006B7449     E9 FF000000    JMP gta_sa_u.006B754D
-	memset((VOID *)0x6B7449, 0xE9, 1);
-	memset((VOID *)(0x6B7449+1), 0xFF, 1);
-	memset((VOID *)(0x6B7449+2), 0x00, 1);
+	memset((void *)0x6B7449, 0xE9, 1);
+	memset((void *)(0x6B7449+1), 0xFF, 1);
+	memset((void *)(0x6B7449+2), 0x00, 1);
 
 	// For quadbikes hitting water	
 	// 006A90D8   E9 29020000      JMP gta_sa.006A9306
-	memset((VOID *)0x6A90D8, 0xE9, 1);
-	memset((VOID *)(0x6A90D8+1), 0x29, 1);
-	memset((VOID *)(0x6A90D8+2), 0x02, 1);
-	memset((VOID *)(0x6A90D8+3), 0x00, 1);
-	memset((VOID *)(0x6A90D8+4), 0x00, 1);
+	memset((void *)0x6A90D8, 0xE9, 1);
+	memset((void *)(0x6A90D8+1), 0x29, 1);
+	memset((void *)(0x6A90D8+2), 0x02, 1);
+	memset((void *)(0x6A90D8+3), 0x00, 1);
+	memset((void *)(0x6A90D8+4), 0x00, 1);
 }
 
 
@@ -2746,7 +2750,7 @@ void CMultiplayerSA::SetDebugVars ( float f1, float f2, float f3 )
 
 }
 
-VOID _declspec(naked) HOOK_CGame_Process ()
+void _declspec(naked) HOOK_CGame_Process ()
 {
     if ( m_pGameProcessHandler )
         m_pGameProcessHandler ();
@@ -2758,6 +2762,24 @@ VOID _declspec(naked) HOOK_CGame_Process ()
     }
 }
 
+void _declspec(naked) HOOK_CollisionStreamRead ()
+{
+    if ( *(DWORD *)VAR_CollisionStreamRead_ModelInfo )
+    {
+        _asm
+        {
+            mov eax, dword ptr fs:[0]
+            jmp RETURN_CollisionStreamRead
+        }
+    }
+    else
+    {
+        _asm
+        {
+            ret
+        }
+    }
+}
 
 // Allowing a created object into the vertical line test makes getGroundPosition, jetpacks and molotovs to work.
 // Not allowing a created object into the vertical line test makes the breakable animation work.
