@@ -12,6 +12,7 @@
 
 #include <StdInc.h>
 #include "CWeaponRPCs.h"
+#include "net/SyncStructures.h"
 
 void CWeaponRPCs::LoadFunctions ( void )
 {
@@ -29,78 +30,83 @@ void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
     ElementID ID;
-    unsigned char ucWeaponID;
-    unsigned short usAmmo;
-    unsigned char ucGiveWeapon;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucWeaponID ) &&
-         bitStream.Read ( usAmmo ) &&
-         bitStream.Read ( ucGiveWeapon ) )
+    SWeaponTypeSync weaponType;
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed )
+        SWeaponAmmoSync ammo ( weaponType.data.ucWeaponType, true, false );
+        if ( bitStream.Read ( &ammo ) )
         {
-            // Don't change remote players weapons (affects sync)
-            if ( pPed->GetType () == CCLIENTPED || pPed->GetType () == CCLIENTPLAYER )
+            bool bGiveWeapon = bitStream.ReadBit ();
+            unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
+
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
             {
-                // Valid weapon id?
-                if ( ucWeaponID == 0 || CClientPickupManager::IsValidWeaponID ( ucWeaponID ) )
+                // Don't change remote players weapons (affects sync)
+                if ( pPed->GetType () == CCLIENTPED || pPed->GetType () == CCLIENTPLAYER )
                 {
-                    // Adjust the ammo to 9999 if it's above
-                    if ( usAmmo > 9999 ) usAmmo = 9999;
+                    // Valid weapon id?
+                    if ( ucWeaponID == 0 || CClientPickupManager::IsValidWeaponID ( ucWeaponID ) )
+                    {
+                        // Adjust the ammo to 9999 if it's above
+                        if ( usAmmo > 9999 ) usAmmo = 9999;
 
-                    // Give the local player the weapon
-                    CWeapon* pPlayerWeapon = NULL;
-                    if ( ucWeaponID != 0 )
-                    {
-                        pPlayerWeapon = pPed->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usAmmo );
-                        if ( pPlayerWeapon && ucGiveWeapon == 1 )
-                            pPlayerWeapon->SetAsCurrentWeapon ();
-                    }
-                    else
-                    {
-                        // This could be entered into a hack of the year competition. Its about as hacky as it gets.
-                        // For some stupid reason, going from brassknuckles to unarmed causes the knuckles to remain 
-                        // on display but unusable. So, what we do is switch to a MELEE weapon (creating one if necessary)
-                        // then switch back to unarmed from there, which works fine.
-                        CWeapon* oldWeapon = pPed->GetWeapon (WEAPONSLOT_TYPE_UNARMED);
-                        if ( oldWeapon )
+                        // Give the local player the weapon
+                        CWeapon* pPlayerWeapon = NULL;
+                        if ( ucWeaponID != 0 )
                         {
-                            eWeaponType unarmedWeapon = oldWeapon->GetType();
-                            pPed->RemoveWeapon ( unarmedWeapon );
-                            if ( ucGiveWeapon == 1 || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
-                            {
-                                oldWeapon = NULL;
-                                if ( unarmedWeapon == WEAPONTYPE_BRASSKNUCKLE )
-                                {
-                                    oldWeapon = pPed->GetWeapon(WEAPONSLOT_TYPE_MELEE);
-                                    if ( oldWeapon && oldWeapon->GetType() == WEAPONTYPE_UNARMED )
-                                    {
-                                        oldWeapon = pPed->GiveWeapon(WEAPONTYPE_GOLFCLUB, 100);
-                                    }
-                                    else
-                                    {
-                                        oldWeapon = NULL;
-                                    }
-                                    pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_MELEE );
-                                }
-
-                                // switch to the unarmed slot
-                                pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
-
-                                // if we created a special MELEE weapon just for this, remove it now
-                                if ( oldWeapon )
-                                {
-                                    oldWeapon->Remove();
-                                }
-                            }
+                            pPlayerWeapon = pPed->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usAmmo );
+                            if ( pPlayerWeapon && bGiveWeapon )
+                                pPlayerWeapon->SetAsCurrentWeapon ();
                         }
                         else
                         {
-                            // Probably the ped is streamed out
-                            pPed->GiveWeapon ( WEAPONTYPE_UNARMED, 1 );
-                            if ( ucGiveWeapon == 1 )
-                                pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+                            // This could be entered into a hack of the year competition. Its about as hacky as it gets.
+                            // For some stupid reason, going from brassknuckles to unarmed causes the knuckles to remain 
+                            // on display but unusable. So, what we do is switch to a MELEE weapon (creating one if necessary)
+                            // then switch back to unarmed from there, which works fine.
+                            CWeapon* oldWeapon = pPed->GetWeapon (WEAPONSLOT_TYPE_UNARMED);
+                            if ( oldWeapon )
+                            {
+                                eWeaponType unarmedWeapon = oldWeapon->GetType();
+                                pPed->RemoveWeapon ( unarmedWeapon );
+                                if ( bGiveWeapon || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
+                                {
+                                    oldWeapon = NULL;
+                                    if ( unarmedWeapon == WEAPONTYPE_BRASSKNUCKLE )
+                                    {
+                                        oldWeapon = pPed->GetWeapon(WEAPONSLOT_TYPE_MELEE);
+                                        if ( oldWeapon && oldWeapon->GetType() == WEAPONTYPE_UNARMED )
+                                        {
+                                            oldWeapon = pPed->GiveWeapon(WEAPONTYPE_GOLFCLUB, 100);
+                                        }
+                                        else
+                                        {
+                                            oldWeapon = NULL;
+                                        }
+                                        pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_MELEE );
+                                    }
+
+                                    // switch to the unarmed slot
+                                    pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+
+                                    // if we created a special MELEE weapon just for this, remove it now
+                                    if ( oldWeapon )
+                                    {
+                                        oldWeapon->Remove();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Probably the ped is streamed out
+                                pPed->GiveWeapon ( WEAPONTYPE_UNARMED, 1 );
+                                if ( bGiveWeapon )
+                                    pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+                            }
                         }
                     }
                 }
@@ -114,10 +120,13 @@ void CWeaponRPCs::TakeWeapon ( NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
     ElementID ID;
-    unsigned char ucWeaponID;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucWeaponID )  )
+    SWeaponTypeSync weaponType;
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType )  )
     {
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
@@ -139,7 +148,7 @@ void CWeaponRPCs::TakeWeapon ( NetBitStreamInterface& bitStream )
 void CWeaponRPCs::TakeAllWeapons ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    if ( bitStream.Read ( ID ) )
+    if ( bitStream.ReadCompressed ( ID ) )
     {
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -154,32 +163,36 @@ void CWeaponRPCs::TakeAllWeapons ( NetBitStreamInterface& bitStream )
 void CWeaponRPCs::GiveWeaponAmmo ( NetBitStreamInterface& bitStream )
 {
 	ElementID ID;
-    unsigned char ucWeaponID;
-    unsigned short usAmmo;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucWeaponID ) &&
-         bitStream.Read ( usAmmo ) )
+    SWeaponTypeSync weaponType;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed )
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+        if ( bitStream.Read ( &ammo ) )
         {
-            // Valid weapon id?
-            if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
-
-		    // Do we have it?
-		    CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
-		    if ( pPlayerWeapon == NULL ) return;
-
-		    unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
-		    ulWeaponAmmo += usAmmo;
-            // Adjust the ammo to 9999 if it's above
-            if ( ulWeaponAmmo > 9999 )
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
             {
-                ulWeaponAmmo = 9999;
-            }
+                // Valid weapon id?
+                if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
 
-            // Add the weapon ammo
-		    pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+	    	    // Do we have it?
+		        CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+		        if ( pPlayerWeapon == NULL ) return;
+
+    		    unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
+	    	    ulWeaponAmmo += usAmmo;
+                // Adjust the ammo to 9999 if it's above
+                if ( ulWeaponAmmo > 9999 )
+                {
+                    ulWeaponAmmo = 9999;
+                }
+
+                // Add the weapon ammo
+    		    pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+            }
         }
     }
 }
@@ -188,38 +201,43 @@ void CWeaponRPCs::GiveWeaponAmmo ( NetBitStreamInterface& bitStream )
 void CWeaponRPCs::TakeWeaponAmmo ( NetBitStreamInterface& bitStream )
 {
 	ElementID ID;
-    unsigned char ucWeaponID;
-    unsigned short usAmmo;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucWeaponID ) &&
-         bitStream.Read ( usAmmo ) )
+    SWeaponTypeSync weaponType;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed )
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+        if ( bitStream.Read ( &ammo ) )
         {
-            // Valid weapon id?
-            if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
 
-	        // Do we have it?
-	        CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
-	        if ( pPlayerWeapon == NULL ) return;
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
+            {
+                // Valid weapon id?
+                if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
 
-            unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
-            pPlayerWeapon->SetAmmoInClip ( 0 );
+	            // Do we have it?
+	            CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+	            if ( pPlayerWeapon == NULL ) return;
 
-	        unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
-            if ( ulWeaponAmmo - usAmmo < 0 )
-                ulWeaponAmmo = 0;
-            else
-                ulWeaponAmmo -= usAmmo;
+                unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                pPlayerWeapon->SetAmmoInClip ( 0 );
 
-            // Remove the weapon ammo
-	        pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+	            unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
+                if ( ulWeaponAmmo - usAmmo < 0 )
+                    ulWeaponAmmo = 0;
+                else
+                    ulWeaponAmmo -= usAmmo;
 
-            if ( pPlayerWeapon->GetAmmoTotal () > ucAmmoInClip )
-                pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
-            else if ( pPlayerWeapon->GetAmmoTotal () <= ucAmmoInClip )
-                pPlayerWeapon->SetAmmoInClip ( pPlayerWeapon->GetAmmoTotal () );
+                // Remove the weapon ammo
+	            pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+
+                if ( pPlayerWeapon->GetAmmoTotal () > ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
+                else if ( pPlayerWeapon->GetAmmoTotal () <= ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( pPlayerWeapon->GetAmmoTotal () );
+            }
         }
     }
 }
@@ -228,14 +246,15 @@ void CWeaponRPCs::TakeWeaponAmmo ( NetBitStreamInterface& bitStream )
 void CWeaponRPCs::SetWeaponSlot ( NetBitStreamInterface& bitStream )
 {
 	ElementID ID;
-    unsigned char ucSlot;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucSlot ) )
+    SWeaponSlotSync slot;
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &slot ) )
     {
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
-		    pPed->SetCurrentWeaponSlot ( (eWeaponSlot) ucSlot );
+            pPed->SetCurrentWeaponSlot ( (eWeaponSlot) slot.data.uiSlot );
         }
     }
 }
@@ -244,34 +263,39 @@ void CWeaponRPCs::SetWeaponSlot ( NetBitStreamInterface& bitStream )
 void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 {
 	ElementID ID;
-    unsigned char ucWeaponID;
-    unsigned short usAmmo;
-    unsigned short usAmmoInClip;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucWeaponID ) &&
-         bitStream.Read ( usAmmo )  &&
-         bitStream.Read ( usAmmoInClip ) )
+    SWeaponTypeSync weaponType;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed )
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        SWeaponAmmoSync ammo ( ucWeaponID, true, true );
+
+        if ( bitStream.Read ( &ammo ) )
         {
-            // Valid weapon id?
-            if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
+            unsigned short usAmmoInClip = ammo.data.usAmmoInClip;
 
-		    // Do we have it?
-		    CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
-		    if ( pPlayerWeapon == NULL ) return;
-
-            unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
-            pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
-            pPlayerWeapon->SetAmmoTotal ( usAmmo );
-
-            if ( !usAmmoInClip )
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
             {
-                if ( usAmmo > ucAmmoInClip )
-                    pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
-                else if ( usAmmo <= ucAmmoInClip )
-                    pPlayerWeapon->SetAmmoInClip ( usAmmo );
+                // Valid weapon id?
+                if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
+
+	    	    // Do we have it?
+		        CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+		        if ( pPlayerWeapon == NULL ) return;
+
+                unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
+                pPlayerWeapon->SetAmmoTotal ( usAmmo );
+
+                if ( !usAmmoInClip )
+                {
+                    if ( usAmmo > ucAmmoInClip )
+                        pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
+                    else if ( usAmmo <= ucAmmoInClip )
+                        pPlayerWeapon->SetAmmoInClip ( usAmmo );
+                }
             }
         }
     }

@@ -20,11 +20,17 @@ bool CLuaPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     // Copy each byte from the bitstream we have to this one
     unsigned char ucTemp;
-    int iLength = m_BitStream.GetNumberOfBytesUsed ();
-    for ( int i = 0; i < iLength; i++ )
+    int iLength = m_BitStream.GetNumberOfBitsUsed ();
+    while ( iLength > 8 )
     {
         m_BitStream.Read ( ucTemp );
         BitStream.Write ( ucTemp );
+        iLength -= 8;
+    }
+    if ( iLength > 0 )
+    {
+        m_BitStream.ReadBits ( &ucTemp, iLength );
+        BitStream.WriteBits ( &ucTemp, iLength );
     }
 
     m_BitStream.ResetReadPointer ();
