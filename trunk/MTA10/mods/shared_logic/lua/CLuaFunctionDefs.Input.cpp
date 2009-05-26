@@ -325,12 +325,11 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
             if ( !controlBinds.empty () )
             {
                 lua_newtable ( luaVM );
-                unsigned int uiIndex = 0;
                 list < CGTAControlBind * > ::iterator iter = controlBinds.begin ();
                 for ( ; iter != controlBinds.end () ; iter++ )
                 {
-                    lua_pushnumber ( luaVM, ++uiIndex );
                     lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
+					lua_pushstring ( luaVM, "down" );
                     lua_settable ( luaVM, -3 );
                 }
             }
@@ -346,12 +345,11 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
             if ( !commandBinds.empty () )
             {
                 lua_newtable ( luaVM );
-                unsigned int uiIndex = 0;
                 list < CCommandBind * > ::iterator iter = commandBinds.begin ();
                 for ( ; iter != commandBinds.end () ; iter++ )
                 {
-                    lua_pushnumber ( luaVM, ++uiIndex );
                     lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
+					lua_pushstring ( luaVM, (*iter)->bHitState ? "down" : "up" );
                     lua_settable ( luaVM, -3 );
                 }
             }

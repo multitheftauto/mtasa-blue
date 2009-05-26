@@ -457,7 +457,7 @@ int CLuaFunctionDefs::GetPacketInfo ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 {
-    lua_createtable ( luaVM, 0, 5 );
+    lua_createtable ( luaVM, 0, 6 );
 
     lua_pushstring ( luaVM, "number" );
     lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetVersion () );
