@@ -141,6 +141,8 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             // The same model?
             if ( pInfo == pEntry->pModel )
             {
+                pInfo->MakeCustomModel ();
+
                 // He has to wait more for it
                 return false;
             }
@@ -177,6 +179,8 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             // Already loaded? Don't bother adding to the list.
             if ( pInfo->IsLoaded () )
             {
+                pInfo->MakeCustomModel ();
+
                 return true;
             }
 
