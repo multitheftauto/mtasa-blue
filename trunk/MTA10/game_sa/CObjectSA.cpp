@@ -140,9 +140,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
         // Setup some flags
         this->BeingDeleted = FALSE;
 	    this->DoNotRemoveFromGame = FALSE;
-	    m_pInterface->bIsStatic = false;
         *(BYTE *)(dwObjectPtr + 316) = 6;   // Related to moving stuff (eg: fire hydrants, default is 2)
-	    m_pInterface->bIsStaticWaitingForCollision = true;
         m_pInterface->bStreamingDontDelete = true;
     }
     else
