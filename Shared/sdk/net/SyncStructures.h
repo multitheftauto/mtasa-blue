@@ -95,13 +95,12 @@ struct SPositionSync : public ISyncStructure
         }
         else
         {
-            SFloatSync < 14, 10 > x, y, z;
+            SFloatSync < 14, 10 > x, y;
 
-            if ( bitStream.Read ( &x ) && bitStream.Read ( &y ) && bitStream.Read ( &z ) )
+            if ( bitStream.Read ( &x ) && bitStream.Read ( &y ) && bitStream.Read ( data.vecPosition.fZ ) )
             {
                 data.vecPosition.fX = x.data.fValue;
                 data.vecPosition.fY = y.data.fValue;
-                data.vecPosition.fZ = z.data.fValue;
                 return true;
             }
         }
@@ -119,14 +118,13 @@ struct SPositionSync : public ISyncStructure
         }
         else
         {
-            SFloatSync < 14, 10 > x, y, z;
+            SFloatSync < 14, 10 > x, y;
             x.data.fValue = data.vecPosition.fX;
             y.data.fValue = data.vecPosition.fY;
-            z.data.fValue = data.vecPosition.fZ;
 
             bitStream.Write ( &x );
             bitStream.Write ( &y );
-            bitStream.Write ( &z );
+            bitStream.Write ( data.vecPosition.fZ );
         }
     }
 
