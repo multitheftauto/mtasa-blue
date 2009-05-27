@@ -64,12 +64,12 @@ public:
 		return sqrt((fX*fX) + (fY*fY) + (fZ*fZ));
 	}
 
-    float DotProduct ( CVector * param ) const
+    float DotProduct ( const CVector * param ) const
     {
         return fX*param->fX + fY*param->fY + fZ*param->fZ;
     }
 
-    void CrossProduct ( CVector * param ) 
+    void CrossProduct ( const CVector * param ) 
     { 
         float _fX = fX, _fY = fY, _fZ = fZ;
         fX = _fY * param->fZ - param->fY * _fZ;
