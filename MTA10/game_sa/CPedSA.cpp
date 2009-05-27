@@ -404,7 +404,10 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     // ryden: Hack to increase the sniper range
     CWeapon* pWeapon = GetWeapon ( (eWeaponSlot)dwReturn );
     if ( weaponType == WEAPONTYPE_SNIPERRIFLE )
+    {
         pWeapon->GetInfo ()->SetWeaponRange ( 300.0f );
+        pWeapon->GetInfo ()->SetTargetRange ( 250.0f );
+    }
 
     return pWeapon;
 }
