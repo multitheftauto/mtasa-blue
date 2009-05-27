@@ -805,6 +805,9 @@ void CMultiplayerSA::InitHooks()
 
     // Disable idle cam
     *(BYTE *)0x522C80 = 0xC3;
+
+    // Disable radar map hiding when pressing TAB (action key) while on foot
+    memset ( (void *)0x58FC3E, 0x90, 14 );
 }
 
 
