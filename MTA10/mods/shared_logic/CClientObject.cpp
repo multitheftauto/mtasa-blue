@@ -266,8 +266,8 @@ void CClientObject::Render ( void )
 
 void CClientObject::SetStatic ( bool bStatic )
 {
-    // This will only change on the next creation (maybe recreate here, if streamed in)
     m_bIsStatic = bStatic;
+    StreamOutForABit ( );
 }
 
 
