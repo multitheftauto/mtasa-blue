@@ -1128,27 +1128,30 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
 
     // Sirene states
     int iModelID = pVehicle->GetModel ();
-    if ( CClientVehicleManager::HasSirens ( iModelID ) )
+    if ( uiSeat == 0 )
     {
-        pVehicle->SetSirenOrAlarmActive ( bSireneActive );
-    }
+        if ( CClientVehicleManager::HasSirens ( iModelID ) )
+        {
+            pVehicle->SetSirenOrAlarmActive ( bSireneActive );
+        }
 
-    // Smoke trail
-    if ( CClientVehicleManager::HasSmokeTrail ( iModelID ) )
-    {
-        pVehicle->SetSmokeTrailEnabled ( bSmokeTrail );
-    }
+        // Smoke trail
+        if ( CClientVehicleManager::HasSmokeTrail ( iModelID ) )
+        {
+            pVehicle->SetSmokeTrailEnabled ( bSmokeTrail );
+        }
 
-    // Landing gear vehicles
-    if ( CClientVehicleManager::HasLandingGears ( iModelID ) )
-    {
-        pVehicle->SetLandingGearDown ( bLandingGearDown );
-    }
+        // Landing gear vehicles
+        if ( CClientVehicleManager::HasLandingGears ( iModelID ) )
+        {
+            pVehicle->SetLandingGearDown ( bLandingGearDown );
+        }
 
-    // Derailed state
-    if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
-    {
-        pVehicle->SetDerailed ( bDerailed );
+        // Derailed state
+        if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
+        {
+            pVehicle->SetDerailed ( bDerailed );
+        }
     }
 
     // Current weapon id
