@@ -18,6 +18,7 @@
 using std::list;
 
 // Return the distance between two points ^ 2
+/*
 inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2 )
 {
 	float fDistanceX = vec2.fX - vec1.fX;
@@ -25,6 +26,58 @@ inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2
 	float fDistanceZ = vec2.fZ - vec1.fZ;
     return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 }
+*/
+namespace
+{
+
+    float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fBoxExtents, const CVector** vecBoxAxes )
+    {
+	    CVector vecOffset = vecPosition - vecBoxCenter;
+	    float fDistSq = 0.f;
+
+	    // For each axis
+	    for ( int i = 0 ; i < 3 ; i++ )
+	    {
+            // Project vecOffset on the axis
+		    float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
+
+            // Add any distance outside the box on that axis
+		    if ( fDot < -fBoxExtents[i] )
+			    fDistSq += ( fDot + fBoxExtents[i] ) * ( fDot + fBoxExtents[i] );
+		    else
+            if ( fDot > fBoxExtents[i] )
+			    fDistSq += ( fDot - fBoxExtents[i] ) * ( fDot - fBoxExtents[i] );
+	    }
+
+	    return fDistSq;
+    }
+
+
+    // First draft. Works, but is not optimized.
+    float GetElementStreamDistanceSquared ( CClientStreamElement* pElement, const CVector& vecPosition )
+    {
+        // Get bounding box extents
+        CVector vecMin;
+        CVector vecMax;
+        CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
+
+        // This makes sure the bounding box is centered around the origin. (At the expense of making it smaller).
+        float fBoxExtents[3] = {
+                        Max ( 1.f, Min ( -vecMin.fX, vecMax.fX ) ),
+                        Max ( 1.f, Min ( -vecMin.fY, vecMax.fY ) ),
+                        Max ( 1.f, Min ( -vecMin.fZ, vecMax.fZ ) ) };
+
+        // Get bounding box axes
+        CMatrix gtaMatrix;
+        pElement->GetMatrix ( gtaMatrix );
+
+        const CVector* vecBoxAxes[3] = { &gtaMatrix.vRoll, &gtaMatrix.vDirection, &gtaMatrix.vWas };
+
+        return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), fBoxExtents, vecBoxAxes );
+    }
+
+}
+
 
 CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance )
 {    
@@ -299,7 +352,7 @@ void CClientStreamer::OnUpdateStreamPosition ( CClientStreamElement * pElement )
     else
     {
         // Make sure our distance is updated
-        pElement->SetExpDistance ( ExpDistanceBetweenPoints ( pElement->GetStreamPosition (), m_vecPosition ) );
+        pElement->SetExpDistance ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) );
     }
 }
 
@@ -330,7 +383,7 @@ void CClientStreamer::SetExpDistances ( list < CClientStreamElement * > * pList 
     {
         pElement = *iter;
         // Set its distance ^ 2
-        pElement->SetExpDistance ( ExpDistanceBetweenPoints ( pElement->GetStreamPosition (), m_vecPosition ) );
+        pElement->SetExpDistance ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) );
     }
 }
 
@@ -338,7 +391,7 @@ void CClientStreamer::SetExpDistances ( list < CClientStreamElement * > * pList 
 void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, CClientStreamElement * pElement )
 {
     // Make sure it's exp distance is updated
-    float fDistance = ExpDistanceBetweenPoints ( pElement->GetStreamPosition (), m_vecPosition );
+    float fDistance = GetElementStreamDistanceSquared ( pElement, m_vecPosition );
     pElement->SetExpDistance ( fDistance );
 
     // Don't add if already in the list
@@ -353,7 +406,7 @@ void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, 
         pTemp = *iter;
 
         // Is it further than the one we add?
-        if ( ExpDistanceBetweenPoints ( pTemp->GetStreamPosition (), m_vecPosition ) > fDistance )
+        if ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) > fDistance )
         {
             // Add it before here
             pList->insert ( iter, pElement );
