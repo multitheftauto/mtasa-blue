@@ -56,6 +56,9 @@ namespace
     // First draft. Works, but is not optimized.
     float GetElementStreamDistanceSquared ( CClientStreamElement* pElement, const CVector& vecPosition )
     {
+        CVector vecDif = pElement->GetStreamPosition () - vecPosition;
+        return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
+
         // Get bounding box extents
         CVector vecMin;
         CVector vecMax;
