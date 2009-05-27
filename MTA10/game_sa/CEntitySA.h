@@ -125,7 +125,7 @@ public:
 	
 	unsigned long bDontCastShadowsOn : 1;		// Dont cast shadows on this object
 	unsigned long bOffscreen : 1;				// offscreen flag. This can only be trusted when it is set to true
-	unsigned long bIsStaticWaitingForCollision : 1; // this is used by script created entities - they are static until the collision is loaded below them
+	unsigned long bIsStaticWaitingForCollision_Misnamed : 1; // this is used by script created entities - they are static until the collision is loaded below them
 	unsigned long bDontStream : 1;				// tell the streaming not to stream me
 	unsigned long bUnderwater : 1;				// this object is underwater change drawing order
 	unsigned long bHasPreRenderEffects : 1;	// Object has a prerender effects attached to it
@@ -244,8 +244,8 @@ public:
     void*                       GetStoredPointer    ( void )                { return m_pStoredPointer; };
     void                        SetStoredPointer    ( void* pPointer )      { m_pStoredPointer = pPointer; };
 
-    bool                        IsStaticWaitingForCollision ( void )        { return m_pInterface->bIsStaticWaitingForCollision; }
-    void                        SetStaticWaitingForCollision ( bool bStatic ) { m_pInterface->bIsStaticWaitingForCollision = bStatic; }
+    bool                        IsStaticWaitingForCollision_Misnamed  ( void )        { return m_pInterface->bIsStaticWaitingForCollision_Misnamed; }
+    void                        SetStaticWaitingForCollision_Misnamed  ( bool bStatic ) { m_pInterface->bIsStaticWaitingForCollision_Misnamed  = bStatic; }
 
     void                        GetImmunities   ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof );
 

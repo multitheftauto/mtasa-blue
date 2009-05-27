@@ -35,7 +35,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
 
     m_usModel = usModel;
     m_bIsVisible = true;
-    m_bIsStatic = true;
+    m_bIsStatic = false;
     m_bUsesCollision = true;
     m_ucAlpha = 255;
     m_fScale = 1.0f;
@@ -376,7 +376,7 @@ void CClientObject::Create ( void )
                 m_pObject->SetStoredPointer ( this );
 
                 // Set some flags first
-                m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
+                m_pObject->SetStaticWaitingForCollision_Misnamed ( m_bIsStatic );
 
                 // Apply our data to the object
                 m_pObject->Teleport ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
