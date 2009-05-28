@@ -16,7 +16,9 @@
 void CInputRPCs::LoadFunctions ( void )
 {
     AddHandler ( BIND_KEY, BindKey, "BindKey" );
+    AddHandler ( BIND_COMMAND, BindCommand, "BindCommand" );
     AddHandler ( UNBIND_KEY, UnbindKey, "UnbindKey" );
+    AddHandler ( UNBIND_COMMAND, UnbindCommand, "UnbindCommand" );
     AddHandler ( TOGGLE_CONTROL_ABILITY, ToggleControl, "ToggleControl" );
     AddHandler ( TOGGLE_ALL_CONTROL_ABILITY, ToggleAllControls, "ToggleAllControls" );
     AddHandler ( SET_CONTROL_STATE, SetControlState, "SetControlState" );
@@ -68,6 +70,47 @@ void CInputRPCs::BindKey ( NetBitStreamInterface& bitStream )
     }
 }
 
+void CInputRPCs::BindCommand ( NetBitStreamInterface& bitStream )
+{
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+    if ( pKeyBinds )
+    {
+        unsigned char ucLength = 0;
+        if ( bitStream.Read ( ucLength ) )
+        {
+            char* szKey = new char [ ucLength + 1 ];            
+			szKey [ ucLength ] = NULL;
+            bitStream.Read ( szKey, ucLength );
+
+            const char* szHitState;
+            char ucHitState;
+            bitStream.Read ( ucHitState );
+            szHitState = ucHitState == 0 ? "down" : ( ucHitState == 1 ? "up" : (ucHitState == 3 ? "both" : "down" ) );
+
+            bitStream.Read ( ucLength );
+            char* szCommandName = new char [ ucLength + 1 ];            
+			szCommandName [ ucLength ] = NULL;
+            bitStream.Read ( szCommandName, ucLength );
+
+            bitStream.Read ( ucLength );
+            char* szArguments = new char [ ucLength + 1 ];            
+			szArguments [ ucLength ] = NULL;
+            bitStream.Read ( szArguments, ucLength );
+
+            bitStream.Read ( ucLength );
+            char* szResource = new char [ ucLength + 1 ];            
+			szResource [ ucLength ] = NULL;
+            bitStream.Read ( szResource, ucLength );
+
+            CStaticFunctionDefinitions::BindKey ( szKey, szHitState, szCommandName, szArguments, szResource );
+            delete [] szKey;
+            delete [] szCommandName;
+            delete [] szArguments;
+            delete [] szResource;
+        }
+    }
+}
+
 
 void CInputRPCs::UnbindKey ( NetBitStreamInterface& bitStream )
 {
@@ -99,6 +142,41 @@ void CInputRPCs::UnbindKey ( NetBitStreamInterface& bitStream )
                 }
             }
             delete [] szKey;
+        }
+    }
+}
+
+void CInputRPCs::UnbindCommand ( NetBitStreamInterface& bitStream )
+{
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+    if ( pKeyBinds )
+    {
+        unsigned char ucLength = 0;
+        if ( bitStream.Read ( ucLength ) )
+        {
+            char* szKey = new char [ ucLength + 1 ];            
+			szKey [ ucLength ] = NULL;
+            bitStream.Read ( szKey, ucLength );
+
+            const char* szHitState;
+            char ucHitState;
+            bitStream.Read ( ucHitState );
+            szHitState = ucHitState == 0 ? "down" : ( ucHitState == 1 ? "up" : (ucHitState == 3 ? "both" : "down" ) );
+
+            bitStream.Read ( ucLength );
+            char* szCommandName = new char [ ucLength + 1 ];            
+			szCommandName [ ucLength ] = NULL;
+            bitStream.Read ( szCommandName, ucLength );
+
+            bitStream.Read ( ucLength );
+            char* szResource = new char [ ucLength + 1 ];            
+			szResource [ ucLength ] = NULL;
+            bitStream.Read ( szResource, ucLength );
+
+            CStaticFunctionDefinitions::UnbindKey ( szKey, szHitState, szCommandName, szResource );
+            delete [] szKey;
+            delete [] szCommandName;
+            delete [] szResource;
         }
     }
 }
