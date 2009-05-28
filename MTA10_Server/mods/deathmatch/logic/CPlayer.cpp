@@ -361,6 +361,7 @@ void CPlayer::SetTeam ( CTeam* pTeam, bool bChangeTeam )
 
 void CPlayer::Reset ( void )
 {
+    //Called when resetMapInfo is called to reset per player information that is reset in the clientside implimentation of resetMapInfo. This stops our functions clientside and serverside possibly returning different results.
     memset ( m_fStats, 0, sizeof ( m_fStats ) );
     m_fStats [ 24 ] = 569.0f;           // default max_health
     m_pClothes->DefaultClothes ();    
@@ -368,13 +369,13 @@ void CPlayer::Reset ( void )
 
     // Removed
     //m_bForcedScoreboard = false;
-    //m_bForcedMap = false;
-    //m_ucInterior = 0;
-    //m_usDimension = 0;
-    //m_bCamFadedIn = true;
-    //SetCamFadeColor ( 0, 0, 0 );
+    m_bForcedMap = false;
+    m_ucInterior = 0;
+    m_usDimension = 0;
+    m_bCamFadedIn = true;
+    SetCamFadeColor ( 0, 0, 0 );
     //m_pKeyBinds->Clear ();
-    //m_bCursorShowing = false;
+    m_bCursorShowing = false;
 
     // Added
     m_ucFightingStyle = 15; // STYLE_GRAB_KICK
