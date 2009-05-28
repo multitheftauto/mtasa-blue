@@ -642,6 +642,13 @@ void CCore::ApplyMenuSettings ( void )
     m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();
 }
 
+void CCore::ApplyCommunityState ( void )
+{
+    bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
+    if ( bLoggedIn )
+        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow()->OnLoginStateChange ( true );
+}
+
 void CCore::SetConnected ( bool bConnected )
 {
     m_pLocalGUI->GetMainMenu ( )->SetIsIngame ( bConnected );

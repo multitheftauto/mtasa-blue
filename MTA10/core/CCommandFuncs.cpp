@@ -149,6 +149,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
             g_pCore->ApplyConsoleSettings ();
             g_pCore->ApplyServerBrowserSettings ();
             g_pCore->ApplyMenuSettings ();
+            g_pCore->ApplyCommunityState();
         }
         else
         {

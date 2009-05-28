@@ -132,6 +132,7 @@ public:
     void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
     void                    ApplyMenuSettings               ( void );
+    void                    ApplyCommunityState             ( void );
 
     // Net
     void                    SetConnected                    ( bool bConnected );
