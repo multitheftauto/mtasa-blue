@@ -14,11 +14,13 @@
 
 #define JSON_OBJECT_DEF_HASH_ENTIRES 16
 
+typedef unsigned int json_boolean;
+
 #undef FALSE
-#define FALSE ((boolean)0)
+#define FALSE ((json_boolean)0)
 
 #undef TRUE
-#define TRUE ((boolean)1)
+#define TRUE ((json_boolean)1)
 
 extern char *json_number_chars;
 extern char *json_hex_chars;
@@ -224,7 +226,7 @@ extern struct json_object* json_object_array_get_idx(struct json_object *obj,
  * @param b a boolean TRUE or FALSE (0 or 1)
  * @returns a json_object of type json_type_boolean
  */
-extern struct json_object* json_object_new_boolean(boolean b);
+extern struct json_object* json_object_new_boolean(json_boolean b);
 
 /** Get the boolean value of a json_object
  *
@@ -237,7 +239,7 @@ extern struct json_object* json_object_new_boolean(boolean b);
  * @param obj the json_object instance
  * @returns a boolean
  */
-extern boolean json_object_get_boolean(struct json_object *obj);
+extern json_boolean json_object_get_boolean(struct json_object *obj);
 
 
 /* int type methods */

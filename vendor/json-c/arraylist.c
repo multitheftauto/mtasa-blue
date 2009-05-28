@@ -9,8 +9,6 @@
  *
  */
 
-typedef int boolean;
-
 #include "config.h"
 
 #if STDC_HEADERS

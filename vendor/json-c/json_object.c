@@ -9,8 +9,6 @@
  *
  */
 
-typedef int boolean;
-
 #include "config.h"
 
 #include <stdio.h>
@@ -285,7 +283,7 @@ static int json_object_boolean_to_json_string(struct json_object* this,
   else return sprintbuf(pb, "false");
 }
 
-struct json_object* json_object_new_boolean(boolean b)
+struct json_object* json_object_new_boolean(json_boolean b)
 {
   struct json_object *this = json_object_new(json_type_boolean);
   if(!this) return NULL;
@@ -294,7 +292,7 @@ struct json_object* json_object_new_boolean(boolean b)
   return this;
 }
 
-boolean json_object_get_boolean(struct json_object *this)
+json_boolean json_object_get_boolean(struct json_object *this)
 {
   if(!this) return FALSE;
   switch(this->o_type) {
