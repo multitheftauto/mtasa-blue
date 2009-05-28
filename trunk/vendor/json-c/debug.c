@@ -9,8 +9,6 @@
  *
  */
 
-typedef int boolean;
-
 #include "config.h"
 
 #include <stdio.h>
