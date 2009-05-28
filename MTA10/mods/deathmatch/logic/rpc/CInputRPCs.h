@@ -23,6 +23,8 @@ public:
 
     DECLARE_RPC ( BindKey );
     DECLARE_RPC ( UnbindKey );
+    DECLARE_RPC ( BindCommand );
+    DECLARE_RPC ( UnbindCommand );
     DECLARE_RPC ( ToggleControl );
     DECLARE_RPC ( ToggleAllControls );
     DECLARE_RPC ( SetControlState );

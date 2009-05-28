@@ -7109,32 +7109,47 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-             lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-             lua_type ( luaVM, 3 ) == LUA_TSTRING &&
-             lua_type ( luaVM, 4 ) == LUA_TFUNCTION )
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
         {
             CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            const char* szKey = lua_tostring ( luaVM, 2 );
-            const char* szHitState = lua_tostring ( luaVM, 3 );
+            if ( pPlayer && 
+                 lua_type ( luaVM, 2 ) == LUA_TSTRING &&
+                 lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            {
+                const char* szKey = lua_tostring ( luaVM, 2 );
+                const char* szHitState = lua_tostring ( luaVM, 3 );
 
-            CLuaArguments Arguments;
-            Arguments.ReadArguments ( luaVM, 5 ); 
-
-            int iLuaFunction = luaM_toref ( luaVM, 4 );     
-
-			if ( pPlayer )
-            {				
-			    if ( VERIFY_FUNCTION ( iLuaFunction ) )
-                {				
-                    if ( CStaticFunctionDefinitions::BindKey ( pPlayer, szKey, szHitState, pLuaMain, iLuaFunction, Arguments ) )
+                if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
+                {
+                    std::string strResource = pLuaMain->GetResource()->GetName();
+                    const char* szCommand = lua_tostring ( luaVM, 4 );
+                    const char* szArguments = "";
+                    if  ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+                        szArguments = lua_tostring ( luaVM, 5 );
+                    if ( CStaticFunctionDefinitions::BindKey ( pPlayer, szKey, szHitState, szCommand, szArguments, strResource.c_str() ) )
                     {
                         lua_pushboolean ( luaVM, true );
                         return 1;
                     }
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 4 );
+                {
+                    CLuaArguments Arguments;
+                    Arguments.ReadArguments ( luaVM, 5 ); 
+
+                    int iLuaFunction = luaM_toref ( luaVM, 4 );     
+
+                    if ( VERIFY_FUNCTION ( iLuaFunction ) )
+                    {				
+                        if ( CStaticFunctionDefinitions::BindKey ( pPlayer, szKey, szHitState, pLuaMain, iLuaFunction, Arguments ) )
+                        {
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                    else
+                        m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 4 );
+                }
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "player", 1 );
@@ -7163,18 +7178,31 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
 
 			if ( lua_type ( luaVM, 3 ) )
                 szHitState = lua_tostring ( luaVM, 3 );
-            if ( lua_type ( luaVM, 4 ) == LUA_TFUNCTION )
-				iLuaFunction = luaM_toref ( luaVM, 4 );
             
             if ( pPlayer )
-            {				
-                if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, szKey, pLuaMain, szHitState, iLuaFunction ) )
+            {		
+                if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
                 {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
+                    std::string strResource = pLuaMain->GetResource()->GetName();
+                    const char* szCommandName = lua_tostring ( luaVM, 4 );
+                    if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, szKey, szHitState, szCommandName, strResource.c_str() ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 }
-            }
-            else
+                else if ( lua_type ( luaVM, 4 ) == LUA_TFUNCTION )
+                {
+			        iLuaFunction = luaM_toref ( luaVM, 4 );
+
+                    if ( CStaticFunctionDefinitions::UnbindKey ( pPlayer, szKey, pLuaMain, szHitState, iLuaFunction ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                }
+             }
+             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "unbindKey", "player", 1 );
         }
         else

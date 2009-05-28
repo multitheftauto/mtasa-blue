@@ -387,7 +387,9 @@ public:
 
     // Input funcs
     static bool                 BindKey                             ( CPlayer* pPlayer, const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
+    static bool                 BindKey                             ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource );
     static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState = NULL, int iLuaFunction = -1 );
+    static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource );
     static bool                 IsKeyBound                          ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction, bool& bBound );
     static bool                 GetControlState                     ( CPlayer* pPlayer, char* szControl, bool& bState );
     static bool                 IsControlEnabled                    ( CPlayer* pPlayer, char* szControl, bool& bEnabled );

@@ -5798,6 +5798,52 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
     return bSuccess;
 }
 
+bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource )
+{
+    assert ( pPlayer );
+    assert ( szKey );
+    assert ( szHitState );
+    assert ( szCommandName );
+    assert ( szResource );
+
+    CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
+    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    szArguments = szArguments ? szArguments : "";
+
+    if ( pKey )
+    {
+        if ( stricmp ( szHitState, "down" ) == 0 || stricmp ( szHitState, "both" ) == 0 || stricmp ( szHitState, "up" ) == 0 )
+        {
+            unsigned char ucHitState = szHitState == "down" ? 0 : (szHitState == "up" ? 1 : (szHitState == "both" ? 3 : -1 ) ) ;
+            if ( stricmp ( szCommandName, "" ) != 0 )
+            {
+                unsigned char ucLength = static_cast < unsigned char > ( strlen ( szKey ) );
+
+                CBitStream bitStream;
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucLength );
+                bitStream.pBitStream->Write ( ucHitState );
+
+                ucLength = static_cast < unsigned char > ( strlen ( szCommandName ) );
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szCommandName ), ucLength );
+
+                ucLength = static_cast < unsigned char > ( strlen ( szArguments ) );
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szArguments ), ucLength );
+
+                ucLength = static_cast < unsigned char > ( strlen ( szResource ) );
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szResource ), ucLength );
+
+                pPlayer->Send ( CLuaPacket ( BIND_COMMAND, *bitStream.pBitStream ) );
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction )
 {
@@ -5845,6 +5891,46 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     return bSuccess;
 }
 
+bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource )
+{
+    assert ( pPlayer );
+    assert ( szKey );
+    assert ( szHitState );
+    assert ( szCommandName );
+    assert ( szResource );
+
+    CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
+    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+
+    if ( pKey )
+    {
+        if ( stricmp ( szHitState, "down" ) == 0 || stricmp ( szHitState, "both" ) == 0 || stricmp ( szHitState, "up" ) == 0 )
+        {
+            unsigned char ucHitState = szHitState == "down" ? 0 : (szHitState == "up" ? 1 : (szHitState == "both" ? 3 : -1 ) ) ;
+            if ( stricmp ( szCommandName, "" ) != 0 )
+            {
+                unsigned char ucLength = static_cast < unsigned char > ( strlen ( szKey ) );
+
+                CBitStream bitStream;
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucLength );
+                bitStream.pBitStream->Write ( ucHitState );
+
+                ucLength = static_cast < unsigned char > ( strlen ( szCommandName ) );
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szCommandName ), ucLength );
+
+                ucLength = static_cast < unsigned char > ( strlen ( szResource ) );
+                bitStream.pBitStream->Write ( ucLength );
+                bitStream.pBitStream->Write ( const_cast < char* > ( szResource ), ucLength );
+
+                pPlayer->Send ( CLuaPacket ( UNBIND_COMMAND, *bitStream.pBitStream ) );
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction, bool& bBound )
 {
