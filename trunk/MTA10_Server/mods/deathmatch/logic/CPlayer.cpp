@@ -365,14 +365,20 @@ void CPlayer::Reset ( void )
     m_fStats [ 24 ] = 569.0f;           // default max_health
     m_pClothes->DefaultClothes ();    
     m_bHasJetPack = false;
-    m_bForcedScoreboard = false;
-    m_bForcedMap = false;
-    m_ucInterior = 0;
-    m_usDimension = 0;
-    m_bCamFadedIn = true;
-    SetCamFadeColor ( 0, 0, 0 );
-    m_pKeyBinds->Clear ();
-    m_bCursorShowing = false;
+
+    // Removed
+    //m_bForcedScoreboard = false;
+    //m_bForcedMap = false;
+    //m_ucInterior = 0;
+    //m_usDimension = 0;
+    //m_bCamFadedIn = true;
+    //SetCamFadeColor ( 0, 0, 0 );
+    //m_pKeyBinds->Clear ();
+    //m_bCursorShowing = false;
+
+    // Added
+    m_ucFightingStyle = 15; // STYLE_GRAB_KICK
+
     SetNametagText ( NULL );
     m_ucAlpha = 255;
 
