@@ -286,19 +286,19 @@ struct CTrainFlags
 {
     unsigned char unknown1 : 3;
     unsigned char bIsTheChainEngine : 1; // Only the first created train on the chain gets this set to true, others get it set to false.
-    unsigned char unknown1 : 1; // This is always set to true in mission trains construction.
+    unsigned char unknown2 : 1; // This is always set to true in mission trains construction.
     unsigned char bIsAtNode : 1;
     unsigned char bDirection : 1;
-    unsigned char unknown2 : 1; // If the mission train was placed at the node, this is set to false in construction.
+    unsigned char unknown3 : 1; // If the mission train was placed at the node, this is set to false in construction.
 
     unsigned char bIsDerailed : 1;
-    unsigned char unknown3 : 1 ;
+    unsigned char unknown4 : 1 ;
     unsigned char bIsDrivenByBrownSteak : 1;
-    unsigned char unknown3 : 5;
+    unsigned char unknown5 : 5;
 
-    unsigned char unknown4 : 8;
+    unsigned char unknown6 : 8;
 
-    unsigned char unknown5 : 8;
+    unsigned char unknown7 : 8;
 };
 
 /*
