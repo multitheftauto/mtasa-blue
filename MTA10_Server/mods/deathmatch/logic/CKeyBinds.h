@@ -40,11 +40,12 @@ struct SBindableGTAControl
 class CKeyBind
 {
 public:
-    inline                  CKeyBind        ( void )    { boundKey = NULL; luaMain = NULL; bIsBeingAdded = false; bIsBeingDeleted = false; }
-    SBindableKey*           boundKey;
+    inline                  CKeyBind        ( void )    { boundKey = NULL; luaMain = NULL; beingDeleted = false; }
+    inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
+	
+	SBindableKey*           boundKey;
     CLuaMain*               luaMain;
-    bool                    bIsBeingAdded;
-    bool                    bIsBeingDeleted;
+    bool                    beingDeleted;
     virtual eKeyBindType    GetType         ( void ) = 0;
 };
 
@@ -112,15 +113,14 @@ public:
 	void						RemoveAllKeys			( CLuaMain* pLuaMain );
 
     static bool                 IsMouse                 ( SBindableKey* pKey );
-    void                        TakeOutTheTrash         ( void );
+	void                        RemoveDeletedBinds      ( void );
 
 protected:
     bool                        Remove                  ( CKeyBind* pKeyBind );
 
     CPlayer*                    m_pPlayer;
     std::list < CKeyBind* >     m_List;
-    std::list < CKeyBind* >     m_TrashCan;
-    bool                        m_bIteratingList;
+    bool                        m_bProcessingKey;
 };
 
 #endif

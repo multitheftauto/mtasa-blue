@@ -279,13 +279,14 @@ bool CScriptKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain,
 bool CScriptKeyBinds::RemoveKeyFunction ( SScriptBindableKey* pKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
+	CScriptKeyFunctionBind* pBind = NULL;
     list < CScriptKeyBind * > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
         {
-            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( *iter );
+            pBind = static_cast < CScriptKeyFunctionBind* > ( *iter );
             if ( pKey == pBind->boundKey )
             {
                 if ( pBind->luaMain == pLuaMain )
@@ -296,11 +297,11 @@ bool CScriptKeyBinds::RemoveKeyFunction ( SScriptBindableKey* pKey, CLuaMain* pL
                         {
                             bFound = true;
 
-                            if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
+                            if ( m_bProcessingKey ) pBind->beingDeleted = true;
                             else
                             {
-                                m_List.remove ( *iter );
-                                delete *iter;
+                                m_List.remove ( pBind );
+                                delete pBind;
                                 iter = cloneList.erase ( iter );
                                 continue;
                             }
@@ -329,8 +330,9 @@ bool CScriptKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain,
 bool CScriptKeyBinds::KeyFunctionExists ( SScriptBindableKey* pKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CScriptKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+	list < CScriptKeyBind* > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; iter++ )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
         {
@@ -356,17 +358,19 @@ bool CScriptKeyBinds::KeyFunctionExists ( SScriptBindableKey* pKey, CLuaMain* pL
 
 void CScriptKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 {
+	CScriptKeyBind * pBind = NULL;
     list < CScriptKeyBind * > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
-		if ( !(*iter)->IsBeingDeleted () && (*iter)->luaMain == pLuaMain )
+		pBind = *iter;
+		if ( !pBind->IsBeingDeleted () && pBind->luaMain == pLuaMain )
         {
-            if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
+            if ( m_bProcessingKey ) pBind->beingDeleted = true;
             else
             {
-                m_List.remove ( *iter );
-                delete *iter;
+                m_List.remove ( pBind );
+                delete pBind;
                 iter = cloneList.erase ( iter );
                 continue;
             }
@@ -434,13 +438,14 @@ bool CScriptKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* p
 bool CScriptKeyBinds::RemoveControlFunction ( SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
+	CScriptControlFunctionBind* pBind = NULL;
     list < CScriptKeyBind * > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
         {
-            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( *iter );
+            pBind = static_cast < CScriptControlFunctionBind* > ( *iter );
             if ( pControl == pBind->boundControl )
             {
                 if ( pBind->luaMain == pLuaMain )
@@ -483,8 +488,9 @@ bool CScriptKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* p
 bool CScriptKeyBinds::ControlFunctionExists ( SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CScriptKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ;iter++ )
+	list < CScriptKeyBind* > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ;iter++ )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
         {

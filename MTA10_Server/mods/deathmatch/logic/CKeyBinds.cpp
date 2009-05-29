@@ -53,8 +53,8 @@ SBindableGTAControl g_bcControls[] =
 
 CKeyBinds::CKeyBinds ( CPlayer* pPlayer )
 {
+	m_bProcessingKey = false;
     m_pPlayer = pPlayer;
-    m_bIteratingList = false;
 }
 
 
@@ -66,9 +66,10 @@ CKeyBinds::~CKeyBinds ( void )
 
 SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 {
+	SBindableKey* temp = NULL;
     for ( int i = 0 ; *g_bkKeys [ i ].szKey != 0 ; i++ )
     {
-        SBindableKey* temp = &g_bkKeys [ i ];
+        temp = &g_bkKeys [ i ];
         if ( !stricmp ( temp->szKey, szKey ) )
         {
             return temp;
@@ -81,9 +82,10 @@ SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
 {
+	SBindableGTAControl* temp = NULL;
     for ( int i = 0 ; *g_bcControls [ i ].szControl != 0 ; i++ )
     {
-        SBindableGTAControl* temp = &g_bcControls [ i ];
+        temp = &g_bcControls [ i ];
         if ( !stricmp ( temp->szControl, szControl ) )
         {
             return temp;
@@ -105,16 +107,14 @@ void CKeyBinds::Add ( CKeyBind* pKeyBind )
 
 bool CKeyBinds::Remove ( CKeyBind* pKeyBind )
 {
-    if ( !m_bIteratingList )
-    {
-        if ( !m_List.empty() ) m_List.remove ( pKeyBind );
+	if ( !m_bProcessingKey )
+	{
+        m_List.remove ( pKeyBind );
         delete pKeyBind;
         return true;
     }
 
-    m_TrashCan.push_back ( pKeyBind );
-    pKeyBind->bIsBeingDeleted = true;
-
+	pKeyBind->beingDeleted = true;
     return false;
 }
 
@@ -124,20 +124,24 @@ void CKeyBinds::Clear ( eKeyBindType bindType )
     list < CKeyBind* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
-        if ( bindType == KEY_BIND_UNDEFINED || (*iter)->GetType () == bindType )
+        if ( !(*iter)->IsBeingDeleted () && bindType == KEY_BIND_UNDEFINED || (*iter)->GetType () == bindType )
         {
-            delete *iter;
-            iter = m_List.erase ( iter );
+            if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
+            else
+            {
+                delete *iter;
+                iter = m_List.erase ( iter );
+                continue;
+            }
         }
-		else
-			++iter;
+        iter++;
     }
 }
 
 
 void CKeyBinds::Call ( CKeyBind* pKeyBind )
 {
-    if ( pKeyBind )
+    if ( pKeyBind && !pKeyBind->IsBeingDeleted () )
     {
         switch ( pKeyBind->GetType () )
         {
@@ -191,58 +195,49 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
             return false;
     }
 
-    m_bIteratingList = true;
+	m_bProcessingKey = true;
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+	CKeyBind* pKeyBind = NULL;
+	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; iter++ )
     {
-        CKeyBind* pKeyBind = *iter;
-        if ( !pKeyBind->bIsBeingDeleted )
+        pKeyBind = *iter;
+        if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == bindType )
         {
-            if ( pKeyBind->bIsBeingAdded )
+            switch ( bindType )
             {
-                pKeyBind->bIsBeingAdded = false;
-                continue;
-            }
-
-            if ( pKeyBind->GetType () == bindType )
-            {
-                switch ( bindType )
+                case KEY_BIND_FUNCTION:
                 {
-                    case KEY_BIND_FUNCTION:
+                    CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
+                    if ( pBind->boundKey == pKey )
                     {
-                        CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
-                        if ( pBind->boundKey == pKey )
+                        if ( pBind->bHitState == bHitState )
                         {
-                            if ( pBind->bHitState == bHitState )
-                            {
-                                Call ( pBind );
-                                
-                                bFound = true;
-                            }
+                            Call ( pBind );                            
+                            bFound = true;
                         }
-                        break;
                     }
-                    case KEY_BIND_CONTROL_FUNCTION:
+                    break;
+                }
+                case KEY_BIND_CONTROL_FUNCTION:
+                {
+                    CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( pKeyBind );
+                    if ( pBind->boundControl == pControl )
                     {
-                        CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( pKeyBind );
-                        if ( pBind->boundControl == pControl )
+                        if ( pBind->bHitState == bHitState )
                         {
-                            if ( pBind->bHitState == bHitState )
-                            {
-                                Call ( pBind );
-                                
-                                bFound = true;
-                            }
+                            Call ( pBind );                            
+                            bFound = true;
                         }
-                        break;
                     }
+                    break;
                 }
             }
         }
     }
-    m_bIteratingList = false;
-    TakeOutTheTrash ();
+	m_bProcessingKey = false;
+    RemoveDeletedBinds ();
     return bFound;
 }
 
@@ -261,9 +256,6 @@ bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pL
         pBind->luaMain = pLuaMain;
 		pBind->m_iLuaFunction = iLuaFunction;
         pBind->m_Arguments = Arguments;
-
-        if ( m_bIteratingList )
-            pBind->bIsBeingAdded = true;
 
         m_List.push_back ( pBind );
 
@@ -284,9 +276,6 @@ bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* p
         pBind->m_iLuaFunction = iLuaFunction;
         pBind->m_Arguments = Arguments;
 
-        if ( m_bIteratingList )
-            pBind->bIsBeingAdded = true;
-
         m_List.push_back ( pBind );
 
         return true;
@@ -298,12 +287,14 @@ bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* p
 bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    while ( iter != m_List.end () )
+	CKeyFunctionBind* pBind = NULL;
+	list < CKeyBind * > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    while ( iter != cloneList.end () )
     {
-        if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
-            CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
+            pBind = static_cast < CKeyFunctionBind* > ( *iter );
             if ( !stricmp ( szKey, pBind->boundKey->szKey ) )
             {
                 if ( pBind->luaMain == pLuaMain )
@@ -314,9 +305,13 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
-                            if ( !pBind->bIsBeingDeleted && Remove ( pBind ) )
+
+							if ( m_bProcessingKey ) pBind->beingDeleted = true;
+                            else
                             {
-                                iter = m_List.begin ();
+								m_List.remove ( pBind );
+                                delete pBind;
+                                iter = cloneList.erase ( iter );
                                 continue;
                             }
                         }
@@ -333,8 +328,9 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
 bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; iter++ )
     {
         if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
@@ -361,18 +357,26 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
 
 void CKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 {
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    while ( iter != m_List.end () )
+	CKeyBind* pBind = NULL;
+	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    while ( iter != cloneList.end () )
     {
-		if ( (*iter)->luaMain == pLuaMain )
-        {
-			CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( *iter );
-            if ( !pBind->bIsBeingDeleted && Remove ( pBind ) )
-            {
-                iter = m_List.begin ();
-                continue;
-            }
-        }
+		pBind = *iter;
+		if ( !pBind->IsBeingDeleted () )
+		{
+			if ( pBind->luaMain == pLuaMain )
+			{
+				if ( m_bProcessingKey ) pBind->beingDeleted = true;
+				else
+				{
+					m_List.remove ( pBind );
+					delete pBind;
+					iter = cloneList.erase ( iter );
+					continue;
+				}
+			}
+		}
         iter++;
     }
 }
@@ -425,12 +429,14 @@ bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitSta
 bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    while ( iter != m_List.end () )
+	CControlFunctionBind* pBind = NULL;
+	list < CKeyBind * > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    while ( iter != cloneList.end () )
     {
         if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
-            CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( *iter );
+            pBind = static_cast < CControlFunctionBind* > ( *iter );
             if ( stricmp ( szControl, pBind->boundControl->szControl ) == 0 )
             {
                 if ( pBind->luaMain == pLuaMain )
@@ -441,9 +447,12 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
-                            if ( !pBind->bIsBeingDeleted && Remove ( pBind ) )
+                            if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
+                            else
                             {
-                                iter = m_List.begin ();
+								m_List.remove ( *iter );
+                                delete *iter;
+                                iter = cloneList.erase ( iter );
                                 continue;
                             }
                         }
@@ -460,8 +469,9 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
 bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ;iter++ )
+	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ;iter++ )
     {
         if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {
@@ -504,18 +514,17 @@ bool CKeyBinds::IsMouse ( SBindableKey* pKey )
 }
 
 
-void CKeyBinds::TakeOutTheTrash ( void )
+void CKeyBinds::RemoveDeletedBinds ( void )
 {
-    list < CKeyBind* > ::iterator iter = m_TrashCan.begin ();
-    for ( ; iter != m_TrashCan.end () ; iter++ )
+    list < CKeyBind* > ::iterator iter = m_List.begin ();
+    while ( iter != m_List.end () )
     {
-		// Remove from the main list
-		CKeyBind* pBind = *iter;
-        m_List.remove ( pBind );
-
-		// Delete the object
-		delete *iter;
+        if ( (*iter)->IsBeingDeleted () )
+        {
+            delete *iter;
+            iter = m_List.erase ( iter );
+        }
+		else
+			++iter;
     }
-	m_TrashCan.clear ();
 }
-

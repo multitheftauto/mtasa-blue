@@ -7288,7 +7288,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                 for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
                 {                                   
                     CKeyBind* pKeyBind = *iter;
-                    if ( !pKeyBind->bIsBeingDeleted )
+                    if ( !pKeyBind->IsBeingDeleted () )
                     {
                         switch ( pKeyBind->GetType () )
                         {
@@ -7356,7 +7356,7 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
                 for ( ; iter != pPlayer->GetKeyBinds ()->IterEnd (); iter++ )
                 {                                   
                     CKeyBind* pKeyBind = *iter;
-                    if ( !pKeyBind->bIsBeingDeleted )
+                    if ( !pKeyBind->IsBeingDeleted () )
                     {
                         switch ( pKeyBind->GetType () )
                         {
