@@ -282,6 +282,25 @@ struct CVehicleFlags
 	unsigned char bUsedForReplay: 1; // This car is controlled by replay and should be removed when replay is done.
 };
 
+struct CTrainFlags
+{
+    unsigned char unknown1 : 3;
+    unsigned char bIsTheChainEngine : 1; // Only the first created train on the chain gets this set to true, others get it set to false.
+    unsigned char unknown1 : 1; // This is always set to true in mission trains construction.
+    unsigned char bIsAtNode : 1;
+    unsigned char bDirection : 1;
+    unsigned char unknown2 : 1; // If the mission train was placed at the node, this is set to false in construction.
+
+    unsigned char bIsDerailed : 1;
+    unsigned char unknown3 : 1 ;
+    unsigned char bIsDrivenByBrownSteak : 1;
+    unsigned char unknown3 : 5;
+
+    unsigned char unknown4 : 8;
+
+    unsigned char unknown5 : 8;
+};
+
 /*
 #ifndef CPEDSA_DEFINED
 #define CPedSA void
@@ -396,13 +415,25 @@ public:
 	float m_nHealth; // 1000.0f = full health. 0 -> explode
 
 	/*** BEGIN SECTION that was added by us ***/
-    long Padding[12];
-	CVehicle* m_pVehicle;
+    BYTE Padding200[48]; //1220
+	CVehicle* m_pVehicle; //1268
 	/*** END SECTION that was added by us ***/
 
+    //1272
     unsigned long ul_doorstate;
 
-    long Padding213[42];
+    //1276
+    BYTE Padding210[24];
+
+    //1300
+    unsigned int m_isUsingHornOrSecondarySiren;
+
+    //1304
+    BYTE Padding220[136];
+
+    //1440
+    unsigned char m_ucTrackNodeID;  // Current node on train tracks
+    BYTE Padding230[3];
 
     //1444
     float m_fTrainSpeed;           // Speed along rails
@@ -410,22 +441,27 @@ public:
     float m_fTrainRailDistance;    // Distance along rail starting from first rail node (determines train position when on rails)
     
     //1452
-    DWORD padding214[3];
+    float m_fDistanceToNextCarriage;
+    DWORD padding240[2];
 
     //1464
-    char unknown1;
-    bool bIsDerailed : 1;
-    char bUnknownFlags2 : 7;
-    char unknown3;
-    char unknown4;
+    CTrainFlags trainFlags;
 
     //1468
-    DWORD padding215[1];
+    DWORD padding250[1];
 
     //1472
     BYTE m_ucRailTrackID;
 
-    BYTE padding9002[803];
+    //1473
+    BYTE padding260[15];
+
+    //1488
+    CVehicleSAInterface* m_prevCarriage;
+    CVehicleSAInterface* m_nextCarriage;
+
+    //1496
+    BYTE padding270[780];
 
     // 2276
     float m_fBurningTime;

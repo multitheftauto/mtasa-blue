@@ -263,7 +263,7 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
 bool CVehicleSA::IsDerailed ( void )
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface ();
-    return pInterface->bIsDerailed;
+    return pInterface->trainFlags.bIsDerailed;
 }
 
 
@@ -277,12 +277,12 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
 
         if ( bDerailed )
         {
-            pInterface->bIsDerailed = true;
+            pInterface->trainFlags.bIsDerailed = true;
             * ( DWORD * ) ( dwThis + 64 ) &= ( DWORD ) 0xFFFDFFFB;
         }
         else
         {
-            pInterface->bIsDerailed = false;
+            pInterface->trainFlags.bIsDerailed = false;
             * ( DWORD * ) ( dwThis + 64 ) |= ( DWORD ) 0x20004;
 
             // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
