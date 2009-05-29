@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEGUIExceptions.h"
 
 using std::list;
 
@@ -165,7 +166,15 @@ void CGUI_Impl::Invalidate ( void )
 
 void CGUI_Impl::Restore ( void )
 {
-    reinterpret_cast < CEGUI::DirectX9Renderer* > ( m_pRenderer ) -> postD3DReset ();
+    try
+    {
+        reinterpret_cast < CEGUI::DirectX9Renderer* > ( m_pRenderer ) -> postD3DReset ();
+    }
+    catch ( CEGUI::RendererException& exception )
+    {
+        MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR );
+        TerminateProcess ( GetCurrentProcess (), 0 );
+    }
 }
 
 void CGUI_Impl::DrawMouseCursor ( void )
