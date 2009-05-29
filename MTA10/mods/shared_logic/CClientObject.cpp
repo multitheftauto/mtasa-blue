@@ -375,8 +375,8 @@ void CClientObject::Create ( void )
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer ( this );
 
-                // Set some flags first
-                m_pObject->SetStaticWaitingForCollision_Misnamed ( m_bIsStatic );
+                // If set to true,this has the effect of forcing the object to be static at all times
+                m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
 
                 // Apply our data to the object
                 m_pObject->Teleport ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
