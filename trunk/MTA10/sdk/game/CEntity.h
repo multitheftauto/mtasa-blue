@@ -101,8 +101,8 @@ public:
     virtual BYTE                        GetAreaCode ( void ) = 0;
     virtual void                        SetAreaCode ( BYTE areaCode ) = 0;
 
-    virtual bool                        IsStaticWaitingForCollision_Misnamed ( void ) = 0;
-    virtual void                        SetStaticWaitingForCollision_Misnamed ( bool bStatic ) = 0;
+    virtual bool                        IsStaticWaitingForCollision ( void ) = 0;
+    virtual void                        SetStaticWaitingForCollision ( bool bStatic ) = 0;
 
     virtual void                        GetImmunities ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof ) = 0;
     virtual unsigned long               GetArrayID ( void ) = 0;
