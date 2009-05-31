@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Derek Abdine <>
 *               Christian Myhre Lundheim <>
 *               Jax <>
+*               Stanislav Bobrov <lil_toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,8 +19,16 @@ class ASE;
 #define __ASE_H__
 
 #ifdef WIN32
-#include <winsock.h>
+	#include <conio.h>
+	#include <winsock.h>
+    #define sockclose closesocket
+#else
+	#include <sys/socket.h>
+	#include <sys/stat.h>
+	#include <netinet/in.h>
+	#define sockclose close
 #endif
+
 #include <string.h>
 #include <stdio.h>
 
@@ -34,20 +43,25 @@ class CASERule;
 class ASE
 {
 public:
-	                        ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, int iPort, const char* lpszServerIP = NULL );
+	                        ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
 	                        ~ASE                ( void );
 
 	void                    DoPulse             ( void );
 
-    static ASE*      GetInstance         ( void )                { return _instance; }
-    
-    char*            GetGameType         ( void )                { return m_szGameType; }
-    void             SetGameType         ( const char * szGameType );
-    char*            GetMapName          ( void )                { return m_szMapName; }
-    void             SetMapName          ( const char * szMapName );
+    static ASE*             GetInstance         ( void )                { return _instance; }
 
-    CMainConfig*     GetMainConfig       ( void )                { return m_pMainConfig; };
-    CPlayerManager*  GetPlayerManager    ( void )                { return m_pPlayerManager; };
+    std::string             QueryFull           ( void );
+    std::string             QueryLight          ( void );
+
+    CLanBroadcast*          InitLan             ( void );
+
+    const char*             GetGameType         ( void )                { return m_strGameType.c_str(); }
+    void                    SetGameType         ( const char * szGameType );
+    const char*             GetMapName          ( void )                { return m_strMapName.c_str(); }
+    void                    SetMapName          ( const char * szMapName );
+
+    CMainConfig*            GetMainConfig       ( void )                { return m_pMainConfig; };
+    CPlayerManager*         GetPlayerManager    ( void )                { return m_pPlayerManager; };
 
     char*                   GetRuleValue        ( char* szKey );
     void                    SetRuleValue        ( char* szKey, char* szValue );
@@ -56,15 +70,26 @@ public:
 
     list < CASERule* > ::iterator IterBegin     ( void )                { return m_Rules.begin (); }
     list < CASERule* > ::iterator IterEnd       ( void )                { return m_Rules.end (); }
+
 private:
+
     CMainConfig*            m_pMainConfig;
     CPlayerManager*         m_pPlayerManager;
-    char                    m_szGameType [64];
-    char                    m_szMapName [64];
+
+    std::string             m_strGameType;
+    std::string             m_strMapName;
+    std::string             m_strIP;
+    std::string             m_strPort;
 
     static ASE*             _instance;
 
     list < CASERule* >      m_Rules;
+
+    unsigned int			m_Socket;
+    sockaddr_in             m_SockAddr;
+
+    bool                    m_bLan;
+    unsigned short          m_usPort;
 
 protected:
 	void                    GetStatusVals();

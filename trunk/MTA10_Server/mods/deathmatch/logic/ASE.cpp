@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Artem Karimov <skybon@live.ru>
+*               Stanislav Bobrov <lil_toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,40 +23,50 @@ extern "C"
 
 ASE* ASE::_instance = NULL;
 
-ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, int iPort, const char* lpszServerIP )
+ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP, bool bLan )
 {
     _instance = this;
 
-	#ifdef _WIN32 /* WinSock initialization */
-			WSADATA WSAData;
-			WSAStartup(MAKEWORD(1,1), &WSAData);
-	#endif
+    m_bLan = bLan;
+    m_usPort = usPort + ( ( m_bLan ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
 
     m_pMainConfig = pMainConfig;
     m_pPlayerManager = pPlayerManager;
 
-    memset(m_szMapName, 0, sizeof(m_szMapName));
-    memset(m_szGameType, 0, sizeof(m_szGameType));
+    m_strGameType = "MTA:SA";
+    m_strMapName = "None";
+    if ( szServerIP )
+        m_strIP = szServerIP;
+    std::stringstream ss;
+    ss << usPort;
+    m_strPort = ss.str();
 
-    SetGameType ( "MTA:SA" );
-    SetMapName ( "None" );
+    // Set the sock addr
+    m_SockAddr.sin_family = AF_INET;         
+    m_SockAddr.sin_port = htons ( m_usPort );
+    // If we are in lan broadcasting mode, only let local ips query us
+    m_SockAddr.sin_addr.s_addr = INADDR_ANY;
 
-    // Make sure it gets 0 if it's empty. ASE shouldn't be changing it but it takes
-    // a char* for some reason.
-    char* szServerIP = const_cast < char* > ( lpszServerIP );
-    if ( szServerIP && szServerIP [0] == 0 )
+    // Initialize socket
+    m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );
+
+    // If we are in lan only mode, reuse addr to avoid possible conflicts
+    if ( m_bLan )
     {
-        szServerIP = NULL;
+        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, "1", sizeof ( "1" ) );
     }
 
-    if ( ASEQuery_initialize ( iPort, 1, szServerIP ) )
+    // Bind the socket
+    if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
-        CLogger::LogPrintf ( "Game-Monitor listing enabled. Port %d (UDP) must be accessible\n           from the internet\n", iPort+123 );
+        sockclose ( m_Socket );
+        m_Socket = NULL;
+        return;
     }
-    else
-    {
-        CLogger::ErrorPrintf ( "ERROR: Game-Monitor registration failed\n" );
-    }
+
+    // Set it to non blocking, so we dont have to wait for a packet
+    unsigned long ulNonBlock = 1;
+    ioctlsocket ( m_Socket, FIONBIO, &ulNonBlock );
 }
 
 
@@ -68,20 +79,223 @@ ASE::~ASE ( void )
 
 void ASE::DoPulse ( void )
 {
-	ASEQuery_check ();
+    sockaddr_in SockAddr;
+#ifndef WIN32
+	socklen_t nLen = sizeof ( sockaddr );
+#else
+    int nLen = sizeof ( sockaddr );
+#endif
+
+    char szBuffer[2];
+    int iBuffer = 0;
+
+    // We set the socket to non-blocking so we can just keep reading
+    iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
+    if ( iBuffer > 0 )
+    {
+        std::string strReply;
+
+        switch ( szBuffer[0] )
+        {
+            case 's':
+            { // ASE protocol query
+                strReply = QueryFull ();
+                break;
+            }
+            case 'b':
+            { // Our own lighter query for ingame browser
+                strReply = QueryLight ();
+                break;
+            }
+            case 'v':
+            { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
+                strReply = MTA_VERSION;
+                break;
+            }
+            default:
+                return;
+        }
+
+        // If our reply buffer isn't empty, send it
+        if ( !strReply.empty() )
+        {
+            int sent = sendto ( m_Socket,
+                                strReply.c_str(),
+                                strReply.length(),
+						        0,
+						        (sockaddr*)&SockAddr,
+						        nLen );
+        }
+    }
 }
+
+
+std::string ASE::QueryFull ( void )
+{
+    std::stringstream reply;
+    std::stringstream temp;
+
+    reply << "EYE1";
+    // game
+    reply << ( unsigned char ) 4;
+    reply << "mta";
+    // port
+    reply << ( unsigned char ) ( m_strPort.length() + 1 );
+    reply << m_strPort;
+    // server name
+    reply << ( unsigned char ) ( m_pMainConfig->GetServerName ().length() + 1 );
+    reply << m_pMainConfig->GetServerName ();
+    // game type
+    reply << ( unsigned char ) ( m_strGameType.length() + 1 );
+    reply << m_strGameType;
+    // map name
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
+    reply << m_strMapName;
+    // version
+    temp << MTA_VERSION;
+    reply << ( unsigned char ) ( temp.str().length() + 1 );
+    reply << temp.str();
+    // passworded
+    reply << ( unsigned char ) 2;
+    reply << ( m_pMainConfig->HasPassword () ) ? 1 : 0;
+    // players count
+    temp.str ( "" );
+    temp << m_pPlayerManager->CountJoined ();
+    reply << ( unsigned char ) ( temp.str().length () + 1 );
+    reply << temp.str();
+    // players max
+    temp.str ( "" );
+    temp << m_pMainConfig->GetMaxPlayers ();
+    reply << ( unsigned char ) ( temp.str().length () + 1 );
+    reply << temp.str();
+
+    // rules
+    list < CASERule* > ::iterator rIter = IterBegin ();
+    for ( ; rIter != IterEnd () ; rIter++ )
+    {
+        // maybe use a map and std strings for rules?
+        reply << ( unsigned char ) ( strlen ( (*rIter)->GetKey () ) + 1 );
+        reply << (*rIter)->GetKey ();
+        reply << ( unsigned char ) ( strlen ( (*rIter)->GetValue () ) + 1 );
+        reply << (*rIter)->GetValue ();
+    }
+    reply << ( unsigned char ) 1;
+
+    // players
+
+    // the flags that tell what data we carry per player ( apparently we need all set cause of GM atm )
+    unsigned char ucFlags = 0;
+    ucFlags |= 0x01; // nick
+    ucFlags |= 0x02; // team
+    ucFlags |= 0x04; // skin
+    ucFlags |= 0x08; // score
+    ucFlags |= 0x16; // ping
+    ucFlags |= 0x32; // time
+
+    char szTemp[256] = { '\0' };
+    CPlayer* pPlayer = NULL;
+
+    list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
+    for ( ; pIter != m_pPlayerManager->IterEnd (); pIter++ )
+    {
+        pPlayer = *pIter;
+        if ( pPlayer->IsJoined () )
+        {
+            reply << ucFlags;
+            // nick
+            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
+            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
+            reply << szTemp;
+            // team (skip)
+            reply << ( unsigned char ) 1;
+            // skin (skip)
+            reply << ( unsigned char ) 1;
+            // score (skip)
+            reply << ( unsigned char ) 1;
+            // ping
+            _snprintf ( szTemp, 255, "%u", pPlayer->GetPing () );
+            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
+            reply << szTemp;
+            // time (skip)
+            reply << ( unsigned char ) 1;
+	    }
+    }
+
+    return reply.str();
+}
+
+
+std::string ASE::QueryLight ( void )
+{
+    std::stringstream reply;
+
+    reply << "EYE2";
+    // game
+    reply << ( unsigned char ) 4;
+    reply << "mta";
+    // port
+    reply << ( unsigned char ) ( m_strPort.length() + 1 );
+    reply << m_strPort;
+    // server name
+    reply << ( unsigned char ) ( m_pMainConfig->GetServerName ().length() + 1 );
+    reply << m_pMainConfig->GetServerName ();
+    // game type
+    reply << ( unsigned char ) ( m_strGameType.length() + 1 );
+    reply << m_strGameType;
+    // map name
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
+    reply << m_strMapName;
+    // version
+    std::string temp = MTA_VERSION;
+    reply << ( unsigned char ) ( temp.length() + 1 );
+    reply << temp;
+    // passworded
+    reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
+    // serial verification?
+    reply << ( unsigned char ) ( ( m_pMainConfig->GetSerialVerificationEnabled() ) ? 1 : 0 );
+    // players count
+    reply << ( unsigned char ) m_pPlayerManager->CountJoined ();
+    // players max
+    reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
+
+    // players
+    char szTemp[256] = { '\0' };
+    CPlayer* pPlayer = NULL;
+
+    list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
+    for ( ; pIter != m_pPlayerManager->IterEnd (); pIter++ )
+    {
+        pPlayer = *pIter;
+        if ( pPlayer->IsJoined () )
+        {
+            // nick
+            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
+            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
+            reply << szTemp;
+	    }
+    }
+
+    return reply.str();
+}
+
+
+CLanBroadcast* ASE::InitLan ( void )
+{
+    return new CLanBroadcast ( m_usPort );
+}
+
 
 void ASE::SetGameType ( const char * szGameType )
 {
-    strncpy ( m_szGameType, szGameType, sizeof(m_szGameType) );
-    m_szGameType[sizeof(m_szGameType)-1] = 0;
+    m_strGameType = szGameType;
 }
+
 
 void ASE::SetMapName ( const char * szMapName )
 {
-    strncpy ( m_szMapName, szMapName, sizeof(m_szMapName) );
-    m_szMapName[sizeof(m_szMapName)-1] = 0;
+    m_strMapName = szMapName;
 }
+
 
 char* ASE::GetRuleValue ( char* szKey )
 {
@@ -152,92 +366,3 @@ void ASE::ClearRules ( void )
     }
     m_Rules.clear ();
 }
-
-
-extern void ASEQuery_wantstatus ( void )
-{
-    CMainConfig* pMainConfig = ASE::GetInstance ()->GetMainConfig ();
-    CPlayerManager* pPlayerManager = ASE::GetInstance ()->GetPlayerManager ();
-
-    if ( pMainConfig && pPlayerManager )
-    {
-        ASE * ase;
-	    int iPassword = 0;
-        int iPlayers = 0;
-        int iMaxPlayers = 0;
-        char strGameVer[256] = { '\0' };
-        char szName[256] = { '\0' };
-        const char * szMapName = NULL;
-        const char * szGameType = NULL;
-
-        if ( ase = ASE::GetInstance() )
-        {
-            szMapName = ase->GetMapName();
-            szGameType = ase->GetGameType();
-        }
-
-        if ( szMapName == NULL ) 
-        {
-            szMapName = "NULL";
-        }
-
-        if ( szGameType == NULL )
-        {
-            szGameType = "NULL";
-        }
-
-        if ( pMainConfig->HasPassword () )
-        {
-            iPassword = 1;
-        }
-        	
-	    sprintf ( strGameVer, MTA_VERSION );
-	    _snprintf ( szName, 255, "%s", pMainConfig->GetServerName ().c_str () );
-		szName[255] = '\0';
-
-	    iPlayers = static_cast < int > ( pPlayerManager->CountJoined () );
-
-        iMaxPlayers = static_cast < int > ( pMainConfig->GetMaxPlayers () );
-
-	    ASEQuery_status ( szName , szGameType, szMapName, strGameVer, iPassword, iPlayers, iMaxPlayers );
-    }
-}
-
-extern void ASEQuery_wantrules ( void )
-{
-	//server rules can be added here
-	ASEQuery_addrule ( "ListenServer", "no" );
-    
-    ASE* ase = ASE::GetInstance ();
-    list < CASERule* > ::iterator iter = ase->IterBegin ();
-    for ( ; iter != ase->IterEnd () ; iter++ )
-    {
-        ASEQuery_addrule ( (*iter)->GetKey (), (*iter)->GetValue () );
-    }
-}
-
-extern void ASEQuery_wantplayers ( void )
-{
-    CPlayerManager* pPlayerManager = ASE::GetInstance ()->GetPlayerManager ();
-
-    if ( pPlayerManager )
-    {
-        list < CPlayer* > ::const_iterator iter = pPlayerManager->IterBegin ();
-
-        for ( ; iter != pPlayerManager->IterEnd (); iter++ )
-        {
-            if ( (*iter)->IsJoined () )
-            {
-                const char* szName = (*iter)->GetNick ();
-                char szPing[256] = { '\0' };
-			    sprintf ( szPing, "%u", (*iter)->GetPing () );
-
-                if ( szName )
-                {
-			        ASEQuery_addplayer ( szName , "", "", "0", szPing, "" );
-                }
-		    }
-	    }
-    }
-}
-
