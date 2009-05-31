@@ -734,7 +734,6 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             m_pOriginalColModelInterface = m_pInterface->pColModel;
 
 		// Apply some low-level hacks
-		*( (BYTE *) ppModelInfo [ m_dwModelID ] + 0x13 ) |= 8;
 		*( (BYTE *) pInterface + 40 ) = 0xA9;
 
 		// Extra flags (3064) -- needs to be tested

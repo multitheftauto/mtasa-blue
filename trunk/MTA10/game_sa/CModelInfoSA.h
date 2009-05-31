@@ -162,7 +162,7 @@ public:
     unsigned char           dwUnknownFlag25: 1;         // +19
     unsigned char           dwUnknownFlag26: 1;
     unsigned char           dwUnknownFlag27: 1;
-    unsigned char           dwUnknownFlag28: 1;
+    unsigned char           bSwaysInWind: 1;
     unsigned char           bCollisionWasStreamedWithModel: 1;  // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
     unsigned char           bDontCollideWithFlyer: 1;           // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
     unsigned char           bHasComplexHierarchy: 1;            // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
