@@ -99,6 +99,7 @@ struct SAnimationData
     bool bLoop;
     bool bUpdatePosition;
     bool bInteruptable;
+    bool bRunInSequence;
     bool bOffsetPed;
     bool bHoldLastFrame;
 };
@@ -366,7 +367,7 @@ public:
 
     bool                        IsRunningAnimation      ( void );
     void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
-    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInteruptable = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInteruptable = false, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        RunNamedAnimation       ( SAnimationData & animData );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_LastAnimation.pBlock; }
