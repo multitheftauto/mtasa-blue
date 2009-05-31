@@ -31,6 +31,7 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
     // Create our collision object
     m_pCollision = new CColCircle ( pColManager, NULL, m_vecPosition, m_fSize, NULL, true );
     m_pCollision->SetCallback ( this );
+    m_pCollision->SetAutoCallEvent ( false );
 
     // Add us to the marker manager
     pMarkerManager->AddToList ( this );
@@ -365,6 +366,7 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
         }
 
         m_pCollision->SetCallback ( this );
+        m_pCollision->SetAutoCallEvent ( false );
     }
 
     // Set the radius after the size

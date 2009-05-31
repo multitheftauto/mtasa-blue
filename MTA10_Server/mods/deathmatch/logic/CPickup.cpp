@@ -22,6 +22,7 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
     m_pPickupManager = pPickupManager;
     m_pCollision = new CColSphere ( pColManager, NULL, m_vecPosition, 2.0f, NULL, true );
     m_pCollision->SetCallback ( this );
+    m_pCollision->SetAutoCallEvent ( false );
 
     // Add us to the pickup manager's list and grab an unique id
     pPickupManager->AddToList ( this );
