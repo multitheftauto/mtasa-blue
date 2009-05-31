@@ -4487,7 +4487,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -4511,7 +4511,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             if ( bLoop ) flags |= 0x2;
             flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
             if ( bUpdatePosition ) flags |= 0x40;
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInteruptable, false, bOffsetPed, bHoldLastFrame );
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInteruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
@@ -4532,6 +4532,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_LastAnimation.bLoop = bLoop;
     m_LastAnimation.bUpdatePosition = bUpdatePosition;
     m_LastAnimation.bInteruptable = bInteruptable;
+    m_LastAnimation.bRunInSequence = bRunInSequence;
     m_LastAnimation.bOffsetPed = bOffsetPed;
     m_LastAnimation.bHoldLastFrame = bHoldLastFrame;
 }
@@ -4540,8 +4541,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
 void CClientPed::RunNamedAnimation ( SAnimationData & animData )
 {
     RunNamedAnimation ( animData.pBlock, animData.szAnimName, animData.iTime, animData.bLoop,
-                        animData.bUpdatePosition, animData.bInteruptable, animData.bOffsetPed,
-                        animData.bHoldLastFrame );
+                        animData.bUpdatePosition, animData.bInteruptable, animData.bRunInSequence, 
+                        animData.bOffsetPed, animData.bHoldLastFrame );
 }
 
 
