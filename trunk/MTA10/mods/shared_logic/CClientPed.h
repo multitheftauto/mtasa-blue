@@ -91,6 +91,18 @@ struct SLastSyncedPedData
     float               fRotation;
 };
 
+struct SAnimationData
+{
+    CAnimBlock * pBlock;
+    char * szAnimName;
+    int iTime;
+    bool bLoop;
+    bool bUpdatePosition;
+    bool bInteruptable;
+    bool bOffsetPed;
+    bool bHoldLastFrame;
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -355,9 +367,10 @@ public:
     bool                        IsRunningAnimation      ( void );
     void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
     void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInteruptable = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        RunNamedAnimation       ( SAnimationData & animData );
     void                        KillAnimation           ( void );
-    inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
-    inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }
+    inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_LastAnimation.pBlock; }
+    inline char *               GetAnimationName        ( void )                                        { return m_LastAnimation.szAnimName; }
 
     bool                        IsUsingGun              ( void );
 
@@ -509,11 +522,8 @@ public:
     CClientPad                  m_Pad;
     bool                        m_bDestroyingSatchels;
     bool                        m_bDoingGangDriveby;
-    CAnimBlock *                m_pAnimationBlock;
-    char *                      m_szAnimationName;
+    SAnimationData              m_LastAnimation;
     bool                        m_bRequestedAnimation;
-    bool                        m_bLoopAnimation;
-    bool                        m_bUpdatePositionAnimation;
     bool                        m_bHeadless;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;

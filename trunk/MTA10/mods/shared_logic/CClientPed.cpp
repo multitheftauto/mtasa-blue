@@ -132,11 +132,8 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
-    m_pAnimationBlock = NULL;
-    m_szAnimationName = NULL;
+    memset ( &m_LastAnimation, 0, sizeof ( SAnimationData ) );
     m_bRequestedAnimation = false;
-    m_bLoopAnimation = false;    
-    m_bUpdatePositionAnimation = false;
     m_bHeadless = false;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
@@ -2384,18 +2381,18 @@ void CClientPed::StreamedInPulse ( void )
         }
 
         // Are we waiting on an unloaded anim-block?
-        if ( m_bRequestedAnimation && m_pAnimationBlock )
+        if ( m_bRequestedAnimation && m_LastAnimation.pBlock )
         {
             // Is it loaded now?
-            if ( m_pAnimationBlock->IsLoaded () )
+            if ( m_LastAnimation.pBlock->IsLoaded () )
             {
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
+                strcpy ( szAnimName, m_LastAnimation.szAnimName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_LastAnimation );
                 delete [] szAnimName;                
             }            
         }
@@ -2797,13 +2794,13 @@ void CClientPed::_CreateModel ( void )
         }       
 
         // Are we still playing a looped animation?
-        if ( m_bLoopAnimation && m_pAnimationBlock )
+        if ( m_LastAnimation.bLoop && m_LastAnimation.pBlock )
         {
-            // Copy our anim name incase it gets deleted
-            char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-            strcpy ( szAnimName, m_szAnimationName );
+            // Copy our name incase it gets deleted
+            char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
+            strcpy ( szAnimName, m_LastAnimation.szAnimName );
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+            RunNamedAnimation ( m_LastAnimation );
             delete [] szAnimName;
         }
 
@@ -3027,13 +3024,13 @@ void CClientPed::_ChangeModel ( void )
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if ( m_bLoopAnimation && m_pAnimationBlock )
+            if ( m_LastAnimation.bLoop && m_LastAnimation.pBlock )
             {
-                // Copy our anim name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                // Copy our name incase it gets deleted
+                char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
+                strcpy ( szAnimName, m_LastAnimation.szAnimName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_LastAnimation );
                 delete [] szAnimName;
             }
 
@@ -4471,7 +4468,7 @@ bool CClientPed::IsRunningAnimation ( void )
         }
         return false;
     }
-    return ( m_bLoopAnimation && m_pAnimationBlock );
+    return ( m_LastAnimation.bLoop && m_LastAnimation.pBlock );
 }
 
 
@@ -4514,7 +4511,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             if ( bLoop ) flags |= 0x2;
             flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
             if ( bUpdatePosition ) flags |= 0x40;
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInteruptable, bOffsetPed, bHoldLastFrame );
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInteruptable, false, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
@@ -4527,11 +4524,24 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             m_bRequestedAnimation = true;
         }
     }
-    m_pAnimationBlock = pBlock;
-    m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
-    strcpy ( m_szAnimationName, szAnimName ); 
-    m_bLoopAnimation = bLoop;
-    m_bUpdatePositionAnimation = bUpdatePosition;
+    m_LastAnimation.pBlock = pBlock;    
+    if ( m_LastAnimation.szAnimName ) delete [] m_LastAnimation.szAnimName;
+    m_LastAnimation.szAnimName = new char [ strlen ( szAnimName ) + 1 ];
+    strcpy ( m_LastAnimation.szAnimName, szAnimName );
+    m_LastAnimation.iTime = iTime;
+    m_LastAnimation.bLoop = bLoop;
+    m_LastAnimation.bUpdatePosition = bUpdatePosition;
+    m_LastAnimation.bInteruptable = bInteruptable;
+    m_LastAnimation.bOffsetPed = bOffsetPed;
+    m_LastAnimation.bHoldLastFrame = bHoldLastFrame;
+}
+
+
+void CClientPed::RunNamedAnimation ( SAnimationData & animData )
+{
+    RunNamedAnimation ( animData.pBlock, animData.szAnimName, animData.iTime, animData.bLoop,
+                        animData.bUpdatePosition, animData.bInteruptable, animData.bOffsetPed,
+                        animData.bHoldLastFrame );
 }
 
 
@@ -4551,12 +4561,7 @@ void CClientPed::KillAnimation ( void )
             }
         }
     }
-    m_pAnimationBlock = NULL;
-    if ( m_szAnimationName )
-    {
-        delete [] m_szAnimationName;
-        m_szAnimationName = NULL;
-    }
+    m_LastAnimation.pBlock = NULL;
     m_bRequestedAnimation = false;
 }
 
