@@ -587,17 +587,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
     }
 
-	if ( !m_pMainConfig->GetDontBroadcastLan() )
-	{
-		m_pLanBroadcast = g_pServerInterface->GetLanBroadcast();
-		if ( m_pLanBroadcast )
-		{
-			// Try to start lan broadcaster
-			if ( !m_pLanBroadcast->Initialize ( usServerPort ) )
-				CLogger::LogPrintf ( "Could not bind LAN broadcast on port '%u'\n", m_pLanBroadcast->GetPort() );
-		}
-	}
-
     // Load the banlist
     m_pBanManager->LoadBanList ();
 
