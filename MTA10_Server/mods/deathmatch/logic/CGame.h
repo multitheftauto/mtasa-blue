@@ -24,7 +24,6 @@ class CGame;
 #define __CGAME_H
 
 #include <net/CNetServer.h>
-#include <net/CLanBroadcastInterface.h>
 #include "CClient.h"
 #include "CEvents.h"
 #include "CCommandLineParser.h"

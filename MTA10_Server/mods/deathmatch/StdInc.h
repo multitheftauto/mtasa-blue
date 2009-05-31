@@ -160,6 +160,7 @@
 #include "CHandling.h"
 #include "CHandlingManager.h"
 #include "CKeyBinds.h"
+#include "CLanBroadcast.h"
 #include "CLogger.h"
 #include "CMD5Hasher.h"
 #include "CMainConfig.h"

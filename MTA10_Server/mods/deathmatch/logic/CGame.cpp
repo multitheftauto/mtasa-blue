@@ -632,7 +632,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
     {
-		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP );
+		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
@@ -659,6 +659,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 			delete pTCP;
 			delete request;
 		}
+
+        if ( !m_pMainConfig->GetDontBroadcastLan() )
+        {
+            m_pLanBroadcast = m_pASE->InitLan();
+        }
     }
 
 	// Now load the rest of the config

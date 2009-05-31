@@ -487,7 +487,7 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
                 for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) 
                 {
                     int k = m_pServerPlayerList [ Type ]->AddRow ();
-                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[k].strName.c_str () );
+                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[k].c_str () );
                 }
 
                 // It's not the same server as was selected before, so we update the password

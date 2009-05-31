@@ -307,85 +307,102 @@ void CServerListItem::Query ( void )
 	addr.sin_addr = Address;
 	addr.sin_port = htons ( usQueryPort );
 
-    int ret = sendto ( m_Socket, "s", 1, 0, (sockaddr *) &addr, sizeof(addr) );
+    int ret = sendto ( m_Socket, "b", 1, 0, (sockaddr *) &addr, sizeof(addr) );
 	if ( ret == 1 )
         m_ulQueryStart = CClientTime::GetTime ();
 }
 
 
-inline std::string ReadNextString ( const char * szBuffer, unsigned int &i )
+bool ReadString ( std::string &strRead, const char * szBuffer, unsigned int &i, unsigned int nLength )
 {
-    unsigned char len = szBuffer[i++];
-    const char *ptr = szBuffer + i;
-    i += len - 1;
-    return std::string ( ptr, len - 1 );
+    if ( i <= nLength )
+    {
+        unsigned char len = szBuffer[i];
+        if ( i + len <= nLength )
+        {
+            const char *ptr = &szBuffer[i + 1];
+            i += len;
+            strRead = std::string ( ptr, len - 1 );
+            return true;
+        }
+        i++;
+    }
+    return false;
 }
 
-inline void SkipNextString ( const char * szBuffer, unsigned int &i )
-{
-    unsigned char len = szBuffer[i++];
-    i += len - 1;
-}
 
 bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 {
-    unsigned int i = 0;
-    #define _C    szBuffer[i++]
-    #define _B(y) _C==y
-    #define _STR ReadNextString(szBuffer,i)
-    #define _SKP SkipNextString(szBuffer,i)
+    // Check length
+    if ( nLength < 15 )
+        return false;
 
     // Check header
-    if(!(_B('E')&&_B('Y')&&_B('E')&&_B('1'))) return false;
+    if ( strncmp ( szBuffer, "EYE2", 4 ) != 0 )
+        return false;
     
     // Get IP as string
     const char* szIP = inet_ntoa ( Address );
 
-    g_pCore->GetConsole()->Printf ( "Got server %s", szIP );
-
     // Calculate the ping/latency
-    nPing           = ( CClientTime::GetTime () - m_ulQueryStart );
+    nPing = ( CClientTime::GetTime () - m_ulQueryStart );
 
     // Parse relevant data
-    strGame         = _STR;
-    usGamePort      = atoi ( _STR.c_str () );
-    strHost         = szIP;
-    strName         = _STR;
-    strType         = _STR;
-    strMap          = _STR;
-    strVersion      = _STR;
-    bPassworded     = ( _STR == "1" ) ? true : false;
-    nPlayers        = atoi ( _STR.c_str () );
-    nMaxPlayers     = atoi ( _STR.c_str () );
+    std::string strTemp;
+    unsigned int i = 4;
 
-    // Skip variables (two strings each)
-    while ( szBuffer[i] != 1 && i < nLength ) {
-        if ( ( _STR.compare ( "SerialVerification" ) == 0 ) && ( _STR.compare ( "yes" ) == 0 ) )
-            bSerials = true;
+    // IP
+    strHost = szIP;
+
+    // Game
+    if ( !ReadString ( strGame, szBuffer, i, nLength ) )
+        return false;
+
+    // Port
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
+        return false;
+    usGamePort      = atoi ( strTemp.c_str () );
+
+    // Server name
+    if ( !ReadString ( strName, szBuffer, i, nLength ) )
+        return false;
+
+    // Game type
+    if ( !ReadString ( strType, szBuffer, i, nLength ) )
+        return false;
+
+    // Map name
+    if ( !ReadString ( strMap, szBuffer, i, nLength ) )
+        return false;
+
+    // Version
+    if ( !ReadString ( strVersion, szBuffer, i, nLength ) )
+        return false;
+
+    if ( strVersion != MTA_VERSION )
+        return false;
+
+    // Got space for password, serial verification, player count, players max?
+    if ( i + 4 > nLength )
+    {
+        return false;
     }
-    if ( i == nLength ) return false;
-    i++;
 
-    // Parse player data
+    bPassworded = ( szBuffer[i++] == 1 );
+    bSerials = ( szBuffer[i++] == 1 );
+    nPlayers = szBuffer[i++];
+    nMaxPlayers = szBuffer[i++];
+
+    // Get player nicks
     vecPlayers.clear ();
-    while ( i < nLength ) {
-        unsigned char playerFlags = _C;
-        CServerListItemPlayer Player;
+    while ( i < nLength )
+    {
+        std::string strPlayer;
 
-        if ( playerFlags & 1 )
-            Player.strName = _STR;
-        if ( playerFlags & 2 )
-            Player.strTeam = _STR;
-        if ( playerFlags & 4 )
-            Player.strSkin = _STR;
-        if ( playerFlags & 8 )
-            Player.nScore = atoi ( _STR.c_str () );
-        if ( playerFlags & 16 )
-            Player.nPing = atoi ( _STR.c_str () );
-        if ( playerFlags & 32 )
-            Player.nTime = atoi ( _STR.c_str () );
-
-        vecPlayers.push_back ( Player );
+        if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+        {
+            vecPlayers.push_back ( strPlayer );
+        }
     }
 
     bScanned = true;

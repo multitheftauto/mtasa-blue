@@ -24,7 +24,6 @@ class CServerImpl;
 #include <string>
 
 #include <core/CServerInterface.h>
-#include <net/CLanBroadcastInterface.h>
 #include <net/CNetServer.h>
 
 #include "CDynamicLibrary.h"
@@ -42,7 +41,6 @@ class CServerImpl;
 
 typedef CXML* (*InitXMLInterface) ( void );
 typedef CNetServer* (*InitNetServerInterface) ( void );
-typedef CLanBroadcast* (*InitLanBroadcastInterface) ( void );
 
 #ifdef WIN32
 typedef void (FClientFeedback) ( const char* szText );
@@ -63,7 +61,6 @@ public:
     CModManager*        GetModManager       ( void );
     CTCP*               GetTCP              ( void );
     CXML*               GetXML              ( void );
-	CLanBroadcast*		GetLanBroadcast		( void );
 
     inline const char*  GetServerPath       ( void )                { return m_szServerPath; };
     const char*         GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize );
@@ -88,7 +85,6 @@ private:
     CDynamicLibrary     m_NetworkLibrary;
     CDynamicLibrary     m_XMLLibrary;
     CNetServer*         m_pNetwork;
-	CLanBroadcast*		m_pLanBroadcast;
     CModManagerImpl*    m_pModManager;
     CTCPImpl*           m_pTCP;
     CXML*               m_pXML;

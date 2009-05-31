@@ -41,17 +41,6 @@ class CServerListItem;
 // LAN packet broadcasting interval (in ms)
 #define SERVER_LIST_BROADCAST_REFRESH       2000
 
-class CServerListItemPlayer
-{
-public:
-    std::string         strName;
-    std::string         strTeam;
-    std::string         strSkin;
-    unsigned short      nScore;
-    unsigned short      nPing;
-    unsigned short      nTime;
-};
-
 class CServerListItem
 {
     friend class CServerList;
@@ -142,8 +131,9 @@ public:
     std::string         strType;        // Game type
     std::string         strMap;         // Map name
 
-    std::vector < CServerListItemPlayer >
+    std::vector < std::string >
                         vecPlayers;
+
 private:
     int                 m_Socket;
     unsigned long       m_ulQueryStart;

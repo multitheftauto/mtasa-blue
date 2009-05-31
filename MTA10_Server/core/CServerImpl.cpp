@@ -107,12 +107,6 @@ CXML* CServerImpl::GetXML ( void )
 }
 
 
-CLanBroadcast* CServerImpl::GetLanBroadcast ( void )
-{
-    return m_pLanBroadcast;
-}
-
-
 const char* CServerImpl::GetAbsolutePath ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize )
 {
     szBuffer [uiBufferSize-1] = 0;
@@ -267,14 +261,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // Grab the network interface
             InitNetServerInterface pfnInitNetServerInterface = (InitNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitNetServerInterface" ) );
             InitXMLInterface pfnInitXMLInterface = (InitXMLInterface) ( m_XMLLibrary.GetProcedureAddress ( "InitXMLInterface" ) );
-		    InitLanBroadcastInterface pfnInitLanBroadcastInterface = (InitLanBroadcastInterface) ( m_NetworkLibrary.GetProcedureAddress ( "InitLanBroadcastInterface" ) );
-            if ( pfnInitNetServerInterface && pfnInitLanBroadcastInterface && pfnInitXMLInterface )
+            if ( pfnInitNetServerInterface && pfnInitXMLInterface )
             {
                 // Call it to grab the network interface class
                 m_pNetwork = pfnInitNetServerInterface ();
-			    m_pLanBroadcast = pfnInitLanBroadcastInterface ();
                 m_pXML = pfnInitXMLInterface ();
-                if ( m_pNetwork && m_pLanBroadcast && m_pXML )
+                if ( m_pNetwork && m_pXML )
                 {
                     // Make the modmanager load our mod
                     if ( m_pModManager->Load ( "deathmatch", iArgumentCount, szArguments ) )   // Hardcoded for now

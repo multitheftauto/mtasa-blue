@@ -287,7 +287,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ASEQuerySDK.lib lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
+				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="../../../output/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -335,10 +335,6 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
-			<File
-				RelativePath=".\logic\ASE.cpp"
-				>
-			</File>
 			<File
 				RelativePath="CServer.cpp"
 				>
@@ -388,6 +384,10 @@
 			<Filter
 				Name="logic"
 				>
+				<File
+					RelativePath=".\logic\ASE.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\logic\CAccessControlList.cpp"
 					>
@@ -537,19 +537,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CHandling.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CHandlingManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CHTTPD.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\logic\CKeyBinds.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CLanBroadcast.cpp"
 					>
 				</File>
 				<File
@@ -1088,10 +1084,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\luadefs\CLuaHandlingDefs.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\luadefs\CLuaHTTPDefs.cpp"
 						>
 					</File>
@@ -1378,10 +1370,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\ASEQuerySDK.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CAccessControlList.h"
 					>
 				</File>
@@ -1538,19 +1526,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CHandling.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CHandlingManager.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CHTTPD.h"
 					>
 				</File>
 				<File
 					RelativePath=".\logic\CKeyBinds.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CLanBroadcast.h"
 					>
 				</File>
 				<File
@@ -2145,10 +2129,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\luadefs\CLuaHandlingDefs.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\luadefs\CLuaHTTPDefs.h"
 						>
 					</File>
@@ -2228,10 +2208,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 		</Filter>
-		<File
-			RelativePath=".\logic\lib\ASEQuerySDK.lib"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
