@@ -390,8 +390,8 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
     bPassworded = ( szBuffer[i++] == 1 );
     bSerials = ( szBuffer[i++] == 1 );
-    nPlayers = szBuffer[i++];
-    nMaxPlayers = szBuffer[i++];
+    nPlayers = (unsigned char)szBuffer[i++];
+    nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Get player nicks
     vecPlayers.clear ();
