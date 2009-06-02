@@ -257,7 +257,6 @@ void CClientCamera::SetFocus ( CClientEntity* pEntity, eCamMode eMode, bool bSmo
             m_pCamera->TakeControl ( pGameEntity, eMode, iSwitchStyle );            
 
             // Store
-            m_pFocusedPlayer = NULL;
             m_pFocusedEntity = pEntity;
             m_pFocusedGameEntity = pGameEntity;
             m_bFixed = false;
