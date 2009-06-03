@@ -57,6 +57,7 @@ extern "C" bool g_bSilent;
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
+	#include <string>
 	#include <fcntl.h>
 	#include <curses.h>
 	#include <dlfcn.h>
