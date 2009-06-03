@@ -50,7 +50,7 @@ public:
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
 
-    virtual void        WriteBits                   ( const void* input, unsigned int numbits ) = 0;
+    virtual void        WriteBits                   ( const char* input, unsigned int numbits ) = 0;
     virtual void        WriteBit                    ( bool input ) = 0;
 
     // Write a normalized 3D vector, using (at most) 4 bytes + 3 bits instead of 12 bytes.  Will further compress y or z axis aligned vectors. Accurate to 1/32767.5.
@@ -93,7 +93,7 @@ public:
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
 
-    virtual bool        ReadBits                    ( void* output, unsigned int numbits ) = 0;
+    virtual bool        ReadBits                    ( char* output, unsigned int numbits ) = 0;
     virtual bool        ReadBit                     ( ) = 0;
 
     virtual bool        ReadNormVector              ( float &x, float &y, float &z ) = 0;
