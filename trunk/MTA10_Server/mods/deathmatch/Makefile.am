@@ -6,12 +6,19 @@ INCLUDES += -I$(srcdir)/../../../vendor/
 INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 
-
 BUILT_SOURCES = Makefile.files
 Makefile.files: Makefile.am
-	echo Generating Makefile.files
-	echo UTILS = `ls --quoting-style=literal --format=horizontal $(srcdir)/utils/*.cpp $(srcdir)/utils/zip/*.cpp` > $(srcdir)/Makefile.files
-	echo LOGIC = `ls --quoting-style=literal --format=horizontal $(srcdir)/logic/*.cpp $(srcdir)/logic/luadefs/*.cpp $(srcdir)/logic/lua/*.cpp $(srcdir)/logic/packets/*.cpp` >> $(srcdir)/Makefile.files
+	@echo Generating Makefile.files
+	echo UTILS = `ls --quoting-style=literal --format=horizontal \
+		$(srcdir)/utils/*.cpp \
+		$(srcdir)/utils/zip/*.cpp \
+	` > $(srcdir)/Makefile.files
+	echo LOGIC = `ls --quoting-style=literal --format=horizontal \
+		$(srcdir)/logic/*.cpp \
+		$(srcdir)/logic/luadefs/*.cpp \
+		$(srcdir)/logic/lua/*.cpp \
+		$(srcdir)/logic/packets/*.cpp \
+	` >> $(srcdir)/Makefile.files
 
 -include $(srcdir)/Makefile.files
 
