@@ -134,7 +134,7 @@ void CTextItem::NotifyObservers ( void )
 {
     // Update all our observers
     list < CTextDisplay* > ::iterator iter = m_Observers.begin ();
-    for ( iter ; iter != m_Observers.end (); iter++ )
+    for ( ; iter != m_Observers.end (); iter++ )
     {
         (*iter)->Update ( this );
     }

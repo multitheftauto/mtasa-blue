@@ -19,7 +19,7 @@
 extern CGame* g_pGame;
 
 #define MAX_DOWNLOADABLE_FILE_TAGS  5
-char * downloadableFileTags[MAX_DOWNLOADABLE_FILE_TAGS]  = {"map", "config", "file", "html", "script"};
+const char * downloadableFileTags[MAX_DOWNLOADABLE_FILE_TAGS]  = {"map", "config", "file", "html", "script"};
 
 //////////////////////////////////////////////////////////
 CResourceDownloadFile::CResourceDownloadFile ( const char * szURL, const char * szFileName, CResourceDownload * pResource )
@@ -33,7 +33,7 @@ CResourceDownloadFile::CResourceDownloadFile ( const char * szURL, const char * 
     m_pResource = pResource;
 }
 
-void CResourceDownloadFile::Download() 
+void CResourceDownloadFile::Download()
 {
     CNetHTTPDownloadManagerInterface * manager = g_pNetServer->GetHTTPDownloadManager();
     manager->QueueFile ( m_strURL.c_str (), m_strFileName.c_str (), 0, NULL, this, ProgressCallback );
@@ -131,7 +131,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 								{
 									// Version is too low, check for (and download) a higher version within the versions the resource can take
 									g_pGame->GetResourceDownloader()->FindUpdates ( pIncludedResource->GetName ().c_str (), pIncludedResource->GetMinVersion (), pIncludedResource->GetMaxVersion () );
-									
+
 									g_pGame->GetResourceManager()->Unload ( pResource ); // remove it so resource just downloaded doesn't think it is still there
 
 									if ( m_bStartWhenDownloaded )
@@ -139,7 +139,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 										CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
 										g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
 									}
-									if ( m_updateResourceVersion ) 
+									if ( m_updateResourceVersion )
 										m_updateResourceVersion->DownloadComplete(true);
 								}
 								else
@@ -149,7 +149,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 										CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
 										resource->Start ( NULL, true );
 									}
-									if ( m_updateResourceVersion ) 
+									if ( m_updateResourceVersion )
 										m_updateResourceVersion->DownloadComplete(true);
 								}
 							}
@@ -157,10 +157,10 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 							{
 								if ( m_bStartWhenDownloaded )
 								{
-									CLogger::LogPrintf ( "Version of %s too high for '%s' attempting to start anyway\n", pIncludedResource->GetName(), resource->GetName().c_str () );
+									CLogger::LogPrintf ( "Version of %s too high for '%s' attempting to start anyway\n", pIncludedResource->GetName().c_str (), resource->GetName().c_str () );
 									resource->Start ( NULL, true );
 								}
-								if ( m_updateResourceVersion ) 
+								if ( m_updateResourceVersion )
 									m_updateResourceVersion->DownloadComplete(true);
 							}
 						}
@@ -178,7 +178,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 								CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
 								g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
 							}
-							if ( m_updateResourceVersion ) 
+							if ( m_updateResourceVersion )
 								m_updateResourceVersion->DownloadComplete(true);
 						}
 						else
@@ -188,7 +188,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 								CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
 								resource->Start ( NULL, true );
 							}
-							if ( m_updateResourceVersion ) 
+							if ( m_updateResourceVersion )
 								m_updateResourceVersion->DownloadComplete(true);
 						}
 					}
@@ -198,7 +198,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 			{
 				if ( m_bStartWhenDownloaded )
 	                resource->Start ( NULL, true );
-				if ( m_updateResourceVersion ) 
+				if ( m_updateResourceVersion )
 					m_updateResourceVersion->DownloadComplete(true);
             }
 			g_pGame->GetResourceDownloader()->CheckWaitingResources (); // check resources that are waiting to be downloaded as this resource is now available
@@ -328,7 +328,7 @@ CUpdateResourceVersion::CUpdateResourceVersion ( const char * szName, CXMLNode *
 
     //CLogger::LogPrintf("Added version for %s", szName);
     m_updateResource = updateResource;
-    
+
     m_resourceDownload = NULL;
 
     m_strName = szName ? szName : "";
@@ -404,7 +404,7 @@ bool CUpdateResourceVersion::Download ( bool bStartResource )
     }
 }
 
-void CUpdateResourceVersion::DownloadComplete (bool bSuccess) 
+void CUpdateResourceVersion::DownloadComplete (bool bSuccess)
 {
     if ( m_resourceDownload )
         delete m_resourceDownload;
@@ -455,7 +455,7 @@ void CUpdateResource::FindUpdates ( unsigned int majorMin, unsigned int minorMin
     for ( ; iter != m_versions.end (); iter++ )
     {
         CUpdateResourceVersion * version = (*iter);
-        if ( version->GetMajor() > majorMin || 
+        if ( version->GetMajor() > majorMin ||
             ( version->GetMajor() == majorMin && version->GetMinor() > minorMin ) ||
             ( version->GetMajor() == majorMin && version->GetMinor() == minorMin && version->GetRevision() > revisionMin ) ||
             ( version->GetMajor() == majorMin && version->GetMinor() == minorMin && version->GetRevision() == revisionMin && version->GetState() >= stateMin ) )
@@ -467,7 +467,7 @@ void CUpdateResource::FindUpdates ( unsigned int majorMin, unsigned int minorMin
                 CUpdateResourceVersion* ver1 = (*iter);
                 CUpdateResourceVersion* ver2 = (*iter2);
 
-                if ( ver1->GetUpdateResource()->GetName().compare ( ver2->GetUpdateResource()->GetName().c_str () ) == 0 && 
+                if ( ver1->GetUpdateResource()->GetName().compare ( ver2->GetUpdateResource()->GetName().c_str () ) == 0 &&
                     ver1->GetMajor() == ver2->GetMajor() &&
                     ver1->GetMinor() == ver2->GetMinor() &&
                     ver1->GetRevision() == ver2->GetRevision() &&
@@ -499,7 +499,7 @@ void CUpdateResource::FindUpdates ( SVersion* pMinVersion, SVersion* pMaxVersion
                 CUpdateResourceVersion* ver1 = (*iter);
                 CUpdateResourceVersion* ver2 = (*iter2);
 
-                if ( ver1->GetUpdateResource()->GetName().compare ( ver2->GetUpdateResource()->GetName().c_str () ) == 0 && 
+                if ( ver1->GetUpdateResource()->GetName().compare ( ver2->GetUpdateResource()->GetName().c_str () ) == 0 &&
                     ver1->GetMajor() == ver2->GetMajor() &&
                     ver1->GetMinor() == ver2->GetMinor() &&
                     ver1->GetRevision() == ver2->GetRevision() &&
@@ -525,7 +525,7 @@ void CUpdateResource::GetLatestVersion ( unsigned int state, CUpdateResourceVers
         if ( state == thisversion->GetState() )
         {
             if  ( ( *version == NULL ) ||
-                ( thisversion->GetMajor() > (*version)->GetMajor() ) || 
+                ( thisversion->GetMajor() > (*version)->GetMajor() ) ||
                 ( thisversion->GetMajor() == (*version)->GetMajor() && thisversion->GetMinor() > (*version)->GetMinor() ) ||
                 ( thisversion->GetMajor() == (*version)->GetMajor() && thisversion->GetMinor() == (*version)->GetMinor() && thisversion->GetRevision() > (*version)->GetRevision() ) )
             {
@@ -542,8 +542,8 @@ CUpdateResourceVersion * CUpdateResource::Get ( unsigned int majorVersion, unsig
     {
         CUpdateResourceVersion * thisversion = (*iter);
         if ( state == thisversion->GetState() &&
-            majorVersion == thisversion->GetMajor() && 
-            minorVersion == thisversion->GetMinor() && 
+            majorVersion == thisversion->GetMajor() &&
+            minorVersion == thisversion->GetMinor() &&
             revisionVersion == thisversion->GetRevision() )
         {
             return thisversion;
@@ -558,7 +558,7 @@ CUpdateSite::CUpdateSite ( const char * szURL )
 {
     int urlLength = strlen ( szURL );
     int start = 0;
-    
+
     if ( szURL[0] == 'h' && szURL[1] == 't' && szURL[2] == 't' && szURL[3] == 'p' && szURL[4] == ':' && szURL[5] == '/' && szURL[6] == '/' )
         start = 7;
 
@@ -745,7 +745,7 @@ bool CResourceDownloader::AddUpdateSite ( const char * szURL )
 
 bool compareUpdates ( CUpdateResourceVersion* first, CUpdateResourceVersion* second)
 {
-    if ( first->GetMajor() > second->GetMajor() || 
+    if ( first->GetMajor() > second->GetMajor() ||
         ( first->GetMajor() == second->GetMajor() && first->GetMinor() > second->GetMinor() ) ||
         ( first->GetMajor() == second->GetMajor() && first->GetMinor() == second->GetMinor() && first->GetRevision() > second->GetRevision() ) ||
         ( first->GetMajor() == second->GetMajor() && first->GetMinor() == second->GetMinor() && first->GetRevision() == second->GetRevision() && first->GetState() >= second->GetState() ) )

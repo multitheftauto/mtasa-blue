@@ -100,7 +100,7 @@ CTCP* CServerImpl::GetTCP ( void )
     return m_pTCP;
 }
 
-  
+
 CXML* CServerImpl::GetXML ( void )
 {
     return m_pXML;
@@ -160,7 +160,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
 		// Adjust the console's screenbuffer so we can disable a bar at the top
 		ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
-		
+
 		SetConsoleWindowInfo ( m_hConsole, TRUE, &ScrnBufferInfo.srWindow );
 		SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
 #else
@@ -399,7 +399,7 @@ void CServerImpl::ShowInfoTag ( char* szTag )
 		// Get the console's width
 		CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
 		GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo );
-		
+
 		COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
 		COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };
 		SMALL_RECT Region = { 0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1 };
@@ -556,7 +556,7 @@ void CServerImpl::HandleInput ( void )
 		break;
 
 #ifdef WIN32	// WIN32: we have to use a prefix code, this routine opens an extra switch
-		case KEY_EXTENDED:	
+		case KEY_EXTENDED:
 			// Color the text
 			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 			if ( kbhit () )
@@ -615,7 +615,7 @@ void CServerImpl::HandleInput ( void )
 			}
 			// Restore the color
 			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
-		
+
 		break;	// KEY_EXTENDED
 #endif
 
@@ -667,7 +667,7 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 break;
             }
             #endif
-           
+
 
             // Nothing we know, proceed
             default:
@@ -726,7 +726,6 @@ void CServerImpl::WaitForKey ( int iKey )
 {
     if ( !g_bSilent )
     {
-        int iKeyPressed = 0;
         for ( ;; )
         {
             // Is the key pressed?

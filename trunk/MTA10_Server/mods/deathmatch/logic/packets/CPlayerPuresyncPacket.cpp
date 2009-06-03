@@ -56,12 +56,12 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         // Contact element
         CElement* pContactElement = NULL;
         if ( flags.data.bHasContact )
-        {            
+        {
             ElementID Temp;
             BitStream.ReadCompressed ( Temp );
             pContactElement = CElementIDs::GetElement ( Temp );
-        }        
-        CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();        
+        }
+        CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();
         pSourcePlayer->SetContactElement ( pContactElement );
 
         if ( pPreviousContactElement != pContactElement )
@@ -88,7 +88,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( pContactElement )
         {
             pSourcePlayer->SetContactPosition ( position.data.vecPosition );
-            
+
             // Get the true position
             CVector vecTempPos = pContactElement->GetPosition ();
             position.data.vecPosition += vecTempPos;
@@ -119,13 +119,13 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
         float fOldArmor = pSourcePlayer->GetArmor ();
         float fArmorLoss = fOldArmor - fArmor;
-        
+
         pSourcePlayer->SetArmor ( fArmor );
 
         // Read out and set the camera rotation
         float fCameraRotation;
         BitStream.Read ( fCameraRotation );
-        pSourcePlayer->SetCameraRotation ( fCameraRotation );        
+        pSourcePlayer->SetCameraRotation ( fCameraRotation );
 
         if ( flags.data.bHasAWeapon )
         {
@@ -176,7 +176,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         {
             ElementID DamagerID;
             BitStream.ReadCompressed ( DamagerID );
-        
+
             CElement* pElement = CElementIDs::GetElement ( DamagerID );
 
             SWeaponTypeSync weaponType;
@@ -200,7 +200,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Less than last packet's frame?
         if ( fHealthLoss > 0 || fArmorLoss > 0 )
-        {            
+        {
             float fDamage = 0.0f;
             if ( fHealthLoss > 0 ) fDamage += fHealthLoss;
             if ( fArmorLoss > 0 ) fDamage += fArmorLoss;
@@ -215,8 +215,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             Arguments.PushNumber ( fDamage );
 
             pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );
-        }        
-        
+        }
+
         // Success
         return true;
     }
@@ -275,7 +275,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );
 
         BitStream.WriteCompressed ( usLatency );
-        WriteFullKeysync ( ControllerState, BitStream );   
+        WriteFullKeysync ( ControllerState, BitStream );
 /*
         // Figure out what to send
         SPlayerPuresyncSentHeader sent;
@@ -293,18 +293,18 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         {
             BitStream.Write ( vecPosition.fX );
             BitStream.Write ( vecPosition.fY );
-            BitStream.Write ( vecPosition.fZ ); 
+            BitStream.Write ( vecPosition.fZ );
         }
 
         if ( sent.bRotation )
-            BitStream.Write ( fRotation );    
+            BitStream.Write ( fRotation );
 
         etc... Could also do a 'sent' header in WriteFullKeysync
 */
         BitStream.Write ( &flags );
-        
+
         if ( pContactElement )
-            BitStream.WriteCompressed ( pContactElement->GetID () );            
+            BitStream.WriteCompressed ( pContactElement->GetID () );
 
         SPositionSync position ( false );
         position.data.vecPosition = vecPosition;
@@ -312,7 +312,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         SPedRotationSync rotation;
         rotation.data.fRotation = pSourcePlayer->GetRotation ();
-        BitStream.Write ( &rotation );       
+        BitStream.Write ( &rotation );
 
         if ( flags.data.bSyncingVelocity )
         {
@@ -335,8 +335,6 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
                 unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
-
-			    bool bArmUp = pSourcePlayer->IsAkimboArmUp ();
 /*
             // Figure out what to send
             SPlayerPuresyncWeaponSentHeader sent;

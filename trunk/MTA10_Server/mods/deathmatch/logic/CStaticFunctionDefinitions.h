@@ -193,7 +193,7 @@ public:
     static bool                 SetCameraTarget                     ( CElement * pElement, CElement* pTarget );
     static bool                 SetCameraInterior                   ( CElement * pElement, unsigned char ucInterior );
     static bool                 FadeCamera                          ( CElement * pElement, bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-    
+
     // Weapon give/take functions
     static bool                 GiveWeapon                          ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, bool bSetAsCurrent = false );
     static bool                 TakeWeapon                          ( CElement* pElement, unsigned char ucWeaponID );
@@ -397,7 +397,7 @@ public:
     static bool                 SetControlState                     ( CPlayer* pPlayer, char* szControl, bool bState );
     static bool                 ToggleControl                       ( CPlayer* pPlayer, char* szControl, bool bEnabled );
     static bool                 ToggleAllControls                   ( CPlayer* pPlayer, bool bGTAControls, bool bMTAControls, bool bEnabled );
-    
+
     // Team get funcs
     static CTeam*               CreateTeam                          ( CResource* pResource, char* szTeamName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     static CTeam*               GetTeamFromName                     ( const char* szTeamName );
@@ -423,7 +423,7 @@ public:
     static unsigned char        GetMaxPlayers                       ( void );
     static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
     static bool                 OutputConsole                       ( const char* szText, CElement* pElement );
-    
+
     // General world get funcs
     static bool                 GetTime                             ( unsigned char& ucHour, unsigned char& ucMinute );
     static bool                 GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
@@ -458,9 +458,9 @@ public:
     // All-Seeing Eye related Functions
     static bool                 SetGameType                         ( const char * szGameType );
     static bool                 SetMapName                          ( const char * szMapName );
-    static char*                GetRuleValue                        ( char* szKey );
-    static bool                 SetRuleValue                        ( char* szKey, char* szValue );
-    static bool                 RemoveRuleValue                     ( char* szKey );
+    static const char*          GetRuleValue                        ( const char* szKey );
+    static bool                 SetRuleValue                        ( const char* szKey, const char* szValue );
+    static bool                 RemoveRuleValue                     ( const char* szKey );
 
     // Registry funcs
     static const std::string&   SQLGetLastError                     ( void );
@@ -478,7 +478,7 @@ public:
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, char* szKey );
-    
+
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
     static bool                 RemoveAccount                       ( CAccount* pAccount );

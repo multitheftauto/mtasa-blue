@@ -6,7 +6,7 @@
 *  PURPOSE:     Structures used for syncing stuff through the network.
 *  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
-*               
+*
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
@@ -609,7 +609,7 @@ struct SAmmoInClipSync : public IAmmoInClipSync
     {
         bitStream.WriteBits ( &data, bitCount );
     }
-    
+
     unsigned short GetAmmoInClip () const
     {
         return data.usAmmoInClip;
@@ -754,7 +754,7 @@ struct SWeaponAimSync : public ISyncStructure
         CVector vecDirection;
 
         short sArmY;
-        if ( bStatus = bitStream.Read ( sArmY ) )
+        if ( (bStatus = bitStream.Read ( sArmY )) )
         {
             data.fArm = ( static_cast < float > ( sArmY ) * 3.14159265f / 180 ) / 90.0f;
         }

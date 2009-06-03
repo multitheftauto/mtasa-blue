@@ -16,7 +16,7 @@
 *
 *****************************************************************************/
 
-// This class controls a single resource, being a zip file 
+// This class controls a single resource, being a zip file
 // or a folder that contains a number of files
 
 //#define RESOURCE_DEBUG_MESSAGES // show info about where the actual files are coming from
@@ -123,7 +123,7 @@ bool CResource::Load ( void )
         // Register the time we loaded this resource and zero out the time we started it
         time ( &m_timeLoaded );
         m_timeStarted = NULL;
-        
+
         // Register us in the EHS stuff
 	    g_pGame->GetHTTPD()->RegisterEHS ( this, m_strResourceName.c_str () );
         this->m_oEHSServerParameters["norouterequest"] = true;
@@ -160,7 +160,7 @@ bool CResource::Load ( void )
                 m_strFailureReason = szBuffer;
                 CLogger::ErrorPrintf ( szBuffer );
                 return false;
-            } 
+            }
             else
             {
                 //chdir ( szCurrentDirectory );
@@ -332,7 +332,7 @@ bool CResource::Load ( void )
 
             return false;
         }
-        
+
 	    // Generate a CRC for this resource
         m_ulCRC = GenerateCRC();
 
@@ -342,7 +342,7 @@ bool CResource::Load ( void )
 
         /*CLuaArguments Arguments;
         Arguments.PushResource ( this );
-        m_pRootElement->CallEvent ( "onResourceLoad", Arguments );*/ 
+        m_pRootElement->CallEvent ( "onResourceLoad", Arguments );*/
         //currently called before the events are initialised @Kevuwk
     }
 
@@ -367,7 +367,7 @@ void ReplaceSlashes ( char* szPath )
 
 bool CResource::Unload ( void )
 {
-    Stop(true); 
+    Stop(true);
 
     TidyUp();
     m_bLoaded = false;
@@ -439,7 +439,7 @@ void CResource::TidyUp ( void )
 
     this->UnregisterEHS("call");
 	g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
-    
+
 }
 
 bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
@@ -515,7 +515,7 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
                     }
                     else
                     {
-                        pInfoNode = pInfoNode = pRootNode->CreateSubNode ( "info" );
+                        pInfoNode = pRootNode->CreateSubNode ( "info" );
                         if ( pInfoNode )
                         {
                             pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
@@ -577,7 +577,7 @@ bool CResource::HasResourceChanged ()
 
     if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );   
+        ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
         if ( ulCRC != m_ulCRC )
             return true;
     }
@@ -613,7 +613,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 		// Create an element group for us
         m_pDefaultElementGroup = new CElementGroup ( this );
         m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
-		
+
 		// Grab the root element
         m_pRootElement = g_pGame->GetMapManager()->GetRootElement();
 
@@ -707,7 +707,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( bStartIncludedResources )
         {
             // Copy the list over included resources because reloading them might change the list
-            list < CIncludedResources* > CopyList = m_includedResources;        
+            list < CIncludedResources* > CopyList = m_includedResources;
             // Start our included resources that haven't been started
             CResource* pIncluded;
             list < CIncludedResources* > ::iterator iterr = CopyList.begin ();
@@ -760,7 +760,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CLogger::LogPrintf ( "Start up of resource %s cancelled by script\n", m_strResourceName.c_str () );
             _snprintf ( szBuffer, 254, "Start up of resource cancelled by script\n" );
             m_strFailureReason = szBuffer;
-            Stop ();   
+            Stop ();
             return false;
         }
 
@@ -783,7 +783,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Add us to the running resources list
         m_StartedResources.push_back ( this );
 
-                
+
       //  if  ( stricmp ( this->GetName(), "updtest" ) == 0 )
         //    printf ( "0x%X\n", m_ulCRC );
     }
@@ -828,7 +828,7 @@ bool CResource::Stop ( bool bStopManually )
 		// Remove us from the resources we depend on (they might unload too first)
         list < CIncludedResources* > ::iterator iterr = m_includedResources.begin ();
         for ( ; iterr != m_includedResources.end (); iterr++ )
-        { 
+        {
             CResource * resource = (*iterr)->GetResource();
             if ( resource )
             {
@@ -1025,7 +1025,7 @@ void CResource::DisplayInfo ( void ) // duplicated for HTML
 
 char * CResource::DisplayInfoHTML ( char * info, size_t length )
 {
-    #define LAZYNESS counter += _snprintf ( info + counter, length - counter, 
+    #define LAZYNESS counter += _snprintf ( info + counter, length - counter,
 
     size_t counter = 0;
     counter = _snprintf ( info, length, "<font face='tahoma,arial' size=-1><h2>Details for resource '%s'</h2><br>\n", m_strResourceName.c_str () );
@@ -1073,7 +1073,7 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
             list < CResource* > ::iterator iterr = m_dependents.begin ();
             for ( ; iterr != m_dependents.end (); iterr++ )
             {
-                LAZYNESS " <li><a href='/resources/%s/' style='color:black;'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", (*iterr)->GetName(), (*iterr)->GetName(), (*iterr)->GetName() );
+                LAZYNESS " <li><a href='/resources/%s/' style='color:black;'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", (*iterr)->GetName().c_str (), (*iterr)->GetName().c_str (), (*iterr)->GetName().c_str () );
             }
             LAZYNESS "<BR>" );
         }
@@ -1093,7 +1093,7 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
     for ( ; iterr != m_includedResources.end (); iterr++ )
     {
         CIncludedResources * includedResource = (*iterr);
-        LAZYNESS " <li><a href='/resources/%s/' style='color:black;'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", (*iterr)->GetName(), (*iterr)->GetName(), (*iterr)->GetName() );
+        LAZYNESS " <li><a href='/resources/%s/' style='color:black;'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", (*iterr)->GetName().c_str (), (*iterr)->GetName().c_str (), (*iterr)->GetName().c_str () );
         if ( includedResource->DoesExist() )
         {
             if ( includedResource->GetResource()->IsLoaded() )
@@ -1123,11 +1123,11 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
         {
             if ( (*iterf)->IsHTTPAccessible() )
             {
-                LAZYNESS "<li> <a href='/call/%s/%s?' style='color: black;'>%s</a>", m_strResourceName.c_str (), (*iterf)->GetFunctionName(), (*iterf)->GetFunctionName() );
+                LAZYNESS "<li> <a href='/call/%s/%s?' style='color: black;'>%s</a>", m_strResourceName.c_str (), (*iterf)->GetFunctionName ().c_str (), (*iterf)->GetFunctionName ().c_str () );
             }
             else
             {
-                LAZYNESS "<li> %s", (*iterf)->GetFunctionName() );
+                LAZYNESS "<li> %s", (*iterf)->GetFunctionName ().c_str () );
             }
 
         }
@@ -1145,7 +1145,7 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
             {
                 if ( ((CResourceHTMLItem *)(*iterf))->IsDefaultPage() )
                     LAZYNESS "<b>" );
-            
+
                 LAZYNESS "<li> <a href='/resources/%s/%s' style='color:black;'>%s</a>", m_strResourceName.c_str (), (*iterf)->GetName(), (*iterf)->GetName() );
 
                 if ( ((CResourceHTMLItem *)(*iterf))->IsDefaultPage() )
@@ -1231,7 +1231,7 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
                 // we've already got a cached copy of this file, check its still the same
                 unsigned long ulFileInZipCRC = get_current_file_crc ( m_zipfile );
                 unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
-                
+
                 if ( ulFileInZipCRC == ulFileOnDiskCRC )
                 {
 #ifdef RESOURCE_DEBUG_MESSAGES
@@ -1254,7 +1254,7 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
                 CLogger::LogPrintf("Extracting %s from zip\n", szFilename );
 #endif
             }
-            
+
             // we've never extracted this EXACT file (maybe an old version), so do it again
             ExtractFile ( szFilename );
             unzClose ( m_zipfile );
@@ -1394,7 +1394,7 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                     iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG;
                 else if ( stricmp ( szType, "client" ) == 0 )
                     iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
-                else                
+                else
                     CLogger::LogPrintf ( "Unknown config type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
@@ -1602,7 +1602,7 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                     iType = CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT;
                 else if ( stricmp ( szType, "client" ) == 0 )
                     iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
-                else                
+                else
                     CLogger::LogPrintf ( "Unknown script type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
@@ -1843,7 +1843,7 @@ bool CResource::IncludedFileExists ( const char* szName, int iType )
     for ( ; iter != m_resourceFiles.end (); iter++ )
     {
         // Is it a config?
-        if ( ( iType == CResourceFile::RESOURCE_FILE_TYPE_NONE ) || 
+        if ( ( iType == CResourceFile::RESOURCE_FILE_TYPE_NONE ) ||
              ( (*iter)->GetType () == iType ) )
         {
             // Check if the name compares equal (case independant)
@@ -1945,7 +1945,7 @@ bool CResource::RemoveFile ( const char* szName )
                     // Delete the metafile
                     metaFile->Write ();
                     delete metaFile;
-    
+
                     // We succeeded
                     return true;
                 }
@@ -2099,7 +2099,7 @@ bool CResource::CheckIfStartable ( void )
     // return straight away if we know we've already got a circular include, otherwise
     // it spams it every few seconds
     if ( m_bLoaded == false ) return false;
-      
+
 	// Check that the included resources aren't circular
     m_strCircularInclude = "";
     vector < CResource * > vecCircular;
@@ -2107,7 +2107,7 @@ bool CResource::CheckIfStartable ( void )
     {
         char szOldString [ 512 ];
         char szTrail [ 512 ] = "";
-     
+
 		// Make a string telling what the circular path is
         vector < CResource* > ::iterator iterr = vecCircular.begin ();
         for ( ; iterr != vecCircular.end (); iterr++ )
@@ -2116,7 +2116,7 @@ bool CResource::CheckIfStartable ( void )
             if ( resc )
             {
                 strcpy ( szOldString, szTrail );
-                _snprintf ( szTrail, 510, "-> %s %s", resc->GetName(), szOldString );
+                _snprintf ( szTrail, 510, "-> %s %s", resc->GetName ().c_str (), szOldString );
             }
         }
 
@@ -2129,7 +2129,7 @@ bool CResource::CheckIfStartable ( void )
         //CLogger::LogPrintf ( "%s\n", m_szCircularInclude );
         m_bLoaded = false;
         return false;
-    }    
+    }
 
 	// Check if all the included resources are startable
     list < CIncludedResources* > ::iterator iterr = m_includedResources.begin ();
@@ -2157,7 +2157,7 @@ bool CResource::CheckIfStartable ( void )
 //        {
 //            CResource * resource = m_resourceManager->Load ( szResourceName, this );
 //            if ( resource )
-//                m_children.push_back ( resource );        
+//                m_children.push_back ( resource );
 //            else
 //                return false;
 //        }
@@ -2167,7 +2167,7 @@ bool CResource::CheckIfStartable ( void )
 //            return true;
 //        }
 //    }
-//    
+//
 //    return true;
 //}
 
@@ -2329,7 +2329,7 @@ ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpRespon
                 strAccessType.assign ( szSlash1 + 1, szSlash2 - (szSlash1 + 1) );
         }
     }
-    
+
     CAccount * account = g_pGame->GetHTTPD()->CheckAuthentication ( ipoHttpRequest );
     if ( account )
     {
@@ -2338,13 +2338,13 @@ ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpRespon
             response = HandleRequestCall ( ipoHttpRequest, ipoHttpResponse, account );
         else
             response = HandleRequestActive ( ipoHttpRequest, ipoHttpResponse, account );
-        
+
         g_pGame->Unlock();
         return response;
     }
    g_pGame->Unlock();
    return HTTPRESPONSECODE_200_OK;
-    
+
 }
 
 void Unescape ( std::string& str )
@@ -2368,7 +2368,7 @@ void Unescape ( std::string& str )
 
 ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, CAccount* account )
 {
-    static int bAlreadyCalling = false; // a mini-mutex flag, seems to work :) 
+    static int bAlreadyCalling = false; // a mini-mutex flag, seems to work :)
     // This code runs multithreaded, we need to make sure multiple server requests don't overlap each other... (slows the server down quite a bit)
 
     // Check for http general and if we have access to this resource
@@ -2379,7 +2379,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 			                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
 											m_strResourceName.c_str (),
 											CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-											true ) || 
+											true ) ||
          !aclManager->CanObjectUseRight ( account->GetName().c_str (),
 			                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             "http",
@@ -2394,7 +2394,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 
     if ( !m_bActive )
     {
-        char * szError = "error: resource not running";
+        const char* szError = "error: resource not running";
         ipoHttpResponse->SetBody ( szError, strlen(szError) );
         return HTTPRESPONSECODE_200_OK;
     }
@@ -2402,7 +2402,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     const char * szQueryString = ipoHttpRequest->sUri.c_str();
     if ( !*szQueryString )
     {
-        char * szError = "error: invalid function name";
+        const char* szError = "error: invalid function name";
         ipoHttpResponse->SetBody ( szError, strlen(szError) );
         bAlreadyCalling = false;
         return HTTPRESPONSECODE_200_OK;
@@ -2491,7 +2491,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                                         {
                                             luaArgs.PushElement ( pElement );
                                         }
-                                        else 
+                                        else
                                         {
                                             g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified." );
                                             luaArgs.PushNil ();
@@ -2505,7 +2505,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                                         {
                                             luaArgs.PushResource ( pResource );
                                         }
-                                        else 
+                                        else
                                         {
                                             g_pGame->GetScriptDebugging()->LogError ( NULL, "Invalid resource specified." );
                                             luaArgs.PushNil ();
@@ -2520,20 +2520,20 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                             }
                         }
                     }
-                    else if ( ipoHttpRequest->nRequestMethod = REQUESTMETHOD_POST )
+                    else if ( ipoHttpRequest->nRequestMethod == REQUESTMETHOD_POST )
                     {
                         const char* szRequestBody = ipoHttpRequest->sBody.c_str();
                         luaArgs.ReadFromJSONString ( szRequestBody );
                     }
 
                     CLuaArguments luaReturns;
-                    
+
                     luaArgs.CallGlobal ( m_pVM, strFuncName.c_str (), &luaReturns );
                     //g_pGame->Unlock(); // release the mutex
 
                     std::string strJSON;
                     luaReturns.WriteToJSONString ( strJSON, true );
-                    
+
                     ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
                     bAlreadyCalling = false;
                     return HTTPRESPONSECODE_200_OK;
@@ -2600,7 +2600,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
 
                     // We need to be active if downloading a HTML file
                     if ( m_bActive )
-                    {  
+                    {
                         // Check for http general and if we have access to this resource
                         // if we're trying to return a http file. Otherwise it's the MTA
                         // client trying to download files.
@@ -2609,7 +2609,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
 		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
 												            m_strResourceName.c_str (),
 												            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-												            true ) && 
+												            true ) &&
                             aclManager->CanObjectUseRight ( account->GetName().c_str (),
 		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                             "http",
@@ -2677,13 +2677,13 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                 if ( pHtml->IsDefaultPage() )
                 {
                     CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-                    
+
                     SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pFile->GetName() );
                     if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
 			                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
 													        m_strResourceName.c_str (),
 													        CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													        true ) && 
+													        true ) &&
                         aclManager->CanObjectUseRight ( account->GetName().c_str (),
 							                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
 															strResourceFileName.c_str (),
@@ -2732,7 +2732,7 @@ bool CResource::CallExportedFunction ( char * szFunctionName, CLuaArguments& arg
 													 CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
 													 szFunctionRightName,
 													 CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													 !bRestricted ) ) 
+													 !bRestricted ) )
                 {
                     if ( args.CallGlobal ( m_pVM, szFunctionName, &returns ) )
                     {
@@ -2773,7 +2773,6 @@ unsigned long get_current_file_crc ( unzFile uf )
 
 
     unz_file_info file_info;
-    uLong ratio=0;
     err = unzGetCurrentFileInfo(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
     if ( err == UNZ_OK )
         return file_info.crc;
@@ -2875,7 +2874,6 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
     uInt size_buf;
 
     unz_file_info file_info;
-    uLong ratio=0;
     err = unzGetCurrentFileInfo(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
 
     if (err!=UNZ_OK)

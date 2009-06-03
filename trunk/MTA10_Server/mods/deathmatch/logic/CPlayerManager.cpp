@@ -117,8 +117,8 @@ CPlayer* CPlayerManager::Get ( const char* szNick, bool bCaseSensitive )
         if ( szTemp )
         {
             // Do they equal?
-            if ( bCaseSensitive && strcmp ( szNick, szTemp ) == 0 ||
-                 !bCaseSensitive && stricmp ( szNick, szTemp ) == 0 )
+            if ( ( bCaseSensitive  && strcmp ( szNick, szTemp ) == 0  ) ||
+                 ( !bCaseSensitive && stricmp ( szNick, szTemp ) == 0 ) )
             {
                 return *iter;
             }

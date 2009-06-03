@@ -141,7 +141,6 @@ CPlayer* CPedSync::FindPlayerCloseToPed ( CPed* pPed, float fMaxDistance )
     CVector vecPedPosition = pPed->GetPosition ();
 
     // See if any players are close enough
-    unsigned int uiLastPlayerSyncingCount = 0xFFFFFFFF;
     CPlayer* pLastPlayerSyncing = NULL;
     CPlayer* pPlayer = NULL;
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();

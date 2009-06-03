@@ -114,7 +114,7 @@ void CPad::UpdateKeys ( void )
             m_ControlStates [ 11 ].bState = ( m_csCurrentState.Select ) ? true : false;
             m_ControlStates [ 12 ].bState = ( m_csCurrentState.ButtonCross ) ? true : false;
             m_ControlStates [ 13 ].bState = ( m_csCurrentState.ShockButtonR ) ? true : false;
-            m_ControlStates [ 14 ].bState = ( m_csCurrentState.ShockButtonL ) ? true : false;            
+            m_ControlStates [ 14 ].bState = ( m_csCurrentState.ShockButtonL ) ? true : false;
             m_ControlStates [ 15 ].bState = ( m_csCurrentState.LeftShoulder1 ) ? true : false;
             m_ControlStates [ 16 ].bState = ( m_csCurrentState.m_bPedWalk ) ? true : false;
             // Vehicle Keys
@@ -206,7 +206,7 @@ bool CPad::IsControlEnabled ( char* szControl, bool& bEnabled )
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -231,7 +231,6 @@ void CPad::SetAllControlsEnabled ( bool bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
         m_ControlStates [ i ].bEnabled = bEnabled;
     }
 }

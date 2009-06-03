@@ -188,8 +188,8 @@ void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
         if ( m_pSourcePlayer->IsCursorShowing () )
         {
             // Get the button and state
-            char* szButton = NULL;
-            char* szState = NULL;
+            const char* szButton = NULL;
+            const char* szState = NULL;
             switch ( ucButton )
             {
                 case 0: szButton = "left"; szState = "down";

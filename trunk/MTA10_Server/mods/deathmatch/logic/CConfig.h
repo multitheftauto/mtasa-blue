@@ -34,14 +34,14 @@ public:
 
     void                GetLine                     ( int iLine, char* szReturnText );
 
-    int                 WriteToConfig               ( char* szEntry );
+    int                 WriteToConfig               ( const char* szEntry );
 
-    void                SetFileName                 ( char* szFileName );
+    void                SetFileName                 ( const char* szFileName );
     void                GetFileName                 ( char* szFileName );
     bool                DoesFileExist               ( void );
 
 private:
-    char*               m_szFileName;
+    std::string         m_strFileName;
     FILE*               m_fp;
 
 };

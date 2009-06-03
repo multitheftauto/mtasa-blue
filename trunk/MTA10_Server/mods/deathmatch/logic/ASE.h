@@ -63,9 +63,9 @@ public:
     CMainConfig*            GetMainConfig       ( void )                { return m_pMainConfig; };
     CPlayerManager*         GetPlayerManager    ( void )                { return m_pPlayerManager; };
 
-    char*                   GetRuleValue        ( char* szKey );
-    void                    SetRuleValue        ( char* szKey, char* szValue );
-    bool                    RemoveRuleValue     ( char* szKey );
+    const char*             GetRuleValue        ( const char* szKey );
+    void                    SetRuleValue        ( const char* szKey, const char* szValue );
+    bool                    RemoveRuleValue     ( const char* szKey );
     void                    ClearRules          ( void );
 
     list < CASERule* > ::iterator IterBegin     ( void )                { return m_Rules.begin (); }
@@ -99,49 +99,24 @@ protected:
 class CASERule
 {
 public:
-    inline              CASERule        ( char* szKey, char* szValue )
+    inline              CASERule        ( const char* szKey, const char* szValue )
     {
-        m_szKey = NULL;
-        m_szValue = NULL;
-        SetKey ( szKey );
-        SetValue ( szValue );
+        m_strKey = szKey;
+        m_strValue = szValue;
     }
-    inline              ~CASERule       ( void )
+    inline const char*  GetKey          ( void )            { return m_strKey.c_str (); }
+    inline void         SetKey          ( const char* szKey )
     {
-        delete [] m_szKey;
-        delete [] m_szValue;
+        m_strKey = szKey;
     }
-    inline char*        GetKey          ( void )            { return m_szKey; }
-    inline void         SetKey          ( char* szKey )
+    inline const char*  GetValue          ( void )          { return m_strValue.c_str (); }
+    inline void         SetValue          ( const char* szValue )
     {
-        if ( m_szKey )
-        {
-            delete [] m_szKey;
-            m_szKey = NULL;
-        }
-        if ( szKey )
-        {
-            m_szKey = new char [ strlen ( szKey ) + 1 ];
-            strcpy ( m_szKey, szKey );
-        }
-    }
-    inline char*        GetValue        ( void )            { return m_szValue; }
-    inline void         SetValue          ( char* szValue )
-    {
-        if ( m_szValue )
-        {
-            delete [] m_szValue;
-            m_szValue = NULL;
-        }
-        if ( szValue )
-        {
-            m_szValue = new char [ strlen ( szValue ) + 1 ];
-            strcpy ( m_szValue, szValue );
-        }
+        m_strValue = szValue;
     }
 private:
-    char*               m_szKey;
-    char*               m_szValue;
+    std::string         m_strKey;
+    std::string         m_strValue;
 };
 
 #endif

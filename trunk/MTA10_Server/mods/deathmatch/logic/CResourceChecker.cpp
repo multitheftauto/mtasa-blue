@@ -104,7 +104,6 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
 void CResourceChecker::CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
-    bool bIsBad         = false;
 
     if ( stricmp ( szExt, ".PNG" ) == 0 )
     {
@@ -196,10 +195,10 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
         // Check integrity
         if ( pos != validSize )
             bIsBad = true;
-            
+
         // Close the file
         fclose ( pFile );
-    }        
+    }
 
     if ( bIsBad )
     {
@@ -471,7 +470,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 
     if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
     {
-        char szTemp [ 256 ];  
+        char szTemp [ 256 ];
         if ( strWhat == "Replaced" )
         {
             m_ulDeprecatedWarningCount++;
@@ -480,7 +479,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
         else
         if ( strWhat == "Removed" )
         {
-            _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );        
+            _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
         }
         else
         {
@@ -807,7 +806,7 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
             }
 
             if( !buf )
-                break;       
+                break;
 
 			// open destination file
 			zip_fileinfo zfi;
@@ -856,7 +855,7 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 			void* local_extra = malloc(size_local_extra);
 			if ((local_extra==NULL)&&(size_local_extra!=0)) {free(extrafield); free(commentary); break;}
 			if (unzGetLocalExtrafield(szip, local_extra, size_local_extra)<0) {free(extrafield); free(commentary); free(local_extra); break;}
-			
+
 			// this malloc may fail if file very large
 			void* buf = malloc(unzfi.compressed_size);
 			if ((buf==NULL)&&(unzfi.compressed_size!=0)) {free(extrafield); free(commentary); free(local_extra); break;}

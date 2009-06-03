@@ -14,7 +14,7 @@
 
 extern CGame* g_pGame;
 
-char *szSerialErrorMessages[] = {
+const char *szSerialErrorMessages[] = {
 	"This server requires you to be logged in. Please make sure your username/password details are correct and that you are logged in.",
 	"Success.",
     "This server requires you to be logged in. Please make sure your username/password details are correct and that you are logged in.",
@@ -179,7 +179,7 @@ void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTot
             // An error occurred, let the player in
             CLogger::LogPrintf ( "VERIFY: Error with master server occurred, allowing player\n" );
             // Complete the connect packet (allowed)
-            pCall->GetCallBack ()( pCall->GetPlayer (), true, NULL ); 
+            pCall->GetCallBack ()( pCall->GetPlayer (), true, NULL );
             // Delete ourselves
 		    g_pGame->GetSerialManager ()->Remove ( pCall );
         }

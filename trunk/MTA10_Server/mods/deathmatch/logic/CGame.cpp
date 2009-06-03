@@ -110,7 +110,7 @@ CGame::CGame ( void )
 	m_ulLastFPSTime = 0;
     m_szCurrentFileName = NULL;
     m_pConsoleClient = NULL;
-    m_bIsFinished = false;     
+    m_bIsFinished = false;
 
     //Setup game glitch defaults ( false = disabled )
     m_Glitches [ GLITCH_QUICKRELOAD ] = false;
@@ -262,35 +262,35 @@ void CGame::DoPulse ( void )
 	}
 	m_usFrames++;
 
- 
+
 #ifdef MTA_VOICE
     // Do voice processing
-    if ( m_pVoiceServer ) 
+    if ( m_pVoiceServer )
     {
         list < CPlayer * >::const_iterator vplayer = m_pPlayerManager->IterBegin ( );
         unsigned char Data [ 1024 ];
         unsigned short usLen = 0;
         CVoiceDataPacket Packet;
-        
+
         for (; vplayer != m_pPlayerManager->IterEnd ( ); vplayer++ )
         {
             usLen = m_pVoiceServer->GetMixedBufForClient ( (*vplayer)->GetID ( ), Data, 1024 );
             if ( usLen > 0 )
             {
                 Packet.SetData ( Data, usLen );
-                
+
                 (*vplayer)->Send ( Packet );
             }
             memset ( Data, 0, sizeof ( Data ) );
         }
 
-        m_pVoiceServer->FreePerFrameBuffers ( );    
+        m_pVoiceServer->FreePerFrameBuffers ( );
     }
 #endif
 
     //_asm int 3
     g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles();
-    
+
     // TODO: Low Priorityy: No need to do this every frame. Could be done every minute or so.
     // Remove any players that have been connected for very long (90 sec) but hasn't reached the verifying step
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
@@ -399,7 +399,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     {
         g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf", szBuffer, MAX_PATH );
     }
-    
+
     m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
@@ -413,7 +413,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     if ( szServerIP && szServerIP [0] == '\0' )
         szServerIP = NULL;
-    
+
     unsigned short usServerPort;
     if ( !m_CommandLineParser.GetPort ( usServerPort ) )
         usServerPort = m_pMainConfig->GetServerPort ();
@@ -487,9 +487,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
-    // Must be created before all clients    
+    // Must be created before all clients
     m_pConsoleClient = new CConsoleClient ( m_pConsole );
-    
+
 
 
     m_pZoneNames = new CZoneNames;
@@ -532,7 +532,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                            m_pResourceManager,
                            m_pACLManager,
                            m_pMainConfig );
-                           
+
     m_pPlayerManager->SetScriptDebugging ( m_pScriptDebugging );
 
     // Set our console control handler
@@ -672,7 +672,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 	g_pServerInterface->GetModManager ()->GetAbsolutePath ( "", szBuffer, MAX_PATH );
 	g_pNetServer->SetAutoPatcherDirectory ( szBuffer );
 
-    
+
 #ifdef MTA_VOICE
     // Grab our voice server instance
     m_pVoiceServer = GetVoiceServerInterface ( );
@@ -936,7 +936,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
     {
         if ( &Player != *iter && (*iter)->IsJoined () && !(*iter)->IsBeingDeleted () )
         {
-            PlayerList.AddPlayer ( *iter ); 
+            PlayerList.AddPlayer ( *iter );
         }
     }
 
@@ -986,7 +986,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
             PlayerClothes.SetSourceElement ( *iter );
             PlayerClothes.Add ( (*iter)->GetClothes () );
             if ( PlayerClothes.Count () > 0 )
-                Player.Send ( PlayerClothes );            
+                Player.Send ( PlayerClothes );
 		}
 	}
 
@@ -1011,10 +1011,10 @@ void CGame::JoinPlayer ( CPlayer& Player )
 }
 
 
-void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, SString strKickReason, SString strResponsiblePlayer )
+void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
 {
     // Grab quit reaason
-    char* szReason = "Unknown";
+    const char* szReason = "Unknown";
     switch ( Reason )
     {
         case CClient::QUIT_QUIT: szReason = "Quit"; break;
@@ -1043,17 +1043,17 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         Arguments.PushString ( szReason );
         if ((Reason == CClient::QUIT_BAN || Reason == CClient::QUIT_KICK))
         {
-            if (strKickReason.size() > 0)
-                Arguments.PushString ( strKickReason );
+            if ( szKickReason [ 0 ] )
+                Arguments.PushString ( szKickReason );
             else
                 Arguments.PushBoolean ( false );
             //Arguments.PushUserData ( strResponsiblePlayer != "Console" ? m_pPlayerManager->Get ( strResponsiblePlayer, true ) : static_cast < CConsoleClient* > (m_pConsoleClient) );
-            if (strResponsiblePlayer == "Console") 
+            if ( strcmp ( szResponsiblePlayer, "Console" ) == 0 )
                 Arguments.PushElement ( m_pConsoleClient );
             else
-                Arguments.PushElement ( m_pPlayerManager->Get ( strResponsiblePlayer, true ) );
+                Arguments.PushElement ( m_pPlayerManager->Get ( szResponsiblePlayer, true ) );
         }
-        else 
+        else
         {
             Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( false );
@@ -1130,7 +1130,7 @@ void CGame::AddBuiltInEvents ( void )
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
     m_Events.AddEvent ( "onPedWeaponSwitch", "previous, current", NULL, false );
-    
+
     // Element events
     m_Events.AddEvent ( "onElementColShapeHit", "colshape, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onElementColShapeLeave", "colshape, matchingDimension", NULL, false );
@@ -1386,7 +1386,7 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
             else Arguments.PushBoolean ( false );
             if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
             else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( false ); 
+            Arguments.PushBoolean ( false );
             pPed->CallEvent ( "onPedWasted", Arguments );
         }
     }
@@ -1422,7 +1422,7 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
             else Arguments.PushBoolean ( false );
             if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
             else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( false ); 
+            Arguments.PushBoolean ( false );
             pPlayer->CallEvent ( "onPlayerWasted", Arguments );
         }
     }
@@ -1493,7 +1493,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
             }
 
             // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );  
+            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
         }
     }
 }
@@ -1578,7 +1578,7 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
 
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );  
+            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
         }
     }
 }
@@ -1711,7 +1711,7 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                 switch ( pOrigin->GetType () )
                 {
                     case CElement::PLAYER:
-                    {    
+                    {
                         // Correct our position vector
                         CVehicle * pVehicle = static_cast < CPlayer * > ( pOrigin )->GetOccupiedVehicle ();
                         if ( pVehicle )
@@ -1843,7 +1843,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
             // Spawned?
             if ( pPlayer->IsSpawned () )
-            {      
+            {
                 CElement* pVehicleElement = CElementIDs::GetElement ( ID );
                 if ( pVehicleElement && IS_VEHICLE ( pVehicleElement ) )
                 {
@@ -1878,7 +1878,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 {
                                     // He musn't already be in a vehicle
                                     if ( !pPlayer->GetOccupiedVehicle () )
-                                    {  
+                                    {
                                         float fCutoffDistance = 50.0f;
                                         bool bWarpIn = false;
                                         // Jax: is he in water and trying to get in a floating vehicle
@@ -1909,12 +1909,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                             // Going for driver?
                                             if ( ucSeat == 0 )
                                             {
-                                                // Does it already have an occupant/occupying?                                                
+                                                // Does it already have an occupant/occupying?
                                                 if ( !pOccupant )
                                                 {
                                                     // Mark him as entering the vehicle
                                                     pPlayer->SetOccupiedVehicle ( pVehicle, 0 );
-                                                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );                                        
+                                                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_ENTERING );
 
                                                     // Call the entering vehicle event
                                                     CLuaArguments Arguments;
@@ -1922,7 +1922,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     Arguments.PushNumber ( 0 );             // seat
                                                     Arguments.PushBoolean ( false );        // jacked
                                                     Arguments.PushNumber ( ucDoor );        // Door
-                                                    if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) )   
+                                                    if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) )
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
                                                         if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_ENTERING )
@@ -1939,7 +1939,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 // Tell everyone he can start entering the vehicle from his current position
                                                                 CVehicleInOutPacket Reply ( ID, 0, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
                                                                 Reply.SetSourceElement ( pPlayer );
-                                                                m_pPlayerManager->BroadcastOnlyJoined ( Reply );                                                                
+                                                                m_pPlayerManager->BroadcastOnlyJoined ( Reply );
                                                             }
                                                             bFailed = false;
                                                         }
@@ -1963,7 +1963,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         pPlayer->SetJackingVehicle ( pVehicle );
                                                         pVehicle->SetJackingPlayer ( pPlayer );
                                                         pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKED );
-                                                                                                               
+
                                                         // Call the entering vehicle event
                                                         CLuaArguments EnterArguments;
                                                         EnterArguments.PushElement ( pPlayer );     // player
@@ -1974,7 +1974,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         {
                                                             // HACK?: check the player's vehicle-action is still the same (not warped in?)
                                                             if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
-                                                            { 
+                                                            {
                                                                 // Call the exiting vehicle event
                                                                 CLuaArguments ExitArguments;
                                                                 ExitArguments.PushElement ( pOccupant );       // player
@@ -1984,8 +1984,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 {
                                                                     // HACK?: check the player's vehicle-action is still the same (not warped out?)
                                                                     if ( pOccupant->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKED )
-                                                                    { 
-                                                                        /* Jax: we don't need to worry about a syncer if we already have and will have a driver 
+                                                                    {
+                                                                        /* Jax: we don't need to worry about a syncer if we already have and will have a driver
                                                                         // Force the player as the syncer of the vehicle to which they are entering
                                                                         m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
                                                                         */
@@ -2005,7 +2005,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                             pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                                             pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                                             failReason = FAIL_SCRIPT_2;
-                                                        }                                                            
+                                                        }
                                                     }
                                                     else
                                                         failReason = FAIL_JACKED_ACTION;
@@ -2015,7 +2015,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                             {
                                                 CPed* pCurrentOccupant = pVehicle->GetOccupant ( ucSeat );
                                                 if ( pCurrentOccupant || ucSeat > pVehicle->GetMaxPassengers () )
-                                                {                                                    
+                                                {
                                                     // Grab a free passenger spot in the vehicle
                                                     ucSeat = pVehicle->GetFreePassengerSeat ();
                                                 }
@@ -2035,7 +2035,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     {
                                                         // HACK?: check the player's vehicle-action is still the same (not warped in?)
                                                         if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_ENTERING )
-                                                        {                        
+                                                        {
                                                             if ( bWarpIn )
                                                             {
                                                                 CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat );
@@ -2408,7 +2408,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     pVehicle->CallEvent ( "onVehicleEnter", Arguments2 );
                                 }
                             }
-                            
+
                             break;
                         }
 
@@ -2442,7 +2442,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         // No driver in this vehicle
                                         pVehicle->SetOccupant ( NULL, 0 );
 
-                                        // Tell everyone to get the jacked person out 
+                                        // Tell everyone to get the jacked person out
                                         CVehicleInOutPacket JackedReply ( ID, 0, VEHICLE_NOTIFY_OUT_RETURN );
                                         JackedReply.SetSourceElement ( pJacked );
                                         m_pPlayerManager->BroadcastOnlyJoined ( JackedReply );
@@ -2592,7 +2592,7 @@ void CGame::Packet_VehicleTrailer ( CVehicleTrailerPacket& Packet )
 
 
 void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
-{ 
+{
 #ifdef MTA_VOICE
     unsigned short usDataLength = 0;
     char szNick [ 256 ];
@@ -2610,8 +2610,8 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
 				szNick[255] = '\0';
 
                 // Pass the packet to the voice server.
-                if (!m_pVoiceServer->DecodeAndQueuePacket ( pPlayer->GetID(), 
-                                                    Packet.GetData ( ), 
+                if (!m_pVoiceServer->DecodeAndQueuePacket ( pPlayer->GetID(),
+                                                    Packet.GetData ( ),
                                                     usDataLength ))
                 {
                     CLogger::LogPrint("Couldn't decode vox packet");
@@ -2632,25 +2632,25 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         if ( Packet.m_bFixed )
-        {    
+        {
             pCamera->SetMode ( CAMERAMODE_FIXED );
             pCamera->SetPosition ( Packet.m_vecPosition );
             pCamera->SetLookAt ( Packet.m_vecLookAt );
         }
         else
-        {        
+        {
             CElement * pTarget = CElementIDs::GetElement ( Packet.m_TargetID );
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             if ( pTarget )
                 pCamera->SetTarget ( pTarget );
             else
-               CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" ); 
+               CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
         }
     }
 }
 
 
-void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, char* szError )
+void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
 	if ( bSuccess )
 	{

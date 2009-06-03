@@ -21,7 +21,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::detachElements );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
-    
+
 
     // Create/destroy
     CLuaCFunctions::AddFunction ( "createElement", CLuaElementDefs::createElement );
@@ -31,7 +31,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     // Get
     CLuaCFunctions::AddFunction ( "isElement", CLuaElementDefs::isElement );
     CLuaCFunctions::AddFunction ( "isElementWithinColShape", CLuaElementDefs::isElementWithinColShape );
-    CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaElementDefs::isElementWithinMarker );  
+    CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaElementDefs::isElementWithinMarker );
     CLuaCFunctions::AddFunction ( "isElementInWater", CLuaElementDefs::isElementInWater );
 
     CLuaCFunctions::AddFunction ( "getElementByID", CLuaElementDefs::getElementByID );
@@ -184,7 +184,7 @@ int CLuaElementDefs::cloneElement ( lua_State* luaVM )
                     if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
                     {
                         vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-                        
+
                         if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
                         {
                             bCloneChildren = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
@@ -570,7 +570,7 @@ int CLuaElementDefs::getElementsByType ( lua_State* luaVM )
     if ( pLuaMain )
     {
         int iArgument2 = lua_type ( luaVM, 2 );
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && 
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING &&
             ( iArgument2 == LUA_TNONE || iArgument2 == LUA_TLIGHTUSERDATA ) )
         {
             // see if a root argument has been specified
@@ -701,7 +701,7 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
     // Grab our VM
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
-    {     
+    {
         if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
         {
             const char* szType = NULL;
@@ -827,7 +827,6 @@ int CLuaElementDefs::getElementAttachedTo ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
-        CElement* pElementAttachedTo = NULL;
 
         if ( pElement )
         {
@@ -848,7 +847,7 @@ int CLuaElementDefs::getElementAttachedTo ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getElementAttached" );
-    
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -911,7 +910,7 @@ int CLuaElementDefs::getElementColShape ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getElementColShape" );
-    
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -1148,7 +1147,7 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
             CLuaArgument Variable;
             if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN && lua_type ( luaVM, 4 ) != LUA_TNONE )
             {
-                bSynchronize = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;            
+                bSynchronize = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
                 Variable.Read ( luaVM, 4 );
             }
             else
@@ -1327,7 +1326,7 @@ int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA && 
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA &&
 		 lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
@@ -1337,7 +1336,7 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
             if ( pReference )
             {
 				if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, lua_toboolean ( luaVM, 3 ) ? true:false ) )
-				{				
+				{
 					lua_pushboolean ( luaVM, true );
 					return 1;
 				}
@@ -1435,8 +1434,6 @@ int CLuaElementDefs::attachElements ( lua_State* luaVM )
         CVector vecPosition, vecRotation;
 
         int iArgument3 = lua_type ( luaVM, 3 );
-        int iArgument4 = lua_type ( luaVM, 4 );
-        int iArgument5 = lua_type ( luaVM, 5 );
         if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
         {
             vecPosition.fX = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
@@ -1502,7 +1499,7 @@ int CLuaElementDefs::detachElements ( lua_State* luaVM )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         CElement* pAttachedToElement = NULL;
-       
+
         if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
         {
             pAttachedToElement = lua_toelement ( luaVM, 2 );

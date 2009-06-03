@@ -121,7 +121,7 @@ void CResourceHTMLItem::ClearPageBuffer ( )
 	m_strPageBuffer.clear ();
 }
 
-void CResourceHTMLItem::SetResponseHeader ( char * szHeaderName, char * szHeaderValue )
+void CResourceHTMLItem::SetResponseHeader ( const char* szHeaderName, const char* szHeaderValue )
 {
 	m_currentResponse->oResponseHeaders [ szHeaderName ] = szHeaderValue;
 }
@@ -131,7 +131,7 @@ void CResourceHTMLItem::SetResponseCode	( int responseCode )
 	m_responseCode = (ResponseCode)responseCode;
 }
 
-void CResourceHTMLItem::SetResponseCookie ( char * szCookieName, char * szCookieValue )
+void CResourceHTMLItem::SetResponseCookie ( const char* szCookieName, const char* szCookieValue )
 {
 	CookieParameters params;
 	Datum data;
@@ -167,9 +167,9 @@ bool CResourceHTMLItem::Start ( void )
         while ( !feof ( pFile ) )
         {
             c = ReadChar ( pFile );
-            if ( feof ( pFile ) ) 
+            if ( feof ( pFile ) )
                 break;
-            
+
             if ( bInCode == false ) // we're in a plain HTML section
             {
                 if ( c == '<' && !feof ( pFile ) )
@@ -208,8 +208,8 @@ bool CResourceHTMLItem::Start ( void )
                     else
                         strScript += c;
                 }
-            } 
-            else 
+            }
+            else
             {   // we're in a code block
                 if ( c == '*' && !feof ( pFile ) )
                 {

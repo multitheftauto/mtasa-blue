@@ -23,7 +23,7 @@ CHTTPD::CHTTPD ( void )
     m_bStartedServer = false;
 
     m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, "http_guest" );
-}   
+}
 
 
 CHTTPD::~CHTTPD ()
@@ -41,7 +41,7 @@ CHTTPD::~CHTTPD ()
         Sleep ( 1000 );
     }
 }
-    
+
 void CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 {
     // Server not already started?
@@ -81,7 +81,7 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
 {
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
-    if ( account ) 
+    if ( account )
     {
         if ( !m_strDefaultResourceName.empty () )
         {
@@ -100,7 +100,7 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
 												  CAccessControlListGroupObject::OBJECT_TYPE_USER,
 												  m_szDefaultResourceName,
 												  CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-												  true ) && 
+												  true ) &&
                 pACLManager->CanObjectUseRight ( szAccountName,
 												 CAccessControlListGroupObject::OBJECT_TYPE_USER,
 												 "http",
@@ -134,7 +134,7 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
 }
 
 ResponseCode CHTTPD::RequestLogin ( HttpResponse * ipoHttpResponse )
-{    
+{
     char szAuthenticateMessage[512];
     sprintf ( szAuthenticateMessage, "Access denied, please login" );
     ipoHttpResponse->SetBody ( szAuthenticateMessage, strlen(szAuthenticateMessage) );
@@ -154,9 +154,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
             // Basic auth
             std::string strAuthDecoded;
             Base64::decode ( authorization.substr(6), strAuthDecoded );
- 
-            const char * szAuthName = NULL;
-            const char * szAuthPassword = NULL;
+
             string authName;
             string authPassword;
             for ( size_t i = 0; i < strAuthDecoded.length(); i++ )

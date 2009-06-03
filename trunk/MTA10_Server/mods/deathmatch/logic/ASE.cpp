@@ -297,7 +297,7 @@ void ASE::SetMapName ( const char * szMapName )
 }
 
 
-char* ASE::GetRuleValue ( char* szKey )
+const char* ASE::GetRuleValue ( const char* szKey )
 {
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
@@ -311,7 +311,7 @@ char* ASE::GetRuleValue ( char* szKey )
 }
 
 
-void ASE::SetRuleValue ( char* szKey, char* szValue )
+void ASE::SetRuleValue ( const char* szKey, const char* szValue )
 {
     if ( szKey && szKey [ 0 ] )
     {
@@ -340,7 +340,7 @@ void ASE::SetRuleValue ( char* szKey, char* szValue )
 }
 
 
-bool ASE::RemoveRuleValue ( char* szKey )
+bool ASE::RemoveRuleValue ( const char* szKey )
 {
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
