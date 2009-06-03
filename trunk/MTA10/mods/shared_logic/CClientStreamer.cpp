@@ -52,12 +52,26 @@ namespace
 	    return fDistSq;
     }
 
+    void* pAddingElement = NULL;
 
     // First draft. Works, but is not optimized.
     float GetElementStreamDistanceSquared ( CClientStreamElement* pElement, const CVector& vecPosition )
     {
-        CVector vecDif = pElement->GetStreamPosition () - vecPosition;
-        return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
+        // Do a simple calculation if the element is newly added ( hack/fix for CClientSteamer::AddElement being called in the CClientStreamElement constructor )
+        if ( pElement == pAddingElement )
+        {
+            CVector vecDif = pElement->GetStreamPosition () - vecPosition;
+            return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
+        }
+
+        // Do a simple calculation if the element has a small radius
+        float fRadius  = 0;
+        CStaticFunctionDefinitions::GetElementRadius ( *pElement, fRadius );
+        if ( fRadius < 20 )
+        {
+            CVector vecDif = pElement->GetStreamPosition () - vecPosition;
+            return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
+        }
 
         // Get bounding box extents
         CVector vecMin;
@@ -362,10 +376,13 @@ void CClientStreamer::OnUpdateStreamPosition ( CClientStreamElement * pElement )
 
 void CClientStreamer::AddElement ( CClientStreamElement * pElement )
 {
+    assert ( pAddingElement == NULL );
+    pAddingElement = pElement;
     CVector vecPosition = pElement->GetStreamPosition ();
     CClientStreamSectorRow * pRow = FindOrCreateRow ( vecPosition );
     pElement->SetStreamRow ( pRow );
     OnElementEnterSector ( pElement, pRow->FindOrCreateSector ( vecPosition ) );
+    pAddingElement = NULL;
 }
 
 
