@@ -32,7 +32,7 @@ struct SFloatSync : public ISyncStructure
     bool Read ( NetBitStreamInterface& bitStream )
     {
         SFixedPointNumber num;
-        if ( bitStream.ReadBits ( &num, integerBits + fractionalBits ) )
+        if ( bitStream.ReadBits ( (char *)&num, integerBits + fractionalBits ) )
         {
             data.fValue = (float)( (double)num.iValue / ( 1 << fractionalBits ) );
             return true;
@@ -59,7 +59,7 @@ struct SFloatSync : public ISyncStructure
         SFixedPointNumber num;
         num.iValue = (int)( dValue * (double)( 1 << fractionalBits ));
 
-        bitStream.WriteBits ( &num, integerBits + fractionalBits );
+        bitStream.WriteBits ( (const char* )&num, integerBits + fractionalBits );
     }
 
     struct
@@ -202,11 +202,11 @@ struct SPlayerPuresyncFlags : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( &data, BITCOUNT );
+        return bitStream.ReadBits ( (char *)&data, BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, BITCOUNT );
+        bitStream.WriteBits ( (const char* )&data, BITCOUNT );
     }
 
     struct
@@ -266,7 +266,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         if ( bitStream.ReadCompressed ( data.vehicleID ) &&
              bitStream.Read ( data.ucTimeContext ) &&
-             bitStream.ReadBits ( &data, 8 ) )
+             bitStream.ReadBits ( (char *)&data, 8 ) )
         {
             if ( data.bSyncPosition )
             {
@@ -315,7 +315,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         bitStream.WriteCompressed ( data.vehicleID );
         bitStream.Write ( data.ucTimeContext );
-        bitStream.WriteBits ( &data, 8 );
+        bitStream.WriteBits ( (const char* )&data, 8 );
 
         if ( data.bSyncPosition )
         {
@@ -391,11 +391,11 @@ struct SKeysyncFlags : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( &data, BITCOUNT );
+        return bitStream.ReadBits ( (char *)&data, BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, BITCOUNT );
+        bitStream.WriteBits ( (const char* )&data, BITCOUNT );
     }
 
     struct
@@ -417,7 +417,7 @@ struct SFullKeysyncSync : public ISyncStructure
         char cLeftStickX;
         char cLeftStickY;
 
-        if ( ( bState = bitStream.ReadBits ( &data, 8 ) ) )
+        if ( ( bState = bitStream.ReadBits ( (char *)&data, 8 ) ) )
         {
             if ( ( bState = bitStream.Read ( cLeftStickX ) ) )
             {
@@ -431,7 +431,7 @@ struct SFullKeysyncSync : public ISyncStructure
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, 8 );
+        bitStream.WriteBits ( (const char* )&data, 8 );
         char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
         bitStream.Write ( cLeftStickX );
         char cLeftStickY = static_cast < char > ( (float)data.sLeftStickY * 127.0f/128.0f );
@@ -464,7 +464,7 @@ struct SSmallKeysyncSync : public ISyncStructure
         char cLeftStickX;
         char cLeftStickY;
 
-        if ( ( bState = bitStream.ReadBits ( &data, 10 ) ) )
+        if ( ( bState = bitStream.ReadBits ( (char *)&data, 10 ) ) )
         {
             if ( data.bLeftStickXChanged && ( bState = bitStream.Read ( cLeftStickX ) ) )
                 data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
@@ -476,7 +476,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, 10 );
+        bitStream.WriteBits ( (const char* )&data, 10 );
         if ( data.bLeftStickXChanged )
         {
             char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
@@ -550,11 +550,11 @@ struct SWeaponSlotSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( &data, BITCOUNT );
+        return bitStream.ReadBits ( (char *)&data, BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, BITCOUNT );
+        bitStream.WriteBits ( (const char* )&data, BITCOUNT );
     }
 
     struct
@@ -569,11 +569,11 @@ struct SWeaponTypeSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( &data, BITCOUNT );
+        return bitStream.ReadBits ( (char *)&data, BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, BITCOUNT );
+        bitStream.WriteBits ( (const char* )&data, BITCOUNT );
     }
 
     struct
@@ -602,12 +602,12 @@ struct SAmmoInClipSync : public IAmmoInClipSync
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( &data, bitCount );
+        return bitStream.ReadBits ( (char *)&data, bitCount );
     }
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( &data, bitCount );
+        bitStream.WriteBits ( (const char* )&data, bitCount );
     }
 
     unsigned short GetAmmoInClip () const
@@ -827,7 +827,7 @@ struct SBodypartSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        bool bStatus = bitStream.ReadBits ( &data, BITCOUNT );
+        bool bStatus = bitStream.ReadBits ( (char *)&data, BITCOUNT );
         if ( bStatus )
             data.uiBodypart += 3;
         else
@@ -844,7 +844,7 @@ struct SBodypartSync : public ISyncStructure
         // Bodyparts go from 3 to 9, so substracting 3 from the value
         // and then restoring it will save 1 bit.
         privateData.uiBodypart = data.uiBodypart - 3;
-        bitStream.WriteBits ( &privateData, BITCOUNT );
+        bitStream.WriteBits ( (const char* )&privateData, BITCOUNT );
     }
 
     struct

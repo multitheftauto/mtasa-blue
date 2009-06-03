@@ -11,6 +11,7 @@
 #include <list>
 #include <string>
 #include <sstream>
+#include <string.h>
 
 #include <assert.h>
 

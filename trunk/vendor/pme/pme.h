@@ -24,7 +24,7 @@
 #include <vector>
 
 #include <stdio.h>
-
+#include <string.h>
 using namespace std;
 
 #include <pcre.h>

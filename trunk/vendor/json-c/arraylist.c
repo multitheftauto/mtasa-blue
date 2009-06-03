@@ -56,13 +56,13 @@ array_list_get_idx(struct array_list *this, int i)
   return this->array[i];
 }
 
-static int array_list_expand_internal(struct array_list *this, int max)
+static int array_list_expand_internal(struct array_list *this, int _max)
 {
   void *t;
   int new_size;
 
-  if(max < this->size) return 0;
-  new_size = max(this->size << 1, max);
+  if(_max < this->size) return 0;
+  new_size = max(this->size << 1, _max);
   if(!(t = realloc(this->array, new_size*sizeof(void*)))) return -1;
   this->array = t;
   (void)memset(this->array + this->size, 0, (new_size-this->size)*sizeof(void*));
