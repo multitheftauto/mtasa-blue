@@ -40,14 +40,14 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
             g_pGame->GetResourceDownloader()->FindUpdates ( szResourceName, 0, 0, 0, 0, &resourcelist );
             char szText[512];
             if ( resourcelist.size() == 1 )
-                _snprintf ( szText, 511, "    %s (1 version)", (*iter)->GetName() );
+                _snprintf ( szText, 511, "    %s (1 version)", (*iter)->GetName().c_str () );
             else
-                _snprintf ( szText, 511, "    %s (%d versions)", (*iter)->GetName(), resourcelist.size() );
+                _snprintf ( szText, 511, "    %s (%d versions)", (*iter)->GetName().c_str (), resourcelist.size() );
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
         }
     }
-    else if ( szResourceName != NULL && szVersion == NULL ) 
+    else if ( szResourceName != NULL && szVersion == NULL )
     {
         CResource * existingResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
         int currentVersionMajor = 0, currentVersionMinor = 0, currentVersionRevision = 0, currentVersionState = 0;
@@ -63,7 +63,6 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
         g_pGame->GetResourceDownloader()->FindUpdates ( szResourceName, 0, 0, 0, 0, &resourcelist );
         if ( resourcelist.size() != 0 )
         {
-            CUpdateResourceVersion * latest = g_pGame->GetResourceDownloader()->GetLatestVersion ( szResourceName, 2 );
             list < CUpdateResourceVersion* > ::iterator iter = resourcelist.begin ();
             char szText[512];
             _snprintf ( szText, 511, "Updates for %s", szResourceName );
@@ -94,12 +93,12 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 }
 
                 _snprintf ( szText, 511, "%s  %-10.10s  %-10.10s %-30.30s", szIsCurrent, szVersion, szStateName, strDomain.c_str () );
-             
+
                 szText[511] = '\0';
                 pEchoClient->SendConsole ( szText );
             }
             _snprintf ( szText, 511, "To install, run: update %s X.Y.Z [release state]", szResourceName );
-            
+
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
         }
@@ -374,7 +373,7 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
                 }
             }
         }
-        else 
+        else
         {
             char szNewURL[250];
             szNewURL[249] = '\0';
@@ -452,8 +451,8 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
 
                                 // Broadcast the message to all clients
                                 pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( szEcho, ucR, ucG, ucB, true ) );
-                            }                           
-                            
+                            }
+
                             break;
                         }
                         case CClient::CLIENT_REMOTECLIENT:
@@ -732,7 +731,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                             if ( szNick )
                             {
                                 // Populate the message to the player
-                                char szMsg[256]; 
+                                char szMsg[256];
                                 szMsg[0] = '\0';
 
                                 _snprintf ( szMsg, 256, "* PM from %s: %s", szNick, szMessage );
@@ -880,7 +879,7 @@ bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szArguments, CClie
                                 // Populate the response to the player
                                 char szMsg[256];
                                 szMsg[0] = '\0';
-                                
+
                                 sprintf ( szMsg, "amsg: Message sent to all Admin's named '%s'", szAdmin );
                                 szMsg[255] = '\0';
 
@@ -971,7 +970,7 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
 
                     // Log it in the console
                     CLogger::LogPrintf ( "CHAT: %s\n", szEcho );
-                    
+
                     // Send the chat message and player pointer to the script IF the client is a player
                     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
                     {
@@ -1032,10 +1031,10 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                         if ( !szNick || strcmp ( szNewNick, szNick ) != 0 )
                         {
                             // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a different case)
-                            if ( szNick && stricmp ( szNick, szNewNick ) == 0 || !pConsole->GetPlayerManager ()->Get ( szNewNick ) )
+                            if ( (szNick && stricmp ( szNick, szNewNick ) == 0) || !pConsole->GetPlayerManager ()->Get ( szNewNick ) )
                             {
 							    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-    							
+
 							    // Call the event
                                 CLuaArguments Arguments;
 							    Arguments.PushString ( pClient->GetNick () );
@@ -1044,10 +1043,10 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
 							    {
 								    // Tell the console
 								    CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );
-    	
+
 								    // Change the nick
 								    pPlayer->SetNick ( szNewNick );
-    	
+
 								    // Tell all ingame players about the nick change
 								    CPlayerChangeNickPacket Packet ( szNewNick );
 								    Packet.SetSourceElement ( pPlayer );
@@ -1055,7 +1054,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
 
 								    return true;
 							    }
-							    else 
+							    else
 								    return false;
                             }
                             else
@@ -1200,7 +1199,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                         {
                             // Set the new password
                             pAccount->SetPassword ( szNewPassword );
-                            
+
                             // Tell the client
                             char szMessage [128];
                             szMessage[0] = '\0';
@@ -1277,7 +1276,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                 {
                     CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
 					pAccount->SetPassword ( szPassword );
-                        
+
                     // Tell the user
                     char szMessage [128];
                     szMessage[0] = '\0';
@@ -1398,7 +1397,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
             {
                 // Set the new password
                 pAccount->SetPassword ( szPassword );
-                        
+
                 // Tell the client
                 char szMessage [128];
                 szMessage[0] = '\0';
@@ -1686,7 +1685,7 @@ bool CConsoleCommands::DebugScript ( CConsole* pConsole, const char* szArguments
 
                     pEchoClient->SendEcho ( szBuffer );
                     CLogger::LogPrintf ( "SCRIPT: %s set his script debug mode to %i\n", pClient->GetNick (), iLevel );
-                
+
                     // Enable/Disable their debugger
                     if ( iLevel == 0 )
                         CStaticFunctionDefinitions::SetPlayerDebuggerVisible ( pPlayer, false );

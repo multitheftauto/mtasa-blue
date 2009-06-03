@@ -57,7 +57,7 @@ CResourceManager::~CResourceManager ( void )
 // Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
 bool CResourceManager::Refresh ( bool bRefreshAll )
 {
-    
+
     char szBuffer [MAX_PATH];
 
     unsigned int uiCount = 0;
@@ -85,14 +85,14 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                         FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
                     }
 
-                    CResource* pResource = GetResource  ( FindData.cFileName );
+                    CResource* pResource = GetResource ( FindData.cFileName );
 
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                         ( bRefreshAll || 
+                         ( bRefreshAll ||
                            !pResource ||
-                           !pResource->CheckIfStartable()       
+                           !pResource->CheckIfStartable()
                           )
-                        ) 
+                        )
                     {
                         // Add the resource
                         Load ( FindData.cFileName );
@@ -128,7 +128,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     #else
         DIR *Dir;
 		struct dirent *DirEntry;
-		time_t llHighestTime = 0;
 		char szPath[MAX_PATH] = {0};
 
 		if ( ( Dir = opendir ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/", szBuffer, MAX_PATH ) ) ) )
@@ -136,7 +135,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
 			{
                 // Skip . and .. entry
-                if ( strcmp ( DirEntry->d_name, "." ) != 0 && 
+                if ( strcmp ( DirEntry->d_name, "." ) != 0 &&
                      strcmp ( DirEntry->d_name, ".." ) != 0 )
                 {
 				    struct stat Info;
@@ -165,12 +164,16 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
 					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
 				        }
+
+				        CResource* pResource = GetResource ( DirEntry->d_name );
+
 						if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-							 ( bRefreshAll || 
+							 ( bRefreshAll ||
 							   !pResource ||
-							   !pResource->CheckIfStartable()       
+							   !pResource->CheckIfStartable()
 							  )
-							) 
+							)
+                        {
                             // Add the resource
                             Load ( DirEntry->d_name );
 
@@ -309,7 +312,7 @@ void CResourceManager::UnloadRemovedResources ( void )
         delete *iter;
     }
 
-                
+
 }
 
 void CResourceManager::Unload ( CResource * resource )
@@ -368,7 +371,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
 
         m_bResourceListChanged = true;
     }
-                   
+
     loadedResource = new CResource ( this, szResourceName );
     if ( !loadedResource->IsLoaded() )
     {
@@ -458,7 +461,7 @@ bool CResourceManager::Exists ( CResource* pResource )
             if ( res->IsActive() )
             {
                 sprintf ( szTemp, "<tr><td>%s</td><td>RUNNING</td><td>%d dependents</td></tr>", szLink, res->GetDependentCount() );
-                
+
                 uiRunningCount++;
             }
             else
@@ -486,7 +489,7 @@ unsigned short CResourceManager::GenerateID ( void )
 		list < CResource* > ::iterator iter = m_resources.begin ();
 		for ( ; iter != m_resources.end (); iter++ )
 		{
-			if ( ( *iter )->GetID () == i ) 
+			if ( ( *iter )->GetID () == i )
                 bMatch = true;
 
 		}
@@ -561,7 +564,7 @@ bool CResourceManager::StartResource ( CResource* pResource, list < CResource* >
     // Has resurce changed since load?
     if ( pResource->HasResourceChanged() )
     {
-        // Attempt to reload it 
+        // Attempt to reload it
         if ( Reload ( pResource ) )
         {
             // Start the resource
@@ -745,7 +748,7 @@ void CResourceManager::ProcessQueue ( void )
                     }
 					else
 						CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
-					
+
                 }
                 else
                     CLogger::ErrorPrintf ( "Unable to stop resource %s for restart\n", sItem.pResource->GetName ().c_str () );
@@ -770,7 +773,7 @@ void CResourceManager::RemoveFromQueue ( CResource* pResource )
 }
 
 
-bool CResourceManager::Install ( char * szURL, char * szName ) 
+bool CResourceManager::Install ( char * szURL, char * szName )
 {
     if ( IsValidFilePath(szName) )
     {
@@ -795,7 +798,7 @@ bool CResourceManager::Install ( char * szURL, char * szName )
 
 
                 FILE * file = fopen ( szResourceFileName, "wb" );
-                if ( file ) 
+                if ( file )
                 {
                     fwrite ( szBuffer, dataLength, 1, file );
                     fclose ( file );

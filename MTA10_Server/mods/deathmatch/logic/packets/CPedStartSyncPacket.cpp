@@ -19,7 +19,6 @@ bool CPedStartSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_pPed->GetID () );
 
     CVector vecTemp;
-    float fTemp = 0.0f;
 
     vecTemp = m_pPed->GetPosition ();
     BitStream.Write ( vecTemp.fX );

@@ -19,6 +19,23 @@ class CLuaCFunctions;
 
 #include "LuaCommon.h"
 
+#ifndef WIN32
+    // gcc's hash(), used in the google hash maps, does not support pointers by default.
+    // Also gcc refuses to implicitly cast function pointers to void*... so we
+    // need a special case.
+    namespace __gnu_cxx
+    {
+        template <>
+        struct hash < lua_CFunction >
+        {
+            size_t operator()( lua_CFunction const& pFunc ) const
+            {
+                return (size_t)pFunc;
+            }
+        };
+    }
+#endif
+
 class CLuaCFunction
 {
 public:

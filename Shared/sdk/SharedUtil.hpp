@@ -28,7 +28,7 @@ SString SharedUtil::GetMTASABaseDir()
         HKEY hkey = NULL;
         DWORD dwBufferSize = MAX_PATH;
         DWORD dwType = 0;
-        if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
+        if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS )
         {
             // Read out the MTA installpath
             if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
@@ -65,10 +65,10 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 // GetTickCount64() exists on Vista and up and is like GetTickCount() except it returns
 // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
 // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
-// 
+//
 long long SharedUtil::GetTickCount64_ ( void )
 {
-    static LONG lHightPart = 0;
+    static long lHightPart = 0;
     static DWORD dwWas = GetTickCount ();
     DWORD dwNow = GetTickCount ();
     DWORD dwDelta = dwNow - dwWas;

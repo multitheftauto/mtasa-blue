@@ -89,18 +89,18 @@ bool CAccountManager::Load ( CXMLNode* pParent )
             pAccountNode = pParent->GetSubNode ( i );
             if ( pAccountNode == NULL )
                 continue;
-            
+
             strBuffer = pAccountNode->GetTagName ();
             if ( strBuffer.compare ( "account" ) == 0 )
             {
                 CXMLAttribute* pAttribute = pAccountNode->GetAttributes ().Find ( "name" );
                 if ( pAttribute )
-                {                    
+                {
                     strName = pAttribute->GetValue ();
 
                     pAttribute = pAccountNode->GetAttributes ().Find ( "password" );
                     if ( pAttribute )
-                    {                        
+                    {
                         strPassword = pAttribute->GetValue ();
                         if ( !strName.empty () && !strPassword.empty () )
                         {
@@ -109,7 +109,6 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                             {
                                 strIP = pAttribute->GetValue ();
 								CAccount* pAccount = NULL;
-								char szSerial [ 128 ] = { 0 };
 								pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
 								if ( pAttribute )
 								{
@@ -119,7 +118,7 @@ bool CAccountManager::Load ( CXMLNode* pParent )
 								{
 	                                pAccount = new CAccount ( this, true, strName, strPassword, strIP );
 								}
-                            
+
                                 // Grab the data on this account
                                 CXMLNode* pDataNode = NULL;
                                 unsigned int uiDataNodesCount = pAccountNode->GetSubNodeCount ();
@@ -195,7 +194,7 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                                             pAttribute = pAttributes->Get ( a );
                                             strDataKey = pAttribute->GetName ();
                                             strDataValue = pAttribute->GetValue ();
-                                            
+
                                             CLuaArgument Argument ( strtod ( strDataValue.c_str (), NULL ) );
                                             pAccount->SetData ( strDataKey.c_str (), &Argument );
                                         }
@@ -205,12 +204,11 @@ bool CAccountManager::Load ( CXMLNode* pParent )
 							else
 							{
 								CAccount* pAccount = NULL;
-								char szSerial [ 128 ] = { 0 };
 								pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
 								if ( pAttribute )
 								{
 									pAccount = new CAccount ( this, true, strName, strPassword, NULL, pAttribute->GetValue () );
-								}    
+								}
 								else
 								{
 									pAccount = new CAccount ( this, true, strName, strPassword );
@@ -262,7 +260,7 @@ bool CAccountManager::Save ( const char* szFileName )
 
     if ( szFileName == NULL || szFileName [ 0 ] == 0 )
         return false;
-    
+
     FILE* pFile = fopen ( szFileName, "w+" );
     if ( pFile == NULL )
         return false;
@@ -291,7 +289,7 @@ bool CAccountManager::Save ( const char* szFileName )
         m_pFile = NULL;
         return false;
     }
-    
+
     m_pFile->Write ();
     delete m_pFile;
     m_pFile = NULL;
@@ -375,7 +373,7 @@ bool CAccountManager::Save ( CXMLNode* pParent )
                             // Create a node for this type of data
                             pDataNode = pNode->CreateSubNode ( "nil_data" );
                             if ( pDataNode )
-                            {                                
+                            {
                                 iterData = pDataList->begin ();
                                 for ( ; iterData != pDataList->end (); iterData++ )
                                 {
@@ -657,7 +655,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         else
             pEchoClient->SendEcho ( "login: You successfully logged in" );
     }
-    
+
     // Delete the old account if it was a guest account
     if ( !pCurrentAccount->IsRegistered () )
         delete pCurrentAccount;
@@ -720,6 +718,6 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
     // Tell the player
     if ( pEchoClient )
         pEchoClient->SendEcho ( "logout: You logged out" );
-    
+
     return true;
 }

@@ -15,8 +15,7 @@
 CConfig::CConfig ( const char* szFileName )
 {
     // Set the file name
-    m_szFileName = new char [ strlen ( szFileName ) + 1 ];
-	strcpy ( m_szFileName, szFileName );
+    m_strFileName = szFileName;
 
     // Set the pointer to the file
 	m_fp = fopen ( szFileName, "r" );
@@ -30,9 +29,6 @@ CConfig::~CConfig ()
     {
 	    fclose ( m_fp );
     }
-
-    // Delete the filename
-    delete [] m_szFileName;
 }
 
 
@@ -40,7 +36,7 @@ bool CConfig::GetEntry ( char* szEntry, char* szReturnText, int iInstance )
 {
 	char szTemp[256];
 	memset ( szTemp, '\0', 256 );
-	
+
     // If the file exists
     if ( m_fp ) {
 		char szInput[256];
@@ -116,7 +112,7 @@ bool CConfig::GetEntry ( char* szEntry, char* szReturnText, int iInstance )
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
 	return false;
 }
@@ -189,7 +185,7 @@ void CConfig::GetPreviousEntry ( char* szEntry, char* szReturnText, int iInstanc
     else
     {
         // Print the file error
-        perror( m_szFileName );
+        perror( m_strFileName.c_str () );
     }
 }
 
@@ -216,7 +212,7 @@ int CConfig::GetNumberOfLines ()
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
     // Return the number of lines found
 	return iLines;
@@ -248,7 +244,7 @@ int CConfig::GetNumberOfEntries ()
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
     // Return the number of entries
 	return iEntries;
@@ -267,7 +263,7 @@ int CConfig::GetNumberOfSpecificEntries ( char* szEntry )
         // Itterate the lines of the file
         while ( !feof ( m_fp ) ) {
             // Grab the current line
-			fgets ( szInput, 128, m_fp );
+			fgets ( szInput, sizeof(szInput) - 1, m_fp );
             // Check for comments or new lines
 			if ( ( szInput[0] != '#' ) && ( szInput[0] != '\n' ) && ( szInput[0] != '\r' ) ) {
 				char* szCurrentEntry = strtok ( szInput, " " );
@@ -284,7 +280,7 @@ int CConfig::GetNumberOfSpecificEntries ( char* szEntry )
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
     // Return the number of specific entries
 	return iEntries;
@@ -302,7 +298,7 @@ int CConfig::GetNumberOfEntryProperties ( char* szEntry, int iInstance )
         // Itterate the lines of the file
         while ( !feof ( m_fp ) ) {
             // Grab the current line
-            if ( fgets ( szInput, 256, m_fp ) ) {
+            if ( fgets ( szInput, sizeof(szInput) - 1, m_fp ) ) {
                 // Check for comments
 				if ( szInput[0] == '#' ) continue;
                 // Check for a new line
@@ -347,7 +343,7 @@ int CConfig::GetNumberOfEntryProperties ( char* szEntry, int iInstance )
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
     // Return the number of properties
 	return iProperties;
@@ -365,7 +361,7 @@ void CConfig::GetLine ( int iLines, char* szReturnText )
         // Itterate the lines of the file
         while ( !feof ( m_fp ) ) {
             // Grab the current line
-            if ( fgets ( szInput, 256, m_fp ) ) {
+            if ( fgets ( szInput, sizeof(szInput) - 1, m_fp ) ) {
                 // If this is the line we are looking for
 				if ( i == iLines )
 				{
@@ -383,40 +379,40 @@ void CConfig::GetLine ( int iLines, char* szReturnText )
     else
     {
         // Print the file error
-        perror ( m_szFileName );
+        perror ( m_strFileName.c_str () );
     }
 }
 
 
-int CConfig::WriteToConfig ( char* szInput )
+int CConfig::WriteToConfig ( const char* szInput )
 {
     // Set the file pointer to write mode
-	m_fp = freopen ( m_szFileName, "at", m_fp );
+	m_fp = freopen ( m_strFileName.c_str (), "at", m_fp );
     // If the file exists
 	if ( m_fp ) {
         // Print a new line
 		fprintf ( m_fp, "\n" );
         // Print the line to the end of the file
-		fprintf ( m_fp, szInput );
-	}		
-	else 
+		fprintf ( m_fp, "%s", szInput );
+	}
+	else
 	{
         // Print the file error
-		perror ( m_szFileName );
+		perror ( m_strFileName.c_str () );
 	}
     // Set the file pointer to read mode for the rest of the object
-	m_fp = freopen ( m_szFileName, "r", m_fp );
+	m_fp = freopen ( m_strFileName.c_str (), "r", m_fp );
 	return 0;
 }
 
-void CConfig::SetFileName ( char* szFileName )
+void CConfig::SetFileName ( const char* szFileName )
 {
-	strcpy ( m_szFileName, szFileName );
+	m_strFileName = szFileName;
 }
 
-void CConfig::GetFileName (char* szFileName )
+void CConfig::GetFileName ( char* szFileName )
 {
-	strcpy ( szFileName, m_szFileName );
+	strcpy ( szFileName, m_strFileName.c_str () );
 }
 
 bool CConfig::DoesFileExist ()

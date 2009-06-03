@@ -131,7 +131,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 					m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; bad filename" );
 			}
 			else
-				m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName () );
+				m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM, "fileCreate" );

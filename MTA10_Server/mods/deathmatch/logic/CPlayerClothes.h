@@ -46,8 +46,8 @@ struct SPlayerClothingType
 
 struct SPlayerClothing
 {
-    char* szTexture;
-    char* szModel;
+    const char* szTexture;
+    const char* szModel;
 };
 
 class CPlayerClothes
@@ -56,9 +56,9 @@ public:
                                 CPlayerClothes              ( void );
 
     SPlayerClothing*            GetClothing                 ( unsigned char ucType );
-    void                        AddClothes                  ( char* szTexture, char* szModel, unsigned char ucType );
+    void                        AddClothes                  ( const char* szTexture, const char* szModel, unsigned char ucType );
     bool                        RemoveClothes               ( unsigned char ucType );
-    
+
     void                        RemoveAll                   ( void );
 
     void                        DefaultClothes              ( void );
@@ -68,9 +68,9 @@ public:
     static char*                GetClothingName             ( unsigned char ucType );
 
     static SPlayerClothing*     GetClothingGroup            ( unsigned char ucType );
-    static SPlayerClothing*     GetClothing                 ( char * szTexture, char * szModel, unsigned char ucType );
+    static SPlayerClothing*     GetClothing                 ( const char * szTexture, const char * szModel, unsigned char ucType );
     static const int            GetClothingGroupMax         ( unsigned char ucType );
-    static bool                 IsValidClothing             ( char * szTexture, char * szModel, unsigned char ucType );
+    static bool                 IsValidClothing             ( const char * szTexture, const char * szModel, unsigned char ucType );
 
     SPlayerClothing *           m_Clothes [ PLAYER_CLOTHING_SLOTS ];
 };

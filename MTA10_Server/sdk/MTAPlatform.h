@@ -61,6 +61,7 @@ extern "C" bool g_bSilent;
 	#include <curses.h>
 	#include <dlfcn.h>
 	#include <sys/time.h>
+	#include <hash_fun.h>
 
 	// Define functions
 	#define MAX_PATH 255
@@ -92,6 +93,18 @@ extern "C" bool g_bSilent;
 
 	// Itoa replacement function
 	char* itoa ( int value, char* result, int base );
+
+    namespace __gnu_cxx
+    {
+        template<>
+        struct hash < std::string >
+        {
+            size_t operator()( const std::string& str ) const
+            {
+                return hash< const char* >()( str.c_str() );
+            }
+        };
+    }
 #endif
 
 // This function should be used instead of mkdir to preserve multiplatform

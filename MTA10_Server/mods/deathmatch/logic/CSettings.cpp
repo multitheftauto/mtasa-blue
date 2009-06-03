@@ -124,8 +124,8 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 			if ( bDeleteNode ) {
 				// If we're walking through all resources (no resource nor setting name was specified) - ...
 				// Or if we're walking through a specific resource - ...
-				if ( ( uiResourceNameLength == 0 && ( strcmpi ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private ) ) 
-					|| ( uiResourceNameLength > 0 && ( ( strcmpi ( szResource, szQueryResource ) == 0 && ( eAccess != CSettings::Private || strcmpi ( szResource, szLocalResource ) == 0 ) ) 
+				if ( ( uiResourceNameLength == 0 && ( strcmpi ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private ) )
+					|| ( uiResourceNameLength > 0 && ( ( strcmpi ( szResource, szQueryResource ) == 0 && ( eAccess != CSettings::Private || strcmpi ( szResource, szLocalResource ) == 0 ) )
 					) ) ) {
 					if ( pMultiresultParentNode == NULL ) {
 						// Create a new temporary node (in which we can put all nodes we have access to), and add it as temporary subnode of pSource
@@ -147,7 +147,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 	// If we have multiple entries, return the storage node
 	if ( bDeleteNode )
         return pMultiresultParentNode;
-	
+
 	// Otherwise, return NULL
 	eStatus = NotFound;
     return NULL;
@@ -159,7 +159,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 // entries are used, the resource's storage node (which only gets deleted on resource stop) is used to store any
 // matching nodes that you have access to. The boolean is meant to let the caller know that the XML node that is
 // returned should be deleted after usage, for the sake of memory usage.
-// 
+//
 // Returns the XML node.
 //
 // If ( bDeleteNode == TRUE ), always remove the XML node after you're done with it!
@@ -274,7 +274,6 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
 		// See if we have access
 		if ( eStatus != NoAccess ) {
 			// See if we have a prefix
-			AccessType eAccess = GetAccessType ( szSetting[0] );
 			bool bPrefix = HasPrefix ( szSetting[0] );
 
 			// If no resource name was specified, use the local resource name

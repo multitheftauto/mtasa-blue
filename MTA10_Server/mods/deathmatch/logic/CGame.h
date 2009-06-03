@@ -149,7 +149,7 @@ public:
         VEHICLE_NOTIFY_JACK_RETURN,
         VEHICLE_ATTEMPT_FAILED,
     };
-    enum 
+    enum
     {
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
@@ -212,7 +212,7 @@ public:
 #endif
 
     void                        JoinPlayer                  ( CPlayer& Player );
-    void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, SString strKickReason = "None", SString strResponsiblePlayer = "None"  );
+    void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None", const char* szResponsiblePlayer = "None" );
 
     inline class CLuaManager*   GetLuaManager               ( void )        { return m_pLuaManager; };
 
@@ -265,7 +265,7 @@ private:
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
 
-	static void					PlayerCompleteConnect		( CPlayer* pPlayer, bool bSuccess, char* szError );
+	static void					PlayerCompleteConnect		( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -314,7 +314,7 @@ private:
     CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
-    
+
 #ifdef WIN32
     CRITICAL_SECTION            m_cs; // to prevent odd things happening with the http server, I hope
 #endif

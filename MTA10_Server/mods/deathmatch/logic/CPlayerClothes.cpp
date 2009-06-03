@@ -16,7 +16,7 @@ SPlayerClothingType g_clothesNames [ PLAYER_CLOTHING_SLOTS ] =
 { { "Torso" }, { "Hair" }, { "Legs" }, { "Shoes" }, { "Left Upper Arm" },
 { "Left Lower Arm" }, { "Right Upper Arm" }, { "Right Lower Arm" },
 { "Back Top" }, { "Left Chest" }, { "Right Chest" }, { "Stomach" },
-{ "Lower Back" }, { "Extra1" }, { "Extra2" }, { "Extra3" }, { "Extra4" }, 
+{ "Lower Back" }, { "Extra1" }, { "Extra2" }, { "Extra3" }, { "Extra4" },
 { "Suit" } };
 
 SPlayerClothing g_TorsoClothing [ TORSO_CLOTHING_MAX + 1 ] =
@@ -132,7 +132,7 @@ SPlayerClothing g_BackTopClothing [ BACK_TOP_CLOTHING_MAX + 1 ] =
 SPlayerClothing g_LeftChestClothing [ LEFT_CHEST_CLOTHING_MAX + 1 ] =
 { { "9crown", "9CROWN" }, { "9gun", "9GUN" }, { "9gun2", "9GUN2" },
 { "9homeboy", "9HOMBY" }, { "9bullet", "9BULLT" }, { "9rasta", "9RASTA" },
-{ NULL, NULL } }; 
+{ NULL, NULL } };
 
 SPlayerClothing g_RightChestClothing [ RIGHT_CHEST_CLOTHING_MAX + 1 ] =
 { { "10ls", "10LS" }, { "10ls2", "10LS2" }, { "10ls3", "10LS3" },
@@ -197,7 +197,7 @@ SPlayerClothing g_Extra4Clothing [ EXTRA4_CLOTHING_MAX + 1 ] =
 { "capblkover", "capovereye" }, { "capblkup", "caprimup" },
 { "trilbydrk", "trilby" }, { "trilbylght", "trilby" }, { "bowler", "bowler" },
 { "bowlerred", "bowler" }, { "bowlerblue", "bowler" },
-{ "bowleryellow", "bowler" }, { "boater", "boater" }, { "bowlergang", "bowler" }, 
+{ "bowleryellow", "bowler" }, { "boater", "boater" }, { "bowlergang", "bowler" },
 { "boaterblk", "boater" }, { NULL, NULL } };
 
 SPlayerClothing g_SuitClothing [ SUIT_CLOTHING_MAX + 1 ] =
@@ -209,7 +209,7 @@ SPlayerClothing g_SuitClothing [ SUIT_CLOTHING_MAX + 1 ] =
 
 CPlayerClothes::CPlayerClothes ( void )
 {
-    memset ( m_Clothes, 0, sizeof ( m_Clothes ) );    
+    memset ( m_Clothes, 0, sizeof ( m_Clothes ) );
 }
 
 
@@ -224,7 +224,7 @@ SPlayerClothing* CPlayerClothes::GetClothing ( unsigned char ucType )
 }
 
 
-void CPlayerClothes::AddClothes ( char* szTexture, char* szModel, unsigned char ucType )
+void CPlayerClothes::AddClothes ( const char* szTexture, const char* szModel, unsigned char ucType )
 {
     SPlayerClothing * pClothing = GetClothing ( szTexture, szModel, ucType );
     if ( pClothing && pClothing != m_Clothes [ ucType ] )
@@ -330,7 +330,7 @@ SPlayerClothing* CPlayerClothes::GetClothingGroup ( unsigned char ucType )
 }
 
 
-SPlayerClothing * CPlayerClothes::GetClothing ( char * szTexture, char * szModel, unsigned char ucType )
+SPlayerClothing * CPlayerClothes::GetClothing ( const char * szTexture, const char * szModel, unsigned char ucType )
 {
     if ( szTexture && szModel && ucType < PLAYER_CLOTHING_SLOTS )
     {
@@ -372,7 +372,7 @@ const int CPlayerClothes::GetClothingGroupMax ( unsigned char ucType )
 }
 
 
-bool CPlayerClothes::IsValidClothing ( char* szTexture, char* szModel, unsigned char ucType )
+bool CPlayerClothes::IsValidClothing ( const char* szTexture, const char* szModel, unsigned char ucType )
 {
     if ( ucType < PLAYER_CLOTHING_SLOTS )
     {

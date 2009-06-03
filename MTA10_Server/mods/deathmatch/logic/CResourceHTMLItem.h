@@ -22,7 +22,7 @@
 
 class CResourceHTMLItem : public CResourceFile
 {
-    
+
 public:
 
                                         CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted );
@@ -33,15 +33,15 @@ public:
     ResponseCode                        Request                         ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, class CAccount * account );
     bool                                AppendToPageBuffer              ( const char * szText, size_t length=0 );
 
-	void								SetResponseHeader				( char * szHeaderName, char * szHeaderValue );
+	void								SetResponseHeader				( const char* szHeaderName, const char* szHeaderValue );
 	void								SetResponseCode					( int responseCode );
-	void								SetResponseCookie				( char * szCookieName, char * szCookieValue );
+	void								SetResponseCookie				( const char* szCookieName, const char* szCookieValue );
 	void								ClearPageBuffer					( void );
 
     inline bool                         IsDefaultPage                   ( void ) { return m_bDefault; }
     inline void                         SetDefaultPage                  ( bool bDefault ) { m_bDefault = bDefault; }
 	inline bool							IsRestricted					( void ) { return m_bRestricted; };
-    
+
 private:
     inline char                         ReadChar                        ( FILE * pFile ) { return (unsigned char)fgetc ( pFile ); }
     void                                GetMimeType                     ( const char * szFilename );

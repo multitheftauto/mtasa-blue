@@ -225,7 +225,6 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
 
 bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
 {
-	char *szErrorMsg = NULL;
     std::string strParsedQuery = "";
 
 	if ( m_bOpened == false ) {
@@ -235,7 +234,7 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 
 	// Walk through the query and replace the variable placeholders with the actual variables
 	unsigned int uiLen = strQuery.length ();
-	unsigned int j = 0, a = 0, type = 0;
+	unsigned int a = 0, type = 0;
 	const char *szContent = NULL;
 	char szBuffer[32] = {0};
 	for ( unsigned int i = 0; i < uiLen; i++ )
@@ -243,7 +242,7 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 		if ( strQuery.at(i) == SQL_VARIABLE_PLACEHOLDER ) {
 			// If the placeholder is found, replace it with the variable
 			CLuaArgument *pArgument = (*pArgs)[a++];
-			
+
 			// Check the type of the argument and convert it to a string we can process
 			if ( pArgument ) {
 				type = pArgument->GetType ();
@@ -286,7 +285,6 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 
 bool CRegistry::Select ( std::string strColumns, std::string strTable, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult )
 {
-	char *szErrorMsg = NULL;
     char szBuffer[32] = {0};
 
 	if ( m_bOpened == false ) {

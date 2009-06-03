@@ -17,7 +17,7 @@
 #include <list>
 #include "CPlayer.h"
 
-typedef void (*SERIALVERIFICATIONCALLBACK) ( CPlayer*, bool, char* );
+typedef void (*SERIALVERIFICATIONCALLBACK) ( CPlayer*, bool, const char* );
 
 #define SERIAL_VERIFICATION_TIMEOUT 3000
 #define SERIAL_VERIFICATION_SERVER  "dp3.community.mtasa.com"
@@ -35,7 +35,7 @@ enum eSerialVerificationResult
 	SERIAL_ERROR_INVALID,
 	SERIAL_ERROR_ACCOUNT_BANNED,
     SERIAL_ERROR_SERIAL_BANNED,
-    
+
     SERIAL_ERROR_LAST
 };
 
@@ -62,7 +62,7 @@ private:
 };
 
 
-class CSerialManager 
+class CSerialManager
 {
 public:
                                 CSerialManager              ( void );

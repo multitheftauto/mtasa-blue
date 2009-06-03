@@ -28,7 +28,6 @@
     #define _vsnprintf vsnprintf
 #endif
 
-
 namespace SharedUtil
 {
     //
@@ -49,7 +48,7 @@ namespace SharedUtil
     // GetTickCount64() exists on Vista and up and is like GetTickCount() except it returns
     // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
     // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
-    // 
+    //
     long long GetTickCount64_ ( void );
 
     //

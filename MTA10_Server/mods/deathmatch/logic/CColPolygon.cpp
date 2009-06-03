@@ -41,7 +41,7 @@ bool CColPolygon::DoHitDetection  ( const CVector& vecLastPosition, const CVecto
         CVector2D vecPi = m_Points[i];
         CVector2D vecPj = m_Points[j];
 
-        if ( vecPi.fY < y && vecPj.fY >= y || vecPj.fY < y && vecPi.fY >= y )
+        if ( (vecPi.fY < y && vecPj.fY >= y) || (vecPj.fY < y && vecPi.fY >= y) )
         {
             if ( vecPi.fX + ( y - vecPi.fY ) / ( vecPj.fY - vecPi.fY ) * ( vecPj.fX - vecPi.fX ) < x )
             {

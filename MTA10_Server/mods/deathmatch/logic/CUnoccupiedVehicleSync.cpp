@@ -168,7 +168,6 @@ CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle ( CVehicle* pVehicle, 
     CVector vecVehiclePosition = pVehicle->GetPosition ();
 
     // See if any players are close enough
-    unsigned int uiLastPlayerSyncingCount = 0xFFFFFFFF;
     CPlayer* pLastPlayerSyncing = NULL;
     CPlayer* pPlayer = NULL;
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
@@ -269,7 +268,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             if ( pTrailer )
                             {
                                 CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle ();
-                                    
+
                                 // Is this a new trailer, attached?
                                 if ( pCurrentTrailer != pTrailer )
                                 {
@@ -346,7 +345,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     // Execute the detach trailer script function
                                     CLuaArguments Arguments;
                                     Arguments.PushElement ( pVehicle );
-                                    pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );                            
+                                    pCurrentTrailer->CallEvent ( "onTrailerDetach", Arguments );
                                 }
                             }
                         }
@@ -355,9 +354,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
 
                         // Derailed state
                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
-                        
+
                         // Run colpoint checks on vehicle
-					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );  
+					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
                         // Send this sync
                         data.bSend = true;

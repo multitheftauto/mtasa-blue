@@ -33,7 +33,7 @@ public:
 
     bool						Write                       ( NetBitStreamInterface& BitStream ) const;
 
-	void						Add							( char* szTexture, char* szModel, unsigned char ucType );
+	void						Add							( const char* szTexture, const char* szModel, unsigned char ucType );
     void                        Add                         ( CPlayerClothes* pClothes );
     inline unsigned int         Count                       ( void )                        { return static_cast < unsigned int > ( m_List.size () ); }
 

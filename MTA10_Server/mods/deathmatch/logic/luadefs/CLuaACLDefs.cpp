@@ -36,7 +36,7 @@ void CLuaACLDefs::LoadFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "aclGetGroup", CLuaACLDefs::aclGetGroup );
     CLuaCFunctions::AddFunction ( "aclGroupList", CLuaACLDefs::aclGroupList );
-    
+
     CLuaCFunctions::AddFunction ( "aclGroupGetName", CLuaACLDefs::aclGroupGetName );
     CLuaCFunctions::AddFunction ( "aclGroupAddACL", CLuaACLDefs::aclGroupAddACL );
     CLuaCFunctions::AddFunction ( "aclGroupListACL", CLuaACLDefs::aclGroupListACL );
@@ -200,12 +200,11 @@ int CLuaACLDefs::aclGetRight ( lua_State* luaVM )
         // Grab the arguments
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
 	    char* szRight = (char*) lua_tostring ( luaVM, 2 );
-		bool bAccess = lua_toboolean ( luaVM, 3 ) ?true:false;
 
         // Verify the ACL pointer
         if ( pACL )
         {
-            // Grab the type from the name passed 
+            // Grab the type from the name passed
             char* szRightAftedDot = szRight;
 			CAccessControlListRight::ERightType eType;
 			if ( StringBeginsWith ( szRight, "command." ) )
@@ -325,7 +324,7 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
 
 int CLuaACLDefs::aclListRights ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
 	{
         // Grab and verify the ACL
@@ -548,7 +547,7 @@ int CLuaACLDefs::aclGroupList ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
 	{
         // Grab the arguments
@@ -572,7 +571,7 @@ int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
 	{
@@ -601,7 +600,7 @@ int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupListACL ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
 	{
         // Grab and verify the group
@@ -635,7 +634,7 @@ int CLuaACLDefs::aclGroupListACL ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
 	{
@@ -664,7 +663,7 @@ int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
 	{
@@ -716,7 +715,7 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupListObjects ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
 	{
         // Grab and verify the group
@@ -766,7 +765,7 @@ int CLuaACLDefs::aclGroupListObjects ( lua_State* luaVM )
 
 int CLuaACLDefs::aclGroupRemoveObject ( lua_State* luaVM )
 {
-    // Verify the arguents  
+    // Verify the arguents
 	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
 	{
@@ -939,7 +938,7 @@ int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
                 return 1;
             }
             if ( pGroup->FindObjectMatch ( szObject, GroupObjectType ) )
-            { 
+            {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }

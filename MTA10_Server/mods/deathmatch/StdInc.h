@@ -13,7 +13,6 @@
 
 #include <list>
 #include <map>
-#include <hash_map>
 #include <set>
 #include <string>
 #include <vector>

@@ -50,7 +50,7 @@ public:
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
 
-    virtual void        WriteBits                   ( const char* input, unsigned int numbits ) = 0;
+    virtual void        WriteBits                   ( const void* input, unsigned int numbits ) = 0;
     virtual void        WriteBit                    ( bool input ) = 0;
 
     // Write a normalized 3D vector, using (at most) 4 bytes + 3 bits instead of 12 bytes.  Will further compress y or z axis aligned vectors. Accurate to 1/32767.5.
@@ -63,7 +63,7 @@ public:
     virtual void        WriteNormQuat               ( float w, float x, float y, float z) = 0;
 
     // Write an orthogonal matrix by creating a quaternion, and writing 3 components of the quaternion in 2 bytes each for 6 bytes instead of 36
-    virtual void        WriteOrthMatrix             ( 
+    virtual void        WriteOrthMatrix             (
                                                       float m00, float m01, float m02,
                                                       float m10, float m11, float m12,
                                                       float m20, float m21, float m22
@@ -92,14 +92,14 @@ public:
     virtual bool        ReadCompressed              ( long& output ) = 0;
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
-    
-    virtual bool        ReadBits                    ( char* output, unsigned int numbits ) = 0;
+
+    virtual bool        ReadBits                    ( void* output, unsigned int numbits ) = 0;
     virtual bool        ReadBit                     ( ) = 0;
 
     virtual bool        ReadNormVector              ( float &x, float &y, float &z ) = 0;
     virtual bool        ReadVector                  ( float &x, float &y, float &z ) = 0;
     virtual bool        ReadNormQuat                ( float &w, float &x, float &y, float &z) = 0;
-    virtual bool        ReadOrthMatrix              ( 
+    virtual bool        ReadOrthMatrix              (
                                                       float &m00, float &m01, float &m02,
                                                       float &m10, float &m11, float &m12,
                                                       float &m20, float &m21, float &m22
@@ -109,7 +109,7 @@ public:
     virtual int         GetNumberOfBytesUsed        ( void ) const = 0;
     virtual int         GetNumberOfUnreadBits       ( void ) const = 0;
 
-    // Helper template methods that are not actually part 
+    // Helper template methods that are not actually part
     // of the interface but get inline compiled.
 
     template < typename T >

@@ -58,7 +58,7 @@ bool CPlayerClothesPacket::Write ( NetBitStreamInterface& BitStream ) const
 }
 
 
-void CPlayerClothesPacket::Add ( char* szTexture, char* szModel, unsigned char ucType )
+void CPlayerClothesPacket::Add ( const char* szTexture, const char* szModel, unsigned char ucType )
 {
 	SPlayerClothes* Clothes = new SPlayerClothes;
     Clothes->szTexture = new char [ strlen ( szTexture ) + 1 ];
