@@ -30,7 +30,7 @@ inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2
 namespace
 {
 
-    float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fBoxExtents, const CVector** vecBoxAxes )
+    float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fExtentMin, const float* fExtentMax, const CVector** vecBoxAxes )
     {
 	    CVector vecOffset = vecPosition - vecBoxCenter;
 	    float fDistSq = 0.f;
@@ -42,11 +42,11 @@ namespace
 		    float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
 
             // Add any distance outside the box on that axis
-		    if ( fDot < -fBoxExtents[i] )
-			    fDistSq += ( fDot + fBoxExtents[i] ) * ( fDot + fBoxExtents[i] );
+            if ( fDot < fExtentMin[i] )
+			    fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
 		    else
-            if ( fDot > fBoxExtents[i] )
-			    fDistSq += ( fDot - fBoxExtents[i] ) * ( fDot - fBoxExtents[i] );
+            if ( fDot > fExtentMax[i] )
+			    fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
 	    }
 
 	    return fDistSq;
@@ -78,11 +78,10 @@ namespace
         CVector vecMax;
         CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
 
-        // This makes sure the bounding box is centered around the origin. (At the expense of making it smaller).
-        float fBoxExtents[3] = {
-                        Max ( 1.f, Min ( -vecMin.fX, vecMax.fX ) ),
-                        Max ( 1.f, Min ( -vecMin.fY, vecMax.fY ) ),
-                        Max ( 1.f, Min ( -vecMin.fZ, vecMax.fZ ) ) };
+        // Adjust for non-centered bounding box
+        CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
+        vecMin -= vecHalfCenter;
+        vecMax -= vecHalfCenter;
 
         // Get bounding box axes
         CMatrix gtaMatrix;
@@ -90,8 +89,8 @@ namespace
 
         const CVector* vecBoxAxes[3] = { &gtaMatrix.vRoll, &gtaMatrix.vDirection, &gtaMatrix.vWas };
 
-        return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), fBoxExtents, vecBoxAxes );
-    }
+        return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), &vecMin.fX, &vecMax.fX, vecBoxAxes );
+   }
 
 }
 
