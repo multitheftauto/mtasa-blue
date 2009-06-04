@@ -1,6 +1,9 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+#ifdef WIN32    // Temp fix to get it to compile on Windows
+    #include "config.h.win32"
+#else
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
@@ -52,7 +55,7 @@
 #define HAVE_STRNCASECMP 1
 
 /* Define to 1 if you have the `strndup' function. */
-/* #undef HAVE_STRNDUP */
+#define HAVE_STRNDUP 1
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #define HAVE_SYSLOG_H 1
@@ -81,10 +84,6 @@
 /* Define to 1 if you have the `vsyslog' function. */
 #define HAVE_VSYSLOG 1
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
-#define LT_OBJDIR ".libs/"
-
 /* Name of package */
 #define PACKAGE ""
 
@@ -99,9 +98,6 @@
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "json-c"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.3"
@@ -123,3 +119,4 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+#endif
