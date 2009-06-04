@@ -3556,7 +3556,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                             if ( !m_pLocalPlayer->IsUsingGun () )
                             {
                                 // Make sure we arent running an animation
-                                if ( !m_pLocalPlayer->IsRunningAnimation () )
+                                if ( m_pLocalPlayer->CountAnimations () == 0 )
                                 {
                                     // Grab the closest vehicle
                                     unsigned int uiDoor = 0;

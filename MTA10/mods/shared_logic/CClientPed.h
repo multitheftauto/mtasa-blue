@@ -91,25 +91,12 @@ struct SLastSyncedPedData
     float               fRotation;
 };
 
-struct SAnimationData
-{
-    CAnimBlock * pBlock;
-    char * szAnimName;
-    int iTime;
-    bool bLoop;
-    bool bUpdatePosition;
-    bool bInteruptable;
-    bool bRunInSequence;
-    bool bOffsetPed;
-    bool bHoldLastFrame;
-};
-
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable:4311)
 
-class CClientPed : public CClientStreamElement, public CAntiCheatModule
+class CClientPed : public CClientStreamElement, public CAntiCheatModule, public CClientAnimation
 {
     friend CClientCamera;
     friend CClientPlayer;
@@ -128,6 +115,7 @@ public:
 	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
     inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
     inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
+    RpClump*                    GetClump                    ( void );
 
     inline bool                 IsLocalPlayer               ( void )                                    { return m_bIsLocalPlayer; }
 
@@ -365,14 +353,6 @@ public:
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
 
-    bool                        IsRunningAnimation      ( void );
-    void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
-    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInteruptable = false, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
-    void                        RunNamedAnimation       ( SAnimationData & animData );
-    void                        KillAnimation           ( void );
-    inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_LastAnimation.pBlock; }
-    inline char *               GetAnimationName        ( void )                                        { return m_LastAnimation.szAnimName; }
-
     bool                        IsUsingGun              ( void );
 
     inline bool                 IsHeadless              ( void )                                        { return m_bHeadless; }
@@ -523,7 +503,6 @@ public:
     CClientPad                  m_Pad;
     bool                        m_bDestroyingSatchels;
     bool                        m_bDoingGangDriveby;
-    SAnimationData              m_LastAnimation;
     bool                        m_bRequestedAnimation;
     bool                        m_bHeadless;
     bool                        m_bIsOnFire;

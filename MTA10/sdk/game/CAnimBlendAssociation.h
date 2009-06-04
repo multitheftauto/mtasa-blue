@@ -16,6 +16,7 @@ class CAnimBlendAssociationSAInterface;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 class CAnimBlendHierarchy;
+typedef void (*CALLBACK_CAnimBlendAssoc) ( CAnimBlendAssociation * pAssoc, void * pData );
 
 class CAnimBlendAssociation
 {
@@ -24,6 +25,11 @@ public:
     virtual AssocGroupId                        GetAnimGroup            ( void ) = 0;
     virtual AnimationId                         GetAnimID               ( void ) = 0;
     virtual CAnimBlendHierarchy *               GetAnimHierarchy        ( void ) = 0;
+
+    virtual void                                SetDeleteCallback       ( CALLBACK_CAnimBlendAssoc Callback, void * pCallbackData ) = 0;
+    virtual void                                SetFinishCallback       ( CALLBACK_CAnimBlendAssoc Callback, void * pCallbackData ) = 0;
+
+    virtual bool                                UpdateBlend             ( float fUnk ) = 0;
 };
 
 #endif

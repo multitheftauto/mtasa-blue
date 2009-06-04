@@ -40,6 +40,7 @@
 
 // Shared logic includes
 #include <Utils.h>
+#include <CClientAnimation.h>
 #include <CClientCommon.h>
 #include <CClientManager.h>
 #include <CClient3DMarker.h>

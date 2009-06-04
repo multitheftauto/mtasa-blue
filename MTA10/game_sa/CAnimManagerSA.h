@@ -108,10 +108,10 @@ public:
     CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, const char * szAnimName );
     CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
-    CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int ID );
+    CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int flags );
     CAnimBlendAssociation *     AddAnimationAndSync                     ( RpClump * pClump, CAnimBlendAssociation * pAssociation, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-    CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta );
+    CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags, float fBlendDelta );
     
     void                        AddAnimBlockRef                         ( int ID );
     void                        RemoveAnimBlockRef                      ( int ID );

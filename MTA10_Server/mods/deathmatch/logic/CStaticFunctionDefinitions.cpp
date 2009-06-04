@@ -2921,10 +2921,10 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, float fBlendDelta, bool bLoop, bool bUpdatePosition )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, fBlendDelta, bLoop, bUpdatePosition );
 
     if ( IS_PED ( pElement ) )
     {
@@ -2945,10 +2945,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
                 BitStream.pBitStream->Write ( szBlockName, ucBlockSize );
                 BitStream.pBitStream->Write ( ucAnimSize );
                 BitStream.pBitStream->Write ( szAnimName, ucAnimSize );
-                BitStream.pBitStream->Write ( iTime );
+                BitStream.pBitStream->Write ( fBlendDelta );
                 BitStream.pBitStream->Write ( ( unsigned char ) ( ( bLoop ) ? 1 : 0 ) );
                 BitStream.pBitStream->Write ( ( unsigned char ) ( ( bUpdatePosition ) ? 1 : 0 ) );
-                BitStream.pBitStream->Write ( ( unsigned char ) ( ( bInteruptable ) ? 1 : 0 ) );
             }
             else
             {

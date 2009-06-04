@@ -18,6 +18,10 @@
 #include <game/CAnimBlendAssociation.h>
 #include "Common.h"
 
+#define FUNC_CAnimBlendAssociation_UpdateBlend          0x4d1490
+#define FUNC_CAnimBlendAssociation_SetDeleteCallback    0x4cebc0
+#define FUNC_CAnimBlendAssociation_SetFinishCallback    0x4cebe0
+
 class CAnimBlendAssocGroupSA;
 class CAnimBlendHierarchySAInterface;
 
@@ -41,15 +45,27 @@ public:
 class CAnimBlendAssociationSA : public CAnimBlendAssociation
 {
 public:
-                                        CAnimBlendAssociationSA ( CAnimBlendAssociationSAInterface * pInterface )   { m_pInterface = pInterface; }
+                                        CAnimBlendAssociationSA ( CAnimBlendAssociationSAInterface * pInterface );
 
     CAnimBlendAssociationSAInterface *  GetInterface            ( void )                                            { return m_pInterface; }
     AssocGroupId                        GetAnimGroup            ( void )                                            { return ( AssocGroupId ) m_pInterface->sAnimGroup; }
     AnimationId                         GetAnimID               ( void )                                            { return ( AnimationId ) m_pInterface->sAnimID; }
     CAnimBlendHierarchy *               GetAnimHierarchy        ( void );
 
+    static void                         StaticDeleteCallback    ( CAnimBlendAssociationSAInterface * pInterface, void * pCallbackData );
+    void                                SetDeleteCallback       ( CALLBACK_CAnimBlendAssoc Callback, void * pData );
+    
+    static void                         StaticFinishCallback    ( CAnimBlendAssociationSAInterface * pInterface, void * pCallbackData );
+    void                                SetFinishCallback       ( CALLBACK_CAnimBlendAssoc Callback, void * pData );
+
+    bool                                UpdateBlend             ( float fUnk );
+
 protected:
     CAnimBlendAssociationSAInterface *  m_pInterface;
+    CALLBACK_CAnimBlendAssoc            m_DeleteCallback;
+    void *                              m_pDeleteCallbackData;
+    CALLBACK_CAnimBlendAssoc            m_FinishCallback;
+    void *                              m_pFinishCallbackData;
 };
 
 #endif
