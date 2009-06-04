@@ -105,9 +105,18 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
         flags |= 16; // plays properly
         if ( pAnim->updatePosition ) flags |= 64;
         
-        CAnimBlendAssociation * pAssoc = m_pAnimManager->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendDelta );
+        CAnimBlendAssociation * pAssoc = m_pAnimManager->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendSpeed );
         if ( pAssoc )
         {
+            // Fixes setting the same animation as the previous with a different loop flag
+            if ( pAnim->loop != pAssoc->IsFlagSet ( 2 ) )
+            {
+                if ( pAnim->loop ) pAssoc->SetFlag ( 2 );
+                else pAssoc->ClearFlag ( 2 );
+            }
+            pAssoc->SetSpeed ( pAnim->speed );
+            pAssoc->SetTime ( pAnim->startTime );
+
             // Add a callback handler which'll be called when its finished being used
             pAssoc->SetFinishCallback ( CClientAnimation::StaticBlendAssocFinish, this );
             pAnim->assoc = pAssoc;
@@ -116,7 +125,7 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
 }
 
 
-bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fBlendDelta, bool bLoop, bool bUpdatePosition, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
+bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
 {
     // Is this a valid block name?
     CAnimBlock * pBlock = m_pAnimManager->GetAnimationBlock ( szBlockName );
@@ -126,7 +135,9 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
         pAnim->block = pBlock;
         pAnim->name = new char [ strlen ( szName ) + 1 ];
         strcpy ( pAnim->name, szName );
-        pAnim->blendDelta = fBlendDelta;
+        pAnim->speed = fSpeed;
+        pAnim->blendSpeed = fBlendSpeed;
+        pAnim->startTime = fStartTime;
         pAnim->loop = bLoop;
         pAnim->updatePosition = bUpdatePosition;
         pAnim->luaMain = pMain;
@@ -168,6 +179,23 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
     }
     
     return false;
+}
+
+
+void CClientAnimation::FinishAnimation ( void )
+{
+    CAnimationItem * pCurrent = GetCurrentAnimation ();
+    if ( pCurrent )
+    {
+        CAnimBlendAssociation * pAssoc = pCurrent->assoc;
+        if ( pAssoc )
+        {
+            // Make sure its no longer looping
+            pAssoc->ClearFlag ( 2 );
+            // Go straight to the end of the animation
+            pAssoc->SetTime ( pAssoc->GetTotalTime () );            
+        }
+    }
 }
 
 
