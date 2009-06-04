@@ -305,14 +305,14 @@ CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, AssocGr
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID )
+CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags )
 {
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_AddAnimation_hier;
     CAnimBlendHierarchySAInterface * pHierarchyInterface = pHierarchy->GetInterface ();
     _asm
     {
-        push    ID
+        push    flags
         push    pHierarchyInterface
         push    pClump
         call    dwFunc
@@ -360,7 +360,7 @@ CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, Assoc
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta )
+CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags, float fBlendDelta )
 {
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_BlendAnimation_hier;
@@ -368,7 +368,7 @@ CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnim
     _asm
     {
         push    fBlendDelta
-        push    ID
+        push    flags
         push    pHierarchyInterface
         push    pClump
         call    dwFunc

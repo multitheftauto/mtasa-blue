@@ -132,8 +132,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
-    memset ( &m_LastAnimation, 0, sizeof ( SAnimationData ) );
-    m_bRequestedAnimation = false;
     m_bHeadless = false;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
@@ -284,6 +282,15 @@ CClientPed::~CClientPed ( void )
 
     g_pClientGame->GetPedSync()->RemovePed ( this );
 }   
+
+RpClump * CClientPed::GetClump ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return m_pPlayerPed->GetRpClump ();
+    }
+    return NULL;
+}
 
 void CClientPed::SetStat ( unsigned short usStat, float fValue )
 {
@@ -552,9 +559,6 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     // Remove us from our car
     RemoveFromVehicle ();    
     SetVehicleInOutState ( VEHICLE_INOUT_NONE );
-
-    // Remove any animation
-    KillAnimation ();
 
     // Give him the correct model
     SetModel ( usModel );
@@ -1174,7 +1178,6 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     SetChoking ( false );
     SetHasJetPack ( false );
     SetSunbathing ( false );
-    KillAnimation ();
 
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle ();
@@ -2380,29 +2383,14 @@ void CClientPed::StreamedInPulse ( void )
             m_Pad.DoPulse ( this );
         }
 
-        // Are we waiting on an unloaded anim-block?
-        if ( m_bRequestedAnimation && m_LastAnimation.pBlock )
-        {
-            // Is it loaded now?
-            if ( m_LastAnimation.pBlock->IsLoaded () )
-            {
-                m_bRequestedAnimation = false;
-
-                // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
-                strcpy ( szAnimName, m_LastAnimation.szAnimName );
-                // Run our animation
-                RunNamedAnimation ( m_LastAnimation );
-                delete [] szAnimName;                
-            }            
-        }
-
         // Update our alpha
         unsigned char ucAlpha = m_ucAlpha;
         // Are we in a different interior to the camera? set our alpha to 0
         if ( m_ucInterior != g_pGame->GetWorld ()->GetCurrentArea () ) ucAlpha = 0;
         RpClump * pClump = m_pPlayerPed->GetRpClump ();
         if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
+
+        CClientAnimation::DoPulse ();
 
         // Grab our current position
         CVector vecPosition = *m_pPlayerPed->GetPosition ();
@@ -2791,17 +2779,6 @@ void CClientPed::_CreateModel ( void )
         {
             // TODO: use TASK_SIMPLE_DEAD
             Kill ( WEAPONTYPE_UNARMED, 0 );
-        }       
-
-        // Are we still playing a looped animation?
-        if ( m_LastAnimation.bLoop && m_LastAnimation.pBlock )
-        {
-            // Copy our name incase it gets deleted
-            char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
-            strcpy ( szAnimName, m_LastAnimation.szAnimName );
-            // Run our animation
-            RunNamedAnimation ( m_LastAnimation );
-            delete [] szAnimName;
         }
 
         // Set the voice that corresponds to our model
@@ -3022,17 +2999,6 @@ void CClientPed::_ChangeModel ( void )
                 WarpIntoVehicle ( pVehicle, uiSeat );
             }
             m_bDontChangeRadio = false;
-
-            // Are we still playing a looped animation?
-            if ( m_LastAnimation.bLoop && m_LastAnimation.pBlock )
-            {
-                // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_LastAnimation.szAnimName ) + 1 ];
-                strcpy ( szAnimName, m_LastAnimation.szAnimName );
-                // Run our animation
-                RunNamedAnimation ( m_LastAnimation );
-                delete [] szAnimName;
-            }
 
             // Set the voice that corresponds to the new model
             short sVoiceType, sVoiceID;
@@ -4315,6 +4281,7 @@ void CClientPed::NotifyCreate ( void )
 {
     m_pManager->GetPedManager ()->OnCreation ( this );
     CClientStreamElement::NotifyCreate ();
+    CClientAnimation::OnCreation ();
 }
 
 
@@ -4456,115 +4423,6 @@ void CClientPed::SetDoingGangDriveby ( bool bDriveby )
     m_bDoingGangDriveby = bDriveby;
 }
 
-
-bool CClientPed::IsRunningAnimation ( void )
-{
-    if ( m_pPlayerPed )
-    {
-        CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
-        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_NAMED_ANIM )
-        {
-            return true;
-        }
-        return false;
-    }
-    return ( m_LastAnimation.bLoop && m_LastAnimation.pBlock );
-}
-
-
-void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
-{
-    KillAnimation ();
-
-    if ( m_pPlayerPed )
-    {
-        CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunAnim ( animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM" );
-        if ( pTask )
-        {
-            pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-        }
-    }
-}
-
-
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
-{
-    /* lil_Toady: this seems to break things
-    // Kill any current animation that might be running
-    KillAnimation ();
-    */
-
-    // Are we streamed in?
-    if ( m_pPlayerPed )
-    {  
-        if ( pBlock->IsLoaded () )
-        {
-            // Kill any higher priority tasks if we dont want this anim interuptable
-            if ( !bInteruptable )
-            {
-                KillTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-                KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-                KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-            }
-
-            int flags = 0;            
-            if ( bLoop ) flags |= 0x2;
-            flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
-            if ( bUpdatePosition ) flags |= 0x40;
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInteruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
-            if ( pTask )
-            {
-                pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-            }                
-        }
-        else
-        {
-            // TODO: unload unreferenced blocks later on
-            g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
-            m_bRequestedAnimation = true;
-        }
-    }
-    m_LastAnimation.pBlock = pBlock;    
-    if ( m_LastAnimation.szAnimName ) delete [] m_LastAnimation.szAnimName;
-    m_LastAnimation.szAnimName = new char [ strlen ( szAnimName ) + 1 ];
-    strcpy ( m_LastAnimation.szAnimName, szAnimName );
-    m_LastAnimation.iTime = iTime;
-    m_LastAnimation.bLoop = bLoop;
-    m_LastAnimation.bUpdatePosition = bUpdatePosition;
-    m_LastAnimation.bInteruptable = bInteruptable;
-    m_LastAnimation.bRunInSequence = bRunInSequence;
-    m_LastAnimation.bOffsetPed = bOffsetPed;
-    m_LastAnimation.bHoldLastFrame = bHoldLastFrame;
-}
-
-
-void CClientPed::RunNamedAnimation ( SAnimationData & animData )
-{
-    RunNamedAnimation ( animData.pBlock, animData.szAnimName, animData.iTime, animData.bLoop,
-                        animData.bUpdatePosition, animData.bInteruptable, animData.bRunInSequence, 
-                        animData.bOffsetPed, animData.bHoldLastFrame );
-}
-
-
-void CClientPed::KillAnimation ( void )
-{
-    if ( m_pPlayerPed )
-    {
-        CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
-        if ( pTask )
-        {
-            int iTaskType = pTask->GetTaskType ();
-            if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
-            {                
-                pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
-                pTask->Destroy ();
-                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
-            }
-        }
-    }
-    m_LastAnimation.pBlock = NULL;
-    m_bRequestedAnimation = false;
-}
 
 void CClientPed::PostWeaponFire ( void )
 {

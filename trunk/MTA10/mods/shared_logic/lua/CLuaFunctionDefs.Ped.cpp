@@ -1388,42 +1388,61 @@ int CLuaFunctionDefs::SetPedCanBeKnockedOffBike ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
 {
-    // Check types
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    // bool setPedAnimation ( ped thePed,string block,string name,[float blendDelta=1.0,bool loop=true,bool updatePosition=true,function callback=nil, ...])
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        // Grab the element
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
+        // Check types
+        if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
         {
-            const char * szBlockName = NULL;
-            const char * szAnimName = NULL;
-            int iTime = -1;
-            bool bLoop = true;
-            bool bUpdatePosition = true;
-            bool bInteruptable = true;
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
-            if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
-            int iArgument4 = lua_type ( luaVM, 4 );
-            if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
-                iTime = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
-            if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
-                bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
-            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
-                bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
-                bInteruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable ) )
+            // Grab the element
+            CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+            if ( pEntity )
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                const char * szBlockName = NULL;
+                const char * szAnimName = NULL;
+                float fBlendDelta = 1.0f;
+                bool bLoop = true;
+                bool bUpdatePosition = true;
+                CLuaMain * pAnimMain = NULL;
+                int iAnimFunction = LUA_REFNIL;
+                CLuaArguments * pAnimArguments = NULL;
+                CLuaArguments Arguments;
+                
+                if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
+                if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
+                int iArgument4 = lua_type ( luaVM, 4 );
+                if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+                    fBlendDelta = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+                if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
+                    bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
+                if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+                    bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
+                if ( lua_type ( luaVM, 7 ) != LUA_TNIL )
+                {
+                    // Jax: grab our arguments first, luaM_toref pops the stack!                    
+                    Arguments.ReadArguments ( luaVM, 8 );
+                    int iLuaFunction = luaM_toref ( luaVM, 7 );
+                    if ( VERIFY_FUNCTION ( iLuaFunction ) )
+                    {
+                        pAnimMain = pLuaMain;
+                        iAnimFunction = iLuaFunction;
+                        pAnimArguments = &Arguments;
+                    }
+                }
+
+                if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, fBlendDelta, bLoop, bUpdatePosition, pAnimMain, iAnimFunction, pAnimArguments ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimation", "element", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimation", "element", 1 );
+            m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimation" );
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimation" );
 
     // Failed
     lua_pushboolean ( luaVM, false );

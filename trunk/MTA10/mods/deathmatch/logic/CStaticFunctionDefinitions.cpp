@@ -1250,12 +1250,17 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 
 bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
 {
-    if ( Ped.IsRunningAnimation () )
+    if ( Ped.CountAnimations () > 0 )
     {
-        strncpy ( szBlockName, Ped.GetAnimationBlock ()->GetName (), uiLength );
-        strncpy ( szAnimName, Ped.GetAnimationName (), uiLength );
-        return true;
+        CAnimationItem * pAnim = Ped.GetCurrentAnimation ();
+        if ( pAnim )
+        {
+            strncpy ( szBlockName, pAnim->block->GetName (), uiLength );
+            strncpy ( szAnimName, pAnim->name, uiLength );
+            return true;
+        }
     }
+    
     return false;
 }
 
@@ -1566,26 +1571,20 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fBlendDelta, bool bLoop, bool bUpdatePosition, CLuaMain * pLuaMain, int iLuaFunction, CLuaArguments * pArguments )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, fBlendDelta, bLoop, bUpdatePosition, pLuaMain, iLuaFunction, pArguments );
 
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         if ( szBlockName && szAnimName )
-        {
-            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
-            if ( pBlock )
-            {
-                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
-                return true;
-            }
+        {            
+            return Ped.BlendAnimation ( szBlockName, szAnimName, fBlendDelta, bLoop, bUpdatePosition, pLuaMain, iLuaFunction, pArguments );
         }
         else
         {
-            Ped.KillAnimation ();
-            return true;
+            // TODO: remove current animation
         }
     }
 
