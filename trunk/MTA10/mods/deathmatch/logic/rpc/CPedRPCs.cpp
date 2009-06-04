@@ -333,13 +333,13 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 
-                        pPed->BlendAnimation ( szBlockName, szAnimName, fBlendDelta, ( ucLoop == 1 ), ( ucUpdatePosition == 1 ) );
+                        pPed->BlendAnimation ( szBlockName, szAnimName, 1.0f, fBlendDelta, 0.0f, ( ucLoop == 1 ), ( ucUpdatePosition == 1 ) );
                     }
                 }
             }
             else
             {
-                // TODO: remove current animation
+                pPed->FinishAnimation ();
             }
         }
     }

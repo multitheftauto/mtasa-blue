@@ -24,8 +24,9 @@ class CAnimationItem
 public:
     CAnimationItem ( void )
     {
-        block = NULL; hierarchy = NULL; assoc = NULL; name = NULL; blendDelta = 1.0f; loop = true;
-        updatePosition = true; luaMain = NULL; luaFunction = -1; requesting = false;
+        block = NULL; hierarchy = NULL; assoc = NULL; name = NULL; speed = 1.0f; blendSpeed = 1.0f;
+        loop = true; startTime = 0.0f;updatePosition = true; luaMain = NULL; luaFunction = -1;
+        requesting = false;
     }
     ~CAnimationItem ( void )
     {
@@ -35,7 +36,9 @@ public:
     CAnimBlendHierarchy *   hierarchy;
     CAnimBlendAssociation * assoc;
     char *                  name;
-    float                   blendDelta;
+    float                   speed;
+    float                   blendSpeed;
+    float                   startTime;
     bool                    loop;
     bool                    updatePosition;
     CLuaMain *              luaMain;
@@ -58,8 +61,9 @@ public:
     void                                DoPulse                     ( void );
     void                                OnCreation                  ( void );
 
-    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fBlendDelta, bool bLoop = true, bool bUpdatePosition = true, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
-    
+    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
+    void                                FinishAnimation             ( void );
+
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
 
 private:
