@@ -483,6 +483,34 @@ float CModelInfoSA::GetLODDistance ()
 
 void CModelInfoSA::SetLODDistance ( float fDistance )
 {
+    // fLodDistanceUnscaled values:
+    //
+    // With the draw distance setting in GTA SP options menu set to maximum:
+    //      0 - 170     roughly correlates to a LOD distance of 0 - 300 game units
+    //      170 - 480   sets the LOD distance to 300 game units and has a negative effect on the alpha fade-in
+    //      490 - 1e7   sets the LOD distance to 300 game units and removes the alpha fade-in completely
+    //
+    // With the draw distance setting in GTA SP options menu set to minimum:
+    //      0 - 325     roughly correlates to a LOD distance of 0 - 300 game units
+    //      340 - 960   sets the LOD distance to 300 game units and has a negative effect on the alpha fade-in
+    //      1000 - 1e7  sets the LOD distance to 300 game units and removes the alpha fade-in completely
+    //
+    // So, to ensure the maximum draw distance with a working alpha fade-in, fLodDistanceUnscaled has to be
+    // no more than: 325 - (325-170) * draw_distance_setting
+    //
+
+    // Get SP draw distance value (0.925 to 1.8)
+    float fDrawDistanceSetting = CSettingsSA ().GetDrawDistance ();
+
+    // Change range from 0.925 to 1.8 into 0 to 1
+    fDrawDistanceSetting = Clamp ( 0.f, ( fDrawDistanceSetting - 0.925f ) / ( 1.8f - 0.925f ), 1.f );
+
+    // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
+    float fMaximumValue = 325 - ( 325 - 170 ) * fDrawDistanceSetting;
+
+    // Ensure fDistance is in range
+    fDistance = Min ( fDistance, fMaximumValue );
+
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;

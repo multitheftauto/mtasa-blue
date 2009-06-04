@@ -24,7 +24,9 @@
 #define VAR_bMouseFlying        0xC1CC03
 
 #define VAR_RadioVolume         0xBA6798
-#define VAR_SfxVolume           0xBA6798
+#define VAR_SfxVolume           0xBA6797
+#define VAR_DrawDistance        0xBA6788
+
 
 struct Settings // see code around 0x57CE9A for where these are
 {
@@ -55,6 +57,7 @@ public:
     void            SetRadioVolume ( unsigned char ucVolume );
     unsigned char   GetSFXVolume ( void );
     void            SetSFXVolume ( unsigned char ucVolume );
+    float           GetDrawDistance ( void );
 
 private:
     static unsigned long        FUNC_GetNumVideoModes;

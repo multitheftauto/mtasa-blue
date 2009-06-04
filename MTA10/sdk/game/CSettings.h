@@ -88,6 +88,7 @@ public:
     virtual void            SetRadioVolume ( unsigned char ucVolume )=0;
     virtual unsigned char   GetSFXVolume ( void )=0;
     virtual void            SetSFXVolume ( unsigned char ucVolume )=0;
+    virtual float           GetDrawDistance ( void )=0;
 };
 
 #endif

@@ -105,3 +105,9 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 {
     *(BYTE *)VAR_SfxVolume = ucVolume;
 }
+
+// Minimum is 0.925 and maximum is 1.8
+float CSettingsSA::GetDrawDistance ( void )
+{
+    return *(float *)VAR_DrawDistance;
+}
