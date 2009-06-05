@@ -37,7 +37,7 @@ SVehicleName VehicleNames [] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Li
 {"Sultan"}, {"Stratum"}, {"Elegy"}, {"Raindance"}, {"RC Tiger"}, {"Flash"}, {"Tahoma"}, {"Savanna"}, {"Bandito"}, {""}, 
 {""}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
 {"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {""}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
-{""}, {""}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police"}, {"Police"}, {"Police"}, {"Ranger"}, 
+{""}, {""}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS"}, {"Police SF"}, {"Police LV"}, {"Police Ranger"},
 {"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale"}, {"Sadler"}, {""}, {""}, {""}, {"Boxville"}, 
 {""} };
 
