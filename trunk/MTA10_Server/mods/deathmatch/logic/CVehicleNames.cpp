@@ -22,23 +22,23 @@ SVehicleName VehicleNames [] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Li
 {"Manana"}, {"Infernus"}, {"Voodoo"}, {"Pony"}, {"Mule"}, {"Cheetah"}, {"Ambulance"}, {"Leviathan"}, {"Moonbeam"}, {"Esperanto"}, 
 {"Taxi"}, {"Washington"}, {"Bobcat"}, {"Mr. Whoopee"}, {"BF Injection"}, {"Hunter"}, {"Premier"}, {"Enforcer"}, {"Securicar"}, {"Banshee"}, 
 {"Predator"}, {"Bus"}, {"Rhino"}, {"Barracks"}, {"Hotknife"}, {""}, {"Previon"}, {"Coach"}, {"Cabbie"}, {"Stallion"}, 
-{"Rumpo"}, {"RC Bandit"}, {"Romero"}, {"Packer"}, {"Monster"}, {"Admiral"}, {"Squalo"}, {"Seasparrow"}, {"Pizzaboy"}, {""}, 
+{"Rumpo"}, {"RC Bandit"}, {"Romero"}, {"Packer"}, {"Monster 1", "Monster"}, {"Admiral"}, {"Squalo"}, {"Seasparrow"}, {"Pizzaboy"}, {""}, 
 {""}, {"Turismo"}, {"Speeder"}, {"Reefer"}, {"Tropic"}, {"Flatbed"}, {"Yankee"}, {"Caddy"}, {"Solair"}, {"Berkley's RC Van"}, 
 {"Skimmer"}, {"PCJ-600"}, {"Faggio"}, {"Freeway"}, {"RC Baron"}, {"RC Raider"}, {"Glendale"}, {"Oceanic"}, {"Sanchez"}, {"Sparrow"}, 
 {"Patriot"}, {"Quadbike"}, {"Coastguard"}, {"Dinghy"}, {"Hermes"}, {"Sabre"}, {"Rustler"}, {"ZR-350"}, {"Walton"}, {"Regina"}, 
 {"Comet"}, {"BMX"}, {"Burrito"}, {"Camper"}, {"Marquis"}, {"Baggage"}, {"Dozer"}, {"Maverick"}, {"News Chopper"}, {"Rancher"}, 
 {"FBI Rancher"}, {"Virgo"}, {"Greenwood"}, {"Jetmax"}, {"Hotring Racer"}, {"Sandking"}, {"Blista Compact"}, {"Police Maverick"}, {"Boxville"}, {"Benson"}, 
-{"Mesa"}, {"RC Goblin"}, {"Hotring Racer"}, {"Hotring Racer"}, {"Bloodring Banger"}, {"Rancher"}, {"Super GT"}, {"Elegant"}, {"Journey"}, {"Bike"}, 
+{"Mesa"}, {"RC Goblin"}, {"Hotring Racer"}, {"Hotring Racer 2"}, {"Bloodring Banger"}, {"Rancher Lure"}, {"Super GT"}, {"Elegant"}, {"Journey"}, {"Bike"}, 
 {"Mountain Bike"}, {"Beagle"}, {"Cropduster"}, {"Stuntplane"}, {"Tanker"}, {"Roadtrain"}, {"Nebula"}, {"Majestic"}, {"Buccaneer"}, {"Shamal"}, 
 {"Hydra"}, {"FCR-900"}, {"NRG-500"}, {"HPV1000"}, {"Cement Truck"}, {"Towtruck"}, {"Fortune"}, {"Cadrona"}, {"FBI Truck"}, {"Willard"}, 
 {"Forklift"}, {"Tractor"}, {"Combine Harvester"}, {"Feltzer"}, {"Remington"}, {"Slamvan"}, {"Blade"}, {"Freight"}, {"Streak"}, {"Vortex"}, 
-{"Vincent"}, {"Bullet"}, {"Clover"}, {"Sadler"}, {"Fire Truck"}, {"Hustler"}, {"Intruder"}, {"Primo"}, {"Cargobob"}, {"Tampa"}, 
-{"Sunrise"}, {"Merit"}, {"Utility Van"}, {"Nevada"}, {"Yosemite"}, {"Windsor"}, {"Monster"}, {"Monster"}, {"Uranus"}, {"Jester"}, 
+{"Vincent"}, {"Bullet"}, {"Clover"}, {"Sadler"}, {"Fire Truck Ladder"}, {"Hustler"}, {"Intruder"}, {"Primo"}, {"Cargobob"}, {"Tampa"}, 
+{"Sunrise"}, {"Merit"}, {"Utility Van"}, {"Nevada"}, {"Yosemite"}, {"Windsor"}, {"Monster 2"}, {"Monster 3"}, {"Uranus"}, {"Jester"}, 
 {"Sultan"}, {"Stratum"}, {"Elegy"}, {"Raindance"}, {"RC Tiger"}, {"Flash"}, {"Tahoma"}, {"Savanna"}, {"Bandito"}, {""}, 
 {""}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
 {"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {""}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
-{""}, {""}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS"}, {"Police SF"}, {"Police LV"}, {"Police Ranger"},
-{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale"}, {"Sadler"}, {""}, {""}, {""}, {"Boxville"}, 
+{""}, {""}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS", "Police"}, {"Police SF"}, {"Police LV"}, {"Police Ranger", "Ranger"}, 
+{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {""}, {""}, {""}, {"Boxville Mission"}, 
 {""} };
 
 SVehicleName VehicleTypes [] = { {"Automobile"}, {"Plane"}, {"Bike"}, {"Helicopter"}, {"Boat"}, {"Train"}, {"Trailer"}, {"BMX"}, {"Monster Truck"}, {"Quad"} };
@@ -89,14 +89,14 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
     if ( szName [0] == 0 ) return 0;
 
     // Look for it in our table
-    for ( unsigned int i = 0; i < sizeof(VehicleNames); i++ )
+    for ( unsigned int i = 0; i <= 211; i++ )
     {
-        if ( stricmp ( szName, VehicleNames [i].szName ) == 0 )
+        if ( stricmp ( szName, VehicleNames [i].szName ) == 0 ||
+           ( stricmp ( szName, VehicleNames[i].szName_replaced ) == 0 ) )
         {
             return i + 400;
         }
     }
-
     return 0;
 }
 
