@@ -18,6 +18,7 @@
 struct SVehicleName
 {
     char szName [32];
+    char szName_replaced [32]; //Compatability
 };
 
 class CVehicleNames
