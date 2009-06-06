@@ -2536,12 +2536,11 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
             // Draw information about their weapon state, total ammo and ammo in clip
             CVector vecScreenPosition;
             CVector vecPosition;
-            float fTempX = 0, fTempY = 0;
 
             pPlayer->GetPosition ( vecPosition );
 
             vecPosition.fZ += 1.0f;
-            g_pGame->GetHud()->CalcScreenCoors ( &vecPosition, &vecScreenPosition, &fTempX, &fTempY, true, true );
+            g_pCore->GetGraphics ()->CalcScreenCoors ( &vecPosition, &vecScreenPosition );
 
             char str [ 2048 ];
             int yoffset;

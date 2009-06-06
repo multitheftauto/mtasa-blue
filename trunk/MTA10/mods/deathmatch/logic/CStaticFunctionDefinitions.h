@@ -372,7 +372,7 @@ public:
     static bool                         SetWaterLevel                       ( CClientWater* pWater, float fLevel, void* pChangeSource = NULL );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         GetWorldFromScreenPosition          ( CVector& vecScreen, CVector& vecWorld );
-    static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen );
+    static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative );
     static bool                         GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
     static bool                         GetGravity                          ( float& fGravity );
     static bool                         GetZoneName                         ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );

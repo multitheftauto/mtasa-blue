@@ -674,8 +674,23 @@ int CLuaFunctionDefs::GetScreenFromWorldPosition ( lua_State * luaVM )
             static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
             static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
 
+        float fEdgeTolerance = 0;
+        bool bRelative = true;
+
+        int iArgument4 = lua_type ( luaVM, 4 );
+        if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+        {
+            fEdgeTolerance = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+        }
+
+        int iArgument5 = lua_type ( luaVM, 5 );
+        if ( iArgument5 == LUA_TBOOLEAN )
+        {
+            bRelative = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
+        }
+
         CVector vecScreen;
-        if ( CStaticFunctionDefinitions::GetScreenFromWorldPosition ( vecWorld, vecScreen ) )
+        if ( CStaticFunctionDefinitions::GetScreenFromWorldPosition ( vecWorld, vecScreen, fEdgeTolerance, bRelative ) )
         {
             lua_pushnumber ( luaVM, vecScreen.fX );
             lua_pushnumber ( luaVM, vecScreen.fY );
