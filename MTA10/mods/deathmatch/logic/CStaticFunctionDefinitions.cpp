@@ -4437,17 +4437,26 @@ bool CStaticFunctionDefinitions::GetWorldFromScreenPosition ( CVector& vecScreen
 }
 
 
-bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld, CVector& vecScreen )
+bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative )
 {
-    float fTempX, fTempY;
-    g_pGame->GetHud ()->CalcScreenCoors ( &vecWorld, &vecScreen, &fTempX, &fTempY, true, true );
+    g_pCore->GetGraphics ()->CalcScreenCoors ( &vecWorld, &vecScreen );
 
-    // We ignore the top 10.0f as that goes dodgy up there for some reason
-    CVector2D vecResolution = g_pCore->GetGUI ()->GetResolution ();
-    if ( vecScreen.fX >= 0.0f && vecScreen.fX <= vecResolution.fX && vecScreen.fY >= 10.0f && vecScreen.fY <= vecResolution.fY && fTempX >= 0 && fTempY >= 0 )
-    {    
+    float fResWidth  = g_pCore->GetGraphics ()->GetViewportWidth ();
+    float fResHeight = g_pCore->GetGraphics ()->GetViewportHeight ();
+
+    // Calc relative values if required
+    float fToleranceX = bRelative ? fEdgeTolerance * fResWidth  : fEdgeTolerance;
+    float fToleranceY = bRelative ? fEdgeTolerance * fResHeight : fEdgeTolerance;
+
+    // Keep within a reasonable range
+    fToleranceX = Clamp ( -fResWidth, fToleranceX, fResWidth );
+    fToleranceY = Clamp ( -fResHeight, fToleranceY, fResHeight );
+
+    if ( vecScreen.fX >= -fToleranceX && vecScreen.fX <= fResWidth + fToleranceX && vecScreen.fY >= -fToleranceY && vecScreen.fY <= fResHeight + fToleranceY && vecScreen.fZ > 0.1f )
+    {
         return true;
     }
+
     return false;
 }
 

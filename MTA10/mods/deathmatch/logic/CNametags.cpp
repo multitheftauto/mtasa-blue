@@ -420,9 +420,8 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
 
     // Calculate where the player is on our screen
     CVector vecScreenPosition;
-    float fTempX = 0, fTempY = 0;
     vecPosition.fZ += 0.3f;
-    m_pHud->CalcScreenCoors ( &vecPosition, &vecScreenPosition, &fTempX, &fTempY, true, true );
+    g_pCore->GetGraphics ()->CalcScreenCoors ( &vecPosition, &vecScreenPosition );
 
     // Grab health and max health
     float fMaxHealth = pPlayer->GetMaxHealth ();
@@ -435,8 +434,8 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     // Some multiplier heh...
     fHealth *= 7.52f;
 
-	// We ignore the top 10.0f as that goes dodgy up there for some reason
-    if ( fHealth > 0 && vecScreenPosition.fX >= 0.0f && vecScreenPosition.fX <= fResWidth && vecScreenPosition.fY >= 10.0f && vecScreenPosition.fY <= fResHeight && fTempX >= 0 && fTempY >= 0 )
+	// Allow up to 50 pixels off screen to avoid nametags suddenly disappearing
+    if ( fHealth > 0 && vecScreenPosition.fX > -50.0f && vecScreenPosition.fX < fResWidth + 50.f && vecScreenPosition.fY > -50.0f && vecScreenPosition.fY < fResHeight + 50.f && vecScreenPosition.fZ > 0.1f )
     {
         // Draw the player nametag and status icon
         if ( pPlayer->HasConnectionTrouble () )
