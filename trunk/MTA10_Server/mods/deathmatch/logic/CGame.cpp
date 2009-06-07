@@ -122,6 +122,8 @@ CGame::CGame ( void )
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
 
+    m_bCloudsEnabled = true;
+
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex
@@ -2721,4 +2723,13 @@ bool CGame::IsGlitchEnabled ( std::string strGlitch )
 bool CGame::IsGlitchEnabled ( char cGlitch )
 {
     return m_Glitches[cGlitch] || false;
+}
+
+void CGame::SetCloudsEnabled ( bool bEnabled )
+{
+    m_bCloudsEnabled = bEnabled;
+}
+bool CGame::GetCloudsEnabled ( void )
+{
+    return m_bCloudsEnabled;
 }

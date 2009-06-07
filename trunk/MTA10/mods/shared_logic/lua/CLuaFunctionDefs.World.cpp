@@ -1253,3 +1253,23 @@ int CLuaFunctionDefs::SetWorldSpecialPropertyEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetCloudsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    {
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetCloudsEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false ) ); 
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setCloudsEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetCloudsEnabled ( lua_State* luaVM )
+{
+      lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled () );
+      return 1;
+}
+

@@ -41,6 +41,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaWorldDefs::setGarageOpen );
     CLuaCFunctions::AddFunction ( "setGlitchEnabled", CLuaWorldDefs::setGlitchEnabled );
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
+    CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaWorldDefs::setCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
 }
 
 
@@ -490,4 +492,27 @@ int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
 
     lua_pushnil ( luaVM );
     return 1;
+}
+int CLuaWorldDefs::setCloudsEnabled ( lua_State* luaVM )
+{
+    int iArgument = lua_type ( luaVM, 1 );
+    if ( iArgument == LUA_TBOOLEAN )
+    {
+        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
+        if ( CStaticFunctionDefinitions::SetCloudsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setCloudsEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+int CLuaWorldDefs::getCloudsEnabled ( lua_State* luaVM )
+{
+     lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled ( ) );
+     return 1;
 }

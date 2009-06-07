@@ -35,7 +35,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBR,
                                  unsigned char ucSkyGradientBG,
                                  unsigned char ucSkyGradientBB,
-								 unsigned short usFPSLimit )
+                                 unsigned short usFPSLimit,
+                                 bool bCloudsEnabled )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -57,7 +58,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucSkyGradientBR = ucSkyGradientBR;
     m_ucSkyGradientBG = ucSkyGradientBG;
     m_ucSkyGradientBB = ucSkyGradientBB;
-	m_usFPSLimit = usFPSLimit;
+    m_usFPSLimit = usFPSLimit;
+    m_bCloudsEnabled = bCloudsEnabled;
 }
 
 
@@ -87,9 +89,12 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     // Gather the map flags
     unsigned char ucFlags = 0;
-    ucFlags |= m_bShowNametags ? 1:0;
-    ucFlags |= m_bShowRadar << 1;
-
+    if (m_bShowNametags)
+        ucFlags |= 0x1;
+    if (m_bShowRadar)
+        ucFlags |= 0x2;
+    if (m_bCloudsEnabled)
+        ucFlags |= 0x4;
     // Write the map flags
     BitStream.Write ( ucFlags );
 

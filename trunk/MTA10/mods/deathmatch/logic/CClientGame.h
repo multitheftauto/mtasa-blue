@@ -337,6 +337,9 @@ public:
     bool                                SetGlitchEnabled                ( char cGlitch, bool bEnabled );
     bool                                IsGlitchEnabled                 ( char cGlitch );
 
+    bool                                SetCloudsEnabled                ( bool bEnabled );
+    bool                                GetCloudsEnabled                ( void );
+
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
@@ -546,6 +549,9 @@ private:
     long                                m_lMoney;
 
     bool                                m_Glitches[3];
+
+    //Clouds Enabled
+    bool                                m_bCloudsEnabled;
 
 	unsigned long						m_ulMinuteDuration;
 

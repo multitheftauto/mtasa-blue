@@ -4724,6 +4724,16 @@ bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled ( const char* sz
 {
     return g_pGame->SetCheatEnabled ( szPropName, bEnabled );
 }
+bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
+{
+    g_pMultiplayer->SetCloudsEnabled ( bEnabled );
+    g_pClientGame->SetCloudsEnabled ( bEnabled );
+    return true;
+}
+bool CStaticFunctionDefinitions::GetCloudsEnabled ( )
+{
+    return g_pClientGame->GetCloudsEnabled ();
+}
 
 
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )

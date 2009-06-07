@@ -6924,8 +6924,20 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled ( std::string strGlitchName, bo
     }
     return false;
 }
+bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( bEnabled );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_CLOUDS_ENABLED, *BitStream.pBitStream ) );
 
+    g_pGame->SetCloudsEnabled ( bEnabled );
+    return true;
 
+}
+bool CStaticFunctionDefinitions::GetCloudsEnabled ( void )
+{
+    return g_pGame->GetCloudsEnabled ();
+}
 
 CElement* CStaticFunctionDefinitions::GetRootElement ( void )
 {

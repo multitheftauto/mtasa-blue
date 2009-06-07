@@ -120,7 +120,7 @@ public:
     virtual void                        ResetSky                    () = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
-    virtual void                        DisableClouds               ( bool bDisabled ) = 0;
+    virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;

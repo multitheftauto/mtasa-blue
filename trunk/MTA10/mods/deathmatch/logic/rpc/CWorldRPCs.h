@@ -37,6 +37,7 @@ public:
     DECLARE_RPC ( SetFPSLimit );
     DECLARE_RPC ( SetGarageOpen );
     DECLARE_RPC ( SetGlitchEnabled );
+    DECLARE_RPC ( SetCloudsEnabled );
 };
 
 #endif

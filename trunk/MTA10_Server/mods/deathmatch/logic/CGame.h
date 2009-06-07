@@ -242,6 +242,9 @@ public:
     char                        GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
     bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
 
+    void                     SetCloudsEnabled            ( bool bEnabled );
+    bool                     GetCloudsEnabled            ( void );
+
 private:
     void                        AddBuiltInEvents            ( void );
 
@@ -347,6 +350,9 @@ private:
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;
     bool                        m_bBeingDeleted;
+
+    //Clouds Enabled
+    bool                        m_bCloudsEnabled;
 };
 
 #endif

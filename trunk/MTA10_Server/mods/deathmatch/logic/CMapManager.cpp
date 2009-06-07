@@ -477,7 +477,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
 
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
-
+    bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -499,7 +499,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomRed,
                                    ucBottomGreen,
                                    ucBottomBlue,
-								   usFPSLimit ) );
+                                   usFPSLimit,
+                                   bCloudsEnabled) );
 
     // Send him all the elements
     SendMapInformation ( Player );

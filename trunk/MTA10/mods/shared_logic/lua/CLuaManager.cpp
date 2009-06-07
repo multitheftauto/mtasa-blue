@@ -788,6 +788,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled );
     CLuaCFunctions::AddFunction ( "setBlurLevel", CLuaFunctionDefs::SetBlurLevel );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
+    CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

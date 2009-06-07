@@ -70,7 +70,7 @@ public:
     void                        ResetSky                    ();
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     void                        ResetWater                  ();
-    void                        DisableClouds               ( bool bDisabled );
+    void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
 
     void                        AllowWindowsCursorShowing   ( bool bAllow );

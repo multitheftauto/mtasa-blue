@@ -32,6 +32,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_FPS_LIMIT, SetFPSLimit, "SetFPSLimit" );
     AddHandler ( SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen" );
     AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
+    AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
 }
 
 
@@ -208,4 +209,13 @@ void CWorldRPCs::SetGlitchEnabled ( NetBitStreamInterface& bitStream )
 	bitStream.Read ( eGlitch );
     bitStream.Read ( ucIsEnabled );
     g_pClientGame->SetGlitchEnabled ( eGlitch, ( ucIsEnabled == 1 ) );
+}
+
+void CWorldRPCs::SetCloudsEnabled ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucIsEnabled;
+    bitStream.Read ( ucIsEnabled );
+    bool bEnabled = (ucIsEnabled == 1);
+    g_pMultiplayer->SetCloudsEnabled ( bEnabled );
+    g_pClientGame->SetCloudsEnabled( bEnabled );
 }
