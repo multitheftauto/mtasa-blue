@@ -384,6 +384,8 @@ public:
     static bool                         GetGarageSize                       ( unsigned char ucGarageID, float& fHeight, float& fWidth, float& fDepth );
     static bool                         GetGarageBoundingBox                ( unsigned char ucGarageID, float& fLeft, float& fRight, float& fFront, float& fBack );
     static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
+    static bool                         SetCloudsEnabled                    ( bool bEnabled );
+    static bool                         GetCloudsEnabled                    ( void );
 
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );

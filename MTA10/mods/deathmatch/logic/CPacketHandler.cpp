@@ -1824,6 +1824,10 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     // Extract the flags
     g_pClientGame->m_bShowNametags = ( ucFlags & 0x01 ) ? true:false;
     g_pClientGame->m_bShowRadar = ( ucFlags & 0x02 ) ? true:false;
+    g_pClientGame->m_bCloudsEnabled = ( ucFlags & 0x04 ) ? true:false;
+   
+    //Set Clouds
+    g_pMultiplayer->SetCloudsEnabled( g_pClientGame->GetCloudsEnabled() ); 
 
     // Read out the gravity
     float fGravity;

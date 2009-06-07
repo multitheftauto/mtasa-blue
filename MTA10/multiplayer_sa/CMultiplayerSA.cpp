@@ -927,33 +927,34 @@ void CMultiplayerSA::DisableBirds ( bool bDisabled )
 		*(BYTE *)0x712330 = 0xA1;
 }
 
-void CMultiplayerSA::DisableClouds ( bool bDisabled )
+void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds
 	if ( bDisabled )
-		*(BYTE *)0x716380 = 0xC3;
+        *(BYTE *)0x716380 = 0xA1;
 	else
-		*(BYTE *)0x716380 = 0xA1;
+		*(BYTE *)0x716380 = 0xC3;
 
     // normal clouds
     //0071395A     90             NOP
-	if ( bDisabled )
-		*(BYTE *)0x713950 = 0xC3;
-	else
-		*(BYTE *)0x713950 = 0x83;
+    if ( bDisabled )
+        *(BYTE *)0x713950 = 0x83;
+    else
+        *(BYTE *)0x713950 = 0xC3;
 
     // plane trails (not really clouds, but they're sort of vapour)
-	if ( bDisabled )
-    {
-		*(BYTE *)0x717180 = 0xC2;
-        *(BYTE *)0x717181 = 0x04;
-        *(BYTE *)0x717182 = 0x00;
-    }
-	else
+
+    if ( bDisabled )
     {
 		*(BYTE *)0x717180 = 0x83;
         *(BYTE *)0x717181 = 0xEC;
         *(BYTE *)0x717182 = 0x08;
+    }
+	else
+    {
+		*(BYTE *)0x717180 = 0xC2;
+        *(BYTE *)0x717181 = 0x04;
+        *(BYTE *)0x717182 = 0x00;
     }
 }
 

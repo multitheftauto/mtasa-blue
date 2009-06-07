@@ -112,6 +112,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
 
+    m_bCloudsEnabled = true;
+
     #ifdef MTA_VOICE
     m_pVoice = VoiceCreate();
     // Initialize the voice module for this mod.
@@ -3965,6 +3967,9 @@ void CClientGame::ResetMapInfo ( void )
     // Water
     g_pGame->GetWaterManager ()->Reset ();
 
+     // Sky-gradient
+    g_pMultiplayer->SetCloudsEnabled ( true );
+
     // Cheats
     g_pGame->ResetCheats ();
 
@@ -4410,4 +4415,14 @@ bool CClientGame::SetGlitchEnabled ( char cGlitch, bool bEnabled )
 bool CClientGame::IsGlitchEnabled ( char cGlitch )
 {
     return m_Glitches[cGlitch] || false;
+}
+
+bool CClientGame::SetCloudsEnabled ( bool bEnabled )
+{
+   m_bCloudsEnabled = bEnabled;
+   return true;
+}
+bool CClientGame::GetCloudsEnabled ( void )
+{
+    return m_bCloudsEnabled;
 }

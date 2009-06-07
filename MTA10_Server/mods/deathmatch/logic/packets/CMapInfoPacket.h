@@ -41,7 +41,8 @@ public:
                                                       unsigned char ucSkyGradientBR = 0,
                                                       unsigned char ucSkyGradientBG = 0,
                                                       unsigned char ucSkyGradientBB = 0,
-													  unsigned short usFPSLimit = 36 );
+                                                      unsigned short usFPSLimit = 36,
+                                                      bool bCloudsEnabled = true);
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
     inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -66,6 +67,7 @@ private:
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
 	unsigned short			m_usFPSLimit;
     bool*                   m_pbGarageStates;
+    bool                    m_bCloudsEnabled;
 };
 
 #endif

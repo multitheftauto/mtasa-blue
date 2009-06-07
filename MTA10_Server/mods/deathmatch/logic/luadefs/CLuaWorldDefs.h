@@ -47,6 +47,8 @@ public:
 	static int		setMinuteDuration					( lua_State* luaVM );
     static int      setGarageOpen                       ( lua_State* luaVM );
     static int      setGlitchEnabled                    ( lua_State* luaVM );
+    static int      setCloudsEnabled                    ( lua_State* luaVM );
+    static int      getCloudsEnabled                    ( lua_State* luaVM );
 };
 
 #endif

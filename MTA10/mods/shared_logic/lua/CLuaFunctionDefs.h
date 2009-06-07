@@ -593,6 +593,8 @@ public:
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
     LUA_DECLARE ( SetBlurLevel );
     LUA_DECLARE ( SetJetpackMaxHeight );
+    LUA_DECLARE ( SetCloudsEnabled );
+    LUA_DECLARE ( GetCloudsEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );

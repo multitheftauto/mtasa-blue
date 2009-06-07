@@ -449,6 +449,8 @@ public:
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
     static bool                 SetGlitchEnabled                    ( std::string strGlitchName, bool bEnabled );
     static bool                 IsGlitchEnabled                     ( std::string strGlitchName, bool& bEnabled );
+    static bool                 SetCloudsEnabled                    ( bool bEnabled );
+    static bool                 GetCloudsEnabled                    ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );
