@@ -101,6 +101,7 @@ public:
     void                                UpdateTimeStep          ( float fUnk, float fUnk2 );
 
     bool                                UpdateBlend             ( float fUnk );
+    void                                SyncAnimation           ( CAnimBlendAssociation * pAssoc );
 
 protected:
     CAnimBlendAssociationSAInterface *  m_pInterface;

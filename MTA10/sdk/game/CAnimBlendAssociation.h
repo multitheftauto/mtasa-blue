@@ -41,6 +41,7 @@ public:
     virtual void                                UpdateTimeStep          ( float fUnk, float fUnk2 ) = 0;
 
     virtual bool                                UpdateBlend             ( float fUnk ) = 0;
+    virtual void                                SyncAnimation           ( CAnimBlendAssociation * pAssoc ) = 0;
 };
 
 #endif

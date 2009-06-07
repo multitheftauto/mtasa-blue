@@ -52,6 +52,7 @@ void CAnimBlendAssociationSA::SetDeleteCallback ( CALLBACK_CAnimBlendAssoc Callb
     _asm
     {
         mov     ecx, dwThis
+        or      byte ptr [ecx+2Fh],20h
         push    pData
         push    dwCallback
         call    dwFunc
@@ -244,4 +245,18 @@ bool CAnimBlendAssociationSA::UpdateBlend ( float fUnk )
         mov     bReturn, al
     }
     return bReturn;
+}
+
+
+void CAnimBlendAssociationSA::SyncAnimation ( CAnimBlendAssociation * pAssoc )
+{
+    DWORD dwFunc = FUNC_CAnimBlendAssociation_SyncAnimation;
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwAssoc = ( DWORD ) pAssoc->GetInterface ();
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwAssoc
+        call    dwFunc
+    }
 }

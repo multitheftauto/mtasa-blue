@@ -64,7 +64,7 @@ class CTaskSimpleAnimSAInterface: public CTaskSimpleSAInterface
 {
 public:
     CAnimBlendAssociation*      m_pAnim;    // 8
-    char                        m_bIsFinished		:1;
+    char                        m_bIsFinished		:1; //12
     char                        m_bDontInterrupt	:1;
     char                        m_bHoldLastFrame	:1;
 
@@ -75,8 +75,6 @@ public:
     char                        m_bRunInSequence    :1;
     char                        m_bOffsetAtEnd		:1;
     char                        m_bOffsetAvailable	:1;
-    // char pad ?
-    //12
 };
 
 
@@ -110,16 +108,16 @@ public:
 class CTaskSimpleRunNamedAnimSAInterface: public CTaskSimpleAnimSAInterface
 {
 public:
-    char                    m_animName [ANIM_NAMELEN]; //36
-    char                    m_animGroupName [ANIMBLOCK_NAMELEN]; //52
+    char                    m_animName [ANIM_NAMELEN]; //16
+    char                    m_animGroupName [ANIMBLOCK_NAMELEN]; //40
 
     float                   m_fBlendDelta; //56
     CAnimBlendHierarchy*    m_pAnimHierarchy; //60
     int                     m_iTime; //64
     CTaskTimer              m_timer; //68
-    CVector                 m_offsetAtEnd; //78
-    int                     m_flags; //90   
-    short                   m_animID; //94
+    CVector                 m_offsetAtEnd; //80
+    int                     m_flags; //92  
+    short                   m_animID; //96
 };
 
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim
