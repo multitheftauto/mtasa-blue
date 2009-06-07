@@ -3969,6 +3969,7 @@ void CClientGame::ResetMapInfo ( void )
 
      // Sky-gradient
     g_pMultiplayer->SetCloudsEnabled ( true );
+    g_pClientGame->SetCloudsEnabled ( true );
 
     // Cheats
     g_pGame->ResetCheats ();
