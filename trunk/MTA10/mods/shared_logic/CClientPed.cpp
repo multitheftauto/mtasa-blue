@@ -33,7 +33,7 @@ SBodyPartName BodyPartNames [10] =
 // HACK: saves unneccesary loading of clothes textures
 CClientPed* g_pLastRebuilt = NULL;
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () ), CClientAnimation ( pManager->GetAnimationManager () )
 {
     SetTypeName ( "ped" );
 
@@ -45,7 +45,7 @@ CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, Elem
 }
 
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () ), CClientAnimation ( pManager->GetAnimationManager () )
 {
     // Init
     Init ( pManager, ulModelID, bIsLocalPlayer );
@@ -2389,8 +2389,6 @@ void CClientPed::StreamedInPulse ( void )
         if ( m_ucInterior != g_pGame->GetWorld ()->GetCurrentArea () ) ucAlpha = 0;
         RpClump * pClump = m_pPlayerPed->GetRpClump ();
         if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
-
-        CClientAnimation::DoPulse ();
 
         // Grab our current position
         CVector vecPosition = *m_pPlayerPed->GetPosition ();

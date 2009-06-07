@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientAnimation.h
-*  PURPOSE:     Ped entity class
+*  PURPOSE:     Animation running class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
@@ -18,6 +18,9 @@
 
 #include <vector>
 #include "lua/CLuaArguments.h"
+
+class CClientAnimationManager;
+class CAnimBlock;
 
 class CAnimationItem
 {
@@ -50,27 +53,30 @@ public:
 class CClientAnimation
 {
 public:
-                                        CClientAnimation            ( void );
+                                        CClientAnimation            ( CClientAnimationManager * pManager );
                                         ~CClientAnimation           ( void );
 
     virtual RpClump *                   GetClump                    ( void ) = 0;
 
     inline unsigned int                 CountAnimations             ( void )    { return ( unsigned int ) m_Animations.size (); }
     CAnimationItem *                    GetCurrentAnimation         ( void );
+    bool                                GetCurrentAnimation         ( AssocGroupId & animGroup, AnimationId & animID );
 
-    void                                DoPulse                     ( void );
     void                                OnCreation                  ( void );
+    void                                OnBlockLoad                 ( CAnimBlock * pBlock );
 
     bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
+    void                                BlendAnimation              ( AssocGroupId animGroup, AnimationId animID, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true );
+    void                                SyncAnimation               ( CClientAnimation & Animation );
     void                                FinishAnimation             ( void );
 
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
-
+    
 private:
     void                                BlendAnimation              ( CAnimationItem * pAnim );
     void                                FindAndClear                ( CAnimBlock * pBlock, const char * szName );
 
-    CAnimManager *                      m_pAnimManager;
+    CClientAnimationManager *           m_pAnimManager;
     std::vector < CAnimationItem * >    m_Animations;
 };
 

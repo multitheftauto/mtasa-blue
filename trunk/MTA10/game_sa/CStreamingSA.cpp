@@ -12,14 +12,26 @@
 
 #include "StdInc.h"
 
-void CStreamingSA::RequestAnimations ( int i, int j )
+void CStreamingSA::RequestAnimations ( int iBlockIndex )
 {
     DWORD dwFunc = FUNC_CStreaming_RequestAnimations;
     _asm
     {
-        push    j
-        push    i
+        push    8
+        push    iBlockIndex
         call    dwFunc
         add     esp, 0x8
+    }
+}
+
+
+void CStreamingSA::RemoveAnimations ( int iBlockIndex )
+{
+    DWORD dwFunc = FUNC_CStreaming_RemoveAnimations;
+    _asm
+    {
+        push    iBlockIndex
+        call    dwFunc
+        add     esp, 0x4
     }
 }

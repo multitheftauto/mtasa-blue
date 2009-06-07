@@ -641,7 +641,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{ 
+{     
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;

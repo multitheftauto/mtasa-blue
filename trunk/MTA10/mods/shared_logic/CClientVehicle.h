@@ -107,6 +107,8 @@ public:
     
     void                        Unlink                  ( void );
 
+    RpClump *                   GetClump                ( void );
+
     inline eClientEntityType    GetType                 ( void ) const                      { return CCLIENTVEHICLE; };
 
     void                        GetName                 ( char* szBuf );

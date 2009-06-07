@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientAnimation.cpp
-*  PURPOSE:     Ped entity class
+*  PURPOSE:     Animation running class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
@@ -19,21 +19,24 @@
 
 using namespace std;
 
-CClientAnimation::CClientAnimation ( void )
+CClientAnimation::CClientAnimation ( CClientAnimationManager * pManager )
 {
-    // Grab and store our manager's pointer
-    m_pAnimManager = g_pGame->GetAnimManager ();
+    // Grab and store our manager pointers
+    m_pAnimManager = pManager;
 }
 
 
 CClientAnimation::~CClientAnimation ( void )
 {
+    // Tell our manager to remove any of our crap
+    m_pAnimManager->Cleanup ( this );
+
     // Make sure we clear the animations we have left
     vector < CAnimationItem * > ::const_iterator iter = m_Animations.begin ();
     for ( ; iter != m_Animations.end () ; iter++ )
     {
         delete *iter;
-    }
+    }    
 }
 
 
@@ -49,24 +52,47 @@ CAnimationItem * CClientAnimation::GetCurrentAnimation ( void )
 }
 
 
-void CClientAnimation::DoPulse ( void )
+bool CClientAnimation::GetCurrentAnimation ( AssocGroupId & animGroup, AnimationId & animID )
+{
+    // Do we have a clump?
+    RpClump * pClump = GetClump ();
+    if ( pClump )
+    {
+        // Grab the first association (which should be the current)
+        CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump );
+        if ( pAssoc )
+        {
+            animGroup = pAssoc->GetAnimGroup ();
+            animID = pAssoc->GetAnimID ();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+void CClientAnimation::OnCreation ( void )
+{
+    // TODO: restore animations (possibly just the most recent)
+}
+
+
+void CClientAnimation::OnBlockLoad ( CAnimBlock * pBlock )
 {
     // Iterate our list of animations
     CAnimationItem * pAnim = NULL;
-    CAnimBlock * pBlock = NULL;
     vector < CAnimationItem * > ::const_iterator iter = m_Animations.begin ();
     while ( iter != m_Animations.end () )
     {
         pAnim = *iter;
-        // Are we waiting for the animations to load?
+        // Are we waiting for the block to load for this animation?
         if ( pAnim->requesting )
         {
-            // Has our block loaded now?
-            pBlock = pAnim->block;
-            if ( pBlock && pBlock->IsLoaded () )
+            // Is this the right block?
+            if ( pAnim->block == pBlock )
             {
                 // Grab our set of animations
-                CAnimBlendHierarchy * pHierarchy = m_pAnimManager->GetAnimation ( pAnim->name, pBlock );
+                CAnimBlendHierarchy * pHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( pAnim->name, pBlock );
                 if ( pHierarchy )
                 {
                     // We're no longer waiting for these animations, play them
@@ -88,12 +114,6 @@ void CClientAnimation::DoPulse ( void )
 }
 
 
-void CClientAnimation::OnCreation ( void )
-{
-    // TODO: restore animations (possibly just the most recent)
-}
-
-
 void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
 {
     RpClump * pClump = GetClump ();
@@ -105,7 +125,7 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
         flags |= 16; // plays properly
         if ( pAnim->updatePosition ) flags |= 64;
         
-        CAnimBlendAssociation * pAssoc = m_pAnimManager->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendSpeed );
+        CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendSpeed );
         if ( pAssoc )
         {
             // Fixes setting the same animation as the previous with a different loop flag
@@ -128,9 +148,13 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
 bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
 {
     // Is this a valid block name?
-    CAnimBlock * pBlock = m_pAnimManager->GetAnimationBlock ( szBlockName );
+    CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
     if ( pBlock )
     {        
+        // We need to clear any previous animations that are the same because..
+        // ..the finish callback won't be called for them.
+        FindAndClear ( pBlock, szName );
+
         CAnimationItem * pAnim = new CAnimationItem;
         pAnim->block = pBlock;
         pAnim->name = new char [ strlen ( szName ) + 1 ];
@@ -143,43 +167,73 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
         pAnim->luaMain = pMain;
         pAnim->luaFunction = iFunction;
         if ( pArguments ) pAnim->luaArguments = *pArguments;
+        pAnim->requesting = true;
+        m_Animations.push_back ( pAnim ); 
 
-        // Is the block already loaded?
-        if ( pBlock->IsLoaded () )
-        {            
-            // Is this a valid animation inside this block?
-            CAnimBlendHierarchy * pHierarchy = m_pAnimManager->GetAnimation ( szName, pBlock );
-            if ( pHierarchy )
-            {
-                // No problems, play our animation
-                pAnim->hierarchy = pHierarchy;
-                BlendAnimation ( pAnim );
-            }
-            else
-            {
-                // Animation doesn't exist, remove it
-                delete pAnim;
-                return false;
-            }
-        }
-        else
-        {
-            // The block isn't loaded yet, request it and handle the animation later
-            g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
-            pAnim->requesting = true;
-        }     
-
-        // We need to clear any previous animations that are the same because..
-        // ..the finish callback won't be called for them.
-        FindAndClear ( pBlock, szName );
-        
-        // Finally, save our new animation
-        m_Animations.push_back ( pAnim );        
+        // Let our manager handle the block loading
+        m_pAnimManager->Request ( pBlock, this );
+               
         return true;
     }
     
     return false;
 }
+
+
+void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition )
+{
+    RpClump * pClump = GetClump ();
+    if ( pClump )
+    {                
+        CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendSpeed );
+        if ( pAssoc )
+        {
+            // Fixes setting the same animation as the previous with a different loop flag
+            if ( bLoop != pAssoc->IsFlagSet ( 2 ) )
+            {
+                if ( bLoop ) pAssoc->SetFlag ( 2 );
+                else pAssoc->ClearFlag ( 2 );
+            }
+            pAssoc->SetSpeed ( fSpeed );
+            pAssoc->SetTime ( fStartTime );
+        }
+    }
+}
+
+
+void CClientAnimation::SyncAnimation ( CClientAnimation & Animation )
+{
+    RpClump * pClumpClone = Animation.GetClump ();
+    if ( pClumpClone )
+    {                
+        CAnimBlendAssociation * pAssocClone = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClumpClone );
+        if ( pAssocClone )
+        {
+            AssocGroupId animGroupClone = pAssocClone->GetAnimGroup ();
+            AnimationId animIDClone = pAssocClone->GetAnimID ();
+
+            RpClump * pClump = GetClump ();
+            if ( pClump )
+            {
+                CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump );
+                if ( !pAssoc ) pAssoc =  g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroupClone, animIDClone, 4.0f );
+                else
+                {
+                    AssocGroupId animGroup = pAssoc->GetAnimGroup ();
+                    AnimationId animID = pAssoc->GetAnimID ();
+
+                    if ( animGroup != animGroupClone || animID != animIDClone )
+                    {
+                        pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroupClone, animIDClone, 4.0f );
+                    }                    
+                }
+                pAssoc->SyncAnimation ( pAssocClone );
+            }
+        }
+    }
+}
+
+
 
 
 void CClientAnimation::FinishAnimation ( void )
@@ -242,7 +296,7 @@ void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
             {
                 // Call our lua callback function if we have one
                 if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
-                
+
                 // Remove this animation from the list now its finished
                 delete pAnim;
                 m_Animations.erase ( iter );
