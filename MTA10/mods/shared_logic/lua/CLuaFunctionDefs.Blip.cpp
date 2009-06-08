@@ -43,6 +43,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
         unsigned char ucBlue = 0;
         unsigned char ucAlpha = 255;
         short sOrdering = 0;
+        float fVisibleDistance = 99999.0f;
 
         // Read out the optional args
         int iArgument4 = lua_type ( luaVM, 4 );
@@ -79,6 +80,12 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
                                 if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
                                 {
                                     sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 10 ) );
+                                
+                                    int iArgument11 = lua_type ( luaVM, 11 );
+                                    if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
+                                    {
+                                        fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 11 ) );
+                                    }
                                 }
                             }
                         }
@@ -94,7 +101,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the blip
-                CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlip ( *pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering );
+                CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlip ( *pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance );
                 if ( pMarker )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -134,6 +141,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             unsigned char ucBlue = 0;
             unsigned char ucAlpha = 255;
             short sOrdering = 0;
+            float fVisibleDistance = 99999.0f;
 
             // Read out the optional args
             int iArgument2 = lua_type ( luaVM, 2 );
@@ -170,6 +178,12 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
                                     if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
                                     {
                                         sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 8 ) );
+                                    
+                                        int iArgument9 = lua_type ( luaVM, 9 );
+                                        if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+                                        {
+                                            fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
+                                        }
                                     }
                                 }
                             }
@@ -185,7 +199,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
                 if ( pResource )
                 {
                     // Create the blip
-                    CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering );
+                    CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance );
                     if ( pMarker )
                     {
                         CElementGroup * pGroup = pResource->GetElementGroup();

@@ -4913,7 +4913,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CElement* pElement, const char*
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
 {
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
@@ -4929,6 +4929,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
             pBlip->m_sOrdering = sOrdering;
+            pBlip->m_fVisibleDistance = fVisibleDistance;
 
             // Make him visible to the given element
             if ( pVisibleTo )
@@ -4948,7 +4949,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
 {
     assert ( pElement );
     // Valid icon and size?
@@ -4962,6 +4963,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
             pBlip->m_sOrdering = sOrdering;
+            pBlip->m_fVisibleDistance = fVisibleDistance;
 
             // Set his visible to element
             if ( pVisibleTo )

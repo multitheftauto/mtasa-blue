@@ -299,8 +299,8 @@ public:
     static bool                 SetMarkerIcon                       ( CElement* pElement, const char* szIcon );
 
     // Blip create/destroy functions
-    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, CElement* pVisibleTo );
-    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, CElement* pVisibleTo );
+    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
+    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
     static bool                 DestroyBlipsAttachedTo              ( CElement* pElement );
 
     // Blip get functions

@@ -403,6 +403,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // Write the ordering id
                     BitStream.Write ( pBlip->m_sOrdering );
 
+                    // Write the visible distance
+                    BitStream.Write ( pBlip->m_fVisibleDistance );
+
                     // Write the icon
                     unsigned char ucIcon = pBlip->m_ucIcon;
                     BitStream.Write ( ucIcon );

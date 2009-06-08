@@ -5973,6 +5973,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
         unsigned char ucBlue = 0;
         unsigned char ucAlpha = 255;
         short sOrdering = 0;
+        float fVisibleDistance = 99999.0f;
         CElement* pVisibleTo = m_pRootElement;
 
         // Read out the optional args
@@ -6011,15 +6012,21 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
                                 {
                                     sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 10 ) );
 
-                                    // Read out the optional visibleto argument
                                     int iArgument11 = lua_type ( luaVM, 11 );
-                                    if ( iArgument11 == LUA_TLIGHTUSERDATA )
+                                    if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
                                     {
-                                        pVisibleTo = lua_toelement ( luaVM, 11 );
-                                    }
-                                    else if ( iArgument11 == LUA_TBOOLEAN || iArgument11 == LUA_TNIL )
-                                    {
-                                        pVisibleTo = NULL;
+                                        fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 11 ) );
+
+                                        // Read out the optional visibleto argument
+                                        int iArgument12 = lua_type ( luaVM, 12 );
+                                        if ( iArgument12 == LUA_TLIGHTUSERDATA )
+                                        {
+                                            pVisibleTo = lua_toelement ( luaVM, 12 );
+                                        }
+                                        else if ( iArgument12 == LUA_TBOOLEAN || iArgument12 == LUA_TNIL )
+                                        {
+                                            pVisibleTo = NULL;
+                                        }
                                     }
                                 }
                             }
@@ -6036,7 +6043,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
 			if ( pResource )
 			{
 				// Create the blip
-				CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, pVisibleTo );
+				CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance, pVisibleTo );
 				if ( pBlip )
 				{
 					CElementGroup * pGroup = pResource->GetElementGroup();
@@ -6075,6 +6082,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
             unsigned char ucBlue = 0;
             unsigned char ucAlpha = 255;
             short sOrdering = 0;
+            float fVisibleDistance = 99999.0f;
             CElement* pVisibleTo = m_pRootElement;
 
             // Read out the optional args
@@ -6113,15 +6121,21 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                                     {
                                         sOrdering = static_cast < short > ( lua_tonumber ( luaVM, 8 ) );
 
-                                        // Read out the optional visibleto argument
                                         int iArgument9 = lua_type ( luaVM, 9 );
-                                        if ( iArgument9 == LUA_TLIGHTUSERDATA )
+                                        if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
                                         {
-                                            pVisibleTo = lua_toelement ( luaVM, 9 );
-                                        }
-                                        else if ( iArgument9 == LUA_TBOOLEAN || iArgument9 == LUA_TNIL )
-                                        {
-                                            pVisibleTo = NULL;
+                                            fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
+
+                                            // Read out the optional visibleto argument
+                                            int iArgument10 = lua_type ( luaVM, 10 );
+                                            if ( iArgument10 == LUA_TLIGHTUSERDATA )
+                                            {
+                                                pVisibleTo = lua_toelement ( luaVM, 10 );
+                                            }
+                                            else if ( iArgument10 == LUA_TBOOLEAN || iArgument10 == LUA_TNIL )
+                                            {
+                                                pVisibleTo = NULL;
+                                            }
                                         }
                                     }
                                 }
@@ -6137,7 +6151,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                 if ( resource )
                 {
 					// Create the blip
-					CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, pVisibleTo );
+					CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance, pVisibleTo );
 					if ( pBlip )
 					{
                         pBlip->SetParentObject ( resource->GetDynamicElementRoot() );

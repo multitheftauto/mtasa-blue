@@ -2970,9 +2970,9 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
 		pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -2985,9 +2985,9 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
 		pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
