@@ -239,8 +239,8 @@ public:
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
 
     // Blip funcs
-    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering );
-    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering );
+    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance );
+    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance );
 
     static bool                         SetBlipIcon                         ( CClientEntity& Entity, unsigned char ucIcon );
     static bool                         SetBlipSize                         ( CClientEntity& Entity, unsigned char ucSize );

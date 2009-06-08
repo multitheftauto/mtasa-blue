@@ -2561,8 +2561,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     short sOrdering;
                     bitStream.Read ( sOrdering );
 
+                    // Read out the visible distance
+                    float fVisibleDistance;
+                    bitStream.Read ( fVisibleDistance );
+
                     // Make a blip with the given ID
-                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering );
+                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, fVisibleDistance );
                     pEntity = pBlip;
 
                     pBlip->SetPosition ( vecPosition );

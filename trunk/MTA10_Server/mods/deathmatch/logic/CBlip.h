@@ -47,6 +47,7 @@ public:
     unsigned char               m_ucColorBlue;
     unsigned char               m_ucColorAlpha;
     short                       m_sOrdering;
+    float                       m_fVisibleDistance;
 };
 
 #endif
