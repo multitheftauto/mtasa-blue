@@ -17,7 +17,7 @@
 #include <gui/CGUIWindow.h>
 #include "CGUIElement_Impl.h"
 
-class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl
+class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl, public CGUITabList
 {
 public:
                         CGUIWindow_Impl         ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );

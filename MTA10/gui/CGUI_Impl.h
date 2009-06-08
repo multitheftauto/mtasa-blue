@@ -60,7 +60,7 @@ namespace CEGUI {
     typedef GUISheet DefaultWindow;
 }
 
-class CGUI_Impl : public CGUI
+class CGUI_Impl : public CGUI, public CGUITabList
 {
 public:
                                     CGUI_Impl                   ( IDirect3DDevice9* pDevice );
