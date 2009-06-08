@@ -2415,9 +2415,13 @@ stop_looping:
 
 
 // Hook to detect when a player is choking
-static DWORD dwChokingChoke = 0x4C05C1;
-static DWORD dwChokingDontchoke = 0x4C0620;
-static unsigned char ucChokingWeaponType = 0;
+DWORD dwChokingChoke = 0x4C05C1;
+DWORD dwChokingDontchoke = 0x4C0620;
+unsigned char ucChokingWeaponType = 0;
+CPedSAInterface * pChokingPedInterface = NULL;
+CPlayerPed * pChokingPed = NULL;
+CPedSAInterface * pResponsiblePedInterface = NULL;
+CPlayerPed * pResponsiblePed = NULL;
 void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
 {
     _asm
@@ -2425,10 +2429,21 @@ void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
         pushad
         mov     al, [esp+0x8C]
         mov     ucChokingWeaponType, al
+        mov     eax, dword ptr [edi]
+        mov     pChokingPedInterface, eax
+        mov     pResponsiblePedInterface, ebp
     }
 
-    if ( m_pChokingHandler && m_pChokingHandler ( ucChokingWeaponType ) == false )
-        goto dont_choke;
+    pChokingPed = dynamic_cast < CPlayerPed * > ( pGameInterface->GetPools ()->GetPed ( ( DWORD * ) pChokingPedInterface ) );
+    pResponsiblePed = dynamic_cast < CPlayerPed * > ( pGameInterface->GetPools ()->GetPed ( ( DWORD * ) pResponsiblePedInterface ) );
+
+    if ( pChokingPed )
+    {
+        if ( m_pChokingHandler )
+        {
+            if ( !m_pChokingHandler ( pChokingPed, pResponsiblePed, ucChokingWeaponType ) ) goto dont_choke;
+        }
+    }
 
     _asm
     {

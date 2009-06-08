@@ -3043,9 +3043,9 @@ void CClientGame::StaticGameProcessHandler ( void )
     g_pClientGame->GameProcessHandler ();
 }
 
-bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
-{
-    return g_pClientGame->ChokingHandler ( ucWeaponType );
+bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
+{    
+    return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3131,11 +3131,17 @@ void CClientGame::GameProcessHandler ( void )
     }
 }
 
-bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
+bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
 {
-    CLuaArguments Arguments;
-    Arguments.PushNumber ( ucWeaponType );
-    return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
+    CClientPed * pPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pChokingPed ), true, true );
+    if ( pPed )
+    {
+        CLuaArguments Arguments;        
+        Arguments.PushNumber ( ucWeaponType );
+        if ( pResponsiblePed ) Arguments.PushUserData ( pResponsiblePed );
+        else Arguments.PushNil ();
+        return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
+    }
 }
 
 

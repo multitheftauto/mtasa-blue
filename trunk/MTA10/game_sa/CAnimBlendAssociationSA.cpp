@@ -52,7 +52,6 @@ void CAnimBlendAssociationSA::SetDeleteCallback ( CALLBACK_CAnimBlendAssoc Callb
     _asm
     {
         mov     ecx, dwThis
-        or      byte ptr [ecx+2Fh],20h
         push    pData
         push    dwCallback
         call    dwFunc

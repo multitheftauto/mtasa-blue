@@ -34,7 +34,7 @@ typedef void ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef void ( GameProcessHandler ) ( void );
-typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
+typedef bool ( ChokingHandler ) ( class CPed* pChokingPed, class CPed* pResponsiblePed, unsigned char ucWeaponType );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
