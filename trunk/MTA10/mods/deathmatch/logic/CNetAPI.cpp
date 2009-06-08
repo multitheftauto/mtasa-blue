@@ -316,21 +316,6 @@ void CNetAPI::DoPulse ( void )
                 }
             }
 
-            if ( IsCameraSyncNeeded () )
-            {
-                // Send a camera-sync packet
-                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                if ( pBitStream )
-                {
-                    // Write our data
-                    WriteCameraSync ( *pBitStream );
-
-                    // Send the packet and destroy it
-                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_GAME );
-                    g_pNet->DeallocateNetBitStream ( pBitStream );
-                }
-            }
-
             // Time to freeze because of lack of return sync?
             if ( ( m_bStoredReturnSync ) &&
                     ( m_ulLastPuresyncTime != 0 ) &&
@@ -368,6 +353,25 @@ void CNetAPI::DoPulse ( void )
 
                 // Display network trouble
                 m_pManager->GetDisplayManager ()->DrawText2D ( "*** NETWORK TROUBLE ***", CVector ( 0.30f, 0.45f, 0 ), 2.0f, 0xFFFF0000 );
+            }
+        }
+
+        if ( pPlayer )
+        {
+            // Do camera sync even if player is dead
+            if ( IsCameraSyncNeeded () )
+            {
+                // Send a camera-sync packet
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                if ( pBitStream )
+                {
+                    // Write our data
+                    WriteCameraSync ( *pBitStream );
+
+                    // Send the packet and destroy it
+                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_GAME );
+                    g_pNet->DeallocateNetBitStream ( pBitStream );
+                }
             }
         }
     }

@@ -4449,8 +4449,8 @@ bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld,
     float fToleranceY = bRelative ? fEdgeTolerance * fResHeight : fEdgeTolerance;
 
     // Keep within a reasonable range
-    fToleranceX = Clamp ( -fResWidth, fToleranceX, fResWidth );
-    fToleranceY = Clamp ( -fResHeight, fToleranceY, fResHeight );
+    fToleranceX = Clamp ( 0.f, fToleranceX, fResWidth * 10 );
+    fToleranceY = Clamp ( 0.f, fToleranceY, fResHeight * 10 );
 
     if ( vecScreen.fX >= -fToleranceX && vecScreen.fX <= fResWidth + fToleranceX && vecScreen.fY >= -fToleranceY && vecScreen.fY <= fResHeight + fToleranceY && vecScreen.fZ > 0.1f )
     {
