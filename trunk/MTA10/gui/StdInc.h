@@ -17,6 +17,8 @@
 
 #include "SharedUtil.h"
 #include "SString.h"
+#include "CGUITabListItem.h"
+#include "CGUITabList.h"
 #include "CGUI_Impl.h"
 #include "CGUIButton_Impl.h"
 #include "CGUICheckBox_Impl.h"

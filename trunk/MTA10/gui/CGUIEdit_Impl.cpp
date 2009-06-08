@@ -6,6 +6,7 @@
 *  PURPOSE:     Edit box widget class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Marcus Bauer <mabako@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -32,7 +33,7 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
 	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our event
-    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextAccepted, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnTextAccepted, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnKeyDown, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnTextChanged, this ) );
     AddEvents ();
 
@@ -40,17 +41,30 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
     if ( pParent )
     {
         SetParent ( reinterpret_cast < CGUIElement_Impl* > ( pParent ) );
+        if ( CGUITabList* pTabList = dynamic_cast < CGUITabList* > ( pParent ) )
+        {
+            pTabList->AddItem ( this );
+        }
     }
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        pGUI->AddItem ( this );
+        SetParent ( NULL );
     }
 }
 
 
 CGUIEdit_Impl::~CGUIEdit_Impl ( void )
 {
+    if ( GetParent () == NULL ) 
+    {
+        m_pManager->RemoveItem ( this );
+    }
+    else if ( CGUITabList* pTabList = dynamic_cast < CGUITabList* > ( GetParent () ) )
+    {
+        pTabList->RemoveItem ( this );
+    }
     DestroyElement ();
 }
 
@@ -151,11 +165,16 @@ void CGUIEdit_Impl::SetTextChangedHandler ( GUI_CALLBACK Callback )
 }
 
 
-bool CGUIEdit_Impl::Event_OnTextAccepted ( const CEGUI::EventArgs& e )
+bool CGUIEdit_Impl::ActivateOnTab ( void )
 {
-	if ( m_OnTextAccepted )
-		m_OnTextAccepted ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
+    // Only select this as active if its visible and writable
+    if ( IsVisible () && !IsReadOnly () )
+    {
+        Activate ();
+        SetCaratIndex ( GetText ().length () );
+        return true;
+    }
+    return false;
 }
 
 
@@ -163,5 +182,29 @@ bool CGUIEdit_Impl::Event_OnTextChanged ( const CEGUI::EventArgs& e )
 {
 	if ( m_OnTextChanged )
 		m_OnTextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+bool CGUIEdit_Impl::Event_OnKeyDown( const CEGUI::EventArgs& e )
+{
+    const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
+    if( KeyboardArgs.scancode == CGUIKeys::Scan::Tab )
+    {
+        // tab pressed, if we are in a window with tab enabled, just switch to the next element
+        if ( GetParent () == NULL )
+        {
+            m_pManager->SelectNext ( this );
+        }
+        else if ( CGUITabList* pTabList = dynamic_cast < CGUITabList* > ( GetParent() ) )
+        {
+            pTabList->SelectNext ( this );
+        }
+    }
+    else if( KeyboardArgs.scancode == CGUIKeys::Scan::Return || KeyboardArgs.scancode == CGUIKeys::Scan::NumpadEnter )
+    {
+        // Enter/Return event is split from Tab now, since we use that for Console, Quick Connect, etc. as enter-only
+        if ( m_OnTextAccepted )
+            m_OnTextAccepted ( reinterpret_cast < CGUIElement* > ( this ) );
+    }
     return true;
 }

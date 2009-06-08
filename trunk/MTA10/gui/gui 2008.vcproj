@@ -376,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CGUITabList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CGUITabPanel_Impl.cpp"
 				>
 			</File>
@@ -498,6 +502,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CGUITabList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CGUITabPanel_Impl.h"
 				>
 			</File>
@@ -598,6 +606,10 @@
 				</File>
 				<File
 					RelativePath="..\sdk\gui\CGUITab.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CGUITabListItem.h"
 					>
 				</File>
 				<File
