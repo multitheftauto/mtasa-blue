@@ -738,13 +738,13 @@ void CLocalGUI::UpdateCursor ( void )
 
 DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
 {
-	// The following switch case is necessary to convert input WM_KEY* messages
-	// to corresponding DirectInput key messages.  CEGUI needs these.
+    // The following switch case is necessary to convert input WM_KEY* messages
+    // to corresponding DirectInput key messages.  CEGUI needs these.
 
     switch ( dwCharacter )
     {
         case VK_HOME:       return DIK_HOME;
-		case VK_END:		return DIK_END;
+        case VK_END:        return DIK_END;
         case VK_RETURN:     return DIK_RETURN;
         case VK_TAB:        return DIK_TAB;
         case VK_BACK:       return DIK_BACK;
@@ -754,12 +754,13 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
         case VK_DOWN:       return DIK_DOWNARROW;
         case VK_LSHIFT:     return DIK_LSHIFT;
         case VK_RSHIFT:     return DIK_RSHIFT;
-		case VK_CONTROL:    return DIK_LCONTROL;
+        case VK_SHIFT:      return DIK_LSHIFT;
+        case VK_CONTROL:    return DIK_LCONTROL;
         case VK_DELETE:     return DIK_DELETE;
-		case 0x56:		    return DIK_V;			// V
-		case 0x43:		    return DIK_C;			// C
-        case 0x58:		    return DIK_X;			// X
-        case 0x41:		    return DIK_A;			// A
+        case 0x56:          return DIK_V;			// V
+        case 0x43:          return DIK_C;			// C
+        case 0x58:          return DIK_X;			// X
+        case 0x41:          return DIK_A;			// A
         default:            return 0;
     }
 }
