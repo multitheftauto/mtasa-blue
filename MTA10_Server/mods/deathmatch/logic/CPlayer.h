@@ -46,6 +46,7 @@ class CPlayer : public CPed, public CClient
     {
         CPlayer*        pPlayer;
         unsigned long   ulLastSent;
+        unsigned long   ulSwitchingToSlowSyncRate;
     };
 
 public:

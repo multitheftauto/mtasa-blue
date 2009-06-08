@@ -467,22 +467,32 @@ bool CPlayer::IsTimeToSendSyncFrom ( CPlayer& Player, unsigned long ulTimeNow )
         // Matching player?
         if ( &Player == pData->pPlayer )
         {
-            // Less than a second ago we sent him a sync?
-            if ( ulTimeNow - pData->ulLastSent < SLOW_SYNCRATE )
-            {
-                // Is the player too far away for doing a sync at this rate?
-                // The camera must also be too far away.
-                CVector vecCameraPosition;
-                m_pCamera->GetPosition ( vecCameraPosition );
-                const CVector& vecRemotePlayerPos = Player.GetPosition ();
-                const CVector& vecLocalPlayerPos = GetPosition ();
+            // Is a slow sync rate required?
+            bool bReqSlowSync = false;
+            CVector vecCameraPosition;
+            m_pCamera->GetPosition ( vecCameraPosition );
+            const CVector& vecRemotePlayerPos = Player.GetPosition ();
+            const CVector& vecLocalPlayerPos = GetPosition ();
 
-                if ( ( DistanceBetweenPoints3D ( vecLocalPlayerPos, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) &&
-                     ( DistanceBetweenPoints3D ( vecCameraPosition, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) )
-                {
-                    // Don't send
-                    return false;
-                }
+            if ( ( DistanceBetweenPoints3D ( vecLocalPlayerPos, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) &&
+                 ( DistanceBetweenPoints3D ( vecCameraPosition, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) )
+            {
+                // Allow 5 fast syncs when switching from fast to slow sync rate to ensure big moves away from the viewer are updated in a timely manner
+                if ( pData->ulSwitchingToSlowSyncRate < 5 )
+                    pData->ulSwitchingToSlowSyncRate++;
+                else
+                    bReqSlowSync = true;
+            }
+            else
+            {
+                pData->ulSwitchingToSlowSyncRate = 0;
+            }
+
+            // Skip if slow syncing and previous sync was less than SLOW_SYNCRATE ticks ago
+            if ( bReqSlowSync && ulTimeNow - pData->ulLastSent < SLOW_SYNCRATE )
+            {
+                // Don't send
+                return false;
             }
 
             // Send a sync now since we're close to him or it's time to do so
@@ -496,6 +506,7 @@ bool CPlayer::IsTimeToSendSyncFrom ( CPlayer& Player, unsigned long ulTimeNow )
     pData = new sPlayerSyncData;
     pData->pPlayer = &Player;
     pData->ulLastSent = ulTimeNow;
+    pData->ulSwitchingToSlowSyncRate = 0;
     m_SyncTimes.push_back ( pData );
 
     // And do the sync
