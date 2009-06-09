@@ -155,6 +155,15 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
         // ..the finish callback won't be called for them.
         FindAndClear ( pBlock, szName );
 
+        // Do we have a previous animation finished and waiting to be deleted?
+        CAnimationItem * pCurrentAnim = GetCurrentAnimation ();
+        if ( pCurrentAnim && pCurrentAnim->finished )
+        {
+            // Lets remove it
+            delete pCurrentAnim;
+            m_Animations.pop_back ();
+        }
+
         CAnimationItem * pAnim = new CAnimationItem;
         pAnim->block = pBlock;
         pAnim->name = new char [ strlen ( szName ) + 1 ];
@@ -246,10 +255,19 @@ void CClientAnimation::FinishAnimation ( void )
         {
             // Make sure its no longer looping
             pAssoc->ClearFlag ( 2 );
-            // Go straight to the end of the animation
-            pAssoc->SetTime ( pAssoc->GetTotalTime () );            
+            /* Go straight to the end of the animation
+            (note: not completely as our finish event wont get called) */
+            pAssoc->SetTime ( pAssoc->GetTotalTime () - 0.001f );            
         }
     }
+
+    // Clear up our animations
+    vector < CAnimationItem * > ::const_iterator iter = m_Animations.begin ();
+    for ( ; iter != m_Animations.end () ; iter++ )
+    {
+        delete *iter;
+    }
+    m_Animations.clear ();
 }
 
 
@@ -269,14 +287,37 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
             // Call our lua callback function if we have one
             if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
 
-            // Remove this animation from the list now its finished
-            delete pAnim;
-            pElement->m_Animations.erase ( iter );
+            // Is this our final animation?
+            if ( pAnim == pElement->m_Animations.back () )
+            {
+                // Set it as finished
+                pAnim->finished = true;
+            }
+            else
+            {
+                // Remove this animation from the list now its finished
+                delete pAnim;
+                pElement->m_Animations.erase ( iter );
+            }
 
             // Finish here as there should only be 1 match.
             return;
         }
     }
+}
+
+
+bool CClientAnimation::AllowBlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    // Grab our last animation
+    CAnimationItem * pAnim = GetCurrentAnimation ();
+    if ( pAnim )
+    {        
+        // We have a current animation that isnt finished, dont allow a new one to be played
+        return false;
+    }
+    // Allow GTA to set a new animation
+    return true;
 }
 
 

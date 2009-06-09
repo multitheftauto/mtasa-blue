@@ -20,6 +20,9 @@
 
 #define DEFAULT_WAVES -1.0f
 
+typedef unsigned long AssocGroupId;
+typedef unsigned long AnimationId;
+
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
@@ -35,6 +38,7 @@ typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef void ( GameProcessHandler ) ( void );
 typedef bool ( ChokingHandler ) ( class CPed* pChokingPed, class CPed* pResponsiblePed, unsigned char ucWeaponType );
+typedef bool ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -108,6 +112,7 @@ public:
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
 	virtual void						SetGameProcessHandler       ( GameProcessHandler* pProcessHandler ) = 0;
     virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
+    virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
 
     virtual void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler ) = 0;
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;

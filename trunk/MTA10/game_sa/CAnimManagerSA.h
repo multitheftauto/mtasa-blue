@@ -140,12 +140,13 @@ public:
     int                         RpAnimBlendClumpGetNumAssociations      ( RpClump * pClump );
     void                        RpAnimBlendClumpUpdateAnimations        ( RpClump * pClump, float f1, bool b1 );
 
-
     // MTA members
     CAnimBlendAssociation *     GetAnimBlendAssociation                 ( CAnimBlendAssociationSAInterface * pInterface );
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
+    void                        ClearAnimBlendAssociation               ( CAnimBlendAssociationSAInterface * pInterface );
+    void                        ClearAnimBlendHierarchy                 ( CAnimBlendHierarchySAInterface * pInterface );
 
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
