@@ -222,6 +222,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
+    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -350,6 +351,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetGameProcessHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
+    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -3048,6 +3050,12 @@ bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePe
     return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
 }
 
+
+bool CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    return g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3142,6 +3150,23 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
         else Arguments.PushNil ();
         return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
     }
+    return true;
+}
+
+bool CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    if ( pPed )
+    {
+        // Make sure we have atleast one animation running if we're going to ignore another
+        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
+        {
+            // Do NOT remove this call
+            bool bAllow = pPed->AllowBlendAnimation ( animGroup, animID, fBlendDelta );
+            if ( !bAllow ) return false;
+        }
+    }
+    return true;
 }
 
 

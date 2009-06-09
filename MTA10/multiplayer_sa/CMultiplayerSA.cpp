@@ -88,6 +88,8 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 DWORD FUNC_CEntity_Render =                                 0x534310;
 
+#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -133,6 +135,7 @@ ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
 GameProcessHandler* m_pGameProcessHandler = NULL;
 ChokingHandler* m_pChokingHandler = NULL;
+BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 
 ExplosionHandler * m_pExplosionHandler; // stores our handler
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
@@ -171,6 +174,7 @@ void HOOK_CGame_Process ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
 void HOOK_ComputeDamageResponse_StartChoking ();
 void HOOK_CollisionStreamRead ();
+void HOOK_CAnimManager_BlendAnimation ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -250,6 +254,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -1067,6 +1072,11 @@ void CMultiplayerSA::SetGameProcessHandler ( GameProcessHandler* pProcessHandler
 void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 {
     m_pChokingHandler = pChokingHandler;
+}
+
+void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
+{
+    m_pBlendAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -2796,6 +2806,60 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
         _asm
         {
             ret
+        }
+    }
+}
+
+/* If we don't want any MTA animations interrupted and GTA tries to call CAnimManager::BlendAnimation..
+   ..then pass them a fake CAnimBlendAssociation pointer for them to play with =) */
+DWORD dwBlendAnimationReturn = 0x4D4617;
+RpClump * pBlendAnimationClump = NULL;
+AssocGroupId blendAnimationGroup = 0;
+AnimationId blendAnimationID = 0;
+float fBlendAnimationBlendDelta;
+class CFakeAnimBlendAssociation
+{
+public:
+    CFakeAssoc () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
+    void * m_pointer;
+    char m_data [ 100 ];
+} fakeAssoc;
+CFakeAssoc * pFakeAssoc = &fakeAssoc;
+
+void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
+{
+    _asm
+    {        
+        mov     eax, [esp+4]
+        mov     pBlendAnimationClump, eax
+        mov     eax, [esp+8]
+        mov     blendAnimationGroup, eax
+        mov     eax, [esp+12]
+        mov     blendAnimationID, eax
+        mov     eax, [esp+16]
+        mov     fBlendAnimationBlendDelta, eax
+        pushad
+    }
+    if ( m_pBlendAnimationHandler && !m_pBlendAnimationHandler ( pBlendAnimationClump,
+                                                                 blendAnimationGroup,
+                                                                 blendAnimationID,
+                                                                 fBlendAnimationBlendDelta ) )
+    {
+        _asm
+        {
+            popad
+            mov     eax, pFakeAssoc
+            ret
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            sub     esp,14h 
+            mov     ecx,dword ptr [esp+18h]
+            jmp     dwBlendAnimationReturn
         }
     }
 }
