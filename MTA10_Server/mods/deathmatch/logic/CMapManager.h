@@ -96,6 +96,7 @@ private:
     CElement*                   LoadNode                    ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
     bool                        LoadSubNodes                ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
     bool                        HandleNode                  ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart, CElement** pCreated );
+    void                        LinkupElements              ( void );
 
     CBlipManager*               m_pBlipManager;
     CObjectManager*             m_pObjectManager;
