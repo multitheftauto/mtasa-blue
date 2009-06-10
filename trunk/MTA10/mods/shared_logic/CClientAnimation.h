@@ -22,14 +22,17 @@
 class CClientAnimationManager;
 class CAnimBlock;
 
+#define ANIM_TYPE_MANAGED 0
+#define ANIM_TYPE_TASK 1
+
 class CAnimationItem
 {
 public:
     CAnimationItem ( void )
     {
         block = NULL; hierarchy = NULL; assoc = NULL; name = NULL; speed = 1.0f; blendSpeed = 1.0f;
-        loop = true; startTime = 0.0f;updatePosition = true; luaMain = NULL; luaFunction = -1;
-        requesting = false; finished = false;
+        loop = true; startTime = 0.0f; updatePosition = true; interruptable = false; luaMain = NULL;
+        luaFunction = -1; requesting = false; finished = false; type = ANIM_TYPE_MANAGED; time = 0;
     }
     ~CAnimationItem ( void )
     {
@@ -44,11 +47,14 @@ public:
     float                   startTime;
     bool                    loop;
     bool                    updatePosition;
+    bool                    interruptable;
     CLuaMain *              luaMain;
     int                     luaFunction;
     CLuaArguments           luaArguments;
     bool                    requesting;
     bool                    finished;
+    unsigned char           type;
+    int                     time;
 };
 
 class CClientAnimation
@@ -66,10 +72,10 @@ public:
     void                                OnCreation                  ( void );
     void                                OnBlockLoad                 ( CAnimBlock * pBlock );
 
-    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
-    void                                BlendAnimation              ( AssocGroupId animGroup, AnimationId animID, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true );
-    void                                SyncAnimation               ( CClientAnimation & Animation );
+    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
     void                                FinishAnimation             ( void );
+
+    bool                                RunNamedAnimation           ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
 
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
     bool                                AllowBlendAnimation         ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );

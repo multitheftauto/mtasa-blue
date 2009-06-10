@@ -1571,16 +1571,38 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, CLuaMain * pLuaMain, int iLuaFunction, CLuaArguments * pArguments )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
+{
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+    
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+
+        if ( szBlockName && szAnimName )
+        {
+            return Ped.RunNamedAnimation ( szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+        }
+        else
+        {
+            Ped.FinishAnimation ();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::BlendPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pLuaMain, int iLuaFunction, CLuaArguments * pArguments )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, pLuaMain, iLuaFunction, pArguments );
+    RUN_CHILDREN BlendPedAnimation ( **iter, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
 
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         if ( szBlockName && szAnimName )
         {            
-            return Ped.BlendAnimation ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, pLuaMain, iLuaFunction, pArguments );
+            return Ped.BlendAnimation ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
         }
         else
         {

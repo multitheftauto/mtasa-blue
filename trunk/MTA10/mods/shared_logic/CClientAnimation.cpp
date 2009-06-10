@@ -124,28 +124,52 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
         if ( pAnim->loop ) flags |= 2; // loop
         flags |= 16; // plays properly
         if ( pAnim->updatePosition ) flags |= 64;
-        
-        CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendSpeed );
-        if ( pAssoc )
-        {
-            // Fixes setting the same animation as the previous with a different loop flag
-            if ( pAnim->loop != pAssoc->IsFlagSet ( 2 ) )
-            {
-                if ( pAnim->loop ) pAssoc->SetFlag ( 2 );
-                else pAssoc->ClearFlag ( 2 );
-            }
-            pAssoc->SetSpeed ( pAnim->speed );
-            pAssoc->SetTime ( pAnim->startTime );
 
-            // Add a callback handler which'll be called when its finished being used
-            pAssoc->SetFinishCallback ( CClientAnimation::StaticBlendAssocFinish, this );
-            pAnim->assoc = pAssoc;
+        if ( pAnim->type == ANIM_TYPE_MANAGED )
+        {        
+            CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pAnim->hierarchy, flags, pAnim->blendSpeed );
+            if ( pAssoc )
+            {
+                // Fixes setting the same animation as the previous with a different loop flag
+                if ( pAnim->loop != pAssoc->IsFlagSet ( 2 ) )
+                {
+                    if ( pAnim->loop ) pAssoc->SetFlag ( 2 );
+                    else pAssoc->ClearFlag ( 2 );
+                }
+                pAssoc->SetSpeed ( pAnim->speed );
+                pAssoc->SetTime ( pAnim->startTime );
+
+                // Add a callback handler which'll be called when its finished being used
+                pAssoc->SetFinishCallback ( CClientAnimation::StaticBlendAssocFinish, this );
+                pAnim->assoc = pAssoc;
+            }
+        }
+        else if ( pAnim->type == ANIM_TYPE_TASK )
+        {
+            CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
+            CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
+            if ( pPlayerPed )
+            {
+                // Kill any higher priority tasks if we dont want this anim interuptable
+                if ( !pAnim->interruptable )
+                {
+                    pPed->KillTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+                    pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+                    pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+                }
+
+                CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( pAnim->name, pAnim->block->GetName (), flags, pAnim->blendSpeed, pAnim->time, !pAnim->interruptable );
+                if ( pTask )
+                {
+                    pTask->SetAsPedTask ( pPlayerPed, TASK_PRIORITY_PRIMARY );
+                }
+            }
         }
     }
 }
 
 
-bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
+bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
 {
     // Is this a valid block name?
     CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
@@ -173,6 +197,7 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
         pAnim->startTime = fStartTime;
         pAnim->loop = bLoop;
         pAnim->updatePosition = bUpdatePosition;
+        pAnim->interruptable = bInterruptable;
         pAnim->luaMain = pMain;
         pAnim->luaFunction = iFunction;
         if ( pArguments ) pAnim->luaArguments = *pArguments;
@@ -189,75 +214,42 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
 }
 
 
-void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition )
-{
-    RpClump * pClump = GetClump ();
-    if ( pClump )
-    {                
-        CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendSpeed );
-        if ( pAssoc )
-        {
-            // Fixes setting the same animation as the previous with a different loop flag
-            if ( bLoop != pAssoc->IsFlagSet ( 2 ) )
-            {
-                if ( bLoop ) pAssoc->SetFlag ( 2 );
-                else pAssoc->ClearFlag ( 2 );
-            }
-            pAssoc->SetSpeed ( fSpeed );
-            pAssoc->SetTime ( fStartTime );
-        }
-    }
-}
-
-
-void CClientAnimation::SyncAnimation ( CClientAnimation & Animation )
-{
-    RpClump * pClumpClone = Animation.GetClump ();
-    if ( pClumpClone )
-    {                
-        CAnimBlendAssociation * pAssocClone = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClumpClone );
-        if ( pAssocClone )
-        {
-            AssocGroupId animGroupClone = pAssocClone->GetAnimGroup ();
-            AnimationId animIDClone = pAssocClone->GetAnimID ();
-
-            RpClump * pClump = GetClump ();
-            if ( pClump )
-            {
-                CAnimBlendAssociation * pAssoc = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump );
-                if ( !pAssoc ) pAssoc =  g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroupClone, animIDClone, 4.0f );
-                else
-                {
-                    AssocGroupId animGroup = pAssoc->GetAnimGroup ();
-                    AnimationId animID = pAssoc->GetAnimID ();
-
-                    if ( animGroup != animGroupClone || animID != animIDClone )
-                    {
-                        pAssoc = g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroupClone, animIDClone, 4.0f );
-                    }                    
-                }
-                pAssoc->SyncAnimation ( pAssocClone );
-            }
-        }
-    }
-}
-
-
-
-
 void CClientAnimation::FinishAnimation ( void )
 {
     CAnimationItem * pCurrent = GetCurrentAnimation ();
     if ( pCurrent )
     {
-        CAnimBlendAssociation * pAssoc = pCurrent->assoc;
-        if ( pAssoc )
+        if ( pCurrent->type == ANIM_TYPE_MANAGED )
         {
-            // Make sure its no longer looping
-            pAssoc->ClearFlag ( 2 );
-            /* Go straight to the end of the animation
-            (note: not completely as our finish event wont get called) */
-            pAssoc->SetTime ( pAssoc->GetTotalTime () - 0.001f );            
+            CAnimBlendAssociation * pAssoc = pCurrent->assoc;
+            if ( pAssoc )
+            {
+                // Make sure its no longer looping
+                pAssoc->ClearFlag ( 2 );
+                /* Go straight to the end of the animation
+                (note: not completely as our finish event wont get called) */
+                pAssoc->SetTime ( pAssoc->GetTotalTime () - 0.001f );            
+            }
+        }
+        else if ( pCurrent->type == ANIM_TYPE_TASK )
+        {
+            CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
+            CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
+            CTaskManager * pTaskManager = pPed->GetTaskManager ();
+            if ( pPlayerPed && pTaskManager )
+            {                
+                CTask* pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+                if ( pTask )
+                {
+                    int iTaskType = pTask->GetTaskType ();
+                    if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
+                    {
+                        pTask->MakeAbortable ( pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
+                        pTask->Destroy ();
+                        pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                    }
+                }
+            }
         }
     }
 
@@ -268,6 +260,36 @@ void CClientAnimation::FinishAnimation ( void )
         delete *iter;
     }
     m_Animations.clear ();
+}
+
+
+bool CClientAnimation::RunNamedAnimation ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
+{
+    // Is this a valid block name?
+    CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
+    if ( pBlock )
+    {
+        CAnimationItem * pAnim = new CAnimationItem;
+        pAnim->block = pBlock;
+        pAnim->name = new char [ strlen ( szName ) + 1 ];
+        strcpy ( pAnim->name, szName );
+        pAnim->speed = 1.0f;
+        pAnim->blendSpeed = 4.0f;
+        pAnim->startTime = 0.0f;
+        pAnim->loop = bLoop;
+        pAnim->updatePosition = bUpdatePosition;
+        pAnim->interruptable = bInterruptable;
+        pAnim->time = iTime;
+        pAnim->requesting = true;
+        pAnim->type = ANIM_TYPE_TASK;
+        m_Animations.push_back ( pAnim ); 
+
+        // Let our manager handle the block loading
+        m_pAnimManager->Request ( pBlock, this );
+        
+        return true;
+    }
+    return false;
 }
 
 
@@ -311,10 +333,27 @@ bool CClientAnimation::AllowBlendAnimation ( AssocGroupId animGroup, AnimationId
 {
     // Grab our last animation
     CAnimationItem * pAnim = GetCurrentAnimation ();
-    if ( pAnim )
+    if ( pAnim  )
     {        
-        // We have a current animation that isnt finished, dont allow a new one to be played
-        return false;
+        // Is this animation not interruptable?
+        if ( !pAnim->interruptable )
+        {           
+            // We have a current animation that isnt interruptable, dont allow a new one to be played
+            return false;
+        }
+        else
+        {
+            // Was it not finished yet?
+            if ( !pAnim->finished )
+            {
+                // Call our lua callback function if we have one
+                if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
+            }
+
+            // Lets remove it
+            delete pAnim;
+            m_Animations.pop_back ();
+        }
     }
     // Allow GTA to set a new animation
     return true;

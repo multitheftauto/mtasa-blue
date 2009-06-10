@@ -210,6 +210,7 @@ public:
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
+    LUA_DECLARE ( BlendPedAnimation );
     LUA_DECLARE ( SetPedAnimation );
     LUA_DECLARE ( SetPedMoveAnim );
     LUA_DECLARE ( SetPedWeaponSlot );

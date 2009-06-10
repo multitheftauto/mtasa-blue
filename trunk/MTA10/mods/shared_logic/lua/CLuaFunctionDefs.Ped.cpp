@@ -1388,6 +1388,51 @@ int CLuaFunctionDefs::SetPedCanBeKnockedOffBike ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
 {
+    // Check types
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab the element
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            const char * szBlockName = NULL;
+            const char * szAnimName = NULL;
+            int iTime = -1;
+            bool bLoop = true;
+            bool bUpdatePosition = true;
+            bool bInteruptable = true;
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
+            if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
+            int iArgument4 = lua_type ( luaVM, 4 );
+            if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+                iTime = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
+            if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
+                bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
+            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+                bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
+            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+                bInteruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
+
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimation", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimation" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::BlendPedAnimation ( lua_State* luaVM )
+{
     // bool setPedAnimation ( ped thePed,string block,string name,[float speed=1.0,float blendSpeed=1.0, float startTime=0.0,bool loop=true,bool updatePosition=true,function callbackFunction=nil, var arguments, ...] )
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
@@ -1406,6 +1451,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
                 float fStartTime = 0.0f;
                 bool bLoop = true;
                 bool bUpdatePosition = true;
+                bool bInterruptable = false;
                 CLuaMain * pAnimMain = NULL;
                 int iAnimFunction = LUA_REFNIL;
                 CLuaArguments * pAnimArguments = NULL;
@@ -1426,11 +1472,13 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
                     bLoop = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
                 if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
                     bUpdatePosition = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
-                if ( lua_type ( luaVM, 9 ) != LUA_TNIL )
+                if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )
+                    bInterruptable = ( lua_toboolean ( luaVM, 9 ) ) ? true:false;
+                if ( lua_type ( luaVM, 10 ) != LUA_TNIL )
                 {
                     // Jax: grab our arguments first, luaM_toref pops the stack!                    
-                    Arguments.ReadArguments ( luaVM, 10 );
-                    int iLuaFunction = luaM_toref ( luaVM, 9 );
+                    Arguments.ReadArguments ( luaVM, 11 );
+                    int iLuaFunction = luaM_toref ( luaVM, 10 );
                     if ( VERIFY_FUNCTION ( iLuaFunction ) )
                     {
                         pAnimMain = pLuaMain;
@@ -1439,7 +1487,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
                     }
                 }
 
-                if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, pAnimMain, iAnimFunction, pAnimArguments ) )
+                if ( CStaticFunctionDefinitions::BlendPedAnimation ( *pEntity, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pAnimMain, iAnimFunction, pAnimArguments ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
