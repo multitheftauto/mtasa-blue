@@ -2243,7 +2243,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
     m_Events.AddEvent ( "onClientPedWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
     m_Events.AddEvent ( "onClientPedWasted", "", NULL, false );
-    
+    m_Events.AddEvent ( "onClientPedChoke", "", NULL, false );
+
     // Vehicle events
     m_Events.AddEvent ( "onClientVehicleRespawn", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleEnter", "player, seat", NULL, false );
@@ -3148,7 +3149,10 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
         Arguments.PushNumber ( ucWeaponType );
         if ( pResponsiblePed ) Arguments.PushUserData ( pResponsiblePed );
         else Arguments.PushNil ();
-        return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
+        if ( IS_PLAYER (pPed) )
+            return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
+        else
+            return pPed->CallEvent ( "onClientPedChoke", Arguments, true );
     }
     return true;
 }
