@@ -37,6 +37,7 @@ public:
     DECLARE_RPC ( SetPedAnimation );
     DECLARE_RPC ( SetPedOnFire );
     DECLARE_RPC ( SetPedHeadless );
+    DECLARE_RPC ( SetPedFrozen );
 };
 
 #endif

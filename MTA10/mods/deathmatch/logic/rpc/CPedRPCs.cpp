@@ -34,6 +34,7 @@ void CPedRPCs::LoadFunctions ( void )
     AddHandler ( SET_PED_ANIMATION, SetPedAnimation, "SetPedAnimation" );
     AddHandler ( SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire" );
     AddHandler ( SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless" );
+    AddHandler ( SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen" );
 }
 
 
@@ -377,6 +378,24 @@ void CPedRPCs::SetPedHeadless ( NetBitStreamInterface& bitStream )
         if ( pPed )
         {
             pPed->SetHeadless ( ( ucIsHeadless == 1 ) );
+        }
+    }
+}
+
+
+void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
+{
+    ElementID PedID;
+    unsigned char ucIsFrosen;
+
+    if ( bitStream.Read ( PedID ) &&
+         bitStream.Read ( ucIsFrosen ) )
+    {
+        // Grab the ped
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
+        if ( pPed )
+        {
+            // pPed->SetFrosen ( ( ucIsFrosen == 1 ) );
         }
     }
 }
