@@ -781,6 +781,7 @@ CElement* CMapManager::LoadNode ( CResource& Loader, CXMLNode& Node, CElement* p
     // Load the given node and its children
     CElement* pLoadedRoot;
     HandleNode ( Loader, Node, pParent, pAdded, bIsDuringStart, &pLoadedRoot );
+    LinkupElements ();
     return pLoadedRoot;
 }
 
@@ -801,63 +802,6 @@ bool CMapManager::LoadSubNodes ( CResource& Loader, CXMLNode& Node, CElement* pP
             {
                 return false;
             }
-        }
-    }
-
-    // * Link up all the attaching elements
-    list < CVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
-    {
-        CVehicle* pVehicle = *iterVehicles;
-
-        char* szAttachToID = pVehicle->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
-        {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pVehicle->AttachTo ( pElement );
-        }
-    }
-
-    list < CPlayer* > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd (); iterPlayers++ )
-    {
-        CPlayer* pPlayer = *iterPlayers;
-        // Link up all the attaching elements
-        char* szAttachToID = pPlayer->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
-        {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pPlayer->AttachTo ( pElement );
-        }
-    }
-
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
-    for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
-    {
-        CObject* pObject = *iterObjects;
-        // Link up all the attaching elements
-        char* szAttachToID = pObject->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
-        {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pObject->AttachTo ( pElement );
-        }
-    }
-
-    list < CBlip* > ::const_iterator iterBlips = m_pBlipManager->IterBegin ();
-    for ( ; iterBlips != m_pBlipManager->IterEnd (); iterBlips++ )
-    {
-        CBlip* pBlip = *iterBlips;
-        // Link up all the attaching elements
-        char* szAttachToID = pBlip->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
-        {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pBlip->AttachTo ( pElement );
         }
     }
 
@@ -956,4 +900,65 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
         return LoadSubNodes ( Loader, Node, pNode, pAdded, bIsDuringStart );
     }
     return false;
+}
+
+
+void CMapManager::LinkupElements ( void )
+{
+    // * Link up all the attaching elements
+    list < CVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
+    for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
+    {
+        CVehicle* pVehicle = *iterVehicles;
+
+        char* szAttachToID = pVehicle->GetAttachToID ();
+        if ( szAttachToID [ 0 ] )
+        {
+            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
+            if ( pElement )
+                pVehicle->AttachTo ( pElement );
+        }
+    }
+
+    list < CPlayer* > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
+    for ( ; iterPlayers != m_pPlayerManager->IterEnd (); iterPlayers++ )
+    {
+        CPlayer* pPlayer = *iterPlayers;
+        // Link up all the attaching elements
+        char* szAttachToID = pPlayer->GetAttachToID ();
+        if ( szAttachToID [ 0 ] )
+        {
+            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
+            if ( pElement )
+                pPlayer->AttachTo ( pElement );
+        }
+    }
+
+    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
+    {
+        CObject* pObject = *iterObjects;
+        // Link up all the attaching elements
+        char* szAttachToID = pObject->GetAttachToID ();
+        if ( szAttachToID [ 0 ] )
+        {
+            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
+            if ( pElement )
+                pObject->AttachTo ( pElement );
+        }
+    }
+
+    list < CBlip* > ::const_iterator iterBlips = m_pBlipManager->IterBegin ();
+    for ( ; iterBlips != m_pBlipManager->IterEnd (); iterBlips++ )
+    {
+        CBlip* pBlip = *iterBlips;
+        // Link up all the attaching elements
+        char* szAttachToID = pBlip->GetAttachToID ();
+        if ( szAttachToID [ 0 ] )
+        {
+            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
+            if ( pElement )
+                pBlip->AttachTo ( pElement );
+        }
+    }
 }
