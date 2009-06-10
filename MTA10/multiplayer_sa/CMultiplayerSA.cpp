@@ -2820,11 +2820,11 @@ float fBlendAnimationBlendDelta;
 class CFakeAnimBlendAssociation
 {
 public:
-    CFakeAssoc () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
+    CFakeAnimBlendAssociation () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
     void * m_pointer;
     char m_data [ 100 ];
 } fakeAssoc;
-CFakeAssoc * pFakeAssoc = &fakeAssoc;
+CFakeAnimBlendAssociation * pFakeAssoc = &fakeAssoc;
 
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
 {
@@ -2840,6 +2840,7 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
         mov     fBlendAnimationBlendDelta, eax
         pushad
     }
+    
     if ( m_pBlendAnimationHandler && !m_pBlendAnimationHandler ( pBlendAnimationClump,
                                                                  blendAnimationGroup,
                                                                  blendAnimationID,

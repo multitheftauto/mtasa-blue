@@ -131,7 +131,8 @@ public:
     static bool							SetPedWeaponSlot					( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
-    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, CLuaMain * pLuaMain = NULL, int iLuaFunction = LUA_REFNIL, CLuaArguments * pArguments = NULL );
+    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable );
+    static bool                         BlendPedAnimation                   ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pLuaMain = NULL, int iLuaFunction = LUA_REFNIL, CLuaArguments * pArguments = NULL );
     static bool                         SetPedMoveAnim                      ( CClientEntity& Entity, unsigned int iMoveAnim );
     static bool                         AddPedClothes						( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
     static bool                         RemovePedClothes					( CClientEntity& Entity, unsigned char ucType );
