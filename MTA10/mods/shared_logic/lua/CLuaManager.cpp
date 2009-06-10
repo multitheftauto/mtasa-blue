@@ -398,6 +398,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedControlState", CLuaFunctionDefs::GetPedControlState );
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefs::IsPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefs::GetPedAnimation );
+    CLuaCFunctions::AddFunction ( "getPedAnimationData", CLuaFunctionDefs::GetPedAnimationData ); 
     //CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefs::GetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefs::IsPedHeadless );
 	CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefs::GetPedCameraRotation );
