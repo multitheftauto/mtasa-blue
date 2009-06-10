@@ -949,6 +949,83 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetPedAnimationData ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            CAnimationItem * pAnim = pPed->GetCurrentAnimation ();
+            if ( pAnim )
+            {
+                const char * szDataType = lua_tostring ( luaVM, 2 );
+                if ( !stricmp ( szDataType, "name" ) )
+                {
+                    lua_pushstring ( luaVM, pAnim->name );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "blockName" ) )
+                {
+                    lua_pushstring ( luaVM, pAnim->block->GetName () );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "loop" ) )
+                {
+                    lua_pushboolean ( luaVM, pAnim->loop );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "updatePosition" ) )
+                {
+                    lua_pushboolean ( luaVM, pAnim->updatePosition );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "interruptable" ) )
+                {
+                    lua_pushboolean ( luaVM, pAnim->interruptable );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "time" ) )
+                {
+                    lua_pushnumber ( luaVM, pAnim->time );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "startTime" ) )
+                {
+                    lua_pushnumber ( luaVM, pAnim->startTime );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "finished" ) )
+                {
+                    lua_pushboolean ( luaVM, pAnim->finished );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "speed" ) )
+                {
+                    lua_pushnumber ( luaVM, pAnim->speed );
+                    return 1;
+                }
+                else if ( !stricmp ( szDataType, "blendSpeed" ) )
+                {
+                    lua_pushnumber ( luaVM, pAnim->blendSpeed );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogWarning ( luaVM, "getPedAnimationData: bad 'dataType' string" );
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnimationData", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnimationData" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetPedMoveAnim ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )

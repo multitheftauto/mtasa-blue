@@ -158,7 +158,8 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
                     pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
                 }
 
-                CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( pAnim->name, pAnim->block->GetName (), flags, pAnim->blendSpeed, pAnim->time, !pAnim->interruptable );
+                // Time arg is always -1 (which means the task will stay until removed)
+                CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( pAnim->name, pAnim->block->GetName (), flags, pAnim->blendSpeed, -1, !pAnim->interruptable );
                 if ( pTask )
                 {
                     pTask->SetAsPedTask ( pPlayerPed, TASK_PRIORITY_PRIMARY );
