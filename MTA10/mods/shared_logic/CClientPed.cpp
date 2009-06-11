@@ -77,7 +77,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pOccupyingVehicle = NULL;
     m_uiOccupyingSeat = 0;
     m_uiOccupiedVehicleSeat = 0xFF;
-    m_bIsFrozen = false;
     m_bHealthLocked = false;
     m_bDontChangeRadio = false;
     m_bArmorLocked = false;
@@ -133,6 +132,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
     m_bHeadless = false;
+    m_bFrozen = false;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
     
@@ -346,6 +346,12 @@ void CClientPed::ResetStats ( void )
 
 bool CClientPed::GetMatrix ( CMatrix& Matrix ) const
 {
+    // Are we frozen?
+    if ( IsFrozen () )
+    {
+        Matrix = m_matFrozen;
+    }    
+    else
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->GetMatrix ( &Matrix );
@@ -371,6 +377,7 @@ bool CClientPed::SetMatrix ( const CMatrix& Matrix )
         UpdateStreamPosition ( Matrix.vPos );
     }
     m_Matrix = Matrix;
+    m_matFrozen = Matrix;
 
     return true;
 }
@@ -381,9 +388,9 @@ void CClientPed::GetPosition ( CVector& vecPosition ) const
     CClientVehicle * pVehicle = const_cast < CClientPed * > ( this )->GetRealOccupiedVehicle ();
 
     // Are we frozen?
-    if ( m_bIsFrozen )
+    if ( IsFrozen () )
     {
-        vecPosition = m_vecFrozen;
+        vecPosition = m_matFrozen.vPos;
     }    
     // Streamed in?
     else if ( m_pPlayerPed )
@@ -411,9 +418,6 @@ void CClientPed::GetPosition ( CVector& vecPosition ) const
 
 void CClientPed::SetPosition ( const CVector& vecPosition )
 {
-    // Don't allow a position change if we're frozen
-    if ( m_bIsFrozen ) return;
-
     // We have a player ped?
     if ( m_pPlayerPed )
     {
@@ -441,6 +445,8 @@ void CClientPed::SetPosition ( const CVector& vecPosition )
     {
         // Store our new position
         m_Matrix.vPos = vecPosition;
+        m_matFrozen.vPos = vecPosition;
+
         // Update our streaming position
         UpdateStreamPosition ( vecPosition );
     }
@@ -471,9 +477,6 @@ void CClientPed::SetInterior ( unsigned char ucInterior )
 
 void CClientPed::Teleport ( const CVector& vecPosition )
 {
-    // Don't allow a position change if we're frozen
-    if ( m_bIsFrozen ) return;
-
     // We have a player ped?
     if ( m_pPlayerPed )
     {
@@ -501,6 +504,7 @@ void CClientPed::Teleport ( const CVector& vecPosition )
     {
         // Store our new position
         m_Matrix.vPos = vecPosition;
+        m_matFrozen.vPos = vecPosition;
 
         // Update our streaming position
         UpdateStreamPosition ( vecPosition );
@@ -1211,10 +1215,6 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         m_pOccupiedVehicle = pVehicle;
         m_uiOccupiedVehicleSeat = 0;
         pVehicle->m_pDriver = this;
-
-        // Make sure it is just as frozen as we are
-        if ( m_bIsFrozen )
-            pVehicle->SetFrozen ( m_bIsFrozen );
     }
     else
     {
@@ -1312,10 +1312,6 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
                 // Warp the player out
                 InternalRemoveFromVehicle ( pGameVehicle );
             }
-
-            // Make sure the vehicle is unfrozen
-            if ( m_bIsFrozen )
-                pVehicle->SetFrozen ( false );
         }        
 
         // Clear our record in the vehicle class
@@ -1625,23 +1621,29 @@ void CClientPed::StealthKill ( CClientPed * pPed )
 
 void CClientPed::SetFrozen ( bool bFrozen )
 {
-	if(bFrozen) {
-		m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
-		m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-		m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-		m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-
-		return;
-	}
-
-    m_bIsFrozen = bFrozen;
-    GetPosition ( m_vecFrozen );
-
-    // Make sure the vehicle we're in is/isn't frozen
-    CClientVehicle* pVehicle = GetOccupiedVehicle ();
-    if ( pVehicle )
+    if ( m_bFrozen != bFrozen )
     {
-        pVehicle->SetFrozen ( bFrozen );
+        m_bFrozen = bFrozen;
+
+        if ( bFrozen )
+        {
+            if ( m_pTaskManager )
+            {
+		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+            }
+
+            if ( m_pPlayerPed )
+            {
+                m_pPlayerPed->GetMatrix ( &m_matFrozen );
+            }
+            else
+            {
+                m_matFrozen = m_Matrix;
+            }
+        }
     }
 }
 
@@ -2271,9 +2273,9 @@ void CClientPed::StreamedInPulse ( void )
         }
 
         // Are we frozen and not in a vehicle
-        if ( m_bIsFrozen && !pVehicle )
+        if ( IsFrozen () && !pVehicle )
         {
-            m_pPlayerPed->SetPosition ( &m_vecFrozen );
+            m_pPlayerPed->SetMatrix ( &m_matFrozen );
         }
 
         // Is our health locked?
@@ -2397,6 +2399,7 @@ void CClientPed::StreamedInPulse ( void )
         {
             // Store our new position
             m_Matrix.vPos = vecPosition;
+            m_matFrozen.vPos = vecPosition;
 
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );

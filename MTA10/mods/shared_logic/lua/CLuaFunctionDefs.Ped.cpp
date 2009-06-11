@@ -1076,6 +1076,31 @@ int CLuaFunctionDefs::IsPedHeadless ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsPedFrozen ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            bool bFrozen;
+            if ( CStaticFunctionDefinitions::IsPedFrozen ( *pPed, bFrozen ) )
+            {
+                lua_pushboolean ( luaVM, bFrozen );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedFrozen", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isPedFrozen" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetPedCameraRotation ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
@@ -1335,6 +1360,31 @@ int CLuaFunctionDefs::SetPedHeadless ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::SetPedFrozen ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+        ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        bool bFrozen = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedFrozen ( *pEntity, bFrozen ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFrozen", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedFrozen" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::SetPedCameraRotation ( lua_State* luaVM )
 {

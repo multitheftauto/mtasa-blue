@@ -386,16 +386,16 @@ void CPedRPCs::SetPedHeadless ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
 {
     ElementID PedID;
-    unsigned char ucIsFrosen;
+    unsigned char ucIsFrozen;
 
     if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucIsFrosen ) )
+         bitStream.Read ( ucIsFrozen ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
-            // pPed->SetFrosen ( ( ucIsFrosen == 1 ) );
+            pPed->SetFrozen ( ( ucIsFrozen == 1 ) );
         }
     }
 }
