@@ -277,7 +277,7 @@ CClientEntity * CClientManager::FindEntity ( CEntity * pGameEntity, bool bValida
                 }
                 case ENTITY_TYPE_PED:
                 {
-                    pEntity = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pGameEntity ), true, false );
+                    pEntity = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pGameEntity ), false, true );
                     break;
                 }
                 case ENTITY_TYPE_OBJECT:
