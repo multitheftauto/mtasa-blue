@@ -206,6 +206,7 @@ public:
     LUA_DECLARE ( GetPedAnimationData );
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
+    LUA_DECLARE ( IsPedFrozen );
 	LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
 
@@ -222,6 +223,7 @@ public:
     LUA_DECLARE ( SetPedDoingGangDriveby );
     LUA_DECLARE ( SetPedLookAt );
     LUA_DECLARE ( SetPedHeadless );
+    LUA_DECLARE ( SetPedFrozen );
 	LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );

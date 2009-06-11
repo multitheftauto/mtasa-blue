@@ -1279,6 +1279,13 @@ bool CStaticFunctionDefinitions::IsPedHeadless ( CClientPed & Ped, bool & bHeadl
 }
 
 
+bool CStaticFunctionDefinitions::IsPedFrozen ( CClientPed & Ped, bool & bFrozen )
+{
+    bFrozen = Ped.IsFrozen ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetPedCameraRotation ( CClientPed & Ped, float & fRotation )
 {
 	fRotation = ConvertRadiansToDegrees ( Ped.GetCameraRotation() );
@@ -1713,6 +1720,19 @@ bool CStaticFunctionDefinitions::SetPedHeadless ( CClientEntity & Entity, bool b
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         Ped.SetHeadless ( bHeadless );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetPedFrozen ( CClientEntity & Entity, bool bFrozen )
+{
+    RUN_CHILDREN SetPedFrozen ( **iter, bFrozen );
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        Ped.SetFrozen ( bFrozen );
         return true;
     }
     return false;

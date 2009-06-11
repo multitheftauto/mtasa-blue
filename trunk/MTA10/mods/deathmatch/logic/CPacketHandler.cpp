@@ -502,6 +502,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         bool bNametagShowing = ( ucFlags & 0x10 ) ? true:false;
         bool bHasNametagColorOverridden = ( ucFlags & 0x20 ) ? true:false;
         bool bIsHeadless = ( ucFlags & 0x40 ) ? true:false;
+        bool bIsFrozen = ( ucFlags & 0x80 ) ? true:false;
 
         // Player nametag text
         char szNametagText [MAX_PLAYER_NICK_LENGTH + 1];
@@ -638,6 +639,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                     }
                 }
                 pPlayer->SetHeadless ( bIsHeadless );
+                pPlayer->SetFrozen ( bIsFrozen );
                 pPlayer->SetDimension ( usDimension );
                 pPlayer->SetFightingStyle ( ( eFightingStyle ) ucFightingStyle );
                 pPlayer->SetAlpha ( ucAlpha );
@@ -2737,6 +2739,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bool bHasJetPack = ( ucFlags & 0x1 ) > 0;
                     bool bSynced = ( ucFlags & 0x2 ) > 0;
                     bool bIsHeadless = ( ucFlags & 0x4 ) > 0;
+                    bool bIsFrozen = ( ucFlags & 0x8 ) > 0;
 
                     CClientPed* pPed = new CClientPed ( g_pClientGame->m_pManager, usModel, EntityID );
                     pEntity = pPed;
@@ -2754,6 +2757,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     if ( pVehicle ) pPed->WarpIntoVehicle ( pVehicle, ucSeat );
                     pPed->SetHasJetPack ( bHasJetPack );
                     pPed->SetHeadless ( bIsHeadless );
+                    pPed->SetFrozen ( bIsFrozen );
 
                     // Alpha
                     unsigned char ucAlpha;

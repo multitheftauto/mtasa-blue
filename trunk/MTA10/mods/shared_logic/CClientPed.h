@@ -214,9 +214,6 @@ public:
     void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
     void                        StealthKill                 ( CClientPed * pPed );
 
-    inline bool                 IsFrozen                    ( void )                                    { return m_bIsFrozen; };
-    void                        SetFrozen                   ( bool bFrozen );
-
     inline int                  GetRespawnState             ( void )                                    { return m_pRespawnState; };
     inline void                 SetRespawnState             ( int iRespawnState )                       { m_pRespawnState = iRespawnState; };
 
@@ -358,6 +355,9 @@ public:
     inline bool                 IsHeadless              ( void )                                        { return m_bHeadless; }
     void                        SetHeadless             ( bool bHeadless );
 
+    inline bool                 IsFrozen                ( void ) const                                  { return m_bFrozen; }
+    void                        SetFrozen               ( bool bFrozen );
+
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
 
@@ -416,8 +416,7 @@ public:
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
     unsigned long               m_ulModel;	
-    bool                        m_bIsFrozen;
-    CVector                     m_vecFrozen;
+    CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
     bool                        m_bHealthLocked;
@@ -505,6 +504,7 @@ public:
     bool                        m_bDoingGangDriveby;
     bool                        m_bRequestedAnimation;
     bool                        m_bHeadless;
+    bool                        m_bFrozen;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
 };
