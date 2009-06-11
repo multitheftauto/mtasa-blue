@@ -1813,6 +1813,12 @@ void CClientVehicle::StreamedInPulse ( void )
         // Grab our current position
         CVector vecPosition = *m_pVehicle->GetPosition ();
 
+        if ( m_pAttachedToEntity )
+        {
+            m_pAttachedToEntity->GetPosition ( vecPosition );
+            vecPosition += m_vecAttachedPosition;
+        }
+
         // Have we moved?
         if ( vecPosition != m_Matrix.vPos )
         {
