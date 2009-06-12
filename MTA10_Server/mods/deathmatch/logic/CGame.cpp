@@ -786,6 +786,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_WASTED:
+        {
+            Packet_PlayerWasted ( static_cast < CPlayerWastedPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_PLAYER_QUIT:
         {
             Packet_PlayerQuit ( static_cast < CPlayerQuitPacket& > ( Packet ) );
@@ -1357,78 +1363,71 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
 {
     CElement * pElement = ( Packet.m_PedID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_PedID ) : NULL;
-    //If its the player who sent the packet pElement is null
-    bool bisDeadPersonPed = pElement != NULL ? true : false;
-    if ( bisDeadPersonPed ) {
-        CPed* pPed = static_cast < CPed* > ( pElement );
-        if ( !pPed->IsDead() )
-        {
-            pPed->SetIsDead ( true );
-            pPed->SetPosition ( Packet.m_vecPosition );
-            // Remove him from any occupied vehicle
-            pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-            CVehicle* pVehicle = pPed->GetOccupiedVehicle ();
-            if ( pVehicle )
-            {
-                pVehicle->SetOccupant ( NULL, pPed->GetOccupiedVehicleSeat () );
-                pPed->SetOccupiedVehicle ( NULL, 0 );
-            }
-
-            CElement * pKiller = ( Packet.m_Killer != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_Killer ) : NULL;
-
-            // Create a new packet to send to everyone
-            CPedWastedPacket ReturnWastedPacket ( pPed, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-            m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
-
-            // Tell our scripts the player has died
-            CLuaArguments Arguments;
-            Arguments.PushNumber ( Packet.m_usAmmo );
-            if ( pKiller ) Arguments.PushElement ( pKiller );
-            else Arguments.PushBoolean ( false );
-            if ( Packet.m_ucKillerWeapon != 0xFF ) Arguments.PushNumber ( Packet.m_ucKillerWeapon );
-            else Arguments.PushBoolean ( false );
-            if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
-            else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( false );
-            pPed->CallEvent ( "onPedWasted", Arguments );
-        }
-    }
-    else
+    CPed* pPed = static_cast < CPed* > ( pElement );
+    if ( pPed && !pPed->IsDead() )
     {
-        CPlayer* pPlayer = Packet.GetSourcePlayer();
-        if ( !pPlayer->IsDead() )
+        pPed->SetIsDead ( true );
+        pPed->SetPosition ( Packet.m_vecPosition );
+        // Remove him from any occupied vehicle
+        pPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+        CVehicle* pVehicle = pPed->GetOccupiedVehicle ();
+        if ( pVehicle )
         {
-            pPlayer->SetSpawned ( false );
-            pPlayer->SetIsDead ( true );
-            pPlayer->SetPosition ( Packet.m_vecPosition );
-            // Remove him from any occupied vehicle
-            pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-            CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-            if ( pVehicle )
-            {
-                pVehicle->SetOccupant ( NULL, pPlayer->GetOccupiedVehicleSeat () );
-                pPlayer->SetOccupiedVehicle ( NULL, 0 );
-            }
-
-            CElement * pKiller = ( Packet.m_Killer != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_Killer ) : NULL;
-
-            // Create a new packet to send to everyone
-            CPedWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-            m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
-
-            // Tell our scripts the player has died
-            CLuaArguments Arguments;
-            Arguments.PushNumber ( Packet.m_usAmmo );
-            if ( pKiller ) Arguments.PushElement ( pKiller );
-            else Arguments.PushBoolean ( false );
-            if ( Packet.m_ucKillerWeapon != 0xFF ) Arguments.PushNumber ( Packet.m_ucKillerWeapon );
-            else Arguments.PushBoolean ( false );
-            if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
-            else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( false );
-            pPlayer->CallEvent ( "onPlayerWasted", Arguments );
+            pVehicle->SetOccupant ( NULL, pPed->GetOccupiedVehicleSeat () );
+            pPed->SetOccupiedVehicle ( NULL, 0 );
         }
+
+        CElement * pKiller = ( Packet.m_Killer != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_Killer ) : NULL;
+
+        // Create a new packet to send to everyone
+        CPedWastedPacket ReturnWastedPacket ( pPed, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
+        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
+
+        // Tell our scripts the player has died
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( Packet.m_usAmmo );
+        if ( pKiller ) Arguments.PushElement ( pKiller );
+        else Arguments.PushBoolean ( false );
+        if ( Packet.m_ucKillerWeapon != 0xFF ) Arguments.PushNumber ( Packet.m_ucKillerWeapon );
+        else Arguments.PushBoolean ( false );
+        if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
+        else Arguments.PushBoolean ( false );
+        Arguments.PushBoolean ( false );
+        pPed->CallEvent ( "onPedWasted", Arguments );
     }
+}
+void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    pPlayer->SetSpawned ( false );
+    pPlayer->SetIsDead ( true );
+    pPlayer->SetPosition ( Packet.m_vecPosition );
+    // Remove him from any occupied vehicle
+    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+    CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
+    if ( pVehicle )
+    {
+        pVehicle->SetOccupant ( NULL, pPlayer->GetOccupiedVehicleSeat () );
+        pPlayer->SetOccupiedVehicle ( NULL, 0 );
+    }
+
+    CElement * pKiller = ( Packet.m_Killer != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( Packet.m_Killer ) : NULL;
+
+    // Create a new packet to send to everyone
+    CPlayerWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
+    m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
+
+    // Tell our scripts the player has died
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( Packet.m_usAmmo );
+    if ( pKiller ) Arguments.PushElement ( pKiller );
+    else Arguments.PushBoolean ( false );
+    if ( Packet.m_ucKillerWeapon != 0xFF ) Arguments.PushNumber ( Packet.m_ucKillerWeapon );
+    else Arguments.PushBoolean ( false );
+    if ( Packet.m_ucBodyPart != 0xFF ) Arguments.PushNumber ( Packet.m_ucBodyPart );
+    else Arguments.PushBoolean ( false );
+    Arguments.PushBoolean ( false );
+    pPlayer->CallEvent ( "onPlayerWasted", Arguments );
 }
 
 
