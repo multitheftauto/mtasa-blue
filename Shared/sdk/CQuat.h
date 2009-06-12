@@ -40,14 +40,14 @@ public:
 		x = y = z = w = 0;
 	};
 	CQuat(CMatrix* m) {
-		w = sqrt( max( 0, 1.0f + m->vRoll.fX + m->vDirection.fY + m->vWas.fZ ) ) * 0.5f;
-		x = sqrt( max( 0, 1.0f + m->vRoll.fX - m->vDirection.fY - m->vWas.fZ ) ) * 0.5f;
-		y = sqrt( max( 0, 1.0f - m->vRoll.fX + m->vDirection.fY - m->vWas.fZ ) ) * 0.5f;
-		z = sqrt( max( 0, 1.0f - m->vRoll.fX - m->vDirection.fY + m->vWas.fZ ) ) * 0.5f;
+		w = sqrt( max( 0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+		x = sqrt( max( 0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		y = sqrt( max( 0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		z = sqrt( max( 0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
 		
-		x = _copysign( x, m->vWas.fY - m->vDirection.fZ );
-		y = _copysign( y, m->vRoll.fZ - m->vWas.fX );
-		z = _copysign( z, m->vDirection.fX - m->vRoll.fY );
+		x = _copysign( x, m->vUp.fY - m->vFront.fZ );
+		y = _copysign( y, m->vRight.fZ - m->vUp.fX );
+		z = _copysign( z, m->vFront.fX - m->vRight.fY );
 	};
 
 	static void CQuat::ToMatrix(const CQuat& q, CMatrix& m){
@@ -63,17 +63,17 @@ public:
 		float zz = q.z * q.z;
 		float zw = q.z * q.w;
 
-		m.vRoll.fX =		1.0f -	2.0f * ( yy + zz );
-		m.vRoll.fY =				2.0f * ( xy - zw );
-		m.vRoll.fZ =				2.0f * ( xz + yw );
+		m.vRight.fX =		1.0f -	2.0f * ( yy + zz );
+		m.vRight.fY =				2.0f * ( xy - zw );
+		m.vRight.fZ =				2.0f * ( xz + yw );
 
-		m.vDirection.fX =			2.0f * ( xy + zw );
-		m.vDirection.fY =	1.0f -	2.0f * ( xx + zz );
-		m.vDirection.fZ =			2.0f * ( yz - xw );
+		m.vFront.fX =			2.0f * ( xy + zw );
+		m.vFront.fY =	1.0f -	2.0f * ( xx + zz );
+		m.vFront.fZ =			2.0f * ( yz - xw );
 
-		m.vWas.fX =					2.0f * ( xz - yw );
-		m.vWas.fY =					2.0f * ( yz + xw );
-		m.vWas.fZ =			1.0f -	2.0f * ( xx + yy );
+		m.vUp.fX =					2.0f * ( xz - yw );
+		m.vUp.fY =					2.0f * ( yz + xw );
+		m.vUp.fZ =			1.0f -	2.0f * ( xx + yy );
 	};
 
 	// Linear interpolation

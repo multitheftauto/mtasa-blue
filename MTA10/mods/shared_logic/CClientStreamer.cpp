@@ -87,7 +87,7 @@ namespace
         CMatrix gtaMatrix;
         pElement->GetMatrix ( gtaMatrix );
 
-        const CVector* vecBoxAxes[3] = { &gtaMatrix.vRoll, &gtaMatrix.vDirection, &gtaMatrix.vWas };
+        const CVector* vecBoxAxes[3] = { &gtaMatrix.vRight, &gtaMatrix.vFront, &gtaMatrix.vUp };
 
         return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), &vecMin.fX, &vecMax.fX, vecBoxAxes );
    }

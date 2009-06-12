@@ -196,11 +196,11 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
 
                 // First row
                 lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vRoll.fX );
+                lua_pushnumber ( luaVM, matrix.vRight.fX );
                 lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vRoll.fY );
+                lua_pushnumber ( luaVM, matrix.vRight.fY );
                 lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vRoll.fZ );
+                lua_pushnumber ( luaVM, matrix.vRight.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 4 );
@@ -208,11 +208,11 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
 
                 // Second row
                 lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vDirection.fX );
+                lua_pushnumber ( luaVM, matrix.vFront.fX );
                 lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vDirection.fY );
+                lua_pushnumber ( luaVM, matrix.vFront.fY );
                 lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vDirection.fZ );
+                lua_pushnumber ( luaVM, matrix.vFront.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 4 );
@@ -220,11 +220,11 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
 
                 // Third row
                 lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vWas.fX );
+                lua_pushnumber ( luaVM, matrix.vUp.fX );
                 lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vWas.fY );
+                lua_pushnumber ( luaVM, matrix.vUp.fY );
                 lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vWas.fZ );
+                lua_pushnumber ( luaVM, matrix.vUp.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
                 lua_pushnumber ( luaVM, 1.0f );
                 lua_rawseti ( luaVM, -2, 4 );

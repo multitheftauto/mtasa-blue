@@ -464,8 +464,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefs::IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefs::GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefs::GetTrainSpeed );
+    CLuaCFunctions::AddFunction ( "getVehicleGravityVector", CLuaFunctionDefs::GetVehicleGravityVector );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefs::IsVehicleBlown );
-
+    CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -499,8 +500,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefs::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefs::SetTrainSpeed );
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefs::SetVehicleTaxiLightOn );
-    CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
-
+    CLuaCFunctions::AddFunction ( "setVehicleGravityVector", CLuaFunctionDefs::SetVehicleGravityVector );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
@@ -519,22 +519,22 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefs::CreateFire );
 
 	// Engine funcs
+    CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
     CLuaCFunctions::AddFunction ( "engineLoadCOL", CLuaFunctionDefs::EngineLoadCOL );
     CLuaCFunctions::AddFunction ( "engineLoadDFF", CLuaFunctionDefs::EngineLoadDFF );
+    CLuaCFunctions::AddFunction ( "engineImportTXD", CLuaFunctionDefs::EngineImportTXD );
     CLuaCFunctions::AddFunction ( "engineReplaceCOL", CLuaFunctionDefs::EngineReplaceCOL );
     CLuaCFunctions::AddFunction ( "engineRestoreCOL", CLuaFunctionDefs::EngineRestoreCOL );
 	CLuaCFunctions::AddFunction ( "engineReplaceModel", CLuaFunctionDefs::EngineReplaceModel );
     CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefs::EngineRestoreModel );
     CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefs::EngineSetModelLODDistance );
 
-	CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
-	CLuaCFunctions::AddFunction ( "engineImportTXD", CLuaFunctionDefs::EngineImportTXD );
-	CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
-	CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
-	CLuaCFunctions::AddFunction ( "enginePositionAtomic", CLuaFunctionDefs::EnginePositionAtomic );
-	CLuaCFunctions::AddFunction ( "enginePositionSeats", CLuaFunctionDefs::EnginePositionSeats );
-	CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
-	CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
+	//CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
+	//CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
+	//CLuaCFunctions::AddFunction ( "enginePositionAtomic", CLuaFunctionDefs::EnginePositionAtomic );
+	//CLuaCFunctions::AddFunction ( "enginePositionSeats", CLuaFunctionDefs::EnginePositionSeats );
+	//CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
+	//CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
 
     // Drawing funcs
     CLuaCFunctions::AddFunction ( "dxDrawLine", CLuaFunctionDefs::dxDrawLine );

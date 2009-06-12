@@ -74,9 +74,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     memset ( m_pOccupyingPassengers, 0, sizeof ( m_pOccupyingPassengers ) );
     m_pPreviousLink = NULL;
     m_pNextLink = NULL;
-    m_Matrix.vDirection.fY = 1.0f;
-    m_Matrix.vWas.fZ = 1.0f;
-    m_Matrix.vRoll.fX = 1.0f;
+    m_Matrix.vFront.fY = 1.0f;
+    m_Matrix.vUp.fZ = 1.0f;
+    m_Matrix.vRight.fX = 1.0f;
 	m_MatrixLast = m_Matrix;
 	m_dLastRotationTime = 0;
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
@@ -128,6 +128,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
+    m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -307,8 +308,8 @@ void CClientVehicle::SetRoll ( const CVector &vecRoll )
     {
         m_pVehicle->SetRoll ( const_cast < CVector* > ( &vecRoll ) );
     }
-    m_Matrix.vRoll = vecRoll;
-    m_matFrozen.vRoll = vecRoll;
+    m_Matrix.vRight = vecRoll;
+    m_matFrozen.vRight = vecRoll;
 }
 
 
@@ -318,8 +319,8 @@ void CClientVehicle::SetDirection ( const CVector &vecDir )
     {
         m_pVehicle->SetDirection ( const_cast < CVector* > ( &vecDir ) );
     }
-    m_Matrix.vDirection = vecDir;
-    m_matFrozen.vDirection = vecDir;
+    m_Matrix.vFront = vecDir;
+    m_matFrozen.vFront = vecDir;
 }
 
 void CClientVehicle::SetWas ( const CVector &vecWas )
@@ -328,8 +329,8 @@ void CClientVehicle::SetWas ( const CVector &vecWas )
     {
         m_pVehicle->SetWas ( const_cast < CVector* > ( &vecWas ) );
     }
-    m_Matrix.vWas = vecWas;
-    m_matFrozen.vWas = vecWas;
+    m_Matrix.vUp = vecWas;
+    m_matFrozen.vUp = vecWas;
 }
 
 
@@ -1999,6 +2000,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetEngineOn ( m_bEngineOn );
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
+        m_pVehicle->SetGravityVector ( &m_vecGravity );
 
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
@@ -2930,4 +2932,12 @@ void CClientVehicle::RemoveAllProjectiles ( void )
         g_pClientGame->GetElementDeleter ()->Delete ( pProjectile );        
     }
     m_Projectiles.clear ();
+}
+
+void CClientVehicle::SetGravityVector ( const CVector& vecGravity )
+{
+    if ( m_pVehicle )
+        m_pVehicle->SetGravityVector ( &vecGravity );
+
+    m_vecGravity = vecGravity;
 }

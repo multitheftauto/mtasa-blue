@@ -252,17 +252,17 @@ void CClientPacketRecorder::RecordLocalData ( CClientPlayer* pLocalPlayer )
                 float fHealth = pVehicle->GetHealth ();
 
                 // Write it
-                fwrite ( &matVehicle.vRoll.fX, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vRoll.fY, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vRoll.fZ, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vRight.fX, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vRight.fY, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vRight.fZ, sizeof ( float ), 1, pFile );
 
-                fwrite ( &matVehicle.vDirection.fX, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vDirection.fY, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vDirection.fZ, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vFront.fX, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vFront.fY, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vFront.fZ, sizeof ( float ), 1, pFile );
 
-                fwrite ( &matVehicle.vWas.fX, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vWas.fY, sizeof ( float ), 1, pFile );
-                fwrite ( &matVehicle.vWas.fZ, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vUp.fX, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vUp.fY, sizeof ( float ), 1, pFile );
+                fwrite ( &matVehicle.vUp.fZ, sizeof ( float ), 1, pFile );
 
                 fwrite ( &matVehicle.vPos.fX, sizeof ( float ), 1, pFile );
                 fwrite ( &matVehicle.vPos.fY, sizeof ( float ), 1, pFile );
@@ -307,17 +307,17 @@ void CClientPacketRecorder::ReadLocalData ( FILE* pFile )
             float fHealth;
 
             // Read it out
-            fread ( &matVehicle.vRoll.fX, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vRoll.fY, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vRoll.fZ, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vRight.fX, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vRight.fY, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vRight.fZ, sizeof ( float ), 1, pFile );
 
-            fread ( &matVehicle.vDirection.fX, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vDirection.fY, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vDirection.fZ, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vFront.fX, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vFront.fY, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vFront.fZ, sizeof ( float ), 1, pFile );
 
-            fread ( &matVehicle.vWas.fX, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vWas.fY, sizeof ( float ), 1, pFile );
-            fread ( &matVehicle.vWas.fZ, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vUp.fX, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vUp.fY, sizeof ( float ), 1, pFile );
+            fread ( &matVehicle.vUp.fZ, sizeof ( float ), 1, pFile );
 
             fread ( &matVehicle.vPos.fX, sizeof ( float ), 1, pFile );
             fread ( &matVehicle.vPos.fY, sizeof ( float ), 1, pFile );
