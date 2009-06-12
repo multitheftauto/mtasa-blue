@@ -372,6 +372,20 @@ int CLuaFunctionDefs::GetResourceFile ( lua_State* luaVM )
         else
             m_pScriptDebugging->LogBadType ( luaVM, "getResourceFile" );
     }
+    else if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    {
+        std::string strFileName = lua_tostring ( luaVM, 1 );
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain && IsValidFilePath ( strFileName.c_str() ) )
+        {
+            CResourceFileItem* pItem = pLuaMain->GetResource ()->GetResourceFileItem ( strFileName );
+            if ( pItem )
+            {
+                lua_pushresourcefile ( luaVM, pItem );
+                return 1;
+            }
+        }
+    }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getResourceFile" );     
         
