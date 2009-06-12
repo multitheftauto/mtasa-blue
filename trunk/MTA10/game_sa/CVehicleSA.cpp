@@ -17,7 +17,7 @@
 #include "StdInc.h"
 
 CVehicleSA::CVehicleSA ()
-    : m_ucAlpha ( 255 ), m_bIsDerailable ( true )
+    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f )
 {
 }
 
@@ -25,6 +25,7 @@ CVehicleSA::CVehicleSA ()
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
 CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
+    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f )
 {
 	DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
 	// for SA, we can just call the following function and it should just work:
@@ -79,9 +80,6 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
-
-    m_bIsDerailable = true;
-    m_ucAlpha = 255;
 }
 
 CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )

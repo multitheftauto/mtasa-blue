@@ -26,16 +26,16 @@
 class CVector
 {
 public:
-	FLOAT fX, fY, fZ;
+	float fX, fY, fZ;
 	
-	CVector()
+	CVector ()
 	{
 		this->fX = 0;
 		this->fY = 0;
 		this->fZ = 0;
 	};
-	// contructor
-	CVector(FLOAT fX, FLOAT fY, FLOAT fZ) 
+	
+	CVector ( float fX, float fY, float fZ) 
 	{ 
 		this->fX = fX;
 		this->fY = fY;
@@ -61,7 +61,7 @@ public:
 
 	float Length ( void ) const
 	{
-		return sqrt((fX*fX) + (fY*fY) + (fZ*fZ));
+		return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
 	}
 
     float DotProduct ( const CVector * param ) const
@@ -100,6 +100,11 @@ public:
     CVector operator / ( const CVector& vecRight ) const
     {
         return CVector ( fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ );
+    }
+
+    CVector operator - () const
+    {
+        return CVector ( -fX, -fY, -fZ );
     }
 
     void operator += ( float fRight )

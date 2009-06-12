@@ -424,9 +424,9 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
     CMatrix matPlayer;
     pPlayer->GetMatrix ( matPlayer );
 
-    fprintf ( pFile, "Matrix: vecRoll: %f %f %f\n", matPlayer.vRoll.fX, matPlayer.vRoll.fY, matPlayer.vRoll.fZ );
-    fprintf ( pFile, "        vecDir:  %f %f %f\n", matPlayer.vDirection.fX, matPlayer.vDirection.fY, matPlayer.vDirection.fZ );
-    fprintf ( pFile, "        vecWas:  %f %f %f\n", matPlayer.vWas.fX, matPlayer.vWas.fY, matPlayer.vWas.fZ );
+    fprintf ( pFile, "Matrix: vecRoll: %f %f %f\n", matPlayer.vRight.fX, matPlayer.vRight.fY, matPlayer.vRight.fZ );
+    fprintf ( pFile, "        vecDir:  %f %f %f\n", matPlayer.vFront.fX, matPlayer.vFront.fY, matPlayer.vFront.fZ );
+    fprintf ( pFile, "        vecWas:  %f %f %f\n", matPlayer.vUp.fX, matPlayer.vUp.fY, matPlayer.vUp.fZ );
     fprintf ( pFile, "        vecPos:  %f %f %f\n\n", matPlayer.vPos.fX, matPlayer.vPos.fY, matPlayer.vPos.fZ );
 
     fprintf ( pFile, "Euler rot: %f\n", pPlayer->GetCurrentRotation () );

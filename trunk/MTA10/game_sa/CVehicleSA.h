@@ -472,10 +472,11 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
 	friend class CPoolsSA;
 private:
-	CDamageManagerSA		* damageManager;
-    CHandlingEntrySA*       m_pHandlingData;
-    bool                    m_bIsDerailable;
-    unsigned char           m_ucAlpha;
+	CDamageManagerSA		    * damageManager;
+    CHandlingEntrySA*           m_pHandlingData;
+    bool                        m_bIsDerailable;
+    unsigned char               m_ucAlpha;
+    CVector                     m_vecGravity;
 
 public:
 								CVehicleSA                      ();
@@ -649,6 +650,9 @@ public:
 
     BYTE                        GetBikeWheelStatus              ( BYTE bWheel );
     void                        SetBikeWheelStatus              ( BYTE bWheel, BYTE bStatus );
+
+    void                        GetGravityVector                ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
+    void                        SetGravityVector                ( const CVector* pvecGravity )  { m_vecGravity = *pvecGravity; }
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };

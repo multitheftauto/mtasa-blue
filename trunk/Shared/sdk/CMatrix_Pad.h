@@ -21,11 +21,11 @@
 class CMatrix_Padded
 {
 public:
-	CVector vRoll; // 0			RIGHT
+	CVector vRight; // 0			RIGHT
 	DWORD	 dwPadRoll; // 12
-	CVector vDirection; // 16	FOREWARDS
+	CVector vFront; // 16	FOREWARDS
 	DWORD	 dwPadDirection; // 28
-	CVector vWas; // 32			UP
+	CVector vUp; // 32			UP
 	DWORD	 dwPadWas; // 44	
 	CVector vPos;  // 48		TRANSLATE
 	DWORD	 dwPadPos; // 60
@@ -43,9 +43,9 @@ public:
     void ConvertToMatrix ( CMatrix& Matrix ) const
     {
         Matrix.vPos = vPos;
-        Matrix.vDirection = vDirection;
-        Matrix.vWas = vWas;
-        Matrix.vRoll = vRoll;
+        Matrix.vFront = vFront;
+        Matrix.vUp = vUp;
+        Matrix.vRight = vRight;
     }
 
     void SetFromMatrix ( const CMatrix& Matrix )
@@ -53,13 +53,13 @@ public:
         vPos = Matrix.vPos;
         dwPadPos = 0;
 
-        vDirection = Matrix.vDirection;
+        vFront = Matrix.vFront;
         dwPadDirection = 0;
 
-        vWas = Matrix.vWas;
+        vUp = Matrix.vUp;
         dwPadWas = 0;
 
-        vRoll = Matrix.vRoll;
+        vRight = Matrix.vRight;
         dwPadRoll = 0;
     }
 };

@@ -2086,3 +2086,56 @@ int CLuaFunctionDefs::GetRadioChannelName ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetVehicleGravityVector ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            CVector vecGravity;
+            pVehicle->GetGravityVector ( vecGravity );
+            lua_pushnumber ( luaVM, vecGravity.fX );
+            lua_pushnumber ( luaVM, vecGravity.fY );
+            lua_pushnumber ( luaVM, vecGravity.fZ );
+            return 3;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleGravityVector", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleGravityVector" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleGravityVector ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            CVector vecGravity ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                                 static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                                 static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+            pVehicle->SetGravityVector ( vecGravity );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleGravityVector", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleGravityVector" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

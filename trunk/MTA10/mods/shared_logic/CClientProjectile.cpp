@@ -159,10 +159,10 @@ bool CClientProjectile::GetMatrix ( CMatrix & matrix )
             // Jax: If the creator is a ped, we need to invert X and Y on Direction and Was for CMultiplayer::ConvertMatrixToEulerAngles
             if ( m_pCreator && IS_PED ( m_pCreator ) )
             {
-                matrix.vDirection.fX = 0.0f - matrix.vDirection.fX;
-                matrix.vDirection.fY = 0.0f - matrix.vDirection.fY;
-                matrix.vWas.fX = 0.0f - matrix.vWas.fX;
-                matrix.vWas.fY = 0.0f - matrix.vWas.fY;
+                matrix.vFront.fX = 0.0f - matrix.vFront.fX;
+                matrix.vFront.fY = 0.0f - matrix.vFront.fY;
+                matrix.vUp.fX = 0.0f - matrix.vUp.fX;
+                matrix.vUp.fY = 0.0f - matrix.vUp.fY;
             }
             return true;
         }
@@ -178,10 +178,10 @@ bool CClientProjectile::SetMatrix ( const CMatrix & matrix_ )
     // Jax: If the creator is a ped, we need to invert X and Y on Direction and Was for CMultiplayer::ConvertEulerAnglesToMatrix
     if ( m_pCreator && IS_PED ( m_pCreator ) )
     {        
-        matrix.vDirection.fX = 0.0f - matrix.vDirection.fX;
-        matrix.vDirection.fY = 0.0f - matrix.vDirection.fY;
-        matrix.vWas.fX = 0.0f - matrix.vWas.fX;
-        matrix.vWas.fY = 0.0f - matrix.vWas.fY;
+        matrix.vFront.fX = 0.0f - matrix.vFront.fX;
+        matrix.vFront.fY = 0.0f - matrix.vFront.fY;
+        matrix.vUp.fX = 0.0f - matrix.vUp.fX;
+        matrix.vUp.fY = 0.0f - matrix.vUp.fY;
     }
 
     m_pProjectile->SetMatrix ( &matrix );

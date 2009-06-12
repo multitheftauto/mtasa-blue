@@ -23,13 +23,13 @@ VOID C3DMarkerSA::SetPosition(CVector * vecPosition)
 VOID C3DMarkerSA::SetUp(CVector * vecUp)
 {
 	DEBUG_TRACE("VOID C3DMarkerSA::SetUp(CVector * vecUP)");
-	this->GetInterface()->m_mat.vWas = *vecUp;
+	this->GetInterface()->m_mat.vUp = *vecUp;
 }
 
 CVector * C3DMarkerSA::GetUp()
 {
 	DEBUG_TRACE("CVector * C3DMarkerSA::GetUp()");
-	return &this->GetInterface()->m_mat.vWas;
+	return &this->GetInterface()->m_mat.vUp;
 }
 
 CVector * C3DMarkerSA::GetPosition()

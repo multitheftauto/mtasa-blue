@@ -231,14 +231,14 @@ void CEntitySA::SetRoll ( CVector * vecRoll )
 {
     if ( m_pInterface->Placeable.matrix )
     {
-        m_pInterface->Placeable.matrix->vRoll = *vecRoll;
+        m_pInterface->Placeable.matrix->vRight = *vecRoll;
     }
 }   
 void CEntitySA::SetDirection ( CVector * vecDir )
 {
     if ( m_pInterface->Placeable.matrix )
     {
-        m_pInterface->Placeable.matrix->vDirection = *vecDir;
+        m_pInterface->Placeable.matrix->vFront = *vecDir;
     }
 }
 
@@ -246,7 +246,7 @@ void CEntitySA::SetWas ( CVector * vecWas )
 {
     if ( m_pInterface->Placeable.matrix )
     {
-        m_pInterface->Placeable.matrix->vWas = *vecWas;
+        m_pInterface->Placeable.matrix->vUp = *vecWas;
     }
 }
 
@@ -256,10 +256,10 @@ CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix ) const
 	DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-	    memcpy(&matrix->vDirection,		&m_pInterface->Placeable.matrix->vDirection, sizeof(CVector));
+	    memcpy(&matrix->vFront,		&m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
 	    memcpy(&matrix->vPos,			&m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-	    memcpy(&matrix->vWas,			&m_pInterface->Placeable.matrix->vWas, sizeof(CVector));
-	    memcpy(&matrix->vRoll,			&m_pInterface->Placeable.matrix->vRoll, sizeof(CVector));
+	    memcpy(&matrix->vUp,			&m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
+	    memcpy(&matrix->vRight,			&m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
 	    return matrix;
     }
     else
@@ -273,10 +273,10 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 	DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-	    memcpy(&m_pInterface->Placeable.matrix->vDirection,		&matrix->vDirection, sizeof(CVector));
+	    memcpy(&m_pInterface->Placeable.matrix->vFront,		&matrix->vFront, sizeof(CVector));
 	    memcpy(&m_pInterface->Placeable.matrix->vPos,			&matrix->vPos, sizeof(CVector));
-	    memcpy(&m_pInterface->Placeable.matrix->vWas,			&matrix->vWas, sizeof(CVector));
-	    memcpy(&m_pInterface->Placeable.matrix->vRoll,			&matrix->vRoll, sizeof(CVector));
+	    memcpy(&m_pInterface->Placeable.matrix->vUp,			&matrix->vUp, sizeof(CVector));
+	    memcpy(&m_pInterface->Placeable.matrix->vRight,			&matrix->vRight, sizeof(CVector));
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
 
