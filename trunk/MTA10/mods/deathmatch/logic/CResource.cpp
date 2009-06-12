@@ -373,7 +373,7 @@ CResourceFileItem* CResource::GetResourceFileItem ( std::string strPath )
         CResourceFileItem* pResourceFileItem = (*iter);
         if ( strPath == pResourceFileItem->GetFilePath() )
         {
-            return (*iter);
+            return pResourceFileItem;
         }
     }
 
