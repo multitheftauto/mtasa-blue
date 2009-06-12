@@ -27,6 +27,5 @@ CResourceFileItem::CResourceFileItem ( CResource * resource, std::string strFile
 //Check if the specified file even exists
 bool CResourceFileItem::Exists ()
 {
-    g_pCore->ChatEcho(SString("%s\\%s",m_pResource->GetResourceDirectoryPath(),m_strFilePath.c_str()).c_str());
     return DoesFileExist(SString("%s\\%s",m_pResource->GetResourceDirectoryPath(),m_strFilePath.c_str()).c_str());
 }
