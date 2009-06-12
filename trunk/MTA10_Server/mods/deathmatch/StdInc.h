@@ -70,6 +70,7 @@
 #include "packets/CPlayerSpawnPacket.h"
 #include "packets/CPlayerStatsPacket.h"
 #include "packets/CPlayerTimeoutPacket.h"
+#include "packets/CPlayerWastedPacket.h"
 #include "packets/CProjectileSyncPacket.h"
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"

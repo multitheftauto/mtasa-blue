@@ -2428,9 +2428,6 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
                 CPed* pPedKiller = static_cast < CPed* > ( pKiller );
                 KillerID = pPedKiller->GetID ();
             }
-            // Tell everyone to kill this player
-            CPedWastedPacket WastedPacket ( pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth );
-            m_pPlayerManager->BroadcastOnlyJoined ( WastedPacket );
 
             // Tell our scripts the ped has died
             CLuaArguments Arguments;
@@ -2443,10 +2440,18 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
             else Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( bStealth );
             // TODO: change to onPedWasted
-            if ( IS_PLAYER(pPed) )
+            if ( IS_PLAYER(pPed) ) {
+                // Tell everyone to kill this player
+                CPlayerWastedPacket WastedPacket ( pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth );
+                m_pPlayerManager->BroadcastOnlyJoined ( WastedPacket );
                 pPed->CallEvent ( "onPlayerWasted", Arguments );
-            else
+            }
+            else {
+                // Tell everyone to kill this player
+                CPedWastedPacket WastedPacket ( pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth );
+                m_pPlayerManager->BroadcastOnlyJoined ( WastedPacket );
                 pPed->CallEvent ( "onPedWasted", Arguments );
+            }
 
             return true;
         }

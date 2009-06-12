@@ -61,6 +61,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PlayerWasted ( bitStream );
             return true;
 
+        case PACKET_ID_PLAYER_WASTED:
+            Packet_PlayerWasted ( bitStream );
+            return true;
+
         case PACKET_ID_PLAYER_CHANGE_NICK:
             Packet_PlayerChangeNick ( bitStream );
             return true;

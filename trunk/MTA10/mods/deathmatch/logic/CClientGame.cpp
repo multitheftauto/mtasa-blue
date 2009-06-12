@@ -4096,6 +4096,8 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( pBitStream )
         {
+            m_pLocalPlayer->SetDeadOnNetwork(true);
+
             // Write some death info
             pBitStream->Write ( animGroup );
             pBitStream->Write ( animID );
@@ -4117,9 +4119,8 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
             pBitStream->Write ( usAmmo );
             
-            pBitStream->Write ( INVALID_ELEMENT_ID );
             // Send the packet
-            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }

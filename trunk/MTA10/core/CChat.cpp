@@ -817,7 +817,7 @@ void CChatInputLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool 
     if ( colPrefix.A > 0 )
         m_Prefix.Draw ( vecPosition, colPrefix.A, bShadow, RenderBounds );
     
-    if ( g_pChat->m_InputColor.A > 0 && m_Sections.size () > 0 )
+    if ( g_pChat->m_InputTextColor.A > 0 && m_Sections.size () > 0 )
     {
         m_Sections [ 0 ].Draw ( CVector2D ( vecPosition.fX + m_Prefix.GetWidth (), vecPosition.fY ),
             g_pChat->m_InputTextColor.A, bShadow, RenderBounds );
