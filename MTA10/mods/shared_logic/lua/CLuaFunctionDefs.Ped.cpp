@@ -1525,7 +1525,7 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+            if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
                 bInteruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
 
             if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable ) )
