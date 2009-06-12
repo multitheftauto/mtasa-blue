@@ -493,6 +493,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CResourceFileItem.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResourceManager.cpp"
 					>
 				</File>
@@ -1360,6 +1364,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CResourceFile.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CResourceFileItem.h"
 					>
 				</File>
 				<File

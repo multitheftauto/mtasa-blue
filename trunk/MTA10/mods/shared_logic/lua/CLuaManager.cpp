@@ -240,6 +240,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "call", CLuaFunctionDefs::Call );
     CLuaCFunctions::AddFunction ( "getThisResource", CLuaFunctionDefs::GetThisResource );
     CLuaCFunctions::AddFunction ( "getResourceConfig", CLuaFunctionDefs::GetResourceConfig );
+    CLuaCFunctions::AddFunction ( "getResourceFile", CLuaFunctionDefs::GetResourceFile );
     CLuaCFunctions::AddFunction ( "getResourceName", CLuaFunctionDefs::GetResourceName );
     CLuaCFunctions::AddFunction ( "getResourceFromName", CLuaFunctionDefs::GetResourceFromName );
     CLuaCFunctions::AddFunction ( "getResourceRootElement", CLuaFunctionDefs::GetResourceRootElement );

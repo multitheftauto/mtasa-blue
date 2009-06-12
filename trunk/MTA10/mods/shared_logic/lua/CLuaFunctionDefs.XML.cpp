@@ -379,48 +379,71 @@ int CLuaFunctionDefs::XMLNodeGetParent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 {
-    // Filename
-    if ( lua_type ( luaVM, 1 ) != LUA_TSTRING )
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    else
-    {
-        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( luaMain )
+        SString strFilename;
+        // Filename
+        if ( lua_type ( luaVM, 1 ) != LUA_TSTRING )
         {
-            //const char * szFilename = lua_tostring ( luaVM, 1 );
-            SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
-            //if ( IsValidFilePath ( szFilename ) ) // This would be checking the full path when we only need to check the user input
+            if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  )
+            {
+                CResourceFileItem* pFile = lua_toresourcefile ( luaVM, 1 );
+                if ( pFile )
+                {
+                    strFilename = SString( "%s\\%s", pFile->GetResource()->GetResourceDirectoryPath(), pFile->GetFilePath().c_str() );
+                }
+                else
+                {
+                    m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
+
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+            }
+            else
+            {
+                m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
+
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+        else
+        {
             if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
             {
-                // Create the XML
-                CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
-                if ( xmlFile )
-                {
-                    // Parse it
-                    if ( xmlFile->Parse() )
-                    {
-                        // Create the root node if it doesn't exist
-                        CXMLNode* pRootNode = xmlFile->GetRootNode ();
-                        if ( !pRootNode )
-                            pRootNode = xmlFile->CreateRootNode ( "root" );
-
-                        // Got a root node?
-                        if ( pRootNode )
-                        {
-                            lua_pushxmlnode ( luaVM, pRootNode );
-                            return 1;
-                        }
-                    }
-
-                    // Destroy the XML
-                    luaMain->DestroyXML ( xmlFile );
-                }	
+                strFilename = SString( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
             }
+        }
+        //const char * szFilename = lua_tostring ( luaVM, 1 );
+        //if ( IsValidFilePath ( szFilename ) ) // This would be checking the full path when we only need to check the user input
+
+        if ( strFilename )
+        {
+            // Create the XML
+            CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
+            if ( xmlFile )
+            {
+                // Parse it
+                if ( xmlFile->Parse() )
+                {
+                    // Create the root node if it doesn't exist
+                    CXMLNode* pRootNode = xmlFile->GetRootNode ();
+                    if ( !pRootNode )
+                        pRootNode = xmlFile->CreateRootNode ( "root" );
+
+                    // Got a root node?
+                    if ( pRootNode )
+                    {
+                        lua_pushxmlnode ( luaVM, pRootNode );
+                        return 1;
+                    }
+                }
+
+                // Destroy the XML
+                luaMain->DestroyXML ( xmlFile );
+            }	
         }
     }
 

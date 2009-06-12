@@ -133,6 +133,14 @@ CResource::~CResource ( void )
     }
     m_ConfigFiles.empty ();
 
+    // Delete the file item pointers
+    list < CResourceFileItem* >::iterator iterf = m_ResourceFileItems.begin ();
+    for ( ; iterf != m_ResourceFileItems.end (); iterf++ )
+    {
+        delete ( *iterf );
+    }
+    m_ResourceFileItems.empty ();
+
 	// Delete the exported functions
 	list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
 	for ( ; iterExportedFunction != m_exportedFunctions.end(); iterExportedFunction++ )
@@ -351,4 +359,37 @@ void CResource::ShowCursor ( bool bShow, bool bToggleControls )
         g_pCore->ForceCursorVisible ( m_iShowingCursor > 0, bToggleControls );
         g_pClientGame->SetCursorEventsEnabled ( m_iShowingCursor > 0 );
     }
+}
+
+CResourceFileItem* CResource::GetResourceFileItem ( std::string strPath )
+{
+    //Transform it to lowercase
+    std::transform(strPath.begin(), strPath.end(), strPath.begin(), tolower);
+
+    //Do we have it stored already?
+    list < CResourceFileItem* >::iterator iter = m_ResourceFileItems.begin ();
+    for ( ; iter != m_ResourceFileItems.end (); iter++ )
+    {
+        CResourceFileItem* pResourceFileItem = (*iter);
+        if ( strPath == pResourceFileItem->GetFilePath() )
+        {
+            return (*iter);
+        }
+    }
+
+    //It doesnt exist already, lets make a new one
+    CResourceFileItem* pFile = new CResourceFileItem ( this, strPath );
+    if ( pFile )
+    {
+        if ( pFile->Exists() )
+        {
+            m_ResourceFileItems.push_back ( pFile );
+            return pFile;
+        }
+        else
+        {
+            delete pFile;
+        }
+    }
+    return NULL;
 }
