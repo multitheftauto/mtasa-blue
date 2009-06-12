@@ -45,6 +45,7 @@ public:
 	LUA_DECLARE ( Call );
     LUA_DECLARE ( GetThisResource );
     LUA_DECLARE ( GetResourceConfig );
+    LUA_DECLARE ( GetResourceFile );
     LUA_DECLARE ( GetResourceName );
     LUA_DECLARE ( GetResourceFromName );
     LUA_DECLARE ( GetResourceRootElement );

@@ -20,6 +20,7 @@
 #include "..\shared_logic\lua\CLuaManager.h"
 #include "CClientEntity.h"
 #include "CResourceConfigItem.h"
+#include "CResourceFileItem.h"
 #include "CResourceFile.h"
 #include "CElementGroup.h"
 #include <list>
@@ -79,12 +80,14 @@ public:
     inline CClientEntity*   GetResourceCOLModelRoot ( void )                           { return m_pResourceCOLRoot; };
     inline CClientEntity*   GetResourceDFFRoot ( void )                           { return m_pResourceDFFEntity; };
     inline CClientEntity*   GetResourceTXDRoot ( void )                           { return m_pResourceTXDRoot; };
+    CResourceFileItem*      GetResourceFileItem ( std::string strPath );
 
 	// This is to delete all the elements created in this resource that are created locally in this client
 	void					DeleteClientChildren		( void );
 
     // Use this for cursor showing/hiding
     void                    ShowCursor                  ( bool bShow, bool bToggleControls = true );
+    
 
 private:
     unsigned short          m_usID;
@@ -107,6 +110,7 @@ private:
 
     SString                 m_strResourceDirectoryPath; // stores the path to /mods/deathmatch/resources/resource_name
 
+    std::list < class CResourceFileItem* >       m_ResourceFileItems;
     std::list < class CResourceFile* >           m_ResourceFiles;
     std::list < class CResourceConfigItem* >     m_ConfigFiles;
     std::list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
