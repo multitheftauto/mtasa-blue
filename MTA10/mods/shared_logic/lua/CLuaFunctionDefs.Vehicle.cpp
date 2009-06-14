@@ -2086,7 +2086,7 @@ int CLuaFunctionDefs::GetRadioChannelName ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetVehicleGravityVector ( lua_State* luaVM )
+int CLuaFunctionDefs::GetVehicleGravity ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -2101,16 +2101,16 @@ int CLuaFunctionDefs::GetVehicleGravityVector ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleGravityVector", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleGravity", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleGravityVector" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleGravity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-int CLuaFunctionDefs::SetVehicleGravityVector ( lua_State* luaVM )
+int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
 {
     int iArgument2 = lua_type ( luaVM, 2 );
     int iArgument3 = lua_type ( luaVM, 3 );
@@ -2131,10 +2131,10 @@ int CLuaFunctionDefs::SetVehicleGravityVector ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleGravityVector", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleGravity", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleGravityVector" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleGravity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
