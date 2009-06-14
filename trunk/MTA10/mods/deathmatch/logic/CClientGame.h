@@ -287,6 +287,8 @@ public:
 
     void                                SetAllDimensions                ( unsigned short usDimension );
 
+    CClientEntity *                     GetLocalInterpolationEntity     ( void );
+
     static void                         StaticProcessClientKeyBind      ( CKeyFunctionBind* pBind );
     void                                ProcessClientKeyBind            ( CKeyFunctionBind* pBind );
     static void                         StaticProcessClientControlBind  ( CControlFunctionBind* pBind );
@@ -403,7 +405,8 @@ private:
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticGameProcessHandler        ( void );
-    static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
+    static bool                         StaticChokingHandler            ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
+    static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -412,7 +415,8 @@ private:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
     void                                GameProcessHandler              ( void );
-    bool                                ChokingHandler                  ( unsigned char ucWeaponType );
+    bool                                ChokingHandler                  ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
+    void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

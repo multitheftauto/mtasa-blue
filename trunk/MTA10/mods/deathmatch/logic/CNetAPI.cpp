@@ -215,10 +215,21 @@ void CNetAPI::AddInterpolation ( const CVector& vecPosition )
 }
 
 
-void CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency )
+bool CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency )
 {
+    unsigned long ulCurrentTime = CClientTime::GetTime ();
     unsigned long ulInterTime = CClientTime::GetTime () - usLatency;
+    // Are we looking for a time which is later than our last sync
+    if ( ulInterTime > m_ulLastPuresyncTime )
+    {
+        // Is the time we're looking for closer to our next sync rather than our last?
+        if ( ( ulInterTime - m_ulLastPuresyncTime ) > ( TICK_RATE / 2 ) )
+        {
+            return false;
+        }
+    }
     m_Interpolator.Evaluate ( ulInterTime, vecPosition );
+    return true;
 }
 
 

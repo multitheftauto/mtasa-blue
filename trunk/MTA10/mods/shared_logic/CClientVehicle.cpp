@@ -233,6 +233,16 @@ void CClientVehicle::Unlink ( void )
 }
 
 
+RpClump * CClientVehicle::GetClump ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetRpClump ();
+    }
+    return NULL;
+}
+
+
 void CClientVehicle::GetName ( char* szBuf )
 {
     // Get the name

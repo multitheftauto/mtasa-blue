@@ -46,7 +46,7 @@ public:
     void                    ResetReturnPosition             ( void );
 
     void                    AddInterpolation                ( const CVector& vecPosition );
-    void                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
+    bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
 
 	static bool             IsWeaponIDAkimbo				( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );

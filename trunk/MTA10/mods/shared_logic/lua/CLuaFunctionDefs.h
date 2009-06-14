@@ -202,6 +202,7 @@ public:
     LUA_DECLARE ( IsPedSunbathing );
     LUA_DECLARE ( IsPedDoingGangDriveby );
     LUA_DECLARE ( GetPedAnimation );
+    LUA_DECLARE ( GetPedAnimationData );
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
 	LUA_DECLARE ( GetPedCameraRotation );
@@ -209,6 +210,7 @@ public:
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
+    LUA_DECLARE ( BlendPedAnimation );
     LUA_DECLARE ( SetPedAnimation );
     LUA_DECLARE ( SetPedMoveAnim );
     LUA_DECLARE ( SetPedWeaponSlot );

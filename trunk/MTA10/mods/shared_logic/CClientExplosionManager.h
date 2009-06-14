@@ -35,15 +35,6 @@ public:
 
 private:
     CClientManager *        m_pManager;
-
-    // Ignore list for explosions played locally, which should be not replayed when relayed back from the server
-    struct SIgnoreItem
-    {
-        float           fExpireTime;
-        CVector         vecPosition;
-        eExplosionType  explosionType;
-    };
-    std::vector < SIgnoreItem > m_IgnoreList;
 };
 
 #endif

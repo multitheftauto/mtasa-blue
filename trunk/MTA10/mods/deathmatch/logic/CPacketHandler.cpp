@@ -3505,6 +3505,8 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
 {
+    CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
+
     // Read out the creator, latency, position and type
     unsigned short usLatency;
     ElementID CreatorID, OriginID;
@@ -3518,6 +3520,10 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
          bitStream.Read ( vecPosition.fZ ) &&
          bitStream.Read ( ucType ) )
     {
+        // Ping compensation vars
+        CClientEntity * pMovedEntity = NULL;
+        CVector vecRestorePosition;
+
         // Grab the creator if any (for kill credits)
         CClientPlayer* pCreator = NULL;
         if ( CreatorID != INVALID_ELEMENT_ID )
@@ -3549,12 +3555,26 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
             }
         }
         else
-        {
-            // TODO: Ping compensate
+        {            
+            // * Ping compensation *
+            // Do we have an entity to move for the explosion?
+            pMovedEntity = g_pClientGame->GetLocalInterpolationEntity ();            
+            if ( pMovedEntity )
+            {
+		        // Warp back in time to where we were when this explosion happened
+    	        unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
+                if ( pCreator && pCreator != pLocalPlayer ) usLatency = pCreator->GetLatency ();
+                CVector vecPosition;
+                if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency ) )
+                {
+                    pMovedEntity->GetPosition ( vecRestorePosition );
+                    pMovedEntity->SetPosition ( vecPosition );
+                }
+                else pMovedEntity = false;
+            }
         }
 
         eExplosionType explosionType = ( eExplosionType ) ucType;       
-
         
         CLuaArguments Arguments;
         Arguments.PushNumber ( vecPosition.fX );
@@ -3584,6 +3604,13 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         {
             if ( !bCancelExplosion )
 				g_pClientGame->m_pManager->GetExplosionManager ()->Create ( explosionType, vecPosition, pCreator );       
+        }
+
+        // If we moved an entity to ping compensate..
+        if ( pMovedEntity )
+        {
+            // Restore its position
+            pMovedEntity->SetPosition ( vecRestorePosition );
         }
     }
 }
