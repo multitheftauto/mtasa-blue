@@ -330,8 +330,8 @@ public:
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
     inline void                 SetIllegalTowBreakTime  ( unsigned long ulTime )            { m_ulIllegalTowBreakTime = ulTime; }
 
-    void                        GetGravityVector        ( CVector& vecGravity ) const       { vecGravity = m_vecGravity; }
-    void                        SetGravityVector        ( const CVector& vecGravity );
+    void                        GetGravity              ( CVector& vecGravity ) const       { vecGravity = m_vecGravity; }
+    void                        SetGravity              ( const CVector& vecGravity );
 
     bool                        IsEnterable             ( void );
 

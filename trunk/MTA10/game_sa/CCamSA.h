@@ -176,6 +176,8 @@ public:
 	CVector				* GetFixedModeVector();
 
     CEntity *           GetTargetEntity();
+
+    void                AdjustToNewGravity ( const CVector* pvecOldGravity, const CVector* pvecNewGravity );
 };
 
 #endif

@@ -72,3 +72,54 @@ CEntity * CCamSA::GetTargetEntity ( void )
 	}
 	return pReturn;
 }
+
+void GetMatrixForGravity ( const CVector& vecGravity, CMatrix& mat )
+{
+    // Calculates a basis where the z axis is the inverse of the gravity
+    if ( vecGravity.Length () > 0.0001f )
+    {
+        mat.vUp = -vecGravity;
+        mat.vUp.Normalize ();
+        if ( abs(mat.vUp.fX) > 0.0001f || abs(mat.vUp.fZ) > 0.0001f )
+        {
+            CVector y ( 0.0f, 1.0f, 0.0f );
+            mat.vFront = vecGravity;
+            mat.vFront.CrossProduct ( &y );
+            mat.vFront.CrossProduct ( &vecGravity );
+            mat.vFront.Normalize ();
+        }
+        else
+        {
+            mat.vFront = CVector ( 0.0f, 0.0f, vecGravity.fY );
+        }
+        mat.vRight = mat.vFront;
+        mat.vRight.CrossProduct ( &mat.vUp );
+    }
+    else
+    {
+        // No gravity, use default axes
+        mat.vRight = CVector ( 1.0f, 0.0f, 0.0f );
+        mat.vFront = CVector ( 0.0f, 1.0f, 0.0f );
+        mat.vUp    = CVector ( 0.0f, 0.0f, 1.0f );
+    }
+}
+
+void CCamSA::AdjustToNewGravity ( const CVector* pvecOldGravity, const CVector* pvecNewGravity )
+{
+    CEntitySAInterface* pEntity = (CEntitySAInterface *)internalInterface->CamTargetEntity;
+    if ( !pEntity )
+        return;
+
+    CMatrix matOld, matNew;
+    GetMatrixForGravity ( *pvecOldGravity, matOld );
+    GetMatrixForGravity ( *pvecNewGravity, matNew );
+    
+    CVector* pvecPosition = &pEntity->Placeable.matrix->vPos;
+
+    matOld.Invert ();
+    internalInterface->m_aTargetHistoryPos [ 0 ] = matOld * (internalInterface->m_aTargetHistoryPos [ 0 ] - *pvecPosition);
+    internalInterface->m_aTargetHistoryPos [ 0 ] = matNew * internalInterface->m_aTargetHistoryPos [ 0 ] + *pvecPosition;
+
+    internalInterface->m_aTargetHistoryPos [ 1 ] = matOld * (internalInterface->m_aTargetHistoryPos [ 1 ] - *pvecPosition);
+    internalInterface->m_aTargetHistoryPos [ 1 ] = matNew * internalInterface->m_aTargetHistoryPos [ 1 ] + *pvecPosition;
+}

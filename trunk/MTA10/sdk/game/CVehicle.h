@@ -197,8 +197,8 @@ public:
     virtual bool                 IsSmokeTrailEnabled                    () = 0;
     virtual void                 SetSmokeTrailEnabled                   ( bool bEnabled ) = 0;
 
-    virtual void                 GetGravityVector                       ( CVector* pvecGravity ) const = 0;
-    virtual void                 SetGravityVector                       ( const CVector* pvecGravity ) = 0;
+    virtual void                 GetGravity                             ( CVector* pvecGravity ) const = 0;
+    virtual void                 SetGravity                             ( const CVector* pvecGravity ) = 0;
 };
 
 #endif
