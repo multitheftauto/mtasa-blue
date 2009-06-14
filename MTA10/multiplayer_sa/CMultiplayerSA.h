@@ -61,7 +61,6 @@ public:
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetGameProcessHandler       ( GameProcessHandler* pProcessHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
-    void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

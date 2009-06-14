@@ -60,7 +60,6 @@ CClientManager::CClientManager ( void )
     m_pHandlingManager = new CClientHandlingManager ( this );
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
-    m_pAnimationManager = new CClientAnimationManager ( this );
 
 	m_pPacketRecorder = new CClientPacketRecorder ( this );
 
@@ -169,9 +168,6 @@ CClientManager::~CClientManager ( void )
     delete m_pWaterManager;
     m_pWaterManager = NULL;
 
-    delete m_pAnimationManager;
-    m_pAnimationManager = NULL;
-
     // Delete the connection trouble texture
     delete m_pConnectionTroubleTexture;
     m_pConnectionTroubleTexture = NULL;
@@ -196,8 +192,7 @@ void CClientManager::DoPulse ( void )
         m_pObjectManager->DoPulse ();
         m_pProjectileManager->DoPulse ();
         m_pSoundManager->DoPulse ();
-        m_pPlayerManager->DoPulse ();
-        m_pAnimationManager->DoPulse ();
+        m_pPlayerManager->DoPulse ();        
     }
 }
 

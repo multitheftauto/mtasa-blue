@@ -905,20 +905,23 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
 		{
             const char * szBlockName = NULL;
             const char * szAnimName = NULL;
-            float fBlendDelta = 1.0f;
+            int iTime = -1;
             bool bLoop = true;
             bool bUpdatePosition = true;
+            bool bInterruptable = true;
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
             int iArgument4 = lua_type ( luaVM, 4 );
             if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
-                fBlendDelta = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+                iTime = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
             if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
+            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+                bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
 
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, fBlendDelta, bLoop, bUpdatePosition ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable ) )
             {
 			    lua_pushboolean ( luaVM, true );
                 return 1;
