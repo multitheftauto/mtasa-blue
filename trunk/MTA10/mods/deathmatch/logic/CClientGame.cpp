@@ -3682,6 +3682,7 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
                 {				    
 			        unsigned short usLatency = pPlayer->GetLatency ();
 
+                    CVector vecPosition;
                     if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency ) )
                     {    	
                         pShotMovedEntity->GetPosition ( vecShotRestorePosition );
