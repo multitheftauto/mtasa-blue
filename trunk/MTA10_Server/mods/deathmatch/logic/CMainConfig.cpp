@@ -221,12 +221,14 @@ bool CMainConfig::Load ( const char* szFilename )
 	}
 
 	// Grab the serial verification
+	/** ACHTUNG: Unsupported for release 1.0 (#4090)
 	iResult = GetBoolean ( m_pRootNode, "verifyserials", m_bVerifySerials );
     if ( iResult == INVALID_VALUE )
     {
         m_bVerifySerials = true;
     }
     else if ( iResult == DOESNT_EXIST )
+	*/
     {
         m_bVerifySerials = false;
     }
