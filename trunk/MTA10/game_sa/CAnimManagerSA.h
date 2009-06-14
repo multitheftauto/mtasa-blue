@@ -145,6 +145,9 @@ public:
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
+    
+    CAnimBlendHierarchy *       GetAnimation                            ( const char * szName, const char * szBlockName );
+    
     void                        ClearAnimBlendAssociation               ( CAnimBlendAssociationSAInterface * pInterface );
     void                        ClearAnimBlendHierarchy                 ( CAnimBlendHierarchySAInterface * pInterface );
 

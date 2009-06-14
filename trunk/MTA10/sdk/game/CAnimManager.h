@@ -102,6 +102,8 @@ public:
     virtual CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface ) = 0;
     virtual CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface ) = 0;
     virtual CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
+
+    virtual CAnimBlendHierarchy *       GetAnimation                            ( const char * szName, const char * szBlockName ) = 0;
 };
 
 #endif
