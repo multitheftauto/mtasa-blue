@@ -124,6 +124,17 @@ public:
         return ReadBits ( reinterpret_cast < char * > ( output ), numbits );
     }
 
+    bool                ReadBit                     ( bool& output )
+    {
+        unsigned char ucTemp = 0;
+        if ( ReadBits ( &ucTemp, 1 ) )
+        {
+            output = ucTemp & 1;
+            return true;
+        }
+        return false;
+    }
+
 };
 
 // Interface for all sync structures
