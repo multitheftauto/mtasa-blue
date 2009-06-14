@@ -43,9 +43,9 @@ void CPedRPCs::SetPedArmor ( NetBitStreamInterface& bitStream )
     ElementID ID;
     unsigned char ucArmor;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucArmor ) &&
-         bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadCompressed ( ucArmor ) &&
+         bitStream.ReadCompressed ( ucTimeContext ) )
     {
         float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
 
@@ -64,9 +64,9 @@ void CPedRPCs::SetPedRotation ( NetBitStreamInterface& bitStream )
     ElementID ID;
     float fRotation;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( fRotation ) &&
-         bitStream.Read ( ucTimeContext ) )
+         bitStream.ReadCompressed ( ucTimeContext ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -83,7 +83,7 @@ void CPedRPCs::SetPedRotation ( NetBitStreamInterface& bitStream )
 void CPedRPCs::GivePedJetPack ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    if ( bitStream.Read ( ID ) )
+    if ( bitStream.ReadCompressed ( ID ) )
     {
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -97,7 +97,7 @@ void CPedRPCs::GivePedJetPack ( NetBitStreamInterface& bitStream )
 void CPedRPCs::RemovePedJetPack ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    if ( bitStream.Read ( ID ) )
+    if ( bitStream.ReadCompressed ( ID ) )
     {
         CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -112,7 +112,7 @@ void CPedRPCs::RemovePedClothes ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned char ucType;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucType ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( ucType ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -131,7 +131,7 @@ void CPedRPCs::SetPedGravity ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     float fGravity;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( fGravity ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( fGravity ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -156,13 +156,13 @@ void CPedRPCs::SetPedGravity ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedChoking ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    unsigned char ucChoking;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucChoking ) )
+    bool bChoking;
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadBit ( bChoking ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
-            pPed->SetChoking ( ( ucChoking == 1 ) );
+            pPed->SetChoking ( bChoking );
         }
     }
 }
@@ -172,7 +172,7 @@ void CPedRPCs::SetPedFightingStyle ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned char ucStyle;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucStyle ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( ucStyle ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
@@ -186,13 +186,13 @@ void CPedRPCs::SetPedFightingStyle ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedMoveAnim ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    int iMoveAnim;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( iMoveAnim ) )
+    unsigned int uiMoveAnim;
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( uiMoveAnim ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
-            pPed->SetMoveAnim ( (eMoveAnim)iMoveAnim );
+            pPed->SetMoveAnim ( (eMoveAnim)uiMoveAnim );
         }
     }
 }
@@ -205,10 +205,10 @@ void CPedRPCs::WarpPedIntoVehicle ( NetBitStreamInterface& bitStream )
     ElementID VehicleID;
     unsigned char ucSeat;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( VehicleID ) &&
-         bitStream.Read ( ucSeat ) &&
-         bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadCompressed ( VehicleID ) &&
+         bitStream.ReadCompressed ( ucSeat ) &&
+         bitStream.ReadCompressed ( ucTimeContext ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
@@ -261,8 +261,8 @@ void CPedRPCs::RemovePedFromVehicle ( NetBitStreamInterface& bitStream )
     // Read out the player and vehicle id
     ElementID PedID;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadCompressed ( ucTimeContext ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
@@ -287,11 +287,11 @@ void CPedRPCs::SetPedDoingGangDriveby ( NetBitStreamInterface& bitStream )
 {
     // Read out the player and vehicle id
     ElementID PedID;
-    unsigned char ucDriveby;
+    bool bDriveby;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucDriveby ) &&
-         bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bDriveby ) &&
+         bitStream.ReadCompressed ( ucTimeContext ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
@@ -299,7 +299,7 @@ void CPedRPCs::SetPedDoingGangDriveby ( NetBitStreamInterface& bitStream )
         {
             pPed->SetSyncTimeContext ( ucTimeContext );
 
-            pPed->SetDoingGangDriveby ( ( ucDriveby == 1 ) );
+            pPed->SetDoingGangDriveby ( bDriveby );
         }
     }
 }
@@ -312,10 +312,10 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
     char szBlockName [ 64 ], szAnimName [ 64 ];
     unsigned char ucBlockSize, ucAnimSize;
     float fBlendDelta;
-    unsigned char ucLoop;
-    unsigned char ucUpdatePosition;
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucBlockSize ) )
+    bool bLoop;
+    bool bUpdatePosition;
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadCompressed ( ucBlockSize ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
@@ -324,17 +324,17 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
             if ( ucBlockSize > 0 )
             {
                 if ( bitStream.Read ( szBlockName, ucBlockSize ) &&
-                    bitStream.Read ( ucAnimSize ) )
+                    bitStream.ReadCompressed ( ucAnimSize ) )
                 {
                     szBlockName [ ucBlockSize ] = 0;
                     if ( bitStream.Read ( szAnimName, ucAnimSize ) &&
                          bitStream.Read ( fBlendDelta ) &&
-                         bitStream.Read ( ucLoop ) &&
-                         bitStream.Read ( ucUpdatePosition ) )
+                         bitStream.ReadBit ( bLoop ) &&
+                         bitStream.ReadBit ( bUpdatePosition ) )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 
-                        pPed->BlendAnimation ( szBlockName, szAnimName, 1.0f, fBlendDelta, 0.0f, ( ucLoop == 1 ), ( ucUpdatePosition == 1 ) );
+                        pPed->BlendAnimation ( szBlockName, szAnimName, 1.0f, fBlendDelta, 0.0f, bLoop, bUpdatePosition );
                     }
                 }
             }
@@ -350,16 +350,16 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedOnFire ( NetBitStreamInterface& bitStream )
 {
     ElementID PedID;
-    unsigned char ucIsOnFire;
+    bool bIsOnFire;
 
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucIsOnFire ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsOnFire ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
-            pPed->SetOnFire( ( ucIsOnFire == 1 ) );
+            pPed->SetOnFire( bIsOnFire );
         }
     }
 }
@@ -368,16 +368,16 @@ void CPedRPCs::SetPedOnFire ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedHeadless ( NetBitStreamInterface& bitStream )
 {
     ElementID PedID;
-    unsigned char ucIsHeadless;
+    bool bIsHeadless;
 
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucIsHeadless ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsHeadless ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
-            pPed->SetHeadless ( ( ucIsHeadless == 1 ) );
+            pPed->SetHeadless ( bIsHeadless );
         }
     }
 }
@@ -386,16 +386,16 @@ void CPedRPCs::SetPedHeadless ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
 {
     ElementID PedID;
-    unsigned char ucIsFrozen;
+    bool bIsFrozen = 0;
 
-    if ( bitStream.Read ( PedID ) &&
-         bitStream.Read ( ucIsFrozen ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsFrozen ) )
     {
         // Grab the ped
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
-            pPed->SetFrozen ( ( ucIsFrozen == 1 ) );
+            pPed->SetFrozen ( bIsFrozen );
         }
     }
 }

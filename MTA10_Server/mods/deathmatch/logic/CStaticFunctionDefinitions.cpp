@@ -2381,9 +2381,9 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
 
                 // Tell everyone
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( ucArmor );
-                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                BitStream.pBitStream->WriteCompressed ( ucArmor );
+                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ARMOR, *BitStream.pBitStream ) );
             }
         }
@@ -2477,9 +2477,9 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
 
             // Tell the players
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             BitStream.pBitStream->Write ( fRadians );
-            BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ROTATION, *BitStream.pBitStream ) );
         }
     }
@@ -2575,8 +2575,8 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned
                     pPed->GetClothes ()->RemoveClothes ( ucType );
 
                     CBitStream BitStream;
-                    BitStream.pBitStream->Write ( pPed->GetID () );
-                    BitStream.pBitStream->Write ( ucType );
+                    BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                    BitStream.pBitStream->WriteCompressed ( ucType );
                     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_PED_CLOTHES, *BitStream.pBitStream ) );
 
                     return true;
@@ -2603,7 +2603,7 @@ bool CStaticFunctionDefinitions::GivePedJetPack ( CElement* pElement )
             pPed->SetHasJetPack ( true );
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_PED_JETPACK, *BitStream.pBitStream ) );
 
             return true;
@@ -2628,7 +2628,7 @@ bool CStaticFunctionDefinitions::RemovePedJetPack ( CElement* pElement )
             pPed->SetHasJetPack ( false );
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_PED_JETPACK, *BitStream.pBitStream ) );
 
             return true;
@@ -2655,8 +2655,8 @@ bool CStaticFunctionDefinitions::SetPedFightingStyle ( CElement* pElement, unsig
                 pPed->SetFightingStyle ( ucStyle );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( ucStyle );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                BitStream.pBitStream->WriteCompressed ( ucStyle );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_FIGHTING_STYLE, *BitStream.pBitStream ) );
 
                 return true;
@@ -2683,8 +2683,8 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CElement* pElement, unsigned i
                 pPed->SetMoveAnim ( iMoveAnim );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( iMoveAnim );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                BitStream.pBitStream->WriteCompressed ( iMoveAnim );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_MOVE_ANIM, *BitStream.pBitStream ) );
 
                 return true;
@@ -2713,7 +2713,7 @@ bool CStaticFunctionDefinitions::SetPedGravity ( CElement* pElement, float fGrav
                 pPed->SetGravity ( fGravity );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
                 BitStream.pBitStream->Write ( fGravity );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_GRAVITY, *BitStream.pBitStream ) );
             }
@@ -2744,8 +2744,8 @@ bool CStaticFunctionDefinitions::SetPedChoking ( CElement* pElement, bool bChoki
                     pPed->SetChoking ( bChoking );
 
                     CBitStream bitStream;
-                    bitStream.pBitStream->Write ( pPed->GetID () );
-                    bitStream.pBitStream->Write ( ( unsigned char ) ( ( bChoking ) ? 1 : 0 ) );
+                    bitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                    bitStream.pBitStream->WriteBit ( bChoking );
                     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_CHOKING, *bitStream.pBitStream ) );
 
                     return true;
@@ -2821,10 +2821,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
 
                 // Tell all the players
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( pVehicle->GetID () );
-                BitStream.pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
-                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                BitStream.pBitStream->WriteCompressed ( pVehicle->GetID () );
+                BitStream.pBitStream->WriteCompressed ( static_cast < unsigned char > ( uiSeat ) );
+                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( WARP_PED_INTO_VEHICLE, *BitStream.pBitStream ) );
 
                 // Call the player->vehicle event
@@ -2894,8 +2894,8 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
 
             // Tell the players
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
-            BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream ) );
         }
     }
@@ -2921,9 +2921,9 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
 
                 // Tell the players
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pPed->GetID () );
-                BitStream.pBitStream->Write ( ( unsigned char ) ( ( bGangDriveby ) ? 1 : 0 ) );
-                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+                BitStream.pBitStream->WriteBit ( bGangDriveby );
+                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_DOING_GANG_DRIVEBY, *BitStream.pBitStream ) );
 
                 return true;
@@ -2948,24 +2948,24 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
 
             // Tell the players
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pPed->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             if ( szBlockName && szAnimName )
             {
                 unsigned char ucBlockSize = ( unsigned char ) strlen ( szBlockName );
                 unsigned char ucAnimSize = ( unsigned char ) strlen ( szAnimName );
 
-                BitStream.pBitStream->Write ( ucBlockSize );
+                BitStream.pBitStream->WriteCompressed ( ucBlockSize );
                 BitStream.pBitStream->Write ( szBlockName, ucBlockSize );
-                BitStream.pBitStream->Write ( ucAnimSize );
+                BitStream.pBitStream->WriteCompressed ( ucAnimSize );
                 BitStream.pBitStream->Write ( szAnimName, ucAnimSize );
                 BitStream.pBitStream->Write ( fBlendDelta );
-                BitStream.pBitStream->Write ( ( unsigned char ) ( ( bLoop ) ? 1 : 0 ) );
-                BitStream.pBitStream->Write ( ( unsigned char ) ( ( bUpdatePosition ) ? 1 : 0 ) );
+                BitStream.pBitStream->WriteBit ( bLoop );
+                BitStream.pBitStream->WriteBit ( bUpdatePosition );
             }
             else
             {
                 // Inform them to kill the current animation instead
-                BitStream.pBitStream->Write ( ( unsigned char ) 0 );
+                BitStream.pBitStream->WriteCompressed ( ( unsigned char ) 0 );
             }
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ANIMATION, *BitStream.pBitStream ) );
 
@@ -2988,8 +2988,8 @@ bool CStaticFunctionDefinitions::SetPedOnFire ( CElement * pElement, bool bIsOnF
 
         pPed->SetOnFire( bIsOnFire );
 
-        BitStream.pBitStream->Write ( pPed->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bIsOnFire ) ? 1 : 0 ) );
+        BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+        BitStream.pBitStream->WriteBit ( bIsOnFire );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ON_FIRE, *BitStream.pBitStream ) );
 
         return true;
@@ -3010,8 +3010,8 @@ bool CStaticFunctionDefinitions::SetPedHeadless ( CElement * pElement, bool bIsH
 
         pPed->SetHeadless ( bIsHeadless );
 
-        BitStream.pBitStream->Write ( pPed->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bIsHeadless ) ? 1 : 0 ) );
+        BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+        BitStream.pBitStream->WriteBit ( bIsHeadless );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_HEADLESS, *BitStream.pBitStream ) );
 
         return true;
@@ -3032,8 +3032,8 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CElement * pElement, bool bIsFro
 
         pPed->SetFrozen ( bIsFrozen );
 
-        BitStream.pBitStream->Write ( pPed->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bIsFrozen ) ? 1 : 0 ) );
+        BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+        BitStream.pBitStream->WriteBit ( bIsFrozen );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_FROZEN, *BitStream.pBitStream ) );
 
         return true;
