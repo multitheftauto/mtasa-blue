@@ -180,7 +180,7 @@ public:
     static bool                 WarpPedIntoVehicle                  ( CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0 );
     static bool                 RemovePedFromVehicle                ( CElement* pElement );
     static bool                 SetPedDoingGangDriveby              ( CElement * pElement, bool bGangDriveby );
-    static bool                 SetPedAnimation                     ( CElement * pElement, const char * szBlockName, const char * szAnimName, float fBlendDelta, bool bLoop, bool bUpdatePosition );
+    static bool                 SetPedAnimation                     ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
     static bool                 SetPedOnFire                        ( CElement * pElement, bool bIsOnFire );
     static bool                 SetPedHeadless                      ( CElement * pElement, bool bIsHeadless );
     static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );

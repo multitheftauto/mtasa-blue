@@ -63,8 +63,8 @@ typedef unsigned long AnimationId;
 class CTaskSimpleAnimSAInterface: public CTaskSimpleSAInterface
 {
 public:
-    CAnimBlendAssociation*      m_pAnim;    // 8
-    char                        m_bIsFinished		:1; //12
+    CAnimBlendAssociation*      m_pAnim;
+    char                        m_bIsFinished		:1;
     char                        m_bDontInterrupt	:1;
     char                        m_bHoldLastFrame	:1;
 
@@ -108,16 +108,16 @@ public:
 class CTaskSimpleRunNamedAnimSAInterface: public CTaskSimpleAnimSAInterface
 {
 public:
-    char                    m_animName [ANIM_NAMELEN]; //16
-    char                    m_animGroupName [ANIMBLOCK_NAMELEN]; //40
+    char                    m_animName [ANIM_NAMELEN];
+    char                    m_animGroupName [ANIMBLOCK_NAMELEN];
 
-    float                   m_fBlendDelta; //56
-    CAnimBlendHierarchy*    m_pAnimHierarchy; //60
-    int                     m_iTime; //64
-    CTaskTimer              m_timer; //68
-    CVector                 m_offsetAtEnd; //80
-    int                     m_flags; //92  
-    short                   m_animID; //96
+    float                   m_fBlendDelta;
+    CAnimBlendHierarchy*    m_pAnimHierarchy;
+    int                     m_iTime;
+    CTaskTimer              m_timer;
+    CVector                 m_offsetAtEnd;
+    int                   m_flags;    
+    short                   m_animID;	
 };
 
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim

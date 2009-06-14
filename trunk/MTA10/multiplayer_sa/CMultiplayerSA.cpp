@@ -88,8 +88,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 DWORD FUNC_CEntity_Render =                                 0x534310;
 
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-
 #define HOOKPOS_VehicleCamStart                             0x5245B7
 DWORD RETURN_VehicleCamStart =                              0x5245BD;
 #define HOOKPOS_VehicleCamLookDir1                          0x524DF1
@@ -165,7 +163,6 @@ ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
 GameProcessHandler* m_pGameProcessHandler = NULL;
 ChokingHandler* m_pChokingHandler = NULL;
-BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 
 ExplosionHandler * m_pExplosionHandler; // stores our handler
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
@@ -204,7 +201,6 @@ void HOOK_CGame_Process ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
 void HOOK_ComputeDamageResponse_StartChoking ();
 void HOOK_CollisionStreamRead ();
-void HOOK_CAnimManager_BlendAnimation ();
 void HOOK_CPhysical_ApplyGravity ();
 void HOOK_VehicleCamStart ();
 void HOOK_VehicleCamLookDir1 ();
@@ -297,7 +293,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
     HookInstall(HOOKPOS_VehicleCamStart, (DWORD)HOOK_VehicleCamStart, 6);
     HookInstall(HOOKPOS_VehicleCamLookDir1, (DWORD)HOOK_VehicleCamLookDir1, 5);
     HookInstall(HOOKPOS_VehicleCamLookDir2, (DWORD)HOOK_VehicleCamLookDir2, 6);
@@ -1130,11 +1125,6 @@ void CMultiplayerSA::SetGameProcessHandler ( GameProcessHandler* pProcessHandler
 void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 {
     m_pChokingHandler = pChokingHandler;
-}
-
-void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
-{
-    m_pBlendAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -2483,13 +2473,9 @@ stop_looping:
 
 
 // Hook to detect when a player is choking
-DWORD dwChokingChoke = 0x4C05C1;
-DWORD dwChokingDontchoke = 0x4C0620;
-unsigned char ucChokingWeaponType = 0;
-CPedSAInterface * pChokingPedInterface = NULL;
-CPlayerPed * pChokingPed = NULL;
-CPedSAInterface * pResponsiblePedInterface = NULL;
-CPlayerPed * pResponsiblePed = NULL;
+static DWORD dwChokingChoke = 0x4C05C1;
+static DWORD dwChokingDontchoke = 0x4C0620;
+static unsigned char ucChokingWeaponType = 0;
 void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
 {
     _asm
@@ -2497,21 +2483,10 @@ void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
         pushad
         mov     al, [esp+0x8C]
         mov     ucChokingWeaponType, al
-        mov     eax, dword ptr [edi]
-        mov     pChokingPedInterface, eax
-        mov     pResponsiblePedInterface, ebp
     }
 
-    pChokingPed = dynamic_cast < CPlayerPed * > ( pGameInterface->GetPools ()->GetPed ( ( DWORD * ) pChokingPedInterface ) );
-    pResponsiblePed = dynamic_cast < CPlayerPed * > ( pGameInterface->GetPools ()->GetPed ( ( DWORD * ) pResponsiblePedInterface ) );
-
-    if ( pChokingPed )
-    {
-        if ( m_pChokingHandler )
-        {
-            if ( !m_pChokingHandler ( pChokingPed, pResponsiblePed, ucChokingWeaponType ) ) goto dont_choke;
-        }
-    }
+    if ( m_pChokingHandler && m_pChokingHandler ( ucChokingWeaponType ) == false )
+        goto dont_choke;
 
     _asm
     {
@@ -2864,61 +2839,6 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
         _asm
         {
             ret
-        }
-    }
-}
-
-/* If we don't want any MTA animations interrupted and GTA tries to call CAnimManager::BlendAnimation..
-   ..then pass them a fake CAnimBlendAssociation pointer for them to play with =) */
-DWORD dwBlendAnimationReturn = 0x4D4617;
-RpClump * pBlendAnimationClump = NULL;
-AssocGroupId blendAnimationGroup = 0;
-AnimationId blendAnimationID = 0;
-float fBlendAnimationBlendDelta;
-class CFakeAnimBlendAssociation
-{
-public:
-    CFakeAnimBlendAssociation () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
-    void * m_pointer;
-    char m_data [ 100 ];
-} fakeAssoc;
-CFakeAnimBlendAssociation * pFakeAssoc = &fakeAssoc;
-
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
-{
-    _asm
-    {        
-        mov     eax, [esp+4]
-        mov     pBlendAnimationClump, eax
-        mov     eax, [esp+8]
-        mov     blendAnimationGroup, eax
-        mov     eax, [esp+12]
-        mov     blendAnimationID, eax
-        mov     eax, [esp+16]
-        mov     fBlendAnimationBlendDelta, eax
-        pushad
-    }
-    
-    if ( m_pBlendAnimationHandler && !m_pBlendAnimationHandler ( pBlendAnimationClump,
-                                                                 blendAnimationGroup,
-                                                                 blendAnimationID,
-                                                                 fBlendAnimationBlendDelta ) )
-    {
-        _asm
-        {
-            popad
-            mov     eax, pFakeAssoc
-            ret
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            sub     esp,14h 
-            mov     ecx,dword ptr [esp+18h]
-            jmp     dwBlendAnimationReturn
         }
     }
 }

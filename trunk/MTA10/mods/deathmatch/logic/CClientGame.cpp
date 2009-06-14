@@ -222,7 +222,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
-    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -351,7 +350,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetGameProcessHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
-    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -643,7 +641,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{     
+{ 
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -3048,15 +3046,9 @@ void CClientGame::StaticGameProcessHandler ( void )
     g_pClientGame->GameProcessHandler ();
 }
 
-bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
-{    
-    return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
-}
-
-
-bool CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
 {
-    return g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3142,37 +3134,11 @@ void CClientGame::GameProcessHandler ( void )
     }
 }
 
-bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
+bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 {
-    CClientPed * pPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pChokingPed ), true, true );
-    if ( pPed )
-    {
-        CLuaArguments Arguments;        
-        Arguments.PushNumber ( ucWeaponType );
-        if ( pResponsiblePed ) Arguments.PushUserData ( pResponsiblePed );
-        else Arguments.PushNil ();
-        if ( IS_PLAYER (pPed) )
-            return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
-        else
-            return pPed->CallEvent ( "onClientPedChoke", Arguments, true );
-    }
-    return true;
-}
-
-bool CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{
-    CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-    if ( pPed )
-    {
-        // Make sure we have atleast one animation running if we're going to ignore another
-        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
-        {
-            // Do NOT remove this call
-            bool bAllow = pPed->AllowBlendAnimation ( animGroup, animID, fBlendDelta );
-            if ( !bAllow ) return false;
-        }
-    }
-    return true;
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( ucWeaponType );
+    return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
 
@@ -3594,7 +3560,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                             if ( !m_pLocalPlayer->IsUsingGun () )
                             {
                                 // Make sure we arent running an animation
-                                if ( m_pLocalPlayer->CountAnimations () == 0 )
+                                if ( !m_pLocalPlayer->IsRunningAnimation () )
                                 {
                                     // Grab the closest vehicle
                                     unsigned int uiDoor = 0;
