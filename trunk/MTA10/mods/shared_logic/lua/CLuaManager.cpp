@@ -322,7 +322,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaFunctionDefs::SetElementCollisionsEnabled );
     
 	// Sound effects and synth funcs
-    CLuaCFunctions::AddFunction ( "synthProcessMIDI", CLuaFunctionDefs::SynthProcessMIDI );
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );
     CLuaCFunctions::AddFunction ( "playSound3D", CLuaFunctionDefs::PlaySound3D );
     CLuaCFunctions::AddFunction ( "stopSound", CLuaFunctionDefs::StopSound );

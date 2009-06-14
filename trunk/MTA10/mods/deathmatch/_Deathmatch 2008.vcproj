@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 	RootNamespace="Client - Deathmatch"
@@ -507,18 +507,6 @@
 				<File
 					RelativePath=".\logic\CServer.cpp"
 					>
-				</File>
-				<File
-					RelativePath=".\logic\CSFX.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							MinimalRebuild="false"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
@@ -1372,10 +1360,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CServer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CSFX.h"
 					>
 				</File>
 				<File

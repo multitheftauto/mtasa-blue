@@ -28,8 +28,6 @@ class CLuaMain;
 
 #include <list>
 
-class CSFXSynth;
-
 class CLuaMain //: public CClient
 {
 public:
@@ -65,9 +63,6 @@ public:
     void                            Start                   ( void );
 
     void                            DoPulse                 ( void );
-
-	// Gets the SFXSynth instance or creates one if it's non-existant
-	CSFXSynth *						GetSFXSynthInstance		( void );
 
     void                            GetScriptName           ( char* szLuaScript ) const     { strcpy ( szLuaScript, m_szScriptName ); };
     inline const char*              GetScriptNamePointer    ( void ) const                  { return m_szScriptName; };
@@ -110,9 +105,6 @@ private:
     class CResource*                m_pResource;
 
     std::list < CXMLFile* >         m_XMLFiles;
-
-	// Sound classes
-	CSFXSynth*						m_pSFXSynth;
 };
 
 #endif

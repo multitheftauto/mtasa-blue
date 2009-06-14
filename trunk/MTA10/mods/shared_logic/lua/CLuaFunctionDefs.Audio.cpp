@@ -19,27 +19,6 @@
 
 #include "StdInc.h"
 
-int CLuaFunctionDefs::SynthProcessMIDI ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) && pLuaMain )
-    {
-        // Get the VM's synth (or let it create one if it doesn't exist)
-        CSFXSynth *pSynth = pLuaMain->GetSFXSynthInstance ();
-
-        const char *szData = lua_tostring ( luaVM, 1 );
-        unsigned long nSize = lua_strlen ( luaVM, 1 );	// binary data can contain zero's, so use lua_strlen
-        pSynth->ProcessMIDI ( (unsigned char*)szData, nSize );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )

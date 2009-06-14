@@ -39,7 +39,6 @@ CClientPickupManager*        CLuaFunctionDefs::m_pPickupManager;
 CClientDFFManager*           CLuaFunctionDefs::m_pDFFManager;
 CClientColModelManager*      CLuaFunctionDefs::m_pColModelManager;
 CRegisteredCommands*         CLuaFunctionDefs::m_pRegisteredCommands;
-CSFX*                        CLuaFunctionDefs::m_pSFX;
 
 void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging, CClientGame* pClientGame )
 {
@@ -63,7 +62,6 @@ void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* 
     m_pDFFManager = m_pManager->GetDFFManager ();
     m_pColModelManager = m_pManager->GetColModelManager ();
     m_pRegisteredCommands = m_pClientGame->GetRegisteredCommands ();
-	m_pSFX = pClientGame->GetSFX ();
 }
 
 int CLuaFunctionDefs::DisabledFunction ( lua_State* luaVM )

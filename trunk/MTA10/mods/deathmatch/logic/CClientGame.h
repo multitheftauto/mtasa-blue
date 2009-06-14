@@ -55,8 +55,6 @@
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
 
-class CSFX;
-
 #ifdef MTA_VOICE
 	#include "CVoice.h"
 #endif
@@ -234,7 +232,6 @@ public:
     inline CNametags*                   GetNametags                     ( void )        { return m_pNametags; }
     inline CSyncDebug*                  GetSyncDebug                    ( void )        { return m_pSyncDebug; };
     inline CRPCFunctions*               GetRPCFunctions                 ( void )        { return m_pRPCFunctions; }
-	inline CSFX*						GetSFX							( void )		{ return m_pSFX; }
 
     inline CClientEntity*               GetRootEntity                   ( void )        { return m_pRootEntity; }
     inline CEvents*                     GetEvents                       ( void )        { return &m_Events; }
@@ -441,7 +438,6 @@ private:
     bool								m_bFirstPlaybackFrame;
 
     CClientManager*                     m_pManager;
-	CSFX*								m_pSFX;
 	CClientCamera*				        m_pCamera;
 	CClientGUIManager*					m_pGUIManager;
     CClientMarkerManager*               m_pMarkerManager;

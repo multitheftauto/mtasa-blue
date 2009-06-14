@@ -105,20 +105,8 @@ void CLuaMain::InitSecurity ( void )
 }
 
 
-CSFXSynth* CLuaMain::GetSFXSynthInstance ( void )
-{
-	// Create a synth if it doesn't exist yet
-	if ( !m_pSFXSynth ) {
-		m_pSFXSynth = g_pClientGame->GetSFX ()->CreateSynth ();
-	}
-	return m_pSFXSynth;
-}
-
 void CLuaMain::InitVM ( void )
 {
-	// Null VM-dependant classes
-	m_pSFXSynth = NULL;
-
     // Create a new VM
     m_luaVM = lua_open ();
 
@@ -251,10 +239,6 @@ void CLuaMain::Start ( void )
 void CLuaMain::UnloadScript ( void )
 {
 	// ACHTUNG: UNLOAD MODULES!
-
-	// Delete our sound classes
-	if ( m_pSFXSynth )
-		g_pClientGame->GetSFX ()->DeleteSynth ( m_pSFXSynth );
 
     // End the lua vm
     if ( m_luaVM )
