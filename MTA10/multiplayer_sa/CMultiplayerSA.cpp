@@ -2957,7 +2957,7 @@ void _cdecl CPhysical_ApplyGravity ( DWORD dwThis )
             return;
 
         CVector vecGravity, vecMoveSpeed;
-        pVehicle->GetGravityVector ( &vecGravity );
+        pVehicle->GetGravity ( &vecGravity );
         pVehicle->GetMoveSpeed ( &vecMoveSpeed );
         vecMoveSpeed += vecGravity * fTimeStep * fGravity;
         pVehicle->SetMoveSpeed ( &vecMoveSpeed );
@@ -2982,16 +2982,16 @@ void _declspec(naked) HOOK_CPhysical_ApplyGravity ()
 
 // ---------------------------------------------------
 
-void GetMatrixForGravity ( CVector& vecGravity, CMatrix& mat )
+void GetMatrixForGravity ( const CVector& vecGravity, CMatrix& mat )
 {
     // Calculates a basis where the z axis is the inverse of the gravity
     if ( vecGravity.Length () > 0.0001f )
     {
-        mat.vUp = vecGravity * (-1.0f);
+        mat.vUp = -vecGravity;
         mat.vUp.Normalize ();
         if ( abs(mat.vUp.fX) > 0.0001f || abs(mat.vUp.fZ) > 0.0001f )
         {
-            CVector y ( 0.0f, vecGravity.fZ <= 0.0f ? 1.0f : -1.0f, 0.0f );
+            CVector y ( 0.0f, 1.0f, 0.0f );
             mat.vFront = vecGravity;
             mat.vFront.CrossProduct ( &y );
             mat.vFront.CrossProduct ( &vecGravity );
@@ -3031,7 +3031,7 @@ void _cdecl VehicleCamStart ( DWORD dwCam, DWORD pVehicleInterface )
         return;
 
     CVector vecGravity;
-    pVehicle->GetGravityVector ( &vecGravity );
+    pVehicle->GetGravity ( &vecGravity );
 
     GetMatrixForGravity ( vecGravity, gravcam_matGravity );
     gravcam_matInvertGravity = gravcam_matGravity;
@@ -3321,7 +3321,7 @@ float _cdecl VehicleBurnCheck ( DWORD pVehicleInterface )
 
     CVector vecGravity;
     CMatrix matVehicle;
-    pVehicle->GetGravityVector ( &vecGravity );
+    pVehicle->GetGravity ( &vecGravity );
     pVehicle->GetMatrix ( &matVehicle );
     vecGravity = -vecGravity;
     return matVehicle.vUp.DotProduct ( &vecGravity );
@@ -3362,7 +3362,7 @@ void _cdecl ApplyVehicleBlowHop ( DWORD pVehicleInterface )
         return;
 
     CVector vecGravity, vecVelocity;
-    pVehicle->GetGravityVector ( &vecGravity );
+    pVehicle->GetGravity ( &vecGravity );
     pVehicle->GetMoveSpeed ( &vecVelocity );
     vecVelocity -= vecGravity * 0.13f;
     pVehicle->SetMoveSpeed ( &vecVelocity );

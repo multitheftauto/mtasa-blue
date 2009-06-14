@@ -651,8 +651,8 @@ public:
     BYTE                        GetBikeWheelStatus              ( BYTE bWheel );
     void                        SetBikeWheelStatus              ( BYTE bWheel, BYTE bStatus );
 
-    void                        GetGravityVector                ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
-    void                        SetGravityVector                ( const CVector* pvecGravity )  { m_vecGravity = *pvecGravity; }
+    void                        GetGravity                      ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
+    void                        SetGravity                      ( const CVector* pvecGravity );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };

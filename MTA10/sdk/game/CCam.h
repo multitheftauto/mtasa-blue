@@ -25,6 +25,7 @@ public:
 	virtual CVector				* GetFixedModeVector()=0;
     virtual unsigned int        GetMode()=0;
     virtual CEntity *           GetTargetEntity()=0;
+    virtual void                AdjustToNewGravity ( const CVector* pvecOldGravity, const CVector* pvecNewGravity ) = 0;
 };
 
 #endif

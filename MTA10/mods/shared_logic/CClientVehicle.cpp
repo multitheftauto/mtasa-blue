@@ -2000,7 +2000,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetEngineOn ( m_bEngineOn );
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
-        m_pVehicle->SetGravityVector ( &m_vecGravity );
+        m_pVehicle->SetGravity ( &m_vecGravity );
 
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
@@ -2934,10 +2934,10 @@ void CClientVehicle::RemoveAllProjectiles ( void )
     m_Projectiles.clear ();
 }
 
-void CClientVehicle::SetGravityVector ( const CVector& vecGravity )
+void CClientVehicle::SetGravity ( const CVector& vecGravity )
 {
     if ( m_pVehicle )
-        m_pVehicle->SetGravityVector ( &vecGravity );
+        m_pVehicle->SetGravity ( &vecGravity );
 
     m_vecGravity = vecGravity;
 }

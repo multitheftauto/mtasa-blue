@@ -16,6 +16,8 @@
 
 #include "StdInc.h"
 
+extern CGameSA* pGame;
+
 CVehicleSA::CVehicleSA ()
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f )
 {
@@ -1560,4 +1562,15 @@ void CVehicleSA::SetTaxiLightOn ( bool bLightOn )
         push    dwState
         call    dwFunc
     }
+}
+
+void CVehicleSA::SetGravity ( const CVector* pvecGravity )
+{
+    if ( pGame->GetPools ()->GetPedFromRef ( 1 )->GetVehicle () == this )
+    {
+        CCam* pCam = pGame->GetCamera ()->GetCam ( pGame->GetCamera ()->GetActiveCam () );
+        pCam->AdjustToNewGravity ( &m_vecGravity, pvecGravity );
+    }
+
+    m_vecGravity = *pvecGravity;
 }

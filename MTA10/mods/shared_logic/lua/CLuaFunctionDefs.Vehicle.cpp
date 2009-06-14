@@ -2094,7 +2094,7 @@ int CLuaFunctionDefs::GetVehicleGravity ( lua_State* luaVM )
         if ( pVehicle )
         {
             CVector vecGravity;
-            pVehicle->GetGravityVector ( vecGravity );
+            pVehicle->GetGravity ( vecGravity );
             lua_pushnumber ( luaVM, vecGravity.fX );
             lua_pushnumber ( luaVM, vecGravity.fY );
             lua_pushnumber ( luaVM, vecGravity.fZ );
@@ -2126,7 +2126,7 @@ int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
             CVector vecGravity ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                  static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                  static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-            pVehicle->SetGravityVector ( vecGravity );
+            pVehicle->SetGravity ( vecGravity );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
