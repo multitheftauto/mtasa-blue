@@ -311,9 +311,10 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
     ElementID PedID;   
     char szBlockName [ 64 ], szAnimName [ 64 ];
     unsigned char ucBlockSize, ucAnimSize;
-    float fBlendDelta;
+    int iTime;
     bool bLoop;
     bool bUpdatePosition;
+    bool bInteruptable;
     if ( bitStream.ReadCompressed ( PedID ) &&
          bitStream.Read ( ucBlockSize ) )
     {
@@ -328,13 +329,14 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
                 {
                     szBlockName [ ucBlockSize ] = 0;
                     if ( bitStream.Read ( szAnimName, ucAnimSize ) &&
-                         bitStream.Read ( fBlendDelta ) &&
+                         bitStream.Read ( iTime ) &&
                          bitStream.ReadBit ( bLoop ) &&
-                         bitStream.ReadBit ( bUpdatePosition ) )
+                         bitStream.ReadBit ( bUpdatePosition ) &&
+                         bitStream.ReadBit ( bInteruptable ) )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 
-                        pPed->BlendAnimation ( szBlockName, szAnimName, 1.0f, fBlendDelta, 0.0f, bLoop, bUpdatePosition );
+                        pPed->RunNamedAnimation ( szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
                     }
                 }
             }
