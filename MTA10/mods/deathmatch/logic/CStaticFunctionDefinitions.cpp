@@ -1250,12 +1250,17 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 
 bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
 {
-    if ( Ped.IsRunningAnimation () )
+    if ( Ped.CountAnimations () > 0 )
     {
-        strncpy ( szBlockName, Ped.GetAnimationBlock ()->GetName (), uiLength );
-        strncpy ( szAnimName, Ped.GetAnimationName (), uiLength );
-        return true;
+        CAnimationItem * pAnim = Ped.GetCurrentAnimation ();
+        if ( pAnim )
+        {
+            strncpy ( szBlockName, pAnim->block->GetName (), uiLength );
+            strncpy ( szAnimName, pAnim->name, uiLength );
+            return true;
+        }
     }
+    
     return false;
 }
 
@@ -1566,26 +1571,42 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
+{
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+    
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+
+        if ( szBlockName && szAnimName )
+        {
+            return Ped.RunNamedAnimation ( szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+        }
+        else
+        {
+            Ped.FinishAnimation ();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::BlendPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pLuaMain, int iLuaFunction, CLuaArguments * pArguments )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+    RUN_CHILDREN BlendPedAnimation ( **iter, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
 
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         if ( szBlockName && szAnimName )
-        {
-            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
-            if ( pBlock )
-            {
-                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
-                return true;
-            }
+        {            
+            return Ped.BlendAnimation ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
         }
         else
         {
-            Ped.KillAnimation ();
-            return true;
+            Ped.FinishAnimation ();
         }
     }
 

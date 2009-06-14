@@ -17,11 +17,13 @@
 #include "Common.h"
 
 #define FUNC_CStreaming_RequestAnimations 0x407120
+#define FUNC_CStreaming_RemoveAnimations 0x40c1a0
 
 class CStreamingSA : public CStreaming
 {
 public:
-    void            RequestAnimations   ( int i, int j );
+    void            RequestAnimations   ( int iBlockIndex );
+    void            RemoveAnimations    ( int iBlockIndex );
 };
 
 #endif

@@ -219,6 +219,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
+    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -347,6 +348,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetGameProcessHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
+    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -637,7 +639,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{ 
+{     
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -1914,6 +1916,20 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
+CClientEntity * CClientGame::GetLocalInterpolationEntity ( void )
+{
+    CClientPlayer * pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();            
+    CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
+    if ( pVehicle )
+    {
+        if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 ) return pVehicle;
+    }
+    else return pLocalPlayer;
+
+    return NULL;
+}
+
+
 void CClientGame::StaticProcessClientKeyBind ( CKeyFunctionBind* pBind )
 {
     g_pClientGame->ProcessClientKeyBind ( pBind );
@@ -3040,9 +3056,15 @@ void CClientGame::StaticGameProcessHandler ( void )
     g_pClientGame->GameProcessHandler ();
 }
 
-bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
+bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
+{    
+    return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
+}
+
+
+void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
-    return g_pClientGame->ChokingHandler ( ucWeaponType );
+    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3128,11 +3150,30 @@ void CClientGame::GameProcessHandler ( void )
     }
 }
 
-bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
+bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
 {
-    CLuaArguments Arguments;
-    Arguments.PushNumber ( ucWeaponType );
-    return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
+    CClientPed * pPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pChokingPed ), true, true );
+    if ( pPed )
+    {
+        CLuaArguments Arguments;        
+        Arguments.PushNumber ( ucWeaponType );
+        if ( pResponsiblePed ) Arguments.PushUserData ( pResponsiblePed );
+        else Arguments.PushNil ();
+        if ( IS_PLAYER (pPed) )
+            return pPed->CallEvent ( "onClientPlayerChoke", Arguments, true );
+        else
+            return pPed->CallEvent ( "onClientPedChoke", Arguments, true );
+    }
+    return true;
+}
+
+void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    if ( pPed )
+    {
+        
+    }
 }
 
 
@@ -3554,7 +3595,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                             if ( !m_pLocalPlayer->IsUsingGun () )
                             {
                                 // Make sure we arent running an animation
-                                if ( !m_pLocalPlayer->IsRunningAnimation () )
+                                if ( m_pLocalPlayer->CountAnimations () == 0 )
                                 {
                                     // Grab the closest vehicle
                                     unsigned int uiDoor = 0;
@@ -3612,12 +3653,14 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
 bool bShotCompensation = true;
 
 // Temporary pointers for pre- and post-functions
-CVector vecWeaponFirePosition, vecRemoteWeaponFirePosition;
+CClientEntity * pShotMovedEntity = NULL;
+CVector vecShotRestorePosition;
 CPlayerPed* pWeaponFirePed = NULL;
 
 void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
 {
     pWeaponFirePed = pPlayerPed;
+    pShotMovedEntity = NULL;
 
     // Got a local player model?
     CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
@@ -3633,26 +3676,18 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
         {                   
 			if ( bShotCompensation )
 			{
-                if ( !pVehicle || pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
-                {
-				    // Warp back in time to where we were when this player shot (their latency)
-				    
-                    // We don't account for interpolation here, +250ms seems to work better
-                    CVector vecPosition;
-				    unsigned short usLatency = ( pPlayer->GetLatency () + 250 );
-				    g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency );
-			
-				    // Move the entity back
-                    if ( pVehicle )
-                    {
-                        pVehicle->GetPosition ( vecWeaponFirePosition );
-                        pVehicle->SetPosition ( vecPosition );
+                // Do we have an entity to move for the shot?
+                pShotMovedEntity = g_pClientGame->GetLocalInterpolationEntity ();
+                if ( pShotMovedEntity )
+                {				    
+			        unsigned short usLatency = pPlayer->GetLatency ();
+
+                    if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency ) )
+                    {    	
+                        pShotMovedEntity->GetPosition ( vecShotRestorePosition );
+                        pShotMovedEntity->SetPosition ( vecPosition );
                     }
-                    else
-                    {
-				        pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-				        pLocalPlayer->SetPosition ( vecPosition );
-                    }
+                    else pShotMovedEntity = NULL;
                 }
 			}
         }
@@ -3676,15 +3711,7 @@ void CClientGame::PostWeaponFire ( void )
 				    // Restore compensated positions            
 				    if ( !pPed->IsLocalPlayer () )
 				    {
-					    CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-					    if ( !pVehicle )
-					    {
-						    pLocalPlayer->SetPosition ( vecWeaponFirePosition );
-					    }
-                        else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
-                        {
-                            pVehicle->SetPosition ( vecWeaponFirePosition );
-                        }
+                        if ( pShotMovedEntity ) pShotMovedEntity->SetPosition ( vecShotRestorePosition );
 				    }
 			    }
             }

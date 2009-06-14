@@ -625,6 +625,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientAnimation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientAnimationManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientCamera.cpp"
 					>
 				</File>
@@ -1504,6 +1512,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClient3DMarker.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientAnimation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientAnimationManager.h"
 					>
 				</File>
 				<File

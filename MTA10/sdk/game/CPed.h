@@ -227,6 +227,8 @@ public:
     virtual void            SetVoice           ( short sVoiceType, short sVoiceID ) = 0;
     virtual void            SetVoice           ( const char* szVoiceType, const char* szVoice ) = 0;
 
+    virtual void            PlayFootSteps      ( void ) = 0;
+
 	/*virtual	bool		CanPedReturnToState (  )=0;
 	virtual bool		CanSeeEntity ( CEntity * entity, FLOAT fUnknown )=0;
 	virtual void		ClearAimFlag (  )=0;
