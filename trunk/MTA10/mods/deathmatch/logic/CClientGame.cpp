@@ -4096,7 +4096,7 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( pBitStream )
         {
-            m_pLocalPlayer->SetDeadOnNetwork(true);
+            m_pLocalPlayer->SetDeadOnNetwork( true );
 
             // Write some death info
             pBitStream->Write ( animGroup );
