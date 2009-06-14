@@ -98,6 +98,8 @@ DWORD RETURN_VehicleCamLookDir1 =                           0x524DF6;
 DWORD RETURN_VehicleCamLookDir2 =                           0x525B73;
 #define HOOKPOS_VehicleCamHistory                           0x525C56
 DWORD RETURN_VehicleCamHistory =                            0x525D4A;
+#define HOOKPOS_VehicleCamColDetect                         0x525D8D
+DWORD RETURN_VehicleCamColDetect =                          0x525D92;
 #define CALL_VehicleCamUp                                   0x525E1F
 #define HOOKPOS_VehicleCamEnd                               0x525E43
 
@@ -208,6 +210,7 @@ void HOOK_VehicleCamStart ();
 void HOOK_VehicleCamLookDir1 ();
 void HOOK_VehicleCamLookDir2 ();
 void HOOK_VehicleCamHistory ();
+void HOOK_VehicleCamColDetect ();
 void HOOK_VehicleCamUp ();
 void HOOK_VehicleCamEnd ();
 void HOOK_VehicleLookBehind ();
@@ -299,6 +302,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamLookDir1, (DWORD)HOOK_VehicleCamLookDir1, 5);
     HookInstall(HOOKPOS_VehicleCamLookDir2, (DWORD)HOOK_VehicleCamLookDir2, 6);
     HookInstall(HOOKPOS_VehicleCamHistory, (DWORD)HOOK_VehicleCamHistory, 6);
+    HookInstall(HOOKPOS_VehicleCamColDetect, (DWORD)HOOK_VehicleCamColDetect, 5);
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 5);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
@@ -3156,6 +3160,38 @@ void _declspec(naked) HOOK_VehicleCamHistory ()
 
         mov eax, [esp+0x24]
         jmp RETURN_VehicleCamHistory
+    }
+}
+
+// ---------------------------------------------------
+
+CVector* _cdecl VehicleCamColDetect ( CVector* pvecTarget )
+{
+    // Hack for collision detection placing the camera too close to the car
+    // when using upside down gravity
+    static CVector vecAdjustedTarget;
+    if ( gravcam_matGravity.vUp.fZ < 0.0f )
+    {
+        vecAdjustedTarget = *pvecTarget + gravcam_matGravity.vUp;
+        return &vecAdjustedTarget;
+    }
+    else
+    {
+        return pvecTarget;
+    }
+}
+
+void _declspec(naked) HOOK_VehicleCamColDetect ()
+{
+    _asm
+    {
+        lea eax, [esp+0x48]
+        push eax
+        call VehicleCamColDetect
+        add esp, 4
+
+        push eax
+        jmp RETURN_VehicleCamColDetect
     }
 }
 

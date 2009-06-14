@@ -276,7 +276,7 @@ public:
     LUA_DECLARE ( IsTrainDerailable );
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
-    LUA_DECLARE ( GetVehicleGravityVector );
+    LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
 
     // Vehicle set functions
@@ -320,7 +320,7 @@ public:
     LUA_DECLARE ( SetTrainDerailable );
     LUA_DECLARE ( SetTrainDirection );
     LUA_DECLARE ( SetTrainSpeed );
-    LUA_DECLARE ( SetVehicleGravityVector );
+    LUA_DECLARE ( SetVehicleGravity );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
