@@ -39,17 +39,20 @@ public:
     virtual void        Write                       ( const char* input, int numberOfBytes ) = 0;
     virtual void        Write                       ( const ISyncStructure* syncStruct ) = 0;
 
+private:    // Don't use char functions, says ryden
     virtual void        WriteCompressed             ( const unsigned char& input ) = 0;
     virtual void        WriteCompressed             ( const char& input ) = 0;
+public:
     virtual void        WriteCompressed             ( const unsigned short& input ) = 0;
     virtual void        WriteCompressed             ( const short& input ) = 0;
     virtual void        WriteCompressed             ( const unsigned int& input ) = 0;
     virtual void        WriteCompressed             ( const int& input ) = 0;
     virtual void        WriteCompressed             ( const unsigned long& input ) = 0;
     virtual void        WriteCompressed             ( const long& input ) = 0;
+private:    // Float functions not used for some reason
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
-
+public:
     virtual void        WriteBits                   ( const char* input, unsigned int numbits ) = 0;
     virtual void        WriteBit                    ( bool input ) = 0;
 
@@ -82,17 +85,20 @@ public:
     virtual bool        Read                        ( char* output, int numberOfBytes ) = 0;
     virtual bool        Read                        ( ISyncStructure* syncStruct ) = 0;
 
+private:    // Don't use char functions, says ryden
     virtual bool        ReadCompressed              ( unsigned char& output ) = 0;
     virtual bool        ReadCompressed              ( char& output ) = 0;
+public:
     virtual bool        ReadCompressed              ( unsigned short& output ) = 0;
     virtual bool        ReadCompressed              ( short& output ) = 0;
     virtual bool        ReadCompressed              ( unsigned int& output ) = 0;
     virtual bool        ReadCompressed              ( int& output ) = 0;
     virtual bool        ReadCompressed              ( unsigned long& output ) = 0;
     virtual bool        ReadCompressed              ( long& output ) = 0;
+private:    // Float functions not used for some reason
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
-
+public:
     virtual bool        ReadBits                    ( char* output, unsigned int numbits ) = 0;
     virtual bool        ReadBit                     ( ) = 0;
 

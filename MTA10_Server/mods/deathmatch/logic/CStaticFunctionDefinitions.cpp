@@ -2382,8 +2382,8 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
                 // Tell everyone
                 CBitStream BitStream;
                 BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-                BitStream.pBitStream->WriteCompressed ( ucArmor );
-                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->Write ( ucArmor );
+                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ARMOR, *BitStream.pBitStream ) );
             }
         }
@@ -2479,7 +2479,7 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
             CBitStream BitStream;
             BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             BitStream.pBitStream->Write ( fRadians );
-            BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
+            BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ROTATION, *BitStream.pBitStream ) );
         }
     }
@@ -2576,7 +2576,7 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned
 
                     CBitStream BitStream;
                     BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-                    BitStream.pBitStream->WriteCompressed ( ucType );
+                    BitStream.pBitStream->Write ( ucType );
                     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_PED_CLOTHES, *BitStream.pBitStream ) );
 
                     return true;
@@ -2656,7 +2656,7 @@ bool CStaticFunctionDefinitions::SetPedFightingStyle ( CElement* pElement, unsig
 
                 CBitStream BitStream;
                 BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-                BitStream.pBitStream->WriteCompressed ( ucStyle );
+                BitStream.pBitStream->Write ( ucStyle );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_FIGHTING_STYLE, *BitStream.pBitStream ) );
 
                 return true;
@@ -2823,8 +2823,8 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
                 CBitStream BitStream;
                 BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
                 BitStream.pBitStream->WriteCompressed ( pVehicle->GetID () );
-                BitStream.pBitStream->WriteCompressed ( static_cast < unsigned char > ( uiSeat ) );
-                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
+                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( WARP_PED_INTO_VEHICLE, *BitStream.pBitStream ) );
 
                 // Call the player->vehicle event
@@ -2895,7 +2895,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-            BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
+            BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream ) );
         }
     }
@@ -2923,7 +2923,7 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
                 CBitStream BitStream;
                 BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
                 BitStream.pBitStream->WriteBit ( bGangDriveby );
-                BitStream.pBitStream->WriteCompressed ( pPed->GenerateSyncTimeContext () );
+                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_DOING_GANG_DRIVEBY, *BitStream.pBitStream ) );
 
                 return true;
@@ -2954,9 +2954,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
                 unsigned char ucBlockSize = ( unsigned char ) strlen ( szBlockName );
                 unsigned char ucAnimSize = ( unsigned char ) strlen ( szAnimName );
 
-                BitStream.pBitStream->WriteCompressed ( ucBlockSize );
+                BitStream.pBitStream->Write ( ucBlockSize );
                 BitStream.pBitStream->Write ( szBlockName, ucBlockSize );
-                BitStream.pBitStream->WriteCompressed ( ucAnimSize );
+                BitStream.pBitStream->Write ( ucAnimSize );
                 BitStream.pBitStream->Write ( szAnimName, ucAnimSize );
                 BitStream.pBitStream->Write ( fBlendDelta );
                 BitStream.pBitStream->WriteBit ( bLoop );
@@ -2965,7 +2965,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
             else
             {
                 // Inform them to kill the current animation instead
-                BitStream.pBitStream->WriteCompressed ( ( unsigned char ) 0 );
+                BitStream.pBitStream->Write ( ( unsigned char ) 0 );
             }
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ANIMATION, *BitStream.pBitStream ) );
 
