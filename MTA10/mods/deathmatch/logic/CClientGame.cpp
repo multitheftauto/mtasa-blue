@@ -130,9 +130,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pVoiceBuffer = new CVariableBuffer( 65535 );
     #endif
 
-	// Create the SFX manager
-	m_pSFX = new CSFX ();
-
     // Grab the mod path
     m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
@@ -378,7 +375,6 @@ CClientGame::~CClientGame ( void )
     delete m_pMovingObjectsManager;
     delete m_pRadarMap;
     delete m_pLuaManager;
-	delete m_pSFX;
 
     delete m_pRootEntity;
 

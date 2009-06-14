@@ -27,7 +27,6 @@ class CLuaFunctionDefinitions;
 #include "CLuaTimerManager.h"
 
 class CRegisteredCommands;
-class CSFX;
 
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 
@@ -62,7 +61,6 @@ public:
     LUA_DECLARE ( WasEventCancelled );
 
 	// Sound effects and synth functions
-	LUA_DECLARE ( SynthProcessMIDI );
     LUA_DECLARE ( PlaySound );
     LUA_DECLARE ( PlaySound3D );
     LUA_DECLARE ( StopSound );
@@ -709,7 +707,6 @@ private:
     static CClientDFFManager*           m_pDFFManager;
     static CClientColModelManager*      m_pColModelManager;
     static CRegisteredCommands*         m_pRegisteredCommands;
-    static CSFX*						m_pSFX;
 };
 
 #endif
