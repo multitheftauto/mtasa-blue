@@ -738,6 +738,17 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
 }
 
 
+CAnimBlendHierarchy * CAnimManagerSA::GetAnimation ( const char * szName, const char * szBlockName )
+{
+    CAnimBlock * pBlock = GetAnimationBlock ( szBlockName );
+    if ( pBlock )
+    {
+        return GetAnimation ( szName, pBlock );
+    }
+    return NULL;
+}
+
+
 void CAnimManagerSA::ClearAnimBlendAssociation ( CAnimBlendAssociationSAInterface * pInterface )
 {
     if ( pInterface )

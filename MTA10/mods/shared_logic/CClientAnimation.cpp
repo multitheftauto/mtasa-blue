@@ -220,21 +220,30 @@ void CClientAnimation::FinishAnimation ( void )
     CAnimationItem * pCurrent = GetCurrentAnimation ();
     if ( pCurrent )
     {
+        CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
+        
         if ( pCurrent->type == ANIM_TYPE_MANAGED )
         {
-            CAnimBlendAssociation * pAssoc = pCurrent->assoc;
-            if ( pAssoc )
+            // Set our ped back to an idle stance
+            RpClump * pClump = GetClump ();
+            if ( pClump )
             {
-                // Make sure its no longer looping
-                pAssoc->ClearFlag ( 2 );
-                /* Go straight to the end of the animation
-                (note: not completely as our finish event wont get called) */
-                pAssoc->SetTime ( pAssoc->GetTotalTime () - 0.001f );            
+                // "ped" animation block should always be loaded
+                CAnimBlendHierarchy * pHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( "idle_stance", "ped" );
+                if ( pHierarchy )
+                {
+                    // Set our playing flags
+                    int flags = 0;
+                    flags |= 2; // loop
+                    flags |= 16; // plays properly
+                    flags |= 64; // update position
+          
+                    g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pHierarchy, flags, 4.0f );
+                }
             }
         }
         else if ( pCurrent->type == ANIM_TYPE_TASK )
         {
-            CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
             CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
             CTaskManager * pTaskManager = pPed->GetTaskManager ();
             if ( pPlayerPed && pTaskManager )
