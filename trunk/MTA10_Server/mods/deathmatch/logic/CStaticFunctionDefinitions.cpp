@@ -2347,14 +2347,6 @@ bool CStaticFunctionDefinitions::IsPedHeadless ( CPed * pPed, bool & bIsHeadless
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsPedFrozen ( CPed * pPed, bool & bIsFrozen )
-{
-    assert ( pPed );
-
-    bIsFrozen = pPed->IsFrozen ();
-    return true;
-}
-
 // ************** PED SET FUNCS ************** //
 bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor )
 {
@@ -3021,28 +3013,6 @@ bool CStaticFunctionDefinitions::SetPedHeadless ( CElement * pElement, bool bIsH
 }
 
 
-bool CStaticFunctionDefinitions::SetPedFrozen ( CElement * pElement, bool bIsFrozen )
-{
-    assert ( pElement );
-    RUN_CHILDREN SetPedFrozen ( *iter, bIsFrozen );
-
-    if ( IS_PED ( pElement ) )
-    {
-        CBitStream BitStream;
-        CPed * pPed = static_cast < CPed * > ( pElement );
-
-        pPed->SetFrozen ( bIsFrozen );
-
-        BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-        BitStream.pBitStream->WriteBit ( bIsFrozen );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_FROZEN, *BitStream.pBitStream ) );
-
-        return true;
-    }
-    return false;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt )
 {
     assert ( pPlayer );
@@ -3692,7 +3662,7 @@ bool CStaticFunctionDefinitions::IsVehicleFrozen ( CVehicle* pVehicle, bool& bFr
 {
     assert ( pVehicle );
 
-    bFrozen = pVehicle->IsFrozen ();
+    bFrozen = pVehicle->GetFrozen ();
 
     return true;
 }

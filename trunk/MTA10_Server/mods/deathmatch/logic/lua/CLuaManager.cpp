@@ -300,7 +300,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefinitions::IsPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "isPedOnFire", CLuaFunctionDefinitions::IsPedOnFire );
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefinitions::IsPedHeadless );
-    CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefinitions::IsPedFrozen );
     CLuaCFunctions::AddFunction ( "getPedOccupiedVehicle", CLuaFunctionDefinitions::GetPedOccupiedVehicle );
     CLuaCFunctions::AddFunction ( "getPedOccupiedVehicleSeat", CLuaFunctionDefinitions::GetPedOccupiedVehicleSeat );
     CLuaCFunctions::AddFunction ( "isPedInVehicle", CLuaFunctionDefinitions::IsPedInVehicle );
@@ -325,7 +324,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedAnimation", CLuaFunctionDefinitions::SetPedAnimation );
     CLuaCFunctions::AddFunction ( "setPedOnFire", CLuaFunctionDefinitions::SetPedOnFire );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefinitions::SetPedHeadless );
-    CLuaCFunctions::AddFunction ( "setPedFrozen", CLuaFunctionDefinitions::SetPedFrozen );
     CLuaCFunctions::AddFunction ( "getPedSkin", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaElementDefs::setElementModel );
 

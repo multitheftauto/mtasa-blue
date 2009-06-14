@@ -209,9 +209,6 @@ public:
     inline bool                                 IsHeadless                  ( void )                        { return m_bHeadless; };
     inline void                                 SetHeadless                 ( bool bHeadless )              { m_bHeadless = bHeadless; };
 
-    inline bool                                 IsFrozen                    ( void )                        { return m_bFrozen; };
-    inline void                                 SetFrozen                   ( bool bFrozen )                { m_bFrozen = bFrozen; };
-
     inline class CPlayer*                       GetSyncer                   ( void )                        { return m_pSyncer; };
     void                                        SetSyncer                   ( class CPlayer* pPlayer );
 
@@ -254,7 +251,6 @@ protected:
     CVector                                     m_vecVelocity;
     bool                                        m_bDoingGangDriveby;
     bool                                        m_bHeadless;
-    bool                                        m_bFrozen;
 
     CVehicle*                                   m_pVehicle;
     unsigned int                                m_uiVehicleSeat;

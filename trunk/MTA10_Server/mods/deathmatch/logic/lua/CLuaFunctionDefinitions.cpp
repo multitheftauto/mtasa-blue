@@ -867,32 +867,6 @@ int CLuaFunctionDefinitions::IsPedHeadless ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::IsPedFrozen ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CPed* pPed = lua_toped ( luaVM, 1 );
-        if ( pPed )
-        {
-            bool bIsFrozen;
-            if ( CStaticFunctionDefinitions::IsPedFrozen ( pPed, bIsFrozen ) )
-            {
-                lua_pushboolean ( luaVM, bIsFrozen );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedFrozen", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedFrozen" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-
 
 int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
 {
@@ -1020,32 +994,6 @@ int CLuaFunctionDefinitions::SetPedHeadless ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefinitions::SetPedFrozen ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        bool bIsFrozen = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
-
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::SetPedFrozen ( pElement, bIsFrozen ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFrozen", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedFrozen" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 int CLuaFunctionDefinitions::GetPlayerAmmoInClip ( lua_State* luaVM )
 {

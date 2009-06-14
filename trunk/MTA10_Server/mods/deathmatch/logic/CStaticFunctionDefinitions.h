@@ -159,7 +159,6 @@ public:
     static bool                 IsPedDoingGangDriveby               ( CPed* pPed, bool & bDoingGangDriveby );
     static bool                 IsPedOnFire                         ( CPed* pPed, bool & bIsOnFire );
     static bool                 IsPedHeadless                       ( CPed* pPed, bool & bIsHeadless );
-    static bool                 IsPedFrozen                         ( CPed* pPed, bool & bIsFrozen );
     static CVehicle*            GetPedOccupiedVehicle               ( CPed* pPed );
     static bool                 GetPedOccupiedVehicleSeat           ( CPed* pPed, unsigned int& uiSeat );
 
@@ -183,7 +182,6 @@ public:
     static bool                 SetPedAnimation                     ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
     static bool                 SetPedOnFire                        ( CElement * pElement, bool bIsOnFire );
     static bool                 SetPedHeadless                      ( CElement * pElement, bool bIsHeadless );
-    static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );
 
     // Camera get functions
     static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt );
