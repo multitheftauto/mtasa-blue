@@ -74,7 +74,6 @@ class CGroups;
 class CHandlingManager;
 class CHTTPD;
 class CMainConfig;
-class CMapFiles;
 class CMapManager;
 class CMarkerManager;
 class CObjectManager;
@@ -288,7 +287,6 @@ private:
     CRadarAreaManager*              m_pRadarAreaManager;
     CVehicleManager*                m_pVehicleManager;
     CPacketTranslator*              m_pPacketTranslator;
-    CMapFiles*                      m_pMapFiles;
     CMapManager*                    m_pMapManager;
     CElementDeleter                 m_ElementDeleter;
     CConnectHistory                 m_ConnectHistory;

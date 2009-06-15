@@ -14,11 +14,10 @@
 
 #include "StdInc.h"
 
-CConsole::CConsole ( CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands, CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CWhoWas* pWhoWas, CMapFiles* pMapFiles, CBanManager* pBanManager, CAccessControlListManager* pACLManager )
+CConsole::CConsole ( CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands, CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CWhoWas* pWhoWas, CBanManager* pBanManager, CAccessControlListManager* pACLManager )
 {
     // Init
     m_pBlipManager = pBlipManager;
-    m_pMapFiles = pMapFiles;
     m_pMapManager = pMapManager;
     m_pPlayerManager = pPlayerManager;
     m_pRegisteredCommands = pRegisteredCommands;

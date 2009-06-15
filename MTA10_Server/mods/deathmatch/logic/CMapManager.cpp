@@ -29,7 +29,6 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CTeamManager* pTeamManager,
                            CPedManager* pPedManager,
                            CColManager* pColManager,
-                           CMapFiles* pMapFiles,
                            CClock* pClock,
                            CLuaManager* pLuaManager,
                            CGroups* pGroups,
@@ -48,7 +47,6 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pTeamManager = pTeamManager;
     m_pPedManager = pPedManager;
     m_pColManager = pColManager;
-    m_pMapFiles = pMapFiles;
     m_pServerClock = pClock;
     m_pLuaManager = pLuaManager;
     m_pGroups = pGroups;
