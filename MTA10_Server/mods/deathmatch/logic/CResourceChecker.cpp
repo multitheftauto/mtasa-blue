@@ -365,7 +365,7 @@ long CResourceChecker::FindLuaIdentifier ( const char* szLuaSource, long* plOutL
     for ( long lPos = 0 ; szLuaSource[lPos] ; lPos++ )
     {
         const char* pBufPos = szLuaSource + lPos;
-        char c = *pBufPos;
+        unsigned char c = *pBufPos;
 
         // Handle comments
         if ( c == '-' && strncmp ( pBufPos, "--[[", 4 ) == 0 )
