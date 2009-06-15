@@ -667,7 +667,7 @@ bool CChatLine::IsColorCode ( const char* szColorCode )
     for ( int i = 0; i < 6; i++ )
     {
         char c = szColorCode [ 1 + i ];
-        if ( !isdigit ( c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+        if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
         {
             bValid = false;
             break;
@@ -713,7 +713,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
                 color = ulColor;
                 break;
             }
-            if ( isspace ( *szSectionEnd ) || ispunct ( *szSectionEnd ) )
+            if ( isspace ( (unsigned char)*szSectionEnd ) || ispunct ( (unsigned char)*szSectionEnd ) )
             {
                 szLastWrapPoint = szSectionEnd;
             }
