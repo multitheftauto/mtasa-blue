@@ -2841,6 +2841,9 @@ void CClientPed::_CreateLocalModel ( void )
 
 void CClientPed::_DestroyModel ()
 {
+    // Call this before we actually destroy the ped incase its needed.
+    NotifyDestroy ();
+
     // Remember the player position
     m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
 
@@ -2883,9 +2886,7 @@ void CClientPed::_DestroyModel ()
 
     // Remove the reference to its model
     m_pLoadedModelInfo->RemoveRef ();
-    m_pLoadedModelInfo = NULL;
-
-    NotifyDestroy ();
+    m_pLoadedModelInfo = NULL;    
 }
 
 
@@ -4277,6 +4278,7 @@ CClientEntity* CClientPed::GetTargetedEntity ( void )
 
 void CClientPed::NotifyCreate ( void )
 {
+    // Called after creation
     m_pManager->GetPedManager ()->OnCreation ( this );
     CClientStreamElement::NotifyCreate ();
     CClientAnimation::OnCreation ();
@@ -4285,7 +4287,9 @@ void CClientPed::NotifyCreate ( void )
 
 void CClientPed::NotifyDestroy ( void )
 {
+    // Called before destruction
     m_pManager->GetPedManager ()->OnDestruction ( this );
+    CClientAnimation::OnDestruction ();
 }
 
 
