@@ -3062,9 +3062,9 @@ bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePe
 }
 
 
-void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+bool CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
-    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    return g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3167,13 +3167,20 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
     return true;
 }
 
-void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+bool CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
     CClientPed * pPed = m_pPedManager->Get ( pClump, true );
     if ( pPed )
     {
-        
+        // Make sure we have atleast one animation running if we're going to ignore another
+        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
+        {
+            bool bAllow = pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
+            if ( !bAllow ) return false;
+        }
     }
+    
+    return true;
 }
 
 
@@ -3595,7 +3602,8 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                             if ( !m_pLocalPlayer->IsUsingGun () )
                             {
                                 // Make sure we arent running an animation
-                                if ( m_pLocalPlayer->CountAnimations () == 0 )
+                                CAnimationItem * pAnim = m_pLocalPlayer->GetCurrentAnimation ();
+                                if ( !pAnim || pAnim->type == ANIM_TYPE_MANAGED )
                                 {
                                     // Grab the closest vehicle
                                     unsigned int uiDoor = 0;
@@ -3705,15 +3713,12 @@ void CClientGame::PostWeaponFire ( void )
         CClientPed * pPed = g_pClientGame->GetPedManager ()->Get ( pWeaponFirePed, true, true );
         if ( pPed )
         {
-            if ( pPed->GetType () == CCLIENTPLAYER )
-            {
-			    if ( bShotCompensation )
-			    {
-				    // Restore compensated positions            
-				    if ( !pPed->IsLocalPlayer () )
-				    {
-                        if ( pShotMovedEntity ) pShotMovedEntity->SetPosition ( vecShotRestorePosition );
-				    }
+            // Restore compensated positions  
+            if ( bShotCompensation )
+			{
+                if ( pPed->GetType () == CCLIENTPLAYER && !pPed->IsLocalPlayer () )
+                {          
+                    if ( pShotMovedEntity ) pShotMovedEntity->SetPosition ( vecShotRestorePosition );
 			    }
             }
 

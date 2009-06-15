@@ -2875,7 +2875,14 @@ RpClump * pBlendAnimationClump = NULL;
 AssocGroupId blendAnimationGroup = 0;
 AnimationId blendAnimationID = 0;
 float fBlendAnimationBlendDelta;
-
+class CFakeAnimBlendAssociation
+{
+public:
+    CFakeAnimBlendAssociation () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
+    void * m_pointer;
+    char m_data [ 100 ];
+} fakeAssoc;
+CFakeAnimBlendAssociation * pFakeAssoc = &fakeAssoc;
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
 {
     _asm
@@ -2891,18 +2898,27 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
         pushad
     }
     
-    if ( m_pBlendAnimationHandler )
+    if ( m_pBlendAnimationHandler && !m_pBlendAnimationHandler ( pBlendAnimationClump,
+                                                                 blendAnimationGroup,
+                                                                 blendAnimationID,
+                                                                 fBlendAnimationBlendDelta ) )
     {
-        m_pBlendAnimationHandler ( pBlendAnimationClump, blendAnimationGroup,
-                                   blendAnimationID,fBlendAnimationBlendDelta );
+        _asm
+        {
+            popad
+            mov     eax, pFakeAssoc
+            ret
+        }
     }
-    
-    _asm
-    {
-        popad
-        sub     esp,14h 
-        mov     ecx,dword ptr [esp+18h]
-        jmp     dwBlendAnimationReturn
+    else
+    {    
+        _asm
+        {
+            popad
+            sub     esp,14h 
+            mov     ecx,dword ptr [esp+18h]
+            jmp     dwBlendAnimationReturn
+        }
     }
 }
 

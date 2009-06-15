@@ -70,6 +70,8 @@ public:
     bool                                GetCurrentAnimation         ( AssocGroupId & animGroup, AnimationId & animID );
 
     void                                OnCreation                  ( void );
+    void                                OnDestruction               ( void );
+
     void                                OnBlockLoad                 ( CAnimBlock * pBlock );
 
     bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
@@ -78,7 +80,7 @@ public:
     bool                                RunNamedAnimation           ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
 
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
-    bool                                AllowBlendAnimation         ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    bool                                OnBlendAnimation            ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
 private:
     void                                BlendAnimation              ( CAnimationItem * pAnim );

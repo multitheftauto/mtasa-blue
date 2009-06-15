@@ -1250,15 +1250,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 
 bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
 {
-    if ( Ped.CountAnimations () > 0 )
+    CAnimationItem * pAnim = Ped.GetCurrentAnimation ();
+    if ( pAnim )
     {
-        CAnimationItem * pAnim = Ped.GetCurrentAnimation ();
-        if ( pAnim )
-        {
-            strncpy ( szBlockName, pAnim->block->GetName (), uiLength );
-            strncpy ( szAnimName, pAnim->name, uiLength );
-            return true;
-        }
+        strncpy ( szBlockName, pAnim->block->GetName (), uiLength );
+        strncpy ( szAnimName, pAnim->name, uiLength );
+        return true;
     }
     
     return false;

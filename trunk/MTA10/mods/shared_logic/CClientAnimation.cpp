@@ -73,7 +73,26 @@ bool CClientAnimation::GetCurrentAnimation ( AssocGroupId & animGroup, Animation
 
 void CClientAnimation::OnCreation ( void )
 {
-    // TODO: restore animations (possibly just the most recent)
+    // Do we have a current animation?
+    CAnimationItem * pAnim = GetCurrentAnimation ();
+    if ( pAnim )
+    {
+        // Reapply this animation
+        BlendAnimation ( pAnim );
+    }
+}
+
+
+void CClientAnimation::OnDestruction ( void )
+{
+    // Do we have a current animation?
+    CAnimationItem * pAnim = GetCurrentAnimation ();
+    if ( pAnim && pAnim->type == ANIM_TYPE_MANAGED )
+    {
+        // Save our current animations time/position to reapply later
+        pAnim->blendSpeed = 8.0f;
+        if ( pAnim->assoc ) pAnim->startTime = pAnim->assoc->GetTime ();
+    }
 }
 
 
@@ -137,7 +156,8 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
                     else pAssoc->ClearFlag ( 2 );
                 }
                 pAssoc->SetSpeed ( pAnim->speed );
-                pAssoc->SetTime ( pAnim->startTime );
+                if ( pAnim->finished ) pAssoc->SetTime ( pAssoc->GetTotalTime () );
+                else pAssoc->SetTime ( pAnim->startTime );
 
                 // Add a callback handler which'll be called when its finished being used
                 pAssoc->SetFinishCallback ( CClientAnimation::StaticBlendAssocFinish, this );
@@ -248,12 +268,15 @@ void CClientAnimation::FinishAnimation ( void )
             CTaskManager * pTaskManager = pPed->GetTaskManager ();
             if ( pPlayerPed && pTaskManager )
             {                
+                // Grab the primary task
                 CTask* pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
                 if ( pTask )
                 {
+                    // Is it an animation task we've set?
                     int iTaskType = pTask->GetTaskType ();
                     if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
                     {
+                        // Stop and destroy this task
                         pTask->MakeAbortable ( pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
                         pTask->Destroy ();
                         pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
@@ -324,6 +347,7 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
             {
                 // Set it as finished
                 pAnim->finished = true;
+                pAnim->assoc = NULL;
             }
             else
             {
@@ -339,18 +363,20 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
 }
 
 
-/*
-bool CClientAnimation::AllowBlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+bool CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
     // Grab our last animation
     CAnimationItem * pAnim = GetCurrentAnimation ();
-    if ( pAnim  )
+    if ( pAnim && pAnim->type == ANIM_TYPE_MANAGED )
     {        
         // Is this animation not interruptable?
         if ( !pAnim->interruptable )
         {           
+            // TODO: find a cleaner way to stop CAnimManager::BlendAnimation calls
+            /*
             // We have a current animation that isnt interruptable, dont allow a new one to be played
             return false;
+            */
         }
         else
         {
@@ -369,7 +395,6 @@ bool CClientAnimation::AllowBlendAnimation ( AssocGroupId animGroup, AnimationId
     // Allow GTA to set a new animation
     return true;
 }
-*/
 
 
 void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
