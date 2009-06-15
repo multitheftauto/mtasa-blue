@@ -573,14 +573,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CMapFile.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CMapFiles.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CMapManager.cpp"
 					>
 				</File>
@@ -1575,14 +1567,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CMapEventManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CMapFile.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CMapFiles.h"
 					>
 				</File>
 				<File

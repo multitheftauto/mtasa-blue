@@ -166,8 +166,6 @@
 #include "CMainConfig.h"
 #include "CMapEvent.h"
 #include "CMapEventManager.h"
-#include "CMapFile.h"
-#include "CMapFiles.h"
 #include "CMapManager.h"
 #include "CMarker.h"
 #include "CMarkerManager.h"

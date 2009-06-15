@@ -22,7 +22,7 @@
 class CConsole
 {
 public:
-                                        CConsole                    ( class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager, class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager, CWhoWas* pWhoWas, class CMapFiles* pMapFiles, class CBanManager* pBanManager, class CAccessControlListManager* pACLManager );
+                                        CConsole                    ( class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager, class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager, CWhoWas* pWhoWas, class CBanManager* pBanManager, class CAccessControlListManager* pACLManager );
                                         ~CConsole                   ( void );
 
     bool                                HandleInput                 ( const char* szCommand, CClient* pClient, CClient* pEchoClient );
@@ -37,7 +37,6 @@ public:
 
     inline class CBlipManager*          GetBlipManager              ( void )                { return m_pBlipManager; };
     inline class CLuaManager*           GetLuaManager               ( void )                { return m_pLuaManager; };
-    inline class CMapFiles*             GetMapFiles                 ( void )                { return m_pMapFiles; };
     inline class CMapManager*           GetMapManager               ( void )                { return m_pMapManager; };
     inline class CPlayerManager*        GetPlayerManager            ( void )                { return m_pPlayerManager; };
     inline class CVehicleManager*       GetVehicleManager           ( void )                { return m_pVehicleManager; };
@@ -46,7 +45,6 @@ public:
 
 private:
     class CBlipManager*                 m_pBlipManager;
-    class CMapFiles*                    m_pMapFiles;
     class CMapManager*                  m_pMapManager;
     class CPlayerManager*               m_pPlayerManager;
     class CRegisteredCommands*          m_pRegisteredCommands;

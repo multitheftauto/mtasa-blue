@@ -22,7 +22,6 @@ class CMapManager;
 #include "CBlipManager.h"
 #include "CClock.h"
 #include "CElementDeleter.h"
-#include "CMapFiles.h"
 #include "CObjectManager.h"
 #include "CPickupManager.h"
 #include "CPlayerManager.h"
@@ -48,7 +47,6 @@ public:
                                                               CTeamManager* pTeamManager,
                                                               CPedManager* pPedManager,
                                                               CColManager* pColManager,
-                                                              CMapFiles* pMapFiles,
                                                               CClock* pClock,
                                                               class CLuaManager* pLuaManager,
                                                               CGroups* pGroups,
@@ -108,7 +106,6 @@ private:
     CTeamManager*               m_pTeamManager;
     CPedManager*                m_pPedManager;
     CColManager*                m_pColManager;
-    CMapFiles*                  m_pMapFiles;
     CClock*                     m_pServerClock;
     class CLuaManager*          m_pLuaManager;
     CGroups*                    m_pGroups;

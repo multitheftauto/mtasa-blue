@@ -67,7 +67,6 @@ CGame::CGame ( void )
     m_pMapManager = NULL;
     m_pHandlingManager = NULL;
     m_pLuaManager = NULL;
-    m_pMapFiles = NULL;
     m_pPacketTranslator = NULL;
     m_pMarkerManager = NULL;
     m_pRadarAreaManager = NULL;
@@ -175,7 +174,6 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pLuaManager );
-    SAFE_DELETE ( m_pMapFiles );
     SAFE_DELETE ( m_pPacketTranslator );
     SAFE_DELETE ( m_pMarkerManager );
     SAFE_DELETE ( m_pRadarAreaManager );
@@ -370,17 +368,16 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pHandlingManager = new CHandlingManager;
     m_pVehicleManager = new CVehicleManager;
     m_pPacketTranslator = new CPacketTranslator ( m_pPlayerManager );
-    m_pMapFiles = new CMapFiles;
     m_pBanManager = new CBanManager;
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pMapFiles, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
+    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
     m_pACLManager = new CAccessControlListManager;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
     m_pLuaManager = new CLuaManager ( m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands, m_pMapManager, &m_Events );
-    m_pConsole = new CConsole ( m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas, m_pMapFiles, m_pBanManager, m_pACLManager );
+    m_pConsole = new CConsole ( m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas, m_pBanManager, m_pACLManager );
     m_pMainConfig = new CMainConfig ( m_pConsole, m_pLuaManager );
     m_pRPCFunctions = new CRPCFunctions;
     m_pWaterManager = new CWaterManager;
