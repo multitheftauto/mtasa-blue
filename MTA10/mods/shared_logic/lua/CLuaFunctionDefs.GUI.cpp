@@ -167,34 +167,29 @@ int CLuaFunctionDefs::GUICreateStaticImage ( lua_State* luaVM )
             lua_istype ( luaVM, 3, LUA_TNUMBER ) && lua_istype ( luaVM, 4, LUA_TNUMBER ) &&
             lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )
         {
-            const char *szFile = lua_tostring ( luaVM, 5 );
+            SString strFile = lua_tostring ( luaVM, 5 );
             CClientGUIElement* pParent = lua_toguielement ( luaVM, 7 );
 
-            CResource* pResource = NULL;
-            if ( lua_istype ( luaVM, 8, LUA_TLIGHTUSERDATA ) )
+            CResource* pResource =  pLuaMain->GetResource();
+            SString strPath;
+            if ( pResource && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
-                pResource = lua_toresource ( luaVM, 8 );
-            }
+                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage (
+                    *pLuaMain,
+                    static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                    static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                    static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                    static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
+                    strPath,
+                    lua_toboolean ( luaVM, 6 ) ? true : false,
+                    pParent
+                    );
 
-            if ( !pResource )
-                pResource = pLuaMain->GetResource();
-
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage (
-                *pLuaMain,
-                static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
-                szFile,
-                lua_toboolean ( luaVM, 6 ) ? true : false,
-                pParent,
-                pResource
-                );
-
-            // Only proceed if we have a valid element (since GUICreateStaticImage can return a NULL pointer)
-            if ( pGUIElement ) {
-                lua_pushelement ( luaVM, pGUIElement );
-                return 1;
+                // Only proceed if we have a valid element (since GUICreateStaticImage can return a NULL pointer)
+                if ( pGUIElement ) {
+                    lua_pushelement ( luaVM, pGUIElement );
+                    return 1;
+                }
             }
         }
     }
@@ -568,18 +563,18 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
         if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
             lua_istype ( luaVM, 2, LUA_TSTRING ) )
         {
+            CResource* pResource =  pLuaMain->GetResource();
+
             // sanitize the input
-            const char *szFile = lua_tostring ( luaVM, 2 );
-            if ( IsValidFilePath ( szFile ) ) {
-
-                // get the correct directory
-                SString strPath ( "%s/resources/%s/", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName () );
-
+            SString strFile = lua_tostring ( luaVM, 2 );
+            SString strPath;
+            if ( pResource && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            {
                 // and attempt to load the image
                 CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
                 if ( pEntity )
                 {
-                    bRet = CStaticFunctionDefinitions::GUIStaticImageLoadImage ( *pEntity, szFile, strPath );
+                    bRet = CStaticFunctionDefinitions::GUIStaticImageLoadImage ( *pEntity, strPath );
                 }
                 else
                     m_pScriptDebugging->LogBadPointer ( luaVM, "guiStaticImageLoadImage", "gui-element", 1 );

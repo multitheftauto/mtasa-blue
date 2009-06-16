@@ -140,6 +140,12 @@ bool IsValidFilePath ( const char *szDir )
 	return true;
 }
 
+void ReplaceOccurrencesInString ( std::string &s, const char *a, const char *b )
+{
+    int idx = 0;
+    while( (idx=s.find_first_of(a, idx)) >= 0 )
+        s.replace(idx, 1, b);
+}
 
 void RaiseFatalError ( unsigned int uiCode )
 {

@@ -42,6 +42,8 @@ public:
 
 	void					    LoadUnavailableResources	( CClientEntity* pRootEntity );
 
+    static bool                 ParseResourcePathInput          ( std::string strInput, CResource* &pResource, std::string &strPath );
+
 private:
 
     std::list < CResource* >    m_resources;

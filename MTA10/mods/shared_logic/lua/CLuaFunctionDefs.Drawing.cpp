@@ -352,12 +352,12 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
         CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
 
         // Check for a valid (and sane) file path
-        if ( pResource && szFile && IsValidFilePath ( szFile ) )
+        if ( pResource && szFile )
         {
             // Get the correct directory
-            SString strPath ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
-
-            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+            SString strPath;
+            if ( CResourceManager::ParseResourcePathInput( szFile, pResource, strPath ) &&
+                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
             {
                 // Success
                 lua_pushboolean ( luaVM, true );

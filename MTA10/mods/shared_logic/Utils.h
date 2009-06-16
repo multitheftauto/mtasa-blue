@@ -181,7 +181,8 @@ bool            DoesFileExist               ( const char* szFilename );
 char*           ReplaceAnyStringOccurrence  ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax );
 unsigned int    StripUnwantedCharacters     ( char* szText, unsigned char cReplace = ' ' );
 bool            IsWantedCharacter           ( unsigned char c );
-bool			IsValidFilePath				( const char* szDir );
+bool            IsValidFilePath	            ( const char* szDir );
+void			ReplaceOccurrencesInString  ( std::string &s, const char *a, const char *b );
 
 void            RaiseFatalError             ( unsigned int uiCode );
 void            RaiseProtocolError          ( unsigned int uiCode );

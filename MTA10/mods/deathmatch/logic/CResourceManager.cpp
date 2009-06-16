@@ -124,3 +124,35 @@ void CResourceManager::StopAll ( void )
         Remove ( m_resources.front () );
     }
 }
+
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
+{
+    ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    if ( strInput[0] == ':' )
+    {
+        unsigned int iEnd = strInput.find_first_of("/");
+        if ( iEnd )
+        {
+            std::string strResourceName = strInput.substr(1,iEnd-1);
+            pResource = g_pClientGame->GetResourceManager()->GetResource(strResourceName.c_str());
+            if ( strInput[iEnd+1] )
+            {
+                std::string strSubDirectory = strInput.substr(iEnd+1);
+                if ( IsValidFilePath ( strSubDirectory.c_str() ) )
+                {
+                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strSubDirectory;
+                    return true;
+                }
+            }
+        }
+    }
+    else
+    {
+        if ( IsValidFilePath ( strInput.c_str() ) )
+        {
+            strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+            return true;
+        }
+    }
+    return false;
+}

@@ -23,15 +23,15 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
     {
-        const char* szSound = lua_tostring ( luaVM, 1 );
+        SString strSound = lua_tostring ( luaVM, 1 );
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-                SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
-                if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+                SString strFilename;
+                if ( CResourceManager::ParseResourcePathInput( strSound, pResource, strFilename ) )
                 {
                     bool bLoop = false;
                     if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
@@ -67,7 +67,7 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
             static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
             static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
 
-        const char* szSound = lua_tostring ( luaVM, 1 );
+        SString strSound = lua_tostring ( luaVM, 1 );
 
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
@@ -75,8 +75,8 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
             CResource* pResource = luaMain->GetResource();
             if ( pResource )
             {
-                SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), szSound );
-                if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+                SString strFilename;
+                if ( CResourceManager::ParseResourcePathInput( strSound, pResource, strFilename ) )
                 {
                     bool bLoop = false;
                     if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )

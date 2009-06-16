@@ -30,14 +30,12 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
         if ( pResource )
         {
             // Grab the filename
-            const char* szFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
-
+            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
+            
+            SString strPath;
             // Is this a legal filepath?
-            if ( szFile && IsValidFilePath ( szFile ) )
+            if ( strFile && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
-                // Generate the full path to the file
-                SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pLuaMain->GetResource ()->GetName (), szFile );
-
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
 
@@ -81,19 +79,17 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
         CResource* pResource = pLuaMain->GetResource ();
         if ( pResource )
         {
-            // Grab the filename and the model ID
-            const char* szFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
-
-            // Is it a valid filepath?
-            if ( szFile && lua_istype ( luaVM, 2, LUA_TNUMBER ) && IsValidFilePath ( szFile ) )
+            // Grab the filename
+            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
+            
+            SString strPath;
+            // Is this a legal filepath?
+            if ( strFile && lua_istype ( luaVM, 2, LUA_TNUMBER ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
                 // Check the model ID
                 unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
-                    // Grab the path to resource root
-                    SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
-
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
 
@@ -141,14 +137,12 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
         if ( pResource )
         {
             // Grab the filename
-            const char* szFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
-
-            // Is it a valid filepath?
-            if ( szFile && IsValidFilePath ( szFile ) )
+            SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : NULL );
+            
+            SString strPath;
+            // Is this a legal filepath?
+            if ( strFile && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
-                // Grab the path to resource root
-                SString strPath ( "%s/resources/%s/%s", m_pClientGame->GetModRoot (), pResource->GetName (), szFile );
-
                 // Grab the resource root entity
                 CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
 

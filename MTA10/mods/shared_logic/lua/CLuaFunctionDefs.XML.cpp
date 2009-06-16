@@ -392,10 +392,9 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            //const char * szFilename = lua_tostring ( luaVM, 1 );
-            SString strFilename ( "%s\\%s", luaMain->GetResource()->GetResourceDirectoryPath(), lua_tostring ( luaVM, 1 ) );
-            //if ( IsValidFilePath ( szFilename ) ) // This would be checking the full path when we only need to check the user input
-            if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+            CResource* pResource = luaMain->GetResource();
+            SString strFilename;
+            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFilename ) )
             {
                 // Create the XML
                 CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
@@ -443,11 +442,9 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if ( pLuaMain )
         {
-            // Construct file path
-            std::string strFile = m_pClientGame->GetModRoot () + std::string ( "\\resources\\" ) + pLuaMain->GetResource ()->GetName () + std::string ( "\\" ) + lua_tostring ( luaVM, 1 );
-
-            // Make sure the original filename is valid
-            if ( IsValidFilePath ( lua_tostring ( luaVM, 1 ) ) )
+            CResource* pResource = pLuaMain->GetResource();
+            SString strFile;
+            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFile ) )
             {
                 char szRootName [ MAX_STRING_LENGTH ];
                 strncpy ( szRootName,  lua_tostring ( luaVM, 2 ), MAX_STRING_LENGTH - 1 );
@@ -607,9 +604,9 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
         if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  &&
             lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
-            // Grab the full filepath of the copied xml and make sure its legal
-            SString strFilename ( "%s\\resources\\%s\\%s", m_pClientGame->GetModRoot(), pLUA->GetResource()->GetName() ,lua_tostring ( luaVM, 2 ) );
-            if ( IsValidFilePath ( lua_tostring ( luaVM, 2 ) ) )
+            CResource* pResource = pLUA->GetResource();
+            SString strFilename;
+            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFilename ) )
             {
                 // Grab the source node
                 CXMLNode* pSourceNode = lua_toxmlnode ( luaVM, 1 );

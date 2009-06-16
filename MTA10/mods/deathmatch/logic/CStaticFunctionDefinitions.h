@@ -298,9 +298,9 @@ public:
 	static CClientGUIElement*			GUICreateScrollBar					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent );
 	static CClientGUIElement*			GUICreateCheckBox					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
 	static CClientGUIElement*			GUICreateRadioButton				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateStaticImage				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szFile, bool bRelative, CClientGUIElement* pParent, CResource* pResource );
+	static CClientGUIElement*			GUICreateStaticImage				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, SString strFile, bool bRelative, CClientGUIElement* pParent );
 	
-	static bool							GUIStaticImageLoadImage				( CClientEntity& Element, const char* szFile, const char* szDir );
+	static bool							GUIStaticImageLoadImage				( CClientEntity& Element, SString strDir );
 
     static bool                         GUISetSelectedTab                   ( CClientEntity& Element, CClientEntity& Tab );
     static CClientGUIElement*           GUIGetSelectedTab                   ( CClientEntity& Element );
