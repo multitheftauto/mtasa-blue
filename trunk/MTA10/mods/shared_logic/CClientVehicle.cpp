@@ -1750,8 +1750,17 @@ void CClientVehicle::StreamedInPulse ( void )
             m_bBlowNextFrame = false;
         }
 
-        // Vehicles have a way of getting their cols back, so we have to force this each frame (not much overhead anyway)
-        m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
+        // Are we an unmanned, invisible, blown-up plane?
+        if ( !GetOccupant () && m_eVehicleType == CLIENTVEHICLE_PLANE && m_bBlown && !m_pVehicle->IsVisible () )
+        {
+            // Disable our collisions
+            m_pVehicle->SetUsesCollision ( false );
+        }
+        else
+        {    
+            // Vehicles have a way of getting their cols back, so we have to force this each frame (not much overhead anyway)
+            m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
+        }
 
         // If we are frozen, make sure we freeze our matrix and keep move/turn speed at 0,0,0
         if ( m_bIsFrozen )
