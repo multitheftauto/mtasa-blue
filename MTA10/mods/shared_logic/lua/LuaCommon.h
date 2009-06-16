@@ -50,7 +50,6 @@ class CClientWater;
 class CClientRadarArea;
 class CLuaTimer;
 class CResource;
-class CResourceFileItem;
 class CXMLNode;
 
 
@@ -71,7 +70,6 @@ CClientPickup*          lua_topickup        ( lua_State* luaVM, int iArgument );
 CClientPlayer*          lua_toplayer        ( lua_State* luaVM, int iArgument );
 CClientProjectile*      lua_toprojectile    ( lua_State* luaVM, int iArgument );
 CLuaTimer*              lua_totimer         ( lua_State* luaVM, int iArgument );
-CResourceFileItem*      lua_toresourcefile  ( lua_State* luaVM, int iArgument );
 CResource*              lua_toresource      ( lua_State* luaVM, int iArgument );
 CClientSound*			lua_tosound         ( lua_State* luaVM, int iArgument );
 CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
@@ -84,7 +82,6 @@ CClientRadarArea*		lua_toradararea		( lua_State* luaVM, int iArgument );
 void                    lua_pushelement     ( lua_State* luaVM, CClientEntity* pElement );
 void                    lua_pushresource    ( lua_State* luaVM, CResource* pElement );
 void                    lua_pushtimer       ( lua_State* luaVM, CLuaTimer* pElement );
-void                    lua_pushresourcefile( lua_State* luaVM, CResourceFileItem* pElement );
 void                    lua_pushxmlnode     ( lua_State* luaVM, CXMLNode* pElement );
 
 #define lua_istype(luavm, number,type) (lua_type(luavm,number) == type)
