@@ -298,7 +298,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
         if ( CheckFileForCorruption ( ( *iter )->GetName () ) )
         {
             SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", (*iter)->GetShortName (), m_szResourceName );
-            g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
+            g_pCore->DebugEchoColor ( strBuffer, 255, 0, 0 );
         }
     }
 
