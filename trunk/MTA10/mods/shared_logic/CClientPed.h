@@ -115,6 +115,9 @@ public:
 	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
     inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
     inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
+  
+    void                        CleanUpForVM                ( CLuaMain* pLuaMain, bool bRecursive );
+    
     RpClump*                    GetClump                    ( void );
 
     inline bool                 IsLocalPlayer               ( void )                                    { return m_bIsLocalPlayer; }
