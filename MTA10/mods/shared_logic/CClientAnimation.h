@@ -33,6 +33,7 @@ public:
         block = NULL; hierarchy = NULL; assoc = NULL; name = NULL; speed = 1.0f; blendSpeed = 1.0f;
         loop = true; startTime = 0.0f; updatePosition = true; interruptable = false; luaMain = NULL;
         luaFunction = -1; requesting = false; finished = false; type = ANIM_TYPE_MANAGED; time = 0;
+        deleted = false;
     }
     ~CAnimationItem ( void )
     {
@@ -55,6 +56,7 @@ public:
     bool                    finished;
     unsigned char           type;
     int                     time;
+    bool                    deleted;
 };
 
 class CClientAnimation
@@ -82,6 +84,9 @@ public:
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
     void                                OnBlendAnimation            ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
+    void                                CleanUpForVM                ( CLuaMain * pLuaMain );
+
+    void                                RemoveTrash                 ( void );
 private:
     void                                BlendAnimation              ( CAnimationItem * pAnim );
     void                                FindAndClear                ( CAnimBlock * pBlock, const char * szName );

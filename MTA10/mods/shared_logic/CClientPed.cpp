@@ -283,6 +283,12 @@ CClientPed::~CClientPed ( void )
     g_pClientGame->GetPedSync()->RemovePed ( this );
 }   
 
+void CClientPed::CleanUpForVM ( CLuaMain * pLuaMain, bool bRecursive )
+{
+    CClientAnimation::CleanUpForVM ( pLuaMain );
+    CClientEntity::CleanUpForVM ( pLuaMain, bRecursive );
+}
+
 RpClump * CClientPed::GetClump ( void )
 {
     if ( m_pPlayerPed )

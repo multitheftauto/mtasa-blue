@@ -75,7 +75,7 @@ void CClientAnimation::OnCreation ( void )
 {
     // Do we have a current animation?
     CAnimationItem * pAnim = GetCurrentAnimation ();
-    if ( pAnim )
+    if ( pAnim && !pAnim->requesting )
     {
         // Reapply this animation
         BlendAnimation ( pAnim );
@@ -344,7 +344,7 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
         // There should only be one matching assoc
         if ( pAnim->assoc == pAssoc )
         {
-            // Call our lua callback function if we have one
+            // Call our lua callback function if we have one            
             if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
 
             // Is this our final animation?
@@ -357,11 +357,11 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
             else
             {
                 // Remove this animation from the list now its finished
-                delete pAnim;
-                pElement->m_Animations.erase ( iter );
+                pAnim->deleted = true;
+                pElement->RemoveTrash ();
             }
 
-            // Finish here as there should only be 1 match.
+            // Finish here as there should only be 1 match.            
             return;
         }
     }
@@ -381,7 +381,7 @@ void CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId an
             // Was it not finished yet?
             if ( !pAnim->finished )
             {
-                // Call our lua callback function if we have one
+                // Call our lua callback function if we have one            
                 if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
             }
 
@@ -389,6 +389,43 @@ void CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId an
             delete pAnim;
             m_Animations.pop_back ();
         }
+    }
+    RemoveTrash ();
+}
+
+
+void CClientAnimation::CleanUpForVM ( CLuaMain * pLuaMain )
+{
+    // Iterate our animations
+    CAnimationItem * pAnim = NULL;
+    vector < CAnimationItem * > ::const_iterator iter = m_Animations.begin ();
+    for ( ; iter != m_Animations.end () ; iter++ )
+    {
+        pAnim = *iter;
+        // Is it the same luaVM?
+        if ( pAnim->luaMain == pLuaMain )
+        {
+            // NULL it so we dont try to call it later
+            pAnim->luaMain = NULL;
+        }
+    }
+}
+
+
+void CClientAnimation::RemoveTrash ( void )
+{
+    CAnimationItem * pAnim = NULL;
+    vector < CAnimationItem * > ::const_iterator iter = m_Animations.begin ();
+    while ( iter != m_Animations.end () )
+    {
+        pAnim = *iter;
+        if ( pAnim->deleted )
+        {
+            delete pAnim;
+            iter = m_Animations.erase ( iter );
+            continue;
+        }
+        iter++;
     }
 }
 
@@ -407,14 +444,13 @@ void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
             // Same name too?
             if ( !stricmp ( pAnim->name, szName ) )
             {
-                // Call our lua callback function if we have one
+                // Call our lua callback function if we have one            
                 if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
 
-                // Remove this animation from the list now its finished
-                delete pAnim;
-                m_Animations.erase ( iter );
-                
-                // Finish here as there should only be 1 match.
+                pAnim->deleted = true;
+                RemoveTrash ();                
+
+                // Finish here as there should only be 1 match.                               
                 return;
             }
         }
