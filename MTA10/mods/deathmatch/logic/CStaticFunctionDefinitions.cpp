@@ -1606,6 +1606,16 @@ bool CStaticFunctionDefinitions::BlendPedAnimation ( CClientEntity& Entity, cons
             Ped.FinishAnimation ();
         }
     }
+    /*
+    else if ( IS_OBJECT ( &Entity ) )
+    {
+        CClientObject& Object = static_cast < CClientObject& > ( Entity );
+        if ( szBlockName && szAnimName )
+        {
+            return Object.BlendAnimation  ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
+        }
+    }
+    */
 
     return false;
 }
@@ -2020,9 +2030,25 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExpl
 
     return false;
 }
+
+
 bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool& bBlown )
 {
     bBlown = Vehicle.IsVehicleBlown();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetVehicleGravity ( CClientVehicle& Vehicle, CVector & vecGravity )
+{
+    Vehicle.GetGravity ( vecGravity );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+{
+    Vehicle.GetHeadLightColor ( ucR, ucG, ucB );
     return true;
 }
 
@@ -2503,56 +2529,130 @@ bool CStaticFunctionDefinitions::SetVehicleAdjustableProperty ( CClientEntity& E
 }
 
 
-bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehicle, float fSpeed )
+bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientEntity& Entity, float fSpeed )
 {
-	// It's a heli?
-	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
-	{
-		Vehicle.SetHelicopterRotorSpeed ( fSpeed );
-		return true;
-	}
+    RUN_CHILDREN SetHelicopterRotorSpeed ( **iter, fSpeed );
+
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+
+	    // It's a heli?
+	    if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
+	    {
+		    Vehicle.SetHelicopterRotorSpeed ( fSpeed );
+		    return true;
+	    }
+    }
 
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, bool bDerailed )
+bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientEntity& Entity, bool bDerailed )
 {
-    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
-        return false;
+    RUN_CHILDREN SetTrainDerailed ( **iter, bDerailed );
 
-	Vehicle.SetDerailed ( bDerailed );
-    return true;
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+        
+        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+	        Vehicle.SetDerailed ( bDerailed );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientVehicle& Vehicle, bool bDerailable )
+bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientEntity& Entity, bool bDerailable )
 {
-    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
-        return false;
+    RUN_CHILDREN SetTrainDerailable ( **iter, bDerailable );
 
-	Vehicle.SetDerailable ( bDerailable );
-    return true;
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+
+        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+	        Vehicle.SetDerailable ( bDerailable );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDirection ( CClientVehicle& Vehicle, bool bDirection )
+bool CStaticFunctionDefinitions::SetTrainDirection ( CClientEntity& Entity,  bool bDirection )
 {
-    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
-        return false;
+    RUN_CHILDREN SetTrainDirection ( **iter, bDirection );
 
-	Vehicle.SetTrainDirection ( bDirection );
-    return true;
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+	        Vehicle.SetTrainDirection ( bDirection );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float fSpeed )
+bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientEntity& Entity, float fSpeed )
 {
-    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
-        return false;
+    RUN_CHILDREN SetTrainSpeed ( **iter, fSpeed );
 
-	Vehicle.SetTrainSpeed ( fSpeed );
-    return true;
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+
+        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+	        Vehicle.SetTrainSpeed ( fSpeed );
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehicleGravity ( CClientEntity& Entity, CVector & vecGravity )
+{
+    RUN_CHILDREN SetVehicleGravity ( **iter, vecGravity );
+
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+
+        Vehicle.SetGravity ( vecGravity );
+        return true;
+    }
+    
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+{
+    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, ucR, ucG, ucB );
+
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+
+        Vehicle.SetHeadLightColor ( ucR, ucG, ucB );
+        return true;
+    }
+    
+    return false;
 }
 
 

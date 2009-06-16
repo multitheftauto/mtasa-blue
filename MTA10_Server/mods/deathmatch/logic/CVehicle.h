@@ -235,6 +235,9 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
+    inline void                     GetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB ) { ucR = m_ucHeadLightR, ucG = m_ucHeadLightG, ucB = m_ucHeadLightB; }
+    inline void                     SetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB ) { m_ucHeadLightR = ucR, m_ucHeadLightG = ucG, m_ucHeadLightB = ucB; }
+
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
@@ -296,8 +299,8 @@ private:
     bool                            m_bDerailed;
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
-
     CPlayer *                       m_pJackingPlayer;
+    unsigned char                   m_ucHeadLightR, m_ucHeadLightG, m_ucHeadLightB;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

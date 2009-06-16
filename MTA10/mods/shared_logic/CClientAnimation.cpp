@@ -167,22 +167,25 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
         else if ( pAnim->type == ANIM_TYPE_TASK )
         {
             CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
-            CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
-            if ( pPlayerPed )
+            if ( pPed )
             {
-                // Kill any higher priority tasks if we dont want this anim interuptable
-                if ( !pAnim->interruptable )
+                CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
+                if ( pPlayerPed )
                 {
-                    pPed->KillTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-                    pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-                    pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-                }
+                    // Kill any higher priority tasks if we dont want this anim interuptable
+                    if ( !pAnim->interruptable )
+                    {
+                        pPed->KillTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+                        pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+                        pPed->KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+                    }
 
-                // Time arg is always -1 (which means the task will stay until removed)
-                CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( pAnim->name, pAnim->block->GetName (), flags, pAnim->blendSpeed, pAnim->time, !pAnim->interruptable );
-                if ( pTask )
-                {
-                    pTask->SetAsPedTask ( pPlayerPed, TASK_PRIORITY_PRIMARY );
+                    // Time arg is always -1 (which means the task will stay until removed)
+                    CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( pAnim->name, pAnim->block->GetName (), flags, pAnim->blendSpeed, pAnim->time, !pAnim->interruptable );
+                    if ( pTask )
+                    {
+                        pTask->SetAsPedTask ( pPlayerPed, TASK_PRIORITY_PRIMARY );
+                    }
                 }
             }
         }
@@ -241,45 +244,47 @@ void CClientAnimation::FinishAnimation ( void )
     if ( pCurrent )
     {
         CClientPed * pPed = dynamic_cast < CClientPed * > ( this );
-        
-        if ( pCurrent->type == ANIM_TYPE_MANAGED )
-        {
-            // Set our ped back to an idle stance
-            RpClump * pClump = GetClump ();
-            if ( pClump )
+        if ( pPed )
+        {        
+            if ( pCurrent->type == ANIM_TYPE_MANAGED )
             {
-                // "ped" animation block should always be loaded
-                CAnimBlendHierarchy * pHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( "idle_stance", "ped" );
-                if ( pHierarchy )
+                // Set our ped back to an idle stance
+                RpClump * pClump = GetClump ();
+                if ( pClump )
                 {
-                    // Set our playing flags
-                    int flags = 0;
-                    flags |= 2; // loop
-                    flags |= 16; // plays properly
-                    flags |= 64; // update position
-          
-                    g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pHierarchy, flags, 4.0f );
+                    // "ped" animation block should always be loaded
+                    CAnimBlendHierarchy * pHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( "idle_stance", "ped" );
+                    if ( pHierarchy )
+                    {
+                        // Set our playing flags
+                        int flags = 0;
+                        flags |= 2; // loop
+                        flags |= 16; // plays properly
+                        flags |= 64; // update position
+              
+                        g_pGame->GetAnimManager ()->BlendAnimation ( pClump, pHierarchy, flags, 4.0f );
+                    }
                 }
             }
-        }
-        else if ( pCurrent->type == ANIM_TYPE_TASK )
-        {
-            CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
-            CTaskManager * pTaskManager = pPed->GetTaskManager ();
-            if ( pPlayerPed && pTaskManager )
-            {                
-                // Grab the primary task
-                CTask* pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
-                if ( pTask )
-                {
-                    // Is it an animation task we've set?
-                    int iTaskType = pTask->GetTaskType ();
-                    if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
+            else if ( pCurrent->type == ANIM_TYPE_TASK )
+            {
+                CPlayerPed * pPlayerPed = pPed->GetGamePlayer ();
+                CTaskManager * pTaskManager = pPed->GetTaskManager ();
+                if ( pPlayerPed && pTaskManager )
+                {                
+                    // Grab the primary task
+                    CTask* pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+                    if ( pTask )
                     {
-                        // Stop and destroy this task
-                        pTask->MakeAbortable ( pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
-                        pTask->Destroy ();
-                        pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                        // Is it an animation task we've set?
+                        int iTaskType = pTask->GetTaskType ();
+                        if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
+                        {
+                            // Stop and destroy this task
+                            pTask->MakeAbortable ( pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
+                            pTask->Destroy ();
+                            pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                        }
                     }
                 }
             }
@@ -363,23 +368,16 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
 }
 
 
-bool CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+void CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
+    // * This is when GTA calls CAnimManager::BlendAnimation *
     // Grab our last animation
     CAnimationItem * pAnim = GetCurrentAnimation ();
     if ( pAnim && pAnim->type == ANIM_TYPE_MANAGED )
     {        
-        // Is this animation not interruptable?
-        if ( !pAnim->interruptable )
-        {           
-            // TODO: find a cleaner way to stop CAnimManager::BlendAnimation calls
-            /*
-            // We have a current animation that isnt interruptable, dont allow a new one to be played
-            return false;
-            */
-        }
-        else
-        {
+        // Is this animation interruptable?
+        if ( pAnim->interruptable )
+        {   
             // Was it not finished yet?
             if ( !pAnim->finished )
             {
@@ -392,8 +390,6 @@ bool CClientAnimation::OnBlendAnimation ( AssocGroupId animGroup, AnimationId an
             m_Animations.pop_back ();
         }
     }
-    // Allow GTA to set a new animation
-    return true;
 }
 
 
@@ -409,7 +405,7 @@ void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
         if ( pAnim->block == pBlock )
         {
             // Same name too?
-            if ( strcmp ( pAnim->name, szName ) == 0 )
+            if ( !stricmp ( pAnim->name, szName ) )
             {
                 // Call our lua callback function if we have one
                 if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );

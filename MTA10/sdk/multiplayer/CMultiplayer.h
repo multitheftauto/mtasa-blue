@@ -38,7 +38,7 @@ typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef void ( GameProcessHandler ) ( void );
 typedef bool ( ChokingHandler ) ( class CPed* pChokingPed, class CPed* pResponsiblePed, unsigned char ucWeaponType );
-typedef bool ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
 /**
  * This class contains information used for shot syncing, one exists per player.

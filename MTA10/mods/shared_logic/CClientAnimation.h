@@ -80,7 +80,7 @@ public:
     bool                                RunNamedAnimation           ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
 
     static void                         StaticBlendAssocFinish      ( CAnimBlendAssociation * pAssoc, void * pData );
-    bool                                OnBlendAnimation            ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    void                                OnBlendAnimation            ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
 private:
     void                                BlendAnimation              ( CAnimationItem * pAnim );

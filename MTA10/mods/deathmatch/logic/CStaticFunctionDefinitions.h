@@ -166,6 +166,8 @@ public:
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
+    static bool                         GetVehicleGravity                   ( CClientVehicle& Vehicle, CVector & vecGravity );
+    static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -194,11 +196,13 @@ public:
     static bool                         SetVehicleFuelTankExplodable        ( CClientEntity& Entity, bool bExplodable );
     static bool                         SetVehicleFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetVehicleAdjustableProperty        ( CClientEntity& Entity, unsigned short usAdjustableProperty );
-	static bool							SetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float fSpeed );
-	static bool							SetTrainDerailed				    ( CClientVehicle& Vehicle, bool bDerailed );
-    static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
-    static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
-    static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
+	static bool							SetHelicopterRotorSpeed				( CClientEntity& Entity, float fSpeed );
+	static bool							SetTrainDerailed				    ( CClientEntity& Entity, bool bDerailed );
+    static bool                         SetTrainDerailable                  ( CClientEntity& Entity, bool bDerailable );
+    static bool                         SetTrainDirection                   ( CClientEntity& Entity, bool bDirection );
+    static bool                         SetTrainSpeed                       ( CClientEntity& Entity, float fSpeed );
+    static bool                         SetVehicleGravity                   ( CClientEntity& Entity, CVector & vecGravity );
+    static bool                         SetVehicleHeadLightColor            ( CClientEntity& Entity, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );

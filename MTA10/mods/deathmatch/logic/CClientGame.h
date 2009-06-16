@@ -406,7 +406,7 @@ private:
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticGameProcessHandler        ( void );
     static bool                         StaticChokingHandler            ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
-    static bool                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -416,7 +416,7 @@ private:
     void                                Render3DStuffHandler            ( void );
     void                                GameProcessHandler              ( void );
     bool                                ChokingHandler                  ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
-    bool                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
