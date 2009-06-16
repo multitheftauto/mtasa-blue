@@ -3527,7 +3527,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMa
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szFile, bool bRelative, CClientGUIElement* pParent, CResource* pResource )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, SString strPath, bool bRelative, CClientGUIElement* pParent )
 {
 	CGUIElement *pElement = m_pGUI->CreateStaticImage ( pParent ? pParent->GetCGUIElement () : NULL );
 	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
@@ -3538,16 +3538,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
 	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
 	// Check for a valid (and sane) file path
-	if ( szFile && IsValidFilePath ( szFile ) )
+	if ( strPath )
     {
-		// Get the correct directory       
-        if ( !pResource )
-            pResource = LuaMain.GetResource ();
-
-		SString strPath ( "%s\\resources\\%s\\", m_pClientGame->GetModRoot (), pResource->GetName () );
-
 		// Load the image
-		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( szFile, strPath ) ) {
+		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( "", strPath ) ) {
 			// If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
 			// So delete it and reset the pointer, so we return NULL
 			delete pGUIElement;
@@ -3559,9 +3553,9 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
 }
 
 
-bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity, const char* szFile, const char* szDir )
+bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity, SString strDir )
 {
-    RUN_CHILDREN GUIStaticImageLoadImage ( **iter, szFile, szDir );
+    RUN_CHILDREN GUIStaticImageLoadImage ( **iter, strDir );
 
     // Is this a gui element?
     if ( IS_GUI ( &Entity ) )
@@ -3573,10 +3567,10 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
         {
 	        CGUIElement *pCGUIElement = GUIElement.GetCGUIElement ();
 
-	        if ( szFile && szDir )
+	        if ( strDir )
             {
 		        // load the image, if any
-		        return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( szFile, szDir );
+		        return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( "", strDir );
 	        }
         }
     }
