@@ -17,13 +17,14 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <stdio.h>
 
 // These includes have to be fixed!
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
+
+using namespace std;
 
 extern CGame * pGameInterface;
 
@@ -126,8 +127,8 @@ DWORD RETURN_CVehicle_DoVehicleLights =                     0x6e1a68;
 #define HOOKPOS_CAutomobile_Render                          0x6a2b10
 DWORD RETURN_CAutomobile_Render =                           0x6a2b18;
 
-#define HOOKPOS_CVehicle_DoHeadLightBeam                    0x6E13AE
-DWORD RETURN_CVehicle_DoHeadLightBeam =                     0x6E13B6;
+#define HOOKPOS_CVehicle_DoHeadLightBeam                    0x6E13A4
+DWORD RETURN_CVehicle_DoHeadLightBeam =                     0x6E13AE;
 
 #define HOOKPOS_CVehicle_DoHeadLightEffect_1                0x6E0D01
 DWORD RETURN_CVehicle_DoHeadLightEffect_1 =                 0x6E0D09;
@@ -341,7 +342,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);    
     HookInstall(HOOKPOS_CVehicle_DoVehicleLights, (DWORD)HOOK_CVehicle_DoVehicleLights, 8 );
     HookInstall(HOOKPOS_CAutomobile_Render, (DWORD)HOOK_CAutomobile_Render, 8 );
-    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam, (DWORD)HOOK_CVehicle_DoHeadLightBeam, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam, (DWORD)HOOK_CVehicle_DoHeadLightBeam, 10 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_1, (DWORD)HOOK_CVehicle_DoHeadLightEffect_1, 8 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_2, (DWORD)HOOK_CVehicle_DoHeadLightEffect_2, 8 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightReflectionTwin, (DWORD)HOOK_CVehicle_DoHeadLightReflectionTwin, 8 );
@@ -3417,6 +3418,8 @@ void _declspec(naked) HOOK_ApplyCarBlowHop ()
     }
 }
 
+// ---------------------------------------------------
+
 CVehicleSAInterface * pLightsVehicleInterface = NULL;
 void _declspec(naked) HOOK_CVehicle_DoVehicleLights ()
 {
@@ -3442,20 +3445,26 @@ void _declspec(naked) HOOK_CAutomobile_Render ()
     }
 }
 
-
-#define LOWEST(a,b) (a>b)?b:a
 unsigned char ucHeadLightR = 0, ucHeadLightG = 0, ucHeadLightB = 0;
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, float fG, float fB )
 {
     CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pInterface );
-    if ( pVehicle ) pVehicle->GetHeadLightColor ( ucHeadLightR, ucHeadLightG, ucHeadLightB );
-    else ucHeadLightR = 255, ucHeadLightG = 255, ucHeadLightB = 255;
+    if ( pVehicle )
+    {
+        pVehicle->GetHeadLightColor ( ucHeadLightR, ucHeadLightG, ucHeadLightB );
+    }
+    else
+    {
+        ucHeadLightR = 255;
+        ucHeadLightG = 255;
+        ucHeadLightB = 255;
+    }
     
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightR ) / 255.0f ) * fR ) );
-    ulHeadLightG = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightG ) / 255.0f ) * fR ) );
-    ulHeadLightB = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightB ) / 255.0f ) * fR ) );
+    ulHeadLightR = (unsigned char) min ( 255.0f, ( (float)ucHeadLightR / 255.0f ) * fR );
+    ulHeadLightG = (unsigned char) min ( 255.0f, ( (float)ucHeadLightG / 255.0f ) * fG );
+    ulHeadLightB = (unsigned char) min ( 255.0f, ( (float)ucHeadLightB / 255.0f ) * fB );
 }
 
 RwVertex * pHeadLightVerts = NULL;
@@ -3481,16 +3490,13 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam ()
         mov     pHeadLightVerts, eax
         mov     eax, [esp+4]
         mov     uiHeadLightNumVerts, eax
-        pushad
     }
 
     CVehicle_DoHeadLightBeam ();
+    *(int *)0xC4B950 = 5;
     
     _asm
     {
-        popad
-        call    dw_RwIm3DTransform 
-        add     esp,10h 
         jmp     RETURN_CVehicle_DoHeadLightBeam
     }
 }
