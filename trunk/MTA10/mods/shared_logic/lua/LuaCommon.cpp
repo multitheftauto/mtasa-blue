@@ -174,16 +174,6 @@ CLuaTimer* lua_totimer ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CResourceFileItem* lua_toresourcefile ( lua_State* luaVM, int iArgument )
-{
-    CResourceFileItem* pResourceFile = reinterpret_cast < CResourceFileItem* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( pResourceFile )
-    {
-        return pResourceFile;
-    }
-    return NULL;
-}
-
 CResource* lua_toresource ( lua_State* luaVM, int iArgument )
 {
     CResource* pResource = reinterpret_cast < CResource* > ( lua_touserdata ( luaVM, iArgument ) );
@@ -274,11 +264,6 @@ void lua_pushresource ( lua_State* luaVM, CResource* pElement )
 }
 
 void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pElement )
-{
-    lua_pushlightuserdata ( luaVM, pElement );
-}
-
-void lua_pushresourcefile ( lua_State* luaVM, CResourceFileItem* pElement )
 {
     lua_pushlightuserdata ( luaVM, pElement );
 }

@@ -350,47 +350,4 @@ int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetResourceFile ( lua_State* luaVM )
-{
-    // We have resource, string args passed?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        CResource* pResource = lua_toresource ( luaVM, 1 );
-        if ( lua_istype ( luaVM, 2, LUA_TSTRING ) )
-        {
-            std::string strFileName = lua_tostring ( luaVM, 2 );
-            if ( IsValidFilePath ( strFileName.c_str() ) )
-            {
-                CResourceFileItem* pItem = pResource->GetResourceFileItem ( strFileName );
-                if ( pItem )
-                {
-                    lua_pushresourcefile ( luaVM, pItem );
-                    return 1;
-                }
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getResourceFile" );
-    }
-    else if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
-    {
-        std::string strFileName = lua_tostring ( luaVM, 1 );
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain && IsValidFilePath ( strFileName.c_str() ) )
-        {
-            CResourceFileItem* pItem = pLuaMain->GetResource ()->GetResourceFileItem ( strFileName );
-            if ( pItem )
-            {
-                lua_pushresourcefile ( luaVM, pItem );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceFile" );     
-        
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
