@@ -2473,6 +2473,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( ucAlpha );
                     pVehicle->SetAlpha ( ucAlpha );	
 
+                    // Read our headlight color
+                    unsigned char ucHeadLightR, ucHeadLightG, ucHeadLightB;
+                    bitStream.Read ( ucHeadLightR );
+                    bitStream.Read ( ucHeadLightG );
+                    bitStream.Read ( ucHeadLightB );
+                    pVehicle->SetHeadLightColor ( ucHeadLightR, ucHeadLightG, ucHeadLightB );
+
                     // Set the matrix
                     pVehicle->SetPosition ( vecPosition );
                     pVehicle->SetRotationDegrees ( vecRotationDegrees );

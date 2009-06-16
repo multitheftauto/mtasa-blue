@@ -239,6 +239,7 @@ public:
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
     static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
+    static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
@@ -274,11 +275,12 @@ public:
     static bool                 SetVehicleDamageProof               ( CElement* pElement, bool bDamageProof );
     static bool                 SetVehiclePaintjob                  ( CElement* pElement, unsigned char ucPaintjob );
     static bool                 SetVehicleFuelTankExplodable        ( CElement* pElement, bool bExplodable );
-    static bool                 SetVehicleFrozen                    ( CVehicle* pVehicle, bool bFrozen );
-    static bool                 SetTrainDerailed                    ( CVehicle* pVehicle, bool bDerailed );
-    static bool                 SetTrainDerailable                  ( CVehicle* pVehicle, bool bDerailable );
-    static bool                 SetTrainDirection                   ( CVehicle* pVehicle, bool bDireciton );
-    static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
+    static bool                 SetVehicleFrozen                    ( CElement* pElement, bool bFrozen );
+    static bool                 SetTrainDerailed                    ( CElement* pElement, bool bDerailed );
+    static bool                 SetTrainDerailable                  ( CElement* pElement, bool bDerailable );
+    static bool                 SetTrainDirection                   ( CElement* pElement, bool bDireciton );
+    static bool                 SetTrainSpeed                       ( CElement* pElement, float fSpeed );
+    static bool                 SetVehicleHeadLightColor            ( CElement* pElement, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo );

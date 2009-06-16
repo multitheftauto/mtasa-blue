@@ -43,6 +43,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAIN_DIRECTION, SetTrainDirection, "SetTrainDirection" );
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
     AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
+    AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
 }
 
 
@@ -585,6 +586,24 @@ void CVehicleRPCs::SetTrainSpeed ( NetBitStreamInterface& bitStream )
         if ( pVehicle )
         {
             pVehicle->SetTrainSpeed ( fSpeed );
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetVehicleHeadLightColor ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    unsigned char ucR, ucG, ucB;
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucR ) &&
+         bitStream.Read ( ucG ) &&
+         bitStream.Read ( ucB ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            pVehicle->SetHeadLightColor ( ucR, ucG, ucB );
         }
     }
 }

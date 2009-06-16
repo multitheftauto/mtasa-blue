@@ -1179,7 +1179,8 @@ int CLuaFunctionDefs::IsVehicleBlown ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle ) {
+        if ( pVehicle )
+        {
             bool bBlown;
             if ( CStaticFunctionDefinitions::IsVehicleBlown(*pVehicle, bBlown) ) {
                 lua_pushboolean ( luaVM, bBlown );
@@ -1191,6 +1192,32 @@ int CLuaFunctionDefs::IsVehicleBlown ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "isVehicleBlown" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucR, ucG, ucB;
+            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, ucR, ucG, ucB ) )
+            {
+                lua_pushnumber ( luaVM, ucR );
+                lua_pushnumber ( luaVM, ucG );
+                lua_pushnumber ( luaVM, ucB );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHeadLightColor", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1849,12 +1876,12 @@ int CLuaFunctionDefs::SetVehicleFrozen ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetVehicleFrozen ( *pVehicle, lua_toboolean ( luaVM, 2 ) ? true:false ) )
+                if ( CStaticFunctionDefinitions::SetVehicleFrozen ( *pEntity, lua_toboolean ( luaVM, 2 ) ? true:false ) )
                 {
                     lua_pushboolean ( luaVM, true );
                 }
@@ -1907,11 +1934,11 @@ int CLuaFunctionDefs::SetHelicopterRotorSpeed ( lua_State* luaVM )
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             float fSpeed = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-            if ( CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( *pVehicle, fSpeed ) )
+            if ( CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( *pEntity, fSpeed ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1933,11 +1960,11 @@ int CLuaFunctionDefs::SetTrainDerailed ( lua_State* luaVM )
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
         ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             bool bDerailed = ( lua_toboolean ( luaVM, 2 ) ? true : false );
-            if ( CStaticFunctionDefinitions::SetTrainDerailed ( *pVehicle, bDerailed ) )
+            if ( CStaticFunctionDefinitions::SetTrainDerailed ( *pEntity, bDerailed ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1958,11 +1985,11 @@ int CLuaFunctionDefs::SetTrainDerailable ( lua_State* luaVM )
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
         ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             bool bDerailable = ( lua_toboolean ( luaVM, 2 ) ? true : false );
-            if ( CStaticFunctionDefinitions::SetTrainDerailable ( *pVehicle, bDerailable ) )
+            if ( CStaticFunctionDefinitions::SetTrainDerailable ( *pEntity, bDerailable ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1983,11 +2010,11 @@ int CLuaFunctionDefs::SetTrainDirection ( lua_State* luaVM )
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
         ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             bool bDirection = lua_toboolean ( luaVM, 2 ) ? true : false;
-            if ( CStaticFunctionDefinitions::SetTrainDirection ( *pVehicle, bDirection ) )
+            if ( CStaticFunctionDefinitions::SetTrainDirection ( *pEntity, bDirection ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2010,11 +2037,11 @@ int CLuaFunctionDefs::SetTrainSpeed ( lua_State* luaVM )
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             float fSpeed = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-            if ( CStaticFunctionDefinitions::SetTrainSpeed ( *pVehicle, fSpeed ) )
+            if ( CStaticFunctionDefinitions::SetTrainSpeed ( *pEntity, fSpeed ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2094,11 +2121,13 @@ int CLuaFunctionDefs::GetVehicleGravity ( lua_State* luaVM )
         if ( pVehicle )
         {
             CVector vecGravity;
-            pVehicle->GetGravity ( vecGravity );
-            lua_pushnumber ( luaVM, vecGravity.fX );
-            lua_pushnumber ( luaVM, vecGravity.fY );
-            lua_pushnumber ( luaVM, vecGravity.fZ );
-            return 3;
+            if ( CStaticFunctionDefinitions::GetVehicleGravity ( *pVehicle, vecGravity ) )
+            {
+                lua_pushnumber ( luaVM, vecGravity.fX );
+                lua_pushnumber ( luaVM, vecGravity.fY );
+                lua_pushnumber ( luaVM, vecGravity.fZ );
+                return 3;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleGravity", "vehicle", 1 );
@@ -2120,21 +2149,58 @@ int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
          ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             CVector vecGravity ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                  static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                  static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-            pVehicle->SetGravity ( vecGravity );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+
+            if ( CStaticFunctionDefinitions::SetVehicleGravity ( *pEntity, vecGravity ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleGravity", "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setVehicleGravity" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            unsigned char ucR = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            unsigned char ucG = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned char ucB = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+
+            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, ucR, ucG, ucB ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHeadLightColor", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

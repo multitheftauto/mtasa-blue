@@ -19,7 +19,7 @@
 extern CGameSA* pGame;
 
 CVehicleSA::CVehicleSA ()
-    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f )
+    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_ucHeadLightR ( 255 ), m_ucHeadLightG ( 255 ), m_ucHeadLightB ( 255 )
 {
 }
 
@@ -27,7 +27,7 @@ CVehicleSA::CVehicleSA ()
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
 CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
-    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f )
+    : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_ucHeadLightR ( 255 ), m_ucHeadLightG ( 255 ), m_ucHeadLightB ( 255 )
 {
 	DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
 	// for SA, we can just call the following function and it should just work:

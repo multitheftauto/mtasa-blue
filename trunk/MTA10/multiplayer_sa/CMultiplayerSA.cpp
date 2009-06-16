@@ -120,6 +120,28 @@ DWORD RETURN_ApplyCarBlowHop =                              0x6B3831;
 #define HOOKPOS_CPhysical_ApplyGravity                      0x543081
 DWORD RETURN_CPhysical_ApplyGravity =                       0x543093;
 
+#define HOOKPOS_CVehicle_DoVehicleLights                    0x6e1a60
+DWORD RETURN_CVehicle_DoVehicleLights =                     0x6e1a68;
+
+#define HOOKPOS_CAutomobile_Render                          0x6a2b10
+DWORD RETURN_CAutomobile_Render =                           0x6a2b18;
+
+#define HOOKPOS_CVehicle_DoHeadLightBeam                    0x6E13AE
+DWORD RETURN_CVehicle_DoHeadLightBeam =                     0x6E13B6;
+
+#define HOOKPOS_CVehicle_DoHeadLightEffect_1                0x6E0D01
+DWORD RETURN_CVehicle_DoHeadLightEffect_1 =                 0x6E0D09;
+
+#define HOOKPOS_CVehicle_DoHeadLightEffect_2                0x6E0DF7
+DWORD RETURN_CVehicle_DoHeadLightEffect_2 =                 0x6E0DFF;
+
+#define HOOKPOS_CVehicle_DoHeadLightReflectionTwin          0x6E170F
+DWORD RETURN_CVehicle_DoHeadLightReflectionTwin =           0x6E1717;
+
+#define HOOKPOS_CVehicle_DoHeadLightReflectionSingle        0x6E15E2
+DWORD RETURN_CVehicle_DoHeadLightReflectionSingle =         0x6E15EA;
+
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -218,6 +240,13 @@ void HOOK_VehicleLookAside ();
 void HOOK_OccupiedVehicleBurnCheck ();
 void HOOK_UnoccupiedVehicleBurnCheck ();
 void HOOK_ApplyCarBlowHop ();
+void HOOK_CAutomobile_Render ();
+void HOOK_CVehicle_DoVehicleLights ();
+void HOOK_CVehicle_DoHeadLightBeam ();
+void HOOK_CVehicle_DoHeadLightEffect_1 ();
+void HOOK_CVehicle_DoHeadLightEffect_2 ();
+void HOOK_CVehicle_DoHeadLightReflectionTwin ();
+void HOOK_CVehicle_DoHeadLightReflectionSingle ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -309,7 +338,14 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
-    HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);
+    HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);    
+    HookInstall(HOOKPOS_CVehicle_DoVehicleLights, (DWORD)HOOK_CVehicle_DoVehicleLights, 8 );
+    HookInstall(HOOKPOS_CAutomobile_Render, (DWORD)HOOK_CAutomobile_Render, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam, (DWORD)HOOK_CVehicle_DoHeadLightBeam, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_1, (DWORD)HOOK_CVehicle_DoHeadLightEffect_1, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_2, (DWORD)HOOK_CVehicle_DoHeadLightEffect_2, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightReflectionTwin, (DWORD)HOOK_CVehicle_DoHeadLightReflectionTwin, 8 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightReflectionSingle, (DWORD)HOOK_CVehicle_DoHeadLightReflectionSingle, 8 );
 
     HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
@@ -849,7 +885,6 @@ void CMultiplayerSA::InitHooks()
     // Remove also some hardcoded and inlined checks for if it's a tag
     memset ( (void *)0x53374A, 0x90, 56 );
     *(BYTE *)(0x4C4403) = 0xEB;
-
 
     // Allow turning on vehicle lights even if the engine is off
     memset ( (void *)0x6E1DBC, 0x90, 8 );
@@ -2868,21 +2903,11 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
     }
 }
 
-/* If we don't want any MTA animations interrupted and GTA tries to call CAnimManager::BlendAnimation..
-   ..then pass them a fake CAnimBlendAssociation pointer for them to play with =) */
 DWORD dwBlendAnimationReturn = 0x4D4617;
 RpClump * pBlendAnimationClump = NULL;
 AssocGroupId blendAnimationGroup = 0;
 AnimationId blendAnimationID = 0;
 float fBlendAnimationBlendDelta;
-class CFakeAnimBlendAssociation
-{
-public:
-    CFakeAnimBlendAssociation () { memset ( &m_data, 0, sizeof ( m_data ) ); m_pointer = &m_data; }
-    void * m_pointer;
-    char m_data [ 100 ];
-} fakeAssoc;
-CFakeAnimBlendAssociation * pFakeAssoc = &fakeAssoc;
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
 {
     _asm
@@ -2898,27 +2923,18 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
         pushad
     }
     
-    if ( m_pBlendAnimationHandler && !m_pBlendAnimationHandler ( pBlendAnimationClump,
-                                                                 blendAnimationGroup,
-                                                                 blendAnimationID,
-                                                                 fBlendAnimationBlendDelta ) )
+    if ( m_pBlendAnimationHandler  )
     {
-        _asm
-        {
-            popad
-            mov     eax, pFakeAssoc
-            ret
-        }
+        m_pBlendAnimationHandler ( pBlendAnimationClump, blendAnimationGroup,
+                                   blendAnimationID, fBlendAnimationBlendDelta );
     }
-    else
-    {    
-        _asm
-        {
-            popad
-            sub     esp,14h 
-            mov     ecx,dword ptr [esp+18h]
-            jmp     dwBlendAnimationReturn
-        }
+
+    _asm
+    {
+        popad
+        sub     esp,14h 
+        mov     ecx,dword ptr [esp+18h]
+        jmp     dwBlendAnimationReturn
     }
 }
 
@@ -3398,5 +3414,184 @@ void _declspec(naked) HOOK_ApplyCarBlowHop ()
         or dl, 0x28
         mov [esi+0x36], dl
         jmp RETURN_ApplyCarBlowHop
+    }
+}
+
+CVehicleSAInterface * pLightsVehicleInterface = NULL;
+void _declspec(naked) HOOK_CVehicle_DoVehicleLights ()
+{
+    _asm
+    {
+        mov     pLightsVehicleInterface, ecx
+        mov     al,byte ptr ds:[00C1CC18h] 
+        sub     esp,3Ch 
+        jmp     RETURN_CVehicle_DoVehicleLights
+    }
+}
+
+
+CVehicleSAInterface * pRenderVehicleInterface = NULL;
+void _declspec(naked) HOOK_CAutomobile_Render ()
+{
+    _asm
+    {
+        mov     pRenderVehicleInterface, ecx
+        sub     esp,74h 
+        mov     eax,dword ptr ds:[00B7CB84h] 
+        jmp     RETURN_CAutomobile_Render
+    }
+}
+
+
+#define LOWEST(a,b) (a>b)?b:a
+unsigned char ucHeadLightR = 0, ucHeadLightG = 0, ucHeadLightB = 0;
+unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
+void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, float fG, float fB )
+{
+    CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pInterface );
+    if ( pVehicle ) pVehicle->GetHeadLightColor ( ucHeadLightR, ucHeadLightG, ucHeadLightB );
+    else ucHeadLightR = 255, ucHeadLightG = 255, ucHeadLightB = 255;
+    
+    // Scale our color values to the defaults ..looks dodgy but its needed!
+    ulHeadLightR = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightR ) / 255.0f ) * fR ) );
+    ulHeadLightG = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightG ) / 255.0f ) * fR ) );
+    ulHeadLightB = unsigned char ( LOWEST ( 255.0f, ( float ( ucHeadLightB ) / 255.0f ) * fR ) );
+}
+
+RwVertex * pHeadLightVerts = NULL;
+unsigned int uiHeadLightNumVerts = 0;
+void CVehicle_DoHeadLightBeam ()
+{    
+    // 255, 255, 255
+    CVehicle_GetHeadLightColor ( pRenderVehicleInterface, 255.0f, 255.0f, 255.0f );
+
+    for ( unsigned int i = 0 ; i < uiHeadLightNumVerts ; i++ )
+    {        
+        unsigned char alpha = ( unsigned char ) ( pHeadLightVerts [ i ].color >> 24 );
+        pHeadLightVerts [ i ].color = COLOR_ARGB ( alpha, ulHeadLightR, ulHeadLightG, ulHeadLightB );
+    }
+}
+
+DWORD dw_RwIm3DTransform = 0x7EF450;
+void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam ()
+{
+    _asm
+    {
+        mov     eax, [esp]
+        mov     pHeadLightVerts, eax
+        mov     eax, [esp+4]
+        mov     uiHeadLightNumVerts, eax
+        pushad
+    }
+
+    CVehicle_DoHeadLightBeam ();
+    
+    _asm
+    {
+        popad
+        call    dw_RwIm3DTransform 
+        add     esp,10h 
+        jmp     RETURN_CVehicle_DoHeadLightBeam
+    }
+}
+
+DWORD dwCCoronas_RegisterCorona = 0x6FC580;
+void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1 ()
+{
+    // 160, 160, 140
+    _asm pushad
+
+    CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
+
+    _asm
+    {
+        popad
+        mov     eax, ulHeadLightR
+        mov     [esp+8], eax
+        mov     eax, ulHeadLightG
+        mov     [esp+12], eax
+        mov     eax, ulHeadLightB
+        mov     [esp+16], eax
+        //mov     eax, ulHeadLightA
+        //mov     [esp+20], eax
+
+        call    dwCCoronas_RegisterCorona 
+        add     esp,54h
+        jmp     RETURN_CVehicle_DoHeadLightEffect_1
+    }
+}
+
+
+void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2 ()
+{
+    // 160, 160, 140
+    _asm pushad
+
+    CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
+
+    _asm
+    {
+        popad
+        mov     eax, ulHeadLightR
+        mov     [esp+8], eax
+        mov     eax, ulHeadLightG
+        mov     [esp+12], eax
+        mov     eax, ulHeadLightB
+        mov     [esp+16], eax
+        //mov     eax, ulHeadLightA
+        //mov     [esp+20], eax
+
+        call    dwCCoronas_RegisterCorona 
+        add     esp, 54h
+        jmp     RETURN_CVehicle_DoHeadLightEffect_2
+    }
+}
+
+
+DWORD dwCShadows_StoreCarLightShadow = 0x70C500;
+void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin ()
+{
+    // 45, 45, 45
+    _asm pushad
+ 
+    CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
+
+    _asm
+    {
+        popad
+        mov     eax, ulHeadLightR
+        mov     [esp+32], eax
+        mov     eax, ulHeadLightG
+        mov     [esp+36], eax
+        mov     eax, ulHeadLightB
+        mov     [esp+40], eax
+
+        call    dwCShadows_StoreCarLightShadow
+        add     esp, 4Ch
+        jmp     RETURN_CVehicle_DoHeadLightReflectionTwin
+    }    
+}
+
+
+void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle ()
+{
+    // 45, 45, 45
+    __asm pushad
+
+    CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
+
+    _asm
+    {
+        popad
+        mov     eax, ulHeadLightR
+        mov     [esp+32], eax
+        mov     eax, ulHeadLightG
+        mov     [esp+36], eax
+        mov     eax, ulHeadLightB
+        mov     [esp+40], eax
+
+        call    dwCShadows_StoreCarLightShadow
+        add     esp, 30h
+        jmp     RETURN_CVehicle_DoHeadLightReflectionSingle
     }
 }

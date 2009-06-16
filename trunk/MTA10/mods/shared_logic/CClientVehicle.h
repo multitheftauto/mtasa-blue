@@ -333,6 +333,9 @@ public:
     void                        GetGravity              ( CVector& vecGravity ) const       { vecGravity = m_vecGravity; }
     void                        SetGravity              ( const CVector& vecGravity );
 
+    void                        GetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
+    void                        SetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
+
     bool                        IsEnterable             ( void );
 
     void                        ReCreate                ( void );
@@ -470,6 +473,7 @@ protected:
     bool                        m_bIsInWater;
 
     CVector                     m_vecGravity;
+    unsigned char               m_ucHeadLightR, m_ucHeadLightG, m_ucHeadLightB;
 
 public:
     CClientPlayer *             m_pLastSyncer;

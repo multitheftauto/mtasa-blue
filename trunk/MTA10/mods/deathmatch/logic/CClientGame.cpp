@@ -3062,9 +3062,9 @@ bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePe
 }
 
 
-bool CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
-    return g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3167,20 +3167,13 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
     return true;
 }
 
-bool CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
     CClientPed * pPed = m_pPedManager->Get ( pClump, true );
     if ( pPed )
     {
-        // Make sure we have atleast one animation running if we're going to ignore another
-        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
-        {
-            bool bAllow = pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
-            if ( !bAllow ) return false;
-        }
+        pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
     }
-    
-    return true;
 }
 
 

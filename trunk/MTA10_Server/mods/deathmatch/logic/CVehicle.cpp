@@ -66,6 +66,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bIsDerailable = true;
     m_bTaxiLightState = false;
     m_bTrainDirection = true;
+    m_ucHeadLightR = 255, m_ucHeadLightG = 255, m_ucHeadLightB = 255;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
