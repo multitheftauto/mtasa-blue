@@ -350,6 +350,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\explosion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\fx_manager.cpp"
 				>
 			</File>
@@ -367,6 +371,10 @@
 			</File>
 			<File
 				RelativePath=".\multiplayersa_init.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\running_script.cpp"
 				>
 			</File>
 			<File
