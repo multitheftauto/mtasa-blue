@@ -22,20 +22,22 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket ( void )
 bool CUnoccupiedVehicleSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of bytes
-    while ( BitStream.GetNumberOfUnreadBits () > 0 )
+    while ( BitStream.GetNumberOfUnreadBits () >= 8 )
     {
         // Read out the sync data
         SyncData data;
         data.bSend = false;
 
         SUnoccupiedVehicleSync vehicle;
-        BitStream.Read ( &vehicle );
-        data.syncStructure = vehicle;
+        if ( BitStream.Read ( &vehicle ) )
+        {
+            data.syncStructure = vehicle;
 
-        // Add it to our list. We no longer check if it's valid here
-        // because CUnoccupiedVehicleSync does and it won't write bad ID's
-        // back to clients.
-        m_Syncs.push_back ( data );
+            // Add it to our list. We no longer check if it's valid here
+            // because CUnoccupiedVehicleSync does and it won't write bad ID's
+            // back to clients.
+            m_Syncs.push_back ( data );
+        }
     }
 
     return m_Syncs.size () > 0;

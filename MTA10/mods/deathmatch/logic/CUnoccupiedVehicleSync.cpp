@@ -199,7 +199,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStopSync ( NetBitStreamInte
 void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterface& BitStream )
 {
     // While we're not out of vehicles
-    while ( BitStream.GetNumberOfUnreadBits () > 0 )
+    while ( BitStream.GetNumberOfUnreadBits () >= 8 )
     {
         SUnoccupiedVehicleSync vehicle;
         if ( BitStream.Read ( &vehicle ) )
