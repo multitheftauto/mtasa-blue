@@ -49,7 +49,7 @@ bool CFireSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     else
     {
         BitStream.Write ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
-        BitStream.Write ( static_cast < unsigned short > ( 0 ) );
+        BitStream.WriteCompressed ( static_cast < unsigned short > ( 0 ) );
     }
 
     // Write position and size

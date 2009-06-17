@@ -39,7 +39,7 @@ public:
     virtual void        Write                       ( const char* input, int numberOfBytes ) = 0;
     virtual void        Write                       ( const ISyncStructure* syncStruct ) = 0;
 
-private:    // Don't use char functions, says ryden
+private:    // Don't use char functions, as they offer poor compression
     virtual void        WriteCompressed             ( const unsigned char& input ) = 0;
     virtual void        WriteCompressed             ( const char& input ) = 0;
 public:
@@ -49,7 +49,7 @@ public:
     virtual void        WriteCompressed             ( const int& input ) = 0;
     virtual void        WriteCompressed             ( const unsigned long& input ) = 0;
     virtual void        WriteCompressed             ( const long& input ) = 0;
-private:    // Float functions not used for some reason
+private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
 public:
@@ -85,7 +85,7 @@ public:
     virtual bool        Read                        ( char* output, int numberOfBytes ) = 0;
     virtual bool        Read                        ( ISyncStructure* syncStruct ) = 0;
 
-private:    // Don't use char functions, says ryden
+private:    // Don't use char functions, as they offer poor compression
     virtual bool        ReadCompressed              ( unsigned char& output ) = 0;
     virtual bool        ReadCompressed              ( char& output ) = 0;
 public:
@@ -95,7 +95,7 @@ public:
     virtual bool        ReadCompressed              ( int& output ) = 0;
     virtual bool        ReadCompressed              ( unsigned long& output ) = 0;
     virtual bool        ReadCompressed              ( long& output ) = 0;
-private:    // Float functions not used for some reason
+private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
 public:
@@ -110,9 +110,10 @@ public:
                                                       float &m10, float &m11, float &m12,
                                                       float &m20, float &m21, float &m22
                                                     ) = 0;
-
+    // GetNumberOfBitsUsed appears to round up to the next byte boundary, when reading
     virtual int         GetNumberOfBitsUsed         ( void ) const = 0;
     virtual int         GetNumberOfBytesUsed        ( void ) const = 0;
+    // GetNumberOfUnreadBits appears to round up to the next byte boundary, when reading
     virtual int         GetNumberOfUnreadBits       ( void ) const = 0;
 
     // Helper template methods that are not actually part
@@ -130,6 +131,7 @@ public:
         return ReadBits ( reinterpret_cast < char * > ( output ), numbits );
     }
 
+    // Read a single bit
     bool                ReadBit                     ( bool& output )
     {
         unsigned char ucTemp = 0;

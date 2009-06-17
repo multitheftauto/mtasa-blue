@@ -209,5 +209,6 @@
       <right name="function.xmlLoadFile" access="true"/>
       <right name="function.startResource" access="true"/>
       <right name="function.stopResource" access="true"/>
+      <right name="function.restartResource" access="true"/>
     </acl>
 </acl>
