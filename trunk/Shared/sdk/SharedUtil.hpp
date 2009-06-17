@@ -91,3 +91,27 @@ double SharedUtil::GetSecondCount ( void )
 {
     return GetTickCount64_ () * ( 1 / 1000.0 );
 }
+
+
+// Split into parts
+void SString::Split ( const SString& strDelim, std::vector < SString >& outResult ) const
+{
+    outResult.clear ();
+    int iStartPoint = 0;
+
+    while ( true )
+    {
+        int iPos = find ( strDelim, iStartPoint );
+
+        if ( iPos == npos )
+        {
+            if ( iStartPoint < length () )
+                outResult.push_back ( substr ( iStartPoint ) );
+            return;
+        }
+
+        outResult.push_back ( substr ( iStartPoint, iPos - iStartPoint ) );
+
+        iStartPoint = iPos + strDelim.length ();
+    }
+}

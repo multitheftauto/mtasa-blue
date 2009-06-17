@@ -85,8 +85,19 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 		uiResourceNameLength = strlen ( szQueryResource ) + 1;
 	}
 
+    // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
+    SString strSetting = szSetting;
+    SString strAttribute = "value";
+    vector < SString > Result;
+    strSetting.Split ( ".", Result );
+    if ( Result.size () == 3 && Result[2].length () )
+    {
+        strSetting = Result[0] + "." + Result[1];
+        strAttribute = Result[2];
+    }
+
 	// Get the actual name from the specified setting
-	if ( !(szQueryName = GetName ( szSetting, uiResourceNameLength ) ) ) {
+	if ( !(szQueryName = GetName ( strSetting, uiResourceNameLength ) ) ) {
 		// No name specified, so make sure we eventually return the entire node
 		bDeleteNode = true;
 	}
@@ -97,7 +108,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
 		unsigned int uiResourceNameLength = 0;
 
 		CXMLAttribute* pName	= pNode->GetAttributes ().Find ( "name" );
-		CXMLAttribute* pValue	= pNode->GetAttributes ().Find ( "value" );
+		CXMLAttribute* pValue	= pNode->GetAttributes ().Find ( strAttribute );
 
 		// Check if both attibutes exist (otherwise ignore the entry)
 		if ( pName && pValue ) {
