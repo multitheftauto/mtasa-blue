@@ -2046,9 +2046,9 @@ bool CStaticFunctionDefinitions::GetVehicleGravity ( CClientVehicle& Vehicle, CV
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA & color )
 {
-    Vehicle.GetHeadLightColor ( ucR, ucG, ucB );
+    color = Vehicle.GetHeadLightColor ();
     return true;
 }
 
@@ -2640,15 +2640,15 @@ bool CStaticFunctionDefinitions::SetVehicleGravity ( CClientEntity& Entity, CVec
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, RGBA color )
 {
-    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, ucR, ucG, ucB );
+    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, color );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-        Vehicle.SetHeadLightColor ( ucR, ucG, ucB );
+        Vehicle.SetHeadLightColor ( color );
         return true;
     }
     

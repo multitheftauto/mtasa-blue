@@ -27,6 +27,12 @@ class CVehicle;
 #define DEFAULT_VEHICLE_HEALTH 1000
 #define MAX_VEHICLE_HEALTH 10000
 
+typedef DWORD RGBA;
+typedef DWORD ARGB;
+#define COLOR_ARGB(a,r,g,b) \
+    ((ARGB)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+#define COLOR_RGBA(r,g,b,a) (RGBA)COLOR_ARGB(a,r,g,b)
+
 enum eWheelStatus {
 	DT_WHEEL_INTACT=0,
 	DT_WHEEL_BURST,
@@ -235,8 +241,8 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
-    inline void                     GetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB ) { ucR = m_ucHeadLightR, ucG = m_ucHeadLightG, ucB = m_ucHeadLightB; }
-    inline void                     SetHeadLightColor       ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB ) { m_ucHeadLightR = ucR, m_ucHeadLightG = ucG, m_ucHeadLightB = ucB; }
+    inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
+    inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
 
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
@@ -300,7 +306,7 @@ private:
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
     CPlayer *                       m_pJackingPlayer;
-    unsigned char                   m_ucHeadLightR, m_ucHeadLightG, m_ucHeadLightB;
+    RGBA                            m_HeadLightColor;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

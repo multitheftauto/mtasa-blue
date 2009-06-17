@@ -392,6 +392,14 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\vehicle_gravity.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vehicle_lights.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

@@ -2478,7 +2478,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( ucHeadLightR );
                     bitStream.Read ( ucHeadLightG );
                     bitStream.Read ( ucHeadLightB );
-                    pVehicle->SetHeadLightColor ( ucHeadLightR, ucHeadLightG, ucHeadLightB );
+                    RGBA headLightColor = COLOR_RGBA ( ucHeadLightR, ucHeadLightG, ucHeadLightB, 255 );
+                    pVehicle->SetHeadLightColor ( headLightColor );
 
                     // Set the matrix
                     pVehicle->SetPosition ( vecPosition );

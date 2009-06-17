@@ -3792,11 +3792,11 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, RGBA & color )
 {
     assert ( pVehicle );
     
-    pVehicle->GetHeadLightColor ( ucR, ucG, ucB );
+    color = pVehicle->GetHeadLightColor ();
     return true;
 }
 
@@ -4767,26 +4767,29 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CElement* pElement, float fSpee
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CElement* pElement, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CElement* pElement, RGBA color )
 {
     assert ( pElement );
-    RUN_CHILDREN SetVehicleHeadLightColor ( *iter, ucR, ucG, ucB );
+    RUN_CHILDREN SetVehicleHeadLightColor ( *iter, color );
 
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
-        unsigned char ucR_, ucG_, ucB_;
-        pVehicle->GetHeadLightColor ( ucR_, ucG_, ucB_ );
-        if ( ucR != ucR_ || ucG != ucG_ || ucB != ucB_ )
+        RGBA _color = pVehicle->GetHeadLightColor ();
+        if ( color != _color )
         {
-            pVehicle->SetHeadLightColor ( ucR, ucG, ucB );
+            pVehicle->SetHeadLightColor ( color );
+
+            unsigned char R = unsigned char ( color );
+            unsigned char G = unsigned char ( color >> 8 );
+            unsigned char B = unsigned char ( color >> 16 );
 
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
-            BitStream.pBitStream->Write ( ucR );
-            BitStream.pBitStream->Write ( ucG );
-            BitStream.pBitStream->Write ( ucB );
+            BitStream.pBitStream->Write ( R );
+            BitStream.pBitStream->Write ( G );
+            BitStream.pBitStream->Write ( B );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream ) );
 
             return true;
