@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        multiplayer_sa/vehicle_gravity.cpp
 *  PURPOSE:     vehicle gravity modification
-*  DEVELOPERS:  Mattthew Hinson <>
+*  DEVELOPERS:  arc_ <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

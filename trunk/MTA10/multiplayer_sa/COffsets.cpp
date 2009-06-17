@@ -72,9 +72,6 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay =                                  0x586650;
     CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask =                               0x67DABE;
     CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail =                                  0x6F8DBA;
-    CMultiplayerSA::HOOKPOS_CVehicle_SetupRender =                                          0x6D6512;
-    CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender =                                     0x6D0E3E;
-    CMultiplayerSA::HOOKPOS_CObject_Render =                                                0x59F1ED;
     CMultiplayerSA::HOOKPOS_EndWorldColors =                                                0x561795;
     CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList =                          0x563357;
     CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking =                            0x4C05B9;
