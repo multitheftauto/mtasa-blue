@@ -10805,8 +10805,18 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 		unsigned int uiIndex = 0;
 		bool bDeleteNode;
 
+        // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
+        SString strSetting = lua_tostring ( luaVM, 1 );
+        SString strAttribute = "value";
+        vector < SString > Result;
+        strSetting.Split ( ".", Result );
+        if ( Result.size () == 3 && Result[2].length () )
+        {
+            strAttribute = Result[2];
+        }
+
 		// Get the setting
-		CXMLNode *pSubNode, *pNode = g_pGame->GetSettings ()->Get ( pResource->GetName ().c_str (), lua_tostring ( luaVM, 1 ), bDeleteNode );
+		CXMLNode *pSubNode, *pNode = g_pGame->GetSettings ()->Get ( pResource->GetName ().c_str (), strSetting.c_str (), bDeleteNode );
 
 		// Only proceed if we have a valid node
 		if ( pNode ) {
@@ -10815,8 +10825,17 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 
 			// See if we need to return a table with single or multiple entries
 			if ( pNode->GetSubNodeCount () == 0 ) {
+				// See if required attribute exists
+                CXMLAttribute *pAttribute = pNode->GetAttributes().Find ( strAttribute.c_str () );
+                if ( !pAttribute )
+                {
+			        if ( bDeleteNode )
+				        delete pNode;
+	                lua_pushboolean ( luaVM, false );
+	                return 1;
+                }
 				// We only have a single entry for a specific setting, so output a string
-				char *szDataValue = const_cast < char* > ( pNode->GetAttributes().Find ( "value" )->GetValue ().c_str () );
+				char *szDataValue = const_cast < char* > ( pAttribute->GetValue ().c_str () );
 				if ( !Args.ReadFromJSONString ( szDataValue ) ) {
 					// No valid JSON? Parse as plain text
 					Args.PushString ( szDataValue );

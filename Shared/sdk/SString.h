@@ -19,6 +19,7 @@
 // Adds some functionality to the std::string class
 //
 #include <string>
+#include <vector>
 
 #ifdef WIN32
     #define va_copy(dest, orig) (dest) = (orig)
@@ -184,4 +185,8 @@ public:
 
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
+
+    // Split into parts
+    void        Split               ( const SString& strDelim, std::vector < SString >& outResult ) const;
+
 };
