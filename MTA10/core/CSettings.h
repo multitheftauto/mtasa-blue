@@ -9,6 +9,7 @@
 *               Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Marcus Bauer <mabako@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -19,7 +20,12 @@ class CSettings;
 #ifndef __CSETTINGS_H
 #define __CSETTINGS_H
 
+#include <core/CCoreInterface.h>
 #include "CMainMenu.h"
+#include "CCore.h"
+
+#define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
+#define CHAT_PRESETS_ROOT             "chatboxpresets"
 
 struct SKeyBindSection
 {
@@ -61,12 +67,22 @@ struct SKeyBindSection
     class CGUIListItem * headerItem;
 };
 
+class CColor;
 
 class CSettings
 {
 	friend class CCore;
 
-    public:
+    typedef enum ChatColorType
+    {
+        CHAT_COLOR_BG = 0,
+        CHAT_COLOR_TEXT,
+        CHAT_COLOR_INPUT_BG,
+        CHAT_COLOR_INPUT_TEXT,
+        CHAT_COLOR_MAX
+    };
+
+public:
                         CSettings               ( void );
                         ~CSettings              ( void );
 
@@ -152,6 +168,27 @@ protected:
     CGUIRadioButton*    m_pStandardControls;
     CGUIRadioButton*    m_pClassicControls;
 
+    CGUIComboBox*       m_pChatPresets;
+    CGUIButton*         m_pChatLoadPreset;
+
+    CGUIScrollBar*      m_pChatRed          [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatGreen        [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatBlue         [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatAlpha        [ ChatColorType::CHAT_COLOR_MAX ];
+
+    CGUIScrollPane*     m_pPaneChatFont;
+    CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
+
+    CGUIEdit*           m_pChatLines;
+    CGUIEdit*           m_pChatScaleX;
+    CGUIEdit*           m_pChatScaleY;
+    CGUIEdit*           m_pChatWidth;
+
+    CGUICheckBox*       m_pChatCssBackground;
+    CGUICheckBox*       m_pChatCssText;
+    CGUIEdit*           m_pChatLineLife;
+    CGUIEdit*           m_pChatLineFadeout;
+
     bool			    OnJoypadTextChanged	    ( CGUIElement* pElement );
 	bool			    OnAxisSelectClick       ( CGUIElement* pElement );
 	bool			    OnJoypadDefaultClick    ( CGUIElement* pElement );
@@ -165,11 +202,23 @@ protected:
 
 	bool			    OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
+    bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
+
 private:
 	void			    ProcessKeyBinds			( void );
 	void			    ProcessJoypad			( void );
 
     void                SaveData                ( void );
+
+    void                LoadChatPresets         ( void );
+    void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );
+    void                LoadChatColorFromCVar   ( ChatColorType eType, const char* szCVar );
+    void                LoadChatColorFromString ( ChatColorType eType, std::string strColor );
+    void                SaveChatColor           ( ChatColorType eType, const char* szCVar );
+    CColor              GetChatColorValues      ( ChatColorType eType );
+    void                SetChatColorValues      ( ChatColorType eType, CColor pColor );
+    int                 GetMilliseconds         ( CGUIEdit* pEdit );
+    void                SetMilliseconds         ( CGUIEdit* pEdit, int milliseconds );
 
 	unsigned int	    m_uiCaptureKey;
     bool                m_bCaptureKey;
