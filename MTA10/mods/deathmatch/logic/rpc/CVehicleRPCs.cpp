@@ -603,7 +603,8 @@ void CVehicleRPCs::SetVehicleHeadLightColor ( NetBitStreamInterface& bitStream )
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetHeadLightColor ( ucR, ucG, ucB );
+            RGBA color = COLOR_RGBA ( ucR, ucG, ucB, 255 );
+            pVehicle->SetHeadLightColor ( color );
         }
     }
 }

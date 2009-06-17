@@ -129,7 +129,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
-    m_ucHeadLightR = 255, m_ucHeadLightG = 255, m_ucHeadLightB = 255;
+    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -2011,7 +2011,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
-        m_pVehicle->SetHeadLightColor ( m_ucHeadLightR, m_ucHeadLightG, m_ucHeadLightB );
+        m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
 
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
@@ -2954,21 +2954,21 @@ void CClientVehicle::SetGravity ( const CVector& vecGravity )
 }
 
 
-void CClientVehicle::GetHeadLightColor ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+RGBA CClientVehicle::GetHeadLightColor ( void )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->GetHeadLightColor ( ucR, ucG, ucB );
+        return m_pVehicle->GetHeadLightColor ();
     }
-    else ucR = m_ucHeadLightR, ucG = m_ucHeadLightG, ucB = m_ucHeadLightB;
+    return m_HeadLightColor;
 }
 
 
-void CClientVehicle::SetHeadLightColor ( unsigned char & ucR, unsigned char & ucG, unsigned char & ucB )
+void CClientVehicle::SetHeadLightColor ( RGBA color )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->SetHeadLightColor ( ucR, ucG, ucB );
+        m_pVehicle->SetHeadLightColor ( color );
     }
-    m_ucHeadLightR = ucR, m_ucHeadLightG = ucG, m_ucHeadLightB = ucB;
+    m_HeadLightColor = color;
 }

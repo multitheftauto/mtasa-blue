@@ -1204,12 +1204,16 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            unsigned char ucR, ucG, ucB;
-            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, ucR, ucG, ucB ) )
+            RGBA color;
+            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, color ) )
             {
-                lua_pushnumber ( luaVM, ucR );
-                lua_pushnumber ( luaVM, ucG );
-                lua_pushnumber ( luaVM, ucB );
+                unsigned char R = unsigned char ( color );
+                unsigned char G = unsigned char ( color >> 8 );
+                unsigned char B = unsigned char ( color >> 16 );
+
+                lua_pushnumber ( luaVM, R );
+                lua_pushnumber ( luaVM, G );
+                lua_pushnumber ( luaVM, B );
                 return 3;
             }
         }
@@ -2186,11 +2190,12 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            unsigned char ucR = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucG = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char ucB = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            unsigned char R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            unsigned char G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned char B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            RGBA color = COLOR_RGBA ( R, G, B, 255 );
 
-            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, ucR, ucG, ucB ) )
+            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
