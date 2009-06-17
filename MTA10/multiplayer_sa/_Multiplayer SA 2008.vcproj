@@ -346,6 +346,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\entity_alpha.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fx_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="multiplayer_hooksystem.cpp"
 				>
 			</File>

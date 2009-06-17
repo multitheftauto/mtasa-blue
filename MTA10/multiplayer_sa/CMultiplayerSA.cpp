@@ -41,9 +41,6 @@ unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
 unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
 unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
-unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
@@ -57,11 +54,6 @@ unsigned long CMultiplayerSA::ADDR_GotFocus;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
-#define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
-#define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
-
-DWORD RETURN_FxManager_CreateFxSystem =                     0x4A9BE8;
-DWORD RETURN_FxManager_DestroyFxSystem =                    0x4A9817;
 
 #define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
@@ -87,7 +79,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define CALL_CGame_Process                                  0x53E981
 
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
-DWORD FUNC_CEntity_Render =                                 0x534310;
 
 #define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
 
@@ -101,7 +92,6 @@ bool bHideRadar;
 bool bHasProcessedScript;
 float fX, fY, fZ;
 DWORD RoadSignFixTemp;
-DWORD dwEAEG = 0;
 bool m_bExplosionsDisabled;
 float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
@@ -160,16 +150,11 @@ void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CBike_ProcessRiderAnims();
-void HOOK_FxManager_CreateFxSystem ();
-void HOOK_FxManager_DestroyFxSystem ();
 void HOOK_CCam_ProcessFixed ();
 void HOOK_Render3DStuff ();
 void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 void HOOK_CPed_IsPlayer ();
 void HOOK_CTrain_ProcessControl_Derail ();
-void HOOK_CVehicle_SetupRender ();
-void HOOK_CVehicle_ResetAfterRender();
-void HOOK_CObject_Render ();
 void HOOK_EndWorldColors ();
 void HOOK_CGame_Process ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
@@ -179,6 +164,8 @@ void HOOK_CAnimManager_BlendAnimation ();
 
 void vehicle_lights_init ();
 void vehicle_gravity_init ();
+void entity_alpha_init ();
+void fx_manager_init ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -219,6 +206,8 @@ void CMultiplayerSA::InitHooks()
     InitShotsyncHooks();
     vehicle_lights_init ();
     vehicle_gravity_init ();
+    entity_alpha_init ();
+    fx_manager_init ();
 
 	bSetCenterOfWorld = false;
 	bHasProcessedScript = false;
@@ -248,16 +237,11 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
     HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
-    HookInstall(HOOKPOS_FxManager_CreateFxSystem, (DWORD)HOOK_FxManager_CreateFxSystem, 8);
-    HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, 7);
     HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 7);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
-    HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
-    HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
-    HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
-	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
+    HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
@@ -373,12 +357,7 @@ void CMultiplayerSA::InitHooks()
     // Disable MakePlayerSafe
 	*(BYTE *)0x56E870 = 0xC2;
 	*(BYTE *)0x56E871 = 0x08;
-	*(BYTE *)0x56E872 = 0x00;
-
-    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
-    // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
-    // so vehicles that catch fire (upside down) then delete them, repeating a few times.
-    memset((void*)0x4DCF87,0x90,6);
+	*(BYTE *)0x56E872 = 0x00;    
     
     /*
     // DISABLE CPed__RemoveBodyPart
@@ -735,13 +714,7 @@ void CMultiplayerSA::InitHooks()
     
     // Stop CTaskSimpleCarDrive::ProcessPed from exiting passengers with CTaskComplexSequence (some timer check)
     *(BYTE *)0x644C18 = 0x90;
-	*(BYTE *)0x644C19 = 0xE9;
-
-    // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
-    memset ( (void*)0x5E8E84, 0x90, 5 );
-
-    // Stop CVehicle::UpdateClumpAlpha from calling CVisibilityPlugins::SetClumpAlpha
-    memset ( (void*)0x6D29CB, 0x90, 5 );
+	*(BYTE *)0x644C19 = 0xE9;      
 
     // Disable CVehicle::DoDriveByShootings
     memset ( (void*)0x741FD0, 0x90, 3 );
@@ -815,35 +788,6 @@ void CMultiplayerSA::InitHooks()
     memset ( (void *)0x58FC3E, 0x90, 14 );
 }
 
-
-// Used to store copied pointers for explosions in the FxSystem
-
-std::list < DWORD* > Pointers_FxSystem;
-
-void AddFxSystemPointer ( DWORD* pPointer )
-{
-    Pointers_FxSystem.push_front ( pPointer );
-}
-
-
-void RemoveFxSystemPointer ( DWORD* pPointer )
-{
-    // Look through our list for the pointer
-    std::list < DWORD* > ::iterator iter = Pointers_FxSystem.begin ();
-    for ( ; iter != Pointers_FxSystem.end (); iter++ )
-    {
-        // It exists in our list?
-        if ( *iter == pPointer )
-        {
-            // Remove it from the list over our copied matrices
-            Pointers_FxSystem.erase ( iter );
-
-            // Delete the pointer itself
-            free ( pPointer );
-            return;
-        }
-    }
-}
 
 CRemoteDataStorage * CMultiplayerSA::CreateRemoteDataStorage ()
 {
@@ -1741,101 +1685,6 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 }
 
 
-char* szCreateFxSystem_ExplosionType = 0;
-DWORD* pCreateFxSystem_Matrix = 0;
-DWORD* pNewCreateFxSystem_Matrix = 0;
-
-
-void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
-{
-    _asm
-    {
-        // Store the explosion type
-        mov eax, [esp+4]
-        mov szCreateFxSystem_ExplosionType, eax
-
-        // Store the vector
-        mov eax, [esp+12]
-        mov pCreateFxSystem_Matrix, eax
-
-        // Store all the registers on the stack
-        pushad
-    }
-
-    // If we got a matrix and it is an explosion type?
-    if ( pCreateFxSystem_Matrix != 0 &&
-         strncmp ( szCreateFxSystem_ExplosionType, "explosion", 9 ) == 0 )
-    {
-        // Copy the matrix so we don't crash if the owner of this matrix is deleted
-        pNewCreateFxSystem_Matrix = (DWORD*) malloc ( 64 );
-        memcpy ( pNewCreateFxSystem_Matrix, pCreateFxSystem_Matrix, 64 );
-
-        // Add it to the list over FxSystem matrices we've copied
-        AddFxSystemPointer ( pNewCreateFxSystem_Matrix );
-    }
-    else
-    {
-        // Use the same pointer. This is not an explosion or it is 0.
-        pNewCreateFxSystem_Matrix = pCreateFxSystem_Matrix;
-    }
-
-    _asm 
-    {
-        // Restore the registers
-        popad
-
-        // Put the new vector back onto the stack
-        mov         eax, pNewCreateFxSystem_Matrix
-        mov         [esp+12], eax
-
-        // The original code we replaced
-        mov         eax, [esp+10]
-        mov         edx, [esp+8]
-
-		// Jump back to the rest of the function we hooked
-        jmp         RETURN_FxManager_CreateFxSystem
-    }
-}
-
-
-DWORD dwDestroyFxSystem_Pointer = 0;
-DWORD* pDestroyFxSystem_Matrix = 0;
-
-void _declspec(naked) HOOK_FxManager_DestroyFxSystem ()
-{
-    _asm
-    {
-        // Grab the FxSystem that's being destroyed
-        mov eax, [esp+4]
-        mov dwDestroyFxSystem_Pointer, eax
-
-        // Store all the registers on the stack
-        pushad
-    }
-
-    // Grab the matrix pointer in it
-    pDestroyFxSystem_Matrix = *( (DWORD**) ( dwDestroyFxSystem_Pointer + 12 ) );
-
-    // Delete it if it's in our list
-    RemoveFxSystemPointer ( pDestroyFxSystem_Matrix );
-
-    _asm 
-    {
-        // Restore the registers
-        popad
-
-        // The original code we replaced
-        push        ecx  
-        push        ebx  
-        push        edi  
-        mov         edi, [esp+10h] 
-
-		// Jump back to the rest of the function we hooked
-        jmp         RETURN_FxManager_DestroyFxSystem
-    }
-}
-
-
 void CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
@@ -2140,227 +1989,6 @@ train_would_derail:
     }
 }
 
-
-/**
- ** Per-entity alpha
- **/
-static DWORD dwAlphaEntity = 0;
-static bool bEntityHasAlpha = false;
-static unsigned char ucCurrentAlpha [ 1024 ];
-static unsigned char* pCurAlpha = ucCurrentAlpha;
-
-static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha )
-{
-    if ( dwEntity )
-    {
-        // Alpha setting of SetRwObjectAlpha function is done by
-        // iterating all materials of a clump and its atoms, and
-        // calling a given callback. We temporarily overwrite that
-        // callback with our own callback and then restore it.
-        *(DWORD *)(0x5332A2) = dwCallback;
-        *(DWORD *)(0x5332F3) = dwCallback;
-
-        // Call SetRwObjectAlpha
-        DWORD dwFunc = FUNC_SetRwObjectAlpha;
-        _asm
-        {
-            mov     ecx, dwEntity
-            push    dwAlpha
-            call    dwFunc
-        }
-
-        // Restore the GTA callbacks
-        *(DWORD *)(0x5332A2) = (DWORD)(0x533280);
-        *(DWORD *)(0x5332F3) = (DWORD)(0x533280);
-    }
-}
-
-static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
-{
-    *pCurAlpha = pMaterial->color.a;
-    pCurAlpha++;
-
-    return pMaterial;
-}
-static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
-{
-    pMaterial->color.a = static_cast < unsigned char > ( (float)(pMaterial->color.a) * (float)ucAlpha / 255.0f );
-
-    return pMaterial;
-}
-static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
-{
-    pMaterial->color.a = *pCurAlpha;
-    pCurAlpha++;
-
-    return pMaterial;
-}
-
-static void GetAlphaAndSetNewValues ( unsigned char ucAlpha )
-{
-    if ( ucAlpha < 255 )
-    {
-        bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, ucAlpha );
-    }
-    else
-        bEntityHasAlpha = false;
-}
-static void RestoreAlphaValues ()
-{
-    if ( bEntityHasAlpha )
-    {
-        pCurAlpha = ucCurrentAlpha;
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_RestoreAlphaValues, 0 );
-    }
-}
-
-
-/**
- ** Vehicles
- **/
-static RpAtomic* CVehicle_EAEG ( RpAtomic* pAtomic, void* )
-{
-    RwFrame* pFrame = ((RwFrame*)(((RwObject *)(pAtomic))->parent));
-    if ( pFrame )
-    {
-        switch ( pFrame->szName[0] )
-        {
-            case '\0': case 'h': break;
-            default:
-                DWORD dwFunc = (DWORD)0x533290;
-                DWORD dwAtomic = (DWORD)pAtomic;
-                _asm
-                {
-                    push    0
-                    push    dwAtomic
-                    call    dwFunc
-                    add     esp, 0x8
-                }
-        }
-    }
-
-    return pAtomic;
-}
-
-static void SetVehicleAlpha ( )
-{
-    CVehicleSAInterface* pInterface = ((CVehicleSAInterface *)dwAlphaEntity);
-    unsigned char ucAlpha = pInterface->m_pVehicle->GetAlpha ();
-
-    if ( ucAlpha < 255 )
-        GetAlphaAndSetNewValues ( ucAlpha );
-    else if ( dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A )
-    {
-        bEntityHasAlpha = true;
-        pCurAlpha = ucCurrentAlpha;
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
-        *(DWORD *)(0x5332D6) = (DWORD)CVehicle_EAEG;
-        SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );
-        *(DWORD *)(0x5332D6) = 0x533290;
-    }
-    else
-        bEntityHasAlpha = false;
-}
-
-static DWORD dwCVehicle_SetupRender_ret = 0x6D6517;
-void _declspec(naked) HOOK_CVehicle_SetupRender()
-{
-    _asm
-    {
-        mov     dwAlphaEntity, esi
-        pushad
-    }
-
-    SetVehicleAlpha ( );
-
-    _asm
-    {
-        popad
-        add     esp, 0x8
-        test    eax, eax
-        jmp     dwCVehicle_SetupRender_ret
-    }
-}
-
-static DWORD dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
-void _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
-{
-    _asm
-    {
-        pushad
-    }
-
-    RestoreAlphaValues ();
-
-    _asm
-    {
-        popad
-        add     esp, 0x0C
-        test    eax, eax
-        jmp     dwCVehicle_ResetAfterRender_ret
-    }
-}
-
-
-/**
- ** Objects
- **/
-static void SetObjectAlpha ()
-{
-    bEntityHasAlpha = false;
-
-    if ( dwAlphaEntity )
-    {
-        CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)dwAlphaEntity );
-        if ( pObject )
-        {
-            GetAlphaAndSetNewValues ( pObject->GetAlpha () );
-        }
-    }
-}
-
-DWORD dwCObjectRenderRet = 0;
-void _declspec(naked) HOOK_CObject_PostRender ()
-{
-    _asm
-    {
-        pushad
-    }
-
-    RestoreAlphaValues ( );
-
-    _asm
-    {
-        popad
-        mov         edx, dwCObjectRenderRet
-        jmp         edx
-    }
-}
-
-// Note: This hook is also called for world objects (light poles, wooden fences, etc).
-void _declspec(naked) HOOK_CObject_Render ()
-{
-    _asm
-    {
-        mov         dwAlphaEntity, ecx
-        pushad 
-    }
-
-    SetObjectAlpha ( );
-
-    _asm
-    {
-        popad
-        mov         edx, [esp]
-        mov         dwCObjectRenderRet, edx
-        mov         edx, HOOK_CObject_PostRender
-        mov         [esp], edx
-        jmp         FUNC_CEntity_Render
-    }
-}
 
 // Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
 void _declspec(naked) HOOK_EndWorldColors ()
@@ -2738,7 +2366,7 @@ void CMultiplayerSA::SetLocalPlayerGravity ( float fGravity )
     fLocalPlayerGravity = fGravity;
 }
 
-
+extern DWORD dwEAEG;
 void CMultiplayerSA::SetLocalStatValue ( unsigned short usStat, float fValue )
 {
     if ( usStat < MAX_FLOAT_STATS )
