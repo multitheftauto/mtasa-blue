@@ -33,8 +33,6 @@ unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld;
 unsigned long CMultiplayerSA::HOOKPOS_FindPlayerHeading;
 unsigned long CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller;
 unsigned long CMultiplayerSA::HOOKPOS_CHud_Draw_Caller;
-unsigned long CMultiplayerSA::HOOKPOS_CRunningScript_Process;
-unsigned long CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion;
 unsigned long CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
 unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
 unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
@@ -89,10 +87,7 @@ bool bSetCenterOfWorld;
 DWORD dwVectorPointer;
 bool bInStreamingUpdate;
 bool bHideRadar;
-bool bHasProcessedScript;
-float fX, fY, fZ;
 DWORD RoadSignFixTemp;
-bool m_bExplosionsDisabled;
 float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
 float fLocalPlayerCameraRotation = 0.0f;
@@ -128,7 +123,6 @@ GameProcessHandler* m_pGameProcessHandler = NULL;
 ChokingHandler* m_pChokingHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 
-ExplosionHandler * m_pExplosionHandler; // stores our handler
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
@@ -141,8 +135,6 @@ void HOOK_FindPlayerCentreOfWorld();
 void HOOK_FindPlayerHeading();
 void HOOK_CStreaming_Update_Caller();
 void HOOK_CHud_Draw_Caller();
-void HOOK_CRunningScript_Process();
-void HOOK_CExplosion_AddExplosion();
 void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
@@ -166,6 +158,8 @@ void vehicle_lights_init ();
 void vehicle_gravity_init ();
 void entity_alpha_init ();
 void fx_manager_init ();
+void explosion_init ();
+void running_script_init ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -186,9 +180,7 @@ CMultiplayerSA::CMultiplayerSA()
 	Population = new CPopulationSA;
     
     CRemoteDataSA::Init();
-
-    m_bExplosionsDisabled = false;
-	m_pExplosionHandler = NULL;
+    
     m_pBreakTowLinkHandler = NULL;
     m_pDrawRadarAreasHandler = NULL;
     m_pDamageHandler = NULL;
@@ -208,9 +200,10 @@ void CMultiplayerSA::InitHooks()
     vehicle_gravity_init ();
     entity_alpha_init ();
     fx_manager_init ();
+    explosion_init ();
+    running_script_init ();
 
-	bSetCenterOfWorld = false;
-	bHasProcessedScript = false;
+	bSetCenterOfWorld = false;	
 
 	//00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
 	//00442DC6     E9 32090000    JMP gta_sa_u.004436FD
@@ -229,9 +222,7 @@ void CMultiplayerSA::InitHooks()
 	HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
 	HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, 6);
 	HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
-	HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
-	HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
-	HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
+	HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);		
     HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
 	HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
@@ -950,6 +941,7 @@ void CMultiplayerSA::ResetWater ( void )
     *(BYTE *)0x7051D7 = 184;
 }
 
+extern bool m_bExplosionsDisabled;
 bool CMultiplayerSA::GetExplosionsDisabled ( void )
 {
     return m_bExplosionsDisabled;
@@ -962,7 +954,7 @@ void CMultiplayerSA::DisableExplosions ( bool bDisabled )
 }
 
 
-
+extern ExplosionHandler * m_pExplosionHandler;
 void CMultiplayerSA::SetExplosionHandler ( ExplosionHandler * pExplosionHandler )
 {
 	m_pExplosionHandler = pExplosionHandler;
@@ -1469,150 +1461,6 @@ void _declspec(naked) HOOK_CBike_ProcessRiderAnims ()
     }
 }
 
-eExplosionType explosionType;
-CVector vecExplosionLocation;
-DWORD explosionCreator = 0;
-DWORD explosionEntity = 0;
-
-bool CallExplosionHandler ( void )
-{
-    // Find out who the creator is
-    CEntity* pExplosionCreator = NULL;
-    CEntity* pExplodingEntity = NULL;
-    CEntitySAInterface* pInterface = (CEntitySAInterface*) explosionCreator;
-    CEntitySAInterface* pExplodingEntityInterface = (CEntitySAInterface*) explosionEntity;
-
-    if ( pInterface )
-    {
-        // See what type it is and grab the SA interface depending on type
-        switch ( pInterface->nType )
-        {
-            case ENTITY_TYPE_PED:
-            {
-                pExplosionCreator = pGameInterface->GetPools ()->GetPed ( (DWORD*) pInterface );
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                pExplosionCreator = pGameInterface->GetPools ()->GetVehicle ( (DWORD*) pInterface );
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                //pExplosionCreator = pGameInterface->GetPools ()->GetObject ( (DWORD*) pInterface );
-                break;
-            }
-        }
-    }
-
-    if ( pExplodingEntityInterface )
-    {
-        // See what type it is and grab the SA interface depending on type
-        switch ( pExplodingEntityInterface->nType )
-        {
-            case ENTITY_TYPE_PED:
-            {
-                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetPed ( (DWORD *) pExplodingEntityInterface ) );
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                pExplodingEntity = dynamic_cast < CEntity * > ( pGameInterface->GetPools ()->GetVehicle ( (DWORD *) pExplodingEntityInterface ) );
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                //pExplodingEntity = pGameInterface->GetPools ()->GetObject ( (CObjectSAInterface*) pExplodingEntityInterface );
-                break;
-            }
-        }
-    }
-
-	return m_pExplosionHandler ( pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType );
-}
-
-void _declspec(naked) HOOK_CExplosion_AddExplosion()
-{
-    _asm
-    {
-        // Check if explosions are disabled.
-        push        eax
-        mov         al, m_bExplosionsDisabled
-        test        al, al
-        pop         eax
-        jz          checkexplosionhandler
-
-        // If they are, just return now
-        retn
-        
-        // Check the explosion handler. So we can call it if it exists. Jump over the explosion
-        // handler part if we have none
-        checkexplosionhandler:
-        push        eax
-        mov         eax, m_pExplosionHandler
-        test        eax, eax
-        pop         eax
-        jz          noexplosionhandler
-
-        // Extract arguments....
-		push	esi
-		push	edi
-
-        mov     esi, [esp+12]
-        mov     explosionEntity, esi
-
-        mov     esi, [esp+16]
-        mov     explosionCreator, esi
-
-		mov		esi, [esp+20]
-		mov		explosionType, esi
-
-		lea		edi, vecExplosionLocation
-		mov		esi, esp
-		add		esi, 24 // 3 DWORDS and RETURN address and 2 STORED REGISTERS
-		movsd
-		movsd
-		movsd
-
-		pop		edi
-		pop		esi
-
-        // Store registers for calling this handler
-		pushad
-    }
-
-    // Call the explosion handler
-	if ( !CallExplosionHandler () )
-	{
-		_asm	popad
-		_asm	retn // if they return false from the handler, they don't want the explosion to show
-	}
-    else
-    {
-		_asm popad
-	}
-
-	_asm
-	{
-        noexplosionhandler:
-
-        // Replaced code
-		sub		esp, 0x1C
-		push	ebx
-		push	ebp
-		push	esi
-
-        // Return to the calling function and resume (do the explosion)
-		mov		edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
-		add		edx, 6
-		jmp		edx
-	}
-}
-
 
 void _declspec(naked) HOOK_CRealTimeShadowManager__ReturnRealTimeShadow()
 {
@@ -1822,134 +1670,6 @@ void _declspec(naked) HOOK_CPed_IsPlayer ()
             xor         al, al
             ret
         }
-    }
-}
-
-
-void CRunningScript_Process ( void )
-{
-	if ( !bHasProcessedScript )
-	{
-        CCamera * pCamera = pGameInterface->GetCamera();
-        pCamera->SetFadeColor ( 0, 0, 0 );
-        pCamera->Fade ( 0.0f, FADE_OUT );
-
-		DWORD dwFunc = 0x409D10; // RequestSpecialModel
-
-        char szModelName [64];
-		strcpy ( szModelName, "player" );
-		_asm
-		{
-			push	26
-			lea		eax, szModelName
-			push	eax
-			push	0
-			call	dwFunc
-			add		esp, 12
-		}
-
-		dwFunc = 0x40EA10; // load all requested models
-		_asm
-		{
-			push	1
-			call	dwFunc
-			add		esp, 4
-		}
-
-		dwFunc = 0x60D790; // setup player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
-		
-		/*dwFunc = 0x05E47E0; // set created by
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			mov		ecx, [edi]
-			push	2
-			call	dwFunc
-		}
-
-		dwFunc = 0x609520; // deactivate player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
-*/
-		//_asm int 3
-		dwFunc = 0x420B80; // set position
-		fX = 2488.562f;
-		fY = -1666.864f;
-		fZ = 12.8757f;
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			push	fZ
-			push	fY
-			push	fX
-			mov		ecx, [edi]
-			call	dwFunc
-		}
-		/*_asm int 3
-		dwFunc = 0x609540; // reactivate player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
-
-		dwFunc = 0x61A5A0; // CTask::operator new
-		_asm
-		{
-			push	28
-			call	dwFunc
-			add		esp, 4
-		}
-
-		dwFunc = 0x685750; // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
-		_asm
-		{
-			mov		ecx, eax
-			call	dwFunc
-		}
-
-		dwFunc = 0x681AF0; // set task
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			mov		edi, [edi]
-			mov		ecx, [edi+0x47C]
-			add		ecx, 4
-			push	0
-			push	4	
-			push	eax
-			call	dwFunc
-		}*/
-
-		
-		bHasProcessedScript = true;
-	}
-}
-
-void _declspec(naked) HOOK_CRunningScript_Process()
-{
-    _asm
-    {
-        pushad
-    }
-
-    CRunningScript_Process ();
-
-    _asm
-    {
-        popad
-	    retn
     }
 }
 

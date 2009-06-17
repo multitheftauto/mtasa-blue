@@ -38,8 +38,8 @@ void COffsetsMP::Initialize11 ( void )
     CMultiplayerSA::HOOKPOS_FindPlayerHeading =                                             0x56E8F0; // 1.01
     CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller =                                      0x53C3A9; // 1.01
     CMultiplayerSA::HOOKPOS_CHud_Draw_Caller =                                              0x53E99A; // 1.01
-    CMultiplayerSA::HOOKPOS_CRunningScript_Process =                                        0x469F80; // 1.01
-    CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion =                                       0x737280; // 1.01
+    //CMultiplayerSA::HOOKPOS_CRunningScript_Process =                                        0x469F80; // 1.01
+    //CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion =                                       0x737280; // 1.01
     CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow =                  0x70636B; // 1.01
     CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic =                      0x6FFB8B; // 1.01
     CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail =                                  0x6F8DBA; // 1.01???? ACHTUNG!
@@ -64,8 +64,6 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_FindPlayerHeading =                                             0x56E450;
     CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller =                                      0x53BF09;
     CMultiplayerSA::HOOKPOS_CHud_Draw_Caller =                                              0x53E4FA;
-    CMultiplayerSA::HOOKPOS_CRunningScript_Process =                                        0x469F00;
-    CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion =                                       0x736A50;
     CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow =                  0x705B3B;
     CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic =                      0x6FF35B;
     CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink =                                          0x6E0027;

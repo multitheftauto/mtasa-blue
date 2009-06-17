@@ -15,11 +15,11 @@
 #define HOOKPOS_CVehicle_DoVehicleLights                    0x6e1a60
 DWORD RETURN_CVehicle_DoVehicleLights =                     0x6e1a68;
 
-#define HOOKPOS_CAutomobile_Render                          0x6a2b10
-DWORD RETURN_CAutomobile_Render =                           0x6a2b18;
+#define HOOKPOS_CVehicle_DoHeadLightBeam_1                  0x6E0E20
+DWORD RETURN_CVehicle_DoHeadLightBeam_1 =                   0x6E0E26;
 
-#define HOOKPOS_CVehicle_DoHeadLightBeam                    0x6E13A4
-DWORD RETURN_CVehicle_DoHeadLightBeam =                     0x6E13AE;
+#define HOOKPOS_CVehicle_DoHeadLightBeam_2                  0x6E13A4
+DWORD RETURN_CVehicle_DoHeadLightBeam_2 =                   0x6E13AE;
 
 #define HOOKPOS_CVehicle_DoHeadLightEffect_1                0x6E0D01
 DWORD RETURN_CVehicle_DoHeadLightEffect_1 =                 0x6E0D09;
@@ -33,9 +33,9 @@ DWORD RETURN_CVehicle_DoHeadLightReflectionTwin =           0x6E1717;
 #define HOOKPOS_CVehicle_DoHeadLightReflectionSingle        0x6E15E2
 DWORD RETURN_CVehicle_DoHeadLightReflectionSingle =         0x6E15EA;
 
-void HOOK_CAutomobile_Render ();
 void HOOK_CVehicle_DoVehicleLights ();
-void HOOK_CVehicle_DoHeadLightBeam ();
+void HOOK_CVehicle_DoHeadLightBeam_1 ();
+void HOOK_CVehicle_DoHeadLightBeam_2 ();
 void HOOK_CVehicle_DoHeadLightEffect_1 ();
 void HOOK_CVehicle_DoHeadLightEffect_2 ();
 void HOOK_CVehicle_DoHeadLightReflectionTwin ();
@@ -44,8 +44,8 @@ void HOOK_CVehicle_DoHeadLightReflectionSingle ();
 void vehicle_lights_init ( void )
 {
     HookInstall(HOOKPOS_CVehicle_DoVehicleLights, (DWORD)HOOK_CVehicle_DoVehicleLights, 8 );
-    HookInstall(HOOKPOS_CAutomobile_Render, (DWORD)HOOK_CAutomobile_Render, 8 );
-    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam, (DWORD)HOOK_CVehicle_DoHeadLightBeam, 10 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam_1, (DWORD)HOOK_CVehicle_DoHeadLightBeam_1, 6 );
+    HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam_2, (DWORD)HOOK_CVehicle_DoHeadLightBeam_2, 10 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_1, (DWORD)HOOK_CVehicle_DoHeadLightEffect_1, 8 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightEffect_2, (DWORD)HOOK_CVehicle_DoHeadLightEffect_2, 8 );
     HookInstall(HOOKPOS_CVehicle_DoHeadLightReflectionTwin, (DWORD)HOOK_CVehicle_DoHeadLightReflectionTwin, 8 );
@@ -71,19 +71,6 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights ()
     }
 }
 
-
-CVehicleSAInterface * pRenderVehicleInterface = NULL;
-void _declspec(naked) HOOK_CAutomobile_Render ()
-{
-    _asm
-    {
-        mov     pRenderVehicleInterface, ecx
-        sub     esp,74h 
-        mov     eax,dword ptr ds:[00B7CB84h] 
-        jmp     RETURN_CAutomobile_Render
-    }
-}
-
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, float fG, float fB )
 {
@@ -103,12 +90,23 @@ void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, fl
     ulHeadLightB = (unsigned char) min ( 255.0f, ( (float)B / 255.0f ) * fB );
 }
 
+CVehicleSAInterface * pHeadLightBeamVehicleInterface = NULL;
+void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1 ()
+{
+    _asm
+    {
+        mov     pHeadLightBeamVehicleInterface, ecx
+        sub     esp, 94h
+        jmp     RETURN_CVehicle_DoHeadLightBeam_1
+    }        
+}
+
 RwVertex * pHeadLightVerts = NULL;
 unsigned int uiHeadLightNumVerts = 0;
 void CVehicle_DoHeadLightBeam ()
 {    
     // 255, 255, 255
-    CVehicle_GetHeadLightColor ( pRenderVehicleInterface, 255.0f, 255.0f, 255.0f );
+    CVehicle_GetHeadLightColor ( pHeadLightBeamVehicleInterface, 255.0f, 255.0f, 255.0f );
 
     for ( unsigned int i = 0 ; i < uiHeadLightNumVerts ; i++ )
     {        
@@ -117,22 +115,24 @@ void CVehicle_DoHeadLightBeam ()
     }
 }
 
-void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam ()
+void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2 ()
 {
     _asm
     {
         mov     eax, [esp]
         mov     pHeadLightVerts, eax
         mov     eax, [esp+4]
-        mov     uiHeadLightNumVerts, eax
+        mov     uiHeadLightNumVerts, eax 
+        pushad
     }
 
     CVehicle_DoHeadLightBeam ();
-    *(int *)0xC4B950 = 5;
     
     _asm
     {
-        jmp     RETURN_CVehicle_DoHeadLightBeam
+        popad
+        mov     dword ptr ds:[0C4B950h],5 
+        jmp     RETURN_CVehicle_DoHeadLightBeam_2
     }
 }
 
