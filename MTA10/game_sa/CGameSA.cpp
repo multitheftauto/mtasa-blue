@@ -96,6 +96,7 @@ CGameSA::CGameSA()
     this->m_pKeyGen                 = new CKeyGenSA;
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
+    this->m_pFxManager              = new CFxManagerSA ( (CFxManagerSAInterface *)CLASS_CFxManager );
     this->m_pWaterManager           = new CWaterManagerSA ();
 
 	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
@@ -120,6 +121,8 @@ CGameSA::~CGameSA ( void )
         delete reinterpret_cast < CWeaponInfoSA* > ( WeaponInfos [i] );
     }
 
+    delete reinterpret_cast < CWaterManagerSA * > ( m_pWaterManager );
+    delete reinterpret_cast < CFxManagerSA * > ( m_pFxManager );
     delete reinterpret_cast < CFxSA * > ( m_pFx );
     delete reinterpret_cast < CRopesSA * > ( m_pRopes );
     delete reinterpret_cast < CKeyGenSA * > ( m_pKeyGen );

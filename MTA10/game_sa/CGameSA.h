@@ -28,6 +28,7 @@
 #define		CLASS_CPad						0xB73458	// ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
 #define     CLASS_CFx                       0xa9ae00    // ##SA##
+#define     CLASS_CFxManager                0xa9ae80    // ##SA##
 
 #define     CLASS_RwCamera                  0xB6F97C
 
@@ -104,6 +105,7 @@ public:
     inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
+    inline CFxManager               * GetFxManager ()            { return m_pFxManager; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
 
     class CEventDamage              * GetEventDamage ( CEventDamageSAInterface * pInterface );
@@ -192,6 +194,7 @@ private:
     CKeyGen                 * m_pKeyGen;
     CRopes                  * m_pRopes;
     CFx                     * m_pFx;
+    CFxManager              * m_pFxManager;
     CWaterManager           * m_pWaterManager;
 
 	CPad					    * m_pPad;

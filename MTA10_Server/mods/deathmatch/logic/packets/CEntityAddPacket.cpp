@@ -333,9 +333,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Write headlight color
                     RGBA color = pVehicle->GetHeadLightColor ();
-                    unsigned char R = unsigned char ( color );
-                    unsigned char G = unsigned char ( color >> 8 );
-                    unsigned char B = unsigned char ( color >> 16 );
+                    unsigned char R = COLOR_RGBA_R ( color );
+                    unsigned char G = COLOR_RGBA_G ( color );
+                    unsigned char B = COLOR_RGBA_B ( color );
                     BitStream.Write ( R );
                     BitStream.Write ( G );
                     BitStream.Write ( B );

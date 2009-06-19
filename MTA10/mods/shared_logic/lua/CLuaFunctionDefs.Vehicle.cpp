@@ -1207,9 +1207,9 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
             RGBA color;
             if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, color ) )
             {
-                unsigned char R = unsigned char ( color );
-                unsigned char G = unsigned char ( color >> 8 );
-                unsigned char B = unsigned char ( color >> 16 );
+                unsigned char R = COLOR_RGBA_R ( color );
+                unsigned char G = COLOR_RGBA_G ( color );
+                unsigned char B = COLOR_RGBA_B ( color );
 
                 lua_pushnumber ( luaVM, R );
                 lua_pushnumber ( luaVM, G );

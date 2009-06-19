@@ -37,6 +37,7 @@ typedef void ( InRenderer ) ( void );
 #include "CFireManager.h"
 #include "CFont.h"
 #include "CFx.h"
+#include "CFxManager.h"
 #include "CGarages.h"
 #include "CHandlingManager.h"
 #include "CHud.h"
@@ -124,6 +125,7 @@ public:
     virtual CKeyGen             * GetKeyGen () = 0;
     virtual CRopes              * GetRopes () = 0;
     virtual CFx                 * GetFx () = 0;
+    virtual CFxManager          * GetFxManager () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
 
     virtual class CEventDamage  * GetEventDamage ( class CEventDamageSAInterface * pInterface ) = 0;

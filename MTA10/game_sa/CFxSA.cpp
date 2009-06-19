@@ -12,6 +12,21 @@
 
 #include "StdInc.h"
 
+void CFxSA::CreateMatFromVec ( RwMatrix * pMatrix, CVector * pvecPosition, CVector * pvecLookAt )
+{
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CFx_CreateMatFromVec;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    pvecLookAt
+        push    pvecPosition
+        push    pMatrix
+        call    dwFunc
+    }
+}
+
+
 void CFxSA::AddBlood ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness )
 {
     CVector * pvecPosition = &vecPosition;
