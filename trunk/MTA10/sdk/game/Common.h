@@ -20,12 +20,16 @@ typedef DWORD ARGB;
 typedef DWORD ABGR;
 
 #define COLOR_ARGB(a,r,g,b) \
-    ((ARGB)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-#define COLOR_RGBA(r,g,b,a) (RGBA)COLOR_ARGB(a,r,g,b)
+    (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+#define COLOR_RGBA(r,g,b,a) COLOR_ARGB(r,g,b,a)
+#define COLOR_ABGR(a,b,g,r) COLOR_ARGB(a,b,g,r)
+#define COLOR_BGRA(b,g,r,a) COLOR_ARGB(b,g,r,a)
 
-#define COLOR_ABGR(a,b,g,r) \
-    ((ABGR)((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-#define COLOR_BGRA(b,g,r,a) (BGRA)COLOR_ARGB(a,b,g,r)
+#define COLOR_RGBA_R(color) unsigned char ( color >> 24 )
+#define COLOR_RGBA_G(color) unsigned char ( color >> 16 );
+#define COLOR_RGBA_B(color) unsigned char ( color >> 8 );
+#define COLOR_RGBA_A(color) unsigned char ( color );
+#define COLOR_ARGB_A(color) COLOR_RGBA_R(color)
 
 #define MAX_VEHICLES                        110
 #define MAX_PEDS                            140

@@ -15,6 +15,7 @@
 
 #include <game/CFx.h>
 
+#define FUNC_CFx_CreateMatFromVec          0x49e950
 #define FUNC_CFx_AddBlood                  0x49eb00
 #define FUNC_CFx_AddWood                   0x49ee10
 #define FUNC_CFx_AddSparks                 0x49f040
@@ -44,7 +45,9 @@ public:
 class CFxSA : public CFx
 {
 public:
-                        CFxSA                  ( CFxSAInterface * pInterface )    { m_pInterface = pInterface; }
+                        CFxSA                   ( CFxSAInterface * pInterface )    { m_pInterface = pInterface; }
+
+    void                CreateMatFromVec        ( RwMatrix * pMatrix, CVector * pvecPosition, CVector * pvecLookAt );
 
     void                AddBlood                ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness );
     void                AddWood                 ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness );

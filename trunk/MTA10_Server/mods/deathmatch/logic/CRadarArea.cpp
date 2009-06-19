@@ -156,18 +156,6 @@ void CRadarArea::SetColor ( unsigned long ulColor )
 }
 
 
-// TODO: Move
-#define COLOR_ARGB(a,r,g,b) \
-    (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-#define COLOR_RGBA(r,g,b,a) \
-    (((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
-
-#define COLOR_ABGR(a,b,g,r) \
-    (((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-#define COLOR_BGRA(b,g,r,a) \
-    (((((b)&0xff)<<24)|(((g)&0xff)<<16)|(((r)&0xff)<<8)|((a)&0xff)))
-
-
 void CRadarArea::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
     SetColor ( COLOR_ABGR ( ucAlpha, ucBlue, ucGreen, ucRed ) );

@@ -487,7 +487,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxManagerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CFxSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxSystemSA.cpp"
 				>
 			</File>
 			<File
@@ -972,7 +980,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxManagerSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFxSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxSystemSA.h"
 				>
 			</File>
 			<File
