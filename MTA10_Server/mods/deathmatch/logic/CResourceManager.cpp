@@ -218,7 +218,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 void CResourceManager::Upgrade ( void )
 {
     CResourceChecker::BeginUpgradeMode();
-    Refresh ();
+    Refresh ( true );
     CResourceChecker::EndUpgradeMode();
 }
 
