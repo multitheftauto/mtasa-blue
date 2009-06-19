@@ -369,6 +369,11 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
 	bool bLocal = false;
     CServerList *pList;
 
+    // Save selected item details
+    CGUIListItem* pSelectedItem = m_pServerList [ Type ]->GetSelectedItem ();
+    int iSelectedItemRow        = m_pServerList [ Type ]->GetSelectedItemRow ();
+    int iSelectedItemColumn     = m_pServerList [ Type ]->GetSelectedItemColumn ();
+
     // Clear current list
     m_pServerList [ Type ]->Clear ();
 
@@ -399,6 +404,19 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
     */
     m_pServerList [ Type ]->ForceUpdate ();
     pList->SetUpdated ( false );
+
+    // Restore previous selection
+    if ( pSelectedItem )
+    {
+        // index to hColumn
+        int hColumn;
+        for( hColumn = 0 ; hColumn < 100 ; hColumn++ )
+        {
+            if ( m_pServerList [ Type ]->GetColumnIndex ( hColumn ) == iSelectedItemColumn )
+                break;            
+        }
+        m_pServerList [ Type ]->SetSelectedItem ( iSelectedItemRow, hColumn, true );
+    }
 }
 
 
