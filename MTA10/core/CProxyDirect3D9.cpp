@@ -161,6 +161,10 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         #undef MTA_FULLSCREEN_WINDOWED
     #endif
 
+    // Possible fix for 4348: Nightly "window" C++ error. Cross your fingers and close your eyes.
+    #define MTA_WINDOWED
+    #undef MTA_FULLSCREEN_WINDOWED
+
     #ifdef MTA_WINDOWED
         int x, y;
         x = GetSystemMetrics ( SM_CXSCREEN );
