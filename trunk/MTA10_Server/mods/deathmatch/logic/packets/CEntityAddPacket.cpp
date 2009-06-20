@@ -304,7 +304,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bool bIsLocked = pVehicle->IsLocked ();
                     bool bAreDoorsUndamageable = pVehicle->AreDoorsUndamageable ();
                     bool bDamageProof = pVehicle->IsDamageProof ();
-                    bool bFrozen = pVehicle->GetFrozen ();
+                    bool bFrozen = pVehicle->IsFrozen ();
                     bool bDerailed = pVehicle->IsDerailed ();
                     bool bIsDerailable = pVehicle->IsDerailable ();
                     bool bTrainDirection = pVehicle->GetTrainDirection ();
@@ -542,6 +542,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( pPed->HasJetPack () ) ucFlags |= 0x1;
                     if ( pPed->IsSyncable () ) ucFlags |= 0x2;
                     if ( pPed->IsHeadless () ) ucFlags |= 0x4;
+                    if ( pPed->IsFrozen () )   ucFlags |= 0x8;
                     BitStream.Write ( ucFlags );
 
                     // alpha

@@ -133,7 +133,7 @@ public:
     inline const CVehicleColor&     GetColor                ( void )                        { return m_Color; };
     inline void                     SetColor                ( const CVehicleColor& Color )  { m_Color = Color; };
 
-    inline bool                     GetFrozen               ( void )                        { return m_bIsFrozen; };
+    inline bool                     IsFrozen                ( void )                        { return m_bIsFrozen; };
     inline void                     SetFrozen               ( bool bIsFrozen )              { m_bIsFrozen = bIsFrozen; };
 
     inline const CVector&           GetPosition             ( void );

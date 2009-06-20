@@ -1146,7 +1146,6 @@ void CClientGame::ShowWepdata ( const char* szNick )
 void CClientGame::ShowPlayer ( const char* szNick )
 {
     m_pShowPlayer = m_pPlayerManager->Get ( szNick );
-	m_pShowPlayer->SetFrozen ( true );
 }
 
 
@@ -2486,7 +2485,8 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
                         "Aim: %f %f\n"
                         "Aim source: %f %f %f\n"
                         "Aim target: %f %f %f\n"
-                        "Driveby aim: %u\n",
+                        "Driveby aim: %u\n"
+                        "Frozen: %u\n",
                         vecPosition.fX, vecPosition.fY, vecPosition.fZ,
                         fRotation, fCameraRotation,
                         fHealth,
@@ -2511,7 +2511,9 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
                         fAimX, fAimY,
                         vecAimSource.fX, vecAimSource.fY, vecAimSource.fZ,
                         vecAimTarget.fX, vecAimTarget.fY, vecAimTarget.fZ,
-                        ucDrivebyAim );
+                        ucDrivebyAim,
+                        pPlayer->IsFrozen()
+                    );
 
     // Draw it
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFFFFFFF );
@@ -4027,6 +4029,9 @@ void CClientGame::ResetMapInfo ( void )
 
         // Headless state
         m_pLocalPlayer->SetHeadless ( false );
+
+        // Frozen state
+        m_pLocalPlayer->SetFrozen ( false );
 
         // Voice
         short sVoiceType, sVoiceID;
