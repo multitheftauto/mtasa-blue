@@ -79,9 +79,9 @@ void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, fl
     if ( pVehicle )
     {
         RGBA color = pVehicle->GetHeadLightColor ();
-        R = COLOR_R ( color );
-        G = COLOR_G ( color );
-        B = COLOR_B ( color );
+        R = COLOR_RGBA_R ( color );
+        G = COLOR_RGBA_G ( color );
+        B = COLOR_RGBA_B ( color );
     }
     
     // Scale our color values to the defaults ..looks dodgy but its needed!
@@ -110,7 +110,7 @@ void CVehicle_DoHeadLightBeam ()
 
     for ( unsigned int i = 0 ; i < uiHeadLightNumVerts ; i++ )
     {        
-        unsigned char alpha = COLOR_A ( pHeadLightVerts [ i ].color );
+        unsigned char alpha = COLOR_ARGB_A ( pHeadLightVerts [ i ].color );
         pHeadLightVerts [ i ].color = COLOR_ARGB ( alpha, ulHeadLightR, ulHeadLightG, ulHeadLightB );
     }
 }

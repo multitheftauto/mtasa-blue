@@ -287,7 +287,7 @@ int CLuaFunctionDefs::tocolor ( lua_State* luaVM )
             }
 
             // Make it into an unsigned long
-            unsigned long ulColor = COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha );
+            unsigned long ulColor = COLOR_ARGB ( ucAlpha, ucRed, ucGreen, ucBlue );
             lua_pushinteger ( luaVM, static_cast < lua_Integer > ( ulColor ) );
             return 1;
         }
