@@ -212,10 +212,10 @@ void CMarker::SetTarget ( const CVector* pTargetVector )
 
 void CMarker::GetColor ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A )
 {
-    R = static_cast < unsigned char > ( m_ulColor );
-    G = static_cast < unsigned char > ( m_ulColor >> 8 );
-    B = static_cast < unsigned char > ( m_ulColor >> 16 );
-    A = static_cast < unsigned char > ( m_ulColor >> 24 );
+    R = COLOR_RGBA_R ( m_ulColor );
+    G = COLOR_RGBA_G ( m_ulColor );
+    B = COLOR_RGBA_B ( m_ulColor );
+    A = COLOR_RGBA_A ( m_ulColor );
 }
 
 
@@ -281,17 +281,8 @@ void CMarker::SetColor ( unsigned long ulColor )
 
 void CMarker::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
-    // TODO: Move
-    #define COLOR_ARGB(a,r,g,b) \
-        (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-    #define COLOR_RGBA(r,g,b,a) COLOR_ARGB(a,r,g,b)
-
-    #define COLOR_ABGR(a,b,g,r) \
-        (((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-    #define COLOR_BGRA(b,g,r,a) COLOR_ARGB(a,b,g,r)
-
     // Set the new color
-    SetColor ( COLOR_ARGB ( ucAlpha, ucBlue, ucGreen, ucRed ) );
+    SetColor ( COLOR_RGBA ( ucAlpha, ucBlue, ucGreen, ucRed ) );
 }
 
 
