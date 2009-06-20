@@ -980,46 +980,6 @@
 					RelativePath=".\CExceptionInformation_Impl.h"
 					>
 				</File>
-				<File
-					RelativePath=".\client\CMainConfigInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CSerialManagerInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CSetCursorPosHookInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXML.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLAttribute.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLAttributes.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLCommon.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLErrorCodes.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLFile.h"
-					>
-				</File>
-				<File
-					RelativePath=".\client\CXMLNode.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -1084,7 +1044,7 @@
 					Name="net"
 					>
 					<File
-						RelativePath="..\..\..\MtasaDev\Shared\sdk\net\bitstream.h"
+						RelativePath="..\..\Shared\sdk\net\bitstream.h"
 						>
 					</File>
 					<File
@@ -1100,7 +1060,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\Shared\sdk\net\packetenums.h"
+						RelativePath="..\..\Shared\sdk\net\packetenums.h"
 						>
 					</File>
 				</Filter>
@@ -1108,443 +1068,443 @@
 					Name="game"
 					>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\C3DMarker.h"
+						RelativePath="..\..\MTA10\sdk\game\C3DMarker.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\C3DMarkers.h"
+						RelativePath="..\..\MTA10\sdk\game\C3DMarkers.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAERadioTrackManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CAERadioTrackManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlendAssocGroup.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlendAssocGroup.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlendAssociation.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlendAssociation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlendHierarchy.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlendHierarchy.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlendSequence.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlendSequence.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlendStaticAssociation.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlendStaticAssociation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimBlock.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimBlock.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAnimManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CAnimManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAudio.h"
+						RelativePath="..\..\MTA10\sdk\game\CAudio.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CAutomobile.h"
+						RelativePath="..\..\MTA10\sdk\game\CAutomobile.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CBike.h"
+						RelativePath="..\..\MTA10\sdk\game\CBike.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CBmx.h"
+						RelativePath="..\..\MTA10\sdk\game\CBmx.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CBoat.h"
+						RelativePath="..\..\MTA10\sdk\game\CBoat.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CBuilding.h"
+						RelativePath="..\..\MTA10\sdk\game\CBuilding.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCam.h"
+						RelativePath="..\..\MTA10\sdk\game\CCam.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCamera.h"
+						RelativePath="..\..\MTA10\sdk\game\CCamera.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCarEnterExit.h"
+						RelativePath="..\..\MTA10\sdk\game\CCarEnterExit.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCarGenerator.h"
+						RelativePath="..\..\MTA10\sdk\game\CCarGenerator.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCheckpoint.h"
+						RelativePath="..\..\MTA10\sdk\game\CCheckpoint.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCheckpoints.h"
+						RelativePath="..\..\MTA10\sdk\game\CCheckpoints.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCivilianPed.h"
+						RelativePath="..\..\MTA10\sdk\game\CCivilianPed.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CClock.h"
+						RelativePath="..\..\MTA10\sdk\game\CClock.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CColModel.h"
+						RelativePath="..\..\MTA10\sdk\game\CColModel.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CColPoint.h"
+						RelativePath="..\..\MTA10\sdk\game\CColPoint.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CControllerConfigManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CControllerConfigManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CCoronas.h"
+						RelativePath="..\..\MTA10\sdk\game\CCoronas.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CDamageManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CDamageManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CDoor.h"
+						RelativePath="..\..\MTA10\sdk\game\CDoor.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CEntity.h"
+						RelativePath="..\..\MTA10\sdk\game\CEntity.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CEvent.h"
+						RelativePath="..\..\MTA10\sdk\game\CEvent.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CEventDamage.h"
+						RelativePath="..\..\MTA10\sdk\game\CEventDamage.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CEventList.h"
+						RelativePath="..\..\MTA10\sdk\game\CEventList.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CExplosion.h"
+						RelativePath="..\..\MTA10\sdk\game\CExplosion.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CExplosionManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CExplosionManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CFire.h"
+						RelativePath="..\..\MTA10\sdk\game\CFire.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CFireManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CFireManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CFont.h"
+						RelativePath="..\..\MTA10\sdk\game\CFont.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CFx.h"
+						RelativePath="..\..\MTA10\sdk\game\CFx.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CGame.h"
+						RelativePath="..\..\MTA10\sdk\game\CGame.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CGarage.h"
+						RelativePath="..\..\MTA10\sdk\game\CGarage.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CGarages.h"
+						RelativePath="..\..\MTA10\sdk\game\CGarages.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CHandlingEntry.h"
+						RelativePath="..\..\MTA10\sdk\game\CHandlingEntry.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CHandlingManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CHandlingManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CHud.h"
+						RelativePath="..\..\MTA10\sdk\game\CHud.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CKeyGen.h"
+						RelativePath="..\..\MTA10\sdk\game\CKeyGen.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CMarker.h"
+						RelativePath="..\..\MTA10\sdk\game\CMarker.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CMenuManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CMenuManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CModelInfo.h"
+						RelativePath="..\..\MTA10\sdk\game\CModelInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CMonsterTruck.h"
+						RelativePath="..\..\MTA10\sdk\game\CMonsterTruck.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CObject.h"
+						RelativePath="..\..\MTA10\sdk\game\CObject.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\Common.h"
+						RelativePath="..\..\MTA10\sdk\game\Common.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPad.h"
+						RelativePath="..\..\MTA10\sdk\game\CPad.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CParticle.h"
+						RelativePath="..\..\MTA10\sdk\game\CParticle.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CParticleObject.h"
+						RelativePath="..\..\MTA10\sdk\game\CParticleObject.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CParticleSystemManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CParticleSystemManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPathFind.h"
+						RelativePath="..\..\MTA10\sdk\game\CPathFind.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPed.h"
+						RelativePath="..\..\MTA10\sdk\game\CPed.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPedIK.h"
+						RelativePath="..\..\MTA10\sdk\game\CPedIK.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPedIntelligence.h"
+						RelativePath="..\..\MTA10\sdk\game\CPedIntelligence.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPedModelInfo.h"
+						RelativePath="..\..\MTA10\sdk\game\CPedModelInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPhysical.h"
+						RelativePath="..\..\MTA10\sdk\game\CPhysical.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPickup.h"
+						RelativePath="..\..\MTA10\sdk\game\CPickup.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPickups.h"
+						RelativePath="..\..\MTA10\sdk\game\CPickups.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPlane.h"
+						RelativePath="..\..\MTA10\sdk\game\CPlane.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPlayerInfo.h"
+						RelativePath="..\..\MTA10\sdk\game\CPlayerInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPlayerPed.h"
+						RelativePath="..\..\MTA10\sdk\game\CPlayerPed.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPools.h"
+						RelativePath="..\..\MTA10\sdk\game\CPools.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CPopulation.h"
+						RelativePath="..\..\MTA10\sdk\game\CPopulation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CProjectile.h"
+						RelativePath="..\..\MTA10\sdk\game\CProjectile.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CProjectileInfo.h"
+						RelativePath="..\..\MTA10\sdk\game\CProjectileInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CQuadBike.h"
+						RelativePath="..\..\MTA10\sdk\game\CQuadBike.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRadar.h"
+						RelativePath="..\..\MTA10\sdk\game\CRadar.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRegisteredCorona.h"
+						RelativePath="..\..\MTA10\sdk\game\CRegisteredCorona.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRemote.h"
+						RelativePath="..\..\MTA10\sdk\game\CRemote.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRenderWare.h"
+						RelativePath="..\..\MTA10\sdk\game\CRenderWare.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRestart.h"
+						RelativePath="..\..\MTA10\sdk\game\CRestart.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CRopes.h"
+						RelativePath="..\..\MTA10\sdk\game\CRopes.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CSettings.h"
+						RelativePath="..\..\MTA10\sdk\game\CSettings.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CStats.h"
+						RelativePath="..\..\MTA10\sdk\game\CStats.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CStreaming.h"
+						RelativePath="..\..\MTA10\sdk\game\CStreaming.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CTaskManagementSystem.h"
+						RelativePath="..\..\MTA10\sdk\game\CTaskManagementSystem.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CTaskManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CTaskManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CTasks.h"
+						RelativePath="..\..\MTA10\sdk\game\CTasks.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CText.h"
+						RelativePath="..\..\MTA10\sdk\game\CText.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CTheCarGenerators.h"
+						RelativePath="..\..\MTA10\sdk\game\CTheCarGenerators.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CTrailer.h"
+						RelativePath="..\..\MTA10\sdk\game\CTrailer.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CVehicle.h"
+						RelativePath="..\..\MTA10\sdk\game\CVehicle.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CVehicleScanner.h"
+						RelativePath="..\..\MTA10\sdk\game\CVehicleScanner.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CVisibilityPlugins.h"
+						RelativePath="..\..\MTA10\sdk\game\CVisibilityPlugins.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWanted.h"
+						RelativePath="..\..\MTA10\sdk\game\CWanted.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWater.h"
+						RelativePath="..\..\MTA10\sdk\game\CWater.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWaterManager.h"
+						RelativePath="..\..\MTA10\sdk\game\CWaterManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWeapon.h"
+						RelativePath="..\..\MTA10\sdk\game\CWeapon.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWeaponInfo.h"
+						RelativePath="..\..\MTA10\sdk\game\CWeaponInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWeather.h"
+						RelativePath="..\..\MTA10\sdk\game\CWeather.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\CWorld.h"
+						RelativePath="..\..\MTA10\sdk\game\CWorld.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\RenderWare.h"
+						RelativePath="..\..\MTA10\sdk\game\RenderWare.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\Task.h"
+						RelativePath="..\..\MTA10\sdk\game\Task.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskAttack.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskAttack.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskBasic.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskBasic.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskCar.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskCar.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskCarAccessories.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskCarAccessories.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskGoTo.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskGoTo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskIK.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskIK.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskJumpFall.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskJumpFall.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskPhysicalResponse.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskPhysicalResponse.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskSecondary.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskSecondary.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\game\TaskTypes.h"
+						RelativePath="..\..\MTA10\sdk\game\TaskTypes.h"
 						>
 					</File>
 				</Filter>
@@ -1552,11 +1512,11 @@
 					Name="multiplayer"
 					>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\multiplayer\CMultiplayer.h"
+						RelativePath="..\..\MTA10\sdk\multiplayer\CMultiplayer.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\MtasaDev\MTA10\sdk\multiplayer\CPopulationMP.h"
+						RelativePath="..\..\MTA10\sdk\multiplayer\CPopulationMP.h"
 						>
 					</File>
 				</Filter>
