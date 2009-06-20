@@ -43,7 +43,6 @@ class CGUI;
 #define	CGUI_ICON_MESSAGEBOX_WARNING	"cgui\\images\\warning.png"
 #define	CGUI_ICON_MESSAGEBOX_ERROR		"cgui\\images\\error.png"
 #define CGUI_ICON_SERVER_PASSWORD		"cgui\\images\\locked.png"
-#define CGUI_IMAGE_BACKGROUND			"cgui\\images\\background.png"
 
 // Message box types
 enum CMessageBoxFlag

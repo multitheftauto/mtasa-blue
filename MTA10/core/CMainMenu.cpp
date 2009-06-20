@@ -71,7 +71,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
 	// Scene background image
     m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
-	m_pBackground->LoadFromFile ( CGUI_IMAGE_BACKGROUND );
+	m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
     m_pBackground->MoveToBack ();
     m_pBackground->SetVisible ( false );
 	m_pBackground->SetAlpha ( 0 );
