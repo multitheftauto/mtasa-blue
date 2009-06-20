@@ -133,6 +133,7 @@ public:
     static int      IsPedDoingGangDriveby               ( lua_State* luaVM );
     static int      IsPedOnFire                         ( lua_State* luaVM );
     static int      IsPedHeadless                       ( lua_State* luaVM );
+    static int      IsPedFrozen                         ( lua_State* luaVM );
     static int      GetPedOccupiedVehicle               ( lua_State* luaVM );
     static int      GetPedOccupiedVehicleSeat           ( lua_State* luaVM );
     static int      IsPedInVehicle                      ( lua_State* luaVM );
@@ -157,6 +158,7 @@ public:
     static int      SetPedWeaponSlot                    ( lua_State* luaVM );
     static int      SetPedOnFire                        ( lua_State* luaVM );
     static int      SetPedHeadless                      ( lua_State* luaVM );
+    static int      SetPedFrozen                        ( lua_State* luaVM );
 
     // Weapon give/take functions
     static int      GiveWeapon                          ( lua_State* luaVM );

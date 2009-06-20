@@ -97,21 +97,21 @@ double SharedUtil::GetSecondCount ( void )
 void SString::Split ( const SString& strDelim, std::vector < SString >& outResult ) const
 {
     outResult.clear ();
-    int iStartPoint = 0;
+    unsigned long ulStartPoint = 0;
 
     while ( true )
     {
-        int iPos = find ( strDelim, iStartPoint );
+        unsigned long ulPos = find ( strDelim, ulStartPoint );
 
-        if ( iPos == npos )
+        if ( ulPos == npos )
         {
-            if ( iStartPoint < length () )
-                outResult.push_back ( substr ( iStartPoint ) );
+            if ( ulStartPoint < length () )
+                outResult.push_back ( substr ( ulStartPoint ) );
             return;
         }
 
-        outResult.push_back ( substr ( iStartPoint, iPos - iStartPoint ) );
+        outResult.push_back ( substr ( ulStartPoint, ulPos - ulStartPoint ) );
 
-        iStartPoint = iPos + strDelim.length ();
+        ulStartPoint = ulPos + strDelim.length ();
     }
 }

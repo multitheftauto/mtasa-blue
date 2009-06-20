@@ -48,6 +48,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_bInWater = false;
     m_bOnGround = true;
     m_bIsPlayer = false;
+    m_bFrozen = false;
 
     m_pTasks = new CPlayerTasks;
 
