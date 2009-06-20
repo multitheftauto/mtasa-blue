@@ -24,7 +24,7 @@ typedef DWORD ARGB;
 #define COLOR_RGBA_R(color) unsigned char ( color >> 16 )
 #define COLOR_RGBA_G(color) unsigned char ( color >> 8 )
 #define COLOR_RGBA_B(color) unsigned char ( color )
-#define COLOR_ARGB_A(color) COLOR_RGBA_R(color)
+#define COLOR_ARGB_A(color) COLOR_RGBA_A(color)
 
 #define MAX_VEHICLES                        110
 #define MAX_PEDS                            140
