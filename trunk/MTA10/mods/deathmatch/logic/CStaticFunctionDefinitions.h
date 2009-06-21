@@ -274,7 +274,7 @@ public:
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
 
     // Camera set funcs
-    static bool                         SetCameraMatrix                     ( CVector & vecPosition, CVector & vecLookAt );
+    static bool                         SetCameraMatrix                     ( CVector & vecPosition, CVector * pvecLookAt );
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );

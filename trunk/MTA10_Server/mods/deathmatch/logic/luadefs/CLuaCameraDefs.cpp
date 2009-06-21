@@ -128,6 +128,7 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
         vecPosition.fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
         vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
         CVector vecLookAt;
+        CVector * pvecLookAt = NULL;;
         int iArgument5 = lua_type ( luaVM, 5 );
         int iArgument6 = lua_type ( luaVM, 6 );
         int iArgument7 = lua_type ( luaVM, 7 );
@@ -138,13 +139,14 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
             vecLookAt.fX = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
             vecLookAt.fY = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
             vecLookAt.fZ = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+            pvecLookAt = &vecLookAt;
         }
 
 
         // Verify the element
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetCameraMatrix ( pElement, vecPosition, vecLookAt ) )
+            if ( CStaticFunctionDefinitions::SetCameraMatrix ( pElement, vecPosition, pvecLookAt ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
