@@ -889,8 +889,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CClientEntity& Entity, uns
     RUN_CHILDREN SetElementInterior ( **iter, ucInterior, bSetPosition, vecPosition );
 
     Entity.SetInterior ( ucInterior );
-    if ( bSetPosition )
-        Entity.SetPosition ( vecPosition );
+    if ( bSetPosition ) Entity.SetPosition ( vecPosition );
 
     return true;
 }

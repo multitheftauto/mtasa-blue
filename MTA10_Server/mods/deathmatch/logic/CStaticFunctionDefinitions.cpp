@@ -1093,11 +1093,9 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
             BitStream.pBitStream->Write ( vecPosition.fZ );
         }
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_INTERIOR, *BitStream.pBitStream ) );
-
-        return true;
     }
 
-    return false;
+    return true;
 }
 
 
