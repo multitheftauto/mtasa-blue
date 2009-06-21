@@ -1684,8 +1684,6 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
             if ( weaponSlot == WEAPONSLOT_TYPE_UNARMED )
             {
                 eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
-                // remove the current weapon's model
-                //m_pPlayerPed->RemoveWeaponModel ( GetWeapon(currentSlot)->GetType() );
 
                 CWeapon * oldWeapon = GetWeapon(currentSlot);
                 DWORD ammoInClip = oldWeapon->GetAmmoInClip();
