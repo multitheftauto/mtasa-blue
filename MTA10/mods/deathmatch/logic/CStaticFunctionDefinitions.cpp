@@ -3397,7 +3397,7 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVector & vecLookAt )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVector * pvecLookAt )
 {
     CNetAPI* pNetAPI = m_pClientGame->GetNetAPI ();
 
@@ -3408,7 +3408,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVecto
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
-    m_pCamera->SetTarget ( vecLookAt );
+    if ( pvecLookAt ) m_pCamera->SetTarget ( *pvecLookAt );
     return true;
 }
 

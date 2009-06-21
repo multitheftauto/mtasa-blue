@@ -3082,10 +3082,10 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( CPlayer * pPlayer, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVector& vecPosition, const CVector& vecLookAt )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVector& vecPosition, CVector * pvecLookAt )
 {
     assert ( pElement );
-    RUN_CHILDREN SetCameraMatrix ( *iter, vecPosition, vecLookAt );
+    RUN_CHILDREN SetCameraMatrix ( *iter, vecPosition, pvecLookAt );
 
     if ( IS_PLAYER ( pElement ) )
     {
@@ -3093,8 +3093,13 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVe
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         pCamera->SetMode ( CAMERAMODE_FIXED );
-        pCamera->SetMatrix ( const_cast < CVector & > ( vecPosition ), const_cast < CVector & > ( vecLookAt ) );
+        if ( pvecLookAt ) pCamera->SetMatrix ( const_cast < CVector & > ( vecPosition ), *pvecLookAt );
+        else pCamera->SetPosition ( const_cast < CVector & > ( vecPosition ) );
 
+        CVector vecLookAt;
+        if ( pvecLookAt ) vecLookAt = *pvecLookAt;
+        else pCamera->GetLookAt ( vecLookAt );
+        
         // Tell the player
         CBitStream BitStream;
         BitStream.pBitStream->Write ( vecPosition.fX );
