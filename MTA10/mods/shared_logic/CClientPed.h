@@ -221,7 +221,7 @@ public:
     inline void                 SetRespawnState             ( int iRespawnState )                       { m_pRespawnState = iRespawnState; };
 
     CWeapon*                    GiveWeapon                  ( eWeaponType weaponType, unsigned int uiAmmo );
-    void                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
+    bool                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
     eWeaponSlot                 GetCurrentWeaponSlot        ( void );
     eWeaponType                 GetCurrentWeaponType        ( void );
     CWeapon*                    GetWeapon                   ( void );
