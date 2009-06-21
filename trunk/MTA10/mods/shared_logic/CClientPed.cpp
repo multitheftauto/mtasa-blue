@@ -1675,7 +1675,7 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     return pWeapon;
 }
 
-void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
+bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
     {
@@ -1683,11 +1683,11 @@ void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
         {
             if ( weaponSlot == WEAPONSLOT_TYPE_UNARMED )
             {
+                eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
                 // remove the current weapon's model
-                //m_pPlayerPed->RemoveWeaponModel ( GetWeapon(m_CurrentWeaponSlot)->GetType() );
-                CWeapon * oldWeapon;
+                //m_pPlayerPed->RemoveWeaponModel ( GetWeapon(currentSlot)->GetType() );
 
-                oldWeapon = GetWeapon(m_CurrentWeaponSlot);
+                CWeapon * oldWeapon = GetWeapon(currentSlot);
                 DWORD ammoInClip = oldWeapon->GetAmmoInClip();
                 DWORD ammoInTotal = oldWeapon->GetAmmoTotal();
                 eWeaponType weaponType = oldWeapon->GetType();
@@ -1699,10 +1699,22 @@ void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                 newWeapon->SetAmmoInClip(ammoInClip);
                 newWeapon->SetAmmoTotal(ammoInTotal);
             }
-            m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
+            else
+            {
+                // Make sure we have a weapon and some ammo on this slot
+                CWeapon * pWeapon = GetWeapon ( weaponSlot );                
+                if ( pWeapon && pWeapon->GetAmmoTotal () )
+                {
+                    m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
+                }
+                else return false;
+            }
         }
         m_CurrentWeaponSlot = weaponSlot;
+        return true;
     }
+
+    return false;
 }
 
 

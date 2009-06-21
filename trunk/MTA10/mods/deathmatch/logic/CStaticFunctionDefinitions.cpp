@@ -1421,8 +1421,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-		Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
-        return true;
+		return Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
     }
 
     return false;
