@@ -4087,16 +4087,6 @@ void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
         CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( usID );
         if ( pResource )
         {
-            // Grab the resource entity
-            CClientEntity* pResourceEntity = pResource->GetResourceEntity ();
-            if ( pResourceEntity )
-            {
-                // Call our lua event
-                CLuaArguments Arguments;
-                Arguments.PushUserData ( pResource );
-                pResourceEntity->CallEvent ( "onClientResourceStop", Arguments, true );
-            }
-
 			// Delete the resource
             g_pClientGame->m_pResourceManager->RemoveResource ( usID );
         }
