@@ -404,9 +404,10 @@ private:
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
-    static void                         StaticGameProcessHandler        ( void );
+    static void                         StaticPostWorldProcessHandler   ( void );
     static bool                         StaticChokingHandler            ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    static void                         StaticIdleHandler               ( void );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -414,9 +415,10 @@ private:
     void                                DrawRadarAreasHandler           ( void );
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
-    void                                GameProcessHandler              ( void );
+    void                                PostWorldProcessHandler         ( void );
     bool                                ChokingHandler                  ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    void                                IdleHandler                     ( void );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

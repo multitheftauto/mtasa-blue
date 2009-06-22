@@ -217,7 +217,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
-    g_pMultiplayer->SetGameProcessHandler ( CClientGame::StaticGameProcessHandler );
+    g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
+    g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
@@ -346,7 +347,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
-    g_pMultiplayer->SetGameProcessHandler ( NULL );
+    g_pMultiplayer->SetPostWorldProcessHandler ( NULL );
+    g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
@@ -765,11 +767,12 @@ void CClientGame::DoPulsePostFrame ( void )
         #endif
     }
 
-    // If we are focused we do the pulsing here
+#ifndef MTA_DEBUG
+    // If we are focused we aren't minimized (unless in debug)
     if ( g_pCore->IsFocused () )
-    {
+#endif
+        // Do our pulse here
         DoPulses ();
-    }
 }
 
 
@@ -3053,9 +3056,14 @@ void CClientGame::StaticRender3DStuffHandler ( void )
     g_pClientGame->Render3DStuffHandler ();
 }
 
-void CClientGame::StaticGameProcessHandler ( void )
+void CClientGame::StaticPostWorldProcessHandler ( void )
 {
-    g_pClientGame->GameProcessHandler ();
+    g_pClientGame->PostWorldProcessHandler ();
+}
+
+void CClientGame::StaticIdleHandler ( void )
+{
+    g_pClientGame->IdleHandler ();
 }
 
 bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
@@ -3143,13 +3151,22 @@ void CClientGame::Render3DStuffHandler ( void )
 }
 
 
-void CClientGame::GameProcessHandler ( void )
+void CClientGame::PostWorldProcessHandler ( void )
 {
-    // If we are minimized we do the pulsing here
-    if ( !g_pCore->IsFocused() )
+    m_pManager->GetMarkerManager ()->DoPulse ();
+}
+
+void CClientGame::IdleHandler ( void )
+{
+    // * GTA's main loop, hooked just before CGame::Process *
+#ifndef MTA_DEBUG
+    // If we aren't focused we're minimized (unless in debug)
+    if ( !g_pCore->IsFocused () )
     {
+        // Do our pulse here as DoPulsePreFrame/DoPulsePostFrame won't be called
         DoPulses ();
     }
+#endif
 }
 
 bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType )
