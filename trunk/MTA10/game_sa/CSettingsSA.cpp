@@ -19,27 +19,27 @@ unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 
 CSettingsSA::CSettingsSA ( void )
 {
-    settings = (Settings *)CLASS_CMenuManager;
+    m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
 }
 
 bool CSettingsSA::IsFrameLimiterEnabled ( void )
 {
-    return settings->bFrameLimiter;
+    return m_pInterface->bFrameLimiter;
 }
 
 void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
 {
-    settings->bFrameLimiter = bEnabled;
+    m_pInterface->bFrameLimiter = bEnabled;
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
 {
-    return settings->bUseWideScreen;
+    return m_pInterface->bUseWideScreen;
 }
 
 void CSettingsSA::SetWideScreenEnabled ( bool bEnabled )
 {
-    settings->bUseWideScreen = bEnabled;
+    m_pInterface->bUseWideScreen = bEnabled;
 }
 
 unsigned int CSettingsSA::GetNumVideoModes ( void )
@@ -84,30 +84,41 @@ void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex )
         call    FUNC_SetCurrentVideoMode
         add     esp, 4
     }
+    m_pInterface->dwVideoMode = modeIndex;
 }
 
 unsigned char CSettingsSA::GetRadioVolume ( void )
 {
-    return *(BYTE *)VAR_RadioVolume;
+    return m_pInterface->ucRadioVolume;
 }
 
 void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
 {
-    *(BYTE *)VAR_RadioVolume = ucVolume;
+    m_pInterface->ucRadioVolume = ucVolume;
 }
 
 unsigned char CSettingsSA::GetSFXVolume ( void )
 {
-    return *(BYTE *)VAR_SfxVolume;
+    return m_pInterface->ucSfxVolume;
 }
 
 void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 {
-    *(BYTE *)VAR_SfxVolume = ucVolume;
+    m_pInterface->ucSfxVolume = ucVolume;
 }
 
 // Minimum is 0.925 and maximum is 1.8
 float CSettingsSA::GetDrawDistance ( void )
 {
-    return *(float *)VAR_DrawDistance;
+    return m_pInterface->fDrawDistance;
+}
+
+void CSettingsSA::Save ()
+{
+    _asm
+    {
+        mov ecx, CLASS_CMenuManager
+        mov eax, FUNC_SAVE
+        call eax
+    }
 }

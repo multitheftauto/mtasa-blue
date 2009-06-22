@@ -1723,6 +1723,9 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
+
+    // Save the single player settings (e.g. video mode, volume)
+    gameSettings->Save ();
 }
 
 void CSettings::RemoveKeyBindSection ( char * szSectionName )
