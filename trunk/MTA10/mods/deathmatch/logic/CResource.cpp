@@ -76,6 +76,11 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
 
 CResource::~CResource ( void )
 {
+    // Call our lua event
+    CLuaArguments Arguments;
+    Arguments.PushUserData ( this );
+    m_pRootEntity->CallEvent ( "onClientResourceStop", Arguments, true );
+
     // Make sure we don't force the cursor on
     ShowCursor ( false );
 
