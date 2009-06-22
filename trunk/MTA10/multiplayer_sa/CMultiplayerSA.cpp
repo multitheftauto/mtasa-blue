@@ -74,7 +74,11 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define FUNC_CWeapon_FireAreaEffect                         0x53A450
 #define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
 
-#define CALL_CGame_Process                                  0x53E981
+#define HOOKPOS_CGame_Process                               0x53C095
+DWORD RETURN_CGame_Process =                                0x53C09F;
+
+#define HOOKPOS_Idle                                        0x53E981
+DWORD RETURN_Idle =                                         0x53E98B;
 
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 
@@ -119,9 +123,10 @@ FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
-GameProcessHandler* m_pGameProcessHandler = NULL;
 ChokingHandler* m_pChokingHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
+PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
+IdleHandler * m_pIdleHandler = NULL;
 
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
@@ -148,11 +153,12 @@ void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ();
 void HOOK_CPed_IsPlayer ();
 void HOOK_CTrain_ProcessControl_Derail ();
 void HOOK_EndWorldColors ();
-void HOOK_CGame_Process ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
 void HOOK_ComputeDamageResponse_StartChoking ();
 void HOOK_CollisionStreamRead ();
 void HOOK_CAnimManager_BlendAnimation ();
+void HOOK_CGame_Process ();
+void HOOK_Idle ();
 
 void vehicle_lights_init ();
 void vehicle_gravity_init ();
@@ -236,9 +242,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );    
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 ); 
+    HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10 );
+    HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
 
-    HookInstallCall ( CALL_CGame_Process, (DWORD)HOOK_CGame_Process );
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
 	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
@@ -1000,11 +1007,6 @@ void CMultiplayerSA::SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandle
     m_pProcessCamHandler = pProcessCamHandler;
 }
 
-void CMultiplayerSA::SetGameProcessHandler ( GameProcessHandler* pProcessHandler )
-{
-    m_pGameProcessHandler = pProcessHandler;
-}
-
 void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 {
     m_pChokingHandler = pChokingHandler;
@@ -1013,6 +1015,16 @@ void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
 {
     m_pBlendAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHandler )
+{
+    m_pPostWorldProcessHandler = pHandler;
+}
+
+void CMultiplayerSA::SetIdleHandler ( IdleHandler * pHandler )
+{
+    m_pIdleHandler = pHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -2127,18 +2139,6 @@ void CMultiplayerSA::SetDebugVars ( float f1, float f2, float f3 )
 
 }
 
-void _declspec(naked) HOOK_CGame_Process ()
-{
-    if ( m_pGameProcessHandler )
-        m_pGameProcessHandler ();
-
-    _asm
-    {
-        mov eax, 0x53BEE0
-        jmp eax
-    }
-}
-
 void _declspec(naked) HOOK_CollisionStreamRead ()
 {
     if ( *(DWORD *)VAR_CollisionStreamRead_ModelInfo )
@@ -2190,6 +2190,45 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
         sub     esp,14h 
         mov     ecx,dword ptr [esp+18h]
         jmp     dwBlendAnimationReturn
+    }
+}
+
+DWORD dwCWorld_Process = 0x5684a0;
+void _declspec(naked) HOOK_CGame_Process ()
+{
+    _asm
+    {
+        call    dwCWorld_Process
+        mov     ecx, 0B72978h
+        pushad
+    }
+
+    if ( m_pPostWorldProcessHandler ) m_pPostWorldProcessHandler ();
+
+    _asm
+    {
+        popad
+        jmp     RETURN_CGame_Process;
+    }
+}
+
+
+DWORD dwCGame_Process = 0x53BEE0;
+void _declspec(naked) HOOK_Idle ()
+{
+    _asm
+    {
+        call    dwCGame_Process
+        pushad
+    }
+
+    if ( m_pIdleHandler ) m_pIdleHandler ();
+
+    _asm
+    {
+        popad
+        mov     ecx,0B6BC90h
+        jmp     RETURN_Idle;
     }
 }
 

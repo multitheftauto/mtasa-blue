@@ -2989,8 +2989,6 @@ void CClientPed::_ChangeModel ( void )
                 RemoveFromVehicle ();
             }
 
-            m_pPlayerPed->GetFightingStyle ();
-
             // Takes care of clothes/task issues
             Respawn ( NULL, true, false );
 

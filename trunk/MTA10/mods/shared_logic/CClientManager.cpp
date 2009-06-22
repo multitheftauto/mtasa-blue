@@ -186,7 +186,7 @@ void CClientManager::DoPulse ( void )
     {
         m_pModelRequestManager->DoPulse ();
         m_pCamera->DoPulse ();
-        m_pMarkerManager->DoPulse ();
+        //m_pMarkerManager->DoPulse (); * we call this from CClientGame::PostWorldProcessHandler
         m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
         m_pVehicleManager->DoPulse ();
         m_pPathManager->DoPulse ();
