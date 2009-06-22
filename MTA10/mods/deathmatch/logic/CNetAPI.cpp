@@ -228,8 +228,7 @@ bool CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency 
             return false;
         }
     }
-    m_Interpolator.Evaluate ( ulInterTime, vecPosition );
-    return true;
+    return m_Interpolator.Evaluate ( ulInterTime, vecPosition );
 }
 
 

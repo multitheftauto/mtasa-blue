@@ -79,6 +79,19 @@ namespace SharedUtil
         return a < min ? min : a > max ? max : a;
     }
 
+    // Lerps between two values depending on the weight
+	template< class T >
+    T Lerp ( T& From, float Alpha, T& To )
+	{
+		return static_cast < T > ( ( To - From ) * Alpha + From );
+	}
+
+    // Find the relative position of Pos between From and To
+    inline const double Unlerp ( const double From, const double Pos, const double To )
+    {
+	    return ( Pos - From ) / ( To - From );
+    }
+
 };
 
 using namespace SharedUtil;
