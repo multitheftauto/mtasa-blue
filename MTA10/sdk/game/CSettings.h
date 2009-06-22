@@ -76,19 +76,20 @@ struct VideoMode //RwVideoMode
 class CGameSettings
 {
 public:
-    virtual bool            IsFrameLimiterEnabled ( void )=0;
-    virtual void            SetFrameLimiterEnabled ( bool bEnabled )=0;
-    virtual bool            IsWideScreenEnabled ( void )=0;
-    virtual void            SetWideScreenEnabled ( bool bEnabled )=0;
-    virtual unsigned int    GetNumVideoModes ( void )=0;
-    virtual VideoMode *     GetVideoModeInfo ( VideoMode * modeInfo, unsigned int modeIndex )=0;
-    virtual unsigned int    GetCurrentVideoMode ( void )=0;
-    virtual void            SetCurrentVideoMode ( unsigned int modeIndex )=0;
-    virtual unsigned char   GetRadioVolume ( void )=0;
-    virtual void            SetRadioVolume ( unsigned char ucVolume )=0;
-    virtual unsigned char   GetSFXVolume ( void )=0;
-    virtual void            SetSFXVolume ( unsigned char ucVolume )=0;
-    virtual float           GetDrawDistance ( void )=0;
+    virtual bool            IsFrameLimiterEnabled   ( void ) = 0;
+    virtual void            SetFrameLimiterEnabled  ( bool bEnabled ) = 0;
+    virtual bool            IsWideScreenEnabled     ( void ) = 0;
+    virtual void            SetWideScreenEnabled    ( bool bEnabled ) = 0;
+    virtual unsigned int    GetNumVideoModes        ( void ) = 0;
+    virtual VideoMode *     GetVideoModeInfo        ( VideoMode * modeInfo, unsigned int modeIndex ) = 0;
+    virtual unsigned int    GetCurrentVideoMode     ( void ) = 0;
+    virtual void            SetCurrentVideoMode     ( unsigned int modeIndex ) = 0;
+    virtual unsigned char   GetRadioVolume          ( void ) = 0;
+    virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;
+    virtual unsigned char   GetSFXVolume            ( void ) = 0;
+    virtual void            SetSFXVolume            ( unsigned char ucVolume ) = 0;
+    virtual float           GetDrawDistance         ( void ) = 0;
+    virtual void            Save                    ( void ) = 0;
 };
 
 #endif
