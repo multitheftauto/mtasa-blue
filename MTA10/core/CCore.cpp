@@ -808,7 +808,7 @@ void CCore::CreateGame ( )
         WriteDebugEvent ( "Game loaded." );
         m_pGame = pfnGameInit ( );
 
-        if ( m_pGame->GetGameVersion () == VERSION_UNKNOWN )
+        if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!", "Error", MB_OK|MB_ICONEXCLAMATION );
             TerminateProcess ( GetCurrentProcess (), 0 );
