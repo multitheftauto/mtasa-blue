@@ -57,28 +57,32 @@ void CClientCamera::DoPulse ( void )
     // If we aren't invalidated
     if ( !m_bInvalidated )
     {
-        // If we got the camera behind a player but no focused entity
-        if ( m_pFocusedPlayer )
+        // If we aren't in fixed mode
+        if ( !m_bFixed )
         {
-            if ( m_pFocusedEntity )
+            // If we got the camera behind a player but no focused entity
+            if ( m_pFocusedPlayer )
             {
-                // Is the focused entity a vehicle, but the player doesn't have any occupied?
-                CClientVehicle* pVehicle = m_pFocusedPlayer->GetOccupiedVehicle ();
-                if ( m_pFocusedEntity->GetType () == CCLIENTVEHICLE )
+                if ( m_pFocusedEntity )
                 {
-                    if ( !pVehicle )
+                    // Is the focused entity a vehicle, but the player doesn't have any occupied?
+                    CClientVehicle* pVehicle = m_pFocusedPlayer->GetOccupiedVehicle ();
+                    if ( m_pFocusedEntity->GetType () == CCLIENTVEHICLE )
+                    {
+                        if ( !pVehicle )
+                        {
+                            SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                        }
+                    }
+                    else if ( pVehicle )
                     {
                         SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
                     }
                 }
-                else if ( pVehicle )
+                else
                 {
                     SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
                 }
-            }
-            else
-            {
-                SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
             }
         }
 
