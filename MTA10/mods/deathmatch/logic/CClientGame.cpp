@@ -3351,13 +3351,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
                 return false;
             }
-
-            // Update our stored health/armor
-            pDamagedPed->m_fHealth = fCurrentHealth;
-            pDamagedPed->m_fArmor = fCurrentArmor;
+            
             // Is it the local player?
             if ( pDamagedPed->IsLocalPlayer () )
             {  
+                // Update our stored health/armor
+                // (We dont update remote players health here, just from sync)
+                pDamagedPed->m_fHealth = fCurrentHealth;
+                pDamagedPed->m_fArmor = fCurrentArmor;
+
                 // Update our stored damage stuff
                 m_ucDamageWeapon = static_cast < unsigned char > ( weaponUsed );
                 m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
