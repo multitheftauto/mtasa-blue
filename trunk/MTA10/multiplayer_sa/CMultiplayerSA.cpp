@@ -209,6 +209,8 @@ void CMultiplayerSA::InitHooks()
     explosion_init ();
     running_script_init ();
 
+    eGameVersion version = pGameInterface->GetGameVersion ();
+
 	bSetCenterOfWorld = false;	
 
 	//00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
@@ -784,6 +786,20 @@ void CMultiplayerSA::InitHooks()
 
     // Disable radar map hiding when pressing TAB (action key) while on foot
     memset ( (void *)0x58FC3E, 0x90, 14 );
+
+    // No intro movies kthx
+    if ( version == VERSION_US_10 )
+    {
+        *(DWORD *)0x748EF8 = 0x748AE7;
+        *(DWORD *)0x748EFC = 0x748B08;
+        *(BYTE *)0x748B0E = 5;
+    }
+    else if ( version == VERSION_EU_10 )
+    {
+        *(DWORD *)0x748F48 = 0x748B37;
+        *(DWORD *)0x748F4C = 0x748B58;
+        *(BYTE *)0x748B5E = 5;
+    }
 }
 
 
