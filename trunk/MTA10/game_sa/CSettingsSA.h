@@ -20,10 +20,14 @@
 
 #define CLASS_CMenuManager      0xBA6748
 
-#define FUNC_SAVE               0x57C660
+#define FUNC_CMenuManager_Save  0x57C660
 
 #define VAR_bMouseSteering      0xC1CC02
 #define VAR_bMouseFlying        0xC1CC03
+
+#define CLASS_CAudioEngine 0xB6BC90
+#define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
+#define FUNC_CAudioEngine_SetMusicMasterVolume 0x506DE0
 
 struct CSettingsSAInterface // see code around 0x57CE9A for where these are
 {
@@ -88,6 +92,7 @@ private:
     static unsigned long    FUNC_GetVideoModeInfo;
     static unsigned long    FUNC_GetCurrentVideoMode;
     static unsigned long    FUNC_SetCurrentVideoMode;
+    static unsigned long    FUNC_SetRadioVolume;
 };
 
 #endif
