@@ -93,83 +93,83 @@ typedef struct D3DLVERTEX {
 
 typedef struct __SPRITEVERTEX2D
 {
-    FLOAT	fX, fY, fZ;     // Vertex position
-	FLOAT	fRHW;
+    float	fX, fY, fZ;     // Vertex position
+	float	fRHW;
 	DWORD	dwColor;
-    FLOAT   tu, tv; // Vertex texture coordinates
+    float   tu, tv; // Vertex texture coordinates
 } D3DSPRITEVERTEX2D, *PD3DSPRITEVERTEX2D;
 
 typedef struct __SPRITEVERTEX3D
 {
-    FLOAT	fX, fY, fZ;     // Vertex position
+    float	fX, fY, fZ;     // Vertex position
 	DWORD	dwColor;
-    FLOAT   tu, tv; // Vertex texture coordinates
+    float   tu, tv; // Vertex texture coordinates
 } D3DSPRITEVERTEX3D, *PD3DSPRITEVERTEX3D;
 
 typedef struct __FONTCOORDS
 {
-	FLOAT	tx1, tx2, ty1, ty2;
-	FLOAT	fWidth, fHeight;
+	float	tx1, tx2, ty1, ty2;
+	float	fWidth, fHeight;
 } FONTCOORDS, *PFONTCOORDS;
 
 class CD3DMGEng
 {
 public:
 
-	CD3DMGEng ( LPDIRECT3DDEVICE9 pD3DDevice );
-	~CD3DMGEng () {};
+	        CD3DMGEng                   ( LPDIRECT3DDEVICE9 pD3DDevice );
+	        ~CD3DMGEng                  () {}
 
-	VOID OnDeleteDevice ( void );
-	VOID OnRestoreDevice ( void );
-	VOID OnInvalidateDevice ( void );
+	void    OnDeleteDevice              ( void );
+	void    OnRestoreDevice             ( void );
+	void    OnInvalidateDevice          ( void );
 
-	BOOL Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
-	BOOL Render2DSprite ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColor );
-	BOOL Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
-	BOOL Render3DSprite ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColor );
+    void	SetRenderTarget             ( LPDIRECT3DSURFACE9 pSurface )	{ m_pDevice->SetRenderTarget ( 0, pSurface ); };
+	void    GetRenderTarget             ( LPDIRECT3DSURFACE9 pSurface )	{ m_pDevice->GetRenderTarget ( 0, &pSurface ); };
+
+    bool    BeginDrawing                ();
+	bool    EndDrawing                  ();
+
+	bool    Render2DSpriteEx            ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
+	bool    Render2DSprite              ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColor );
+	bool    Render3DSpriteEx            ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
+	bool    Render3DSprite              ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColor );
     
-    BOOL Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorB );
+    bool    Render3DTriangle            ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorB );
 
-	inline VOID	SetRenderTarget ( LPDIRECT3DSURFACE9 pSurface )	{ m_pDevice->SetRenderTarget ( 0, pSurface ); };
-	inline VOID GetRenderTarget ( LPDIRECT3DSURFACE9 pSurface )	{ m_pDevice->GetRenderTarget ( 0, &pSurface ); };
+	bool    Render2DBox                 ( float x, float y, float fWidth, float fHeight, DWORD dwColor );
+	bool    Render2DBoxEx               ( float x, float y, float fWidth, float fHeight, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
+	bool    Render3DBox                 ( float x, float y, float z, float fL, float fW, float fH, DWORD dwColor, bool bWireframe = FALSE );
 
-    BOOL BeginDrawing ();
-	BOOL EndDrawing ();
+    bool    DrawLine                    ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, DWORD dwColor );
+    bool    DrawLine3D                  ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float fWidth, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor );
 
-	BOOL Render2DBox ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, DWORD dwColor );
-	BOOL Render2DBoxEx ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR );
-	BOOL Render3DBox ( FLOAT x, FLOAT y, FLOAT z, FLOAT fL, FLOAT fW, FLOAT fH, DWORD dwColor, BOOL bWireframe = FALSE );
+	bool    DrawPlane3D                 ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor );
 
-	BOOL LoadFontTextureFromMem ( PVOID pvMemory, DWORD dwSizeOfFile );
-	BOOL LoadFontTextureFromFile ( TCHAR *wszFileName );
-	BOOL LoadFontInfoFromMem ( PVOID pvMemory );
-	BOOL LoadFontInfoFromFile ( TCHAR *wszFileName );
-	BOOL LoadDefaultFontInfo ( VOID );
-	BOOL UnloadFont ( VOID );
+    void    DrawTextTTF                 ( int left, int top, int right, int bottom,  DWORD dwColor, const TCHAR *wszText, INT iTextHeight, INT iTextWeight, DWORD dwFormat, CHAR * szFaceName );
+	bool    DrawText2D                  ( float x, float y, DWORD dwColor, const TCHAR *wszText,  float fTextSize = 1.0f, FONTFLAGS ffFlags = D3DFF_LEFT, FONTSET fsSet = D3DFS_FONTSET1 );
+    bool    DrawText3D                  ( float x, float y, float z, D3DMATRIX * pMatView, DWORD dwColor, const TCHAR *wszText,  float fTextSize = 1.0f, FONTFLAGS ffFlags = D3DFF_CENTERED, FONTSET fsSet = D3DFS_FONTSET1 );
 
-    BOOL DrawLine ( float fX1, float fY1, float fZ1, float fX2, float fY2, float fZ2, DWORD dwColor );
+    bool    LoadFontTextureFromMem      ( PVOID pvMemory, DWORD dwSizeOfFile );
+	bool    LoadFontTextureFromFile     ( TCHAR *wszFileName );
+	bool    LoadFontInfoFromMem         ( PVOID pvMemory );
+	bool    LoadFontInfoFromFile        ( TCHAR *wszFileName );
+	bool    LoadDefaultFontInfo         ( void );
+	bool    UnloadFont                  ( void );
 
-    VOID DrawTextTTF ( int left, int top, int right, int bottom,  DWORD dwColor, const TCHAR *wszText, INT iTextHeight, INT iTextWeight, DWORD dwFormat, CHAR * szFaceName );
-	BOOL DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszText,  FLOAT fTextSize = 1.0f, FONTFLAGS ffFlags = D3DFF_LEFT, FONTSET fsSet = D3DFS_FONTSET1 );
-    BOOL DrawText3D ( FLOAT x, FLOAT y, FLOAT z, D3DMATRIX * pMatView, DWORD dwColor, const TCHAR *wszText,  FLOAT fTextSize = 1.0f, FONTFLAGS ffFlags = D3DFF_CENTERED, FONTSET fsSet = D3DFS_FONTSET1 );
-	BOOL DrawLine3D ( FLOAT ax, FLOAT ay, FLOAT az, FLOAT bx, FLOAT by, FLOAT bz, FLOAT w, FLOAT h, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor );
-
-	BOOL DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor );
-
-	BOOL UTIL_FormatText ( const TCHAR* wszInputText, TCHAR* wszOutputText, float fMaxWidth, FLOAT fTextSize = 1.0f, FONTSET fsSet = D3DFS_FONTSET1 );
-	BOOL UTIL_GetTextExtent ( const TCHAR* strText, SIZE* pSize, FLOAT fTextSize = 1.0f, FONTSET fsSet = D3DFS_FONTSET1 );
-    VOID UTIL_CaptureDeviceState ( );
-    VOID UTIL_RestoreDeviceState ( );
+	bool    UTIL_FormatText             ( const TCHAR* wszInputText, TCHAR* wszOutputText, float fMaxWidth, float fTextSize = 1.0f, FONTSET fsSet = D3DFS_FONTSET1 );
+	bool    UTIL_GetTextExtent          ( const TCHAR* strText, SIZE* pSize, float fTextSize = 1.0f, FONTSET fsSet = D3DFS_FONTSET1 );
+    void    UTIL_CaptureDeviceState     ();
+    void    UTIL_RestoreDeviceState     ();
 
 private:
 
 	//////////////////////////////////////////
 	// Font engine related variables.
 	LPDIRECT3DTEXTURE9		m_pFontTexture;	
-	FLOAT					m_fFontTexWidth;
-	FLOAT					m_fFontTexHeight;
+	float					m_fFontTexWidth;
+	float					m_fFontTexHeight;
 	FONTCOORDS				m_aFontCoords[D3DFE_CHARACTERSPERROW*D3DFE_CHARACTERSPERCOLUMN];
-	BOOL					m_bFontInfoLoaded;
+	bool					m_bFontInfoLoaded;
     D3DXFONT_DESC           m_dLastFontDesc;
     LPD3DXFONT              m_pLastFont;
 

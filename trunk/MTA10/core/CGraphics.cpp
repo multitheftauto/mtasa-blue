@@ -272,7 +272,7 @@ void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned 
     BeginSingleDrawing ( );
 
     // Draw the line
-    m_pGUI->GetRenderingLibrary ()->DrawLine ( fX1, fY1, 0, fX2, fY2, 0, ulColor );
+    m_pGUI->GetRenderingLibrary ()->DrawLine ( D3DXVECTOR3 ( fX1, fY1, 0 ), D3DXVECTOR3 ( fX2, fY2, 0 ), ulColor );
 
     // End drawing
     EndSingleDrawing ( );
@@ -281,16 +281,17 @@ void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned 
 
 void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth )
 {
-	BeginSingleDrawing ( );
+	BeginSingleDrawing ();
 
-	m_pGUI->GetRenderingLibrary ()->DrawLine3D ( vecBegin.fX, vecBegin.fY, vecBegin.fZ, vecEnd.fX, vecEnd.fY, vecEnd.fZ, 0, fWidth / 75.0f, NULL, ulColor );
-    m_pGUI->GetRenderingLibrary ()->DrawLine3D ( vecBegin.fX, vecBegin.fY, vecBegin.fZ, vecEnd.fX, vecEnd.fY, vecEnd.fZ, fWidth / 75.0f, 0, NULL, ulColor );
+	m_pGUI->GetRenderingLibrary ()->DrawLine3D (
+        D3DXVECTOR3 ( vecBegin.fX, vecBegin.fY, vecBegin.fZ ),
+        D3DXVECTOR3 ( vecEnd.fX, vecEnd.fY, vecEnd.fZ ),
+        fWidth / 75.0f,
+        NULL,
+        ulColor
+    );
 
-	// Why draw it twice? - Commented out for a test
-    //m_pGUI->GetRenderingLibrary ()->DrawLine3D ( vecEnd.fX, vecEnd.fY, vecEnd.fZ, vecBegin.fX, vecBegin.fY, vecBegin.fZ, 0, fWidth / 75.0f, NULL, ulColor );
-    //m_pGUI->GetRenderingLibrary ()->DrawLine3D ( vecEnd.fX, vecEnd.fY, vecEnd.fZ, vecBegin.fX, vecBegin.fY, vecBegin.fZ, fWidth / 75.0f, 0, NULL, ulColor );
-
-	EndSingleDrawing ( );
+	EndSingleDrawing ();
 }
 
 
@@ -929,22 +930,19 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             }
 
             break;
-        };
+        }
 		// 3D Line type?
 		case QUEUE_LINE3D:
 		{
-			m_pGUI->GetRenderingLibrary ()->DrawLine3D ( Item.Line3D.fX1, 
-														 Item.Line3D.fY1,
-														 Item.Line3D.fZ1,
-														 Item.Line3D.fX2,
-														 Item.Line3D.fY2,
-														 Item.Line3D.fZ2,
-														 0,
-														 Item.Line3D.fWidth / 75.0f,
-														 NULL,
-														 Item.Line3D.ulColor );
+			m_pGUI->GetRenderingLibrary ()->DrawLine3D (
+                D3DXVECTOR3 ( Item.Line3D.fX1, Item.Line3D.fY1, Item.Line3D.fZ1 ),
+				D3DXVECTOR3 ( Item.Line3D.fX2, Item.Line3D.fY2, Item.Line3D.fZ2 ),
+				Item.Line3D.fWidth / 75.0f,
+				NULL,
+				Item.Line3D.ulColor
+            );
 			break;
-		};
+		}
 		// Rectangle type?
 		case QUEUE_RECT:
 		{
@@ -956,7 +954,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 			m_pDXSprite->SetTransform ( &matrix );
 			m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, Item.Rect.ulColor );
 			break;
-		};
+		}
 		case QUEUE_TEXT:
 		{
 			RECT rect;        
@@ -989,7 +987,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         case QUEUE_CIRCLE:
         {
             break;
-        };
+        }
     }
 }
 

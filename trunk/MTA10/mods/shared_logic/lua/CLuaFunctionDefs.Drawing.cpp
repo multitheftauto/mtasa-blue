@@ -87,7 +87,7 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
     int iArgument7 = lua_type ( luaVM, 7 ); // Color
     int iArgument8 = lua_type ( luaVM, 8 ); // Width
     int iArgument9 = lua_type ( luaVM, 9 ); // Reserved: Post GUI
-    int iArgument10 = lua_type ( luaVM, 9 ); // Reserved: Z-buffer
+    int iArgument10 = lua_type ( luaVM, 10 ); // Reserved: Z-buffer
 
     // Check required arguments. Should all be numbers.
     if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) ||
@@ -98,7 +98,7 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
         ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) ||
         ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ))
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine" );
+        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine3D" );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -114,7 +114,7 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
     bool bPostGUI = false;
     if ( iArgument9 == LUA_TBOOLEAN )
     {
-        bPostGUI = ( lua_toboolean ( luaVM, 9 ) ) ? true:false;
+        bPostGUI = ( lua_toboolean ( luaVM, 9 ) ) ? true : false;
     }
 
     // Grab the arguments
