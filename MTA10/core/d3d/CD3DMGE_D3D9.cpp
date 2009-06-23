@@ -15,19 +15,19 @@
 #include "StdInc.h"
 #include "include/cd3dmge_d3d9.h"
 
-inline D3DSPRITEVERTEX2D InitFont2DVertex( FLOAT x, FLOAT y, FLOAT z, FLOAT rhw, DWORD dwColor, FLOAT tu, FLOAT tv )
+inline D3DSPRITEVERTEX2D InitFont2DVertex( float x, float y, float z, float rhw, DWORD dwColor, float tu, float tv )
 {
     D3DSPRITEVERTEX2D v = { x, y, z, rhw, dwColor, tu, tv };
     return v;
 }
 
-inline D3DSPRITEVERTEX3D InitFont3DVertex( FLOAT x, FLOAT y, FLOAT z, DWORD dwColor, FLOAT tu, FLOAT tv)
+inline D3DSPRITEVERTEX3D InitFont3DVertex( float x, float y, float z, DWORD dwColor, float tu, float tv)
 {
     D3DSPRITEVERTEX3D v = { x, y, z, dwColor, tu, tv };
     return v;
 }
 
-inline D3DSPRITEVERTEX3D InitBox3DVertex( FLOAT x, FLOAT y, FLOAT z, DWORD dwColor )
+inline D3DSPRITEVERTEX3D InitBox3DVertex( float x, float y, float z, DWORD dwColor )
 {
     D3DSPRITEVERTEX3D v = { x, y, z, dwColor };
     return v;
@@ -41,7 +41,7 @@ CD3DMGEng::CD3DMGEng ( LPDIRECT3DDEVICE9 pD3DDevice )
 	m_fFontTexWidth = 0.0f;
 	m_fFontTexHeight = 0.0f;
 	m_pVB = NULL;
-	m_bFontInfoLoaded = FALSE;
+	m_bFontInfoLoaded = false;
     m_pDeviceState = NULL;
     m_pLastFont = NULL;
     memset( &m_dLastFontDesc, 0, sizeof ( D3DXFONT_DESC ) );
@@ -49,7 +49,7 @@ CD3DMGEng::CD3DMGEng ( LPDIRECT3DDEVICE9 pD3DDevice )
 	memset(m_aFontCoords,0,sizeof(m_aFontCoords));
 }
 
-VOID CD3DMGEng::OnRestoreDevice ( void )
+void CD3DMGEng::OnRestoreDevice ( void )
 {
 
 	m_pDevice->CreateVertexBuffer( D3DSPRITE_NUMVERTS*sizeof(D3DSPRITEVERTEX2D),  //sizeof(2D) > sizeof(3D)
@@ -64,7 +64,7 @@ VOID CD3DMGEng::OnRestoreDevice ( void )
     D3DXCreateFontIndirect ( m_pDevice,&m_dLastFontDesc,&m_pLastFont ); 
 }
 
-VOID CD3DMGEng::OnDeleteDevice ( void )
+void CD3DMGEng::OnDeleteDevice ( void )
 {
     if ( m_pLastFont != NULL )
     {
@@ -73,7 +73,7 @@ VOID CD3DMGEng::OnDeleteDevice ( void )
     }
 }
 
-VOID CD3DMGEng::OnInvalidateDevice ( void )
+void CD3DMGEng::OnInvalidateDevice ( void )
 {
 	SAFE_RELEASE( m_pVB )
 
@@ -84,12 +84,12 @@ VOID CD3DMGEng::OnInvalidateDevice ( void )
     }
 }
 
-BOOL CD3DMGEng::Render2DSprite ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColor )
+bool CD3DMGEng::Render2DSprite ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColor )
 {
 	return Render2DSpriteEx( pTexture, pScaling, pTranslation, dwColor, dwColor, dwColor, dwColor );
 }
 
-BOOL CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR )
+bool CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR )
 {
 	D3DSURFACE_DESC myDesc;
 	D3DSPRITEVERTEX2D *pVertices;
@@ -98,7 +98,7 @@ BOOL CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pSc
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	////////////////////////////////////////////////////
@@ -185,15 +185,15 @@ BOOL CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pSc
 	if ( pTexture )
 		m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::Render3DSprite ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColor )
+bool CD3DMGEng::Render3DSprite ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColor )
 {
 	return Render3DSpriteEx( pTexture, fScale, pTranslation, pMatView, dwColor, dwColor, dwColor, dwColor );
 }
 
-BOOL CD3DMGEng::DrawLine ( FLOAT fX1, FLOAT fY1, FLOAT fZ1, FLOAT fX2, FLOAT fY2, FLOAT fZ2, DWORD dwColor )
+bool CD3DMGEng::DrawLine ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, DWORD dwColor )
 {
     m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -202,8 +202,8 @@ BOOL CD3DMGEng::DrawLine ( FLOAT fX1, FLOAT fY1, FLOAT fZ1, FLOAT fX2, FLOAT fY2
 
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    //m_pDevice->SetRenderState ( D3DRS_ZENABLE, FALSE );
-    //m_pDevice->SetRenderState ( D3DRS_LIGHTING, FALSE );
+    //m_pDevice->SetRenderState ( D3DRS_ZENABLE, false );
+    //m_pDevice->SetRenderState ( D3DRS_LIGHTING, false );
 
 	D3DLVERTEX lineList[2];
     
@@ -211,24 +211,24 @@ BOOL CD3DMGEng::DrawLine ( FLOAT fX1, FLOAT fY1, FLOAT fZ1, FLOAT fX2, FLOAT fY2
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	//////////////////////////////////////////////////
 	// Lock the vertex buffer and copy in the verts.
 	m_pVB->Lock( 0, 0, (void**)&lineList, 0 );
 	{
-        lineList[0].x=fX1;
-        lineList[0].y=fY1;
-        lineList[0].z=fZ1;
-        lineList[0].color=dwColor;
-        lineList[0].specular=dwColor;
+        lineList[0].x = a.x;
+        lineList[0].y = a.y;
+        lineList[0].z = a.z;
+        lineList[0].color = dwColor;
+        lineList[0].specular = dwColor;
 
-        lineList[1].x=fX2;
-        lineList[1].y=fY2;
-        lineList[1].z=fZ2;
-        lineList[1].color=dwColor;
-        lineList[1].specular=dwColor;
+        lineList[1].x = b.x;
+        lineList[1].y = b.y;
+        lineList[1].z = b.z;
+        lineList[1].color = dwColor;
+        lineList[1].specular = dwColor;
 	}
 	m_pVB->Unlock();
 
@@ -237,26 +237,26 @@ BOOL CD3DMGEng::DrawLine ( FLOAT fX1, FLOAT fY1, FLOAT fZ1, FLOAT fX2, FLOAT fY2
 	////////////////////////////////////////////////////
 	// Draw!
 	m_pDevice->DrawPrimitiveUP ( D3DPT_LINESTRIP, 2, lineList, sizeof(lineList)/2 );
-    return TRUE;
+    return true;
 }
 
-BOOL CD3DMGEng::BeginDrawing ()
+bool CD3DMGEng::BeginDrawing ()
 {
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	// Set our own states...
-	m_pDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
+	m_pDevice->SetRenderState( D3DRS_ZENABLE, true );
 	m_pDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
-    m_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+    m_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, true );
     m_pDevice->SetRenderState( D3DRS_SRCBLEND,   D3DBLEND_SRCALPHA );
     m_pDevice->SetRenderState( D3DRS_DESTBLEND,  D3DBLEND_INVSRCALPHA );
-    m_pDevice->SetRenderState( D3DRS_ALPHATESTENABLE,  TRUE );
+    m_pDevice->SetRenderState( D3DRS_ALPHATESTENABLE,  true );
     m_pDevice->SetRenderState( D3DRS_ALPHAREF,         0x08 );
     m_pDevice->SetRenderState( D3DRS_ALPHAFUNC,  D3DCMP_GREATEREQUAL );
-    m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE);
+    m_pDevice->SetRenderState( D3DRS_LIGHTING, false);
     m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
     m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
     m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
@@ -264,35 +264,35 @@ BOOL CD3DMGEng::BeginDrawing ()
     m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
     m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::EndDrawing ()
+bool CD3DMGEng::EndDrawing ()
 {
 	m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::DrawText3D ( FLOAT x, FLOAT y, FLOAT z, D3DMATRIX * pMatView, DWORD dwColor, const TCHAR *wszText,  FLOAT fTextSize, FONTFLAGS ffFlags, FONTSET fsSet )
+bool CD3DMGEng::DrawText3D ( float x, float y, float z, D3DMATRIX * pMatView, DWORD dwColor, const TCHAR *wszText,  float fTextSize, FONTFLAGS ffFlags, FONTSET fsSet )
 {
 	D3DSPRITEVERTEX3D * pVertices = NULL;
     D3DXMATRIX          MatWorld, MatView, MatTranslation, MatTransposed;
 	DWORD               dwTriangleCount = 0;
-	FLOAT               fStartX = 0;
+	float               fStartX = 0;
 
 	////////////////////////////////////////////////////
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	////////////////////////////////////////////////////
 	// Make sure our texture and coords are loaded.
-	if ( m_pFontTexture == NULL || m_bFontInfoLoaded == FALSE )
+	if ( m_pFontTexture == NULL || m_bFontInfoLoaded == false )
 	{
-		return FALSE;
+		return false;
 	}
 
 	///////////////////////////////////////////////////
@@ -310,7 +310,7 @@ BOOL CD3DMGEng::DrawText3D ( FLOAT x, FLOAT y, FLOAT z, D3DMATRIX * pMatView, DW
     D3DXMatrixIdentity ( &MatWorld );
 
     // Add in our scaling here.
-    FLOAT fSize = fTextSize / 100.0f;
+    float fSize = fTextSize / 100.0f;
     D3DXMatrixScaling ( &MatWorld, fSize, fSize, fSize );
 
     // Set position of text in world.
@@ -373,12 +373,12 @@ BOOL CD3DMGEng::DrawText3D ( FLOAT x, FLOAT y, FLOAT z, D3DMATRIX * pMatView, DW
 			continue;
 		}
 
-		FLOAT tx1 = m_aFontCoords[fsSet+c-32].tx1;
-		FLOAT tx2 = m_aFontCoords[fsSet+c-32].tx2;
-		FLOAT ty1 = m_aFontCoords[fsSet+c-32].ty1;
-		FLOAT ty2 = m_aFontCoords[fsSet+c-32].ty2;
-		FLOAT   w = m_aFontCoords[fsSet+c-32].fWidth;
-		FLOAT   h = m_aFontCoords[fsSet+c-32].fHeight;
+		float tx1 = m_aFontCoords[fsSet+c-32].tx1;
+		float tx2 = m_aFontCoords[fsSet+c-32].tx2;
+		float ty1 = m_aFontCoords[fsSet+c-32].ty1;
+		float ty2 = m_aFontCoords[fsSet+c-32].ty2;
+		float   w = m_aFontCoords[fsSet+c-32].fWidth;
+		float   h = m_aFontCoords[fsSet+c-32].fHeight;
 
         if ( c == _T(' ') )
 		{
@@ -418,10 +418,10 @@ BOOL CD3DMGEng::DrawText3D ( FLOAT x, FLOAT y, FLOAT z, D3DMATRIX * pMatView, DW
 	{
 		m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, dwTriangleCount );
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR ) 
+bool CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR ) 
 {
 	D3DSPRITEVERTEX3D *pVertices;
 
@@ -429,14 +429,14 @@ BOOL CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	////////////////////////////////////////////////////
 	// If we have a NULL translation, return an error.
 	if ( pTranslation == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 	float  x = pTranslation->x;
 	float  y = pTranslation->y;
@@ -498,10 +498,10 @@ BOOL CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3
 
     m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorB ) 
+bool CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3DXVECTOR3 *pTranslation, D3DXMATRIX *pMatView, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorB ) 
 {
 	D3DSPRITEVERTEX3D *pVertices;
 
@@ -509,14 +509,14 @@ BOOL CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	////////////////////////////////////////////////////
 	// If we have a NULL translation, return an error.
 	if ( pTranslation == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 	float  x = pTranslation->x;
 	float  y = pTranslation->y;
@@ -571,15 +571,15 @@ BOOL CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, FLOAT fScale, D3
 
     m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::Render2DBox ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, DWORD dwColor )
+bool CD3DMGEng::Render2DBox ( float x, float y, float fWidth, float fHeight, DWORD dwColor )
 {
 	return Render2DBoxEx( x, y, fWidth, fHeight, dwColor, dwColor, dwColor, dwColor );
 }
 
-BOOL CD3DMGEng::Render2DBoxEx ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR )
+bool CD3DMGEng::Render2DBoxEx ( float x, float y, float fWidth, float fHeight, DWORD dwColorTL, DWORD dwColorTR, DWORD dwColorBL, DWORD dwColorBR )
 {
 	D3DSPRITEVERTEX2D *pVertices;
 
@@ -587,7 +587,7 @@ BOOL CD3DMGEng::Render2DBoxEx ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, D
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	///////////////////////////////////////////////////
@@ -642,10 +642,10 @@ BOOL CD3DMGEng::Render2DBoxEx ( FLOAT x, FLOAT y, FLOAT fWidth, FLOAT fHeight, D
 	// Draw!
 	m_pDevice->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, 2 );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor )
+bool CD3DMGEng::DrawPlane3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor )
 {
 	D3DSPRITEVERTEX3D *pVertices;
 
@@ -653,7 +653,7 @@ BOOL CD3DMGEng::DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 p
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	///////////////////////////////////////////////////
@@ -666,30 +666,30 @@ BOOL CD3DMGEng::DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 p
 	// Lock the vertex buffer and copy in the verts.
 	m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 	{
-		pVertices[0].fX =		a[0];
-		pVertices[0].fY =		a[1];
-		pVertices[0].fZ =		a[2];
+		pVertices[0].fX =		a.x;
+		pVertices[0].fY =		a.y;
+		pVertices[0].fZ =		a.z;
 		pVertices[0].tu =		1.0f;
 		pVertices[0].tv =		1.0f;
 		pVertices[0].dwColor =	dwColor;
 
-		pVertices[1].fX =		a[0];
-		pVertices[1].fY =		b[1];
-		pVertices[1].fZ =		a[2];
+		pVertices[1].fX =		a.x;
+		pVertices[1].fY =		b.y;
+		pVertices[1].fZ =		a.z;
 		pVertices[1].tu =		1.0f;
 		pVertices[1].tv =		0.0f;
 		pVertices[1].dwColor =	dwColor;
 
-		pVertices[2].fX =		b[0];
-		pVertices[2].fY =		a[1];
-		pVertices[2].fZ =		b[2];
+		pVertices[2].fX =		b.x;
+		pVertices[2].fY =		a.y;
+		pVertices[2].fZ =		b.z;
 		pVertices[2].tu =		0.0f;
 		pVertices[2].tv =		1.0f;
 		pVertices[2].dwColor =	dwColor;
 
-		pVertices[3].fX =		b[0];
-		pVertices[3].fY =		b[1];
-		pVertices[3].fZ =		b[2];
+		pVertices[3].fX =		b.x;
+		pVertices[3].fY =		b.y;
+		pVertices[3].fZ =		b.z;
 		pVertices[3].tu =		0.0f;
 		pVertices[3].tv =		0.0f;
 		pVertices[3].dwColor =	dwColor;
@@ -698,9 +698,9 @@ BOOL CD3DMGEng::DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 p
 
 	m_pDevice->SetRenderState ( D3DRS_CULLMODE, D3DCULL_NONE );
 	/*
-	m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE, FALSE );
-	m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
-	m_pDevice->SetRenderState ( D3DRS_CLIPPLANEENABLE, FALSE );
+	m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE, false );
+	m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, false );
+	m_pDevice->SetRenderState ( D3DRS_CLIPPLANEENABLE, false );
 	m_pDevice->SetRenderState ( D3DRS_SRCBLEND, D3DBLEND_ONE );
 	m_pDevice->SetRenderState ( D3DRS_DESTBLEND, D3DBLEND_ZERO );
 	*/
@@ -712,54 +712,75 @@ BOOL CD3DMGEng::DrawPlane3D ( D3DXVECTOR3 a, D3DXVECTOR3 b, LPDIRECT3DTEXTURE9 p
 
 	m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::DrawLine3D ( FLOAT ax, FLOAT ay, FLOAT az, FLOAT bx, FLOAT by, FLOAT bz, FLOAT w, FLOAT h, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor )
+bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float fWidth, LPDIRECT3DTEXTURE9 pTexture, DWORD dwColor )
 {
 	D3DSPRITEVERTEX3D *pVertices;
 
 	////////////////////////////////////////////////////
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
-	{
-		return FALSE;
-	}
+		return false;
+	
+    if ( a == b )
+        return false;
 
 	///////////////////////////////////////////////////
 	// Setup the rendering.
 	m_pDevice->SetFVF ( D3DFVF_SPRITEVERTEX3DTEX );
-	m_pDevice->SetStreamSource( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
-	m_pDevice->SetTexture( 0, pTexture );
+	m_pDevice->SetStreamSource ( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
+	m_pDevice->SetTexture ( 0, pTexture );
+
+    CVector vecA ( a.x, a.y, a.z );
+    CVector vecB ( b.x, b.y, b.z );
+    CVector vecDir = vecB - vecA;
+    vecDir.Normalize ();
+    CVector vecUpInit ( 0.0f, 0.0f, 1.0f );
+    CVector vecUp;
+    if ( abs(vecDir.fX) > 0.0001f || abs(vecDir.fY) > 0.0001f )
+    {
+        vecUp = vecDir;
+        vecUp.CrossProduct ( &vecUpInit );
+        vecUp.CrossProduct ( &vecDir );
+    }
+    else
+    {
+        vecUp = CVector ( 0.0f, 1.0f, 0.0f );
+    }
+
+    CVector vecA2 = vecA + vecUp * fWidth;
+    CVector vecB2 = vecB + vecUp * fWidth;
 
 	//////////////////////////////////////////////////
 	// Lock the vertex buffer and copy in the verts.
 	m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 	{
-		pVertices[0].fX =		ax;
-		pVertices[0].fY =		ay;
-		pVertices[0].fZ =		az;
+        pVertices[0].fX =		vecA.fX;
+		pVertices[0].fY =		vecA.fY;
+		pVertices[0].fZ =		vecA.fZ;
 		pVertices[0].tu =		0.0f;
 		pVertices[0].tv =		0.0f;
 		pVertices[0].dwColor =	dwColor;
 
-		pVertices[1].fX =		ax + w;
-		pVertices[1].fY =		ay + w;
-		pVertices[1].fZ =		az + h;
+		pVertices[1].fX =		vecA2.fX;
+		pVertices[1].fY =		vecA2.fY;
+		pVertices[1].fZ =		vecA2.fZ;
 		pVertices[1].tu =		0.0f;
 		pVertices[1].tv =		1.0f;
 		pVertices[1].dwColor =	dwColor;
 
-		pVertices[2].fX =		bx;
-		pVertices[2].fY =		by;
-		pVertices[2].fZ =		bz;
+		pVertices[2].fX =		vecB.fX;
+		pVertices[2].fY =		vecB.fY;
+		pVertices[2].fZ =		vecB.fZ;
 		pVertices[2].tu =		1.0f;
 		pVertices[2].tv =		0.0f;
 		pVertices[2].dwColor =	dwColor;
 
-		pVertices[3].fX =		bx + w;
-		pVertices[3].fY =		by + w;
-		pVertices[3].fZ =		bz + h;
+		pVertices[3].fX =		vecB2.fX;
+		pVertices[3].fY =		vecB2.fY;
+		pVertices[3].fZ =		vecB2.fZ;
 		pVertices[3].tu =		1.0f;
 		pVertices[3].tv =		1.0f;
 		pVertices[3].dwColor =	dwColor;
@@ -768,9 +789,9 @@ BOOL CD3DMGEng::DrawLine3D ( FLOAT ax, FLOAT ay, FLOAT az, FLOAT bx, FLOAT by, F
 
 	m_pDevice->SetRenderState ( D3DRS_CULLMODE, D3DCULL_NONE );
 	/*
-	m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE, FALSE );
-	m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
-	m_pDevice->SetRenderState ( D3DRS_CLIPPLANEENABLE, FALSE );
+	m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE, false );
+	m_pDevice->SetRenderState ( D3DRS_STENCILENABLE, false );
+	m_pDevice->SetRenderState ( D3DRS_CLIPPLANEENABLE, false );
 	m_pDevice->SetRenderState ( D3DRS_SRCBLEND, D3DBLEND_ONE );
 	m_pDevice->SetRenderState ( D3DRS_DESTBLEND, D3DBLEND_ZERO );
 	*/
@@ -782,10 +803,10 @@ BOOL CD3DMGEng::DrawLine3D ( FLOAT ax, FLOAT ay, FLOAT az, FLOAT bx, FLOAT by, F
 
 	m_pDevice->SetTexture( 0, NULL );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::Render3DBox ( FLOAT x, FLOAT y, FLOAT z, FLOAT fL, FLOAT fW, FLOAT fH, DWORD dwColor, BOOL bWireframe )
+bool CD3DMGEng::Render3DBox ( float x, float y, float z, float fL, float fW, float fH, DWORD dwColor, bool bWireframe )
 {
 	D3DSPRITEVERTEX3D *pVertices;
 
@@ -793,7 +814,7 @@ BOOL CD3DMGEng::Render3DBox ( FLOAT x, FLOAT y, FLOAT z, FLOAT fL, FLOAT fW, FLO
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	///////////////////////////////////////////////////
@@ -809,21 +830,21 @@ BOOL CD3DMGEng::Render3DBox ( FLOAT x, FLOAT y, FLOAT z, FLOAT fL, FLOAT fW, FLO
     m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2 );
     m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2 );
 
-	FLOAT w = fW/2;
-	FLOAT h = fH/2;
-	FLOAT d = fL/2;
+	float w = fW/2;
+	float h = fH/2;
+	float d = fL/2;
 	//////////////////////////////////////////////////
 	// Lock the vertex buffer and copy in the verts.
 	m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 	{
 		////////////////////////////////////////////////
 		// Do floating point arithmetic once only.
-		FLOAT px1 = x-w;
-		FLOAT px2 = x+w;
-		FLOAT py1 = y-h;
-		FLOAT py2 = y+h;
-		FLOAT pz1 = z-d;
-		FLOAT pz2 = z+d;
+		float px1 = x-w;
+		float px2 = x+w;
+		float py1 = y-h;
+		float py2 = y+h;
+		float pz1 = z-d;
+		float pz2 = z+d;
 
 		///////////////////////////////////////////////
 		// Render faces of cube.
@@ -875,10 +896,10 @@ BOOL CD3DMGEng::Render3DBox ( FLOAT x, FLOAT y, FLOAT z, FLOAT fL, FLOAT fW, FLO
 	// Draw!
 	m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, 12 );
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::LoadFontTextureFromMem ( PVOID pvMemory, DWORD dwSizeOfFile )
+bool CD3DMGEng::LoadFontTextureFromMem ( PVOID pvMemory, DWORD dwSizeOfFile )
 {
 	D3DSURFACE_DESC desc;
 	
@@ -890,18 +911,18 @@ BOOL CD3DMGEng::LoadFontTextureFromMem ( PVOID pvMemory, DWORD dwSizeOfFile )
 	// Load the requested texture from memory.
 	if ( (D3D_OK != D3DXCreateTextureFromFileInMemory( m_pDevice, pvMemory, dwSizeOfFile, &m_pFontTexture )) )
 	{
-		return FALSE;
+		return false;
 	}
 
 	m_pFontTexture->GetLevelDesc( 0, &desc );
-	m_fFontTexWidth = static_cast<FLOAT>(desc.Width);
-	m_fFontTexHeight = static_cast<FLOAT>(desc.Height);
+	m_fFontTexWidth = static_cast<float>(desc.Width);
+	m_fFontTexHeight = static_cast<float>(desc.Height);
 	LoadDefaultFontInfo();
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::LoadFontTextureFromFile ( TCHAR *wszFileName )
+bool CD3DMGEng::LoadFontTextureFromFile ( TCHAR *wszFileName )
 {
 	D3DSURFACE_DESC desc;
 
@@ -913,30 +934,30 @@ BOOL CD3DMGEng::LoadFontTextureFromFile ( TCHAR *wszFileName )
 	// Load the requested texture.from file.
 	if ( (D3D_OK != D3DXCreateTextureFromFile( m_pDevice, wszFileName, &m_pFontTexture )) )
 	{
-		return FALSE;
+		return false;
 	}
 
 	m_pFontTexture->GetLevelDesc( 0, &desc );
-	m_fFontTexWidth = static_cast<FLOAT>(desc.Width);
-	m_fFontTexHeight = static_cast<FLOAT>(desc.Height);
+	m_fFontTexWidth = static_cast<float>(desc.Width);
+	m_fFontTexHeight = static_cast<float>(desc.Height);
 	LoadDefaultFontInfo();
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::LoadFontInfoFromMem ( PVOID pvMemory )
+bool CD3DMGEng::LoadFontInfoFromMem ( PVOID pvMemory )
 {
 	//////////////////////////////////////////////////////
 	// We must have our texture loaded first!
 	if ( m_pFontTexture == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	BYTE *pTypeWidths = static_cast<PBYTE>(pvMemory);
-	FLOAT fDistX = 0.0f;
-	FLOAT fDistY = 0.0f;
-	FLOAT fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
+	float fDistX = 0.0f;
+	float fDistY = 0.0f;
+	float fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
 
 	for ( int r=0; r < D3DFE_CHARACTERSPERROW; r++ )
 	{
@@ -945,7 +966,7 @@ BOOL CD3DMGEng::LoadFontInfoFromMem ( PVOID pvMemory )
 		for ( int c=0; c < D3DFE_CHARACTERSPERCOLUMN; c++ )
 		{
 			UCHAR i = (r * D3DFE_CHARACTERSPERROW) + c;
-			FLOAT fCharWidth = static_cast<FLOAT>(pTypeWidths[i]);
+			float fCharWidth = static_cast<float>(pTypeWidths[i]);
 			
 			m_aFontCoords[i].tx1 = fDistX / m_fFontTexWidth;
 			m_aFontCoords[i].tx2 = (fDistX + fCharWidth) / m_fFontTexWidth;
@@ -961,10 +982,10 @@ BOOL CD3DMGEng::LoadFontInfoFromMem ( PVOID pvMemory )
 		fDistY += fCharHeight;
 	}
 
-	return (m_bFontInfoLoaded = TRUE);
+	return (m_bFontInfoLoaded = true);
 }
 
-BOOL CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
+bool CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
 {
 	HANDLE hFile;
 	DWORD dwSizeRead;
@@ -974,20 +995,20 @@ BOOL CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
 	// We must have our texture loaded first!
 	if ( m_pFontTexture == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	//////////////////////////////////////////////////////
 	// Load the widths file from disk.
 	if ( (hFile = CreateFile( wszFileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL )) == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	//if ( (pTypeWidths = static_cast<PBYTE>(VirtualAlloc( NULL,D3DFE_MAXFONTWIDTHS,MEM_COMMIT,PAGE_READWRITE ))) == NULL ) 
 	if ( (pTypeWidths = static_cast<PBYTE>(VirtualAlloc( NULL,256 + 17,MEM_COMMIT,PAGE_READWRITE ))) == NULL ) 
 	{
-		return FALSE;
+		return false;
 	}
 
     //ReadFile(hFile, pTypeWidths, D3DFE_MAXFONTWIDTHS, &dwSizeRead, NULL);
@@ -996,9 +1017,9 @@ BOOL CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
 
 	//////////////////////////////////////////////////////
 	// Start filling up our coordinate array.
-	FLOAT fDistX = 0.0f;
-	FLOAT fDistY = 0.0f;
-	FLOAT fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
+	float fDistX = 0.0f;
+	float fDistY = 0.0f;
+	float fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
 
 	for ( int r=0; r < D3DFE_CHARACTERSPERROW; r++ )
 	{
@@ -1007,7 +1028,7 @@ BOOL CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
 		for ( int c=0; c < D3DFE_CHARACTERSPERCOLUMN; c++ )
 		{
 			UCHAR i = (r * D3DFE_CHARACTERSPERROW) + c;
-			FLOAT fCharWidth = static_cast<FLOAT>(pTypeWidths[17 + 32 + i]) - 2;
+			float fCharWidth = static_cast<float>(pTypeWidths[17 + 32 + i]) - 2;
 			
 			m_aFontCoords[i].tx1 = fDistX / m_fFontTexWidth;
 			m_aFontCoords[i].tx2 = (fDistX + fCharWidth) / m_fFontTexWidth;
@@ -1027,24 +1048,24 @@ BOOL CD3DMGEng::LoadFontInfoFromFile ( TCHAR *wszFileName )
 	// Free up the memory we used to get the file data.
 	VirtualFree( static_cast<PVOID>(pTypeWidths), 0, MEM_RELEASE );
 
-	return (m_bFontInfoLoaded = TRUE);
+	return (m_bFontInfoLoaded = true);
 }
 
-BOOL CD3DMGEng::LoadDefaultFontInfo ( VOID )
+bool CD3DMGEng::LoadDefaultFontInfo ( void )
 {
 	//////////////////////////////////////////////////////
 	// We must have our texture loaded first!
 	if ( m_pFontTexture == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	//////////////////////////////////////////////////////
 	// Start filling up our coordinate array.
-	FLOAT fDistX = 0.0f;
-	FLOAT fDistY = 0.0f;
-	FLOAT fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
-	FLOAT fCharWidth = m_fFontTexWidth / D3DFE_CHARACTERSPERCOLUMN;
+	float fDistX = 0.0f;
+	float fDistY = 0.0f;
+	float fCharHeight = m_fFontTexHeight / D3DFE_CHARACTERSPERROW;
+	float fCharWidth = m_fFontTexWidth / D3DFE_CHARACTERSPERCOLUMN;
 
 	for ( int r=0; r < D3DFE_CHARACTERSPERROW; r++ )
 	{
@@ -1066,18 +1087,18 @@ BOOL CD3DMGEng::LoadDefaultFontInfo ( VOID )
 		fDistY += fCharHeight;
 	}
 
-	return (m_bFontInfoLoaded = TRUE);
+	return (m_bFontInfoLoaded = true);
 }
 
-BOOL CD3DMGEng::UnloadFont ( VOID )
+bool CD3DMGEng::UnloadFont ( void )
 {
 	SAFE_RELEASE( m_pFontTexture );
-	m_bFontInfoLoaded = FALSE;
+	m_bFontInfoLoaded = false;
 
-	return TRUE;
+	return true;
 }
 
-VOID CD3DMGEng::DrawTextTTF ( int left, int top, int right, int bottom,  DWORD dwColor, const TCHAR *wszText, INT iTextHeight, INT iTextWeight, DWORD dwFormat, CHAR * szFaceName )
+void CD3DMGEng::DrawTextTTF ( int left, int top, int right, int bottom,  DWORD dwColor, const TCHAR *wszText, INT iTextHeight, INT iTextWeight, DWORD dwFormat, CHAR * szFaceName )
 {
     if ( m_dLastFontDesc.Height != iTextHeight || m_dLastFontDesc.Weight != iTextWeight || strcmp(m_dLastFontDesc.FaceName, szFaceName) != 0 || m_pLastFont == NULL )
     {
@@ -1122,7 +1143,7 @@ VOID CD3DMGEng::DrawTextTTF ( int left, int top, int right, int bottom,  DWORD d
                     dwColor); //draw text
 }
 
-BOOL CD3DMGEng::DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszText,  FLOAT fTextSize, FONTFLAGS ffFlags, FONTSET fsSet )
+bool CD3DMGEng::DrawText2D ( float x, float y, DWORD dwColor, const TCHAR *wszText,  float fTextSize, FONTFLAGS ffFlags, FONTSET fsSet )
 {
 	D3DSPRITEVERTEX2D *pVertices;
 
@@ -1130,14 +1151,14 @@ BOOL CD3DMGEng::DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszTe
 	// Make sure we have a valid vertex buffer.
 	if ( m_pVB == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	////////////////////////////////////////////////////
 	// Make sure our texture and coords are loaded.
-	if ( m_pFontTexture == NULL || m_bFontInfoLoaded == FALSE )
+	if ( m_pFontTexture == NULL || m_bFontInfoLoaded == false )
 	{
-		return FALSE;
+		return false;
 	}
 
 	///////////////////////////////////////////////////
@@ -1173,12 +1194,12 @@ BOOL CD3DMGEng::DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszTe
 		
 	
 	DWORD dwTriangleCount = 0;
-	const FLOAT fStartX = x;
+	const float fStartX = x;
 	m_pVB->Lock( 0, 0, (void**)&pVertices, D3DLOCK_DISCARD );
 	while ( *wszText )
 	{
 		TCHAR c = *wszText++;
-		FLOAT fScl = fTextSize;
+		float fScl = fTextSize;
 
 		if ( c == _T('\n') )
 		{
@@ -1192,12 +1213,12 @@ BOOL CD3DMGEng::DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszTe
 			continue;
 		}
 
-		FLOAT tx1 = m_aFontCoords[fsSet+c-32].tx1;
-		FLOAT tx2 = m_aFontCoords[fsSet+c-32].tx2;
-		FLOAT ty1 = m_aFontCoords[fsSet+c-32].ty1;
-		FLOAT ty2 = m_aFontCoords[fsSet+c-32].ty2;
-		FLOAT   w = m_aFontCoords[fsSet+c-32].fWidth;
-		FLOAT   h = m_aFontCoords[fsSet+c-32].fHeight;
+		float tx1 = m_aFontCoords[fsSet+c-32].tx1;
+		float tx2 = m_aFontCoords[fsSet+c-32].tx2;
+		float ty1 = m_aFontCoords[fsSet+c-32].ty1;
+		float ty2 = m_aFontCoords[fsSet+c-32].ty2;
+		float   w = m_aFontCoords[fsSet+c-32].fWidth;
+		float   h = m_aFontCoords[fsSet+c-32].fHeight;
 
 		w *= fScl;
 		h *= fScl;
@@ -1240,30 +1261,30 @@ BOOL CD3DMGEng::DrawText2D ( FLOAT x, FLOAT y, DWORD dwColor, const TCHAR *wszTe
 		m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, dwTriangleCount );
 	}
 
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::UTIL_FormatText ( const TCHAR* wszInputText, TCHAR* wszOutputText, float fMaxWidth, FLOAT fTextSize, FONTSET fsSet )
+bool CD3DMGEng::UTIL_FormatText ( const TCHAR* wszInputText, TCHAR* wszOutputText, float fMaxWidth, float fTextSize, FONTSET fsSet )
 {
-	FLOAT fCurrentWidth = 0.0f;
+	float fCurrentWidth = 0.0f;
 	DWORD dwOutputIndex = 0;
 
 	// Make sure we have valid parameters.
 	if ( wszInputText == NULL || wszOutputText == NULL )
 	{
-		return FALSE;
+		return false;
 	}
 
 	// Make sure we've been loaded correctly!
-	if ( m_bFontInfoLoaded == FALSE )
+	if ( m_bFontInfoLoaded == false )
 	{
-		return FALSE;
+		return false;
 	}
 
 	while ( *wszInputText )
 	{
 		TCHAR c = *wszInputText++;
-		FLOAT fScl = fTextSize;
+		float fScl = fTextSize;
 
 		// Check for newline case.
 		// If we find a newline, reset current width and continue.
@@ -1297,7 +1318,7 @@ BOOL CD3DMGEng::UTIL_FormatText ( const TCHAR* wszInputText, TCHAR* wszOutputTex
 		// at some point.
 		if ( c == _T(' ') )
 		{
-			FLOAT fWordWidth = 0.0f;
+			float fWordWidth = 0.0f;
 			const TCHAR *theWord = wszInputText;
 
 			while ( *theWord )
@@ -1346,26 +1367,26 @@ BOOL CD3DMGEng::UTIL_FormatText ( const TCHAR* wszInputText, TCHAR* wszOutputTex
 	
 	// Put a NULL terminator on our output string.
 	wszOutputText[dwOutputIndex] = NULL;
-	return TRUE;
+	return true;
 }
 
-BOOL CD3DMGEng::UTIL_GetTextExtent ( const TCHAR* strText, SIZE* pSize, FLOAT fTextSize, FONTSET fsSet )
+bool CD3DMGEng::UTIL_GetTextExtent ( const TCHAR* strText, SIZE* pSize, float fTextSize, FONTSET fsSet )
 {
     if( NULL == strText || NULL == pSize )
 	{
-		return FALSE;
+		return false;
 	}
 
 	// Make sure we've been loaded correctly!
-	if ( m_bFontInfoLoaded == FALSE )
+	if ( m_bFontInfoLoaded == false )
 	{
-		return FALSE;
+		return false;
 	}
 
-	FLOAT fScl       = fTextSize;
-    FLOAT fRowWidth  = 0.0f;
-    FLOAT fWidth     = 0.0f;
-    FLOAT fHeight    = m_aFontCoords[fsSet].fHeight*fScl;
+	float fScl       = fTextSize;
+    float fRowWidth  = 0.0f;
+    float fWidth     = 0.0f;
+    float fHeight    = m_aFontCoords[fsSet].fHeight*fScl;
 
     while( *strText )
     {
@@ -1396,10 +1417,10 @@ BOOL CD3DMGEng::UTIL_GetTextExtent ( const TCHAR* strText, SIZE* pSize, FLOAT fT
     pSize->cx = (int)fWidth;
 	pSize->cy = (int)fHeight;
 
-	return TRUE;
+	return true;
 }
 
-VOID CD3DMGEng::UTIL_CaptureDeviceState ( )
+void CD3DMGEng::UTIL_CaptureDeviceState ( )
 {
     if ( m_pDeviceState == NULL )
     {
@@ -1407,7 +1428,7 @@ VOID CD3DMGEng::UTIL_CaptureDeviceState ( )
     }
 }
 
-VOID CD3DMGEng::UTIL_RestoreDeviceState ( )
+void CD3DMGEng::UTIL_RestoreDeviceState ( )
 {
     if ( m_pDeviceState )
     {
