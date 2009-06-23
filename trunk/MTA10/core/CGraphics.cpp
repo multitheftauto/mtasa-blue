@@ -858,7 +858,7 @@ void CGraphics::DrawPostGUIQueue ( void )
 
 bool CGraphics::IsDrawQueueItemSprite ( const sDrawQueueItem& Item )
 {
-    return Item.eType == QUEUE_LINE || Item.eType == QUEUE_TEXT || Item.eType == QUEUE_RECT ||
+    return Item.eType == QUEUE_TEXT || Item.eType == QUEUE_RECT ||
            Item.eType == QUEUE_CIRCLE || Item.eType == QUEUE_TEXTURE;
 }
 
