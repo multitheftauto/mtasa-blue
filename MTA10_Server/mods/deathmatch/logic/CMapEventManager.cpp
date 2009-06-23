@@ -261,6 +261,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     lua_getglobal ( pState, "client" );
                     CLuaArgument OldClient ( pState, -1 );
+
+                    lua_getglobal ( pState, "eventName" );
+                    CLuaArgument OldEventName ( pState, -1 );
                     
                     // Set the "source", "this", "sourceResource" and "sourceResourceRoot" globals on that VM
                     lua_pushelement ( pState, pSource );
@@ -286,6 +289,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 					    lua_setglobal ( pState, "client" );
 				    }
 
+                    lua_pushstring ( pState, szName );
+                    lua_setglobal ( pState, "eventName" );
+
                     // Call it
                     pMapEvent->Call ( Arguments );
                     bCalled = true;
@@ -305,6 +311,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     OldClient.Push ( pState );
                     lua_setglobal ( pState, "client" );
+
+                    OldEventName.Push ( pState );
+                    lua_setglobal ( pState, "eventName" );
                 }
             }
         }
