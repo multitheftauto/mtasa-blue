@@ -3334,7 +3334,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
         }               
         // Have we taken any damage here?
-        if ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor )
+        if ( (fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor) && fDamage != 0.0f )
         {
             CLuaArguments Arguments;
             if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
@@ -3352,13 +3352,12 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 return false;
             }
 
+            // Update our stored health/armor
+            pDamagedPed->m_fHealth = fCurrentHealth;
+            pDamagedPed->m_fArmor = fCurrentArmor;
             // Is it the local player?
             if ( pDamagedPed->IsLocalPlayer () )
             {  
-                // Update our stored health/armor
-                pDamagedPed->m_fHealth = fCurrentHealth;
-                pDamagedPed->m_fArmor = fCurrentArmor;
-
                 // Update our stored damage stuff
                 m_ucDamageWeapon = static_cast < unsigned char > ( weaponUsed );
                 m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
