@@ -951,6 +951,9 @@ void CServerBrowser::ClearServerPasswords ()
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
-    pServerPasswords->DeleteAllSubNodes();
-    pConfig->DeleteSubNode ( pServerPasswords );
+    if ( pServerPasswords )
+    {
+        pServerPasswords->DeleteAllSubNodes();
+        pConfig->DeleteSubNode ( pServerPasswords );
+    }
 }
