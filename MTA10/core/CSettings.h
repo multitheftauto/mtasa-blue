@@ -133,10 +133,10 @@ protected:
 	
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
-    CGUILabel*          m_pLabelMTAVolume;
-    CGUIProgressBar*    m_pAudioRadioVolume;
-    CGUIProgressBar*    m_pAudioSFXVolume;
-    CGUIProgressBar*    m_pAudioMTAVolume;
+    //CGUILabel*          m_pLabelMTAVolume;
+    CGUIScrollBar*      m_pAudioRadioVolume;
+    CGUIScrollBar*      m_pAudioSFXVolume;
+    //CGUIScrollBar*      m_pAudioMTAVolume;
 
 	CGUIGridList*	    m_pBindsList;
 	CGUIButton*		    m_pBindsDefButton;

@@ -94,6 +94,14 @@ unsigned char CSettingsSA::GetRadioVolume ( void )
 
 void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
 {
+    DWORD dwRadioVolume = ucVolume;
+    _asm
+    {
+        mov ecx, CLASS_CAudioEngine
+        mov eax, FUNC_CAudioEngine_SetMusicMasterVolume
+        push dwRadioVolume
+        call eax
+    }
     m_pInterface->ucRadioVolume = ucVolume;
 }
 
@@ -104,6 +112,14 @@ unsigned char CSettingsSA::GetSFXVolume ( void )
 
 void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 {
+    DWORD dwSFXVolume = ucVolume;
+    _asm
+    {
+        mov ecx, CLASS_CAudioEngine
+        mov eax, FUNC_CAudioEngine_SetEffectsMasterVolume
+        push dwSFXVolume
+        call eax
+    }
     m_pInterface->ucSfxVolume = ucVolume;
 }
 
@@ -118,7 +134,7 @@ void CSettingsSA::Save ()
     _asm
     {
         mov ecx, CLASS_CMenuManager
-        mov eax, FUNC_SAVE
+        mov eax, FUNC_CMenuManager_Save
         call eax
     }
 }

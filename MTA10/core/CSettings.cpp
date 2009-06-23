@@ -340,7 +340,7 @@ CSettings::CSettings ( void )
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
 	m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
 
-    m_pAudioRadioVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
 
@@ -349,18 +349,18 @@ CSettings::CSettings ( void )
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
 	m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
 
-    m_pAudioSFXVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
 
-    m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
+    /*m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
 	m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
-
-    m_pAudioMTAVolume = reinterpret_cast < CGUIProgressBar* > ( pManager->CreateProgressBar ( pTabAudio ) );
+    //Not used
+    m_pAudioMTAVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
-    m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );*/
 
 	/**
 	 *	Video tab
@@ -1553,8 +1553,8 @@ void CSettings::LoadData ( void )
 
     // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    m_pAudioRadioVolume->SetProgress ( gameSettings->GetRadioVolume() / 64 * 100.0f );
-    m_pAudioSFXVolume->SetProgress ( gameSettings->GetSFXVolume() / 64 * 100.0f );
+    m_pAudioRadioVolume->SetScrollPosition ( (float)gameSettings->GetRadioVolume() / 64.0f );
+    m_pAudioSFXVolume->SetScrollPosition ( (float)gameSettings->GetSFXVolume() / 64.0f );
     // Video
 
     VideoMode           vidModemInfo;
@@ -1669,8 +1669,8 @@ void CSettings::SaveData ( void )
 
     // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    gameSettings->SetRadioVolume ( ( unsigned char )( m_pAudioRadioVolume->GetProgress() / 100 * 64 ) );
-    gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetProgress() / 100 * 64 ) );
+    gameSettings->SetRadioVolume ( ( unsigned char )( m_pAudioRadioVolume->GetScrollPosition() * 64.0f ) );
+    gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetScrollPosition() * 64.0f ) );
 
 
     // Video
