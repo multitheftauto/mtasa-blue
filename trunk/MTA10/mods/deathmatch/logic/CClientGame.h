@@ -355,6 +355,8 @@ private:
 	bool								OnKeyDown						( CGUIKeyEventArgs Args );
 	bool								OnMouseClick					( CGUIMouseEventArgs Args );
 	bool								OnMouseDoubleClick				( CGUIMouseEventArgs Args );
+	bool								OnMouseButtonDown				( CGUIMouseEventArgs Args );
+	bool								OnMouseButtonUp					( CGUIMouseEventArgs Args );
 	bool								OnMouseMove						( CGUIMouseEventArgs Args );
 	bool								OnMouseEnter					( CGUIMouseEventArgs Args );
 	bool								OnMouseLeave					( CGUIMouseEventArgs Args );

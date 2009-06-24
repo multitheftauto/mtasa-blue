@@ -161,6 +161,8 @@ public:
 	const GUI_CALLBACK_KEY&			GetKeyDownHandler			( void )									{ return m_KeyDownHandler; }
 	const GUI_CALLBACK_MOUSE&		GetMouseClickHandler		( void )									{ return m_MouseClickHandler; }
 	const GUI_CALLBACK_MOUSE&		GetMouseDoubleClickHandler	( void )									{ return m_MouseDoubleClickHandler; }
+	const GUI_CALLBACK_MOUSE&		GetMouseButtonDownHandler	( void )									{ return m_MouseButtonDownHandler; }
+	const GUI_CALLBACK_MOUSE&		GetMouseButtonUpHandler		( void )									{ return m_MouseButtonUpHandler; }
 	const GUI_CALLBACK_MOUSE&		GetMouseMoveHandler			( void )									{ return m_MouseMoveHandler; }
 	const GUI_CALLBACK_MOUSE&		GetMouseEnterHandler		( void )									{ return m_MouseEnterHandler; }
 	const GUI_CALLBACK_MOUSE&		GetMouseLeaveHandler		( void )									{ return m_MouseLeaveHandler; }
@@ -172,6 +174,8 @@ public:
 	void							SetKeyDownHandler			( void )									{ m_KeyDownHandler = GUI_CALLBACK_KEY (); }
 	void							SetMouseClickHandler		( void )									{ m_MouseClickHandler = GUI_CALLBACK_MOUSE (); }
 	void							SetMouseDoubleClickHandler	( void )									{ m_MouseDoubleClickHandler = GUI_CALLBACK_MOUSE (); }
+	void							SetMouseButtonDownHandler	( void )									{ m_MouseButtonDownHandler = GUI_CALLBACK_MOUSE (); }
+	void							SetMouseButtonUpHandler		( void )									{ m_MouseButtonUpHandler = GUI_CALLBACK_MOUSE (); }
 	void							SetMouseMoveHandler			( void )									{ m_MouseMoveHandler = GUI_CALLBACK_MOUSE (); }
 	void							SetMouseEnterHandler		( void )									{ m_MouseEnterHandler = GUI_CALLBACK_MOUSE (); }
 	void							SetMouseLeaveHandler		( void )									{ m_MouseLeaveHandler = GUI_CALLBACK_MOUSE (); }
@@ -183,6 +187,8 @@ public:
 	void							SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback )		{ m_KeyDownHandler = Callback; }
 	void							SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseClickHandler = Callback; }
 	void							SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseDoubleClickHandler = Callback; }
+	void							SetMouseButtonDownHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseButtonDownHandler = Callback; }
+	void							SetMouseButtonUpHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseButtonUpHandler = Callback; }
 	void							SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseMoveHandler = Callback; }
 	void							SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseEnterHandler = Callback; }
 	void							SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseLeaveHandler = Callback; }
@@ -197,6 +203,8 @@ public:
 	bool							Event_KeyDown				( const CEGUI::EventArgs& e );
 	bool							Event_MouseClick			( const CEGUI::EventArgs& e );
 	bool							Event_MouseDoubleClick		( const CEGUI::EventArgs& e );
+	bool							Event_MouseButtonDown		( const CEGUI::EventArgs& e );
+	bool							Event_MouseButtonUp			( const CEGUI::EventArgs& e );
 	bool							Event_MouseWheel			( const CEGUI::EventArgs& e );
 	bool							Event_MouseMove				( const CEGUI::EventArgs& e );
 	bool							Event_MouseEnter			( const CEGUI::EventArgs& e );
@@ -255,6 +263,8 @@ private:
     GUI_CALLBACK_KEY                m_KeyDownHandler;
 	GUI_CALLBACK_MOUSE              m_MouseClickHandler;
 	GUI_CALLBACK_MOUSE              m_MouseDoubleClickHandler;
+    GUI_CALLBACK_MOUSE              m_MouseButtonDownHandler;
+    GUI_CALLBACK_MOUSE              m_MouseButtonUpHandler;
 	GUI_CALLBACK_MOUSE				m_MouseMoveHandler;
 	GUI_CALLBACK_MOUSE				m_MouseEnterHandler;
 	GUI_CALLBACK_MOUSE  			m_MouseLeaveHandler;

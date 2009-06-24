@@ -1159,12 +1159,12 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
-		ApplyServerBrowserSettings ();
+        ApplyServerBrowserSettings ();
         ApplyGameSettings ();
         ApplyMenuSettings ();
 
         m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-		m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+        m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
 
         m_Community.Initialize ();
     }
@@ -1232,9 +1232,13 @@ void CCore::DoPostFramePulse ( )
 // Called after MOD is unloaded
 void CCore::OnModUnload ( )
 {
-	// reattach the global event
+    // reattach the global event
     m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-	m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+    m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+
+    // remove unused events
+    m_pGUI->SetMouseButtonDownHandler ();
+    m_pGUI->SetMouseButtonUpHandler ();
 }
 
 
