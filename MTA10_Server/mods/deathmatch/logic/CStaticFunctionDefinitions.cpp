@@ -3126,18 +3126,24 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CElement* pElement, CElement*
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         // If we don't have a target, change it to the player
-        if ( !pTarget ) pTarget = pPlayer;
+        if ( !pTarget )
+            pTarget = pPlayer;
 
         // Make sure our target is a player element
-        if ( pTarget->GetType () == CElement::PLAYER )
+        switch ( pTarget->GetType () )
         {
-            pCamera->SetMode ( CAMERAMODE_PLAYER );
-            pCamera->SetTarget ( pTarget );
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                pCamera->SetMode ( CAMERAMODE_PLAYER );
+                pCamera->SetTarget ( pTarget );
 
-            CBitStream BitStream;
-            BitStream.pBitStream->Write ( pTarget->GetID () );
-	        pPlayer->Send ( CLuaPacket ( SET_CAMERA_TARGET, *BitStream.pBitStream ) );
-            return true;
+                CBitStream BitStream;
+                BitStream.pBitStream->Write ( pTarget->GetID () );
+	            pPlayer->Send ( CLuaPacket ( SET_CAMERA_TARGET, *BitStream.pBitStream ) );
+                return true;
+            }
         }
     }
 
