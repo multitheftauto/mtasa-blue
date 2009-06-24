@@ -3374,7 +3374,12 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
                 m_bDamageSent = false;
             }
-
+            if ( pDamagedPed->GetType () == CCLIENTPED )
+            {   
+                // Update our stored health/armor (Fixes #4353)
+                pDamagedPed->m_fHealth = fCurrentHealth;
+                pDamagedPed->m_fArmor = fCurrentArmor;
+            }
             // Does this damage kill the player?
             if ( fCurrentHealth == 0.0f )
             {                
