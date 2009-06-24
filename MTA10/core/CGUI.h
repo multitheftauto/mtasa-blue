@@ -134,8 +134,10 @@ private:
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
 
-	GUI_CALLBACK_MOUSE      m_ModMouseClickHandler;
-	GUI_CALLBACK_MOUSE      m_ModMouseDoubleClickHandler;
+    GUI_CALLBACK_MOUSE      m_ModMouseClickHandler;
+    GUI_CALLBACK_MOUSE      m_ModMouseDoubleClickHandler;
+    GUI_CALLBACK_MOUSE      m_ModMouseButtonDownHandler;
+    GUI_CALLBACK_MOUSE      m_ModMouseButtonUpHandler;
 };
 
 #endif

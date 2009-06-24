@@ -104,6 +104,8 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventKeyDown			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_KeyDown, this ) );
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseClick		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseClick, this ) );
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseDoubleClick	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseDoubleClick, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonDown	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonDown, this ) );
+	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonUp		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonUp, this ) );
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseWheel		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseWheel, this ) );
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseMove			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseMove, this ) );
 	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseEnters		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseEnter, this ) );
@@ -775,6 +777,67 @@ bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
 	return true;
 }
 
+bool CGUI_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& Args )
+{
+    if ( m_MouseButtonDownHandler )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
+
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
+
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
+
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
+
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseButtonDownHandler ( NewArgs );
+    }
+    return true;
+}
+
+bool CGUI_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& Args )
+{
+    if ( m_MouseButtonUpHandler )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
+
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
+
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
+
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
+
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseButtonUpHandler ( NewArgs );
+    }
+    return true;
+}
 
 bool CGUI_Impl::Event_MouseWheel ( const CEGUI::EventArgs& Args )
 {

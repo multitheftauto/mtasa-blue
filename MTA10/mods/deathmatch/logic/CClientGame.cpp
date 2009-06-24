@@ -137,6 +137,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pCore->GetGUI ()->SetKeyDownHandler           ( GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
     g_pCore->GetGUI ()->SetMouseClickHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
     g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseDoubleClick, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonDownHandler   ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonDown, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonUpHandler     ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonUp, this ) );
     g_pCore->GetGUI ()->SetMouseMoveHandler         ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseMove, this ) );
     g_pCore->GetGUI ()->SetMouseEnterHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseEnter, this ) );
     g_pCore->GetGUI ()->SetMouseLeaveHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseLeave, this ) );
@@ -2270,8 +2272,10 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
 
     // GUI events
-    m_Events.AddEvent ( "onClientGUIClick", "element", NULL, false );
-    m_Events.AddEvent ( "onClientGUIDoubleClick", "element", NULL, false );
+    m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
+    m_Events.AddEvent ( "onClientGUIDoubleClick", "button, state, absoluteX, absoluteY", NULL, false );
+    m_Events.AddEvent ( "onClientGUIMouseDown", "button, absoluteX, absoluteY", NULL, false );
+    m_Events.AddEvent ( "onClientGUIMouseUp", "button, absoluteX, absoluteY", NULL, false );
     m_Events.AddEvent ( "onClientGUIScroll", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUIChanged", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUIAccepted", "element", NULL, false );
@@ -4208,11 +4212,17 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
     char* szState = NULL;
     switch ( Args.button )
     {
-    case CGUIMouse::LeftButton: szButton = "left"; szState = "up";
+    case CGUIMouse::LeftButton:
+        szButton = "left";
+        szState = "up";
         break;
-    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "up";
+    case CGUIMouse::MiddleButton:
+        szButton = "middle";
+        szState = "up";
         break;
-    case CGUIMouse::RightButton: szButton = "right"; szState = "up";
+    case CGUIMouse::RightButton:
+        szButton = "right";
+        szState = "up";
         break;
     }
 
@@ -4246,11 +4256,17 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     char* szState = NULL;
     switch ( Args.button )
     {
-    case CGUIMouse::LeftButton: szButton = "left"; szState = "up";
+    case CGUIMouse::LeftButton:
+        szButton = "left";
+        szState = "up";
         break;
-    case CGUIMouse::MiddleButton: szButton = "middle"; szState = "up";
+    case CGUIMouse::MiddleButton:
+        szButton = "middle";
+        szState = "up";
         break;
-    case CGUIMouse::RightButton: szButton = "right"; szState = "up";
+    case CGUIMouse::RightButton:
+        szButton = "right";
+        szState = "up";
         break;
     }
 
@@ -4275,6 +4291,72 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     return true;
 }
 
+bool CClientGame::OnMouseButtonDown ( CGUIMouseEventArgs Args )
+{
+    if ( !Args.pWindow )
+        return false;
+
+    const char* szButton = NULL;
+    switch ( Args.button )
+    {
+    case CGUIMouse::LeftButton:
+        szButton = "left";
+        break;
+    case CGUIMouse::MiddleButton:
+        szButton = "middle";
+        break;
+    case CGUIMouse::RightButton:
+        szButton = "right";
+        break;
+    }
+
+    CLuaArguments Arguments;
+    Arguments.PushString ( szButton );
+    Arguments.PushNumber ( Args.position.fX );
+    Arguments.PushNumber ( Args.position.fY );
+
+    CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
+    if ( GetGUIManager ()->Exists ( pGUIElement ) )
+    {
+        pGUIElement->CallEvent ( "onClientGUIMouseDown", Arguments, true );
+    }
+
+    return true;
+}
+
+
+bool CClientGame::OnMouseButtonUp ( CGUIMouseEventArgs Args )
+{
+    if ( !Args.pWindow )
+        return false;
+
+    const char* szButton = NULL;
+    switch ( Args.button )
+    {
+    case CGUIMouse::LeftButton:
+        szButton = "left";
+        break;
+    case CGUIMouse::MiddleButton:
+        szButton = "middle";
+        break;
+    case CGUIMouse::RightButton:
+        szButton = "right";
+        break;
+    }
+
+    CLuaArguments Arguments;
+    Arguments.PushString ( szButton );
+    Arguments.PushNumber ( Args.position.fX );
+    Arguments.PushNumber ( Args.position.fY );
+
+    CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
+    if ( GetGUIManager ()->Exists ( pGUIElement ) )
+    {
+        pGUIElement->CallEvent ( "onClientGUIMouseUp", Arguments, true );
+    }
+
+    return true;
+}
 
 bool CClientGame::OnMouseMove ( CGUIMouseEventArgs Args )
 {

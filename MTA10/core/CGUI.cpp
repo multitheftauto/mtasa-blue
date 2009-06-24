@@ -391,8 +391,12 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         {
             m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
             m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
+            m_ModMouseButtonDownHandler = pGUI->GetMouseButtonDownHandler ();
+            m_ModMouseButtonUpHandler = pGUI->GetMouseButtonUpHandler ();
             pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
             pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
+            pGUI->SetMouseButtonDownHandler ();
+            pGUI->SetMouseButtonUpHandler ();
         }
         else
         {
@@ -400,6 +404,10 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
                 pGUI->SetMouseClickHandler ( m_ModMouseClickHandler );
             if ( m_ModMouseDoubleClickHandler )
                 pGUI->SetMouseDoubleClickHandler ( m_ModMouseDoubleClickHandler );
+            if ( m_ModMouseButtonDownHandler )
+                pGUI->SetMouseButtonDownHandler ( m_ModMouseButtonDownHandler );
+            if ( m_ModMouseButtonUpHandler )
+                pGUI->SetMouseButtonUpHandler ( m_ModMouseButtonUpHandler );
         }
     }
     else

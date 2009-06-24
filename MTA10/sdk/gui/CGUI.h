@@ -143,6 +143,8 @@ public:
 	virtual const GUI_CALLBACK_KEY&		GetKeyDownHandler			( void ) = 0;
 	virtual const GUI_CALLBACK_MOUSE&	GetMouseClickHandler		( void ) = 0;
 	virtual const GUI_CALLBACK_MOUSE&	GetMouseDoubleClickHandler	( void ) = 0;
+    virtual const GUI_CALLBACK_MOUSE&	GetMouseButtonDownHandler	( void ) = 0;
+	virtual const GUI_CALLBACK_MOUSE&	GetMouseButtonUpHandler		( void ) = 0;
 	virtual const GUI_CALLBACK_MOUSE&	GetMouseMoveHandler			( void ) = 0;
 	virtual const GUI_CALLBACK_MOUSE&	GetMouseEnterHandler		( void ) = 0;
 	virtual const GUI_CALLBACK_MOUSE&	GetMouseLeaveHandler		( void ) = 0;
@@ -154,6 +156,8 @@ public:
 	virtual void				SetKeyDownHandler			( void ) = 0;
 	virtual void				SetMouseClickHandler		( void ) = 0;
 	virtual void				SetMouseDoubleClickHandler	( void ) = 0;
+	virtual void				SetMouseButtonDownHandler	( void ) = 0;
+	virtual void				SetMouseButtonUpHandler		( void ) = 0;
 	virtual void				SetMouseMoveHandler			( void ) = 0;
 	virtual void				SetMouseEnterHandler		( void ) = 0;
 	virtual void				SetMouseLeaveHandler		( void ) = 0;
@@ -165,6 +169,8 @@ public:
 	virtual void				SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback ) = 0;
 	virtual void				SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
 	virtual void				SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback ) = 0;
+	virtual void				SetMouseButtonDownHandler	( const GUI_CALLBACK_MOUSE & Callback ) = 0;
+	virtual void				SetMouseButtonUpHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
 	virtual void				SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback ) = 0;
 	virtual void				SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
 	virtual void				SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
