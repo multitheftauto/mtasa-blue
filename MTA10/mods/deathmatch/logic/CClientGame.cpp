@@ -1036,6 +1036,9 @@ void CClientGame::DoPulses ( void )
         UpdatePlayerWeapons ();        
         UpdateTrailers ();
         UpdateStunts ();
+        // Clear last damager if more than 2 seconds old
+        if ( CClientTime::GetTime () - m_ulDamageTime > 2000 )
+            m_DamagerID = INVALID_ELEMENT_ID;
         DoWastedCheck ( m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece );
     }
 
@@ -3408,6 +3411,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
+                        m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
                         if (pInflictingEntity)
                             m_DamagerID = pInflictingEntity->GetID ();
