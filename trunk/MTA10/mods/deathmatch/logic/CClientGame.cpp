@@ -3253,6 +3253,8 @@ void CClientGame::DownloadFiles ( void )
 }
 
 
+// 191 is given as the invalid animation-id, as 190 is the end of the ped anim group
+#define INVALID_ANIM_ID 191
 bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 {
     // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return true))
@@ -3316,12 +3318,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     weaponUsed == WEAPONTYPE_EXTINGUISHER )
                 {
                     return false;
-                }
-
-                // Prevent remote players that are aiming to play hit-damage animations
-                // (Test for issue #4099: Player desync caused by 'hit by gun' animation)
-                if ( pDamagedPed->m_ulBeginTarget != 0 )
-                    return false;      
+                }     
             }
 
             // Do we have an inflicting player?
@@ -3402,8 +3399,10 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     // Don't let GTA start the death task
                     return false;            
                 }
-                else {
-                    if (pDamagedPed->IsLocalEntity() && fPreviousHealth > 0.0f) {
+                else
+                {
+                    if ( pDamagedPed->IsLocalEntity () && fPreviousHealth > 0.0f )
+                    {
                         pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
@@ -3411,17 +3410,48 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
                         return true;
                     }
-                    if (fPreviousHealth > 0.0f) {
+                    if ( fPreviousHealth > 0.0f )
+                    {
                         // Grab our death animation
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
                         m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
-                        if (pInflictingEntity)
+                        if ( pInflictingEntity )
                             m_DamagerID = pInflictingEntity->GetID ();
+
                         // Check if we're dead
                         SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
+                    }
+                }
+            }
+            // If we've taken damage but aren't dying
+            else
+            {
+                // Make sure its a player
+                if ( pDamagedPed->GetType () == CCLIENTPLAYER )
+                {    
+                    // Is it the local player?
+                    if ( pDamagedPed->IsLocalPlayer () )
+                    {
+                        // Grab our damage-anim
+                        pEvent->ComputeDamageAnim ( pDamagePed, true );
+                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
+                        AnimationId animID = pEvent->GetAnimId ();
+
+                        // Is this a valid anim? are we actually setting a new animation?
+                        if ( animID != INVALID_ANIM_ID )
+                        {
+                            // Tell the server about it
+                            SendDamagePacket ( animGroup, animID );
+                        }
+                    }
+                    // Remote player damage?
+                    else
+                    {
+                        // Don't let this damage register
+                        return false;
                     }
                 }
             }
@@ -4066,41 +4096,7 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
-void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
-{
-    if ( Ped && Ped->GetHealth () == 0.0f )
-    {
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            // Write some death info
-            pBitStream->Write ( animGroup );
-            pBitStream->Write ( animID );
 
-            pBitStream->Write ( damagerID );
-            pBitStream->Write ( ucWeapon );
-            pBitStream->Write ( ucBodyPiece );
-
-            // Write the position we died in
-            CVector vecPosition;
-            Ped->GetPosition ( vecPosition );
-            pBitStream->Write ( vecPosition.fX );
-            pBitStream->Write ( vecPosition.fY );
-            pBitStream->Write ( vecPosition.fZ );
-
-            // The ammo in our weapon and write the ammo total
-            CWeapon* pPlayerWeapon = Ped->GetWeapon();
-            unsigned short usAmmo = 0;
-            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
-            pBitStream->Write ( usAmmo );
-
-            pBitStream->Write ( Ped->GetID() );
-            // Send the packet
-            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
-    }
-}
 
 void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
@@ -4138,6 +4134,57 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
+    }
+}
+
+
+void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
+{
+    if ( Ped && Ped->GetHealth () == 0.0f )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            // Write some death info
+            pBitStream->Write ( animGroup );
+            pBitStream->Write ( animID );
+
+            pBitStream->Write ( damagerID );
+            pBitStream->Write ( ucWeapon );
+            pBitStream->Write ( ucBodyPiece );
+
+            // Write the position we died in
+            CVector vecPosition;
+            Ped->GetPosition ( vecPosition );
+            pBitStream->Write ( vecPosition.fX );
+            pBitStream->Write ( vecPosition.fY );
+            pBitStream->Write ( vecPosition.fZ );
+
+            // The ammo in our weapon and write the ammo total
+            CWeapon* pPlayerWeapon = Ped->GetWeapon();
+            unsigned short usAmmo = 0;
+            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
+            pBitStream->Write ( usAmmo );
+
+            pBitStream->Write ( Ped->GetID() );
+            // Send the packet
+            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+        }
+    }
+}
+
+
+void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId )
+{
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+    if ( pBitStream )
+    {
+        pBitStream->Write ( animGroup );
+        pBitStream->Write ( animId );
+
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_DAMAGE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
     }
 }
 

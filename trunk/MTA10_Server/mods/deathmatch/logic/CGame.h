@@ -251,6 +251,7 @@ private:
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
     void                        Packet_PedWasted            ( class CPedWastedPacket& Packet );
     void                        Packet_PlayerWasted         ( class CPlayerWastedPacket& Packet );
+    void                        Packet_PlayerDamage         ( class CPlayerDamagePacket& Packet );
     void                        Packet_PlayerQuit           ( class CPlayerQuitPacket& Packet );
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );

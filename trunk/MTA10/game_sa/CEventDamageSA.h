@@ -17,11 +17,12 @@
 #include <game/CEventDamage.h>
 #include "CEntitySA.h"
 
-#define FUNC_CEventDamage_HasKilledPed 0x4ABCA0
-#define FUNC_CEventDamage_GetDamageApplied 0x4ABCE0
-#define FUNC_CEventDamage_GetAnimGroup 0x4B8060
-#define FUNC_CEventDamage_GetAnimId 0x4B8070
-#define FUNC_CEventDamage_ComputeDeathAnim 0x4B3A60
+#define FUNC_CEventDamage_HasKilledPed          0x4ABCA0
+#define FUNC_CEventDamage_GetDamageApplied      0x4ABCE0
+#define FUNC_CEventDamage_GetAnimGroup          0x4B8060
+#define FUNC_CEventDamage_GetAnimId             0x4B8070
+#define FUNC_CEventDamage_ComputeDeathAnim      0x4B3A60
+#define FUNC_CEventDamage_ComputeDamageAnim     0x4b3fc0
 
 class CEntitySAInterface;
 enum eWeaponType;
@@ -72,6 +73,7 @@ public:
     AssocGroupId                        GetAnimGroup        ( void );
     AnimationId                         GetAnimId           ( void );
     void                                ComputeDeathAnim    ( CPed * pPed, bool bUnk );
+    void                                ComputeDamageAnim   ( CPed * pPed, bool bUnk );
 };
 
 #endif

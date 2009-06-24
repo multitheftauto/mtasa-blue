@@ -238,6 +238,16 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
 }
 
 
+void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    RpClump * pClump = GetClump ();
+    if ( pClump )
+    {
+        g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
+    }
+}
+
+
 void CClientAnimation::FinishAnimation ( void )
 {
     CAnimationItem * pCurrent = GetCurrentAnimation ();

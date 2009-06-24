@@ -320,7 +320,8 @@ public:
     void                                ResetMapInfo                    ( void );
 
     void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15 );
-    void                                SendPedWastedPacket                       ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
+    void                                SendPedWastedPacket             ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
+    void                                SendDamagePacket                ( AssocGroupId animGroup, AnimationId animId );
 
     void                                SetMarkerBounce                 ( float fMarkerBounce ) { m_fMarkerBounce = fMarkerBounce; }
     float                               GetMarkerBounce                 ( void ) { return m_fMarkerBounce; }
