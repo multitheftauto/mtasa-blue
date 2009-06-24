@@ -954,7 +954,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CClientEntity& Entity, CClient
         // Make sure they aren't already attached to eachother in reverse
         if ( AttachedToEntity.GetAttachedTo () != &Entity )
         {
-            if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () )
+            if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () && Entity.GetDimension() == AttachedToEntity.GetDimension() )
             {
                 ConvertDegreesToRadians ( vecRotation );
 
