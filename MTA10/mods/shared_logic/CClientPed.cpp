@@ -2666,7 +2666,8 @@ void CClientPed::UpdateKeysync ( void )
                                 if ( pPlayerWeapon )
                                 {
                                     pPlayerWeapon->SetAmmoTotal ( 9999 );
-                                    if ( pData->usWeaponAmmo < pPlayerWeapon->GetAmmoInClip () && pPlayerWeapon->GetState () != WEAPONSTATE_RELOADING )
+                                   // r1154 - Commented out below as it was causing reload animation desync (Issue #4503). Although it must have been there for a reason...
+                                    if ( /*pData->usWeaponAmmo < pPlayerWeapon->GetAmmoInClip () &&*/ pPlayerWeapon->GetState () != WEAPONSTATE_RELOADING )
                                         pPlayerWeapon->SetAmmoInClip ( pData->usWeaponAmmo );
                                 }
                             }
