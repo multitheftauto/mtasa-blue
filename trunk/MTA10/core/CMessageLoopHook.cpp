@@ -74,18 +74,16 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     pThis = CMessageLoopHook::GetSingletonPtr ( );
 
     // Log our state
-    if ( uMsg == WM_KILLFOCUS ||
-         uMsg == WM_NCACTIVATE ||
-         (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
+    if ( uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
     {
         g_pCore->SetFocused ( false );
-        CSetCursorPosHook::GetSingleton ( ).DisableSetCursorPos ();
+        CSetCursorPosHook::GetSingleton ().DisableSetCursorPos ();
     }
     else if ( uMsg == WM_SETFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) != WA_INACTIVE) )
     {
         g_pCore->SetFocused ( true );
         if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
-            CSetCursorPosHook::GetSingleton ( ).EnableSetCursorPos ();
+            CSetCursorPosHook::GetSingleton ().EnableSetCursorPos ();
     }
 
     // Prevent GTA from knowing about kill focuses. Prevents pausing.

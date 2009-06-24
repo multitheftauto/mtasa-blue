@@ -510,4 +510,5 @@ bool CClientCamera::ProcessFixedCamera ( CCam* pCam )
 
     // Set the up vector in CCam
     *pCamUp = vecUp;
+    return true;
 }
