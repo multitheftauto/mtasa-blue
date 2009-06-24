@@ -77,6 +77,7 @@ public:
     void                                OnBlockLoad                 ( CAnimBlock * pBlock );
 
     bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
+    void                                BlendAnimation              ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     void                                FinishAnimation             ( void );
 
     bool                                RunNamedAnimation           ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );

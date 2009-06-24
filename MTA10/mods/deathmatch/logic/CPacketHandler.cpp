@@ -65,6 +65,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PlayerWasted ( bitStream );
             return true;
 
+        case PACKET_ID_PLAYER_DAMAGE:
+            Packet_PlayerDamage ( bitStream );
+            return true;
+
         case PACKET_ID_PLAYER_CHANGE_NICK:
             Packet_PlayerChangeNick ( bitStream );
             return true;
@@ -925,6 +929,30 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
     else
     {
         RaiseProtocolError ( 21 );
+    }
+}
+
+
+void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;    
+    AssocGroupId animGroup;
+    AnimationId animID;
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( animGroup ) &&
+         bitStream.Read ( animID ) )
+    {
+        // Grab the ped that was damaged
+        CClientPlayer * pPlayer = g_pClientGame->GetPlayerManager ()->Get ( ID );
+        if ( pPlayer )
+        {
+            // Set his damage animation
+            pPlayer->BlendAnimation ( animGroup, animID, 4.0f );
+        }
+    }
+    else
+    {
+        RaiseProtocolError ( 55 );
     }
 }
 

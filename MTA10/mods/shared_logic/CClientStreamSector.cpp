@@ -33,6 +33,10 @@ CClientStreamSector::~CClientStreamSector ( void )
     if ( m_pRight ) m_pRight->m_pLeft = NULL;
     if ( m_pTop ) m_pTop->m_pBottom = NULL;
     if ( m_pBottom ) m_pBottom->m_pTop = NULL;
+    m_pLeft = NULL;
+    m_pRight = NULL;
+    m_pTop = NULL;
+    m_pBottom = NULL;
 }
 
 

@@ -924,6 +924,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDamagePacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDisconnectedPacket.cpp"
 						>
 					</File>
@@ -1946,6 +1950,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerConnectCompletePacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerDamagePacket.h"
 						>
 					</File>
 					<File

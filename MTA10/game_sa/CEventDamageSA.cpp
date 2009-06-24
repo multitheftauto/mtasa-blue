@@ -110,3 +110,18 @@ void CEventDamageSA::ComputeDeathAnim ( CPed * pPed, bool bUnk )
         call    dwFunc
     }
 }
+
+
+void CEventDamageSA::ComputeDamageAnim ( CPed * pPed, bool bUnk )
+{
+    DWORD dwThis = ( DWORD ) m_pInterface;    
+    DWORD dwPed = ( DWORD ) pPed->GetInterface ();
+    DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    bUnk
+        push    dwPed
+        call    dwFunc
+    }
+}

@@ -789,6 +789,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_DAMAGE:
+        {
+            Packet_PlayerDamage ( static_cast < CPlayerDamagePacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_PLAYER_QUIT:
         {
             Packet_PlayerQuit ( static_cast < CPlayerQuitPacket& > ( Packet ) );
@@ -1393,10 +1399,13 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
         pPed->CallEvent ( "onPedWasted", Arguments );
     }
 }
+
+
 void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if ( pPlayer ) {
+    if ( pPlayer && !pPlayer->IsDead () )
+    {
         pPlayer->SetSpawned ( false );
         pPlayer->SetIsDead ( true );
         pPlayer->SetPosition ( Packet.m_vecPosition );
@@ -1426,6 +1435,21 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
         else Arguments.PushBoolean ( false );
         Arguments.PushBoolean ( false );
         pPlayer->CallEvent ( "onPlayerWasted", Arguments );
+    }
+}
+
+
+void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if ( pPlayer )
+    {
+        if ( pPlayer->IsSpawned () )
+        {            
+            // Create a new packet to send to everyone
+            CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_AnimGroup, Packet.m_AnimID );
+            m_pPlayerManager->BroadcastOnlyJoined ( ReturnDamagePacket, pPlayer );
+        }
     }
 }
 
