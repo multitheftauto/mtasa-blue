@@ -168,7 +168,18 @@ float CGUILabel_Impl::GetTextExtent ( void )
     {
         try
         {
-            return pFont->getTextExtent ( m_pWindow->getText () );
+            // Retrieve the longest line's extent
+            std::stringstream ssText ( m_pWindow->getText ().c_str () );
+            std::string sLineText;
+            float fMax = 0.0f, fLineExtent = 0.0f;
+
+            while( std::getline ( ssText, sLineText ) )
+            {
+                fLineExtent = pFont->getTextExtent ( sLineText );
+                if ( fLineExtent > fMax )
+                    fMax = fLineExtent;
+            }
+            return fMax;
         }
         catch ( CEGUI::Exception e )
         {}
