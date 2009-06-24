@@ -405,12 +405,6 @@ bool CClientCamera::SetCameraMode ( eCamMode eMode )
 }
 
 
-inline float vecsize3d ( float fX, float fY, float fZ )
-{
- 	return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
-}
-
-
 void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
 {    
     if ( bEnabled )
@@ -455,14 +449,19 @@ CClientEntity * CClientCamera::GetTargetEntity ( void )
 }
 
 
-void CClientCamera::ProcessFixedCamera ( CCam* pCam )
+bool CClientCamera::ProcessFixedCamera ( CCam* pCam )
 {
     // The purpose of this handler function is changing the Source, Front and Up vectors in CCam
     // when called by GTA. This is called when we are in fixed camera mode.
 
-    // Grab this camera interface and the position it's supposed to be at and what
-    // it should look at.
     CClientCamera* pThis = g_pClientGame->GetManager ()->GetCamera ();
+
+    // Make sure we actually want to apply our custom camera position/lookat
+    // (this handler could also be called from cinematic mode)
+    if ( !pThis->m_bFixed )
+        return false;
+
+    // Grab the position the camera is supposed to be at and what it should look at.
     const CVector& vecPosition = pThis->m_vecFixedPosition;
     const CVector& vecTarget = pThis->m_vecFixedTarget;
 
@@ -476,7 +475,7 @@ void CClientCamera::ProcessFixedCamera ( CCam* pCam )
         vecFront = CVector ( 1.0, 0.0f, 0.0f );
 
     // Grab the right vector and normalize it. We assume the camera can't roll.
-    CVector vecRight = CVector ( -vecFront.fY, vecFront.fX, 0 );
+    CVector vecRight = CVector ( vecFront.fY, -vecFront.fX, 0 );
     vecRight.Normalize ();
 
     // Normalize the front vector and set it
@@ -491,10 +490,8 @@ void CClientCamera::ProcessFixedCamera ( CCam* pCam )
     if ( vecRight.Length () != 0 )
     {
         // Cross multiply it with front.
-        // TODO: Implement .cross in CVector
-        vecUp.fX = vecFront.fY * vecRight.fZ - vecFront.fZ * vecRight.fY;
-        vecUp.fY = vecFront.fZ * vecRight.fX - vecFront.fX * vecRight.fZ ;
-        vecUp.fZ = vecFront.fX * vecRight.fY - vecFront.fY * vecRight.fX;
+        vecUp = vecRight;
+        vecUp.CrossProduct ( &vecFront );
     }
     else
     {

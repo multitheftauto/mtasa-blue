@@ -33,7 +33,7 @@ typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
 typedef void ( ProjectileHandler ) ( class CEntity * owner, class CProjectile* projectile, class CProjectileInfo* projectileInfo, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
 typedef bool ( BreakTowLinkHandler ) ( class CVehicle * towingVehicle );
-typedef void ( ProcessCamHandler ) ( class CCam* pCam );
+typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef bool ( ChokingHandler ) ( class CPed* pChokingPed, class CPed* pResponsiblePed, unsigned char ucWeaponType );
