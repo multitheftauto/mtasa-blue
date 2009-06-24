@@ -3316,7 +3316,12 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     weaponUsed == WEAPONTYPE_EXTINGUISHER )
                 {
                     return false;
-                }            
+                }
+
+                // Prevent remote players that are aiming to play hit-damage animations
+                // (Test for issue #4099: Player desync caused by 'hit by gun' animation)
+                if ( pDamagedPed->m_ulBeginTarget != 0 )
+                    return false;      
             }
 
             // Do we have an inflicting player?
