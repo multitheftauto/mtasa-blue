@@ -134,8 +134,8 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
         if ( iEnd )
         {
             std::string strResourceName = strInput.substr(1,iEnd-1);
-            pResource = g_pClientGame->GetResourceManager()->GetResource(strResourceName.c_str());
-            if ( strInput[iEnd+1] )
+            pResource = g_pClientGame->GetResourceManager()->GetResource ( strResourceName.c_str() );
+            if ( pResource && strInput[iEnd+1] )
             {
                 std::string strSubDirectory = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strSubDirectory.c_str() ) )
