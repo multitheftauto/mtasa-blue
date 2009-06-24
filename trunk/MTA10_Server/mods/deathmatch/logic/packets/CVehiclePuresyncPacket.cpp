@@ -46,9 +46,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Read out its position
             CVector vecPosition;
-            BitStream.Read ( vecPosition.fX );
-            BitStream.Read ( vecPosition.fY );
-            BitStream.Read ( vecPosition.fZ );
+            SPositionSync position ( false );
+            BitStream.Read ( &position );
+            vecPosition = position.data.vecPosition;
             pSourcePlayer->SetPosition ( vecPosition );
 
             // Jax: don't allow any outdated packets through
@@ -62,39 +62,35 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
 
             // Read out the vehicle matrix only if he's the driver
-            CVector vecTemp;
             unsigned int uiSeat = pSourcePlayer->GetOccupiedVehicleSeat ();
             if ( uiSeat == 0 )
             {
                 // Read out the vehicle rotation in degrees
-                CVector vecRotationDegrees;
-                BitStream.Read ( vecRotationDegrees.fX );
-                BitStream.Read ( vecRotationDegrees.fY );
-                BitStream.Read ( vecRotationDegrees.fZ );
+                SRotationDegreesSync rotation;
+                BitStream.Read ( &rotation );
 
                 // Set it
                 pVehicle->SetPosition ( vecPosition );
-                pVehicle->SetRotationDegrees ( vecRotationDegrees );
+                pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
 
                 // Move speed vector
-                BitStream.Read ( vecTemp.fX );
-                BitStream.Read ( vecTemp.fY );
-                BitStream.Read ( vecTemp.fZ );
+                SVelocitySync velocity;
+                BitStream.Read ( &velocity );
 
-                pVehicle->SetVelocity ( vecTemp );
-                pSourcePlayer->SetVelocity ( vecTemp );
+                pVehicle->SetVelocity ( velocity.data.vecVelocity );
+                pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
 
                 // Turn speed vector
-                BitStream.Read ( vecTemp.fX );
-                BitStream.Read ( vecTemp.fY );
-                BitStream.Read ( vecTemp.fZ );
+                SVelocitySync turnSpeed;
+                BitStream.Read ( &turnSpeed );
 
-                pVehicle->SetTurnSpeed ( vecTemp );
+                pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 
                 // Health
-                float fHealth = 1000.0f;
-	            BitStream.Read ( fHealth );
+                SFloatAsByteSync health ( 0, 1000, true );
+                BitStream.Read ( &health );
                 float fPreviousHealth = pVehicle->GetHealth ();                
+                float fHealth = health.data.fValue;
 
                 // Less than last time?
                 if ( fHealth < fPreviousHealth )
@@ -116,7 +112,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 CVehicle* pTowedByVehicle = pVehicle;
                 CVehicle* pTrailer = NULL;
                 ElementID TrailerID;
-                BitStream.Read ( TrailerID );
+                BitStream.ReadCompressed ( TrailerID );
 
                 while ( TrailerID != INVALID_ELEMENT_ID )
                 {
@@ -126,13 +122,13 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     
                     // Read out the trailer position and rotation
                     CVector vecTrailerPosition, vecTrailerRotationDegrees;
-                    BitStream.Read ( vecTrailerPosition.fX );
-                    BitStream.Read ( vecTrailerPosition.fY );
-                    BitStream.Read ( vecTrailerPosition.fZ );
+                    SPositionSync trailerPosition ( false );
+                    BitStream.Read ( &trailerPosition );
+                    vecTrailerPosition = trailerPosition.data.vecPosition;
 
-                    BitStream.Read ( vecTrailerRotationDegrees.fX );
-                    BitStream.Read ( vecTrailerRotationDegrees.fY );
-                    BitStream.Read ( vecTrailerRotationDegrees.fZ );
+                    SRotationDegreesSync trailerRotation;
+                    BitStream.Read ( &trailerRotation );
+                    vecTrailerRotationDegrees = trailerRotation.data.vecRotation;
 
                     // If we found the trailer
                     if ( pTrailer )
@@ -219,10 +215,10 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
 
             // Player health
-            unsigned char ucTemp;
-	        BitStream.Read ( ucTemp );
+            SFloatAsByteSync health ( 0, 100.0f, true );
+            BitStream.Read ( &health );
+            float fHealth = health.data.fValue;
 
-            float fHealth = static_cast < float > ( ucTemp ) / 1.25f;
             float fOldHealth = pSourcePlayer->GetHealth ();
 			float fHealthLoss = fOldHealth - fHealth;
 
@@ -237,9 +233,11 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetHealth ( fHealth );
 
 			// Armor
-			BitStream.Read ( ucTemp );
+			//BitStream.Read ( ucTemp );
+            SFloatAsByteSync armor ( 0, 100.0f, true );
+            BitStream.Read ( &armor );
+            float fArmor = armor.data.fValue;
 
-			float fArmor = static_cast < float > ( ucTemp ) / 1.25f;
 			float fOldArmor = pSourcePlayer->GetArmor ();
 			float fArmorLoss = fOldArmor - fArmor;
 
@@ -276,6 +274,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetWearingGoggles ( bWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( bDoingGangDriveby );            
 
+            // Weapon stuff no compressed yet
             // Current weapon slot
             unsigned char ucCurrentWeaponSlot;
             BitStream.Read ( ucCurrentWeaponSlot );
@@ -357,39 +356,39 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( uiSeat == 0 )
             {
                 // Vehicle position
-                const CVector& vecPosition = pVehicle->GetPosition ();
-                BitStream.Write ( vecPosition.fX );
-                BitStream.Write ( vecPosition.fY );
-                BitStream.Write ( vecPosition.fZ );
+                SPositionSync position ( false );
+                position.data.vecPosition = pVehicle->GetPosition ();
+                BitStream.Write ( &position );
 
                 // Vehicle rotation
-                CVector vecRotationDegrees;
-                pVehicle->GetRotationDegrees ( vecRotationDegrees );
-                BitStream.Write ( vecRotationDegrees.fX );
-                BitStream.Write ( vecRotationDegrees.fY );
-                BitStream.Write ( vecRotationDegrees.fZ );
+                 SRotationDegreesSync rotation;
+                pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
+                BitStream.Write ( &rotation );
 
                 // Move speed vector
-                vecTemp = pVehicle->GetVelocity ();
-                BitStream.Write ( vecTemp.fX );
-                BitStream.Write ( vecTemp.fY );
-                BitStream.Write ( vecTemp.fZ );
+                SVelocitySync velocity;
+                velocity.data.vecVelocity = pVehicle->GetVelocity ();
+                BitStream.Write ( &velocity );
 
                 // Turn speed vector
-                vecTemp = pVehicle->GetTurnSpeed ();
-                BitStream.Write ( vecTemp.fX );
-                BitStream.Write ( vecTemp.fY );
-                BitStream.Write ( vecTemp.fZ );
+                SVelocitySync turnSpeed;
+                turnSpeed.data.vecVelocity = pVehicle->GetTurnSpeed ();
+                BitStream.Write ( &turnSpeed );
 
                 // Health
-                BitStream.Write ( pVehicle->GetHealth () );                
+                SFloatAsByteSync health ( 0, 1000, true );
+                health.data.fValue = pVehicle->GetHealth ();
+                BitStream.Write ( &health );
             }
 
             // Player health and armor
-            unsigned char ucHealth = static_cast < unsigned char > ( pSourcePlayer->GetHealth () * 1.25f );
-            unsigned char ucArmor = static_cast < unsigned char > ( pSourcePlayer->GetArmor () * 1.25f );
-	        BitStream.Write ( ucHealth );
-            BitStream.Write ( ucArmor );
+            SFloatAsByteSync health ( 0, 100, true );
+            health.data.fValue = pSourcePlayer->GetHealth ();
+            BitStream.Write ( &health );
+
+            SFloatAsByteSync armor ( 0, 100, true );
+            armor.data.fValue = pSourcePlayer->GetArmor ();
+            BitStream.Write ( &armor );
 
             // Flags
             unsigned char ucFlags = 0;
@@ -405,6 +404,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             // Write the flags
             BitStream.Write ( ucFlags );
 
+            // Weapon stuff not compressed yet
             // Current weapon id
             unsigned char ucWeaponType = pSourcePlayer->GetWeaponType ();
             BitStream.Write ( ucWeaponType );

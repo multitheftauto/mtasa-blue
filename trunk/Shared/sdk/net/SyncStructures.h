@@ -78,6 +78,64 @@ private:
 
 //////////////////////////////////////////
 //                                      //
+//              Data types              //
+//                                      //
+//////////////////////////////////////////
+struct SFloatAsByteSync : public ISyncStructure
+{
+    SFloatAsByteSync ( float fMin, float fMax, bool bPreserveNonZeroness )
+        : m_fMin ( fMin )
+        , m_fMax ( fMax )
+        , m_bPreserveNonZeroness ( bPreserveNonZeroness )
+    {
+    }
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        unsigned char ucValue;
+        if ( bitStream.Read ( ucValue ) )
+        {
+            float fAlpha = ucValue / 250.f;
+            // Find value in range
+            data.fValue = Lerp ( m_fMin, fAlpha, m_fMax );
+            return true;
+        }
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        // Find position in range
+        float fAlpha = Clamp ( 0.f, ( float ) Unlerp ( m_fMin, data.fValue, m_fMax ), 1.f );
+        // Convert to byte
+        unsigned char ucValue = static_cast < unsigned char > ( floor ( fAlpha * 250 ) );
+
+        // Checks
+        int iValue = ( int ) floor ( fAlpha * 250 );
+        assert ( iValue == ucValue && iValue >= 0 && iValue <= 250 );
+
+        if ( m_bPreserveNonZeroness )
+            if ( ucValue == 0 && fAlpha > 0.0f )
+                ucValue = 1;
+
+        bitStream.Write ( ucValue );
+    }
+
+    struct
+    {
+        float fValue;
+    } data;
+
+private:
+    const float m_fMin;
+    const float m_fMax;
+    const bool  m_bPreserveNonZeroness;
+};
+
+
+
+//////////////////////////////////////////
+//                                      //
 //               Position               //
 //                                      //
 //////////////////////////////////////////
@@ -131,6 +189,71 @@ struct SPositionSync : public ISyncStructure
     struct
     {
         CVector vecPosition;
+    } data;
+
+private:
+    bool m_bUseFloats;
+};
+
+
+
+//////////////////////////////////////////
+//                                      //
+//        Rotation Degrees              //
+//                                      //
+//////////////////////////////////////////
+struct SRotationDegreesSync : public ISyncStructure
+{
+    SRotationDegreesSync ( bool bUseFloats = false ) : m_bUseFloats ( bUseFloats ) {}
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( m_bUseFloats )
+        {
+            return bitStream.Read ( data.vecRotation.fX ) &&
+                   bitStream.Read ( data.vecRotation.fY ) &&
+                   bitStream.Read ( data.vecRotation.fZ );
+        }
+        else
+        {
+            unsigned short usRx;
+            unsigned short usRy;
+            unsigned short usRz;
+
+            if ( bitStream.Read ( usRx ) && bitStream.Read ( usRy ) && bitStream.Read ( usRz ) )
+            {
+                data.vecRotation.fX = usRx * ( 360.f / 65536.f );
+                data.vecRotation.fY = usRy * ( 360.f / 65536.f );
+                data.vecRotation.fZ = usRz * ( 360.f / 65536.f );
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        if ( m_bUseFloats )
+        {
+            bitStream.Write ( data.vecRotation.fX );
+            bitStream.Write ( data.vecRotation.fY );
+            bitStream.Write ( data.vecRotation.fZ );
+        }
+        else
+        {
+            unsigned short usRx = static_cast < unsigned short > ( data.vecRotation.fX * ( 65536 / 360.f ) );
+            unsigned short usRy = static_cast < unsigned short > ( data.vecRotation.fY * ( 65536 / 360.f ) );
+            unsigned short usRz = static_cast < unsigned short > ( data.vecRotation.fZ * ( 65536 / 360.f ) );
+            bitStream.Write ( usRx );
+            bitStream.Write ( usRy );
+            bitStream.Write ( usRz );
+        }
+    }
+
+    struct
+    {
+        CVector vecRotation;
     } data;
 
 private:

@@ -1076,29 +1076,31 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         CVector vecRotationDegrees;
 
         // Read out the vehicle matrix
-        BitStream.Read ( vecPosition.fX );
-        BitStream.Read ( vecPosition.fY );
-        BitStream.Read ( vecPosition.fZ );
+        SPositionSync position ( false );
+        BitStream.Read ( &position );
+        vecPosition = position.data.vecPosition;
 
-        BitStream.Read ( vecRotationDegrees.fX );
-        BitStream.Read ( vecRotationDegrees.fY );
-        BitStream.Read ( vecRotationDegrees.fZ );     
+        SRotationDegreesSync rotation;
+        BitStream.Read ( &rotation );
+        vecRotationDegrees = rotation.data.vecRotation;
 
         // Read out the movespeed
         CVector vecMoveSpeed;
-        BitStream.Read ( vecMoveSpeed.fX );
-        BitStream.Read ( vecMoveSpeed.fY );
-        BitStream.Read ( vecMoveSpeed.fZ );
+        SVelocitySync velocity;
+        BitStream.Read ( &velocity );
+        vecMoveSpeed = velocity.data.vecVelocity;
 
         // Read out the turnspeed
         CVector vecTurnSpeed;
-        BitStream.Read ( vecTurnSpeed.fX );
-        BitStream.Read ( vecTurnSpeed.fY );
-        BitStream.Read ( vecTurnSpeed.fZ );        
+        SVelocitySync turnSpeed;
+        BitStream.Read ( &turnSpeed );
+        vecTurnSpeed = turnSpeed.data.vecVelocity;
 
         // Read out the vehicle health
         float fHealth;
-        BitStream.Read ( fHealth ); 
+        SFloatAsByteSync health ( 0, 1000, true );
+        BitStream.Read ( &health );
+        fHealth = health.data.fValue;
         pVehicle->SetHealth ( fHealth );
 
         // Set the target position and rotation
@@ -1111,16 +1113,17 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     }
 
     // Player health
-    unsigned char ucPlayerHealth;
-    BitStream.Read ( ucPlayerHealth );
-    float fPlayerHealth = static_cast < float > ( ucPlayerHealth ) / 1.25f;
+    SFloatAsByteSync health ( 0, 100.0f, true );
+    BitStream.Read ( &health );
+    float fPlayerHealth = health.data.fValue;
     pPlayer->SetHealth ( fPlayerHealth );
     pPlayer->LockHealth ( fPlayerHealth );
 
     // Player armor
-    unsigned char ucArmor;
-    BitStream.Read ( ucArmor );
-    float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
+    SFloatAsByteSync armor ( 0, 100.0f, true );
+    BitStream.Read ( &armor );
+    float fArmor = armor.data.fValue;
+
     pPlayer->SetArmor ( fArmor );
 
     // Vehicle flags
@@ -1168,6 +1171,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         }
     }
 
+    // Weapon stuff not compressed yet
     // Current weapon id
     unsigned char ucCurrentWeapon = 0;
     BitStream.Read ( ucCurrentWeapon );
@@ -1257,9 +1261,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     pVehicle->GetPosition ( vecPosition );
 
     // Write it
-    BitStream.Write ( vecPosition.fX );
-    BitStream.Write ( vecPosition.fY );
-    BitStream.Write ( vecPosition.fZ );
+    SPositionSync position ( false );
+    position.data.vecPosition = vecPosition;
+    BitStream.Write ( &position );
 
     // Grab the occupied vehicle seat. Send this only if we're driver.
     unsigned int uiSeat = pPlayerModel->GetOccupiedVehicleSeat ();
@@ -1271,9 +1275,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         pVehicle->GetRotationDegrees ( vecRotation );
 
         // Write it
-        BitStream.Write ( vecRotation.fX );
-        BitStream.Write ( vecRotation.fY );
-        BitStream.Write ( vecRotation.fZ );
+        SRotationDegreesSync rotation;
+        rotation.data.vecRotation = vecRotation;
+        BitStream.Write ( &rotation );
 
         // Write the movespeed/turnspeed
         CVector vecMoveSpeed, vecTurnSpeed;
@@ -1285,22 +1289,24 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
             pVehicle->GetTurnSpeed ( vecTurnSpeed ); 
         }
 
-        BitStream.Write ( vecMoveSpeed.fX );
-        BitStream.Write ( vecMoveSpeed.fY );
-        BitStream.Write ( vecMoveSpeed.fZ );       
+        SVelocitySync velocity;
+        velocity.data.vecVelocity = vecMoveSpeed;
+        BitStream.Write ( &velocity );
 
-        BitStream.Write ( vecTurnSpeed.fX );
-        BitStream.Write ( vecTurnSpeed.fY );
-        BitStream.Write ( vecTurnSpeed.fZ );
+        SVelocitySync turnSpeed;
+        turnSpeed.data.vecVelocity = vecTurnSpeed;
+        BitStream.Write ( &turnSpeed );
 
         // Write the health
-        BitStream.Write ( pVehicle->GetHealth () );
+        SFloatAsByteSync health ( 0, 1000, true );
+        health.data.fValue = pVehicle->GetHealth ();
+        BitStream.Write ( &health );
 
         // Write the trailer chain
         CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
         while ( pTrailer )
         {
-            BitStream.Write ( pTrailer->GetID () );
+            BitStream.WriteCompressed ( pTrailer->GetID () );
 
             // Write the position and rotation
             CVector vecTrailerPosition, vecTrailerRotationDegrees;
@@ -1309,32 +1315,30 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
             pTrailer->GetPosition ( vecTrailerPosition );
             pTrailer->GetRotationDegrees ( vecTrailerRotationDegrees );
 
-            BitStream.Write ( vecTrailerPosition.fX );
-            BitStream.Write ( vecTrailerPosition.fY );
-            BitStream.Write ( vecTrailerPosition.fZ );
+            SPositionSync trailerPosition ( false );
+            trailerPosition.data.vecPosition = vecTrailerPosition;
+            BitStream.Write ( &trailerPosition );
 
-            BitStream.Write ( vecTrailerRotationDegrees.fX );
-            BitStream.Write ( vecTrailerRotationDegrees.fY );
-            BitStream.Write ( vecTrailerRotationDegrees.fZ );
+            SRotationDegreesSync trailerRotation;
+            trailerRotation.data.vecRotation = vecTrailerRotationDegrees;
+            BitStream.Write ( &trailerRotation );
 
             // Get the next towed vehicle
             pTrailer = pTrailer->GetTowedVehicle ();
         }
 
         // End of our trailer chain
-        BitStream.Write ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
+        BitStream.WriteCompressed ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
     }
 
-    // Health (scaled from 0.0f-100.0f to 0-250 to save three bytes)
-    float fHealth = pPlayerModel->GetHealth ();
-    unsigned char ucHealth = static_cast < unsigned char > ( 1.25f * fHealth );
-    // Make sure its atleast 1 if we aren't quite dead
-    if ( ucHealth == 0 && fHealth > 0.0f ) ucHealth = 1;
-    BitStream.Write ( ucHealth );
+    SFloatAsByteSync health ( 0, 100.0f, true );
+    health.data.fValue = pPlayerModel->GetHealth ();
+    BitStream.Write ( &health );
 
     // Player armor (scaled from 0.0f-100.0f to 0-250 to save three bytes)
-    unsigned char ucArmor = static_cast < unsigned char > ( 1.25f * pPlayerModel->GetArmor () );
-    BitStream.Write ( ucArmor );
+    SFloatAsByteSync armor ( 0, 100.0f, true );
+    armor.data.fValue = pPlayerModel->GetHealth ();
+    BitStream.Write ( &armor );
 
     // Flags
     unsigned char ucFlags = 0;
@@ -1350,6 +1354,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     // Write the flags
     BitStream.Write ( ucFlags );
 
+    // Weapon not compressed yet
     // Grab the current weapon
     CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon();
     if ( pPlayerWeapon )
