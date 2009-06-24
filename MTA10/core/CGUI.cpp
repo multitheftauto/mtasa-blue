@@ -665,10 +665,8 @@ bool CLocalGUI::InputGoesToGUI ( void )
 
     // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-#ifndef MTA_DEBUG
-    if ( !CCore::GetSingleton ().IsFocused () ) return true;
-#endif
-    return ( IsConsoleVisible () || IsMainMenuVisible () || IsChatBoxInputEnabled () || m_bForceCursorVisible || pGUI->GetGUIInputEnabled () );
+    return ( IsConsoleVisible () || IsMainMenuVisible () || IsChatBoxInputEnabled () ||
+        m_bForceCursorVisible || pGUI->GetGUIInputEnabled () || !CCore::GetSingleton ().IsFocused () );
 }
 
 
