@@ -1165,7 +1165,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
         // Make sure they aren't already attached to eachother in reverse
         if ( pAttachedToElement->GetAttachedToElement () != pElement )
         {
-            if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () )
+            if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () && pElement->GetDimension() == pAttachedToElement->GetDimension() )
             {
                 ConvertDegreesToRadians ( vecRotation );
                 pElement->SetAttachedOffsets ( vecPosition, vecRotation );
