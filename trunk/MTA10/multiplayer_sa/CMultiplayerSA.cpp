@@ -57,6 +57,7 @@ unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
 #define HOOKPOS_CPed_IsPlayer                               0x5DF8F0
 
+DWORD RETURN_CCam_ProcessFixed =                            0x51D475;
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon =  0x6859A7;
 DWORD RETURN_CPed_IsPlayer =                                0x5DF8F6;
 
@@ -236,7 +237,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
     HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
-    HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 7);
+    HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
@@ -1561,14 +1562,15 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 }
 
 
-void CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
+bool CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
 
     if ( m_pProcessCamHandler )
     {
-        m_pProcessCamHandler ( pCam );
+        return m_pProcessCamHandler ( pCam );
     }
+    return false;
 }
 
 
@@ -1579,20 +1581,26 @@ void _declspec(naked) HOOK_CCam_ProcessFixed ()
 {
     _asm
     {
-        // Store the CCam* and push all the registers
-        mov     CCam_ProcessFixed_pCam, ecx
-        pushad
+        mov CCam_ProcessFixed_pCam, ecx
     }
 
-    CCam_ProcessFixed ( CCam_ProcessFixed_pCam );
-
-    _asm
+    if ( CCam_ProcessFixed ( CCam_ProcessFixed_pCam ) )
     {
-        // Restore all the registers
-        popad
-
-        // Abort the func
-        ret 10h
+        _asm
+        {
+            ret 10h
+        }
+    }
+    else
+    {
+        _asm
+        {
+            mov ecx, CCam_ProcessFixed_pCam
+            sub esp, 28h
+            push ebx
+            push ebp
+            jmp RETURN_CCam_ProcessFixed
+        }
     }
 }
 

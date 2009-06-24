@@ -69,7 +69,7 @@ private:
                                 CClientCamera               ( CClientManager* pManager );
                                 ~CClientCamera              ( void );
 
-    static void                 ProcessFixedCamera          ( CCam* pCam );
+    static bool                 ProcessFixedCamera          ( CCam* pCam );
 
     void                        SetFocusToLocalPlayerImpl   ( void );
 
