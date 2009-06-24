@@ -68,7 +68,15 @@ void CCameraRPCs::SetCameraTarget ( NetBitStreamInterface& bitStream )
                     }
                     break;
                 }
-                default: return;
+                case CCLIENTPED:
+                case CCLIENTVEHICLE:
+                {
+                    // focus on a ped or vehicle
+                    m_pCamera->SetFocus ( pEntity, MODE_BEHINDCAR, false );
+                    break;
+                }
+                default:
+                    return;
             }
         }
     }
