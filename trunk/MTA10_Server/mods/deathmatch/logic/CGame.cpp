@@ -1454,7 +1454,7 @@ void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
             pSendPlayer = *iter;
-            if ( pSendPlayer != pPlayer )
+            //if ( pSendPlayer != pPlayer )
             {
                 // We tell the reporter to create the explosion too
                 // Grab this player's camera position                

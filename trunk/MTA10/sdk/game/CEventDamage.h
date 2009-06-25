@@ -44,6 +44,7 @@ public:
     virtual float                       GetDamageApplied    ( void ) = 0;
     virtual AssocGroupId                GetAnimGroup        ( void ) = 0;
     virtual AnimationId                 GetAnimId           ( void ) = 0;
+    virtual bool                        GetAnimAdded        ( void ) = 0;
     virtual void                        ComputeDeathAnim    ( CPed * pPed, bool bUnk ) = 0;
     virtual void                        ComputeDamageAnim   ( CPed * pPed, bool bUnk ) = 0;
 };

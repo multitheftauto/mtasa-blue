@@ -3264,8 +3264,6 @@ void CClientGame::DownloadFiles ( void )
 }
 
 
-// 191 is given as the invalid animation-id, as 190 is the end of the ped anim group
-#define INVALID_ANIM_ID 191
 bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEntity * pInflictor, float fDamage )
 {  
     CPlayerPed * pGamePlayer = pPed->GetGamePlayer ();
@@ -3432,11 +3430,13 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
                 {
                     // Grab our damage-anim
                     pEvent->ComputeDamageAnim ( pGamePlayer, true );
+
                     AssocGroupId animGroup = pEvent->GetAnimGroup ();
                     AnimationId animID = pEvent->GetAnimId ();
 
-                    // Is this a valid anim? are we actually setting a new animation?
-                    if ( animID != INVALID_ANIM_ID )
+                    // Check this animation is valid
+                    CAnimBlendAssocGroup * pGroup = g_pGame->GetAnimManager ()->GetAnimBlendAssoc ( animGroup );
+                    if ( pGroup && animID < pGroup->GetNumAnimations () )
                     {
                         // Tell the server about it
                         SendDamagePacket ( animGroup, animID );
