@@ -3427,23 +3427,19 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
             // If we've taken damage but aren't dying
             else
             {
-                // Make sure its a player
-                if ( pPed->GetType () == CCLIENTPLAYER )
-                {    
-                    // Is it the local player?
-                    if ( pPed->IsLocalPlayer () )
-                    {
-                        // Grab our damage-anim
-                        pEvent->ComputeDamageAnim ( pGamePlayer, true );
-                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                        AnimationId animID = pEvent->GetAnimId ();
+                // Is this the local player?
+                if ( pPed->GetType () == CCLIENTPLAYER && pPed->IsLocalPlayer () )
+                {
+                    // Grab our damage-anim
+                    pEvent->ComputeDamageAnim ( pGamePlayer, true );
+                    AssocGroupId animGroup = pEvent->GetAnimGroup ();
+                    AnimationId animID = pEvent->GetAnimId ();
 
-                        // Is this a valid anim? are we actually setting a new animation?
-                        if ( animID != INVALID_ANIM_ID )
-                        {
-                            // Tell the server about it
-                            SendDamagePacket ( animGroup, animID );
-                        }
+                    // Is this a valid anim? are we actually setting a new animation?
+                    if ( animID != INVALID_ANIM_ID )
+                    {
+                        // Tell the server about it
+                        SendDamagePacket ( animGroup, animID );
                     }
                 }
             }
@@ -3457,7 +3453,7 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
     }
 
     // Allow the damage to register
-    return false;
+    return true;
 }
 
 bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
