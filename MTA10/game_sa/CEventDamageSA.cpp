@@ -113,6 +113,21 @@ AnimationId CEventDamageSA::GetAnimId ( void )
 }
 
 
+bool CEventDamageSA::GetAnimAdded ( void )
+{
+    bool bReturn;
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
+}
+
+
 void CEventDamageSA::ComputeDeathAnim ( CPed * pPed, bool bUnk )
 {
     DWORD dwThis = ( DWORD ) m_pInterface;    
