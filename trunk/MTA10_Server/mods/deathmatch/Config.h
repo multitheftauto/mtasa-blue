@@ -42,6 +42,10 @@ public:
 #define MIN_NICK_LENGTH 1
 #define MAX_NICK_LENGTH 22
 
+// Min and max number of characters in player nametags (this must match the client's)
+#define MIN_NAMETAG_LENGTH 1
+#define MAX_NAMETAG_LENGTH 22
+
 // Min and max number of characters in passwords
 #define MIN_PASSWORD_LENGTH 0
 #define MAX_PASSWORD_LENGTH 30

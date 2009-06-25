@@ -1090,7 +1090,29 @@ void CClientGame::HandleRadioPrevious ( CControlFunctionBind*  )
         }
     }
 }
+bool CClientGame::IsNametagValid ( const char* szNick )
+{
+    // Grab the size of the nametag. Check that it's not to long or short
+    size_t sizeNick = strlen ( szNick );
+    if ( sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH )
+    {
+        return false;
+    }
 
+    // Check that each character is valid (Anything above 32)
+    unsigned char ucTemp;
+    for ( size_t i = 0; i < sizeNick; i++ )
+    {
+        ucTemp = szNick [i];
+        if ( ucTemp < 32 )
+        {
+            return false;
+        }
+    }
+
+    // nametag is valid, return true
+    return true;
+}
 
 bool CClientGame::IsNickValid ( const char* szNick )
 {

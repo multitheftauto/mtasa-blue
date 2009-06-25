@@ -1495,7 +1495,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, c
     assert ( szText );
     RUN_CHILDREN ( **iter, szText );
 
-    if ( IS_PLAYER ( &Entity ) )
+    if ( IS_PLAYER ( &Entity ) && g_pClientGame->IsNametagValid ( szText ) )
     {
         CClientPlayer& Player = static_cast < CClientPlayer& > ( Entity );
 

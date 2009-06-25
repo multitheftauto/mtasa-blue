@@ -2016,7 +2016,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CElement* pElement, cons
         if ( ( szText && ( szNametagText == NULL || strcmp ( szNametagText, szText ) ) ) ||
              ( szText == NULL && szNametagText ) )
         {
-            if ( szText == NULL || IsNickValid ( szText ) )
+            if ( szText == NULL || IsNametagValid ( szText ) )
             {
                 pPlayer->SetNametagText ( szText );
 

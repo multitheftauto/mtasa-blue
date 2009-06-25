@@ -201,6 +201,7 @@ public:
     static void                         HandleRadioPrevious             ( CControlFunctionBind* );
 
     bool                                IsNickValid                     ( const char* szNick );
+    bool                                IsNametagValid                  ( const char* szNick );
 
     bool                                IsOfflineGame                   ( void ) { return m_Status == STATUS_OFFLINE; };
 

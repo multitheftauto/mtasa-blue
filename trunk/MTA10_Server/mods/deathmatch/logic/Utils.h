@@ -176,7 +176,7 @@ void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInt
 
 // Validation funcs
 bool            IsNickValid                 ( const char* szNick );
-
+bool            IsNametagValid              ( const char* szNick );
 void            RotateVector                ( CVector& vecLine, const CVector& vecRotation );
 
 // Network funcs
