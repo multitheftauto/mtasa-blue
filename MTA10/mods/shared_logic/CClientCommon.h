@@ -27,6 +27,11 @@
 #define MIN_PLAYER_NICK_LENGTH          1
 #define MAX_PLAYER_NICK_LENGTH          22
 
+// Defines the min/max size for the player nametag (who the hell came up with 22?)
+#define MIN_PLAYER_NAMETAG_LENGTH          1
+#define MAX_PLAYER_NAMETAG_LENGTH          22
+
+
 // Defines the minimum fade time for a transfer
 #define MIN_TRANSFER_TIME				1500
 
