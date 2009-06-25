@@ -155,6 +155,8 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 {
 	WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
 
+    GetVideoModeManager ()->PreReset ( pPresentationParameters );
+
     HRESULT hResult;
 
     // Call our event handler.
@@ -162,6 +164,8 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
     // Call the real reset routine.
     hResult = m_pDevice->Reset ( pPresentationParameters );
+
+    GetVideoModeManager ()->PostReset ( pPresentationParameters );
 
     // Update our data.
     m_pData->StoreViewport ( 0, 0, 

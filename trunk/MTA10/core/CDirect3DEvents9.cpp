@@ -15,7 +15,6 @@
 #include "StdInc.h"
 #include <libpng/png.h>
 
-BYTE** ppScreenData = NULL;
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
@@ -69,31 +68,12 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
 	// Notify gui
     CLocalGUI::GetSingleton().Invalidate ();
 
-	// Clean up the screen data buffer
-	if ( ppScreenData ) {
-		unsigned short height = (unsigned short)CDirect3DData::GetSingleton ().GetViewportHeight ();
-		for ( unsigned short y = 0; y < height; y++ ) {
-			delete [] ppScreenData[y];
-		}
-		delete [] ppScreenData;
-	}
-
     CGraphics::GetSingleton ().OnDeviceInvalidate ( pDevice );
 }
 
 void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 {
 	WriteDebugEvent ( "CDirect3DEvents9::OnRestore" );
-
-	// Create the screen data buffer
-	unsigned short width_channels = (unsigned short)(CDirect3DData::GetSingleton ().GetViewportWidth () * 4);
-	unsigned short height = (unsigned short)(CDirect3DData::GetSingleton ().GetViewportHeight ());
-
-	ppScreenData = new BYTE* [ height ];
-
-	for ( unsigned short y = 0; y < height; y++ ) {
-		ppScreenData[y] = new BYTE [ width_channels ];
-	}
 
 	// Restore the VMR9 manager
 	//CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
@@ -179,6 +159,13 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 			unsigned long ulScreenHeight = ScreenSize.bottom - ScreenSize.top;
 			unsigned long ulScreenWidth = ScreenSize.right - ScreenSize.left;
 
+            // Create rhe screen data buffer
+            BYTE** ppScreenData = NULL;
+	        ppScreenData = new BYTE* [ ulScreenHeight ];
+	        for ( unsigned short y = 0; y < ulScreenHeight; y++ ) {
+		        ppScreenData[y] = new BYTE [ ulScreenWidth * 4 ];
+	        }
+
 			// Copy the surface data into a row-based buffer for libpng
 			#define BYTESPERPIXEL 4
 			unsigned long ulLineWidth = ulScreenWidth * 4;
@@ -206,6 +193,16 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 				png_write_end ( png_ptr, info_ptr );
 				png_destroy_write_struct ( &png_ptr, &info_ptr );
 			fclose(file);
+
+	        // Clean up the screen data buffer
+	        if ( ppScreenData ) {
+		        unsigned short height = (unsigned short)CDirect3DData::GetSingleton ().GetViewportHeight ();
+		        for ( unsigned short y = 0; y < height; y++ ) {
+			        delete [] ppScreenData[y];
+		        }
+		        delete [] ppScreenData;
+	        }
+
 
 			// Call the post-screenshot function
 			CScreenShot::PostScreenShot ( strFileName );

@@ -115,26 +115,10 @@ void CCommandFuncs::Vid ( const char* szParameters )
         if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
         {
             // Grab the device window and what mode to switch to
-		    HWND hDeviceWindow = CDirect3DData::GetSingleton ().GetDeviceWindow ();
 		    int iParameter = atoi ( szParameters );
 
             // Change the video mode
-		    gameSettings->SetCurrentVideoMode ( iParameter );
-
-		    // Apply some extra settings for windowed mode
-		    if ( iParameter == 0 )
-            {
-                // Disable the thick frame so it can't be resized
-                LONG lLong = GetWindowLong ( hDeviceWindow, GWL_STYLE ) ^ WS_THICKFRAME;
-                lLong ^= WS_MAXIMIZEBOX;
-				//lLong ^= WS_MINIMIZEBOX;
-				lLong ^= WS_SYSMENU;
-			    SetWindowLong ( hDeviceWindow, GWL_STYLE, lLong );
-
-                SetWindowLong ( NULL, GWL_STYLE, WS_BORDER | WS_CAPTION );
-			    SetWindowPos ( NULL, HWND_TOP, 0, 0, 0, 0, /* SWP_NOMOVE | SWP_NOSIZE | */ SWP_NOSENDCHANGING  );
-		        SetWindowPos( hDeviceWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE );
-		    }
+            GetVideoModeManager ()->ChangeVideoMode ( iParameter );
 
             // Grab viewport settings
             int iViewportX = CCore::GetSingleton ().GetGraphics()->GetViewportWidth ();
@@ -169,30 +153,8 @@ void CCommandFuncs::Window ( const char* szParameters )
 
         if ( currentMode == 0 )
         {
-            // Maybe not the best way to find out the mode to return to
-
-            VideoMode           vidModeInfo, currentModeInfo;
-            int                 vidMode, numVidModes, currentVidMode;
-
-            gameSettings->GetVideoModeInfo(&currentModeInfo, currentMode);
-
-            numVidModes = gameSettings->GetNumVideoModes();
-            currentVidMode = gameSettings->GetCurrentVideoMode();
-
-            for (vidMode = 0; vidMode < numVidModes; vidMode++)
-            {
-                gameSettings->GetVideoModeInfo(&vidModeInfo, vidMode);
-
-                if ( vidModeInfo.width == currentModeInfo.width &&
-                     vidModeInfo.height == currentModeInfo.height &&
-                     vidModeInfo.depth == currentModeInfo.depth &&
-                     ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) != ( currentModeInfo.flags & rwVIDEOMODEEXCLUSIVE ) )
-                {
-                        gameSettings->SetCurrentVideoMode ( vidMode );
-                        g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
-
-                }
-            }
+            GetVideoModeManager ()->ChangeVideoMode ( VIDEO_MODE_FULLSCREEN );
+            g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
         }
         else
         {
