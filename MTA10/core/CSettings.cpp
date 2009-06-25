@@ -1687,7 +1687,7 @@ void CSettings::SaveData ( void )
              selectedVidMode <= numVidModes &&
              selectedVidMode >= 0 )
         {
-            gameSettings->SetCurrentVideoMode ( selectedVidMode );
+            GetVideoModeManager ()->ChangeVideoMode ( selectedVidMode );
             g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
         }
     }

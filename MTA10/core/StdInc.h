@@ -49,6 +49,7 @@
 #include "tracking/CHTTPClient.h"
 #include "UtilityMacros.h"
 #include "CJoystickManager.h"
+#include "CVideoModeManager.h"
 
 // SDK includes
 #include <xml/CXMLNode.h>

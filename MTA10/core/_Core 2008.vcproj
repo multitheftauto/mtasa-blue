@@ -585,6 +585,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVideoModeManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration
@@ -935,6 +939,10 @@
 			</File>
 			<File
 				RelativePath=".\CText.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVideoModeManager.h"
 				>
 			</File>
 			<File

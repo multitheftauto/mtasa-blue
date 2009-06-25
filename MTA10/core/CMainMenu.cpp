@@ -661,7 +661,11 @@ void CMainMenu::OnRestore ( IDirect3DDevice9 * pDevice )
 
 	//CVector2D ScreenSize = m_pManager->GetResolution ();
 	D3DVIEWPORT9 Viewport;
-	pDevice->GetViewport ( &Viewport );
+	HRESULT hr = pDevice->GetViewport ( &Viewport );
+    if ( FAILED(hr) )
+    {
+        MessageBox ( NULL, "Failed to get the viewport size", "Error", MB_BUTTON_OK | MB_ICON_ERROR );
+    }
 	CVector2D ScreenSize(Viewport.Width,Viewport.Height);
 
 	// If we use the dynamic background

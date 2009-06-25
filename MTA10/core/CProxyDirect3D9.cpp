@@ -156,55 +156,19 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         SetWindowText ( hFocusWindow, "MTA: San Andreas" );
     #endif
 
-    #ifndef MTA_DEBUG
-        #undef MTA_WINDOWED
-        #undef MTA_FULLSCREEN_WINDOWED
-    #endif
-
-    #ifdef MTA_WINDOWED
-        int x, y;
-        x = GetSystemMetrics ( SM_CXSCREEN );
-        y = GetSystemMetrics ( SM_CYSCREEN );
-        SetWindowLong ( pPresentationParameters->hDeviceWindow, GWL_STYLE, WS_POPUP );
-        #ifdef MTA_FULLSCREEN_WINDOWED
-            MoveWindow ( hFocusWindow, 
-                        0 /*(x/2)-(pPresentationParameters->BackBufferWidth/2)*/, 
-                        0 /*(y/2)-(pPresentationParameters->BackBufferHeight/2)*/, 
-                        pPresentationParameters->BackBufferWidth,
-                        pPresentationParameters->BackBufferHeight,
-                        TRUE );
-        #else
-            MoveWindow ( hFocusWindow, 
-                        (x/2)-(pPresentationParameters->BackBufferWidth/2), 
-                        (y/2)-(pPresentationParameters->BackBufferHeight/2), 
-                        pPresentationParameters->BackBufferWidth,
-                        pPresentationParameters->BackBufferHeight,
-                        TRUE );
-        #endif
-        pPresentationParameters->Windowed = true;
-        pPresentationParameters->FullScreen_RefreshRateInHz = 0;
-    #endif
-
 	// Enable the auto depth stencil parameter
 	pPresentationParameters->EnableAutoDepthStencil = true;
 	
+    GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
+
     // Create our object.
     hResult = m_pDevice->CreateDevice ( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
+
+    GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
 
 	// Pass the device to the core and store the rendering window in the direct 3d data
 	CCore::GetSingleton ().SetRenderDevice ( *ppReturnedDeviceInterface );
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
-
-    // Make us windowed
-    #ifdef MTA_WINDOWED
-        (*ppReturnedDeviceInterface)->Reset ( pPresentationParameters );
-    #endif
-    
-    #ifdef MTA_WINDOWED
-        #ifdef MTA_FULLSCREEN_WINDOWED
-            CCore::GetSingleton().GetResManager()->ChangeRes ( pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight, 32 );
-        #endif
-    #endif
 
 	// Apply input hook
 	CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
