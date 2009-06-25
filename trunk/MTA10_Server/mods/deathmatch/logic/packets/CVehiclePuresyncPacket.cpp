@@ -45,11 +45,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
             // Read out its position
-            CVector vecPosition;
             SPositionSync position ( false );
             BitStream.Read ( &position );
-            vecPosition = position.data.vecPosition;
-            pSourcePlayer->SetPosition ( vecPosition );
+            pSourcePlayer->SetPosition ( position.data.vecPosition );
 
             // Jax: don't allow any outdated packets through
             unsigned char ucSeat;
@@ -70,7 +68,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 BitStream.Read ( &rotation );
 
                 // Set it
-                pVehicle->SetPosition ( vecPosition );
+                pVehicle->SetPosition ( position.data.vecPosition );
                 pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
 
                 // Move speed vector
@@ -87,7 +85,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 
                 // Health
-                SFloatAsByteSync health ( 0, 1000, true );
+                SFloatAsByteSync health ( 0.f, 1000.f, true );
                 BitStream.Read ( &health );
                 float fPreviousHealth = pVehicle->GetHealth ();                
                 float fHealth = health.data.fValue;
@@ -121,21 +119,18 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                         pTrailer = static_cast < CVehicle* > ( pElement );
                     
                     // Read out the trailer position and rotation
-                    CVector vecTrailerPosition, vecTrailerRotationDegrees;
                     SPositionSync trailerPosition ( false );
                     BitStream.Read ( &trailerPosition );
-                    vecTrailerPosition = trailerPosition.data.vecPosition;
 
                     SRotationDegreesSync trailerRotation;
                     BitStream.Read ( &trailerRotation );
-                    vecTrailerRotationDegrees = trailerRotation.data.vecRotation;
 
                     // If we found the trailer
                     if ( pTrailer )
                     {
                         // Set its position and rotation
-                        pTrailer->SetPosition ( vecTrailerPosition );
-                        pTrailer->SetRotationDegrees ( vecTrailerRotationDegrees );
+                        pTrailer->SetPosition ( trailerPosition.data.vecPosition );
+                        pTrailer->SetRotationDegrees ( trailerRotation.data.vecRotation );
     
                         // Is this a new trailer, attached?
                         CVehicle* pCurrentTrailer = pTowedByVehicle->GetTowedVehicle ();
@@ -215,7 +210,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
 
             // Player health
-            SFloatAsByteSync health ( 0, 100.0f, true );
+            SFloatAsByteSync health ( 0.f, 100.f, true );
             BitStream.Read ( &health );
             float fHealth = health.data.fValue;
 
@@ -234,7 +229,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
 			// Armor
 			//BitStream.Read ( ucTemp );
-            SFloatAsByteSync armor ( 0, 100.0f, true );
+            SFloatAsByteSync armor ( 0.f, 100.f, true );
             BitStream.Read ( &armor );
             float fArmor = armor.data.fValue;
 
@@ -262,14 +257,14 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Flags
             unsigned char ucFlags;
             BitStream.Read ( ucFlags );
-            bool bWearingGoggles = ( ucFlags & 0x01 ) ? true:false;
-            bool bDoingGangDriveby = ( ucFlags & 0x02 ) ? true:false;
-            bool bSirenActive = ( ucFlags & 0x04 ) ? true:false;
-            bool bSmokeTrail = ( ucFlags & 0x08 ) ? true:false;
-            bool bLandingGearDown = ( ucFlags & 0x10 ) ? true:false;
-            bool bOnGround = ( ucFlags & 0x20 ) ? true:false;
-            bool bInWater = ( ucFlags & 0x40 ) ? true:false;
-            bool bIsDerailed = ( ucFlags & 0x80 ) ? true:false;
+            bool bWearingGoggles    = ( ucFlags & 0x01 ) ? true:false;
+            bool bDoingGangDriveby  = ( ucFlags & 0x02 ) ? true:false;
+            bool bSirenActive       = ( ucFlags & 0x04 ) ? true:false;
+            bool bSmokeTrail        = ( ucFlags & 0x08 ) ? true:false;
+            bool bLandingGearDown   = ( ucFlags & 0x10 ) ? true:false;
+            bool bOnGround          = ( ucFlags & 0x20 ) ? true:false;
+            bool bInWater           = ( ucFlags & 0x40 ) ? true:false;
+            bool bIsDerailed        = ( ucFlags & 0x80 ) ? true:false;
 
             pSourcePlayer->SetWearingGoggles ( bWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( bDoingGangDriveby );            
@@ -361,7 +356,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &position );
 
                 // Vehicle rotation
-                 SRotationDegreesSync rotation;
+                SRotationDegreesSync rotation;
                 pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
                 BitStream.Write ( &rotation );
 
@@ -376,30 +371,30 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &turnSpeed );
 
                 // Health
-                SFloatAsByteSync health ( 0, 1000, true );
+                SFloatAsByteSync health ( 0.f, 1000.f, true );
                 health.data.fValue = pVehicle->GetHealth ();
                 BitStream.Write ( &health );
             }
 
             // Player health and armor
-            SFloatAsByteSync health ( 0, 100, true );
+            SFloatAsByteSync health ( 0.f, 100.f, true );
             health.data.fValue = pSourcePlayer->GetHealth ();
             BitStream.Write ( &health );
 
-            SFloatAsByteSync armor ( 0, 100, true );
+            SFloatAsByteSync armor ( 0.f, 100.f, true );
             armor.data.fValue = pSourcePlayer->GetArmor ();
             BitStream.Write ( &armor );
 
             // Flags
             unsigned char ucFlags = 0;
-            if ( pSourcePlayer->IsWearingGoggles () ) ucFlags |= 0x01;
+            if ( pSourcePlayer->IsWearingGoggles () )   ucFlags |= 0x01;
             if ( pSourcePlayer->IsDoingGangDriveby () ) ucFlags |= 0x02;
-            if ( pVehicle->IsSirenActive () ) ucFlags |= 0x04;
-            if ( pVehicle->IsSmokeTrailEnabled () ) ucFlags |= 0x08;
-            if ( pVehicle->IsLandingGearDown () ) ucFlags |= 0x10;
-            if ( pVehicle->IsOnGround () ) ucFlags |= 0x20;
-            if ( pVehicle->IsInWater () ) ucFlags |= 0x40;
-            if ( pVehicle->IsDerailed () ) ucFlags |= 0x80;
+            if ( pVehicle->IsSirenActive () )           ucFlags |= 0x04;
+            if ( pVehicle->IsSmokeTrailEnabled () )     ucFlags |= 0x08;
+            if ( pVehicle->IsLandingGearDown () )       ucFlags |= 0x10;
+            if ( pVehicle->IsOnGround () )              ucFlags |= 0x20;
+            if ( pVehicle->IsInWater () )               ucFlags |= 0x40;
+            if ( pVehicle->IsDerailed () )              ucFlags |= 0x80;
 
             // Write the flags
             BitStream.Write ( ucFlags );
