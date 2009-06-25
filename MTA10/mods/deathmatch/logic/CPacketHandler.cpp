@@ -938,7 +938,7 @@ void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
     ElementID ID;    
     unsigned char ucAnimGroup;
     unsigned char ucAnimID;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( ucAnimGroup ) &&
          bitStream.Read ( ucAnimID ) )
     {
