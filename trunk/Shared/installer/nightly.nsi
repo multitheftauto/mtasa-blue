@@ -13,6 +13,7 @@ SetCompressor /SOLID lzma
 Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
+Var CreateDesktopIcon
 Var RedistInstalled
 
 ; ###########################################################################################################
@@ -516,6 +517,17 @@ Function .onInstSuccess
 		!endif
 		skip3:
 	${EndIf}
+    
+    ${If} $CreateDesktopIcon == 1
+		!ifdef CLIENT_SETUP
+			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
+			SetOutPath "$INSTDIR"
+			CreateShortCut "$DESKTOP\Play MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
+				"" "Play Multi Theft Auto: San Andreas"
+			skip4:
+		!endif
+	${EndIf}
 
 	UAC::Unload ;Must call unload!
 FunctionEnd
@@ -731,6 +743,11 @@ DontInstallRedist:
 Section "Start menu group"
 	SectionIn 1 2
 	StrCpy $CreateSMShortcuts 1
+SectionEnd
+
+Section "Desktop icon"
+	SectionIn 1 2
+	StrCpy $CreateDesktopIcon 1
 SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
