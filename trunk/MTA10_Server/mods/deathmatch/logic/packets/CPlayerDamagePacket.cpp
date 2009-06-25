@@ -21,7 +21,7 @@ CPlayerDamagePacket::CPlayerDamagePacket ( void )
 
 
 CPlayerDamagePacket::CPlayerDamagePacket ( CPed * pPed, unsigned char animGroup, unsigned char animID )
-{
+{    
     m_PlayerID = pPed->GetID ();
     m_ucAnimGroup = animGroup;
     m_ucAnimID = animID;

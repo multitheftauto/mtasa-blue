@@ -1440,7 +1440,7 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if ( pPlayer )
+    if ( pPlayer && pPlayer->IsSpawned () )
     {   
         CVector vecPosition = pPlayer->GetPosition ();
 
@@ -1449,6 +1449,7 @@ void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
         
         // Loop through all the players
         CPlayer* pSendPlayer;
+        CVector vecCameraPosition;
         std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
@@ -1456,15 +1457,14 @@ void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
             if ( pSendPlayer != pPlayer )
             {
                 // We tell the reporter to create the explosion too
-                // Grab this player's camera position
-                CVector vecCameraPosition;
+                // Grab this player's camera position                
                 pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
                 // Is this players camera close enough to send?
                 if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_SYNC_DISTANCE ) )
                 {
                     // Send the packet to him
-                    pSendPlayer->Send ( Packet );
+                    pSendPlayer->Send ( ReturnDamagePacket );
                 }
             }
         }

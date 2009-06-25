@@ -4218,6 +4218,9 @@ void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, uns
 
 void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId )
 {
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket: %u %u", animGroup, animId );
+#endif
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
     {
