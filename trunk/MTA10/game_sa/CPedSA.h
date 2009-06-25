@@ -283,7 +283,7 @@ public:
     CPedIKSAInterface pedIK; // 1292 (length 32 bytes)
     int bPad5[5];
 
-    float fHealth;
+    float fHealth; // 1344
     int  iUnknown121;
     float fArmor;
 
@@ -307,7 +307,7 @@ public:
     BYTE bFightingStyle; // 1837
     BYTE bFightingStyleExtra;
     BYTE bPad7[1];
-    CFireInterface* pFireOnPed;
+    CFireSAInterface* pFireOnPed;
     BYTE bPad10[104];
     CEntitySAInterface * pTargetedEntity; // 1948
 };
@@ -412,6 +412,7 @@ public:
 
     bool                IsOnFire ( void );
     void                SetOnFire ( bool bOnFire );
+    CFire *             GetFire ( void );
 
     inline bool         GetStayInSamePlace ( void )             { return GetPedInterface ()->pedFlags.bStayInSamePlace; }
     void                SetStayInSamePlace ( bool bStay );

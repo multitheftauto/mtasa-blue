@@ -13,6 +13,7 @@
 #define __CGAME_PED
 
 class CTaskManager;
+class CFire;
 
 #include "Common.h"
 #include "CPhysical.h"
@@ -218,6 +219,7 @@ public:
 
     virtual bool            IsOnFire ( void ) = 0;
     virtual void            SetOnFire ( bool bOnFire ) = 0;
+    virtual CFire *         GetFire ( void ) = 0;
 
     virtual bool            GetStayInSamePlace ( void ) = 0;
     virtual void            SetStayInSamePlace ( bool bStay ) = 0;

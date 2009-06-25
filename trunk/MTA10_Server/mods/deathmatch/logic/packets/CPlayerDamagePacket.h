@@ -17,14 +17,12 @@
 #include <CVector.h>
 
 class CPed;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
 
 class CPlayerDamagePacket : public CPacket
 {
 public:
                             CPlayerDamagePacket         ( void );
-                            CPlayerDamagePacket         ( CPed * pPed, AssocGroupId animGroup, AnimationId animID );
+                            CPlayerDamagePacket         ( CPed * pPed, unsigned char animGroup, unsigned char animID );
 
     inline ePacketID        GetPacketID                 ( void ) const                      { return PACKET_ID_PLAYER_DAMAGE; };
     inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -33,8 +31,8 @@ public:
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     ElementID               m_PlayerID;
-    AssocGroupId            m_AnimGroup;
-    AnimationId             m_AnimID;
+    unsigned char           m_ucAnimGroup;
+    unsigned char           m_ucAnimID;
 };
 
 #endif
