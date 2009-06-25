@@ -357,18 +357,22 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
             // Call our lua callback function if we have one            
             if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
 
-            // Is this our final animation?
-            if ( pAnim == pElement->m_Animations.back () )
+            // Check our animations are still there
+            if ( !pElement->m_Animations.empty () )
             {
-                // Set it as finished
-                pAnim->finished = true;
-                pAnim->assoc = NULL;
-            }
-            else
-            {
-                // Remove this animation from the list now its finished
-                pAnim->deleted = true;
-                pElement->RemoveTrash ();
+                // Is this our final animation?
+                if ( pAnim == pElement->m_Animations.back () )
+                {
+                    // Set it as finished
+                    pAnim->finished = true;
+                    pAnim->assoc = NULL;
+                }
+                else
+                {
+                    // Remove this animation from the list now its finished
+                    pAnim->deleted = true;
+                    pElement->RemoveTrash ();
+                }
             }
 
             // Finish here as there should only be 1 match.            
