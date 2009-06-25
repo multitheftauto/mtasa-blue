@@ -42,12 +42,9 @@ bool CReturnSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( &position );
 
             // And rotation
-            CVector vecRotationDegrees;
-            pVehicle->GetRotationDegrees ( vecRotationDegrees );
-
-            BitStream.Write ( vecRotationDegrees.fX );
-            BitStream.Write ( vecRotationDegrees.fY );
-            BitStream.Write ( vecRotationDegrees.fZ );
+            SRotationDegreesSync rotation ( false );
+            pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
+            BitStream.Write ( &rotation );
         }
         else
         {

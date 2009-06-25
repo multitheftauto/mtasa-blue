@@ -80,16 +80,22 @@ namespace SharedUtil
     }
 
     // Lerps between two values depending on the weight
-	template< class T >
-    T Lerp ( T& From, float Alpha, T& To )
-	{
-		return static_cast < T > ( ( To - From ) * Alpha + From );
-	}
+    template< class T >
+    T Lerp ( T& from, float fAlpha, T& to )
+    {
+        return ( to - from ) * fAlpha + from;
+    }
 
     // Find the relative position of Pos between From and To
-    inline const double Unlerp ( const double From, const double Pos, const double To )
+    inline const float Unlerp ( const double dFrom, const double dPos, const double dTo )
     {
-	    return ( Pos - From ) / ( To - From );
+        return static_cast < float > ( ( dPos - dFrom ) / ( dTo - dFrom ) );
+    }
+
+    //  Unlerp avoiding extrapolation
+    inline const float UnlerpClamped ( const double dFrom, const double dPos, const double dTo )
+    {
+        return Clamp ( 0.0f, Unlerp( dFrom, dPos, dTo ), 1.0f );
     }
 
 };

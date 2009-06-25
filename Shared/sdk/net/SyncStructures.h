@@ -75,18 +75,19 @@ private:
 };
 
 
-
 //////////////////////////////////////////
 //                                      //
-//              Data types              //
+//              FloatAsByte             //
+//                                      //
+// Map a float range into a byte        //
 //                                      //
 //////////////////////////////////////////
 struct SFloatAsByteSync : public ISyncStructure
 {
-    SFloatAsByteSync ( float fMin, float fMax, bool bPreserveNonZeroness )
+    SFloatAsByteSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
         : m_fMin ( fMin )
         , m_fMax ( fMax )
-        , m_bPreserveNonZeroness ( bPreserveNonZeroness )
+        , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
     {
     }
 
@@ -95,7 +96,7 @@ struct SFloatAsByteSync : public ISyncStructure
         unsigned char ucValue;
         if ( bitStream.Read ( ucValue ) )
         {
-            float fAlpha = ucValue / 250.f;
+            float fAlpha = ucValue / 255.f;
             // Find value in range
             data.fValue = Lerp ( m_fMin, fAlpha, m_fMax );
             return true;
@@ -106,15 +107,12 @@ struct SFloatAsByteSync : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         // Find position in range
-        float fAlpha = Clamp ( 0.f, ( float ) Unlerp ( m_fMin, data.fValue, m_fMax ), 1.f );
+        float fAlpha = UnlerpClamped ( m_fMin, data.fValue, m_fMax );
         // Convert to byte
-        unsigned char ucValue = static_cast < unsigned char > ( floor ( fAlpha * 250 ) );
+        unsigned char ucValue = static_cast < unsigned char > ( floor ( fAlpha * 255.f ) );
 
-        // Checks
-        int iValue = ( int ) floor ( fAlpha * 250 );
-        assert ( iValue == ucValue && iValue >= 0 && iValue <= 250 );
-
-        if ( m_bPreserveNonZeroness )
+        // If required, ensure ( fValue > m_fMin ) is preserved.
+        if ( m_bPreserveGreaterThanMin )
             if ( ucValue == 0 && fAlpha > 0.0f )
                 ucValue = 1;
 
@@ -129,7 +127,7 @@ struct SFloatAsByteSync : public ISyncStructure
 private:
     const float m_fMin;
     const float m_fMax;
-    const bool  m_bPreserveNonZeroness;
+    const bool  m_bPreserveGreaterThanMin;
 };
 
 
@@ -200,6 +198,8 @@ private:
 //////////////////////////////////////////
 //                                      //
 //        Rotation Degrees              //
+//                                      //
+// 2 bytes for each component           //
 //                                      //
 //////////////////////////////////////////
 struct SRotationDegreesSync : public ISyncStructure
@@ -400,9 +400,9 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
             if ( data.bSyncRotation )
             {
-                bitStream.Read ( data.vecRotation.fX );
-                bitStream.Read ( data.vecRotation.fY );
-                bitStream.Read ( data.vecRotation.fZ );
+                SRotationDegreesSync rot;
+                bitStream.Read ( &rot );
+                data.vecRotation = rot.data.vecRotation;
             }
 
             if ( data.bSyncVelocity )
@@ -414,14 +414,16 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
             if ( data.bSyncTurnVelocity )
             {
-                bitStream.Read ( data.vecTurnVelocity.fX );
-                bitStream.Read ( data.vecTurnVelocity.fY );
-                bitStream.Read ( data.vecTurnVelocity.fZ );
+                SVelocitySync turnVelocity;
+                bitStream.Read ( &turnVelocity );
+                data.vecTurnVelocity = turnVelocity.data.vecVelocity;
             }
 
             if ( data.bSyncHealth )
             {
-                bitStream.Read ( data.fHealth );
+                SFloatAsByteSync health ( 0.f, 1000.f, true );
+                bitStream.Read ( &health );
+                data.fHealth = health.data.fValue;
             }
 
             if ( data.bSyncTrailer )
@@ -449,9 +451,9 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
         if ( data.bSyncRotation )
         {
-            bitStream.Write ( data.vecRotation.fX );
-            bitStream.Write ( data.vecRotation.fY );
-            bitStream.Write ( data.vecRotation.fZ );
+            SRotationDegreesSync rot;
+            rot.data.vecRotation = data.vecRotation;
+            bitStream.Write ( &rot );
         }
 
         if ( data.bSyncVelocity )
@@ -463,14 +465,16 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
         if ( data.bSyncTurnVelocity )
         {
-            bitStream.Write ( data.vecTurnVelocity.fX );
-            bitStream.Write ( data.vecTurnVelocity.fY );
-            bitStream.Write ( data.vecTurnVelocity.fZ );
+            SVelocitySync turnVelocity;
+            turnVelocity.data.vecVelocity = data.vecTurnVelocity;
+            bitStream.Write ( &turnVelocity );
         }
 
         if ( data.bSyncHealth )
         {
-            bitStream.Write ( data.fHealth );
+            SFloatAsByteSync health ( 0.f, 1000.f, true );
+            health.data.fValue = data.fHealth;
+            bitStream.Write ( &health );
         }
 
         if ( data.bSyncTrailer )
