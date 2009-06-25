@@ -40,7 +40,7 @@ bool CPlayerDamagePacket::Write ( NetBitStreamInterface& BitStream ) const
 {    
     if ( m_PlayerID != INVALID_ELEMENT_ID && m_ucAnimGroup != 0xFF && m_ucAnimID != 0xFF )
     {
-        BitStream.Write ( m_PlayerID );
+        BitStream.WriteCompressed ( m_PlayerID );
         BitStream.Write ( m_ucAnimGroup );
         BitStream.Write ( m_ucAnimID );
 
