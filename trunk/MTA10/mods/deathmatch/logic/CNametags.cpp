@@ -416,7 +416,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
 
     // Get the position
     CVector vecPosition;
-    pPlayer->GetPosition ( vecPosition );
+    pPlayer->GetBonePosition(BONE_PELVIS, vecPosition );
 
     // Calculate where the player is on our screen
     CVector vecScreenPosition;
