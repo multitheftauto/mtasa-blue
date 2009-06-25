@@ -3437,13 +3437,6 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
             }
             break;
         }
-        case CCLIENTPED:
-        case CCLIENTVEHICLE:
-        {
-            // focus on a ped or vehicle
-            m_pCamera->SetFocus ( pEntity, MODE_BEHINDCAR, false );
-            break;
-        }
         default:
             return false;
     }
