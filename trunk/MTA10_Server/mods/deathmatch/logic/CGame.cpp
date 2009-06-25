@@ -1441,21 +1441,20 @@ void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if ( pPlayer )
-    {
-        if ( pPlayer->IsSpawned () )
-        {            
-            CVector vecPosition = pPlayer->GetPosition ();
+    {   
+        CVector vecPosition = pPlayer->GetPosition ();
 
-            // Create a new packet to send to everyone
-            CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_ucAnimGroup, Packet.m_ucAnimID );
-            
-            // Loop through all the players
-            CPlayer* pSendPlayer;
-            std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-            for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+        // Create a new packet to send to everyone
+        CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_ucAnimGroup, Packet.m_ucAnimID );
+        
+        // Loop through all the players
+        CPlayer* pSendPlayer;
+        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+        {
+            pSendPlayer = *iter;
+            if ( pSendPlayer != pPlayer )
             {
-                pSendPlayer = *iter;
-
                 // We tell the reporter to create the explosion too
                 // Grab this player's camera position
                 CVector vecCameraPosition;

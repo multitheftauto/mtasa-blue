@@ -3445,19 +3445,19 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
                             SendDamagePacket ( animGroup, animID );
                         }
                     }
-                    // Remote player damage?
-                    else
-                    {
-                        // Don't let this damage register
-                        return false;
-                    }
                 }
             }
+        }
+        // Is this a remote player
+        if ( pPed->GetType () == CCLIENTPLAYER && !pPed->IsLocalPlayer () )
+        {
+            // Dont allow the damage
+            return false;
         }
     }
 
     // Allow the damage to register
-    return true;
+    return false;
 }
 
 bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
