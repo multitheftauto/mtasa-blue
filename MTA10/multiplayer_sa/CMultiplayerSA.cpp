@@ -71,8 +71,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define CALL_CRenderer_Render                               0x53EA12
 #define FUNC_CRenderer_Render                               0x727140
 
-#define CALL_CWeapon_FireAreaEffect                         0x73EBFE
-#define FUNC_CWeapon_FireAreaEffect                         0x53A450
 #define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
 
 #define HOOKPOS_CGame_Process                               0x53C095
@@ -119,7 +117,6 @@ PreContextSwitchHandler* m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler* m_pPostContextSwitchHandler = NULL;
 PreWeaponFireHandler* m_pPreWeaponFireHandler = NULL;
 PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
-DamageHandler* m_pDamageHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
@@ -132,6 +129,8 @@ IdleHandler * m_pIdleHandler = NULL;
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
+extern DamageHandler* m_pDamageHandler;
+extern FireDamageHandler* m_pFireDamageHandler;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -146,7 +145,6 @@ void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
-void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CBike_ProcessRiderAnims();
 void HOOK_CCam_ProcessFixed ();
 void HOOK_Render3DStuff ();
@@ -167,6 +165,7 @@ void entity_alpha_init ();
 void fx_manager_init ();
 void explosion_init ();
 void running_script_init ();
+void damage_events_init ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -191,6 +190,7 @@ CMultiplayerSA::CMultiplayerSA()
     m_pBreakTowLinkHandler = NULL;
     m_pDrawRadarAreasHandler = NULL;
     m_pDamageHandler = NULL;
+    m_pFireDamageHandler = NULL;
     m_pFireHandler = NULL;
     m_pProjectileHandler = NULL;
     m_pProjectileStopHandler = NULL;
@@ -209,6 +209,7 @@ void CMultiplayerSA::InitHooks()
     fx_manager_init ();
     explosion_init ();
     running_script_init ();
+    damage_events_init ();
 
     eGameVersion version = pGameInterface->GetGameVersion ();
 
@@ -251,7 +252,6 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
-	HookInstallCall ( CALL_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     memset ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1014,6 +1014,11 @@ void CMultiplayerSA::SetDamageHandler ( DamageHandler * pDamageHandler )
     m_pDamageHandler = pDamageHandler;
 }
 
+void CMultiplayerSA::SetFireDamageHandler ( FireDamageHandler * pFireDamageHandler )
+{
+    m_pFireDamageHandler = pFireDamageHandler;
+}
+
 void CMultiplayerSA::SetFireHandler ( FireHandler * pFireHandler )
 {
     m_pFireHandler = pFireHandler;
@@ -1428,19 +1433,6 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
         mov     ecx, CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink
         add     ecx, 6
         jmp     ecx
-    }
-}
-
-
-CEntitySAInterface * fireAreaEffectInterface = 0;
-void _declspec(naked) HOOK_CWeapon_FireAreaEffect ()
-{    
-    _asm
-    {
-		mov eax, [esp+32]
-		mov fireAreaEffectInterface, eax
-        mov eax, FUNC_CWeapon_FireAreaEffect
-        jmp eax
     }
 }
 

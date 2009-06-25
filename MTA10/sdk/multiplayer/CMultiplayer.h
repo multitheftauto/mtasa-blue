@@ -29,6 +29,7 @@ typedef void ( PostContextSwitchHandler ) ( void );
 typedef void ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostWeaponFireHandler ) ( void );
 typedef bool ( DamageHandler ) ( class CPed* pDamagePed, class CEventDamage * pEvent );
+typedef bool ( FireDamageHandler ) ( class CPed* pDamagePed );
 typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
 typedef void ( ProjectileHandler ) ( class CEntity * owner, class CProjectile* projectile, class CProjectileInfo* projectileInfo, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
@@ -109,6 +110,7 @@ public:
 	virtual void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
     virtual void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler ) = 0;
     virtual void                        SetDamageHandler            ( DamageHandler * pDamageHandler ) = 0;
+    virtual void                        SetFireDamageHandler        ( FireDamageHandler * pDamageHandler ) = 0;
     virtual void                        SetFireHandler              ( FireHandler * pFireHandler ) = 0;
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
 	virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;

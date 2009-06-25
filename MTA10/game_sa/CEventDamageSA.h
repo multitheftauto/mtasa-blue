@@ -23,6 +23,7 @@
 #define FUNC_CEventDamage_GetAnimId             0x4B8070
 #define FUNC_CEventDamage_ComputeDeathAnim      0x4B3A60
 #define FUNC_CEventDamage_ComputeDamageAnim     0x4b3fc0
+#define FUNC_CEventDamage_Destructor            0x4ad960
 
 class CEntitySAInterface;
 enum eWeaponType;
@@ -42,6 +43,7 @@ public:
     ePedPieceTypes              pedPieceType;   // 32
     char                        cDirection;     // 36
     char                        cFlags;         // 37
+    char pad [ 30 ];
 };
 
 class CEventDamageSA : public CEventDamage
@@ -49,11 +51,12 @@ class CEventDamageSA : public CEventDamage
 private:
     CEventDamageSAInterface *           m_pInterface;
 public:
+
     inline                              CEventDamageSA      ( CEventDamageSAInterface * pInterface )    { m_pInterface = pInterface; }
 
     inline CEventDamageSAInterface *    GetInterface        ( void )        { return m_pInterface; }
 
-    inline void                         Destroy             ( void )                                    { delete this; }
+    void                                Destroy             ( bool bDestroyInterface );
 
     // Flag accessors
     inline bool                         DidPedFallDown      ( void )                                    { return (m_pInterface->cFlags & 2) == 1; }

@@ -844,6 +844,21 @@ void CPedSA::SetOnFire ( bool bOnFire )
 }
 
 
+CFire * CPedSA::GetFire ( void )
+{
+    CFireSAInterface * pFireInterface = GetPedInterface()->pFireOnPed;
+    if ( pFireInterface )
+    {
+        CFire * pFire = ((CFireManagerSA*)pGame->GetFireManager ())->GetFire ( pFireInterface );
+        if ( pFire )
+        {
+            return pFire;
+        }
+    }
+    return NULL;
+}
+
+
 void CPedSA::SetStayInSamePlace ( bool bStay )
 {
     GetPedInterface ()->pedFlags.bStayInSamePlace = bStay;

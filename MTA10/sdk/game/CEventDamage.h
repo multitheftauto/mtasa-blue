@@ -25,7 +25,7 @@ class CEventDamage
 public:
     virtual CEventDamageSAInterface *   GetInterface        ( void ) = 0;
 
-    virtual void                        Destroy             ( void ) = 0;
+    virtual void                        Destroy             ( bool bDestroyInterface ) = 0;
 
     // Flag accessors
     virtual bool                        DidPedFallDown      ( void ) = 0;

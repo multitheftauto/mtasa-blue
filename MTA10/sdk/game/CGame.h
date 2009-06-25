@@ -128,8 +128,6 @@ public:
     virtual CFxManager          * GetFxManager () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
 
-    virtual class CEventDamage  * GetEventDamage ( class CEventDamageSAInterface * pInterface ) = 0;
-
 	
 	virtual CWeaponInfo			* GetWeaponInfo(eWeaponType weapon)=0;
 	virtual CModelInfo			* GetModelInfo(DWORD dwModelID)=0;

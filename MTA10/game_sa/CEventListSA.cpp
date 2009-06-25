@@ -63,3 +63,32 @@ CEvent * CEventListSA::GetEvent ( eEventType eventtype )
 	}
 	return NULL;
 }
+
+
+CEventDamage * CEventListSA::GetEventDamage ( CEventDamageSAInterface * pInterface )
+{
+    return new CEventDamageSA ( pInterface );
+}
+
+
+CEventDamage * CEventListSA::CreateEventDamage ( CEntity * pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4 )
+{
+    
+    CEventDamageSAInterface * pInterface = new CEventDamageSAInterface;
+    DWORD dwEntityInterface = (DWORD)pEntity->GetInterface ();
+    DWORD dwThis = (DWORD)pInterface;
+    DWORD dwFunc = FUNC_CEventDamage_CEventDamage;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    b_4
+        push    b_3
+        push    uc_2
+        push    hitZone
+        push    weaponType
+        push    i_1
+        push    dwEntityInterface
+        call    dwFunc
+    }    
+    return new CEventDamageSA ( pInterface );
+}

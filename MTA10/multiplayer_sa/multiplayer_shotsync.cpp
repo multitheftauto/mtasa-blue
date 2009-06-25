@@ -61,7 +61,6 @@ CPedSAInterface * pShootingPed;
 
 extern PreWeaponFireHandler* m_pPreWeaponFireHandler;
 extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
-extern DamageHandler* m_pDamageHandler;
 extern FireHandler* m_pFireHandler;
 extern ProjectileHandler* m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
@@ -82,7 +81,6 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CPedIK__PointGunInDirection, (DWORD)HOOK_CPedIK__PointGunInDirection, 7 );
     HookInstall ( HOOKPOS_CTaskSimpleGangDriveBy__PlayerTarget, (DWORD)HOOK_CTaskSimpleGangDriveBy__PlayerTarget, 6 );
     HookInstall ( HOOKPOS_CWeapon__Fire_Sniper, (DWORD)HOOK_CWeapon__Fire_Sniper, 6 );
-    HookInstall ( HOOKPOS_CEventDamage__AffectsPed, (DWORD)HOOK_CEventDamage__AffectsPed, 6 );
     HookInstall ( HOOKPOS_CFireManager__StartFire, (DWORD)HOOK_CFireManager__StartFire, 6 );
     HookInstall ( HOOKPOS_CFireManager__StartFire_, (DWORD)HOOK_CFireManager__StartFire_, 6 );
     HookInstall ( HOOKPOS_CProjectileInfo__AddProjectile, (DWORD)HOOK_CProjectileInfo__AddProjectile, 7 );
@@ -614,81 +612,6 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
         }
     }
 
-}
-
-bool ProcessDamageEvent ( CEventDamageSAInterface * event, CPedSAInterface * affectsPed )
-{
-    if ( m_pDamageHandler && event )
-    {
-        CPoolsSA * pPools = (CPoolsSA*)pGameInterface->GetPools();
-        CPed * pPed = pPools->GetPed ( (DWORD *)affectsPed );
-        CEntity * pInflictor = NULL;
-
-        if ( pPed )
-        {
-            // This creates a CEventDamageSA for us
-            CEventDamage * pEvent = pGameInterface->GetEventDamage ( event );
-            // Call the event
-            bool bReturn = m_pDamageHandler ( pPed, pEvent );
-            // Destroy the CEventDamageSA (so we dont get a leak)
-            pEvent->Destroy ();
-            // Finally, return
-            return bReturn;
-        }
-    }
-    return true;
-}
-
-CPedSAInterface * affectsPed = 0;
-CEventDamageSAInterface * event = 0;
-void _declspec(naked) HOOK_CEventDamage__AffectsPed()
-{
-    /*
-    004B35A0   83EC 0C          SUB ESP,0C
-    004B35A3   56               PUSH ESI
-    004B35A4   8BF1             MOV ESI,ECX
-    */
-
-    _asm
-    {
-        push    esi  
-    
-        mov     esi, [esp+8]        
-        mov     affectsPed, esi // store the ped
-        mov     event, ecx // store the event pointer
-
-        pop     esi
-
-        pushad
-    }
-
-    if ( ProcessDamageEvent ( event, affectsPed ) )
-    {
-        // they want the damage to happen!
-        _asm
-        {
-            popad
-            
-            sub     esp, 0xC        // replacement code
-            push    esi
-            mov     esi, ecx
-
-            mov     ecx, HOOKPOS_CEventDamage__AffectsPed
-            add     ecx, 6
-            jmp     ecx
-        }
-    }
-    else
-    {
-        // they want the player to escape unscathed
-
-        _asm
-        {
-            popad
-            xor     eax, eax
-            retn    4 // return from the function
-        }
-    }
 }
 
 

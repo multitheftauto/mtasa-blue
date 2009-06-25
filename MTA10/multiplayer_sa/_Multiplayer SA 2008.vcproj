@@ -346,6 +346,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\damage_events.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\entity_alpha.cpp"
 				>
 			</File>

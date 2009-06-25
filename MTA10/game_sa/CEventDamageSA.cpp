@@ -12,6 +12,22 @@
 
 #include "StdInc.h"
 
+
+void CEventDamageSA::Destroy ( bool bDestroyInterface )
+{
+    if ( bDestroyInterface )
+    {
+        DWORD dwThis = (DWORD)m_pInterface;
+        DWORD dwFunc = FUNC_CEventDamage_Destructor;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+        }
+    }
+    delete this;
+}
+
 CEntity * CEventDamageSA::GetInflictingEntity ( void )
 {
     CEntity * pReturn = NULL;

@@ -402,6 +402,7 @@ private:
 	void								Event_OnTransferComplete		( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
+    static bool                         StaticFireDamageHandler         ( CPed* pDamagePed );
     static void                         StaticFireHandler               ( CFire* pFire );
     static bool                         StaticBreakTowLinkHandler       ( CVehicle* pTowedVehicle );
     static void                         StaticDrawRadarAreasHandler     ( void );
@@ -412,7 +413,9 @@ private:
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static void                         StaticIdleHandler               ( void );
 
+    bool                                HandleDamage                    ( CClientPed * pPed, CEventDamage * pEvent, CEntity * pInflictor, float fDamage );
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
+    bool                                FireDamageHandler               ( CPed* pDamagePed );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
