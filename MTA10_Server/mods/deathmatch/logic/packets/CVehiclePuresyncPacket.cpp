@@ -30,7 +30,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         {
             // Read out the time context
             unsigned char ucTimeContext = 0;
-            BitStream.Read ( ucTimeContext );
+            if ( !BitStream.Read ( ucTimeContext ) )
+                return false;
 
             // Only read this packet if it matches the current time context that
             // player is in.
@@ -41,17 +42,20 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Read out the keysync data
             CControllerState ControllerState;
-            ReadFullKeysync ( ControllerState, BitStream );
+            if ( !ReadFullKeysync ( ControllerState, BitStream ) )
+                return false;
             pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
             // Read out its position
             SPositionSync position ( false );
-            BitStream.Read ( &position );
+            if ( !BitStream.Read ( &position ) )
+                return false;
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
             // Jax: don't allow any outdated packets through
             unsigned char ucSeat;
-            BitStream.Read ( ucSeat );
+            if ( !BitStream.Read ( ucSeat ) )
+                return false;
             if ( ucSeat != pSourcePlayer->GetOccupiedVehicleSeat () )
             {
                 // Mis-matching seats can happen when we warp into a different one,
@@ -65,7 +69,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Read out the vehicle rotation in degrees
                 SRotationDegreesSync rotation;
-                BitStream.Read ( &rotation );
+                if( !BitStream.Read ( &rotation ) )
+                    return false;
 
                 // Set it
                 pVehicle->SetPosition ( position.data.vecPosition );
@@ -73,20 +78,23 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 // Move speed vector
                 SVelocitySync velocity;
-                BitStream.Read ( &velocity );
+                if ( !BitStream.Read ( &velocity ) )
+                    return false;
 
                 pVehicle->SetVelocity ( velocity.data.vecVelocity );
                 pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
 
                 // Turn speed vector
                 SVelocitySync turnSpeed;
-                BitStream.Read ( &turnSpeed );
+                if ( !BitStream.Read ( &turnSpeed ) )
+                    return false;
 
                 pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 
                 // Health
                 SFloatAsByteSync health ( 0.f, 1000.f, true );
-                BitStream.Read ( &health );
+                if ( !BitStream.Read ( &health ) )
+                    return false;
                 float fPreviousHealth = pVehicle->GetHealth ();                
                 float fHealth = health.data.fValue;
 
@@ -110,7 +118,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 CVehicle* pTowedByVehicle = pVehicle;
                 CVehicle* pTrailer = NULL;
                 ElementID TrailerID;
-                BitStream.ReadCompressed ( TrailerID );
+                if ( !BitStream.ReadCompressed ( TrailerID ) )
+                    return false;
 
                 while ( TrailerID != INVALID_ELEMENT_ID )
                 {
@@ -120,10 +129,12 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     
                     // Read out the trailer position and rotation
                     SPositionSync trailerPosition ( false );
-                    BitStream.Read ( &trailerPosition );
+                    if ( !BitStream.Read ( &trailerPosition ) )
+                        return false;
 
                     SRotationDegreesSync trailerRotation;
-                    BitStream.Read ( &trailerRotation );
+                    if ( !BitStream.Read ( &trailerRotation ) )
+                        return false;
 
                     // If we found the trailer
                     if ( pTrailer )
@@ -211,7 +222,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Player health
             SFloatAsByteSync health ( 0.f, 100.f, true );
-            BitStream.Read ( &health );
+            if ( !BitStream.Read ( &health ) )
+                return false;
             float fHealth = health.data.fValue;
 
             float fOldHealth = pSourcePlayer->GetHealth ();
@@ -230,7 +242,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 			// Armor
 			//BitStream.Read ( ucTemp );
             SFloatAsByteSync armor ( 0.f, 100.f, true );
-            BitStream.Read ( &armor );
+            if ( !BitStream.Read ( &armor ) )
+                return false;
             float fArmor = armor.data.fValue;
 
 			float fOldArmor = pSourcePlayer->GetArmor ();
@@ -256,7 +269,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Flags
             unsigned char ucFlags;
-            BitStream.Read ( ucFlags );
+            if ( !BitStream.Read ( ucFlags ) )
+                return false;
             bool bWearingGoggles    = ( ucFlags & 0x01 ) ? true:false;
             bool bDoingGangDriveby  = ( ucFlags & 0x02 ) ? true:false;
             bool bSirenActive       = ( ucFlags & 0x04 ) ? true:false;
@@ -272,19 +286,22 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Weapon stuff no compressed yet
             // Current weapon slot
             unsigned char ucCurrentWeaponSlot;
-            BitStream.Read ( ucCurrentWeaponSlot );
+            if ( !BitStream.Read ( ucCurrentWeaponSlot ) )
+                return false;
             pSourcePlayer->SetWeaponSlot ( ucCurrentWeaponSlot );
             unsigned char ucCurrentWeapon = pSourcePlayer->GetWeaponType ();
             if ( ucCurrentWeapon != 0 )
             {
                 // Read out the ammo state
                 unsigned short usAmmoInClip;
-                BitStream.Read ( usAmmoInClip );
+                if ( !BitStream.Read ( usAmmoInClip ) )
+                    return false;
                 pSourcePlayer->SetWeaponAmmoInClip ( usAmmoInClip );
 
                 // Read out aim data
                 SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
-                BitStream.Read ( &aim );
+                if ( !BitStream.Read ( &aim ) )
+                    return false;
 
                 pSourcePlayer->SetAimDirection ( aim.data.fArm );
                 pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
@@ -292,7 +309,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 // Read out the driveby direction
                 unsigned char ucDriveByDirection;
-                BitStream.Read ( ucDriveByDirection );
+                if ( !BitStream.Read ( ucDriveByDirection ) )
+                    return false;
                 pSourcePlayer->SetDriveByDirection ( ucDriveByDirection );
             }
 
@@ -442,7 +460,8 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     {
         // Read out the turret position
         SVehicleSpecific vehicle;
-        BitStream.Read ( &vehicle );
+        if ( !BitStream.Read ( &vehicle ) )
+            return;
 
         // Set the data
         pVehicle->SetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );

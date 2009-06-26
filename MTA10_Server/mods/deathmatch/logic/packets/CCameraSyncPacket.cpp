@@ -15,23 +15,23 @@
 bool CCameraSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     unsigned char ucTemp;
-    BitStream.Read ( ucTemp );
+    if ( !BitStream.Read ( ucTemp ) )
+        return false;
+
     m_bFixed = ( ucTemp == 1 );
 
     if ( m_bFixed )
     {
-        BitStream.Read ( m_vecPosition.fX );
-        BitStream.Read ( m_vecPosition.fY );
-        BitStream.Read ( m_vecPosition.fZ );
+        return BitStream.Read ( m_vecPosition.fX ) &&
+               BitStream.Read ( m_vecPosition.fY ) &&
+               BitStream.Read ( m_vecPosition.fZ ) &&
 
-        BitStream.Read ( m_vecLookAt.fX );
-        BitStream.Read ( m_vecLookAt.fY );
-        BitStream.Read ( m_vecLookAt.fZ );
+               BitStream.Read ( m_vecLookAt.fX ) &&
+               BitStream.Read ( m_vecLookAt.fY ) &&
+               BitStream.Read ( m_vecLookAt.fZ );
     }
     else
     {
-        BitStream.Read ( m_TargetID );
+        return BitStream.Read ( m_TargetID );
     }
-
-    return true;
 }

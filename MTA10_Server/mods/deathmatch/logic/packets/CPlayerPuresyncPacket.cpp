@@ -26,7 +26,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Read out the time context
         unsigned char ucTimeContext = 0;
-        BitStream.Read ( ucTimeContext );
+        if ( !BitStream.Read ( ucTimeContext ) )
+            return false;
 
         // Only read this packet if it matches the current time context that
         // player is in.
@@ -42,7 +43,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Read the flags
         SPlayerPuresyncFlags flags;
-        BitStream.Read ( &flags );
+        if ( !BitStream.Read ( &flags ) )
+            return false;
 
         pSourcePlayer->SetInWater ( flags.data.bIsInWater );
         pSourcePlayer->SetOnGround ( flags.data.bIsOnGround );
@@ -58,7 +60,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( flags.data.bHasContact )
         {
             ElementID Temp;
-            BitStream.ReadCompressed ( Temp );
+            if ( !BitStream.ReadCompressed ( Temp ) )
+                return false;
             pContactElement = CElementIDs::GetElement ( Temp );
         }
         CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();
@@ -82,7 +85,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Player position
         SPositionSync position ( false );
-        if ( ! BitStream.Read ( &position ) )
+        if ( !BitStream.Read ( &position ) )
             return false;
 
         if ( pContactElement )
@@ -97,24 +100,28 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Player rotation
         SPedRotationSync rotation;
-        BitStream.Read ( &rotation );
+        if ( !BitStream.Read ( &rotation ) )
+            return false;
         pSourcePlayer->SetRotation ( rotation.data.fRotation );
 
         // Move speed vector
         if ( flags.data.bSyncingVelocity )
         {
             SVelocitySync velocity;
-            if ( BitStream.Read ( &velocity ) )
-                pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
+            if ( !BitStream.Read ( &velocity ) )
+                return false;
+            pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
         }
 
         // Health ( stored with damage )
         unsigned char ucHealth;
-        BitStream.Read ( ucHealth );
+        if ( !BitStream.Read ( ucHealth ) )
+            return false;
 
         // Armor
         unsigned char ucArmor;
-        BitStream.Read ( ucArmor );
+        if ( !BitStream.Read ( ucArmor ) )
+            return false;
 
         float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
         float fOldArmor = pSourcePlayer->GetArmor ();
@@ -124,14 +131,16 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Read out and set the camera rotation
         float fCameraRotation;
-        BitStream.Read ( fCameraRotation );
+        if ( !BitStream.Read ( fCameraRotation ) )
+            return false;
         pSourcePlayer->SetCameraRotation ( fCameraRotation );
 
         if ( flags.data.bHasAWeapon )
         {
             // Current weapon slot
             SWeaponSlotSync slot;
-            BitStream.Read ( &slot );
+            if ( !BitStream.Read ( &slot ) )
+                return false;
             unsigned int uiSlot = slot.data.uiSlot;
 
             pSourcePlayer->SetWeaponSlot ( uiSlot );
@@ -140,13 +149,15 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Read out the ammo states
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), true, true );
-                BitStream.Read ( &ammo );
+                if ( !BitStream.Read ( &ammo ) )
+                    return false;
                 pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
                 pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
                 // Read out the aim data
                 SWeaponAimSync sync ( pSourcePlayer->GetWeaponRange (), ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
-                BitStream.Read ( &sync );
+                if ( !BitStream.Read ( &sync ) )
+                    return false;
 
                 // Set the arm directions and whether or not arms are up
                 pSourcePlayer->SetAimDirection ( sync.data.fArm );
@@ -175,15 +186,18 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( BitStream.ReadBit () == true )
         {
             ElementID DamagerID;
-            BitStream.ReadCompressed ( DamagerID );
+            if ( !BitStream.ReadCompressed ( DamagerID ) )
+                return false;
 
             CElement* pElement = CElementIDs::GetElement ( DamagerID );
 
             SWeaponTypeSync weaponType;
-            BitStream.Read ( &weaponType );
+            if ( !BitStream.Read ( &weaponType ) )
+                return false;
 
             SBodypartSync bodyPart;
-            BitStream.Read ( &bodyPart );
+            if ( !BitStream.Read ( &bodyPart ) )
+                return false;
 
             pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
         }
