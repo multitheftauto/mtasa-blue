@@ -947,7 +947,7 @@ void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
         if ( pPlayer )
         {
             // Set his damage animation
-            pPlayer->BlendAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID, 4.0f );
+            pPlayer->AddAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID );
         }
     }
     else

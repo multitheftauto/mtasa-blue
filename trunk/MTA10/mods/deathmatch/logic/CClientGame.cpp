@@ -223,6 +223,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
+    g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
@@ -354,6 +355,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostWorldProcessHandler ( NULL );
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
+    g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -645,7 +647,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{   
+{  
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -3107,6 +3109,10 @@ bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePe
     return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
 }
 
+void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+{
+    g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+}
 
 void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
@@ -3220,6 +3226,24 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
             return pPed->CallEvent ( "onClientPedChoke", Arguments, true );
     }
     return true;
+}
+
+void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+{
+    CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    if ( pPed )
+    {
+        // Is this the local player?
+        if ( pPed == m_pLocalPlayer )
+        {
+            // Is this a damage animation?
+            if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
+            {
+                // Notify the server
+                SendDamagePacket ( animGroup, animID );
+            }
+        }
+    }
 }
 
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
@@ -3441,27 +3465,6 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
 
                         // Check if we're dead
                         SendPedWastedPacket ( pPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
-                    }
-                }
-            }
-            // If we've taken damage but aren't dying
-            else
-            {
-                // Is this the local player?
-                if ( pPed->GetType () == CCLIENTPLAYER && pPed->IsLocalPlayer () )
-                {
-                    // Grab our damage-anim
-                    pEvent->ComputeDamageAnim ( pGamePlayer, true );
-
-                    AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                    AnimationId animID = pEvent->GetAnimId ();
-
-                    // Check this animation is valid
-                    CAnimBlendAssocGroup * pGroup = g_pGame->GetAnimManager ()->GetAnimBlendAssoc ( animGroup );
-                    if ( pGroup && animID < pGroup->GetNumAnimations () )
-                    {
-                        // Tell the server about it
-                        SendDamagePacket ( animGroup, animID );
                     }
                 }
             }

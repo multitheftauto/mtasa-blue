@@ -330,6 +330,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\animation.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CMultiplayerSA.cpp"
 				>
 			</File>

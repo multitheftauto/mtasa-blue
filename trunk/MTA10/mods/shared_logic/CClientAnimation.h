@@ -76,8 +76,9 @@ public:
 
     void                                OnBlockLoad                 ( CAnimBlock * pBlock );
 
-    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
+    void                                AddAnimation                ( AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimation              ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    bool                                BlendAnimation              ( const char * szBlockName, const char * szName, float fSpeed = 1.0f, float fBlendSpeed = 1.0f, float fStartTime = 0.0f, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, CLuaMain * pMain = NULL, int iFunction = -1, CLuaArguments * pArguments = NULL );
     void                                FinishAnimation             ( void );
 
     bool                                RunNamedAnimation           ( const char * szBlockName, const char * szName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
@@ -88,6 +89,9 @@ public:
     void                                CleanUpForVM                ( CLuaMain * pLuaMain );
 
     void                                RemoveTrash                 ( void );
+
+    static bool                         IsDamageAnimation           ( AssocGroupId animGroup, AnimationId animID );
+
 private:
     void                                BlendAnimation              ( CAnimationItem * pAnim );
     void                                FindAndClear                ( CAnimBlock * pBlock, const char * szName );

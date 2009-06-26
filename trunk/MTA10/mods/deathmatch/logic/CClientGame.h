@@ -411,6 +411,7 @@ private:
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static bool                         StaticChokingHandler            ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
+    static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static void                         StaticIdleHandler               ( void );
 
@@ -424,6 +425,7 @@ private:
     void                                Render3DStuffHandler            ( void );
     void                                PostWorldProcessHandler         ( void );
     bool                                ChokingHandler                  ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
+    void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     void                                IdleHandler                     ( void );
 

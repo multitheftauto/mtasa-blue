@@ -193,6 +193,26 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
 }
 
 
+void CClientAnimation::AddAnimation ( AssocGroupId animGroup, AnimationId animID )
+{
+    RpClump * pClump = GetClump ();
+    if ( pClump )
+    {
+        g_pGame->GetAnimManager ()->AddAnimation ( pClump, animGroup, animID );
+    }
+}
+
+
+void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    RpClump * pClump = GetClump ();
+    if ( pClump )
+    {
+        g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
+    }
+}
+
+
 bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
 {
     // Is this a valid block name?
@@ -235,16 +255,6 @@ bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * s
     }
     
     return false;
-}
-
-
-void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{
-    RpClump * pClump = GetClump ();
-    if ( pClump )
-    {
-        g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
-    }
 }
 
 
@@ -469,4 +479,24 @@ void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
             }
         }
     }
+}
+
+
+bool CClientAnimation::IsDamageAnimation ( AssocGroupId animGroup, AnimationId animID )
+{
+    if ( animGroup == 0 ) // ped
+    {
+        if ( animID >= 15 && animID <= 20 ) return true;
+        if ( animID >= 22 && animID <= 40 ) return true;
+    }
+    else if ( animGroup >= 2 && animGroup <= 7 )
+    {
+        if ( animID == 7 ) return true;
+    }
+    else if ( animGroup >= 33 && animGroup <= 45 )
+    {
+        if ( animID >= 5 && animID <= 7 ) return true;
+    }
+
+    return false;
 }
