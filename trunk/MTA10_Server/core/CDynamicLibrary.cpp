@@ -129,7 +129,7 @@ FuncPtr_t CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
     if ( m_hModule != 0 )
     {
         #ifdef WIN32
-            return GetProcAddress ( m_hModule, szProcName );
+            return (FuncPtr_t)GetProcAddress ( m_hModule, szProcName );
         #else
             char* szError = NULL;
 	    dlerror ();
