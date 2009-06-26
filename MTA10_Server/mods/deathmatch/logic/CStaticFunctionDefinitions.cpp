@@ -3802,6 +3802,11 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
         // Blow it up on our records. Also change the sync time context or this vehicle
         // is likely to blow up twice, call the events twice and all that if someone's
         // nearby and syncing it.
+        if ( IsVehicleBlown( pVehicle ) == false ) {
+            // Call the onVehicleExplode event
+	        CLuaArguments Arguments;
+	        pVehicle->CallEvent ( "onVehicleExplode", Arguments );
+        }
         pVehicle->SetHealth ( 0.0f );
         pVehicle->SetBlowTime ( ::GetTime () );
         pVehicle->GenerateSyncTimeContext ();
@@ -3811,10 +3816,6 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
         BitStream.pBitStream->Write ( ( unsigned char ) ( ( bExplode ) ? 1 : 0 ) );
         BitStream.pBitStream->Write ( pVehicle->GetSyncTimeContext () );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( BLOW_VEHICLE, *BitStream.pBitStream ) );
-
-        // Call the onVehicleExplode event
-        CLuaArguments Arguments;
-        pVehicle->CallEvent ( "onVehicleExplode", Arguments );
         return true;
     }
 
