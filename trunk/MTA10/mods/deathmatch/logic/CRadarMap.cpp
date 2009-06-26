@@ -35,6 +35,12 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_bIsMovingSouth = false;
     m_bIsMovingEast = false;
     m_bIsMovingWest = false;
+    m_bTextVisible = false;
+
+    // Set the initial alpha to the alpha from the users options
+    int iVar;
+    g_pCore->GetCVars()->Get ( "mapalpha", iVar );
+    m_iRadarAlpha = iVar;
 
     // Set the update time to the current time
     m_ulUpdateTime = GetTickCount ();
@@ -59,6 +65,60 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pModeText->SetScale ( 2.0f );
     m_pModeText->SetCaption ( "Current Mode: Free Move" );
     m_pModeText->SetVisible ( false );
+
+    // Create the text displays for the help text
+    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextZooming->SetColor( 255, 0, 0, 255 );
+    m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.12f, 0 ) );
+    m_pHelpTextZooming->SetFormat ( DT_CENTER | DT_VCENTER );
+    m_pHelpTextZooming->SetScale ( 2.0f );
+
+    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextMovement->SetColor( 255, 0, 0, 255 );
+    m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.17f, 0 ) );
+    m_pHelpTextMovement->SetFormat ( DT_CENTER | DT_VCENTER );
+    m_pHelpTextMovement->SetScale ( 2.0f );
+
+    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextAttachment->SetColor( 255, 0, 0, 255 );
+    m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.22f, 0 ) );
+    m_pHelpTextAttachment->SetFormat ( DT_CENTER | DT_VCENTER );
+    m_pHelpTextAttachment->SetScale ( 2.0f );
+
+    // retrieve the key binds
+    // zooming
+    CCommandBind * cbZoomOut = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_out", 0, 0, 0, false, 0 );
+    const SBindableKey *bkZoomOut = cbZoomOut->boundKey;
+
+    CCommandBind * cbZoomIn = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_in", 0, 0, 0, false, 0 );
+    const SBindableKey *bkZoomIn = cbZoomIn->boundKey;
+
+    // movement
+    CCommandBind * cbMoveNorth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_north", 0, 0, 0, false, 0 );
+    const SBindableKey *bkMoveNorth = cbMoveNorth->boundKey;
+
+    CCommandBind * cbMoveEast = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_east", 0, 0, 0, false, 0 );
+    const SBindableKey *bkMoveEast = cbMoveEast->boundKey;
+
+    CCommandBind * cbMoveSouth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_south", 0, 0, 0, false, 0 );
+    const SBindableKey *bkMoveSouth = cbMoveSouth->boundKey;
+
+    CCommandBind * cbMoveWest = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_west", 0, 0, 0, false, 0 );
+    const SBindableKey *bkMoveWest = cbMoveWest->boundKey;
+
+    // toggle map mode
+    CCommandBind * cbAttachRadar = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_attach", 0, 0, 0, false, 0 );
+    const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
+
+    // load the controls into our label
+    m_pHelpTextZooming->SetCaption ( SString("%s %s %s %s %s", "Press ", bkZoomOut->szKey, "/", bkZoomIn->szKey, " to zoom out/in.").c_str() );
+    m_pHelpTextZooming->SetVisible ( false );
+
+    m_pHelpTextMovement->SetCaption ( SString("%s %s %s %s %s %s %s %s %s", "Press ", bkMoveNorth->szKey, ", ", bkMoveEast->szKey, ", ", bkMoveSouth->szKey, ", ", bkMoveWest->szKey, " to navigate the map.").c_str() );
+    m_pHelpTextMovement->SetVisible ( false );
+
+    m_pHelpTextAttachment->SetCaption ( SString("%s %s %s", "Press ", bkAttachRadar->szKey, " to change mode.").c_str() );
+    m_pHelpTextAttachment->SetVisible ( false );
 }
 
 
@@ -82,6 +142,11 @@ void CRadarMap::DoPulse ( void )
     // If our radar image exists
     if ( IsRadarShowing () )
     {
+        // Get the alpha from the options, incase it has changed
+        int iVar;
+        g_pCore->GetCVars()->Get ( "mapalpha", iVar );
+        m_iRadarAlpha = iVar;
+
         // If we are following the local player blip
         if ( m_bIsAttachedToLocal )
         {
@@ -119,7 +184,7 @@ void CRadarMap::DoPulse ( void )
                                                              m_fMapSize / RADAR_TEXTURE_WIDTH,
                                                              m_fMapSize / RADAR_TEXTURE_HEIGHT,
                                                              0.0f, 0.0f, 0.0f,
-                                                             RADAR_TEXTURE_ALPHA );
+                                                             m_iRadarAlpha );
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -296,13 +361,33 @@ void CRadarMap::DoPulse ( void )
 
         g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
 
-        if ( !m_pModeText->IsVisible () )
+        if ( !m_bTextVisible )
+        {
+            m_bTextVisible = true;
             m_pModeText->SetVisible ( true );
+            m_pHelpTextZooming->SetVisible ( true );
+            m_pHelpTextMovement->SetVisible ( true );
+            m_pHelpTextAttachment->SetVisible ( true );
+        }
+
+        if ( m_bTextVisible )
+        {
+            m_pModeText->Render ( true );
+            m_pHelpTextZooming->Render ( true );
+            m_pHelpTextMovement->Render ( true );
+            m_pHelpTextAttachment->Render ( true );
+        }
     }
     else
     {
-        if ( m_pModeText->IsVisible () )
+        if ( m_bTextVisible )
+        {
+            m_bTextVisible = false;
             m_pModeText->SetVisible ( false );
+            m_pHelpTextZooming->SetVisible ( false );
+            m_pHelpTextMovement->SetVisible ( false );
+            m_pHelpTextAttachment->SetVisible ( false );
+        }
     }
 }
 
@@ -684,4 +769,9 @@ bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
 	{
 		return false;
 	}
+}
+
+void CRadarMap::SetRadarAlpha ( int iRadarAlpha )
+{
+    m_iRadarAlpha = iRadarAlpha;
 }

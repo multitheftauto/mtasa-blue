@@ -130,6 +130,10 @@ protected:
 	CGUICheckBox*	    m_pCheckBoxMenuDynamic;
 	CGUICheckBox*	    m_pCheckBoxMenuVideo;
 	CGUICheckBox*	    m_pCheckBoxMenuPostEffects;
+    CGUILabel*          m_pMapRenderingLabel;
+    CGUILabel*          m_pMapAlphaLabel;
+    CGUIScrollBar*      m_pMapAlpha;
+    CGUILabel*          m_pMapAlphaValueLabel;
 	
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
@@ -199,6 +203,7 @@ protected:
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
 	bool				OnLoginButtonClick		( CGUIElement* pElement );
     bool				OnRegisterButtonClick	( CGUIElement* pElement );
+    bool                OnMapAlphaChanged        ( CGUIElement* pElement );
 
 	bool			    OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
