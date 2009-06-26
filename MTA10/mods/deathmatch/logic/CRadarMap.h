@@ -23,7 +23,6 @@
 
 #define RADAR_TEXTURE_WIDTH 1152
 #define RADAR_TEXTURE_HEIGHT 1152
-#define RADAR_TEXTURE_ALPHA 155
 
 class CRadarMap
 {
@@ -42,6 +41,9 @@ public:
     void                                SetForcedState                      ( bool bState );
 
 	bool                                GetBoundingBox                      ( CVector &vecMin, CVector &vecMax );
+
+    int                                 GetRadarAlpha                       ( void ) const                  { return m_iRadarAlpha; }
+    void                                SetRadarAlpha                       ( int iRadarAlpha );
 
 protected:
     void                                InternalSetRadarEnabled             ( bool bEnabled );
@@ -96,6 +98,8 @@ private:
     int                                 m_iHorizontalMovement;
     int                                 m_iVerticalMovement;
 
+    int                                 m_iRadarAlpha;
+
     unsigned char                       m_ucZoom;
 
     bool                                m_bIsRadarEnabled;
@@ -110,11 +114,15 @@ private:
     unsigned long                       m_ulUpdateTime;
 
     CClientTextDisplay*                 m_pModeText;
+    CClientTextDisplay*                 m_pHelpTextZooming;
+    CClientTextDisplay*                 m_pHelpTextMovement;
+    CClientTextDisplay*                 m_pHelpTextAttachment;
 
     bool                                m_bHudVisible;
     bool                                m_bChatVisible;
     bool                                m_bRadarVisible;
     bool                                m_bDebugVisible;
+    bool                                m_bTextVisible;
 };
 
 #endif

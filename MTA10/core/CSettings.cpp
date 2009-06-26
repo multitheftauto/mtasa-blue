@@ -413,6 +413,27 @@ CSettings::CSettings ( void )
 	m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
 	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
 	m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
+
+    m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
+    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
+    m_pMapRenderingLabel->GetPosition ( vecTemp, false );
+    m_pMapRenderingLabel->AutoSize ( "Map rendering options " );
+    m_pMapRenderingLabel->SetFont ( "default-bold-small" );
+
+    m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Opacity:" ) );
+    m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pMapAlphaLabel->GetPosition ( vecTemp, false );
+    m_pMapAlphaLabel->AutoSize ( "Opacity: " );
+
+    m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 50.0f, vecTemp.fY ) );
+    m_pMapAlpha->GetPosition ( vecTemp, false );
+    m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+    m_pMapAlphaValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
+    m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 170.0f, vecTemp.fY ) );
+    m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
+    m_pMapAlphaValueLabel->AutoSize ( "100% " );
 	
     /**
      * Chat Tab
@@ -555,6 +576,7 @@ CSettings::CSettings ( void )
     m_pCheckBoxMenuVideo->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
     m_pCheckBoxMenuPostEffects->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
+    m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1583,6 +1605,24 @@ void CSettings::LoadData ( void )
     m_pCheckBoxWindowed->SetSelected ( currentVidMode == 0 );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
 
+    // Map alpha
+    int iVar;
+    CVARS_GET ( "mapalpha", iVar);
+    
+    if (iVar >= 0 && iVar<= 255)
+    {
+        int iAlphaPercent = ceil( ( (float)iVar / 255 ) * 100 );
+        m_pMapAlphaValueLabel->SetText ( SString("%i %s", iAlphaPercent, "%").c_str() );
+        float sbPos = (float)iAlphaPercent / 100.0f;
+        m_pMapAlpha->SetScrollPosition ( sbPos );
+    }
+    else
+    {
+        CVARS_SET ( "mapalpha", 155 );
+        m_pMapAlphaValueLabel->SetText ( "60%" ); // ~155 Alpha
+        m_pMapAlpha->SetScrollPosition ( 0.6f );
+    }
+
     // Chat
     LoadChatColorFromCVar ( ChatColorType::CHAT_COLOR_BG, "chat_color" );
     LoadChatColorFromCVar ( ChatColorType::CHAT_COLOR_TEXT, "chat_text_color" );
@@ -1699,6 +1739,12 @@ void CSettings::SaveData ( void )
     else if ( !m_pCheckBoxWindowed->GetSelected() && currentVidMode == 0 )
         CCommandFuncs::Window ( "" );
     */
+
+    // Map alpha
+    SString sText = m_pMapAlphaValueLabel->GetText ();
+
+    float fMapAlpha = ( ( atof(sText.substr(0, sText.length() - 1 ).c_str() )) / 100 ) * 255;
+    CVARS_SET ( "mapalpha", fMapAlpha );
 
     // Chat
     SaveChatColor ( ChatColorType::CHAT_COLOR_BG, "chat_color" );
@@ -2005,5 +2051,15 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
             }
         }
     }
+    return true;
+}
+
+bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
+{
+
+    int iAlpha = ( m_pMapAlpha->GetScrollPosition () ) * 100;
+
+    m_pMapAlphaValueLabel->SetText ( SString("%i %s", iAlpha, "%").c_str() );
+    m_pMapAlphaValueLabel->AutoSize ( SString("%i %s", iAlpha, "%").c_str() );
     return true;
 }
