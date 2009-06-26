@@ -81,8 +81,6 @@ DWORD RETURN_Idle =                                         0x53E98B;
 
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -122,7 +120,6 @@ ProjectileHandler* m_pProjectileHandler = NULL;
 ProjectileStopHandler* m_pProjectileStopHandler = NULL;
 ProcessCamHandler* m_pProcessCamHandler = NULL;
 ChokingHandler* m_pChokingHandler = NULL;
-BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 
@@ -155,7 +152,6 @@ void HOOK_EndWorldColors ();
 void HOOK_CWorld_ProcessVerticalLineSectorList ();
 void HOOK_ComputeDamageResponse_StartChoking ();
 void HOOK_CollisionStreamRead ();
-void HOOK_CAnimManager_BlendAnimation ();
 void HOOK_CGame_Process ();
 void HOOK_Idle ();
 
@@ -166,6 +162,7 @@ void fx_manager_init ();
 void explosion_init ();
 void running_script_init ();
 void damage_events_init ();
+void animation_init ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -210,6 +207,7 @@ void CMultiplayerSA::InitHooks()
     explosion_init ();
     running_script_init ();
     damage_events_init ();
+    animation_init ();
 
     eGameVersion version = pGameInterface->GetGameVersion ();
 
@@ -245,8 +243,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
-    HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 ); 
+    HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);    
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10 );
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
 
@@ -1034,6 +1031,13 @@ void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
     m_pChokingHandler = pChokingHandler;
 }
 
+extern AddAnimationHandler * m_pAddAnimationHandler;
+void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
+{
+    m_pAddAnimationHandler = pHandler;
+}
+
+extern BlendAnimationHandler * m_pBlendAnimationHandler;
 void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
 {
     m_pBlendAnimationHandler = pHandler;
@@ -2171,41 +2175,6 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
         {
             ret
         }
-    }
-}
-
-DWORD dwBlendAnimationReturn = 0x4D4617;
-RpClump * pBlendAnimationClump = NULL;
-AssocGroupId blendAnimationGroup = 0;
-AnimationId blendAnimationID = 0;
-float fBlendAnimationBlendDelta;
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
-{
-    _asm
-    {        
-        mov     eax, [esp+4]
-        mov     pBlendAnimationClump, eax
-        mov     eax, [esp+8]
-        mov     blendAnimationGroup, eax
-        mov     eax, [esp+12]
-        mov     blendAnimationID, eax
-        mov     eax, [esp+16]
-        mov     fBlendAnimationBlendDelta, eax
-        pushad
-    }
-    
-    if ( m_pBlendAnimationHandler  )
-    {
-        m_pBlendAnimationHandler ( pBlendAnimationClump, blendAnimationGroup,
-                                   blendAnimationID, fBlendAnimationBlendDelta );
-    }
-
-    _asm
-    {
-        popad
-        sub     esp,14h 
-        mov     ecx,dword ptr [esp+18h]
-        jmp     dwBlendAnimationReturn
     }
 }
 
