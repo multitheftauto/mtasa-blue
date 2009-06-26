@@ -18,6 +18,8 @@
 #include <windows.h>
 #endif
 
+typedef void (*FuncPtr_t)();
+
 class CDynamicLibrary
 {
 public:
@@ -28,7 +30,7 @@ public:
     void            Unload                  ( void );
     bool            IsLoaded                ( void );
 
-    void*           GetProcedureAddress     ( const char* szProcName );
+    FuncPtr_t       GetProcedureAddress     ( const char* szProcName );
 
 private:
     #ifdef WIN32
