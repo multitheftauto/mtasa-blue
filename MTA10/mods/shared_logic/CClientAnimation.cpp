@@ -489,13 +489,9 @@ bool CClientAnimation::IsDamageAnimation ( AssocGroupId animGroup, AnimationId a
         if ( animID >= 15 && animID <= 20 ) return true;
         if ( animID >= 22 && animID <= 40 ) return true;
     }
-    else if ( animGroup >= 2 && animGroup <= 7 )
-    {
-        if ( animID == 7 ) return true;
-    }
     else if ( animGroup >= 33 && animGroup <= 45 )
     {
-        if ( animID >= 5 && animID <= 7 ) return true;
+        if ( animID >= 219 && animID <= 221 ) return true;
     }
 
     return false;
