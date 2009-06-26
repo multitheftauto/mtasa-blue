@@ -123,7 +123,7 @@ bool CDynamicLibrary::IsLoaded ( void )
 }
 
 
-void* CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
+FuncPtr_t CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
 {
     // Got a module?
     if ( m_hModule != 0 )
@@ -134,7 +134,7 @@ void* CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
             char* szError = NULL;
 	    dlerror ();
 
-            void* pFunc = dlsym ( m_hModule, szProcName );
+            FuncPtr_t pFunc = (FuncPtr_t)dlsym ( m_hModule, szProcName );
             if (  ( szError = dlerror () ) != NULL )
             {
                 return NULL;
