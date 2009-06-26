@@ -3812,6 +3812,9 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
         BitStream.pBitStream->Write ( pVehicle->GetSyncTimeContext () );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( BLOW_VEHICLE, *BitStream.pBitStream ) );
 
+        // Call the onVehicleExplode event
+        CLuaArguments Arguments;
+        pVehicle->CallEvent ( "onVehicleExplode", Arguments );
         return true;
     }
 
