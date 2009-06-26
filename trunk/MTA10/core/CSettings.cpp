@@ -385,11 +385,9 @@ CSettings::CSettings ( void )
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
     m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
 	m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    // Out for now
-    m_pCheckBoxWindowed->SetVisible ( false );
 
     m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
-    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 16.0f ) );
 	m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
@@ -1714,6 +1712,8 @@ void CSettings::SaveData ( void )
 
 
     // Video
+    GetVideoModeManager ()->ChangeVideoMode ( (int)m_pCheckBoxWindowed->GetSelected () - 1 );
+
     int numVidModes = gameSettings->GetNumVideoModes(),
         currentVidMode = gameSettings->GetCurrentVideoMode();
 
