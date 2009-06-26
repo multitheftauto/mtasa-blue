@@ -344,10 +344,18 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
 
+    m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
+    m_pLabelRadioVolumeValue->AutoSize ( "64 " );
+
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
 	m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
+
+    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
+    m_pLabelSFXVolumeValue->AutoSize ( "64 " );
 
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
@@ -575,6 +583,8 @@ CSettings::CSettings ( void )
     m_pCheckBoxMenuPostEffects->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
     m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
+    m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
+    m_pAudioSFXVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnSFXVolumeChanged, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1818,36 +1828,56 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     pLabel->GetPosition ( vecTemp, false );
     pLabel->AutoSize ( "Red:" );
 
+    m_pChatRedValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+    m_pChatRedValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
+    m_pChatRedValue [ eType ]->AutoSize ( "255 " );
+
     m_pChatRed [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
     m_pChatRed [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatRed [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
+    m_pChatRed [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatRedChanged, this ) );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Green:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
     pLabel->AutoSize ( "Green:" );
 
+    m_pChatGreenValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+    m_pChatGreenValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
+    m_pChatGreenValue [ eType ]->AutoSize ( "255 " );
+
     m_pChatGreen [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
     m_pChatGreen [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatGreen [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
+    m_pChatGreen [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatGreenChanged, this ) );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Blue:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
     pLabel->AutoSize ( "Blue:" );
 
+    m_pChatBlueValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+    m_pChatBlueValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
+    m_pChatBlueValue [ eType ]->AutoSize ( "255 " );
+
     m_pChatBlue [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
     m_pChatBlue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatBlue [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
+    m_pChatBlue [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatBlueChanged, this ) );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Transparency:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     pLabel->GetPosition ( vecTemp, false );
     pLabel->AutoSize ( "Transparency:" );
 
+    m_pChatAlphaValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+    m_pChatAlphaValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
+    m_pChatAlphaValue [ eType ]->AutoSize ( "255 " );
+
     m_pChatAlpha [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
     m_pChatAlpha [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatAlpha [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
+    m_pChatAlpha [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatAlphaChanged, this ) );
 }
 
 void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar )
@@ -2056,10 +2086,93 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
 
 bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 {
-
     int iAlpha = ( m_pMapAlpha->GetScrollPosition () ) * 100;
 
     m_pMapAlphaValueLabel->SetText ( SString("%i %s", iAlpha, "%").c_str() );
     m_pMapAlphaValueLabel->AutoSize ( SString("%i %s", iAlpha, "%").c_str() );
+    return true;
+}
+
+bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
+{
+    int iVolume = (float)m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
+    m_pLabelRadioVolumeValue->SetText ( SString("%i", iVolume).c_str() );
+    m_pLabelRadioVolumeValue->AutoSize ( SString("%i", iVolume, "%").c_str() );
+    return true;
+}
+
+bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
+{
+    int iVolume = (float)m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
+    m_pLabelSFXVolumeValue->SetText ( SString("%i", iVolume).c_str() );
+    m_pLabelSFXVolumeValue->AutoSize ( SString("%i", iVolume, "%").c_str() );
+    return true;
+}
+
+bool CSettings::OnChatRedChanged ( CGUIElement* pElement)
+{
+    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
+    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+
+    if ( pScrollBar == m_pChatRed [ ChatColorType::CHAT_COLOR_BG ] )
+        m_pChatRedValue [ ChatColorType::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ ChatColorType::CHAT_COLOR_TEXT ] )
+        m_pChatRedValue [ ChatColorType::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ ChatColorType::CHAT_COLOR_INPUT_BG ] )
+        m_pChatRedValue [ ChatColorType::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
+        m_pChatRedValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+
+    return true;
+}
+
+bool CSettings::OnChatGreenChanged ( CGUIElement* pElement)
+{
+    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
+    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+
+    if ( pScrollBar == m_pChatGreen [ ChatColorType::CHAT_COLOR_BG ] )
+        m_pChatGreenValue [ ChatColorType::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ ChatColorType::CHAT_COLOR_TEXT ] )
+        m_pChatGreenValue [ ChatColorType::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ ChatColorType::CHAT_COLOR_INPUT_BG ] )
+        m_pChatGreenValue [ ChatColorType::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
+        m_pChatGreenValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+
+    return true;
+}
+
+bool CSettings::OnChatBlueChanged ( CGUIElement* pElement)
+{
+    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
+    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+
+    if ( pScrollBar == m_pChatBlue [ ChatColorType::CHAT_COLOR_BG ] )
+        m_pChatBlueValue [ ChatColorType::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ ChatColorType::CHAT_COLOR_TEXT ] )
+        m_pChatBlueValue [ ChatColorType::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ ChatColorType::CHAT_COLOR_INPUT_BG ] )
+        m_pChatBlueValue [ ChatColorType::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
+        m_pChatBlueValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+
+    return true;
+}
+
+bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
+{
+    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
+    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+
+    if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_BG ] )
+        m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_TEXT ] )
+        m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_INPUT_BG ] )
+        m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
+        m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+
     return true;
 }
