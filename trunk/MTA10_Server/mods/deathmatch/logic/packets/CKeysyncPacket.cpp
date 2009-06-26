@@ -31,11 +31,13 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         // Read out the controller states
         CControllerState ControllerState;
         CControllerState LastControllerState = pSourcePlayer->GetPad ()->GetLastControllerState ();
-        ReadSmallKeysync ( ControllerState, LastControllerState, BitStream );        
+        if ( !ReadSmallKeysync ( ControllerState, LastControllerState, BitStream ) )
+            return false;
 
         // Flags
         SKeysyncFlags flags;
-        BitStream.Read ( &flags );
+        if ( !BitStream.Read ( &flags ) )
+            return false;
 
         // Set the ducked and choking state
         pSourcePlayer->SetDucked ( flags.data.bIsDucked );
@@ -50,7 +52,8 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Read out the current weapon slot and set it
                 SWeaponSlotSync slot;
-                BitStream.Read ( &slot );
+                if ( !BitStream.Read ( &slot ) )
+                    return false;
                 unsigned int uiSlot = slot.data.uiSlot;
 
                 pSourcePlayer->SetWeaponSlot ( uiSlot );
@@ -60,12 +63,14 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                 {
                     // And ammo in clip
                     SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
-                    BitStream.Read ( &ammo );
+                    if ( !BitStream.Read ( &ammo ) )
+                        return false;
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
 
                     // Read the aim data
                     SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
-                    BitStream.Read ( &aim );
+                    if ( !BitStream.Read ( &aim ) )
+                        return false;
                     pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
                     pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
@@ -75,7 +80,8 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                     // Read out the driveby direction
                     unsigned char ucDriveByDirection;
-                    BitStream.Read ( ucDriveByDirection );
+                    if ( !BitStream.Read ( ucDriveByDirection ) )
+                        return false;
                     pSourcePlayer->SetDriveByDirection ( ucDriveByDirection );
                 }
             }
@@ -94,8 +100,9 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) ) // Hydraulics?
             {
                 short sRightStickX, sRightStickY;
-                BitStream.Read ( sRightStickX );
-                BitStream.Read ( sRightStickY );
+                if ( !BitStream.Read ( sRightStickX ) ||
+                     !BitStream.Read ( sRightStickY ) )
+                     return false;
 
                 ControllerState.RightStickX = sRightStickX;
                 ControllerState.RightStickY = sRightStickY;

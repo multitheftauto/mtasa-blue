@@ -42,16 +42,15 @@ CPlayerWastedPacket::CPlayerWastedPacket ( CPed * pPed, CElement * pKiller, unsi
 
 bool CPlayerWastedPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    BitStream.Read ( m_AnimGroup );
-    BitStream.Read ( m_AnimID );
-    BitStream.Read ( m_Killer );
-    BitStream.Read ( m_ucKillerWeapon );
-    BitStream.Read ( m_ucBodyPart );
-    BitStream.Read ( m_vecPosition.fX );
-    BitStream.Read ( m_vecPosition.fY );
-    BitStream.Read ( m_vecPosition.fZ );
-    BitStream.Read ( m_usAmmo );
-    return true;
+    return BitStream.Read ( m_AnimGroup ) &&
+           BitStream.Read ( m_AnimID ) &&
+           BitStream.Read ( m_Killer ) &&
+           BitStream.Read ( m_ucKillerWeapon ) &&
+           BitStream.Read ( m_ucBodyPart ) &&
+           BitStream.Read ( m_vecPosition.fX ) &&
+           BitStream.Read ( m_vecPosition.fY ) &&
+           BitStream.Read ( m_vecPosition.fZ ) &&
+           BitStream.Read ( m_usAmmo );
 }
 
 

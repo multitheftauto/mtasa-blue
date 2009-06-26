@@ -32,40 +32,54 @@ bool CPedSyncPacket::Read ( NetBitStreamInterface& BitStream )
         SyncData* pData = new SyncData;
         pData->bSend = false;
 
-        BitStream.Read ( pData->Model );
+        if ( !BitStream.Read ( pData->Model ) )
+            return false;
 
         // Read the sync time context
-        BitStream.Read ( pData->ucSyncTimeContext );
+        if ( !BitStream.Read ( pData->ucSyncTimeContext ) )
+            return false;
 
         unsigned char ucFlags = 0;
-        BitStream.Read ( ucFlags );
+        if ( !BitStream.Read ( ucFlags ) )
+            return false;
         pData->ucFlags = ucFlags;
 
         // Did we recieve position?
         if ( ucFlags & 0x01 )
         {
-            BitStream.Read ( pData->vecPosition.fX );
-            BitStream.Read ( pData->vecPosition.fY );
-            BitStream.Read ( pData->vecPosition.fZ );
+            if ( !BitStream.Read ( pData->vecPosition.fX ) ||
+                 !BitStream.Read ( pData->vecPosition.fY ) ||
+                 !BitStream.Read ( pData->vecPosition.fZ ) )
+                return false;
         }
 
         // Rotation
         if ( ucFlags & 0x02 )
         {
-            BitStream.Read ( pData->fRotation );
+            if ( !BitStream.Read ( pData->fRotation ) )
+                return false;
         }
 
         // Velocity
         if ( ucFlags & 0x04 )
         {
-            BitStream.Read ( pData->vecVelocity.fX );
-            BitStream.Read ( pData->vecVelocity.fY );
-            BitStream.Read ( pData->vecVelocity.fZ );
+            if ( !BitStream.Read ( pData->vecVelocity.fX ) ||
+                 !BitStream.Read ( pData->vecVelocity.fY ) ||
+                 !BitStream.Read ( pData->vecVelocity.fZ ) )
+                return false;
         }
 
         // Health and armour
-        if ( ucFlags & 0x08 ) BitStream.Read ( pData->fHealth );
-        if ( ucFlags & 0x10 ) BitStream.Read ( pData->fArmor );
+        if ( ucFlags & 0x08 )
+        {
+            if ( !BitStream.Read ( pData->fHealth ) )
+                return false;
+        }
+        if ( ucFlags & 0x10 )
+        {
+            if ( !BitStream.Read ( pData->fArmor ) )
+                return false;
+        }
 
         // Add it to our list. We no longer check if it's valid here
         // because CPedSync does and it won't write bad ID's

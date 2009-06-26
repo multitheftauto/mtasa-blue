@@ -93,20 +93,20 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
 
     // Read out the action id
     m_ucAction = 0xFF;
-    BitStream.Read ( m_ucAction );
+    if ( !BitStream.Read ( m_ucAction ) )
+        return false;
 
     // If the action is requesting to get in, read out the "passenger" flag too
     if ( m_ucAction == CGame::VEHICLE_REQUEST_IN )
     {
-        BitStream.Read ( m_ucSeat );    
-        BitStream.Read ( m_ucOnWater );
-        BitStream.Read ( m_ucDoor );
+        return BitStream.Read ( m_ucSeat ) &&
+               BitStream.Read ( m_ucOnWater ) &&
+               BitStream.Read ( m_ucDoor );
     }
     else if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_ABORT )
     {
-        BitStream.Read ( m_ucStartedJacking );
+        return BitStream.Read ( m_ucStartedJacking );
     }
-
     return true;
 }
 
