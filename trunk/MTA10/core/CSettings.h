@@ -137,6 +137,8 @@ protected:
 	
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
+    CGUILabel*          m_pLabelRadioVolumeValue;
+    CGUILabel*          m_pLabelSFXVolumeValue;
     //CGUILabel*          m_pLabelMTAVolume;
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
@@ -180,6 +182,11 @@ protected:
     CGUIScrollBar*      m_pChatBlue         [ ChatColorType::CHAT_COLOR_MAX ];
     CGUIScrollBar*      m_pChatAlpha        [ ChatColorType::CHAT_COLOR_MAX ];
 
+    CGUILabel*          m_pChatRedValue     [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatGreenValue   [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatBlueValue    [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatAlphaValue   [ ChatColorType::CHAT_COLOR_MAX ];
+
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
 
@@ -203,7 +210,13 @@ protected:
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
 	bool				OnLoginButtonClick		( CGUIElement* pElement );
     bool				OnRegisterButtonClick	( CGUIElement* pElement );
-    bool                OnMapAlphaChanged        ( CGUIElement* pElement );
+    bool                OnMapAlphaChanged       ( CGUIElement* pElement );
+    bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
+    bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
+    bool                OnChatRedChanged        ( CGUIElement* pElement );
+    bool                OnChatGreenChanged      ( CGUIElement* pElement );
+    bool                OnChatBlueChanged       ( CGUIElement* pElement );
+    bool                OnChatAlphaChanged      ( CGUIElement* pElement );
 
 	bool			    OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
