@@ -3247,11 +3247,22 @@ void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup
 }
 
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{
+{   
     CClientPed * pPed = m_pPedManager->Get ( pClump, true );
     if ( pPed )
     {
         pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
+    
+        // Is this the local player?
+        if ( pPed == m_pLocalPlayer )
+        {
+            // Is this a damage animation?
+            if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
+            {
+                // Notify the server
+                SendDamagePacket ( animGroup, animID );
+            }
+        }
     }
 }
 
