@@ -139,8 +139,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 				        CConsoleInterface* pConsole = g_pCore->GetConsole ();
 				        if ( pConsole->IsVisible () )
 				        {
-					        CLocalGUI::GetSingleton ().SetMainMenuVisible ( false );
-					        CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
 					        pConsole->SetVisible ( false );
 					        return true;
 				        }
@@ -152,7 +150,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 					        if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )
 					        {
 						        CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
-						        CLocalGUI::GetSingleton ().SetMainMenuVisible ( false );
 						        return true;
 					        }
 
