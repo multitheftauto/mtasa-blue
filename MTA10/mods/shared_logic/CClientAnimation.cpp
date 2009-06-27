@@ -208,7 +208,12 @@ void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId anim
     RpClump * pClump = GetClump ();
     if ( pClump )
     {
-        g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
+        // Check we have an animation to blend with?
+        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
+        {
+            g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
+        }
+        else g_pGame->GetAnimManager ()->AddAnimation ( pClump, animGroup, animID );
     }
 }
 
