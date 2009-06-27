@@ -7123,10 +7123,7 @@ bool CStaticFunctionDefinitions::SetGameType ( const char * szGameType )
         // New text?
         if ( szGameType && szGameType [0] != '\0' )
         {
-            char* szTemp = new char [ strlen ( szGameType ) + 10 ];
-            sprintf ( szTemp, "MTA:SA: %s", szGameType );
-            ase->SetGameType ( szTemp );
-            delete [] szTemp;
+            ase->SetGameType ( szGameType );
             return true;
         }
         else
