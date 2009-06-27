@@ -647,7 +647,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{  
+{      
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -2756,7 +2756,6 @@ void CClientGame::UpdateMimics ( void )
                         if ( pPlayerWeapon )
                         {
                             pPlayerWeapon->SetAmmoTotal ( 9999 );
-                            pPlayerWeapon->SetAmmoInClip ( ulWeaponAmmoInClip );
                             pPlayerWeapon->SetState ( static_cast < eWeaponState > ( ucWeaponState ) );
                         }
                         pMimic->SetAimInterpolated ( TICK_RATE, fAimX, fAimY, bAkimboUp, cVehicleAimDirection );
@@ -3240,7 +3239,7 @@ void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup
             if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
             {
                 // Notify the server
-                SendDamagePacket ( animGroup, animID );
+                SendDamagePacket ( animGroup, animID, false );
             }
         }
     }
@@ -3260,7 +3259,7 @@ void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGro
             if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
             {
                 // Notify the server
-                SendDamagePacket ( animGroup, animID );
+                SendDamagePacket ( animGroup, animID, true );
             }
         }
     }
@@ -4252,16 +4251,17 @@ void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, uns
 }
 
 
-void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId )
+void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId, bool bBlend )
 {
 #ifdef MTA_DEBUG
-    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket: %u %u", animGroup, animId );
+    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket_%s %u %u", animGroup, animId, ( bBlend ) ? "Blend":"Add" );
 #endif
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
-    {
+    {        
         pBitStream->Write ( ( unsigned char ) animGroup );
         pBitStream->Write ( ( unsigned char ) animId );
+        pBitStream->WriteBit ( bBlend );
 
         g_pNet->SendPacket ( PACKET_ID_PLAYER_DAMAGE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
         g_pNet->DeallocateNetBitStream ( pBitStream );

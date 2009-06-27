@@ -22,7 +22,7 @@ class CPlayerDamagePacket : public CPacket
 {
 public:
                             CPlayerDamagePacket         ( void );
-                            CPlayerDamagePacket         ( CPed * pPed, unsigned char animGroup, unsigned char animID );
+                            CPlayerDamagePacket         ( CPed * pPed, unsigned char animGroup, unsigned char animID, bool bBlend );
 
     inline ePacketID        GetPacketID                 ( void ) const                      { return PACKET_ID_PLAYER_DAMAGE; };
     inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -33,6 +33,7 @@ public:
     ElementID               m_PlayerID;
     unsigned char           m_ucAnimGroup;
     unsigned char           m_ucAnimID;
+    bool                    m_bBlend;
 };
 
 #endif

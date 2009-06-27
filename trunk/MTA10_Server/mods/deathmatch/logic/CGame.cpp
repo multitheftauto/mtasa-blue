@@ -1445,7 +1445,7 @@ void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
         CVector vecPosition = pPlayer->GetPosition ();
 
         // Create a new packet to send to everyone
-        CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_ucAnimGroup, Packet.m_ucAnimID );
+        CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_ucAnimGroup, Packet.m_ucAnimID, Packet.m_bBlend );
         
         // Loop through all the players
         CPlayer* pSendPlayer;

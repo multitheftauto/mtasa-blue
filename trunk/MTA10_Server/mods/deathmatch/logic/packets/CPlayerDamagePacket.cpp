@@ -17,21 +17,24 @@ CPlayerDamagePacket::CPlayerDamagePacket ( void )
     m_PlayerID = INVALID_ELEMENT_ID;
     m_ucAnimGroup = 0xFF;
     m_ucAnimID = 0xFF;
+    m_bBlend = false;
 }
 
 
-CPlayerDamagePacket::CPlayerDamagePacket ( CPed * pPed, unsigned char animGroup, unsigned char animID )
+CPlayerDamagePacket::CPlayerDamagePacket ( CPed * pPed, unsigned char animGroup, unsigned char animID, bool bBlend )
 {    
     m_PlayerID = pPed->GetID ();
     m_ucAnimGroup = animGroup;
     m_ucAnimID = animID;
+    m_bBlend = bBlend;
 }
 
 
 bool CPlayerDamagePacket::Read ( NetBitStreamInterface& BitStream )
 {
     return BitStream.Read ( m_ucAnimGroup ) &&
-           BitStream.Read ( m_ucAnimID );
+           BitStream.Read ( m_ucAnimID ) &&
+           BitStream.ReadBit ( m_bBlend );
 }
 
 
@@ -42,6 +45,7 @@ bool CPlayerDamagePacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.WriteCompressed ( m_PlayerID );
         BitStream.Write ( m_ucAnimGroup );
         BitStream.Write ( m_ucAnimID );
+        BitStream.WriteBit ( m_bBlend );
 
         return true;
     }
