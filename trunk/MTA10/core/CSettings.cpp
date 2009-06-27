@@ -1588,22 +1588,39 @@ void CSettings::LoadData ( void )
     // Video
 
     VideoMode           vidModemInfo;
-    int                 vidMode, numVidModes, currentVidMode;
+    int                 vidMode, numVidModes, currentVidMode, lastFullScreenVidMode;
 
     m_pComboResolution->Clear ();
     numVidModes = gameSettings->GetNumVideoModes();
     currentVidMode = gameSettings->GetCurrentVideoMode();
+    lastFullScreenVidMode = GetVideoModeManager ()->GetLastFullScreenVideoMode ();
 
     for (vidMode = 0; vidMode < numVidModes; vidMode++)
     {
         gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
-        
+
+        // Remove resolutions that will make the gui unusable
+        if ( vidModemInfo.width < 640 || vidModemInfo.height < 480 )
+            continue;
+
+        // Check resolution hasn't already been added
+        bool bDuplicate = false;
+        for ( int i = 1; i < vidMode ; i++ )
+        {
+            VideoMode info;
+            gameSettings->GetVideoModeInfo(&info, i);
+            if ( info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth )
+                bDuplicate = true;
+        }
+        if ( bDuplicate )
+            continue;
+
         if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
         {
             SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
         }
-        if ( vidMode == currentVidMode )
+        if ( vidMode == lastFullScreenVidMode )
         {
             SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             
@@ -1722,8 +1739,6 @@ void CSettings::SaveData ( void )
 
 
     // Video
-    GetVideoModeManager ()->ChangeVideoMode ( (int)m_pCheckBoxWindowed->GetSelected () - 1 );
-
     int numVidModes = gameSettings->GetNumVideoModes(),
         currentVidMode = gameSettings->GetCurrentVideoMode();
 
@@ -1742,13 +1757,7 @@ void CSettings::SaveData ( void )
         }
     }
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
-    /*
-    currentVidMode = gameSettings->GetCurrentVideoMode();
-    if ( m_pCheckBoxWindowed->GetSelected() && currentVidMode != 0 )
-        CCommandFuncs::Window ( "" );
-    else if ( !m_pCheckBoxWindowed->GetSelected() && currentVidMode == 0 )
-        CCommandFuncs::Window ( "" );
-    */
+    GetVideoModeManager ()->ChangeVideoMode ( (int)m_pCheckBoxWindowed->GetSelected () - 1 );
 
     // Map alpha
     SString sText = m_pMapAlphaValueLabel->GetText ();

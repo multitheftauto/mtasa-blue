@@ -28,6 +28,7 @@ public:
     virtual void        PostCreateDevice            ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp ) = 0;
     virtual void        PreReset                    ( D3DPRESENT_PARAMETERS* pp ) = 0;
     virtual void        PostReset                   ( D3DPRESENT_PARAMETERS* pp ) = 0;
+    virtual int         GetLastFullScreenVideoMode  ( void ) = 0;
     virtual void        ChangeVideoMode             ( int iMode ) = 0;
 };
 

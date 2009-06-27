@@ -43,6 +43,7 @@ public:
     virtual void        PostCreateDevice            ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp );
     virtual void        PreReset                    ( D3DPRESENT_PARAMETERS* pp );
     virtual void        PostReset                   ( D3DPRESENT_PARAMETERS* pp );
+    virtual int         GetLastFullScreenVideoMode  ( void );
     virtual void        ChangeVideoMode             ( int iNewMode );
 
     // CVideoModeManager methods
@@ -56,7 +57,7 @@ private:
     int                 ForceBackBufferWidth;
     int                 ForceBackBufferHeight;
     int                 iLastMode;
-    int                 iLastFullscreenMode;
+    int                 iLastFullScreenMode;
     HWND                hDeviceWindow;
     CGameSettings *     gameSettings;
 };
@@ -91,8 +92,8 @@ CVideoModeManagerInterface* GetVideoModeManager ( void )
 CVideoModeManager::CVideoModeManager ( void )
 {
     gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    iLastMode = -1;
-    iLastFullscreenMode = -1;
+    iLastMode = 0;
+    iLastFullScreenMode = 1;
 }
 
 
@@ -126,10 +127,10 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     pp->Windowed = true;
     pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
-#if MTA_DEBUG
-    bool bStartupWindowed = true;
-#else
     bool bStartupWindowed = false;
+
+#ifdef MTA_WINDOWED
+    bStartupWindowed = true;
 #endif
 
     if ( bStartupWindowed )
@@ -146,8 +147,31 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
         ForceBackBufferWidth = pp->BackBufferWidth;
         ForceBackBufferHeight = pp->BackBufferHeight;
     }
+
+    // Calc a valid iLastFullScreenMode
+    int iColorDepth = pp->BackBufferFormat >= D3DFMT_R5G6B5 && pp->BackBufferFormat <= D3DFMT_X4R4G4B4 ? 16 : 32;
+    int numVideoModes = gameSettings->GetNumVideoModes ();
+    for ( int vidMode = 1 ; vidMode < numVideoModes ; vidMode++ )
+    {
+        VideoMode vidModemInfo;
+        gameSettings->GetVideoModeInfo ( &vidModemInfo, vidMode );
+        
+        if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        {
+            if ( pp->BackBufferWidth == vidModemInfo.width &&
+                 pp->BackBufferHeight == vidModemInfo.height &&
+                 iColorDepth == vidModemInfo.depth )
+            {
+                iLastFullScreenMode = vidMode;
+                break;
+            }
+        }
+    }
+
+    // Calc a valid iLastMode
+    iLastMode = bStartupWindowed ? 0 : iLastFullScreenMode;
 }
-	
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -205,8 +229,8 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
         LONG Style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
         SetWindowLong ( hDeviceWindow, GWL_STYLE, Style );
 
-        LONG ExStyle = WS_EX_WINDOWEDGE;
-        SetWindowLong ( hDeviceWindow, GWL_EXSTYLE, ExStyle );
+        //LONG ExStyle = WS_EX_WINDOWEDGE;
+        //SetWindowLong ( hDeviceWindow, GWL_EXSTYLE, ExStyle );
 
         // Ensure client area of window is correct size
 		RECT ClientRect = { 0, 0, pp->BackBufferWidth, pp->BackBufferHeight };
@@ -215,8 +239,22 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
 		int SizeX = ClientRect.right - ClientRect.left;
 		int SizeY = ClientRect.bottom - ClientRect.top;
 
+        SetWindowPos( hDeviceWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE );
         SetWindowPos( hDeviceWindow, HWND_NOTOPMOST, 0, 0, SizeX, SizeY, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED );
 	}
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::GetLastFullScreenVideoMode
+//
+//
+//
+///////////////////////////////////////////////////////////////
+int CVideoModeManager::GetLastFullScreenVideoMode ( void )
+{
+    return iLastFullScreenMode;
 }
 
 
@@ -232,6 +270,12 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::ChangeVideoMode ( int iNewMode )
 {
+    if ( iNewMode == -1 )
+    {
+        // Determine valid target fullscreen mode
+        iNewMode = iLastFullScreenMode;
+    }
+
     // To windowed?
     if ( iNewMode == 0 )
     {
@@ -243,8 +287,7 @@ void CVideoModeManager::ChangeVideoMode ( int iNewMode )
     // From windowed?
     if ( iLastMode == 0 )
     {
-        if ( iNewMode != 0 )
-            FromWindowed ( iNewMode );
+        FromWindowed ( iNewMode );
         return;
     }
 
@@ -262,25 +305,6 @@ void CVideoModeManager::ChangeVideoMode ( int iNewMode )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::FromWindowed ( int iFullscreenMode )
 {
-    // Determine valid target fullscreen mode
-    if ( iFullscreenMode == 0 )
-        return;
-
-    if ( iFullscreenMode < 1 )
-    {
-        iFullscreenMode = iLastFullscreenMode;
-    }
-
-    if ( iFullscreenMode < 1 )
-    {
-        iFullscreenMode = gameSettings->GetCurrentVideoMode ();
-    }
-
-    if ( iFullscreenMode < 1 )
-    {
-        return;
-    }
-
     // Remove window frame
     LONG Style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS;
     SetWindowLong ( hDeviceWindow, GWL_STYLE, Style );
@@ -301,10 +325,6 @@ void CVideoModeManager::FromWindowed ( int iFullscreenMode )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::ToWindowed ( void )
 {
-    if ( iLastFullscreenMode < 1 )
-    {
-        iLastFullscreenMode = gameSettings->GetCurrentVideoMode ();
-    }
     DoSetCurrentVideoMode ( 0 );
 }
 
@@ -318,16 +338,18 @@ void CVideoModeManager::ToWindowed ( void )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::DoSetCurrentVideoMode ( int iNewMode )
 {
-    if ( iNewMode == -1 )
+    assert ( iNewMode >= 0 && iNewMode < (int)gameSettings->GetNumVideoModes() );
+
+    if ( iNewMode == iLastMode )
         return;
 
     // Remeber last set mode
     iLastMode = iNewMode;
 
-    if ( iNewMode != 0 )
+    if ( iNewMode > 0 )
     {
         // Remember last set fullscreen mode
-        iLastFullscreenMode = iNewMode;
+        iLastFullScreenMode = iNewMode;
 
         // Update ForceBackBuffer sizes
         VideoMode   vidModemInfo;
