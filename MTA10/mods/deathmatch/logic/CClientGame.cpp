@@ -4254,7 +4254,7 @@ void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, uns
 void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId, bool bBlend )
 {
 #ifdef MTA_DEBUG
-    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket_%s %u %u", animGroup, animId, ( bBlend ) ? "Blend":"Add" );
+    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket_%s %u %u", ( bBlend ) ? "Blend":"Add", animGroup, animId );
 #endif
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
