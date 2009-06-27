@@ -939,11 +939,13 @@ void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
     unsigned char ucAnimGroup;
     unsigned char ucAnimID;
     bool bBlend;
+
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( ucAnimGroup ) &&
-         bitStream.Read ( ucAnimID ) &&
-         bitStream.ReadBit ( bBlend ) )
+         bitStream.Read ( ucAnimID ) )
     {
+        bBlend = bitStream.ReadBit ( bBlend );
+
         // Grab the ped that was damaged
         CClientPlayer * pPlayer = g_pClientGame->GetPlayerManager ()->Get ( ID );
         if ( pPlayer )
