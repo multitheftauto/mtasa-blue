@@ -100,6 +100,9 @@ public:
 	#error MAX_PLAYER_COUNT "macro can't exceed 254"
 #endif
 
+// Game Type
+#define GAME_TYPE_STRING "MTA:SA"
+
 // Banlist filename
 #define FILENAME_BANLIST	"banlist.xml"
 

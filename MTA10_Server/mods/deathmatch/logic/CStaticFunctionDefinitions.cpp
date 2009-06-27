@@ -7128,9 +7128,7 @@ bool CStaticFunctionDefinitions::SetGameType ( const char * szGameType )
         }
         else
         {
-            char szTemp [32];
-            strcpy ( szTemp, "MTA:SA" );
-            ase->SetGameType ( szTemp );
+            ase->SetGameType ( GAME_TYPE_STRING );
             return true;
         }
     }
