@@ -57,7 +57,6 @@ libdeathmatch_la_LIBADD = \
 
 libdeathmatch_la_LDFLAGS = \
 	-Wl,-export-dynamic \
-	../../../libs/ASEQuerySDK.o \
 	-L../../sdk/ \
 	-L../../../vendor/json-c/ \
 	-L../../../vendor/ehs/ \
