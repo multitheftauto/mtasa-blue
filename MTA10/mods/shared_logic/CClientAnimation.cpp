@@ -486,12 +486,13 @@ bool CClientAnimation::IsDamageAnimation ( AssocGroupId animGroup, AnimationId a
 {
     if ( animGroup == 0 ) // ped
     {
-        if ( animID >= 15 && animID <= 20 ) return true;
-        if ( animID >= 22 && animID <= 40 ) return true;
+        if ( animID >= 15 && animID <= 20 ) return true; // shot
+        if ( animID >= 22 && animID <= 40 ) return true; // hit
+        if ( animID >= 112 && animID <= 115 ) return true; // getup
     }
     else if ( animGroup >= 33 && animGroup <= 45 )
     {
-        if ( animID >= 219 && animID <= 221 ) return true;
+        if ( animID >= 219 && animID <= 221 ) return true; // melee hit
     }
 
     return false;
