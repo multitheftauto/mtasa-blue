@@ -938,16 +938,19 @@ void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
     ElementID ID;    
     unsigned char ucAnimGroup;
     unsigned char ucAnimID;
+    bool bBlend;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( ucAnimGroup ) &&
-         bitStream.Read ( ucAnimID ) )
+         bitStream.Read ( ucAnimID ) &&
+         bitStream.ReadBit ( bBlend ) )
     {
         // Grab the ped that was damaged
         CClientPlayer * pPlayer = g_pClientGame->GetPlayerManager ()->Get ( ID );
         if ( pPlayer )
         {
             // Set his damage animation
-            pPlayer->AddAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID );
+            if ( bBlend ) pPlayer->BlendAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID, 4.0f );
+            else pPlayer->AddAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID );
         }
     }
     else
