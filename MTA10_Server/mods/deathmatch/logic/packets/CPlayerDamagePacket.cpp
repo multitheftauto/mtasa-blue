@@ -32,9 +32,10 @@ CPlayerDamagePacket::CPlayerDamagePacket ( CPed * pPed, unsigned char animGroup,
 
 bool CPlayerDamagePacket::Read ( NetBitStreamInterface& BitStream )
 {
-    return BitStream.Read ( m_ucAnimGroup ) &&
-           BitStream.Read ( m_ucAnimID ) &&
-           BitStream.ReadBit ( m_bBlend );
+    bool bRet = BitStream.Read ( m_ucAnimGroup ) &&
+                BitStream.Read ( m_ucAnimID );
+    m_bBlend = BitStream.ReadBit ();
+    return bRet;
 }
 
 
