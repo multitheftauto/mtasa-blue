@@ -186,12 +186,12 @@ public:
     static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );
 
     // Camera get functions
-    static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt );
+    static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CElement*            GetCameraTarget                     ( CPlayer * pPlayer );
     static bool                 GetCameraInterior                   ( CPlayer * pPlayer, unsigned char & ucInterior );
 
     // Camera set functions
-    static bool                 SetCameraMatrix                     ( CElement * pElement, const CVector& vecPosition, CVector * pvecLookAt );
+    static bool                 SetCameraMatrix                     ( CElement * pElement, const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
     static bool                 SetCameraTarget                     ( CElement * pElement, CElement* pTarget );
     static bool                 SetCameraInterior                   ( CElement * pElement, unsigned char ucInterior );
     static bool                 FadeCamera                          ( CElement * pElement, bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );

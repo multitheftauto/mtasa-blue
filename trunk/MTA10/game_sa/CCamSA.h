@@ -163,21 +163,24 @@ protected:
 class CCamSA : public CCam
 {
 private:
-	CCamSAInterface			* internalInterface;
+	CCamSAInterface*    m_pInterface;
+
 public:
-	CCamSA(CCamSAInterface	* camInterface)     { this->internalInterface = camInterface; }
-	CCamSAInterface			* GetInterface()    { return this->internalInterface;};
-	CVector				* GetFront();
-	CVector				* GetUp();
-	CVector				* GetSource();
-    unsigned int        GetMode()               { return this->internalInterface->Mode; }
+	                    CCamSA                      ( CCamSAInterface* pInterface )     { m_pInterface = pInterface; }
+	CCamSAInterface*    GetInterface                ()              { return m_pInterface; }
 
-	CVector				* GetFixedModeSource();
-	CVector				* GetFixedModeVector();
+    CVector*            GetFront                    () const        { return &m_pInterface->Front; }
+    CVector*            GetUp                       () const        { return &m_pInterface->Up; }
+    CVector*            GetSource                   () const        { return &m_pInterface->Source; }
+    unsigned int        GetMode                     () const        { return m_pInterface->Mode; }
+    float               GetFOV                      () const        { return m_pInterface->FOV; }
+    void                SetFOV                      ( float fFOV )  { m_pInterface->FOV = fFOV; }
 
-    CEntity *           GetTargetEntity();
+    CVector*            GetFixedModeSource          () const        { return &m_pInterface->m_cvecCamFixedModeSource; }
+    CVector*            GetFixedModeVector          () const        { return &m_pInterface->m_cvecCamFixedModeVector; }
+    CVector*            GetTargetHistoryPos         () const        { return m_pInterface->m_aTargetHistoryPos; }
 
-    void                AdjustToNewGravity ( const CVector* pvecOldGravity, const CVector* pvecNewGravity );
+    CEntity*            GetTargetEntity             () const;
 };
 
 #endif

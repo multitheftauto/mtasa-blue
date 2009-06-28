@@ -12,20 +12,19 @@
 #ifndef __CGAME_CAM
 #define __CGAME_CAM
 
-#include "CCam.h"
-#include <CVector.h>
-
 class CCam
 {
 public:
-	virtual CVector				* GetFront()=0;
-	virtual CVector				* GetUp()=0;
-	virtual CVector				* GetSource()=0;
-	virtual CVector				* GetFixedModeSource()=0;
-	virtual CVector				* GetFixedModeVector()=0;
-    virtual unsigned int        GetMode()=0;
-    virtual CEntity *           GetTargetEntity()=0;
-    virtual void                AdjustToNewGravity ( const CVector* pvecOldGravity, const CVector* pvecNewGravity ) = 0;
+	virtual CVector*        GetFront            () const = 0;
+	virtual CVector*        GetUp               () const = 0;
+	virtual CVector*        GetSource           () const = 0;
+	virtual CVector*        GetFixedModeSource  () const = 0;
+	virtual CVector*        GetFixedModeVector  () const = 0;
+    virtual CVector*        GetTargetHistoryPos () const = 0;
+    virtual unsigned int    GetMode             () const = 0;
+    virtual float           GetFOV              () const = 0;
+    virtual void            SetFOV              ( float fFOV ) = 0;
+    virtual CEntity*        GetTargetEntity     () const = 0;
 };
 
 #endif

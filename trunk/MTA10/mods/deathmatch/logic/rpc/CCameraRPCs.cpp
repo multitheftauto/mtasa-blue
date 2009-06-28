@@ -25,6 +25,8 @@ void CCameraRPCs::LoadFunctions ( void )
 void CCameraRPCs::SetCameraMatrix ( NetBitStreamInterface& bitStream )
 {
     CVector vecPosition, vecLookAt;
+    float fRoll = 0.0f;
+    float fFOV = 70.0f;
     if ( bitStream.Read ( vecPosition.fX ) &&
          bitStream.Read ( vecPosition.fY ) &&
          bitStream.Read ( vecPosition.fZ ) &&
@@ -32,11 +34,17 @@ void CCameraRPCs::SetCameraMatrix ( NetBitStreamInterface& bitStream )
          bitStream.Read ( vecLookAt.fY ) &&
          bitStream.Read ( vecLookAt.fZ ) )
     {
-        if ( !m_pCamera->IsInFixedMode () ) m_pCamera->ToggleCameraFixedMode ( true );
+        bitStream.Read ( fRoll );
+        bitStream.Read ( fFOV );
+
+        if ( !m_pCamera->IsInFixedMode () )
+            m_pCamera->ToggleCameraFixedMode ( true );
 
         // Put the camera there
         m_pCamera->SetPosition ( vecPosition );
         m_pCamera->SetTarget ( vecLookAt );
+        m_pCamera->SetRoll ( fRoll );
+        m_pCamera->SetFOV ( fFOV );
     }
 }
 

@@ -18,7 +18,7 @@
 #include <ieee754.h>
 
 // Used to make sure that any position values we receive are at least half sane
-#define POSITION_LIMIT 100000.0f
+#define SYNC_POSITION_LIMIT 100000.0f
 
 #pragma pack(push)
 #pragma pack(1)
@@ -148,17 +148,17 @@ struct SPositionSync : public ISyncStructure
     {
         if ( m_bUseFloats )
         {
-            return bitStream.Read ( data.vecPosition.fX ) && data.vecPosition.fX > -POSITION_LIMIT && data.vecPosition.fX < POSITION_LIMIT &&
-                   bitStream.Read ( data.vecPosition.fY ) && data.vecPosition.fY > -POSITION_LIMIT && data.vecPosition.fY < POSITION_LIMIT &&
-                   bitStream.Read ( data.vecPosition.fZ ) && data.vecPosition.fZ > -POSITION_LIMIT && data.vecPosition.fZ < POSITION_LIMIT;
+            return bitStream.Read ( data.vecPosition.fX ) && data.vecPosition.fX > -SYNC_POSITION_LIMIT && data.vecPosition.fX < SYNC_POSITION_LIMIT &&
+                   bitStream.Read ( data.vecPosition.fY ) && data.vecPosition.fY > -SYNC_POSITION_LIMIT && data.vecPosition.fY < SYNC_POSITION_LIMIT &&
+                   bitStream.Read ( data.vecPosition.fZ ) && data.vecPosition.fZ > -SYNC_POSITION_LIMIT && data.vecPosition.fZ < SYNC_POSITION_LIMIT;
         }
         else
         {
             SFloatSync < 14, 10 > x, y;
 
-            if ( bitStream.Read ( &x ) && x.data.fValue > -POSITION_LIMIT && x.data.fValue < POSITION_LIMIT &&
-                 bitStream.Read ( &y ) && y.data.fValue > -POSITION_LIMIT && y.data.fValue < POSITION_LIMIT &&
-                 bitStream.Read ( data.vecPosition.fZ ) && data.vecPosition.fZ > -POSITION_LIMIT && data.vecPosition.fZ < POSITION_LIMIT )
+            if ( bitStream.Read ( &x ) && x.data.fValue > -SYNC_POSITION_LIMIT && x.data.fValue < SYNC_POSITION_LIMIT &&
+                 bitStream.Read ( &y ) && y.data.fValue > -SYNC_POSITION_LIMIT && y.data.fValue < SYNC_POSITION_LIMIT &&
+                 bitStream.Read ( data.vecPosition.fZ ) && data.vecPosition.fZ > -SYNC_POSITION_LIMIT && data.vecPosition.fZ < SYNC_POSITION_LIMIT )
             {
                 data.vecPosition.fX = x.data.fValue;
                 data.vecPosition.fY = y.data.fValue;
@@ -893,9 +893,9 @@ struct SWeaponAimSync : public ISyncStructure
 
         if ( m_bFull && bStatus )
         {
-            if (( bStatus = bitStream.Read ( data.vecOrigin.fX ) && data.vecOrigin.fX > -POSITION_LIMIT && data.vecOrigin.fX < POSITION_LIMIT ))
-                if (( bStatus = bitStream.Read ( data.vecOrigin.fY ) && data.vecOrigin.fY > -POSITION_LIMIT && data.vecOrigin.fY < POSITION_LIMIT ))
-                    if (( bStatus = bitStream.Read ( data.vecOrigin.fZ ) && data.vecOrigin.fZ > -POSITION_LIMIT && data.vecOrigin.fZ < POSITION_LIMIT ))
+            if (( bStatus = bitStream.Read ( data.vecOrigin.fX ) && data.vecOrigin.fX > -SYNC_POSITION_LIMIT && data.vecOrigin.fX < SYNC_POSITION_LIMIT ))
+                if (( bStatus = bitStream.Read ( data.vecOrigin.fY ) && data.vecOrigin.fY > -SYNC_POSITION_LIMIT && data.vecOrigin.fY < SYNC_POSITION_LIMIT ))
+                    if (( bStatus = bitStream.Read ( data.vecOrigin.fZ ) && data.vecOrigin.fZ > -SYNC_POSITION_LIMIT && data.vecOrigin.fZ < SYNC_POSITION_LIMIT ))
                         bStatus = bitStream.ReadNormVector ( vecDirection.fX, vecDirection.fZ, vecDirection.fY );
 
             if ( bStatus )
