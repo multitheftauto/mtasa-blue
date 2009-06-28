@@ -131,8 +131,14 @@ void _declspec(naked) HOOK_CWorld_SetWorldOnFire ()
         mov     pFireInterface, eax
         pushad
     }
-    // Set our fire creator as GTA is too lazy to do it for us!
-    pFireInterface->entityCreator = pFireCreatorInterface;
+
+    if ( pFireInterface )
+    {
+        // ryden: CFireManager::StartFire could return NULL if the given
+        //        target doesn't allow fires to be created.
+        // Set our fire creator as GTA is too lazy to do it for us!
+        pFireInterface->entityCreator = pFireCreatorInterface;
+    }
 
     _asm
     {
