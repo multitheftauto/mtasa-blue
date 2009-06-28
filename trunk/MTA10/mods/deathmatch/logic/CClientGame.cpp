@@ -647,7 +647,7 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 
 
 void CClientGame::DoPulsePostFrame ( void )
-{      
+{   
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -1173,7 +1173,7 @@ void CClientGame::ShowWepdata ( const char* szNick )
     CClientPlayer* pPlayer = m_pPlayerManager->Get ( szNick );
     if ( pPlayer )
     {
-        pPlayer->SetShowingWepdata ( ! pPlayer->IsShowingWepdata() );
+        pPlayer ->SetShowingWepdata ( ! pPlayer->IsShowingWepdata() );
     }
 }
 
@@ -2756,6 +2756,7 @@ void CClientGame::UpdateMimics ( void )
                         if ( pPlayerWeapon )
                         {
                             pPlayerWeapon->SetAmmoTotal ( 9999 );
+                            pPlayerWeapon->SetAmmoInClip ( ulWeaponAmmoInClip );
                             pPlayerWeapon->SetState ( static_cast < eWeaponState > ( ucWeaponState ) );
                         }
                         pMimic->SetAimInterpolated ( TICK_RATE, fAimX, fAimY, bAkimboUp, cVehicleAimDirection );
@@ -3229,9 +3230,10 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
 
 void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
+    /* DAMAGE SYNC
     CClientPed * pPed = m_pPedManager->Get ( pClump, true );
     if ( pPed )
-    {
+    {        
         // Is this the local player?
         if ( pPed == m_pLocalPlayer )
         {
@@ -3241,8 +3243,11 @@ void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup
                 // Notify the server
                 SendDamagePacket ( animGroup, animID, false );
             }
+#ifdef MTA_DEBUG
+            //g_pCore->GetConsole ()->Printf ( "* addAnimation: %u %u", animGroup, animID );
+#endif
         }
-    }
+    }*/
 }
 
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
@@ -3252,6 +3257,7 @@ void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGro
     {
         pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
     
+        /* DAMAGE SYNC
         // Is this the local player?
         if ( pPed == m_pLocalPlayer )
         {
@@ -3261,7 +3267,11 @@ void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGro
                 // Notify the server
                 SendDamagePacket ( animGroup, animID, true );
             }
+#ifdef MTA_DEBUG
+            //g_pCore->GetConsole ()->Printf ( "* blendAnimation: %u %u", animGroup, animID );
+#endif
         }
+        */
     }
 }
 
@@ -3479,12 +3489,14 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
                 }
             }
         }
+        /* DAMAGE SYNC
         // Is this a remote player
         if ( pPed->GetType () == CCLIENTPLAYER && !pPed->IsLocalPlayer () )
         {
             // Dont allow the damage
             return false;
         }
+        */
     }
 
     // Allow the damage to register
