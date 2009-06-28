@@ -65,10 +65,6 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PlayerWasted ( bitStream );
             return true;
 
-        case PACKET_ID_PLAYER_DAMAGE:
-            Packet_PlayerDamage ( bitStream );
-            return true;
-
         case PACKET_ID_PLAYER_CHANGE_NICK:
             Packet_PlayerChangeNick ( bitStream );
             return true;
@@ -929,35 +925,6 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
     else
     {
         RaiseProtocolError ( 21 );
-    }
-}
-
-
-void CPacketHandler::Packet_PlayerDamage ( NetBitStreamInterface& bitStream )
-{
-    ElementID ID;    
-    unsigned char ucAnimGroup;
-    unsigned char ucAnimID;
-    bool bBlend;
-
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( ucAnimGroup ) &&
-         bitStream.Read ( ucAnimID ) )
-    {
-        bBlend = bitStream.ReadBit ();
-
-        // Grab the ped that was damaged
-        CClientPlayer * pPlayer = g_pClientGame->GetPlayerManager ()->Get ( ID );
-        if ( pPlayer )
-        {
-            // Set his damage animation
-            if ( bBlend ) pPlayer->BlendAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID, 4.0f );
-            else pPlayer->AddAnimation ( (AssocGroupId)ucAnimGroup, (AnimationId)ucAnimID );
-        }
-    }
-    else
-    {
-        RaiseProtocolError ( 55 );
     }
 }
 
@@ -4120,6 +4087,16 @@ void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
         CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( usID );
         if ( pResource )
         {
+            // Grab the resource entity
+            CClientEntity* pResourceEntity = pResource->GetResourceEntity ();
+            if ( pResourceEntity )
+            {
+                // Call our lua event
+                CLuaArguments Arguments;
+                Arguments.PushUserData ( pResource );
+                pResourceEntity->CallEvent ( "onClientResourceStop", Arguments, true );
+            }
+
 			// Delete the resource
             g_pClientGame->m_pResourceManager->RemoveResource ( usID );
         }

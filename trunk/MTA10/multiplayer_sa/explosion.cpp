@@ -11,11 +11,10 @@
 *****************************************************************************/
 
 #include <StdInc.h>
-#include "..\game_sa\CExplosionSA.h"
 
 #define HOOKPOS_CExplosion_AddExplosion     0x736A50
 
-void HOOK_CExplosion_AddExplosion ();
+void HOOK_CExplosion_AddExplosion();
 
 bool m_bExplosionsDisabled;
 ExplosionHandler * m_pExplosionHandler; // stores our handler

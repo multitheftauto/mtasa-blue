@@ -12,22 +12,6 @@
 
 #include "StdInc.h"
 
-
-void CEventDamageSA::Destroy ( bool bDestroyInterface )
-{
-    if ( bDestroyInterface )
-    {
-        DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CEventDamage_Destructor;
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
-    delete this;
-}
-
 CEntity * CEventDamageSA::GetInflictingEntity ( void )
 {
     CEntity * pReturn = NULL;
@@ -113,41 +97,11 @@ AnimationId CEventDamageSA::GetAnimId ( void )
 }
 
 
-bool CEventDamageSA::GetAnimAdded ( void )
-{
-    bool bReturn;
-    DWORD dwThis = ( DWORD ) m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-
 void CEventDamageSA::ComputeDeathAnim ( CPed * pPed, bool bUnk )
 {
     DWORD dwThis = ( DWORD ) m_pInterface;    
     DWORD dwPed = ( DWORD ) pPed->GetInterface ();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
-}
-
-
-void CEventDamageSA::ComputeDamageAnim ( CPed * pPed, bool bUnk )
-{
-    DWORD dwThis = ( DWORD ) m_pInterface;    
-    DWORD dwPed = ( DWORD ) pPed->GetInterface ();
-    DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
     _asm
     {
         mov     ecx, dwThis

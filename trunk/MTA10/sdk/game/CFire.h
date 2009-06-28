@@ -16,7 +16,10 @@
 #include <CVector.h>
 #include "CEntity.h"
 
-class CFireSAInterface;
+class CFireInterface
+{
+public:
+};
 
 class CFire
 {
@@ -36,7 +39,7 @@ public:
 	virtual	FLOAT					GetStrength (  )=0;
 	virtual	VOID					SetStrength ( FLOAT fStrength )=0;
     virtual	VOID                    SetNumGenerationsAllowed ( char generations )=0;
-    virtual CFireSAInterface*       GetInterface ( ) = 0;
+    virtual CFireInterface*         GetInterface ( ) = 0;
 };
 
 #endif

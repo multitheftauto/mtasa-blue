@@ -20,7 +20,9 @@
 
 #include "StdInc.h"
 
-#define MAX_SYNC_DISTANCE 400.0f
+#define MAX_KEYSYNC_DISTANCE 400.0f
+#define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
+#define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 CGame* g_pGame = NULL;
 
@@ -787,12 +789,6 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
-        case PACKET_ID_PLAYER_DAMAGE:
-        {
-            Packet_PlayerDamage ( static_cast < CPlayerDamagePacket& > ( Packet ) );
-            return true;
-        }
-
         case PACKET_ID_PLAYER_QUIT:
         {
             Packet_PlayerQuit ( static_cast < CPlayerQuitPacket& > ( Packet ) );
@@ -1397,13 +1393,10 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
         pPed->CallEvent ( "onPedWasted", Arguments );
     }
 }
-
-
 void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if ( pPlayer && !pPlayer->IsDead () )
-    {
+    if ( pPlayer ) {
         pPlayer->SetSpawned ( false );
         pPlayer->SetIsDead ( true );
         pPlayer->SetPosition ( Packet.m_vecPosition );
@@ -1433,41 +1426,6 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
         else Arguments.PushBoolean ( false );
         Arguments.PushBoolean ( false );
         pPlayer->CallEvent ( "onPlayerWasted", Arguments );
-    }
-}
-
-
-void CGame::Packet_PlayerDamage ( CPlayerDamagePacket& Packet )
-{
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if ( pPlayer && pPlayer->IsSpawned () )
-    {   
-        CVector vecPosition = pPlayer->GetPosition ();
-
-        // Create a new packet to send to everyone
-        CPlayerDamagePacket ReturnDamagePacket ( pPlayer, Packet.m_ucAnimGroup, Packet.m_ucAnimID, Packet.m_bBlend );
-        
-        // Loop through all the players
-        CPlayer* pSendPlayer;
-        CVector vecCameraPosition;
-        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-        {
-            pSendPlayer = *iter;
-            if ( pSendPlayer != pPlayer )
-            {
-                // We tell the reporter to create the explosion too
-                // Grab this player's camera position                
-                pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
-
-                // Is this players camera close enough to send?
-                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_SYNC_DISTANCE ) )
-                {
-                    // Send the packet to him
-                    pSendPlayer->Send ( ReturnDamagePacket );
-                }
-            }
-        }
     }
 }
 
@@ -1651,7 +1609,7 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
                 pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
                 // Is this players camera close enough to warrant keysync?
-                if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_SYNC_DISTANCE ) )
+                if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_KEYSYNC_DISTANCE ) )
                 {
                     // Send the packet to him
                     pSendPlayer->Send ( Packet );
@@ -1820,7 +1778,7 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                 pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
                 // Is this players camera close enough to send?
-                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_SYNC_DISTANCE ) )
+                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE ) )
                 {
                     // Send the packet to him
                     pSendPlayer->Send ( Packet );
@@ -1860,7 +1818,7 @@ void CGame::Packet_ProjectileSync ( CProjectileSyncPacket& Packet )
                 pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
                 // Is this players camera close enough to send?
-                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_SYNC_DISTANCE ) )
+                if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_PROJECTILE_SYNC_DISTANCE ) )
                 {
                     // Send the packet to him
                     pSendPlayer->Send ( Packet );

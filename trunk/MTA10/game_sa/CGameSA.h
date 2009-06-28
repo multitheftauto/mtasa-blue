@@ -108,6 +108,8 @@ public:
     inline CFxManager               * GetFxManager ()            { return m_pFxManager; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
 
+    class CEventDamage              * GetEventDamage ( CEventDamageSAInterface * pInterface );
+
 	CWeaponInfo				* GetWeaponInfo(eWeaponType weapon);
 	CModelInfo				* GetModelInfo( DWORD dwModelID );
 

@@ -321,8 +321,7 @@ public:
     void                                ResetMapInfo                    ( void );
 
     void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15 );
-    void                                SendPedWastedPacket             ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
-    void                                SendDamagePacket                ( AssocGroupId animGroup, AnimationId animId, bool bBlend );
+    void                                SendPedWastedPacket                       ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
 
     void                                SetMarkerBounce                 ( float fMarkerBounce ) { m_fMarkerBounce = fMarkerBounce; }
     float                               GetMarkerBounce                 ( void ) { return m_fMarkerBounce; }
@@ -403,7 +402,6 @@ private:
 	void								Event_OnTransferComplete		( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
-    static bool                         StaticFireDamageHandler         ( CPed* pDamagePed );
     static void                         StaticFireHandler               ( CFire* pFire );
     static bool                         StaticBreakTowLinkHandler       ( CVehicle* pTowedVehicle );
     static void                         StaticDrawRadarAreasHandler     ( void );
@@ -411,13 +409,10 @@ private:
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static bool                         StaticChokingHandler            ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
-    static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static void                         StaticIdleHandler               ( void );
 
-    bool                                HandleDamage                    ( CClientPed * pPed, CEventDamage * pEvent, CEntity * pInflictor, float fDamage );
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
-    bool                                FireDamageHandler               ( CPed* pDamagePed );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
     void                                DrawRadarAreasHandler           ( void );
@@ -425,7 +420,6 @@ private:
     void                                Render3DStuffHandler            ( void );
     void                                PostWorldProcessHandler         ( void );
     bool                                ChokingHandler                  ( CPed* pChokingPed, CPed* pResponsiblePed, unsigned char ucWeaponType );
-    void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     void                                IdleHandler                     ( void );
 
