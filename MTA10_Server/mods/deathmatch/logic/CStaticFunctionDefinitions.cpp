@@ -3041,7 +3041,7 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CElement * pElement, bool bIsFro
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer * pPlayer, CVector & vecPosition, CVector & vecLookAt )
+bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer* pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     assert ( pPlayer );
 
@@ -3052,6 +3052,8 @@ bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer * pPlayer, CVector & 
     {
         pCamera->GetPosition ( vecPosition );
         pCamera->GetLookAt ( vecLookAt );
+        fRoll = pCamera->GetRoll ();
+        fFOV = pCamera->GetFOV ();
         return true;
     }
     return false;
@@ -3080,10 +3082,10 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( CPlayer * pPlayer, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVector& vecPosition, CVector * pvecLookAt )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     assert ( pElement );
-    RUN_CHILDREN SetCameraMatrix ( *iter, vecPosition, pvecLookAt );
+    RUN_CHILDREN SetCameraMatrix ( *iter, vecPosition, pvecLookAt, fRoll, fFOV );
 
     if ( IS_PLAYER ( pElement ) )
     {
@@ -3091,12 +3093,19 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVe
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         pCamera->SetMode ( CAMERAMODE_FIXED );
-        if ( pvecLookAt ) pCamera->SetMatrix ( const_cast < CVector & > ( vecPosition ), *pvecLookAt );
-        else pCamera->SetPosition ( const_cast < CVector & > ( vecPosition ) );
+        if ( pvecLookAt )
+            pCamera->SetMatrix ( vecPosition, *pvecLookAt );
+        else
+            pCamera->SetPosition ( vecPosition );
 
         CVector vecLookAt;
-        if ( pvecLookAt ) vecLookAt = *pvecLookAt;
-        else pCamera->GetLookAt ( vecLookAt );
+        if ( pvecLookAt )
+            vecLookAt = *pvecLookAt;
+        else
+            pCamera->GetLookAt ( vecLookAt );
+
+        pCamera->SetRoll ( fRoll );
+        pCamera->SetFOV ( fFOV );
         
         // Tell the player
         CBitStream BitStream;
@@ -3106,6 +3115,11 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVe
         BitStream.pBitStream->Write ( vecLookAt.fX );
         BitStream.pBitStream->Write ( vecLookAt.fY );
         BitStream.pBitStream->Write ( vecLookAt.fZ );
+        if ( fRoll != 0.0f || fFOV != 70.0f )
+        {
+            BitStream.pBitStream->Write ( fRoll );
+            BitStream.pBitStream->Write ( fFOV );
+        }
 	    pPlayer->Send ( CLuaPacket ( SET_CAMERA_MATRIX, *BitStream.pBitStream ) );
 
         return true;
@@ -3134,6 +3148,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CElement* pElement, CElement*
         {
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             pCamera->SetTarget ( pTarget );
+            pCamera->SetRoll ( 0.0f );
+            pCamera->SetFOV ( 70.0f );
 
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pTarget->GetID () );

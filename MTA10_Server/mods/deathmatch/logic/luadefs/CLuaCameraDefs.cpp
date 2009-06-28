@@ -36,7 +36,8 @@ int CLuaCameraDefs::getCameraMatrix ( lua_State* luaVM )
         if ( pPlayer )
         {
             CVector vecPosition, vecLookAt;
-            if ( CStaticFunctionDefinitions::GetCameraMatrix ( pPlayer, vecPosition, vecLookAt ) )
+            float fRoll, fFOV;
+            if ( CStaticFunctionDefinitions::GetCameraMatrix ( pPlayer, vecPosition, vecLookAt, fRoll, fFOV ) )
             {
                 lua_pushnumber ( luaVM, vecPosition.fX );
                 lua_pushnumber ( luaVM, vecPosition.fY );
@@ -44,7 +45,9 @@ int CLuaCameraDefs::getCameraMatrix ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, vecLookAt.fX );
                 lua_pushnumber ( luaVM, vecLookAt.fY );
                 lua_pushnumber ( luaVM, vecLookAt.fZ );
-                return 6;
+                lua_pushnumber ( luaVM, fRoll );
+                lua_pushnumber ( luaVM, fFOV );
+                return 8;
             }
         }
         else
@@ -128,7 +131,10 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
         vecPosition.fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
         vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
         CVector vecLookAt;
-        CVector * pvecLookAt = NULL;;
+        CVector * pvecLookAt = NULL;
+        float fRoll = 0.0f;
+        float fFOV = 70.0f;
+
         int iArgument5 = lua_type ( luaVM, 5 );
         int iArgument6 = lua_type ( luaVM, 6 );
         int iArgument7 = lua_type ( luaVM, 7 );
@@ -140,13 +146,26 @@ int CLuaCameraDefs::setCameraMatrix ( lua_State* luaVM )
             vecLookAt.fY = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
             vecLookAt.fZ = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
             pvecLookAt = &vecLookAt;
+
+            int iArgument8 = lua_type ( luaVM, 8 );
+            if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
+            {
+                fRoll = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
+                int iArgument9 = lua_type ( luaVM, 9 );
+                if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+                {
+                    fFOV = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
+                    if ( fFOV <= 0.0f || fFOV >= 180.0f )
+                        fFOV = 70.0f;
+                }
+            }
         }
 
 
         // Verify the element
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetCameraMatrix ( pElement, vecPosition, pvecLookAt ) )
+            if ( CStaticFunctionDefinitions::SetCameraMatrix ( pElement, vecPosition, pvecLookAt, fRoll, fFOV ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

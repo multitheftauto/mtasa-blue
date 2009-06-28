@@ -31,25 +31,30 @@ class CPlayerCamera
 public:
                             CPlayerCamera           ( CPlayer * pPlayer );
 
-    inline eCameraMode      GetMode                 ( void )                        { return m_Mode; }
+    inline eCameraMode      GetMode                 ( void ) const                  { return m_Mode; }
     inline void             SetMode                 ( eCameraMode Mode )            { m_Mode = Mode; }
     static void             GetMode                 ( eCameraMode Mode, char* szBuffer, size_t sizeBuffer );
     static eCameraMode      GetMode                 ( const char * szMode );
 
-    void                    GetPosition             ( CVector & vecPosition );
-    void                    SetPosition             ( CVector & vecPosition );
+    void                    GetPosition             ( CVector& vecPosition ) const;
+    void                    SetPosition             ( const CVector& vecPosition );
     
-    void                    GetLookAt               ( CVector & vecLookAt );
-    void                    SetLookAt               ( CVector & vecLookAt );
+    void                    GetLookAt               ( CVector& vecLookAt ) const;
+    void                    SetLookAt               ( const CVector& vecLookAt );
 
-    void                    SetMatrix               ( CVector & vecPosition, CVector & vecLookAt );
+    void                    SetMatrix               ( const CVector& vecPosition, const CVector& vecLookAt );
 
-    inline CElement *       GetTarget               ( void )                        { return m_pTarget; }
-    void                    SetTarget               ( CElement * pElement );
+    CElement *              GetTarget               ( void ) const                  { return m_pTarget; }
+    void                    SetTarget               ( CElement* pElement );
+
+    float                   GetRoll                 ( void ) const                  { return m_fRoll; }
+    void                    SetRoll                 ( float fRoll )                 { m_fRoll = fRoll; }
+    float                   GetFOV                  ( void ) const                  { return m_fFOV; }
+    void                    SetFOV                  ( float fFOV )                  { m_fFOV = fFOV; }
 
     void                    SetRotation             ( CVector & vecRotation );
 
-    inline unsigned char    GetInterior             ( void )                        { return m_ucInterior; }
+    inline unsigned char    GetInterior             ( void ) const                  { return m_ucInterior; }
     inline void             SetInterior             ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
 
 private:
@@ -60,6 +65,8 @@ private:
     CVector                 m_vecPosition;
     CVector                 m_vecLookAt;
     CElement *              m_pTarget;
+    float                   m_fRoll;
+    float                   m_fFOV;
 };
 
 #endif

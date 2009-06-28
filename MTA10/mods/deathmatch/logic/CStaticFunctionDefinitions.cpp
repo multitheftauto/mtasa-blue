@@ -3372,10 +3372,12 @@ bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuf
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector & vecPosition, CVector & vecLookAt )
+bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
     m_pCamera->GetTarget ( vecLookAt );
+    fRoll = m_pCamera->GetRoll ();
+    fFOV = m_pCamera->GetFOV ();
     return true;
 }
 
@@ -3395,10 +3397,8 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVector * pvecLookAt )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
-    CNetAPI* pNetAPI = m_pClientGame->GetNetAPI ();
-
     if ( !m_pCamera->IsInFixedMode () )        
     {
         m_pCamera->ToggleCameraFixedMode ( true );
@@ -3406,7 +3406,10 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector & vecPosition, CVecto
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
-    if ( pvecLookAt ) m_pCamera->SetTarget ( *pvecLookAt );
+    if ( pvecLookAt )
+        m_pCamera->SetTarget ( *pvecLookAt );
+    m_pCamera->SetRoll ( fRoll );
+    m_pCamera->SetFOV ( fFOV );
     return true;
 }
 

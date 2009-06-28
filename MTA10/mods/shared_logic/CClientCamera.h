@@ -45,6 +45,10 @@ public:
     void                        SetRotation                 ( const CVector& vecRotation );
     void                        GetTarget                   ( CVector& vecTarget ) const;
     void                        SetTarget                   ( const CVector& vecPosition );
+    float                       GetRoll                     ()                              { return m_fRoll; }
+    void                        SetRoll                     ( float fRoll )                 { m_fRoll = fRoll; }
+    float                       GetFOV                      ()                              { return m_fFOV; }
+    void                        SetFOV                      ( float fFOV )                  { m_fFOV = fFOV; }
 
     void                        FadeIn                      ( float fTime );
     void                        FadeOut                     ( float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
@@ -87,6 +91,8 @@ private:
     bool                        m_bFixed;
     CVector                     m_vecFixedPosition;
     CVector                     m_vecFixedTarget;
+    float                       m_fRoll;
+    float                       m_fFOV;
 
     CCamera*                    m_pCamera;
 };

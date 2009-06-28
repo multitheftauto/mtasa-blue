@@ -33,6 +33,8 @@ CClientCamera::CClientCamera ( CClientManager* pManager ) : CClientEntity ( INVA
     m_pFocusedGameEntity = NULL;
     m_bInvalidated = false;
     m_bFixed = false;
+    m_fRoll = 0.0f;
+    m_fFOV = 70.0f;
 
     m_pCamera = g_pGame->GetCamera ();
 
@@ -272,6 +274,9 @@ void CClientCamera::SetFocus ( CClientEntity* pEntity, eCamMode eMode, bool bSmo
         // Restore the camera to the local player at the moment
         SetFocusToLocalPlayer ();
     }
+
+    m_fRoll = 0.0f;
+    m_fFOV = 70.0f;
 }
 
 
@@ -299,6 +304,8 @@ void CClientCamera::SetFocus ( CClientPlayer* pPlayer, eCamMode eMode, bool bSmo
 
     // Store the player we focused
     m_pFocusedPlayer = pPlayer;
+    m_fRoll = 0.0f;
+    m_fFOV = 70.0f;
     m_bFixed = false;
 }
 
@@ -335,6 +342,8 @@ void CClientCamera::SetFocusToLocalPlayer ( void )
     m_pFocusedEntity = NULL;
     m_pFocusedGameEntity = NULL;
     m_bFixed = false;
+    m_fRoll = 0.0f;
+    m_fFOV = 70.0f;
 }
 
 
@@ -429,6 +438,9 @@ void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
     {
         g_pMultiplayer->SetCenterOfWorld ( NULL, NULL, NULL );
         SetFocusToLocalPlayer();
+
+        m_fRoll = 0.0f;
+        m_fFOV = 70.0f;
     }
 }
 
@@ -461,54 +473,45 @@ bool CClientCamera::ProcessFixedCamera ( CCam* pCam )
     if ( !pThis->m_bFixed )
         return false;
 
-    // Grab the position the camera is supposed to be at and what it should look at.
     const CVector& vecPosition = pThis->m_vecFixedPosition;
     const CVector& vecTarget = pThis->m_vecFixedTarget;
 
     // Set the position in the CCam interface
     *pCam->GetSource () = vecPosition;
 
-    // Calculate the front vector, target - position. If it's length is 0 we'll get problems
-    // ie if position and target are the same, so make a new vector then looking horizontally
+    // Calculate the front vector, target - position. If its length is 0 we'll get problems
+    // (i.e. if position and target are the same), so make a new vector then looking horizontally
     CVector vecFront = vecTarget - vecPosition;
-    if ( vecFront.Length () == 0 )
-        vecFront = CVector ( 1.0, 0.0f, 0.0f );
+    if ( vecFront.Length () < FLOAT_EPSILON )
+        vecFront = CVector ( 0.0, 1.0f, 0.0f );
+    else
+        vecFront.Normalize ();
 
-    // Grab the right vector and normalize it. We assume the camera can't roll.
-    CVector vecRight = CVector ( vecFront.fY, -vecFront.fX, 0 );
-    vecRight.Normalize ();
-
-    // Normalize the front vector and set it
-    vecFront.Normalize ();
     *pCam->GetFront () = vecFront;
 
-    // Grab the up vector in the CCam
-    CVector* pCamUp = pCam->GetUp ();
-
-    // Is the right vector valid length?
-    CVector vecUp;
-    if ( vecRight.Length () != 0 )
-    {
-        // Cross multiply it with front.
-        vecUp = vecRight;
-        vecUp.CrossProduct ( &vecFront );
-    }
+    // Grab the right vector
+    CVector vecRight = CVector ( vecFront.fY, -vecFront.fX, 0 );
+    if ( vecRight.Length () < FLOAT_EPSILON )
+        vecRight = CVector ( 1.0f, 0.0f, 0.0f );
     else
-    {
-        // Use the existing X, Y parts of the up vector to avoid whitescreen if
-        // right is invalid (looking straight up or down)
-        vecUp = CVector ( pCamUp->fX, pCamUp->fY, 0 );
-    }
+        vecRight.Normalize ();
 
-    // Normalize it
+    // Calculate the up vector from this
+    CVector vecUp = vecRight;
+    vecUp.CrossProduct ( &vecFront );
     vecUp.Normalize ();
 
-    // Is it valid? It will become invalid if we look horizontally then look straight
-    // down, so we do a check here and fake it if it's invalid
-    if ( vecUp.Length () == 0 )
-        vecUp = CVector ( 1, 0, 0 );
+    // Apply roll if needed
+    if ( pThis->m_fRoll != 0.0f )
+    {
+        float fRoll = ConvertDegreesToRadiansNoWrap ( pThis->m_fRoll );
+        vecUp = vecUp*cos(fRoll) - vecRight*sin(fRoll);
+    }
 
-    // Set the up vector in CCam
-    *pCamUp = vecUp;
+    *pCam->GetUp () = vecUp;
+
+    // Set the zoom
+    pCam->SetFOV ( pThis->m_fFOV );
+
     return true;
 }

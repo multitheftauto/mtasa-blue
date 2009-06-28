@@ -22,6 +22,9 @@ CPlayerCamera::CPlayerCamera ( CPlayer * pPlayer )
     // We start off at chilliad
     m_Mode = CAMERAMODE_FIXED;
     m_vecPosition = CVector ( -2377, -1636, 700 );
+
+    m_fRoll = 0.0f;
+    m_fFOV = 70.0f;
 }
 
 
@@ -64,7 +67,7 @@ eCameraMode CPlayerCamera::GetMode ( const char * szMode )
 }
 
 
-void CPlayerCamera::GetPosition ( CVector & vecPosition )
+void CPlayerCamera::GetPosition ( CVector & vecPosition ) const
 {
     if ( m_Mode == CAMERAMODE_FIXED )
     {
@@ -77,7 +80,7 @@ void CPlayerCamera::GetPosition ( CVector & vecPosition )
 }
 
 
-void CPlayerCamera::SetPosition ( CVector & vecPosition )
+void CPlayerCamera::SetPosition ( const CVector& vecPosition )
 {
     if ( m_Mode == CAMERAMODE_FIXED )
     {
@@ -86,7 +89,7 @@ void CPlayerCamera::SetPosition ( CVector & vecPosition )
 }
 
 
-void CPlayerCamera::GetLookAt ( CVector & vecLookAt )
+void CPlayerCamera::GetLookAt ( CVector& vecLookAt ) const
 {
     if ( m_Mode == CAMERAMODE_FIXED )
     {
@@ -99,7 +102,7 @@ void CPlayerCamera::GetLookAt ( CVector & vecLookAt )
 }
 
 
-void CPlayerCamera::SetLookAt ( CVector & vecLookAt )
+void CPlayerCamera::SetLookAt ( const CVector& vecLookAt )
 {
     if ( m_Mode == CAMERAMODE_FIXED )
     {
@@ -108,7 +111,7 @@ void CPlayerCamera::SetLookAt ( CVector & vecLookAt )
 }
 
 
-void CPlayerCamera::SetMatrix ( CVector & vecPosition, CVector & vecLookAt )
+void CPlayerCamera::SetMatrix ( const CVector& vecPosition, const CVector& vecLookAt )
 {
     if ( m_Mode == CAMERAMODE_FIXED )
     {
@@ -118,7 +121,7 @@ void CPlayerCamera::SetMatrix ( CVector & vecPosition, CVector & vecLookAt )
 }
 
 
-void CPlayerCamera::SetTarget ( CElement * pElement )
+void CPlayerCamera::SetTarget ( CElement* pElement )
 {
     // We should always have a target here
     assert ( pElement );

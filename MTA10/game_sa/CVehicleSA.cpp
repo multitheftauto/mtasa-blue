@@ -1564,12 +1564,59 @@ void CVehicleSA::SetTaxiLightOn ( bool bLightOn )
     }
 }
 
+void GetMatrixForGravity ( const CVector& vecGravity, CMatrix& mat )
+{
+    // Calculates a basis where the z axis is the inverse of the gravity
+    if ( vecGravity.Length () > 0.0001f )
+    {
+        mat.vUp = -vecGravity;
+        mat.vUp.Normalize ();
+        if ( abs(mat.vUp.fX) > 0.0001f || abs(mat.vUp.fZ) > 0.0001f )
+        {
+            CVector y ( 0.0f, 1.0f, 0.0f );
+            mat.vFront = vecGravity;
+            mat.vFront.CrossProduct ( &y );
+            mat.vFront.CrossProduct ( &vecGravity );
+            mat.vFront.Normalize ();
+        }
+        else
+        {
+            mat.vFront = CVector ( 0.0f, 0.0f, vecGravity.fY );
+        }
+        mat.vRight = mat.vFront;
+        mat.vRight.CrossProduct ( &mat.vUp );
+    }
+    else
+    {
+        // No gravity, use default axes
+        mat.vRight = CVector ( 1.0f, 0.0f, 0.0f );
+        mat.vFront = CVector ( 0.0f, 1.0f, 0.0f );
+        mat.vUp    = CVector ( 0.0f, 0.0f, 1.0f );
+    }
+}
+
+
 void CVehicleSA::SetGravity ( const CVector* pvecGravity )
 {
     if ( pGame->GetPools ()->GetPedFromRef ( 1 )->GetVehicle () == this )
     {
+        // If this is the local player's vehicle, adjust the camera's position history.
+        // This is to keep the automatic camera settling (which happens when driving while not moving the mouse)
+        // nice and consistent while the gravity changes.
         CCam* pCam = pGame->GetCamera ()->GetCam ( pGame->GetCamera ()->GetActiveCam () );
-        pCam->AdjustToNewGravity ( &m_vecGravity, pvecGravity );
+
+        CMatrix matOld, matNew;
+        GetMatrixForGravity ( m_vecGravity, matOld );
+        GetMatrixForGravity ( *pvecGravity, matNew );
+        
+        CVector* pvecPosition = &m_pInterface->Placeable.matrix->vPos;
+
+        matOld.Invert ();
+        pCam->GetTargetHistoryPos () [ 0 ] = matOld * (pCam->GetTargetHistoryPos () [ 0 ] - *pvecPosition);
+        pCam->GetTargetHistoryPos () [ 0 ] = matNew * pCam->GetTargetHistoryPos () [ 0 ] + *pvecPosition;
+
+        pCam->GetTargetHistoryPos () [ 1 ] = matOld * (pCam->GetTargetHistoryPos () [ 1 ] - *pvecPosition);
+        pCam->GetTargetHistoryPos () [ 1 ] = matNew * pCam->GetTargetHistoryPos () [ 1 ] + *pvecPosition;
     }
 
     m_vecGravity = *pvecGravity;
