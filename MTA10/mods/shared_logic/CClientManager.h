@@ -18,7 +18,6 @@ class CClientManager;
 #define __CCLIENTMANAGER_H
 
 #include "CAntiCheat.h"
-#include "CClientAnimationManager.h"
 #include "CClientCamera.h"
 #include "CClientCivilianManager.h"
 #include "CClientColModelManager.h"
@@ -60,7 +59,6 @@ public:
     void                                UpdateStreamers             ( void );
 
     inline CAntiCheat&                  GetAntiCheat                ( void )        { return m_AntiCheat; }
-    inline CClientAnimationManager*     GetAnimationManager         ( void )        { return m_pAnimationManager; }
     inline CClientCamera*               GetCamera                   ( void )        { return m_pCamera; }
     inline CClientCivilianManager*		GetCivilianManager			( void )        { return m_pCivilianManager; }
     inline CClientColModelManager*      GetColModelManager          ( void )        { return m_pColModelManager; }
@@ -108,7 +106,6 @@ public:
 
 private:
     CAntiCheat                          m_AntiCheat;
-    CClientAnimationManager*            m_pAnimationManager;
     CClientCamera*                      m_pCamera;
 	CClientCivilianManager*		        m_pCivilianManager;
     CClientColModelManager*             m_pColModelManager;

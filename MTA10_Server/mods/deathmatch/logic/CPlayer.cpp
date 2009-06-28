@@ -335,7 +335,14 @@ bool CPlayer::SetScriptDebugLevel ( unsigned int uiLevel )
 
 void CPlayer::SetCamFadeColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
+    #define COLOR_ARGB(a,r,g,b) \
+        (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+    #define COLOR_RGBA(r,g,b,a) COLOR_ARGB(a,r,g,b)
+
     m_ulCamFadeColor = COLOR_ARGB ( 255, ucRed, ucGreen, ucBlue );
+
+	#undef COLOR_ARGB
+	#undef COLOR_RGBA
 }
 
 

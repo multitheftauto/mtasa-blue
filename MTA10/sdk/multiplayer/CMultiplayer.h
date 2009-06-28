@@ -20,9 +20,6 @@
 
 #define DEFAULT_WAVES -1.0f
 
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
-
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
@@ -36,10 +33,8 @@ typedef bool ( BreakTowLinkHandler ) ( class CVehicle * towingVehicle );
 typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
-typedef bool ( ChokingHandler ) ( class CPed* pChokingPed, class CPed* pResponsiblePed, unsigned char ucWeaponType );
-typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-typedef void ( PostWorldProcessHandler ) ( void );
-typedef void ( IdleHandler ) ( void );
+typedef void ( GameProcessHandler ) ( void );
+typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -111,10 +106,8 @@ public:
     virtual void                        SetDamageHandler            ( DamageHandler * pDamageHandler ) = 0;
     virtual void                        SetFireHandler              ( FireHandler * pFireHandler ) = 0;
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
-	virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
-    virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
-    virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
-    virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
+	virtual void						SetGameProcessHandler       ( GameProcessHandler* pProcessHandler ) = 0;
+    virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
 
     virtual void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler ) = 0;
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;

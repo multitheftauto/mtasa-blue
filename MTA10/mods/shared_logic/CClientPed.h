@@ -96,7 +96,7 @@ class CClientObject;
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable:4311)
 
-class CClientPed : public CClientStreamElement, public CAntiCheatModule, public CClientAnimation
+class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
     friend CClientCamera;
     friend CClientPlayer;
@@ -115,10 +115,6 @@ public:
 	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
     inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
     inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
-  
-    void                        CleanUpForVM                ( CLuaMain* pLuaMain, bool bRecursive );
-    
-    RpClump*                    GetClump                    ( void );
 
     inline bool                 IsLocalPlayer               ( void )                                    { return m_bIsLocalPlayer; }
 
@@ -221,7 +217,7 @@ public:
     inline void                 SetRespawnState             ( int iRespawnState )                       { m_pRespawnState = iRespawnState; };
 
     CWeapon*                    GiveWeapon                  ( eWeaponType weaponType, unsigned int uiAmmo );
-    bool                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
+    void                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
     eWeaponSlot                 GetCurrentWeaponSlot        ( void );
     eWeaponType                 GetCurrentWeaponType        ( void );
     CWeapon*                    GetWeapon                   ( void );
@@ -352,6 +348,13 @@ public:
 
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
+
+    bool                        IsRunningAnimation      ( void );
+    void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
+    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        KillAnimation           ( void );
+    inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
+    inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }
 
     bool                        IsUsingGun              ( void );
 
@@ -505,7 +508,11 @@ public:
     CClientPad                  m_Pad;
     bool                        m_bDestroyingSatchels;
     bool                        m_bDoingGangDriveby;
+    CAnimBlock *                m_pAnimationBlock;
+    char *                      m_szAnimationName;
     bool                        m_bRequestedAnimation;
+    bool                        m_bLoopAnimation;
+    bool                        m_bUpdatePositionAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
     bool                        m_bIsOnFire;

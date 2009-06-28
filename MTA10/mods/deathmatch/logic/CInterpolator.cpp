@@ -70,17 +70,27 @@ bool CInterpolator::Evaluate(unsigned long ulTime, CVector &Vec )
         Vec.fZ = m_vecVecList.back()->m_fZ;
         return true;
     }
+    m_vecVecList[m_vecVecList.size()/2];
     
-    unsigned int iLeft = 0;
-    unsigned int iRight = (unsigned int)m_vecVecList.size()-1;
-    for (unsigned int i = 0; i < m_vecVecList.size(); i++ )
+    unsigned int j = (unsigned int)m_vecVecList.size()-1;
+    int iLeft= 0;
+    int iRight = j;
+    bool bRight = false;
+    bool bLeft = false;
+    for (unsigned int i = 0; i < m_vecVecList.size(); i ++ )
     {
-        if ( m_vecVecList[i]->m_ulTimeStamp > ulTime ) iLeft = i;
-        else
+        if ( !bLeft && m_vecVecList[i]->m_ulTimeStamp <= ulTime )
         {
-            iRight = i;
-            break;
+            bLeft = true;
+            iLeft = i;            
         }
+        if ( !bRight && m_vecVecList[j]->m_ulTimeStamp >= ulTime )
+        {
+            bRight = true;
+            iRight = j;
+        }
+        j--;
+
     }
 
     return Eval ( *m_vecVecList[iLeft], *m_vecVecList[iRight],ulTime, Vec);

@@ -129,7 +129,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
-    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -231,16 +230,6 @@ void CClientVehicle::Unlink ( void )
     m_pVehicleManager->RemoveFromList ( this );
     m_pVehicleManager->m_Attached.remove ( this );
     m_pVehicleManager->m_StreamedIn.remove ( this );
-}
-
-
-RpClump * CClientVehicle::GetClump ( void )
-{
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->GetRpClump ();
-    }
-    return NULL;
 }
 
 
@@ -1750,17 +1739,8 @@ void CClientVehicle::StreamedInPulse ( void )
             m_bBlowNextFrame = false;
         }
 
-        // Are we an unmanned, invisible, blown-up plane?
-        if ( !GetOccupant () && m_eVehicleType == CLIENTVEHICLE_PLANE && m_bBlown && !m_pVehicle->IsVisible () )
-        {
-            // Disable our collisions
-            m_pVehicle->SetUsesCollision ( false );
-        }
-        else
-        {    
-            // Vehicles have a way of getting their cols back, so we have to force this each frame (not much overhead anyway)
-            m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
-        }
+        // Vehicles have a way of getting their cols back, so we have to force this each frame (not much overhead anyway)
+        m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
 
         // If we are frozen, make sure we freeze our matrix and keep move/turn speed at 0,0,0
         if ( m_bIsFrozen )
@@ -2011,7 +1991,6 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
-        m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
 
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
@@ -2951,24 +2930,4 @@ void CClientVehicle::SetGravity ( const CVector& vecGravity )
         m_pVehicle->SetGravity ( &vecGravity );
 
     m_vecGravity = vecGravity;
-}
-
-
-RGBA CClientVehicle::GetHeadLightColor ( void )
-{
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->GetHeadLightColor ();
-    }
-    return m_HeadLightColor;
-}
-
-
-void CClientVehicle::SetHeadLightColor ( RGBA color )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetHeadLightColor ( color );
-    }
-    m_HeadLightColor = color;
 }

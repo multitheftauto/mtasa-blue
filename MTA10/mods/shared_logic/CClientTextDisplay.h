@@ -43,7 +43,7 @@ public:
 	void						SetPosition             ( const CVector& vecPosition );
 
     void						SetColor                ( RGBA rgbaColor );
-    void						SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { SetColor ( COLOR_ARGB ( ucAlpha, ucRed, ucGreen, ucBlue ) ); };
+    void						SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { SetColor ( COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha ) ); };
     void                        SetColorAlpha           ( unsigned char ucAlpha );
 
 	inline float                GetScale                ( void )                                { return m_fScale; };

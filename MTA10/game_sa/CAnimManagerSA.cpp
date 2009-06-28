@@ -14,17 +14,11 @@
 
 using std::list;
 
-void HOOK_CAnimBlendAssociation_Destructor ();
-
-#define FUNC_CAnimBlendAssociation_Destructor           0x4cecf0
-
 CAnimManagerSA::CAnimManagerSA ( void )
 {
     memset ( m_pAnimAssocGroups, 0, sizeof ( m_pAnimAssocGroups ) );
     memset ( m_pAnimations, 0, sizeof ( m_pAnimations ) );
     memset ( m_pAnimBlocks, 0, sizeof ( m_pAnimBlocks ) );
-
-    HookInstall ( FUNC_CAnimBlendAssociation_Destructor, (DWORD)HOOK_CAnimBlendAssociation_Destructor, 6 );
 }
 
 
@@ -311,14 +305,14 @@ CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, AssocGr
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags )
+CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID )
 {
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_AddAnimation_hier;
     CAnimBlendHierarchySAInterface * pHierarchyInterface = pHierarchy->GetInterface ();
     _asm
     {
-        push    flags
+        push    ID
         push    pHierarchyInterface
         push    pClump
         call    dwFunc
@@ -366,7 +360,7 @@ CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, Assoc
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags, float fBlendDelta )
+CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta )
 {
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_BlendAnimation_hier;
@@ -374,7 +368,7 @@ CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnim
     _asm
     {
         push    fBlendDelta
-        push    flags
+        push    ID
         push    pHierarchyInterface
         push    pClump
         call    dwFunc
@@ -735,57 +729,4 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
         }
     }
     return NULL;
-}
-
-
-CAnimBlendHierarchy * CAnimManagerSA::GetAnimation ( const char * szName, const char * szBlockName )
-{
-    CAnimBlock * pBlock = GetAnimationBlock ( szBlockName );
-    if ( pBlock )
-    {
-        return GetAnimation ( szName, pBlock );
-    }
-    return NULL;
-}
-
-
-void CAnimManagerSA::ClearAnimBlendAssociation ( CAnimBlendAssociationSAInterface * pInterface )
-{
-    if ( pInterface )
-    {
-        CAnimBlendAssociation * pAssoc = NULL;
-        list < CAnimBlendAssociation * > ::iterator iter = m_Associations.begin ();
-        for ( ; iter != m_Associations.end () ; iter++ )
-        {
-            pAssoc = *iter;
-            if ( pAssoc->GetInterface () == pInterface )
-            {
-                delete pAssoc;
-                m_Associations.erase ( iter );
-                break;                
-            }
-        }
-    }
-}
-
-
-CAnimBlendAssociationSAInterface * pAssocInterface = NULL;
-VOID _declspec(naked) HOOK_CAnimBlendAssociation_Destructor ()
-{
-    _asm
-    {
-        pushad
-        mov     pAssocInterface, ecx
-    }
-    ((CAnimManagerSA*)pGame->GetAnimManager ())->ClearAnimBlendAssociation ( pAssocInterface );
-    _asm
-    {
-        popad
-        push    esi  
-        mov     esi, ecx 
-        mov     eax, dword ptr [esi+10h]
-        mov     ecx, FUNC_CAnimBlendAssociation_Destructor
-        add     ecx, 6
-        jmp     ecx
-    }
 }

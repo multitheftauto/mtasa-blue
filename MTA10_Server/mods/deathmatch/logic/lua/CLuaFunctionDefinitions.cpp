@@ -908,7 +908,7 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
             int iTime = -1;
             bool bLoop = true;
             bool bUpdatePosition = true;
-            bool bInteruptable = true;
+            bool bInterruptable = true;
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
             int iArgument4 = lua_type ( luaVM, 4 );
@@ -918,10 +918,10 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
-                bInteruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
+            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+                bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
 
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable ) )
             {
 			    lua_pushboolean ( luaVM, true );
                 return 1;
@@ -4452,36 +4452,6 @@ int CLuaFunctionDefinitions::IsVehicleBlown ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::GetVehicleHeadLightColor ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
-        {
-            RGBA color;
-            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( pVehicle, color ) )
-            {
-                unsigned char R = COLOR_RGBA_R ( color );
-                unsigned char G = COLOR_RGBA_G ( color );
-                unsigned char B = COLOR_RGBA_B ( color );
-
-                lua_pushnumber ( luaVM, R );
-                lua_pushnumber ( luaVM, G );
-                lua_pushnumber ( luaVM, B );
-                return 3;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHeadLightColor", "vehicle", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHeadLightColor" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefinitions::SetVehicleRotation ( lua_State* luaVM )
 {
     // Verify the arguments
@@ -5429,12 +5399,12 @@ int CLuaFunctionDefinitions::SetVehicleFrozen ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetVehicleFrozen ( pElement, lua_toboolean ( luaVM, 2 ) ? true:false ) )
+                if ( CStaticFunctionDefinitions::SetVehicleFrozen ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true:false ) )
                 {
                         lua_pushboolean ( luaVM, true );
                 }
@@ -5458,12 +5428,12 @@ int CLuaFunctionDefinitions::SetTrainDerailed ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetTrainDerailed ( pElement, lua_toboolean ( luaVM, 2 ) ? true : false ) )
+                if ( CStaticFunctionDefinitions::SetTrainDerailed ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -5487,12 +5457,12 @@ int CLuaFunctionDefinitions::SetTrainDerailable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetTrainDerailable ( pElement, lua_toboolean ( luaVM, 2 ) ? true : false ) )
+                if ( CStaticFunctionDefinitions::SetTrainDerailable ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -5516,12 +5486,12 @@ int CLuaFunctionDefinitions::SetTrainDirection ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::SetTrainDirection ( pElement, lua_toboolean ( luaVM, 2 ) ? true : false ) )
+                if ( CStaticFunctionDefinitions::SetTrainDirection ( pVehicle, lua_toboolean ( luaVM, 2 ) ? true : false ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -5545,13 +5515,13 @@ int CLuaFunctionDefinitions::SetTrainSpeed ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER || lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
                 float fSpeed = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-                if ( CStaticFunctionDefinitions::SetTrainSpeed ( pElement, fSpeed ) )
+                if ( CStaticFunctionDefinitions::SetTrainSpeed ( pVehicle, fSpeed ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -5565,41 +5535,6 @@ int CLuaFunctionDefinitions::SetTrainSpeed ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrainSpeed" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::SetVehicleHeadLightColor ( lua_State* luaVM )
-{
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            unsigned char ucR = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucG = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char ucB = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-
-            RGBA color = COLOR_RGBA ( ucR, ucG, ucB, 255 );
-            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( pElement, color ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHeadLightColor", "vehicle", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

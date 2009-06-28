@@ -884,17 +884,6 @@ void CPedSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     SetVoice ( sVoiceType, sVoiceID );
 }
 
-void CPedSA::PlayFootSteps ( void )
-{
-    DWORD dwThis = (DWORD)GetInterface ();
-    DWORD dwFunc = FUNC_CPed_PlayFootSteps;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-}
-
 /*
 bool CPedSA::CanPedReturnToState (  )
 {

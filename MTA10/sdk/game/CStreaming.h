@@ -15,8 +15,7 @@
 class CStreaming
 {
 public:
-    virtual void            RequestAnimations   ( int iBlockIndex ) = 0;
-    virtual void            RemoveAnimations   ( int iBlockIndex ) = 0;
+    virtual void            RequestAnimations   ( int i, int j ) = 0;
 };
 
 #endif

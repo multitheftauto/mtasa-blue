@@ -346,18 +346,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\entity_alpha.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\explosion.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fx_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="multiplayer_hooksystem.cpp"
 				>
 			</File>
@@ -371,10 +359,6 @@
 			</File>
 			<File
 				RelativePath=".\multiplayersa_init.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\running_script.cpp"
 				>
 			</File>
 			<File
@@ -407,14 +391,6 @@
 						PrecompiledHeaderThrough="StdInc.h"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\vehicle_gravity.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vehicle_lights.cpp"
-				>
 			</File>
 		</Filter>
 		<Filter

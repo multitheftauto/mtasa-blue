@@ -21,7 +21,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetObjectStreamer (), ID ), CClientAnimation ( pManager->GetAnimationManager () )
+CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetObjectStreamer (), ID )
 {
     // Init
     m_pManager = pManager;
@@ -68,16 +68,6 @@ void CClientObject::Unlink ( void )
     m_pObjectManager->RemoveFromList ( this );
     m_pObjectManager->m_Attached.remove ( this );
     m_pObjectManager->m_StreamedIn.remove ( this );
-}
-
-
-RpClump * CClientObject::GetClump ( void )
-{
-    if ( m_pObject )
-    {
-        return m_pObject->GetRpClump ();
-    }
-    return NULL;
 }
 
 

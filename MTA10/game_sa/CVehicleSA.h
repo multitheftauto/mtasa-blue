@@ -477,7 +477,6 @@ private:
     bool                        m_bIsDerailable;
     unsigned char               m_ucAlpha;
     CVector                     m_vecGravity;
-    RGBA                        m_HeadLightColor;
 
 public:
 								CVehicleSA                      ();
@@ -654,9 +653,6 @@ public:
 
     void                        GetGravity                      ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
     void                        SetGravity                      ( const CVector* pvecGravity );
-
-    inline RGBA                 GetHeadLightColor               ( void )        { return m_HeadLightColor; }
-    inline void                 SetHeadLightColor               ( RGBA color )  { m_HeadLightColor = color; }
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };

@@ -33,7 +33,7 @@ SBodyPartName BodyPartNames [10] =
 // HACK: saves unneccesary loading of clothes textures
 CClientPed* g_pLastRebuilt = NULL;
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () ), CClientAnimation ( pManager->GetAnimationManager () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     SetTypeName ( "ped" );
 
@@ -45,7 +45,7 @@ CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, Elem
 }
 
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () ), CClientAnimation ( pManager->GetAnimationManager () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     // Init
     Init ( pManager, ulModelID, bIsLocalPlayer );
@@ -131,6 +131,11 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+    m_pAnimationBlock = NULL;
+    m_szAnimationName = NULL;
+    m_bRequestedAnimation = false;
+    m_bLoopAnimation = false;    
+    m_bUpdatePositionAnimation = false;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bIsOnFire = false;
@@ -282,21 +287,6 @@ CClientPed::~CClientPed ( void )
 
     g_pClientGame->GetPedSync()->RemovePed ( this );
 }   
-
-void CClientPed::CleanUpForVM ( CLuaMain * pLuaMain, bool bRecursive )
-{
-    CClientAnimation::CleanUpForVM ( pLuaMain );
-    CClientEntity::CleanUpForVM ( pLuaMain, bRecursive );
-}
-
-RpClump * CClientPed::GetClump ( void )
-{
-    if ( m_pPlayerPed )
-    {
-        return m_pPlayerPed->GetRpClump ();
-    }
-    return NULL;
-}
 
 void CClientPed::SetStat ( unsigned short usStat, float fValue )
 {
@@ -569,6 +559,9 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     // Remove us from our car
     RemoveFromVehicle ();    
     SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+
+    // Remove any animation
+    KillAnimation ();
 
     // Give him the correct model
     SetModel ( usModel );
@@ -1188,6 +1181,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     SetChoking ( false );
     SetHasJetPack ( false );
     SetSunbathing ( false );
+    KillAnimation ();
 
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle ();
@@ -1675,7 +1669,7 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     return pWeapon;
 }
 
-bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
+void CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
     {
@@ -1683,9 +1677,11 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
         {
             if ( weaponSlot == WEAPONSLOT_TYPE_UNARMED )
             {
-                eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
+                // remove the current weapon's model
+                //m_pPlayerPed->RemoveWeaponModel ( GetWeapon(m_CurrentWeaponSlot)->GetType() );
+                CWeapon * oldWeapon;
 
-                CWeapon * oldWeapon = GetWeapon(currentSlot);
+                oldWeapon = GetWeapon(m_CurrentWeaponSlot);
                 DWORD ammoInClip = oldWeapon->GetAmmoInClip();
                 DWORD ammoInTotal = oldWeapon->GetAmmoTotal();
                 eWeaponType weaponType = oldWeapon->GetType();
@@ -1697,22 +1693,10 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                 newWeapon->SetAmmoInClip(ammoInClip);
                 newWeapon->SetAmmoTotal(ammoInTotal);
             }
-            else
-            {
-                // Make sure we have a weapon and some ammo on this slot
-                CWeapon * pWeapon = GetWeapon ( weaponSlot );                
-                if ( pWeapon && pWeapon->GetAmmoTotal () )
-                {
-                    m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
-                }
-                else return false;
-            }
+            m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
         }
         m_CurrentWeaponSlot = weaponSlot;
-        return true;
     }
-
-    return false;
 }
 
 
@@ -2401,6 +2385,23 @@ void CClientPed::StreamedInPulse ( void )
             m_Pad.DoPulse ( this );
         }
 
+        // Are we waiting on an unloaded anim-block?
+        if ( m_bRequestedAnimation && m_pAnimationBlock )
+        {
+            // Is it loaded now?
+            if ( m_pAnimationBlock->IsLoaded () )
+            {
+                m_bRequestedAnimation = false;
+
+                // Copy our name incase it gets deleted
+                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
+                strcpy ( szAnimName, m_szAnimationName );
+                // Run our animation
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                delete [] szAnimName;                
+            }            
+        }
+
         // Update our alpha
         unsigned char ucAlpha = m_ucAlpha;
         // Are we in a different interior to the camera? set our alpha to 0
@@ -2797,6 +2798,17 @@ void CClientPed::_CreateModel ( void )
         {
             // TODO: use TASK_SIMPLE_DEAD
             Kill ( WEAPONTYPE_UNARMED, 0 );
+        }       
+
+        // Are we still playing a looped animation?
+        if ( m_bLoopAnimation && m_pAnimationBlock )
+        {
+            // Copy our anim name incase it gets deleted
+            char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
+            strcpy ( szAnimName, m_szAnimationName );
+            // Run our animation
+            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+            delete [] szAnimName;
         }
 
         // Set the voice that corresponds to our model
@@ -2861,9 +2873,6 @@ void CClientPed::_CreateLocalModel ( void )
 
 void CClientPed::_DestroyModel ()
 {
-    // Call this before we actually destroy the ped incase its needed.
-    NotifyDestroy ();
-
     // Remember the player position
     m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
 
@@ -2906,7 +2915,9 @@ void CClientPed::_DestroyModel ()
 
     // Remove the reference to its model
     m_pLoadedModelInfo->RemoveRef ();
-    m_pLoadedModelInfo = NULL;    
+    m_pLoadedModelInfo = NULL;
+
+    NotifyDestroy ();
 }
 
 
@@ -2990,6 +3001,8 @@ void CClientPed::_ChangeModel ( void )
                 RemoveFromVehicle ();
             }
 
+            m_pPlayerPed->GetFightingStyle ();
+
             // Takes care of clothes/task issues
             Respawn ( NULL, true, false );
 
@@ -3016,6 +3029,17 @@ void CClientPed::_ChangeModel ( void )
                 WarpIntoVehicle ( pVehicle, uiSeat );
             }
             m_bDontChangeRadio = false;
+
+            // Are we still playing a looped animation?
+            if ( m_bLoopAnimation && m_pAnimationBlock )
+            {
+                // Copy our anim name incase it gets deleted
+                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
+                strcpy ( szAnimName, m_szAnimationName );
+                // Run our animation
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                delete [] szAnimName;
+            }
 
             // Set the voice that corresponds to the new model
             short sVoiceType, sVoiceID;
@@ -4296,18 +4320,14 @@ CClientEntity* CClientPed::GetTargetedEntity ( void )
 
 void CClientPed::NotifyCreate ( void )
 {
-    // Called after creation
     m_pManager->GetPedManager ()->OnCreation ( this );
     CClientStreamElement::NotifyCreate ();
-    CClientAnimation::OnCreation ();
 }
 
 
 void CClientPed::NotifyDestroy ( void )
 {
-    // Called before destruction
     m_pManager->GetPedManager ()->OnDestruction ( this );
-    CClientAnimation::OnDestruction ();
 }
 
 
@@ -4443,6 +4463,106 @@ void CClientPed::SetDoingGangDriveby ( bool bDriveby )
     m_bDoingGangDriveby = bDriveby;
 }
 
+
+bool CClientPed::IsRunningAnimation ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_NAMED_ANIM )
+        {
+            return true;
+        }
+        return false;
+    }
+    return ( m_bLoopAnimation && m_pAnimationBlock );
+}
+
+
+void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
+{
+    KillAnimation ();
+
+    if ( m_pPlayerPed )
+    {
+        CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunAnim ( animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM" );
+        if ( pTask )
+        {
+            pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
+        }
+    }
+}
+
+
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bOffsetPed, bool bHoldLastFrame )
+{
+    /* lil_Toady: this seems to break things
+    // Kill any current animation that might be running
+    KillAnimation ();
+    */
+
+    // Are we streamed in?
+    if ( m_pPlayerPed )
+    {  
+        if ( pBlock->IsLoaded () )
+        {
+            // Kill any higher priority tasks if we dont want this anim interuptable
+            if ( !bInterruptable )
+            {
+                KillTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+                KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+                KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+            }
+
+            int flags = 0;            
+            if ( bLoop ) flags |= 0x2;
+            flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
+            if ( bUpdatePosition ) flags |= 0x40;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bOffsetPed, bHoldLastFrame );
+            if ( pTask )
+            {
+                pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
+            }                
+        }
+        else
+        {
+            // TODO: unload unreferenced blocks later on
+            g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
+            m_bRequestedAnimation = true;
+        }
+    }
+    m_pAnimationBlock = pBlock;
+    m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
+    strcpy ( m_szAnimationName, szAnimName ); 
+    m_bLoopAnimation = bLoop;
+    m_bUpdatePositionAnimation = bUpdatePosition;
+}
+
+
+void CClientPed::KillAnimation ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        CTask* pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+        if ( pTask )
+        {
+            int iTaskType = pTask->GetTaskType ();
+            if ( iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM )
+            {                
+                pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
+                pTask->Destroy ();
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+            }
+        }
+    }
+    m_pAnimationBlock = NULL;
+    if ( m_szAnimationName )
+    {
+        delete [] m_szAnimationName;
+        m_szAnimationName = NULL;
+    }
+    m_bRequestedAnimation = false;
+}
 
 void CClientPed::PostWeaponFire ( void )
 {

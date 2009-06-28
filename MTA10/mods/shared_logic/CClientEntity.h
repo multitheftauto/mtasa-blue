@@ -178,7 +178,7 @@ public:
     void                                        DeleteEvents            ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents         ( void );
 
-    virtual void                                CleanUpForVM            ( CLuaMain* pLuaMain, bool bRecursive );
+    void                                        CleanUpForVM            ( CLuaMain* pLuaMain, bool bRecursive );
 
 
     CClientEntity*                              FindChild               ( const char* szName, unsigned int uiIndex, bool bRecursive );

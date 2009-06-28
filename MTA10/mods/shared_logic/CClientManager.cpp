@@ -60,7 +60,6 @@ CClientManager::CClientManager ( void )
     m_pHandlingManager = new CClientHandlingManager ( this );
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
-    m_pAnimationManager = new CClientAnimationManager ( this );
 
 	m_pPacketRecorder = new CClientPacketRecorder ( this );
 
@@ -169,9 +168,6 @@ CClientManager::~CClientManager ( void )
     delete m_pWaterManager;
     m_pWaterManager = NULL;
 
-    delete m_pAnimationManager;
-    m_pAnimationManager = NULL;
-
     // Delete the connection trouble texture
     delete m_pConnectionTroubleTexture;
     m_pConnectionTroubleTexture = NULL;
@@ -186,7 +182,7 @@ void CClientManager::DoPulse ( void )
     {
         m_pModelRequestManager->DoPulse ();
         m_pCamera->DoPulse ();
-        //m_pMarkerManager->DoPulse (); * we call this from CClientGame::PostWorldProcessHandler
+        m_pMarkerManager->DoPulse ();
         m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
         m_pVehicleManager->DoPulse ();
         m_pPathManager->DoPulse ();
@@ -196,8 +192,7 @@ void CClientManager::DoPulse ( void )
         m_pObjectManager->DoPulse ();
         m_pProjectileManager->DoPulse ();
         m_pSoundManager->DoPulse ();
-        m_pPlayerManager->DoPulse ();
-        m_pAnimationManager->DoPulse ();
+        m_pPlayerManager->DoPulse ();        
     }
 }
 

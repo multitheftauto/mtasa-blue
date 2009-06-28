@@ -49,7 +49,6 @@ public:
     DECLARE_RPC ( SetTrainDirection );
     DECLARE_RPC ( SetTrainSpeed );
     DECLARE_RPC ( SetVehicleTaxiLightOn );
-    DECLARE_RPC ( SetVehicleHeadLightColor );
 };
 
 #endif

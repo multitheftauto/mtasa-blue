@@ -889,7 +889,8 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CClientEntity& Entity, uns
     RUN_CHILDREN SetElementInterior ( **iter, ucInterior, bSetPosition, vecPosition );
 
     Entity.SetInterior ( ucInterior );
-    if ( bSetPosition ) Entity.SetPosition ( vecPosition );
+    if ( bSetPosition )
+        Entity.SetPosition ( vecPosition );
 
     return true;
 }
@@ -1249,14 +1250,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 
 bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
 {
-    CAnimationItem * pAnim = Ped.GetCurrentAnimation ();
-    if ( pAnim )
+    if ( Ped.IsRunningAnimation () )
     {
-        strncpy ( szBlockName, pAnim->block->GetName (), uiLength );
-        strncpy ( szAnimName, pAnim->name, uiLength );
+        strncpy ( szBlockName, Ped.GetAnimationBlock ()->GetName (), uiLength );
+        strncpy ( szAnimName, Ped.GetAnimationName (), uiLength );
         return true;
     }
-    
     return false;
 }
 
@@ -1420,7 +1419,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-		return Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
+		Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
+        return true;
     }
 
     return false;
@@ -1573,54 +1573,28 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
-{
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
-    
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
+{    
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-
         if ( szBlockName && szAnimName )
         {
-            return Ped.RunNamedAnimation ( szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
+            if ( pBlock )
+            {
+                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+                return true;
+            }
         }
         else
         {
-            Ped.FinishAnimation ();
+            Ped.KillAnimation ();
             return true;
         }
     }
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::BlendPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pLuaMain, int iLuaFunction, CLuaArguments * pArguments )
-{    
-    RUN_CHILDREN BlendPedAnimation ( **iter, szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
-
-    if ( IS_PED ( &Entity ) )
-    {
-        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        if ( szBlockName && szAnimName )
-        {            
-            return Ped.BlendAnimation ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
-        }
-        else
-        {
-            Ped.FinishAnimation ();
-        }
-    }
-    /*
-    else if ( IS_OBJECT ( &Entity ) )
-    {
-        CClientObject& Object = static_cast < CClientObject& > ( Entity );
-        if ( szBlockName && szAnimName )
-        {
-            return Object.BlendAnimation  ( szBlockName, szAnimName, fSpeed, fBlendSpeed, fStartTime, bLoop, bUpdatePosition, bInterruptable, pLuaMain, iLuaFunction, pArguments );
-        }
-    }
-    */
 
     return false;
 }
@@ -2048,25 +2022,9 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExpl
 
     return false;
 }
-
-
 bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool& bBlown )
 {
     bBlown = Vehicle.IsVehicleBlown();
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetVehicleGravity ( CClientVehicle& Vehicle, CVector & vecGravity )
-{
-    Vehicle.GetGravity ( vecGravity );
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA & color )
-{
-    color = Vehicle.GetHeadLightColor ();
     return true;
 }
 
@@ -2547,130 +2505,56 @@ bool CStaticFunctionDefinitions::SetVehicleAdjustableProperty ( CClientEntity& E
 }
 
 
-bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientEntity& Entity, float fSpeed )
+bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehicle, float fSpeed )
 {
-    RUN_CHILDREN SetHelicopterRotorSpeed ( **iter, fSpeed );
-
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-
-	    // It's a heli?
-	    if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
-	    {
-		    Vehicle.SetHelicopterRotorSpeed ( fSpeed );
-		    return true;
-	    }
-    }
+	// It's a heli?
+	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
+	{
+		Vehicle.SetHelicopterRotorSpeed ( fSpeed );
+		return true;
+	}
 
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientEntity& Entity, bool bDerailed )
+bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, bool bDerailed )
 {
-    RUN_CHILDREN SetTrainDerailed ( **iter, bDerailed );
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
 
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        
-        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
-        {
-	        Vehicle.SetDerailed ( bDerailed );
-            return true;
-        }
-    }
-
-    return false;
+	Vehicle.SetDerailed ( bDerailed );
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientEntity& Entity, bool bDerailable )
+bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientVehicle& Vehicle, bool bDerailable )
 {
-    RUN_CHILDREN SetTrainDerailable ( **iter, bDerailable );
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
 
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-
-        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
-        {
-	        Vehicle.SetDerailable ( bDerailable );
-            return true;
-        }
-    }
-
-    return false;
+	Vehicle.SetDerailable ( bDerailable );
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDirection ( CClientEntity& Entity,  bool bDirection )
+bool CStaticFunctionDefinitions::SetTrainDirection ( CClientVehicle& Vehicle, bool bDirection )
 {
-    RUN_CHILDREN SetTrainDirection ( **iter, bDirection );
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
 
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
-        {
-	        Vehicle.SetTrainDirection ( bDirection );
-            return true;
-        }
-    }
-
-    return false;
+	Vehicle.SetTrainDirection ( bDirection );
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientEntity& Entity, float fSpeed )
+bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float fSpeed )
 {
-    RUN_CHILDREN SetTrainSpeed ( **iter, fSpeed );
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
 
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-
-        if ( Vehicle.GetVehicleType () == CLIENTVEHICLE_TRAIN )
-        {
-	        Vehicle.SetTrainSpeed ( fSpeed );
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetVehicleGravity ( CClientEntity& Entity, CVector & vecGravity )
-{
-    RUN_CHILDREN SetVehicleGravity ( **iter, vecGravity );
-
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-
-        Vehicle.SetGravity ( vecGravity );
-        return true;
-    }
-    
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, RGBA color )
-{
-    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, color );
-
-    if ( IS_VEHICLE ( &Entity ) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-
-        Vehicle.SetHeadLightColor ( color );
-        return true;
-    }
-    
-    return false;
+	Vehicle.SetTrainSpeed ( fSpeed );
+    return true;
 }
 
 

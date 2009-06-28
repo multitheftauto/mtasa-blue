@@ -27,24 +27,6 @@ class CVehicle;
 #define DEFAULT_VEHICLE_HEALTH 1000
 #define MAX_VEHICLE_HEALTH 10000
 
-typedef DWORD RGBA;
-typedef DWORD ARGB;
-
-// Jax: COLOR DEFS ARE OFF LIMITS !
-#define COLOR_ARGB(a,r,g,b) (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-#define COLOR_ARGB_A(color) unsigned char ( color >> 24 )
-#define COLOR_ARGB_R(color) unsigned char ( color >> 16 )
-#define COLOR_ARGB_G(color) unsigned char ( color >> 8 )
-#define COLOR_ARGB_B(color) unsigned char ( color )
-
-#define COLOR_RGBA(r,g,b,a) COLOR_ARGB(r,g,b,a)
-#define COLOR_ABGR(a,b,g,r) COLOR_ARGB(a,b,g,r)
-
-#define COLOR_RGBA_R(color) COLOR_ARGB_A(color)
-#define COLOR_RGBA_G(color) COLOR_ARGB_R(color)
-#define COLOR_RGBA_B(color) COLOR_ARGB_G(color)
-#define COLOR_RGBA_A(color) COLOR_ARGB_B(color)
-
 enum eWheelStatus {
 	DT_WHEEL_INTACT=0,
 	DT_WHEEL_BURST,
@@ -253,9 +235,6 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
-    inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
-    inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
-
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
@@ -317,8 +296,8 @@ private:
     bool                            m_bDerailed;
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
+
     CPlayer *                       m_pJackingPlayer;
-    RGBA                            m_HeadLightColor;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;
