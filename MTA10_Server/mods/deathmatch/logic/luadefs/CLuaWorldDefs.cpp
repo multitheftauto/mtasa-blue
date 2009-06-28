@@ -391,7 +391,7 @@ int CLuaWorldDefs::resetSkyGradient ( lua_State* luaVM )
 int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING || iArgument1 == LUA_TBOOLEAN )
     {
         unsigned short usLimit = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
         if ( CStaticFunctionDefinitions::SetFPSLimit ( usLimit ) )

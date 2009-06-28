@@ -211,14 +211,17 @@ bool CMainConfig::Load ( const char* szFilename )
     // Grab the server password
     iResult = GetString ( m_pRootNode, "password", m_strPassword, 1, 32 );
 
-	// Grab the server fps limit
-	int iFPSTemp = 0;
-	iResult = GetInteger ( m_pRootNode, "fpslimit", iFPSTemp, 25, 100 );
-	if ( iResult == IS_SUCCESS )
-	{
-		m_usFPSLimit = (unsigned short)iFPSTemp;
-		SetInteger ( m_pRootNode, "fpslimit", (int)m_usFPSLimit );
-	}
+    // Grab the server fps limit
+    int iFPSTemp = 0;
+    iResult = GetInteger ( m_pRootNode, "fpslimit", iFPSTemp, 0, 100 );
+    if ( iResult == IS_SUCCESS )
+    {
+        if ( iFPSTemp == 0 || iFPSTemp >= 25 )
+        {
+             m_usFPSLimit = (unsigned short)iFPSTemp;
+             SetInteger ( m_pRootNode, "fpslimit", (int)m_usFPSLimit );
+        }
+    }
 
 	// Grab the serial verification
 	/** ACHTUNG: Unsupported for release 1.0 (#4090)
@@ -536,7 +539,7 @@ void CMainConfig::SetPassword ( const char* szPassword )
 
 void CMainConfig::SetFPSLimit ( unsigned short usFPS )
 {
-    if ( usFPS >= 25 && usFPS <= 100 )
+    if ( usFPS == 0 || usFPS >= 25 && usFPS <= 100 )
     {
         m_usFPSLimit = usFPS;
         SetInteger ( m_pRootNode, "fpslimit", usFPS );
