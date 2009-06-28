@@ -6962,9 +6962,9 @@ bool CStaticFunctionDefinitions::SetWaveHeight ( float fHeight )
 
 bool CStaticFunctionDefinitions::SetFPSLimit ( unsigned short usLimit )
 {
-    if ( usLimit >= 25 && usLimit <= 100 )
+    if ( usLimit == 0 || ( usLimit >= 25 && usLimit <= 100 ) )
     {
-		g_pGame->GetConfig()->SetFPSLimit ( usLimit );
+        g_pGame->GetConfig()->SetFPSLimit ( usLimit );
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( (short)usLimit );

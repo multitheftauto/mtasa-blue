@@ -445,7 +445,15 @@ unsigned long CGameSA::GetFramelimiter ( void )
 
 void CGameSA::SetFramelimiter ( unsigned long ulFramelimiter )
 {
-    *VAR_Framelimiter = ulFramelimiter;
+    if ( ulFramelimiter == 0 )
+    {
+        m_pSettings->SetFrameLimiterEnabled ( false );
+    }
+    else
+    {
+        m_pSettings->SetFrameLimiterEnabled ( true );
+        *VAR_Framelimiter = ulFramelimiter;
+    }
 }
 
 
