@@ -106,7 +106,6 @@ class CPedIntelligenceSAInterface;
 #define FUNC_WarpPedIntoCar				0x4EF8B0
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
-#define FUNC_CPed_PlayFootSteps         0x5e57f0
 
 #define VAR_LocalPlayer					0x94AD28
 
@@ -420,8 +419,6 @@ public:
     void                GetVoice                ( const char** pszVoiceType, const char** pszVoice );
     void                SetVoice                ( short sVoiceType, short sVoiceID );
     void                SetVoice                ( const char* szVoiceType, const char* szVoice );
-
-    void                PlayFootSteps           ( void );
 };
 
 #endif

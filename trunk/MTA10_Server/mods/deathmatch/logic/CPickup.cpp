@@ -465,29 +465,27 @@ void CPickup::Callback_OnCollision ( CColShape& Shape, CElement& Element )
         // Is he alive?
         if ( !Player.IsDead () )
         {
-            // Are they both in the same dimension?
-            if ( Shape.GetDimension () == Element.GetDimension () )
+            // Call the onPickupHit event
+            CLuaArguments Arguments;
+            Arguments.PushElement ( &Player );
+            Arguments.PushBoolean ( ( Shape.GetDimension () == Element.GetDimension () ) );
+            bool bContinue1 = CallEvent ( "onPickupHit", Arguments );
+
+            CLuaArguments Arguments2;
+            Arguments2.PushElement ( this );       // pickup
+            Arguments2.PushBoolean ( ( Shape.GetDimension () == Element.GetDimension () ) );
+            bool bContinue2 = Element.CallEvent ( "onPlayerPickupHit", Arguments2 );
+
+            if ( bContinue1 && bContinue2 )
             {
-                // Call the onPickupHit event
-                CLuaArguments Arguments;
-                Arguments.PushElement ( &Player );
-                bool bContinue1 = CallEvent ( "onPickupHit", Arguments );
-
-                CLuaArguments Arguments2;
-                Arguments2.PushElement ( this );       // pickup
-                bool bContinue2 = Element.CallEvent ( "onPlayerPickupHit", Arguments2 );
-
-                if ( bContinue1 && bContinue2 )
+                // Does it still exist?
+                if ( !IsBeingDeleted () )
                 {
-                    // Does it still exist?
-                    if ( !IsBeingDeleted () )
+                    // Can we USE the pickup?
+                    if ( CanUse ( Player ) )
                     {
-                        // Can we USE the pickup?
-                        if ( CanUse ( Player ) )
-                        {
-                            // USE the pickup
-                            Use ( Player );
-                        }
+                        // USE the pickup
+                        Use ( Player );
                     }
                 }
             }

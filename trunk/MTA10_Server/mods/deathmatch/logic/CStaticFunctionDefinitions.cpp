@@ -1093,9 +1093,11 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
             BitStream.pBitStream->Write ( vecPosition.fZ );
         }
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_INTERIOR, *BitStream.pBitStream ) );
+
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -2932,10 +2934,10 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInteruptable );
+    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
 
     if ( IS_PED ( pElement ) )
     {
@@ -2959,7 +2961,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
                 BitStream.pBitStream->Write ( iTime );
                 BitStream.pBitStream->WriteBit ( bLoop );
                 BitStream.pBitStream->WriteBit ( bUpdatePosition );
-                BitStream.pBitStream->WriteBit ( bInteruptable );
+                BitStream.pBitStream->WriteBit ( bInterruptable );
             }
             else
             {
@@ -3837,21 +3839,10 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
 
     return false;
 }
-
-
 bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 {
     assert ( pVehicle );
     return pVehicle->GetBlowTime() != 0;
-}
-
-
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, RGBA & color )
-{
-    assert ( pVehicle );
-    
-    color = pVehicle->GetHeadLightColor ();
-    return true;
 }
 
 
@@ -4697,160 +4688,89 @@ bool CStaticFunctionDefinitions::SetVehicleFuelTankExplodable ( CElement* pEleme
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleFrozen ( CElement* pElement, bool bFrozen )
+bool CStaticFunctionDefinitions::SetVehicleFrozen ( CVehicle* pVehicle, bool bFrozen )
 {
-    assert ( pElement );
-    RUN_CHILDREN SetVehicleFrozen ( *iter, bFrozen );
+    assert ( pVehicle );
 
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+    pVehicle->SetFrozen ( bFrozen );
 
-        pVehicle->SetFrozen ( bFrozen );
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    if ( bFrozen )
+        BitStream.pBitStream->Write ( ( unsigned char ) 0 );
+    else
+        BitStream.pBitStream->Write ( ( unsigned char ) 1 );
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pVehicle->GetID () );
-        if ( bFrozen )
-            BitStream.pBitStream->Write ( ( unsigned char ) 0 );
-        else
-            BitStream.pBitStream->Write ( ( unsigned char ) 1 );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_FROZEN, *BitStream.pBitStream ) );
 
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_FROZEN, *BitStream.pBitStream ) );
-
-        return true;
-    }
-    return false;
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailed ( CElement* pElement, bool bDerailed )
+bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDerailed )
 {
-    assert ( pElement );
-    RUN_CHILDREN SetTrainDerailed ( *iter, bDerailed );
+    assert ( pVehicle );
 
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+    pVehicle->SetDerailed ( bDerailed );
 
-        pVehicle->SetDerailed ( bDerailed );
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailed ? 1 : 0 ) );
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailed ? 1 : 0 ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILED, *BitStream.pBitStream ) );
 
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILED, *BitStream.pBitStream ) );
-
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDerailable ( CElement* pElement, bool bDerailable )
+bool CStaticFunctionDefinitions::SetTrainDerailable ( CVehicle* pVehicle, bool bDerailable )
 {
-    assert ( pElement );
-    RUN_CHILDREN SetTrainDerailable ( *iter, bDerailable );
+    assert ( pVehicle );
 
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+    pVehicle->SetDerailable ( bDerailable );
 
-        pVehicle->SetDerailable ( bDerailable );
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailable ? 1 : 0 ) );
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( bDerailable ? 1 : 0 ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILABLE, *BitStream.pBitStream ) );
 
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DERAILABLE, *BitStream.pBitStream ) );
-
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainDirection ( CElement* pElement, bool bDirection )
+bool CStaticFunctionDefinitions::SetTrainDirection ( CVehicle* pVehicle, bool bDirection )
 {
-    assert ( pElement );
-    RUN_CHILDREN SetTrainDirection ( *iter, bDirection );
+    assert ( pVehicle );
 
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+    pVehicle->SetTrainDirection ( bDirection );
 
-        pVehicle->SetTrainDirection ( bDirection );
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( ( unsigned char ) ( bDirection ? 1 : 0 ) );
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( ( unsigned char ) ( bDirection ? 1 : 0 ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DIRECTION, *BitStream.pBitStream ) );
 
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_DIRECTION, *BitStream.pBitStream ) );
-
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainSpeed ( CElement* pElement, float fSpeed )
+bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpeed )
 {
-    assert ( pElement );
-    RUN_CHILDREN SetTrainSpeed ( *iter, fSpeed );
+    assert ( pVehicle );
 
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+    CVector vecVelocity = pVehicle->GetVelocity ();
+    vecVelocity.Normalize ();
+    vecVelocity *= fSpeed;
+    pVehicle->SetVelocity ( vecVelocity );
 
-        CVector vecVelocity = pVehicle->GetVelocity ();
-        vecVelocity.Normalize ();
-        vecVelocity *= fSpeed;
-        pVehicle->SetVelocity ( vecVelocity );
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( fSpeed );
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( fSpeed );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_SPEED, *BitStream.pBitStream ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_SPEED, *BitStream.pBitStream ) );
 
-        return true;
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CElement* pElement, RGBA color )
-{
-    assert ( pElement );
-    RUN_CHILDREN SetVehicleHeadLightColor ( *iter, color );
-
-    if ( IS_VEHICLE ( pElement ) )
-    {
-        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-
-        RGBA _color = pVehicle->GetHeadLightColor ();
-        if ( color != _color )
-        {
-            pVehicle->SetHeadLightColor ( color );
-
-            unsigned char R = COLOR_RGBA_R ( color );
-            unsigned char G = COLOR_RGBA_G ( color );
-            unsigned char B = COLOR_RGBA_B ( color );
-
-            CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
-            BitStream.pBitStream->Write ( R );
-            BitStream.pBitStream->Write ( G );
-            BitStream.pBitStream->Write ( B );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream ) );
-
-            return true;
-        }
-    }
-
-    return false;
+    return true;
 }
 
 

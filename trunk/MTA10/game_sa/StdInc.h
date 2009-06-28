@@ -96,5 +96,3 @@
 #include "CBuildingSA.h"
 #include "CRestartSA.h"
 #include "CWaterManagerSA.h"
-#include "CFxSystemSA.h"
-#include "CFxManagerSA.h"

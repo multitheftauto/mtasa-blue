@@ -19,7 +19,7 @@ class CClientObject;
 
 #include "CClientStreamElement.h"
 
-class CClientObject : public CClientStreamElement, public CClientAnimation
+class CClientObject : public CClientStreamElement
 {
     friend class CClientObjectManager;
     friend CClientPed;
@@ -30,8 +30,6 @@ public:
 
     void                            Unlink                  ( void );
     
-    RpClump *                       GetClump                ( void );
-
     inline eClientEntityType        GetType                 ( void ) const                      { return CCLIENTOBJECT; };
 
     inline CObject *                GetGameObject           ( void )                            { return m_pObject; }

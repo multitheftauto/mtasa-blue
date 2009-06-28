@@ -20,7 +20,6 @@ class CClientMarkerManager
 {
     friend class CClientManager;
     friend class CClientMarker;
-    friend class CClientGame;
 
 public:
     inline unsigned int             Count                               ( void )                            { return static_cast < unsigned int > ( m_Markers.size () ); };

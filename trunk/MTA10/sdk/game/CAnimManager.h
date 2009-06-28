@@ -64,10 +64,10 @@ public:
     virtual CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, AnimationId animID ) = 0;
     virtual CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, const char * szAnimName ) = 0;
     virtual CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID ) = 0;
-    virtual CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int flags ) = 0;
+    virtual CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int ID ) = 0;
     virtual CAnimBlendAssociation *     AddAnimationAndSync                     ( RpClump * pClump, CAnimBlendAssociation * pAssociation, AssocGroupId animGroup, AnimationId animID ) = 0;
     virtual CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta ) = 0;
-    virtual CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags, float fBlendDelta ) = 0;
+    virtual CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta ) = 0;
     
     virtual void                        AddAnimBlockRef                         ( int ID ) = 0;
     virtual void                        RemoveAnimBlockRef                      ( int ID ) = 0;
@@ -102,8 +102,6 @@ public:
     virtual CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface ) = 0;
     virtual CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface ) = 0;
     virtual CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
-
-    virtual CAnimBlendHierarchy *       GetAnimation                            ( const char * szName, const char * szBlockName ) = 0;
 };
 
 #endif

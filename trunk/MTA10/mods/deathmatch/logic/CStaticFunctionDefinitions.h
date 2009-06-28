@@ -132,8 +132,7 @@ public:
     static bool							SetPedWeaponSlot					( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
-    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInteruptable );
-    static bool                         BlendPedAnimation                   ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pLuaMain = NULL, int iLuaFunction = LUA_REFNIL, CLuaArguments * pArguments = NULL );
+    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
     static bool                         SetPedMoveAnim                      ( CClientEntity& Entity, unsigned int iMoveAnim );
     static bool                         AddPedClothes						( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
     static bool                         RemovePedClothes					( CClientEntity& Entity, unsigned char ucType );
@@ -168,8 +167,6 @@ public:
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
-    static bool                         GetVehicleGravity                   ( CClientVehicle& Vehicle, CVector & vecGravity );
-    static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, RGBA & color );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -198,13 +195,11 @@ public:
     static bool                         SetVehicleFuelTankExplodable        ( CClientEntity& Entity, bool bExplodable );
     static bool                         SetVehicleFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetVehicleAdjustableProperty        ( CClientEntity& Entity, unsigned short usAdjustableProperty );
-	static bool							SetHelicopterRotorSpeed				( CClientEntity& Entity, float fSpeed );
-	static bool							SetTrainDerailed				    ( CClientEntity& Entity, bool bDerailed );
-    static bool                         SetTrainDerailable                  ( CClientEntity& Entity, bool bDerailable );
-    static bool                         SetTrainDirection                   ( CClientEntity& Entity, bool bDirection );
-    static bool                         SetTrainSpeed                       ( CClientEntity& Entity, float fSpeed );
-    static bool                         SetVehicleGravity                   ( CClientEntity& Entity, CVector & vecGravity );
-    static bool                         SetVehicleHeadLightColor            ( CClientEntity& Entity, RGBA color );
+	static bool							SetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float fSpeed );
+	static bool							SetTrainDerailed				    ( CClientVehicle& Vehicle, bool bDerailed );
+    static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
+    static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
+    static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );

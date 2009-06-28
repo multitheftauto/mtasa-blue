@@ -21,8 +21,6 @@ class CVehicle;
 class CFx
 {
 public:
-    virtual void                CreateMatFromVec        ( RwMatrix * pMatrix, CVector * pvecPosition, CVector * pvecLookAt ) = 0;
-    
     virtual void                AddBlood                ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness ) = 0;
     virtual void                AddWood                 ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness ) = 0;
     virtual void                AddSparks               ( CVector & vecPosition, CVector & vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread, float fLife ) = 0;

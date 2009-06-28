@@ -108,10 +108,10 @@ public:
     CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, const char * szAnimName );
     CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
-    CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int flags );
+    CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int ID );
     CAnimBlendAssociation *     AddAnimationAndSync                     ( RpClump * pClump, CAnimBlendAssociation * pAssociation, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-    CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int flags, float fBlendDelta );
+    CAnimBlendAssociation *     BlendAnimation                          ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta );
     
     void                        AddAnimBlockRef                         ( int ID );
     void                        RemoveAnimBlockRef                      ( int ID );
@@ -140,16 +140,12 @@ public:
     int                         RpAnimBlendClumpGetNumAssociations      ( RpClump * pClump );
     void                        RpAnimBlendClumpUpdateAnimations        ( RpClump * pClump, float f1, bool b1 );
 
+
     // MTA members
     CAnimBlendAssociation *     GetAnimBlendAssociation                 ( CAnimBlendAssociationSAInterface * pInterface );
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
-    
-    CAnimBlendHierarchy *       GetAnimation                            ( const char * szName, const char * szBlockName );
-    
-    void                        ClearAnimBlendAssociation               ( CAnimBlendAssociationSAInterface * pInterface );
-    void                        ClearAnimBlendHierarchy                 ( CAnimBlendHierarchySAInterface * pInterface );
 
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
