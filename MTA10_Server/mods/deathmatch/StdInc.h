@@ -30,6 +30,8 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include "CVector.h"
+#include "CMatrix.h"
+#include "CQuat.h"
 #include "SharedUtil.h"
 #include "SString.h"
 

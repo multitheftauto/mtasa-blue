@@ -642,11 +642,11 @@ struct SVehicleSpecific : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        unsigned short usHorizontal, usVertical;
-        if ( bitStream.Read ( usHorizontal ) && bitStream.Read ( usVertical ) )
+        short sHorizontal, sVertical;
+        if ( bitStream.Read ( sHorizontal ) && bitStream.Read ( sVertical ) )
         {
-            data.fTurretX = static_cast < float > ( usHorizontal ) / ( 65535.0f / 360.0f );
-            data.fTurretY = static_cast < float > ( usVertical ) / ( 65535.0f / 360.0f );
+            data.fTurretX = static_cast < float > ( sHorizontal ) / ( 32767.0f / PI );
+            data.fTurretY = static_cast < float > ( sVertical )   / ( 32767.0f / PI );
 
             return true;
         }
@@ -655,11 +655,11 @@ struct SVehicleSpecific : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         // Convert to shorts to save 4 bytes (multiply for precision on how many rounds can fit in a ushort)
-        unsigned short usHorizontal = static_cast < unsigned short > ( data.fTurretX * ( 65535.0f / 360.0f ) ),
-                       usVertical = static_cast < unsigned short > ( data.fTurretY * ( 65535.0f / 360.0f ) );
+        short sHorizontal = static_cast < short > ( data.fTurretX * ( 32767.0f / PI ) ),
+              sVertical   = static_cast < short > ( data.fTurretY * ( 32767.0f / PI ) );
 
-        bitStream.Write ( usHorizontal );
-        bitStream.Write ( usVertical );
+        bitStream.Write ( sHorizontal );
+        bitStream.Write ( sVertical );
     }
 
     struct
