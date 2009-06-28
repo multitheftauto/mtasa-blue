@@ -26,12 +26,17 @@ CResourceManager::CResourceManager ( void )
 
 CResourceManager::~CResourceManager ( void )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    while ( !m_resources.empty () )
     {
-        delete (*iter);
+        CResource* pResource = m_resources.back ();
+
+        CLuaArguments Arguments;
+        Arguments.PushUserData ( pResource );
+        pResource->GetResourceEntity ()->CallEvent ( "onClientResourceStop", Arguments, true );
+        delete pResource;
+
+        m_resources.pop_back ();
     }
-    m_resources.clear ();
 }
 
 CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
