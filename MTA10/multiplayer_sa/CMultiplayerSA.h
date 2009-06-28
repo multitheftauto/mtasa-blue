@@ -54,14 +54,12 @@ public:
     void                        DisableExplosions           ( bool bDisabled );
 	void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
     void                        SetDamageHandler            ( DamageHandler * pDamageHandler );
-    void                        SetFireDamageHandler        ( FireDamageHandler * pDamageHandler );
     void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler );
     void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler );
     void                        SetFireHandler              ( FireHandler * pFireHandler );
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
-    void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );

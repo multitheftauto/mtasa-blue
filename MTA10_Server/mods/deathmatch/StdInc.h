@@ -59,7 +59,6 @@
 #include "packets/CPickupHitConfirmPacket.h"
 #include "packets/CPlayerChangeNickPacket.h"
 #include "packets/CPlayerClothesPacket.h"
-#include "packets/CPlayerDamagePacket.h"
 #include "packets/CPlayerConnectCompletePacket.h"
 #include "packets/CPlayerDisconnectedPacket.h"
 #include "packets/CPlayerJoinCompletePacket.h"

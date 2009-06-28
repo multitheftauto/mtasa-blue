@@ -215,7 +215,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
     g_pMultiplayer->SetDamageHandler ( CClientGame::StaticDamageHandler );
-    g_pMultiplayer->SetFireDamageHandler ( CClientGame::StaticFireDamageHandler );
     g_pMultiplayer->SetFireHandler ( CClientGame::StaticFireHandler );
     g_pMultiplayer->SetProjectileStopHandler ( CClientProjectileManager::Hook_StaticProjectileAllow );
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
@@ -223,7 +222,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
-    g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
@@ -347,7 +345,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetBreakTowLinkHandler ( NULL );
     g_pMultiplayer->SetDrawRadarAreasHandler ( NULL );
     g_pMultiplayer->SetDamageHandler ( NULL );
-    g_pMultiplayer->SetFireDamageHandler ( NULL );
     g_pMultiplayer->SetFireHandler ( NULL );
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
@@ -355,7 +352,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostWorldProcessHandler ( NULL );
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
-    g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -1173,7 +1169,7 @@ void CClientGame::ShowWepdata ( const char* szNick )
     CClientPlayer* pPlayer = m_pPlayerManager->Get ( szNick );
     if ( pPlayer )
     {
-        pPlayer ->SetShowingWepdata ( ! pPlayer->IsShowingWepdata() );
+        pPlayer->SetShowingWepdata ( ! pPlayer->IsShowingWepdata() );
     }
 }
 
@@ -3074,11 +3070,6 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
     return g_pClientGame->DamageHandler ( pDamagePed, pEvent );
 }
 
-bool CClientGame::StaticFireDamageHandler ( CPed* pDamagePed )
-{
-    return g_pClientGame->FireDamageHandler ( pDamagePed );
-}
-
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
@@ -3109,10 +3100,6 @@ bool CClientGame::StaticChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePe
     return g_pClientGame->ChokingHandler ( pChokingPed, pResponsiblePed, ucWeaponType );
 }
 
-void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
-{
-    g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
-}
 
 void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
@@ -3228,50 +3215,12 @@ bool CClientGame::ChokingHandler ( CPed* pChokingPed, CPed* pResponsiblePed, uns
     return true;
 }
 
-void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
-{
-    /* DAMAGE SYNC
-    CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-    if ( pPed )
-    {        
-        // Is this the local player?
-        if ( pPed == m_pLocalPlayer )
-        {
-            // Is this a damage animation?
-            if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
-            {
-                // Notify the server
-                SendDamagePacket ( animGroup, animID, false );
-            }
-#ifdef MTA_DEBUG
-            //g_pCore->GetConsole ()->Printf ( "* addAnimation: %u %u", animGroup, animID );
-#endif
-        }
-    }*/
-}
-
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{   
+{
     CClientPed * pPed = m_pPedManager->Get ( pClump, true );
     if ( pPed )
     {
         pPed->OnBlendAnimation ( animGroup, animID, fBlendDelta );
-    
-        /* DAMAGE SYNC
-        // Is this the local player?
-        if ( pPed == m_pLocalPlayer )
-        {
-            // Is this a damage animation?
-            if ( CClientAnimation::IsDamageAnimation ( animGroup, animID ) )
-            {
-                // Notify the server
-                SendDamagePacket ( animGroup, animID, true );
-            }
-#ifdef MTA_DEBUG
-            //g_pCore->GetConsole ()->Printf ( "* blendAnimation: %u %u", animGroup, animID );
-#endif
-        }
-        */
     }
 }
 
@@ -3330,11 +3279,29 @@ void CClientGame::DownloadFiles ( void )
 }
 
 
-bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEntity * pInflictor, float fDamage )
-{  
-    CPlayerPed * pGamePlayer = pPed->GetGamePlayer ();
+bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
+{
+    // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return true))
+    
+    // Grab some data from the event
+    CEntity * pInflictor = pEvent->GetInflictingEntity ();
     eWeaponType weaponUsed = pEvent->GetWeaponUsed ();
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
+    float fDamage = pEvent->GetDamageApplied ();
+
+    /* Causes too much desync right now
+    // Is this shotgun damage?
+    if ( weaponUsed == WEAPONTYPE_SHOTGUN || weaponUsed == WEAPONTYPE_SPAS12_SHOTGUN )
+    {
+        // Make the ped fall down
+        pEvent->MakePedFallDown ();
+    } */
+
+    // Grab the damaged ped
+    CClientPed* pDamagedPed = NULL;    
+    if ( pDamagePed )
+        pDamagedPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pDamagePed ), true, true );
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
@@ -3355,27 +3322,32 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
     }
 
     // Do we have a damaged ped?
-    if ( pPed )
+    if ( pDamagedPed )
     {
-        float fPreviousHealth = pPed->m_fHealth;
-        float fCurrentHealth = pGamePlayer->GetHealth ();
-        float fPreviousArmor = pPed->m_fArmor;
-        float fCurrentArmor = pGamePlayer->GetArmor ();
+        float fPreviousHealth = pDamagedPed->m_fHealth;
+        float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
+        float fPreviousArmor = pDamagedPed->m_fArmor;
+        float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
 
         // Is the damaged ped a player?
-        if ( pPed->GetType () == CCLIENTPLAYER )
+        if ( pDamagedPed->GetType () == CCLIENTPLAYER )
         {
-            CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pPed );
+            CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
 
             // Is this is a remote player?
-            if ( !pPed->IsLocalPlayer () )
+            if ( !pDamagedPed->IsLocalPlayer () )
             {  
                 // Don't allow GTA to start the choking task
                 if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN ||
                     weaponUsed == WEAPONTYPE_EXTINGUISHER )
                 {
                     return false;
-                }     
+                }
+
+                // Prevent remote players that are aiming to play hit-damage animations
+                // (Test for issue #4099: Player desync caused by 'hit by gun' animation)
+                if ( pDamagedPed->m_ulBeginTarget != 0 )
+                    return false;      
             }
 
             // Do we have an inflicting player?
@@ -3406,22 +3378,20 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
             Arguments.PushNumber ( fDamage );
 
             // Call our event
-            if ( ( IS_PLAYER(pPed) && !pPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER(pPed) && !pPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
+            if ( ( IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
             {
                 // Stop here if they cancelEvent it
-                pGamePlayer->SetHealth ( fPreviousHealth );
-                pGamePlayer->SetArmor ( fPreviousArmor );
+                pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
+                pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
                 return false;
             }
-            
-            // Is it the local player?
-            if ( pPed->IsLocalPlayer () )
-            {  
-                // Update our stored health/armor
-                // (We dont update remote players health here, just from sync)
-                pPed->m_fHealth = fCurrentHealth;
-                pPed->m_fArmor = fCurrentArmor;
 
+            // Update our stored health/armor
+            pDamagedPed->m_fHealth = fCurrentHealth;
+            pDamagedPed->m_fArmor = fCurrentArmor;
+            // Is it the local player?
+            if ( pDamagedPed->IsLocalPlayer () )
+            {  
                 // Update our stored damage stuff
                 m_ucDamageWeapon = static_cast < unsigned char > ( weaponUsed );
                 m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
@@ -3431,22 +3401,22 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
                 if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
                 m_bDamageSent = false;
             }
-            if ( pPed->GetType () == CCLIENTPED )
+            if ( pDamagedPed->GetType () == CCLIENTPED )
             {   
                 // Update our stored health/armor (Fixes #4353)
-                pPed->m_fHealth = fCurrentHealth;
-                pPed->m_fArmor = fCurrentArmor;
+                pDamagedPed->m_fHealth = fCurrentHealth;
+                pDamagedPed->m_fArmor = fCurrentArmor;
             }
             // Does this damage kill the player?
             if ( fCurrentHealth == 0.0f )
             {                
-                if ( pPed->GetType () == CCLIENTPLAYER )
+                if ( pDamagedPed->GetType () == CCLIENTPLAYER )
                 {                
                     // Is the local player dying?
-                    if ( pPed->IsLocalPlayer () && fPreviousHealth > 0.0f )
+                    if ( pDamagedPed->IsLocalPlayer () && fPreviousHealth > 0.0f )
                     {
                         // Grab our death animation
-                        pEvent->ComputeDeathAnim ( pGamePlayer, true );
+                        pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
 
@@ -3455,98 +3425,39 @@ bool CClientGame::HandleDamage ( CClientPed * pPed, CEventDamage * pEvent, CEnti
                     }
 
                     // Allow GTA to kill us if we've fell to our death
-                    if ( pPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL )
+                    if ( pDamagedPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL )
                         return true;
                     
                     // Don't let GTA start the death task
                     return false;            
                 }
-                else
-                {
-                    if ( pPed->IsLocalEntity () && fPreviousHealth > 0.0f )
-                    {
-                        pPed->CallEvent ( "onClientPedWasted", Arguments, true );
-                        pEvent->ComputeDeathAnim ( pGamePlayer, true );
+                else {
+                    if (pDamagedPed->IsLocalEntity() && fPreviousHealth > 0.0f) {
+                        pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
+                        pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
-                        pPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
+                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
                         return true;
                     }
-                    if ( fPreviousHealth > 0.0f )
-                    {
+                    if (fPreviousHealth > 0.0f) {
                         // Grab our death animation
-                        pEvent->ComputeDeathAnim ( pGamePlayer, true );
+                        pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
                         m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
-                        if ( pInflictingEntity )
+                        if (pInflictingEntity)
                             m_DamagerID = pInflictingEntity->GetID ();
-
                         // Check if we're dead
-                        SendPedWastedPacket ( pPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
+                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
                     }
                 }
             }
         }
-        /* DAMAGE SYNC
-        // Is this a remote player
-        if ( pPed->GetType () == CCLIENTPLAYER && !pPed->IsLocalPlayer () )
-        {
-            // Dont allow the damage
-            return false;
-        }
-        */
-    }
+    }       
 
     // Allow the damage to register
-    return true;
-}
-
-bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
-{
-    // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return true))
-    
-    // Grab the damaged ped
-    CClientPed* pPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pDamagePed ), true, true );
-    if ( pPed )
-    {
-        // Grab some data from the event
-        CEntity * pInflictor = pEvent->GetInflictingEntity ();        
-        float fDamage = pEvent->GetDamageApplied ();
-
-        /* Causes too much desync right now
-        // Is this shotgun damage?
-        if ( weaponUsed == WEAPONTYPE_SHOTGUN || weaponUsed == WEAPONTYPE_SPAS12_SHOTGUN )
-        {
-            // Make the ped fall down
-            pEvent->MakePedFallDown ();
-        } */
-
-        return HandleDamage ( pPed, pEvent, pInflictor, fDamage );
-    }
-    return true;
-}
-
-
-bool CClientGame::FireDamageHandler ( CPed* pDamagePed )
-{
-    // Grab the damaged ped
-    CClientPed* pPed = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pDamagePed ), true, true );
-    if ( pPed )
-    {
-        CFire * pFire = pDamagePed->GetFire ();
-        if ( pFire )
-        {
-            CEntity * pCreator = pFire->GetCreator ();
-            float fDamage = pPed->m_fHealth - pDamagePed->GetHealth ();
-            CEventDamage * pEvent = g_pGame->GetEventList ()->CreateEventDamage ( pDamagePed, 0, WEAPONTYPE_FLAMETHROWER, PED_PIECE_UNKNOWN, 0, false, false );
-            bool bContinue = HandleDamage ( pPed, pEvent, pCreator, fDamage );
-            pEvent->Destroy ( true );
-            return bContinue;
-        }
-    }
-
     return true;
 }
 
@@ -4184,7 +4095,41 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
+void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
+{
+    if ( Ped && Ped->GetHealth () == 0.0f )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            // Write some death info
+            pBitStream->Write ( animGroup );
+            pBitStream->Write ( animID );
 
+            pBitStream->Write ( damagerID );
+            pBitStream->Write ( ucWeapon );
+            pBitStream->Write ( ucBodyPiece );
+
+            // Write the position we died in
+            CVector vecPosition;
+            Ped->GetPosition ( vecPosition );
+            pBitStream->Write ( vecPosition.fX );
+            pBitStream->Write ( vecPosition.fY );
+            pBitStream->Write ( vecPosition.fZ );
+
+            // The ammo in our weapon and write the ammo total
+            CWeapon* pPlayerWeapon = Ped->GetWeapon();
+            unsigned short usAmmo = 0;
+            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
+            pBitStream->Write ( usAmmo );
+
+            pBitStream->Write ( Ped->GetID() );
+            // Send the packet
+            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+        }
+    }
+}
 
 void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
@@ -4222,61 +4167,6 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
-    }
-}
-
-
-void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
-{
-    if ( Ped && Ped->GetHealth () == 0.0f )
-    {
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            // Write some death info
-            pBitStream->Write ( animGroup );
-            pBitStream->Write ( animID );
-
-            pBitStream->Write ( damagerID );
-            pBitStream->Write ( ucWeapon );
-            pBitStream->Write ( ucBodyPiece );
-
-            // Write the position we died in
-            CVector vecPosition;
-            Ped->GetPosition ( vecPosition );
-            pBitStream->Write ( vecPosition.fX );
-            pBitStream->Write ( vecPosition.fY );
-            pBitStream->Write ( vecPosition.fZ );
-
-            // The ammo in our weapon and write the ammo total
-            CWeapon* pPlayerWeapon = Ped->GetWeapon();
-            unsigned short usAmmo = 0;
-            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
-            pBitStream->Write ( usAmmo );
-
-            pBitStream->Write ( Ped->GetID() );
-            // Send the packet
-            g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
-    }
-}
-
-
-void CClientGame::SendDamagePacket ( AssocGroupId animGroup, AnimationId animId, bool bBlend )
-{
-#ifdef MTA_DEBUG
-    g_pCore->GetConsole ()->Printf ( "* SendDamagePacket_%s %u %u", ( bBlend ) ? "Blend":"Add", animGroup, animId );
-#endif
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-    if ( pBitStream )
-    {        
-        pBitStream->Write ( ( unsigned char ) animGroup );
-        pBitStream->Write ( ( unsigned char ) animId );
-        pBitStream->WriteBit ( bBlend );
-
-        g_pNet->SendPacket ( PACKET_ID_PLAYER_DAMAGE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-        g_pNet->DeallocateNetBitStream ( pBitStream );
     }
 }
 

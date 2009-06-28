@@ -181,6 +181,12 @@ bool CGameSA::IsInForeground ()
     return *VAR_IsForegroundWindow;
 }
 
+CEventDamage * CGameSA::GetEventDamage ( CEventDamageSAInterface * pInterface )
+{
+    // This must be destroyed later
+    return new CEventDamageSA ( pInterface );
+}
+
 CModelInfo	* CGameSA::GetModelInfo(DWORD dwModelID )
 { 
 	DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");

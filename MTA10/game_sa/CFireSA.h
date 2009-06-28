@@ -26,7 +26,7 @@
 
 class FxSystem_c; // we don't actually define this anywhere
 
-class CFireSAInterface
+class CFireSAInterface : public CFireInterface
 {
 public:
 	BYTE					bActive:1;
@@ -70,7 +70,7 @@ public:
 	FLOAT					GetStrength (  );
 	VOID					SetStrength ( FLOAT fStrength );
     VOID                    SetNumGenerationsAllowed ( char generations );
-    inline CFireSAInterface*  GetInterface ( ) { return this->internalInterface; }
+    inline CFireInterface*  GetInterface ( ) { return this->internalInterface; }
 };
 
 #endif

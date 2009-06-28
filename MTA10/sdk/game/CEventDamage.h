@@ -25,7 +25,7 @@ class CEventDamage
 public:
     virtual CEventDamageSAInterface *   GetInterface        ( void ) = 0;
 
-    virtual void                        Destroy             ( bool bDestroyInterface ) = 0;
+    virtual void                        Destroy             ( void ) = 0;
 
     // Flag accessors
     virtual bool                        DidPedFallDown      ( void ) = 0;
@@ -44,9 +44,7 @@ public:
     virtual float                       GetDamageApplied    ( void ) = 0;
     virtual AssocGroupId                GetAnimGroup        ( void ) = 0;
     virtual AnimationId                 GetAnimId           ( void ) = 0;
-    virtual bool                        GetAnimAdded        ( void ) = 0;
     virtual void                        ComputeDeathAnim    ( CPed * pPed, bool bUnk ) = 0;
-    virtual void                        ComputeDamageAnim   ( CPed * pPed, bool bUnk ) = 0;
 };
 
 #endif

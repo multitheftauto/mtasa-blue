@@ -330,10 +330,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\animation.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CMultiplayerSA.cpp"
 				>
 			</File>
@@ -347,10 +343,6 @@
 			</File>
 			<File
 				RelativePath=".\CRemoteDataSA.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\damage_events.cpp"
 				>
 			</File>
 			<File

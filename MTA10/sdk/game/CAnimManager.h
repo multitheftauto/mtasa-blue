@@ -34,8 +34,6 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchySAInterface;
 class CAnimBlockSAInterface;
 
-#include "../../sdk/game/CAnimBlendAssocGroup.h"
-
 class CAnimManager
 {
     friend CAnimBlendAssociation;

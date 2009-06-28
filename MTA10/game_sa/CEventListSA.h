@@ -16,10 +16,9 @@
 #include <game/CEventList.h>
 #include "CEventSA.h"
 
-#define FUNC_ClearEvent				        0x489F50
-#define FUNC_FindClosestEvent		        0x489E70
-#define FUNC_GetEvent				        0x489F70
-#define FUNC_CEventDamage_CEventDamage      0x4ad830
+#define FUNC_ClearEvent				0x489F50
+#define FUNC_FindClosestEvent		0x489E70
+#define FUNC_GetEvent				0x489F70
 
 #define ARRAY_CEvent				0x7DAAB8
 
@@ -30,9 +29,6 @@ class CEventListSA : public CEventList
 	CEvent			* FindClosestEvent ( eEventType eventtype, CVector * vecPosition );
 	CEvent			* GetEvent ( DWORD ID );
 	CEvent			* GetEvent ( eEventType eventtype );
-
-    CEventDamage    * GetEventDamage ( CEventDamageSAInterface * pInterface );
-    CEventDamage    * CreateEventDamage ( CEntity * pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4 );
 };
 
 #endif

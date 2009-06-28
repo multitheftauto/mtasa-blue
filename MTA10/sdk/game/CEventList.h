@@ -16,18 +16,12 @@
 #include "CEvent.h"
 #include <CVector.h>
 
-class CEventDamage;
-class CEventDamageSAInterface;
-
 class CEventList
 {
 public:
     virtual CEvent			* FindClosestEvent ( eEventType eventtype, CVector * vecPosition ) = 0;
 	virtual CEvent			* GetEvent ( DWORD ID ) = 0;
 	virtual CEvent			* GetEvent ( eEventType eventtype ) = 0;
-
-    virtual CEventDamage    * GetEventDamage ( CEventDamageSAInterface * pInterface ) = 0;
-    virtual CEventDamage    * CreateEventDamage ( CEntity * pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4 ) = 0;
 };
 
 #endif

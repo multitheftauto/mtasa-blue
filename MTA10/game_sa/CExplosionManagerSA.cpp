@@ -37,9 +37,16 @@ CExplosionManagerSA::~CExplosionManagerSA()
 CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, CVector * vecPosition, CEntity * creator, bool bMakeSound, float fCamShake, bool bNoDamage )
 {
 	DEBUG_TRACE("CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, CVector * vecPosition, CEntity * creator = NULL)");
-	
+	CEntitySAInterface * entityInterface  = 0;
+	DWORD dwFunction = FUNC_AddExplosion;
 	CExplosion * explosion = CExplosionManagerSA::FindFreeExplosion();
 	BYTE bSuccess = 0;
+	if ( creator )
+	{
+		CEntitySA * vcEnt = dynamic_cast < CEntitySA* > ( creator );
+		if ( vcEnt )
+			entityInterface = vcEnt->GetInterface();
+	}
 
 	/*
 	static bool		AddExplosion(CEntity *pExplodingEntity, CEntity *pEntExplosionOwner, 
@@ -47,12 +54,10 @@ CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, C
 	unsigned char bMakeSound = true, float fCamShake=-1.0f, unsigned char noDamage=false);
 	*/
 
-    DWORD dwCreatorInterface = 0;
-    if ( creator ) dwCreatorInterface = ( DWORD ) creator->GetInterface ();
-    FLOAT fX = vecPosition->fX;
+	FLOAT fX = vecPosition->fX;
 	FLOAT fY = vecPosition->fY;
 	FLOAT fZ = vecPosition->fZ;
-    DWORD dwFunction = FUNC_AddExplosion;	
+
 	_asm
 	{
 		push	bNoDamage
@@ -63,7 +68,7 @@ CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, C
 		push	fY
 		push	fX
 		push	explosiontype
-		push	dwCreatorInterface
+		push	0
 		push	0
 
 		// OUR CALL

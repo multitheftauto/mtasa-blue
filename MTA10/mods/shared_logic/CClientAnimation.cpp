@@ -193,31 +193,6 @@ void CClientAnimation::BlendAnimation ( CAnimationItem * pAnim )
 }
 
 
-void CClientAnimation::AddAnimation ( AssocGroupId animGroup, AnimationId animID )
-{
-    RpClump * pClump = GetClump ();
-    if ( pClump )
-    {
-        g_pGame->GetAnimManager ()->AddAnimation ( pClump, animGroup, animID );
-    }
-}
-
-
-void CClientAnimation::BlendAnimation ( AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{
-    RpClump * pClump = GetClump ();
-    if ( pClump )
-    {
-        // Check we have an animation to blend with?
-        if ( g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( pClump ) )
-        {
-            g_pGame->GetAnimManager ()->BlendAnimation ( pClump, animGroup, animID, fBlendDelta );
-        }
-        else g_pGame->GetAnimManager ()->AddAnimation ( pClump, animGroup, animID );
-    }
-}
-
-
 bool CClientAnimation::BlendAnimation ( const char * szBlockName, const char * szName, float fSpeed, float fBlendSpeed, float fStartTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, CLuaMain * pMain, int iFunction, CLuaArguments * pArguments )
 {
     // Is this a valid block name?
@@ -372,22 +347,18 @@ void CClientAnimation::StaticBlendAssocFinish ( CAnimBlendAssociation * pAssoc, 
             // Call our lua callback function if we have one            
             if ( pAnim->luaMain ) pAnim->luaArguments.Call ( pAnim->luaMain, pAnim->luaFunction );
 
-            // Check our animations are still there
-            if ( !pElement->m_Animations.empty () )
+            // Is this our final animation?
+            if ( pAnim == pElement->m_Animations.back () )
             {
-                // Is this our final animation?
-                if ( pAnim == pElement->m_Animations.back () )
-                {
-                    // Set it as finished
-                    pAnim->finished = true;
-                    pAnim->assoc = NULL;
-                }
-                else
-                {
-                    // Remove this animation from the list now its finished
-                    pAnim->deleted = true;
-                    pElement->RemoveTrash ();
-                }
+                // Set it as finished
+                pAnim->finished = true;
+                pAnim->assoc = NULL;
+            }
+            else
+            {
+                // Remove this animation from the list now its finished
+                pAnim->deleted = true;
+                pElement->RemoveTrash ();
             }
 
             // Finish here as there should only be 1 match.            
@@ -484,22 +455,4 @@ void CClientAnimation::FindAndClear ( CAnimBlock * pBlock, const char * szName )
             }
         }
     }
-}
-
-
-bool CClientAnimation::IsDamageAnimation ( AssocGroupId animGroup, AnimationId animID )
-{
-    if ( animGroup == 0 ) // ped
-    {
-        if ( animID >= 15 && animID <= 20 ) return true; // shot
-        if ( animID >= 22 && animID <= 40 ) return true; // hit
-        if ( animID >= 112 && animID <= 115 ) return true; // getup
-        if ( animID >= 171 && animID <= 186 ) return true; // damage
-    }
-    else if ( animGroup >= 33 && animGroup <= 45 )
-    {
-        if ( animID >= 219 && animID <= 221 ) return true; // melee hit
-    }
-
-    return false;
 }
