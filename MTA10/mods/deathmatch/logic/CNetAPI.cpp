@@ -1098,6 +1098,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     SFloatAsByteSync armor ( 0.f, 100.f, true );
     BitStream.Read ( &armor );
     pPlayer->SetArmor ( armor.data.fValue );
+    pPlayer->LockArmor ( armor.data.fValue );
 
     // Vehicle flags
     unsigned char ucFlags;
@@ -1306,7 +1307,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
     // Player armor (scaled from 0.0f-100.0f to 0-250 to save three bytes)
     SFloatAsByteSync armor ( 0.f, 100.f, true );
-    armor.data.fValue = pPlayerModel->GetHealth ();
+    armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
 
     // Flags
