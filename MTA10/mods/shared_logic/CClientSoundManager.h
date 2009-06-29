@@ -6,6 +6,7 @@
 *  FILE:        mods/shared_logic/CClientSound.h
 *  PURPOSE:     Sound entity class header
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Marcus Bauer <mabako@gmail.com>
 *
 *****************************************************************************/
 
@@ -43,6 +44,8 @@ public:
     CClientSound*           Get                         ( ISound* pSound );
 
     virtual void            OnSoundStopped              ( ISound* sound, E_STOP_EVENT_CAUSE reason, void* pObj );
+
+    void                    UpdateVolume                ( void );
 
 private:
 

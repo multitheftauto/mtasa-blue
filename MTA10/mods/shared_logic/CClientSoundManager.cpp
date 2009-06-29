@@ -6,6 +6,7 @@
 *  FILE:        mods/shared_logic/CClientSound.h
 *  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Marcus Bauer <mabako@gmail.com>
 *
 *****************************************************************************/
 
@@ -35,6 +36,8 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 
     // Load plugins (mp3 in our case)
     m_pSoundEngine->loadPlugins ( CalcMTASAPath("\\MTA\\") );
+
+    UpdateVolume ();
 }
 
 CClientSoundManager::~CClientSoundManager ( void )
@@ -50,6 +53,8 @@ CClientSoundManager::~CClientSoundManager ( void )
 
 void CClientSoundManager::DoPulse ( void )
 {
+    UpdateVolume ();
+
     CClientCamera* pCamera = m_pClientManager->GetCamera();
 
     CVector vecPosition, vecLookAt;
@@ -152,4 +157,23 @@ void CClientSoundManager::OnSoundStopped ( ISound* sound, E_STOP_EVENT_CAUSE rea
         g_pClientGame->GetElementDeleter()->Delete ( pSound );
         RemoveFromList ( pSound );
     }
+}
+
+void CClientSoundManager::UpdateVolume ( )
+{
+    // set our master sound volume if the cvar changed
+    float fValue = 0.0f;
+    if( g_pCore->GetCVars ()->Get ( "mtavolume", fValue ) )
+    {
+        if ( fValue == m_pSoundEngine->getSoundVolume () )
+            return;
+
+        fValue = max( 0.0f, min( 1.0f, fValue ) );
+    }
+    else
+    {
+        fValue = 1.0f;
+    }
+
+    m_pSoundEngine->setSoundVolume( fValue );
 }

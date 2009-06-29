@@ -10,6 +10,7 @@
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Marcus Bauer <mabako@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -361,14 +362,18 @@ CSettings::CSettings ( void )
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
 
-    /*m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
+    m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
-	m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
-    //Not used
+    m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
+
+    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
+    m_pLabelMTAVolumeValue->AutoSize ( "100%" );
+
     m_pAudioMTAVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
-    m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );*/
+    m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
 
 	/**
 	 *	Video tab
@@ -585,6 +590,7 @@ CSettings::CSettings ( void )
     m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
     m_pAudioSFXVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnSFXVolumeChanged, this ) );
+    m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1585,6 +1591,9 @@ void CSettings::LoadData ( void )
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
     m_pAudioRadioVolume->SetScrollPosition ( (float)gameSettings->GetRadioVolume() / 64.0f );
     m_pAudioSFXVolume->SetScrollPosition ( (float)gameSettings->GetSFXVolume() / 64.0f );
+    float fVar = 0.0f;
+    CVARS_GET ( "mtavolume", fVar );
+    m_pAudioMTAVolume->SetScrollPosition ( max( 0.0f, min( 1.0f, fVar ) ) );
     // Video
 
     VideoMode           vidModemInfo;
@@ -1637,7 +1646,7 @@ void CSettings::LoadData ( void )
     if (iVar >= 0 && iVar<= 255)
     {
         int iAlphaPercent = ceil( ( (float)iVar / 255 ) * 100 );
-        m_pMapAlphaValueLabel->SetText ( SString("%i %s", iAlphaPercent, "%").c_str() );
+        m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
         float sbPos = (float)iAlphaPercent / 100.0f;
         m_pMapAlpha->SetScrollPosition ( sbPos );
     }
@@ -1736,6 +1745,7 @@ void CSettings::SaveData ( void )
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
     gameSettings->SetRadioVolume ( ( unsigned char )( m_pAudioRadioVolume->GetScrollPosition() * 64.0f ) );
     gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetScrollPosition() * 64.0f ) );
+    CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
 
 
     // Video
@@ -2097,8 +2107,7 @@ bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 {
     int iAlpha = ( m_pMapAlpha->GetScrollPosition () ) * 100;
 
-    m_pMapAlphaValueLabel->SetText ( SString("%i %s", iAlpha, "%").c_str() );
-    m_pMapAlphaValueLabel->AutoSize ( SString("%i %s", iAlpha, "%").c_str() );
+    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlpha).c_str() );
     return true;
 }
 
@@ -2106,7 +2115,6 @@ bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
 {
     int iVolume = (float)m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
     m_pLabelRadioVolumeValue->SetText ( SString("%i", iVolume).c_str() );
-    m_pLabelRadioVolumeValue->AutoSize ( SString("%i", iVolume, "%").c_str() );
     return true;
 }
 
@@ -2114,7 +2122,13 @@ bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
 {
     int iVolume = (float)m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
     m_pLabelSFXVolumeValue->SetText ( SString("%i", iVolume).c_str() );
-    m_pLabelSFXVolumeValue->AutoSize ( SString("%i", iVolume, "%").c_str() );
+    return true;
+}
+
+bool CSettings::OnMTAVolumeChanged ( CGUIElement* pElement)
+{
+    int iVolume = (float)m_pAudioMTAVolume->GetScrollPosition () * 100.0f;
+    m_pLabelMTAVolumeValue->SetText ( SString("%i%%", iVolume).c_str() );
     return true;
 }
 
