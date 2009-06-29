@@ -221,7 +221,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
 
             // Player health
-            SFloatAsByteSync health ( 0.f, 100.f, true );
+            SFloatAsByteSync health ( 0.f, 200.0f, true );
             if ( !BitStream.Read ( &health ) )
                 return false;
             float fHealth = health.data.fValue;
@@ -395,7 +395,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
 
             // Player health and armor
-            SFloatAsByteSync health ( 0.f, 100.f, true );
+            SFloatAsByteSync health ( 0.f, 200.f, true );
             health.data.fValue = pSourcePlayer->GetHealth ();
             BitStream.Write ( &health );
 

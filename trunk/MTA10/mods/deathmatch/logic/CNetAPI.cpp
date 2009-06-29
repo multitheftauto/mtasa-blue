@@ -746,19 +746,17 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
             pPlayer->SetMoveSpeed ( velocity.data.vecVelocity );
     }
 
-    // Health
-    unsigned char ucHealth;
-    BitStream.Read ( ucHealth );
-    float fHealth = static_cast < float > ( ucHealth ) / 1.25f;    
-    pPlayer->SetHealth ( fHealth );
-    pPlayer->LockHealth ( fHealth );
+    // Player health
+    SFloatAsByteSync health ( 0.f, 200.f, true );
+    BitStream.Read ( &health );
+    pPlayer->SetHealth ( health.data.fValue );
+    pPlayer->LockHealth ( health.data.fValue );
 
-    // Armor
-    unsigned char ucArmor;
-    BitStream.Read ( ucArmor );
-    float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
-	pPlayer->SetArmor ( fArmor );
-    pPlayer->LockArmor ( fArmor );
+    // Player armor
+    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    BitStream.Read ( &armor );
+    pPlayer->SetArmor ( armor.data.fValue );
+    pPlayer->LockArmor ( armor.data.fValue );
 
     // Read out the camera rotation
     float fCameraRotation;
@@ -937,17 +935,16 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
         BitStream.Write ( &velocity );
     }
 
-    // Health (scaled from 0.0f-100.0f to 0-250 to save three bytes)
-    float fHealth = pPlayerModel->GetHealth ();
-    unsigned char ucHealth = static_cast < unsigned char > ( 1.25f * fHealth );
-    // Make sure its atleast 1 if we aren't quite dead
-    if ( ucHealth == 0 && fHealth > 0.0f )
-        ucHealth = 1;
-    BitStream.Write ( ucHealth );
+    // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
+    // Scale goes up to 200.0f because having max stats gives you the double of health.
+    SFloatAsByteSync health ( 0.f, 200.0f, true );
+    health.data.fValue = pPlayerModel->GetHealth ();
+    BitStream.Write ( &health );
 
-    // Armor (scaled from 0.0f-100.0f to 0-250 to save three bytes)
-    unsigned char ucArmor = static_cast < unsigned char > ( 1.25f * pPlayerModel->GetArmor () );
-    BitStream.Write ( ucArmor );
+    // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
+    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    armor.data.fValue = pPlayerModel->GetArmor ();
+    BitStream.Write ( &armor );
 
     // Write the camera rotation
     BitStream.Write ( g_pGame->GetCamera ()->GetCameraRotation () );
@@ -1089,7 +1086,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     }
 
     // Player health
-    SFloatAsByteSync health ( 0.f, 100.f, true );
+    SFloatAsByteSync health ( 0.f, 200.f, true );
     BitStream.Read ( &health );
     pPlayer->SetHealth ( health.data.fValue );
     pPlayer->LockHealth ( health.data.fValue );
@@ -1301,11 +1298,13 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.WriteCompressed ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
     }
 
-    SFloatAsByteSync health ( 0.f, 100.f, true );
+    // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
+    // Scale goes up to 200.0f because having max stats gives you the double of health.
+    SFloatAsByteSync health ( 0.f, 200.0f, true );
     health.data.fValue = pPlayerModel->GetHealth ();
     BitStream.Write ( &health );
 
-    // Player armor (scaled from 0.0f-100.0f to 0-250 to save three bytes)
+    // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
     SFloatAsByteSync armor ( 0.f, 100.f, true );
     armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
