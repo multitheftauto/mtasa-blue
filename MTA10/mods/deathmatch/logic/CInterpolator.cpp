@@ -96,11 +96,13 @@ bool CInterpolator::Evaluate(unsigned long ulTime, CVector &Vec )
     return Eval ( *m_vecVecList[iLeft], *m_vecVecList[iRight],ulTime, Vec);
 }
 
-// L should be later than R
+
 bool CInterpolator::Eval(VecMap L, VecMap R, unsigned long ulTimeEval, CVector &Vec )
 {
-    // Check for being the same or maybe wrap around
-    if ( R.m_ulTimeStamp >= L.m_ulTimeStamp )
+    float fA = float ( R.m_ulTimeStamp - ulTimeEval );
+    float fB = float ( R.m_ulTimeStamp - L.m_ulTimeStamp );
+    // Jax: not sure why these are both 0 sometimes, but 0/0 = corrupt time
+    if ( fA == 0.0f && fB == 0.0f )
     {
         Vec.fX = L.m_fX;
         Vec.fY = L.m_fY;
@@ -108,13 +110,20 @@ bool CInterpolator::Eval(VecMap L, VecMap R, unsigned long ulTimeEval, CVector &
         return true;
     }
 
-    // Find the relative position of ulTimeEval between R.m_ulTimeStamp and L.m_ulTimeStamp
-    float fAlpha = Unlerp ( R.m_ulTimeStamp, ulTimeEval, L.m_ulTimeStamp );
+    float fTime = fA / fB;    
+    if ( fTime != 0.0f )
+    {        
+        Vec.fX = ( ( R.m_fX - L.m_fX ) * fTime ) + L.m_fX;
+        Vec.fY = ( ( R.m_fY - L.m_fY ) * fTime ) + L.m_fY;
+        Vec.fZ = ( ( R.m_fZ - L.m_fZ ) * fTime ) + L.m_fZ;
+    }
+    else
+    {
+        Vec.fX = L.m_fX;
+        Vec.fY = L.m_fY;
+        Vec.fZ = L.m_fZ;
+    }
 
-    // Lerp between R.pos and L.pos
-    Vec.fX = Lerp ( R.m_fX, fAlpha, L.m_fX );
-    Vec.fY = Lerp ( R.m_fY, fAlpha, L.m_fY );
-    Vec.fZ = Lerp ( R.m_fZ, fAlpha, L.m_fZ );
     return true;
 }
 
