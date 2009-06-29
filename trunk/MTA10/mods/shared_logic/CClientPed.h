@@ -207,6 +207,8 @@ public:
     void                        LockArmor                   ( float fArmor );
     inline void                 UnlockHealth                ( void )                                    { m_bHealthLocked = false; };
     inline void                 UnlockArmor                 ( void )                                    { m_bArmorLocked = false; };
+    inline bool                 IsHealthLocked              ( void ) const                              { return m_bHealthLocked; };
+    inline bool                 IsArmorLocked               ( void ) const                              { return m_bArmorLocked; };
 
     bool                        IsDying                     ( void );
     bool                        IsDead                      ( void );
