@@ -1958,6 +1958,7 @@ void CClientVehicle::Create ( void )
 
         // Got any settings to restore?
         m_pVehicle->SetMatrix ( &m_Matrix );
+        m_matFrozen = m_Matrix;
         m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
         m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
         m_pVehicle->SetVisible ( m_bVisible );
