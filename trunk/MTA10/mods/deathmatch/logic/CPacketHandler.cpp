@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SyncStructures.h"
 
 using std::list;
 
@@ -1268,24 +1269,35 @@ void CPacketHandler::Packet_VehicleDamageSync ( NetBitStreamInterface& bitStream
 {
     // Read out the vehicle id and the damage sync model
     ElementID ID;
-    unsigned char ucDoorStates [MAX_DOORS];
-    unsigned char ucWheelStates [MAX_WHEELS];
-    unsigned char ucPanelStates [MAX_PANELS];
-    unsigned char ucLightStates [MAX_LIGHTS];
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( (char*) ucDoorStates, MAX_DOORS ) &&
-         bitStream.Read ( (char*) ucWheelStates, MAX_WHEELS ) &&
-         bitStream.Read ( (char*) ucPanelStates, MAX_PANELS ) &&
-         bitStream.Read ( (char*) ucLightStates, MAX_LIGHTS ) )
+    SVehicleDamageSync damage ( true, true, true, true, true );
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &damage ) )
     {
         // Grab the vehicle
         CDeathmatchVehicle* pVehicle = static_cast < CDeathmatchVehicle* > ( g_pClientGame->m_pVehicleManager->Get ( ID ) );
         if ( pVehicle )
         {
-            for ( int i = 0 ; i < MAX_DOORS ; i++ ) pVehicle->SetDoorStatus ( i, ucDoorStates [ i ] );
-            for ( int i = 0 ; i < MAX_WHEELS ; i++ ) pVehicle->SetWheelStatus ( i, ucWheelStates [ i ], false );
-            for ( int i = 0 ; i < MAX_PANELS ; i++ ) pVehicle->SetPanelStatus ( i, ucPanelStates [ i ] );
-            for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) pVehicle->SetLightStatus ( i, ucLightStates [ i ] );
+            for ( unsigned int i = 0 ; i < MAX_DOORS ; ++i )
+            {
+                if ( damage.data.bDoorStatesChanged [ i ] )
+                    pVehicle->SetDoorStatus ( i, damage.data.ucDoorStates [ i ] );
+            }
+            for ( unsigned int i = 0 ; i < MAX_WHEELS ; ++i )
+            {
+                if ( damage.data.bWheelStatesChanged [ i ] )
+                    pVehicle->SetWheelStatus ( i, damage.data.ucWheelStates [ i ] );
+            }
+            for ( unsigned int i = 0 ; i < MAX_PANELS ; ++i )
+            {
+                if ( damage.data.bPanelStatesChanged [ i ] )
+                    pVehicle->SetPanelStatus ( i, damage.data.ucPanelStates [ i ] );
+            }
+            for ( unsigned int i = 0 ; i < MAX_LIGHTS ; ++i )
+            {
+                if ( damage.data.bLightStatesChanged [ i ] )
+                    pVehicle->SetLightStatus ( i, damage.data.ucLightStates [ i ] );
+            }
 
             pVehicle->ResetDamageModelSync ();
         }
@@ -2333,14 +2345,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
 
                     // Read out the vehicle damage sync model
-                    unsigned char ucDoorStates [MAX_DOORS];
-                    unsigned char ucWheelStates [MAX_WHEELS];
-                    unsigned char ucPanelStates [MAX_PANELS];
-                    unsigned char ucLightStates [MAX_LIGHTS];
-                    if ( !bitStream.Read ( (char*) ucDoorStates, MAX_DOORS ) ||
-                         !bitStream.Read ( (char*) ucWheelStates, MAX_WHEELS ) ||
-                         !bitStream.Read ( (char*) ucPanelStates, MAX_PANELS ) ||
-                         !bitStream.Read ( (char*) ucLightStates, MAX_LIGHTS ) )
+                    SVehicleDamageSync damage ( true, true, true, true, false );
+                    if ( !bitStream.Read ( &damage ) )
                     {
                         RaiseProtocolError ( 42 );
                         return;
@@ -2362,10 +2368,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
 
                     // Setup our damage model
-                    for ( int i = 0 ; i < MAX_DOORS ; i++ ) pVehicle->SetDoorStatus ( i, ucDoorStates [ i ] );
-                    for ( int i = 0 ; i < MAX_WHEELS ; i++ ) pVehicle->SetWheelStatus ( i, ucWheelStates [ i ] );
-                    for ( int i = 0 ; i < MAX_PANELS ; i++ ) pVehicle->SetPanelStatus ( i, ucPanelStates [ i ] );
-                    for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) pVehicle->SetLightStatus ( i, ucLightStates [ i ] );
+                    for ( int i = 0 ; i < MAX_DOORS ; i++ ) pVehicle->SetDoorStatus ( i, damage.data.ucDoorStates [ i ] );
+                    for ( int i = 0 ; i < MAX_WHEELS ; i++ ) pVehicle->SetWheelStatus ( i, damage.data.ucWheelStates [ i ] );
+                    for ( int i = 0 ; i < MAX_PANELS ; i++ ) pVehicle->SetPanelStatus ( i, damage.data.ucPanelStates [ i ] );
+                    for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) pVehicle->SetLightStatus ( i, damage.data.ucLightStates [ i ] );
                     pVehicle->ResetDamageModelSync ();
 
                     // If the vehicle has a turret, read out its position
