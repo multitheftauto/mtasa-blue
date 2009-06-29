@@ -1477,6 +1477,12 @@ bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
     m_pWindow->SetVisible ( false );
     pMainMenu->m_bIsInSubWindow = false;
 
+    // restore old audio settings
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    gameSettings->SetRadioVolume ( m_ucOldRadioVolume );
+    gameSettings->SetSFXVolume ( m_ucOldSFXVolume );
+    CVARS_SET ( "mtavolume", m_fOldMTAVolume );
+
     return true;
 }
 
@@ -1589,11 +1595,15 @@ void CSettings::LoadData ( void )
 
     // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    m_pAudioRadioVolume->SetScrollPosition ( (float)gameSettings->GetRadioVolume() / 64.0f );
-    m_pAudioSFXVolume->SetScrollPosition ( (float)gameSettings->GetSFXVolume() / 64.0f );
-    float fVar = 0.0f;
-    CVARS_GET ( "mtavolume", fVar );
-    m_pAudioMTAVolume->SetScrollPosition ( max( 0.0f, min( 1.0f, fVar ) ) );
+
+    m_ucOldRadioVolume = gameSettings->GetRadioVolume();
+    m_pAudioRadioVolume->SetScrollPosition ( (float)m_ucOldRadioVolume / 64.0f );
+    m_ucOldSFXVolume = gameSettings->GetSFXVolume();
+    m_pAudioSFXVolume->SetScrollPosition ( (float)m_ucOldSFXVolume / 64.0f );
+    
+    CVARS_GET ( "mtavolume", m_fOldMTAVolume );
+    m_fOldMTAVolume = max( 0.0f, min( 1.0f, m_fOldMTAVolume ) );
+    m_pAudioMTAVolume->SetScrollPosition ( m_fOldMTAVolume );
 
     // Video
     int nextVideoMode;
@@ -1743,12 +1753,6 @@ void CSettings::SaveData ( void )
 
     CCore::GetSingleton ().SaveConfig ();
 
-    // Audio
-    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-    gameSettings->SetRadioVolume ( ( unsigned char )( m_pAudioRadioVolume->GetScrollPosition() * 64.0f ) );
-    gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetScrollPosition() * 64.0f ) );
-    CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
-
     // Video
     // get current
     int iNextVidMode;
@@ -1764,6 +1768,7 @@ void CSettings::SaveData ( void )
     if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed ) )
         CCore::GetSingleton ().ShowMessageBox ( "Information", "Resolution will be changed when you next start MTA", MB_BUTTON_OK | MB_ICON_INFO );
 
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
 
     // Map alpha
@@ -2110,22 +2115,29 @@ bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 
 bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
 {
-    int iVolume = (float)m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
-    m_pLabelRadioVolumeValue->SetText ( SString("%i", iVolume).c_str() );
-    return true;
+    unsigned char ucVolume = m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
+    m_pLabelRadioVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    gameSettings->SetRadioVolume ( ucVolume );    return true;
 }
 
 bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
 {
-    int iVolume = (float)m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
-    m_pLabelSFXVolumeValue->SetText ( SString("%i", iVolume).c_str() );
+    unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
+    m_pLabelSFXVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    gameSettings->SetSFXVolume ( ucVolume );
     return true;
 }
 
 bool CSettings::OnMTAVolumeChanged ( CGUIElement* pElement)
 {
-    int iVolume = (float)m_pAudioMTAVolume->GetScrollPosition () * 100.0f;
+    int iVolume = m_pAudioMTAVolume->GetScrollPosition () * 100.0f;
     m_pLabelMTAVolumeValue->SetText ( SString("%i%%", iVolume).c_str() );
+    
+    CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
     return true;
 }
 
