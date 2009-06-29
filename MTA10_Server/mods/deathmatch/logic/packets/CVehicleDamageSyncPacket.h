@@ -16,10 +16,13 @@
 
 #include "CPacket.h"
 #include "../CVehicle.h"
+#include "net/SyncStructures.h"
 
 class CVehicleDamageSyncPacket : public CPacket
 {
 public:
+                                    CVehicleDamageSyncPacket    ( );
+
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_VEHICLE_DAMAGE_SYNC; };
     inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
@@ -27,10 +30,7 @@ public:
     bool                            Write                       ( NetBitStreamInterface& BitStream ) const;
 
     ElementID                       m_Vehicle;
-    unsigned char                   m_ucDoorStates [MAX_DOORS];
-    unsigned char                   m_ucWheelStates [MAX_WHEELS];
-    unsigned char                   m_ucPanelStates [MAX_PANELS];
-    unsigned char                   m_ucLightStates [MAX_LIGHTS];
+    SVehicleDamageSync              m_damage;
 };
 
 #endif

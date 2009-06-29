@@ -1528,10 +1528,26 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
             if ( pVehicle->GetSyncer () == pPlayer || pVehicle->GetOccupant ( 0 ) == pPlayer )
             {
                 // Set the new damage model
-                memcpy ( pVehicle->m_ucDoorStates, Packet.m_ucDoorStates, MAX_DOORS );
-                memcpy ( pVehicle->m_ucWheelStates, Packet.m_ucWheelStates, MAX_WHEELS );
-                memcpy ( pVehicle->m_ucPanelStates, Packet.m_ucPanelStates, MAX_PANELS );
-                memcpy ( pVehicle->m_ucLightStates, Packet.m_ucLightStates, MAX_LIGHTS );
+                for ( unsigned int i = 0; i < MAX_DOORS; ++i )
+                {
+                    if ( Packet.m_damage.data.bDoorStatesChanged [ i ] )
+                        pVehicle->m_ucDoorStates [ i ] = Packet.m_damage.data.ucDoorStates [ i ];
+                }
+                for ( unsigned int i = 0; i < MAX_WHEELS; ++i )
+                {
+                    if ( Packet.m_damage.data.bWheelStatesChanged [ i ] )
+                        pVehicle->m_ucWheelStates [ i ] = Packet.m_damage.data.ucWheelStates [ i ];
+                }
+                for ( unsigned int i = 0; i < MAX_PANELS; ++i )
+                {
+                    if ( Packet.m_damage.data.bPanelStatesChanged [ i ] )
+                        pVehicle->m_ucPanelStates [ i ] = Packet.m_damage.data.ucPanelStates [ i ];
+                }
+                for ( unsigned int i = 0; i < MAX_LIGHTS; ++i )
+                {
+                    if ( Packet.m_damage.data.bLightStatesChanged [ i ] )
+                        pVehicle->m_ucLightStates [ i ] = Packet.m_damage.data.ucLightStates [ i ];
+                }
 
                 // Broadcast the packet to everyone
                 m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );

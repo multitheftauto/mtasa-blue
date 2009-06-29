@@ -13,23 +13,22 @@
 
 #include "StdInc.h"
 
+CVehicleDamageSyncPacket::CVehicleDamageSyncPacket ()
+: m_damage ( true, true, true, true, true )
+{
+}
+
 bool CVehicleDamageSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    return ( BitStream.Read ( m_Vehicle ) &&
-             BitStream.Read ( (char*) m_ucDoorStates, MAX_DOORS ) &&
-             BitStream.Read ( (char*) m_ucWheelStates, MAX_WHEELS ) &&
-             BitStream.Read ( (char*) m_ucPanelStates, MAX_PANELS ) &&
-             BitStream.Read ( (char*) m_ucLightStates, MAX_LIGHTS ) );
+     return ( BitStream.ReadCompressed ( m_Vehicle ) &&
+              BitStream.Read ( &m_damage ) );
 }
 
 
 bool CVehicleDamageSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.Write ( m_Vehicle );
-    BitStream.Write ( (char*) m_ucDoorStates, MAX_DOORS );
-    BitStream.Write ( (char*) m_ucWheelStates, MAX_WHEELS );
-    BitStream.Write ( (char*) m_ucPanelStates, MAX_PANELS );
-    BitStream.Write ( (char*) m_ucLightStates, MAX_LIGHTS );
+    BitStream.WriteCompressed ( m_Vehicle );
+    BitStream.Write ( &m_damage );
 
     return true;
 }

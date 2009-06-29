@@ -11,7 +11,8 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+#include "net/SyncStructures.h"
 
 CDeathmatchVehicle::CDeathmatchVehicle ( CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel ) : CClientVehicle ( pManager, ID, usVehicleModel )
 {
@@ -44,37 +45,74 @@ void CDeathmatchVehicle::SetIsSyncing ( bool bIsSyncing )
 
 bool CDeathmatchVehicle::SyncDamageModel ( void )
 {
-    // Grab the door status
-    unsigned char ucDoorStates [ MAX_DOORS ], ucWheelStates [ MAX_WHEELS ],
-                  ucPanelStates [ MAX_PANELS ], ucLightStates [ MAX_LIGHTS ];
+    SVehicleDamageSync damage ( true, true, true, true, true );
+    bool bChanges = false;
 
-    for ( int i = 0; i < MAX_DOORS; i++ ) ucDoorStates [i] = GetDoorStatus ( i );
-    for ( int i = 0; i < MAX_WHEELS; i++ ) ucWheelStates [i] = GetWheelStatus ( i );
-    for ( int i = 0; i < MAX_PANELS; i++ ) ucPanelStates [i] = GetPanelStatus ( i );
-    for ( int i = 0; i < MAX_LIGHTS; i++ ) ucLightStates [i] = GetLightStatus ( i );
+    // Copy current door states to the sync structure and mark those that changed
+    for ( unsigned int i = 0; i < MAX_DOORS; ++i )
+    {
+        damage.data.ucDoorStates [ i ] = GetDoorStatus ( i );
+        if ( damage.data.ucDoorStates [ i ] != m_ucLastDoorStates [ i ] )
+        {
+            bChanges = true;
+            damage.data.bDoorStatesChanged [ i ] = true;
+        }
+        else
+            damage.data.bDoorStatesChanged [ i ] = false;
+    }
+    // Copy current wheel states to the sync structure and mark those that changed
+    for ( unsigned int i = 0; i < MAX_WHEELS; ++i )
+    {
+        damage.data.ucWheelStates [ i ] = GetWheelStatus ( i );
+        if ( damage.data.ucWheelStates [ i ] != m_ucLastWheelStates [ i ] )
+        {
+            bChanges = true;
+            damage.data.bWheelStatesChanged [ i ] = true;
+        }
+        else
+            damage.data.bWheelStatesChanged [ i ] = false;
+    }
+    // Copy current panel states to the sync structure and mark those that changed
+    for ( unsigned int i = 0; i < MAX_PANELS; ++i )
+    {
+        damage.data.ucPanelStates [ i ] = GetPanelStatus ( i );
+        if ( damage.data.ucPanelStates [ i ] != m_ucLastPanelStates [ i ] )
+        {
+            bChanges = true;
+            damage.data.bPanelStatesChanged [ i ] = true;
+        }
+        else
+            damage.data.bPanelStatesChanged [ i ] = false;
+    }
+    // Copy current light states to the sync structure and mark those that changed
+    for ( unsigned int i = 0; i < MAX_LIGHTS; ++i )
+    {
+        damage.data.ucLightStates [ i ] = GetLightStatus ( i );
+        if ( damage.data.ucLightStates [ i ] != m_ucLastLightStates [ i ] )
+        {
+            bChanges = true;
+            damage.data.bLightStatesChanged [ i ] = true;
+        }
+        else
+            damage.data.bLightStatesChanged [ i ] = false;
+    }
 
     // Something has changed?
-    if ( memcmp ( m_ucLastDoorStates, ucDoorStates, sizeof ( m_ucLastDoorStates ) ) != 0 ||
-         memcmp ( m_ucLastWheelStates, ucWheelStates, sizeof ( m_ucLastWheelStates ) ) != 0 ||
-         memcmp ( m_ucLastPanelStates, ucPanelStates, sizeof ( m_ucLastPanelStates ) ) != 0 ||
-         memcmp ( m_ucLastLightStates, ucLightStates, sizeof ( m_ucLastLightStates ) ) != 0 )
+    if ( bChanges )
     {
         // Set the last state to current
-        memcpy ( m_ucLastDoorStates, ucDoorStates, sizeof ( m_ucLastDoorStates ) );
-        memcpy ( m_ucLastWheelStates, ucWheelStates, sizeof ( m_ucLastWheelStates ) );
-        memcpy ( m_ucLastPanelStates, ucPanelStates, sizeof ( m_ucLastPanelStates ) );
-        memcpy ( m_ucLastLightStates, ucLightStates, sizeof ( m_ucLastLightStates ) );
+        memcpy ( m_ucLastDoorStates,  damage.data.ucDoorStates,  sizeof ( m_ucLastDoorStates ) );
+        memcpy ( m_ucLastWheelStates, damage.data.ucWheelStates, sizeof ( m_ucLastWheelStates ) );
+        memcpy ( m_ucLastPanelStates, damage.data.ucPanelStates, sizeof ( m_ucLastPanelStates ) );
+        memcpy ( m_ucLastLightStates, damage.data.ucLightStates, sizeof ( m_ucLastLightStates ) );
 
         // Sync it
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( pBitStream )
         {
             // Write the vehicle id and the damage model data
-            pBitStream->Write ( m_ID );
-            pBitStream->Write ( (char*) ucDoorStates, MAX_DOORS );
-            pBitStream->Write ( (char*) ucWheelStates, MAX_WHEELS );
-            pBitStream->Write ( (char*) ucPanelStates, MAX_PANELS );
-            pBitStream->Write ( (char*) ucLightStates, MAX_LIGHTS );
+            pBitStream->WriteCompressed ( m_ID );
+            pBitStream->Write ( &damage );
 
             // Send and delete it
             g_pNet->SendPacket ( PACKET_ID_VEHICLE_DAMAGE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED );

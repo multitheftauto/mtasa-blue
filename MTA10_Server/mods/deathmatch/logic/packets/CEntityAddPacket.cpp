@@ -242,10 +242,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( pVehicle->GetPaintjob () );
 
                     // Write the damage model
-                    BitStream.Write ( (char*) pVehicle->m_ucDoorStates, MAX_DOORS );
-                    BitStream.Write ( (char*) pVehicle->m_ucWheelStates, MAX_WHEELS );
-                    BitStream.Write ( (char*) pVehicle->m_ucPanelStates, MAX_PANELS );
-                    BitStream.Write ( (char*) pVehicle->m_ucLightStates, MAX_LIGHTS );
+                    SVehicleDamageSync damage ( true, true, true, true, false );
+                    memcpy ( damage.data.ucDoorStates,  pVehicle->m_ucDoorStates,  MAX_DOORS );
+                    memcpy ( damage.data.ucWheelStates, pVehicle->m_ucWheelStates, MAX_WHEELS );
+                    memcpy ( damage.data.ucPanelStates, pVehicle->m_ucPanelStates, MAX_PANELS );
+                    memcpy ( damage.data.ucLightStates, pVehicle->m_ucLightStates, MAX_LIGHTS );
+                    BitStream.Write ( &damage );
 
                     // If the vehicle has a turret, send its position too
                     unsigned short usModel = pVehicle->GetModel ();
