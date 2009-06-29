@@ -28,8 +28,10 @@ public:
     virtual void        PostCreateDevice            ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp ) = 0;
     virtual void        PreReset                    ( D3DPRESENT_PARAMETERS* pp ) = 0;
     virtual void        PostReset                   ( D3DPRESENT_PARAMETERS* pp ) = 0;
-    virtual int         GetLastFullScreenVideoMode  ( void ) = 0;
-    virtual void        ChangeVideoMode             ( int iMode ) = 0;
+    virtual void        GetNextVideoMode            ( int& iOutNextVideoMode, bool& bOutNextWindowed ) = 0;
+    virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed ) = 0;
+    virtual bool        IsWindowed                  ( void ) = 0;
+    virtual bool        IsMultiMonitor              ( void ) = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager ( void );

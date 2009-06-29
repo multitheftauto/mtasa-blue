@@ -73,6 +73,7 @@ public:
 	void				LoadMenuOptions					( void );
 
     void                ChangeCommunityState            ( bool bIn, std::string strUsername );
+    bool                HasStarted                      ( void ) { return m_bStarted; };
 
 private:
 	void				SetStaticBackground				( bool bEnabled );

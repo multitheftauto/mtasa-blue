@@ -83,6 +83,7 @@ void CCommandFuncs::ScreenShot ( const char* szParameters )
 
 void CCommandFuncs::Vid ( const char* szParameters )
 {
+#if 0
     // ripped from the renderware sdk
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
 
@@ -140,11 +141,13 @@ void CCommandFuncs::Vid ( const char* szParameters )
             g_pCore->GetConsole ()->Echo ( "vid: Please disconnect before changing video mode" );
         }
     }
+#endif
 }
 
 
 void CCommandFuncs::Window ( const char* szParameters )
 {
+#if 0
     // Make sure no mod is loaded
     if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
     {
@@ -166,6 +169,7 @@ void CCommandFuncs::Window ( const char* szParameters )
     {
         g_pCore->GetConsole ()->Echo ( "window: Please disconnect first" );
     }
+#endif
 }
 
 
