@@ -245,6 +245,10 @@ private:
     bool                m_bCaptureKey;
     bool                m_bCaptureAxis;
 
+    unsigned char       m_ucOldRadioVolume;
+    unsigned char       m_ucOldSFXVolume;
+    float               m_fOldMTAVolume;
+
 	CGUIListItem*	    m_pSelectedBind;
 
 	DWORD			    m_dwFrameCount;

@@ -211,4 +211,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls
     DEFAULT ( "steer_with_mouse",           false );                        // steering with mouse controls
     DEFAULT ( "classic_controls",           false );                        // classic/standard controls
+    DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
 }
