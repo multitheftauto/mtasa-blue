@@ -259,7 +259,7 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed )
     bool bRequiresRestart = false;
 
     // Resolution
-    if ( iNextVideoMode > 0 && iNextVideoMode < m_pGameSettings->GetNumVideoModes () )
+    if ( iNextVideoMode > 0 && iNextVideoMode < (int)m_pGameSettings->GetNumVideoModes () )
     {
         if ( m_iNextVideoMode != iNextVideoMode )
         {
@@ -350,9 +350,9 @@ bool CVideoModeManager::IsMultiMonitor ( void )
                 break;
 
             // Calc flags
-            bool bAttachedToDesktop = device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP; 
-            bool bMirroringDriver   = device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER;
-            bool bPrimaryDevice     = device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE; 
+            bool bAttachedToDesktop = ( device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP ) != 0;
+            bool bMirroringDriver   = ( device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER ) != 0;
+            bool bPrimaryDevice     = ( device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) != 0;
 
             // Ignore devices that are not required
             if( !bAttachedToDesktop || bMirroringDriver )

@@ -24,6 +24,7 @@ CServerList::CServerList ( void )
     m_strStatus = "Idle";
     m_nScanned = 0;
     m_nSkipped = 0;
+    m_iRevision = 1;
 }
 
 
@@ -41,6 +42,7 @@ void CServerList::Clear ( void )
     m_Servers.clear ();
     m_nScanned = 0;
     m_nSkipped = 0;
+    m_iRevision++;
 }
 
 

@@ -20,6 +20,12 @@ class CServerBrowser;
 #ifndef __CSERVERBROWSER_H
 #define __CSERVERBROWSER_H
 
+// Amount of server lists/tabs (ServerBrowserType)
+#define SERVER_BROWSER_TYPE_COUNT           4
+
+// Server browser list update interval (in ms)
+#define SERVER_BROWSER_UPDATE_INTERVAL      250
+
 #include "CMainMenu.h"
 #include "CServerList.h"
 #include "CSingleton.h"
@@ -27,11 +33,6 @@ class CServerBrowser;
 #include "CCommunityLogin.h"
 #include <ctime>
 
-// Amount of server lists/tabs (ServerBrowserType)
-#define SERVER_BROWSER_TYPE_COUNT           4
-
-// Server browser list update interval (in ms)
-#define SERVER_BROWSER_UPDATE_INTERVAL      250
 
 class CServerBrowser : public CSingleton < CServerBrowser >
 {
@@ -95,6 +96,7 @@ protected:
     CGUITab*            m_pTab [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIGridList*       m_pServerList [ SERVER_BROWSER_TYPE_COUNT ];
+    int                 m_pServerListRevision [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUILabel*          m_pServerPlayerListLabel [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIGridList*       m_pServerPlayerList [ SERVER_BROWSER_TYPE_COUNT ];

@@ -120,6 +120,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
     m_pServerList [ type ]->SetPosition ( CVector2D ( 0.02f, 0.10f ), true );
     m_pServerList [ type ]->SetSize ( CVector2D ( 0.80f, 0.815f ), true );
+    m_pServerListRevision [ type ] = 0;
     
     // Server player list label
     m_pServerPlayerListLabel [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Player List:" ) );
@@ -365,23 +366,20 @@ bool CServerBrowser::IsVisible ( void )
 
 void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
 {
-	bool bLocked = false;
-	bool bLocal = false;
-    CServerList *pList;
-
-    // Save selected item details
-    CGUIListItem* pSelectedItem = m_pServerList [ Type ]->GetSelectedItem ();
-    int iSelectedItemRow        = m_pServerList [ Type ]->GetSelectedItemRow ();
-    int iSelectedItemColumn     = m_pServerList [ Type ]->GetSelectedItemColumn ();
-
-    // Clear current list
-    m_pServerList [ Type ]->Clear ();
-
-    // Clear the player lists
-    m_pServerPlayerList [ Type ]->Clear ();
 
     // Get the appropriate server list
-    pList = GetServerList ( Type );
+    CServerList* pList = GetServerList ( Type );
+
+    if ( pList->GetRevision () != m_pServerListRevision [ Type ] )
+    {
+        m_pServerListRevision [ Type ] = pList->GetRevision ();
+
+        // Clear current list
+        m_pServerList [ Type ]->Clear ();
+
+        // Clear the player lists
+        m_pServerPlayerList [ Type ]->Clear ();
+    }
 
     // Loop the server list
     CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
@@ -392,7 +390,7 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
             CServerListItem * pServer = *i;
 
             // Add the item to the list
-            if ( pServer->bScanned )
+            if ( pServer->bScanned && !pServer->bAddedToList[ Type ] )
                 AddServerToList ( pServer, Type );
             j++;
         }
@@ -404,24 +402,13 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
     */
     m_pServerList [ Type ]->ForceUpdate ();
     pList->SetUpdated ( false );
-
-    // Restore previous selection
-    if ( pSelectedItem )
-    {
-        // index to hColumn
-        int hColumn;
-        for( hColumn = 0 ; hColumn < 100 ; hColumn++ )
-        {
-            if ( m_pServerList [ Type ]->GetColumnIndex ( hColumn ) == iSelectedItemColumn )
-                break;            
-        }
-        m_pServerList [ Type ]->SetSelectedItem ( iSelectedItemRow, hColumn, true );
-    }
 }
 
 
 void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserType Type )
 {
+    pServer->bAddedToList[ Type ] = true;
+
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
