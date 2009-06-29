@@ -1594,15 +1594,20 @@ void CSettings::LoadData ( void )
     float fVar = 0.0f;
     CVARS_GET ( "mtavolume", fVar );
     m_pAudioMTAVolume->SetScrollPosition ( max( 0.0f, min( 1.0f, fVar ) ) );
+
     // Video
+    int nextVideoMode;
+    bool bNextWindowed;
+    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed );
+
+    m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
+    m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
 
     VideoMode           vidModemInfo;
-    int                 vidMode, numVidModes, currentVidMode, lastFullScreenVidMode;
+    int                 vidMode, numVidModes;
 
     m_pComboResolution->Clear ();
     numVidModes = gameSettings->GetNumVideoModes();
-    currentVidMode = gameSettings->GetCurrentVideoMode();
-    lastFullScreenVidMode = GetVideoModeManager ()->GetLastFullScreenVideoMode ();
 
     for (vidMode = 0; vidMode < numVidModes; vidMode++)
     {
@@ -1624,20 +1629,17 @@ void CSettings::LoadData ( void )
         if ( bDuplicate )
             continue;
 
+        SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+
         if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
-        {
-            SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
             m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
-        }
-        if ( vidMode == lastFullScreenVidMode )
-        {
-            SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
-            
+
+        VideoMode currentInfo;
+        gameSettings->GetVideoModeInfo ( &currentInfo, nextVideoMode );
+
+        if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
             m_pComboResolution->SetText ( strMode );
-        }
     }
-    m_pCheckBoxWindowed->SetSelected ( currentVidMode == 0 );
-    m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
 
     // Map alpha
     int iVar;
@@ -1747,27 +1749,22 @@ void CSettings::SaveData ( void )
     gameSettings->SetSFXVolume ( ( unsigned char )( m_pAudioSFXVolume->GetScrollPosition() * 64.0f ) );
     CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
 
-
     // Video
-    int numVidModes = gameSettings->GetNumVideoModes(),
-        currentVidMode = gameSettings->GetCurrentVideoMode();
+    // get current
+    int iNextVidMode;
+    bool bNextWindowed;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed );
 
-    CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem ();
-    if ( pSelected )
-    {
-        g_pCore->GetConsole()->Printf ( "selected" );
-        int selectedVidMode = ( int ) pSelected->GetData();;
-        g_pCore->GetConsole()->Printf ( "%d", selectedVidMode );
-        if ( selectedVidMode != currentVidMode &&
-             selectedVidMode <= numVidModes &&
-             selectedVidMode >= 0 )
-        {
-            GetVideoModeManager ()->ChangeVideoMode ( selectedVidMode );
-            g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
-        }
-    }
+    // update from gui
+    bNextWindowed = m_pCheckBoxWindowed->GetSelected ();
+    if ( CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem () )
+        iNextVidMode = ( int ) pSelected->GetData();
+
+    // change
+    if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed ) )
+        CCore::GetSingleton ().ShowMessageBox ( "Information", "Resolution will be changed when you next start MTA", MB_BUTTON_OK | MB_ICON_INFO );
+
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
-    GetVideoModeManager ()->ChangeVideoMode ( (int)m_pCheckBoxWindowed->GetSelected () - 1 );
 
     // Map alpha
     SString sText = m_pMapAlphaValueLabel->GetText ();

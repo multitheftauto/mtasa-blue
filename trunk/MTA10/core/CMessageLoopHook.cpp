@@ -232,21 +232,23 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 					return true; 
 				}
 
+                // Prevent game window auto-minimizing if full screen and:
+                //     1. More than one monitor present
+                // or  2. Starting up (Main menu has not been displayed yet)
+                if ( uMsg == WM_ACTIVATE ||
+                    uMsg == WM_ACTIVATEAPP ||
+                    uMsg == WM_NCACTIVATE ||
+                    uMsg == WM_SETFOCUS ||
+                    uMsg == WM_KILLFOCUS )
+                {
+                    if ( !GetVideoModeManager ()->IsWindowed () )
+                    {
+                        if ( GetVideoModeManager ()->IsMultiMonitor ()
+                            || !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
+                            return true;
+                    }
+                }
                 /*
-				// Prevent alt-tabbing
-				if ( uMsg == WM_ACTIVATE ||
-					uMsg == WM_ACTIVATEAPP ||
-					uMsg == WM_NCACTIVATE ||
-					uMsg == WM_SETFOCUS ||
-					uMsg == WM_KILLFOCUS )
-				{
-					// If we're in game
-					if ( CCore::GetSingleton ().GetModManager ()->IsLoaded () )
-					{
-						return true;
-					}
-				}
-
 				// Should not really ever get here, just in case. 
 				else if ( uMsg == WM_SIZE )
 				{

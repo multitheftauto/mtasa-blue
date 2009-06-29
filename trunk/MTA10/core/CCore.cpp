@@ -1290,6 +1290,8 @@ void CCore::SetRenderDevice ( IUnknown* pDevice )
 
 void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
 {
+    assert ( 0 );
+#if 0
     // Make GTA windowed
     m_pGame->GetSettings()->SetCurrentVideoMode(0);
 
@@ -1309,6 +1311,7 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
 	// Turn the GTA window into a child window of our static render container window
     SetParent ( hDeviceWindow, hWnd );
 	SetWindowLong ( hDeviceWindow, GWL_STYLE, WS_VISIBLE | WS_CHILD );
+#endif
 }
 
 

@@ -346,6 +346,7 @@ void CMainMenu::Update ( void )
         // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
 		if ( WaitForMenu >= 250 ) {
             m_bIsVisible = true;
+            m_bStarted = true;
 		} else
             WaitForMenu++;
     }

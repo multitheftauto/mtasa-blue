@@ -78,7 +78,7 @@ public:
     unsigned int            GetNumVideoModes            ( void );
     VideoMode *             GetVideoModeInfo            ( VideoMode * modeInfo, unsigned int modeIndex );
     unsigned int            GetCurrentVideoMode         ( void );
-    void                    SetCurrentVideoMode         ( unsigned int modeIndex );
+    void                    SetCurrentVideoMode         ( unsigned int modeIndex, bool bOnRestart );
     unsigned char           GetRadioVolume              ( void );
     void                    SetRadioVolume              ( unsigned char ucVolume );
     unsigned char           GetSFXVolume                ( void );

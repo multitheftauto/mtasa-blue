@@ -76,15 +76,20 @@ unsigned int CSettingsSA::GetCurrentVideoMode ( void )
     return uiReturn;
 }
 
-void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex )
+void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex, bool bOnRestart )
 {
-    _asm
+    if ( !bOnRestart )
     {
-        push    modeIndex
-        call    FUNC_SetCurrentVideoMode
-        add     esp, 4
+        _asm
+        {
+            push    modeIndex
+            call    FUNC_SetCurrentVideoMode
+            add     esp, 4
+        }
     }
-    m_pInterface->dwVideoMode = modeIndex;
+    // Only update settings variables for fullscreen modes
+    if ( modeIndex )
+        m_pInterface->dwVideoMode = modeIndex;
 }
 
 unsigned char CSettingsSA::GetRadioVolume ( void )
