@@ -102,6 +102,8 @@ public:
         bSkipped = false;
         bSerials = false;
         m_ulQueryStart = 0;
+        for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
+            bAddedToList[i] = false;
         
         // Initialize sockets
         m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
@@ -123,6 +125,7 @@ public:
     bool                bSerials;       // Serial verification on
     bool                bScanned;
     bool                bSkipped;
+    bool                bAddedToList[ SERVER_BROWSER_TYPE_COUNT ];
 
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version
@@ -164,11 +167,13 @@ public:
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };
     void                                    SetUpdated              ( bool bUpdated )               { m_bUpdated = bUpdated; };
+    int                                     GetRevision             ( void )                        { return m_iRevision; }
 protected:
     bool                                    m_bUpdated;
     int                                     m_iPass;
     unsigned int                            m_nScanned;
     unsigned int                            m_nSkipped;
+    int                                     m_iRevision;
     std::list < CServerListItem* >          m_Servers;
     std::string                             m_strStatus;
 };
