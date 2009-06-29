@@ -10,6 +10,7 @@
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Marcus Bauer <mabako@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -137,12 +138,13 @@ protected:
 	
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
+    CGUILabel*          m_pLabelMTAVolume;
     CGUILabel*          m_pLabelRadioVolumeValue;
     CGUILabel*          m_pLabelSFXVolumeValue;
-    //CGUILabel*          m_pLabelMTAVolume;
+    CGUILabel*          m_pLabelMTAVolumeValue;
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
-    //CGUIScrollBar*      m_pAudioMTAVolume;
+    CGUIScrollBar*      m_pAudioMTAVolume;
 
 	CGUIGridList*	    m_pBindsList;
 	CGUIButton*		    m_pBindsDefButton;
@@ -213,6 +215,7 @@ protected:
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
+    bool                OnMTAVolumeChanged      ( CGUIElement* pElement );
     bool                OnChatRedChanged        ( CGUIElement* pElement );
     bool                OnChatGreenChanged      ( CGUIElement* pElement );
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
