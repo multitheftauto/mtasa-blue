@@ -114,16 +114,17 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         }
 
         // Health ( stored with damage )
-        unsigned char ucHealth;
-        if ( !BitStream.Read ( ucHealth ) )
+        SFloatAsByteSync health ( 0.f, 200.0f, true );
+        if ( !BitStream.Read ( &health ) )
             return false;
+        float fHealth = health.data.fValue;
 
         // Armor
-        unsigned char ucArmor;
-        if ( !BitStream.Read ( ucArmor ) )
+        SFloatAsByteSync armor ( 0.f, 100.f, true );
+        if ( !BitStream.Read ( &armor ) )
             return false;
 
-        float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
+        float fArmor = armor.data.fValue;
         float fOldArmor = pSourcePlayer->GetArmor ();
         float fArmorLoss = fOldArmor - fArmor;
 
@@ -202,8 +203,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
         }
 
-        float fHealth = static_cast < float > ( ucHealth ) / 1.25f;
-
         // If we know the player's dead, make sure the health we send on is 0
         if ( pSourcePlayer->IsDead () )
             fHealth = 0.0f;
@@ -279,8 +278,6 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         CVector vecPosition = pSourcePlayer->GetPosition ();
         if ( pContactElement )
             pSourcePlayer->GetContactPosition ( vecPosition );
-        unsigned char ucHealth = static_cast < unsigned char > ( pSourcePlayer->GetHealth () * 1.25f );
-        unsigned char ucArmor = static_cast < unsigned char > ( pSourcePlayer->GetArmor () * 1.25f );
         float fCameraRotation = pSourcePlayer->GetCameraRotation ();
 
         BitStream.WriteCompressed ( PlayerID );
@@ -335,8 +332,15 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( &velocity );
         }
 
-	    BitStream.Write ( ucHealth );
-        BitStream.Write ( ucArmor );
+        // Player health and armor
+        SFloatAsByteSync health ( 0.f, 200.f, true );
+        health.data.fValue = pSourcePlayer->GetHealth ();
+        BitStream.Write ( &health );
+
+        SFloatAsByteSync armor ( 0.f, 100.f, true );
+        armor.data.fValue = pSourcePlayer->GetArmor ();
+        BitStream.Write ( &armor );
+
         BitStream.Write ( fCameraRotation );
 
         if ( flags.data.bHasAWeapon )
