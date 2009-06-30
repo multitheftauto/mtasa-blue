@@ -53,11 +53,6 @@ using std::string;
     void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
 
-static int Round ( float value )
-{
-	return (int)floor(value + 0.5f);
-}
-
 static SString GUIDToString ( const GUID& g )
 {
     return SString (

@@ -80,14 +80,15 @@ private:
 
 //////////////////////////////////////////
 //                                      //
-//              FloatAsByte             //
+//              FloatAsBits             //
 //                                      //
-// Map a float range into a byte        //
+// Map a float range into bits          //
 //                                      //
 //////////////////////////////////////////
-struct SFloatAsByteSync : public ISyncStructure
+template < unsigned int bits >
+struct SFloatAsBitsSync : public ISyncStructure
 {
-    SFloatAsByteSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
+    SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
         : m_fMin ( fMin )
         , m_fMax ( fMax )
         , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
@@ -96,10 +97,11 @@ struct SFloatAsByteSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        unsigned char ucValue;
-        if ( bitStream.Read ( ucValue ) )
+        unsigned long ulValue = 0;
+        if ( bitStream.ReadBits ( &ulValue, bits ) )
         {
-            float fAlpha = ucValue / 255.f;
+            // Convert bits to position in range
+            float fAlpha = ulValue / (float)ulValueMax;
             // Find value in range
             data.fValue = Lerp ( m_fMin, fAlpha, m_fMax );
             return true;
@@ -111,28 +113,44 @@ struct SFloatAsByteSync : public ISyncStructure
     {
         // Find position in range
         float fAlpha = UnlerpClamped ( m_fMin, data.fValue, m_fMax );
-        // Convert to byte
-        unsigned char ucValue = static_cast < unsigned char > ( floor ( fAlpha * 255.f ) );
+        // Convert to bits
+        unsigned long ulValue = Round ( ulValueMax * fAlpha );
 
         // If required, ensure ( fValue > m_fMin ) is preserved.
         if ( m_bPreserveGreaterThanMin )
-            if ( ucValue == 0 && fAlpha > 0.0f )
-                ucValue = 1;
+            if ( ulValue == 0 && fAlpha > 0.0f )
+                ulValue = 1;
 
-        bitStream.Write ( ucValue );
+        bitStream.WriteBits ( &ulValue, bits );
     }
 
     struct
     {
         float fValue;
     } data;
-
 private:
     const float m_fMin;
     const float m_fMax;
     const bool  m_bPreserveGreaterThanMin;
+    const static unsigned long ulValueMax = ( 1 << bits ) - 1;
 };
 
+
+// Declare specific health and armor sync structures
+struct SPlayerHealthSync : public SFloatAsBitsSync < 8 >
+{
+    SPlayerHealthSync () : SFloatAsBitsSync ( 0.f, 200.0f, true ) {}
+};
+
+struct SPlayerArmorSync : public SFloatAsBitsSync < 8 >
+{
+    SPlayerArmorSync () : SFloatAsBitsSync ( 0.f, 100.0f, true ) {}
+};
+
+struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
+{
+    SVehicleHealthSync () : SFloatAsBitsSync ( 0.f, 2000.0f, true ) {}
+};
 
 
 //////////////////////////////////////////
@@ -426,7 +444,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
             if ( data.bSyncHealth )
             {
-                SFloatAsByteSync health ( 0.f, 1000.f, true );
+                SVehicleHealthSync health;
                 bitStream.Read ( &health );
                 data.fHealth = health.data.fValue;
             }
@@ -477,7 +495,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
         if ( data.bSyncHealth )
         {
-            SFloatAsByteSync health ( 0.f, 1000.f, true );
+            SVehicleHealthSync health;
             health.data.fValue = data.fHealth;
             bitStream.Write ( &health );
         }

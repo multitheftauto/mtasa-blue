@@ -114,13 +114,13 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         }
 
         // Health ( stored with damage )
-        SFloatAsByteSync health ( 0.f, 200.0f, true );
+        SPlayerHealthSync health;
         if ( !BitStream.Read ( &health ) )
             return false;
         float fHealth = health.data.fValue;
 
         // Armor
-        SFloatAsByteSync armor ( 0.f, 100.f, true );
+        SPlayerArmorSync armor;
         if ( !BitStream.Read ( &armor ) )
             return false;
 
@@ -333,11 +333,11 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Player health and armor
-        SFloatAsByteSync health ( 0.f, 200.f, true );
+        SPlayerHealthSync health;
         health.data.fValue = pSourcePlayer->GetHealth ();
         BitStream.Write ( &health );
 
-        SFloatAsByteSync armor ( 0.f, 100.f, true );
+        SPlayerArmorSync armor;
         armor.data.fValue = pSourcePlayer->GetArmor ();
         BitStream.Write ( &armor );
 
