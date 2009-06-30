@@ -4274,15 +4274,31 @@ void CClientPed::UpdateTargetPosition ( void )
 
         vecPosition -= vecOrigin;
 
+        // Needs to be calced
+        float fTimeSlice = 1/30.f;
+
         CVector vecOffset = m_vecTargetPosition - vecPosition;
-        vecOffset /= CVector ( 20.0f, 20.0f, 5.0f );
+        float fDistanceToTarget = vecOffset.Length ();
+        // fDistanceToTarget 0.20f to 0.00f     then fSpeed = 5.0f to 15.0f
+        float fSpeedAlpha = UnlerpClamped ( 0, fDistanceToTarget, 0.20f );
+        float fSpeed = Lerp < const float > ( 15.f, fSpeedAlpha, 5.f );
+        CVector vecScale = CVector ( 1.5f, 1.5f, 6.0f ) * fSpeed * fTimeSlice;
+        // Make sure not to overshoot
+        vecScale.fX = Min ( vecScale.fX, 1.f );
+        vecScale.fY = Min ( vecScale.fY, 1.f );
+        vecScale.fZ = Min ( vecScale.fZ, 1.f );
+        vecOffset *= vecScale;
+#if 1
+        // Apply offset ignoring m_bTargetDirections, as they seem to make things worse
+        vecPosition += vecOffset;
+#else
         if ( ( vecOffset.fX > 0.0f ) == m_bTargetDirections [ 0 ] )
             vecPosition.fX += vecOffset.fX;
         if ( ( vecOffset.fY > 0.0f ) == m_bTargetDirections [ 1 ] )
             vecPosition.fY += vecOffset.fY;
         if ( ( vecOffset.fZ > 0.0f ) == m_bTargetDirections [ 2 ] )
             vecPosition.fZ += vecOffset.fZ;
-
+#endif
         vecPosition += vecOrigin;
 
         SetPosition ( vecPosition );
