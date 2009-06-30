@@ -3328,17 +3328,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 return false;
             }
 
-            // Check if their health or armor is locked, and if so prevent applying the damage locally
-            if ( pDamagedPed->IsHealthLocked () && pDamagedPed->IsArmorLocked () )
-            {
-                pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
-                pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
-                return false;
-            }
-
-            // Update our stored health/armor
-            pDamagedPed->m_fHealth = fCurrentHealth;
-            pDamagedPed->m_fArmor = fCurrentArmor;
             // Is it the local player?
             if ( pDamagedPed->IsLocalPlayer () )
             {  
