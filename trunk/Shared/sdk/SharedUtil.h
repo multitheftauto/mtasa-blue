@@ -92,10 +92,16 @@ namespace SharedUtil
         return static_cast < float > ( ( dPos - dFrom ) / ( dTo - dFrom ) );
     }
 
-    //  Unlerp avoiding extrapolation
+    // Unlerp avoiding extrapolation
     inline const float UnlerpClamped ( const double dFrom, const double dPos, const double dTo )
     {
         return Clamp ( 0.0f, Unlerp( dFrom, dPos, dTo ), 1.0f );
+    }
+
+    template < class T >
+    int Round ( T value )
+    {
+        return static_cast < int > ( floor ( value + 0.5f ) );
     }
 
 };

@@ -747,13 +747,13 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Player health
-    SFloatAsByteSync health ( 0.f, 200.f, true );
+    SPlayerHealthSync health;
     BitStream.Read ( &health );
     pPlayer->SetHealth ( health.data.fValue );
     pPlayer->LockHealth ( health.data.fValue );
 
     // Player armor
-    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    SPlayerArmorSync armor;
     BitStream.Read ( &armor );
     pPlayer->SetArmor ( armor.data.fValue );
     pPlayer->LockArmor ( armor.data.fValue );
@@ -937,12 +937,12 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
-    SFloatAsByteSync health ( 0.f, 200.0f, true );
+    SPlayerHealthSync health;
     health.data.fValue = pPlayerModel->GetHealth ();
     BitStream.Write ( &health );
 
     // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
-    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    SPlayerArmorSync armor;
     armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
 
@@ -1072,7 +1072,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         BitStream.Read ( &turnSpeed );
 
         // Read out the vehicle health
-        SFloatAsByteSync health ( 0.f, 1000.f, true );
+        SVehicleHealthSync health;
         BitStream.Read ( &health );
         pVehicle->SetHealth ( health.data.fValue );
 
@@ -1086,13 +1086,13 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     }
 
     // Player health
-    SFloatAsByteSync health ( 0.f, 200.f, true );
+    SPlayerHealthSync health;
     BitStream.Read ( &health );
     pPlayer->SetHealth ( health.data.fValue );
     pPlayer->LockHealth ( health.data.fValue );
 
     // Player armor
-    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    SPlayerArmorSync armor;
     BitStream.Read ( &armor );
     pPlayer->SetArmor ( armor.data.fValue );
     pPlayer->LockArmor ( armor.data.fValue );
@@ -1265,7 +1265,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         BitStream.Write ( &turnSpeed );
 
         // Write the health
-        SFloatAsByteSync health ( 0.f, 1000.f, true );
+        SVehicleHealthSync health;
         health.data.fValue = pVehicle->GetHealth ();
         BitStream.Write ( &health );
 
@@ -1300,12 +1300,12 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
-    SFloatAsByteSync health ( 0.f, 200.0f, true );
+    SPlayerHealthSync health;
     health.data.fValue = pPlayerModel->GetHealth ();
     BitStream.Write ( &health );
 
     // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
-    SFloatAsByteSync armor ( 0.f, 100.f, true );
+    SPlayerArmorSync armor;
     armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
 

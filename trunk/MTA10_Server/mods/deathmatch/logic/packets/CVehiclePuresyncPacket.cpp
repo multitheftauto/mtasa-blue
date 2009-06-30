@@ -92,7 +92,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 
                 // Health
-                SFloatAsByteSync health ( 0.f, 1000.f, true );
+                SVehicleHealthSync health;
                 if ( !BitStream.Read ( &health ) )
                     return false;
                 float fPreviousHealth = pVehicle->GetHealth ();                
@@ -221,7 +221,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
 
             // Player health
-            SFloatAsByteSync health ( 0.f, 200.0f, true );
+            SPlayerHealthSync health;
             if ( !BitStream.Read ( &health ) )
                 return false;
             float fHealth = health.data.fValue;
@@ -240,8 +240,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetHealth ( fHealth );
 
 			// Armor
-			//BitStream.Read ( ucTemp );
-            SFloatAsByteSync armor ( 0.f, 100.f, true );
+            SPlayerArmorSync armor;
             if ( !BitStream.Read ( &armor ) )
                 return false;
             float fArmor = armor.data.fValue;
@@ -389,17 +388,17 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &turnSpeed );
 
                 // Health
-                SFloatAsByteSync health ( 0.f, 1000.f, true );
+                SVehicleHealthSync health;
                 health.data.fValue = pVehicle->GetHealth ();
                 BitStream.Write ( &health );
             }
 
             // Player health and armor
-            SFloatAsByteSync health ( 0.f, 200.f, true );
+            SPlayerHealthSync health;
             health.data.fValue = pSourcePlayer->GetHealth ();
             BitStream.Write ( &health );
 
-            SFloatAsByteSync armor ( 0.f, 100.f, true );
+            SPlayerArmorSync armor;
             armor.data.fValue = pSourcePlayer->GetArmor ();
             BitStream.Write ( &armor );
 
