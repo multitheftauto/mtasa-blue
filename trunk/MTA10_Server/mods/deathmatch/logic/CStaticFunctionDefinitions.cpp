@@ -1552,7 +1552,7 @@ bool CStaticFunctionDefinitions::GetPlayerTotalAmmo ( CPlayer* pPlayer, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip )
+bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip, bool bSyncClipAmmo )
 {
     assert ( pElement );
     CPlayer* pPlayer = NULL;
@@ -1560,20 +1560,31 @@ bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned ch
 		pPlayer = static_cast < CPlayer* > ( pElement );
     if ( !pPlayer )
         return false;
-    unsigned char ucWeaponID = pPlayer->GetWeapon ( ucSlot )->ucType;
 
-	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo, usAmmoInClip );
+    CWeapon* pWeapon = pPlayer->GetWeapon ( ucSlot );
+    if ( pWeapon ) {
+        unsigned char ucWeaponID = pPlayer->GetWeapon ( ucSlot )->ucType;
+        if ( ucWeaponID ) {
+	        if ( pPlayer->IsSpawned () )
+            {
+                CBitStream BitStream;
+                BitStream.pBitStream->WriteCompressed ( pPlayer->GetID () );
 
-    if ( pPlayer->IsSpawned () )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( ucWeaponID );
-        BitStream.pBitStream->Write ( usAmmo );
-        BitStream.pBitStream->Write ( usAmmoInClip );
+                SWeaponTypeSync weaponType;
+                weaponType.data.ucWeaponType = ucWeaponID;
+		        BitStream.pBitStream->Write ( &weaponType );
+                SWeaponAmmoSync ammo ( ucWeaponID, true, true );
+                ammo.data.usTotalAmmo = usAmmo;
+                if ( bSyncClipAmmo )
+                    ammo.data.usAmmoInClip = usAmmoInClip;
+                else
+                    ammo.data.usAmmoInClip = pPlayer->GetWeaponAmmoInClip( CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
 
-        pPlayer->Send ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
-
-        return true;
+                BitStream.pBitStream->Write ( &ammo );
+                pPlayer->Send ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
+                return true;
+            }
+        }
     }
 
 	return false;
@@ -3404,10 +3415,10 @@ bool CStaticFunctionDefinitions::TakeWeaponAmmo ( CElement* pElement, unsigned c
 }
 
 
-bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip )
+bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip, bool bSyncClipAmmo )
 {
     assert ( pElement );
-	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo, usAmmoInClip );
+	RUN_CHILDREN SetWeaponAmmo ( *iter, ucWeaponID, usAmmo, usAmmoInClip, bSyncClipAmmo );
 
 	if ( IS_PED ( pElement ) )
     {
@@ -3420,10 +3431,13 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
             SWeaponTypeSync weaponType;
             weaponType.data.ucWeaponType = ucWeaponID;
 		    BitStream.pBitStream->Write ( &weaponType );
-
             SWeaponAmmoSync ammo ( ucWeaponID, true, true );
             ammo.data.usTotalAmmo = usAmmo;
-            ammo.data.usAmmoInClip = usAmmoInClip;
+            if ( bSyncClipAmmo )
+                ammo.data.usAmmoInClip = usAmmoInClip;
+            else
+                ammo.data.usAmmoInClip = pPed->GetWeaponAmmoInClip( CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
+
             BitStream.pBitStream->Write ( &ammo );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
