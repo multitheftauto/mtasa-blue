@@ -30,17 +30,35 @@ enum ePedPieceTypes;
 class CEventDamageSAInterface
 {
 public:
-    DWORD unk;                                  // 0
-    DWORD unk2;                                 // 4
-    DWORD unk3;                                 // 8
-    DWORD unk4;                                 // 12
-    DWORD unk5;                                 // 16
-    CEntitySAInterface *        inflictor;      // 20
-    DWORD                       damageTime;     // 24
-    eWeaponType                 weaponUsed;     // 28
-    ePedPieceTypes              pedPieceType;   // 32
-    char                        cDirection;     // 36
-    char                        cFlags;         // 37
+    DWORD vmt;                                  // 0
+    DWORD ticks;                                // 4
+    BYTE unk8;                                  // 8
+    BYTE unk9;                                  // 9
+    BYTE unkA;                                  // Ah
+    BYTE unkB;                                  // Bh
+    BYTE unkC;                                  // Ch
+    BYTE unkD;                                  // Dh
+    WORD unkE;                                  // Eh
+    WORD unk10;                                 // 10h
+    WORD unk12;                                 // 12h
+    CEntitySAInterface *        pInflictor;     // 14h
+    DWORD                       damageTime;     // 18h
+    eWeaponType                 weaponUsed;     // 1Ch
+    ePedPieceTypes              pedPieceType;   // 20h
+    BYTE                        ucDirection;    // 24h
+    BYTE                        ucFlags;        // 25h
+    BYTE unk26;                                 // 26h
+    BYTE unk27;                                 // 27h
+    DWORD                       dwAnimGroup;    // 28h
+    DWORD                       dwAnimID;       // 2Ch
+    float                       fAnimBlend;     // 30h
+    float                       fAnimSpeed;     // 34h
+    float                       fDamageBase;    // 38h     + fDamageExtra = total damage applied
+    float                       fDamageExtra;   // 3Ch
+    BYTE unk40;                                 // 40h
+    BYTE unk41;                                 // 41h
+    BYTE unk42;                                 // 42h
+    BYTE unk43;                                 // 43h
 };
 
 class CEventDamageSA : public CEventDamage
@@ -55,15 +73,15 @@ public:
     inline void                         Destroy             ( void )                                    { delete this; }
 
     // Flag accessors
-    inline bool                         DidPedFallDown      ( void )                                    { return (m_pInterface->cFlags & 2) == 1; }
-    inline bool                         WasStealthAttack    ( void )                                    { return (m_pInterface->cFlags & 5) == 1; }
+    inline bool                         DidPedFallDown      ( void )                                    { return (m_pInterface->ucFlags & 2) != 0; }
+    inline bool                         WasStealthAttack    ( void )                                    { return (m_pInterface->ucFlags & 16) != 0; }
 
-    inline void                         MakePedFallDown     ( void )                                    { m_pInterface->cFlags |= 2; }
+    inline void                         MakePedFallDown     ( void )                                    { m_pInterface->ucFlags |= 2; }
 
     inline DWORD                        GetDamageTime       ( void )                                    { return m_pInterface->damageTime; }
     inline eWeaponType                  GetWeaponUsed       ( void )                                    { return m_pInterface->weaponUsed; }
     inline ePedPieceTypes               GetPedPieceType     ( void )                                    { return m_pInterface->pedPieceType; }
-    inline char                         GetDirection        ( void )                                    { return m_pInterface->cDirection; }
+    inline BYTE                         GetDirection        ( void )                                    { return m_pInterface->ucDirection; }
     
     CEntity *                           GetInflictingEntity ( void );
 

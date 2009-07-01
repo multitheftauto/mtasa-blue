@@ -3348,7 +3348,8 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_pDamageEntity = pInflictingEntity;
                 m_ulDamageTime = CClientTime::GetTime ();
                 m_DamagerID = INVALID_ELEMENT_ID;
-                if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+                if ( pInflictingEntity )
+                    m_DamagerID = pInflictingEntity->GetID ();
                 m_bDamageSent = false;
             }
             if ( pDamagedPed->GetType () == CCLIENTPED )
@@ -3405,8 +3406,12 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
             }
         }
-    }       
+    }
 
+    // No damage anim for fire
+    if ( weaponUsed == WEAPONTYPE_FLAMETHROWER )
+        return false;
+    
     // Allow the damage to register
     return true;
 }

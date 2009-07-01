@@ -36,7 +36,7 @@ public:
     virtual DWORD                       GetDamageTime       ( void ) = 0;
     virtual eWeaponType                 GetWeaponUsed       ( void ) = 0;
     virtual ePedPieceTypes              GetPedPieceType     ( void ) = 0;
-    virtual char                        GetDirection        ( void ) = 0;
+    virtual BYTE                        GetDirection        ( void ) = 0;
     
     virtual CEntity *                   GetInflictingEntity ( void ) = 0;
 
