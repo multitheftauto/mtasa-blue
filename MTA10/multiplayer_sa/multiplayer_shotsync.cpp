@@ -95,12 +95,9 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7 );
 
-	/*
-    DWORD oldProt, oldProt2;
-    VirtualProtect((LPVOID)0x73FDEC,2,PAGE_EXECUTE_READWRITE,&oldProt);		
+	/*	
 	*(BYTE *)0x73FDEC = 0x90;
     *(BYTE *)0x73FDED = 0xE9;
-	VirtualProtect((LPVOID)0x73FDEC,2,oldProt,&oldProt2); 
 	*/
 
     m_pools = pGameInterface->GetPools();

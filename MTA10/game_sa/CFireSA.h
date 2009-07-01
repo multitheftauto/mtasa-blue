@@ -35,12 +35,12 @@ public:
 	BYTE					bBeingExtinguished : 1;
 	BYTE					bFirstGeneration : 1;
 	WORD                    ScriptReferenceIndex;
-	CVector                 vecPosition; 
-	CEntitySAInterface		* entityTarget; 
-	CEntitySAInterface		* entityCreator;	
-	DWORD					nTimeToBurn; 
+	CVector                 vecPosition;
+	CEntitySAInterface		* entityTarget;
+	CEntitySAInterface		* entityCreator;
+	DWORD					nTimeToBurn;
 	FLOAT					Strength;
-	signed char				nNumGenerationsAllowed; 
+	signed char				nNumGenerationsAllowed;
 	BYTE					RemovalDist;
 
 	FxSystem_c				* m_fxSysPtr;

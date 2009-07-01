@@ -15,7 +15,7 @@
 CEntity * CEventDamageSA::GetInflictingEntity ( void )
 {
     CEntity * pReturn = NULL;
-    CEntitySAInterface * pInterface = m_pInterface->inflictor;
+    CEntitySAInterface * pInterface = m_pInterface->pInflictor;
     if ( pInterface )
     {
         CPoolsSA * pPools = ((CPoolsSA *)pGame->GetPools());
