@@ -2029,6 +2029,13 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool&
 }
 
 
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA & color )
+{
+    color = Vehicle.GetHeadLightColor ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
     RUN_CHILDREN SetVehicleColor ( **iter, ucRed, ucGreen, ucBlue, ucAlpha );
@@ -2554,6 +2561,13 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
         return false;
 
 	Vehicle.SetTrainSpeed ( fSpeed );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA color )
+{
+    Vehicle.SetHeadLightColor ( color );
     return true;
 }
 

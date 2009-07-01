@@ -199,6 +199,9 @@ public:
 
     virtual void                 GetGravity                             ( CVector* pvecGravity ) const = 0;
     virtual void                 SetGravity                             ( const CVector* pvecGravity ) = 0;
+
+    virtual RGBA                 GetHeadLightColor                      ( void ) = 0;
+    virtual void                 SetHeadLightColor                      ( RGBA color ) = 0;
 };
 
 #endif

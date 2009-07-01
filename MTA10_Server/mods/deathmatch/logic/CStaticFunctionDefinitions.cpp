@@ -3846,6 +3846,15 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 }
 
 
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, RGBA & color )
+{
+    assert ( pVehicle );
+    
+    color = pVehicle->GetHeadLightColor ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
     assert ( pElement );
@@ -4769,6 +4778,31 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpee
     BitStream.pBitStream->Write ( fSpeed );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAIN_SPEED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, RGBA color )
+{
+    assert ( pVehicle );
+
+    RGBA _color = pVehicle->GetHeadLightColor ();
+    if ( color != _color )
+    {
+        pVehicle->SetHeadLightColor ( color );
+
+        unsigned char R = COLOR_RGBA_R ( color );
+        unsigned char G = COLOR_RGBA_G ( color );
+        unsigned char B = COLOR_RGBA_B ( color );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pVehicle->GetID () );
+        BitStream.pBitStream->Write ( R );
+        BitStream.pBitStream->Write ( G );
+        BitStream.pBitStream->Write ( B );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream ) );
+    }
 
     return true;
 }

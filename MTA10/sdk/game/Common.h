@@ -14,17 +14,6 @@
 
 #include <windows.h>
 
-typedef DWORD RGBA;
-typedef DWORD ARGB;
-
-#define COLOR_ARGB(a,r,g,b) \
-    ((ARGB)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-#define COLOR_RGBA(r,g,b,a) (RGBA)COLOR_ARGB(a,r,g,b)
-
-#define COLOR_ABGR(a,b,g,r) \
-    ((ABGR)((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-#define COLOR_BGRA(b,g,r,a) (BGRA)COLOR_ARGB(a,b,g,r)
-
 #define MAX_VEHICLES                        110
 #define MAX_PEDS                            140
 #define MAX_OBJECTS                         350

@@ -34,10 +34,10 @@ public:
 
     inline unsigned long            GetColor                        ( void )                            { return m_rgbaColor; };
     void                            GetColor                        ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
-    inline unsigned char            GetColorRed                     ( void ) const                      { return static_cast < unsigned char > ( m_rgbaColor ); };
-    inline unsigned char            GetColorGreen                   ( void ) const                      { return static_cast < unsigned char > ( m_rgbaColor >> 8 ); };
-    inline unsigned char            GetColorBlue                    ( void ) const                      { return static_cast < unsigned char > ( m_rgbaColor >> 16 ); };
-    inline unsigned char            GetColorAlpha                   ( void ) const                      { return static_cast < unsigned char > ( m_rgbaColor >> 24 ); };
+    inline unsigned char            GetColorRed                     ( void ) const                      { return m_rgbaColor.R; };
+    inline unsigned char            GetColorGreen                   ( void ) const                      { return m_rgbaColor.G; };
+    inline unsigned char            GetColorBlue                    ( void ) const                      { return m_rgbaColor.B; };
+    inline unsigned char            GetColorAlpha                   ( void ) const                      { return m_rgbaColor.A; };
     void                            SetColor                        ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
     void                            SetColor                        ( unsigned long ulColor );
 

@@ -16,10 +16,10 @@
 #include <vector>
 
 // SDK includes
+#include "SharedUtil.h"
 #include <game/CGame.h>
 #include <game/CWanted.h>
 #include <ijsify.h>
-#include "SharedUtil.h"
 #include "SString.h"
 
 // Game includes

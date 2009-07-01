@@ -241,6 +241,7 @@ public:
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
     static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
+    static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, RGBA & color );
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
@@ -281,6 +282,7 @@ public:
     static bool                 SetTrainDerailable                  ( CVehicle* pVehicle, bool bDerailable );
     static bool                 SetTrainDirection                   ( CVehicle* pVehicle, bool bDireciton );
     static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
+    static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, RGBA color );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo );

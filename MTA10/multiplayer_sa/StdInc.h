@@ -14,9 +14,9 @@
 #include <vector>
 
 // SDK includes
+#include "SharedUtil.h"
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
-#include "SharedUtil.h"
 #include "SString.h"
 
 // Multiplayer includes

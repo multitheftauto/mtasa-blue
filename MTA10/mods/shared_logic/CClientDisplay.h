@@ -43,12 +43,12 @@ public:
     virtual RGBA                GetColor                ( void )                                { return m_rgbaColor; };
 	virtual void                GetColor                ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
     {
-		ucBlue = static_cast < unsigned char > ( m_rgbaColor );
-		ucGreen = static_cast < unsigned char > ( m_rgbaColor >> 8 );
-		ucRed = static_cast < unsigned char > ( m_rgbaColor >> 16 );
-		ucAlpha = static_cast < unsigned char > ( m_rgbaColor >> 24 );
+		ucBlue  = m_rgbaColor.B;
+		ucGreen = m_rgbaColor.G;
+		ucRed   = m_rgbaColor.R;
+		ucAlpha = m_rgbaColor.A;
 	};
-    inline unsigned char        GetColorAlpha           ( void )                                { return static_cast < unsigned char > ( m_rgbaColor >> 24 ); };
+    inline unsigned char        GetColorAlpha           ( void )                                { return m_rgbaColor.A; };
 
     virtual void                SetColor                ( RGBA rgbaColor )                      { m_rgbaColor = rgbaColor; };
     virtual void                SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { m_rgbaColor = COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha ); };

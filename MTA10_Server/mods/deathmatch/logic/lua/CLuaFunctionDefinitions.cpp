@@ -4452,6 +4452,36 @@ int CLuaFunctionDefinitions::IsVehicleBlown ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::GetVehicleHeadLightColor ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            RGBA color;
+            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( pVehicle, color ) )
+            {
+                unsigned char R = COLOR_RGBA_R ( color );
+                unsigned char G = COLOR_RGBA_G ( color );
+                unsigned char B = COLOR_RGBA_B ( color );
+
+                lua_pushnumber ( luaVM, R );
+                lua_pushnumber ( luaVM, G );
+                lua_pushnumber ( luaVM, B );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHeadLightColor", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHeadLightColor" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::SetVehicleRotation ( lua_State* luaVM )
 {
     // Verify the arguments
@@ -5535,6 +5565,41 @@ int CLuaFunctionDefinitions::SetTrainSpeed ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrainSpeed" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetVehicleHeadLightColor ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucR = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            unsigned char ucG = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned char ucB = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+
+            RGBA color = COLOR_RGBA ( ucR, ucG, ucB, 255 );
+            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( pVehicle, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHeadLightColor", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
