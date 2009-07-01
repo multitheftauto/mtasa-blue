@@ -267,6 +267,9 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &weaponType ) )
     {
+        bool bReload = false;
+        bitStream.ReadBit ( bReload );
+
         unsigned char ucWeaponID = weaponType.data.ucWeaponType;
         SWeaponAmmoSync ammo ( ucWeaponID, true, true );
 
@@ -286,19 +289,19 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 		        if ( pPlayerWeapon == NULL ) return;
 
                 unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
-                pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
                 pPlayerWeapon->SetAmmoTotal ( usAmmo );
-
+                if ( bReload ) {
+                    //Reload
+                    pPlayerWeapon->SetState( WEAPONSTATE_RELOADING );
+                    return;
+                }
+                pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
                 if ( !usAmmoInClip )
                 {
                     if ( usAmmo > ucAmmoInClip )
                         pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
                     else if ( usAmmo <= ucAmmoInClip )
                         pPlayerWeapon->SetAmmoInClip ( usAmmo );
-                }
-                if ( usAmmoInClip == 0 ) {
-                    //Reload
-                    pPlayerWeapon->SetState( WEAPONSTATE_RELOADING );
                 }
             }
         }
