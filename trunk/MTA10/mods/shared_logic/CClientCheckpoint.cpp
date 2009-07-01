@@ -244,10 +244,10 @@ void CClientCheckpoint::SetIcon ( unsigned int uiIcon )
 
 void CClientCheckpoint::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
 {
-    Red = static_cast < unsigned char > ( m_rgbaColor );
-    Green = static_cast < unsigned char > ( m_rgbaColor >> 8 );
-    Blue = static_cast < unsigned char > ( m_rgbaColor >> 16 );
-    Alpha = static_cast < unsigned char > ( m_rgbaColor >> 24 );
+    Red   = m_rgbaColor.R;
+    Green = m_rgbaColor.G;
+    Blue  = m_rgbaColor.B;
+    Alpha = m_rgbaColor.A;
 }
 
 

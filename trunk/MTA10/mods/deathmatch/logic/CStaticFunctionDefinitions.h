@@ -167,6 +167,7 @@ public:
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
+    static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, RGBA & color );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -200,6 +201,7 @@ public:
     static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
     static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
+    static bool                         SetVehicleHeadLightColor            ( CClientVehicle& Vehicle, RGBA color );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );

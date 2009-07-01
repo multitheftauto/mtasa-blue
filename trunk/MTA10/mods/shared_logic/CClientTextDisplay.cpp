@@ -171,10 +171,9 @@ void CClientTextDisplay::SetColor ( RGBA rgbaColor )
 
 void CClientTextDisplay::SetColorAlpha ( unsigned char ucAlpha )
 {
-    unsigned char ucRGBA [4];
-    GetColor ( ucRGBA [0], ucRGBA [1], ucRGBA [2], ucRGBA [3] );
-    ucRGBA [3] = ucAlpha;
-    SetColor ( ucRGBA [0], ucRGBA [1], ucRGBA [2], ucRGBA [3] );
+    SColor color = GetColor ();
+    color.A = ucAlpha;
+    SetColor ( color );
 }
 
 void CClientTextDisplay::SetScale ( float fScale )

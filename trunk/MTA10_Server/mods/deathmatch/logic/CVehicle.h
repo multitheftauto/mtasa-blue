@@ -235,6 +235,9 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
+    inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
+    inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
+
     // Functions used to remember where this vehicle spawns
     void                            PutAtRespawnLocation    ( void );
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
@@ -298,6 +301,7 @@ private:
     bool                            m_bTrainDirection;
 
     CPlayer *                       m_pJackingPlayer;
+    RGBA                            m_HeadLightColor;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

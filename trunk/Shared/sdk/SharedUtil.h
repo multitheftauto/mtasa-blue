@@ -104,6 +104,88 @@ namespace SharedUtil
         return static_cast < int > ( floor ( value + 0.5f ) );
     }
 
+
+    //
+    // SColor
+    //
+    // Encapsulates the most common usage of 4 byte color storage.
+    // Casts to and from a DWORD as 0xAARRGGBB
+    //
+    class SColor
+    {
+        // No shifting allowed to access the color channel information
+        void operator >> ( int ) const;
+        void operator << ( int ) const;
+        void operator >>= ( int );
+        void operator <<= ( int );
+    public:
+        union
+        {
+            struct
+            {
+                unsigned char B, G, R, A;
+            };
+            unsigned long ulARGB;
+        };
+
+        SColor () {}
+        SColor ( unsigned long ulValue )
+        {
+            ulARGB = ulValue;
+        }
+
+        operator unsigned long () const
+        {
+            return ulARGB;
+        }
+    };
+
+
+    //
+    // SColorARGB
+    //
+    // Make an SColor from A,R,G,B
+    //
+    class SColorARGB : public SColor
+    {
+    public:
+        SColorARGB ( unsigned char ucA, unsigned char ucR, unsigned char ucG, unsigned char ucB )
+        {
+            A = ucA; R = ucR; G = ucG; B = ucB;
+        }
+    };
+
+
+    //
+    // SColorRGBA
+    //
+    // Make an SColor from R,G,B,A
+    //
+    class SColorRGBA : public SColor
+    {
+    public:
+        SColorRGBA ( unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA )
+        {
+            A = ucA; R = ucR; G = ucG; B = ucB;
+        }
+    };
+
+
+    //
+    // Things to make it simpler to use SColor with the source code as it stands
+    //
+    typedef SColor RGBA;
+
+    inline unsigned char COLOR_RGBA_R ( SColor color ) { return color.R; }
+    inline unsigned char COLOR_RGBA_G ( SColor color ) { return color.G; }
+    inline unsigned char COLOR_RGBA_B ( SColor color ) { return color.B; }
+    inline unsigned char COLOR_RGBA_A ( SColor color ) { return color.A; }
+    inline unsigned char COLOR_ARGB_A ( SColor color ) { return color.A; }
+
+    inline SColor COLOR_RGBA ( unsigned char R, unsigned char G, unsigned char B, unsigned char A ) { return SColorRGBA ( R, G, B, A ); }
+    inline SColor COLOR_ARGB ( unsigned char A, unsigned char R, unsigned char G, unsigned char B ) { return SColorRGBA ( R, G, B, A ); }
+    inline SColor COLOR_ABGR ( unsigned char A, unsigned char B, unsigned char G, unsigned char R ) { return SColorRGBA ( R, G, B, A ); }
+
 };
 
 using namespace SharedUtil;

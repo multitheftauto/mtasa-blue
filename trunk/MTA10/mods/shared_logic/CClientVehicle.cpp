@@ -129,6 +129,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
+    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -1992,6 +1993,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetAreaCode ( m_ucInterior );
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
+        m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
 
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
@@ -2931,4 +2933,24 @@ void CClientVehicle::SetGravity ( const CVector& vecGravity )
         m_pVehicle->SetGravity ( &vecGravity );
 
     m_vecGravity = vecGravity;
+}
+
+
+RGBA CClientVehicle::GetHeadLightColor ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetHeadLightColor ();
+    }
+    return m_HeadLightColor;
+}
+
+
+void CClientVehicle::SetHeadLightColor ( RGBA color )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetHeadLightColor ( color );
+    }
+    m_HeadLightColor = color;
 }
