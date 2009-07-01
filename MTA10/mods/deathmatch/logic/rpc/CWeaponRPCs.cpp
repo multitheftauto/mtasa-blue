@@ -296,6 +296,10 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
                     else if ( usAmmo <= ucAmmoInClip )
                         pPlayerWeapon->SetAmmoInClip ( usAmmo );
                 }
+                if ( usAmmoInClip == 0 ) {
+                    //Reload
+                    pPlayerWeapon->SetState( WEAPONSTATE_RELOADING );
+                }
             }
         }
     }
