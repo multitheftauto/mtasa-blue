@@ -13,6 +13,7 @@
 #define __CGAME_3DMARKER
 
 #include "Common.h"
+#include "SharedUtil.h"
 
 class CVector;
 struct RpClump;
@@ -32,7 +33,7 @@ public:
 	virtual DWORD			GetType()=0; // need enum?
 	virtual BOOL			IsActive()=0;
 	virtual DWORD			GetIdentifier()=0;
-	virtual RGBA			GetColor()=0;
+    virtual SharedUtil::RGBA GetColor()=0;
 	virtual VOID			SetColor(RGBA color)=0;
 	virtual VOID			SetPulsePeriod(WORD wPulsePeriod)=0;
 	virtual VOID			SetPulseFraction(FLOAT fPulseFraction)=0;
