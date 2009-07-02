@@ -2845,11 +2845,11 @@ void CClientVehicle::UpdateTargetPosition ( void )
         {
             // Calculate how much to interpolate and add it as long as this is the direction we're interpolating
             vecOffset /= CVector ( fInterpolationStrengthXY, fInterpolationStrengthXY, fInterpolationStrengthZ );
-            if ( ( vecOffset.fX > 0.0f ) == m_bTargetPositionDirections [ 0 ] )
+            //if ( ( vecOffset.fX > 0.0f ) == m_bTargetPositionDirections [ 0 ] )
                 vecPosition.fX += vecOffset.fX;
-            if ( ( vecOffset.fY > 0.0f ) == m_bTargetPositionDirections [ 1 ] )
+            //if ( ( vecOffset.fY > 0.0f ) == m_bTargetPositionDirections [ 1 ] )
                 vecPosition.fY += vecOffset.fY;
-            if ( ( vecOffset.fZ > 0.0f ) == m_bTargetPositionDirections [ 2 ] )
+            //if ( ( vecOffset.fZ > 0.0f ) == m_bTargetPositionDirections [ 2 ] )
                 vecPosition.fZ += vecOffset.fZ;
         }
 
@@ -2888,6 +2888,9 @@ void CClientVehicle::UpdateTargetRotation ( void )
         vecRotation += vecOffset;
 
         SetRotationDegrees ( vecRotation );
+
+        // SetRotationDegrees clears m_bHasTargetRotation, and we don't want that
+        m_bHasTargetRotation = true;
     }
 }
 
