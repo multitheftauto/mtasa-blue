@@ -62,7 +62,7 @@ void CClientCorona::GetColor ( unsigned char& Red, unsigned char& Green, unsigne
 
 void CClientCorona::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
 {
-    SetColor ( (((((Alpha)&0xff)<<24)|(((Blue)&0xff)<<16)|(((Green)&0xff)<<8)|((Red)&0xff))) );
+    SetColor ( SColorARGB ( Alpha, Red, Green, Blue ) );
 }
 
 

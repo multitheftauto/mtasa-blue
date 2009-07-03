@@ -59,9 +59,9 @@ public:
     inline float            GetSize                 ( void )                                        { return m_fSize; };
     void                    GetColor                ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A );
     inline unsigned long    GetColor                ( void )                                        { return m_ulColor; };
-    inline unsigned char    GetColorRed             ( void )                                        { return static_cast < unsigned char > ( m_ulColor ); };
+    inline unsigned char    GetColorRed             ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 16 ); };
     inline unsigned char    GetColorGreen           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 8 ); };
-    inline unsigned char    GetColorBlue            ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 16 ); };
+    inline unsigned char    GetColorBlue            ( void )                                        { return static_cast < unsigned char > ( m_ulColor ); };
     inline unsigned char    GetColorAlpha           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 24 ); };
     inline unsigned char    GetIcon                 ( void )                                        { return m_ucIcon; }
     

@@ -253,7 +253,7 @@ void CClientCheckpoint::GetColor ( unsigned char& Red, unsigned char& Green, uns
 
 void CClientCheckpoint::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
 {
-    SetColor ( (((((Alpha)&0xff)<<24)|(((Blue)&0xff)<<16)|(((Green)&0xff)<<8)|((Red)&0xff))) );
+    SetColor ( SColorARGB ( Alpha, Red, Green, Blue ) );
 }
 
 
