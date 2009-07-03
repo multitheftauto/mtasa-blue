@@ -182,6 +182,6 @@ CExplosion * CClientExplosionManager::Create ( eExplosionType explosionType, CVe
         }
     }
 
-    CExplosion * pExplosion = g_pGame->GetExplosionManager ()->AddExplosion ( explosionType, &vecPosition, pGameCreator, bMakeSound, fCamShake, bNoDamage );
+    CExplosion * pExplosion = g_pGame->GetExplosionManager ()->AddExplosion ( NULL, pGameCreator, explosionType, vecPosition, 0, bMakeSound, fCamShake, bNoDamage );
     return pExplosion;
 }
