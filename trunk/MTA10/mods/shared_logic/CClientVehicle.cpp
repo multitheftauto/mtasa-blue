@@ -130,10 +130,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
-    m_fTargetPositionWeight = 0.f;
-    m_fTargetPositionTargetWeight = 0.f;
-    m_fTargetRotationWeight = 0.f;
-    m_fTargetRotationTargetWeight = 0.f;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -2649,13 +2645,6 @@ void CClientVehicle::SetSmokeTrailEnabled ( bool bEnabled )
 
 void CClientVehicle::ResetInterpolation ( void )
 {
-    m_bHasTargetPosition = false;
-    m_bHasTargetRotation = false;
-    m_fTargetPositionWeight = 0.f;
-    m_fTargetPositionTargetWeight = 0.f;
-    m_fTargetRotationWeight = 0.f;
-    m_fTargetRotationTargetWeight = 0.f;
-
 	float f[3];
 	double dCurrentTime = CClientTime::GetTimeNano ();
 
@@ -2779,23 +2768,19 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition )
         m_bTargetPositionDirections [ 2 ] = ( vecTemp.fZ < vecPosition.fZ );
         m_vecTargetPosition = vecPosition;
         m_bHasTargetPosition = true;
-        m_fTargetPositionWeight = 1.f;          // Switch position interpolation on
-        m_fTargetPositionTargetWeight = 1.f;
     }
     else
     {
         // Update our position now and remove any previous target we had
         SetPosition ( vecPosition );
         m_bHasTargetPosition = false;
-        m_fTargetPositionWeight = 0.f;          // Switch position interpolation off
-        m_fTargetPositionTargetWeight = 0.f;
     }
 }
 
 
 void CClientVehicle::RemoveTargetPosition ( void )
 {
-    m_fTargetPositionTargetWeight = 0.f;        // Fade position interpolation out
+    m_bHasTargetPosition = false;
 }
 
 
@@ -2807,23 +2792,19 @@ void CClientVehicle::SetTargetRotation ( CVector& vecRotation )
         // Set our target rotation
         m_vecTargetRotation = vecRotation;
         m_bHasTargetRotation = true;
-        m_fTargetRotationWeight = 1.f;          // Switch rotation interpolation on
-        m_fTargetRotationTargetWeight = 1.f;
     }
     else
     {
         // Update our rotation now and remove any previous target we had
         SetRotationDegrees ( vecRotation );
         m_bHasTargetRotation = false;
-        m_fTargetRotationWeight = 0.f;          // Switch rotation interpolation off
-        m_fTargetRotationTargetWeight = 0.f;
     }
 }
 
 
 void CClientVehicle::RemoveTargetRotation ( void )
 {
-    m_fTargetRotationTargetWeight = 0.f;        // Fade rotation interpolation out
+    m_bHasTargetRotation = false;
 }
 
 float fInterpolationStrengthXY = 12;
@@ -2832,14 +2813,6 @@ float fInterpolationStrengthR = 8;
 
 void CClientVehicle::UpdateTargetPosition ( void )
 {
-    // Update m_fTargetPositionWeight - Aim to be at m_fTargetPositionTargetWeight in 1.5 seconds
-    float fTimeSlice = 1/30.f;
-    m_fTargetPositionWeight = Lerp ( m_fTargetPositionWeight, Min ( 1.0f, fTimeSlice * 1.5f ) , m_fTargetPositionTargetWeight );
-    if ( m_fTargetPositionWeight < 0.001f )
-    {
-       m_bHasTargetPosition = false; 
-    }
-
     // Do we have a position to move towards? and are we streamed in?
     if ( m_bHasTargetPosition && m_pVehicle )
     {
@@ -2880,8 +2853,7 @@ void CClientVehicle::UpdateTargetPosition ( void )
         else
         {
             // Calculate how much to interpolate and add it as long as this is the direction we're interpolating
-            CVector vecScale = CVector ( 2.5f, 2.5f, 2.5f ) * fTimeSlice * m_fTargetPositionWeight;
-            vecOffset *= vecScale;
+            vecOffset /= CVector ( fInterpolationStrengthXY, fInterpolationStrengthXY, fInterpolationStrengthZ );
             //if ( ( vecOffset.fX > 0.0f ) == m_bTargetPositionDirections [ 0 ] )
                 vecPosition.fX += vecOffset.fX;
             //if ( ( vecOffset.fY > 0.0f ) == m_bTargetPositionDirections [ 1 ] )
@@ -2910,14 +2882,6 @@ void CClientVehicle::UpdateTargetPosition ( void )
 
 void CClientVehicle::UpdateTargetRotation ( void )
 {
-    // Update m_fTargetRotationWeight - Aim to be at m_fTargetRotationTargetWeight in 1.5 seconds
-    float fTimeSlice = 1/30.f;
-    m_fTargetRotationWeight = Lerp ( m_fTargetRotationWeight, Min ( 1.0f, fTimeSlice * 1.5f ) , m_fTargetRotationTargetWeight );
-    if ( m_fTargetRotationWeight < 0.001f )
-    {
-       m_bHasTargetRotation = false; 
-    }
-
     // Do we have a rotation to move towards? and are we streamed in?
     if ( m_bHasTargetRotation && m_pVehicle )
     {
@@ -2929,16 +2893,13 @@ void CClientVehicle::UpdateTargetRotation ( void )
         vecOffset.fY = GetOffsetDegrees ( vecRotation.fY, m_vecTargetRotation.fY );
         vecOffset.fZ = GetOffsetDegrees ( vecRotation.fZ, m_vecTargetRotation.fZ );
 
-        CVector vecScale = CVector ( 3.75f, 3.75f, 3.75f ) * fTimeSlice * m_fTargetRotationWeight;
-        vecOffset *= vecScale;
+        vecOffset /= CVector ( fInterpolationStrengthR, fInterpolationStrengthR, fInterpolationStrengthR );
         vecRotation += vecOffset;
-
-        float fSaved = m_fTargetRotationTargetWeight;
 
         SetRotationDegrees ( vecRotation );
 
-        // SetRotationDegrees sets m_fTargetRotationTargetWeight, and we don't want that
-        m_fTargetRotationTargetWeight = fSaved;
+        // SetRotationDegrees clears m_bHasTargetRotation, and we don't want that
+        m_bHasTargetRotation = true;
     }
 }
 
