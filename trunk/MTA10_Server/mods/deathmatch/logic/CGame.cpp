@@ -2317,7 +2317,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 {
                                     pVehicle->SetIdleTime ( GetTime () );
                                 }
-
+                                pPlayer->SetVehicleAction( CPlayer::VEHICLEACTION_NONE );
                                 // Tell the other players about it
                                 CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_FELL_OFF_RETURN );
                                 Reply.SetSourceElement ( pPlayer );
