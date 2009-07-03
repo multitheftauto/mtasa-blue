@@ -281,17 +281,8 @@ void CMarker::SetColor ( unsigned long ulColor )
 
 void CMarker::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
-    // TODO: Move
-    #define COLOR_ARGB(a,r,g,b) \
-        (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-    #define COLOR_RGBA(r,g,b,a) COLOR_ARGB(a,r,g,b)
-
-    #define COLOR_ABGR(a,b,g,r) \
-        (((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-    #define COLOR_BGRA(b,g,r,a) COLOR_ARGB(a,b,g,r)
-
     // Set the new color
-    SetColor ( COLOR_ARGB ( ucAlpha, ucBlue, ucGreen, ucRed ) );
+    SetColor ( COLOR_ARGB ( ucAlpha, ucRed, ucGreen, ucBlue ) );
 }
 
 

@@ -75,13 +75,16 @@ VOID CCheckpointSA::SetIdentifier(DWORD dwIdentifier)
 RGBA CCheckpointSA::GetColor()
 {
 	DEBUG_TRACE("RGBA CCheckpointSA::GetColor()");
-	return this->GetInterface()->rwColour;
+    // From ABGR
+    unsigned long ulABGR = this->GetInterface()->rwColour;
+	return ( ulABGR >> 24 ) | ulABGR | ( ulABGR >> 8 ) | ( ulABGR >> 16 );
 }
 
 VOID CCheckpointSA::SetColor(RGBA color)
 {
 	DEBUG_TRACE("VOID CCheckpointSA::SetColor(RGBA color)");
-	this->GetInterface()->rwColour = color;
+    // To ABGR
+	this->GetInterface()->rwColour = ( color.A << 24 ) | ( color.B << 16 ) | ( color.G << 8 ) | color.R;
 }
 
 VOID CCheckpointSA::SetPulsePeriod(WORD wPulsePeriod)

@@ -65,12 +65,15 @@ DWORD C3DMarkerSA::GetIdentifier()
 RGBA C3DMarkerSA::GetColor()
 {
 	DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
-	return this->GetInterface()->rwColour;
+    // From ABGR
+    unsigned long ulABGR = this->GetInterface()->rwColour;
+	return ( ulABGR >> 24 ) | ulABGR | ( ulABGR >> 8 ) | ( ulABGR >> 16 );
 }
 
 VOID C3DMarkerSA::SetColor(RGBA color)
 {
-	this->GetInterface()->rwColour = color;
+    // To ABGR
+	this->GetInterface()->rwColour = ( color.A << 24 ) | ( color.B << 16 ) | ( color.G << 8 ) | color.R;
 }
 
 VOID C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
