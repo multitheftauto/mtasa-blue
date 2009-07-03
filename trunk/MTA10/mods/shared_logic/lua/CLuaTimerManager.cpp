@@ -103,7 +103,11 @@ CLuaTimer* CLuaTimerManager::AddTimer ( lua_State* luaVM )
 {
     if ( luaVM )
     {
-        if ( lua_type ( luaVM, 1 ) && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+        int iArgument2 = lua_type ( luaVM, 2 );
+        int iArgument3 = lua_type ( luaVM, 3 );
+        if ( lua_type ( luaVM, 1 ) &&
+             ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) ||
+             ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
         {
             // Grab the string argument, start-time, delay and repeats
             unsigned long ulTimeDelay = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
