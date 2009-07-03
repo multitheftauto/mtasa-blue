@@ -55,60 +55,7 @@ CClientCamera::~CClientCamera ( void )
 
 
 void CClientCamera::DoPulse ( void )
-{
-    // If we aren't invalidated
-    if ( !m_bInvalidated )
-    {
-        // If we got the camera behind a player but no focused entity
-        if ( m_pFocusedPlayer )
-        {
-            if ( m_pFocusedEntity )
-            {
-                // Is the focused entity a vehicle, but the player doesn't have any occupied?
-                CClientVehicle* pVehicle = m_pFocusedPlayer->GetOccupiedVehicle ();
-                if ( m_pFocusedEntity->GetType () == CCLIENTVEHICLE )
-                {
-                    if ( !pVehicle )
-                    {
-                        SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
-                    }
-                }
-                else if ( pVehicle )
-                {
-                    SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
-                }
-            }
-            else
-            {
-                SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
-            }
-        }
-
-        // Make sure the world center is where the camera is
-        if ( m_pFocusedGameEntity )
-        {
-            // Make sure we have the proper rotation for what we're spectating
-            float fRotation = 0;
-            if ( m_pFocusedEntity )
-            {
-                eClientEntityType eType = m_pFocusedEntity->GetType ();
-                if ( eType == CCLIENTVEHICLE )
-                {
-                    CVector vecVehicleRotation;
-                    static_cast < CClientVehicle* > ( m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
-                    fRotation = vecVehicleRotation.fZ * 3.14159f / 180;
-                }
-                else if ( eType == CCLIENTPED || eType == CCLIENTPLAYER )
-                {
-                    fRotation = static_cast < CClientPed* > ( m_pFocusedEntity )->GetCurrentRotation ();
-                }
-            }
-
-            // Set the new world center/rotation
-            g_pMultiplayer->SetCenterOfWorld ( NULL, m_pFocusedGameEntity->GetPosition (), fRotation );
-        }
-    }
-
+{   
     // If we're fixed, force the target vector
     if ( m_bFixed )
     {
@@ -118,6 +65,61 @@ void CClientCamera::DoPulse ( void )
         GetMatrix ( matTemp );
         g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );    
         g_pMultiplayer->SetCenterOfWorld ( NULL, &m_vecFixedPosition, 3.1415926535897932384626433832795f - vecRotation.fZ );
+    }
+    else
+    {
+        // If we aren't invalidated
+        if ( !m_bInvalidated )
+        {
+            // If we got the camera behind a player but no focused entity
+            if ( m_pFocusedPlayer )
+            {
+                if ( m_pFocusedEntity )
+                {
+                    // Is the focused entity a vehicle, but the player doesn't have any occupied?
+                    CClientVehicle* pVehicle = m_pFocusedPlayer->GetOccupiedVehicle ();
+                    if ( m_pFocusedEntity->GetType () == CCLIENTVEHICLE )
+                    {
+                        if ( !pVehicle )
+                        {
+                            SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                        }
+                    }
+                    else if ( pVehicle )
+                    {
+                        SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                    }
+                }
+                else
+                {
+                    SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                }
+            }
+
+            // Make sure the world center is where the camera is
+            if ( m_pFocusedGameEntity )
+            {
+                // Make sure we have the proper rotation for what we're spectating
+                float fRotation = 0;
+                if ( m_pFocusedEntity )
+                {
+                    eClientEntityType eType = m_pFocusedEntity->GetType ();
+                    if ( eType == CCLIENTVEHICLE )
+                    {
+                        CVector vecVehicleRotation;
+                        static_cast < CClientVehicle* > ( m_pFocusedEntity )->GetRotationRadians ( vecVehicleRotation );
+                        fRotation = vecVehicleRotation.fZ * 3.14159f / 180;
+                    }
+                    else if ( eType == CCLIENTPED || eType == CCLIENTPLAYER )
+                    {
+                        fRotation = static_cast < CClientPed* > ( m_pFocusedEntity )->GetCurrentRotation ();
+                    }
+                }
+
+                // Set the new world center/rotation
+                g_pMultiplayer->SetCenterOfWorld ( NULL, m_pFocusedGameEntity->GetPosition (), fRotation );
+            }
+        }
     }
 }
 
