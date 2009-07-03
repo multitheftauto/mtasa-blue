@@ -364,7 +364,9 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
             CObject* pTemp = m_pObjectManager->Create ( pElement->GetParentEntity () );
             if ( pTemp )
             {
-                pTemp->SetRotation ( pObject->GetRotation () );
+                CVector vecRotation;
+                pObject->GetRotation ( vecRotation );
+                pTemp->SetRotation ( vecRotation );
                 pTemp->SetModel ( pObject->GetModel () );
                 pTemp->SetParentObject ( pObject->GetParentEntity () );
 
@@ -5283,7 +5285,7 @@ CObject* CStaticFunctionDefinitions::CreateObject ( CResource* pResource, unsign
 
 bool CStaticFunctionDefinitions::GetObjectRotation ( CObject* pObject, CVector& vecRotation )
 {
-    vecRotation = pObject->GetRotation ();
+    pObject->GetRotation ( vecRotation );
     ConvertRadiansToDegrees ( vecRotation );
     return true;
 }
@@ -5324,7 +5326,8 @@ bool CStaticFunctionDefinitions::MoveObject ( CElement* pElement, unsigned long 
 
         // Grab the source position and rotation
         CVector vecSourcePosition = pObject->GetPosition ();
-        CVector vecSourceRotation = pObject->GetRotation ();
+        CVector vecSourceRotation;
+        pObject->GetRotation ( vecSourceRotation );
 
         // Convert the target rotation given to radians (don't wrap around as these can be rotated more than 360)
         CVector vecRadians = vecRotation;
@@ -5368,7 +5371,8 @@ bool CStaticFunctionDefinitions::StopObject ( CElement* pElement )
 
         // Grab the source position and rotation
         CVector vecSourcePosition = pObject->GetPosition ();
-        CVector vecSourceRotation = pObject->GetRotation ();
+        CVector vecSourceRotation;
+        pObject->GetRotation ( vecSourceRotation );
 
         // Tell the players
         CBitStream BitStream;

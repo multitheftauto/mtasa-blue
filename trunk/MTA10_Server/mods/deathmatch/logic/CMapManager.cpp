@@ -299,7 +299,8 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
             BitStream.pBitStream->Write ( vecTemp.fY );
             BitStream.pBitStream->Write ( vecTemp.fZ );
 
-            CVector vecRotation = pObject->GetRotation ();
+            CVector vecRotation;
+            pObject->GetRotation ( vecRotation );
             BitStream.pBitStream->Write ( vecRotation.fX );
             BitStream.pBitStream->Write ( vecRotation.fY );
             BitStream.pBitStream->Write ( vecRotation.fZ );

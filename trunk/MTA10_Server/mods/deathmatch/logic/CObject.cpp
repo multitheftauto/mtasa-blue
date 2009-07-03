@@ -184,15 +184,13 @@ void CObject::SetPosition ( const CVector& vecPosition )
 }
 
 
-const CVector& CObject::GetRotation ( void )
+void CObject::GetRotation ( CVector & vecRotation )
 {
+    vecRotation = m_vecRotation;
+
     // Are we attached to something?
-    if ( m_pAttachedTo )
-    {
-        // TODO: fix this
-        //m_vecRotation = m_pAttachedTo->GetRotation ();
-        m_vecRotation += m_vecAttachedRotation;
-    }
+    if ( m_pAttachedTo ) vecRotation += m_vecAttachedRotation;
+
     // Are we moving?
     else if ( IsMoving () )
     {
@@ -212,11 +210,8 @@ const CVector& CObject::GetRotation ( void )
         vecJourney *= fTimePassed;
 
         // Update our stored rotation
-        m_vecRotation = m_moveData.vecStartRotation + vecJourney;
+        vecRotation = m_vecRotation = m_moveData.vecStartRotation + vecJourney;
     }
-
-    // Finally, return it
-    return m_vecRotation;
 }
 
 
@@ -269,7 +264,7 @@ void CObject::Move ( const CVector& vecPosition, const CVector& vecRotation, uns
         // Setup our move data
         m_moveData.vecStartPosition = GetPosition ();
         m_moveData.vecStopPosition = vecPosition;
-        m_moveData.vecStartRotation = GetRotation ();
+        GetRotation ( m_moveData.vecStartRotation );
         m_moveData.vecStopRotation = vecRotation;
         m_moveData.ulTime = ulTime;
         m_moveData.ulTimeStart = GetTime ();
@@ -280,7 +275,9 @@ void CObject::Move ( const CVector& vecPosition, const CVector& vecRotation, uns
     else
     {
         SetPosition ( vecPosition );
-        SetRotation ( GetRotation () + vecRotation );
+        CVector vecRotation;
+        GetRotation ( vecRotation );
+        SetRotation ( vecRotation + vecRotation );
     }
 }
 
