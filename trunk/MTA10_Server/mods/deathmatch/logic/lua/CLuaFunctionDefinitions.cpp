@@ -1115,20 +1115,14 @@ int CLuaFunctionDefinitions::SetPlayerAmmo ( lua_State* luaVM )
             
             int iArgument4 = lua_type ( luaVM, 4 );
             unsigned short usAmmoInClip = 0;
-            bool bReload = false;
             if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
             {
                 usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
             }
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( iArgument5 == LUA_TBOOLEAN )
-            {
-                bReload = lua_toboolean ( luaVM, 5 ) ? true : false;
-            }
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pPlayer, ucSlot, usAmmo, usAmmoInClip, bReload ) )
+                if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pPlayer, ucSlot, usAmmo, usAmmoInClip ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -3186,7 +3180,6 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
     int iArgument2 = lua_type ( luaVM, 2 );
     int iArgument3 = lua_type ( luaVM, 3 );
     int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
     if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
          ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
@@ -3195,18 +3188,13 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
         unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
         unsigned short usAmmoInClip = 0;
-        bool bReload = false;
         if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
         {
             usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
         }
-        if ( iArgument5 == LUA_TBOOLEAN )
-        {
-            bReload = lua_toboolean ( luaVM, 5 ) ? true : false;
-        }
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo, usAmmoInClip, bReload ) )
+            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo, usAmmoInClip ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
