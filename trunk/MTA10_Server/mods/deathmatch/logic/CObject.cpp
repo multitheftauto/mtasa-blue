@@ -275,9 +275,9 @@ void CObject::Move ( const CVector& vecPosition, const CVector& vecRotation, uns
     else
     {
         SetPosition ( vecPosition );
-        CVector vecRotation;
-        GetRotation ( vecRotation );
-        SetRotation ( vecRotation + vecRotation );
+        CVector vecTemp;
+        GetRotation ( vecTemp );
+        SetRotation ( vecTemp + vecRotation );
     }
 }
 
