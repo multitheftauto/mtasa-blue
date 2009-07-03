@@ -147,7 +147,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( vecTemp.fZ );
 
                     // Rotation
-                    vecTemp = pObject->GetRotation ();
+                    pObject->GetRotation ( vecTemp );
                     BitStream.Write ( vecTemp.fX );
                     BitStream.Write ( vecTemp.fY );
                     BitStream.Write ( vecTemp.fZ );
