@@ -459,10 +459,6 @@ protected:
     bool                        m_bHasTargetPosition;
     CVector                     m_vecTargetRotation;
     bool                        m_bHasTargetRotation;
-    float                       m_fTargetPositionWeight;
-    float                       m_fTargetPositionTargetWeight;
-    float                       m_fTargetRotationWeight;
-    float                       m_fTargetRotationTargetWeight;
 
     unsigned long               m_ulIllegalTowBreakTime;
 
