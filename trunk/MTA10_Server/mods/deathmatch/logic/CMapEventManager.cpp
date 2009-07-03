@@ -258,6 +258,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     lua_getglobal ( pState, "sourceResourceRoot" );
                     CLuaArgument OldResourceRoot ( pState, -1 );
+                    
+                    lua_getglobal ( pState, "eventName" );
+                    CLuaArgument OldEventName ( pState, -1 );
 
                     lua_getglobal ( pState, "client" );
                     CLuaArgument OldClient ( pState, -1 );
@@ -274,6 +277,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
 				    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );
 				    lua_setglobal ( pState, "sourceResourceRoot" );
+
+                    lua_pushstring ( pState, szName );
+                    lua_setglobal ( pState, "eventName" );
 
 				    if ( pCaller )
 				    {
@@ -302,6 +308,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     OldResourceRoot.Push ( pState );
                     lua_setglobal ( pState, "sourceResourceRoot" );
+
+                    OldEventName.Push ( pState );
+                    lua_setglobal ( pState, "eventName" );
 
                     OldClient.Push ( pState );
                     lua_setglobal ( pState, "client" );
