@@ -279,45 +279,6 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
     // Send it
     Player.Send ( EntityPacket );
 
-    // Tell him which objects are moving
-    CObject* pObject;
-    iterObjects = m_pObjectManager->IterBegin ();
-    for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
-    {
-        // Is the object moving?
-        pObject = *iterObjects;
-        if ( pObject->IsMoving () )
-        {
-            // Tell him about it
-            CBitStream BitStream;
-            BitStream.pBitStream->Write ( pObject->GetID () );
-            BitStream.pBitStream->Write ( pObject->GetMoveTimeLeft () );
-
-
-            CVector vecTemp = pObject->GetPosition ();
-            BitStream.pBitStream->Write ( vecTemp.fX );
-            BitStream.pBitStream->Write ( vecTemp.fY );
-            BitStream.pBitStream->Write ( vecTemp.fZ );
-
-            CVector vecRotation;
-            pObject->GetRotation ( vecRotation );
-            BitStream.pBitStream->Write ( vecRotation.fX );
-            BitStream.pBitStream->Write ( vecRotation.fY );
-            BitStream.pBitStream->Write ( vecRotation.fZ );
-
-            vecTemp = pObject->m_moveData.vecStopPosition;
-            BitStream.pBitStream->Write ( vecTemp.fX );
-            BitStream.pBitStream->Write ( vecTemp.fY );
-            BitStream.pBitStream->Write ( vecTemp.fZ );
-
-            vecTemp = pObject->m_moveData.vecStopRotation - vecRotation;
-            BitStream.pBitStream->Write ( vecTemp.fX );
-            BitStream.pBitStream->Write ( vecTemp.fY );
-            BitStream.pBitStream->Write ( vecTemp.fZ );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MOVE_OBJECT, *BitStream.pBitStream ) );
-        }
-    }
-
     // Send per-player entities
     SendPerPlayerEntities ( Player );
 
