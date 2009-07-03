@@ -5316,9 +5316,9 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CElement* pElement, const C
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
 {
-    RUN_CHILDREN MoveObject ( *iter, ulTime, vecPosition, vecRotation );
+    RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation );
 
     if ( IS_OBJECT ( pElement ) )
     {
@@ -5333,26 +5333,30 @@ bool CStaticFunctionDefinitions::MoveObject ( CElement* pElement, unsigned long 
         CVector vecRadians = vecRotation;
         ConvertDegreesToRadiansNoWrap ( vecRadians );
 
-        // Tell the players
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( pObject->GetID () );
-        BitStream.pBitStream->Write ( ulTime );
-        BitStream.pBitStream->Write ( vecSourcePosition.fX );
-        BitStream.pBitStream->Write ( vecSourcePosition.fY );
-        BitStream.pBitStream->Write ( vecSourcePosition.fZ );
-        BitStream.pBitStream->Write ( vecSourceRotation.fX );
-        BitStream.pBitStream->Write ( vecSourceRotation.fY );
-        BitStream.pBitStream->Write ( vecSourceRotation.fZ );
-        BitStream.pBitStream->Write ( vecPosition.fX );
-        BitStream.pBitStream->Write ( vecPosition.fY );
-        BitStream.pBitStream->Write ( vecPosition.fZ );
-        BitStream.pBitStream->Write ( vecRadians.fX );
-        BitStream.pBitStream->Write ( vecRadians.fY );
-        BitStream.pBitStream->Write ( vecRadians.fZ );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MOVE_OBJECT, *BitStream.pBitStream ) );
-
         // Start moving it here so we can keep track of the position/rotation
         pObject->Move ( vecPosition, vecSourceRotation + vecRadians, ulTime );
+
+        // Has this resource started yet?
+        if ( pResource->HasStarted() )
+		{
+            // Tell the players
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( pObject->GetID () );
+            BitStream.pBitStream->Write ( ulTime );
+            BitStream.pBitStream->Write ( vecSourcePosition.fX );
+            BitStream.pBitStream->Write ( vecSourcePosition.fY );
+            BitStream.pBitStream->Write ( vecSourcePosition.fZ );
+            BitStream.pBitStream->Write ( vecSourceRotation.fX );
+            BitStream.pBitStream->Write ( vecSourceRotation.fY );
+            BitStream.pBitStream->Write ( vecSourceRotation.fZ );
+            BitStream.pBitStream->Write ( vecPosition.fX );
+            BitStream.pBitStream->Write ( vecPosition.fY );
+            BitStream.pBitStream->Write ( vecPosition.fZ );
+            BitStream.pBitStream->Write ( vecRadians.fX );
+            BitStream.pBitStream->Write ( vecRadians.fY );
+            BitStream.pBitStream->Write ( vecRadians.fZ );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MOVE_OBJECT, *BitStream.pBitStream ) );
+        }        
     }
 
     return true;

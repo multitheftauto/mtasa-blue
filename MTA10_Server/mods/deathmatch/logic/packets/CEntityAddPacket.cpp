@@ -147,16 +147,36 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( vecTemp.fZ );
 
                     // Rotation
-                    pObject->GetRotation ( vecTemp );
-                    BitStream.Write ( vecTemp.fX );
-                    BitStream.Write ( vecTemp.fY );
-                    BitStream.Write ( vecTemp.fZ );
+                    CVector vecRotation;
+                    pObject->GetRotation ( vecRotation );
+                    BitStream.Write ( vecRotation.fX );
+                    BitStream.Write ( vecRotation.fY );
+                    BitStream.Write ( vecRotation.fZ );
 
                     // Object id
                     BitStream.Write ( pObject->GetModel () );
 
                     // Alpha
                     BitStream.Write ( pObject->GetAlpha() );
+
+                    bool bIsMoving = pObject->IsMoving ();
+                    BitStream.WriteBit ( bIsMoving );
+
+                    if ( bIsMoving )
+                    {
+                        BitStream.Write ( pObject->GetMoveTimeLeft () );
+
+                        vecTemp = pObject->m_moveData.vecStopPosition;
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
+
+                        vecTemp = pObject->m_moveData.vecStopRotation - vecRotation;
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
+                    }
+
 
                     break;
                 }

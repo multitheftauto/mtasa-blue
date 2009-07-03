@@ -6722,10 +6722,18 @@ int CLuaFunctionDefinitions::MoveObject ( lua_State* luaVM )
                 }
             }
 
-            if ( CStaticFunctionDefinitions::MoveObject ( pElement, ulTime, vecTargetPosition, vecTargetRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+            CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+			if ( pLuaMain )
+			{
+				CResource * pResource = pLuaMain->GetResource();
+				if ( pResource )
+				{
+                    if ( CStaticFunctionDefinitions::MoveObject ( pResource, pElement, ulTime, vecTargetPosition, vecTargetRotation ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                }
             }
         }
         else

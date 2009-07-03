@@ -2212,7 +2212,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
 
                         // Create the object and put it at its position
-                        CClientObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
                         pEntity = pObject;
                         if ( pObject )
                         {
@@ -2223,6 +2223,23 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         {
                             RaiseFatalError ( 9 );
                         }
+
+                        bool bIsMoving;
+                        if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
+                        {
+                            unsigned long ulMoveTimeLeft;
+                            CVector vecTargetPosition, vecTargetRotation;
+                            if ( bitStream.Read ( ulMoveTimeLeft ) &&
+                                 bitStream.Read ( vecTargetPosition.fX ) &&
+                                 bitStream.Read ( vecTargetPosition.fY ) &&
+                                 bitStream.Read ( vecTargetPosition.fZ ) &&
+                                 bitStream.Read ( vecTargetRotation.fX ) &&
+                                 bitStream.Read ( vecTargetRotation.fY ) &&
+                                 bitStream.Read ( vecTargetRotation.fZ ) )
+                            {
+                                pObject->StartMovement ( vecTargetPosition, vecTargetRotation, ulMoveTimeLeft );
+                            }
+                        }                                 
                     }
 
                     break;
