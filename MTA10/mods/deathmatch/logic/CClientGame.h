@@ -405,8 +405,9 @@ private:
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
-    static void                         StaticGameProcessHandler        ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
+    static void                         StaticPostWorldProcessHandler   ( void );
+    static void                         StaticIdleHandler               ( void );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -414,8 +415,9 @@ private:
     void                                DrawRadarAreasHandler           ( void );
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
-    void                                GameProcessHandler              ( void );
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
+    void                                PostWorldProcessHandler         ( void );
+    void                                IdleHandler                     ( void );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

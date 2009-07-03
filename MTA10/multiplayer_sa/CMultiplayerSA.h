@@ -59,8 +59,9 @@ public:
     void                        SetFireHandler              ( FireHandler * pFireHandler );
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
-    void                        SetGameProcessHandler       ( GameProcessHandler* pProcessHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
+    void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
+    void                        SetIdleHandler              ( IdleHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
