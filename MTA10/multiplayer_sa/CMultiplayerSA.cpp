@@ -924,6 +924,10 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x53A4A9 = 0x33;
     *(WORD *)0x53A55F = 0x9090;
     *(BYTE *)0x73EC06 = 0x85;       // CWeapon::FireAreaEffect: test al,al -> test eax,eax
+
+
+    // Increase the events pool size (Fixes #4577).
+    *(DWORD *)0x551177 = 9001;
 }
 
 
