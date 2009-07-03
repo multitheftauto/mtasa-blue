@@ -182,7 +182,9 @@ void CClientManager::DoPulse ( void )
     {
         m_pModelRequestManager->DoPulse ();
         m_pCamera->DoPulse ();
-        m_pMarkerManager->DoPulse ();
+        /* now called from CClientGame::PostWorldProcessHandler so marker positions
+           are no longer a frame behind when attached to other entities.
+        m_pMarkerManager->DoPulse (); */ 
         m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
         m_pVehicleManager->DoPulse ();
         m_pPathManager->DoPulse ();
