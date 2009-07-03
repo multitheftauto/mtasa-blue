@@ -20,11 +20,11 @@
 class CExplosionManager
 {
 public:
-	virtual CExplosion		* AddExplosion ( eExplosionType explosiontype, CVector * vecPosition, CEntity * creator = NULL, bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false )=0;
-	virtual VOID			RemoveAllExplosionsInArea ( CVector * vecPosition, FLOAT fRadius )=0;
-	virtual VOID			RemoveAllExplosions (  )=0;
-	virtual CExplosion		* GetExplosion ( DWORD ID )=0;
-	virtual CExplosion		* FindFreeExplosion (  )=0;
+	virtual CExplosion *        AddExplosion                ( CEntity * pExplodingEntity, CEntity * pOwner, eExplosionType explosionType, CVector & vecPosition, unsigned int uiActivationDelay = 0, bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false ) = 0;
+	virtual VOID			    RemoveAllExplosionsInArea   ( CVector * vecPosition, FLOAT fRadius ) = 0;
+	virtual VOID			    RemoveAllExplosions         ( void ) = 0;
+	virtual CExplosion *        GetExplosion                ( DWORD ID ) = 0;
+	virtual CExplosion *        FindFreeExplosion           ( void ) = 0;
 };
 
 #endif
