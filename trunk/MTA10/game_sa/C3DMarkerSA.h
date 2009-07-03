@@ -63,29 +63,29 @@ public:
 
 	C3DMarkerSAInterface	* GetInterface() { return internalInterface; }
 
-	VOID			SetPosition(CVector * vecPosition);
+    void            GetMatrix       ( CMatrix * pMatrix );
+    void            SetMatrix       ( CMatrix * pMatrix );
+	void			SetPosition(CVector * vecPosition);
 	CVector			* GetPosition();
-	VOID			SetUp(CVector * vecUp);
-	CVector			* GetUp();
 	DWORD			GetType(); // need enum?
-	VOID			SetType(DWORD dwType); // doesn't work propperly (not virtualed)
+	void			SetType(DWORD dwType); // doesn't work propperly (not virtualed)
 	BOOL			IsActive();
 	DWORD			GetIdentifier();
 	RGBA			GetColor();
-	VOID			SetColor(RGBA color); // actually BGRA
-	VOID			SetPulsePeriod(WORD wPulsePeriod);
-	VOID			SetRotateRate(short RotateRate);
+	void			SetColor(RGBA color); // actually BGRA
+	void			SetPulsePeriod(WORD wPulsePeriod);
+	void			SetRotateRate(short RotateRate);
 	FLOAT			GetSize();
-	VOID			SetSize(FLOAT fSize);
+	void			SetSize(FLOAT fSize);
 	FLOAT			GetBrightness();
-	VOID			SetBrightness(FLOAT fBrightness);
-	VOID			SetCameraRange(FLOAT fCameraRange);
-	VOID			SetPulseFraction(FLOAT fPulseFraction); // doesn't work propperly (not virtualed)
+	void			SetBrightness(FLOAT fBrightness);
+	void			SetCameraRange(FLOAT fCameraRange);
+	void			SetPulseFraction(FLOAT fPulseFraction); // doesn't work propperly (not virtualed)
 	FLOAT			GetPulseFraction();
-	VOID			Disable();
-	VOID			DeleteMarkerObject();
-    VOID            Reset();
-    VOID            SetActive() { this->internalInterface->m_bIsUsed = true;};
+	void			Disable();
+	void			DeleteMarkerObject();
+    void            Reset();
+    void            SetActive() { this->internalInterface->m_bIsUsed = true;};
     RpClump *       GetRwObject() { return this->internalInterface->m_pRwObject; }
 };
 

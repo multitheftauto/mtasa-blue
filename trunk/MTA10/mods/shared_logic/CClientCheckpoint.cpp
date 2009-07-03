@@ -111,11 +111,11 @@ bool CClientCheckpoint::IsHit ( const CVector& vecPosition ) const
     unsigned long ulType = GetCheckpointType ();
     if ( ulType == CClientCheckpoint::TYPE_NORMAL )
     {
-        return IsPointNearPoint2D ( m_vecPosition, vecPosition, m_fSize + 4 );
+        return IsPointNearPoint2D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
     }
     else
     {
-        return IsPointNearPoint3D ( m_vecPosition, vecPosition, m_fSize + 4 );
+        return IsPointNearPoint3D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
     }
 }
 
@@ -123,7 +123,7 @@ bool CClientCheckpoint::IsHit ( const CVector& vecPosition ) const
 void CClientCheckpoint::SetPosition ( const CVector& vecPosition )
 { 
     // Different from our current position?
-    if ( m_vecPosition != vecPosition )
+    if ( m_Matrix.vPos != vecPosition )
     {
         // Recalculate the stored target so that its accurate even if we move it
         if ( m_vecTargetPosition.fX != 0 && m_vecTargetPosition.fY != 0 && m_vecTargetPosition.fZ != 0 )
@@ -133,7 +133,7 @@ void CClientCheckpoint::SetPosition ( const CVector& vecPosition )
         }
 
         // Store the new position, recreate and tell the streamer about the new position
-        m_vecPosition = vecPosition;
+        m_Matrix.vPos = vecPosition;
         ReCreateWithSameIdentifier ();
     }
 }
@@ -165,7 +165,7 @@ void CClientCheckpoint::SetNextPosition ( const CVector& vecPosition )
     {
         // Set the new target position and direction
         m_vecTargetPosition = vecPosition;
-        m_vecDirection = m_vecTargetPosition - m_vecPosition;
+        m_vecDirection = m_vecTargetPosition - m_Matrix.vPos;
         m_vecDirection.Normalize ();
 
         // Recreate
@@ -366,7 +366,7 @@ void CClientCheckpoint::Create ( unsigned long ulIdentifier )
         }
 
         // Create it
-        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, m_dwType, &m_vecPosition, &m_vecDirection, m_fSize, 0.2f, m_rgbaColor );
+        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, m_dwType, &m_Matrix.vPos, &m_vecDirection, m_fSize, 0.2f, m_rgbaColor );
         if ( m_pCheckpoint )
         {
             // Set properties

@@ -56,6 +56,9 @@ public:
     virtual void                GetPosition             ( CVector& vecPosition ) const = 0;
     virtual void                SetPosition             ( const CVector& vecPosition ) = 0;
 
+    virtual void                GetMatrix               ( CMatrix & matrix ) = 0;
+    virtual void                SetMatrix               ( CMatrix & matrix ) = 0;
+
     virtual float               GetSize                 ( void ) const = 0;
     virtual void                SetSize                 ( float fSize ) = 0;
 

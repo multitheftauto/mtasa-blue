@@ -14,22 +14,29 @@
 
 #include "StdInc.h"
 
+void C3DMarkerSA::GetMatrix ( CMatrix * pMatrix )
+{
+    CMatrix_Padded * mat = &GetInterface ()->m_mat;
+    memcpy ( &pMatrix->vPos, &mat->vPos, sizeof ( CVector ) );
+    memcpy ( &pMatrix->vFront, &mat->vFront, sizeof ( CVector ) );
+    memcpy ( &pMatrix->vRight, &mat->vRight, sizeof ( CVector ) );
+    memcpy ( &pMatrix->vUp, &mat->vUp, sizeof ( CVector ) );
+}
+
+
+void C3DMarkerSA::SetMatrix ( CMatrix * pMatrix )
+{
+    CMatrix_Padded * mat = &GetInterface ()->m_mat;
+    memcpy ( &mat->vPos, &pMatrix->vPos, sizeof ( CVector ) );
+    memcpy ( &mat->vFront, &pMatrix->vFront, sizeof ( CVector ) );
+    memcpy ( &mat->vRight, &pMatrix->vRight, sizeof ( CVector ) );
+    memcpy ( &mat->vUp, &pMatrix->vUp, sizeof ( CVector ) );
+}
+
 VOID C3DMarkerSA::SetPosition(CVector * vecPosition)
 {
 	DEBUG_TRACE("VOID C3DMarkerSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->m_mat.vPos = *vecPosition;
-}
-
-VOID C3DMarkerSA::SetUp(CVector * vecUp)
-{
-	DEBUG_TRACE("VOID C3DMarkerSA::SetUp(CVector * vecUP)");
-	this->GetInterface()->m_mat.vUp = *vecUp;
-}
-
-CVector * C3DMarkerSA::GetUp()
-{
-	DEBUG_TRACE("CVector * C3DMarkerSA::GetUp()");
-	return &this->GetInterface()->m_mat.vUp;
 }
 
 CVector * C3DMarkerSA::GetPosition()

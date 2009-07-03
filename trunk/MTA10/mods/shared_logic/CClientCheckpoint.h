@@ -48,10 +48,13 @@ public:
 
     bool                            IsHit                           ( const CVector& vecPosition ) const;
     
-    inline void                     GetPosition                     ( CVector& vecPosition ) const      { vecPosition = m_vecPosition; };
+    inline void                     GetPosition                     ( CVector& vecPosition ) const      { vecPosition = m_Matrix.vPos; };
     void                            SetPosition                     ( const CVector& vecPosition );
     void                            SetDirection                    ( const CVector& vecDirection );
     void                            SetNextPosition                 ( const CVector& vecPosition );
+
+    inline void                     GetMatrix                       ( CMatrix & mat )                   { m_Matrix = mat; };
+    inline void                     SetMatrix                       ( CMatrix & mat )                   { mat = m_Matrix; };
 
     inline bool                     IsVisible                       ( void ) const                      { return m_bVisible; };
     void                            SetVisible                      ( bool bVisible );
@@ -91,7 +94,7 @@ private:
 
     CClientMarker *                 m_pThis;
     bool                            m_bStreamedIn;
-    CVector                         m_vecPosition;
+    CMatrix                         m_Matrix;
     CVector                         m_vecDirection;
     CVector                         m_vecTargetPosition;
     bool                            m_bVisible;

@@ -17,6 +17,7 @@
 
 class CVector;
 struct RpClump;
+class CMatrix;
 
 /**
  * \todo fix SetColor/GetColor, the format is actually BGRA (strange)
@@ -26,10 +27,10 @@ class C3DMarker
 public:
     virtual                 ~C3DMarker ( void ) {};
 
+    virtual void            GetMatrix       ( CMatrix * pMatrix )=0;
+    virtual void            SetMatrix       ( CMatrix * pMatrix )=0;
 	virtual VOID			SetPosition(CVector * vecPosition)=0;
 	virtual CVector			* GetPosition()=0;
-	virtual VOID			SetUp(CVector * vecUp)=0;
-	virtual CVector			* GetUp()=0;
 	virtual DWORD			GetType()=0; // need enum?
 	virtual BOOL			IsActive()=0;
 	virtual DWORD			GetIdentifier()=0;

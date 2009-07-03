@@ -72,19 +72,7 @@ void CClient3DMarker::Set3DMarkerType ( unsigned long ulType )
 
 bool CClient3DMarker::IsHit ( const CVector& vecPosition ) const
 {
-    return IsPointNearPoint3D ( m_vecPosition, vecPosition, m_fSize + 4 );
-}
-
-
-void CClient3DMarker::SetPosition ( const CVector& vecPosition )
-{
-    m_vecPosition = vecPosition;
-}
-
-
-void CClient3DMarker::SetUp ( const CVector& vecUp )
-{
-	m_vecUp = vecUp;
+    return IsPointNearPoint3D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
 }
 
 void CClient3DMarker::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
@@ -123,13 +111,14 @@ void CClient3DMarker::DoPulse ( void )
     {       
         unsigned char R, G, B, A;
         GetColor ( R, G, B, A );
-        m_pMarker = g_pGame->Get3DMarkers ()->CreateMarker ( m_ulIdentifier, static_cast < e3DMarkerType > ( m_dwType ), &m_vecPosition, m_fSize, 0.2f, R, G, B, A );
+        m_pMarker = g_pGame->Get3DMarkers ()->CreateMarker ( m_ulIdentifier, static_cast < e3DMarkerType > ( m_dwType ), &m_Matrix.vPos, m_fSize, 0.2f, R, G, B, A );
         if ( m_pMarker )
         {
             // Make sure it doesn't get cleaned up
             m_pMarker->SetActive ();
             m_pMarker->SetColor ( m_rgbaColor );
             m_pMarker->SetSize ( m_fSize );
+            m_pMarker->SetMatrix ( &m_Matrix );
 
             g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( ( RpClump * ) m_pMarker->GetRwObject (), A );
         }
