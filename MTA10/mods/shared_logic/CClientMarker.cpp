@@ -97,59 +97,49 @@ void CClientMarker::SetPosition ( const CVector& vecPosition )
 void CClientMarker::DoPulse ( void )
 {
     // Move with our attached element?
-    UpdateAttachedPosition ();
+    UpdateAttaching ();
 
     // Pulse the element we contain
     if ( m_pMarker ) m_pMarker->DoPulse ();
 }
 
 
-void CClientMarker::UpdateAttachedPosition ( void )
+void CClientMarker::UpdateAttaching ( void )
 {
     // Attached to an entity
     if ( m_pAttachedToEntity )
     {
-        CVector vecNewPosition;
-        m_pAttachedToEntity->GetPosition ( vecNewPosition );   
-        if ( m_vecAttachedPosition.fX == 0.0f && m_vecAttachedPosition.fY == 0.0f )
-        {
-            vecNewPosition += m_vecAttachedPosition;
-        }
-        else
-        {
-            CVector vecRotation;
-            switch ( m_pAttachedToEntity->GetType () )
-            {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                    vecRotation.fZ = static_cast < CClientPed* > ( m_pAttachedToEntity )->GetCurrentRotation ();
-                    break;
-                case CCLIENTVEHICLE:
-                    static_cast < CClientVehicle* > ( m_pAttachedToEntity )->GetRotationRadians ( vecRotation );
-                    break;
-                case CCLIENTOBJECT:
-                    static_cast < CClientObject* > ( m_pAttachedToEntity )->GetRotationRadians ( vecRotation );
-                    break;
-            }
-            float fRadius = sqrt ( m_vecAttachedPosition.fX*m_vecAttachedPosition.fX + m_vecAttachedPosition.fY*m_vecAttachedPosition.fY );
-            float fAngle = atan2 ( m_vecAttachedPosition.fY, m_vecAttachedPosition.fX );
-            vecNewPosition.fX += fRadius * cos ( vecRotation.fZ + fAngle );
-            vecNewPosition.fY += fRadius * sin ( vecRotation.fZ + fAngle );
-            vecNewPosition.fZ += m_vecAttachedPosition.fZ;
-        }
+        // Grab our offset as our attached position offset (eg: (0,0,1))
+        CVector vecOffset = m_vecAttachedPosition;
+
+        // Grab our attached entities matrix
+        CMatrix mat;
+        m_pAttachedToEntity->GetMatrix ( mat );
+        CVector vecRotation;
+        g_pMultiplayer->ConvertMatrixToEulerAngles ( mat, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+
+        // Rotate our offset by our attached entities matrix
+        RotateVector ( vecOffset, vecRotation );
+
+        // Our position is our attached entities' plus our offset
+        CVector vecPosition = mat.vPos + vecOffset;
+       
+        // Update our matrix to match our attached entity
+        vecRotation += m_vecAttachedRotation;
+        g_pMultiplayer->ConvertEulerAnglesToMatrix ( mat, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        m_pMarker->SetMatrix ( mat );
 
         // Grab our current position
         CVector vecCurrentPosition;
         m_pMarker->GetPosition ( vecCurrentPosition );
         
         // Do we need to move it?
-        if ( vecNewPosition != vecCurrentPosition )
+        if ( vecPosition != vecCurrentPosition )
         {
-            SetPosition ( vecNewPosition );
+            SetPosition ( vecPosition );
 
 			// We have a col shape? Update it's position too
-			if ( m_pCollision )
-				m_pCollision->SetPosition ( vecNewPosition );
+			if ( m_pCollision ) m_pCollision->SetPosition ( vecPosition );
         }
     }
 }

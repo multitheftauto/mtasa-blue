@@ -31,7 +31,7 @@ CClientCorona::CClientCorona ( CClientMarker * pThis )
 CClientCorona::~CClientCorona ( void )
 {
     // Disable our corona
-    CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_vecPosition );
+    CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_Matrix.vPos );
     if ( pCorona )
     {
         pCorona->Disable ();
@@ -41,13 +41,7 @@ CClientCorona::~CClientCorona ( void )
 
 bool CClientCorona::IsHit ( const CVector& vecPosition ) const
 {
-    return IsPointNearPoint3D ( m_vecPosition, vecPosition, m_fSize + 4 );
-}
-
-
-void CClientCorona::SetPosition ( const CVector& vecPosition )
-{
-    m_vecPosition = vecPosition;
+    return IsPointNearPoint3D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
 }
 
 
@@ -87,7 +81,7 @@ void CClientCorona::StreamIn ( void )
 void CClientCorona::StreamOut ( void )
 {
     // Disable the corona
-    CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_vecPosition );
+    CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_Matrix.vPos );
     if ( pCorona )
     {
         pCorona->Disable();
@@ -103,7 +97,7 @@ void CClientCorona::DoPulse ( void )
     if ( IsStreamedIn () && m_bVisible && m_pThis->GetInterior () == g_pGame->GetWorld ()->GetCurrentArea () )
     {
         // Draw it and set the properties
-        CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_vecPosition );
+        CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_Matrix.vPos );
         if ( pCorona )
         {
             unsigned char R, G, B, A;

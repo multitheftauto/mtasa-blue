@@ -26,20 +26,23 @@ public:
 
     bool                            IsHit                               ( const CVector& vecPosition ) const;
 
-    inline void                     GetPosition                         ( CVector& vecPosition ) const      { vecPosition = m_vecPosition; };
-    void                            SetPosition                         ( const CVector& vecPosition );
+    inline void                     GetPosition                         ( CVector& vecPosition ) const      { vecPosition = m_Matrix.vPos; };
+    inline void                     SetPosition                         ( const CVector& vecPosition )      { m_Matrix.vPos = vecPosition; }
+
+    inline void                     GetMatrix                           ( CMatrix & mat )                   {};
+    inline void                     SetMatrix                           ( CMatrix & mat )                   {};
 
     inline bool                     IsVisible                           ( void ) const                      { return m_bVisible; };
     inline void                     SetVisible                          ( bool bVisible )                   { m_bVisible = bVisible; };
 
-    inline unsigned long            GetColor                        ( void )                            { return m_rgbaColor; };
-    void                            GetColor                        ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
-    inline unsigned char            GetColorRed                     ( void ) const                      { return m_rgbaColor.R; };
-    inline unsigned char            GetColorGreen                   ( void ) const                      { return m_rgbaColor.G; };
-    inline unsigned char            GetColorBlue                    ( void ) const                      { return m_rgbaColor.B; };
-    inline unsigned char            GetColorAlpha                   ( void ) const                      { return m_rgbaColor.A; };
-    void                            SetColor                        ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
-    void                            SetColor                        ( unsigned long ulColor );
+    inline unsigned long            GetColor                            ( void )                            { return m_rgbaColor; };
+    void                            GetColor                            ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
+    inline unsigned char            GetColorRed                         ( void ) const                      { return m_rgbaColor.R; };
+    inline unsigned char            GetColorGreen                       ( void ) const                      { return m_rgbaColor.G; };
+    inline unsigned char            GetColorBlue                        ( void ) const                      { return m_rgbaColor.B; };
+    inline unsigned char            GetColorAlpha                       ( void ) const                      { return m_rgbaColor.A; };
+    void                            SetColor                            ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
+    void                            SetColor                            ( unsigned long ulColor );
 
     inline float                    GetSize                             ( void ) const                      { return m_fSize; };
     inline void                     SetSize                             ( float fSize )                     { m_fSize = fSize; };
@@ -55,7 +58,7 @@ private:
     CClientMarker *                 m_pThis;
     bool                            m_bStreamedIn;
     unsigned long                   m_ulIdentifier;
-    CVector                         m_vecPosition;
+    CMatrix                         m_Matrix;
     bool                            m_bVisible;
     float                           m_fSize;
     RGBA                            m_rgbaColor;
