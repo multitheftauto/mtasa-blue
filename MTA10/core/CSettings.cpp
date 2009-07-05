@@ -396,13 +396,19 @@ CSettings::CSettings ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
 	m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
-    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 16.0f ) );
+    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
 	m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 29.0f ) );
+	m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
+
+    vecTemp.fY += 8;
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
     m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
@@ -1612,6 +1618,7 @@ void CSettings::LoadData ( void )
 
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
+    m_pCheckBoxMinimize->SetSelected ( GetVideoModeManager ()->IsMinimizeEnabled () );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1714,6 +1721,7 @@ void CSettings::LoadData ( void )
 void CSettings::SaveData ( void )
 {
     std::string strVar;
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
 	// Set and save our settings
     if ( CModManager::GetSingleton ().GetCurrentMod () != NULL )
@@ -1751,8 +1759,6 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "classic_controls", bClassicControls );
     bClassicControls ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
 
-    CCore::GetSingleton ().SaveConfig ();
-
     // Video
     // get current
     int iNextVidMode;
@@ -1768,7 +1774,7 @@ void CSettings::SaveData ( void )
     if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed ) )
         CCore::GetSingleton ().ShowMessageBox ( "Information", "Resolution will be changed when you next start MTA", MB_BUTTON_OK | MB_ICON_INFO );
 
-    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    GetVideoModeManager ()->SetMinimizeEnabled ( m_pCheckBoxMinimize->GetSelected() );
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
 
     // Map alpha
@@ -1801,6 +1807,8 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 
+    // Save the config here
+    CCore::GetSingleton ().SaveConfig ();
     // Save the single player settings (e.g. video mode, volume)
     gameSettings->Save ();
 }

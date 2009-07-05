@@ -127,6 +127,7 @@ protected:
     CGUIComboBox*       m_pComboResolution;
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
+    CGUICheckBox*       m_pCheckBoxMinimize;
 	CGUILabel*		    m_pVideoRenderingLabel;
 	CGUICheckBox*	    m_pCheckBoxMenuDynamic;
 	CGUICheckBox*	    m_pCheckBoxMenuVideo;

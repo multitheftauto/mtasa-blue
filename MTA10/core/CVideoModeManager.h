@@ -32,6 +32,8 @@ public:
     virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed ) = 0;
     virtual bool        IsWindowed                  ( void ) = 0;
     virtual bool        IsMultiMonitor              ( void ) = 0;
+    virtual bool        IsMinimizeEnabled           ( void ) = 0;
+    virtual void        SetMinimizeEnabled          ( bool bOn ) = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager ( void );
