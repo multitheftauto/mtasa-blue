@@ -19,12 +19,13 @@
 class CScreenShot
 {
 public:
-    static SString			        PreScreenShot			( void );
-	static void						PostScreenShot			( const char *szFileName );
-	static void						SetPath					( const char *szPath );
+    static SString                  PreScreenShot               ( void );
+    static void                     PostScreenShot              ( const char *szFileName );
+    static void                     SetPath                     ( const char *szPath );
 
-	static SString				    GetScreenShotPath		( int iNumber );
-	static int						GetScreenShots			( void );
+    static SString                  GetScreenShotPath           ( int iNumber );
+    static SString                  GetValidScreenshotFilename  ( void );
+    static int                      GetScreenShots              ( void );
 };
 
 #endif
