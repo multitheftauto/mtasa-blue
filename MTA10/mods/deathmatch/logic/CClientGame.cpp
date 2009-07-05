@@ -3236,6 +3236,22 @@ void CClientGame::DownloadFiles ( void )
 }
 
 
+//
+// DamageHandler seems to be called 3 times for each bit of damage:
+//
+// pass 1 - preApplyDamage
+//   is pass 1 if: fDamage == zero  &&  fCurrentHealth == fPreviousHealth
+//      returning false stops any damage being inflicted
+//      returning true applies damage and allows pass 2
+// pass 2 - postApplyDamage/preApplyAnim
+//   is pass 2 if: fDamage > zero  &&  fCurrentHealth != fPreviousHealth
+//      returning false stops damage anim
+//      returning true allows damage anim and allows pass 3
+// pass 3 - postApplyAnim
+//   is pass 3 if: fDamage > zero  &&  fCurrentHealth == fPreviousHealth
+//      returning false ??
+//      returning true ??
+//
 bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 {
     // CEventDamage::AffectsPed: This is/can be called more than once for each bit of damage (and may not actually take any more health (even if we return true))
@@ -3301,10 +3317,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     return false;
                 }
 
-                // Prevent remote players that are aiming to play hit-damage animations
-                // (Test for issue #4099: Player desync caused by 'hit by gun' animation)
-                if ( pDamagedPed->m_ulBeginTarget != 0 )
-                    return false;      
             }
 
             // Do we have an inflicting player?
@@ -3343,12 +3355,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 return false;
             }
 
+            // Temp fix for #4099 - Don't allow damage anim if hit by certain weapons and aiming a gun
+            bool bAllowDamageAnim = ( weaponUsed < WEAPONTYPE_PISTOL || weaponUsed > WEAPONTYPE_MINIGUN || !pDamagedPed->IsUsingGun () );
+
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () && pDamagedPed->IsArmorLocked () )
             {
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
-                return true;	// Allow animation
+                return bAllowDamageAnim;	    // Play animation if allowed
             }
 
             // Update our stored health/armor
@@ -3419,6 +3434,11 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
                     }
                 }
+            }
+            // Inhibit hit-by-gun animation for local player if required
+            if ( pDamagedPed->IsLocalPlayer () && !bAllowDamageAnim )
+            {
+                return false;	    // No animation
             }
         }
     }
@@ -3707,8 +3727,10 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
 				    // Warp back in time to where we were when this player shot (their latency)
 				    
                     // We don't account for interpolation here, +250ms seems to work better
+                    // ** Changed ajustment to +200ms as the position of this clients player on the firers screen
+                    // has been changed. See CClientPed::UpdateTargetPosition() **
                     CVector vecPosition;
-				    unsigned short usLatency = ( pPlayer->GetLatency () + 250 );
+				    unsigned short usLatency = ( pPlayer->GetLatency () + 200 );
 				    g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency );
 			
 				    // Move the entity back
