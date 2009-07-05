@@ -4289,10 +4289,10 @@ void CClientPed::UpdateTargetPosition ( void )
 
         CVector vecOffset = m_vecTargetPosition - vecPosition;
         float fDistanceToTarget = vecOffset.Length ();
-        // fDistanceToTarget 0.20f to 0.00f     then fSpeed = 5.0f to 15.0f
+        // fDistanceToTarget 0.20f to 0.00f     then fSpeed = 3.0f to 15.0f
         float fSpeedAlpha = UnlerpClamped ( 0, fDistanceToTarget, 0.20f );
-        float fSpeed = Lerp < const float > ( 15.f, fSpeedAlpha, 5.f );
-        CVector vecScale = CVector ( 1.5f, 1.5f, 6.0f ) * fSpeed * fTimeSlice;
+        float fSpeed = Lerp < const float > ( 15.f, fSpeedAlpha, 3.f );
+        CVector vecScale = CVector ( 1.5f, 1.5f, 1.5f ) * fSpeed * fTimeSlice;
         // Make sure not to overshoot
         vecScale.fX = Min ( vecScale.fX, 1.f );
         vecScale.fY = Min ( vecScale.fY, 1.f );
