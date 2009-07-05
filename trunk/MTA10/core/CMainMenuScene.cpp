@@ -612,9 +612,11 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
 				// Add our default screenshots as well
                 strTexPath.Format ( "data\\default%u.png", i - i_own );
 			}
-			D3DXCreateTextureFromFile ( m_pDevice, strTexPath, &pMaskAnimTexture[i] );
-			iMaskAnimTextures++;
-		}
+            if ( strTexPath != "" ) {
+			    D3DXCreateTextureFromFile ( m_pDevice, strTexPath, &pMaskAnimTexture[i] );
+			    iMaskAnimTextures++;
+            }
+        }
 
 		CCore::GetSingleton ().GetConsole ()->Printf ( "Creating meshes" );
 

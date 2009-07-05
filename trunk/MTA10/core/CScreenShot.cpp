@@ -20,7 +20,6 @@ static bool bIsDebugVisible = false;
 
 SString CScreenShot::PreScreenShot ()
 {
-    int iNumberOfFiles = 1;
 
 	bIsChatVisible = g_pCore->IsChatVisible ();
 	bIsDebugVisible = g_pCore->IsDebugVisible ();
@@ -29,18 +28,7 @@ SString CScreenShot::PreScreenShot ()
 	g_pCore->SetChatVisible ( false );
 	g_pCore->SetDebugVisible ( false );
 
-    SString strScreenShotName ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-
-    OFSTRUCT ReOpenBuff;
-    HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
-
-    while ( hFile != HFILE_ERROR )
-    {
-        CloseHandle( (HANDLE)hFile );
-        iNumberOfFiles++;
-        strScreenShotName = SString ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-        hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
-    }
+    SString strScreenShotName = GetValidScreenshotFilename();
 
     return strScreenShotName;
 }
@@ -65,33 +53,66 @@ void CScreenShot::SetPath ( const char *szPath )
 
 int CScreenShot::GetScreenShots ( void )
 {
-    int iNumberOfFiles = 1;
-
-	bIsChatVisible = g_pCore->IsChatVisible ();
-	bIsDebugVisible = g_pCore->IsDebugVisible ();
-
-	// make the chat and debug windows invisible
-	g_pCore->SetChatVisible ( false );
-	g_pCore->SetDebugVisible ( false );
-
-    SString strScreenShotName ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-
-    OFSTRUCT ReOpenBuff;
-    HFILE hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );    
-
-    while ( hFile != HFILE_ERROR )
-    {
-        CloseHandle( (HANDLE)hFile );
+    int iNumberOfFiles = 0;
+    HANDLE hFind;
+    WIN32_FIND_DATA fdFindData;
+    //Create a search string
+    SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
+    // Find the first match
+    hFind = FindFirstFile(strScreenShotName, &fdFindData); 
+    // Check if the first match failed
+    if ( hFind != INVALID_HANDLE_VALUE) {
         iNumberOfFiles++;
-        strScreenShotName.Format ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumberOfFiles );
-        hFile = OpenFile ( strScreenShotName, &ReOpenBuff, OF_CANCEL );
-	}
+        //Loop through and count the files
+        while (FindNextFile(hFind, &fdFindData)) { 
+            //Keep going until we find the last file
+            iNumberOfFiles++;
+        }
+    }
+    //Close the file handle
+    FindClose(hFind);
+    return iNumberOfFiles;
+}
 
-	return iNumberOfFiles;
+SString CScreenShot::GetValidScreenshotFilename ( void )
+{
+    //Get the system time
+    SYSTEMTIME sysTime;
+    GetLocalTime( &sysTime );
+    //Return a filename containing the full system time ms included (its impossible to take more than one screenshot with the same filename this way)
+    return SString("%s\\mta-screen %d-%.2d-%.2d %d-%d-%.2d-%d.png" ,&szScreenShotPath[0],sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds);
 }
 
 SString CScreenShot::GetScreenShotPath ( int iNumber )
 {
-	// Get a random number
-	return SString ( "%s\\mta-screen%04d.png", &szScreenShotPath[0], iNumber );
+    //Create a search string
+    SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
+    HANDLE hFind;
+    SString strReturn = "";
+    WIN32_FIND_DATA fdFindData;
+    int i = 1;
+    //Find the first match
+    hFind = FindFirstFile(strScreenShotName, &fdFindData);
+    //Check if the first match failed
+    if ( hFind != INVALID_HANDLE_VALUE) {
+        if (iNumber == 1) {
+            //We wanted the first file
+            strReturn = SString("%s\\%s",&szScreenShotPath[0],fdFindData.cFileName);
+        }
+        else
+        {
+            //Loop through and find all occurences of the file
+            while (FindNextFile(hFind, &fdFindData)) { 
+                //Keep going until we find the last file
+                i++;
+                if (iNumber == i) {
+                    strReturn = SString("%s\\%s",&szScreenShotPath[0], fdFindData.cFileName);
+                    break;
+                }
+            }
+        }
+    }
+    FindClose(hFind); //Close the file handle
+	// Get Return the file directory
+	return strReturn;
 }
