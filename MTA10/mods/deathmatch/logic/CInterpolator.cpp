@@ -21,7 +21,12 @@ CInterpolator::CInterpolator()
 
 CInterpolator::~CInterpolator()
 {
-    return;
+    while ( !m_vecVecList.empty () )
+    {
+        VecMap* map = m_vecVecList.back ();
+        m_vecVecList.pop_back ();
+        delete map;
+    }
 }
 
 
@@ -34,20 +39,6 @@ void CInterpolator::Push(float fX, float fY, float fZ, unsigned long ulTimeStamp
     map->m_ulTimeStamp = ulTimeStamp;
     m_vecVecList.insert(m_vecVecList.begin(), map);
 }
-bool CInterpolator::IsTimeInFuture ( unsigned long ulTime )
-{
-    if ( m_vecVecList.empty () )
-        return false;
-
-    return (ulTime>m_vecVecList[0]->m_ulTimeStamp);
-}
-inline bool CInterpolator::IsTimeTooFarPast( unsigned long ulTime )
-{
-    if ( m_vecVecList.empty () )
-        return false;
-
-    return (ulTime<m_vecVecList.back()->m_ulTimeStamp);
-}
 
 
 unsigned long CInterpolator::GetOldestEntry(CVector &Vec)
@@ -58,72 +49,55 @@ unsigned long CInterpolator::GetOldestEntry(CVector &Vec)
     return m_vecVecList.back()->m_ulTimeStamp;
 }
 
-bool CInterpolator::Evaluate(unsigned long ulTime, CVector &Vec )
+bool CInterpolator::Evaluate ( unsigned long ulTime, CVector& vecResult )
 {
     if ( m_vecVecList.empty () )
         return false;
 
-    if (IsTimeTooFarPast(ulTime))
+	// Time later than newest point, so use the newest point
+	if ( ulTime > m_vecVecList[0]->m_ulTimeStamp )
     {
-        Vec.fX = m_vecVecList.back()->m_fX;
-        Vec.fY = m_vecVecList.back()->m_fY;
-        Vec.fZ = m_vecVecList.back()->m_fZ;
+        vecResult.fX = m_vecVecList[0]->m_fX;
+        vecResult.fY = m_vecVecList[0]->m_fY;
+        vecResult.fZ = m_vecVecList[0]->m_fZ;
         return true;
     }
-    m_vecVecList[m_vecVecList.size()/2];
-    
-    unsigned int j = (unsigned int)m_vecVecList.size()-1;
-    int iLeft= 0;
-    int iRight = j;
-    bool bRight = false;
-    bool bLeft = false;
-    for (unsigned int i = 0; i < m_vecVecList.size(); i ++ )
-    {
-        if ( !bLeft && m_vecVecList[i]->m_ulTimeStamp <= ulTime )
-        {
-            bLeft = true;
-            iLeft = i;            
-        }
-        if ( !bRight && m_vecVecList[j]->m_ulTimeStamp >= ulTime )
-        {
-            bRight = true;
-            iRight = j;
-        }
-        j--;
 
+	// Find the two points either side and interpolate
+    for ( unsigned int idx = 1 ; idx < m_vecVecList.size () ; idx++ )
+    {
+	    if ( ulTime > m_vecVecList[idx]->m_ulTimeStamp )
+        {
+            return Eval ( *m_vecVecList[idx-1], *m_vecVecList[idx], ulTime, vecResult );
+        }
     }
 
-    return Eval ( *m_vecVecList[iLeft], *m_vecVecList[iRight],ulTime, Vec);
+	// Time earlier than oldest point, so use the oldest point
+    vecResult.fX = m_vecVecList.back ()->m_fX;
+    vecResult.fY = m_vecVecList.back ()->m_fY;
+    vecResult.fZ = m_vecVecList.back ()->m_fZ;
+    return true;
 }
 
-
-bool CInterpolator::Eval(VecMap L, VecMap R, unsigned long ulTimeEval, CVector &Vec )
+// Left should be later than Right
+bool CInterpolator::Eval ( const VecMap& Left, const VecMap& Right, unsigned long ulTimeEval, CVector& vecResult )
 {
-    float fA = float ( R.m_ulTimeStamp - ulTimeEval );
-    float fB = float ( R.m_ulTimeStamp - L.m_ulTimeStamp );
-    // Jax: not sure why these are both 0 sometimes, but 0/0 = corrupt time
-    if ( fA == 0.0f && fB == 0.0f )
+    // Check for being the same or maybe wrap around
+    if ( Right.m_ulTimeStamp >= Left.m_ulTimeStamp )
     {
-        Vec.fX = L.m_fX;
-        Vec.fY = L.m_fY;
-        Vec.fZ = L.m_fZ;
+        vecResult.fX = Left.m_fX;
+        vecResult.fY = Left.m_fY;
+        vecResult.fZ = Left.m_fZ;
         return true;
     }
 
-    float fTime = fA / fB;    
-    if ( fTime != 0.0f )
-    {        
-        Vec.fX = ( ( R.m_fX - L.m_fX ) * fTime ) + L.m_fX;
-        Vec.fY = ( ( R.m_fY - L.m_fY ) * fTime ) + L.m_fY;
-        Vec.fZ = ( ( R.m_fZ - L.m_fZ ) * fTime ) + L.m_fZ;
-    }
-    else
-    {
-        Vec.fX = L.m_fX;
-        Vec.fY = L.m_fY;
-        Vec.fZ = L.m_fZ;
-    }
+    // Find the relative position of ulTimeEval between R.m_ulTimeStamp and L.m_ulTimeStamp
+    float fAlpha = Unlerp ( Right.m_ulTimeStamp, ulTimeEval, Left.m_ulTimeStamp );
 
+    // Lerp between Right.pos and Left.pos
+    vecResult.fX = Lerp ( Right.m_fX, fAlpha, Left.m_fX );
+    vecResult.fY = Lerp ( Right.m_fY, fAlpha, Left.m_fY );
+    vecResult.fZ = Lerp ( Right.m_fZ, fAlpha, Left.m_fZ );
     return true;
 }
 

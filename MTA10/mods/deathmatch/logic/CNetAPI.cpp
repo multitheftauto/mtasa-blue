@@ -213,10 +213,10 @@ void CNetAPI::AddInterpolation ( const CVector& vecPosition )
 }
 
 
-void CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency )
+bool CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency )
 {
     unsigned long ulInterTime = CClientTime::GetTime () - usLatency;
-    m_Interpolator.Evaluate ( ulInterTime, vecPosition );
+    return m_Interpolator.Evaluate ( ulInterTime, vecPosition );
 }
 
 
