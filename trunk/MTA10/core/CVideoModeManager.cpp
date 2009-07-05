@@ -47,6 +47,8 @@ public:
     virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed );
     virtual bool        IsWindowed                  ( void );
     virtual bool        IsMultiMonitor              ( void );
+    virtual bool        IsMinimizeEnabled           ( void );
+    virtual void        SetMinimizeEnabled          ( bool bOn );
 
 private:
     void                LoadCVars                   ( void );
@@ -64,6 +66,7 @@ private:
     bool                m_bCurrentWindowed;
     int                 m_iNextVideoMode;       // VideoMode next run
     bool                m_bNextWindowed;
+    bool                m_bFullScreenMinimize;
 };
 
 
@@ -153,7 +156,8 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     }
     else
     {
-        m_bForceFullScreenOnce = true;
+        // Commented out to stop fullscreen refresh rate being set here
+        //m_bForceFullScreenOnce = true;
         m_bForceWindowed = false;
         m_ulForceBackBufferWidth  = pp->BackBufferWidth;
         m_ulForceBackBufferHeight = pp->BackBufferHeight;
@@ -297,7 +301,8 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed )
 void CVideoModeManager::LoadCVars ( void )
 {
     m_iCurrentVideoMode = m_pGameSettings->GetCurrentVideoMode ();
-    CVARS_GET ( "display_windowed",     m_bCurrentWindowed );
+    CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
+    CVARS_GET ( "multimon_fullscreen_minimize", m_bFullScreenMinimize );
 }
 
 
@@ -311,7 +316,7 @@ void CVideoModeManager::LoadCVars ( void )
 void CVideoModeManager::SaveCVars ( void )
 {
     m_pGameSettings->SetCurrentVideoMode ( m_iNextVideoMode, true );
-    CVARS_SET ( "display_windowed",     m_bNextWindowed );
+    CVARS_SET ( "display_windowed",             m_bNextWindowed );
 }
 
 
@@ -363,4 +368,34 @@ bool CVideoModeManager::IsMultiMonitor ( void )
     }
 
     return m_ulMonitorCount > 1;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::IsMinimizeEnabled
+//
+// Multi-monitor, full screen, minimize
+//
+///////////////////////////////////////////////////////////////
+bool CVideoModeManager::IsMinimizeEnabled ( void )
+{
+    return m_bFullScreenMinimize;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::SetMinimizeEnabled
+//
+// Multi-monitor, full screen, minimize
+//
+///////////////////////////////////////////////////////////////
+void CVideoModeManager::SetMinimizeEnabled ( bool bOn )
+{
+    if ( m_bFullScreenMinimize != bOn )
+    {
+        m_bFullScreenMinimize = bOn;
+        CVARS_SET ( "multimon_fullscreen_minimize", m_bFullScreenMinimize );
+    }
 }

@@ -234,7 +234,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
                 // Prevent game window auto-minimizing if full screen and:
                 //     1. More than one monitor present
-                // or  2. Starting up (Main menu has not been displayed yet)
+                // and 2. Minimizing option disabled
+                // or
+                //     1. Starting up (Main menu has not been displayed yet)
                 if ( uMsg == WM_ACTIVATE ||
                     uMsg == WM_ACTIVATEAPP ||
                     uMsg == WM_NCACTIVATE ||
@@ -243,9 +245,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 {
                     if ( !GetVideoModeManager ()->IsWindowed () )
                     {
+                        if ( !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
+                            return true;    // No auto-minimize
+
                         if ( GetVideoModeManager ()->IsMultiMonitor ()
-                            || !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
-                            return true;
+                            && !GetVideoModeManager ()->IsMinimizeEnabled () )
+                            return true;    // No auto-minimize
                     }
                 }
                 /*
