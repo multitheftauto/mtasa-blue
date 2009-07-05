@@ -24,12 +24,13 @@ extern CGame * g_pGame;
 
 CElementGroup::~CElementGroup()
 {
+    list < CElement* > ::iterator iter;
+
     if ( !g_pGame->IsBeingDeleted () )
     {
         CEntityRemovePacket removePacket;
 
-        list < CElement* > ::iterator iter = m_elements.begin ();
-        for ( ; iter != m_elements.end (); iter++ )
+        for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
         {
             CElement * pElement = (*iter);
 
@@ -47,19 +48,18 @@ CElementGroup::~CElementGroup()
             }
         }
 
-        g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );        
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
+    }
 
-        // Delete all the elements
-        CElementDeleter * deleter = g_pGame->GetElementDeleter();
-        iter = m_elements.begin ();
-        CElement * pElement = NULL;
-        for ( ; iter != m_elements.end (); iter++ )
-        {
-            pElement = *iter;
-            pElement->SetElementGroup ( NULL );
-            pElement->DeleteAllEvents ();
-            deleter->Delete ( pElement );
-        }
+    // Delete all the elements
+    CElementDeleter * deleter = g_pGame->GetElementDeleter();
+    CElement * pElement = NULL;
+    for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+    {
+        pElement = *iter;
+        pElement->SetElementGroup ( NULL );
+        pElement->DeleteAllEvents ();
+        deleter->Delete ( pElement );
     }
 }
 

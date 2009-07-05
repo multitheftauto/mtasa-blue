@@ -66,15 +66,12 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
 
 CElement::~CElement ( void )
 {
-    if ( !g_pGame->IsBeingDeleted () )
-    {
-        // Get rid of the children elements
-        ClearChildren ();
+    // Get rid of the children elements
+    ClearChildren ();
 
-        // Remove ourselves from our element group
-        if ( m_pElementGroup )
-            m_pElementGroup->Remove ( this );
-    }
+    // Remove ourselves from our element group
+    if ( m_pElementGroup )
+        m_pElementGroup->Remove ( this );
 
     // Delete our event manager
     delete m_pCustomData;
