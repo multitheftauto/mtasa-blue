@@ -1559,10 +1559,8 @@ bool CClientPed::IsDead ( void )
 
 void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, AssocGroupId animGroup, AnimationId animID )
 {
-    // Are we already dead or dying?
-    if ( IsDead () || IsDying () ) return;
-
-    if ( m_pPlayerPed )
+    // Don't change task if already dead or dying
+    if ( m_pPlayerPed && !IsDead () && !IsDying () )
     {        
         // Do we have the in_water task?
         CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
