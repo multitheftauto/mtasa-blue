@@ -33,24 +33,16 @@ public:
                                 CInterpolator( void );
                                 ~CInterpolator( void );
 
-    bool                        IsTimeInFuture ( unsigned long ulTime );
-    inline bool                 IsTimeTooFarPast( unsigned long ulTime );
     void                        Push( float fX, float fY, float fZ, unsigned long ulTimeStamp );
     bool                        Evaluate( unsigned long ulTime, CVector &Vec );
     void                        Pop();
     unsigned long               GetOldestEntry(CVector &Vec);
 
-    inline void                 Clear           ( void )            { m_vecVecList.clear (); };
-    inline unsigned int         Count           ( void )            { return static_cast < unsigned int > ( m_vecVecList.size () ); };
-
-    inline std::vector <VecMap*>::const_iterator   IterBegin   ( void )    { return m_vecVecList.begin (); };
-    inline std::vector <VecMap*>::const_iterator   IterEnd     ( void )    { return m_vecVecList.end (); };
-
 private:
 
 
     std::vector <VecMap *>      m_vecVecList;
-    bool                        Eval( VecMap L, VecMap R, unsigned long ulTime, CVector &Vec );
+    bool                        Eval ( const VecMap& Left, const VecMap& Right, unsigned long ulTimeEval, CVector& vecResult );
 };
 
 #endif
