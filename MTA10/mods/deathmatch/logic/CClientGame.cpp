@@ -3727,10 +3727,10 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
 				    // Warp back in time to where we were when this player shot (their latency)
 				    
                     // We don't account for interpolation here, +250ms seems to work better
-                    // ** Changed ajustment to +200ms as the position of this clients player on the firers screen
+                    // ** Changed ajustment to +125ms as the position of this clients player on the firers screen
                     // has been changed. See CClientPed::UpdateTargetPosition() **
                     CVector vecPosition;
-				    unsigned short usLatency = ( pPlayer->GetLatency () + 200 );
+				    unsigned short usLatency = ( pPlayer->GetLatency () + 125 );
 				    g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency );
 			
 				    // Move the entity back

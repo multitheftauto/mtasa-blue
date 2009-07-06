@@ -4292,23 +4292,23 @@ void CClientPed::UpdateTargetPosition ( void )
         // fDistanceToTarget 0.20f to 0.00f     then fSpeed = 3.0f to 15.0f
         float fSpeedAlpha = UnlerpClamped ( 0, fDistanceToTarget, 0.20f );
         float fSpeed = Lerp < const float > ( 15.f, fSpeedAlpha, 3.f );
-        CVector vecScale = CVector ( 1.5f, 1.5f, 1.5f ) * fSpeed * fTimeSlice;
+        CVector vecScale;
+        vecScale.fX = 1.5f * fTimeSlice * fSpeed;
+        vecScale.fY = 1.5f * fTimeSlice * fSpeed;
+        vecScale.fZ = 6.0f * fTimeSlice;
         // Make sure not to overshoot
         vecScale.fX = Min ( vecScale.fX, 1.f );
         vecScale.fY = Min ( vecScale.fY, 1.f );
         vecScale.fZ = Min ( vecScale.fZ, 1.f );
         vecOffset *= vecScale;
-#if 1
-        // Apply offset ignoring m_bTargetDirections, as they seem to make things worse
-        vecPosition += vecOffset;
-#else
-        if ( ( vecOffset.fX > 0.0f ) == m_bTargetDirections [ 0 ] )
+        // Apply offset ignoring X and Y m_bTargetDirections
+        //if ( ( vecOffset.fX > 0.0f ) == m_bTargetDirections [ 0 ] )
             vecPosition.fX += vecOffset.fX;
-        if ( ( vecOffset.fY > 0.0f ) == m_bTargetDirections [ 1 ] )
+        //if ( ( vecOffset.fY > 0.0f ) == m_bTargetDirections [ 1 ] )
             vecPosition.fY += vecOffset.fY;
         if ( ( vecOffset.fZ > 0.0f ) == m_bTargetDirections [ 2 ] )
             vecPosition.fZ += vecOffset.fZ;
-#endif
+
         vecPosition += vecOrigin;
 
         SetPosition ( vecPosition );
