@@ -31,7 +31,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     {
         // ESEO_USE_3D_BUFFERS in the default options set fucks up gta sounds
         // on some PCs, so we set the options ourselves
-        m_pSoundEngine = createIrrKlangDevice ( ESOD_AUTO_DETECT, ESEO_MULTI_THREADED | ESEO_MUTE_IF_NOT_FOCUSED );
+        m_pSoundEngine = createIrrKlangDevice ( ESOD_AUTO_DETECT, ESEO_MULTI_THREADED );
     }
 
     // Load plugins (mp3 in our case)
