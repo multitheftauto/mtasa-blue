@@ -9,9 +9,6 @@
 *
 *****************************************************************************/
 
-// Version
-#define MTA_VERSION "1.0"
-
 // Min and max number of characters in player serial
 #define MIN_SERIAL_LENGTH 1
 #define MAX_SERIAL_LENGTH 32

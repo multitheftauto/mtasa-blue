@@ -113,7 +113,7 @@ void ASE::DoPulse ( void )
             }
             case 'v':
             { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
-                strReply = MTA_VERSION;
+                strReply = MTA_DM_ASE_VERSION;
                 break;
             }
             default:
@@ -156,7 +156,7 @@ std::string ASE::QueryFull ( void )
     reply << ( unsigned char ) ( m_strMapName.length() + 1 );
     reply << m_strMapName;
     // version
-    temp << MTA_VERSION;
+    temp << MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.str().length() + 1 );
     reply << temp.str();
     // passworded
@@ -250,7 +250,7 @@ std::string ASE::QueryLight ( void )
     reply << ( unsigned char ) ( m_strMapName.length() + 1 );
     reply << m_strMapName;
     // version
-    std::string temp = MTA_VERSION;
+    std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
     reply << temp;
     // passworded

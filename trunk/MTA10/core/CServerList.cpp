@@ -260,7 +260,7 @@ void CServerListLAN::Discover ( void )
     m_strStatus = "Attempting to discover LAN servers";
 
     // Send out the broadcast packet
-    std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_VERSION );
+    std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );
 	sendto ( m_Socket, strQuery.c_str (), strQuery.length () + 1, 0, (sockaddr *)&m_Remote, sizeof (m_Remote) );
     
     // Keep the time
@@ -381,7 +381,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     if ( !ReadString ( strVersion, szBuffer, i, nLength ) )
         return false;
 
-    if ( strVersion != MTA_VERSION )
+    if ( strVersion != MTA_DM_ASE_VERSION )
         return false;
 
     // Got space for password, serial verification, player count, players max?

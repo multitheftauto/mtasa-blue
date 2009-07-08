@@ -468,7 +468,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 								"= MTU packet size	: %u\n" \
 								"===========================================================\n",
 
-                                MTA_VERSION,
+                                MTA_DM_VERSIONSTRING,
 								m_pMainConfig->GetServerName ().c_str (),
 								szServerIP,
 								usServerPort,
