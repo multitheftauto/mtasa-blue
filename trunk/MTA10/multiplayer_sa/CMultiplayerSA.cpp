@@ -928,6 +928,10 @@ void CMultiplayerSA::InitHooks()
 
     // Increase the events pool size (Fixes #4577).
     *(DWORD *)0x551177 = 9001;
+
+    // Do not fixate camera behind spectated player if local player is dead
+    *(BYTE *)0x52A1C2 = 0xE9;
+    *(DWORD *)0x52A1C3 = 0x100;
 }
 
 
