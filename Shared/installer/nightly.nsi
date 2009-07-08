@@ -585,8 +585,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
 				File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
-				File "${FILES_ROOT}\MTA San Andreas\mta\xvidcore.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.is.xml"
