@@ -319,6 +319,9 @@ void CNametags::DrawDefault ( void )
     CMatrix CameraMatrix;
     g_pGame->GetCamera ()->GetMatrix ( &CameraMatrix );
 
+    // Remove collision from our local vehicle (if we have one)
+    if ( pLocalVehicle ) pLocalVehicle->WorldIgnore ( true );
+
     // Draw the nametags we need to
     CVector vecPlayerPosition;
     CClientVehicle * pPlayerVehicle = NULL;
@@ -345,18 +348,15 @@ void CNametags::DrawDefault ( void )
         pPlayer->GetPosition ( vecPlayerPosition );
         fDistanceExp = pPlayer->GetExpDistance ();
         pPlayerVehicle = pPlayer->GetOccupiedVehicle ();
-        
+       
         // Is he in the same vehicle as the local player?
         if ( ( pSniperTargetedPlayer == pPlayer ) ||
-                ( pSniperTargetedVehicle && pSniperTargetedVehicle == pPlayer->GetOccupiedVehicle () ) ||
+                ( pSniperTargetedVehicle && pSniperTargetedVehicle == pPlayerVehicle ) ||
                 ( pLocalVehicle && pLocalVehicle == pPlayerVehicle ) ||
                 ( fDistanceExp < DEFAULT_VIEW_RANGE_EXP && pPlayer->IsOnScreen () ) )
         {                
-            // If he's in a vehicle, get the world to ignore it for line-of-sight
-            if ( pPlayerVehicle ) pPlayerVehicle->WorldIgnore ( true );
-
             bCollision = g_pCore->GetGame ()->GetWorld ()->ProcessLineOfSight ( &CameraMatrix.vPos, &vecPlayerPosition, &pColPoint, &pGameEntity, true, true, false, true );
-            if ( !bCollision || ( pGameEntity && pGameEntity == pLocalGameVehicle ) ) 
+            if ( !bCollision || ( pGameEntity && pPlayerVehicle && pGameEntity == pPlayerVehicle->GetGameEntity() ) )
             {
                 pPlayer->SetNametagDistance ( sqrt ( fDistanceExp ) );
                 playerTags.push_front ( pPlayer );
@@ -364,10 +364,12 @@ void CNametags::DrawDefault ( void )
 
             // Destroy the colpoint
             if ( pColPoint ) pColPoint->Destroy ();
-
-            if ( pPlayerVehicle ) pPlayerVehicle->WorldIgnore ( false );
         }            
+
     }
+
+    // Readd collision from our local vehicle (if we have one)
+    if ( pLocalVehicle ) pLocalVehicle->WorldIgnore ( false );
 
     // Draw each player's nametag
     float fAlphaModifier;
