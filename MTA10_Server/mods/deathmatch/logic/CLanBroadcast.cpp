@@ -40,7 +40,7 @@ CLanBroadcast::CLanBroadcast ( unsigned short usServerPort )
 
     // Set up the query messages
     std::stringstream ss;
-    m_strClientMessage = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_VERSION );
+    m_strClientMessage = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );
     ss << std::string ( SERVER_LIST_SERVER_BROADCAST_STR ) << " " << ( usServerPort );
     m_strServerMessage = ss.str();
 }
