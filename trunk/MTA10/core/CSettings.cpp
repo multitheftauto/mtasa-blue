@@ -344,6 +344,7 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioRadioVolume->SetProperty ( "StepSize", "0.015625" );
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -361,6 +362,7 @@ CSettings::CSettings ( void )
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioSFXVolume->SetProperty ( "StepSize", "0.015625" );
 
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -374,6 +376,7 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
 
 	/**
 	 *	Video tab
@@ -446,6 +449,7 @@ CSettings::CSettings ( void )
     m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 50.0f, vecTemp.fY ) );
     m_pMapAlpha->GetPosition ( vecTemp, false );
     m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMapAlpha->SetProperty ( "StepSize", "0.01" );
 
     m_pMapAlphaValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 170.0f, vecTemp.fY ) );
@@ -1865,6 +1869,7 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatRed [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatRed [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
     m_pChatRed [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatRedChanged, this ) );
+    m_pChatRed [ eType ]->SetProperty ( "StepSize", "0.004" );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Green:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
@@ -1879,6 +1884,7 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatGreen [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatGreen [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
     m_pChatGreen [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatGreenChanged, this ) );
+    m_pChatGreen [ eType ]->SetProperty ( "StepSize", "0.004" );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Blue:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
@@ -1893,6 +1899,7 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatBlue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatBlue [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
     m_pChatBlue [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatBlueChanged, this ) );
+    m_pChatBlue [ eType ]->SetProperty ( "StepSize", "0.004" );
 
     pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "Transparency:" ) );
     pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
@@ -1907,6 +1914,7 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatAlpha [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
     m_pChatAlpha [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
     m_pChatAlpha [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatAlphaChanged, this ) );
+    m_pChatAlpha [ eType ]->SetProperty ( "StepSize", "0.004" );
 }
 
 void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar )
