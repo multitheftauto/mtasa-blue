@@ -930,8 +930,8 @@ void CMultiplayerSA::InitHooks()
     *(DWORD *)0x551177 = 9001;
 
     // Do not fixate camera behind spectated player if local player is dead
-    *(BYTE *)0x52A1C2 = 0xE9;
-    *(DWORD *)0x52A1C3 = 0x100;
+    *(BYTE *)0x52A2BB = 0;
+    *(BYTE *)0x52A4F8 = 0;
 }
 
 
