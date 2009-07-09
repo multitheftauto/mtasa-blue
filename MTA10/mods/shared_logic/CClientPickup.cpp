@@ -203,7 +203,7 @@ void CClientPickup::Callback_OnLeave ( CClientColShape& Shape, CClientEntity& En
         // Call the pickup leave event
         CLuaArguments Arguments;
         Arguments.PushElement ( &Entity );            // player that hit it
-        Arguments.PushBoolean ( ( Shape.GetDimension () == Entity.GetDimension () ) ); // matching dimension?
+        Arguments.PushBoolean ( ( GetDimension () == Entity.GetDimension () ) ); // matching dimension?
         CallEvent ( "onClientPickupLeave", Arguments, true );
     }
 }
