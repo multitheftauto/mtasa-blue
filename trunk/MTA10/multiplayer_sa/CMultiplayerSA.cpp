@@ -92,8 +92,8 @@ DWORD RETURN_Idle =                                         0x53E98B;
 DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 DWORD FUNC_CEntity_Render =                                 0x534310;
 
-#define HOOKPOS_VehicleCamStart                             0x5245B7
-DWORD RETURN_VehicleCamStart =                              0x5245BD;
+#define HOOKPOS_VehicleCamStart                             0x5245ED
+DWORD RETURN_VehicleCamStart =                              0x5245F3;
 #define HOOKPOS_VehicleCamLookDir1                          0x524DF1
 DWORD RETURN_VehicleCamLookDir1 =                           0x524DF6;
 #define HOOKPOS_VehicleCamLookDir2                          0x525B0E
@@ -103,7 +103,8 @@ DWORD RETURN_VehicleCamHistory =                            0x525D4A;
 #define HOOKPOS_VehicleCamColDetect                         0x525D8D
 DWORD RETURN_VehicleCamColDetect =                          0x525D92;
 #define CALL_VehicleCamUp                                   0x525E1F
-#define HOOKPOS_VehicleCamEnd                               0x525E43
+#define HOOKPOS_VehicleCamEnd                               0x525E3C
+DWORD RETURN_VehicleCamEnd =                                0x525E42;
 
 #define HOOKPOS_VehicleLookBehind                           0x5207E3
 DWORD RETURN_VehicleLookBehind =                            0x520891;
@@ -325,7 +326,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamLookDir2, (DWORD)HOOK_VehicleCamLookDir2, 6);
     HookInstall(HOOKPOS_VehicleCamHistory, (DWORD)HOOK_VehicleCamHistory, 6);
     HookInstall(HOOKPOS_VehicleCamColDetect, (DWORD)HOOK_VehicleCamColDetect, 5);
-    HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 5);
+    HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
@@ -3041,12 +3042,12 @@ void _declspec(naked) HOOK_VehicleCamStart ()
 {
     _asm
     {
-        mov edi, [esi+0x21C]        // edi = camera target, i.e. the vehicle
-
         push edi
         push esi
         call VehicleCamStart
         add esp, 8
+
+        mov eax, [edi+0x460]
         jmp RETURN_VehicleCamStart
     }
 }
@@ -3223,14 +3224,13 @@ void _declspec(naked) HOOK_VehicleCamEnd ()
 {
     _asm
     {
+        mov ds:[0xB6F020], edx
+
         push edi
         call VehicleCamEnd
         add esp, 4
 
-        pop edi
-        pop esi
-        add esp, 0x68
-        retn 0x14
+        jmp RETURN_VehicleCamEnd
     }
 }
 
