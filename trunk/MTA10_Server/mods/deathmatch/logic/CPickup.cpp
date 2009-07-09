@@ -466,7 +466,7 @@ void CPickup::Callback_OnCollision ( CColShape& Shape, CElement& Element )
         if ( !Player.IsDead () )
         {
             // Are they both in the same dimension?
-            if ( Shape.GetDimension () == Element.GetDimension () )
+            if ( GetDimension () == Element.GetDimension () )
             {
                 // Call the onPickupHit event
                 CLuaArguments Arguments;
@@ -508,12 +508,12 @@ void CPickup::Callback_OnLeave ( CColShape& Shape, CElement& Element )
             // Call the onPickupHit event
             CLuaArguments Arguments;
             Arguments.PushElement ( &Player );
-            Arguments.PushBoolean ( ( Shape.GetDimension () == Element.GetDimension () ) );
+            Arguments.PushBoolean ( ( GetDimension () == Element.GetDimension () ) );
             CallEvent ( "onPickupLeave", Arguments );
 
             CLuaArguments Arguments2;
             Arguments2.PushElement ( this );       // pickup
-            Arguments2.PushBoolean ( ( Shape.GetDimension () == Element.GetDimension () ) );
+            Arguments2.PushBoolean ( ( GetDimension () == Element.GetDimension () ) );
             Element.CallEvent ( "onPlayerPickupLeave", Arguments2 );            
         }
     }
