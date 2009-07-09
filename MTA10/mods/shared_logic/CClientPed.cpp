@@ -4309,6 +4309,17 @@ void CClientPed::UpdateTargetPosition ( void )
         if ( ( vecOffset.fZ > 0.0f ) == m_bTargetDirections [ 2 ] )
             vecPosition.fZ += vecOffset.fZ;
 
+        // Temp hack to help ensure gravity doesn't suck the ped underground - ( Maybe when level collision is streamed out and ped it not? )
+        if ( CCamera* pCamera = g_pGame->GetCamera () )
+        {
+            CMatrix matCamera;
+            pCamera->GetMatrix ( &matCamera );
+            float fDist = ( matCamera.vPos - ( vecPosition + vecOrigin ) ).Length ();
+            // Fix only required if ped is between 250.f and 300.f units away, possibly
+            if ( fDist > 230.f && fDist < 320.f )
+                vecPosition.fZ = m_vecTargetPosition.fZ;
+        }
+
         vecPosition += vecOrigin;
 
         SetPosition ( vecPosition );
