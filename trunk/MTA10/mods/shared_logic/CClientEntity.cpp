@@ -720,10 +720,13 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
     }
 
     // Call it on all our children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
+    if ( ! m_Children.empty () )
     {
-        (*iter)->CallEventNoParent ( szName, Arguments, pSource );
+        list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+        for ( ; iter != m_Children.end (); iter++ )
+        {
+            (*iter)->CallEventNoParent ( szName, Arguments, pSource );
+        }
     }
 }
 
