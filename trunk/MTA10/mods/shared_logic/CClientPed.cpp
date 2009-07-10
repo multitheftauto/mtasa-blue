@@ -1266,6 +1266,16 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     }
 
     RemoveTargetPosition ();
+
+    // Make peds stream in when they warp to a vehicle
+    if ( pVehicle )
+    {
+        CVector vecInVehiclePosition;
+        GetPosition ( vecInVehiclePosition );
+        UpdateStreamPosition ( vecInVehiclePosition );
+        if ( pVehicle->IsStreamedIn () )
+            StreamIn ( true );
+    }
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon ( void )
