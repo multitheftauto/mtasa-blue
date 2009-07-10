@@ -537,7 +537,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 //////////////////////////////////////////
 struct SKeysyncFlags : public ISyncStructure
 {
-    enum { BITCOUNT = 3 };
+    enum { BITCOUNT = 4 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -553,6 +553,7 @@ struct SKeysyncFlags : public ISyncStructure
         bool bIsDucked : 1;
         bool bIsChoking : 1;
         bool bAkimboTargetUp : 1;
+        bool bSyncingVehicle : 1;
     } data;
 };
 

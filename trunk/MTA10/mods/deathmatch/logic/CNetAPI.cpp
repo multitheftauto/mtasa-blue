@@ -472,7 +472,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
 
     // Grab the occupied vehicle
     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-    bool bSyncingVehicle = pVehicle && pPlayer->GetOccupiedVehicleSeat () == 0;
 
     // If he's shooting
     if ( ControllerState.ButtonCircle )
@@ -563,7 +562,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     }
 
     // Are we syncing a vehicle?
-    if ( bSyncingVehicle )
+    if ( pVehicle && flags.data.bSyncingVehicle )
     {
         // Eventually read vehicle specific keysync data
         ReadSmallVehicleSpecific ( pVehicle, BitStream );
@@ -619,6 +618,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     flags.data.bIsDucked        = ( pPlayerModel->IsDucked () == true );
     flags.data.bIsChoking       = ( pPlayerModel->IsChoking () == true );
     flags.data.bAkimboTargetUp  = ( g_pMultiplayer->GetAkimboTargetUp () == true );
+    flags.data.bSyncingVehicle  = ( pVehicle != NULL && pPlayerModel->GetOccupiedVehicleSeat () == 0 );
 
     // Write the flags
     BitStream.Write ( &flags );
@@ -665,7 +665,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     }
 
     // Eventually write vehicle specific stuff.
-    if ( pVehicle && pPlayerModel->GetOccupiedVehicleSeat () == 0 )
+    if ( flags.data.bSyncingVehicle )
     {
         WriteSmallVehicleSpecific ( pVehicle, BitStream );
 

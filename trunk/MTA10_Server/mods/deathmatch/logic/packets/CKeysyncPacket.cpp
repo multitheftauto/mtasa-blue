@@ -93,7 +93,7 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // If he's in a vehicle, read out the small vehicle specific data
         CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle ();
-        if ( pVehicle && pSourcePlayer->GetOccupiedVehicleSeat () == 0 )
+        if ( pVehicle && flags.data.bSyncingVehicle )
         {
             ReadVehicleSpecific ( pVehicle, BitStream );
 
@@ -125,6 +125,7 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pSourceElement )
     {
         CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
+        CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle ();
 
         // Write the source player id
         ElementID PlayerID = pSourcePlayer->GetID ();
@@ -140,6 +141,7 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         flags.data.bIsDucked = ( pSourcePlayer->IsDucked () == true );
         flags.data.bIsChoking = ( pSourcePlayer->IsChoking () == true );
         flags.data.bAkimboTargetUp = ( pSourcePlayer->IsAkimboArmUp () == true );
+        flags.data.bSyncingVehicle = ( pVehicle != NULL && pSourcePlayer->GetOccupiedVehicleSeat () == 0 );
 
         // Write the flags
         BitStream.Write ( &flags );
@@ -178,8 +180,7 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // If he's in a vehicle, read out the small vehicle specific data
-        CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle ();
-        if ( pVehicle && pSourcePlayer->GetOccupiedVehicleSeat () == 0 )
+        if ( flags.data.bSyncingVehicle )
         {
             WriteVehicleSpecific ( pVehicle, BitStream );
 
