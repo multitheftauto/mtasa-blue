@@ -403,12 +403,15 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
     CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     int j = 0;
     int k = pList->GetServerCount ();
-    if ( k > 0 ) {
-        for ( CServerListIterator i = i_b; i != i_e; i++ ) {
+    if ( k > 0 )
+    {
+        for ( CServerListIterator i = i_b; i != i_e; i++ )
+        {
             CServerListItem * pServer = *i;
 
             // Add the item to the list
-            if ( pServer->bScanned && (!pServer->bAddedToList[ Type ] || bClearServerList ) )
+            if ( ( pServer->bScanned || (pServer->bSkipped && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
+                 ( !pServer->bAddedToList[ Type ] || bClearServerList ) )
                 AddServerToList ( pServer, Type );
             j++;
         }
@@ -685,7 +688,7 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
                     m_ServersFavourites.Add ( pServer );
                 }
             }
-            UpdateServerList ( ServerBrowserType::FAVOURITES );
+            UpdateServerList ( ServerBrowserType::FAVOURITES, true );
         }
     }
     return true;
@@ -853,21 +856,21 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, C
     CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     int j = 0;
     int k = pList->GetServerCount ();
-    if ( k > 0 ) {
-        for ( CServerListIterator i = i_b; i != i_e; i++ ) {
+    if ( k > 0 )
+    {
+        for ( CServerListIterator i = i_b; i != i_e; i++ )
+        {
             CServerListItem * pServer = *i;
 
-            // Add the (scanned) item to the node
-            if ( pServer->bScanned ) {
-                CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
-                if ( pSubNode )
-                {
-                    CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
-					pHostAttribute->SetValue ( pServer->strHost.c_str () );
-                    
-                    CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
-					pPortAttribute->SetValue ( pServer->usGamePort );
-                }
+            // Add the item to the node
+            CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
+            if ( pSubNode )
+            {
+                CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
+				pHostAttribute->SetValue ( pServer->strHost.c_str () );
+                
+                CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
+				pPortAttribute->SetValue ( pServer->usGamePort );
             }
             j++;
         }

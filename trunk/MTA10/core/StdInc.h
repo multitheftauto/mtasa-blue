@@ -28,6 +28,17 @@
 #include <cstdlib>
 #include <iomanip>
 
+// SDK includes
+#include <xml/CXMLNode.h>
+#include <xml/CXMLFile.h>
+#include <xml/CXMLAttribute.h>
+#include <xml/CXMLAttributes.h>
+#include <Common.h>
+
+#include <net/CNet.h>
+#include <multiplayer/CMultiplayer.h>
+// Game can not be included here because of conflicting classnames (CText)
+
 // Core-level includes
 #include "SharedUtil.h"
 #include "SString.h"
@@ -50,14 +61,3 @@
 #include "UtilityMacros.h"
 #include "CJoystickManager.h"
 #include "CVideoModeManager.h"
-
-// SDK includes
-#include <xml/CXMLNode.h>
-#include <xml/CXMLFile.h>
-#include <xml/CXMLAttribute.h>
-#include <xml/CXMLAttributes.h>
-#include <Common.h>
-
-#include <net/CNet.h>
-#include <multiplayer/CMultiplayer.h>
-// Game can not be included here because of conflicting classnames (CText)
