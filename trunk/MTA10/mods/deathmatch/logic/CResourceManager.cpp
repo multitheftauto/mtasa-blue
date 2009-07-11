@@ -130,7 +130,7 @@ void CResourceManager::StopAll ( void )
     }
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     if ( strInput[0] == ':' )
@@ -142,22 +142,20 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
             pResource = g_pClientGame->GetResourceManager()->GetResource ( strResourceName.c_str() );
             if ( pResource && strInput[iEnd+1] )
             {
-                std::string strSubDirectory = strInput.substr(iEnd+1);
-                if ( IsValidFilePath ( strSubDirectory.c_str() ) )
+                strMetaPath = strInput.substr(iEnd+1);
+                if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strSubDirectory;
+                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
                     return true;
                 }
             }
         }
     }
-    else
+    else if ( IsValidFilePath ( strInput.c_str() ) )
     {
-        if ( IsValidFilePath ( strInput.c_str() ) )
-        {
-            strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
-            return true;
-        }
+        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+        strMetaPath = strInput;
+        return true;
     }
     return false;
 }

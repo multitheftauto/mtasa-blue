@@ -132,20 +132,11 @@ int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
 {
     // Resource and config name
     CResource* pResource = NULL;
-    const char* szConfigName = NULL;
+    const char* szInput = NULL;
+    std::string strAbsPath;
+    std::string strMetaPath;
 
-    // We have resource, string args passed?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TSTRING ) )
-    {
-        // Grab the arguments
-        pResource = lua_toresource ( luaVM, 1 );
-        szConfigName = lua_tostring ( luaVM, 2 );
-    }
-
-    // We have only string?
-    else if ( lua_istype ( luaVM, 1, LUA_TSTRING ) &&
-        lua_istype ( luaVM, 2, LUA_TNONE ) )
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
     {
         // Grab our lua main
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -153,27 +144,30 @@ int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
         {
             // Grab resource and the config name from arg
             pResource = pLuaMain->GetResource ();
-            szConfigName = lua_tostring ( luaVM, 1 );
+            szInput = lua_tostring ( luaVM, 1 );
         }
     }
 
     // We have both a resource file to grab the config from and a config name?
-    if ( pResource && szConfigName )
+    if ( pResource && szInput )
     {
-        // Loop through the configs in that resource
-        list < CResourceConfigItem* >::iterator iter = pResource->ConfigIterBegin ();
-        for ( ; iter != pResource->ConfigIterEnd (); iter++ )
+        if ( CResourceManager::ParseResourcePathInput ( szInput, pResource, strAbsPath, strMetaPath ) )
         {
-            // Matching name?
-            if ( strcmp ( (*iter)->GetShortName(), szConfigName ) == 0 )
+            // Loop through the configs in that resource
+            list < CResourceConfigItem* >::iterator iter = pResource->ConfigIterBegin ();
+            for ( ; iter != pResource->ConfigIterEnd (); iter++ )
             {
-                // Return it
-                CResourceConfigItem* pConfig = (CResourceConfigItem*) (*iter);
-                CXMLNode* pNode = pConfig->GetRoot ();
-                if ( pNode )
+                // Matching name?
+                if ( strcmp ( (*iter)->GetShortName(), strMetaPath.c_str() ) == 0 )
                 {
-                    lua_pushxmlnode ( luaVM, pNode );
-                    return 1;
+                    // Return it
+                    CResourceConfigItem* pConfig = (CResourceConfigItem*) (*iter);
+                    CXMLNode* pNode = pConfig->GetRoot ();
+                    if ( pNode )
+                    {
+                        lua_pushxmlnode ( luaVM, pNode );
+                        return 1;
+                    }
                 }
             }
         }
