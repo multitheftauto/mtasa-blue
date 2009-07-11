@@ -94,6 +94,8 @@ DWORD FUNC_CEntity_Render =                                 0x534310;
 
 #define HOOKPOS_VehicleCamStart                             0x5245ED
 DWORD RETURN_VehicleCamStart =                              0x5245F3;
+#define HOOKPOS_VehicleCamTargetZTweak                      0x524A68
+DWORD RETURN_VehicleCamTargetZTweak =                       0x524AA4;
 #define HOOKPOS_VehicleCamLookDir1                          0x524DF1
 DWORD RETURN_VehicleCamLookDir1 =                           0x524DF6;
 #define HOOKPOS_VehicleCamLookDir2                          0x525B0E
@@ -223,6 +225,7 @@ void HOOK_ComputeDamageResponse_StartChoking ();
 void HOOK_CollisionStreamRead ();
 void HOOK_CPhysical_ApplyGravity ();
 void HOOK_VehicleCamStart ();
+void HOOK_VehicleCamTargetZTweak ();
 void HOOK_VehicleCamLookDir1 ();
 void HOOK_VehicleCamLookDir2 ();
 void HOOK_VehicleCamHistory ();
@@ -331,6 +334,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
     HookInstall(HOOKPOS_VehicleCamStart, (DWORD)HOOK_VehicleCamStart, 6);
+    HookInstall(HOOKPOS_VehicleCamTargetZTweak, (DWORD)HOOK_VehicleCamTargetZTweak, 8);
     HookInstall(HOOKPOS_VehicleCamLookDir1, (DWORD)HOOK_VehicleCamLookDir1, 5);
     HookInstall(HOOKPOS_VehicleCamLookDir2, (DWORD)HOOK_VehicleCamLookDir2, 6);
     HookInstall(HOOKPOS_VehicleCamHistory, (DWORD)HOOK_VehicleCamHistory, 6);
@@ -3070,6 +3074,41 @@ void _declspec(naked) HOOK_VehicleCamStart ()
 
 // ---------------------------------------------------
 
+void _cdecl VehicleCamTargetZTweak ( CVector* pvecCamTarget, float fTargetZTweak )
+{
+    // Replacement for "vecCamTarget = vecCarPosition + (0, 0, 1)*fZTweak"
+    *pvecCamTarget += gravcam_matGravity.vUp*fTargetZTweak;
+}
+
+void _declspec(naked) HOOK_VehicleCamTargetZTweak ()
+{
+    _asm
+    {
+        fstp st
+
+        lea eax, [esp+0x48]
+        push [esp+0x30]
+        push eax
+        call VehicleCamTargetZTweak
+        add esp, 8
+
+        fld [esp+0x30]
+        fadd [esp+0x7C]
+        fstp [esp+0x7C]
+        fld ds:[0x8CCEDC]
+        fdiv [esp+0x7C]
+        fmul [esp+0x30]
+        fadd [esp+0x1C]
+        fstp [esp+0x1C]
+
+        mov eax, ds:[0xB6F0DC]
+        cmp eax, 1
+        jmp RETURN_VehicleCamTargetZTweak
+    }
+}
+
+// ---------------------------------------------------
+
 void _cdecl VehicleCamLookDir1 ( DWORD dwCam, DWORD pVehicleInterface )
 {
     // For the same reason as in VehicleCamStart, inverse transform the camera's lookdir
@@ -3391,6 +3430,8 @@ void _declspec(naked) HOOK_ApplyCarBlowHop ()
     }
 }
 
+// ---------------------------------------------------
+
 
 DWORD CALL_CWorld_Process = 0x5684a0;
 void _declspec(naked) HOOK_CGame_Process ()
@@ -3431,6 +3472,7 @@ void _declspec(naked) HOOK_Idle ()
     }
 }
 
+// ---------------------------------------------------
 
 #define ENABLE_VEHICLE_HEADLIGHT_COLOR 1
 
@@ -3673,6 +3715,8 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle ()
 #endif  // ENABLE_VEHICLE_HEADLIGHT_COLOR
 
 // ---------------------------------------------------
+
+// Report fire damage, with correct inflictor entity
 
 void _declspec(naked) HOOK_CWorld_SetWorldOnFire ()
 {
