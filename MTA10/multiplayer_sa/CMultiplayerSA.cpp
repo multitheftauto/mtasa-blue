@@ -3751,15 +3751,23 @@ fail:
 
 // ---------------------------------------------------
 
+// The purpose of these hooks is to divide plant (grass) rendering in two:
+// rather than render *all* grass before or after the water like SA does, we render
+// underwater plants before the water and above-water plants after. This way, we have
+// at the same time that underwater plants do not pop up in front of water,
+// and water is not drawn in front of above-water plants (eg if you're looking at a
+// lake through some high grass).
+
 void _declspec(naked) HOOK_RenderScene_Plants ()
 {
     _asm
     {
+        push 1                  // bRenderingBeforeWater
         movzx eax, bl           // bCamBelowWater
         push eax
         mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
-        add esp, 4
+        add esp, 8
         ret
     }
 }
@@ -3768,13 +3776,12 @@ void _declspec(naked) HOOK_RenderScene_end ()
 {
     _asm
     {
-        cmp bl, 0
-        setz bl
+        push 0                  // bRenderingBeforeWater
         movzx eax, bl           // bCamBelowWater
         push eax
         mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
-        add esp, 4
+        add esp, 8
 
         pop ebx
         add esp, 8
@@ -3790,25 +3797,37 @@ bool _cdecl IsPlantBelowWater ( float fPlantZ, float fWaterZ )
 
 void _declspec(naked) HOOK_CPlantMgr_Render ()
 {
+    // (bCamBelowWater, bRenderingBeforeWater)
     _asm
     {
         sub esp, 4
         mov eax, esp
         push 0
         push 0
-        push eax
-        push [ebp+8]
+        push eax                // pWaterLevel
+        push [ebp+8]            // Plant position
         push [ebp+4]
         push [ebp]
         mov eax, 0x6E8580       // CWaterLevel::GetWaterLevelNoWaves
         call eax
         add esp, 0x18
+        add esp, 4
+        test al, al
+        jnz watercheck          // only compare plant.z to water level if there actually is water here
+        
+        xor eax, eax            // if there's no water, assume "plant above water"
+        jmp rendercheck
+
+watercheck:
+        sub esp, 4
         push [ebp+8]
         call IsPlantBelowWater
         add esp, 8
         
-        cmp eax, [esp+0x88+4]
-        jz fail
+rendercheck:
+        xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
+        cmp eax, [esp+0x88+8]
+        jnz fail
 
         mov ax, [esi-0x10]
         mov edx, edi
