@@ -50,6 +50,7 @@ public:
     {
         Address.S_un.S_addr = 0;
         usQueryPort = 0;
+        usGamePort = 0;
         Init ();
     }
 
@@ -57,6 +58,7 @@ public:
     {
         Address = _Address;
         usQueryPort = _usQueryPort;
+        usGamePort = _usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET;
         Init ();
     }
 
@@ -64,6 +66,7 @@ public:
     {
         Address.S_un.S_addr = copy.Address.S_un.S_addr;
         usQueryPort = copy.usQueryPort;
+        usGamePort = copy.usGamePort;
         Init ();
     }
 
@@ -101,9 +104,16 @@ public:
         bScanned = false;
         bSkipped = false;
         bSerials = false;
+        bPassworded = false;
+        nPlayers = 0;
+        nMaxPlayers = 0;
+        nPing = 0;
         m_ulQueryStart = 0;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
             bAddedToList[i] = false;
+
+        strHost = inet_ntoa ( Address );
+        strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
         
         // Initialize sockets
         m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
