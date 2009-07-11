@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -81,7 +82,7 @@ CServerBrowser::CServerBrowser ( void )
     CreateTab ( ServerBrowserType::RECENTLY_PLAYED, "Recently Played" );
     
     // Create the "Add to favourites by IP" button
-    m_pButtonFavouritesByIP = reinterpret_cast < CGUIButton * > ( pManager->CreateButton ( m_pTab [ ServerBrowserType::FAVOURITES ], "Add by host/port" ) );
+    m_pButtonFavouritesByIP = reinterpret_cast < CGUIButton * > ( pManager->CreateButton ( m_pTab [ ServerBrowserType::FAVOURITES ], "Add by host/ip" ) );
     m_pButtonFavouritesByIP->SetPosition ( CVector2D ( 0.30f, 0.93f ), true );
     m_pButtonFavouritesByIP->SetSize ( CVector2D ( 0.25f, 0.04f ), true );
     m_pButtonFavouritesByIP->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesByIPClick, this ) );
@@ -134,23 +135,37 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerPlayerList [ type ]->SetIgnoreTextSpacer ( true );
 
     // Filters
+
+    // Search edit
+    m_pEditSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
+    m_pEditSearch [ type ]->SetPosition ( CVector2D ( 0.02f, 0.04f ), true );
+    m_pEditSearch [ type ]->SetSize ( CVector2D ( 0.19f, 0.05f ), true );
+    m_pEditSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
+
+    // Search icon
+	m_pSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditSearch [ type ] ) );
+	m_pSearchIcon [ type ]->SetPosition ( CVector2D ( 0.85f, 0.15f ), true );
+	m_pSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
+	m_pSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
+    
+    // Include checkboxes
     m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Empty", true ) );
-    m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.02f, 0.05f ), true );
-    m_pIncludeEmpty [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeEmptyClick, this ) );
+    m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.225f, 0.045f ), true );
+    m_pIncludeEmpty [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
     m_pIncludeFull [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Full", true ) );
-    m_pIncludeFull [ type ]->SetPosition ( CVector2D ( 0.18f, 0.05f ), true );
-    m_pIncludeFull [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeFullClick, this ) );
+    m_pIncludeFull [ type ]->SetPosition ( CVector2D ( 0.38f, 0.045f ), true );
+    m_pIncludeFull [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
     m_pIncludeLocked [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Locked", true ) );
-    m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( 0.32f, 0.05f ), true );
-    m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
+    m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( 0.515f, 0.045f ), true );
+    m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
     if ( type != ServerBrowserType::INTERNET && type != ServerBrowserType::LAN )
     {
         m_pIncludeOffline [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Offline", true ) );
-        m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( 0.48f, 0.05f ), true );
-        m_pIncludeOffline [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnIncludeLockedClick, this ) );
+        m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( 0.675f, 0.045f ), true );
+        m_pIncludeOffline [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
     }
     else
     {
@@ -228,6 +243,9 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     
     delete m_pLabelPassword [ type ];
     delete m_pEditPassword [ type ];
+
+    delete m_pEditSearch [ type ];
+    delete m_pSearchIcon [ type ];
 
     delete m_pIncludeEmpty [ type ];
     delete m_pIncludeFull [ type ];
@@ -364,13 +382,13 @@ bool CServerBrowser::IsVisible ( void )
 }
 
 
-void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
+void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServerList )
 {
 
     // Get the appropriate server list
     CServerList* pList = GetServerList ( Type );
 
-    if ( pList->GetRevision () != m_pServerListRevision [ Type ] )
+    if ( pList->GetRevision () != m_pServerListRevision [ Type ] || bClearServerList )
     {
         m_pServerListRevision [ Type ] = pList->GetRevision ();
 
@@ -390,7 +408,7 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type )
             CServerListItem * pServer = *i;
 
             // Add the item to the list
-            if ( pServer->bScanned && !pServer->bAddedToList[ Type ] )
+            if ( pServer->bScanned && (!pServer->bAddedToList[ Type ] || bClearServerList ) )
                 AddServerToList ( pServer, Type );
             j++;
         }
@@ -412,12 +430,23 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
+    bool bSearchFound = true;
+
+    std::string strSearchText = m_pEditSearch [ Type ]->GetText ();
+    if ( !strSearchText.empty() )
+    {
+        // Search for the search text in the servername
+        std::string strServerName = pServer->strName;
+        for ( int i = 0, j = strSearchText.length (); i < j; i ++ ) strSearchText[i] = tolower(strSearchText[i] );
+        for ( int i = 0, j = strServerName.length (); i < j; i ++ ) strServerName[i] = tolower(strServerName[i] );
+        bSearchFound = strServerName.find(strSearchText) != string::npos;
+    }
 
     if (
         ( pServer->nPlayers > 0 || bIncludeEmpty ) &&
         ( pServer->nPlayers < pServer->nMaxPlayers || pServer->nPlayers == 0 || pServer->nMaxPlayers == 0 || bIncludeFull ) &&
-        ( !pServer->bPassworded || bIncludeLocked )
-        )
+        ( !pServer->bPassworded || bIncludeLocked ) && bSearchFound
+       )
     {
         // Create a new row
         int iIndex = m_pServerList [ Type ]->AddRow ( true );
@@ -606,7 +635,12 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
 
 bool CServerBrowser::OnRefreshClick ( CGUIElement* pElement )
 {
-    GetServerList ( GetCurrentServerBrowserType () )->Refresh ();
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+
+    GetServerList ( Type )->Refresh ();
+
+    //Clear the search field
+    m_pEditSearch [ Type ]->SetText("");
     return true;
 }
 
@@ -723,34 +757,9 @@ bool CServerBrowser::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 	return false;
 }
 
-
-bool CServerBrowser::OnIncludeEmptyClick ( CGUIElement* pElement )
+bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 {
-    UpdateServerList ( GetCurrentServerBrowserType () );
-
-    return true;
-}
-
-
-bool CServerBrowser::OnIncludeFullClick ( CGUIElement* pElement )
-{
-    UpdateServerList ( GetCurrentServerBrowserType () );
-
-    return true;
-}
-
-
-bool CServerBrowser::OnIncludeLockedClick ( CGUIElement* pElement )
-{
-    UpdateServerList ( GetCurrentServerBrowserType () );
-
-    return true;
-}
-
-
-bool CServerBrowser::OnIncludeOfflineClick ( CGUIElement* pElement )
-{
-    UpdateServerList ( GetCurrentServerBrowserType () );
+    UpdateServerList ( GetCurrentServerBrowserType (), true );
 
     return true;
 }
