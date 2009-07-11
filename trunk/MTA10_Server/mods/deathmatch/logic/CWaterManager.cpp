@@ -47,6 +47,16 @@ CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMa
     return pWater;
 }
 
+void CWaterManager::SetGlobalWaterLevel ( float fLevel )
+{
+    m_fGlobalWaterLevel = fLevel;
+    std::list < CWater* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        (*iter)->SetLevel ( fLevel );
+    }
+}
+
 void CWaterManager::DeleteAll ()
 {
     // Delete all items

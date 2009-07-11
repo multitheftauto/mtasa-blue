@@ -134,6 +134,12 @@ DWORD RETURN_CExplosion_Update =                            0x7377D8;
 #define HOOKPOS_CWeapon_FireAreaEffect                      0x73EBFE
 DWORD RETURN_CWeapon_FireAreaEffect =                       0x73EC03;
 
+#define CALL_RenderScene_Plants                             0x53E103
+#define HOOKPOS_RenderScene_end                             0x53E159
+#define HOOKPOS_CPlantMgr_Render                            0x5DBC4C
+DWORD RETURN_CPlantMgr_Render_success =                     0x5DBC52;
+DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -235,6 +241,9 @@ void HOOK_CExplosion_Update ();
 void HOOK_CWeapon_FireAreaEffect ();
 void HOOK_CGame_Process ();
 void HOOK_Idle ();
+void HOOK_RenderScene_Plants ();
+void HOOK_RenderScene_end ();
+void HOOK_CPlantMgr_Render ();
 
 void vehicle_lights_init ();
 
@@ -340,13 +349,15 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10 );
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
+    HookInstall(HOOKPOS_RenderScene_end, (DWORD)HOOK_RenderScene_end, 5);
+    HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
     HookInstallCall ( CALL_VehicleCamUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookAsideUp, (DWORD)HOOK_VehicleCamUp );
-
+    HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     memset ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -863,11 +874,6 @@ void CMultiplayerSA::InitHooks()
     // Remove this check so that no bullets are ignored.
     *(BYTE *)0x73FDF9 = 0xEB;
 
-    // Make sure water is always drawn after trees and LOD instead of before
-    // Disabled for now... Works fine for trees/LOD but *always* draws in front of
-    // high grass which is annoying
-    //*(WORD *)0x53DF55 = 0x9090;
-
     // Disallow spraying gang tags
     // Nop the whole CTagManager::IsTag function and replace its body with:
     // xor eax, eax
@@ -926,13 +932,23 @@ void CMultiplayerSA::InitHooks()
     *(WORD *)0x53A55F = 0x9090;
     *(BYTE *)0x73EC06 = 0x85;       // CWeapon::FireAreaEffect: test al,al -> test eax,eax
 
-
     // Increase the events pool size (Fixes #4577).
     *(DWORD *)0x551177 = 9001;
 
     // Do not fixate camera behind spectated player if local player is dead
     *(BYTE *)0x52A2BB = 0;
     *(BYTE *)0x52A4F8 = 0;
+
+    // Always render water after other entities (otherwise underwater LODs and trees are rendered
+    // in front of it)
+    *(BYTE *)0x53DFF5 = 0xEB;
+    *(WORD *)0x53E133 = 0x9090;
+    // Disable some stack management instructions as we need ebx for a bit longer. We replicate
+    // these in HOOK_RenderScene_end
+    *(BYTE *)0x53E132 = 0x90;
+    memset ( (void *)0x53E156, 0x90, 3 );
+    // Use 0.5 instead of 0.0 for underwater threshold
+    *(DWORD *)0x53DF4B = 0x858B8C;
 }
 
 
@@ -3730,5 +3746,76 @@ void _declspec(naked) HOOK_CWeapon_FireAreaEffect ()
         mov [eax+0x14], ecx
 fail:
         jmp RETURN_CWeapon_FireAreaEffect
+    }
+}
+
+// ---------------------------------------------------
+
+void _declspec(naked) HOOK_RenderScene_Plants ()
+{
+    _asm
+    {
+        movzx eax, bl           // bCamBelowWater
+        push eax
+        mov eax, 0x5DBAE0       // CPlantMgr::Render
+        call eax
+        add esp, 4
+        ret
+    }
+}
+
+void _declspec(naked) HOOK_RenderScene_end ()
+{
+    _asm
+    {
+        cmp bl, 0
+        setz bl
+        movzx eax, bl           // bCamBelowWater
+        push eax
+        mov eax, 0x5DBAE0       // CPlantMgr::Render
+        call eax
+        add esp, 4
+
+        pop ebx
+        add esp, 8
+        mov eax, 0x7113B0
+        jmp eax
+    }
+}
+
+bool _cdecl IsPlantBelowWater ( float fPlantZ, float fWaterZ )
+{
+    return fPlantZ + 2.0f < fWaterZ;
+}
+
+void _declspec(naked) HOOK_CPlantMgr_Render ()
+{
+    _asm
+    {
+        sub esp, 4
+        mov eax, esp
+        push 0
+        push 0
+        push eax
+        push [ebp+8]
+        push [ebp+4]
+        push [ebp]
+        mov eax, 0x6E8580       // CWaterLevel::GetWaterLevelNoWaves
+        call eax
+        add esp, 0x18
+        push [ebp+8]
+        call IsPlantBelowWater
+        add esp, 8
+        
+        cmp eax, [esp+0x88+4]
+        jz fail
+
+        mov ax, [esi-0x10]
+        mov edx, edi
+        fld ds:[0x8D12C0]
+        jmp RETURN_CPlantMgr_Render_success
+
+fail:
+        jmp RETURN_CPlantMgr_Render_fail
     }
 }

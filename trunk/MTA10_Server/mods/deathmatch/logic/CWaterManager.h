@@ -32,7 +32,7 @@ public:
 
     float                           GetGlobalWaterLevel         () const            { return m_fGlobalWaterLevel; }
     float                           GetGlobalWaveHeight         () const            { return m_fGlobalWaveHeight; }
-    void                            SetGlobalWaterLevel         ( float fLevel )    { m_fGlobalWaterLevel = fLevel; }
+    void                            SetGlobalWaterLevel         ( float fLevel );
     void                            SetGlobalWaveHeight         ( float fHeight )   { m_fGlobalWaveHeight = fHeight; }
 
     std::list < CWater* > ::const_iterator IterBegin            ()          { return m_List.begin (); }
