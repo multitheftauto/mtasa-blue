@@ -198,7 +198,7 @@ CClientPed::~CClientPed ( void )
     }
 
     // Make sure we're not requesting any model
-    m_pRequester->Cancel ( this );
+    m_pRequester->Cancel ( this, false );
 
     // Detach us from eventual entities
 	AttachTo ( NULL );
@@ -3182,7 +3182,7 @@ void CClientPed::StreamOut ( void )
 
         // Make sure no model loading is pending. This would recreate
         // us very soon.
-        m_pRequester->Cancel ( this );
+        m_pRequester->Cancel ( this, true );
     }
 }
 

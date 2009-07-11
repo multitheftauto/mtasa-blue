@@ -50,7 +50,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
 CClientObject::~CClientObject ( void )
 {
     // Unrequest whatever we've requested or we'll crash in unlucky situations
-    m_pModelRequester->Cancel ( this );  
+    m_pModelRequester->Cancel ( this, false );  
 
     // Detach us from anything
 	AttachTo ( NULL );
@@ -335,7 +335,7 @@ void CClientObject::StreamOut ( void )
     Destroy ();
 
     // Cancel anything we might've requested.
-    m_pModelRequester->Cancel ( this );
+    m_pModelRequester->Cancel ( this, true );
 }
 
 

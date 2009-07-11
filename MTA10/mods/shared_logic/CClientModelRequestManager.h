@@ -42,7 +42,7 @@ public:
     bool                            RequestBlocking                 ( unsigned short usModelID );
 
     bool                            Request                         ( unsigned short usModelID, CClientEntity* pRequester );
-    void                            Cancel                          ( CClientEntity* pRequester );
+    void                            Cancel                          ( CClientEntity* pRequester, bool bAllowQueue );
 
 private:
     void                                DoPulse                     ( void );

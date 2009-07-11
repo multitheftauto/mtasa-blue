@@ -204,14 +204,18 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
 }
 
 
-void CClientModelRequestManager::Cancel ( CClientEntity* pEntity )
+void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQueue )
 {
     assert ( pEntity );
+    // Check to ensure entity has not got its knickers in a twist
+    assert ( !ListContains ( m_CancelQueue, pEntity ) );
 
     // Are we inside a pulse? Add it to a list to delete after or we'll crash.
     // If not, cancel now.
     if ( m_bDoingPulse )
     {
+        // Check queuing is allowed by the caller
+        assert ( bAllowQueue );
         m_CancelQueue.push_back ( pEntity );
     }
     else
@@ -311,7 +315,7 @@ void CClientModelRequestManager::DoPulse ( void )
             list < CClientEntity* > ::iterator iter = m_CancelQueue.begin ();
             for ( ; iter != m_CancelQueue.end (); iter++ )
             {
-                Cancel ( *iter );
+                Cancel ( *iter, false );
             }
 
             // Clear our cancel list
