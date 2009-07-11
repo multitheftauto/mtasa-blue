@@ -10,6 +10,7 @@
 *               Ed Lyons <eai@opencoding.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -113,6 +114,9 @@ protected:
     CGUILabel*          m_pLabelPassword [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditPassword [ SERVER_BROWSER_TYPE_COUNT ];
 
+    CGUIEdit*           m_pEditSearch [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
+
     // Server list columns
     CGUIHandle			m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
 	CGUIHandle			m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
@@ -130,7 +134,7 @@ private:
     void                    CreateTab                       ( ServerBrowserType type, const char* szName );
     void                    DeleteTab                       ( ServerBrowserType type );
 
-    void                    UpdateServerList                ( ServerBrowserType Type );
+    void                    UpdateServerList                ( ServerBrowserType Type, bool bClearServerList = false);
     CServerList *           GetServerList                   ( ServerBrowserType Type );
     void                    AddServerToList                 ( CServerListItem * pServer, ServerBrowserType Type );
     
@@ -140,10 +144,7 @@ private:
     bool                    OnRefreshClick                  ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
-    bool                    OnIncludeEmptyClick             ( CGUIElement* pElement );
-    bool                    OnIncludeFullClick              ( CGUIElement* pElement );
-    bool                    OnIncludeLockedClick            ( CGUIElement* pElement );
-    bool                    OnIncludeOfflineClick           ( CGUIElement* pElement );
+    bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnFavouritesByIPClick           ( CGUIElement* pElement );
     bool                    OnFavouritesByIPAddClick        ( CGUIElement* pElement );
     bool                    OnWindowSize                    ( CGUIElement* pElement );
