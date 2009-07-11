@@ -172,7 +172,7 @@ CClientVehicle::~CClientVehicle ( void )
 
     // Make sure we haven't requested any model that will make us crash
     // when it's done loading.
-    m_pModelRequester->Cancel ( this );
+    m_pModelRequester->Cancel ( this, false );
 
     // Unreference us from the driving player model (if any)
     if ( m_pDriver )
@@ -1874,7 +1874,7 @@ void CClientVehicle::StreamOut ( void )
     // pending in the model request manager. If we
     // had and don't do this it could create us when
     // we're not streamed in.
-    m_pModelRequester->Cancel ( this );
+    m_pModelRequester->Cancel ( this, true );
 }
 
 

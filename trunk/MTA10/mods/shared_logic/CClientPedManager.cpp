@@ -138,7 +138,9 @@ void CClientPedManager::RemoveFromList ( CClientPed* pPed )
 
 void CClientPedManager::OnCreation ( CClientPed * pPed )
 {
-    m_StreamedIn.push_back ( pPed );
+    // Check not already in the list to avoid multiple calls to pPed->StreamedInPulse() later
+    if ( !ListContains ( m_StreamedIn, pPed ) )
+        m_StreamedIn.push_back ( pPed );
 }
 
 
