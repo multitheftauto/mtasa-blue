@@ -88,6 +88,10 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 #ifdef MTA_DEBUG
     m_bShowingWepdata = false;
 #endif
+
+    m_fPretendHealthSmoothed = 0;
+    m_fPretendArmorSmoothed = 0;
+    m_fLastSecondCount = 0;
 }
 
 
@@ -272,6 +276,10 @@ void CClientPlayer::Reset ( void )
     m_bNametagColorOverridden = false;
 
     SetAlpha ( 255 );
+
+    m_fPretendHealthSmoothed = 100;
+    m_fPretendArmorSmoothed = 100;
+    m_PretendDamageList.clear ();
 }
 
 
@@ -289,3 +297,67 @@ void CClientPlayer::SetNametagText ( const char * szText )
         strcpy ( m_szNametag, szText );
     }
 }
+
+
+void CClientPlayer::AddPretendDamage ( float fDamage, unsigned long ulLatency )
+{
+    // Add to list
+    ulLatency += 200;
+    m_PretendDamageList.insert ( m_PretendDamageList.begin(), SPretendDamage ( fDamage, CClientTime::GetTime () + ulLatency ) );
+}
+
+
+void CClientPlayer::GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor )
+{
+    // Calc pretend health and armor
+    float fHealth = GetHealth ();
+    float fArmor  = GetArmor ();
+    float fDamage = GetTotalPretendDamage ();
+    float fArmorDamage  = Min ( fArmor, fDamage );
+    float fHealthDamage = Min ( fHealth, fDamage - fArmorDamage );
+    float fPretendArmor  = fArmor  - fArmorDamage;
+    float fPretendHealth = fHealth - fHealthDamage;
+
+    // Skip smoothing if health jumps to 100
+    if ( fDamage == 0.f && fHealth > 99.f && m_fPretendHealthSmoothed < 1.f )
+        m_fPretendHealthSmoothed = fPretendHealth;
+
+    // Calc elapsed time
+    float fSecondCount = GetSecondCount ();
+    float fDeltaSeconds = fSecondCount - m_fLastSecondCount;
+    m_fLastSecondCount = fSecondCount;
+
+    // Smooth update
+    float fSmoothAlpha = Min ( 1.f, fDeltaSeconds * 2.f );
+    m_fPretendHealthSmoothed = Lerp ( m_fPretendHealthSmoothed, fSmoothAlpha, fPretendHealth );
+    m_fPretendArmorSmoothed  = Lerp ( m_fPretendArmorSmoothed,  fSmoothAlpha, fPretendArmor  );
+
+    // Output
+    *pfHealth = m_fPretendHealthSmoothed;
+    *pfArmor = m_fPretendArmorSmoothed;
+}
+
+
+float CClientPlayer::GetTotalPretendDamage ( void )
+{
+    // Add up all damage that has not expired
+    float fDamage = 0;
+    unsigned long ulTime = CClientTime::GetTime ();
+
+    std::vector < SPretendDamage > ::iterator iter = m_PretendDamageList.begin ();
+    while ( iter != m_PretendDamageList.end () )
+    {
+        if ( ulTime > iter->ulExpireTime )
+        {
+            // Remove old item
+            iter = m_PretendDamageList.erase ( iter );
+        }
+		else
+        {
+            fDamage += iter->fDamage;
+			++iter;
+        }
+    }
+    return fDamage;
+}
+
