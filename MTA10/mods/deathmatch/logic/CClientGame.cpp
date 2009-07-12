@@ -3361,6 +3361,13 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             // Check if their health or armor is locked, and if so prevent applying the damage locally
             if ( pDamagedPed->IsHealthLocked () && pDamagedPed->IsArmorLocked () )
             {
+                // Save possible damage that might be caused to a remote player.
+                // This is to give the local player some instant visual feedback on damage that might be inflicted
+                if ( !pDamagedPed->IsLocalPlayer () && pDamagedPed->GetType () == CCLIENTPLAYER )
+                {
+                    CClientPlayer* pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
+                    pDamagedPlayer->AddPretendDamage ( fDamage, pDamagedPlayer->GetLatency () );
+                }
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
                 return bAllowDamageAnim;	    // Play animation if allowed

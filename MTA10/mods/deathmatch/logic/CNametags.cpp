@@ -428,6 +428,13 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     // Grab health and max health
     float fMaxHealth = pPlayer->GetMaxHealth ();
     float fHealth = pPlayer->GetHealth ();
+    float fArmor = pPlayer->GetArmor ();
+    // Calculate 'pretend' armor and health scale to apply visual feedback of likely damage to remote players
+    float fPretendArmor;
+    float fPretendHealth;
+    pPlayer->GetPretendHealthAndArmor ( &fPretendHealth, &fPretendArmor );
+    float fPretendArmorScale  = fArmor  > 0.0f ? fPretendArmor  / fArmor  : 1.0f;
+    float fPretendHealthScale = fHealth > 0.0f ? fPretendHealth / fHealth : 1.0f;
 
     // Recalculate that to be within 0-100
     fHealth = fHealth / fMaxHealth * 100;
@@ -493,103 +500,89 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             float fWidth = fResWidth * 0.060f;
             float fTopOffset = fResHeight * 0.025f;
             float fSizeIncreaseBorder = fResWidth * 0.003f;
-            float fRemovedWidth = fWidth - (fHealth / 512.0f * fWidth);
+            float fRemovedWidth = fWidth - (fHealth * fPretendHealthScale / 512.0f * fWidth);
             float fTopArmorOffset = fTopOffset + fHeight - 0.01f * fResWidth;
-            float fArmor = pPlayer->GetArmor ();
             float fMaxArmor = 100.0f;
-            float fArmorAlpha = ( fArmor / fMaxArmor ) * ( ( float ) ucAlpha / 255.0f ); // 0->1
+            float fArmorAlpha = ( fArmor * fPretendArmorScale / fMaxArmor ) * ( ( float ) ucAlpha / 255.0f ); // 0->1
             unsigned char ucArmorAlpha = ( unsigned char ) ( 255.0f * fArmorAlpha );
 
             #define ARMOR_BORDER_COLOR COLOR_ARGB(ucArmorAlpha,167,177,179)
                 
-            // background
-            m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2 - fSizeIncreaseBorder, 
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
-                            vecScreenPosition.fX + fWidth / 2 + fSizeIncreaseBorder,
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
+            // Base rectangle
+            CVector vecTopLeftBase  ( vecScreenPosition.fX - fWidth * 0.5f, vecScreenPosition.fY + fTopOffset,           0 );
+            CVector vecBotRightBase ( vecScreenPosition.fX + fWidth * 0.5f, vecScreenPosition.fY + fTopOffset + fHeight, 0 );
 
-                            vecScreenPosition.fX - fWidth / 2 - fSizeIncreaseBorder, 
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
-                            vecScreenPosition.fX + fWidth / 2 + fSizeIncreaseBorder,
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
+            // background
+            CVector vecTopLeft  = vecTopLeftBase  + CVector ( -fSizeIncreaseBorder, -fSizeIncreaseBorder, 0 );
+            CVector vecBotRight = vecBotRightBase + CVector ( +fSizeIncreaseBorder, +fSizeIncreaseBorder, 0 );
+            m_pHud->Draw2DPolygon ( 
+                            vecTopLeft.fX,  vecTopLeft.fY,
+                            vecBotRight.fX, vecTopLeft.fY,
+                            vecTopLeft.fX,  vecBotRight.fY,
+                            vecBotRight.fX, vecBotRight.fY,
                             COLOR_ARGB ( ucAlpha, 0, 0, 0 ) );
 
-            // Left side of armor indicator
-            m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2 - fSizeIncreaseBorder, 
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
-                            vecScreenPosition.fX - fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
+            if ( fArmor > 0.0f )
+            {
+                // Left side of armor indicator
+                vecTopLeft  = vecTopLeftBase  + CVector ( -fSizeIncreaseBorder, -fSizeIncreaseBorder, 0 );
+                vecBotRight = vecBotRightBase + CVector ( -fWidth,              +fSizeIncreaseBorder, 0 );
+                m_pHud->Draw2DPolygon ( 
+                                vecTopLeft.fX,  vecTopLeft.fY,
+                                vecBotRight.fX, vecTopLeft.fY,
+                                vecTopLeft.fX,  vecBotRight.fY,
+                                vecBotRight.fX, vecBotRight.fY,
+                                ARMOR_BORDER_COLOR );
 
-                            vecScreenPosition.fX - fWidth / 2 - fSizeIncreaseBorder, 
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
-                            vecScreenPosition.fX - fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder ,
-                            ARMOR_BORDER_COLOR );
+                // Right side of armor indicator
+                vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth,              -fSizeIncreaseBorder, 0 );
+                vecBotRight = vecBotRightBase + CVector ( +fSizeIncreaseBorder, +fSizeIncreaseBorder, 0 );
+                m_pHud->Draw2DPolygon ( 
+                                vecTopLeft.fX,  vecTopLeft.fY,
+                                vecBotRight.fX, vecTopLeft.fY,
+                                vecTopLeft.fX,  vecBotRight.fY,
+                                vecBotRight.fX, vecBotRight.fY,
+                                ARMOR_BORDER_COLOR );
 
-            // Right side of armor indicator
-            m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX + fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
-                            vecScreenPosition.fX + fWidth / 2 + fSizeIncreaseBorder,
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
+                // Top armor indicator
+                vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   -fSizeIncreaseBorder, 0 );
+                vecBotRight = vecBotRightBase + CVector ( +0,                   -fHeight, 0 );
+                m_pHud->Draw2DPolygon ( 
+                                vecTopLeft.fX,  vecTopLeft.fY,
+                                vecBotRight.fX, vecTopLeft.fY,
+                                vecTopLeft.fX,  vecBotRight.fY,
+                                vecBotRight.fX, vecBotRight.fY,
+                                ARMOR_BORDER_COLOR );
 
-                            vecScreenPosition.fX + fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
-                            vecScreenPosition.fX + fWidth / 2 + fSizeIncreaseBorder,
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder ,
-                            ARMOR_BORDER_COLOR );
-
-            // Top armor indicator
-            m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
-                            vecScreenPosition.fX - fWidth / 2 + fWidth,
-                            vecScreenPosition.fY + fTopOffset - fSizeIncreaseBorder,
-
-                            vecScreenPosition.fX - fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset,
-                            vecScreenPosition.fX - fWidth / 2 + fWidth,
-                            vecScreenPosition.fY + fTopOffset,
-                            ARMOR_BORDER_COLOR );
-
-            // Bottom armor indicator
-            m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset + fHeight,
-                            vecScreenPosition.fX - fWidth / 2 + fWidth,
-                            vecScreenPosition.fY + fTopOffset + fHeight,
-
-                            vecScreenPosition.fX - fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
-                            vecScreenPosition.fX - fWidth / 2 + fWidth,
-                            vecScreenPosition.fY + fTopOffset + fHeight + fSizeIncreaseBorder,
-                            ARMOR_BORDER_COLOR );
-
+                // Bottom armor indicator
+                vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   +fHeight, 0 );
+                vecBotRight = vecBotRightBase + CVector ( +0,                   +fSizeIncreaseBorder, 0 );
+                m_pHud->Draw2DPolygon ( 
+                                vecTopLeft.fX,  vecTopLeft.fY,
+                                vecBotRight.fX, vecTopLeft.fY,
+                                vecTopLeft.fX,  vecBotRight.fY,
+                                vecBotRight.fX, vecBotRight.fY,
+                                ARMOR_BORDER_COLOR );
+            }
 
             // the colored bit
+            vecTopLeft  = vecTopLeftBase  + CVector ( +0,                       +0, 0 );
+            vecBotRight = vecBotRightBase + CVector ( -fRemovedWidth,           +0, 0 );
             m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset,
-                            vecScreenPosition.fX + fWidth / 2 - fRemovedWidth,
-                            vecScreenPosition.fY + fTopOffset,
-                            vecScreenPosition.fX - fWidth / 2, 
-                            vecScreenPosition.fY + fTopOffset + fHeight,
-                            vecScreenPosition.fX + fWidth / 2  - fRemovedWidth,
-                            vecScreenPosition.fY + fTopOffset + fHeight,
+                            vecTopLeft.fX,  vecTopLeft.fY,
+                            vecBotRight.fX, vecTopLeft.fY,
+                            vecTopLeft.fX,  vecBotRight.fY,
+                            vecBotRight.fX, vecBotRight.fY,
                             COLOR_ARGB ( ucAlpha, 0, lGreen, lRed ) );
 
             // the black bit
+            vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth - fRemovedWidth,  +0, 0 );
+            vecBotRight = vecBotRightBase + CVector ( +0,                       +0, 0 );
             m_pHud->Draw2DPolygon ( 
-                            vecScreenPosition.fX - fWidth / 2 + (fWidth - fRemovedWidth), 
-                            vecScreenPosition.fY + fTopOffset,
-                            vecScreenPosition.fX + fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset,
-                            vecScreenPosition.fX - fWidth / 2 + (fWidth - fRemovedWidth), 
-                            vecScreenPosition.fY + fTopOffset + fHeight,
-                            vecScreenPosition.fX + fWidth / 2,
-                            vecScreenPosition.fY + fTopOffset + fHeight,
+                            vecTopLeft.fX,  vecTopLeft.fY,
+                            vecBotRight.fX, vecTopLeft.fY,
+                            vecTopLeft.fX,  vecBotRight.fY,
+                            vecBotRight.fX, vecBotRight.fY,
                             COLOR_ARGB ( ucAlpha, 0, lGreenBlack, lRedBlack ) );
         }
  	}
