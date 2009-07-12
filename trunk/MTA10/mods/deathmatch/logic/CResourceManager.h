@@ -42,7 +42,7 @@ public:
 
 	void					    LoadUnavailableResources	( CClientEntity* pRootEntity );
 
-    static bool                 ParseResourcePathInput          ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath = std::string("") );
+    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath = std::string("") );
 
 private:
 

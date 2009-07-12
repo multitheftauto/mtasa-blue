@@ -7827,7 +7827,7 @@ CElement* CStaticFunctionDefinitions::GetResourceMapRootElement ( CResource* pRe
 }
 
 
-CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, const char* szMapNameUnmodified, int iDimension, CLuaMain* pLUA )
+CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, std::string strFilePath, std::string strMapName, int iDimension, CLuaMain* pLUA )
 {
     // See if it's loaded
     if ( pResource->IsLoaded () )
@@ -7838,72 +7838,56 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, con
             // Is this a zip resource? We can't modify those
             if ( !pResource->IsResourceZip () )
             {
-                // Check that the filepath is valid
-                if ( IsValidFilePath ( szMapNameUnmodified ) )
+                // Does this file already exist in this resource?
+                if ( !pResource->IncludedFileExists ( strMapName.c_str(), CResourceFile::RESOURCE_FILE_TYPE_NONE ) )
                 {
-                    // Replace the \ with / for linux compatibility
-                    char szMapName [MAX_PATH];
-                    strncpy ( szMapName, szMapNameUnmodified, MAX_PATH );
-                    ReplaceCharactersInString ( szMapName, '\\', '/' );
-
-                    // Does this file already exist in this resource?
-                    if ( !pResource->IncludedFileExists ( szMapName, CResourceFile::RESOURCE_FILE_TYPE_NONE ) )
+                    CXMLFile* pXML = pLUA->CreateXML ( strFilePath.c_str() );
+                    if ( pXML )
                     {
-                        // Create an new XML in the resource directory path
-                        char szFilepath [MAX_PATH + 1];
-                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath ().c_str(), szMapName );
-                        CXMLFile* pXML = pLUA->CreateXML ( szFilepath );
-                        if ( pXML )
-                        {
-                            // Create a root node
-                            CXMLNode* pRootNode = pXML->CreateRootNode ( "map" );
+                        // Create a root node
+                        CXMLNode* pRootNode = pXML->CreateRootNode ( "map" );
 
-                            // Write it so the file is created
-                            if ( pRootNode && pXML->Write () )
+                        // Write it so the file is created
+                        if ( pRootNode && pXML->Write () )
+                        {
+                            // Add it to the resource's meta file
+                            if ( pResource->AddMapFile ( strMapName.c_str(), strFilePath.c_str(), iDimension ) )
                             {
-                                // Add it to the resource's meta file
-                                if ( pResource->AddMapFile ( szMapName, szFilepath, iDimension ) )
-                                {
-                                    // Return the created XML's root node
-                                    return pRootNode;
-                                }
-                                else
-                                {
-                                    CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to alter meta file", szMapName, pResource->GetName ().c_str () );
-                                }
+                                // Return the created XML's root node
+                                return pRootNode;
                             }
                             else
                             {
-                                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to write XML", szMapName, pResource->GetName ().c_str () );
+                                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to alter meta file", strMapName.c_str(), pResource->GetName ().c_str () );
                             }
-
-                            // Destroy the XML if we failed
-                            pLUA->DestroyXML ( pXML );
                         }
                         else
-                            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to create XML", szMapName, pResource->GetName ().c_str () );
+                        {
+                            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to write XML", strMapName.c_str(), pResource->GetName ().c_str () );
+                        }
+
+                        // Destroy the XML if we failed
+                        pLUA->DestroyXML ( pXML );
                     }
-                    else
-                        CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; File already exists in resource", szMapName, pResource->GetName ().c_str () );
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Bad map name", szMapNameUnmodified, pResource->GetName ().c_str () );
+                    CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; File already exists in resource", strMapName.c_str(), pResource->GetName ().c_str () );
             }
             else
-                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in a zip file", szMapNameUnmodified, pResource->GetName ().c_str () );
+                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in a zip file", strMapName.c_str(), pResource->GetName ().c_str () );
         }
         else
-            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in use", szMapNameUnmodified, pResource->GetName ().c_str () );
+            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in use", strMapName.c_str(), pResource->GetName ().c_str () );
     }
     else
-        CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is not loaded", szMapNameUnmodified, pResource->GetName ().c_str () );
+        CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is not loaded", strMapName.c_str(), pResource->GetName ().c_str () );
 
     // Failed
     return NULL;
 }
 
 
-CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, const char* szConfigNameUnmodified, int iType, CLuaMain* pLUA )
+CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, std::string strFilePath, std::string strConfigName, int iType, CLuaMain* pLUA )
 {
     // See if it's loaded
     if ( pResource->IsLoaded () )
@@ -7914,65 +7898,51 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, 
             // Is this a zip resource? We can't modify those
             if ( !pResource->IsResourceZip () )
             {
-                // Check that the filepath is valid
-                if ( IsValidFilePath ( szConfigNameUnmodified ) )
+                // Does this file already exist in this resource?
+                if ( !pResource->IncludedFileExists ( strConfigName.c_str(), CResourceFile::RESOURCE_FILE_TYPE_NONE ) )
                 {
-                    // Replace the \ with / for linux compatibility
-                    char szConfigName [MAX_PATH];
-                    strncpy ( szConfigName, szConfigNameUnmodified, MAX_PATH );
-                    ReplaceCharactersInString ( szConfigName, '\\', '/' );
-
-                    // Does this file already exist in this resource?
-                    if ( !pResource->IncludedFileExists ( szConfigName, CResourceFile::RESOURCE_FILE_TYPE_NONE ) )
+                    CXMLFile* pXML = pLUA->CreateXML ( strFilePath.c_str() );
+                    if ( pXML )
                     {
-                        // Create an new XML in the resource directory path
-                        char szFilepath [MAX_PATH + 1];
-                        _snprintf ( szFilepath, MAX_PATH, "%s/%s", pResource->GetResourceDirectoryPath ().c_str(), szConfigName );
-                        CXMLFile* pXML = pLUA->CreateXML ( szFilepath );
-                        if ( pXML )
-                        {
-                            // Create a root node
-                            CXMLNode* pRootNode = pXML->CreateRootNode ( "root" );
+                        // Create a root node
+                        CXMLNode* pRootNode = pXML->CreateRootNode ( "root" );
 
-                            // Write it so the file is created
-                            if ( pRootNode && pXML->Write () )
+                        // Write it so the file is created
+                        if ( pRootNode && pXML->Write () )
+                        {
+                            // Add it to the resource's meta file
+                            if ( pResource->AddConfigFile ( strConfigName.c_str(), strFilePath.c_str(), iType ) )
                             {
-                                // Add it to the resource's meta file
-                                if ( pResource->AddConfigFile ( szConfigName, szFilepath, iType ) )
-                                {
-                                    // Return the created XML's root node
-                                    return pRootNode;
-                                }
-                                else
-                                {
-                                    CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to alter meta file", szConfigName, pResource->GetName ().c_str () );
-                                }
+                                // Return the created XML's root node
+                                return pRootNode;
                             }
                             else
                             {
-                                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to write XML", szConfigName, pResource->GetName ().c_str () );
+                                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to alter meta file", strConfigName.c_str(), pResource->GetName ().c_str () );
                             }
-
-                            // Destroy the XML if we failed
-                            pLUA->DestroyXML ( pXML );
                         }
                         else
-                            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to create XML", szConfigName, pResource->GetName ().c_str () );
+                        {
+                            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to write XML", strConfigName.c_str(), pResource->GetName ().c_str () );
+                        }
+
+                        // Destroy the XML if we failed
+                        pLUA->DestroyXML ( pXML );
                     }
                     else
-                        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; File already exists in resource", szConfigName, pResource->GetName ().c_str () );
+                        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to create XML", strConfigName.c_str(), pResource->GetName ().c_str () );
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Bad config name", szConfigNameUnmodified, pResource->GetName ().c_str () );
+                    CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; File already exists in resource", strConfigName.c_str(), pResource->GetName ().c_str () );
             }
             else
-                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in a zip file", szConfigNameUnmodified, pResource->GetName ().c_str () );
+                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in a zip file", strConfigName.c_str(), pResource->GetName ().c_str () );
         }
         else
-            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in use", szConfigNameUnmodified, pResource->GetName ().c_str () );
+            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in use", strConfigName.c_str(), pResource->GetName ().c_str () );
     }
     else
-        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is not loaded", szConfigNameUnmodified, pResource->GetName ().c_str () );
+        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is not loaded", strConfigName.c_str(), pResource->GetName ().c_str () );
 
     // Failed
     return NULL;

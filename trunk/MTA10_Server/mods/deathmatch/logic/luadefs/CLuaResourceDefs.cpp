@@ -113,19 +113,21 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
     if ( pLUA )
     {
         // Check that our passed arguments are of the correct type
-        if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-             ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) )
+        if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) )
         {
             // Read out the resource and make sure it exists
-            CResource* pResource = lua_toresource ( luaVM, 1 );
+            CResource* pResource = pLUA->GetResource();
+            CResource* pThisResource = pResource;
 		    if ( pResource )
             {
                 // Grab the mapname string
-                const char* szMapName = lua_tostring ( luaVM, 2 );
+                std::string strMapName = lua_tostring ( luaVM, 1 );
+                std::string strPath;
+                std::string strMetaName;
 
                 // Eventually read out dimension
                 int iDimension = 0;
-                if ( ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) || ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) )
+                if ( ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) == LUA_TNUMBER ) )
                 {
                     iDimension = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
                     if ( ( iDimension < 0 ) || ( iDimension > 65535 ) )
@@ -133,14 +135,27 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                         iDimension = 0;
                     }
                 }
-
-                // Add the resource map and return it if we succeeded
-                CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap ( pResource, szMapName, iDimension, pLUA );
-                if ( pXMLNode )
+                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, strPath, strMetaName ) )
                 {
-                    lua_pushxmlnode ( luaVM, pXMLNode );
-                    return 1;
+                    // Do we have permissions?
+			        if ( pResource == pThisResource ||
+				         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+													    "ModifyOtherObjects",
+													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
+													    false ) )
+                    {
+                        // Add the resource map and return it if we succeeded
+                        CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap ( pResource, strPath, strMetaName, iDimension, pLUA );
+                        if ( pXMLNode )
+                        {
+                            lua_pushxmlnode ( luaVM, pXMLNode );
+                            return 1;
+                        }
+                    }
                 }
+                else
+                    m_pScriptDebugging->LogError ( luaVM, "addResourceMap failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
             else
                 m_pScriptDebugging->LogBadType ( luaVM, "addResourceMap" );
@@ -161,33 +176,46 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
     if ( pLUA )
     {
         // Check that our passed arguments are of the correct type
-        if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-             ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) )
+        if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) )
         {
             // Read out the resource and make sure it exists
-            CResource* pResource = lua_toresource ( luaVM, 1 );
+            CResource* pResource = pLUA->GetResource();
+            CResource* pThisResource = pResource;
 		    if ( pResource )
             {
-                // Grab the configname string
-                const char* szConfigName = lua_tostring ( luaVM, 2 );
+                // Grab the mapname string
+                std::string strMapName = lua_tostring ( luaVM, 1 );
+                std::string strPath;
+                std::string strConfigName;
 
-                // Eventually read out the type string
-                int iType = CResourceFile::RESOURCE_FILE_TYPE_CONFIG;
-                if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, strPath, strConfigName ) )
                 {
-                    const char* szType = lua_tostring ( luaVM, 3 );
-                    if ( stricmp ( szType, "client" ) == 0 )
-                        iType = CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
-                    else if ( stricmp ( szType, "server" ) != 0 )
-                        CLogger::LogPrintf ( "WARNING: Unknown config file type specified for addResourceConfig. Defaulting to 'server'" );
-                }
-
-                // Add the resource map and return it if we succeeded
-                CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig ( pResource, szConfigName, iType, pLUA );
-                if ( pXMLNode )
-                {
-                    lua_pushxmlnode ( luaVM, pXMLNode );
-                    return 1;
+                    // Eventually read out the type string
+                    int iType = CResourceFile::RESOURCE_FILE_TYPE_CONFIG;
+                    if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+                    {
+                        const char* szType = lua_tostring ( luaVM, 2 );
+                        if ( stricmp ( szType, "client" ) == 0 )
+                            iType = CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
+                        else if ( stricmp ( szType, "server" ) != 0 )
+                            CLogger::LogPrintf ( "WARNING: Unknown config file type specified for addResourceConfig. Defaulting to 'server'" );
+                    }
+                    // Do we have permissions?
+			        if ( pResource == pThisResource ||
+				         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+													    "ModifyOtherObjects",
+													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
+													    false ) )
+                    {
+                        // Add the resource map and return it if we succeeded
+                        CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig ( pResource, strPath, strConfigName, iType, pLUA );
+                        if ( pXMLNode )
+                        {
+                            lua_pushxmlnode ( luaVM, pXMLNode );
+                            return 1;
+                        }
+                    }
                 }
             }
         }
@@ -677,31 +705,17 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
 
 int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 {
-    CResource* resource = NULL;
-    char * szConfigName = NULL;
-    // resource, configfilename
-    if ( argtype ( 1, LUA_TLIGHTUSERDATA ) &&
-         argtype ( 2, LUA_TSTRING ) )
-    {
-        resource = lua_toresource ( luaVM, 1 );
-        szConfigName = (char *)lua_tostring ( luaVM, 2 );
-    }
-    else if ( argtype ( 1, LUA_TSTRING ) &&
-              argtype ( 2, LUA_TNONE ) )
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            resource = pLuaMain->GetResource ();
-            szConfigName = (char *)lua_tostring ( luaVM, 1 );
-        }
-    }
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    CResource* pResource = pLuaMain->GetResource();
+    std::string strConfigName;
+    std::string strMetaPath;
 
-    if ( szConfigName )
+    if ( argtype ( 1, LUA_TSTRING ) )
     {
-        if ( resource )
+        strConfigName = lua_tostring ( luaVM, 1 );
+        if ( CResourceManager::ParseResourcePathInput ( strConfigName, pResource, std::string(""), strMetaPath ) )
         {
-            list<CResourceFile *> * resourceFileList = resource->GetFiles();
+            list<CResourceFile *> * resourceFileList = pResource->GetFiles();
             list<CResourceFile *>::iterator iterd = resourceFileList->begin();
             for ( ; iterd != resourceFileList->end(); iterd++ )
             {
@@ -709,7 +723,7 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 
                 if ( config &&
                      config->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG &&
-                     strcmp ( config->GetName(), szConfigName ) == 0 )
+                     strcmp ( config->GetName(), strMetaPath.c_str() ) == 0 )
                 {
                     CXMLNode* pNode = config->GetRoot();
                     if ( pNode )
@@ -720,8 +734,6 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getResourceConfig" );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getResourceConfig" );

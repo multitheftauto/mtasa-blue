@@ -529,8 +529,8 @@ public:
 
     // Resource funcs
     static CElement*            GetResourceMapRootElement           ( CResource* pResource, char* szMap );
-    static CXMLNode*            AddResourceMap                      ( CResource* pResource, const char* szMapName, int iDimension, CLuaMain* pLUA );
-    static CXMLNode*            AddResourceConfig                   ( CResource* pResource, const char* szConfigName, int iType, CLuaMain* pLUA );
+    static CXMLNode*            AddResourceMap                      ( CResource* pResource, std::string strFilePath, std::string strMapName, int iDimension, CLuaMain* pLUA );
+    static CXMLNode*            AddResourceConfig                   ( CResource* pResource, std::string strFilePath, std::string strConfigName, int iType, CLuaMain* pLUA );
     static bool                 RemoveResourceFile                  ( CResource* pResource, const char* szFilename );
 
     // Version funcs
