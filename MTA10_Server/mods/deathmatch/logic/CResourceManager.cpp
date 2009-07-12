@@ -867,3 +867,33 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const ch
 {
     return NULL;
 }
+
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
+{
+    ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    if ( strInput[0] == ':' )
+    {
+        unsigned int iEnd = strInput.find_first_of("/");
+        if ( iEnd )
+        {
+            std::string strResourceName = strInput.substr(1,iEnd-1);
+            pResource = g_pGame->GetResourceManager()->GetResource ( strResourceName.c_str() );
+            if ( pResource && strInput[iEnd+1] )
+            {
+                strMetaPath = strInput.substr(iEnd+1);
+                if ( IsValidFilePath ( strMetaPath.c_str() ) )
+                {
+                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
+                    return true;
+                }
+            }
+        }
+    }
+    else if ( IsValidFilePath ( strInput.c_str() ) )
+    {
+        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+        strMetaPath = strInput;
+        return true;
+    }
+    return false;
+}

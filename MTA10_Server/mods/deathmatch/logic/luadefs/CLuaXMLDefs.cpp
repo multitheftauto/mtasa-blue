@@ -56,57 +56,39 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
         CResource* pThisResource = pLUA->GetResource ();
         CResource* pResource = pThisResource;
 
-        // Check if we have some other resourcefile specified
-        if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
+        // Filename
+        if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) ||
+             ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) )
         {
-            // Grab the resource
-            pResource = lua_toresource ( luaVM, 3 );
-            if ( !pResource )
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+            m_pScriptDebugging->LogBadType ( luaVM, "xmlCreateFile" );
+
+            lua_pushboolean ( luaVM, false );
+            return 1;
         }
-
-        // We have access to modify this resource?
-        if ( pResource == pThisResource ||
-            m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                            "ModifyOtherObjects",
-                                            CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                            false ) )
+        else
         {
-            // Filename
-            if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) ||
-                 ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) )
+            std::string strFile = lua_tostring ( luaVM, 1 );
+            std::string strPath;
+
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath ) )
             {
-                m_pScriptDebugging->LogBadType ( luaVM, "xmlCreateFile" );
-
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-            else
-            {
-                // Grab the filename passed
-                std::string strFile = lua_tostring ( luaVM, 1 );
-
-                // Replace backslashes
-                ReplaceOccurrencesInString ( strFile, "\\", "/" );
-
-                // Verify the original filename
-                if ( IsValidFilePath ( strFile.c_str () ) )
+                // We have access to modify this resource?
+                if ( pResource == pThisResource ||
+                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                    "ModifyOtherObjects",
+                                                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                    false ) )
                 {
-                    // Prefix the resource path
-                    strFile = pResource->GetResourceDirectoryPath () + strFile;
 
                     // Make sure the dir exists so we can successfully make the file
-                    MakeSureDirExists ( strFile.c_str () );
+                    MakeSureDirExists ( strPath.c_str () );
 
                     // Grab the root
-		            const char* szRootName = lua_tostring ( luaVM, 2 );
+	                const char* szRootName = lua_tostring ( luaVM, 2 );
 
                     // Create the XML file
-                    CXMLFile * xmlFile = pLUA->CreateXML ( strFile.c_str () );
+                    CXMLFile * xmlFile = pLUA->CreateXML ( strPath.c_str () );
                     if ( xmlFile )
                     {
                         // Create its root node
@@ -123,8 +105,6 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogError ( luaVM,"xmlCreateFile failed for resource %s", pThisResource->GetName ().c_str () );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -140,79 +120,60 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
     {
         CResource* pThisResource = pLUA->GetResource ();
         CResource* pResource = pThisResource;
-
-        // Check if we have some other resourcefile specified
-        if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        
+        // Filename
+        if ( lua_type ( luaVM, 1 ) != LUA_TSTRING )
         {
-            // Grab the resource
-            pResource = lua_toresource ( luaVM, 2 );
-            if ( !pResource )
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+            m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
+
+            lua_pushboolean ( luaVM, false );
+            return 1;
         }
+        // Grab the filename passed
+        std::string strFile = lua_tostring ( luaVM, 1 );
+        std::string strPath;
 
-        // We have access to modify this resource?
-        if ( pResource == pThisResource ||
-            m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                            "ModifyOtherObjects",
-                                            CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                            false ) )
+
+        if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath ) )
         {
-            // Filename
-            if ( lua_type ( luaVM, 1 ) != LUA_TSTRING )
+            if ( pResource == pThisResource ||
+                m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                "ModifyOtherObjects",
+                                                CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                false ) )
             {
-                m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
+                // Make sure the dir exists so we can successfully make the file
+                MakeSureDirExists ( strPath.c_str () );
 
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-            else
-            {
-                // Grab the filename passed
-                string strFile = lua_tostring ( luaVM, 1 );
-
-                // Verify the original filename
-		        if ( IsValidFilePath ( strFile.c_str () ) )
+                // Create the XML
+                CXMLFile* xmlFile = pLUA->CreateXML ( strPath.c_str () );
+                if ( xmlFile )
                 {
-                    // Replace backslashes
-                    ReplaceOccurrencesInString ( strFile, "\\", "/" );
-
-                    string strPath;
-                    if ( pResource->GetFilePath ( strFile.c_str (), strPath ) )
+                    // Try to parse it
+                    if ( xmlFile->Parse () )
                     {
-                        // Create the XML
-                        CXMLFile* xmlFile = pLUA->CreateXML ( strPath.c_str () );
-                        if ( xmlFile )
+                        // Grab the root node. If it didn't exist, create one
+                        CXMLNode * pRootNode = xmlFile->GetRootNode ();
+                        if ( !pRootNode )
+                            pRootNode = xmlFile->CreateRootNode ( "root" );
+
+                        // Could we create one?
+                        if ( pRootNode )
                         {
-                            // Try to parse it
-                            if ( xmlFile->Parse () )
-                            {
-                                // Grab the root node. If it didn't exist, create one
-                                CXMLNode * pRootNode = xmlFile->GetRootNode ();
-                                if ( !pRootNode )
-                                    pRootNode = xmlFile->CreateRootNode ( "root" );
-
-                                // Could we create one?
-                                if ( pRootNode )
-                                {
-                                    // Return the root node
-                                    lua_pushxmlnode ( luaVM, pRootNode );
-                                    return 1;
-                                }
-                            }
-
-                            // Destroy it if we failed
-                            pLUA->DestroyXML ( xmlFile );
+                            // Return the root node
+                            lua_pushxmlnode ( luaVM, pRootNode );
+                            return 1;
                         }
                     }
+
+                    // Destroy it if we failed
+                    pLUA->DestroyXML ( xmlFile );
                 }
             }
+            else
+                m_pScriptDebugging->LogError ( luaVM, "xmlLoadFile failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
         }
-        else
-            m_pScriptDebugging->LogError ( luaVM, "xmlLoadFile failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -229,40 +190,24 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
         CResource* pThisResource = pLUA->GetResource ();
         CResource* pResource = pThisResource;
 
-        // Check if we have some other resourcefile specified
-        if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
+        // Verify the argument types passed
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  &&
+            lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
-            // Grab the resource
-            pResource = lua_toresource ( luaVM, 3 );
-            if ( !pResource )
+            // Grab the filename passed
+            std::string strFile = lua_tostring ( luaVM, 2 );
+            std::string strPath;
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath ) )
             {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-        }
-
-        // We have access to modify this resource?
-        if ( m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                            "ModifyOtherObjects",
-                                            CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                            false ) )
-        {
-            // Verify the argument types passed
-            if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  &&
-                lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            {
-                // Grab the filename passed
-                std::string strFile = lua_tostring ( luaVM, 2 );
-
-                // Replace backslashes
-                ReplaceOccurrencesInString ( strFile, "\\", "/" );
-
-                // Verify the original filename
-                if ( IsValidFilePath ( strFile.c_str () ) )
+                // We have access to modify this resource?
+                if ( m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                    "ModifyOtherObjects",
+                                                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                    false ) )
                 {
-                    // Prefix the resource path
-                    strFile = pResource->GetResourceDirectoryPath () + strFile;
+                    // Make sure the dir exists so we can successfully make the file
+                    MakeSureDirExists ( strPath.c_str () );
 
                     // Grab the source node
                     CXMLNode* pSourceNode = lua_toxmlnode ( luaVM, 1 );
@@ -303,15 +248,15 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                             pLUA->DestroyXML ( pNewXML );
                         }
                     }
+                    else
+                        CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath" );
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath" );
+                    m_pScriptDebugging->LogError ( luaVM,"xmlCopyFile failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "xmlCopyFile" );
         }
         else
-            m_pScriptDebugging->LogError ( luaVM,"xmlCopyFile failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+            m_pScriptDebugging->LogBadType ( luaVM, "xmlCopyFile" );
     }
 
     // Error
