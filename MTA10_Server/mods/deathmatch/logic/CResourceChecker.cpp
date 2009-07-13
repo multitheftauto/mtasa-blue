@@ -659,6 +659,7 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
         hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
         hashServer["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
+		hashServer["getPlayerFromNick"]         = "Replaced|getPlayerFromName";
 
         // Client
         hashServer["getClientName"]             = "Replaced|getPlayerName";

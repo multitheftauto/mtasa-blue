@@ -1142,7 +1142,7 @@ int CLuaFunctionDefinitions::SetPlayerAmmo ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetPlayerFromNick ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPlayerFromName ( lua_State* luaVM )
 {
     // Valid player nick argument?
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
@@ -1151,7 +1151,7 @@ int CLuaFunctionDefinitions::GetPlayerFromNick ( lua_State* luaVM )
         const char* szNick = lua_tostring ( luaVM, 1 );
 
         // Grab the player with that nick
-        CPlayer* pPlayer = CStaticFunctionDefinitions::GetPlayerFromNick ( szNick );
+        CPlayer* pPlayer = CStaticFunctionDefinitions::GetPlayerFromName ( szNick );
         if ( pPlayer )
         {
             // Return the player
@@ -1160,7 +1160,7 @@ int CLuaFunctionDefinitions::GetPlayerFromNick ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerFromNick" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerFromName" );
 
     // Doesn't exist
     lua_pushboolean ( luaVM, false );
@@ -7640,10 +7640,10 @@ int CLuaFunctionDefinitions::ToggleControl ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "enableControl", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "toggleControl", "player", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "enableControl" );
+        m_pScriptDebugging->LogBadType ( luaVM, "toggleControl" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

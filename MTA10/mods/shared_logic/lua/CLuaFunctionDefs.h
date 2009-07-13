@@ -148,7 +148,7 @@ public:
     // Player get functions
     LUA_DECLARE ( GetLocalPlayer );
     LUA_DECLARE ( GetPlayerName );
-    LUA_DECLARE ( GetPlayerFromNick );
+    LUA_DECLARE ( GetPlayerFromName );
     LUA_DECLARE ( GetPlayerNametagText );
     LUA_DECLARE ( GetPlayerNametagColor );
     LUA_DECLARE ( IsPlayerNametagShowing );

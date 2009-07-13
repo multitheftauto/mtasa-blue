@@ -57,7 +57,7 @@ int CLuaFunctionDefs::GetPlayerName ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetPlayerFromNick ( lua_State* luaVM )
+int CLuaFunctionDefs::GetPlayerFromName ( lua_State* luaVM )
 {
     // Valid player nick argument?
     if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
@@ -66,7 +66,7 @@ int CLuaFunctionDefs::GetPlayerFromNick ( lua_State* luaVM )
         const char* szNick = lua_tostring ( luaVM, 1 );
 
         // Grab the player with that nick
-        CClientPlayer* pPlayer = CStaticFunctionDefinitions::GetPlayerFromNick ( szNick );
+        CClientPlayer* pPlayer = CStaticFunctionDefinitions::GetPlayerFromName ( szNick );
         if ( pPlayer )
         {
             // Return the player
@@ -75,7 +75,7 @@ int CLuaFunctionDefs::GetPlayerFromNick ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerNick" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerFromName" );
 
     // Doesn't exist
     lua_pushboolean ( luaVM, false );

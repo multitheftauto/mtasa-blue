@@ -1600,7 +1600,7 @@ bool CStaticFunctionDefinitions::GetPlayerWeapon ( CPlayer* pPlayer, unsigned ch
 }
 
 
-CPlayer* CStaticFunctionDefinitions::GetPlayerFromNick ( const char* szNick )
+CPlayer* CStaticFunctionDefinitions::GetPlayerFromName ( const char* szNick )
 {
     assert ( szNick );
 
