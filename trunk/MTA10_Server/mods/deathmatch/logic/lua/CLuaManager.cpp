@@ -242,7 +242,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPlayerWeapon );
     CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPlayerAmmoInClip );
     CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPlayerTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefinitions::GetPlayerFromNick );
+    CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefinitions::GetPlayerFromName );
+	CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefinitions::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefinitions::GetPlayerMoney );
     CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefinitions::GetPlayerPing );
     CLuaCFunctions::AddFunction ( "getRandomPlayer", CLuaFunctionDefinitions::GetRandomPlayer );

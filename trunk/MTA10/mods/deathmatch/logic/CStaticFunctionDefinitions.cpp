@@ -1374,7 +1374,7 @@ bool CStaticFunctionDefinitions::GetPedBonePosition ( CClientPed & Ped, eBone bo
 }
 
 
-CClientPlayer* CStaticFunctionDefinitions::GetPlayerFromNick ( const char* szNick )
+CClientPlayer* CStaticFunctionDefinitions::GetPlayerFromName ( const char* szNick )
 {
     assert ( szNick );
 

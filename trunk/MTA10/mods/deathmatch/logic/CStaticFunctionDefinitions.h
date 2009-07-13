@@ -95,7 +95,7 @@ public:
 
     // Player get funcs
     static CClientPlayer*               GetLocalPlayer                      ( void );
-    static CClientPlayer*               GetPlayerFromNick                   ( const char* szNick );
+    static CClientPlayer*               GetPlayerFromName                   ( const char* szNick );
     static bool                         GetPlayerMoney                      ( long& lMoney );
     static bool                         GetPlayerWantedLevel                ( char& cWanted );
     static bool                         GetPlayerNametagText                ( CClientPlayer & Player, char *  szBuffer, unsigned int uiLength );

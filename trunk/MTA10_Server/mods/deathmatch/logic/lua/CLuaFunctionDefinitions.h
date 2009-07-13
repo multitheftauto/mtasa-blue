@@ -72,7 +72,7 @@ public:
     static int      GetPlayerTotalAmmo                  ( lua_State* luaVM );
     static int      SetPlayerAmmo                       ( lua_State* luaVM );
     static int      GetPlayerWeapon                     ( lua_State* luaVM );
-    static int      GetPlayerFromNick                   ( lua_State* luaVM );
+    static int      GetPlayerFromName                   ( lua_State* luaVM );
     static int      GetPlayerMoney                      ( lua_State* luaVM );
     static int      GetPlayerPing                       ( lua_State* luaVM );
     static int      GetRandomPlayer                     ( lua_State* luaVM );
