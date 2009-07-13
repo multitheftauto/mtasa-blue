@@ -79,8 +79,7 @@ SString CScreenShot::GetValidScreenshotFilename ( void )
     //Get the system time
     SYSTEMTIME sysTime;
     GetLocalTime( &sysTime );
-    //Return a filename containing the full system time ms included (its impossible to take more than one screenshot with the same filename this way)
-    return SString("%s\\mta-screen %d-%.2d-%.2d %d-%d-%.2d-%d.png" ,&szScreenShotPath[0],sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds);
+    return SString("%s\\mta-screen %d-%02d-%02d %02d-%02d-%02d.png" ,&szScreenShotPath[0],sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
 }
 
 SString CScreenShot::GetScreenShotPath ( int iNumber )
