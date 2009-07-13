@@ -54,10 +54,11 @@ private:
     void                LoadCVars                   ( void );
     void                SaveCVars                   ( void );
 
-    int                 m_bForceFullScreenOnce;
-    int                 m_bForceWindowed;
-    int                 m_ulForceBackBufferWidth;
-    int                 m_ulForceBackBufferHeight;
+    bool                m_bForceFullScreenOnce;
+    bool                m_bForceWindowed;
+    unsigned long       m_ulForceBackBufferWidth;
+    unsigned long       m_ulForceBackBufferHeight;
+    unsigned long       m_ulFullScreenRefreshRate;
     HWND                m_hDeviceWindow;
     CGameSettings *     m_pGameSettings;
     unsigned long       m_ulMonitorCount;
@@ -128,22 +129,22 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     m_iNextVideoMode = m_iCurrentVideoMode;
     m_bNextWindowed  = m_bCurrentWindowed;
 
-    // Do windowed
-    if ( m_bCurrentWindowed )
-    {
-        int x, y;
-        x = GetSystemMetrics ( SM_CXSCREEN );
-        y = GetSystemMetrics ( SM_CYSCREEN );
-        SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
-        MoveWindow ( m_hDeviceWindow, 
-                    (x/2)-(pp->BackBufferWidth/2), 
-                    (y/2)-(pp->BackBufferHeight/2), 
-                    pp->BackBufferWidth,
-                    pp->BackBufferHeight,
-                    TRUE );
-        pp->Windowed = true;
-        pp->FullScreen_RefreshRateInHz = 0;
-    }
+    // Remember this for later
+    m_ulFullScreenRefreshRate = pp->FullScreen_RefreshRateInHz;
+
+    // This block helps stability
+    int x, y;
+    x = GetSystemMetrics ( SM_CXSCREEN );
+    y = GetSystemMetrics ( SM_CYSCREEN );
+    SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
+    MoveWindow ( m_hDeviceWindow, 
+                (x/2)-(pp->BackBufferWidth/2), 
+                (y/2)-(pp->BackBufferHeight/2), 
+                pp->BackBufferWidth,
+                pp->BackBufferHeight,
+                TRUE );
+    pp->Windowed = true;
+    pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
 
     // Final bits
@@ -156,8 +157,7 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     }
     else
     {
-        // Commented out to stop fullscreen refresh rate being set here
-        //m_bForceFullScreenOnce = true;
+        m_bForceFullScreenOnce = true;
         m_bForceWindowed = false;
         m_ulForceBackBufferWidth  = pp->BackBufferWidth;
         m_ulForceBackBufferHeight = pp->BackBufferHeight;
@@ -174,9 +174,8 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::PostCreateDevice ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp )
 {
-    // Make us windowed
-    if ( m_bCurrentWindowed )
-        pD3DDevice->Reset ( pp );
+    // This helps stability
+    pD3DDevice->Reset ( pp );
 }
 
 
@@ -193,17 +192,16 @@ void CVideoModeManager::PreReset ( D3DPRESENT_PARAMETERS* pp )
     {
         m_bForceFullScreenOnce = false;
         pp->Windowed = false;
-        pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
     else
     if ( m_bForceWindowed )
     {
         pp->Windowed = true;
-        pp->FullScreen_RefreshRateInHz = 0;
     }
 
     pp->BackBufferWidth = m_ulForceBackBufferWidth;
     pp->BackBufferHeight = m_ulForceBackBufferHeight;
+    pp->FullScreen_RefreshRateInHz = pp->Windowed ? D3DPRESENT_RATE_DEFAULT : m_ulFullScreenRefreshRate;
 }
 
 
@@ -222,8 +220,8 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
         LONG Style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | WS_DLGFRAME | WS_SYSMENU;
         SetWindowLong ( m_hDeviceWindow, GWL_STYLE, Style );
 
-        //LONG ExStyle = WS_EX_WINDOWEDGE;
-        //SetWindowLong ( m_hDeviceWindow, GWL_EXSTYLE, ExStyle );
+        LONG ExStyle = 0;//WS_EX_WINDOWEDGE;
+        SetWindowLong ( m_hDeviceWindow, GWL_EXSTYLE, ExStyle );
 
         // Ensure client area of window is correct size
         RECT ClientRect = { 0, 0, pp->BackBufferWidth, pp->BackBufferHeight };
