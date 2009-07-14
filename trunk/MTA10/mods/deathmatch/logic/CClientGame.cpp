@@ -3338,18 +3338,39 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
 
             // Do we have an inflicting player?
-            if ( pInflictingEntity && pInflictingEntity->GetType () == CCLIENTPLAYER )
+            if ( pInflictingEntity )
             {
-                CClientPlayer * pInflictingPlayer = static_cast < CClientPlayer * > ( pInflictingEntity );
-                
-                // Is the damaged player on a team
-                CClientTeam* pTeam = pDamagedPlayer->GetTeam ();
-                if ( pTeam )
-                {
-                    // Is this friendly-fire from a team-mate?
-                    if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
+                CClientPlayer * pInflictingPlayer;
+                if ( pInflictingEntity->GetType () == CCLIENTPLAYER ) {
+                    pInflictingPlayer = static_cast < CClientPlayer * > ( pInflictingEntity );
+                    // Is the damaged player on a team
+                    CClientTeam* pTeam = pDamagedPlayer->GetTeam ();
+                    if ( pTeam )
                     {
-                        return false;
+                        // Is this friendly-fire from a team-mate?
+                        if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
+                        {
+                            return false;
+                        }
+                    }
+                }
+                if ( pInflictingEntity->GetType () == CCLIENTVEHICLE ) {
+                    CClientVehicle * pVehicle = static_cast < CClientVehicle * > ( pInflictingEntity );
+                    if ( pVehicle && pVehicle->GetControllingPlayer() ) {
+                        CClientPed * pPed = static_cast < CClientPed * > ( pVehicle->GetControllingPlayer() );
+                        if ( pPed && pPed->GetType() == CCLIENTPLAYER ) {
+                            pInflictingPlayer = static_cast < CClientPlayer * > ( pPed );
+                            // Is the damaged player on a team
+                            CClientTeam* pTeam = pDamagedPlayer->GetTeam ();
+                            if ( pTeam )
+                            {
+                                // Is this friendly-fire from a team-mate?
+                                if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
+                                {
+                                    return false;
+                                }
+                            }
+                        }
                     }
                 }
             }
