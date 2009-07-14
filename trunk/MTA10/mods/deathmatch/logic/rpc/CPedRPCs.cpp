@@ -35,7 +35,7 @@ void CPedRPCs::LoadFunctions ( void )
     AddHandler ( SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire" );
     AddHandler ( SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless" );
     AddHandler ( SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen" );
-    AddHandler ( MAKE_PED_RELOAD, makePedReloadWeapon, "makePedReloadWeapon" );
+    AddHandler ( RELOAD_PED_WEAPON, reloadPedWeapon, "reloadPedWeapon" );
 }
 
 
@@ -405,7 +405,7 @@ void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
         }
     }
 }
-void CPedRPCs::makePedReloadWeapon ( NetBitStreamInterface& bitStream )
+void CPedRPCs::reloadPedWeapon ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     if ( bitStream.ReadCompressed ( ID ) )

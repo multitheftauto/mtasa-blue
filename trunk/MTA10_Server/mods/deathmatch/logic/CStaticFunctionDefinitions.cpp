@@ -3052,17 +3052,17 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CElement * pElement, bool bIsFro
     }
     return false;
 }
-bool CStaticFunctionDefinitions::makePedReloadWeapon ( CElement* pElement )
+bool CStaticFunctionDefinitions::reloadPedWeapon ( CElement* pElement )
 {
     assert ( pElement );
-    RUN_CHILDREN makePedReloadWeapon ( *iter );
+    RUN_CHILDREN reloadPedWeapon ( *iter );
 
     if ( IS_PED ( pElement ) )
     {
         CPed * pPed = static_cast < CPed * > ( pElement );
         CBitStream BitStream;
         BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MAKE_PED_RELOAD, *BitStream.pBitStream ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RELOAD_PED_WEAPON, *BitStream.pBitStream ) );
         return true;
     }
     return false;

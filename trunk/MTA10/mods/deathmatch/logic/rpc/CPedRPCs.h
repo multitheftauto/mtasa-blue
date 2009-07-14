@@ -38,7 +38,7 @@ public:
     DECLARE_RPC ( SetPedOnFire );
     DECLARE_RPC ( SetPedHeadless );
     DECLARE_RPC ( SetPedFrozen );
-    DECLARE_RPC ( makePedReloadWeapon );
+    DECLARE_RPC ( reloadPedWeapon );
 };
 
 #endif

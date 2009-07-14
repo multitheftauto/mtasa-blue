@@ -791,23 +791,23 @@ int CLuaFunctionDefinitions::GetPedWeaponSlot ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-int CLuaFunctionDefinitions::makePedReloadWeapon ( lua_State* luaVM )
+int CLuaFunctionDefinitions::reloadPedWeapon ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::makePedReloadWeapon ( pElement ) ) {
+            if ( CStaticFunctionDefinitions::reloadPedWeapon ( pElement ) ) {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "makePedReloadWeapon", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "reloadPedWeapon", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "makePedReloadWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM, "reloadPedWeapon" );
     
     lua_pushboolean ( luaVM, false );
     return 1;
