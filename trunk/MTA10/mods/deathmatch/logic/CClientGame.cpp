@@ -1750,6 +1750,24 @@ void CClientGame::UpdateFireKey ( void )
                         CClientEntity * pTarget = m_pLocalPlayer->GetTargetedEntity ();
                         if ( pTarget && IS_PED ( pTarget ) )
                         {
+                            // Do we have a target player?
+                            if ( IS_PLAYER ( pTarget ) )
+                            {
+                                CClientPlayer * pTargetPlayer = static_cast < CClientPlayer * > ( pTarget );
+                                
+                                // Is the targetted player on a team
+                                CClientTeam* pTeam = pTargetPlayer->GetTeam ();
+                                if ( pTeam )
+                                {
+                                    // Is this friendly-fire?
+                                    if ( pTargetPlayer->IsOnMyTeam ( m_pLocalPlayer ) && !pTeam->GetFriendlyFire () )
+                                    {
+                                        // Change the state back to false so this press doesn't do anything else
+                                        pControl->bState = false;
+                                        return;
+                                    }
+                                }
+                            }
                             CPlayerPed * pGameTarget = static_cast < CClientPed * > ( pTarget )->GetGamePlayer ();
                             if ( pGameTarget )
                             {
