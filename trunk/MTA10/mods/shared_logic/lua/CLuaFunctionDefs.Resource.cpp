@@ -130,6 +130,9 @@ int CLuaFunctionDefs::GetThisResource ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
 {
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+        m_pScriptDebugging->LogCustom ( luaVM, "getResourceConfig may be using an outdated syntax. Please check and update." );
+
     // Resource and config name
     CResource* pResource = NULL;
     const char* szInput = NULL;

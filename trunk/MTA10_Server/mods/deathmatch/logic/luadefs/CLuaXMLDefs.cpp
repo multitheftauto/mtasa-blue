@@ -49,6 +49,9 @@ void CLuaXMLDefs::LoadFunctions ( void )
 
 int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
 {
+    if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "xmlCreateFile may be using an outdated syntax. Please check and update." );
+
     // Grab our resource
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLUA )
@@ -114,6 +117,9 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
 
 int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
 {
+     if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "xmlLoadFile may be using an outdated syntax. Please check and update." );
+
     // Grab our resource
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLUA )
@@ -183,6 +189,9 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
 
 int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
 {
+    if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "xmlCopyFile may be using an outdated syntax. Please check and update." );
+
     // Grab our resource
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLUA )
