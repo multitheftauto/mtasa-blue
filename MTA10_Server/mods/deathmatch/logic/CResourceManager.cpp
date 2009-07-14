@@ -883,17 +883,15 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                 strMetaPath = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
-                    return true;
+                    return pResource->GetFilePath ( strMetaPath.c_str (), strPath );
                 }
             }
         }
     }
     else if ( IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
         strMetaPath = strInput;
-        return true;
+        return pResource->GetFilePath ( strMetaPath.c_str (), strPath );
     }
     return false;
 }
