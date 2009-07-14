@@ -179,7 +179,8 @@ void COMMAND_Eaeg ( const char* szCmdLine )
 void COMMAND_EnterPassenger ( const char* szCmdLine )
 {
     // HACK: we don't want them to enter a vehicle if they're in cursor mode
-    if ( !g_pClientGame->AreCursorEventsEnabled () )
+    // Disable passenger entry while reloading so it doesen't abort the animation
+    if ( !g_pClientGame->AreCursorEventsEnabled () && g_pClientGame->GetLocalPlayer()->GetWeapon()->GetState() != WEAPONSTATE_RELOADING )
     {
         g_pClientGame->ProcessVehicleInOutKey ( true );
     }

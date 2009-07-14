@@ -126,6 +126,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_ulLastTimeAimed = 0;
     m_ulLastTimeBeganCrouch = 0;
     m_ulLastTimeBeganStand = 0; //Standing after crouching
+    m_ulLastTimeMovedWhileCrouched = 0; //Moved while crouching
     m_bRecreatingModel = false;
     m_pCurrentContactEntity = NULL;
     m_bSunbathing = false;
@@ -2241,7 +2242,29 @@ void CClientPed::StreamedInPulse ( void )
                 Current.RightShoulder1 = 0;
             }
         }
-
+        //Fix for reloading aborting
+        if ( GetWeapon()->GetState() == WEAPONSTATE_RELOADING )
+        {
+            //Disable changing weapons
+            Current.DPadUp = 0;
+            Current.DPadDown = 0;
+            //Disable vehicle entry
+            Current.ButtonTriangle = 0;
+            //Disable jumping
+            Current.ButtonSquare = 0;
+            //if we are ducked disable movement (otherwise it will abort reloading)
+            if ( IsDucked() ) {
+                Current.LeftStickX = 0;
+                Current.LeftStickY = 0;
+            }
+        }
+        //Fix for crouching the end of animation aborting reload
+        CControllerState Previous;
+        GetLastControllerState ( Previous );
+        if ( IsDucked() && ( Current.LeftStickX == 0 || Current.LeftStickY == 0)) {
+            if (Previous.LeftStickY != 0 || Previous.LeftStickX != 0 ) 
+                m_ulLastTimeMovedWhileCrouched = ulNow;
+        }
         // Is this the local player?
         if ( m_bIsLocalPlayer )
         {
@@ -4670,4 +4693,22 @@ void CClientPed::SetVoice ( const char* szVoiceType, const char* szVoice )
 {
     if ( m_pPlayerPed )
         m_pPlayerPed->SetVoice ( szVoiceType, szVoice );
+}
+bool CClientPed::CanReload ( void )
+{
+    unsigned long ulNow = CClientTime::GetTime ();
+    CControllerState Current;
+    GetControllerState ( Current );
+    int iWeaponType = GetWeapon()->GetType();
+    //Hes not Aiming, ducked or if he is ducked he is not currently moving and he hasn't moved while crouching in the last 300ms (sometimes the crouching move anim runs over and kills the reload animation)
+    if ( Current.RightShoulder1 == false && 
+        ( !IsDucked() || ( Current.LeftStickX == 0 && Current.LeftStickY == 0 ) )
+        && ulNow - m_ulLastTimeMovedWhileCrouched > 300) 
+    {
+        //Ignore certain weapons (anything without clip ammo)
+        if ( iWeaponType >= WEAPONTYPE_PISTOL && iWeaponType <= WEAPONTYPE_TEC9 && iWeaponType != WEAPONTYPE_SHOTGUN ) {
+            return true;
+        }
+    }
+    return false;
 }

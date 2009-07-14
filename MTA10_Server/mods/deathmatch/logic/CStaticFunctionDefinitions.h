@@ -184,6 +184,7 @@ public:
     static bool                 SetPedOnFire                        ( CElement * pElement, bool bIsOnFire );
     static bool                 SetPedHeadless                      ( CElement * pElement, bool bIsHeadless );
     static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );
+    static bool                 makePedReloadWeapon                 ( CElement * pElement );
 
     // Camera get functions
     static bool                 GetCameraMatrix                     ( CPlayer * pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );

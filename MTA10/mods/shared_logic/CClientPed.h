@@ -375,6 +375,7 @@ public:
     void                        SetVoice                ( const char* szVoiceType, const char* szVoice );
 
     void                        PostWeaponFire          ( void );
+    bool                        CanReload               ( void );
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -445,6 +446,7 @@ public:
     unsigned long               m_ulLastTimeAimed;
     unsigned long               m_ulLastTimeBeganCrouch;
     unsigned long               m_ulLastTimeBeganStand;
+    unsigned long               m_ulLastTimeMovedWhileCrouched;
     CModelInfo*                 m_pLoadedModelInfo;
     eWeaponSlot                 m_pOutOfVehicleWeaponSlot;
     float                       m_fBeginAimX;

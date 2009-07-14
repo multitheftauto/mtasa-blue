@@ -35,6 +35,7 @@ void CPedRPCs::LoadFunctions ( void )
     AddHandler ( SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire" );
     AddHandler ( SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless" );
     AddHandler ( SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen" );
+    AddHandler ( MAKE_PED_RELOAD, makePedReloadWeapon, "makePedReloadWeapon" );
 }
 
 
@@ -401,6 +402,24 @@ void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
         if ( pPed )
         {
             pPed->SetFrozen ( bIsFrozen );
+        }
+    }
+}
+void CPedRPCs::makePedReloadWeapon ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    if ( bitStream.ReadCompressed ( ID ) )
+    {
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
+        if ( pPed ) {
+            CWeapon* pPedWeapon = pPed->GetWeapon();
+            CTask* pTask = pPed->GetTaskManager()->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+            //Check his control states for anything that can cancel the anim instantly and make sure he is not firing
+            if ( pPed->CanReload() && 
+               ( !pTask || ( pTask && pTask->GetTaskType() != TASK_SIMPLE_USE_GUN ) ) ) {
+                //play anim + reload
+                pPedWeapon->SetState( WEAPONSTATE_RELOADING );
+            }
         }
     }
 }
