@@ -329,7 +329,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedFrozen", CLuaFunctionDefinitions::SetPedFrozen );
     CLuaCFunctions::AddFunction ( "getPedSkin", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "makePedReload", CLuaFunctionDefinitions::makePedReloadWeapon );
+    CLuaCFunctions::AddFunction ( "reloadPedWeapon", CLuaFunctionDefinitions::reloadPedWeapon );
 
     // Weapon give/take functions
     CLuaCFunctions::AddFunction ( "giveWeapon", CLuaFunctionDefinitions::GiveWeapon );
