@@ -159,6 +159,7 @@ public:
     static int      SetPedOnFire                        ( lua_State* luaVM );
     static int      SetPedHeadless                      ( lua_State* luaVM );
     static int      SetPedFrozen                        ( lua_State* luaVM );
+    static int      makePedReloadWeapon                 ( lua_State* luaVM );
 
     // Weapon give/take functions
     static int      GiveWeapon                          ( lua_State* luaVM );

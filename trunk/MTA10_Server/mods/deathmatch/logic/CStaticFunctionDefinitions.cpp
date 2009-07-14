@@ -3052,7 +3052,21 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CElement * pElement, bool bIsFro
     }
     return false;
 }
+bool CStaticFunctionDefinitions::makePedReloadWeapon ( CElement* pElement )
+{
+    assert ( pElement );
+    RUN_CHILDREN makePedReloadWeapon ( *iter );
 
+    if ( IS_PED ( pElement ) )
+    {
+        CPed * pPed = static_cast < CPed * > ( pElement );
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MAKE_PED_RELOAD, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CPlayer* pPlayer, CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
