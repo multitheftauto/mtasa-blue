@@ -34,7 +34,8 @@ void CLuaFileDefs::LoadFunctions ( void )
 
 int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 {
-    // file fileCreate ( string filename, resource from = getThisResource () )
+    if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "fileCreate may be using an outdated syntax. Please check and update." );
 
     // Grab our lua VM
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -118,7 +119,8 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 
 int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 {
-    // file fileOpen ( string filename, resource from = getThisResource () )
+    if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "fileOpen may be using an outdated syntax. Please check and update." );
 
     // Grab our lua VM
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -487,7 +489,8 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
 
 int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 {
-    // file fileDelete ( string filename, resource from = getThisResource () )
+    if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "fileDelete may be using an outdated syntax. Please check and update." );
 
     // Grab our lua VM
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );

@@ -108,6 +108,9 @@ int CLuaResourceDefs::copyResource ( lua_State* luaVM )
 
 int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
 {
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "addResourceMap may be using an outdated syntax. Please check and update." );
+
     // Grab our LUA instance
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLUA )
@@ -171,6 +174,9 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
 
 int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
 {
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        m_pScriptDebugging->LogCustom ( luaVM, "addResourceConfig may be using an outdated syntax. Please check and update." );
+
     // Grab our LUA instance
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLUA )
