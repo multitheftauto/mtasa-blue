@@ -208,7 +208,7 @@ void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQue
 {
     assert ( pEntity );
     // Check to ensure entity has not got its knickers in a twist
-    assert ( !ListContains ( m_CancelQueue, pEntity ) );
+    if ( !ListContains ( m_CancelQueue, pEntity ) ) return;
 
     // Are we inside a pulse? Add it to a list to delete after or we'll crash.
     // If not, cancel now.
