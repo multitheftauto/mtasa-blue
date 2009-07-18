@@ -118,6 +118,8 @@ CVehicleSA::~CVehicleSA()
 	{
 		if ( (DWORD)m_pInterface->vtbl != VTBL_CPlaceable )
 		{
+            GetVehicleInterface ()->m_pVehicle = NULL;
+
             if ( this->damageManager ) delete this->damageManager;
             
             DWORD dwThis = (DWORD) m_pInterface;
