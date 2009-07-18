@@ -93,7 +93,8 @@ DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 DWORD FUNC_CEntity_Render =                                 0x534310;
 
 #define HOOKPOS_VehicleCamStart                             0x5245ED
-DWORD RETURN_VehicleCamStart =                              0x5245F3;
+DWORD RETURN_VehicleCamStart_success =                      0x5245F3;
+DWORD RETURN_VehicleCamStart_failure =                      0x525E43;
 #define HOOKPOS_VehicleCamTargetZTweak                      0x524A68
 DWORD RETURN_VehicleCamTargetZTweak =                       0x524AA4;
 #define HOOKPOS_VehicleCamLookDir1                          0x524DF1
@@ -3031,7 +3032,7 @@ CMatrix gravcam_matInvertGravity;
 CMatrix gravcam_matVehicleTransform;
 CVector gravcam_vecVehicleVelocity;
 
-void _cdecl VehicleCamStart ( DWORD dwCam, DWORD pVehicleInterface )
+bool _cdecl VehicleCamStart ( DWORD dwCam, DWORD pVehicleInterface )
 {
     // Inverse transform some things so that they match a downward pointing gravity.
     // This way SA's gravity-goes-downward assumptive code can calculate the camera
@@ -3039,7 +3040,7 @@ void _cdecl VehicleCamStart ( DWORD dwCam, DWORD pVehicleInterface )
     // completes.
     CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleInterface );
     if ( !pVehicle )
-        return;
+        return false;
 
     CVector vecGravity;
     pVehicle->GetGravity ( &vecGravity );
@@ -3056,6 +3057,7 @@ void _cdecl VehicleCamStart ( DWORD dwCam, DWORD pVehicleInterface )
     pVehicle->GetMoveSpeed ( &gravcam_vecVehicleVelocity );
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
     pVehicle->SetMoveSpeed ( &vecVelocityInverted );
+    return true;
 }
 
 void _declspec(naked) HOOK_VehicleCamStart ()
@@ -3067,8 +3069,14 @@ void _declspec(naked) HOOK_VehicleCamStart ()
         call VehicleCamStart
         add esp, 8
 
+        test eax, eax
+        jz fail
         mov eax, [edi+0x460]
-        jmp RETURN_VehicleCamStart
+        jmp RETURN_VehicleCamStart_success
+
+fail:
+        add esp, 4
+        jmp RETURN_VehicleCamStart_failure
     }
 }
 
