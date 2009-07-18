@@ -411,13 +411,15 @@ void CPedRPCs::reloadPedWeapon ( NetBitStreamInterface& bitStream )
     if ( bitStream.ReadCompressed ( ID ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed ) {
+        if ( pPed && pPed->GetTaskManager () )
+        {
             CWeapon* pPedWeapon = pPed->GetWeapon();
-            CTask* pTask = pPed->GetTaskManager()->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-            //Check his control states for anything that can cancel the anim instantly and make sure he is not firing
+            CTask* pTask = pPed->GetTaskManager ()->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+            // Check his control states for anything that can cancel the anim instantly and make sure he is not firing
             if ( pPed->CanReload() && 
-               ( !pTask || ( pTask && pTask->GetTaskType() != TASK_SIMPLE_USE_GUN ) ) ) {
-                //play anim + reload
+               ( !pTask || ( pTask && pTask->GetTaskType() != TASK_SIMPLE_USE_GUN ) ) )
+            {
+                // Play anim + reload
                 pPedWeapon->SetState( WEAPONSTATE_RELOADING );
             }
         }
