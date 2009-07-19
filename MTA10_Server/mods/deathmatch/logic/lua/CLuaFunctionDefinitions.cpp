@@ -9545,12 +9545,13 @@ int CLuaFunctionDefinitions::GetGameType ( lua_State* luaVM )
     ASE * pASE = ASE::GetInstance ();
     if ( pASE )
     {
-        // Grab the gametype string. Account the "MTA:SA: " prefix
+        // Grab the gametype string.
         const char* szGameType = pASE->GetGameType ();
-        if ( strlen ( szGameType ) > 8 )
+
+        // Return the gametype string if it's not "MTA:SA"
+        if ( strcmp ( szGameType, GAME_TYPE_STRING ) )
         {
-            // Return the gametype string excluding our prefix
-            lua_pushstring ( luaVM, ( szGameType + 8 ) );
+            lua_pushstring ( luaVM, szGameType );
             return 1;
         }
     }
