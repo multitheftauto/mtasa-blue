@@ -1166,12 +1166,8 @@ void MultiColumnList::setNominatedSelectionRow(uint row_idx)
 *************************************************************************/
 void MultiColumnList::setSortDirection(ListHeaderSegment::SortDirection direction)
 {
-	if (getSortDirection() != direction)
-	{
-		// set the sort direction on the header, events will make sure everything else is updated.
-		d_header->setSortDirection(direction);
-	}
-
+	// set the sort direction on the header, events will make sure everything else is updated.
+	d_header->setSortDirection(direction);
 }
 
 
@@ -1180,12 +1176,8 @@ void MultiColumnList::setSortDirection(ListHeaderSegment::SortDirection directio
 *************************************************************************/
 void MultiColumnList::setSortColumn(uint col_idx)
 {
-	if (getSortColumn() != col_idx)
-	{
-		// set the sort column on the header, events will make sure everything else is updated.
-		d_header->setSortColumn(col_idx);
-	}
-
+	// set the sort column on the header, events will make sure everything else is updated.
+	d_header->setSortColumn(col_idx);
 }
 
 

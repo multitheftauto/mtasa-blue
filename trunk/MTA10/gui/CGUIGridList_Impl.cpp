@@ -288,11 +288,14 @@ void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
 }
 
 
-void CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast )
+int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast )
 {
-	try {
+	try
+    {
+        CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
+
 		// Get the current item at that offset and set the text
-		CGUIListItem* pItem = GetItem ( iRow, hColumn );
+		CGUIListItem_Impl* pItem = reinterpret_cast < CGUIListItem_Impl* > ( GetItem ( iRow, hColumn ) );
 		if ( pItem )
 		{
 			if ( bSection )
@@ -333,21 +336,22 @@ void CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText,
             
 
 			// If it doesn't, create it and set it in the gridlist
-			CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, bNumber );
+			pItem = new CGUIListItem_Impl ( szText, bNumber );
 
-			CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
-            CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
-            //DWORD start = timeGetTime();
-			win-> setItem ( pListboxItem, hColumn, iRow, bFast );
+			CEGUI::ListboxItem* pListboxItem = pItem->GetListItem ();
+			win->setItem ( pListboxItem, hColumn, iRow, bFast );
 
 			// Put our new item into the map
-			m_Items [ pNewItem->GetListItem () ] = pNewItem;
+			m_Items [ pItem->GetListItem () ] = pItem;
 
-			if ( bSection ) {
+			if ( bSection )
+            {
 				// Set section properties
-				pNewItem->SetFont ( "default-bold-small" );
-				pNewItem->SetDisabled ( true );
-			} else if ( hColumn == 1 ) {
+				pItem->SetFont ( "default-bold-small" );
+				pItem->SetDisabled ( true );
+			}
+            else if ( hColumn == 1 )
+            {
 				// Enable some spacing on regular items, if this is the first item
 				char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
 
@@ -361,10 +365,22 @@ void CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText,
                 }
 
 				szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;				
-				pNewItem->SetText ( szBuf );
+				pItem->SetText ( szBuf );
 			}
 		}
-		//reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> requestRedraw ();
+
+        // If the list is sorted and we just changed an item in the sorting column,
+        // re-sort the list.
+        if ( win->getSortDirection () != CEGUI::ListHeaderSegment::SortDirection::None &&
+             win->getSortColumn () == GetColumnIndex ( hColumn ) )
+        {
+            win->setSortColumn ( win->getSortColumn () );
+            return GetItemRowIndex ( pItem );
+        }
+        else
+        {
+            return iRow;
+        }
     }
 	catch ( CEGUI::Exception ) {}
 }

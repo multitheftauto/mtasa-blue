@@ -365,21 +365,17 @@ void ListHeader::setSortingEnabled(bool setting)
 *************************************************************************/
 void ListHeader::setSortDirection(ListHeaderSegment::SortDirection direction)
 {
-	if (d_sortDir != direction)
+	d_sortDir = direction;
+
+	// set direction of current sort segment
+	if (d_sortSegment != NULL)
 	{
-		d_sortDir = direction;
-
-		// set direction of current sort segment
-		if (d_sortSegment != NULL)
-		{
-			d_sortSegment->setSortDirection(direction);
-		}
-
-		// Fire sort direction changed event.
-		WindowEventArgs args(this);
-		onSortDirectionChanged(args);
+		d_sortSegment->setSortDirection(direction);
 	}
 
+	// Fire sort direction changed event.
+	WindowEventArgs args(this);
+	onSortDirectionChanged(args);
 }
 
 
@@ -403,24 +399,19 @@ void ListHeader::setSortColumn(uint column)
 	}
 	else
 	{
-		// if column is different to current sort segment
-		if (d_sortSegment != d_segments[column])
+		// set sort direction on 'old' sort segment to none.
+		if (d_sortSegment != NULL)
 		{
-			// set sort direction on 'old' sort segment to none.
-			if (d_sortSegment != NULL)
-			{
-				d_sortSegment->setSortDirection(ListHeaderSegment::None);
-			}
-
-			// set-up new sort segment
-			d_sortSegment = d_segments[column];
-			d_sortSegment->setSortDirection(d_sortDir);
-
-			// Fire sort column changed event
-			WindowEventArgs args(this);
-			onSortColumnChanged(args);
+			d_sortSegment->setSortDirection(ListHeaderSegment::None);
 		}
 
+		// set-up new sort segment
+		d_sortSegment = d_segments[column];
+		d_sortSegment->setSortDirection(d_sortDir);
+
+		// Fire sort column changed event
+		WindowEventArgs args(this);
+		onSortColumnChanged(args);
 	}
 
 }
