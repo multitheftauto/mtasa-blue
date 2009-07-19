@@ -122,8 +122,10 @@ public:
 
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
-    void                        SetRotationDegrees      ( const CVector& vecRotation );
-    void                        SetRotationRadians      ( const CVector& vecRotation );
+    void                        SetRotationDegrees      ( const CVector& vecRotation )      { SetRotationDegrees ( vecRotation, true ); }
+    void                        SetRotationDegrees      ( const CVector& vecRotation, bool bResetInterpolation );
+    void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
+    void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
     
 	void                        AttachTo                ( CClientEntity * pEntity );
 
@@ -313,18 +315,23 @@ public:
 	void						AddMatrix				( CMatrix& Matrix, double dTime, unsigned short usTickRate );
 	void						AddVelocity				( CVector& vecVelocity );
 
+
+
+    // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
     void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay );
     void                        RemoveTargetPosition    ( void );
     inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 
-    inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_vecTargetRotation; }
-    void                        SetTargetRotation       ( CVector& vecRotation );
+    inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_interp.rot.vecTarget; }
+    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay );
     void                        RemoveTargetRotation    ( void );
-    inline bool                 HasTargetRotation       ( void )                            { return m_bHasTargetRotation; }
+    inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
 	void						UpdateTargetPosition	( void );
     void						UpdateTargetRotation	( void );
+
+
 
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
     inline void                 SetIllegalTowBreakTime  ( unsigned long ulTime )            { m_ulIllegalTowBreakTime = ulTime; }
@@ -458,10 +465,16 @@ protected:
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
         } pos;
-    } m_interp;
 
-    CVector                     m_vecTargetRotation;
-    bool                        m_bHasTargetRotation;
+        struct
+        {
+            CVector vecOrigin;
+            CVector vecTarget;
+            CVector vecOffset;
+            unsigned long ulStartTime;
+            unsigned long ulFinishTime;
+        } rot;
+    } m_interp;
 
     unsigned long               m_ulIllegalTowBreakTime;
 
