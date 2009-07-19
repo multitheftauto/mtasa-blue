@@ -32,6 +32,9 @@ CColShape::CColShape ( CColManager* pManager, CElement* pParent, CXMLNode* pNode
 
 CColShape::~CColShape ( void )
 {
+    if ( m_pCallback )
+        m_pCallback->Callback_OnCollisionDestroy ( this );
+
     RemoveAllColliders ( true );
     // Unlink us from our manager
     Unlink ();

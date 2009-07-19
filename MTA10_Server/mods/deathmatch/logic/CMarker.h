@@ -82,10 +82,11 @@ public:
 private:
     void                    Callback_OnCollision    ( CColShape& Shape, CElement& Element );
     void                    Callback_OnLeave        ( CColShape& Shape, CElement& Element );
+    void                    Callback_OnCollisionDestroy ( CColShape* pShape );
 
     void                    UpdateCollisionObject   ( unsigned char ucOldType );
 
-    class CMarkerManager*         m_pMarkerManager;
+    class CMarkerManager*   m_pMarkerManager;
     CColManager*            m_pColManager;
     bool                    m_bHasTarget;
     CVector                 m_vecTarget;

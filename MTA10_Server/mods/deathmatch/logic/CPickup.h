@@ -141,6 +141,7 @@ public:
 private:
     void                            Callback_OnCollision        ( CColShape& Shape, CElement& Element );
     void                            Callback_OnLeave            ( CColShape& Shape, CElement& Element );
+    void                            Callback_OnCollisionDestroy ( CColShape* pShape );
 
     class CPickupManager*           m_pPickupManager;
 
