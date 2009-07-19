@@ -114,7 +114,8 @@ public:
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
     void                        GetPosition             ( CVector& vecPosition ) const;
-    void                        SetPosition             ( const CVector& vecPosition );
+    void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
+    void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
     void                        SetRoll                 ( const CVector& vecRoll );
     void                        SetDirection            ( const CVector& vecDir );
     void                        SetWas                  ( const CVector& vecWas );
@@ -312,10 +313,10 @@ public:
 	void						AddMatrix				( CMatrix& Matrix, double dTime, unsigned short usTickRate );
 	void						AddVelocity				( CVector& vecVelocity );
 
-    inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_vecTargetPosition; }
-    void                        SetTargetPosition       ( CVector& vecPosition );
+    inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
+    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay );
     void                        RemoveTargetPosition    ( void );
-    inline bool                 HasTargetPosition       ( void )                            { return m_bHasTargetPosition; }
+    inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 
     inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_vecTargetRotation; }
     void                        SetTargetRotation       ( CVector& vecRotation );
@@ -388,10 +389,6 @@ protected:
     CMatrix                     m_Matrix;
 	CMatrix						m_MatrixLast;
 	CMatrix						m_MatrixPure;	
-	CQuat						m_QuatA;
-	CQuat						m_QuatB;
-	CQuat						m_QuatLERP;
-	float						m_fLERP;
 	CVector						m_vecMoveSpeedInterpolate;
 	CVector						m_vecMoveSpeedMeters;
 	CVector                     m_vecMoveSpeed;
@@ -451,12 +448,18 @@ protected:
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
 
-    bool                        m_bInterpolationEnabled;
-    double                      m_dResetInterpolationTime;
+    // Time dependent interpolation
+    struct
+    {
+        struct
+        {
+            CVector vecOrigin;
+            CVector vecTarget;
+            unsigned long ulStartTime;
+            unsigned long ulFinishTime;
+        } pos;
+    } m_interp;
 
-    CVector                     m_vecTargetPosition;
-    bool                        m_bTargetPositionDirections [ 3 ];
-    bool                        m_bHasTargetPosition;
     CVector                     m_vecTargetRotation;
     bool                        m_bHasTargetRotation;
 

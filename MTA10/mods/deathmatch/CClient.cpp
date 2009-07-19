@@ -104,6 +104,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
         pCore->GetCommands ()->Add ( "breakpoint",          "inserts breakpoint",                               COMMAND_Breakpoint );
         pCore->GetCommands ()->Add ( "giveweapon",			"gives the player a weapon (id)",					COMMAND_GiveWeapon );
         pCore->GetCommands ()->Add ( "showrpcs",			"shows the remote prodecure calls",					COMMAND_ShowRPCs );
+        pCore->GetCommands ()->Add ( "showinterpolation",   "shows information about the interpolation",        COMMAND_ShowInterpolation );
         
         pCore->GetCommands ()->Add ( "watch",				"enables wpm watch mode",							COMMAND_Watch );
         pCore->GetCommands ()->Add ( "hash",				"enables wpm hash",									COMMAND_Hash );
