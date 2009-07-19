@@ -1206,6 +1206,14 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         ReadFullVehicleSpecific ( pVehicle, BitStream );
     }
 
+    // Gang driveby
+    if ( bDoingGangDriveby &&
+         ( pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_GETTING_OUT ||
+           pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_GETTING_JACKED ) )
+    {
+        // Don't set the ped doing gang driveby if it's leaving the vehicle
+        bDoingGangDriveby = false;
+    }
     pPlayer->SetDoingGangDriveby ( bDoingGangDriveby );
 
     // Remember now as the last puresync time
