@@ -2739,6 +2739,7 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
     // Are we streamed in?
     if ( m_pVehicle )
     {
+#if 0
         if ( HasTargetPosition () )
         {
             // We didn't have enough time to finish the interpolation,
@@ -2747,6 +2748,7 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
             m_interp.pos.vecOrigin = m_interp.pos.vecTarget;
         }
         else
+#endif
             GetPosition ( m_interp.pos.vecOrigin );
         m_interp.pos.vecTarget = vecPosition;
 
