@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <CMD5Hasher.h>
 
 extern CGame* g_pGame;
 
@@ -1178,7 +1179,6 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
         {
             // Copy the command
             char szBuffer [256];
-            szBuffer[0] = '\0';
             strncpy ( szBuffer, szArguments, 256 );
             szBuffer [255] = 0;
 
@@ -1191,26 +1191,31 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                 CAccount* pAccount = pClient->GetAccount ();
                 if ( pAccount )
                 {
-                    // Compare its current password against the given old one
-                    if ( strcmp ( pAccount->GetPassword ().c_str (), szOldPassword ) == 0 )
+                    CMD5Hasher Hasher;
+					MD5 oldPasswordHash;
+                    char szOldPasswordHash[128];
+					Hasher.Calculate ( szOldPassword, strlen ( szOldPassword ), oldPasswordHash );
+					Hasher.ConvertToHex ( oldPasswordHash, szOldPasswordHash );
+                    // Compare the hash of the given oldPassword to the current password hash
+                    if ( stricmp ( pAccount->GetPassword ().c_str (), szOldPasswordHash ) == 0 )
                     {
                         // Old and new password are equal?
                         if ( strcmp ( szOldPassword, szNewPassword ) != 0 )
                         {
+							MD5 newPasswordHash;
+                            char szNewPasswordHash[128];
+							Hasher.Calculate ( szNewPassword, strlen ( szNewPassword ), newPasswordHash );
+							Hasher.ConvertToHex ( newPasswordHash, szNewPasswordHash );
+                            
                             // Set the new password
                             pAccount->SetPassword ( szNewPassword );
 
                             // Tell the client
                             char szMessage [128];
-                            szMessage[0] = '\0';
-
                             _snprintf ( szMessage, 128, "chgmypass: Your password was changed to '%s'", szNewPassword );
                             szMessage[127] = '\0';
 
                             pEchoClient->SendEcho ( szMessage );
-
-                            // Tell the console
-                            CLogger::LogPrintf ( "ACCOUNTS: %s (Account: %s) changed his/her password to '%s'\n", pClient->GetNick (), pAccount->GetName ().c_str (), szNewPassword );
                             return true;
                         }
                         else
