@@ -843,6 +843,11 @@ void COMMAND_ShowRPCs ( const char* szCmdLine )
 }
 
 
+void COMMAND_ShowInterpolation ( const char* )
+{
+    g_pClientGame->ShowInterpolation ( ! g_pClientGame->IsShowingInterpolation () );
+}
+
 void COMMAND_Watch ( const char *szCmdLine )
 {
     // Note: This code might be a little unsafe if the detouring done by the DLL happens to be done

@@ -261,6 +261,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bMimicLag = false;
     m_ulLastMimicLag = 0;
     m_bDoPaintballs = false;
+    m_bShowInterpolation = false;
     #endif
 
     // Add our lua events
@@ -2807,7 +2808,7 @@ void CClientGame::UpdateMimics ( void )
 
                     if ( m_bMimicLag )
                     {
-                        pMimicVehicle->SetTargetPosition ( vecPosition );
+                        pMimicVehicle->SetTargetPosition ( vecPosition, TICK_RATE );
                         pMimicVehicle->SetTargetRotation ( vecRotationDegrees );
                         pMimicVehicle->SetMoveSpeed ( vecMoveSpeed );
                         pMimicVehicle->SetTurnSpeed ( vecTurnSpeed );

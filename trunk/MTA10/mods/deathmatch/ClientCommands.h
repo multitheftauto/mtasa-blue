@@ -72,6 +72,7 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_Breakpoint         ( const char* szCmdLine );
     void COMMAND_GiveWeapon         ( const char* szCmdLine );
     void COMMAND_ShowRPCs           ( const char* szCmdLine );
+    void COMMAND_ShowInterpolation  ( const char* szCmdLine );
 
     void COMMAND_Watch              ( const char* szCmdLine );
     void COMMAND_Hash               ( const char* szCmdLine );

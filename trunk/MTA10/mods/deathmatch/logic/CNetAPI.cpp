@@ -1077,7 +1077,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        pVehicle->SetTargetPosition ( position.data.vecPosition );
+        pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE );
         pVehicle->SetTargetRotation ( rotation.data.vecRotation );
 
         // Apply the correct move and turnspeed

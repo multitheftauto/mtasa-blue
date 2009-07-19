@@ -268,6 +268,8 @@ public:
     void                                SetMimic                        ( unsigned int uiMimicCount );
     inline void                         SetMimicLag                     ( bool bMimicLag )  { m_bMimicLag = bMimicLag; };
     inline void                         SetDoPaintballs                 ( bool bDoPaintballs )  { m_bDoPaintballs = bDoPaintballs; }
+    void                                ShowInterpolation               ( bool bShow ) { m_bShowInterpolation = bShow; }
+    bool                                IsShowingInterpolation          ( ) const { return m_bShowInterpolation; }
     #endif
 
     inline CEntity*                     GetTargetedGameEntity           ( void )    { return m_pTargetedGameEntity; }
@@ -582,6 +584,7 @@ private:
 	CVector								m_vecLastMimicTurn;
 	CVector								m_vecLastMimicRot;
     bool                                m_bDoPaintballs;
+    bool                                m_bShowInterpolation;
     #endif
 
     // Trainer monitoring
