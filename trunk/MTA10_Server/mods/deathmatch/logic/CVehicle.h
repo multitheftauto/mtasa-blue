@@ -239,7 +239,6 @@ public:
     inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
 
     // Functions used to remember where this vehicle spawns
-    void                            PutAtRespawnLocation    ( void );
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
     inline void                     SetRespawnPosition      ( const CVector& vecPosition )  { m_vecRespawnPosition = vecPosition; };
     inline void                     GetRespawnRotationDegrees ( CVector& vecRotation )      { vecRotation = m_vecRespawnRotationDegrees; };
@@ -253,6 +252,9 @@ public:
     inline void                     SetRespawnTime          ( unsigned long ulTime )        { m_ulRespawnTime = ulTime; m_bRespawnInfoChanged = true; };
     inline unsigned long            GetIdleRespawnTime      ( void )                        { return m_ulIdleRespawnTime; };
     inline void                     SetIdleRespawnTime      ( unsigned long ulTime )        { m_ulIdleRespawnTime = ulTime; m_bRespawnInfoChanged = true; };
+    
+    void                            SpawnAt                 ( const CVector& vecPosition, const CVector& vecRotation );
+    void                            Respawn                 ( void );
 
 private:
     class CVehicleManager*          m_pVehicleManager;

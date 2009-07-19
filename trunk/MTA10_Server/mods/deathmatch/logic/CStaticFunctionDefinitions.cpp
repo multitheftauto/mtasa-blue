@@ -4442,21 +4442,7 @@ bool CStaticFunctionDefinitions::SpawnVehicle ( CElement* pElement, const CVecto
 	if ( IS_VEHICLE ( pElement ) )
 	{
 		CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-
-        pVehicle->SetBlowTime ( 0 );
-        pVehicle->SetIdleTime ( 0 );
-        pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( pVehicle->m_ucWheelStates, 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( pVehicle->m_ucPanelStates, 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( pVehicle->m_ucLightStates, 0, sizeof ( pVehicle->m_ucLightStates ) );
-        pVehicle->SetLandingGearDown ( true );
-        pVehicle->SetAdjustableProperty ( 0 );
-
-        // Move it to spawn
-        pVehicle->SetPosition ( vecPosition );
-
-        // Convert rotation to radians and set it
-        pVehicle->SetRotationDegrees ( vecRotation );
+        pVehicle->SpawnAt ( vecPosition, vecRotation );
 
         // Tell everyone to spawn it
         CVehicleSpawnPacket Packet;
@@ -4478,18 +4464,7 @@ bool CStaticFunctionDefinitions::RespawnVehicle ( CElement* pElement )
 	if ( IS_VEHICLE ( pElement ) )
 	{
 		CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-
-        pVehicle->SetBlowTime ( 0 );
-        pVehicle->SetIdleTime ( 0 );
-        pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( pVehicle->m_ucWheelStates, 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( pVehicle->m_ucPanelStates, 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( pVehicle->m_ucLightStates, 0, sizeof ( pVehicle->m_ucLightStates ) );
-        pVehicle->SetLandingGearDown ( true );
-        pVehicle->SetAdjustableProperty ( 0 );
-
-        // Respawn it
-        pVehicle->PutAtRespawnLocation ();
+        pVehicle->Respawn ();
 
         // Call the respawn event?
         CLuaArguments Arguments;
