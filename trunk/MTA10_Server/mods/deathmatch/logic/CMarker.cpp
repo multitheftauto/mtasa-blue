@@ -41,7 +41,8 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
 CMarker::~CMarker ( void )
 {
     // Delete our collision object
-    delete m_pCollision;
+    if ( m_pCollision )
+        delete m_pCollision;
 
     // Unlink from manager
     Unlink ();
@@ -79,7 +80,8 @@ bool CMarker::ReadSpecialData ( void )
     }
 
     // Set the position in the col object
-    m_pCollision->SetPosition ( m_vecPosition );
+    if ( m_pCollision )
+        m_pCollision->SetPosition ( m_vecPosition );
 
     // Grab the "type" data
     char szBuffer [128];
@@ -139,7 +141,8 @@ void CMarker::SetPosition ( const CVector& vecPosition )
     {
         // Set the new position
         m_vecPosition = vecPosition;
-        m_pCollision->SetPosition ( vecPosition );
+        if ( m_pCollision )
+            m_pCollision->SetPosition ( vecPosition );
 
         // We need to make sure the time context is replaced 
         // before that so old packets don't arrive after this.
@@ -337,6 +340,13 @@ void CMarker::Callback_OnLeave ( CColShape& Shape, CElement& Element )
 }
 
 
+void CMarker::Callback_OnCollisionDestroy ( CColShape* pCollision )
+{
+    if ( pCollision == m_pCollision )
+        m_pCollision = NULL;
+}
+
+
 void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
 {
     // Different type than before?
@@ -347,12 +357,14 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
         // lil_Toady: Simply deleting the colshape may cause a dangling pointer in CColManager if we're in DoHitDetection loop
         if ( m_ucType == CMarker::TYPE_CHECKPOINT )
         {
-            g_pGame->GetElementDeleter()->Delete ( m_pCollision );
+            if ( m_pCollision )
+                g_pGame->GetElementDeleter()->Delete ( m_pCollision );
             m_pCollision = new CColCircle ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL );
         }
         else if ( ucOldType == CMarker::TYPE_CHECKPOINT )
         {
-            g_pGame->GetElementDeleter()->Delete ( m_pCollision );
+            if ( m_pCollision )
+                g_pGame->GetElementDeleter()->Delete ( m_pCollision );
             m_pCollision = new CColSphere ( m_pColManager, NULL, m_vecPosition, m_fSize, NULL );
         }
 

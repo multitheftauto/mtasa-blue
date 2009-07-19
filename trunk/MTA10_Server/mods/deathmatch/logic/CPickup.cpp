@@ -49,7 +49,8 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
 CPickup::~CPickup ( void )
 {
     // Delete our collision object
-    delete m_pCollision;
+    if ( m_pCollision )
+        delete m_pCollision;
 
     // Unlink from manager
     Unlink ();
@@ -88,7 +89,8 @@ bool CPickup::ReadSpecialData ( void )
     }
 
     // Put the collision object at the given xyz
-    m_pCollision->SetPosition ( m_vecPosition );
+    if ( m_pCollision )
+        m_pCollision->SetPosition ( m_vecPosition );
 
     // Grab the "type" data
     char szBuffer [128];
@@ -252,7 +254,8 @@ void CPickup::SetPosition ( const CVector& vecPosition )
 {
     m_vecLastPosition = m_vecPosition;
     m_vecPosition = vecPosition;
-    m_pCollision->SetPosition ( vecPosition );
+    if ( m_pCollision )
+        m_pCollision->SetPosition ( vecPosition );
 }
 
 
@@ -299,7 +302,8 @@ void CPickup::SetWeaponType ( unsigned char ucWeaponType )
 void CPickup::SetVisible ( bool bVisible )
 {
     m_bVisible = bVisible;
-    m_pCollision->SetEnabled ( bVisible );
+    if ( m_pCollision )
+        m_pCollision->SetEnabled ( bVisible );
 }
 
 
@@ -517,4 +521,11 @@ void CPickup::Callback_OnLeave ( CColShape& Shape, CElement& Element )
             Element.CallEvent ( "onPlayerPickupLeave", Arguments2 );            
         }
     }
+}
+
+
+void CPickup::Callback_OnCollisionDestroy ( CColShape* pCollision )
+{
+    if ( pCollision == m_pCollision )
+        m_pCollision = NULL;
 }
