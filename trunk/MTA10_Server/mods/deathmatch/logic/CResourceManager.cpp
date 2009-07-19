@@ -868,22 +868,24 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const ch
     return NULL;
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string& strPath, std::string& strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     if ( strInput[0] == ':' )
     {
-        unsigned int iEnd = strInput.find_first_of("/");
+        unsigned int iEnd = strInput.find_first_of ( "/" );
         if ( iEnd )
         {
-            std::string strResourceName = strInput.substr(1,iEnd-1);
-            pResource = g_pGame->GetResourceManager()->GetResource ( strResourceName.c_str() );
-            if ( pResource && strInput[iEnd+1] )
+            std::string strResourceName = strInput.substr ( 1, iEnd - 1 );
+            pResource = g_pGame->GetResourceManager ()->GetResource ( strResourceName.c_str() );
+            if ( pResource && strInput[iEnd + 1] )
             {
-                strMetaPath = strInput.substr(iEnd+1);
+                strMetaPath = strInput.substr ( iEnd + 1 );
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    return pResource->GetFilePath ( strMetaPath.c_str (), strPath );
+                    if ( !pResource->GetFilePath ( strMetaPath.c_str (), strPath ) )
+                        strPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+                    return true;
                 }
             }
         }
@@ -891,7 +893,9 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     else if ( IsValidFilePath ( strInput.c_str() ) )
     {
         strMetaPath = strInput;
-        return pResource->GetFilePath ( strMetaPath.c_str (), strPath );
+        if ( !pResource->GetFilePath ( strMetaPath.c_str (), strPath ) )
+            strPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+        return true;
     }
     return false;
 }
