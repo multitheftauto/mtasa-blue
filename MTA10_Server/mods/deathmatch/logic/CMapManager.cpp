@@ -712,16 +712,8 @@ void CMapManager::DoVehicleRespawning ( void )
         // Need to respawn?
         if ( bRespawn )
         {
-            // Reset blow stuff and idle stuff
-            pVehicle->SetBlowTime ( 0 );
-            pVehicle->SetIdleTime ( 0 );
-            pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-            memset ( pVehicle->m_ucWheelStates, 0, sizeof ( pVehicle->m_ucWheelStates ) );
-            memset ( pVehicle->m_ucPanelStates, 0, sizeof ( pVehicle->m_ucPanelStates ) );
-            memset ( pVehicle->m_ucLightStates, 0, sizeof ( pVehicle->m_ucLightStates ) );
-
-            // Respawn it
-            pVehicle->PutAtRespawnLocation ();
+            // Respawn it and add it to the packet
+            pVehicle->Respawn ();
             VehicleSpawnPacket.Add ( pVehicle );
 
             // Call the respawn event

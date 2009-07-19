@@ -553,12 +553,27 @@ bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
 }
 
 
-void CVehicle::PutAtRespawnLocation ( void )
+void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation )
+{
+    SetHealth ( GetRespawnHealth () );
+    SetBlowTime ( 0 );
+    SetIdleTime ( 0 );
+    GetInitialDoorStates ( m_ucDoorStates );
+    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
+    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
+    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    SetLandingGearDown ( true );
+    SetAdjustableProperty ( 0 );
+
+    m_vecPosition = vecPosition;
+    m_vecRotationDegrees = vecRotation;
+}
+
+
+void CVehicle::Respawn ()
 {
     m_vecLastPosition = m_vecPosition;
-    m_vecPosition = m_vecRespawnPosition;
-    m_vecRotationDegrees = m_vecRespawnRotationDegrees;
-    m_fHealth = m_fRespawnHealth;
+    SpawnAt ( m_vecRespawnPosition, m_vecRespawnRotationDegrees );
 }
 
 
