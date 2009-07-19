@@ -116,7 +116,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 	m_bJustBlewUp = false;
     m_ucAlpha = 255;
     m_bAlphaChanged = false;
-    m_bHasTargetRotation = false;
     m_bBlowNextFrame = false;
     m_bIsOnGround = false;
     m_ulIllegalTowBreakTime = 0;
@@ -136,6 +135,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_szLastSyncType = "none";
 #endif
 
+    m_interp.rot.ulFinishTime = 0;
     m_interp.pos.ulFinishTime = 0;
 	ResetInterpolation ();
 
@@ -390,7 +390,7 @@ void CClientVehicle::GetRotationRadians ( CVector& vecRotation ) const
 }
 
 
-void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation )
+void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation, bool bResetInterpolation )
 {
     // Convert from degrees to radians
     CVector vecTemp;
@@ -399,11 +399,11 @@ void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation )
     vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
 
     // Set the rotation as radians
-    SetRotationRadians ( vecTemp );
+    SetRotationRadians ( vecTemp, bResetInterpolation );
 }
 
 
-void CClientVehicle::SetRotationRadians ( const CVector& vecRotation )
+void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bResetInterpolation )
 {
     // Grab the matrix, apply the rotation to it and set it again
     // ChrML: We flip the actual rotation direction so that the rotation is consistent with
@@ -414,7 +414,8 @@ void CClientVehicle::SetRotationRadians ( const CVector& vecRotation )
     SetMatrix ( matTemp );
 
     // Reset target rotatin
-    RemoveTargetRotation ();
+    if ( bResetInterpolation )
+        RemoveTargetRotation ();
 }
 
 
@@ -1957,9 +1958,9 @@ void CClientVehicle::Create ( void )
         }
 
         // Jump straight to the target rotation if we have one
-        if ( m_bHasTargetRotation )
+        if ( HasTargetRotation () )
         {
-            CVector vecTemp = m_vecTargetRotation;
+            CVector vecTemp = m_interp.rot.vecTarget;
             ConvertDegreesToRadians ( vecTemp );
             g_pMultiplayer->ConvertEulerAnglesToMatrix ( m_Matrix, ( 2 * PI ) - vecTemp.fX, ( 2 * PI ) - vecTemp.fY, ( 2 * PI ) - vecTemp.fZ );
         }
@@ -2646,7 +2647,10 @@ void CClientVehicle::ResetInterpolation ( void )
 {
     if ( HasTargetPosition () )
         SetPosition ( m_interp.pos.vecTarget );
+    if ( HasTargetRotation () )
+        SetRotationDegrees ( m_interp.rot.vecTarget );
     m_interp.pos.ulFinishTime = 0;
+    m_interp.rot.ulFinishTime = 0;
 }
 
 
@@ -2770,32 +2774,35 @@ void CClientVehicle::RemoveTargetPosition ( void )
 }
 
 
-void CClientVehicle::SetTargetRotation ( CVector& vecRotation )
+void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulDelay )
 {
     // Are we streamed in?
-    if ( m_pVehicle && false )
+    if ( m_pVehicle )
     {
-        // Set our target rotation
-        m_vecTargetRotation = vecRotation;
-        m_bHasTargetRotation = true;
+        GetRotationDegrees ( m_interp.rot.vecOrigin );
+        m_interp.rot.vecTarget = vecRotation;
+
+        // Pre-calculate offsets
+        m_interp.rot.vecOffset.fX = GetOffsetDegrees ( m_interp.rot.vecOrigin.fX, m_interp.rot.vecTarget.fX );
+        m_interp.rot.vecOffset.fY = GetOffsetDegrees ( m_interp.rot.vecOrigin.fY, m_interp.rot.vecTarget.fY );
+        m_interp.rot.vecOffset.fZ = GetOffsetDegrees ( m_interp.rot.vecOrigin.fZ, m_interp.rot.vecTarget.fZ );
+
+        unsigned long ulTime = CClientTime::GetTime ();
+        m_interp.rot.ulStartTime = ulTime;
+        m_interp.rot.ulFinishTime = ulTime + ulDelay;
     }
     else
     {
-        // Update our rotation now and remove any previous target we had
+        // Update our rotation now
         SetRotationDegrees ( vecRotation );
-        m_bHasTargetRotation = false;
     }
 }
 
 
 void CClientVehicle::RemoveTargetRotation ( void )
 {
-    m_bHasTargetRotation = false;
+    m_interp.rot.ulFinishTime = 0;
 }
-
-float fInterpolationStrengthXY = 12;
-float fInterpolationStrengthZ = 12;
-float fInterpolationStrengthR = 8;
 
 void CClientVehicle::UpdateTargetPosition ( void )
 {
@@ -2867,23 +2874,32 @@ void CClientVehicle::UpdateTargetPosition ( void )
 void CClientVehicle::UpdateTargetRotation ( void )
 {
     // Do we have a rotation to move towards? and are we streamed in?
-    if ( m_bHasTargetRotation && m_pVehicle )
+    if ( HasTargetRotation () )
     {
-        CVector vecRotation;
-        GetRotationDegrees ( vecRotation );
+        CVector vecNewRotation;
+        unsigned long ulCurrentTime = CClientTime::GetTime ();
 
-        CVector vecOffset;
-        vecOffset.fX = GetOffsetDegrees ( vecRotation.fX, m_vecTargetRotation.fX );
-        vecOffset.fY = GetOffsetDegrees ( vecRotation.fY, m_vecTargetRotation.fY );
-        vecOffset.fZ = GetOffsetDegrees ( vecRotation.fZ, m_vecTargetRotation.fZ );
+        // Get the factor of time spent from the interpolation start
+        // to the current time.
+        float fAlpha = SharedUtil::Unlerp ( m_interp.rot.ulStartTime,
+                                            ulCurrentTime,
+                                            m_interp.rot.ulFinishTime );
 
-        vecOffset /= CVector ( fInterpolationStrengthR, fInterpolationStrengthR, fInterpolationStrengthR );
-        vecRotation += vecOffset;
-
-        SetRotationDegrees ( vecRotation );
-
-        // SetRotationDegrees clears m_bHasTargetRotation, and we don't want that
-        m_bHasTargetRotation = true;
+        // If the factor is bigger or equal to 1.0f, then
+        // we have finished interpolating.
+        if ( fAlpha >= 1.0f )
+        {
+            m_interp.rot.ulFinishTime = 0;
+            vecNewRotation = m_interp.rot.vecTarget;
+        }
+        else
+        {
+            vecNewRotation = SharedUtil::Lerp ( CVector (),
+                                                fAlpha,
+                                                m_interp.rot.vecOffset );
+            vecNewRotation += m_interp.rot.vecOrigin;
+        }
+        SetRotationDegrees ( vecNewRotation, false );
     }
 }
 

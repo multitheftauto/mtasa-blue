@@ -197,7 +197,7 @@ void CFoo::Test ( const char* szString )
             CVector vecT;
             pVehicle->GetRotationDegrees ( vecT );
             vecT.fZ = atof ( szString + 7 );
-            pVehicle->SetTargetRotation ( vecT );
+            pVehicle->SetTargetRotation ( vecT, TICK_RATE );
 
             g_pCore->ChatPrintf ( "Done %f", false, atof ( szString + 7 ) );
 
@@ -424,38 +424,13 @@ void CFoo::Test ( const char* szString )
     }
 
 
-    // 
-    else if ( strnicmp ( szString, "setstrength", 11 ) == 0 )
-    {
-        extern float fInterpolationStrengthXY;
-        fInterpolationStrengthXY = atof ( szString + 12 );
-        g_pCore->ChatPrintf ( "Set %f", false, fInterpolationStrengthXY );
-    }
-
-
-    // 
-    else if ( strnicmp ( szString, "setstrengthz", 12 ) == 0 )
-    {
-        extern float fInterpolationStrengthZ;
-        fInterpolationStrengthZ = atof ( szString + 13 );
-        g_pCore->ChatPrintf ( "Set %f", false, fInterpolationStrengthZ );
-    }
-
-
-    else if ( strnicmp ( szString, "setstrengthr", 12 ) == 0 )
-    {
-        extern float fInterpolationStrengthR;
-        fInterpolationStrengthR = atof ( szString + 13 );
-        g_pCore->ChatPrintf ( "Set %f", false, fInterpolationStrengthR );
-    }
-
     else if ( strnicmp ( szString, "fuckveh", 7 ) == 0 )
     {
         CClientVehicle* pVehicle = pLocal->GetOccupiedVehicle ();
         if ( pVehicle )
         {
             pVehicle->SetTargetPosition ( CVector ( 0, 0, 0 ), TICK_RATE );
-            pVehicle->SetTargetRotation ( CVector ( 0, 0, 0 ) );
+            pVehicle->SetTargetRotation ( CVector ( 0, 0, 0 ), TICK_RATE );
 
             g_pCore->ChatPrintf ( "Done", false );
         }

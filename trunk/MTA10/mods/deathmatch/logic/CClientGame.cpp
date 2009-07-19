@@ -2809,7 +2809,7 @@ void CClientGame::UpdateMimics ( void )
                     if ( m_bMimicLag )
                     {
                         pMimicVehicle->SetTargetPosition ( vecPosition, TICK_RATE );
-                        pMimicVehicle->SetTargetRotation ( vecRotationDegrees );
+                        pMimicVehicle->SetTargetRotation ( vecRotationDegrees, TICK_RATE );
                         pMimicVehicle->SetMoveSpeed ( vecMoveSpeed );
                         pMimicVehicle->SetTurnSpeed ( vecTurnSpeed );
                     }
