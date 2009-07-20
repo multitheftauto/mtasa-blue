@@ -618,16 +618,6 @@ bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerStat
     ControllerState.ShockButtonL    = keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = keys.data.bPedWalk;
 
-    if ( keys.data.bLeftStickXChanged )
-        ControllerState.LeftStickX  = keys.data.sLeftStickX;
-    else
-        ControllerState.LeftStickX  = LastControllerState.LeftStickX;
-
-    if ( keys.data.bLeftStickYChanged )
-        ControllerState.LeftStickY  = keys.data.sLeftStickY;
-    else
-        ControllerState.LeftStickY  = LastControllerState.LeftStickY;
-
     return true;
 }
 
@@ -643,11 +633,6 @@ void WriteSmallKeysync ( const CControllerState& ControllerState, const CControl
     keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
     keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
-
-    keys.data.bLeftStickXChanged    = ( ControllerState.LeftStickX != LastControllerState.LeftStickX );
-    keys.data.bLeftStickYChanged    = ( ControllerState.LeftStickY != LastControllerState.LeftStickY );
-    keys.data.sLeftStickX           = ControllerState.LeftStickX;
-    keys.data.sLeftStickY           = ControllerState.LeftStickY;
 
     // Write it
     BitStream.Write ( &keys );
