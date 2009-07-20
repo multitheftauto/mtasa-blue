@@ -175,6 +175,7 @@ inline float GetOffsetDegrees ( float a, float b )
     return c;
 }
 
+
 bool            DoesFileExist               ( const char* szFilename );
 
 // Misc utility functions
@@ -188,6 +189,7 @@ void            RaiseFatalError             ( unsigned int uiCode );
 void            RaiseProtocolError          ( unsigned int uiCode );
 
 void            RotateVector                ( CVector& vecLine, const CVector& vecRotation );
+void            AttachedMatrix              ( CMatrix & matrix, CMatrix & returnMatrix, CVector vecDirection, CVector vecRotation );
 
 unsigned int    GetRandom                   ( unsigned int uiLow, unsigned int uiHigh );
 double          GetRandomDouble             ( void );

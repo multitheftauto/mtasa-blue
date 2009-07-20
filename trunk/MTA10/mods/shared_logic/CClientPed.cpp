@@ -192,11 +192,8 @@ CClientPed::~CClientPed ( void )
     // Unreference us from stuff
     m_pManager->UnreferenceEntity ( this );
 
-    // Remove our linked contact vehicle
-    if ( m_pCurrentContactEntity )
-    {
-        m_pCurrentContactEntity->RemoveContact ( this );
-    }
+    // Remove our linked contact entity
+    if ( m_pCurrentContactEntity ) m_pCurrentContactEntity->RemoveContact ( this );
 
     // Make sure we're not requesting any model
     m_pRequester->Cancel ( this, false );
@@ -2916,6 +2913,9 @@ void CClientPed::_CreateLocalModel ( void )
 
 void CClientPed::_DestroyModel ()
 {
+    // Remove our linked contact entity
+    if ( m_pCurrentContactEntity ) m_pCurrentContactEntity->RemoveContact ( this );
+
     // Remember the player position
     m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
 
@@ -4694,7 +4694,9 @@ void CClientPed::SetVoice ( const char* szVoiceType, const char* szVoice )
     if ( m_pPlayerPed )
         m_pPlayerPed->SetVoice ( szVoiceType, szVoice );
 }
-bool CClientPed::CanReload ( void )
+
+
+bool CClientPed::CanReloadWeapon ( void )
 {
     unsigned long ulNow = CClientTime::GetTime ();
     CControllerState Current;
@@ -4707,6 +4709,27 @@ bool CClientPed::CanReload ( void )
     {
         //Ignore certain weapons (anything without clip ammo)
         if ( iWeaponType >= WEAPONTYPE_PISTOL && iWeaponType <= WEAPONTYPE_TEC9 && iWeaponType != WEAPONTYPE_SHOTGUN ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CClientPed::ReloadWeapon ( void )
+{
+    if ( m_pTaskManager )
+    {
+        CWeapon * pWeapon = GetWeapon ();
+        CTask * pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+        
+        // Check his control states for anything that can cancel the anim instantly and make sure he is not firing
+        if ( CanReloadWeapon () && 
+           ( !pTask || ( pTask && pTask->GetTaskType() != TASK_SIMPLE_USE_GUN ) ) )
+        {
+            // Play anim + reload
+            pWeapon->SetState ( WEAPONSTATE_RELOADING );
+
             return true;
         }
     }

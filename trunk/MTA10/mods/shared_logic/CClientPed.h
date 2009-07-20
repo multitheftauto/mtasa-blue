@@ -375,7 +375,9 @@ public:
     void                        SetVoice                ( const char* szVoiceType, const char* szVoice );
 
     void                        PostWeaponFire          ( void );
-    bool                        CanReload               ( void );
+
+    bool                        CanReloadWeapon         ( void );
+    bool                        ReloadWeapon            ( void );
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
