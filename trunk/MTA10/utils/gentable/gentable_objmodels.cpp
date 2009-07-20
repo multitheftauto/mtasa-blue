@@ -49,6 +49,7 @@ int main()
   AllowRange(table, 333, 339, true);
   AllowRange(table, 341, 373, true);
   AllowRange(table, 384, 397, true);
+  Allow(table, 392, false);
   AllowRange(table, 615, 661, true);
   Allow(table, 664, true);
   AllowRange(table, 669, 698, true);
