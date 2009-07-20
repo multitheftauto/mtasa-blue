@@ -142,6 +142,9 @@ public:
     virtual void                        ConvertEulerAnglesToMatrix  ( CMatrix& Matrix, float fX, float fY, float fZ ) = 0;
     virtual void                        ConvertMatrixToEulerAngles  ( const CMatrix& Matrix, float& fX, float& fY, float& fZ ) = 0;
 
+    virtual void                        ConvertEulerAnglesToMatrix  ( CMatrix& Matrix, CVector & vecAngles ) = 0;
+    virtual void                        ConvertMatrixToEulerAngles  ( const CMatrix& Matrix, CVector & vecAngles ) = 0;
+
     virtual float                       GetGlobalGravity            () = 0;
     virtual void                        SetGlobalGravity            ( float fGravity ) = 0;
 

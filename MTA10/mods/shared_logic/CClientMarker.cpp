@@ -108,38 +108,24 @@ void CClientMarker::UpdateAttaching ( void )
 {
     // Attached to an entity
     if ( m_pAttachedToEntity )
-    {
-        // Grab our offset as our attached position offset (eg: (0,0,1))
-        CVector vecOffset = m_vecAttachedPosition;
-
-        // Grab our attached entities matrix
-        CMatrix mat;
-        m_pAttachedToEntity->GetMatrix ( mat );
-        CVector vecRotation;
-        g_pMultiplayer->ConvertMatrixToEulerAngles ( mat, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-
-        // Rotate our offset by our attached entities matrix
-        RotateVector ( vecOffset, vecRotation );
-
-        // Our position is our attached entities' plus our offset
-        CVector vecPosition = mat.vPos + vecOffset;
-       
-        // Update our matrix to match our attached entity
-        vecRotation += m_vecAttachedRotation;
-        g_pMultiplayer->ConvertEulerAnglesToMatrix ( mat, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-        m_pMarker->SetMatrix ( mat );
-
+    {        
         // Grab our current position
         CVector vecCurrentPosition;
         m_pMarker->GetPosition ( vecCurrentPosition );
+
+        // Grab our new matrix
+        CMatrix matrix, newMatrix;
+        m_pAttachedToEntity->GetMatrix ( matrix );
+        AttachedMatrix ( matrix, newMatrix, m_vecAttachedPosition, m_vecAttachedRotation );
+        m_pMarker->SetMatrix ( newMatrix );        
         
         // Do we need to move it?
-        if ( vecPosition != vecCurrentPosition )
+        if ( newMatrix.vPos != vecCurrentPosition )
         {
-            SetPosition ( vecPosition );
+            SetPosition ( newMatrix.vPos );
 
 			// We have a col shape? Update it's position too
-			if ( m_pCollision ) m_pCollision->SetPosition ( vecPosition );
+			if ( m_pCollision ) m_pCollision->SetPosition ( newMatrix.vPos );
         }
     }
 }
