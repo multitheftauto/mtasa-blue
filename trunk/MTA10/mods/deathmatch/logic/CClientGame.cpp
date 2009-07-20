@@ -2707,7 +2707,7 @@ void CClientGame::UpdateMimics ( void )
 
                 if ( m_bMimicLag )
                 {
-                    pMimic->SetTargetPosition ( vecPosition );
+                    pMimic->SetTargetPosition ( vecPosition, TICK_RATE );
                     pMimic->SetMoveSpeed ( vecMoveSpeed );
                     pMimic->SetControllerState ( Controller );
                     pMimic->SetTargetRotation ( fRotation );

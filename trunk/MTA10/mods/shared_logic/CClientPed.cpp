@@ -97,8 +97,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fTargetRotationA = 0.0f;
     m_fBeginCameraRotation = 0.0f;
     m_fTargetCameraRotation = 0.0f;
-    m_ulBeginPositionTime = 0;
-    m_ulEndPositionTime = 0;
     m_ulBeginTarget = 0;
     m_ulEndTarget = 0;
     m_bForceGettingIn = false;
@@ -118,8 +116,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_FightingStyle = STYLE_GRAB_KICK;
     m_MoveAnim = MOVE_PLAYER;
     m_ucAlpha = 255;
-    m_bHasTargetPosition = false;
-    m_pTargetOriginSource = NULL;
     m_fTargetRotation = 0.0f;
 	m_bTargetAkimboUp = false;
     m_bIsChoking = false;
@@ -141,6 +137,10 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bFrozen = false;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
+
+    // Time based interpolation
+    m_interp.pTargetOriginSource = NULL;
+    m_interp.bHadOriginSource = false;
     
     m_pClothes = new CClientPlayerClothes ( this );
 
@@ -277,10 +277,10 @@ CClientPed::~CClientPed ( void )
     if ( g_pLastRebuilt == this )
         g_pLastRebuilt = NULL;
 
-    if ( m_pTargetOriginSource )
+    if ( m_interp.pTargetOriginSource )
     {
-        m_pTargetOriginSource->RemoveOriginSourceUser ( this );
-        m_pTargetOriginSource = NULL;
+        m_interp.pTargetOriginSource->RemoveOriginSourceUser ( this );
+        m_interp.pTargetOriginSource = NULL;
     }
 
     g_pClientGame->GetPedSync()->RemovePed ( this );
@@ -410,7 +410,7 @@ void CClientPed::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientPed::SetPosition ( const CVector& vecPosition )
+void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
     // We have a player ped?
     if ( m_pPlayerPed )
@@ -444,6 +444,9 @@ void CClientPed::SetPosition ( const CVector& vecPosition )
         // Update our streaming position
         UpdateStreamPosition ( vecPosition );
     }
+
+    if ( bResetInterpolation )
+        RemoveTargetPosition ();
 }
 
 
@@ -594,21 +597,8 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     SetInterior ( ucInterior );
 }
 
-
-void CClientPed::SetTargetPosition ( unsigned long ulDelay, const CVector& vecPosition )
-{
-    m_ulBeginPositionTime = CClientTime::GetTime ();
-    m_ulEndPositionTime = m_ulBeginPositionTime + ulDelay;
-    GetMatrix ( m_Matrix ); // Test
-    m_vecBeginPosition = m_Matrix.vPos;
-    m_vecTargetPosition = vecPosition;
-}
-
-
 void CClientPed::ResetInterpolation ( void )
 {
-    m_ulBeginPositionTime = 0;
-    m_ulEndPositionTime = 0;
     m_ulBeginRotationTime = 0;
     m_ulEndRotationTime = 0;
     m_ulBeginAimTime = 0;
@@ -2504,6 +2494,7 @@ void CClientPed::SetTargetRotation ( float fRotation )
         m_pPlayerPed->SetTargetRotation ( fRotation );
     }
     m_fTargetRotation = fRotation;
+    SetCurrentRotation ( fRotation );
 }
 
 void CClientPed::SetTargetRotation ( unsigned long ulDelay, float fRotation, float fCameraRotation )
@@ -2774,15 +2765,16 @@ void CClientPed::_CreateModel ( void )
         m_pManager->RestoreEntity ( this );                
 
         // Jump straight to the target position if we have one
-        if ( m_bHasTargetPosition )
+        if ( HasTargetPosition () )
         {
-            m_Matrix.vPos = m_vecTargetPosition;
-            if ( m_pTargetOriginSource )
+            CVector vecPosition = m_interp.pos.vecTarget;
+            if ( m_interp.pTargetOriginSource )
             {
                 CVector vecOrigin;
-                m_pTargetOriginSource->GetPosition ( vecOrigin );
-                m_Matrix.vPos += vecOrigin;
+                m_interp.pTargetOriginSource->GetPosition ( vecOrigin );
+                vecPosition += vecOrigin;
             }
+            m_Matrix.vPos = vecPosition;
         }
 
         // Restore any settings	
@@ -4242,120 +4234,99 @@ char* CClientPed::GetBodyPartName ( unsigned char ucID )
 
 void CClientPed::GetTargetPosition ( CVector & vecPosition )
 {
-    vecPosition = m_vecTargetPosition;
-    if ( m_pTargetOriginSource )
+    vecPosition = m_interp.pos.vecTarget;
+    if ( m_interp.pTargetOriginSource )
     {
         CVector vecTemp;
-        m_pTargetOriginSource->GetPosition ( vecTemp );
+        m_interp.pTargetOriginSource->GetPosition ( vecTemp );
         vecPosition += vecTemp;
     }
 }
 
 
-void CClientPed::SetTargetPosition ( CVector& vecPosition, CClientEntity* pOriginSource )
+void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource )
 {
-    CVector vecTemp, vecOrigin;
-    GetPosition ( vecTemp );
+    // Get the origin of the position if we are in contact with anything
+    CVector vecOrigin;
+    if ( pTargetOriginSource )
+        pTargetOriginSource->GetPosition ( vecOrigin );
 
-    if ( pOriginSource )
-    {        
-        pOriginSource->GetPosition ( vecOrigin );
-        vecTemp -= vecOrigin;
+    // Update the references to the contact entity
+    if ( pTargetOriginSource != m_interp.pTargetOriginSource )
+    {
+        if ( m_interp.pTargetOriginSource )
+            m_interp.pTargetOriginSource->RemoveOriginSourceUser ( this );
+        if ( pTargetOriginSource )
+            pTargetOriginSource->AddOriginSourceUser ( this );
+        m_interp.pTargetOriginSource = pTargetOriginSource;
     }
 
-    m_bTargetDirections [ 0 ] = ( vecTemp.fX < vecPosition.fX );
-    m_bTargetDirections [ 1 ] = ( vecTemp.fY < vecPosition.fY );
-    m_bTargetDirections [ 2 ] = ( vecTemp.fZ < vecPosition.fZ );
-    m_vecTargetPosition = vecPosition;
-    m_bHasTargetPosition = true;
-    if ( pOriginSource != m_pTargetOriginSource )
+    if ( m_pPlayerPed )
     {
-        if ( m_pTargetOriginSource )
-            m_pTargetOriginSource->RemoveOriginSourceUser ( this );
+        // The ped is streamed in
+        GetPosition ( m_interp.pos.vecOrigin );
+        m_interp.pos.vecOrigin -= vecOrigin;
+        m_interp.pos.vecTarget = vecPosition;
+        m_interp.vecOriginSourceLastPosition = vecOrigin;
+        m_interp.bHadOriginSource = false;
 
-        if ( pOriginSource )
-            pOriginSource->AddOriginSourceUser ( this );
-
-        m_pTargetOriginSource = pOriginSource;
+        unsigned long ulTime = CClientTime::GetTime ();
+        m_interp.pos.ulStartTime = ulTime;
+        m_interp.pos.ulFinishTime = ulTime + ulDelay;
     }
-
-    // Jax: if we're streamed out, update our position now and don't interpolate
-    if ( !m_pPlayerPed )
+    else
     {
-        CVector vecActualPosition = vecPosition;
-        if ( pOriginSource )
-        {
-            vecActualPosition += vecOrigin;
-        }
-        SetPosition ( vecActualPosition );
+        // Set the position straight
+        SetPosition ( vecPosition + vecOrigin );
     }
 }
 
 
 void CClientPed::RemoveTargetPosition ( void )
 {
-    m_bHasTargetPosition = false;
-
-    if ( m_pTargetOriginSource )
+    m_interp.pos.ulFinishTime = 0;
+    if ( m_interp.pTargetOriginSource )
     {
-        m_pTargetOriginSource->RemoveOriginSourceUser ( this );
-        m_pTargetOriginSource = NULL;
+        m_interp.pTargetOriginSource->RemoveOriginSourceUser ( this );
+        m_interp.pTargetOriginSource = NULL;
     }
 }
 
 
 void CClientPed::UpdateTargetPosition ( void )
 {
-    if ( m_bHasTargetPosition && m_pPlayerPed )
+    if ( HasTargetPosition () )
     {
-        CVector vecPosition;
-        GetPosition ( vecPosition );
+        CVector vecNewPosition;
+        unsigned long ulCurrentTime = CClientTime::GetTime ();
+
+        // Get the origin position if there is any contact
         CVector vecOrigin;
+        if ( m_interp.pTargetOriginSource )
+            m_interp.pTargetOriginSource->GetPosition ( vecOrigin );
+        else if ( m_interp.bHadOriginSource )
+            vecOrigin = m_interp.vecOriginSourceLastPosition;
 
-        if ( m_pTargetOriginSource )  
-            m_pTargetOriginSource->GetPosition ( vecOrigin );
+        // Get the factor of time spent from the interpolation start
+        // to the current time.
+        float fAlpha = SharedUtil::Unlerp ( m_interp.pos.ulStartTime,
+                                            ulCurrentTime,
+                                            m_interp.pos.ulFinishTime );
 
-        vecPosition -= vecOrigin;
-
-        // Needs to be calced
-        float fTimeSlice = 1/30.f;
-
-        CVector vecOffset = m_vecTargetPosition - vecPosition;
-        float fDistanceToTarget = vecOffset.Length ();
-        // fDistanceToTarget 0.20f to 0.00f     then fSpeed = 3.0f to 15.0f
-        float fSpeedAlpha = UnlerpClamped ( 0, fDistanceToTarget, 0.20f );
-        float fSpeed = Lerp < const float > ( 15.f, fSpeedAlpha, 3.f );
-        CVector vecScale;
-        vecScale.fX = 1.5f * fTimeSlice * fSpeed;
-        vecScale.fY = 1.5f * fTimeSlice * fSpeed;
-        vecScale.fZ = 6.0f * fTimeSlice;
-        // Make sure not to overshoot
-        vecScale.fX = Min ( vecScale.fX, 1.f );
-        vecScale.fY = Min ( vecScale.fY, 1.f );
-        vecScale.fZ = Min ( vecScale.fZ, 1.f );
-        vecOffset *= vecScale;
-        // Apply offset ignoring X and Y m_bTargetDirections
-        //if ( ( vecOffset.fX > 0.0f ) == m_bTargetDirections [ 0 ] )
-            vecPosition.fX += vecOffset.fX;
-        //if ( ( vecOffset.fY > 0.0f ) == m_bTargetDirections [ 1 ] )
-            vecPosition.fY += vecOffset.fY;
-        if ( ( vecOffset.fZ > 0.0f ) == m_bTargetDirections [ 2 ] )
-            vecPosition.fZ += vecOffset.fZ;
-
-        // Temp hack to help ensure gravity doesn't suck the ped underground - ( Maybe when level collision is streamed out and ped it not? )
-        if ( CCamera* pCamera = g_pGame->GetCamera () )
+        // If the factor is bigger or equal to 1.0f, then
+        // we have finished interpolating.
+        if ( fAlpha >= 1.0f )
         {
-            CMatrix matCamera;
-            pCamera->GetMatrix ( &matCamera );
-            float fDist = ( matCamera.vPos - ( vecPosition + vecOrigin ) ).Length ();
-            // Fix only required if ped is between 250.f and 300.f units away, possibly
-            if ( fDist > 230.f && fDist < 320.f )
-                vecPosition.fZ = m_vecTargetPosition.fZ;
+            m_interp.pos.ulFinishTime = 0;
+            vecNewPosition = m_interp.pos.vecTarget;
         }
-
-        vecPosition += vecOrigin;
-
-        SetPosition ( vecPosition );
+        else
+        {
+            vecNewPosition = SharedUtil::Lerp ( m_interp.pos.vecOrigin,
+                                                fAlpha,
+                                                m_interp.pos.vecTarget );
+        }
+        SetPosition ( vecNewPosition + vecOrigin, false );
     }
 }
 
