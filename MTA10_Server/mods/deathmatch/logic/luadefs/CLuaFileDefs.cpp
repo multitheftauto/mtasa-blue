@@ -506,7 +506,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
 			CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath ) && pResource )
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath, std::string("") ) && pResource )
             {
 			    // Do we have permissions?
 			    if ( pResource == pThisResource ||

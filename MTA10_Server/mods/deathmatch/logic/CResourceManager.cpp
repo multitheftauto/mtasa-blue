@@ -868,7 +868,7 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const ch
     return NULL;
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string& strPath, std::string strMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string& strPath, std::string& strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     if ( strInput[0] == ':' )

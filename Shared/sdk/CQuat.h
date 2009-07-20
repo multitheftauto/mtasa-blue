@@ -18,7 +18,7 @@ class CQuat;
 
 #include <math.h>
 #include <float.h>
-
+#include "SharedUtil.h"
 #pragma warning (disable:4244)
 
 #define EPSILON			0.001
@@ -26,8 +26,6 @@ class CQuat;
 #ifndef PI
 #define PI (float)3.14159265358979323846264338327950
 #endif
-
-#define maximum(a,b) 	(((a)>(b))?(a):(b))
 
 #pragma warning ( disable:4244 )
 class CQuat
@@ -42,10 +40,10 @@ public:
 		x = y = z = w = 0;
 	};
 	CQuat(CMatrix* m) {
-		w = sqrt( maximum( 0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
-		x = sqrt( maximum( 0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-		y = sqrt( maximum( 0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-		z = sqrt( maximum( 0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+		w = sqrt( SharedUtil::Max( (float)0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+		x = sqrt( SharedUtil::Max( (float)0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		y = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		z = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
 		
 		x = _copysign( x, m->vUp.fY - m->vFront.fZ );
 		y = _copysign( y, m->vRight.fZ - m->vUp.fX );
