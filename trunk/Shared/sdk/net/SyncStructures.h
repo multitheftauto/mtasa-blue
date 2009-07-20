@@ -139,17 +139,17 @@ private:
 // Declare specific health and armor sync structures
 struct SPlayerHealthSync : public SFloatAsBitsSync < 8 >
 {
-    SPlayerHealthSync () : SFloatAsBitsSync ( 0.f, 200.0f, true ) {}
+    SPlayerHealthSync () : SFloatAsBitsSync<8> ( 0.f, 200.0f, true ) {}
 };
 
 struct SPlayerArmorSync : public SFloatAsBitsSync < 8 >
 {
-    SPlayerArmorSync () : SFloatAsBitsSync ( 0.f, 100.0f, true ) {}
+    SPlayerArmorSync () : SFloatAsBitsSync<8> ( 0.f, 100.0f, true ) {}
 };
 
 struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
 {
-    SVehicleHealthSync () : SFloatAsBitsSync ( 0.f, 2000.0f, true ) {}
+    SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000.0f, true ) {}
 };
 
 

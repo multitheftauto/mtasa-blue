@@ -27,6 +27,8 @@ class CQuat;
 #define PI (float)3.14159265358979323846264338327950
 #endif
 
+#define maximum(a,b) 	(((a)>(b))?(a):(b))
+
 #pragma warning ( disable:4244 )
 class CQuat
 {
@@ -40,17 +42,17 @@ public:
 		x = y = z = w = 0;
 	};
 	CQuat(CMatrix* m) {
-		w = sqrt( max( 0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
-		x = sqrt( max( 0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-		y = sqrt( max( 0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-		z = sqrt( max( 0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+		w = sqrt( maximum( 0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+		x = sqrt( maximum( 0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		y = sqrt( maximum( 0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+		z = sqrt( maximum( 0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
 		
 		x = _copysign( x, m->vUp.fY - m->vFront.fZ );
 		y = _copysign( y, m->vRight.fZ - m->vUp.fX );
 		z = _copysign( z, m->vFront.fX - m->vRight.fY );
 	};
 
-	static void CQuat::ToMatrix(const CQuat& q, CMatrix& m){
+	static void ToMatrix(const CQuat& q, CMatrix& m){
 		float xx = q.x * q.x;
 		float xy = q.x * q.y;
 		float xz = q.x * q.z;
@@ -77,7 +79,7 @@ public:
 	};
 
 	// Linear interpolation
-	static void CQuat::LERP(const CQuat& qa, const CQuat& qb, CQuat& qm, float t) {
+	static void LERP(const CQuat& qa, const CQuat& qb, CQuat& qm, float t) {
 		float cosom, scale0, scale1, s;
 		cosom = qa.x * qb.x + qa.y * qb.y + qa.z * qb.z + qa.w * qb.w;
 		scale0 = 1.0f - t;
@@ -94,7 +96,7 @@ public:
 	};
 
 	// Spherical linear interpolation
-	static void CQuat::SLERP(const CQuat& qa, const CQuat& qb, CQuat& qm, float t) {
+	static void SLERP(const CQuat& qa, const CQuat& qb, CQuat& qm, float t) {
 		// Calculate angle between them.
 		float cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 		// if qa=qb or qa=-qb then theta = 0 and we can return qa

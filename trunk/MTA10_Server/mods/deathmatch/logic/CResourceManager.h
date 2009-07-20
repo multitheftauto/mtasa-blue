@@ -96,7 +96,7 @@ public:
 	CResource*					CreateResource					( char* szResourceName );
     CResource*                  CopyResource                    ( CResource* pSourceResource, const char* szNewResourceName );
 
-    static bool                 ParseResourcePathInput          ( std::string strInput, CResource* pResource, std::string &strPath, std::string &strMetaPath = std::string("") );
+    static bool                 ParseResourcePathInput          ( std::string strInput, CResource* pResource, std::string &strPath, std::string strMetaPath = std::string("") );
 
 
 private:

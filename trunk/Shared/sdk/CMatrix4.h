@@ -26,7 +26,7 @@ public:
 		Identity ();
 	}
 
-	void CMatrix4::rotX(float angle) {
+	void rotX(float angle) {
 		// Assuming the angle is in radians. (?)
 		float c = cos(angle);
 		float s = sin(angle);
@@ -42,7 +42,7 @@ public:
 	}
 
 
-	void CMatrix4::rotY(float angle) {
+	void rotY(float angle) {
 		// Assuming the angle is in radians. (?)
 		float c = cos(angle);
 		float s = sin(angle);
@@ -58,7 +58,7 @@ public:
 	}
 
 
-	void CMatrix4::rotZ(float angle) {
+	void rotZ(float angle) {
 		// Assuming the angle is in radians. (?)
 		float c = cos(angle);
 		float s = sin(angle);
@@ -73,7 +73,7 @@ public:
 		m_cell[10] = 1.0;
 	}
 
-	void CMatrix4::Identity ( void )
+	void Identity ( void )
 	{
 					m_cell[1] =		m_cell[2] =	m_cell[3] =
 		m_cell[4] =					m_cell[6] =	m_cell[7] =
@@ -83,14 +83,14 @@ public:
         m_cell[0] = m_cell[5] = m_cell[10] = m_cell[15] = 1.0f;
 	}
 
-	void CMatrix4::Translate ( CVector vec )
+	void Translate ( CVector vec )
 	{
 		m_cell[3] += vec.fX;
 		m_cell[7] += vec.fY;
 		m_cell[11]+= vec.fZ;
 	}
 
-	const CMatrix4& CMatrix4::operator *= ( const CMatrix4& m )
+	const CMatrix4& operator *= ( const CMatrix4& m )
 	{
 		float c[16];
 		unsigned int idx;
@@ -109,7 +109,7 @@ public:
 		return *this;
 	}
 
-	CVector CMatrix4::Multiply ( const CVector& v )
+	CVector Multiply ( const CVector& v )
 	{
 		CVector ret;
 
@@ -120,19 +120,19 @@ public:
 		return ret;
 	}
 
-	CMatrix4 CMatrix4::operator * ( const CMatrix4& m ) const
+	CMatrix4 operator * ( const CMatrix4& m ) const
 	{
 		CMatrix4 c(*this);
 		c *= m;
 		return c;
 	}
 
-	float & CMatrix4::operator [] ( unsigned int i )
+	float & operator [] ( unsigned int i )
 	{
 		return m_cell[i];
 	}
 
-	float CMatrix4::operator [] ( unsigned int i ) const
+	float operator [] ( unsigned int i ) const
 	{
 		return m_cell[i];
 	}
