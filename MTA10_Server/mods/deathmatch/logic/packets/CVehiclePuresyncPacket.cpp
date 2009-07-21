@@ -44,7 +44,6 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             CControllerState ControllerState;
             if ( !ReadFullKeysync ( ControllerState, BitStream ) )
                 return false;
-            pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
 
             // Read out its position
             SPositionSync position ( false );
@@ -321,6 +320,16 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pVehicle->SetDerailed ( flags.data.bIsDerailed );
             }
 
+            // Read the vehicle_look_left and vehicle_look_right control states
+            // if it's an aircraft.
+            if ( flags.data.bIsAircraft )
+            {
+                ControllerState.LeftShoulder2 = BitStream.ReadBit () * 255;
+                ControllerState.RightShoulder2 = BitStream.ReadBit () * 255;
+            }
+
+            pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
+
             // Success
             return true;
         }
@@ -406,6 +415,8 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             flags.data.bIsOnGround           = pVehicle->IsOnGround ();
             flags.data.bIsInWater            = pVehicle->IsInWater ();
             flags.data.bIsDerailed           = pVehicle->IsDerailed ();
+            flags.data.bIsAircraft           = ( pVehicle->GetVehicleType () == VEHICLE_PLANE ||
+                                                 pVehicle->GetVehicleType () == VEHICLE_HELI );
             BitStream.Write ( &flags );
 
             // Weapon stuff not compressed yet
@@ -434,6 +445,14 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( uiSeat == 0 )
             {
                 WriteVehicleSpecific ( pVehicle, BitStream );
+            }
+
+            // Write vehicle_look_left and vehicle_look_right control states when
+            // it's an aircraft.
+            if ( flags.data.bIsAircraft )
+            {
+                BitStream.WriteBit ( ControllerState.LeftShoulder2 != 0 );
+                BitStream.WriteBit ( ControllerState.RightShoulder2 != 0 );
             }
 
             // Success

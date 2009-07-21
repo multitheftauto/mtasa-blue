@@ -41,19 +41,6 @@ SVehicleName VehicleNames [] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Li
 {"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {""}, {""}, {""}, {"Boxville Mission"}, 
 {""} };
 
-SVehicleName VehicleTypes [] = { {"Automobile"}, {"Plane"}, {"Bike"}, {"Helicopter"}, {"Boat"}, {"Train"}, {"Trailer"}, {"BMX"}, {"Monster Truck"}, {"Quad"} };
-
-unsigned char ucVehicleTypes [] = { 
-	0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
-	0, 0, 4, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 4, 3, 2, 5, 6, 0, 4, 4, 4, 0,
-	0, 0, 0, 0, 1, 2, 2, 2, 1, 3, 0, 0, 2, 3, 0, 9, 4, 4, 0, 0, 1, 0, 0, 0, 0, 7, 0, 0,
-	4, 0, 0, 3, 3, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 7, 7, 1,
-	1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1,
-	0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
-	0, 5, 5, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6
-};
-
 bool CVehicleNames::IsValidModel ( unsigned long ulModel )
 {
     return ( // Trains
@@ -102,12 +89,43 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
 
 const char* CVehicleNames::GetVehicleTypeName ( unsigned long ulModel )
 {
-	// Check whether the model is valid
-	if ( IsValidModel ( ulModel ) && ((ulModel-400) < sizeof(ucVehicleTypes)) )
-	{
-		int iVehicleType = ucVehicleTypes [ulModel - 400];
-		return VehicleTypes [iVehicleType].szName;
-	}
+    const char* pVehicleName = "";
+    switch ( CVehicleManager::GetVehicleType ( ulModel ) )
+    {
+        case VEHICLE_NONE:
+            pVehicleName = "Unknown";
+            break;
+        case VEHICLE_CAR:
+            pVehicleName = "Automobile";
+            break;
+        case VEHICLE_BOAT:
+            pVehicleName = "Boat";
+            break;
+        case VEHICLE_TRAIN:
+            pVehicleName = "Train";
+            break;
+        case VEHICLE_HELI:
+            pVehicleName = "Helicopter";
+            break;
+        case VEHICLE_PLANE:
+            pVehicleName = "Plane";
+            break;
+        case VEHICLE_BIKE:
+            pVehicleName = "Bike";
+            break;
+        case VEHICLE_MONSTERTRUCK:
+            pVehicleName = "Monster Truck";
+            break;
+        case VEHICLE_QUADBIKE:
+            pVehicleName = "Quad";
+            break;
+        case VEHICLE_BMX:
+            pVehicleName = "BMX";
+            break;
+        case VEHICLE_TRAILER:
+            pVehicleName = "Trailer";
+            break;
+    }
 	
-	return szVehicleNameEmpty;
+	return pVehicleName;
 }

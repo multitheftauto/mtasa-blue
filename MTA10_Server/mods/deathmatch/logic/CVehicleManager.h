@@ -41,6 +41,7 @@ public:
     bool                                Exists                      ( CVehicle* pVehicle );
 
     static bool                         IsValidModel                ( unsigned int uiVehicleModel );
+    static eVehicleType                 GetVehicleType              ( unsigned short usModel );
 	static bool							IsValidUpgrade				( unsigned short usUpgrade );
     static unsigned int                 GetMaxPassengers            ( unsigned int uiVehicleModel );
     static bool                         HasTurret                   ( unsigned int uiVehicleModel );
