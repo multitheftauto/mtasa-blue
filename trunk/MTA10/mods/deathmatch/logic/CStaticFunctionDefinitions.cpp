@@ -1971,7 +1971,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
 CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate )
 {
     if ( CClientVehicleManager::IsValidModel ( usModel ) )
-    {      
+    {
         CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel );
         if ( pVehicle )
         {

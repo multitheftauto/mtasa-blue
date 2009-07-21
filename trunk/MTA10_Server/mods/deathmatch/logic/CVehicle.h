@@ -97,6 +97,21 @@ enum eLights
 	MAX_LIGHTS
 };
 
+enum eVehicleType
+{
+    VEHICLE_NONE = 0,
+    VEHICLE_CAR,
+    VEHICLE_BOAT,
+    VEHICLE_TRAIN,
+    VEHICLE_HELI,
+    VEHICLE_PLANE,
+    VEHICLE_BIKE,
+    VEHICLE_MONSTERTRUCK,
+    VEHICLE_QUADBIKE,
+    VEHICLE_BMX,
+    VEHICLE_TRAILER
+};
+
 class CVehicle : public CElement
 {
     friend class CPlayer;
@@ -115,6 +130,8 @@ public:
     inline unsigned short           GetModel            ( void )                        { return m_usModel; };
     void                            SetModel            ( unsigned short usModel );
     bool                            HasValidModel       ( void );
+
+    eVehicleType                    GetVehicleType          ( void )                        { return m_eVehicleType; };
 
     inline const CVehicleColor&     GetColor                ( void )                        { return m_Color; };
     inline void                     SetColor                ( const CVehicleColor& Color )  { m_Color = Color; };
@@ -263,6 +280,7 @@ private:
     CPed*                           m_pOccupants [MAX_VEHICLE_SEATS];
 
     unsigned short                  m_usModel;
+    eVehicleType                    m_eVehicleType;
     CVector                         m_vecPosition;
     CVector                         m_vecRotationDegrees;
     CVector                         m_vecVelocity;

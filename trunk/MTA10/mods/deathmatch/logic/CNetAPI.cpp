@@ -1048,7 +1048,6 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     {
         ControllerState.ButtonCircle = 0;
     }
-    pPlayer->SetControllerState ( ControllerState );
 
     // Grab the vehicle seat the player is in. Only read out vehicle position stuff if he's the driver.
     unsigned int uiSeat = pPlayer->GetOccupiedVehicleSeat ();
@@ -1213,6 +1212,16 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     }
     pPlayer->SetDoingGangDriveby ( flags.data.bIsDoingGangDriveby );
 
+    // Read the vehicle_look_left and vehicle_look_right control states
+    // if it's an aircraft.
+    if ( flags.data.bIsAircraft )
+    {
+        ControllerState.LeftShoulder2 = BitStream.ReadBit () * 255;
+        ControllerState.RightShoulder2 = BitStream.ReadBit () * 255;
+    }
+
+    pPlayer->SetControllerState ( ControllerState );
+
     // Remember now as the last puresync time
     CVector vecPosition;
     pVehicle->GetPosition ( vecPosition );
@@ -1325,6 +1334,8 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     flags.data.bIsOnGround = pVehicle->IsOnGround ();
     flags.data.bIsInWater = pVehicle->IsInWater ();
     flags.data.bIsDerailed = pVehicle->IsDerailed ();
+    flags.data.bIsAircraft = ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
+                               pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI );
 
     // Write the flags
     BitStream.Write ( &flags );
@@ -1365,6 +1376,14 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     if ( uiSeat == 0 )
     {
         WriteFullVehicleSpecific ( pVehicle, BitStream );
+    }
+
+    // Write vehicle_look_left and vehicle_look_right control states when
+    // it's an aircraft.
+    if ( flags.data.bIsAircraft )
+    {
+        BitStream.WriteBit ( ControllerState.LeftShoulder2 != 0 );
+        BitStream.WriteBit ( ControllerState.RightShoulder2 != 0 );
     }
 
     // Write the sent position to the interpolator

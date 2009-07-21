@@ -2438,7 +2438,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                 {
                     std::string strValue ( pEqual + 1, pAnd - (pEqual + 1) );
                     Unescape ( strValue );
-                    if ( iKey + 1 > arguments.size () )
+                    if ( iKey + 1 > static_cast < int > ( arguments.size () ) )
                         arguments.resize ( iKey + 1 );
                     arguments [ iKey ] = strValue;
                 }
