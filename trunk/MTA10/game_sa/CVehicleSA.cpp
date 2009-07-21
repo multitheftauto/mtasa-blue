@@ -1164,16 +1164,30 @@ void CVehicleSA::SetHealth( FLOAT fHealth )
 
 void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
 {
-	DWORD dwFunc = FUNC_CPlane__SetGearUp;
-	if ( bLandingGearDown )
-		dwFunc = FUNC_CPlane__SetGearDown;
-
-	DWORD dwThis = (DWORD)this->GetInterface();
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunc
-	}
+    // This is the C code corresponding to the gta_sa
+    // asm code at address 0x6CB39A.
+    CVehicleSAInterface* pInterface = this->GetVehicleInterface ();
+    DWORD dwThis = (DWORD)pInterface;
+    float& fPosition = *(float *)( dwThis + 0x9CC );
+    float& fTimeStep = *(float *)( 0xB7CB5C );
+    float& flt_871904 = *(float *)( 0x871904 );
+    
+    if ( IsLandingGearDown () != bLandingGearDown )
+    {
+        // The following code toggles the landing gear direction
+        if ( fPosition == 0.0f )
+        {
+            *(DWORD *)(dwThis + 0x5A5) = 0x02020202;
+            fPosition += ( fTimeStep * flt_871904 );
+        }
+        else
+        {
+            if ( fPosition != 1.0f )
+                fPosition *= -1.0f;
+            else
+                fPosition = ( fTimeStep * flt_871904 ) - 1.0f;
+        }
+    }
 }
 
 float CVehicleSA::GetLandingGearPosition ( )
@@ -1191,7 +1205,7 @@ void CVehicleSA::SetLandingGearPosition ( float fPosition )
 bool CVehicleSA::IsLandingGearDown ( )
 {
 	DWORD dwThis = (DWORD)this->GetInterface();
-	if ( *(float *)(dwThis + 2508) == 0.0f )
+	if ( *(float *)(dwThis + 2508) <= 0.0f )
 		return true;
 	else
 		return false;
