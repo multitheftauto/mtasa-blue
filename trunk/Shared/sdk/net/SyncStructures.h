@@ -401,6 +401,58 @@ struct SPedRotationSync : public ISyncStructure
 
 //////////////////////////////////////////
 //                                      //
+//           Vehicle pure-sync          //
+//                                      //
+//////////////////////////////////////////
+struct SVehiclePuresyncFlags : public ISyncStructure
+{
+    enum { BITCOUNT = 8 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        bool bIsWearingGoggles : 1;
+        bool bIsDoingGangDriveby : 1;
+        bool bIsSirenOrAlarmActive : 1;
+        bool bIsSmokeTrailEnabled : 1;
+        bool bIsLandingGearDown : 1;
+        bool bIsOnGround : 1;
+        bool bIsInWater : 1;
+        bool bIsDerailed : 1;
+    } data;
+};
+
+
+struct SDrivebyDirectionSync : public ISyncStructure
+{
+    enum { BITCOUNT = 2 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucDirection : 2;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
 //       Unoccupied vehicle sync        //
 //                                      //
 //////////////////////////////////////////

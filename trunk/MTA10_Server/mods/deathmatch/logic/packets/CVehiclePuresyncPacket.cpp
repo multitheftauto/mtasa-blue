@@ -118,11 +118,13 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 CVehicle* pTowedByVehicle = pVehicle;
                 CVehicle* pTrailer = NULL;
                 ElementID TrailerID;
-                if ( !BitStream.ReadCompressed ( TrailerID ) )
+                bool bHasTrailer;
+                if ( !BitStream.ReadBit ( bHasTrailer ) )
                     return false;
 
-                while ( TrailerID != INVALID_ELEMENT_ID )
+                while ( bHasTrailer )
                 {
+                    BitStream.ReadCompressed ( TrailerID );
                     CElement* pElement = CElementIDs::GetElement ( TrailerID );
                     if ( pElement )
                         pTrailer = static_cast < CVehicle* > ( pElement );
@@ -198,8 +200,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                     pTowedByVehicle = pTrailer;
 
-                    if ( !BitStream.Read ( TrailerID ) )
-                        break;
+                    if ( BitStream.ReadBit ( bHasTrailer ) == false )
+                        return false;
                 }
 
                 // If there was a trailer before
@@ -267,20 +269,12 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetArmor ( fArmor );
 
             // Flags
-            unsigned char ucFlags;
-            if ( !BitStream.Read ( ucFlags ) )
+            SVehiclePuresyncFlags flags;
+            if ( !BitStream.Read ( &flags ) )
                 return false;
-            bool bWearingGoggles    = ( ucFlags & 0x01 ) ? true:false;
-            bool bDoingGangDriveby  = ( ucFlags & 0x02 ) ? true:false;
-            bool bSirenActive       = ( ucFlags & 0x04 ) ? true:false;
-            bool bSmokeTrail        = ( ucFlags & 0x08 ) ? true:false;
-            bool bLandingGearDown   = ( ucFlags & 0x10 ) ? true:false;
-            bool bOnGround          = ( ucFlags & 0x20 ) ? true:false;
-            bool bInWater           = ( ucFlags & 0x40 ) ? true:false;
-            bool bIsDerailed        = ( ucFlags & 0x80 ) ? true:false;
 
-            pSourcePlayer->SetWearingGoggles ( bWearingGoggles );
-            pSourcePlayer->SetDoingGangDriveby ( bDoingGangDriveby );            
+            pSourcePlayer->SetWearingGoggles ( flags.data.bIsWearingGoggles );
+            pSourcePlayer->SetDoingGangDriveby ( flags.data.bIsDoingGangDriveby );            
 
             // Weapon stuff no compressed yet
             // Current weapon slot
@@ -307,10 +301,10 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
                 // Read out the driveby direction
-                unsigned char ucDriveByDirection;
-                if ( !BitStream.Read ( ucDriveByDirection ) )
+                SDrivebyDirectionSync driveby;
+                if ( !BitStream.Read ( &driveby ) )
                     return false;
-                pSourcePlayer->SetDriveByDirection ( ucDriveByDirection );
+                pSourcePlayer->SetDriveByDirection ( driveby.data.ucDirection );
             }
 
             // Vehicle specific data if he's the driver
@@ -319,12 +313,12 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 ReadVehicleSpecific ( pVehicle, BitStream );
 
                 // Set vehicle specific stuff if he's the driver
-                pVehicle->SetSirenActive ( bSirenActive );
-                pVehicle->SetSmokeTrailEnabled ( bSmokeTrail );
-                pVehicle->SetLandingGearDown ( bLandingGearDown );
-                pVehicle->SetOnGround ( bOnGround );
-                pVehicle->SetInWater ( bInWater );
-                pVehicle->SetDerailed ( bIsDerailed );
+                pVehicle->SetSirenActive ( flags.data.bIsSirenOrAlarmActive );
+                pVehicle->SetSmokeTrailEnabled ( flags.data.bIsSmokeTrailEnabled );
+                pVehicle->SetLandingGearDown ( flags.data.bIsLandingGearDown );
+                pVehicle->SetOnGround ( flags.data.bIsOnGround );
+                pVehicle->SetInWater ( flags.data.bIsInWater );
+                pVehicle->SetDerailed ( flags.data.bIsDerailed );
             }
 
             // Success
@@ -403,18 +397,16 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( &armor );
 
             // Flags
-            unsigned char ucFlags = 0;
-            if ( pSourcePlayer->IsWearingGoggles () )   ucFlags |= 0x01;
-            if ( pSourcePlayer->IsDoingGangDriveby () ) ucFlags |= 0x02;
-            if ( pVehicle->IsSirenActive () )           ucFlags |= 0x04;
-            if ( pVehicle->IsSmokeTrailEnabled () )     ucFlags |= 0x08;
-            if ( pVehicle->IsLandingGearDown () )       ucFlags |= 0x10;
-            if ( pVehicle->IsOnGround () )              ucFlags |= 0x20;
-            if ( pVehicle->IsInWater () )               ucFlags |= 0x40;
-            if ( pVehicle->IsDerailed () )              ucFlags |= 0x80;
-
-            // Write the flags
-            BitStream.Write ( ucFlags );
+            SVehiclePuresyncFlags flags;
+            flags.data.bIsWearingGoggles     = pSourcePlayer->IsWearingGoggles ();
+            flags.data.bIsDoingGangDriveby   = pSourcePlayer->IsDoingGangDriveby ();
+            flags.data.bIsSirenOrAlarmActive = pVehicle->IsSirenActive ();
+            flags.data.bIsSmokeTrailEnabled  = pVehicle->IsSmokeTrailEnabled ();
+            flags.data.bIsLandingGearDown    = pVehicle->IsLandingGearDown ();
+            flags.data.bIsOnGround           = pVehicle->IsOnGround ();
+            flags.data.bIsInWater            = pVehicle->IsInWater ();
+            flags.data.bIsDerailed           = pVehicle->IsDerailed ();
+            BitStream.Write ( &flags );
 
             // Weapon stuff not compressed yet
             // Current weapon id
@@ -433,7 +425,9 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &aim );
 
                 // Write the driveby aim directoin
-                BitStream.Write ( pSourcePlayer->GetDriveByDirection () );
+                SDrivebyDirectionSync driveby;
+                driveby.data.ucDirection = pSourcePlayer->GetDriveByDirection ();
+                BitStream.Write ( &driveby );
             }
 
             // Vehicle specific data only if he's the driver
