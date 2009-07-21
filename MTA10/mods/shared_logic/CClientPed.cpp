@@ -4264,6 +4264,8 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
     if ( m_pPlayerPed )
     {
         // The ped is streamed in
+        UpdateTargetPosition ();
+
         GetPosition ( m_interp.pos.vecOrigin );
         m_interp.pos.vecOrigin -= vecOrigin;
         m_interp.pos.vecTarget = vecPosition;
