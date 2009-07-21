@@ -383,8 +383,19 @@ bool CNetAPI::IsSmallKeySyncNeeded ( CClientPed* pPlayerModel )
     pPlayerModel->GetControllerState ( ControllerState );
     pPlayerModel->GetLastControllerState ( LastControllerState );
 
+    bool bPlaneRudderSync = false;
+    CClientVehicle* pVehicle = pPlayerModel->GetOccupiedVehicle ();
+    if ( pVehicle && 
+         ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
+           pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI ) )
+    {
+        bPlaneRudderSync = ( ControllerState.LeftShoulder2 != LastControllerState.LeftShoulder2 ||
+                             ControllerState.RightShoulder2 != LastControllerState.RightShoulder2 );
+    }
+
     // Compare the parts we sync
-    return ( ControllerState.LeftShoulder1 != LastControllerState.LeftShoulder1 ||
+    return ( bPlaneRudderSync ||
+             ControllerState.LeftShoulder1 != LastControllerState.LeftShoulder1 ||
              ControllerState.RightShoulder1 != LastControllerState.RightShoulder1 ||
              ControllerState.ButtonSquare != LastControllerState.ButtonSquare ||
              ControllerState.ButtonCross != LastControllerState.ButtonCross ||
@@ -590,18 +601,25 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             ControllerState.ButtonCircle = 0;
         }
 
+        if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
+             pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI )
+        {
+            ControllerState.LeftShoulder2 = 255 * BitStream.ReadBit ();
+            ControllerState.RightShoulder2 = 255 * BitStream.ReadBit ();
+        }
+
         // Apply the new keysync data immediately
-        pPlayer->SetControllerState ( ControllerState );
         pPlayer->SetChoking ( false );
     }
     else
     {
         // null out the crouch key or it will conflict with the crouch syncing
         ControllerState.ShockButtonL = 0;
-        pPlayer->SetControllerState ( ControllerState );
         pPlayer->Duck ( flags.data.bIsDucked );   
         pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
+
+    pPlayer->SetControllerState ( ControllerState );
 
     // Increment keysync counter
     pPlayer->IncrementKeySync ();
@@ -685,6 +703,13 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
                 BitStream.Write ( ControllerState.RightStickX );
                 BitStream.Write ( ControllerState.RightStickY );
             }
+        }
+
+        if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
+             pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI )
+        {
+            BitStream.WriteBit ( ControllerState.LeftShoulder2 != 0 );
+            BitStream.WriteBit ( ControllerState.RightShoulder2 != 0 );
         }
     }
 }
