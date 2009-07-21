@@ -2744,6 +2744,7 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
     // Are we streamed in?
     if ( m_pVehicle )
     {
+        UpdateTargetPosition ();
 #if 0
         if ( HasTargetPosition () )
         {
@@ -2780,6 +2781,8 @@ void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulD
     // Are we streamed in?
     if ( m_pVehicle )
     {
+        UpdateTargetRotation ();
+
         GetRotationDegrees ( m_interp.rot.vecOrigin );
         m_interp.rot.vecTarget = vecRotation;
 
