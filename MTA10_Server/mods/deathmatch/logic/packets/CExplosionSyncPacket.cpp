@@ -30,11 +30,27 @@ CExplosionSyncPacket::CExplosionSyncPacket ( const CVector& vecPosition, unsigne
 
 bool CExplosionSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    return  ( BitStream.Read ( m_OriginID ) &&
-              BitStream.Read ( m_vecPosition.fX ) &&
-              BitStream.Read ( m_vecPosition.fY ) &&
-              BitStream.Read ( m_vecPosition.fZ ) &&
-              BitStream.Read ( m_ucType ) );
+    bool bHasOrigin;
+    if ( !BitStream.ReadBit ( bHasOrigin ) )
+        return false;
+
+    m_OriginID = INVALID_ELEMENT_ID;
+    if ( bHasOrigin && !BitStream.ReadCompressed ( m_OriginID ) )
+        return false;
+
+    SPositionSync position ( false );
+    if ( BitStream.Read ( &position ) )
+    {
+        SExplosionTypeSync explosionType;
+        if ( BitStream.Read ( &explosionType ) )
+        {
+            m_vecPosition = position.data.vecPosition;
+            m_ucType = explosionType.data.uiType;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -43,24 +59,34 @@ bool CExplosionSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     // Write the source player and latency if any. Otherwize 0
     if ( m_pSourceElement )
     {
+        BitStream.WriteBit ( true );
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.Write ( ID );
+        BitStream.WriteCompressed ( ID );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
         BitStream.WriteCompressed ( usLatency );
     }
     else
     {
-        BitStream.Write ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
-        BitStream.WriteCompressed ( static_cast < unsigned short > ( 0 ) );
+        BitStream.WriteBit ( false );
     }
 
+    if ( m_OriginID != INVALID_ELEMENT_ID )
+    {
+        BitStream.WriteBit ( true );
+        BitStream.WriteCompressed ( m_OriginID );
+    }
+    else
+        BitStream.WriteBit ( false );
+
     // Write position and type
-    BitStream.Write ( m_OriginID );
-    BitStream.Write ( m_vecPosition.fX );
-    BitStream.Write ( m_vecPosition.fY );
-    BitStream.Write ( m_vecPosition.fZ );
-    BitStream.Write ( m_ucType );
+    SPositionSync position ( false );
+    position.data.vecPosition = m_vecPosition;
+    BitStream.Write ( &position );
+
+    SExplosionTypeSync explosionType;
+    explosionType.data.uiType = m_ucType;
+    BitStream.Write ( &explosionType );
 
     return true;
 }

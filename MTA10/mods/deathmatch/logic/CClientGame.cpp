@@ -3931,29 +3931,33 @@ void CClientGame::Event_OnTransferComplete ( void )
 
 void CClientGame::SendExplosionSync ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin )
 {
-    CVector vecTruePosition = vecPosition;
+    SPositionSync position ( false );
+    position.data.vecPosition = vecPosition;
+
     // Create the bitstream
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
     {
         // Write our origin id
-        ElementID OriginID = INVALID_ELEMENT_ID;
         if ( pOrigin )
         {
-            OriginID = pOrigin->GetID ();
+            pBitStream->WriteBit ( true );
+            pBitStream->WriteCompressed ( pOrigin->GetID () );
 
             // Convert position
             CVector vecTemp;
             pOrigin->GetPosition ( vecTemp );
-            vecTruePosition -= vecTemp;
+            position.data.vecPosition -= vecTemp;
         }
-        pBitStream->Write ( OriginID );
+        else
+            pBitStream->WriteBit ( false );
 
         // Write the position and the type
-        pBitStream->Write ( vecTruePosition.fX );
-        pBitStream->Write ( vecTruePosition.fY );
-        pBitStream->Write ( vecTruePosition.fZ );
-        pBitStream->Write ( static_cast < unsigned char > ( Type ) );
+        pBitStream->Write ( &position );
+
+        SExplosionTypeSync explosionType;
+        explosionType.data.uiType = Type;
+        pBitStream->Write ( &explosionType );
 
         // Destroy it
         g_pNet->SendPacket ( PACKET_ID_EXPLOSION, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -3980,28 +3984,37 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
     if ( pBitStream )
     {
+        SPositionSync origin ( false );
         CClientEntity * pOriginSource = NULL;
         eWeaponType weaponType = pProjectile->GetWeaponType ();
         CClientEntity * pTarget = pProjectile->GetTargetEntity ();
-        CVector vecOrigin = *pProjectile->GetOrigin ();        
+        origin.data.vecPosition = *pProjectile->GetOrigin ();        
 
         // Is this a heatseaking missile with a target? sync it relative to the target
         if ( weaponType == WEAPONTYPE_ROCKET_HS && pTarget && !pTarget->IsLocalEntity () )
             pOriginSource = pTarget;
 
+        // Write the source of the projectile, if it has
         if ( pOriginSource )
         {
             CVector vecTemp;
             pOriginSource->GetPosition ( vecTemp );
-            vecOrigin -= vecTemp;
-        }
+            origin.data.vecPosition -= vecTemp;
 
-        ElementID OriginID = ( pOriginSource ) ? pOriginSource->GetID () : INVALID_ELEMENT_ID;  
-        pBitStream->Write ( OriginID );
-        pBitStream->Write ( vecOrigin.fX );
-        pBitStream->Write ( vecOrigin.fY );
-        pBitStream->Write ( vecOrigin.fZ );
-        pBitStream->Write ( ( unsigned char ) weaponType );
+            pBitStream->WriteBit ( true );
+            pBitStream->WriteCompressed ( pOriginSource->GetID () );
+        }
+        else
+            pBitStream->WriteBit ( false );
+
+        // Write the origin position
+        pBitStream->Write ( &origin );
+
+        // Write the creator weapon type
+        SWeaponTypeSync weaponTypeSync;
+        weaponTypeSync.data.ucWeaponType = static_cast < unsigned char > ( weaponType );
+        pBitStream->Write ( &weaponTypeSync );
+
         switch ( weaponType )
         {
             case WEAPONTYPE_GRENADE:
@@ -4009,30 +4022,35 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_MOLOTOV:
             case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
             {
-                CVector vecVelocity;
-                pProjectile->GetVelocity ( vecVelocity );
+                SFloatSync < 7, 17 > projectileForce;
+                projectileForce.data.fValue = pProjectile->GetForce ();
+                pBitStream->Write ( &projectileForce );
 
-                pBitStream->Write ( pProjectile->GetForce () );                
-                pBitStream->Write ( vecVelocity.fX );
-                pBitStream->Write ( vecVelocity.fY );
-                pBitStream->Write ( vecVelocity.fZ );
+                SVelocitySync velocity;
+                pProjectile->GetVelocity ( velocity.data.vecVelocity );
+                pBitStream->Write ( &velocity );
+
                 break;
             }
             case WEAPONTYPE_ROCKET:
             case WEAPONTYPE_ROCKET_HS:
-            {                
-                ElementID TargetID = ( pTarget ) ? pTarget->GetID () : INVALID_ELEMENT_ID;
-                CVector vecRotation, vecVelocity;
-                pProjectile->GetRotation ( vecRotation );
-                pProjectile->GetVelocity ( vecVelocity ); 
+            {
+                if ( pTarget )
+                {
+                    pBitStream->WriteBit ( true );
+                    pBitStream->WriteCompressed ( pTarget->GetID () );
+                }
+                else
+                    pBitStream->WriteBit ( false );
 
-                pBitStream->Write ( TargetID );                               
-                pBitStream->Write ( vecRotation.fX );
-                pBitStream->Write ( vecRotation.fY );
-                pBitStream->Write ( vecRotation.fZ );
-                pBitStream->Write ( vecVelocity.fX );
-                pBitStream->Write ( vecVelocity.fY );
-                pBitStream->Write ( vecVelocity.fZ );
+                SVelocitySync velocity;
+                pProjectile->GetVelocity ( velocity.data.vecVelocity ); 
+                pBitStream->Write ( &velocity );
+
+                SRotationRadiansSync rotation ( true );
+                pProjectile->GetRotation ( rotation.data.vecRotation );
+                pBitStream->Write ( &rotation );
+
                 break;
             }
             case WEAPONTYPE_FLARE:

@@ -220,7 +220,7 @@ private:
 
 //////////////////////////////////////////
 //                                      //
-//        Rotation Degrees              //
+//        Rotation Degrees and radians  //
 //                                      //
 // 2 bytes for each component           //
 //                                      //
@@ -268,6 +268,65 @@ struct SRotationDegreesSync : public ISyncStructure
             unsigned short usRx = static_cast < unsigned short > ( data.vecRotation.fX * ( 65536 / 360.f ) );
             unsigned short usRy = static_cast < unsigned short > ( data.vecRotation.fY * ( 65536 / 360.f ) );
             unsigned short usRz = static_cast < unsigned short > ( data.vecRotation.fZ * ( 65536 / 360.f ) );
+            bitStream.Write ( usRx );
+            bitStream.Write ( usRy );
+            bitStream.Write ( usRz );
+        }
+    }
+
+    struct
+    {
+        CVector vecRotation;
+    } data;
+
+private:
+    bool m_bUseFloats;
+};
+
+
+struct SRotationRadiansSync : public ISyncStructure
+{
+    SRotationRadiansSync ( bool bUseFloats = false ) : m_bUseFloats ( bUseFloats ) {}
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( m_bUseFloats )
+        {
+            return bitStream.Read ( data.vecRotation.fX ) &&
+                   bitStream.Read ( data.vecRotation.fY ) &&
+                   bitStream.Read ( data.vecRotation.fZ );
+        }
+        else
+        {
+            unsigned short usRx;
+            unsigned short usRy;
+            unsigned short usRz;
+
+            if ( bitStream.Read ( usRx ) && bitStream.Read ( usRy ) && bitStream.Read ( usRz ) )
+            {
+                data.vecRotation.fX = usRx * ( 6.283185307f / 65536.f );
+                data.vecRotation.fY = usRy * ( 6.283185307f / 65536.f );
+                data.vecRotation.fZ = usRz * ( 6.283185307f / 65536.f );
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        if ( m_bUseFloats )
+        {
+            bitStream.Write ( data.vecRotation.fX );
+            bitStream.Write ( data.vecRotation.fY );
+            bitStream.Write ( data.vecRotation.fZ );
+        }
+        else
+        {
+            unsigned short usRx = static_cast < unsigned short > ( data.vecRotation.fX * ( 65536 / 6.283185307f ) );
+            unsigned short usRy = static_cast < unsigned short > ( data.vecRotation.fY * ( 65536 / 6.283185307f ) );
+            unsigned short usRz = static_cast < unsigned short > ( data.vecRotation.fZ * ( 65536 / 6.283185307f ) );
             bitStream.Write ( usRx );
             bitStream.Write ( usRy );
             bitStream.Write ( usRz );
@@ -997,7 +1056,7 @@ private:
 
 //////////////////////////////////////////
 //                                      //
-//                Others                //
+//              Bodyparts               //
 //                                      //
 //////////////////////////////////////////
 struct SBodypartSync : public ISyncStructure
@@ -1032,6 +1091,13 @@ struct SBodypartSync : public ISyncStructure
     } data;
 };
 
+
+
+//////////////////////////////////////////
+//                                      //
+//           Vehicle damage             //
+//                                      //
+//////////////////////////////////////////
 template < unsigned int maxElements, unsigned int numBits >
 struct SVehiclePartStateSync : public ISyncStructure
 {
@@ -1217,6 +1283,113 @@ private:
     bool m_bSyncLights;
     bool m_bDeltaSync;
 };
+
+
+
+//////////////////////////////////////////
+//                                      //
+//           Explosion type             //
+//                                      //
+//////////////////////////////////////////
+struct SExplosionTypeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 4 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned int uiType : 4;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//           Map info flags             //
+//                                      //
+//////////////////////////////////////////
+struct SMapInfoFlagsSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        bool bShowNametags : 1;
+        bool bShowRadar : 1;
+        bool bCloudsEnabled : 1;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//           Fun bugs state             //
+//                                      //
+//////////////////////////////////////////
+struct SFunBugsStateSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        bool bQuickReload : 1;
+        bool bFastFire : 1;
+        bool bFastMove : 1;
+    } data;
+};
+
+
+
+//////////////////////////////////////////
+//                                      //
+//             Quit reasons             //
+//                                      //
+//////////////////////////////////////////
+struct SQuitReasonSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned int uiQuitReason : 3;
+    } data;
+};
+
 
 
 #pragma pack(pop)

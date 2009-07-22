@@ -690,16 +690,17 @@ void CPacketHandler::Packet_PlayerQuit ( NetBitStreamInterface& bitStream )
 
     // Read out the id
     ElementID PlayerID;
-    unsigned char ucReason;
-    if ( bitStream.Read ( PlayerID ) &&
-         bitStream.Read ( ucReason ) )
+    SQuitReasonSync quitReason;
+
+    if ( bitStream.ReadCompressed ( PlayerID ) &&
+         bitStream.Read ( &quitReason ) )
     {
         // Look up the player in the playermanager
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
         {
             // Quit him
-            CClientGame::eQuitReason Reason = static_cast < CClientGame::eQuitReason > ( ucReason );
+            CClientGame::eQuitReason Reason = static_cast < CClientGame::eQuitReason > ( quitReason.data.uiQuitReason );
             g_pClientGame->QuitPlayer ( pPlayer, Reason );
         }
     }
@@ -1803,9 +1804,10 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     }
 
     // Read out the sky color
-    unsigned char ucHasSkyGradient = 0;
-    bitStream.Read ( ucHasSkyGradient );
-    if ( ucHasSkyGradient )
+    bool bHasSkyGradient;
+    if ( !bitStream.ReadBit ( bHasSkyGradient ) )
+        return;
+    if ( bHasSkyGradient )
     {
         unsigned char ucTopRed, ucTopGreen, ucTopBlue = 0;
         unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue = 0;
@@ -1831,18 +1833,19 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     // Read and set minute duration
     unsigned long ulMinuteDuration;
-    bitStream.Read ( ulMinuteDuration );
+    bitStream.ReadCompressed ( ulMinuteDuration );
 
     g_pClientGame->SetMinuteDuration ( ulMinuteDuration );
 
     // Flags
-    unsigned char ucFlags;
-    bitStream.Read ( ucFlags );
+    SMapInfoFlagsSync flags;
+    if ( !bitStream.Read ( &flags ) )
+        return;
 
     // Extract the flags
-    g_pClientGame->m_bShowNametags = ( ucFlags & 0x01 ) ? true:false;
-    g_pClientGame->m_bShowRadar = ( ucFlags & 0x02 ) ? true:false;
-    g_pClientGame->m_bCloudsEnabled = ( ucFlags & 0x04 ) ? true:false;
+    g_pClientGame->m_bShowNametags  = flags.data.bShowNametags;
+    g_pClientGame->m_bShowRadar     = flags.data.bShowRadar;
+    g_pClientGame->m_bCloudsEnabled = flags.data.bCloudsEnabled;
    
     //Set Clouds
     g_pMultiplayer->SetCloudsEnabled( g_pClientGame->GetCloudsEnabled() ); 
@@ -1853,9 +1856,17 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pMultiplayer->SetGlobalGravity ( fGravity );
 
     // Read out the game speed
-    float fGameSpeed;
-    bitStream.Read ( fGameSpeed );
-    g_pClientGame->SetGameSpeed ( fGameSpeed );
+    bool bDefaultGamespeed;
+    if ( !bitStream.ReadBit ( bDefaultGamespeed ) )
+        return;
+    if ( bDefaultGamespeed )
+        g_pClientGame->SetGameSpeed ( 1.0f );
+    else
+    {
+        float fGameSpeed;
+        bitStream.Read ( fGameSpeed );
+        g_pClientGame->SetGameSpeed ( fGameSpeed );
+    }
 
     // Read out the wave height
     float fWaveHeight = 0;
@@ -1867,16 +1878,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( fWaterLevel != 0.0f )
         g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fWaterLevel ); 
 
-	short sFPSLimit = 36;
-	bitStream.Read ( sFPSLimit );
+	unsigned short usFPSLimit = 36;
+	bitStream.ReadCompressed ( usFPSLimit );
 
     unsigned int iVal;
     g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
 
-	if ( iVal > ( unsigned long ) sFPSLimit )
+	if ( iVal > ( unsigned long ) usFPSLimit )
     {
 		// For some reason it needs that kind of hacky precision
-		g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
+		g_pGame->SetFramelimiter ( (unsigned long) ( (float)usFPSLimit * 1.333f ) );
     }
 	else
     {
@@ -1888,21 +1899,23 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
-        unsigned char ucGarageState;
+        bool bGarageState;
         CGarage* pGarage = pGarages->GetGarage ( i );
 
-        bitStream.Read ( ucGarageState );
+        if ( !bitStream.ReadBit ( bGarageState ) )
+            return;
 
         if ( pGarage )
-        {
-            pGarage->SetOpen ( (ucGarageState == 1) );
-        }
+            pGarage->SetOpen ( bGarageState );
     }
-    unsigned char ucFunBugs;
-    bitStream.Read ( ucFunBugs );
-    g_pClientGame->m_Glitches[CClientGame::GLITCH_QUICKRELOAD] = ( ucFunBugs & 0x01 ) ? true:false;
-    g_pClientGame->m_Glitches[CClientGame::GLITCH_FASTFIRE] = ( ucFunBugs & 0x02 ) ? true:false;
-    g_pClientGame->m_Glitches[CClientGame::GLITCH_FASTMOVE] = ( ucFunBugs & 0x04 ) ? true:false;
+
+    // Fun bugs
+    SFunBugsStateSync funBugs;
+    if ( !bitStream.Read ( &funBugs ) )
+        return;
+    g_pClientGame->m_Glitches [ CClientGame::GLITCH_QUICKRELOAD ] = funBugs.data.bQuickReload;
+    g_pClientGame->m_Glitches [ CClientGame::GLITCH_FASTFIRE ]    = funBugs.data.bFastFire;
+    g_pClientGame->m_Glitches [ CClientGame::GLITCH_FASTMOVE ]    = funBugs.data.bFastMove;
 }
 
 
@@ -3310,7 +3323,7 @@ void CPacketHandler::Packet_EntityRemove ( NetBitStreamInterface& bitStream )
     // ElementID   (2)     - entity id
 
     ElementID ID;
-    while ( bitStream.Read ( ID ) )
+    while ( bitStream.ReadCompressed ( ID ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -3540,116 +3553,146 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
 {
-    // Read out the creator, latency, position and type
-    unsigned short usLatency;
-    ElementID CreatorID, OriginID;
-    CVector vecPosition;
-    unsigned char ucType;
-    if ( bitStream.Read ( CreatorID ) &&
-         bitStream.ReadCompressed ( usLatency ) &&
-         bitStream.Read ( OriginID ) &&
-         bitStream.Read ( vecPosition.fX ) &&
-         bitStream.Read ( vecPosition.fY ) &&
-         bitStream.Read ( vecPosition.fZ ) &&
-         bitStream.Read ( ucType ) )
+    // Read out the creator
+    bool bHasCreator;
+    if ( !bitStream.ReadBit ( bHasCreator ) )
+        return;
+
+    ElementID CreatorID = INVALID_ELEMENT_ID;
+    unsigned short usLatency = 0;
+    if ( bHasCreator && ( !bitStream.ReadCompressed ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
+        return;
+
+    // Read out the origin
+    bool bHasOrigin;
+    if ( !bitStream.ReadBit ( bHasOrigin ) )
+        return;
+
+    ElementID OriginID = INVALID_ELEMENT_ID;
+    if ( bHasOrigin && !bitStream.ReadCompressed ( OriginID ) )
+        return;
+
+    // Read out the position
+    SPositionSync position ( false );
+    if ( !bitStream.Read ( &position ) )
+        return;
+
+    // Read out the type
+    SExplosionTypeSync explosionType;
+    if ( !bitStream.Read ( &explosionType ) )
+        return;
+
+    // Ping compensation vars
+    CClientEntity * pMovedEntity = NULL;
+    CVector vecRestorePosition;
+
+    // Grab the creator if any (for kill credits)
+    CClientPlayer* pCreator = NULL;
+    if ( CreatorID != INVALID_ELEMENT_ID )
     {
-        // Ping compensation vars
-        CClientEntity * pMovedEntity = NULL;
-        CVector vecRestorePosition;
+        pCreator = g_pClientGame->m_pPlayerManager->Get ( CreatorID );
+    }
 
-        // Grab the creator if any (for kill credits)
-        CClientPlayer* pCreator = NULL;
-        if ( CreatorID != INVALID_ELEMENT_ID )
+    // Grab the true position if we have an origin source
+    CClientEntity * pOrigin = NULL;
+    if ( OriginID != INVALID_ELEMENT_ID )
+    {
+        pOrigin = CElementIDs::GetElement ( OriginID );
+        if ( pOrigin )
         {
-            pCreator = g_pClientGame->m_pPlayerManager->Get ( CreatorID );
-        }
-
-        // Grab the true position if we have an origin source
-        CClientEntity * pOrigin = NULL;
-        if ( OriginID != INVALID_ELEMENT_ID )
-        {
-            pOrigin = CElementIDs::GetElement ( OriginID );
-            if ( pOrigin )
+            // Is the origin a player element?
+            if ( pOrigin->GetType () == CCLIENTPLAYER )
             {
-                // Is the origin a player element?
-                if ( pOrigin->GetType () == CCLIENTPLAYER )
+                // Is he in a vehicle?
+                CClientVehicle * pVehicle = static_cast < CClientPlayer * > ( pOrigin )->GetOccupiedVehicle ();
+                if ( pVehicle )
                 {
-                    // Is he in a vehicle?
-                    CClientVehicle * pVehicle = static_cast < CClientPlayer * > ( pOrigin )->GetOccupiedVehicle ();
-                    if ( pVehicle )
-                    {
-                        // Use this as the origin instead
-                        pOrigin = pVehicle;
-                    }
+                    // Use this as the origin instead
+                    pOrigin = pVehicle;
                 }
-                CVector vecTemp;
-                pOrigin->GetPosition ( vecTemp );
-                vecPosition += vecTemp;
             }
+            CVector vecTemp;
+            pOrigin->GetPosition ( vecTemp );
+            position.data.vecPosition += vecTemp;
+        }
+    }
+    else
+    {
+        // * Ping compensation *
+        // Vehicle or player?
+        CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
+        if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
+            pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
+        if ( !pMovedEntity )
+            pMovedEntity = pLocalPlayer;
+
+        // Warp back in time to where we were when this explosion happened
+        unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
+        if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
+            usLatency = pCreator->GetLatency ();
+        CVector vecWarpPosition;
+        if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+        {
+            pMovedEntity->GetPosition ( vecRestorePosition );
+            pMovedEntity->SetPosition ( vecWarpPosition );
         }
         else
-        {
-            // * Ping compensation *
-            // Vehicle or player?
-            CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
-            if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
-                pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
-            if ( !pMovedEntity )
-                pMovedEntity = pLocalPlayer;
+            pMovedEntity = NULL;
+    }
 
-            // Warp back in time to where we were when this explosion happened
-            unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
-            if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
-                usLatency = pCreator->GetLatency ();
-            CVector vecWarpPosition;
-            if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+    eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
+    
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( position.data.vecPosition.fX );
+    Arguments.PushNumber ( position.data.vecPosition.fY );
+    Arguments.PushNumber ( position.data.vecPosition.fZ );
+    Arguments.PushNumber ( Type );
+	bool bCancelExplosion = false;
+    if ( pCreator )
+    {
+        bCancelExplosion = !pCreator->CallEvent ( "onClientExplosion", Arguments, true );
+    }
+    else
+    {
+        bCancelExplosion = !g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
+    }
+
+    // Is it a vehicle explosion?
+    if ( pOrigin && pOrigin->GetType () == CCLIENTVEHICLE )
+    {
+        switch ( Type )
+        {
+            case EXP_TYPE_BOAT:
+            case EXP_TYPE_CAR:
+            case EXP_TYPE_CAR_QUICK:
+            case EXP_TYPE_HELI:
             {
-                pMovedEntity->GetPosition ( vecRestorePosition );
-                pMovedEntity->SetPosition ( vecWarpPosition );
+                // Make sure the vehicle's blown
+                CClientVehicle * pExplodingVehicle = static_cast < CClientVehicle * > ( pOrigin );
+                pExplodingVehicle->Blow ( false );
+                if ( !bCancelExplosion )
+			        g_pClientGame->m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, position.data.vecPosition, pCreator, true, -1.0f, false, WEAPONTYPE_EXPLOSION );
+                break;
             }
-            else
-                pMovedEntity = NULL;
+            default:
+            {
+                if ( !bCancelExplosion )
+	        		g_pClientGame->m_pManager->GetExplosionManager ()->Create ( Type, position.data.vecPosition, pCreator );       
+                break;
+            }
         }
+    }
+    else
+    {
+        if ( !bCancelExplosion )
+			g_pClientGame->m_pManager->GetExplosionManager ()->Create ( Type, position.data.vecPosition, pCreator );       
+    }
 
-        eExplosionType explosionType = ( eExplosionType ) ucType;       
-
-        
-        CLuaArguments Arguments;
-        Arguments.PushNumber ( vecPosition.fX );
-        Arguments.PushNumber ( vecPosition.fY );
-        Arguments.PushNumber ( vecPosition.fZ );
-        Arguments.PushNumber ( explosionType );
-		bool bCancelExplosion = false;
-        if ( pCreator )
-        {
-            bCancelExplosion = !pCreator->CallEvent ( "onClientExplosion", Arguments, true );
-        }
-        else
-        {
-            bCancelExplosion = !g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
-        }
-
-        // Is it a vehicle explosion?
-        if ( pOrigin && pOrigin->GetType () == CCLIENTVEHICLE && ( ucType == EXP_TYPE_BOAT || ucType == EXP_TYPE_CAR || ucType == EXP_TYPE_CAR_QUICK || ucType == EXP_TYPE_HELI ) )
-        {            
-            // Make sure the vehicle's blown
-            CClientVehicle * pExplodingVehicle = static_cast < CClientVehicle * > ( pOrigin );
-            pExplodingVehicle->Blow ( false );
-            if ( !bCancelExplosion )
-				g_pClientGame->m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, pCreator, true, -1.0f, false, WEAPONTYPE_EXPLOSION );
-        }
-        else
-        {
-            if ( !bCancelExplosion )
-				g_pClientGame->m_pManager->GetExplosionManager ()->Create ( explosionType, vecPosition, pCreator );       
-        }
-
-        // If we moved an entity to ping compensate..
-        if ( pMovedEntity )
-        {
-            // Restore its position
-            pMovedEntity->SetPosition ( vecRestorePosition );
-        }
+    // If we moved an entity to ping compensate..
+    if ( pMovedEntity )
+    {
+        // Restore its position
+        pMovedEntity->SetPosition ( vecRestorePosition );
     }
 }
 
@@ -3684,104 +3727,136 @@ void CPacketHandler::Packet_FireSync ( NetBitStreamInterface& bitStream )
 
 void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
 {
-    // Read out the creator, latency, ...
-    ElementID CreatorID;
-    unsigned short usLatency;    
-    ElementID OriginID;
-    CVector vecOrigin;
-    unsigned char ucWeaponType;
-    if ( bitStream.Read ( CreatorID ) &&
-         bitStream.ReadCompressed ( usLatency ) &&
-         bitStream.Read ( OriginID ) &&         
-         bitStream.Read ( vecOrigin.fX ) &&
-         bitStream.Read ( vecOrigin.fY ) &&
-         bitStream.Read ( vecOrigin.fZ ) &&
-         bitStream.Read ( ucWeaponType ) )
+    // Read out the creator and latency
+    bool bHasCreator;
+    if ( !bitStream.ReadBit ( bHasCreator ) )
+        return;
+
+    ElementID CreatorID = INVALID_ELEMENT_ID;
+    unsigned short usLatency = 0;
+    if ( bHasCreator && ( !bitStream.ReadCompressed ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
+        return;
+
+    // Read out the origin element
+    bool bHasOrigin;
+    if ( !bitStream.ReadBit ( bHasOrigin ) )
+        return;
+
+    ElementID OriginID = INVALID_ELEMENT_ID;
+    if ( bHasOrigin && !bitStream.ReadCompressed ( OriginID ) )
+        return;
+
+    // Read out the origin position
+    SPositionSync origin ( false );
+    if ( !bitStream.Read ( &origin ) )
+        return;
+
+    // Read the creator weapon type
+    SWeaponTypeSync weaponTypeSync;
+    if ( !bitStream.Read ( &weaponTypeSync ) )
+        return;
+
+    CClientEntity* pCreator = NULL;
+    if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
+    if ( OriginID != INVALID_ELEMENT_ID )
     {
-        CClientEntity* pCreator = NULL;
-        if ( CreatorID != INVALID_ELEMENT_ID ) pCreator = CElementIDs::GetElement ( CreatorID );
-        if ( OriginID != INVALID_ELEMENT_ID )
+        CClientEntity* pOriginSource = CElementIDs::GetElement ( OriginID );
+        if ( pOriginSource )
         {
-            CClientEntity* pOriginSource = CElementIDs::GetElement ( OriginID );
-            if ( pOriginSource )
-            {
-                CVector vecTemp;
-                pOriginSource->GetPosition ( vecTemp );
-                vecOrigin += vecTemp;
-            }
+            CVector vecTemp;
+            pOriginSource->GetPosition ( vecTemp );
+            origin.data.vecPosition += vecTemp;
+        }
+    }
+
+    bool bCreateProjectile = false;
+
+    eWeaponType weaponType = static_cast < eWeaponType > ( weaponTypeSync.data.ucWeaponType );
+    float fForce = 0.0f;
+    CVector* pvecRotation = NULL;
+    CVector* pvecVelocity = NULL;
+    CClientEntity * pTargetEntity = NULL;
+    SVelocitySync velocity;
+    SRotationRadiansSync rotation ( true );
+
+    switch ( weaponType )
+    {
+        case WEAPONTYPE_GRENADE:
+        case WEAPONTYPE_TEARGAS:
+        case WEAPONTYPE_MOLOTOV:
+        case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
+        {
+            // Read the force
+            SFloatSync < 7, 17 > projectileForce;
+            if ( !bitStream.Read ( &projectileForce ) )
+                return;
+            fForce = projectileForce.data.fValue;
+
+            // Read the velocity
+            if ( !bitStream.Read ( &velocity ) )
+                return;
+            pvecVelocity = &( velocity.data.vecVelocity );
+            bCreateProjectile = true;
+
+            break;
         }
 
-        bool bCreateProjectile = false;
+        case WEAPONTYPE_ROCKET:
+        case WEAPONTYPE_ROCKET_HS:
+        {
+            CClientVehicle* pTargetVehicle = NULL;
 
-        eWeaponType weaponType = ( eWeaponType ) ucWeaponType;
-        float fForce = 0.0f;
-        CVector vecRotation, *pvecRotation = NULL;
-        CVector vecVelocity, *pvecVelocity = NULL;
-        CClientEntity * pTargetEntity = NULL;
-        switch ( weaponType )
-        {
-            case WEAPONTYPE_GRENADE:
-            case WEAPONTYPE_TEARGAS:
-            case WEAPONTYPE_MOLOTOV:
-            case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
+            // Read the target ID
+            bool bHasTarget;
+            if ( !bitStream.ReadBit ( bHasTarget ) )
+                return;
+
+            ElementID TargetID = INVALID_ELEMENT_ID;
+            if ( bHasTarget && !bitStream.ReadCompressed ( TargetID ) )
+                return;
+
+            // Read out the velocity
+            if ( !bitStream.Read ( &velocity ) )
+                return;
+            pvecVelocity = &( velocity.data.vecVelocity );
+
+            // Read out the rotation
+            if ( !bitStream.Read ( &rotation ) )
+                return;
+            pvecRotation = &( rotation.data.vecRotation );
+
+            if ( TargetID != INVALID_ELEMENT_ID )
             {
-                if ( bitStream.Read ( fForce ) &&                     
-                     bitStream.Read ( vecVelocity.fX ) &&
-                     bitStream.Read ( vecVelocity.fY ) &&
-                     bitStream.Read ( vecVelocity.fZ ) )
+                pTargetVehicle = g_pClientGame->m_pVehicleManager->Get ( TargetID );
+                if ( pTargetVehicle )
                 {
-                    pvecVelocity = &vecVelocity;
-                    bCreateProjectile = true;
+                    pTargetEntity = pTargetVehicle;
                 }
-                break;
             }
-            case WEAPONTYPE_ROCKET:
-            case WEAPONTYPE_ROCKET_HS:
-            {
-                CClientVehicle* pTargetVehicle = NULL;
-                ElementID TargetID = INVALID_ELEMENT_ID;
-                if ( bitStream.Read ( TargetID ) &&
-                     bitStream.Read ( vecRotation.fX ) &&
-                     bitStream.Read ( vecRotation.fY ) &&
-                     bitStream.Read ( vecRotation.fZ ) &&
-                     bitStream.Read ( vecVelocity.fX ) &&
-                     bitStream.Read ( vecVelocity.fY ) &&
-                     bitStream.Read ( vecVelocity.fZ ) )
-                {
-                    pvecRotation = &vecRotation;
-                    pvecVelocity = &vecVelocity;
-                    if ( TargetID != INVALID_ELEMENT_ID )
-                    {
-                        pTargetVehicle = g_pClientGame->m_pVehicleManager->Get ( TargetID );
-                        if ( pTargetVehicle )
-                        {
-                            pTargetEntity = pTargetVehicle;
-                        }
-                    }
-                    bCreateProjectile = true;
-                }
-                break;
-            }
-            case WEAPONTYPE_FLARE:
-            case WEAPONTYPE_FREEFALL_BOMB:
-                bCreateProjectile = true;
-                break;
+            bCreateProjectile = true;
+
+            break;
         }
-        if ( bCreateProjectile )
+        case WEAPONTYPE_FLARE:
+        case WEAPONTYPE_FREEFALL_BOMB:
+            bCreateProjectile = true;
+            break;
+    }
+
+    if ( bCreateProjectile )
+    {
+        if ( pCreator )
         {
-            if ( pCreator )
+            if ( pCreator->GetType () == CCLIENTPED || pCreator->GetType () == CCLIENTPLAYER )
             {
-                if ( pCreator->GetType () == CCLIENTPED || pCreator->GetType () == CCLIENTPLAYER )
-                {
-                    CClientVehicle * pVehicle = static_cast < CClientPed * > ( pCreator )->GetOccupiedVehicle ();
-                    if ( pVehicle ) pCreator = pVehicle;
-                }
-                
-                CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, vecOrigin, fForce, NULL, pTargetEntity );
-                if ( pProjectile )
-                {
-                    pProjectile->Initiate ( &vecOrigin, pvecRotation, pvecVelocity, 0 );
-                }
+                CClientVehicle * pVehicle = static_cast < CClientPed * > ( pCreator )->GetOccupiedVehicle ();
+                if ( pVehicle ) pCreator = pVehicle;
+            }
+            
+            CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, origin.data.vecPosition, fForce, NULL, pTargetEntity );
+            if ( pProjectile )
+            {
+                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, 0 );
             }
         }
     }
@@ -3860,7 +3935,7 @@ void CPacketHandler::Packet_LuaEvent ( NetBitStreamInterface& bitStream )
 {
     // Read out the event name length
     unsigned short usNameLength;
-    if ( bitStream.Read ( usNameLength ) )
+    if ( bitStream.ReadCompressed ( usNameLength ) )
     {
         // Error?
         if ( usNameLength > (MAX_EVENT_NAME_LENGTH - 1) )
@@ -3872,7 +3947,7 @@ void CPacketHandler::Packet_LuaEvent ( NetBitStreamInterface& bitStream )
         // Read out the name and the entity id
         char* szName = new char [ usNameLength + 1 ];
         ElementID EntityID;
-        if ( bitStream.Read ( szName, usNameLength ) && bitStream.Read ( EntityID ) )
+        if ( bitStream.Read ( szName, usNameLength ) && bitStream.ReadCompressed ( EntityID ) )
         {
             // Null-terminate it
             szName [ usNameLength ] = 0;
@@ -4135,22 +4210,19 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
     ElementID Player;
     unsigned short usLatency;
 
-    if ( bitStream.Read ( Player ) &&
+    if ( bitStream.ReadCompressed ( Player ) &&
          bitStream.ReadCompressed ( usLatency ) )
     {
         // Grab the player
-        if ( Player != INVALID_ELEMENT_ID )
+        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( Player );
+        if ( pPlayer )
         {
-            CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( Player );
-            if ( pPlayer )
+            // TODO: Ping compensate
+            
+            pPlayer->DestroySatchelCharges ();
+            if ( pPlayer->IsLocalPlayer () )
             {
-                // TODO: Ping compensate
-                
-                pPlayer->DestroySatchelCharges ();
-                if ( pPlayer->IsLocalPlayer () )
-                {
-                    pPlayer->RemoveWeapon ( WEAPONTYPE_DETONATOR );
-                }
+                pPlayer->RemoveWeapon ( WEAPONTYPE_DETONATOR );
             }
         }
     }

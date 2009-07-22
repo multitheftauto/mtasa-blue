@@ -70,7 +70,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_ucWeatherBlendingTo );
     BitStream.Write ( m_ucBlendedWeatherHour );
 
-    BitStream.Write ( ( unsigned char ) ( ( m_bHasSkyGradient ) ? 1 : 0 ) );
+    BitStream.WriteBit ( m_bHasSkyGradient );
     if ( m_bHasSkyGradient )
     {
         BitStream.Write ( m_ucSkyGradientTR );
@@ -85,38 +85,41 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_ucClockHour );
     BitStream.Write ( m_ucClockMin );
 
-    BitStream.Write ( m_ulMinuteDuration );
+    BitStream.WriteCompressed ( m_ulMinuteDuration );
 
-    // Gather the map flags
-    unsigned char ucFlags = 0;
-    if (m_bShowNametags)
-        ucFlags |= 0x1;
-    if (m_bShowRadar)
-        ucFlags |= 0x2;
-    if (m_bCloudsEnabled)
-        ucFlags |= 0x4;
     // Write the map flags
-    BitStream.Write ( ucFlags );
+    SMapInfoFlagsSync flags;
+    flags.data.bShowNametags  = m_bShowNametags;
+    flags.data.bShowRadar     = m_bShowRadar;
+    flags.data.bCloudsEnabled = m_bCloudsEnabled;
+    BitStream.Write ( &flags );
 
     // Write any other world conditions
     BitStream.Write ( m_fGravity );
-    BitStream.Write ( m_fGameSpeed );
+    if ( m_fGameSpeed == 1.0f )
+        BitStream.WriteBit ( true );
+    else
+    {
+        BitStream.WriteBit ( false );
+        BitStream.Write ( m_fGameSpeed );
+    }
     BitStream.Write ( m_fWaveHeight );
     BitStream.Write ( m_fWaterLevel );
 
-	BitStream.Write ( m_usFPSLimit );
+	BitStream.WriteCompressed ( m_usFPSLimit );
 
     // Write the garage states
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
-        BitStream.Write( (unsigned char)m_pbGarageStates[i] );
+        BitStream.WriteBit( static_cast < unsigned char > ( m_pbGarageStates[i] ) );
     }
 
-    unsigned char ucFunBugs = 0;
-    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKRELOAD)) ucFunBugs |= 0x1;
-    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTFIRE)) ucFunBugs |= 0x2;
-    if (g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE)) ucFunBugs |= 0x4;
-    BitStream.Write ( ucFunBugs );
+    // Write the fun bugs state
+    SFunBugsStateSync funBugs;
+    funBugs.data.bQuickReload = g_pGame->IsGlitchEnabled ( CGame::GLITCH_QUICKRELOAD );
+    funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
+    funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
+    BitStream.Write ( &funBugs );
 
     return true;
 }

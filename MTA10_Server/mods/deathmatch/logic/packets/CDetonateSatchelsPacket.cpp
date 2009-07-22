@@ -25,20 +25,16 @@ bool CDetonateSatchelsPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CDetonateSatchelsPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    // Write the source player and latency if any. Otherwize 0
+    // Write the source player and latency if any.
     if ( m_pSourceElement )
     {
-        ElementID ID = m_pSourceElement->GetID ();
-        BitStream.Write ( ID );
+        BitStream.WriteCompressed ( m_pSourceElement->GetID () );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
         BitStream.WriteCompressed ( usLatency );
     }
     else
-    {
-        BitStream.Write ( static_cast < ElementID > ( INVALID_ELEMENT_ID ) );
-        BitStream.WriteCompressed ( static_cast < unsigned short > ( 0 ) );
-    }
+        return false;
 
     return true;
 }

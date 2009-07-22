@@ -20,7 +20,7 @@
 class CExplosionSyncPacket : public CPacket
 {
 public:
-    enum
+    enum eExplosionType
     {
         EXPLOSION_GRENADE,
 	    EXPLOSION_MOLOTOV,
