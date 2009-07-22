@@ -1581,22 +1581,18 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode ();
-    BitStream.Write ( ( unsigned char ) ( ( bFixed ) ? 1 : 0 ) );
+    BitStream.WriteBit ( bFixed );
     if ( bFixed )
     {
         // Write our position
-        CVector vecPosition;
-        pCamera->GetPosition ( vecPosition );
-        BitStream.Write ( vecPosition.fX );
-        BitStream.Write ( vecPosition.fY );
-        BitStream.Write ( vecPosition.fZ );
+        SPositionSync position ( false );
+        pCamera->GetPosition ( position.data.vecPosition );
+        BitStream.Write ( &position );
 
         // Write our lookAt
-        CVector vecLookAt;
-        pCamera->GetTarget ( vecLookAt );
-        BitStream.Write ( vecLookAt.fX );
-        BitStream.Write ( vecLookAt.fY );
-        BitStream.Write ( vecLookAt.fZ );
+        SPositionSync lookAt ( false );
+        pCamera->GetTarget ( lookAt.data.vecPosition );
+        BitStream.Write ( &lookAt );
     }
     else
     {
@@ -1604,7 +1600,7 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
         CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
         if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();
 
-        BitStream.Write ( pPlayer->GetID () );
+        BitStream.WriteCompressed ( pPlayer->GetID () );
     }
 }
 
