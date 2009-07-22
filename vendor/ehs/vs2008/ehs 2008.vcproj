@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ehs"
 	ProjectGUID="{ECC4BA90-6AA5-4630-AEA9-F923FB633C7D}"
 	RootNamespace="ehs"
@@ -42,7 +42,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\pcre;..\..\pme;..\..\pthreads\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_LIB"
@@ -196,7 +196,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\..\pcre;..\..\pme;..\..\pthreads\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_LIB"

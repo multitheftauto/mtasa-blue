@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="lua5.1_dll"
 	ProjectGUID="{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
 	RootNamespace="lua5.1_dll"
@@ -128,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
 				PreprocessorDefinitions="FORCE_BUILD=3"
 				StringPooling="true"
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
 				PreprocessorDefinitions="FORCE_BUILD=3"
 				StringPooling="true"
