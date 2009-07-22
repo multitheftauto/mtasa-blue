@@ -22,8 +22,14 @@ CPlayerQuitPacket::CPlayerQuitPacket ( void )
 
 bool CPlayerQuitPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.Write ( m_PlayerID );
-    BitStream.Write ( m_ucQuitReason );
+    if ( m_PlayerID == INVALID_ELEMENT_ID )
+        return false;
+    BitStream.WriteCompressed ( m_PlayerID );
+
+    SQuitReasonSync quitReason;
+    quitReason.data.uiQuitReason = m_ucQuitReason;
+    BitStream.Write ( &quitReason );
+
     return true;
 }
 
