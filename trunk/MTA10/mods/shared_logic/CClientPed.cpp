@@ -1685,6 +1685,10 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                 CWeapon * newWeapon = GiveWeapon(weaponType, ammoInTotal);
                 newWeapon->SetAmmoInClip(ammoInClip);
                 newWeapon->SetAmmoTotal(ammoInTotal);
+
+                // Don't allow doing gang driveby while unarmed
+                if ( IsDoingGangDriveby () )
+                    SetDoingGangDriveby ( false );
             }
             else
             {

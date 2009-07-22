@@ -1163,63 +1163,67 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         }
     }
 
-    // Weapon stuff not compressed yet
-    // Current weapon id
-    unsigned char ucCurrentWeapon = 0;
-    BitStream.Read ( ucCurrentWeapon );
-    if ( ucCurrentWeapon != 0 )
+    if ( flags.data.bHasAWeapon )
     {
-        // Is the current weapon a goggle (44 or 45) or a camera (43), or detonator (40), don't apply the fire key
-        if ( ucCurrentWeapon == 44 || ucCurrentWeapon == 45 || ucCurrentWeapon == 43 || ucCurrentWeapon == 40 )
-        {
+        SWeaponSlotSync slot;
+        BitStream.Read ( &slot );
+
+        unsigned int uiSlot = slot.data.uiSlot;
+        CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
+
+        // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
+        if ( uiSlot == 11 || uiSlot == 12 || ( pWeapon && pWeapon->GetType () == 43 ) )
             ControllerState.ButtonCircle = 0;
-        }
 
-        // Read out the weapon ammo
-        unsigned short usWeaponAmmo;
-        BitStream.Read ( usWeaponAmmo );
-
-        float fWeaponRange = 1.6f;
-        // Valid current weapon id?
-        if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
+        if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            // Grab the current weapon the player has
-            CWeapon* pPlayerWeapon = pPlayer->GetWeapon ();
-            eWeaponType eCurrentWeapon = static_cast < eWeaponType > ( ucCurrentWeapon );
-            if ( ( pPlayerWeapon && pPlayerWeapon->GetType () != eCurrentWeapon ) || !pPlayerWeapon )
+
+            unsigned char ucCurrentWeapon = 0;
+            float fWeaponRange = 0.01f;
+            if ( pWeapon )
             {
-                pPlayerWeapon = pPlayer->GiveWeapon ( eCurrentWeapon, usWeaponAmmo );
+                ucCurrentWeapon = pWeapon->GetType ();
+                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+            }
+
+            // Read out the weapon ammo
+            SWeaponAmmoSync ammo ( ucCurrentWeapon, false, true );
+            BitStream.Read ( &ammo );
+            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
+
+            if ( pWeapon )
+            {
+                CWeapon* pPlayerWeapon = pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucCurrentWeapon ), usWeaponAmmo );
                 if ( pPlayerWeapon )
                 {
                     pPlayerWeapon->SetAsCurrentWeapon ();
+                    pPlayerWeapon->SetAmmoTotal ( 9999 );
+                    pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
                 }
             }
 
-            // Give it unlimited ammo and set the ammo in clip
-            if ( pPlayerWeapon )
-            {
-                pPlayerWeapon->SetAmmoTotal ( 9999 );
-                pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
-                fWeaponRange = pPlayerWeapon->GetInfo()->GetWeaponRange();
-            }
+            // Read out the aim directions
+            SWeaponAimSync aim ( fWeaponRange, true );
+            BitStream.Read ( &aim );
+
+            // Read out the driveby direction
+            SDrivebyDirectionSync driveby;
+            BitStream.Read ( &driveby );
+
+            // Set the aiming
+            pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, driveby.data.ucDirection, &aim.data.vecOrigin, false );
         }
-
-        // Read the weapon aim data
-        SWeaponAimSync aim ( fWeaponRange );
-        BitStream.Read ( &aim );
-
-        // Read out the driveby direction
-        SDrivebyDirectionSync driveby;
-        BitStream.Read ( &driveby );
-
-        // Set the aiming data
-        pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, driveby.data.ucDirection, &aim.data.vecOrigin, false );
+        else
+        {
+            pPlayer->SetCurrentWeaponSlot ( static_cast < eWeaponSlot > ( slot.data.uiSlot ) );
+        }
     }
     else
     {
         // Make him empty-handed
         pPlayer->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
     }
+
 
     // Read out vehicle specific data if he's the driver
     if ( uiSeat == 0 )
@@ -1349,6 +1353,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
 
+    // Get the player weapon
+    CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon();
+
     // Flags
     SVehiclePuresyncFlags flags;
     flags.data.bIsWearingGoggles = pPlayerModel->IsWearingGoggles ();
@@ -1361,40 +1368,38 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     flags.data.bIsDerailed = pVehicle->IsDerailed ();
     flags.data.bIsAircraft = ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
                                pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI );
+    flags.data.bHasAWeapon = ( pPlayerWeapon != NULL );
+
 
     // Write the flags
     BitStream.Write ( &flags );
 
-    // Weapon not compressed yet
-    // Grab the current weapon
-    CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon();
-    if ( pPlayerWeapon )
+    if ( flags.data.bHasAWeapon )
     {
-        // Write the weapon type
-        unsigned char ucWeaponSlot = static_cast < unsigned char > ( pPlayerWeapon->GetSlot () );
-        unsigned char ucWeaponType = static_cast < unsigned char > ( pPlayerWeapon->GetType () );
-        BitStream.Write ( ucWeaponSlot );
-        if ( ucWeaponType != 0 )
+        // Write the weapon slot
+        unsigned int uiSlot = pPlayerWeapon->GetSlot ();
+        SWeaponSlotSync slot;
+        slot.data.uiSlot = uiSlot;
+        BitStream.Write ( &slot );
+
+        if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-            // Write the ammo in clip
-            unsigned short usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
-            BitStream.Write ( usAmmoInClip );
+            // Write the ammo states
+            SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
+            ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+            BitStream.Write ( &ammo );
 
             // Sync aim data
-            SWeaponAimSync aim ( 0.0f );
-            pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget, NULL, NULL, &aim.data.fArm );
+            SWeaponAimSync aim ( 0.0f, true );
+            pPlayerModel->GetShotData ( &(aim.data.vecOrigin), &(aim.data.vecTarget), NULL, NULL, &(aim.data.fArm) );
             BitStream.Write ( &aim );
 
-            // Write the driveby direction
+            // Sync driveby direction
             CShotSyncData* pShotsyncData = g_pMultiplayer->GetLocalShotSyncData ();
             SDrivebyDirectionSync driveby;
-            driveby.data.ucDirection = pShotsyncData->m_cInVehicleAimDirection;
+            driveby.data.ucDirection = static_cast < unsigned char > ( pShotsyncData->m_cInVehicleAimDirection );
             BitStream.Write ( &driveby );
         }
-    }
-    else
-    {
-        BitStream.Write ( static_cast < unsigned char > ( 0 ) );
     }
 
     // Write vehicle specific stuff if we're driver
