@@ -230,7 +230,6 @@ void HOOK_VehicleCamTargetZTweak ();
 void HOOK_VehicleCamLookDir1 ();
 void HOOK_VehicleCamLookDir2 ();
 void HOOK_VehicleCamHistory ();
-void HOOK_VehicleCamColDetect ();
 void HOOK_VehicleCamUp ();
 void HOOK_VehicleCamEnd ();
 void HOOK_VehicleLookBehind ();
@@ -339,7 +338,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamLookDir1, (DWORD)HOOK_VehicleCamLookDir1, 5);
     HookInstall(HOOKPOS_VehicleCamLookDir2, (DWORD)HOOK_VehicleCamLookDir2, 6);
     HookInstall(HOOKPOS_VehicleCamHistory, (DWORD)HOOK_VehicleCamHistory, 6);
-    HookInstall(HOOKPOS_VehicleCamColDetect, (DWORD)HOOK_VehicleCamColDetect, 5);
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
@@ -3202,38 +3200,6 @@ void _declspec(naked) HOOK_VehicleCamHistory ()
 
 // ---------------------------------------------------
 
-CVector* _cdecl VehicleCamColDetect ( CVector* pvecTarget )
-{
-    // Hack for collision detection placing the camera too close to the car
-    // when using upside down gravity
-    static CVector vecAdjustedTarget;
-    if ( gravcam_matGravity.vUp.fZ < 0.0f )
-    {
-        vecAdjustedTarget = *pvecTarget + gravcam_matGravity.vUp;
-        return &vecAdjustedTarget;
-    }
-    else
-    {
-        return pvecTarget;
-    }
-}
-
-void _declspec(naked) HOOK_VehicleCamColDetect ()
-{
-    _asm
-    {
-        lea eax, [esp+0x48]
-        push eax
-        call VehicleCamColDetect
-        add esp, 4
-
-        push eax
-        jmp RETURN_VehicleCamColDetect
-    }
-}
-
-// ---------------------------------------------------
-
 void _cdecl VehicleCamUp ( DWORD dwCam )
 {
     // Calculates the up vector for the vehicle camera.
@@ -3324,10 +3290,8 @@ void _declspec(naked) HOOK_VehicleLookBehind ()
         mov [esp+0x34+4], ecx
         mov [esp+0x34+8], edx
 
-        mov eax, 0xB7CD68       // IgnoreEntity
-        mov [eax], ebx
-        mov eax, 0xB6F028       // NumExtraIgnoreEntities
-        mov [eax], 0
+        mov ds:[0xB7CD68], ebx  // IgnoreEntity
+        mov ds:[0xB6FC70], 0    // NumExtraIgnoreEntities
 
         mov eax, ebx            // pEntity
         jmp RETURN_VehicleLookBehind
