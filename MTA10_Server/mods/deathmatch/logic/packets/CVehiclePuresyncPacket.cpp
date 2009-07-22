@@ -275,36 +275,41 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetWearingGoggles ( flags.data.bIsWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( flags.data.bIsDoingGangDriveby );            
 
-            // Weapon stuff no compressed yet
-            // Current weapon slot
-            unsigned char ucCurrentWeaponSlot;
-            if ( !BitStream.Read ( ucCurrentWeaponSlot ) )
-                return false;
-            pSourcePlayer->SetWeaponSlot ( ucCurrentWeaponSlot );
-            unsigned char ucCurrentWeapon = pSourcePlayer->GetWeaponType ();
-            if ( ucCurrentWeapon != 0 )
+            // Weapon sync
+            if ( flags.data.bHasAWeapon )
             {
-                // Read out the ammo state
-                unsigned short usAmmoInClip;
-                if ( !BitStream.Read ( usAmmoInClip ) )
-                    return false;
-                pSourcePlayer->SetWeaponAmmoInClip ( usAmmoInClip );
-
-                // Read out aim data
-                SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
-                if ( !BitStream.Read ( &aim ) )
+                SWeaponSlotSync slot;
+                if ( !BitStream.Read ( &slot ) )
                     return false;
 
-                pSourcePlayer->SetAimDirection ( aim.data.fArm );
-                pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
-                pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
+                pSourcePlayer->SetWeaponSlot ( slot.data.uiSlot );
 
-                // Read out the driveby direction
-                SDrivebyDirectionSync driveby;
-                if ( !BitStream.Read ( &driveby ) )
-                    return false;
-                pSourcePlayer->SetDriveByDirection ( driveby.data.ucDirection );
+                if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
+                {
+                    // Read the ammo states
+                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
+                    if ( !BitStream.Read ( &ammo ) )
+                        return false;
+                    pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
+
+                    // Read aim data
+                    SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange (), true );
+                    if ( !BitStream.Read ( &aim ) )
+                        return false;
+                    pSourcePlayer->SetAimDirection ( aim.data.fArm );
+                    pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
+                    pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
+
+                    // Read the driveby direction
+                    SDrivebyDirectionSync driveby;
+                    if ( !BitStream.Read ( &driveby ) )
+                        return false;
+                    pSourcePlayer->SetDriveByDirection ( driveby.data.ucDirection );
+                }
             }
+            else
+                pSourcePlayer->SetWeaponSlot ( 0 );
+
 
             // Vehicle specific data if he's the driver
             if ( uiSeat == 0 )
@@ -405,6 +410,9 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             armor.data.fValue = pSourcePlayer->GetArmor ();
             BitStream.Write ( &armor );
 
+            // Weapon
+            unsigned char ucWeaponType = pSourcePlayer->GetWeaponType ();
+
             // Flags
             SVehiclePuresyncFlags flags;
             flags.data.bIsWearingGoggles     = pSourcePlayer->IsWearingGoggles ();
@@ -417,28 +425,36 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             flags.data.bIsDerailed           = pVehicle->IsDerailed ();
             flags.data.bIsAircraft           = ( pVehicle->GetVehicleType () == VEHICLE_PLANE ||
                                                  pVehicle->GetVehicleType () == VEHICLE_HELI );
+            flags.data.bHasAWeapon           = ( ucWeaponType != 0 );
             BitStream.Write ( &flags );
 
-            // Weapon stuff not compressed yet
-            // Current weapon id
-            unsigned char ucWeaponType = pSourcePlayer->GetWeaponType ();
-            BitStream.Write ( ucWeaponType );
-            if ( ucWeaponType != 0 )
+            // Write the weapon stuff
+            if ( flags.data.bHasAWeapon )
             {
-                // Write the ammo in clip
-                BitStream.Write ( pSourcePlayer->GetWeaponAmmoInClip () );
+                // Write the weapon slot
+                SWeaponSlotSync slot;
+                slot.data.uiSlot = pSourcePlayer->GetWeaponSlot ();
+                BitStream.Write ( &slot );
 
-                // Write the weapon aim data
-                SWeaponAimSync aim ( 0.0f );
-                aim.data.vecOrigin = pSourcePlayer->GetSniperSourceVector ();
-                pSourcePlayer->GetTargettingVector ( aim.data.vecTarget );
-                aim.data.fArm = pSourcePlayer->GetAimDirection ();
-                BitStream.Write ( &aim );
+                if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
+                {
+                    // Write the ammo states
+                    SWeaponAmmoSync ammo ( ucWeaponType, false, true );
+                    ammo.data.usAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
+                    BitStream.Write ( &ammo );
 
-                // Write the driveby aim directoin
-                SDrivebyDirectionSync driveby;
-                driveby.data.ucDirection = pSourcePlayer->GetDriveByDirection ();
-                BitStream.Write ( &driveby );
+                    // Sync aim data
+                    SWeaponAimSync aim ( 0.0f, true );
+                    aim.data.vecOrigin = pSourcePlayer->GetSniperSourceVector ();
+                    pSourcePlayer->GetTargettingVector ( aim.data.vecTarget );
+                    aim.data.fArm = pSourcePlayer->GetAimDirection ();
+                    BitStream.Write ( &aim );
+
+                    // Sync driveby direction
+                    SDrivebyDirectionSync driveby;
+                    driveby.data.ucDirection = pSourcePlayer->GetDriveByDirection ();
+                    BitStream.Write ( &driveby );
+                }
             }
 
             // Vehicle specific data only if he's the driver

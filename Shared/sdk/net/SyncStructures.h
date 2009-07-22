@@ -406,7 +406,7 @@ struct SPedRotationSync : public ISyncStructure
 //////////////////////////////////////////
 struct SVehiclePuresyncFlags : public ISyncStructure
 {
-    enum { BITCOUNT = 9 };
+    enum { BITCOUNT = 10 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -428,6 +428,7 @@ struct SVehiclePuresyncFlags : public ISyncStructure
         bool bIsInWater : 1;
         bool bIsDerailed : 1;
         bool bIsAircraft : 1;
+        bool bHasAWeapon : 1;
     } data;
 };
 
