@@ -10,7 +10,9 @@ BUILT_SOURCES = Makefile.files
 Makefile.files: Makefile.am
 	@echo Generating Makefile.files
 	echo UTILS = `ls --quoting-style=literal --format=horizontal \
+		$(srcdir)/utils/*.c \
 		$(srcdir)/utils/*.cpp \
+		$(srcdir)/utils/zip/*.c \
 		$(srcdir)/utils/zip/*.cpp \
 	` > $(srcdir)/Makefile.files
 	echo LOGIC = `ls --quoting-style=literal --format=horizontal \
@@ -20,7 +22,7 @@ Makefile.files: Makefile.am
 		$(srcdir)/logic/packets/*.cpp \
 	` >> $(srcdir)/Makefile.files
 
--include $(srcdir)/Makefile.files
+include $(srcdir)/Makefile.files
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES += StdInc.h.gch
