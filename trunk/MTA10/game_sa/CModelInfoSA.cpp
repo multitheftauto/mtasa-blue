@@ -535,6 +535,19 @@ void CModelInfoSA::RestreamIPL ()
         {
             CEntitySAInterface* pEntity = (CEntitySAInterface *)pSectorEntry [ 0 ];
 
+            // Possible bug - pEntity seems to be invalid here occasionally
+            if ( pEntity->vtbl->DeleteRwObject != 0x00534030 )
+            {
+                // Log info
+                OutputDebugString ( SString ( "Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex, i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols ) );
+                // Assert in debug
+                #if _DEBUG
+                    assert ( pEntity->vtbl->DeleteRwObject == 0x00534030 );
+                #endif
+                pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
+                continue;
+            }
+
             if ( pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () == usTxdID )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
