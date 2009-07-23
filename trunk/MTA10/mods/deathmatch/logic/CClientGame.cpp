@@ -3297,8 +3297,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
-    if ( pInflictor )
-        pInflictingEntity = m_pManager->FindEntity ( pInflictor );
+    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor );
 
     // If the damage was caused by an explosion
     if ( weaponUsed == WEAPONTYPE_EXPLOSION )
@@ -3306,8 +3305,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         CClientEntity * pLastExplosionCreator = m_pManager->GetExplosionManager ()->m_pLastCreator;
         
         // If we don't have an inflictor, look for the last explosion creator
-        if ( !pInflictor && pLastExplosionCreator )
-            pInflictingEntity = pLastExplosionCreator;
+        if ( !pInflictor && pLastExplosionCreator ) pInflictingEntity = pLastExplosionCreator;
         
         // Change the weapon used to whatever created the explosion
         weaponUsed = m_pManager->GetExplosionManager ()->m_LastWeaponType;
@@ -3330,54 +3328,52 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             if ( !pDamagedPed->IsLocalPlayer () )
             {  
                 // Don't allow GTA to start the choking task
-                if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN ||
-                    weaponUsed == WEAPONTYPE_EXTINGUISHER )
-                {
+                if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER )
                     return false;
-                }
 
             }
 
-            // Do we have an inflicting player?
+            // Do we have an inflicting entity?
             if ( pInflictingEntity )
             {
-                CClientPlayer * pInflictingPlayer;
-                if ( pInflictingEntity->GetType () == CCLIENTPLAYER ) {
-                    pInflictingPlayer = static_cast < CClientPlayer * > ( pInflictingEntity );
+                // Grab the inflicting player
+                CClientPlayer * pInflictingPlayer = NULL;
+
+                switch ( pInflictingEntity->GetType () )
+                {
+                    case CCLIENTPLAYER:
+                    {
+                        pInflictingPlayer = static_cast < CClientPlayer * > ( pInflictingEntity );                        
+                        break;
+                    }
+                    case CCLIENTVEHICLE:
+                    {
+                        CClientVehicle * pInflictingVehicle = static_cast < CClientVehicle * > ( pInflictingEntity );
+                        if ( pInflictingVehicle && pInflictingVehicle->GetControllingPlayer () )
+                        {
+                            CClientPed * pPed = static_cast < CClientPed * > ( pInflictingVehicle->GetControllingPlayer() );
+                            if ( pPed && pPed->GetType () == CCLIENTPLAYER )
+                                pInflictingPlayer = static_cast < CClientPlayer * > ( pPed );
+                        }
+                        break;
+                    }
+                    default: break;
+                }
+                if ( pInflictingPlayer )
+                {
                     // Is the damaged player on a team
                     CClientTeam* pTeam = pDamagedPlayer->GetTeam ();
                     if ( pTeam )
                     {
                         // Is this friendly-fire from a team-mate?
                         if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
-                        {
                             return false;
-                        }
-                    }
-                }
-                if ( pInflictingEntity->GetType () == CCLIENTVEHICLE ) {
-                    CClientVehicle * pVehicle = static_cast < CClientVehicle * > ( pInflictingEntity );
-                    if ( pVehicle && pVehicle->GetControllingPlayer() ) {
-                        CClientPed * pPed = static_cast < CClientPed * > ( pVehicle->GetControllingPlayer() );
-                        if ( pPed && pPed->GetType() == CCLIENTPLAYER ) {
-                            pInflictingPlayer = static_cast < CClientPlayer * > ( pPed );
-                            // Is the damaged player on a team
-                            CClientTeam* pTeam = pDamagedPlayer->GetTeam ();
-                            if ( pTeam )
-                            {
-                                // Is this friendly-fire from a team-mate?
-                                if ( pDamagedPlayer->IsOnMyTeam ( pInflictingPlayer ) && !pTeam->GetFriendlyFire () && pDamagedPlayer != pInflictingPlayer )
-                                {
-                                    return false;
-                                }
-                            }
-                        }
                     }
                 }
             }
         }               
         // Have we taken any damage here?
-        if ( (fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor) && fDamage != 0.0f )
+        if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor) && fDamage != 0.0f )
         {
             CLuaArguments Arguments;
             if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
@@ -3387,7 +3383,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             Arguments.PushNumber ( fDamage );
 
             // Call our event
-            if ( ( IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER(pDamagedPed) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
+            if ( ( IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
             {
                 // Stop here if they cancelEvent it
                 pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
@@ -3410,12 +3406,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
-                return bAllowDamageAnim;	    // Play animation if allowed
+
+                // Stop here if we arent allowing the animation
+                if ( !bAllowDamageAnim ) return false;
             }
 
             // Update our stored health/armor
             pDamagedPed->m_fHealth = fCurrentHealth;
             pDamagedPed->m_fArmor = fCurrentArmor;
+
             // Is it the local player?
             if ( pDamagedPed->IsLocalPlayer () )
             {  
@@ -3425,8 +3424,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_pDamageEntity = pInflictingEntity;
                 m_ulDamageTime = CClientTime::GetTime ();
                 m_DamagerID = INVALID_ELEMENT_ID;
-                if ( pInflictingEntity )
-                    m_DamagerID = pInflictingEntity->GetID ();
+                if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
                 m_bDamageSent = false;
             }
             if ( pDamagedPed->GetType () == CCLIENTPED )
@@ -3453,14 +3451,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     }
 
                     // Allow GTA to kill us if we've fell to our death
-                    if ( pDamagedPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL )
-                        return true;
+                    if ( pDamagedPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL ) return true;
                     
                     // Don't let GTA start the death task
                     return false;            
                 }
-                else {
-                    if (pDamagedPed->IsLocalEntity() && fPreviousHealth > 0.0f) {
+                else
+                {
+                    if ( pDamagedPed->IsLocalEntity () && fPreviousHealth > 0.0f )
+                    {
                         pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
@@ -3468,31 +3467,28 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
                         return true;
                     }
-                    if (fPreviousHealth > 0.0f) {
+                    if ( fPreviousHealth > 0.0f )
+                    {
                         // Grab our death animation
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
                         m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
-                        if (pInflictingEntity)
-                            m_DamagerID = pInflictingEntity->GetID ();
+                        if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+
                         // Check if we're dead
                         SendPedWastedPacket ( pDamagedPed, m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );
                     }
                 }
             }
             // Inhibit hit-by-gun animation for local player if required
-            if ( pDamagedPed->IsLocalPlayer () && !bAllowDamageAnim )
-            {
-                return false;	    // No animation
-            }
+            if ( pDamagedPed->IsLocalPlayer () && !bAllowDamageAnim ) return false;
         }
     }
 
     // No damage anim for fire
-    if ( weaponUsed == WEAPONTYPE_FLAMETHROWER )
-        return false;
+    if ( weaponUsed == WEAPONTYPE_FLAMETHROWER ) return false;
     
     // Allow the damage to register
     return true;
