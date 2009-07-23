@@ -105,7 +105,7 @@ void CTransferBox::SetInfoSingleDownload ( const char* szFileName, double dDownl
     SString strBuffer ( "Download Progress: %s of %s", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
 	m_pWindow->SetText ( strBuffer );
 
-    m_pProgress->SetProgress ( (dDownloadSizeNow / m_dTotalSize) );
+    m_pProgress->SetProgress ( static_cast < float > (dDownloadSizeNow / m_dTotalSize) );
 }
 
 void CTransferBox::SetInfoMultipleDownload ( double dDownloadSizeNow, double dDownloadSizeTotal, int iDownloadsRemaining, int iDownloadsTotal )
@@ -113,7 +113,7 @@ void CTransferBox::SetInfoMultipleDownload ( double dDownloadSizeNow, double dDo
     SString strBuffer ( "Download Progress: %.2fMB of %.2fMB", (float) ( dDownloadSizeNow / 1048576.0 ), (float) ( dDownloadSizeTotal / 1048576.0 ) );
 	m_pWindow->SetText ( strBuffer );
 
-    m_pProgress->SetProgress ( (dDownloadSizeNow / dDownloadSizeTotal) );
+    m_pProgress->SetProgress ( static_cast < float > (dDownloadSizeNow / dDownloadSizeTotal) );
 }
 
 void CTransferBox::DoPulse ( void )

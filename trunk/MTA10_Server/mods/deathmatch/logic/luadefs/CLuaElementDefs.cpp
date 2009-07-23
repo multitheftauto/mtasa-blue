@@ -1145,13 +1145,10 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
             const char* szName = lua_tostring ( luaVM, 2 );
             bool bSynchronize = true;
             CLuaArgument Variable;
-            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN && lua_type ( luaVM, 4 ) != LUA_TNONE )
-            {
-                bSynchronize = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
-                Variable.Read ( luaVM, 4 );
-            }
-            else
-                Variable.Read ( luaVM, 3 );
+            Variable.Read ( luaVM, 3 );
+
+            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+                bSynchronize = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
 
             if ( pElement )
             {

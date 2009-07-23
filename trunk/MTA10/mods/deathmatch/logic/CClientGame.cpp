@@ -1594,7 +1594,7 @@ void CClientGame::UpdatePlayerWeapons ( void )
             unsigned short usAmmoInClip = 0;
             CWeapon* pWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
             if ( pWeapon )
-                usAmmoInClip = pWeapon->GetAmmoInClip ();
+                usAmmoInClip = static_cast < unsigned short > ( pWeapon->GetAmmoInClip () );
 
             // Force it back to the old slot
             m_pLocalPlayer->SetCurrentWeaponSlot ( m_lastWeaponSlot );
@@ -1635,8 +1635,8 @@ void CClientGame::UpdatePlayerWeapons ( void )
                 if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
                 {
                     SWeaponAmmoSync ammo ( pWeapon->GetType (), true, true );
-                    ammo.data.usAmmoInClip = pWeapon->GetAmmoInClip ();
-                    ammo.data.usTotalAmmo = pWeapon->GetAmmoTotal ();
+                    ammo.data.usAmmoInClip = static_cast < unsigned short > ( pWeapon->GetAmmoInClip () );
+                    ammo.data.usTotalAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoTotal () );
                     BitStream.Write ( &ammo );
                 }
             }

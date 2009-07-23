@@ -383,6 +383,8 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
         }
     }
 	catch ( CEGUI::Exception ) {}
+
+    return 0;
 }
 
 void CGUIGridList_Impl::SetColumnSegmentSizingEnabled (int hColumn, bool bEnabled)

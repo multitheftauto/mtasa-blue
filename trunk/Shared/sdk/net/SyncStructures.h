@@ -1655,4 +1655,32 @@ struct SOverrideLightsSync : public ISyncStructure
         unsigned char ucOverride : 2;
     } data;
 };
+
+
+//////////////////////////////////////////
+//                                      //
+//              Lua types               //
+//                                      //
+//////////////////////////////////////////
+struct SLuaTypeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 4 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucType : 4;
+    } data;
+};
+
+
+
 #pragma pack(pop)

@@ -488,13 +488,13 @@ bool CLuaArgument::GetAsString ( char * szBuffer, unsigned int uiLength )
 bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     DeleteTableData ();
+    SLuaTypeSync type;
 
     // Read out the type
-    unsigned char cType = 0;
-	if ( bitStream.Read ( cType ) )
+	if ( bitStream.Read ( &type ) )
 	{
         // Depending on what type...
-		switch ( cType )
+		switch ( type.data.ucType )
 		{
             // Nil type
             case LUA_TNIL:
@@ -506,20 +506,28 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             // Boolean type
 			case LUA_TBOOLEAN:
 			{
-				unsigned char ucValue;
-				if ( bitStream.Read ( ucValue ) )
-					Read((ucValue==1));
+				bool bValue;
+				if ( bitStream.ReadBit ( bValue ) )
+					Read(bValue);
 				break;
 			}
 
             // Number type
 			case LUA_TNUMBER:
 			{
-				float fNum;
-				if ( bitStream.Read ( fNum ) )
-				{
-					Read ( ( double ) fNum );
-				}
+                bool bIsFloatingPoint;
+                if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
+                {
+                    float fNum;
+                    if ( bitStream.Read ( fNum ) )
+                        Read ( (double) fNum );
+                }
+                else
+                {
+                    long lNum;
+                    if ( bitStream.ReadCompressed ( lNum ) )
+                        Read ( (double) lNum );
+                }
 				break;
 			}
 
@@ -536,7 +544,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             case LUA_TTABLEREF:
             {
                 unsigned long ulTableRef;
-                if ( bitStream.Read ( ulTableRef ) )
+                if ( bitStream.ReadCompressed ( ulTableRef ) )
                 {
                     if ( pKnownTables && ulTableRef < pKnownTables->size () )
                     {
@@ -553,7 +561,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 			{
                 // Read out the string length
 				unsigned short usLength;
-				if ( bitStream.Read ( usLength ) && usLength )
+				if ( bitStream.ReadCompressed ( usLength ) && usLength )
 				{
                     // Allocate a buffer and read the string into it
                     char* szValue = new char [ usLength + 1 ];
@@ -577,7 +585,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 			case LUA_TLIGHTUSERDATA:
 			{
 				ElementID ElementID;
-				if ( bitStream.Read ( ElementID ) )
+				if ( bitStream.ReadCompressed ( ElementID ) )
 				{
 					CElement * element = CElementIDs::GetElement ( ElementID );
 					Read ( element );
@@ -592,22 +600,26 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
 
 bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
+    SLuaTypeSync type;
+
     switch ( GetType () )
     {
         // Nil type
         case LUA_TNIL:
         {
-            bitStream.Write ( (unsigned char)LUA_TNIL );
+            type.data.ucType = LUA_TNIL;
+            bitStream.Write ( &type );
             break;
         }
 
         // Boolean type
         case LUA_TBOOLEAN:
         {
-			bitStream.Write ( (unsigned char)LUA_TBOOLEAN );
+            type.data.ucType = LUA_TBOOLEAN;
+			bitStream.Write ( &type );
 
             // Write the boolean to it
-            bitStream.Write ( static_cast < unsigned char > ( GetBoolean () ? 1 : 0 ) );
+            bitStream.WriteBit ( GetBoolean () );
             break;
         }
 
@@ -617,12 +629,14 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
             if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
             {
                 // Self-referencing table
-                bitStream.Write ( (unsigned char)LUA_TTABLEREF );
-                bitStream.Write ( pKnownTables->find ( m_pTableData )->second );
+                type.data.ucType = LUA_TTABLEREF;
+                bitStream.Write ( &type );
+                bitStream.WriteCompressed ( pKnownTables->find ( m_pTableData )->second );
             }
             else
             {
-                bitStream.Write ( (unsigned char)LUA_TTABLE );
+                type.data.ucType = LUA_TTABLE;
+                bitStream.Write ( &type );
 
                 // Write the subtable to the bitstream
                 m_pTableData->WriteToBitStream ( bitStream, pKnownTables );
@@ -633,8 +647,24 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         // Number argument?
         case LUA_TNUMBER:
         {
-            bitStream.Write ( (unsigned char)LUA_TNUMBER );
-			bitStream.Write ( static_cast < float > ( GetNumber () ) );
+            type.data.ucType = LUA_TNUMBER;
+            bitStream.Write ( &type );
+            float fNumber = static_cast < float > ( GetNumber () );
+            long lNumber = static_cast < long > ( fNumber );
+            float fNumberInteger = static_cast < float > ( lNumber );
+
+            // Check if the number is an integer and can fit a long datatype
+            if ( fabs ( fNumber ) > fabs ( fNumberInteger + 1 ) ||
+                 fabs ( fNumber - fNumberInteger ) >= FLOAT_EPSILON )
+            {
+                bitStream.WriteBit ( true );
+                bitStream.Write ( fNumber );
+            }
+            else
+            {
+                bitStream.WriteBit ( false );
+                bitStream.WriteCompressed ( lNumber );
+            }
             break;
         }
 
@@ -648,10 +678,11 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
 			if ( sizeTemp == usLength )
 			{
                 // This is a string argument
-			    bitStream.Write ( ( unsigned char ) LUA_TSTRING );
+                type.data.ucType = LUA_TSTRING;
+			    bitStream.Write ( &type );
 
                 // Write its length
-				bitStream.Write ( usLength );
+				bitStream.WriteCompressed ( usLength );
 
                 // Write the content too if it's not empty
                 if ( usLength > 0 )
@@ -665,7 +696,8 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 LogUnableToPacketize ( "Couldn't packetize argument list. Invalid string specified, limit is 65535 characters." );
 
                 // Write a nil though so other side won't get out of sync
-                bitStream.Write ( (unsigned char) LUA_TNIL );
+                type.data.ucType = LUA_TNIL;
+                bitStream.Write ( &type );
                 return false;
 			}
             break;
@@ -679,8 +711,9 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
 			if ( pElement && pElement->GetID () != INVALID_ELEMENT_ID )
 			{
                 // Write its ID
-				bitStream.Write ( ( unsigned char ) LUA_TLIGHTUSERDATA );
-				bitStream.Write ( static_cast < ElementID > ( pElement->GetID () ) );
+                type.data.ucType = LUA_TLIGHTUSERDATA;
+				bitStream.Write ( &type );
+				bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
 			}
 			else
 			{
@@ -688,7 +721,8 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 // LogUnableToPacketize ( "Couldn't packetize argument list, invalid element specified." );
 
                 // Write a nil though so other side won't get out of sync
-                bitStream.Write ( (unsigned char) LUA_TNIL );
+                type.data.ucType = LUA_TNIL;
+                bitStream.Write ( &type );
 				return false;
 			}
 
@@ -702,7 +736,8 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
 			LogUnableToPacketize ( "Couldn't packetize argument list, unknown type specified." );
 
             // Write a nil though so other side won't get out of sync
-            bitStream.Write ( (unsigned char) LUA_TNIL );
+            type.data.ucType = LUA_TNIL;
+            bitStream.Write ( &type );
 			return false;
 		}
     }

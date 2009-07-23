@@ -221,7 +221,7 @@ void CWeaponRPCs::TakeWeaponAmmo ( NetBitStreamInterface& bitStream )
 	            CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
 	            if ( pPlayerWeapon == NULL ) return;
 
-                unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );
                 pPlayerWeapon->SetAmmoInClip ( 0 );
 
 	            unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
@@ -285,7 +285,7 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 		        CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
 		        if ( pPlayerWeapon == NULL ) return;
 
-                unsigned char ucAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );
                 pPlayerWeapon->SetAmmoInClip ( usAmmoInClip );
                 pPlayerWeapon->SetAmmoTotal ( usAmmo );
 

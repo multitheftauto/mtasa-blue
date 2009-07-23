@@ -99,7 +99,7 @@ static int luaM_toref (lua_State *L, int i)
     // get the callback table we made in CLuaMain::InitVM (at location 1)
     lua_getref ( L, 1 );
     lua_getfield ( L, -1, index );
-    ref = lua_tonumber ( L, -1 );
+    ref = static_cast < int > ( lua_tonumber ( L, -1 ) );
     lua_pop ( L, 1 );
     lua_pop ( L, 1 );
 

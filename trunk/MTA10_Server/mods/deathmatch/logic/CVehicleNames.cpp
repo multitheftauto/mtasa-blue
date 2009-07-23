@@ -90,7 +90,7 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
 const char* CVehicleNames::GetVehicleTypeName ( unsigned long ulModel )
 {
     const char* pVehicleName = "";
-    switch ( CVehicleManager::GetVehicleType ( ulModel ) )
+    switch ( CVehicleManager::GetVehicleType ( static_cast < unsigned short > ( ulModel ) ) )
     {
         case VEHICLE_NONE:
             pVehicleName = "Unknown";

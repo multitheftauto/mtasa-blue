@@ -26,6 +26,7 @@ struct SCustomData
 {
     CLuaArgument        Variable;
     class CLuaMain*     pLuaMain;
+    bool                bSynchronized;
 };
 
 class CCustomData
@@ -35,7 +36,7 @@ public:
     void                    Copy                ( CCustomData* pCustomData );
 
     SCustomData*            Get                 ( const char* szName );
-    void                    Set                 ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain );
+    void                    Set                 ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized = true );
 
     bool                    Delete              ( const char* szName );
     void                    DeleteAll           ( class CLuaMain* pLuaMain );

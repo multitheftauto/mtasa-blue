@@ -116,13 +116,13 @@ public:
 
     void                                        ReadCustomData              ( CLuaMain* pLuaMain, CEvents* pEvents );
     inline CCustomData*                         GetCustomDataPointer        ( void )                    { return m_pCustomData; }
-    CLuaArgument*                               GetCustomData               ( const char* szName, bool bInheritData );
+    CLuaArgument*                               GetCustomData               ( const char* szName, bool bInheritData, bool* pbIsSynced = NULL );
     CLuaArguments*                              GetAllCustomData            ( CLuaArguments * table );
     bool                                        GetCustomDataString         ( const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData );
     bool                                        GetCustomDataInt            ( const char* szName, int& iOut, bool bInheritData );
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
-    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain );
+    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true );
     bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
 

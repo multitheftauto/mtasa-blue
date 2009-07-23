@@ -569,7 +569,7 @@ bool CStaticFunctionDefinitions::GetElementModel ( CClientEntity& Entity, unsign
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            usModel = Ped.GetModel ();
+            usModel = static_cast < unsigned short > ( Ped.GetModel () );
             break;
         }
         case CCLIENTVEHICLE:
@@ -3289,7 +3289,7 @@ CClientEntity * CStaticFunctionDefinitions::GetCameraTarget ( void )
 
 bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior )
 {
-    ucInterior = g_pGame->GetWorld ()->GetCurrentArea ();
+    ucInterior = static_cast < unsigned char > ( g_pGame->GetWorld ()->GetCurrentArea () );
     return true;
 }
 
@@ -4473,8 +4473,8 @@ bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld,
 {
     g_pCore->GetGraphics ()->CalcScreenCoors ( &vecWorld, &vecScreen );
 
-    float fResWidth  = g_pCore->GetGraphics ()->GetViewportWidth ();
-    float fResHeight = g_pCore->GetGraphics ()->GetViewportHeight ();
+    float fResWidth  = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
+    float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
 
     // Calc relative values if required
     float fToleranceX = bRelative ? fEdgeTolerance * fResWidth  : fEdgeTolerance;
@@ -5195,7 +5195,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
-    dCount = GetTickCount64_();
+    dCount = static_cast < double > ( GetTickCount64_() );
     return true;
 }
 

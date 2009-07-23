@@ -61,7 +61,7 @@ void CClientWater::GetPosition ( CVector& vecPosition ) const
         m_pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
         vecPosition += vecVertexPos;
     }
-    vecPosition /= m_pPoly->GetNumVertices ();
+    vecPosition /= static_cast < float > ( m_pPoly->GetNumVertices () );
 }
 
 bool CClientWater::GetVertexPosition ( int iVertexIndex, CVector& vecPosition )

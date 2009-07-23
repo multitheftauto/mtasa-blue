@@ -108,11 +108,15 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             {
                 const char* szName = iter->first.c_str ();
                 const CLuaArgument* pArgument = &iter->second.Variable;
+                bool bSynchronized = iter->second.bSynchronized;
 
-                unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
-                BitStream.Write ( ucNameLength );
-                BitStream.Write ( szName, ucNameLength );
-                pArgument->WriteToBitStream ( BitStream );
+                if ( bSynchronized )
+                {
+                    unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
+                    BitStream.Write ( ucNameLength );
+                    BitStream.Write ( szName, ucNameLength );
+                    pArgument->WriteToBitStream ( BitStream );
+                }
             }
 
             // Grab its name

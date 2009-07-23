@@ -849,19 +849,20 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, char* szNa
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
         szName [ MAX_CUSTOMDATA_NAME_LENGTH ] = 0;
 
-    CLuaArgument * pCurrentVariable = pElement->GetCustomData ( szName, false );
-    if ( !pCurrentVariable || *pCurrentVariable != Variable )
+    bool bIsSynced;
+    CLuaArgument * pCurrentVariable = pElement->GetCustomData ( szName, false, &bIsSynced );
+    if ( !pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize )
     {
         // Set its custom data
-        pElement->SetCustomData ( szName, Variable, pLuaMain );
+        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
 
         if ( bSynchronize )
         {
             // Tell our clients to update their data
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pElement->GetID () );
-            BitStream.pBitStream->Write ( usNameLength );
+            BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
+            BitStream.pBitStream->WriteCompressed ( usNameLength );
             BitStream.pBitStream->Write ( szName, usNameLength );
             Variable.WriteToBitStream ( *BitStream.pBitStream );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DATA, *BitStream.pBitStream ) );
@@ -888,10 +889,10 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CElement* pElement, const c
         // Tell our clients to update their data
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szShortName ) );
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
-        BitStream.pBitStream->Write ( usNameLength );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( usNameLength );
         BitStream.pBitStream->Write ( szShortName, usNameLength );
-        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) ); // Not recursive
+        BitStream.pBitStream->WriteBit ( false ); // Not recursive
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_ELEMENT_DATA, *BitStream.pBitStream ) );
         return true;
     }
