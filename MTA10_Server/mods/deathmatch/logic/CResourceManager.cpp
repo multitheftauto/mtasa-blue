@@ -868,9 +868,10 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const ch
     return NULL;
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string& strPath, std::string& strMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string* pstrPath, std::string* pstrMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    std::string strMetaPath;
     if ( strInput[0] == ':' )
     {
         unsigned int iEnd = strInput.find_first_of ( "/" );
@@ -881,10 +882,12 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
             if ( pResource && strInput[iEnd + 1] )
             {
                 strMetaPath = strInput.substr ( iEnd + 1 );
+                if ( pstrMetaPath )
+                    *pstrMetaPath = strMetaPath;
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    if ( !pResource->GetFilePath ( strMetaPath.c_str (), strPath ) )
-                        strPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+                    if ( pstrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pstrPath ) )
+                        *pstrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
                     return true;
                 }
             }
@@ -893,8 +896,10 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     else if ( IsValidFilePath ( strInput.c_str() ) )
     {
         strMetaPath = strInput;
-        if ( !pResource->GetFilePath ( strMetaPath.c_str (), strPath ) )
-            strPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+        if ( pstrMetaPath )
+            *pstrMetaPath = strMetaPath;
+        if ( pstrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pstrPath ) )
+            *pstrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
         return true;
     }
     return false;

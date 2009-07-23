@@ -52,7 +52,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
 			CResource* pResource = pThisResource;
-            if ( pResource && CResourceManager::ParseResourcePathInput ( strFile, pResource, strAbsPath, strSubPath ) )
+            if ( pResource && CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) )
             {
 			    // Do we have permissions?
 			    if ( pResource == pThisResource ||
@@ -144,7 +144,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
 			CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strAbsPath, strSubPath ) && pResource )
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) && pResource )
  
                 // Do we have permissions?
 			if ( pResource == pThisResource ||
@@ -506,7 +506,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
 			CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath, std::string("") ) && pResource )
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) && pResource )
             {
 			    // Do we have permissions?
 			    if ( pResource == pThisResource ||
