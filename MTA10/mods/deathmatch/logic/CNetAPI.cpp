@@ -667,7 +667,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
             {
                  // Write the clip ammo
                 SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
-                ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+                ammo.data.usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
                 BitStream.Write ( &ammo );
 
                 // Write the aim data
@@ -993,8 +993,8 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
         {
             // Write the ammo states
             SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), true, true );
-            ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
-            ammo.data.usTotalAmmo = pPlayerWeapon->GetAmmoTotal ();
+            ammo.data.usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
+            ammo.data.usTotalAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
             BitStream.Write ( &ammo );
 
             // Sync aim data
@@ -1386,7 +1386,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         {
             // Write the ammo states
             SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
-            ammo.data.usAmmoInClip = pPlayerWeapon->GetAmmoInClip ();
+            ammo.data.usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
             BitStream.Write ( &ammo );
 
             // Sync aim data

@@ -356,7 +356,7 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
     }
 
     unsigned short usNumArgs;
-    if ( bitStream.Read ( usNumArgs ) )
+    if ( bitStream.ReadCompressed ( usNumArgs ) )
     {
         pKnownTables->push_back ( this );
         for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
@@ -384,7 +384,7 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
 
     bool bSuccess = true;
     pKnownTables->insert ( make_pair ( (CLuaArguments *)this, pKnownTables->size () ) );
-    bitStream.Write ( static_cast < unsigned short > ( m_Arguments.size () ) );
+    bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () ; iter++ )
     {

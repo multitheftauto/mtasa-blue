@@ -43,9 +43,9 @@ public:
 		y = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
 		z = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
 		
-		x = _copysign( x, m->vUp.fY - m->vFront.fZ );
-		y = _copysign( y, m->vRight.fZ - m->vUp.fX );
-		z = _copysign( z, m->vFront.fX - m->vRight.fY );
+		x = static_cast < float > ( _copysign( x, m->vUp.fY - m->vFront.fZ ) );
+		y = static_cast < float > ( _copysign( y, m->vRight.fZ - m->vUp.fX ) );
+		z = static_cast < float > ( _copysign( z, m->vFront.fX - m->vRight.fY ) );
 	};
 
 	static void ToMatrix(const CQuat& q, CMatrix& m){

@@ -846,7 +846,7 @@ bool CClientPed::SetModel ( unsigned long ulModel )
             if ( m_pPlayerPed )
             {
                 // Request the model
-                if ( m_pRequester->Request ( ulModel, this ) )
+                if ( m_pRequester->Request ( static_cast < unsigned short > ( ulModel ), this ) )
                 {
                     // Change the model immediately if it was loaded
                     _ChangeModel ();
@@ -3181,7 +3181,7 @@ void CClientPed::StreamIn ( bool bInstantly )
     }
 
     // Request it
-    if ( !m_pPlayerPed && m_pRequester->Request ( m_ulModel, this ) )
+    if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
     {
         // If it was loaded, create it immediately.
         _CreateModel ();
@@ -4187,7 +4187,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             float fCurrentRotation = GetCurrentRotation ();
             float fTargetRotation = m_pPlayerPed->GetTargetRotation ();
             unsigned char ucInterior = GetInterior ();
-            unsigned char ucCameraInterior = g_pGame->GetWorld ()->GetCurrentArea ();
+            unsigned char ucCameraInterior = static_cast < unsigned char > ( g_pGame->GetWorld ()->GetCurrentArea () );
 
             // Don't allow any camera movement if we're in fixed mode
             if ( m_pManager->GetCamera ()->IsInFixedMode () ) bCameraCut = false;

@@ -61,7 +61,7 @@ void CElementRPCs::SetElementData ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned short usNameLength;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( usNameLength ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
 		szName [ usNameLength ] = NULL;
@@ -85,8 +85,8 @@ void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
     // Read out the entity id and name length
     ElementID ID;
     unsigned short usNameLength;
-    unsigned char ucRecursive;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( usNameLength ) )
+    bool bRecursive;
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( usNameLength ) )
     {
         // Allocate a buffer for the name
         char* szName = new char [ usNameLength + 1 ];
@@ -94,14 +94,14 @@ void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
 
         // Read it out plus whether it's recursive or not
         if ( bitStream.Read ( szName, usNameLength ) &&
-             bitStream.Read ( ucRecursive ) )
+             bitStream.ReadBit ( bRecursive ) )
         {
             // Grab the entity
             CClientEntity* pEntity = CElementIDs::GetElement ( ID );
             if ( pEntity )
             {
                 // Remove that name
-                pEntity->DeleteCustomData ( szName, ucRecursive != 0 );
+                pEntity->DeleteCustomData ( szName, bRecursive );
             }
         }
 

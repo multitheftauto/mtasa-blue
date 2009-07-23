@@ -778,11 +778,11 @@ bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
     // If our radar image exists (Values are not calculated unless map is showing)
     if ( IsRadarShowing () )
 	{
-		vecMin.fX = m_iMapMinX;
-		vecMin.fY = m_iMapMinY;
+		vecMin.fX = static_cast < float > ( m_iMapMinX );
+		vecMin.fY = static_cast < float > ( m_iMapMinY );
 
-		vecMax.fX = m_iMapMaxX;
-		vecMax.fY = m_iMapMaxY;
+		vecMax.fX = static_cast < float > ( m_iMapMaxX );
+		vecMax.fY = static_cast < float > ( m_iMapMaxY );
 
 		return true;
 	}

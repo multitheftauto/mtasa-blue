@@ -40,7 +40,7 @@ SCustomData* CCustomData::Get ( const char* szName )
 #define __STR1__(x) __STR2__(x)
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : warning C0000 *MTA Developers*: "
 
-void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain )
+void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized )
 {
 	assert ( szName );
 
@@ -51,6 +51,7 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
         // Set the variable and eventually its new owner
         pData->Variable = Variable;
         pData->pLuaMain = pLuaMain;
+        pData->bSynchronized = bSynchronized;
     }
     else
     {
@@ -58,6 +59,7 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
         SCustomData newData;
         newData.Variable = Variable;
         newData.pLuaMain = pLuaMain;
+        newData.bSynchronized = bSynchronized;
         m_Data [ szName ] = newData;
     }
 }

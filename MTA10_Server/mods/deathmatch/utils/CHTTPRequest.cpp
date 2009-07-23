@@ -205,7 +205,7 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
     }
 
     // Write the header
-    if ( pSocket->WriteBuffer ( strBuffer.c_str (), strBuffer.size () ) < strBuffer.size () )
+    if ( pSocket->WriteBuffer ( strBuffer.c_str (), strBuffer.size () ) < static_cast < int > ( strBuffer.size () ) )
     {
         delete pSocket;
         return NULL;
@@ -221,10 +221,10 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
         while ( lAmountSent < strPOSTData.size () )
         {
             lAmountToSend = m_lPacketSize;
-            if ( strPOSTData.size () - lAmountSent < m_lPacketSize )
+            if ( static_cast < long > ( strPOSTData.size () - lAmountSent ) < m_lPacketSize )
                 lAmountToSend = strPOSTData.size () - lAmountSent;
 
-            if ( pSocket->WriteBuffer ( pszContent, lAmountToSend ) < lAmountToSend )
+            if ( static_cast < size_t > ( pSocket->WriteBuffer ( pszContent, lAmountToSend ) ) < lAmountToSend )
             {
                 delete pSocket;
                 return NULL;

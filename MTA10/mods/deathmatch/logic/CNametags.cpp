@@ -573,7 +573,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                             vecBotRight.fX, vecTopLeft.fY,
                             vecTopLeft.fX,  vecBotRight.fY,
                             vecBotRight.fX, vecBotRight.fY,
-                            COLOR_ARGB ( ucAlpha, 0, lGreen, lRed ) );
+                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
 
             // the black bit
             vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth - fRemovedWidth,  +0, 0 );
@@ -583,7 +583,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                             vecBotRight.fX, vecTopLeft.fY,
                             vecTopLeft.fX,  vecBotRight.fY,
                             vecBotRight.fX, vecBotRight.fY,
-                            COLOR_ARGB ( ucAlpha, 0, lGreenBlack, lRedBlack ) );
+                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
         }
  	}
 }

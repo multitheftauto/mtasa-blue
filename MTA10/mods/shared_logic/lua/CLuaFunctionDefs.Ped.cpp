@@ -167,7 +167,7 @@ int CLuaFunctionDefs::GetPedAmmoInClip ( lua_State* luaVM )
             CWeapon* pWeapon = pPed->GetWeapon ( (eWeaponSlot) ucSlot );
             if ( pWeapon )
             {
-                unsigned short usAmmo = pWeapon->GetAmmoInClip ();
+                unsigned short usAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoInClip () );
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
@@ -207,7 +207,7 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
             CWeapon* pWeapon = pPed->GetWeapon ( (eWeaponSlot) ucSlot );
             if ( pWeapon )
             {
-                unsigned short usAmmo = pWeapon->GetAmmoTotal ();
+                unsigned short usAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoTotal () );
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
@@ -814,7 +814,7 @@ int CLuaFunctionDefs::SetPedWeaponSlot ( lua_State* luaVM )
     {
         // Grab the arguments
         CClientEntity* pElement = lua_toelement ( luaVM, 1 );
-        int iSlot = lua_tonumber ( luaVM, 2 );
+        int iSlot = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
 
         // Valid ped?
         if ( pElement )

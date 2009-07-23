@@ -410,7 +410,7 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
 }
 
 
-CLuaArgument* CElement::GetCustomData ( const char* szName, bool bInheritData )
+CLuaArgument* CElement::GetCustomData ( const char* szName, bool bInheritData, bool* pbIsSynced )
 {
     assert ( szName );
 
@@ -418,13 +418,15 @@ CLuaArgument* CElement::GetCustomData ( const char* szName, bool bInheritData )
     const SCustomData* pData = m_pCustomData->Get ( szName );
     if ( pData )
     {
+        if ( pbIsSynced )
+            *pbIsSynced = pData->bSynchronized;
         return (CLuaArgument *)&pData->Variable;
     }
 
     // If none, try returning parent's custom data
     if ( bInheritData && m_pParent )
     {
-        return m_pParent->GetCustomData ( szName, true );
+        return m_pParent->GetCustomData ( szName, true, pbIsSynced );
     }
 
     // None available
@@ -613,7 +615,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized )
 {
     assert ( szName );
 
@@ -626,7 +628,7 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     }
 
     // Set the new data
-    m_pCustomData->Set ( szName, Variable, pLuaMain );
+    m_pCustomData->Set ( szName, Variable, pLuaMain, bSynchronized );
 
     // Trigger the onElementDataChange event on us
     CLuaArguments Arguments;

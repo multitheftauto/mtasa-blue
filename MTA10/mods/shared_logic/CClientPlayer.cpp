@@ -323,7 +323,7 @@ void CClientPlayer::GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor )
         m_fPretendHealthSmoothed = fPretendHealth;
 
     // Calc elapsed time
-    float fSecondCount = GetSecondCount ();
+    float fSecondCount = static_cast < float > ( GetSecondCount () );
     float fDeltaSeconds = fSecondCount - m_fLastSecondCount;
     m_fLastSecondCount = fSecondCount;
 

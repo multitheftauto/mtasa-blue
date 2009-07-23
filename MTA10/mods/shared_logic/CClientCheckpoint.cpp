@@ -366,7 +366,7 @@ void CClientCheckpoint::Create ( unsigned long ulIdentifier )
         }
 
         // Create it
-        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, m_dwType, &m_Matrix.vPos, &m_vecDirection, m_fSize, 0.2f, m_rgbaColor );
+        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, static_cast < WORD > ( m_dwType ), &m_Matrix.vPos, &m_vecDirection, m_fSize, 0.2f, m_rgbaColor );
         if ( m_pCheckpoint )
         {
             // Set properties

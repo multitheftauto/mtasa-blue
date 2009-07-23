@@ -274,7 +274,11 @@ int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
             bPostGUI = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
         }
 
-        g_pCore->GetGraphics ()->DrawRectQueued ( iX, iY, iWidth, iHeight, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawRectQueued ( static_cast < float > ( iX ),
+                                                  static_cast < float > ( iY ),
+                                                  static_cast < float > ( iWidth ),
+                                                  static_cast < float > ( iHeight ),
+                                                  ulColor, bPostGUI );
 
         // Success
         lua_pushboolean ( luaVM, true );
