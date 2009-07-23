@@ -177,7 +177,7 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
         for ( iter = m_values.begin (); iter != m_values.end (); iter++ )
         {
             std::string strValue;
-            (*iter)->Write ( strValue, m_version );
+            (*iter)->Write ( strValue );
 
             strPOSTData += SString ( "--%s\r\n", szBoundary ).c_str ();
             strPOSTData += strValue;
