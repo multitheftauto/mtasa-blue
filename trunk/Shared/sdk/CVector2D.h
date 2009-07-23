@@ -13,6 +13,7 @@
 #define __CVector2D_H
 
 #include <cmath>
+#include "CVector.h"
 
 /**
  * CVector2D Structure used to store a 2D vertex.
@@ -30,6 +31,19 @@ public:
     {
         fX = _fX;
         fY = _fY;
+    }
+
+    CVector2D ( const CVector& vec )
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+    }
+
+    CVector2D& operator = ( const CVector& vec )
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+        return *this;
     }
 
     float DotProduct ( CVector2D& other )
@@ -120,14 +134,16 @@ public:
         fY /= vecRight.fY;
     }
 
-    bool operator == ( const CVector2D& vecRight ) const
+    bool operator== ( const CVector2D& param ) const
     {
-        return fX == vecRight.fX && fY == vecRight.fY;
+        return ( ( fabs ( fX - param.fX ) < FLOAT_EPSILON ) &&
+                 ( fabs ( fY - param.fY ) < FLOAT_EPSILON ) );
     }
 
-    bool operator != ( const CVector2D& vecRight ) const
+    bool operator!= ( const CVector2D& param ) const
     {
-        return !(*this == vecRight);
+        return ( ( fabs ( fX - param.fX ) >= FLOAT_EPSILON ) ||
+                 ( fabs ( fY - param.fY ) >= FLOAT_EPSILON ) );
     }
 
     float fX;

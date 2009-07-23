@@ -216,6 +216,59 @@ private:
     bool m_bUseFloats;
 };
 
+struct SPosition2DSync : public ISyncStructure
+{
+    SPosition2DSync ( bool bUseFloats = false ) : m_bUseFloats ( bUseFloats ) {}
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( m_bUseFloats )
+        {
+            return bitStream.Read ( data.vecPosition.fX ) && data.vecPosition.fX > -SYNC_POSITION_LIMIT && data.vecPosition.fX < SYNC_POSITION_LIMIT &&
+                   bitStream.Read ( data.vecPosition.fY ) && data.vecPosition.fY > -SYNC_POSITION_LIMIT && data.vecPosition.fY < SYNC_POSITION_LIMIT;
+        }
+        else
+        {
+            SFloatSync < 14, 10 > x, y;
+
+            if ( bitStream.Read ( &x ) && x.data.fValue > -SYNC_POSITION_LIMIT && x.data.fValue < SYNC_POSITION_LIMIT &&
+                 bitStream.Read ( &y ) && y.data.fValue > -SYNC_POSITION_LIMIT && y.data.fValue < SYNC_POSITION_LIMIT )
+            {
+                data.vecPosition.fX = x.data.fValue;
+                data.vecPosition.fY = y.data.fValue;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        if ( m_bUseFloats )
+        {
+            bitStream.Write ( data.vecPosition.fX );
+            bitStream.Write ( data.vecPosition.fY );
+        }
+        else
+        {
+            SFloatSync < 14, 10 > x, y;
+            x.data.fValue = data.vecPosition.fX;
+            y.data.fValue = data.vecPosition.fY;
+
+            bitStream.Write ( &x );
+            bitStream.Write ( &y );
+        }
+    }
+
+    struct
+    {
+        CVector2D vecPosition;
+    } data;
+
+private:
+    bool m_bUseFloats;
+};
 
 
 //////////////////////////////////////////
@@ -1391,5 +1444,215 @@ struct SQuitReasonSync : public ISyncStructure
 };
 
 
+//////////////////////////////////////////
+//                                      //
+//         Entity alpha (transparency)  //
+//                                      //
+// As in most times the alpha value     //
+// will be 100% (opaque), we write      //
+// 255-alpha compressed, as 255-alpha   //
+// will be then 0 in the most common    //
+// case. A value of 0 is written using  //
+// 1 bit, though for all other values   //
+// it will use 1 extra bit.             //
+//                                      //
+//////////////////////////////////////////
+struct SEntityAlphaSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( bitStream.Read ( data.ucAlpha ) )
+        {
+            data.ucAlpha = 255 - data.ucAlpha;
+            return true;
+        }
+        return false;
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        unsigned char ucAlpha = 255 - data.ucAlpha;
+        bitStream.Write ( ucAlpha );
+    }
 
+    struct
+    {
+        unsigned char ucAlpha;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//             Marker types             //
+//                                      //
+//////////////////////////////////////////
+struct SMarkerTypeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucType : 3;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//             Pickup types             //
+//                                      //
+//////////////////////////////////////////
+struct SPickupTypeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucType : 3;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//           Colshape types             //
+//                                      //
+//////////////////////////////////////////
+struct SColshapeTypeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucType : 3;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//                Colors                //
+//                                      //
+//////////////////////////////////////////
+struct SColorSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), 32 );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 32 );
+    }
+
+    struct
+    {
+        unsigned char ucR;
+        unsigned char ucG;
+        unsigned char ucB;
+        unsigned char ucA;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//        Occupied vehicle seat         //
+//                                      //
+//////////////////////////////////////////
+struct SOccupiedSeatSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucSeat : 3;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//          Vehicle paintjob            //
+//                                      //
+//////////////////////////////////////////
+struct SPaintjobSync : public ISyncStructure
+{
+    enum { BITCOUNT = 2 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucPaintjob : 2;
+    } data;
+};
+
+
+//////////////////////////////////////////
+//                                      //
+//    Vehicle override lights state     //
+//                                      //
+//////////////////////////////////////////
+struct SOverrideLightsSync : public ISyncStructure
+{
+    enum { BITCOUNT = 2 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucOverride : 2;
+    } data;
+};
 #pragma pack(pop)

@@ -2040,12 +2040,20 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // Heavy variables
     CVector vecPosition;
     CVector vecRotation;
+    SPositionSync position ( false );
+    SRotationDegreesSync rotation ( false );
+
+    // Attached
+    bool bIsAttached;
+    SPositionSync attachedPosition ( false );
+    SRotationDegreesSync attachedRotation ( false );
+    ElementID EntityAttachedToID;
 
     // HACK: store new entities and link up anything depending on other entities after
     list < SEntityDependantStuff* > newEntitiesStuff;
 
     ElementID NumEntities = 0;
-    if ( !bitStream.Read ( NumEntities ) || NumEntities == 0 )
+    if ( !bitStream.ReadCompressed ( NumEntities ) || NumEntities == 0 )
     {
         return;
     }
@@ -2058,21 +2066,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         ElementID ParentID;
         unsigned char ucInterior;
         unsigned short usDimension;
-        ElementID EntityAttachedToID;
-        CVector vecAttachedPosition, vecAttachedRotation;
 
-        if ( bitStream.Read ( EntityID ) &&
+        if ( bitStream.ReadCompressed ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
-             bitStream.Read ( ParentID ) &&
+             bitStream.ReadCompressed ( ParentID ) &&
              bitStream.Read ( ucInterior ) &&
-             bitStream.Read ( usDimension ) &&
-             bitStream.Read ( EntityAttachedToID ) &&
-             ( EntityAttachedToID == INVALID_ELEMENT_ID || ( bitStream.Read ( vecAttachedPosition.fX ) &&
-                                                   bitStream.Read ( vecAttachedPosition.fY ) &&
-                                                   bitStream.Read ( vecAttachedPosition.fZ ) &&
-                                                   bitStream.Read ( vecAttachedRotation.fX ) &&
-                                                   bitStream.Read ( vecAttachedRotation.fY ) &&
-                                                   bitStream.Read ( vecAttachedRotation.fZ )) ) )
+             bitStream.ReadCompressed ( usDimension ) &&
+             bitStream.ReadBit ( bIsAttached ) )
         {
 			/*
 #ifdef MTA_DEBUG
@@ -2089,10 +2089,17 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 #endif
 			*/
 
+            if ( bIsAttached )
+            {
+                bitStream.ReadCompressed ( EntityAttachedToID );
+                bitStream.Read ( &attachedPosition );
+                bitStream.Read ( &attachedRotation );
+            }
+
             // Read custom data
             CCustomData* pCustomData = new CCustomData;
             unsigned short usNumData = 0;
-            bitStream.Read ( usNumData );
+            bitStream.ReadCompressed ( usNumData );
             for ( unsigned short us = 0 ; us < usNumData ; us++ )
             {
                 unsigned char ucNameLength = 0;
@@ -2151,7 +2158,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
             // Read out the name length
             unsigned short usNameLength;
-            bitStream.Read ( usNameLength );
+            bitStream.ReadCompressed ( usNameLength );
 
             // Create the name string and 0 terminate it
             char* szName = new char [ usNameLength + 1 ];
@@ -2206,17 +2213,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::OBJECT:
                 {
                     unsigned short usObjectID;
-                    unsigned char ucAlpha;
+                    SEntityAlphaSync alpha;
 
                     // Read out the position, rotation, object ID and alpha value
-                    if ( bitStream.Read ( vecPosition.fX ) &&
-                         bitStream.Read ( vecPosition.fY ) &&
-                         bitStream.Read ( vecPosition.fZ ) &&
-                         bitStream.Read ( vecRotation.fX ) &&
-                         bitStream.Read ( vecRotation.fY ) &&
-                         bitStream.Read ( vecRotation.fZ ) &&
-                         bitStream.Read ( usObjectID ) &&
-                         bitStream.Read ( ucAlpha ) )
+                    if ( bitStream.Read ( &position ) &&
+                         bitStream.Read ( &rotation ) &&
+                         bitStream.ReadCompressed ( usObjectID ) &&
+                         bitStream.Read ( &alpha ) )
                     {
                         // Valid object id?
                         if ( !CClientObjectManager::IsValidModel ( usObjectID ) )
@@ -2229,8 +2232,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pObject;
                         if ( pObject )
                         {
-                            pObject->SetOrientation ( vecPosition, vecRotation );
-                            pObject->SetAlpha ( ucAlpha );
+                            pObject->SetOrientation ( position.data.vecPosition, rotation.data.vecRotation );
+                            pObject->SetAlpha ( alpha.data.ucAlpha );
                         }
                         else
                         {
@@ -2241,16 +2244,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
                         {
                             unsigned long ulMoveTimeLeft;
-                            CVector vecTargetPosition, vecTargetRotation;
-                            if ( bitStream.Read ( ulMoveTimeLeft ) &&
-                                 bitStream.Read ( vecTargetPosition.fX ) &&
-                                 bitStream.Read ( vecTargetPosition.fY ) &&
-                                 bitStream.Read ( vecTargetPosition.fZ ) &&
-                                 bitStream.Read ( vecTargetRotation.fX ) &&
-                                 bitStream.Read ( vecTargetRotation.fY ) &&
-                                 bitStream.Read ( vecTargetRotation.fZ ) )
+                            if ( bitStream.ReadCompressed ( ulMoveTimeLeft ) &&
+                                 bitStream.Read ( &position ) &&
+                                 bitStream.Read ( &rotation ) )
                             {
-                                pObject->StartMovement ( vecTargetPosition, vecTargetRotation, ulMoveTimeLeft );
+                                pObject->StartMovement ( position.data.vecPosition,
+                                                         rotation.data.vecRotation,
+                                                         ulMoveTimeLeft );
                             }
                         }                                 
                     }
@@ -2262,15 +2262,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 {
                     // Read out the pickup data
                     unsigned short usModel;
-                    unsigned char ucFlags;
-                    if ( bitStream.Read ( vecPosition.fX ) &&
-                         bitStream.Read ( vecPosition.fY ) &&
-                         bitStream.Read ( vecPosition.fZ ) &&
-                         bitStream.Read ( usModel ) &&
-                         bitStream.Read ( ucFlags ) )
+                    bool bIsVisible;
+                    SPickupTypeSync pickupType;
+
+                    if ( bitStream.Read ( &position ) &&
+                         bitStream.ReadCompressed ( usModel ) &&
+                         bitStream.ReadBit ( bIsVisible ) &&
+                         bitStream.Read ( &pickupType ) )
                     {
                         // Create the pickup with the given position and model
-                        CClientPickup* pPickup = new CClientPickup ( g_pClientGame->m_pManager, EntityID, usModel, vecPosition );
+                        CClientPickup* pPickup = new CClientPickup ( g_pClientGame->m_pManager, EntityID, usModel, position.data.vecPosition );
                         pEntity = pPickup;
                         if ( !pPickup )
                         {
@@ -2278,36 +2279,41 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             return;
                         }
 
-                        // Set some properties
-                        unsigned char ucPickupType;
-                        bitStream.Read ( ucPickupType );
-                        pPickup->m_ucType = ucPickupType;
-                        switch ( ucPickupType )
+                        pPickup->m_ucType = pickupType.data.ucType;
+                        switch ( pickupType.data.ucType )
                         {
                             case CClientPickup::ARMOR:
+                            {
+                                SPlayerHealthSync health;
+                                if ( bitStream.Read ( &health ) )
+                                    pPickup->m_fAmount = health.data.fValue;
+                                break;
+                            }
                             case CClientPickup::HEALTH:
                             {
-                                float fAmount;
-                                bitStream.Read ( fAmount );
-                                pPickup->m_fAmount = fAmount;
+                                SPlayerArmorSync armor;
+                                if ( bitStream.Read ( &armor )  )
+                                    pPickup->m_fAmount = armor.data.fValue;
                                 break;
                             }
                             case CClientPickup::WEAPON:
                             {
-                                unsigned char ucWeaponType;
-                                bitStream.Read ( ucWeaponType );
-                                pPickup->m_ucWeaponType = ucWeaponType;
+                                SWeaponTypeSync weaponType;
+                                if ( bitStream.Read ( &weaponType ) )
+                                {
+                                    pPickup->m_ucWeaponType = weaponType.data.ucWeaponType;
 
-                                unsigned short usAmmo;
-                                bitStream.Read ( usAmmo );
-                                pPickup->m_usAmmo = usAmmo;
+                                    SWeaponAmmoSync ammo ( weaponType.data.ucWeaponType, true, false );
+                                    if ( bitStream.Read ( &ammo ) )
+                                        pPickup->m_usAmmo = ammo.data.usTotalAmmo;
+                                }
                                 break;
                             }
                             default: break;
                         }
 
                         // Set its visible status
-                        pPickup->SetVisible ( ( ucFlags & 0x1 ) ? true:false );
+                        pPickup->SetVisible ( bIsVisible );
                     }
                     else
                     {
@@ -2321,16 +2327,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::VEHICLE:
                 {
                     // Read out the position
-                    CVector vecPosition;
-                    bitStream.Read ( vecPosition.fX );
-                    bitStream.Read ( vecPosition.fY );
-                    bitStream.Read ( vecPosition.fZ );
+                    bitStream.Read ( &position );
 
                     // Read out the rotation in degrees
-                    CVector vecRotationDegrees;
-                    bitStream.Read ( vecRotationDegrees.fX );
-                    bitStream.Read ( vecRotationDegrees.fY );
-                    bitStream.Read ( vecRotationDegrees.fZ );
+                    bitStream.Read ( &rotation );
 
                     // Read out the vehicle value as a char, then convert
                     unsigned char ucModel = 0xFF;
@@ -2351,8 +2351,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
 
                     // Read out the health
-                    float fHealth;
-                    if ( !bitStream.Read ( fHealth ) )
+                    SVehicleHealthSync health;
+                    if ( !bitStream.Read ( &health ) )
                     {
                         RaiseProtocolError ( 40 );
                         return;
@@ -2363,12 +2363,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     unsigned char ucColor2;
                     unsigned char ucColor3;
                     unsigned char ucColor4;
-                    unsigned char ucPaintjob;
+                    SPaintjobSync paintjob;
                     if ( !bitStream.Read ( ucColor1 ) ||
                          !bitStream.Read ( ucColor2 ) ||
                          !bitStream.Read ( ucColor3 ) ||
                          !bitStream.Read ( ucColor4 ) ||
-                         !bitStream.Read ( ucPaintjob ) )
+                         !bitStream.Read ( &paintjob ) )
                     {
                         RaiseProtocolError ( 41 );
                         return;
@@ -2393,8 +2393,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
 
                     // Set the health, color and paintjob
-                    pVehicle->SetHealth ( fHealth );
-                    pVehicle->SetPaintjob ( ucPaintjob );
+                    pVehicle->SetHealth ( health.data.fValue );
+                    pVehicle->SetPaintjob ( paintjob.data.ucPaintjob );
                     pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
 
                     // Setup our damage model
@@ -2407,17 +2407,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // If the vehicle has a turret, read out its position
                     if ( CClientVehicleManager::HasTurret ( usModel ) )
                     {
-                        float fTurretX, fTurretY;
-                        bitStream.Read ( fTurretX );
-                        bitStream.Read ( fTurretY );
-                        pVehicle->SetTurretRotation ( fTurretX, fTurretY );
+                        SVehicleSpecific specific;
+                        bitStream.Read ( &specific );
+                        pVehicle->SetTurretRotation ( specific.data.fTurretX, specific.data.fTurretY );
                     }
 
                     // If the vehicle has an adjustable property, read out its value
                     if ( CClientVehicleManager::HasAdjustableProperty ( usModel ) )
                     {
                         unsigned short usAdjustableProperty;
-                        bitStream.Read ( usAdjustableProperty );
+                        bitStream.ReadCompressed ( usAdjustableProperty );
                         pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
                     }
 
@@ -2454,27 +2453,23 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetRegPlate ( szRegPlate );
 
                     // Read the light override
-                    unsigned char ucOverrideLights;
-                    bitStream.Read ( ucOverrideLights );
-                    pVehicle->SetOverrideLights ( ucOverrideLights );
+                    SOverrideLightsSync overrideLights;
+                    bitStream.Read ( &overrideLights );
+                    pVehicle->SetOverrideLights ( overrideLights.data.ucOverride );
 
-                    // Flags
-                    unsigned short usFlags = 0;
-                    bitStream.Read ( usFlags );
-
-                    // Extract the flag bools
-                    bool bLandingGearDown   = ( usFlags & 0x0001 ) ? true : false;
-                    bool bSirenesActive     = ( usFlags & 0x0002 ) ? true : false;
-                    bool bPetrolTankWeak    = ( usFlags & 0x0004 ) ? true : false;
-                    bool bEngineOn          = ( usFlags & 0x0008 ) ? true : false;
-                    bool bLocked            = ( usFlags & 0x0010 ) ? true : false;
-                    bool bDoorsUndamageable = ( usFlags & 0x0020 ) ? true : false;
-                    bool bDamageProof       = ( usFlags & 0x0040 ) ? true : false;
-                    bool bFrozen            = ( usFlags & 0x0080 ) ? true : false;
-                    bool bDerailed          = ( usFlags & 0x0100 ) ? true : false;
-                    bool bIsDerailable      = ( usFlags & 0x0200 ) ? true : false;
-                    bool bTrainDirection    = ( usFlags & 0x0400 ) ? true : false;
-                    bool bTaxiLightState    = ( usFlags & 0x0800 ) ? true : false;
+                    // Read the flag bools
+                    bool bLandingGearDown   = bitStream.ReadBit ();
+                    bool bSirenesActive     = bitStream.ReadBit ();
+                    bool bPetrolTankWeak    = bitStream.ReadBit ();
+                    bool bEngineOn          = bitStream.ReadBit ();
+                    bool bLocked            = bitStream.ReadBit ();
+                    bool bDoorsUndamageable = bitStream.ReadBit ();
+                    bool bDamageProof       = bitStream.ReadBit ();
+                    bool bFrozen            = bitStream.ReadBit ();
+                    bool bDerailed          = bitStream.ReadBit ();
+                    bool bIsDerailable      = bitStream.ReadBit ();
+                    bool bTrainDirection    = bitStream.ReadBit ();
+                    bool bTaxiLightState    = bitStream.ReadBit ();
 
                     // If the vehicle has a landing gear, set landing gear state
                     if ( CClientVehicleManager::HasLandingGears ( usModel ) )
@@ -2507,21 +2502,26 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
 
                     // Read out and set alpha
-                    unsigned char ucAlpha = 255;
-                    bitStream.Read ( ucAlpha );
-                    pVehicle->SetAlpha ( ucAlpha );	
+                    SEntityAlphaSync alpha;
+                    bitStream.Read ( &alpha );
+                    pVehicle->SetAlpha ( alpha.data.ucAlpha );	
 
                     // Read our headlight color
-                    unsigned char ucHeadLightR, ucHeadLightG, ucHeadLightB;
-                    bitStream.Read ( ucHeadLightR );
-                    bitStream.Read ( ucHeadLightG );
-                    bitStream.Read ( ucHeadLightB );
+                    unsigned char ucHeadLightR = 255;
+                    unsigned char ucHeadLightG = 255;
+                    unsigned char ucHeadLightB = 255;
+                    if ( bitStream.ReadBit () == true )
+                    {
+                        bitStream.Read ( ucHeadLightR );
+                        bitStream.Read ( ucHeadLightG );
+                        bitStream.Read ( ucHeadLightB );
+                    }
                     RGBA headLightColor = COLOR_RGBA ( ucHeadLightR, ucHeadLightG, ucHeadLightB, 255 );
                     pVehicle->SetHeadLightColor ( headLightColor );
 
                     // Set the matrix
-                    pVehicle->SetPosition ( vecPosition );
-                    pVehicle->SetRotationDegrees ( vecRotationDegrees );
+                    pVehicle->SetPosition ( position.data.vecPosition );
+                    pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
 
                     break;
                 }
@@ -2529,36 +2529,25 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::MARKER:
                 {
                     // Read out the common data for all kinds of markers
-                    unsigned char ucType;
+                    SMarkerTypeSync markerType;
                     float fSize;
-                    unsigned char ucRed;
-                    unsigned char ucGreen;
-                    unsigned char ucBlue;
-                    unsigned char ucAlpha;
-                    unsigned char ucFlags;
+                    SColorSync color;
 
-                    if ( bitStream.Read ( vecPosition.fX ) &&
-                         bitStream.Read ( vecPosition.fY ) &&
-                         bitStream.Read ( vecPosition.fZ ) &&
-                         bitStream.Read ( ucType ) &&
+                    if ( bitStream.Read ( &position ) &&
+                         bitStream.Read ( &markerType ) &&
                          bitStream.Read ( fSize ) &&
-                         bitStream.Read ( ucRed ) &&
-                         bitStream.Read ( ucGreen ) &&
-                         bitStream.Read ( ucBlue ) &&
-                         bitStream.Read ( ucAlpha ) &&
-                         bitStream.Read ( ucFlags ) )
+                         bitStream.Read ( &color ) )
                     {
-                        // Decode the flags
-                        bool bTarget = ucFlags & 0x01;
+                        unsigned char ucType = markerType.data.ucType;
 
                         // Valid type?
                         if ( ucType < CClientMarker::MARKER_INVALID )
                         {
                             // Create it
                             CClientMarker* pMarker = new CClientMarker ( g_pClientGame->m_pManager, EntityID, ucType );
-                            pMarker->SetPosition ( vecPosition );
+                            pMarker->SetPosition ( position.data.vecPosition );
                             pMarker->SetSize ( fSize );
-                            pMarker->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+                            pMarker->SetColor ( color.data.ucR, color.data.ucG, color.data.ucB, color.data.ucA );
 
                             // Entity is this
                             pEntity = pMarker;
@@ -2569,18 +2558,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             {
                                 // Grab the checkpoint
                                 CClientCheckpoint* pCheckpoint = pMarker->GetCheckpoint ();
+                                bool bTarget = bitStream.ReadBit ();
 
                                 // Have a target?
                                 if ( bTarget )
                                 {
                                     // Read out the target position
-                                    CVector vecTarget;
-                                    if ( bitStream.Read ( vecTarget.fX ) &&
-                                         bitStream.Read ( vecTarget.fY ) &&
-                                         bitStream.Read ( vecTarget.fZ ) )
+                                    if ( bitStream.Read ( &position ) )
                                     {
                                         // Set the next position and the icon
-                                        pCheckpoint->SetNextPosition ( vecTarget );
+                                        pCheckpoint->SetNextPosition ( position.data.vecPosition );
                                         pCheckpoint->SetIcon ( CClientCheckpoint::ICON_ARROW );
                                     }
                                 }
@@ -2602,14 +2589,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::BLIP:
                 {         
                     // Read out the position
-                    CVector vecPosition;
-                    bitStream.Read ( vecPosition.fX );
-                    bitStream.Read ( vecPosition.fY );
-                    bitStream.Read ( vecPosition.fZ );                    
+                    bitStream.Read ( &position );
 
                     // Read out the ordering id
                     short sOrdering;
-                    bitStream.Read ( sOrdering );
+                    bitStream.ReadCompressed ( sOrdering );
 
                     // Read out the visible distance
                     float fVisibleDistance;
@@ -2619,7 +2603,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, fVisibleDistance );
                     pEntity = pBlip;
 
-                    pBlip->SetPosition ( vecPosition );
+                    pBlip->SetPosition ( position.data.vecPosition );
 
                     // Read out the icon
                     unsigned char ucIcon;
@@ -2637,13 +2621,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bitStream.Read ( ucSize );
 
                         // Read out the color
-                        bitStream.Read ( ucRed );
-                        bitStream.Read ( ucGreen );
-                        bitStream.Read ( ucBlue );
-                        bitStream.Read ( ucAlpha );
+                        SColorSync color;
+                        bitStream.Read ( &color );
 
                         pBlip->SetScale ( ucSize );
-                        pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+                        pBlip->SetColor ( color.data.ucR, color.data.ucG, color.data.ucB, color.data.ucA );
                     }                    
 
                     break;
@@ -2652,28 +2634,23 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::RADAR_AREA:
                 {
                     // Read out the radar area id, position, size and color
-                    CVector2D vecPosition;
-                    CVector2D vecSize;
+                    SPosition2DSync position2D ( false );
+                    SPosition2DSync size2D ( false );
                     unsigned long ulColor;
-                    unsigned char ucFlags;
-                    if ( bitStream.Read ( vecPosition.fX ) &&
-                         bitStream.Read ( vecPosition.fY ) &&
-                         bitStream.Read ( vecSize.fX ) &&
-                         bitStream.Read ( vecSize.fY ) &&
+                    bool bIsFlashing;
+                    if ( bitStream.Read ( &position2D ) &&
+                         bitStream.Read ( &size2D ) &&
                          bitStream.Read ( ulColor ) &&
-                         bitStream.Read ( ucFlags ) )
+                         bitStream.ReadBit ( bIsFlashing ) )
                     {
-                        // Decode the flags
-                        bool bIsFlashing = ucFlags & 0x01;
-
                         // Create the radar area
                         CClientRadarArea* pArea = g_pClientGame->m_pRadarAreaManager->Create ( EntityID );
                         pEntity = pArea;
                         if ( pArea )
                         {
                             // Set the position, size and color
-                            pArea->SetPosition ( vecPosition );
-                            pArea->SetSize ( vecSize );
+                            pArea->SetPosition ( position2D.data.vecPosition );
+                            pArea->SetSize ( size2D.data.vecPosition );
                             pArea->SetColor ( ulColor );
                             pArea->SetFlashing ( bIsFlashing );
                         }
@@ -2715,7 +2692,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::TEAM:
                 {
                     unsigned short usNameLength;
-                    bitStream.Read ( usNameLength );
+                    bitStream.ReadCompressed ( usNameLength );
                     if (usNameLength > 255)
                     {
                         RaiseFatalError ( 12 );
@@ -2734,9 +2711,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     CClientTeam* pTeam = new CClientTeam ( g_pClientGame->GetManager (), EntityID, szTeamName, ucRed, ucGreen, ucBlue );
                     pEntity = pTeam;
 
-                    unsigned char ucFriendlyFire;
-                    bitStream.Read ( ucFriendlyFire );
-                    pTeam->SetFriendlyFire ( ( ucFriendlyFire == 1 ) );
+                    bool bFriendlyFire;
+                    bitStream.ReadBit ( bFriendlyFire );
+                    pTeam->SetFriendlyFire ( bFriendlyFire );
 
                     delete [] szTeamName;
                     break;
@@ -2745,14 +2722,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::PED:
                 {
                     // Read out position
-                    CVector vecPosition;
-                    bitStream.Read ( vecPosition.fX );
-                    bitStream.Read ( vecPosition.fY );
-                    bitStream.Read ( vecPosition.fZ );
+                    bitStream.Read ( &position );
 
                     // Read out the model
                     unsigned short usModel;
-                    bitStream.Read ( usModel );
+                    bitStream.ReadCompressed ( usModel );
                     if ( !CClientPlayerManager::IsValidModel ( usModel ) )
                     {
                         RaiseProtocolError ( 51 );
@@ -2760,47 +2734,50 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
 
                     // Read out the rotation
-                    float fRotation;
-                    bitStream.Read ( fRotation );
+                    SPedRotationSync pedRotation;
+                    bitStream.Read ( &pedRotation );
 
                     // Read out the health
-                    float fHealth;
-                    bitStream.Read ( fHealth );
+                    SPlayerHealthSync health;
+                    bitStream.Read ( &health );
 
-                    float fArmour;
-                    bitStream.Read ( fArmour );
+                    // Read out the armor
+                    SPlayerArmorSync armor;
+                    bitStream.Read ( &armor );
 
                     // Read out the vehicle id
-                    ElementID VehicleID;
-                    bitStream.Read ( VehicleID );
-                    CClientVehicle * pVehicle = NULL;
+                    ElementID VehicleID = INVALID_ELEMENT_ID;
                     unsigned char ucSeat = 0xFF;
-                    if ( VehicleID != INVALID_ELEMENT_ID )
+                    CClientVehicle * pVehicle = NULL;
+
+                    if ( bitStream.ReadBit () == true )
                     {
+                        bitStream.ReadCompressed ( VehicleID );
                         pVehicle = g_pClientGame->m_pVehicleManager->Get ( VehicleID );
-                        bitStream.Read ( ucSeat );
+
+                        SOccupiedSeatSync seat;
+                        bitStream.Read ( &seat );
+                        ucSeat = seat.data.ucSeat;
                     }
 
                     // Flags
-                    unsigned char ucFlags;
-                    bitStream.Read ( ucFlags );
-                    bool bHasJetPack = ( ucFlags & 0x1 ) > 0;
-                    bool bSynced = ( ucFlags & 0x2 ) > 0;
-                    bool bIsHeadless = ( ucFlags & 0x4 ) > 0;
-                    bool bIsFrozen = ( ucFlags & 0x8 ) > 0;
+                    bool bHasJetPack = bitStream.ReadBit ();
+                    bool bSynced = bitStream.ReadBit ();
+                    bool bIsHeadless = bitStream.ReadBit ();
+                    bool bIsFrozen = bitStream.ReadBit ();
 
                     CClientPed* pPed = new CClientPed ( g_pClientGame->m_pManager, usModel, EntityID );
                     pEntity = pPed;
 
-                    pPed->SetPosition ( vecPosition );
-                    pPed->SetCurrentRotation ( fRotation, true );
-                    pPed->SetCameraRotation ( fRotation );
-                    pPed->SetHealth ( fHealth );
-                    pPed->SetArmor ( fArmour );
+                    pPed->SetPosition ( position.data.vecPosition );
+                    pPed->SetCurrentRotation ( pedRotation.data.fRotation, true );
+                    pPed->SetCameraRotation ( pedRotation.data.fRotation );
+                    pPed->SetHealth ( health.data.fValue );
+                    pPed->SetArmor ( armor.data.fValue );
                     if ( bSynced )
                     {
-                        pPed->LockHealth ( fHealth );
-                        pPed->LockArmor ( fArmour );
+                        pPed->LockHealth ( health.data.fValue );
+                        pPed->LockArmor ( armor.data.fValue );
                     }
                     if ( pVehicle ) pPed->WarpIntoVehicle ( pVehicle, ucSeat );
                     pPed->SetHasJetPack ( bHasJetPack );
@@ -2808,9 +2785,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pPed->SetFrozen ( bIsFrozen );
 
                     // Alpha
-                    unsigned char ucAlpha;
-                    bitStream.Read ( ucAlpha );
-                    pPed->SetAlpha ( ucAlpha );
+                    SEntityAlphaSync alpha;
+                    bitStream.Read ( &alpha );
+                    pPed->SetAlpha ( alpha.data.ucAlpha );
 
                     break;
                 }
@@ -2819,7 +2796,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 {
                     // Type Name
                     unsigned short usTypeNameLength;
-                    bitStream.Read ( usTypeNameLength );
+                    bitStream.ReadCompressed ( usTypeNameLength );
                     char* szTypeName = new char [ usTypeNameLength + 1 ];
                     bitStream.Read ( szTypeName, usTypeNameLength );
                     szTypeName [ usTypeNameLength ] = 0;
@@ -2828,14 +2805,14 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntity = pDummy;
 
                     // Position
-                    CVector vecPosition;
-                    bitStream.Read ( vecPosition.fX );
-                    bitStream.Read ( vecPosition.fY );
-                    bitStream.Read ( vecPosition.fZ );
+                    bool bHasPosition;
+                    if ( bitStream.ReadBit ( bHasPosition ) && bHasPosition )
+                        bitStream.Read ( &position );
 
                     if (pDummy)
                     {
-                        pDummy->SetPosition ( vecPosition );
+                        if ( bHasPosition )
+                            pDummy->SetPosition ( position.data.vecPosition );
 						if ( strcmp ( szTypeName, "resource" ) == 0 )
 						{
 							CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( szName );
@@ -2851,43 +2828,38 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 case CClientGame::COLSHAPE:
                 {
                     // Type
-                    unsigned char ucType;
-                    bitStream.Read ( ucType );
+                    SColshapeTypeSync colType;
+                    bitStream.Read ( &colType );
 
                     // Position
-                    CVector vecPosition;
-                    bitStream.Read ( vecPosition.fX );
-                    bitStream.Read ( vecPosition.fY );
-                    bitStream.Read ( vecPosition.fZ );
+                    bitStream.Read ( &position );
 
                     // Enabled?
-                    unsigned char ucEnabled;
-                    bitStream.Read ( ucEnabled );
+                    bool bEnabled;
+                    bitStream.ReadBit ( bEnabled );
 
                     // AutoCallEvent?
-                    unsigned char ucAutoCallEvent;
-                    bitStream.Read ( ucAutoCallEvent );
+                    bool bAutoCallEvent;
+                    bitStream.ReadBit ( bAutoCallEvent );
 
                     CClientColShape* pShape = NULL;
 
                     // Type-dependant stuff
-                    switch ( ucType )
+                    switch ( colType.data.ucType )
                     {
                         case COLSHAPE_CIRCLE:
                         {
                             float fRadius;
                             bitStream.Read ( fRadius );
-                            CClientColCircle* pCircle = new CClientColCircle ( g_pClientGame->m_pManager, EntityID, vecPosition, fRadius );
+                            CClientColCircle* pCircle = new CClientColCircle ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition, fRadius );
                             pEntity = pShape = pCircle;
                             break;
                         }
                         case COLSHAPE_CUBOID:
                         {
-                            CVector vecSize;
-                            bitStream.Read ( vecSize.fX );
-                            bitStream.Read ( vecSize.fY );
-                            bitStream.Read ( vecSize.fZ );
-                            CClientColCuboid* pCuboid = new CClientColCuboid ( g_pClientGame->m_pManager, EntityID, vecPosition, vecSize );
+                            SPositionSync size ( false );
+                            bitStream.Read ( &size );
+                            CClientColCuboid* pCuboid = new CClientColCuboid ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition, size.data.vecPosition );
                             pEntity = pShape = pCuboid;
                             break;
                         }
@@ -2895,16 +2867,15 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         {
                             float fRadius;
                             bitStream.Read ( fRadius );
-                            CClientColSphere* pSphere = new CClientColSphere ( g_pClientGame->m_pManager, EntityID, vecPosition, fRadius );
+                            CClientColSphere* pSphere = new CClientColSphere ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition, fRadius );
                             pEntity = pShape = pSphere;
                             break;
                         }
                         case COLSHAPE_RECTANGLE:
                         {
-                            CVector2D vecSize;
-                            bitStream.Read ( vecSize.fX );
-                            bitStream.Read ( vecSize.fY );
-                            CClientColRectangle* pRectangle = new CClientColRectangle ( g_pClientGame->m_pManager, EntityID, vecPosition, vecSize );
+                            SPosition2DSync size ( false );
+                            bitStream.Read ( &size );
+                            CClientColRectangle* pRectangle = new CClientColRectangle ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition, size.data.vecPosition );
                             pEntity = pShape = pRectangle;
                             break;
                         }
@@ -2913,7 +2884,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             float fRadius, fHeight;
                             bitStream.Read ( fRadius );
                             bitStream.Read ( fHeight );
-                            CClientColTube* pTube = new CClientColTube ( g_pClientGame->m_pManager, EntityID, vecPosition, fRadius, fHeight );
+                            CClientColTube* pTube = new CClientColTube ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition, fRadius, fHeight );
                             pEntity = pShape = pTube;
                             break;
                         }
@@ -2921,13 +2892,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         {
                             unsigned int uiPoints;
                             CVector2D vecPoint;
-                            bitStream.Read ( uiPoints );
-                            CClientColPolygon* pPolygon = new CClientColPolygon ( g_pClientGame->m_pManager, EntityID, vecPosition );
+                            bitStream.ReadCompressed ( uiPoints );
+                            CClientColPolygon* pPolygon = new CClientColPolygon ( g_pClientGame->m_pManager, EntityID, position.data.vecPosition );
                             for ( unsigned int i = 0; i < uiPoints; i++ )
                             {
-                                bitStream.Read ( vecPoint.fX );
-                                bitStream.Read ( vecPoint.fY );
-                                pPolygon->AddPoint ( vecPoint );
+                                SPosition2DSync vertex ( false );
+                                bitStream.Read ( &vertex );
+                                pPolygon->AddPoint ( vertex.data.vecPosition );
                             }
                             pEntity = pShape = pPolygon;
                             break;
@@ -2941,8 +2912,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     assert ( pShape );
                     if ( pShape )
                     {
-                        pShape->SetEnabled ( ( ucEnabled == 1 ) );
-                        pShape->SetAutoCallEvent ( ( ucAutoCallEvent == 1 ) );
+                        pShape->SetEnabled ( bEnabled );
+                        pShape->SetAutoCallEvent ( bAutoCallEvent );
                     }
 
                     break;
@@ -3269,7 +3240,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 pEntity->SetName ( szName );
                 pEntity->SetInterior ( ucInterior );
                 pEntity->SetDimension ( usDimension );
-                pEntity->SetAttachedOffsets ( vecAttachedPosition, vecAttachedRotation );
+                if ( bIsAttached )
+                    pEntity->SetAttachedOffsets ( attachedPosition.data.vecPosition,
+                                                  attachedRotation.data.vecRotation );
                 pEntity->SetSyncTimeContext ( ucSyncTimeContext );
                 pEntity->GetCustomDataPointer ()->Copy ( pCustomData );
 
@@ -3277,7 +3250,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 SEntityDependantStuff* pStuff = new SEntityDependantStuff;
                 pStuff->pEntity = pEntity;
                 pStuff->Parent = ParentID;
-                pStuff->AttachedToID = EntityAttachedToID;
+                if ( bIsAttached )
+                    pStuff->AttachedToID = EntityAttachedToID;
+                else
+                    pStuff->AttachedToID = INVALID_ELEMENT_ID;
                 newEntitiesStuff.push_back ( pStuff );
             }
 
