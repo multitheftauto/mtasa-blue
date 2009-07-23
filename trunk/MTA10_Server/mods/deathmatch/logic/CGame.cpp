@@ -629,12 +629,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 		if ( m_pMainConfig->GetASEEnabled () )
 		{
 			// Query Wojjie's game-monitor.com
-			CTCPImpl * pTCP = new CTCPImpl;
+			CTCPImpl * pTCP = new CTCPImpl ();
 			pTCP->Initialize ();
 
 			char szURL[256] = { '\0' };
 			CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-			sprintf ( szURL, QUERY_URL_GAME_MONITOR, usServerPort + 123);
+			_snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
 			CHTTPRequest * request = new CHTTPRequest ( szURL );
 			CHTTPResponse * response = request->Send ( pTCP );

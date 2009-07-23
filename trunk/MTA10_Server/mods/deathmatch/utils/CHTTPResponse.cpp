@@ -19,29 +19,25 @@ CHTTPResponse::CHTTPResponse ( void )
 {
     // Init
     m_uiErrorCode = 0;
-    m_szErrorDescription [0] = 0;
     m_iProtocolVersion = HTTP_NONE;
-    m_contentSize = 0;
-    m_content = NULL;
 }
 
 
 CHTTPResponse::~CHTTPResponse ( void )
 {
-    delete[] m_content;
+
 }
 
 
-bool CHTTPResponse::Parse ( const char* pHeaderBuffer, unsigned int uiHeaderSize, const char* pContent, size_t contentSize )
+bool CHTTPResponse::Parse ( const std::string& strHeader, const std::string& strContent )
 {
     // Copy the buffer
-    char* szTemp = new char [uiHeaderSize];
-    memcpy ( szTemp, pHeaderBuffer, uiHeaderSize );
+    char* szTemp = new char [ strHeader.size () + 1 ];
+    memcpy ( szTemp, strHeader.c_str (), strHeader.size () );
+    szTemp [ strHeader.size () ] = '\0';
 
-    m_contentSize = contentSize;
     // copy the contents into this
-    m_content = new char[m_contentSize];
-    memcpy(m_content, pContent, m_contentSize);
+    m_strContent = strContent;
 
     // Start by reading out the first line
     char* szFirstLine = strtok ( szTemp, "\r\n" );
@@ -86,7 +82,7 @@ bool CHTTPResponse::Parse ( const char* pHeaderBuffer, unsigned int uiHeaderSize
     }
 
     // Store the description
-    strncpy ( m_szErrorDescription, szDescription, sizeof ( m_szErrorDescription ) );
+    m_strErrorDescription = szDescription;
 
     // Delete the buffer
     delete [] szTemp;
@@ -102,7 +98,7 @@ unsigned int CHTTPResponse::GetErrorCode ( void )
 
 const char* CHTTPResponse::GetErrorDescription ( void )
 {
-    return m_szErrorDescription;
+    return m_strErrorDescription.c_str ();
 }
 
 
@@ -111,16 +107,12 @@ int CHTTPResponse::GetProtocolVersion ( void )
     return m_iProtocolVersion;
 }
 
-char * CHTTPResponse::GetData ( char * szBuffer, int iBufferSize )
+const char* CHTTPResponse::GetData ()
 {
-    if ( iBufferSize )
-        memcpy ( szBuffer, m_content, iBufferSize );
-    else
-        memcpy ( szBuffer, m_content, m_contentSize );
-    return szBuffer;
+    return m_strContent.c_str ();
 }
 
-int CHTTPResponse::GetDataLength ()
+size_t CHTTPResponse::GetDataLength ()
 {
-    return (int)m_contentSize;
+    return m_strContent.size ();
 }

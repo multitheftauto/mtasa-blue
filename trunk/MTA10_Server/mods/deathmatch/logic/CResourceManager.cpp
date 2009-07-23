@@ -787,8 +787,7 @@ bool CResourceManager::Install ( char * szURL, char * szName )
             size_t dataLength = response->GetDataLength();
             if ( dataLength != 0 )
             {
-                char * szBuffer = new char[dataLength];
-                response->GetData ( szBuffer );
+                const char* szBuffer = response->GetData ();
 
                 char szResourceRoot[MAX_PATH];
                 g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources", szResourceRoot, MAX_PATH );
@@ -802,11 +801,9 @@ bool CResourceManager::Install ( char * szURL, char * szName )
                 {
                     fwrite ( szBuffer, dataLength, 1, file );
                     fclose ( file );
-                    delete[] szBuffer;
                     delete pTCP;
                     return true;
                 }
-                delete[] szBuffer;
             }
         }
         delete request;
