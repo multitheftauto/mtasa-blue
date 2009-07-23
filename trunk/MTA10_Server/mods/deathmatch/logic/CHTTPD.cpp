@@ -85,12 +85,10 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
     {
         if ( !m_strDefaultResourceName.empty () )
         {
-            char szWelcome[512];
-            _snprintf ( szWelcome, 512, "<a href='/%s/'>This is the page you want</a>", m_strDefaultResourceName.c_str () );
-            ipoHttpResponse->SetBody ( szWelcome, strlen(szWelcome) );
-            char szNewURL[512];
-            _snprintf ( szNewURL, 512, "http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str () );
-            ipoHttpResponse->oResponseHeaders["location"] = szNewURL;
+            SString strWelcome ( "<a href='/%s/'>This is the page you want</a>", m_strDefaultResourceName.c_str () );
+            ipoHttpResponse->SetBody ( strWelcome.c_str (), strWelcome.size () );
+            SString strNewURL ( "http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str () );
+            ipoHttpResponse->oResponseHeaders["location"] = strNewURL.c_str ();
             return HTTPRESPONSECODE_302_FOUND;
 
             /*CAccessControlListManager * pACLManager = g_pGame->GetACLManager();
@@ -126,21 +124,17 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
         }
     }
 
-    char szWelcome[512];
-   // _asm int 3
-    _snprintf ( szWelcome, 512, "You haven't set a default resource in your configuration file. You can either do this or visit http://%s/<i>resourcename</i>/ to see a specific resource.<br/><br/>Alternatively, the server may be still starting up, if so, please try again in a minute.", ipoHttpRequest->oRequestHeaders["host"].c_str() );
-    ipoHttpResponse->SetBody ( szWelcome, strlen(szWelcome) );
+    SString strWelcome ( "You haven't set a default resource in your configuration file. You can either do this or visit http://%s/<i>resourcename</i>/ to see a specific resource.<br/><br/>Alternatively, the server may be still starting up, if so, please try again in a minute.", ipoHttpRequest->oRequestHeaders["host"].c_str() );
+    ipoHttpResponse->SetBody ( strWelcome.c_str (), strWelcome.size () );
     return HTTPRESPONSECODE_200_OK;
 }
 
 ResponseCode CHTTPD::RequestLogin ( HttpResponse * ipoHttpResponse )
 {
-    char szAuthenticateMessage[512];
-    sprintf ( szAuthenticateMessage, "Access denied, please login" );
+    const char* szAuthenticateMessage = "Access denied, please login";
     ipoHttpResponse->SetBody ( szAuthenticateMessage, strlen(szAuthenticateMessage) );
-    char szName[255];
-    sprintf ( szName, "Basic realm=\"%s\"", g_pGame->GetConfig ()->GetServerName ().c_str () );
-    ipoHttpResponse->oResponseHeaders [ "WWW-Authenticate" ] = szName;
+    SString strName ( "Basic realm=\"%s\"", g_pGame->GetConfig ()->GetServerName ().c_str () );
+    ipoHttpResponse->oResponseHeaders [ "WWW-Authenticate" ] = strName.c_str ();
     return HTTPRESPONSECODE_401_UNAUTHORIZED;
 }
 

@@ -739,7 +739,7 @@ bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float f
     vecDir.Normalize ();
     CVector vecUpInit ( 0.0f, 0.0f, 1.0f );
     CVector vecUp;
-    if ( abs(vecDir.fX) > 0.0001f || abs(vecDir.fY) > 0.0001f )
+    if ( fabs(vecDir.fX) > 0.0001f || fabs(vecDir.fY) > 0.0001f )
     {
         vecUp = vecDir;
         vecUp.CrossProduct ( &vecUpInit );

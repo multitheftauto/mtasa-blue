@@ -356,7 +356,7 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         pVehicle->m_LastSyncedData->vecTurnSpeed = vehicle.data.vecTurnVelocity;
     }
 
-    if ( abs ( pVehicle->m_LastSyncedData->fHealth - vehicle.data.fHealth ) > FLOAT_EPSILON )
+    if ( fabs ( pVehicle->m_LastSyncedData->fHealth - vehicle.data.fHealth ) > FLOAT_EPSILON )
     {
         bSyncVehicle = true;
         vehicle.data.bSyncHealth = true;

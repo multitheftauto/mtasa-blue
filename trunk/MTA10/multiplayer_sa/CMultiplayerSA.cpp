@@ -2999,7 +2999,7 @@ void GetMatrixForGravity ( const CVector& vecGravity, CMatrix& mat )
     {
         mat.vUp = -vecGravity;
         mat.vUp.Normalize ();
-        if ( abs(mat.vUp.fX) > 0.0001f || abs(mat.vUp.fZ) > 0.0001f )
+        if ( fabs(mat.vUp.fX) > 0.0001f || fabs(mat.vUp.fZ) > 0.0001f )
         {
             CVector y ( 0.0f, 1.0f, 0.0f );
             mat.vFront = vecGravity;
