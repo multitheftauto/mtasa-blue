@@ -31,20 +31,19 @@ public:
                     CHTTPResponse               ( void );
                     ~CHTTPResponse              ( void );
 
-    bool            Parse                       ( const char* pBuffer, unsigned int uiSize, const char* pContent, size_t contentSize );
+    bool            Parse                       ( const std::string& strHeader, const std::string& strContent );
 
     unsigned int    GetErrorCode                ( void );
     const char*     GetErrorDescription         ( void );
     int             GetProtocolVersion          ( void );
-    char *          GetData                     ( char * szBuffer, int iBufferSize = 0 );
-    int             GetDataLength               ( void );
+    const char*     GetData                     ( void );
+    size_t          GetDataLength               ( void );
 
 private:
     unsigned int    m_uiErrorCode;
-    char            m_szErrorDescription [256];
+    std::string     m_strErrorDescription;
     int             m_iProtocolVersion;
-    char*           m_content;
-    size_t          m_contentSize;
+    std::string     m_strContent;
 };
 
 #endif
