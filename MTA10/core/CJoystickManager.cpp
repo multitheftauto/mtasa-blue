@@ -497,8 +497,8 @@ void CJoystickManager::DoPulse ( void )
         // See if any axes have changed to over 0.75
         for ( int i = 0; i < NUMELMS ( m_JoystickState.rgfAxis ) ; i++ )
         {
-            if ( abs ( m_JoystickState.rgfAxis[i] ) > 0.75f )
-                if ( abs ( m_PreBindJoystickState.rgfAxis[i] ) < 0.75f )
+            if ( fabs ( m_JoystickState.rgfAxis[i] ) > 0.75f )
+                if ( fabs ( m_PreBindJoystickState.rgfAxis[i] ) < 0.75f )
                 {
                     m_bCaptureAxis = false;
                     // Save the mapping

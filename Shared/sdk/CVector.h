@@ -165,16 +165,16 @@ public:
 
     bool operator== ( const CVector& param ) const
     {
-        return ( ( abs ( fX - param.fX ) < FLOAT_EPSILON ) ||
-                 ( abs ( fY - param.fY ) < FLOAT_EPSILON ) ||
-                 ( abs ( fZ - param.fZ ) < FLOAT_EPSILON ) );
+        return ( ( fabs ( fX - param.fX ) < FLOAT_EPSILON ) &&
+                 ( fabs ( fY - param.fY ) < FLOAT_EPSILON ) &&
+                 ( fabs ( fZ - param.fZ ) < FLOAT_EPSILON ) );
     }
 
     bool operator!= ( const CVector& param ) const
     {
-        return ( ( abs ( fX - param.fX ) >= FLOAT_EPSILON ) ||
-                 ( abs ( fY - param.fY ) >= FLOAT_EPSILON ) ||
-                 ( abs ( fZ - param.fZ ) >= FLOAT_EPSILON ) );
+        return ( ( fabs ( fX - param.fX ) >= FLOAT_EPSILON ) ||
+                 ( fabs ( fY - param.fY ) >= FLOAT_EPSILON ) ||
+                 ( fabs ( fZ - param.fZ ) >= FLOAT_EPSILON ) );
     }
 };
 

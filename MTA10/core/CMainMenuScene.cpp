@@ -735,7 +735,7 @@ void CMainMenuScene::Draw3DScene ( void )
 
 		// Calculate the sigmoid S-curves
 		float fSigmoid = SIGMOID_TRANSITION_PHASE / (1.0f + exp(-fZoom)) + fSigmoidOffset;			// 1/(1+e^-t)
-		float fSigmoidSpin = abs(0.5f - (1.0f / (1.0f + exp(-fFade))));
+		float fSigmoidSpin = fabs(0.5f - (1.0f / (1.0f + exp(-fFade))));
 
 		// Increment the other counters
 		fLight += 0.03f * fInc;
@@ -832,7 +832,7 @@ void CMainMenuScene::Draw3DScene ( void )
 				fInc *= 1.1f;
 
 				// Calculate which horizontal square (based on the mask texture coordinates) is currently getting into the view
-				unsigned int proj = MASK_SQUARES_X - (unsigned int)fmod(MASK_SQUARES_X + (abs(fTheta)*MASK_THETA_PER_SQUARE),MASK_SQUARES_X);
+				unsigned int proj = MASK_SQUARES_X - (unsigned int)fmod(MASK_SQUARES_X + (fabs(fTheta)*MASK_THETA_PER_SQUARE),MASK_SQUARES_X);
 
 				// Loop through the credit stack to see if we have any new places to fill up
 				unsigned int x;

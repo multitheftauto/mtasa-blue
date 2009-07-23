@@ -19,7 +19,6 @@ class CQuat;
 #include <math.h>
 #include <float.h>
 #include "SharedUtil.h"
-#pragma warning (disable:4244)
 
 #define EPSILON			0.001
 
@@ -27,7 +26,6 @@ class CQuat;
 #define PI (float)3.14159265358979323846264338327950
 #endif
 
-#pragma warning ( disable:4244 )
 class CQuat
 {
 public:
@@ -98,7 +96,7 @@ public:
 		// Calculate angle between them.
 		float cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 		// if qa=qb or qa=-qb then theta = 0 and we can return qa
-		if (abs(cosHalfTheta) >= 1.0f){
+		if (fabs(cosHalfTheta) >= 1.0f){
 			qm.w = qa.w;qm.x = qa.x;qm.y = qa.y;qm.z = qa.z;
 			return;
 		}
