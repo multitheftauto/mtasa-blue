@@ -233,7 +233,7 @@ public:
     void                        Unlock                      ( void );
 
     inline bool                 IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
-    inline void                 ResetMapInfo                ( void );
+    void                        ResetMapInfo                ( void );
 
     void                        SetGlitchEnabled            ( std::string strGlitch, bool bEnabled );
     bool                        IsGlitchEnabled             ( std::string strGlitch );
@@ -241,8 +241,8 @@ public:
     char                        GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
     bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
 
-    void                     SetCloudsEnabled            ( bool bEnabled );
-    bool                     GetCloudsEnabled            ( void );
+    void                        SetCloudsEnabled            ( bool bEnabled );
+    bool                        GetCloudsEnabled            ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );

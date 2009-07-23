@@ -73,7 +73,7 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
             std::string strFile = lua_tostring ( luaVM, 1 );
             std::string strPath;
 
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath, std::string("") ) )
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) )
             {
                 // We have access to modify this resource?
                 if ( pResource == pThisResource ||
@@ -140,7 +140,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
         std::string strPath;
 
 
-        if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath, std::string("") ) )
+        if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) )
         {
             if ( pResource == pThisResource ||
                 m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
@@ -206,7 +206,7 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
             // Grab the filename passed
             std::string strFile = lua_tostring ( luaVM, 2 );
             std::string strPath;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath, std::string("") ) )
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) )
             {
                 // We have access to modify this resource?
                 if ( m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),

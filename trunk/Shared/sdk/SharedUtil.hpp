@@ -43,8 +43,6 @@ SString SharedUtil::GetMTASABaseDir()
     }
     return szInstallRoot;
 }
-#endif
-
 
 //
 // Turns a relative MTASA path i.e. "MTA\file.dat"
@@ -57,6 +55,17 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
     strNewPath += strPath;
     return strNewPath;
 }
+
+#else
+
+SString SharedUtil::CalcMTASAPath ( const SString& strPath )
+{
+    SString strNewPath = "./";
+    strNewPath += strPath;
+    return strNewPath;
+}
+
+#endif
 
 
 //

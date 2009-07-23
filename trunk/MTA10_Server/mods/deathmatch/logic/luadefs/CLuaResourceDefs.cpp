@@ -138,7 +138,7 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                         iDimension = 0;
                     }
                 }
-                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, strPath, strMetaName ) )
+                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, NULL ) )
                 {
                     // Do we have permissions?
 			        if ( pResource == pThisResource ||
@@ -194,7 +194,7 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
                 std::string strPath;
                 std::string strConfigName;
 
-                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, strPath, strConfigName ) )
+                if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, &strConfigName ) )
                 {
                     // Eventually read out the type string
                     int iType = CResourceFile::RESOURCE_FILE_TYPE_CONFIG;
@@ -719,7 +719,7 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
     if ( argtype ( 1, LUA_TSTRING ) )
     {
         strConfigName = lua_tostring ( luaVM, 1 );
-        if ( CResourceManager::ParseResourcePathInput ( strConfigName, pResource, std::string(""), strMetaPath ) )
+        if ( CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
         {
             list<CResourceFile *> * resourceFileList = pResource->GetFiles();
             list<CResourceFile *>::iterator iterd = resourceFileList->begin();
