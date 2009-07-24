@@ -18,7 +18,6 @@
 #ifndef __CGAMESA
 #define __CGAMESA
 
-#include "CEventDamageSA.h"
 #include "CModelInfoSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
@@ -105,8 +104,6 @@ public:
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
-
-    class CEventDamage              * GetEventDamage ( CEventDamageSAInterface * pInterface );
 
 	CWeaponInfo				* GetWeaponInfo(eWeaponType weapon);
 	CModelInfo				* GetModelInfo( DWORD dwModelID );

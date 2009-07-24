@@ -143,6 +143,9 @@ DWORD RETURN_CWeapon_FireAreaEffect =                       0x73EC03;
 DWORD RETURN_CPlantMgr_Render_success =                     0x5DBC52;
 DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 
+#define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
+DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -247,6 +250,7 @@ void HOOK_Idle ();
 void HOOK_RenderScene_Plants ();
 void HOOK_RenderScene_end ();
 void HOOK_CPlantMgr_Render ();
+void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
 
 void vehicle_lights_init ();
 
@@ -354,6 +358,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
     HookInstall(HOOKPOS_RenderScene_end, (DWORD)HOOK_RenderScene_end, 5);
     HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
+    HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -3852,5 +3857,49 @@ rendercheck:
 
 fail:
         jmp RETURN_CPlantMgr_Render_fail
+    }
+}
+
+/* This hook called from CEventHandler::ComputeKnockOffBikeResponse makes sure the
+   damage calculation is made *before* CEventDamage::AffectsPed (our damage hook) is called.
+   * Fixes 'falling off bike' damage being 0 in CClientGame::DamageHandler.
+*/
+CEventDamageSAInterface * pBikeDamageInterface;
+CPedSAInterface * pBikePedInterface;
+float fBikeDamage;
+void CEventHandler_ComputeKnockOffBikeResponse ()
+{
+    CEventDamage * pEvent = pGameInterface->GetEventList ()->GetEventDamage ( pBikeDamageInterface );
+    CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pBikePedInterface );
+    if ( pEvent && pPed )
+    {
+        CPedDamageResponse * pResponse = pEvent->GetDamageResponse ();
+        if ( pResponse )
+        {
+            pResponse->Calculate ( ( CEntity * ) pPed, fBikeDamage, pEvent->GetWeaponUsed (), pEvent->GetPedPieceType (), true, false );
+        }        
+    }
+    if ( pEvent ) pEvent->Destroy ();
+}
+
+DWORD dw_CEventDamage_AffectsPed = 0x4b35a0;
+void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
+{
+    _asm
+    {
+        mov     pBikeDamageInterface, ecx
+        mov     pBikePedInterface, edx
+        mov     eax, [edi+40]
+        mov     fBikeDamage, eax
+
+        pushad
+    }
+    CEventHandler_ComputeKnockOffBikeResponse ();
+    
+    _asm
+    {
+        popad
+        call    dw_CEventDamage_AffectsPed
+        jmp     RETURN_CEventHandler_ComputeKnockOffBikeResponse
     }
 }

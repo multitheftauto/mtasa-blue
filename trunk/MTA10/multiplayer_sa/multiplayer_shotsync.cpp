@@ -624,7 +624,7 @@ bool ProcessDamageEvent ( CEventDamageSAInterface * event, CPedSAInterface * aff
         if ( pPed )
         {
             // This creates a CEventDamageSA for us
-            CEventDamage * pEvent = pGameInterface->GetEventDamage ( event );
+            CEventDamage * pEvent = pGameInterface->GetEventList ()->GetEventDamage ( event );
             // Call the event
             bool bReturn = m_pDamageHandler ( pPed, pEvent );
             // Destroy the CEventDamageSA (so we dont get a leak)

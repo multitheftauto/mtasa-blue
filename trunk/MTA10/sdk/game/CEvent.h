@@ -12,9 +12,12 @@
 #ifndef __CGAME_EVENT
 #define __CGAME_EVENT
 
+class CEventSAInterface;
+
 class CEvent
 {
-
+public:
+    virtual CEventSAInterface *         GetInterface        ( void ) = 0;
 };
 
 #endif
