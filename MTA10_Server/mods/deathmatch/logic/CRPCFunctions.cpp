@@ -154,19 +154,20 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
 
 void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 {
-    unsigned char ucType, ucKeyLength;
+    unsigned char ucType;
     bool bHitState;
     if ( bitStream.ReadBit () == true )
         ucType = 1;
     else
         ucType = 0;
-    bitStream.Read ( ucKeyLength );
+    bitStream.ReadBit ( bHitState );
+
+    unsigned char ucKeyLength = bitStream.GetNumberOfUnreadBits () >> 3;
     if ( ucKeyLength < 256 )
     {
         char szKey [ 256 ];
         bitStream.Read ( szKey, ucKeyLength );
         szKey [ ucKeyLength ] = 0;
-        bitStream.ReadBit ( bHitState );
 
         m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
     }
