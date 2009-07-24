@@ -4610,6 +4610,7 @@ bool CStaticFunctionDefinitions::SetVehicleEngineState ( CElement* pElement, boo
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        pVehicle->SetEngineOn ( bState );
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( pVehicle->GetID () );
