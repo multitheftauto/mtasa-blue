@@ -16,7 +16,7 @@
 eEventEntityType CEventSA::GetType (  )
 {
 	DEBUG_TRACE("eEventEntityType CEventSA::GetType (  )");
-	return internalInterface->m_eEventType;
+	return m_pInterface->m_eEventType;
 }
 
 CEntity	* CEventSA::GetEntity (  )
@@ -28,16 +28,16 @@ CEntity	* CEventSA::GetEntity (  )
 	CPoolsSA * pPools = (CPoolsSA *)pGame->GetPools();
 	CEntity * entity;		
 
-	switch(internalInterface->m_eEventEntity)
+	switch(m_pInterface->m_eEventEntity)
 	{
 	case ENTITY_EVENT_PED:
-		entity = (CEntity *)pPools->GetPedFromRef((DWORD)internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetPedFromRef((DWORD)m_pInterface->m_nEventEntityRef);
 		break;
 	case ENTITY_EVENT_VEHICLE:
-		entity = (CEntity *)pPools->GetVehicleFromRef((DWORD)internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetVehicleFromRef((DWORD)m_pInterface->m_nEventEntityRef);
 		break;
 	case ENTITY_EVENT_OBJECT:
-		entity = (CEntity *)pPools->GetObjectFromRef((DWORD)internalInterface->m_nEventEntityRef);
+		entity = (CEntity *)pPools->GetObjectFromRef((DWORD)m_pInterface->m_nEventEntityRef);
 		break;
 	default:
 		return NULL;
@@ -48,17 +48,17 @@ CEntity	* CEventSA::GetEntity (  )
 eEventEntity CEventSA::GetEntityType (  )
 {
 	DEBUG_TRACE("eEventEntity CEventSA::GetEntityType (  )");
-	return internalInterface->m_eEventEntity;
+	return m_pInterface->m_eEventEntity;
 }
 
 CEntity * CEventSA::GetCommittedBy (  )
 {
 	DEBUG_TRACE("CEntity * CEventSA::GetCommittedBy (  )");
-	return internalInterface->m_pCommitedBy;
+	return m_pInterface->m_pCommitedBy;
 }
 
 CVector * CEventSA::GetPosition (  )
 {
 	DEBUG_TRACE("CVector * CEventSA::GetPosition (  )");
-	return &internalInterface->m_vecEventPosition;
+	return &m_pInterface->m_vecEventPosition;
 }

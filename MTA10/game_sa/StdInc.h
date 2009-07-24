@@ -65,6 +65,7 @@
 #include "CGaragesSA.h"
 #include "CTasksSA.h"
 #include "CEventDamageSA.h"
+#include "CEventGunShotSA.h"
 #include "CAnimManagerSA.h"
 #include "CStreamingSA.h"
 #include "CVisibilityPluginsSA.h"
@@ -96,3 +97,5 @@
 #include "CBuildingSA.h"
 #include "CRestartSA.h"
 #include "CWaterManagerSA.h"
+#include "CPedDamageResponseSA.h"
+#include "CPedDamageResponseCalculatorSA.h"

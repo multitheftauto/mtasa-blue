@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Client - Game SA"
 	ProjectGUID="{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
 	TargetFrameworkVersion="131072"
@@ -459,6 +459,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEventGunShotSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CEventListSA.cpp"
 				>
 			</File>
@@ -560,6 +564,14 @@
 			</File>
 			<File
 				RelativePath=".\CPathFindSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedDamageResponseCalculatorSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedDamageResponseSA.cpp"
 				>
 			</File>
 			<File
@@ -944,6 +956,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CEventGunShotSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CEventListSA.h"
 				>
 			</File>
@@ -1049,6 +1065,14 @@
 			</File>
 			<File
 				RelativePath=".\CPathFindSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedDamageResponseCalculatorSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPedDamageResponseSA.h"
 				>
 			</File>
 			<File

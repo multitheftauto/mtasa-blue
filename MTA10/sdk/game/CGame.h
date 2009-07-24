@@ -31,8 +31,9 @@ typedef void ( InRenderer ) ( void );
 #include "CCheckpoints.h"
 #include "CControllerConfigManager.h"
 #include "CCoronas.h"
-#include "CEventList.h"
 #include "CEventDamage.h"
+#include "CEventGunShot.h"
+#include "CEventList.h"
 #include "CExplosionManager.h"
 #include "CFireManager.h"
 #include "CFont.h"
@@ -45,6 +46,7 @@ typedef void ( InRenderer ) ( void );
 #include "CModelInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
+#include "CPedDamageResponse.h"
 #include "CPedModelInfo.h"
 #include "CPickups.h"
 #include "CPlayerInfo.h"
@@ -125,9 +127,6 @@ public:
     virtual CRopes              * GetRopes () = 0;
     virtual CFx                 * GetFx () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
-
-    virtual class CEventDamage  * GetEventDamage ( class CEventDamageSAInterface * pInterface ) = 0;
-
 	
 	virtual CWeaponInfo			* GetWeaponInfo(eWeaponType weapon)=0;
 	virtual CModelInfo			* GetModelInfo(DWORD dwModelID)=0;
