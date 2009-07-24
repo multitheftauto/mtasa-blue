@@ -1461,7 +1461,7 @@ struct SEntityAlphaSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        if ( bitStream.Read ( data.ucAlpha ) )
+        if ( bitStream.ReadCompressed ( data.ucAlpha ) )
         {
             data.ucAlpha = 255 - data.ucAlpha;
             return true;
@@ -1471,7 +1471,7 @@ struct SEntityAlphaSync : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         unsigned char ucAlpha = 255 - data.ucAlpha;
-        bitStream.Write ( ucAlpha );
+        bitStream.WriteCompressed ( ucAlpha );
     }
 
     struct
@@ -1681,6 +1681,30 @@ struct SLuaTypeSync : public ISyncStructure
     } data;
 };
 
+
+//////////////////////////////////////////
+//                                      //
+//            Mouse button              //
+//                                      //
+//////////////////////////////////////////
+struct SMouseButtonSync : public ISyncStructure
+{
+    enum { BITCOUNT = 3 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucButton : 3;
+    } data;
+};
 
 
 #pragma pack(pop)

@@ -18,12 +18,8 @@ bool CPickupHideShowPacket::Write ( NetBitStreamInterface& BitStream ) const
     // Got more than zero pickups added?
     if ( m_List.size () > 0 )
     {
-        // Make the flags byte
-        unsigned char ucFlags = 0;
-        ucFlags |= m_bShow ? 1:0;
-
         // Write the flags
-        BitStream.Write ( ucFlags );
+        BitStream.WriteBit ( m_bShow );
 
         // Write the pickup ids
         unsigned short usPickupModelID;
@@ -49,8 +45,8 @@ bool CPickupHideShowPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( usPickupModelID != 0 )
             {
                 // Write the pickup model id and id
-                BitStream.Write ( pPickup->GetID () );
-                BitStream.Write ( usPickupModelID );
+                BitStream.WriteCompressed ( pPickup->GetID () );
+                BitStream.WriteCompressed ( usPickupModelID );
             }
         }
 

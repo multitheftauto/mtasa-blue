@@ -708,9 +708,9 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
             if ( pBitStream )
             {
                 // Write element ID, name length and the name. Also write the variable.
-                pBitStream->Write ( Entity.GetID () );
+                pBitStream->WriteCompressed ( Entity.GetID () );
                 unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
-                pBitStream->Write ( usNameLength );
+                pBitStream->WriteCompressed ( usNameLength );
                 pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );    
                 Variable.WriteToBitStream ( *pBitStream );
 

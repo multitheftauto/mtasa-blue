@@ -34,7 +34,7 @@ public:
 
     inline ElementID                GetVehicle                  ( void )                    { return m_Vehicle; };
     inline ElementID                GetAttachedVehicle          ( void )                    { return m_AttachedVehicle; };
-    inline bool                     GetAttached                 ( void )                    { return m_ucAttached == 1; }
+    inline bool                     GetAttached                 ( void )                    { return m_bAttached; }
     inline CVector                  GetPosition                 ( void )                    { return m_vecPosition; }
     inline CVector                  GetRotationDegrees          ( void )                    { return m_vecRotationDegrees; }
     inline CVector                  GetTurnSpeed                ( void )                    { return m_vecTurnSpeed; }
@@ -42,7 +42,7 @@ public:
 private:
     ElementID                       m_Vehicle;
     ElementID                       m_AttachedVehicle;
-    unsigned char                   m_ucAttached;
+    bool                            m_bAttached;
     CVector                         m_vecPosition;
     CVector                         m_vecRotationDegrees;
     CVector                         m_vecTurnSpeed;

@@ -21,15 +21,12 @@ bool CPickupHitConfirmPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pPickup )
     {
         // Write the pickup id and visibily state
-        BitStream.Write ( m_pPickup->GetID () );
+        BitStream.WriteCompressed ( m_pPickup->GetID () );
 
-        // Populate the flags
-        unsigned char ucFlags = 0;
-        ucFlags |= m_pPickup->IsVisible () ? 1:0;
-        ucFlags |= m_bPlaySound << 1;
+        // WRite the flags
+        BitStream.WriteBit ( m_pPickup->IsVisible () );
+        BitStream.WriteBit ( m_bPlaySound );
 
-        // Write the flags
-        BitStream.Write ( ucFlags );
         return true;
     }
 

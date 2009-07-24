@@ -39,7 +39,7 @@ public:
     virtual void        Write                       ( const char* input, int numberOfBytes ) = 0;
     virtual void        Write                       ( const ISyncStructure* syncStruct ) = 0;
 
-private:    // Don't use char functions, as they offer poor compression
+public:    // Use char functions only when they will be 0 most times
     virtual void        WriteCompressed             ( const unsigned char& input ) = 0;
     virtual void        WriteCompressed             ( const char& input ) = 0;
 public:
@@ -85,7 +85,7 @@ public:
     virtual bool        Read                        ( char* output, int numberOfBytes ) = 0;
     virtual bool        Read                        ( ISyncStructure* syncStruct ) = 0;
 
-private:    // Don't use char functions, as they offer poor compression
+public:    // Use char functions only when they will be 0 most times
     virtual bool        ReadCompressed              ( unsigned char& output ) = 0;
     virtual bool        ReadCompressed              ( char& output ) = 0;
 public:

@@ -19,7 +19,7 @@ CVehicleTrailerPacket::CVehicleTrailerPacket ( CVehicle* pVehicle,
 {
     m_Vehicle = pVehicle->GetID ();
     m_AttachedVehicle = pTrailer->GetID ();
-    m_ucAttached = ( bAttached ) ? 1 : 0;
+    m_bAttached = bAttached;
     m_vecPosition = pTrailer->GetPosition ();
     pTrailer->GetRotationDegrees ( m_vecRotationDegrees );
     m_vecTurnSpeed = pTrailer->GetTurnSpeed ();
@@ -27,36 +27,53 @@ CVehicleTrailerPacket::CVehicleTrailerPacket ( CVehicle* pVehicle,
 
 bool CVehicleTrailerPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    return ( BitStream.Read ( m_Vehicle ) &&
-             BitStream.Read ( m_AttachedVehicle ) &&
-             BitStream.Read ( m_ucAttached ) &&
-             ( m_ucAttached == 0 ||
-               ( BitStream.Read ( m_vecPosition.fX ) &&
-                 BitStream.Read ( m_vecPosition.fY ) &&
-                 BitStream.Read ( m_vecPosition.fZ ) &&
-                 BitStream.Read ( m_vecRotationDegrees.fX ) &&
-                 BitStream.Read ( m_vecRotationDegrees.fY ) &&
-                 BitStream.Read ( m_vecRotationDegrees.fZ ) &&
-                 BitStream.Read ( m_vecTurnSpeed.fX ) &&
-                 BitStream.Read ( m_vecTurnSpeed.fY ) &&
-                 BitStream.Read ( m_vecTurnSpeed.fZ ) ) ) );
+    SPositionSync position ( false );
+    SRotationDegreesSync rotation ( false );
+    SVelocitySync turn;
+
+    if ( BitStream.ReadCompressed ( m_Vehicle ) &&
+         BitStream.ReadCompressed ( m_AttachedVehicle ) &&
+         BitStream.ReadBit ( m_bAttached ) &&
+         ( !m_bAttached ||
+           ( BitStream.Read ( &position ) &&
+             BitStream.Read ( &rotation ) &&
+             BitStream.Read ( &turn )
+           )
+         )
+       )
+    {
+        if ( m_bAttached )
+        {
+            m_vecPosition = position.data.vecPosition;
+            m_vecRotationDegrees = rotation.data.vecRotation;
+            m_vecTurnSpeed = turn.data.vecVelocity;
+        }
+        return true;
+    }
+    return false;
 }
 
 
 bool CVehicleTrailerPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.Write ( m_Vehicle );
-    BitStream.Write ( m_AttachedVehicle );
-    BitStream.Write ( m_ucAttached );
-    BitStream.Write ( m_vecPosition.fX );
-    BitStream.Write ( m_vecPosition.fY );
-    BitStream.Write ( m_vecPosition.fZ );
-    BitStream.Write ( m_vecRotationDegrees.fX );
-    BitStream.Write ( m_vecRotationDegrees.fY );
-    BitStream.Write ( m_vecRotationDegrees.fZ );
-    BitStream.Write ( m_vecTurnSpeed.fX );
-    BitStream.Write ( m_vecTurnSpeed.fY );
-    BitStream.Write ( m_vecTurnSpeed.fZ );
+    BitStream.WriteCompressed ( m_Vehicle );
+    BitStream.WriteCompressed ( m_AttachedVehicle );
+    BitStream.WriteBit ( m_bAttached );
+
+    if ( m_bAttached )
+    {
+        SPositionSync position ( false );
+        position.data.vecPosition = m_vecPosition;
+        BitStream.Write ( &position );
+
+        SRotationDegreesSync rotation ( false );
+        rotation.data.vecRotation = m_vecRotationDegrees;
+        BitStream.Write ( &rotation );
+
+        SVelocitySync turn;
+        turn.data.vecVelocity = m_vecTurnSpeed;
+        BitStream.Write ( &turn );
+    }
 
     return true;
 }
