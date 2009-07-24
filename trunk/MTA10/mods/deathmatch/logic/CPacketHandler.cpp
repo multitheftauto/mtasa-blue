@@ -295,7 +295,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
 
     // Read out our local id
-    bitStream.Read ( g_pClientGame->m_LocalID );
+    bitStream.ReadCompressed ( g_pClientGame->m_LocalID );
     if ( g_pClientGame->m_LocalID == INVALID_ELEMENT_ID )
     {
         RaiseProtocolError ( 4 );
@@ -325,7 +325,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 
     // Read out the root element id
     ElementID RootElementID;
-    bitStream.Read ( RootElementID );
+    bitStream.ReadCompressed ( RootElementID );
     if ( RootElementID == INVALID_ELEMENT_ID )
     {
         // Raise an error
@@ -452,12 +452,13 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         return;
     }
 
-    // Flags for all the players
-    unsigned char ucGlobalFlags = 0;
-    bitStream.Read ( ucGlobalFlags );
-
     // Grab the flags
-    bool bJustJoined = ucGlobalFlags & 0x01;
+    bool bJustJoined;
+    if ( !bitStream.ReadBit ( bJustJoined ) )
+    {
+        RaiseProtocolError ( 8 );
+        return;
+    }
 
     // While there are bytes left, parse player list items
     char szNickBuffer [MAX_PLAYER_NICK_LENGTH + 1];
@@ -465,7 +466,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     {
         // Read out the assigned player id
         ElementID PlayerID;
-        if ( !bitStream.Read ( PlayerID ) )
+        if ( !bitStream.ReadCompressed ( PlayerID ) )
         {
             RaiseProtocolError ( 8 );
             return;
@@ -496,18 +497,14 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         StripUnwantedCharacters ( szNickBuffer, '_' );
 
         // Player flags
-        unsigned char ucFlags = 0;
-        bitStream.Read ( ucFlags );
-
-        // Decode the player flags
-        bool bIsDead = ( ucFlags & 0x01 ) ? true:false;
-        bool bIsSpawned = ( ucFlags & 0x02 ) ? true:false;
-        bool bInVehicle = ( ucFlags & 0x04 ) ? true:false;
-        bool bHasJetPack = ( ucFlags & 0x08 ) ? true:false;
-        bool bNametagShowing = ( ucFlags & 0x10 ) ? true:false;
-        bool bHasNametagColorOverridden = ( ucFlags & 0x20 ) ? true:false;
-        bool bIsHeadless = ( ucFlags & 0x40 ) ? true:false;
-        bool bIsFrozen = ( ucFlags & 0x80 ) ? true:false;
+        bool bIsDead = bitStream.ReadBit ();
+        bool bIsSpawned = bitStream.ReadBit ();
+        bool bInVehicle = bitStream.ReadBit ();
+        bool bHasJetPack = bitStream.ReadBit ();
+        bool bNametagShowing = bitStream.ReadBit ();
+        bool bHasNametagColorOverridden = bitStream.ReadBit ();
+        bool bIsHeadless = bitStream.ReadBit ();
+        bool bIsFrozen = bitStream.ReadBit ();
 
         // Player nametag text
         char szNametagText [MAX_PLAYER_NICK_LENGTH + 1];
@@ -536,16 +533,16 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         ElementID TeamID = INVALID_ELEMENT_ID;
         ElementID ID = INVALID_ELEMENT_ID;
         unsigned char ucVehicleSeat = 0xFF;
-        CVector vecPosition;
-        float fRotation = 0.0f;
+        SPositionSync position ( false );
+        SPedRotationSync rotation;
         unsigned short usDimension = 0;
         unsigned char ucFightingStyle = 0;
-        unsigned char ucAlpha = 255;
+        SEntityAlphaSync alpha;
         unsigned char ucInterior = 0;
         if ( bIsSpawned )
         {
             // Read out the player model id
-            bitStream.Read ( usPlayerModelID );
+            bitStream.ReadCompressed ( usPlayerModelID );
             if ( !CClientPlayerManager::IsValidModel ( usPlayerModelID ) )
             {
                 RaiseProtocolError ( 10 );
@@ -553,14 +550,29 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
             }
 
             // Team?
-            bitStream.Read ( TeamID );
+            bool bHasTeam;
+            if ( !bitStream.ReadBit ( bHasTeam ) )
+            {
+                RaiseProtocolError ( 10 );
+                return;
+            }
+            if ( bHasTeam )
+                bitStream.ReadCompressed ( TeamID );
 
             // In vehicle?
             if ( bInVehicle )
             {
                 // Read out the vehicle id
-                bitStream.Read ( ID );
-                bitStream.Read ( ucVehicleSeat );
+                bitStream.ReadCompressed ( ID );
+
+                SOccupiedSeatSync seat;
+                if ( !bitStream.Read ( &seat ) )
+                {
+                    RaiseProtocolError ( 11 );
+                    return;
+                }
+                ucVehicleSeat = seat.data.ucSeat;
+
 
                 // Valid seat?
                 if ( ucVehicleSeat == 0xFF )
@@ -575,17 +587,15 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 ID = INVALID_ELEMENT_ID;
 
                 // Read out the position
-                bitStream.Read ( vecPosition.fX );
-                bitStream.Read ( vecPosition.fY );
-                bitStream.Read ( vecPosition.fZ );
+                bitStream.Read ( &position );
 
                 // Read out the rotation float
-                bitStream.Read ( fRotation );
+                bitStream.Read ( &rotation );
             }
 
-            bitStream.Read ( usDimension );
+            bitStream.ReadCompressed ( usDimension );
             bitStream.Read ( ucFightingStyle );
-            bitStream.Read ( ucAlpha );
+            bitStream.Read ( &alpha );
             bitStream.Read ( ucInterior );
         }
 
@@ -628,9 +638,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 // Not in a vehicle?
                 if ( ID == INVALID_ELEMENT_ID )
                 {
-                    pPlayer->SetPosition ( vecPosition );
-                    pPlayer->SetCurrentRotation ( fRotation );
-                    pPlayer->SetCameraRotation ( fRotation );
+                    pPlayer->SetPosition ( position.data.vecPosition );
+                    pPlayer->SetCurrentRotation ( rotation.data.fRotation );
+                    pPlayer->SetCameraRotation ( rotation.data.fRotation );
                     pPlayer->ResetInterpolation ();
                     pPlayer->SetHasJetPack ( bHasJetPack );
                 }
@@ -647,7 +657,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 pPlayer->SetFrozen ( bIsFrozen );
                 pPlayer->SetDimension ( usDimension );
                 pPlayer->SetFightingStyle ( ( eFightingStyle ) ucFightingStyle );
-                pPlayer->SetAlpha ( ucAlpha );
+                pPlayer->SetAlpha ( alpha.data.ucAlpha );
                 pPlayer->SetInterior ( ucInterior );
 
                 // Read the weapon slots
@@ -655,9 +665,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 {
                     if ( bitStream.ReadBit () == true )
                     {
-                        unsigned char ucWeaponType;
-                        bitStream.Read ( ucWeaponType );
-                        pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponType ), 1 );
+                        SWeaponTypeSync weaponType;
+                        bitStream.Read ( &weaponType );
+                        pPlayer->GiveWeapon ( static_cast < eWeaponType > ( weaponType.data.ucWeaponType ), 1 );
                     }
                 }
             }
@@ -946,14 +956,14 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
 
     // Read out the player ID
     ElementID PlayerID;
-    if ( !bitStream.Read ( PlayerID ) )
+    if ( !bitStream.ReadCompressed ( PlayerID ) )
     {
         RaiseProtocolError ( 23 );
         return;
     }
 
     // Check how many bytes with nick we got to read
-    unsigned int uiNickLength = bitStream.GetNumberOfBytesUsed () - sizeof ( ElementID );
+    unsigned int uiNickLength = bitStream.GetNumberOfUnreadBits () >> 3;
     if ( uiNickLength < MIN_PLAYER_NICK_LENGTH || uiNickLength > MAX_PLAYER_NICK_LENGTH )
     {
         RaiseProtocolError ( 24 );
@@ -1716,30 +1726,33 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
     // CVector (12)         - Rotation in degrees
     // CVector (12)         - TurnSpeed
 
-    ElementID ID, TrailerID;
-    unsigned char ucAttached;
-    CVector vecPosition, vecRotationDegrees;
-    CVector vecTurnSpeed;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( TrailerID ) &&
-         bitStream.Read ( ucAttached ) &&
-         bitStream.Read ( vecPosition.fX ) &&
-         bitStream.Read ( vecPosition.fY ) &&
-         bitStream.Read ( vecPosition.fZ ) &&
-         bitStream.Read ( vecRotationDegrees.fX ) &&
-         bitStream.Read ( vecRotationDegrees.fY ) &&
-         bitStream.Read ( vecRotationDegrees.fZ ) &&
-         bitStream.Read ( vecTurnSpeed.fX ) &&
-         bitStream.Read ( vecTurnSpeed.fY ) &&
-         bitStream.Read ( vecTurnSpeed.fZ ) )
+    ElementID ID;
+    ElementID TrailerID;
+    bool bAttached;
+    SPositionSync position ( false );
+    SRotationDegreesSync rotation ( false );
+    SVelocitySync turn;
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadCompressed ( TrailerID ) &&
+         bitStream.ReadBit ( bAttached ) &&
+         ( !bAttached || ( bitStream.Read ( &position ) &&
+                           bitStream.Read ( &rotation ) &&
+                           bitStream.Read ( &turn )
+                         )
+         )
+       )
     {
         CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get ( ID );
         CClientVehicle* pTrailer = g_pClientGame->m_pVehicleManager->Get ( TrailerID );
-        bool bAttached = ( ucAttached == 1 );
         if ( pVehicle && pTrailer )
         {
             if ( bAttached )
             {
+                pTrailer->SetPosition ( position.data.vecPosition );
+                pTrailer->SetRotationDegrees ( rotation.data.vecRotation );
+                pTrailer->SetTurnSpeed ( turn.data.vecVelocity );
+
                 #ifdef MTA_DEBUG
                     g_pCore->GetConsole ()->Printf ( "Packet_VehicleTrailer: attaching trailer %d to vehicle %d", TrailerID, ID );
                 #endif
@@ -3344,12 +3357,8 @@ void CPacketHandler::Packet_PickupHideShow ( NetBitStreamInterface& bitStream )
         return;
     }
 
-    // Read out global flags
-    unsigned char ucFlags;
-    bitStream.Read ( ucFlags );
-
-    // Extract the flag bools
-    bool bShow = ucFlags & 0x01;
+    // Read the flag bools
+    bool bShow = bitStream.ReadBit ();
 
     // Read until the end
     while ( bitStream.GetNumberOfUnreadBits () > 10 )
@@ -3357,7 +3366,7 @@ void CPacketHandler::Packet_PickupHideShow ( NetBitStreamInterface& bitStream )
         // Pickup id and model
         ElementID PickupID;
         unsigned short usPickupModel;
-        if ( bitStream.Read ( PickupID ) && bitStream.Read ( usPickupModel ) )
+        if ( bitStream.ReadCompressed ( PickupID ) && bitStream.ReadCompressed ( usPickupModel ) )
         {
             // Try to grab the pickup
             CClientPickup* pPickup = g_pClientGame->m_pPickupManager->Get ( PickupID );
@@ -3387,14 +3396,13 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
 
     // Read out the id and the flags
     ElementID PickupID;
-    unsigned char ucFlags;
-    if ( bitStream.Read ( PickupID ) &&
-         bitStream.Read ( ucFlags ) )
-    {
-        // Extract the bools from the flags
-        bool bHide = ( ucFlags & 0x01 ) ? true:false;
-        bool bPlaySound = ( ucFlags & 0x02 ) ? true:false;
+    bool bHide;
+    bool bPlaySound;
 
+    if ( bitStream.ReadCompressed ( PickupID ) &&
+         bitStream.ReadBit ( bHide ) &&
+         bitStream.ReadBit ( bPlaySound ) )
+    {
         // Grab the pickup
         CClientPickup* pPickup = g_pClientGame->m_pPickupManager->Get ( PickupID );
         if ( !pPickup )
@@ -3447,14 +3455,10 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
 
     // Read out the text ID
     unsigned long ulID;
-    bitStream.Read ( ulID );
+    bitStream.ReadCompressed ( ulID );
 
     // Flags
-    unsigned char ucFlags = 0;
-    bitStream.Read ( ucFlags );
-
-    // Extract the flags
-    bool bDelete = ucFlags & 0x01;
+    bool bDelete = bitStream.ReadBit ();
 
     // Something else than invalid?
     if ( ulID != 0xFFFFFFFF )
@@ -3488,7 +3492,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
 
             // Read out the text size
             unsigned short usTextLength = 0;
-            bitStream.Read( usTextLength );
+            bitStream.ReadCompressed ( usTextLength );
             if ( usTextLength <= 1024 )
             {
                 // Read out the texgt
@@ -3844,8 +3848,8 @@ void CPacketHandler::Packet_PlayerStats ( NetBitStreamInterface& bitStream )
     // Read out the player and stats
     ElementID ID;
     unsigned short usNumStats;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( usNumStats ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadCompressed ( usNumStats ) )
     {
         CClientPed* pPed = g_pClientGame->GetPedManager ()->Get ( ID, true );
         if ( pPed )

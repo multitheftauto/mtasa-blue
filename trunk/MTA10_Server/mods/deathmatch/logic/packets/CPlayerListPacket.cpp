@@ -32,12 +32,8 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
     // bool                  - has a jetpack?
     // unsigned short (2)    - dimension
 
-    // Populate the global flags for all players
-    unsigned char ucGlobalFlags = 0;
-    ucGlobalFlags |= m_bShowInChat ? 1:0;
-
     // Write the global flags
-    BitStream.Write ( ucGlobalFlags );
+    BitStream.WriteBit ( m_bShowInChat );
 
     CPlayer* pPlayer = NULL;
     // Put each player in our list into the packet
@@ -49,7 +45,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Write the player ID
         ElementID PlayerID = pPlayer->GetID ();
-        BitStream.Write ( PlayerID );
+        BitStream.WriteCompressed ( PlayerID );
 
         // Time sync context
         BitStream.Write ( pPlayer->GetSyncTimeContext () );
@@ -69,27 +65,16 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Flags
-        bool bIsDead = pPlayer->IsDead ();
         bool bIsSpawned = pPlayer->IsSpawned ();
-        bool bInVehicle = bIsSpawned && ( pPlayer->GetOccupiedVehicle () != NULL );
-        bool bHasJetpack = pPlayer->HasJetPack ();
-        bool bNametagShowing = pPlayer->IsNametagShowing ();
-        bool bNametagColorOverridden = pPlayer->IsNametagColorOverridden ();
-        bool bIsHeadless = pPlayer->IsHeadless();
-        bool bIsFrozen = pPlayer->IsFrozen();
-
-        // Collect the flags into a byte
-        unsigned char ucFlags = 0;
-        ucFlags |= bIsDead ? 1 : 0;
-        ucFlags |= bIsSpawned << 1;
-        ucFlags |= bInVehicle << 2;
-        ucFlags |= bHasJetpack << 3;
-        ucFlags |= bNametagShowing << 4;
-        ucFlags |= bNametagColorOverridden << 5;
-        ucFlags |= bIsHeadless << 6;
-        ucFlags |= bIsFrozen << 7;
-        // Write the flags
-        BitStream.Write ( ucFlags );
+        bool bInVehicle = ( bIsSpawned && ( pPlayer->GetOccupiedVehicle () != NULL ) );
+        BitStream.WriteBit ( pPlayer->IsDead () );
+        BitStream.WriteBit ( bIsSpawned );
+        BitStream.WriteBit ( bInVehicle );
+        BitStream.WriteBit ( pPlayer->HasJetPack () );
+        BitStream.WriteBit ( pPlayer->IsNametagShowing () );
+        BitStream.WriteBit ( pPlayer->IsNametagColorOverridden () );
+        BitStream.WriteBit ( pPlayer->IsHeadless() );
+        BitStream.WriteBit ( pPlayer->IsFrozen() );
 
         // Nametag stuff
         unsigned char ucNametagTextLength = 0;
@@ -102,7 +87,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( szNametagText, ucNametagTextLength );
 
         // Write nametag color if it's overridden
-        if ( bNametagColorOverridden )
+        if ( pPlayer->IsNametagColorOverridden () )
         {
             unsigned char ucR, ucG, ucB;
             pPlayer->GetNametagColor ( ucR, ucG, ucB );
@@ -115,36 +100,50 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( bIsSpawned )
         {
             // Player model ID
-            BitStream.Write ( pPlayer->GetModel () );
+            BitStream.WriteCompressed ( pPlayer->GetModel () );
 
             // Team id
             CTeam* pTeam = pPlayer->GetTeam ();
-            ElementID TeamID = ( pTeam ) ? pTeam->GetID () : INVALID_ELEMENT_ID;
-            BitStream.Write ( TeamID );
-
-            // Grab the occupied vehicle
-            CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-            if ( pVehicle )
+            if ( pTeam )
             {
+                BitStream.WriteBit ( true );
+                BitStream.WriteCompressed ( pTeam->GetID () );
+            }
+            else
+                BitStream.WriteBit ( false );
+
+            if ( bInVehicle )
+            {
+                // Grab the occupied vehicle
+                CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
+
                 // Vehicle ID and seat
-                BitStream.Write ( pVehicle->GetID () );
-                BitStream.Write ( static_cast < unsigned char > ( pPlayer->GetOccupiedVehicleSeat () ) );
+                BitStream.WriteCompressed ( pVehicle->GetID () );
+
+                SOccupiedSeatSync seat;
+                seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat ();
+                BitStream.Write ( &seat );
             }
             else
             {
                 // Player position
-                CVector vecTemp = pPlayer->GetPosition ();
-                BitStream.Write ( vecTemp.fX );
-                BitStream.Write ( vecTemp.fY );
-                BitStream.Write ( vecTemp.fZ );
+                SPositionSync position ( false );
+                position.data.vecPosition = pPlayer->GetPosition ();
+                BitStream.Write ( &position );
 
                 // Player rotation
-                BitStream.Write ( pPlayer->GetRotation () );
+                SPedRotationSync rotation;
+                rotation.data.fRotation = pPlayer->GetRotation ();
+                BitStream.Write ( &rotation );
             }
 
-            BitStream.Write ( pPlayer->GetDimension () );
+            BitStream.WriteCompressed ( pPlayer->GetDimension () );
             BitStream.Write ( pPlayer->GetFightingStyle () );
-            BitStream.Write ( pPlayer->GetAlpha () );
+
+            SEntityAlphaSync alpha;
+            alpha.data.ucAlpha = pPlayer->GetAlpha ();
+            BitStream.Write ( &alpha );
+
             BitStream.Write ( pPlayer->GetInterior () );
 
             // Write the weapons of the player weapon slots
@@ -154,7 +153,9 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( pWeapon && pWeapon->ucType != 0 )
                 {
                     BitStream.WriteBit ( true );
-                    BitStream.Write ( pWeapon->ucType );
+                    SWeaponTypeSync weaponType;
+                    weaponType.data.ucWeaponType = pWeapon->ucType;
+                    BitStream.Write ( &weaponType );
                 }
                 else
                     BitStream.WriteBit ( false );

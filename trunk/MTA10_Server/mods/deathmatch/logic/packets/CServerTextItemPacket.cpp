@@ -47,14 +47,10 @@ CServerTextItemPacket::~CServerTextItemPacket ( void )
 
 bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
 {
-    BitStream.Write ( m_ulUniqueId );
-
-    // Grab the flag byte
-    unsigned char ucFlags = 0;
-    ucFlags |= m_bDeletable ? 1:0;
+    BitStream.WriteCompressed ( m_ulUniqueId );
 
     // Write the flag byte
-    BitStream.Write ( ucFlags );
+    BitStream.WriteBit ( m_bDeletable );
 
     // Not deleting this?
     if ( !m_bDeletable )
@@ -76,7 +72,7 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
         }
 
         // Write the text
-        BitStream.Write ( static_cast < unsigned short > ( sizeText ) );
+        BitStream.WriteCompressed ( static_cast < unsigned short > ( sizeText ) );
         if ( sizeText )
         {
             BitStream.Write ( m_szText, sizeText );

@@ -29,11 +29,11 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pSourceElement )
     {
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.Write ( ID );
+        BitStream.WriteCompressed ( ID );
 
 		// Write the stats
 		unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );
-		BitStream.Write ( usNumStats );
+		BitStream.WriteCompressed ( usNumStats );
 
 		vector < sPlayerStat* > ::const_iterator iter = m_List.begin ();
 		for ( ; iter != m_List.end () ; iter++ )

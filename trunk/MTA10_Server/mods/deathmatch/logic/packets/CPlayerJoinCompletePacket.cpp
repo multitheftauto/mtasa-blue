@@ -49,9 +49,9 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsig
 
 bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.Write ( m_PlayerID );
+    BitStream.WriteCompressed ( m_PlayerID );
     BitStream.Write ( m_ucNumberOfPlayers );
-    BitStream.Write ( m_RootElementID );
+    BitStream.WriteCompressed ( m_RootElementID );
     BitStream.Write ( static_cast < unsigned char > ( m_ucHTTPDownloadType ) );
 
     switch ( m_ucHTTPDownloadType )

@@ -1563,7 +1563,7 @@ void CClientGame::UpdatePlayerTarget ( void )
 		}
 
         CBitStream bitStream;
-        bitStream.pBitStream->Write ( TargetID );
+        bitStream.pBitStream->WriteCompressed ( TargetID );
         m_pNetAPI->RPC ( PLAYER_TARGET, bitStream.pBitStream );
 
         // Call our onClientPlayerTarget event
@@ -1780,7 +1780,7 @@ void CClientGame::UpdateFireKey ( void )
 
                                     // Lets request a stealth kill
                                     CBitStream bitStream;
-                                    bitStream.pBitStream->Write ( pTarget->GetID () );
+                                    bitStream.pBitStream->WriteCompressed ( pTarget->GetID () );
                                     m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
                                 }
                             }
@@ -1996,10 +1996,10 @@ void CClientGame::ProcessServerKeyBind ( CKeyFunctionBind* pBind )
     const char* szName = pBind->boundKey->szKey;
     unsigned char ucNameLength = ( unsigned char ) strlen ( szName );
     CBitStream bitStream;
-    bitStream.pBitStream->Write ( unsigned char ( 0 ) );
+    bitStream.pBitStream->WriteBit ( false );
     bitStream.pBitStream->Write ( ucNameLength );
     bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
-    bitStream.pBitStream->Write ( unsigned char ( ( pBind->bHitState ) ? 1 : 0 ) );
+    bitStream.pBitStream->WriteBit ( pBind->bHitState );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
@@ -2015,10 +2015,10 @@ void CClientGame::ProcessServerControlBind ( CControlFunctionBind* pBind )
     const char* szName = pBind->control->szControl;
     unsigned char ucNameLength = ( unsigned char ) strlen ( szName );
     CBitStream bitStream;
-    bitStream.pBitStream->Write ( unsigned char ( 1 ) );
+    bitStream.pBitStream->WriteBit ( true );
     bitStream.pBitStream->Write ( ucNameLength );
     bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
-    bitStream.pBitStream->Write ( unsigned char ( ( pBind->bHitState ) ? 1 : 0 ) );
+    bitStream.pBitStream->WriteBit ( pBind->bHitState );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
@@ -2152,13 +2152,26 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
 
                         // Send the button, cursor position, 3d position and the entity collided with
                         CBitStream bitStream;
-                        bitStream.pBitStream->Write ( ucButtonHit );
-                        bitStream.pBitStream->Write ( vecCursorPosition.fX );
-                        bitStream.pBitStream->Write ( vecCursorPosition.fY );
-                        bitStream.pBitStream->Write ( vecCollision.fX );
-                        bitStream.pBitStream->Write ( vecCollision.fY );
-                        bitStream.pBitStream->Write ( vecCollision.fZ );
-                        bitStream.pBitStream->Write ( CollisionEntityID );
+
+                        SMouseButtonSync button;
+                        button.data.ucButton = ucButtonHit;
+                        bitStream.pBitStream->Write ( &button );
+
+                        bitStream.pBitStream->WriteCompressed ( static_cast < unsigned short > ( vecCursorPosition.fX  ) );
+                        bitStream.pBitStream->WriteCompressed ( static_cast < unsigned short > ( vecCursorPosition.fY  ) );
+
+                        SPositionSync position ( false );
+                        position.data.vecPosition = vecCollision;
+                        bitStream.pBitStream->Write ( &position );
+
+                        if ( CollisionEntityID != INVALID_ELEMENT_ID )
+                        {
+                            bitStream.pBitStream->WriteBit ( true );
+                            bitStream.pBitStream->WriteCompressed ( CollisionEntityID );
+                        }
+                        else
+                            bitStream.pBitStream->WriteBit ( false );
+
                         m_pNetAPI->RPC ( CURSOR_EVENT, bitStream.pBitStream );
 
                         return true;
