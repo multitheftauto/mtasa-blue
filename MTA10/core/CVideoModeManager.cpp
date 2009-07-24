@@ -43,12 +43,11 @@ public:
     virtual void        PostCreateDevice            ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp );
     virtual void        PreReset                    ( D3DPRESENT_PARAMETERS* pp );
     virtual void        PostReset                   ( D3DPRESENT_PARAMETERS* pp );
-    virtual void        GetNextVideoMode            ( int& iOutNextVideoMode, bool& bOutNextWindowed );
-    virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed );
+    virtual void        GetNextVideoMode            ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize );
+    virtual bool        SetVideoMode                ( int nextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize );
     virtual bool        IsWindowed                  ( void );
     virtual bool        IsMultiMonitor              ( void );
     virtual bool        IsMinimizeEnabled           ( void );
-    virtual void        SetMinimizeEnabled          ( bool bOn );
 
 private:
     void                LoadCVars                   ( void );
@@ -65,9 +64,12 @@ private:
 
     int                 m_iCurrentVideoMode;    // VideoMode this run
     bool                m_bCurrentWindowed;
+    bool                m_bCurrentFullScreenMinimize;
     int                 m_iNextVideoMode;       // VideoMode next run
     bool                m_bNextWindowed;
-    bool                m_bFullScreenMinimize;
+    bool                m_bNextFullScreenMinimize;
+
+    bool                m_bBetterAltTabStability;   // More stable, but can't stop fullscreen minimizing
 };
 
 
@@ -128,24 +130,33 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     // Prime save values
     m_iNextVideoMode = m_iCurrentVideoMode;
     m_bNextWindowed  = m_bCurrentWindowed;
+    m_bNextFullScreenMinimize  = m_bCurrentFullScreenMinimize;
 
     // Remember this for later
     m_ulFullScreenRefreshRate = pp->FullScreen_RefreshRateInHz;
 
-    // This block helps stability
-    int x, y;
-    x = GetSystemMetrics ( SM_CXSCREEN );
-    y = GetSystemMetrics ( SM_CYSCREEN );
-    SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
-    MoveWindow ( m_hDeviceWindow, 
-                (x/2)-(pp->BackBufferWidth/2), 
-                (y/2)-(pp->BackBufferHeight/2), 
-                pp->BackBufferWidth,
-                pp->BackBufferHeight,
-                TRUE );
-    pp->Windowed = true;
-    pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    // Stability precautions have to be disabled to allow the stopping of fullscreen minimize for multi-monitor setups
+    if ( !IsWindowed () && IsMultiMonitor () && !IsMinimizeEnabled () )
+        m_bBetterAltTabStability = false;
+    else
+        m_bBetterAltTabStability = true;
 
+    // This block helps alt-tab stability in fullscreen mode
+    if ( m_bCurrentWindowed || m_bBetterAltTabStability )
+    {
+        int x, y;
+        x = GetSystemMetrics ( SM_CXSCREEN );
+        y = GetSystemMetrics ( SM_CYSCREEN );
+        SetWindowLong ( m_hDeviceWindow, GWL_STYLE, WS_POPUP );
+        MoveWindow ( m_hDeviceWindow, 
+                    (x/2)-(pp->BackBufferWidth/2), 
+                    (y/2)-(pp->BackBufferHeight/2), 
+                    pp->BackBufferWidth,
+                    pp->BackBufferHeight,
+                    TRUE );
+        pp->Windowed = true;
+        pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
 
     // Final bits
     if ( m_bCurrentWindowed )
@@ -157,7 +168,8 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
     }
     else
     {
-        m_bForceFullScreenOnce = true;
+        if ( m_bBetterAltTabStability )
+            m_bForceFullScreenOnce = true;
         m_bForceWindowed = false;
         m_ulForceBackBufferWidth  = pp->BackBufferWidth;
         m_ulForceBackBufferHeight = pp->BackBufferHeight;
@@ -174,8 +186,9 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::PostCreateDevice ( IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp )
 {
-    // This helps stability
-    pD3DDevice->Reset ( pp );
+    // This helps alt-tab stability in fullscreen mode
+    if ( m_bCurrentWindowed || m_bBetterAltTabStability )
+       pD3DDevice->Reset ( pp );
 }
 
 
@@ -242,10 +255,11 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNextWindowed )
+void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize )
 {
     iOutNextVideoMode   = m_iNextVideoMode;
     bOutNextWindowed    = m_bNextWindowed;
+    bOutNextFullScreenMinimize = m_bNextFullScreenMinimize;
 }
 
 
@@ -256,7 +270,7 @@ void CVideoModeManager::GetNextVideoMode ( int& iOutNextVideoMode, bool& bOutNex
 // Returns true if restart is required
 //
 ///////////////////////////////////////////////////////////////
-bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed )
+bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize )
 {
     bool bRequiresRestart = false;
 
@@ -283,6 +297,17 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed )
         }
     }
 
+
+    // Full Screen Minimize
+    if ( m_bNextFullScreenMinimize != bNextFullScreenMinimize )
+    {
+        m_bNextFullScreenMinimize = bNextFullScreenMinimize;
+        if ( m_bCurrentFullScreenMinimize != m_bNextFullScreenMinimize )
+        {
+            bRequiresRestart = true;
+        }
+    }
+
     SaveCVars ();
 
     return bRequiresRestart;
@@ -300,7 +325,7 @@ void CVideoModeManager::LoadCVars ( void )
 {
     m_iCurrentVideoMode = m_pGameSettings->GetCurrentVideoMode ();
     CVARS_GET ( "display_windowed",             m_bCurrentWindowed );
-    CVARS_GET ( "multimon_fullscreen_minimize", m_bFullScreenMinimize );
+    CVARS_GET ( "multimon_fullscreen_minimize", m_bCurrentFullScreenMinimize );
 }
 
 
@@ -315,6 +340,7 @@ void CVideoModeManager::SaveCVars ( void )
 {
     m_pGameSettings->SetCurrentVideoMode ( m_iNextVideoMode, true );
     CVARS_SET ( "display_windowed",             m_bNextWindowed );
+    CVARS_SET ( "multimon_fullscreen_minimize", m_bNextFullScreenMinimize );
 }
 
 
@@ -378,22 +404,5 @@ bool CVideoModeManager::IsMultiMonitor ( void )
 ///////////////////////////////////////////////////////////////
 bool CVideoModeManager::IsMinimizeEnabled ( void )
 {
-    return m_bFullScreenMinimize;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVideoModeManager::SetMinimizeEnabled
-//
-// Multi-monitor, full screen, minimize
-//
-///////////////////////////////////////////////////////////////
-void CVideoModeManager::SetMinimizeEnabled ( bool bOn )
-{
-    if ( m_bFullScreenMinimize != bOn )
-    {
-        m_bFullScreenMinimize = bOn;
-        CVARS_SET ( "multimon_fullscreen_minimize", m_bFullScreenMinimize );
-    }
+    return m_bCurrentFullScreenMinimize;
 }

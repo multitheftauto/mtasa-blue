@@ -1618,11 +1618,12 @@ void CSettings::LoadData ( void )
     // Video
     int nextVideoMode;
     bool bNextWindowed;
-    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed );
+    bool bNextFSMinimize;
+    GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize );
 
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
-    m_pCheckBoxMinimize->SetSelected ( GetVideoModeManager ()->IsMinimizeEnabled () );
+    m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1767,18 +1768,19 @@ void CSettings::SaveData ( void )
     // get current
     int iNextVidMode;
     bool bNextWindowed;
-    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed );
+    bool bNextFSMinimize;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
 
     // update from gui
     bNextWindowed = m_pCheckBoxWindowed->GetSelected ();
     if ( CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem () )
         iNextVidMode = ( int ) pSelected->GetData();
+    bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
 
     // change
-    if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed ) )
-        CCore::GetSingleton ().ShowMessageBox ( "Information", "Resolution will be changed when you next start MTA", MB_BUTTON_OK | MB_ICON_INFO );
+    if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize ) )
+        CCore::GetSingleton ().ShowMessageBox ( "Information", SString ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" ), MB_BUTTON_OK | MB_ICON_INFO );
 
-    GetVideoModeManager ()->SetMinimizeEnabled ( m_pCheckBoxMinimize->GetSelected() );
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
 
     // Map alpha
