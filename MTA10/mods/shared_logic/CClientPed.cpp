@@ -1645,13 +1645,16 @@ void CClientPed::SetFrozen ( bool bFrozen )
 
 
 CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
-{
+{   
+    // Multiply ammo with 10 if flamethrower to get the numbers correct.
+    if ( weaponType == WEAPONTYPE_FLAMETHROWER ) uiAmmo *= 10;
+
     CWeapon* pWeapon = NULL;
     if ( m_pPlayerPed )
     {
-        // Multiply ammo with 10 if flamethrower to get the numbers correct.
-        if ( weaponType == WEAPONTYPE_FLAMETHROWER )
-            uiAmmo *= 10;
+        // Remove our current weapon's model before adding a new one
+        CWeapon * pCurrent = GetWeapon ();
+        if ( pCurrent ) m_pPlayerPed->RemoveWeaponModel ( pCurrent->GetInfo ()->GetModel () );
 
         pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo );		
     }
