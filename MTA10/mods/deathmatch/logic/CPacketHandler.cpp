@@ -989,7 +989,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
         return;
     }
 
-    const char * szOldNick = pPlayer->GetNickPointer ();
+    const char * szOldNick = pPlayer->GetNick ();
     char * szOldNickCopy = NULL;
 
     if ( NULL != szOldNick )

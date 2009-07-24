@@ -352,10 +352,10 @@ void COMMAND_MessageTarget ( const char* szCmdLine )
     CClientPlayer* pTarget = g_pClientGame->GetTargetedPlayer ();
     if ( pTarget )
     {
-        const char * szNick = pTarget->GetNickPointer();
+        const char * szNick = pTarget->GetNick ();
         if ( !szNick )
             return;
-        SString strParameters ( "%s %s", pTarget->GetNickPointer (), szCmdLine );
+        SString strParameters ( "%s %s", pTarget->GetNick (), szCmdLine );
         g_pCore->GetCommands ()->Execute ( "msg", strParameters );
     }
     else
@@ -394,7 +394,7 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
     fprintf ( pFile, "%s\n", "*** START OF PLAYER ***" );
 
     // Write the data
-    fprintf ( pFile, "Nick: %s\n", pPlayer->GetNickPointer () );
+    fprintf ( pFile, "Nick: %s\n", pPlayer->GetNick () );
     
     CVector vecTemp;
     pPlayer->GetPosition ( vecTemp );

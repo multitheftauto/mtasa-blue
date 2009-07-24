@@ -67,7 +67,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ucNametagColorG = 255;
     m_ucNametagColorB = 255;
     m_ulLastNametagShow = 0;
-    m_szNametag = NULL;
     SetNametagText ( m_szNick );
 	
 	// Create the static icon (defaults to a warning icon for network trouble)
@@ -129,17 +128,6 @@ void CClientPlayer::UpdateAimPosition ( const CVector &vecAim )
 }
 
 
-void CClientPlayer::GetNick ( char* szBuffer, unsigned int uiBufferLength ) const
-{
-    // Passed pointer is valid?
-    if ( szBuffer )
-    {
-        strncpy ( szBuffer, m_szNick, uiBufferLength );
-        szBuffer [ uiBufferLength - 1 ] = 0;
-    }
-}
-
-
 void CClientPlayer::SetNick ( const char* szNick )
 {
     // Valid pointer?
@@ -147,20 +135,9 @@ void CClientPlayer::SetNick ( const char* szNick )
     {
         strncpy ( m_szNick, szNick, MAX_PLAYER_NICK_LENGTH );
         m_szNick [ MAX_PLAYER_NICK_LENGTH ] = '\0';
-    }
-}
 
-
-int CClientPlayer::GetNickLength ( void ) const
-{
-    // We have a nickname buffer?
-    if ( m_szNick )
-    {
-        return static_cast < int > ( strlen ( m_szNick ) );
-    }
-    else
-    {
-        return 0;
+        if ( m_strNametag.empty () )
+            m_strNametag = szNick;
     }
 }
 
@@ -285,16 +262,9 @@ void CClientPlayer::Reset ( void )
 
 void CClientPlayer::SetNametagText ( const char * szText )
 {
-    if ( m_szNametag )
+    if ( szText )
     {
-        delete [] m_szNametag;
-        m_szNametag = NULL;
-    }
-
-    if ( szText && strlen ( szText ) > 0 )
-    {
-        m_szNametag = new char [ strlen ( szText ) + 1 ];
-        strcpy ( m_szNametag, szText );
+        m_strNametag = szText;
     }
 }
 

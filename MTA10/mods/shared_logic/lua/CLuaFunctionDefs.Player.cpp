@@ -39,7 +39,7 @@ int CLuaFunctionDefs::GetPlayerName ( lua_State* luaVM )
         if ( pPlayer )
         {
             // Grab his nametag text and return it
-            const char* szName = pPlayer->GetNickPointer ();
+            const char* szName = pPlayer->GetNick ();
             if ( szName )
             {
                 lua_pushstring ( luaVM, szName );

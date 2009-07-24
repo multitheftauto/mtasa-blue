@@ -122,7 +122,7 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
     list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
-        const char* szPtr = (*iter)->GetNickPointer ();
+        const char* szPtr = (*iter)->GetNick ();
         if ( szPtr )
         {
             if ( bCaseSensitive && strcmp ( szNick, szPtr ) == 0 || !bCaseSensitive && stricmp ( szNick, szPtr ) == 0 )

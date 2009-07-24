@@ -1401,7 +1401,7 @@ bool CStaticFunctionDefinitions::GetPlayerNametagText ( CClientPlayer & Player, 
     assert ( szBuffer );
     assert ( uiLength );
 
-    strncpy ( szBuffer, Player.GetNickPointer (), uiLength );
+    strncpy ( szBuffer, Player.GetNick (), uiLength );
     return true;
 }
 
