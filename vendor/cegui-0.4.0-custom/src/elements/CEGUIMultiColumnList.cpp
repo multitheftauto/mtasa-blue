@@ -828,10 +828,21 @@ uint MultiColumnList::addRow(ListboxItem* item, uint col_id, uint row_id, bool f
 	uint pos;
 
 	// if sorting is enabled, insert at an appropriate position
-	if (getSortDirection() != ListHeaderSegment::None)
+    ListHeaderSegment::SortDirection dir = getSortDirection();
+	if ( dir == ListHeaderSegment::Descending || dir == ListHeaderSegment::Ascending )
 	{
         // calculate where the row should be inserted
-        ListItemGrid::iterator ins_pos = std::upper_bound(d_grid.begin(), d_grid.end(), row);
+        ListItemGrid::iterator ins_pos;
+
+	    if ( dir == ListHeaderSegment::Descending )
+	    {
+            ins_pos = std::upper_bound(d_grid.begin(), d_grid.end(), row);
+	    }
+	    else
+	    {
+            ins_pos = std::upper_bound(d_grid.begin(), d_grid.end(), row, pred_descend);
+	    }
+
         // insert item and get final inserted position.
         ListItemGrid::iterator final_pos = d_grid.insert(ins_pos, row);
 		// get final inserted position as an uint.
