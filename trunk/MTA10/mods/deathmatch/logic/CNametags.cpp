@@ -455,7 +455,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
 
         // Grab the nick to show
         const char* szNick = pPlayer->GetNametagText ();
-        if ( !szNick || !szNick [0] ) szNick = pPlayer->GetNickPointer ();
+        if ( !szNick || !szNick [0] ) szNick = pPlayer->GetNick ();
 
         // Draw his name
         unsigned char ucR, ucG, ucB;

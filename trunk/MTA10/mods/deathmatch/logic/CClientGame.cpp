@@ -2934,7 +2934,7 @@ void CClientGame::DoPaintballs ( void )
 void CClientGame::QuitPlayer ( CClientPlayer* pPlayer, eQuitReason Reason )
 {
     // Get the nick pointer and echo the quit message to the chat
-    const char* szNick = pPlayer->GetNickPointer ();
+    const char* szNick = pPlayer->GetNick ();
     char* szReason = "Unknown";
     switch ( Reason )
     {

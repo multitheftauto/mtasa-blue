@@ -103,7 +103,7 @@ void CSyncDebug::OnDraw ( void )
                "Vehicle syncs: %u\n"
                "Key syncs: %u",
 
-               m_pPlayer->GetNickPointer (),
+               m_pPlayer->GetNick (),
                vecPosition.fX, vecPosition.fY, vecPosition.fZ,
                fCurrentRotation,
                m_pPlayer->IsDead (),
