@@ -488,19 +488,27 @@ struct SPedRotationSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        unsigned short sValue;
-        if ( bitStream.Read ( sValue ) )
+        const static float fPI = 3.14159265f;
+        SFloatAsBitsSync < 16 > rotation ( -fPI, fPI, false );
+        if ( bitStream.Read ( &rotation ) )
         {
-            data.fRotation = static_cast < float > ( sValue ) * 3.14159265f / 16200.0f;
+            data.fRotation = rotation.data.fValue;
             return true;
         }
         return false;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
+        const static float fPI = 3.14159265f;
         float fRotation = data.fRotation;
-        short sValue = static_cast < short > ( fRotation * 16200.0f / 3.14159265f );
-        bitStream.Write ( sValue );
+        if ( fRotation < -fPI )
+            fRotation += fPI * 2.0f;
+        else if ( fRotation > fPI )
+            fRotation -= fPI * 2.0f;
+
+        SFloatAsBitsSync < 16 > rotation ( -fPI, fPI, false );
+        rotation.data.fValue = fRotation;
+        bitStream.Write ( &rotation );
     }
 
     struct

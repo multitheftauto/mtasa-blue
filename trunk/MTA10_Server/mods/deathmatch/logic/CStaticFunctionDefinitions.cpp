@@ -2485,12 +2485,32 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
         {
             // Set his new rotation
             float fRadians = ConvertDegreesToRadians ( fRotation );
+
+            // Clamp it to -PI .. PI
+            if ( fRadians < -PI )
+            {
+                do
+                {
+                    fRadians += PI * 2.0f;
+                } while ( fRadians < -PI );
+            }
+            else if ( fRadians > PI )
+            {
+                do
+                {
+                    fRadians -= PI * 2.0f;
+                } while ( fRadians > PI );
+            }
             pPed->SetRotation ( fRadians );
 
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
-            BitStream.pBitStream->Write ( fRadians );
+
+            SPedRotationSync rotation;
+            rotation.data.fRotation = fRadians;
+            BitStream.pBitStream->Write ( &rotation );
+
             BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_PED_ROTATION, *BitStream.pBitStream ) );
         }

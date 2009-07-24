@@ -1544,6 +1544,22 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float f
 
         // Convert the rotation to radians and set the new rotation
         float fRadians = ConvertDegreesToRadians ( fRotation );
+        // Clamp it to -PI .. PI
+        if ( fRadians < -PI )
+        {
+            do
+            {
+                fRadians += PI * 2.0f;
+            } while ( fRadians < -PI );
+        }
+        else if ( fRadians > PI )
+        {
+            do
+            {
+                fRadians -= PI * 2.0f;
+            } while ( fRadians > PI );
+        }
+
         Ped.SetCurrentRotation ( fRadians );
         if ( !IS_PLAYER ( &Entity ) )
             Ped.SetCameraRotation ( -fRadians );

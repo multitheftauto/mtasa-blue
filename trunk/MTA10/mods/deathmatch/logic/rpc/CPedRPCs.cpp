@@ -12,8 +12,9 @@
 *
 *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 #include "CPedRPCs.h"
+#include "net/SyncStructures.h"
 
 class CLuaArguments;
 
@@ -63,18 +64,18 @@ void CPedRPCs::SetPedArmor ( NetBitStreamInterface& bitStream )
 void CPedRPCs::SetPedRotation ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    float fRotation;
+    SPedRotationSync rotation;
     unsigned char ucTimeContext;
     if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( fRotation ) &&
+         bitStream.Read ( &rotation ) &&
          bitStream.Read ( ucTimeContext ) )
     {
         CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
-            pPed->SetCurrentRotation ( fRotation );
+            pPed->SetCurrentRotation ( rotation.data.fRotation );
             if ( !IS_PLAYER ( pPed ) )
-                pPed->SetCameraRotation ( fRotation );
+                pPed->SetCameraRotation ( rotation.data.fRotation );
             pPed->SetSyncTimeContext ( ucTimeContext );
         }
     }
