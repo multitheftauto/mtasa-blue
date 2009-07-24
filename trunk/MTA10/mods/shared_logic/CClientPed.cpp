@@ -4250,6 +4250,8 @@ void CClientPed::GetTargetPosition ( CVector & vecPosition )
 
 void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource )
 {
+    UpdateTargetPosition ();
+
     // Get the origin of the position if we are in contact with anything
     CVector vecOrigin;
     if ( pTargetOriginSource )
@@ -4268,8 +4270,6 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
     if ( m_pPlayerPed )
     {
         // The ped is streamed in
-        UpdateTargetPosition ();
-
         GetPosition ( m_interp.pos.vecOrigin );
         m_interp.pos.vecOrigin -= vecOrigin;
         m_interp.pos.vecTarget = vecPosition;
