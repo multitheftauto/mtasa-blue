@@ -200,8 +200,9 @@ void CGUIGridList_Impl::Clear ( void )
     {
 	    m_iIndex = 0;
 
-	    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( 0 );
-	    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
+        // Don't remove sort options when the list is cleared
+	    //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( 0 );
+	    //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> resetList ();
 
         dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
