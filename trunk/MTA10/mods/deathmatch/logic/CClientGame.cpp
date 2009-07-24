@@ -1997,9 +1997,8 @@ void CClientGame::ProcessServerKeyBind ( CKeyFunctionBind* pBind )
     unsigned char ucNameLength = ( unsigned char ) strlen ( szName );
     CBitStream bitStream;
     bitStream.pBitStream->WriteBit ( false );
-    bitStream.pBitStream->Write ( ucNameLength );
-    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
     bitStream.pBitStream->WriteBit ( pBind->bHitState );
+    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
@@ -2016,9 +2015,8 @@ void CClientGame::ProcessServerControlBind ( CControlFunctionBind* pBind )
     unsigned char ucNameLength = ( unsigned char ) strlen ( szName );
     CBitStream bitStream;
     bitStream.pBitStream->WriteBit ( true );
-    bitStream.pBitStream->Write ( ucNameLength );
-    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
     bitStream.pBitStream->WriteBit ( pBind->bHitState );
+    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
