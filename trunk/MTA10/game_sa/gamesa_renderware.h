@@ -20,9 +20,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#ifndef __CGAMESA_COLMODELSA
-	typedef void CColModelSAInterface;
-#endif
+class CColModelSAInterface;
 
 /*****************************************************************************/
 /** Renderware functions                                                    **/

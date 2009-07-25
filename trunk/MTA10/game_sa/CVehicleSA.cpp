@@ -1637,3 +1637,55 @@ void CVehicleSA::SetGravity ( const CVector* pvecGravity )
 
     m_vecGravity = *pvecGravity;
 }
+
+
+CObject * CVehicleSA::SpawnFlyingComponent ( int i_1, unsigned int ui_2 )
+{
+    DWORD dwReturn;
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    DWORD dwFunc = FUNC_CAutomobile__SpawnFlyingComponent;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    ui_2
+        push    i_1
+        call    dwFunc
+        mov     dwReturn, eax
+    }
+
+    CObject * pObject = NULL;
+    if ( dwReturn ) pObject = pGame->GetPools ()->GetObject ( ( DWORD * ) dwReturn );
+    return pObject;
+}
+
+
+typedef RwFrame * (__cdecl *RwFrameForAllObjects_t) (RwFrame * frame, void * callback, void * data);
+extern RwFrameForAllObjects_t RwFrameForAllObjects;
+void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
+{    
+    CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
+    RwFrame * pFrame = NULL;
+    switch ( wheel )
+    {
+        case FRONT_LEFT_WHEEL: pFrame = vehicle->pWheelFrontLeft; break;
+        case REAR_LEFT_WHEEL: pFrame = vehicle->pWheelRearLeft; break;
+        case FRONT_RIGHT_WHEEL: pFrame = vehicle->pWheelFrontRight; break;
+        case REAR_RIGHT_WHEEL: pFrame = vehicle->pWheelRearRight; break;
+        default: break;
+    }
+
+    if ( pFrame )
+    {
+        DWORD dw_GetCurrentAtomicObjectCB = 0x6a0750;
+        RwObject * pObject = NULL;
+
+        // Stop GetCurrentAtomicObjectCB from returning null for 'invisible' objects
+        * ( BYTE * ) ( 0x6A0758 ) = 0x90;
+        * ( BYTE * ) ( 0x6A0759 ) = 0x90;
+        RwFrameForAllObjects ( pFrame, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
+        * ( BYTE * ) ( 0x6A0758 ) = 0x74;
+        * ( BYTE * ) ( 0x6A0759 ) = 0x06;
+
+        if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
+    }
+}
