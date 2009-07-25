@@ -34,7 +34,10 @@ enum eWheelStatus {
 //	DT_WHEEL_CAP_MISSING,
 //	DT_WHEEL_WARPED,
 	DT_WHEEL_BURST,
-	DT_WHEEL_MISSING
+	DT_WHEEL_MISSING,
+
+    // MTA custom state
+    DT_WHEEL_INTACT_COLLISIONLESS,
 };
 
 enum eDoorStatus {

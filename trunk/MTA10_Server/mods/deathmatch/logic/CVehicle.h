@@ -30,7 +30,8 @@ class CVehicle;
 enum eWheelStatus {
 	DT_WHEEL_INTACT=0,
 	DT_WHEEL_BURST,
-	DT_WHEEL_MISSING
+	DT_WHEEL_MISSING,
+    DT_WHEEL_INTACT_COLLISIONLESS,
 };
 
 enum eDoorStatus

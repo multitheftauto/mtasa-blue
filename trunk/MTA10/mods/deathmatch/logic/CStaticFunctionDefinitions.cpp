@@ -2289,13 +2289,13 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CClientEntity& Entity, 
         unsigned char ucRearRight, ucNewRearRight = ucRearRight = Vehicle.GetWheelStatus ( 3 );
 
         // If we have a new state for them, change it
-        if ( iFrontLeft >= 0 && iFrontLeft <= 2 )
+        if ( iFrontLeft >= 0 && iFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewFrontLeft = static_cast < unsigned char > ( iFrontLeft );
-        if ( iFrontRight >= 0 && iFrontRight <= 2 )
+        if ( iFrontRight >= 0 && iFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewFrontRight = static_cast < unsigned char > ( iFrontRight );
-        if ( iRearLeft >= 0 && iRearLeft <= 2 )
+        if ( iRearLeft >= 0 && iRearLeft <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewRearLeft = static_cast < unsigned char > ( iRearLeft );
-        if ( iRearRight >= 0 && iRearRight <= 2 )
+        if ( iRearRight >= 0 && iRearRight <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewRearRight = static_cast < unsigned char > ( iRearRight );
 
         // If atleast 1 wheel state is different
