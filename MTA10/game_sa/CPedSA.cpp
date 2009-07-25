@@ -480,6 +480,10 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
     {
+        CWeapon * pWeapon = GetWeapon ( GetCurrentWeaponSlot () );
+        if ( pWeapon && weaponSlot != GetCurrentWeaponSlot () )
+            RemoveWeaponModel ( pWeapon->GetInfo ()->GetModel () );
+
         CPedSAInterface * thisPed = (CPedSAInterface *)this->GetInterface();
      
         // set the new weapon slot
