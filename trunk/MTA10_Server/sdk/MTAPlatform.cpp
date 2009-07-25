@@ -26,12 +26,11 @@ int mymkdir ( const char* dirname )
 
 // Platform specific functions
 #ifndef WIN32
-	unsigned long GetTickCount ( void )
-	{
-		struct timeval tv;
-		gettimeofday ( &tv, NULL );
-		return tv.tv_usec / 1000;
-	}
+unsigned long GetTickCount ( void )
+{
+    tms tempTms;
+    return times ( &tempTms ) * 1000 / sysconf ( _SC_CLK_TCK );
+}
 
 char* itoa( int value, char* result, int base ) {
 	// check that the base if valid
