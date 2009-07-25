@@ -957,6 +957,9 @@ void CMultiplayerSA::InitHooks()
     memset ( (void *)0x53E156, 0x90, 3 );
     // Use 0.5 instead of 0.0 for underwater threshold
     *(DWORD *)0x53DF4B = 0x858B8C;
+
+    // Disable setting players on fire when they're riding burning bmx's (see #4573)
+    * ( BYTE * ) ( 0x53A982 ) = 0xEB;
 }
 
 
