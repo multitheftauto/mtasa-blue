@@ -1200,6 +1200,9 @@ unsigned char CClientVehicle::GetWheelStatus ( unsigned char ucWheel )
 {
     if ( ucWheel < MAX_WHEELS )
     {
+        // Return our custom state?
+        if ( m_ucWheelStates [ucWheel] == DT_WHEEL_INTACT_COLLISIONLESS ) return DT_WHEEL_INTACT_COLLISIONLESS;
+
         if ( m_pVehicle )
         {
             if ( HasDamageModel () )
@@ -1264,21 +1267,22 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
     if ( ucWheel < MAX_WHEELS )
     {
         if ( m_pVehicle )
-        {
+        {            
             // Is our new status a burst tyre? and do we need to call BurstTyre?
             if ( ucStatus == DT_WHEEL_BURST && !bSilent ) m_pVehicle->BurstTyre ( ucWheel );
             
             // Update the wheel's visibility
             m_pVehicle->SetWheelVisibility ( ( eWheels ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
 
+            // Are we using our custom state?
+            unsigned char ucGTAStatus = ucStatus;
+            if ( ucStatus == DT_WHEEL_INTACT_COLLISIONLESS ) ucGTAStatus = DT_WHEEL_MISSING;
+
             // Do we have a damage model?
             if ( HasDamageModel () )
-                m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheels ) ( ucWheel ), ucStatus );
+                m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheels ) ( ucWheel ), ucGTAStatus );
             else if ( m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2 )
-                m_pVehicle->SetBikeWheelStatus ( ucWheel, ucStatus );
-
-            // Restore our tyre-burst flag
-            CalcAndUpdateTyresCanBurstFlag ();
+                m_pVehicle->SetBikeWheelStatus ( ucWheel, ucGTAStatus );
         }
         m_ucWheelStates [ucWheel] = ucStatus;
     }

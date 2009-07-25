@@ -4265,24 +4265,28 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, uns
 	{
 		CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
-        // If atleast 1 wheel state is different
-        if ( ( ucFrontLeft != -1 && ucFrontLeft != pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] ) ||
-             ( ucRearLeft != -1 && ucRearLeft != pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] ) ||
-             ( ucFrontRight != -1 && ucFrontRight != pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] ) ||
-             ( ucRearRight != -1 && ucRearRight != pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] ) )
+        if ( ucFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS && ucRearLeft <= DT_WHEEL_INTACT_COLLISIONLESS &&
+             ucFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS && ucRearRight <= DT_WHEEL_INTACT_COLLISIONLESS )
         {
-            if ( ucFrontLeft != -1 ) pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] = ucFrontLeft;
-            if ( ucRearLeft != -1 ) pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] = ucRearLeft;
-            if ( ucFrontRight != -1 ) pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] = ucFrontRight;
-            if ( ucRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = ucRearRight;
+            // If atleast 1 wheel state is different
+            if ( ( ucFrontLeft != -1 && ucFrontLeft != pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] ) ||
+                 ( ucRearLeft != -1 && ucRearLeft != pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] ) ||
+                 ( ucFrontRight != -1 && ucFrontRight != pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] ) ||
+                 ( ucRearRight != -1 && ucRearRight != pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] ) )
+            {
+                if ( ucFrontLeft != -1 ) pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] = ucFrontLeft;
+                if ( ucRearLeft != -1 ) pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] = ucRearLeft;
+                if ( ucFrontRight != -1 ) pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] = ucFrontRight;
+                if ( ucRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = ucRearRight;
 
-			CBitStream BitStream;
-			BitStream.pBitStream->Write ( pVehicle->GetID () );
-			BitStream.pBitStream->Write ( ( char * ) pVehicle->m_ucWheelStates, MAX_WHEELS );
-			m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream ) );
+			    CBitStream BitStream;
+			    BitStream.pBitStream->Write ( pVehicle->GetID () );
+			    BitStream.pBitStream->Write ( ( char * ) pVehicle->m_ucWheelStates, MAX_WHEELS );
+			    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream ) );
 
-			return true;
-		}
+			    return true;
+		    }
+        }
 	}
 
 	return false;
