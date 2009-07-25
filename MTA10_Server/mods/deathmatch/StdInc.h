@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <winsock.h>
 #include <mmsystem.h>
+#else
+#include <sys/times.h>
 #endif
 
 #include <string.h>
