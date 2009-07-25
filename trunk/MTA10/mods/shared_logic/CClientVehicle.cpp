@@ -828,10 +828,19 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         if ( m_pUpgrades )
             m_pUpgrades->RemoveAll ( false );
 
+        // Are we swapping from a vortex or skimmer?
+        bool bResetWheelAndDoorStates = ( m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER );
+
         // Set the new vehicle id and type
         m_usModel = usModel;
         m_eVehicleType = CClientVehicleManager::GetVehicleType ( usModel );
         m_bHasDamageModel = CClientVehicleManager::HasDamageModel ( m_eVehicleType );
+
+        if ( bResetWheelAndDoorStates )
+        {
+            GetInitialDoorStates ( m_ucDoorStates );
+            memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
+        }
 
         // Check if we have landing gears and adjustable properties
         m_bHasLandingGear = DoCheckHasLandingGear ();
