@@ -481,7 +481,6 @@ public:
     RwFrame * pExhaust;
 
     BYTE padding280[576];
-
     // 2276
     float m_fBurningTime;
 };

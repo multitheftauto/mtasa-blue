@@ -1666,7 +1666,7 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     RwFrame * pFrame = NULL;
     switch ( wheel )
-    {
+    {        
         case FRONT_LEFT_WHEEL: pFrame = vehicle->pWheelFrontLeft; break;
         case REAR_LEFT_WHEEL: pFrame = vehicle->pWheelRearLeft; break;
         case FRONT_RIGHT_WHEEL: pFrame = vehicle->pWheelFrontRight; break;

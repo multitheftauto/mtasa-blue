@@ -1267,12 +1267,9 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
     if ( ucWheel < MAX_WHEELS )
     {
         if ( m_pVehicle )
-        {            
+        {
             // Is our new status a burst tyre? and do we need to call BurstTyre?
-            if ( ucStatus == DT_WHEEL_BURST && !bSilent ) m_pVehicle->BurstTyre ( ucWheel );
-            
-            // Update the wheel's visibility
-            m_pVehicle->SetWheelVisibility ( ( eWheels ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
+            if ( ucStatus == DT_WHEEL_BURST && !bSilent ) m_pVehicle->BurstTyre ( ucWheel );  
 
             // Are we using our custom state?
             unsigned char ucGTAStatus = ucStatus;
@@ -1280,7 +1277,12 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
 
             // Do we have a damage model?
             if ( HasDamageModel () )
+            {
                 m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheels ) ( ucWheel ), ucGTAStatus );
+                
+                // Update the wheel's visibility
+                m_pVehicle->SetWheelVisibility ( ( eWheels ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
+            }
             else if ( m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2 )
                 m_pVehicle->SetBikeWheelStatus ( ucWheel, ucGTAStatus );
         }
