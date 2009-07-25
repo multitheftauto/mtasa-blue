@@ -480,41 +480,44 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
     {
-        CWeapon * pWeapon = GetWeapon ( GetCurrentWeaponSlot () );
-        if ( pWeapon && weaponSlot != GetCurrentWeaponSlot () )
-            RemoveWeaponModel ( pWeapon->GetInfo ()->GetModel () );
-
-        CPedSAInterface * thisPed = (CPedSAInterface *)this->GetInterface();
-     
-        // set the new weapon slot
-        thisPed->bCurrentWeaponSlot = weaponSlot;
-
-        // is the player the local player?
-        CPed * pPed = pGame->GetPools()->GetPedFromRef ( (DWORD)1 );
-        //if ( pPed == this && thisPed->pPlayerInfo )
-        //{
-        
-        DWORD dwThis = (DWORD)this->GetInterface();
-        if ( pPed == this )
+        eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
+        if ( weaponSlot != GetCurrentWeaponSlot () )
         {
-           ((CPlayerInfoSA *)pGame->GetPlayerInfo())->GetInterface()->PlayerPedData.m_nChosenWeapon = weaponSlot;
+            CWeapon * pWeapon = GetWeapon ( currentSlot );
+            if ( pWeapon ) RemoveWeaponModel ( pWeapon->GetInfo ()->GetModel () );
 
-            DWORD dwFunc = FUNC_MakeChangesForNewWeapon_Slot;
-            _asm
+            CPedSAInterface * thisPed = (CPedSAInterface *)this->GetInterface();
+         
+            // set the new weapon slot
+            thisPed->bCurrentWeaponSlot = weaponSlot;
+
+            // is the player the local player?
+            CPed * pPed = pGame->GetPools()->GetPedFromRef ( (DWORD)1 );
+            //if ( pPed == this && thisPed->pPlayerInfo )
+            //{
+            
+            DWORD dwThis = (DWORD)this->GetInterface();
+            if ( pPed == this )
             {
-                mov     ecx, dwThis
-                push    weaponSlot
-                call    dwFunc
+               ((CPlayerInfoSA *)pGame->GetPlayerInfo())->GetInterface()->PlayerPedData.m_nChosenWeapon = weaponSlot;
+
+                DWORD dwFunc = FUNC_MakeChangesForNewWeapon_Slot;
+                _asm
+                {
+                    mov     ecx, dwThis
+                    push    weaponSlot
+                    call    dwFunc
+                }
             }
-        }
-        else
-        {
-            DWORD dwFunc = FUNC_SetCurrentWeapon;
-            _asm
+            else
             {
-                mov     ecx, dwThis
-                push    weaponSlot
-                call    dwFunc
+                DWORD dwFunc = FUNC_SetCurrentWeapon;
+                _asm
+                {
+                    mov     ecx, dwThis
+                    push    weaponSlot
+                    call    dwFunc
+                }
             }
         }
     }

@@ -1651,8 +1651,24 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
 
     CWeapon* pWeapon = NULL;
     if ( m_pPlayerPed )
-    {
+    {   
+        // Grab our current ammo in clip
+        pWeapon = GetWeapon ( weaponType );
+        unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
+        if ( pWeapon )
+        {
+            uiPreviousAmmoTotal = pWeapon->GetAmmoTotal ();
+            uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();            
+        }
+
         pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo );
+        
+        // Restore clip ammo?
+        if ( uiPreviousAmmoInClip )
+        {
+            pWeapon->SetAmmoTotal ( uiPreviousAmmoTotal + uiAmmo );
+            pWeapon->SetAmmoInClip ( uiPreviousAmmoInClip );
+        }            
     }
 
     CWeaponInfo* pInfo = g_pGame->GetWeaponInfo ( weaponType );
@@ -1669,43 +1685,46 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
 {
     if ( weaponSlot < WEAPONSLOT_MAX )
     {
-        if ( m_pPlayerPed )
+        if ( weaponSlot != GetCurrentWeaponSlot () )
         {
-            if ( weaponSlot == WEAPONSLOT_TYPE_UNARMED )
+            if ( m_pPlayerPed )
             {
-                eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
-                CWeapon * oldWeapon = GetWeapon ( currentSlot );
-                DWORD ammoInClip = oldWeapon->GetAmmoInClip();
-                DWORD ammoInTotal = oldWeapon->GetAmmoTotal();
-                eWeaponType weaponType = oldWeapon->GetType();
-                RemoveWeapon ( oldWeapon->GetType() );
+                if ( weaponSlot == WEAPONSLOT_TYPE_UNARMED )
+                {
+                    eWeaponSlot currentSlot = GetCurrentWeaponSlot ();
+                    CWeapon * oldWeapon = GetWeapon ( currentSlot );
+                    DWORD ammoInClip = oldWeapon->GetAmmoInClip();
+                    DWORD ammoInTotal = oldWeapon->GetAmmoTotal();
+                    eWeaponType weaponType = oldWeapon->GetType();
+                    RemoveWeapon ( oldWeapon->GetType() );
 
-                m_pPlayerPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
+                    m_pPlayerPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
 
-                CWeapon * newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                newWeapon->SetAmmoInClip(ammoInClip);
-                newWeapon->SetAmmoTotal(ammoInTotal);
+                    CWeapon * newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                    newWeapon->SetAmmoInClip(ammoInClip);
+                    newWeapon->SetAmmoTotal(ammoInTotal);
 
-                // Don't allow doing gang driveby while unarmed
-                if ( IsDoingGangDriveby () )
-                    SetDoingGangDriveby ( false );
+                    // Don't allow doing gang driveby while unarmed
+                    if ( IsDoingGangDriveby () )
+                        SetDoingGangDriveby ( false );
+                }
+                else
+                {
+                    // Make sure we have a weapon and some ammo on this slot
+                    CWeapon * pWeapon = GetWeapon ( weaponSlot );
+                    if ( pWeapon && pWeapon->GetAmmoTotal () )
+                    {
+                        m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
+                        m_CurrentWeaponSlot = weaponSlot;
+                        return true;
+                    }
+                }
             }
             else
             {
-                // Make sure we have a weapon and some ammo on this slot
-                CWeapon * pWeapon = GetWeapon ( weaponSlot );
-                if ( pWeapon && pWeapon->GetAmmoTotal () )
-                {
-                    m_pPlayerPed->SetCurrentWeaponSlot ( weaponSlot );
-                    m_CurrentWeaponSlot = weaponSlot;
-                    return true;
-                }
+                m_CurrentWeaponSlot = weaponSlot;
+                return true;
             }
-        }
-        else
-        {
-            m_CurrentWeaponSlot = weaponSlot;
-            return true;
         }
     }
     return false;
