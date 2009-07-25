@@ -1265,15 +1265,15 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
     {
         if ( m_pVehicle )
         {
-            // Make sure our tyres can burst
-            m_pVehicle->SetTyresDontBurst ( false );
-
             // Is our new status a burst tyre? and do we need to call BurstTyre?
             if ( ucStatus == DT_WHEEL_BURST && !bSilent ) m_pVehicle->BurstTyre ( ucWheel );
+            
+            // Update the wheel's visibility
+            m_pVehicle->SetWheelVisibility ( ( eWheels ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
 
             // Do we have a damage model?
             if ( HasDamageModel () )
-                m_pVehicle->GetDamageManager ()->SetWheelStatus ( static_cast < eWheels > ( ucWheel ), ucStatus );
+                m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheels ) ( ucWheel ), ucStatus );
             else if ( m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2 )
                 m_pVehicle->SetBikeWheelStatus ( ucWheel, ucStatus );
 
@@ -1473,12 +1473,7 @@ void CClientVehicle::FuckCarCompletely ( bool bKeepWheels )
 {
     if ( m_pVehicle )
     {
-        if ( m_eVehicleType == CLIENTVEHICLE_CAR || 
-             m_eVehicleType == CLIENTVEHICLE_HELI ||
-             m_eVehicleType == CLIENTVEHICLE_PLANE ||
-             m_eVehicleType == CLIENTVEHICLE_MONSTERTRUCK ||
-             m_eVehicleType == CLIENTVEHICLE_QUADBIKE ||
-             m_eVehicleType == CLIENTVEHICLE_TRAILER )
+        if ( HasDamageModel () )
         {
             m_pVehicle->GetDamageManager()->FuckCarCompletely ( bKeepWheels );
         }

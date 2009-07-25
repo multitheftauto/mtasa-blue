@@ -132,6 +132,7 @@ class CVehicleSA;
 
 // from CAutomobile
 #define FUNC_CAutomobile__Fix                   0x6A3440
+#define FUNC_CAutomobile__SpawnFlyingComponent  0x6a8580
 
 // from CHeli
 #define FUNC_CHeli__Fix                         0x6C4530
@@ -461,7 +462,25 @@ public:
     CVehicleSAInterface* m_nextCarriage;
 
     //1496
-    BYTE padding270[780];
+    BYTE padding270[116];
+
+    // 1612
+    RwFrame * pChassis;
+    RwFrame * pWheelFrontRight;
+    BYTE padding271[4];
+    RwFrame * pWheelRearRight;
+    RwFrame * pWheelFrontLeft;
+    BYTE padding272[4];
+    RwFrame * pWheelRearLeft;
+    RwFrame * pDoors [ 4 ];
+    RwFrame * pBumpers [ 2 ];
+    BYTE padding273[8];
+    RwFrame * pBonet;
+    RwFrame * pBoot;
+    RwFrame * pWindscreen;
+    RwFrame * pExhaust;
+
+    BYTE padding280[576];
 
     // 2276
     float m_fBurningTime;
@@ -478,6 +497,7 @@ private:
     unsigned char               m_ucAlpha;
     CVector                     m_vecGravity;
     RGBA                        m_HeadLightColor;
+    RwObject                    m_WheelObjects[4];
 
 public:
 								CVehicleSA                      ();
@@ -657,6 +677,9 @@ public:
 
     inline RGBA                 GetHeadLightColor               ( void )        { return m_HeadLightColor; }
     inline void                 SetHeadLightColor               ( RGBA color )  { m_HeadLightColor = color; }
+
+    CObject *                   SpawnFlyingComponent            ( int i_1, unsigned int ui_2 );
+    void                        SetWheelVisibility              ( eWheels wheel, bool bVisible );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };
