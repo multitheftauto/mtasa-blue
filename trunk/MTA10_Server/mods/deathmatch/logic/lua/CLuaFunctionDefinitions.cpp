@@ -7333,7 +7333,7 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
             const char* szHitState = NULL;
 			int iLuaFunction = LUA_REFNIL;
 
-			if ( lua_type ( luaVM, 3 ) )
+			if ( lua_type ( luaVM, 3 ) != LUA_TNONE )
                 szHitState = lua_tostring ( luaVM, 3 );
 
             if ( pPlayer )
@@ -7348,7 +7348,7 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else if ( lua_type ( luaVM, 4 ) == LUA_TFUNCTION )
+                else
                 {
 			        iLuaFunction = luaM_toref ( luaVM, 4 );
 
