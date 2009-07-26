@@ -2377,16 +2377,12 @@ bool CStaticFunctionDefinitions::SetVehicleOverrideLights ( CClientEntity& Entit
 
 
 bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicle, CClientVehicle& Trailer )
-{
-    // Check if the vehicle already has a trailer
-    if ( Vehicle.GetTowedVehicle () == NULL )
+{    
+    // Are they both free to be attached?
+    if ( !Vehicle.GetTowedVehicle () && !Trailer.GetTowedByVehicle () )
     {
-        // ..and the trailer isnt attached to anything
-        if ( Trailer.GetTowedByVehicle () == NULL )
-        {
-            // Attach them
-            return Vehicle.SetTowedVehicle ( &Trailer );
-        }
+        // Attach them
+        return Vehicle.SetTowedVehicle ( &Trailer );
     }
 
     return false;

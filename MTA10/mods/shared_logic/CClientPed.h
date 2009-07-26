@@ -374,6 +374,9 @@ public:
     void                        SetVoice                ( short sVoiceType, short sVoiceID );
     void                        SetVoice                ( const char* szVoiceType, const char* szVoice );
 
+    bool                        IsSpeechEnabled         ( void );
+    void                        SetSpeechEnabled        ( bool bEnabled );
+
     void                        PostWeaponFire          ( void );
 
     bool                        CanReloadWeapon         ( void );
@@ -516,6 +519,7 @@ public:
     bool                        m_bFrozen;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
+    bool                        m_bSpeechEnabled;
 
     // Time dependent interpolation
     struct

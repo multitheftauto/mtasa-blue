@@ -52,16 +52,22 @@ int CLuaFunctionDefs::SetPedVoice ( lua_State* luaVM )
 {
     // Right type?
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && 
-        lua_istype ( luaVM, 2, LUA_TSTRING ) && 
-        lua_istype ( luaVM, 3, LUA_TSTRING ) )
+        lua_istype ( luaVM, 2, LUA_TSTRING ) )
     {
         CClientPed* pPed = lua_toped ( luaVM, 1 );
         const char* szVoiceType = lua_tostring ( luaVM, 2 );
-        const char* szVoiceBank = lua_tostring ( luaVM, 3 );
+        const char* szVoiceBank = NULL;
+        if ( lua_istype ( luaVM, 3, LUA_TSTRING ) ) szVoiceBank = lua_tostring ( luaVM, 3 );        
 
-        if ( pPed && szVoiceType && szVoiceBank )
+        if ( pPed && szVoiceType )
         {
-            pPed->SetVoice ( szVoiceType, szVoiceBank );
+            if ( !stricmp ( szVoiceType, "PED_TYPE_DISABLED" ) ) pPed->SetSpeechEnabled ( false );
+            else if ( szVoiceBank )
+            {
+                pPed->SetSpeechEnabled ( true );
+                pPed->SetVoice ( szVoiceType, szVoiceBank );
+            }
+
             lua_pushboolean ( luaVM, true );
             return 1;
         }

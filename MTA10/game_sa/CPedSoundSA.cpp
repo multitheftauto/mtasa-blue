@@ -18,43 +18,65 @@ SPedVoiceName* CPedSoundSA::m_pVoiceNamesPerType[] =
     (SPedVoiceName *)VAR_CAEPedSound__VoiceNames_GFD
 };
 
-CPedSoundSA::CPedSoundSA ( )
-{
-    m_pPedSoundInterface = NULL;
-}
-
-CPedSoundSA::CPedSoundSA ( CPedSoundSAInterface* pPedSoundInterface )
-{
-    m_pPedSoundInterface = pPedSoundInterface;
-}
-
 short CPedSoundSA::GetVoiceTypeID ( )
 {
-    if ( GetPedSoundInterface () )
-        return GetPedSoundInterface ()->m_sVoiceType;
-    else
-        return -1;
+    return m_pInterface->m_sVoiceType;
 }
 
 short CPedSoundSA::GetVoiceID ( )
 {
-    if ( GetPedSoundInterface () )
-        return GetPedSoundInterface ()->m_sVoiceID;
-    else
-        return -1;
+    return m_pInterface->m_sVoiceID;    
 }
 
 void CPedSoundSA::SetVoiceTypeID ( short sVoiceType )
 {
-    if ( GetPedSoundInterface () )
-        GetPedSoundInterface ()->m_sVoiceType = sVoiceType;
+    m_pInterface->m_sVoiceType = sVoiceType;
 }
 
 void CPedSoundSA::SetVoiceID ( short sVoiceID )
 {
-    if ( GetPedSoundInterface () )
-        GetPedSoundInterface ()->m_sVoiceID = sVoiceID;
+    m_pInterface->m_sVoiceID = sVoiceID;
 }
+
+bool CPedSoundSA::IsSpeechDisabled ( void )
+{
+    bool bReturn;
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CAEPedSound__IsSpeedDisabled;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
+}
+
+
+void CPedSoundSA::EnablePedSpeech ( void )
+{
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CAEPedSound__EnablePedSpeech;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
+
+void CPedSoundSA::DisablePedSpeech ( bool bStopCurrent )
+{
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CAEPedSound__DisablePedSpeech;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    bStopCurrent
+        call    dwFunc
+    }
+}
+
 
 short CPedSoundSA::GetVoiceTypeIDFromName ( const char* szVoiceTypeName )
 {

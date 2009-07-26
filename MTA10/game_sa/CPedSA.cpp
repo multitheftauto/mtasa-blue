@@ -19,7 +19,8 @@ extern CGameSA* pGame;
 
 CPedSA::CPedSA (  ) :
     m_pPedIntelligence ( NULL ),
-    m_pPedInterface ( NULL )
+    m_pPedInterface ( NULL ),
+    m_pPedSound ( NULL )
 {
 	DEBUG_TRACE("CPedSA::CPedSA(  )");
 }
@@ -27,7 +28,7 @@ CPedSA::CPedSA (  ) :
 CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
     m_pPedIntelligence ( NULL ),
     m_pPedInterface ( pPedInterface ),
-    m_PedSound ( &pPedInterface->pedSound )
+    m_pPedSound ( NULL )
 {
 	DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
 }
@@ -35,13 +36,12 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
 VOID CPedSA::SetInterface( CEntitySAInterface * intInterface )
 {
     m_pInterface = intInterface;
-    m_PedSound.SetPedSoundInterface ( &GetPedInterface ()->pedSound );
 }
 
 CPedSA::~CPedSA ( void )
 {
-    if ( m_pPedIntelligence )
-        delete m_pPedIntelligence;
+    if ( m_pPedIntelligence ) delete m_pPedIntelligence;
+    if ( m_pPedSound ) delete m_pPedSound;
 }
 
 // used to init weapons at the moment, called by CPlayerPedSA when its been constructed
@@ -66,7 +66,8 @@ void CPedSA::Init()
     }
     CPedIntelligenceSAInterface * m_pPedIntelligenceInterface = (CPedIntelligenceSAInterface *)(dwPedIntelligence);
 	this->m_pPedIntelligence = new CPedIntelligenceSA(m_pPedIntelligenceInterface, this);
-	
+    this->m_pPedSound = new CPedSoundSA ( &pedInterface->pedSound );
+
     for ( int i = 0; i < WEAPONSLOT_MAX; i++ )
 		this->m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
 
@@ -307,11 +308,6 @@ void CPedSA::SetIsStanding( bool bStanding )
 		push	bStanding
 		call	dwFunc
 	}
-}
-
-CPedIntelligence * CPedSA::GetPedIntelligence ( void )
-{
-	return m_pPedIntelligence;
 }
 
 DWORD CPedSA::GetType ( void )
@@ -859,9 +855,9 @@ void CPedSA::SetStayInSamePlace ( bool bStay )
 void CPedSA::GetVoice ( short* psVoiceType, short* psVoiceID )
 {
     if ( psVoiceType )
-        *psVoiceType = m_PedSound.GetVoiceTypeID ();
+        *psVoiceType = m_pPedSound->GetVoiceTypeID ();
     if ( psVoiceID )
-        *psVoiceID = m_PedSound.GetVoiceID ();
+        *psVoiceID = m_pPedSound->GetVoiceID ();
 }
 
 void CPedSA::GetVoice ( const char** pszVoiceType, const char** pszVoice )
@@ -876,8 +872,8 @@ void CPedSA::GetVoice ( const char** pszVoiceType, const char** pszVoice )
 
 void CPedSA::SetVoice ( short sVoiceType, short sVoiceID )
 {
-    m_PedSound.SetVoiceTypeID ( sVoiceType );
-    m_PedSound.SetVoiceID ( sVoiceID );
+    m_pPedSound->SetVoiceTypeID ( sVoiceType );
+    m_pPedSound->SetVoiceID ( sVoiceID );
 }
 
 void CPedSA::SetVoice ( const char* szVoiceType, const char* szVoice )

@@ -319,7 +319,7 @@ private:
 	CPedIKSA			* m_pPedIK;
 	CPedIntelligenceSA	* m_pPedIntelligence;
     CPedSAInterface     * m_pPedInterface;
-    CPedSoundSA         m_PedSound;
+    CPedSoundSA         * m_pPedSound;
 
 	DWORD				m_dwType;
     unsigned char       m_ucOccupiedSeat;
@@ -355,7 +355,8 @@ public:
     void                ClearWeapon     ( eWeaponType weaponType );
 
 	void				SetIsStanding( bool bStanding );
-	CPedIntelligence	* GetPedIntelligence ( void );
+    CPedIntelligence *  GetPedIntelligence ( void )     { return m_pPedIntelligence; }
+    CPedSound *         GetPedSound ( void )            { return m_pPedSound; }
 	DWORD				GetType ( void );
 	void				SetType ( DWORD dwType );
     DWORD               * GetMemoryValue ( DWORD dwOffset );
