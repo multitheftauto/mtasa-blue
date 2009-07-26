@@ -62,6 +62,7 @@ extern "C" bool g_bSilent;
 	#include <curses.h>
 	#include <dlfcn.h>
 	#include <sys/time.h>
+    #include <sys/times.h>
 	#include <hash_fun.h>
 
 	// Define functions
