@@ -102,7 +102,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
 			assert ( pCustomData );
-            BitStream.WriteCompressed ( static_cast < unsigned short > ( pCustomData->Count () ) );
+            BitStream.WriteCompressed ( pCustomData->CountOnlySynchronized () );
             map < string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
             for ( ; iter != pCustomData->IterEnd (); iter++ )
             {

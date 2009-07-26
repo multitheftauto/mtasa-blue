@@ -133,3 +133,15 @@ CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
     return pNode;   
 }
 
+unsigned short CCustomData::CountOnlySynchronized ( void )
+{
+    unsigned short usSynchronized = 0;
+    std::map < std::string, SCustomData > :: iterator iter = m_Data.begin ();
+    while ( iter != m_Data.end () ) {
+        if ( iter->second.bSynchronized ) { 
+            usSynchronized++;
+        } 
+        iter++; 
+    } 
+    return usSynchronized; 
+}

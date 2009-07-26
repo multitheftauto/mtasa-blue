@@ -33,18 +33,19 @@ class CCustomData
 {
 public:
 
-    void                    Copy                ( CCustomData* pCustomData );
+    void                    Copy                    ( CCustomData* pCustomData );
 
-    SCustomData*            Get                 ( const char* szName );
-    void                    Set                 ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized = true );
+    SCustomData*            Get                     ( const char* szName );
+    void                    Set                     ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized = true );
 
-    bool                    Delete              ( const char* szName );
-    void                    DeleteAll           ( class CLuaMain* pLuaMain );
-    void                    DeleteAll           ( void );
+    bool                    Delete                  ( const char* szName );
+    void                    DeleteAll               ( class CLuaMain* pLuaMain );
+    void                    DeleteAll               ( void );
 
-    inline unsigned int     Count               ( void )                           { return static_cast < unsigned int > ( m_Data.size () ); }
+    inline unsigned int     Count                   ( void )                           { return static_cast < unsigned int > ( m_Data.size () ); }
+    unsigned short          CountOnlySynchronized   ( void );
 
-    CXMLNode *              OutputToXML         ( CXMLNode * pNode );
+    CXMLNode *              OutputToXML             ( CXMLNode * pNode );
 
     std::map < std::string, SCustomData > :: const_iterator IterBegin   ( void )   { return m_Data.begin (); }
     std::map < std::string, SCustomData > :: const_iterator IterEnd     ( void )   { return m_Data.end (); }
