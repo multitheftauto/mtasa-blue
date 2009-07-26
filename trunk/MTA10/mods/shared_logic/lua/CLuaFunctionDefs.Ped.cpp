@@ -27,14 +27,22 @@ int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
         CClientPed* pPed = lua_toped ( luaVM, 1 );
         if ( pPed )
         {
-            const char* szVoiceType = 0;
-            const char* szVoiceBank = 0;
-            pPed->GetVoice ( &szVoiceType, &szVoiceBank );
-            if ( szVoiceType && szVoiceBank )
+            if ( !pPed->IsSpeechEnabled () )
             {
-                lua_pushstring ( luaVM, szVoiceType );
-                lua_pushstring ( luaVM, szVoiceBank );
-                return 2;
+                lua_pushstring ( luaVM, "PED_TYPE_DISABLED" );
+                return 1;
+            }
+            else
+            {
+                const char* szVoiceType = 0;
+                const char* szVoiceBank = 0;
+                pPed->GetVoice ( &szVoiceType, &szVoiceBank );
+                if ( szVoiceType && szVoiceBank )
+                {
+                    lua_pushstring ( luaVM, szVoiceType );
+                    lua_pushstring ( luaVM, szVoiceBank );
+                    return 2;
+                }
             }
         }
         else
