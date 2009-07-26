@@ -18,6 +18,7 @@ class CTaskManager;
 #include "CPhysical.h"
 #include "CWeapon.h"
 #include "CPedIntelligence.h"
+#include "CPedSound.h"
 
 #include <CVector2D.h>
 
@@ -168,8 +169,9 @@ public:
 
 	virtual void			SetIsStanding( bool bStanding )=0;
 	virtual DWORD			GetType ()=0;
-	virtual CPedIntelligence	* GetPedIntelligence()=0;
-    virtual DWORD               * GetMemoryValue ( DWORD dwOffset )=0;
+	virtual CPedIntelligence *  GetPedIntelligence()=0;
+    virtual CPedSound *         GetPedSound () = 0;
+    virtual DWORD *         GetMemoryValue ( DWORD dwOffset )=0;
 
 
 	virtual FLOAT		    GetCurrentRotation()=0;

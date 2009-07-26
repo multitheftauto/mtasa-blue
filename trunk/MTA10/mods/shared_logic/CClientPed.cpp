@@ -137,6 +137,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bFrozen = false;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
+    m_bSpeechEnabled = true;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -2837,6 +2838,7 @@ void CClientPed::_CreateModel ( void )
         SetSunbathing ( m_bSunbathing, false );
         SetHeadless ( m_bHeadless );
         SetOnFire ( m_bIsOnFire );
+        SetSpeechEnabled ( m_bSpeechEnabled );
 
         // Rebuild the player if it's CJ. So we get the clothes.
         RebuildModel ();
@@ -3491,8 +3493,7 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
 
     //Check for swimming task and warp to door.
     CTask* pTask = 0;
-    if ( m_pTaskManager )
-        pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+    if ( m_pTaskManager ) pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
     unsigned short usVehicleModel = pVehicle->GetModel();
     if ( ((pTask && pTask->GetTaskType () == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) && ( usVehicleModel == VT_SKIMMER ||
                                                                                                    usVehicleModel == VT_SEASPAR ||
@@ -4689,6 +4690,27 @@ void CClientPed::SetVoice ( const char* szVoiceType, const char* szVoice )
 {
     if ( m_pPlayerPed )
         m_pPlayerPed->SetVoice ( szVoiceType, szVoice );
+}
+
+
+bool CClientPed::IsSpeechEnabled ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return !m_pPlayerPed->GetPedSound ()->IsSpeechDisabled ();
+    }
+    return m_bSpeechEnabled;
+}
+
+
+void CClientPed::SetSpeechEnabled ( bool bEnabled )
+{
+    if ( m_pPlayerPed )
+    {
+        if ( bEnabled ) m_pPlayerPed->GetPedSound ()->EnablePedSpeech ();
+        else m_pPlayerPed->GetPedSound ()->DisablePedSpeech ( true );
+    }
+    m_bSpeechEnabled = bEnabled;
 }
 
 
