@@ -389,10 +389,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CCriticalSection.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CDebugView.cpp"
 				>
 			</File>
@@ -735,10 +731,6 @@
 			</File>
 			<File
 				RelativePath=".\CCredits.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CCriticalSection.h"
 				>
 			</File>
 			<File

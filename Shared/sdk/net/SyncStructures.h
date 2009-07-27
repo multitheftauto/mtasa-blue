@@ -19,6 +19,7 @@
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
+// Note: Using SFloatSync < 14, 10 > also limits the range from -8191 to 8192
 
 #pragma pack(push)
 #pragma pack(1)

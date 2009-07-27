@@ -3417,8 +3417,15 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
 
+                // Possible fix for bogus death animation of remote players
+                if ( fCurrentHealth == 0.0f )
+                    return false;
+
                 // Stop here if we arent allowing the animation
                 if ( !bAllowDamageAnim ) return false;
+
+                // Allow animation and ensure the code below is not executed if health and armor are locked (i.e. remote players)
+                return true;
             }
 
             // Update our stored health/armor
