@@ -2054,7 +2054,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     CVector vecPosition;
     CVector vecRotation;
     SPositionSync position ( false );
-    SRotationDegreesSync rotation ( false );
 
     // Attached
     bool bIsAttached;
@@ -2227,10 +2226,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 {
                     unsigned short usObjectID;
                     SEntityAlphaSync alpha;
+                    SRotationRadiansSync rotationRadians ( false );
 
                     // Read out the position, rotation, object ID and alpha value
                     if ( bitStream.Read ( &position ) &&
-                         bitStream.Read ( &rotation ) &&
+                         bitStream.Read ( &rotationRadians ) &&
                          bitStream.ReadCompressed ( usObjectID ) &&
                          bitStream.Read ( &alpha ) )
                     {
@@ -2245,7 +2245,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pObject;
                         if ( pObject )
                         {
-                            pObject->SetOrientation ( position.data.vecPosition, rotation.data.vecRotation );
+                            pObject->SetOrientation ( position.data.vecPosition, rotationRadians.data.vecRotation );
                             pObject->SetAlpha ( alpha.data.ucAlpha );
                         }
                         else
@@ -2259,10 +2259,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             unsigned long ulMoveTimeLeft;
                             if ( bitStream.ReadCompressed ( ulMoveTimeLeft ) &&
                                  bitStream.Read ( &position ) &&
-                                 bitStream.Read ( &rotation ) )
+                                 bitStream.Read ( &rotationRadians ) )
                             {
                                 pObject->StartMovement ( position.data.vecPosition,
-                                                         rotation.data.vecRotation,
+                                                         rotationRadians.data.vecRotation,
                                                          ulMoveTimeLeft );
                             }
                         }                                 
@@ -2343,7 +2343,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( &position );
 
                     // Read out the rotation in degrees
-                    bitStream.Read ( &rotation );
+                    SRotationDegreesSync rotationDegrees ( false );
+                    bitStream.Read ( &rotationDegrees );
 
                     // Read out the vehicle value as a char, then convert
                     unsigned char ucModel = 0xFF;
@@ -2534,7 +2535,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
-                    pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
+                    pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );
 
                     break;
                 }

@@ -47,7 +47,6 @@ void CEntityAddPacket::Add ( CElement * pElement )
 bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     SPositionSync position ( false );
-    SRotationDegreesSync rotation ( false );
 
     // Check that we have any entities
     if ( m_Entities.size () > 0 )
@@ -149,8 +148,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( &position );
 
                     // Rotation
-                    pObject->GetRotation ( rotation.data.vecRotation );
-                    BitStream.Write ( &rotation );
+                    SRotationRadiansSync rotationRadians ( false );
+                    pObject->GetRotation ( rotationRadians.data.vecRotation );
+                    BitStream.Write ( &rotationRadians );
 
                     // Object id
                     BitStream.WriteCompressed ( pObject->GetModel () );
@@ -170,8 +170,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         position.data.vecPosition = pObject->m_moveData.vecStopPosition;
                         BitStream.Write ( &position );
 
-                        rotation.data.vecRotation = pObject->m_moveData.vecStopRotation - rotation.data.vecRotation;
-                        BitStream.Write ( &rotation );
+                        rotationRadians.data.vecRotation = pObject->m_moveData.vecStopRotation - rotationRadians.data.vecRotation;
+                        BitStream.Write ( &rotationRadians );
                     }
 
 
@@ -238,11 +238,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Write the vehicle position and rotation
                     position.data.vecPosition = pVehicle->GetPosition ();
-                    pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
+                    SRotationDegreesSync rotationDegrees ( false );
+                    pVehicle->GetRotationDegrees ( rotationDegrees.data.vecRotation );
 
                     // Write it
                     BitStream.Write ( &position );
-                    BitStream.Write ( &rotation );
+                    BitStream.Write ( &rotationDegrees );
 
                     // Vehicle id as a char
                     // I'm assuming the "-400" is for adjustment so that all car values can

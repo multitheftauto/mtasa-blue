@@ -44,7 +44,6 @@
 #include "SString.h"
 #include "CrashHandler.h"
 #include "CCore.h"
-#include "CCriticalSection.h"
 #include "CDebugView.h"
 #include "CChat.h"
 #include "CDirect3DHookManager.h"

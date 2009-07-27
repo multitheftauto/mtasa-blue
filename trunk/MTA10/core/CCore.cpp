@@ -93,9 +93,6 @@ CCore::CCore ( void )
     AC_RestrictAccess ();
     #endif
     
-    // Initialize critical sections
-    CCriticalSection::Initialize ();
-
     m_pConfigFile = NULL;
 
     // NULL the path buffers
@@ -264,9 +261,6 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pLogger;
-
-    // Finalize critical sections
-    CCriticalSection::Finalize ();
 }
 
 
