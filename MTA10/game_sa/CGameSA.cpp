@@ -98,8 +98,19 @@ CGameSA::CGameSA()
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
     this->m_pWaterManager           = new CWaterManagerSA ();
 
+    // Normal weapon types (WEAPONSKILL_STD)
 	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
 		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), (eWeaponType)i);
+    // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
+    int index;
+    for ( int skill = 0; skill < 3 ; skill++ )
+    {
+        for ( int i = 0 ; i < NUM_WeaponInfoSkills ; i++ )
+        {
+            index = WEAPONTYPE_LAST_WEAPONTYPE+(skill*NUM_WeaponInfoSkills)+i;
+            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index * CLASSSIZE_WeaponInfo), (eWeaponType)(i+WEAPONTYPE_PISTOL));
+        }
+    }
 
 	m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
 
@@ -154,11 +165,23 @@ CGameSA::~CGameSA ( void )
 	delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
 }
 
-CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon)
+CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill)
 { 
 	DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
-	if (weapon < WEAPONTYPE_LAST_WEAPONTYPE) 
-		return WeaponInfos[weapon]; 
+	
+    if (weapon < WEAPONTYPE_LAST_WEAPONTYPE) 
+    {
+        int offset = 0;
+        switch ( skill )
+        {
+            case WEAPONSKILL_STD: offset = 0; break;
+            case WEAPONSKILL_POOR: offset = 25; break;
+            case WEAPONSKILL_PRO: offset = 36; break;
+            case WEAPONSKILL_SPECIAL: offset = 47; break;
+            default: break;
+        }
+		return WeaponInfos[weapon+offset]; 
+    }
 	else 
 		return NULL; 
 }

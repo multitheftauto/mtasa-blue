@@ -129,7 +129,7 @@ public:
     virtual CFx                 * GetFx () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
 	
-	virtual CWeaponInfo			* GetWeaponInfo(eWeaponType weapon)=0;
+	virtual CWeaponInfo			* GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
 	virtual CModelInfo			* GetModelInfo(DWORD dwModelID)=0;
 
 	virtual DWORD				GetSystemTime (  )=0;

@@ -47,7 +47,7 @@ public:
 	
 	// skill settings
 	eWeaponSkill m_SkillLevel;		    // what's the skill level of this weapontype
-	int			m_nReqStatLevel;		// what stat level is required for this skill level
+	FLOAT		m_nReqStatLevel;		// what stat level is required for this skill level
 	FLOAT		m_fAccuracy;			// modify accuracy of weapon
 	FLOAT		m_fMoveSpeed;			// how fast can move with weapon
 
@@ -83,7 +83,7 @@ private:
 	CWeaponInfoSAInterface		* internalInterface;
 public:
 	// constructor
-	CWeaponInfoSA(CWeaponInfoSAInterface * weaponInfoInterface, eWeaponType weaponType) { this->internalInterface = weaponInfoInterface;  this->weaponType  = weaponType; };
+	CWeaponInfoSA(CWeaponInfoSAInterface * weaponInfoInterface, eWeaponType weaponType) { this->internalInterface = weaponInfoInterface;  this->weaponType = weaponType; };
 
 	// stolen from R*'s CPedIK :)
 	void SetFlag(DWORD flag)		{this->internalInterface->m_nFlags |= flag;}
@@ -118,8 +118,8 @@ public:
 	VOID						SetSlot ( eWeaponSlot dwSlot ) { GetInterface()->m_nWeaponSlot = (eWeaponSlot)dwSlot; };
     eWeaponSkill                GetSkill() { return GetInterface()->m_SkillLevel; }
     void                        SetSkill ( eWeaponSkill weaponSkill ) { GetInterface ()->m_SkillLevel = weaponSkill; }
-    int                         GetRequiredStatLevel () { return GetInterface()->m_nReqStatLevel; }
-    void                        SetRequiredStatLevel ( int iStatLevel ) { GetInterface()->m_nReqStatLevel = iStatLevel; }
+    float                       GetRequiredStatLevel () { return GetInterface()->m_nReqStatLevel; }
+    void                        SetRequiredStatLevel ( float fStatLevel ) { GetInterface()->m_nReqStatLevel = fStatLevel; }
     eFireType                   GetFireType () { return GetInterface()->m_eFireType; }
 };
 
