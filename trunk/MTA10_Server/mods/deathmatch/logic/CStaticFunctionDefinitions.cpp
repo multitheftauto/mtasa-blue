@@ -4233,6 +4233,8 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CElement* pElement, unsig
                 case VT_RCCAM:
                 case VT_RCGOBLIN:
                     return false;
+                    break;
+                default: break;
             }
 
             if ( ucState != pVehicle->m_ucDoorStates [ ucDoor ] )

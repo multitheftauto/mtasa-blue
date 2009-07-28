@@ -3316,7 +3316,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     eWeaponType weaponUsed = pEvent->GetWeaponUsed ();
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
     CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
-    float fDamage = pEvent->GetDamageApplied ();
+    float fDamage = pEvent->GetDamageApplied ();    
 
     /* Causes too much desync right now
     // Is this shotgun damage?
@@ -3358,6 +3358,19 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         if ( IS_PLAYER ( pDamagedPed ) )
         {
             CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
+
+            // Is this the local player?
+            if ( pDamagedPlayer->IsLocalPlayer () )
+            {
+                // Are we taking some drowning damage?
+                if ( fDamage > 0 && weaponUsed == WEAPONTYPE_DROWNING )
+                {
+                    // Alter the damage so we die slower (bit hacky)
+                    fDamage = 0.2f; // 0.2 takes about 4secs to die like SP
+                    fCurrentHealth = fPreviousHealth - fDamage;
+                    pDamagedPed->GetGamePlayer ()->SetHealth ( fCurrentHealth );
+                }
+            }
 
             // Is this is a remote player?
             if ( !pDamagedPed->IsLocalPlayer () )
