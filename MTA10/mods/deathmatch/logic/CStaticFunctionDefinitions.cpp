@@ -2262,8 +2262,29 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CClientEntity& Entity, un
 	{
 		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		if ( ucDoor < 6 )
+		if ( ucDoor < MAX_DOORS )
 		{
+            switch ( Vehicle.GetModel () )
+            {
+                case VT_BFINJECT:
+                case VT_RCBANDIT:
+                case VT_CADDY:
+                case VT_RCRAIDER:
+                case VT_BAGGAGE:
+                case VT_DOZER:
+                case VT_FORKLIFT:
+                case VT_TRACTOR:
+                case VT_TIGER:
+                case VT_BANDITO:
+                case VT_KART:
+                case VT_MOWER:
+                case VT_RCCAM:
+                case VT_RCGOBLIN:
+                    return false;
+                    break;
+                default: break;
+            }
+
             Vehicle.SetDoorStatus ( ucDoor, ucState );
 
 			return true;
