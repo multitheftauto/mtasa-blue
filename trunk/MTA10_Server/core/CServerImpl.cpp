@@ -146,6 +146,14 @@ void CServerImpl::Printf ( const char* szFormat, ... )
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
+    // Parse our arguments
+    if ( !ParseArguments ( iArgumentCount, szArguments ) )
+    {
+        return 1;
+    }
+
+    if ( !g_bSilent )
+    {
 	// Initialize the console handlers
 #ifdef WIN32
 		// Get the console handle
@@ -204,12 +212,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 		flags |= O_NONBLOCK;
 		fcntl(0, F_SETFL, flags);
 #endif
-
-    // Parse our arguments
-    if ( !ParseArguments ( iArgumentCount, szArguments ) )
-    {
-        return 1;
     }
+
 
     // Did we find the path? If not, assume our current
     if ( m_szServerPath [0] == 0 )
@@ -237,7 +241,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     m_pModManager->SetServerPath ( m_szServerPath );
 
 	// Welcome text
-    Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
+    if ( !g_bSilent )
+        Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
 
     // Load the network DLL
     char szBuffer [MAX_PATH];
