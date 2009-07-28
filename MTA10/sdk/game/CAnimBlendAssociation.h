@@ -24,6 +24,9 @@ public:
     virtual AssocGroupId                        GetAnimGroup            ( void ) = 0;
     virtual AnimationId                         GetAnimID               ( void ) = 0;
     virtual CAnimBlendHierarchy *               GetAnimHierarchy        ( void ) = 0;
+
+    virtual float                               GetBlendAmount          ( void ) = 0;
+    virtual void                                SetBlendAmount          ( float fAmount ) = 0;
 };
 
 #endif

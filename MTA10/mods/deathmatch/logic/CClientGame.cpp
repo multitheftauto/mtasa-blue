@@ -222,6 +222,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
+    g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
+    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -351,7 +353,9 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
-    g_pMultiplayer->SetIdleHandler (  NULL );
+    g_pMultiplayer->SetIdleHandler ( NULL );
+    g_pMultiplayer->SetAddAnimationHandler ( NULL );
+    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -1740,49 +1744,43 @@ void CClientGame::UpdateFireKey ( void )
 
             // ** Stealth kill **
             {
-                // Are we holding a knife?
-                if ( m_pLocalPlayer->GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
+                if ( m_pLocalPlayer->IsStealthAiming () )
                 {
-                    // Do we have the aim key pressed?
-                    SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
-                    if ( pAimControl && pAimControl->bState )
+                    // Do we have a target ped?
+                    CClientPed * pTargetPed = m_pLocalPlayer->GetTargetedPed ();
+                    if ( pTargetPed )
                     {
-                        // Do we have a target ped?
-                        CClientEntity * pTarget = m_pLocalPlayer->GetTargetedEntity ();
-                        if ( pTarget && IS_PED ( pTarget ) )
+                        // Do we have a target player?
+                        if ( IS_PLAYER ( pTargetPed ) )
                         {
-                            // Do we have a target player?
-                            if ( IS_PLAYER ( pTarget ) )
+                            CClientPlayer * pTargetPlayer = static_cast < CClientPlayer * > ( pTargetPed );
+                            
+                            // Is the targetted player on a team
+                            CClientTeam* pTeam = pTargetPlayer->GetTeam ();
+                            if ( pTeam )
                             {
-                                CClientPlayer * pTargetPlayer = static_cast < CClientPlayer * > ( pTarget );
-                                
-                                // Is the targetted player on a team
-                                CClientTeam* pTeam = pTargetPlayer->GetTeam ();
-                                if ( pTeam )
-                                {
-                                    // Is this friendly-fire?
-                                    if ( pTargetPlayer->IsOnMyTeam ( m_pLocalPlayer ) && !pTeam->GetFriendlyFire () )
-                                    {
-                                        // Change the state back to false so this press doesn't do anything else
-                                        pControl->bState = false;
-                                        return;
-                                    }
-                                }
-                            }
-                            CPlayerPed * pGameTarget = static_cast < CClientPed * > ( pTarget )->GetGamePlayer ();
-                            if ( pGameTarget )
-                            {
-                                // Would GTA let us stealth kill now?
-                                if ( m_pLocalPlayer->GetGamePlayer ()->GetPedIntelligence ()->TestForStealthKill ( pGameTarget, false ) )
+                                // Is this friendly-fire?
+                                if ( pTargetPlayer->IsOnMyTeam ( m_pLocalPlayer ) && !pTeam->GetFriendlyFire () )
                                 {
                                     // Change the state back to false so this press doesn't do anything else
                                     pControl->bState = false;
-
-                                    // Lets request a stealth kill
-                                    CBitStream bitStream;
-                                    bitStream.pBitStream->WriteCompressed ( pTarget->GetID () );
-                                    m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
+                                    return;
                                 }
+                            }
+                        }
+                        CPlayerPed * pGameTarget = static_cast < CClientPed * > ( pTargetPed )->GetGamePlayer ();
+                        if ( pGameTarget )
+                        {
+                            // Would GTA let us stealth kill now?
+                            if ( m_pLocalPlayer->GetGamePlayer ()->GetPedIntelligence ()->TestForStealthKill ( pGameTarget, false ) )
+                            {
+                                // Change the state back to false so this press doesn't do anything else
+                                pControl->bState = false;
+
+                                // Lets request a stealth kill
+                                CBitStream bitStream;
+                                bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
+                                m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
                             }
                         }
                     }
@@ -2661,6 +2659,7 @@ void CClientGame::UpdateMimics ( void )
             bool bChoking = m_pLocalPlayer->IsChoking ();
             bool bSunbathing = m_pLocalPlayer->IsSunbathing ();
             bool bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby ();
+            bool bStealthAiming = m_pLocalPlayer->IsStealthAiming ();
 
             CClientVehicle* pVehicle = m_pLocalPlayer->GetOccupiedVehicle ();
             unsigned int uiSeat = m_pLocalPlayer->GetOccupiedVehicleSeat ();
@@ -2713,6 +2712,7 @@ void CClientGame::UpdateMimics ( void )
                 pMimic->SetChoking ( bChoking );
                 pMimic->SetSunbathing ( bSunbathing );
                 pMimic->SetDoingGangDriveby ( bDoingDriveby );
+                pMimic->SetStealthAiming ( bStealthAiming );
 
                 Controller.ShockButtonL = 0;
 
@@ -3103,6 +3103,16 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
+void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+{
+    g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+}
+
+void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{
+    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+}
+
 void CClientGame::StaticPostWorldProcessHandler ( void )
 {
     g_pClientGame->PostWorldProcessHandler ();
@@ -3209,6 +3219,17 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
     CLuaArguments Arguments;
     Arguments.PushNumber ( ucWeaponType );
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
+}
+
+
+void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+{
+    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+}
+
+void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+{   
+    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
 }
 
 
@@ -3330,7 +3351,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
 
         // Is the damaged ped a player?
-        if ( pDamagedPed->GetType () == CCLIENTPLAYER )
+        if ( IS_PLAYER ( pDamagedPed ) )
         {
             CClientPlayer * pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
 
@@ -3340,7 +3361,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 // Don't allow GTA to start the choking task
                 if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER )
                     return false;
-
             }
 
             // Do we have an inflicting entity?
@@ -3401,28 +3421,25 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 return false;
             }
 
-            // Temp fix for #4099 - Don't allow damage anim if hit by certain weapons and aiming a gun
-            bool bAllowDamageAnim = ( weaponUsed < WEAPONTYPE_PISTOL || weaponUsed > WEAPONTYPE_MINIGUN || !pDamagedPed->IsUsingGun () );
+            bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
 
             // Check if their health or armor is locked, and if so prevent applying the damage locally
-            if ( pDamagedPed->IsHealthLocked () && pDamagedPed->IsArmorLocked () )
+            if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
             {
                 // Save possible damage that might be caused to a remote player.
                 // This is to give the local player some instant visual feedback on damage that might be inflicted
-                if ( !pDamagedPed->IsLocalPlayer () && pDamagedPed->GetType () == CCLIENTPLAYER )
+                if ( IS_REMOTE_PLAYER ( pDamagedPed ) )
                 {
                     CClientPlayer* pDamagedPlayer = static_cast < CClientPlayer * > ( pDamagedPed );
                     pDamagedPlayer->AddPretendDamage ( fDamage, pDamagedPlayer->GetLatency () );
                 }
+
+                // Restore health+armor
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
 
-                // Possible fix for bogus death animation of remote players
-                if ( fCurrentHealth == 0.0f )
-                    return false;
-
-                // Stop here if we arent allowing the animation
-                if ( !bAllowDamageAnim ) return false;
+                // Ignore the damage if its going to kill us or we dont want the animation
+                if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming ) return false;
 
                 // Allow animation and ensure the code below is not executed if health and armor are locked (i.e. remote players)
                 return true;
@@ -3443,12 +3460,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_DamagerID = INVALID_ELEMENT_ID;
                 if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
                 m_bDamageSent = false;
-            }
-            if ( pDamagedPed->GetType () == CCLIENTPED )
-            {   
-                // Update our stored health/armor (Fixes #4353)
-                pDamagedPed->m_fHealth = fCurrentHealth;
-                pDamagedPed->m_fArmor = fCurrentArmor;
             }
             // Does this damage kill the player?
             if ( fCurrentHealth == 0.0f )
@@ -3500,7 +3511,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
             }
             // Inhibit hit-by-gun animation for local player if required
-            if ( pDamagedPed->IsLocalPlayer () && !bAllowDamageAnim ) return false;
+            if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
         }
     }
 

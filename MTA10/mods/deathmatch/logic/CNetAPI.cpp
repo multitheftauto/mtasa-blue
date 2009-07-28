@@ -891,6 +891,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     pPlayer->Duck ( flags.data.bIsDucked );
     pPlayer->SetChoking ( flags.data.bIsChoking );
     pPlayer->SetOnFire ( flags.data.bIsOnFire );
+    pPlayer->SetStealthAiming ( flags.data.bStealthAiming );
 
     // Remember now as the last puresync time
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
@@ -929,6 +930,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     flags.data.bIsOnFire        = ( pPlayerModel->IsOnFire () == true );
     flags.data.bHasAWeapon      = ( pPlayerWeapon != NULL );
     flags.data.bSyncingVelocity = ( !flags.data.bIsOnGround || ( pPlayerModel->GetPlayerSyncCount () % 4 ) == 0 );
+    flags.data.bStealthAiming   = ( pPlayerModel->IsStealthAiming () == true );
 
     if ( pPlayerWeapon->GetSlot () > 15 )
         flags.data.bHasAWeapon = false;

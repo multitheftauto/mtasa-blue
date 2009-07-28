@@ -25,6 +25,10 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE	0xFFFFFFFF
 
+#define STEALTH_AIM_ANIM_GROUP 87
+#define STEALTH_AIM_ANIM_ID 347
+#define STEALTH_KILL_RANGE 2.5f
+
 struct SBodyPartName { char szName [32]; };
 SBodyPartName BodyPartNames [10] =
 { {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
@@ -138,6 +142,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
+    m_bStealthAiming = false;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -2134,6 +2139,32 @@ void CClientPed::StreamedInPulse ( void )
 
             // Check if the ped got in fire without the script control
             m_bIsOnFire = m_pPlayerPed->IsOnFire();
+
+            // Do our stealth aiming stuff
+            SetStealthAiming ( ShouldBeStealthAiming () );
+        }
+
+        // Is the player stealth aiming?
+        if ( m_bStealthAiming )
+        {
+            // Grab our current anim
+            CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+            if ( pAssoc )
+            {
+                // Check we're not doing any important animations
+                AnimationId animId = pAssoc->GetAnimID ();
+                if ( animId == 0 || animId == 1 || animId == 3 || animId == 55 ||
+                     animId == STEALTH_AIM_ANIM_ID )
+                {
+                    // Are our knife anims loaded?
+                    CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "KNIFE" );
+                    if ( pBlock->IsLoaded () )
+                    {
+                        // Force the animation
+                        BlendAnimation ( STEALTH_AIM_ANIM_GROUP, STEALTH_AIM_ANIM_ID, 8.0f );
+                    }
+                }
+            }
         }
 
         // Is the player choking?
@@ -4385,6 +4416,17 @@ CClientEntity* CClientPed::GetTargetedEntity ( void )
 }
 
 
+CClientPed * CClientPed::GetTargetedPed ( void )
+{
+    CClientEntity * pTargetEntity = GetTargetedEntity ();
+    if ( pTargetEntity && IS_PED ( pTargetEntity ) )
+    {
+        return static_cast < CClientPed * > ( pTargetEntity );
+    }
+    return NULL;
+}
+
+
 void CClientPed::NotifyCreate ( void )
 {
     m_pManager->GetPedManager ()->OnCreation ( this );
@@ -4752,4 +4794,104 @@ bool CClientPed::ReloadWeapon ( void )
         }
     }
     return false;
+}
+
+
+bool CClientPed::ShouldBeStealthAiming ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        // Do we have a knife?
+        if ( GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
+        {
+            // Do we have the aim key pressed?
+            SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
+            if ( pAimControl && pAimControl->bState )
+            {
+                // Do we have a target ped?
+                CClientPed * pTargetPed = GetTargetedPed ();
+                if ( pTargetPed && pTargetPed->GetGamePlayer () )
+                {
+                    // Are we close enough to the target?
+                    CVector vecPos, vecPos_2;
+                    GetPosition ( vecPos );
+                    pTargetPed->GetPosition ( vecPos_2 );
+                    if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
+                    {
+                        // Grab our current anim
+                        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+                        if ( pAssoc )
+                        {
+                            // Our game checks for stealth killing
+                            if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+void CClientPed::SetStealthAiming ( bool bAiming )
+{
+    if ( bAiming != m_bStealthAiming )
+    {
+        // Stop aiming?
+        if ( !bAiming )
+        {
+            // Do we have the aiming animation?
+            CAnimBlendAssociation * pAssoc = GetAnimation ( STEALTH_AIM_ANIM_ID );
+            if ( pAssoc )
+            {
+                // Stop our animation
+                pAssoc->SetBlendAmount ( -2.0f );
+            }
+        }
+        m_bStealthAiming = bAiming;
+    }
+}
+
+
+CAnimBlendAssociation * CClientPed::AddAnimation ( AssocGroupId group, AnimationId id )
+{
+    if ( m_pPlayerPed )
+    {
+        return g_pGame->GetAnimManager ()->AddAnimation ( m_pPlayerPed->GetRpClump (), group, id );
+    }
+    return NULL;
+}
+
+
+CAnimBlendAssociation * CClientPed::BlendAnimation ( AssocGroupId group, AnimationId id, float fBlendDelta )
+{
+    if ( m_pPlayerPed )
+    {
+        return g_pGame->GetAnimManager ()->BlendAnimation ( m_pPlayerPed->GetRpClump (), group, id, fBlendDelta );
+    }
+    return NULL;
+}
+
+
+CAnimBlendAssociation * CClientPed::GetAnimation ( AnimationId id )
+{
+    if ( m_pPlayerPed )
+    {
+        return g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( m_pPlayerPed->GetRpClump (), id );
+    }
+    return NULL;
+}
+
+
+CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( m_pPlayerPed->GetRpClump () );
+    }
+    return NULL;
 }

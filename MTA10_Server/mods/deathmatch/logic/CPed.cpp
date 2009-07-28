@@ -65,6 +65,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_iMoveAnim = 54; // MOVE_PLAYER
     m_fGravity = 0.008f;
     m_bDoingGangDriveby = false;
+    m_bStealthAiming = false;
 
     m_pVehicle = NULL;
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;

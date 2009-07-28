@@ -20,6 +20,9 @@
 
 #define DEFAULT_WAVES -1.0f
 
+typedef unsigned long AssocGroupId;
+typedef unsigned long AnimationId;
+
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
@@ -36,6 +39,9 @@ typedef void ( Render3DStuffHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
+typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -112,6 +118,8 @@ public:
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
+    virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
+    virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
