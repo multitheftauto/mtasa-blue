@@ -36,6 +36,20 @@ using namespace std;
 
 int main ( int argc, char* argv [] )
 {
+    if ( argc == 2 )
+    {
+        if ( stricmp ( argv[1], "/?" ) == 0 || stricmp ( argv[1], "--help" ) == 0 )
+        {
+            printf ( "Usage: mtaserver [OPTION]\n\n" );
+            printf ( "  -s                   Run server in silent mode\n" );
+            printf ( "  -D [PATH]            Use as base directory\n" );
+            printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
+            printf ( "  --ip [ADDR]          Set IP address\n" );
+            printf ( "  --port [PORT]        Set port\n" );
+            printf ( "  --maxplayers [2-128] Set maxplayers\n" );
+            return 1;
+        }
+    }
     // Load the core library
     CDynamicLibrary Core;
     if ( Core.Load ( LIB_CORE ) )
