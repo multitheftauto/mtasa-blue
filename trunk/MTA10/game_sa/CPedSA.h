@@ -295,8 +295,8 @@ public:
     CEntitySAInterface * pContactEntity;
     BYTE bPad3[32];
 	CEntitySAInterface * CurrentObjective; // current vehicle    1420
-    BYTE bPad2[8];
-	BYTE bPedType;	// ped type? 0 = player, >1 = ped?
+    BYTE bPad2[8];  // 1424
+	BYTE bPedType;	// ped type? 0 = player, >1 = ped?  // 1432
 	BYTE bPad9[7];
     CWeaponSAInterface      Weapons[WEAPONSLOT_MAX];
     //weapons at +1440 ends at +1804

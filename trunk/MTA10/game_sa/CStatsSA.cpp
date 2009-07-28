@@ -83,3 +83,18 @@ void CStatsSA::SetStatValue ( unsigned short usIndex, float fAmmount )
 		add		esp, 8
 	}
 }
+
+unsigned short CStatsSA::GetSkillStatIndex ( eWeaponType type )
+{
+    int weaponType = ( int ) type;
+    int iIndex;
+    DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
+    _asm
+    {
+        push    weaponType
+        call    dwFunc
+        add     esp, 0x4
+        mov     iIndex, eax
+    }
+    return ( unsigned short ) iIndex;
+}

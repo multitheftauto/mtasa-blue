@@ -32,6 +32,8 @@
 
 #define		ARRAY_WeaponInfo				0xC8AAB8    // ##SA##
 #define		CLASSSIZE_WeaponInfo			112         // ##SA##
+#define     NUM_WeaponInfoSkills            11
+#define     NUM_WeaponInfo                  WEAPONTYPE_LAST_WEAPONTYPE+(3*NUM_WeaponInfoSkills) // 3 sets of skill weapon infos
 
 #define     MODELINFO_LAST_PLAYER_ID        288         // ??
 #define     MODELINFO_MAX                   65535
@@ -56,7 +58,7 @@ class CGameSA : public CGame
     friend class COffsets;
 
 private:
-	CWeaponInfo			* WeaponInfos[WEAPONTYPE_LAST_WEAPONTYPE];
+	CWeaponInfo			* WeaponInfos[NUM_WeaponInfo];
 	CModelInfoSA		ModelInfo[MODELINFO_MAX];
 public:
 	CGameSA(); // constructor
@@ -105,7 +107,7 @@ public:
     inline CFx                      * GetFx ()                   { return m_pFx; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
 
-	CWeaponInfo				* GetWeaponInfo(eWeaponType weapon);
+	CWeaponInfo				* GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
 	CModelInfo				* GetModelInfo( DWORD dwModelID );
 
 	inline DWORD            GetSystemTime (  )		{ DEBUG_TRACE("DWORD     GetSystemTime (  )");return *VAR_SystemTime; };

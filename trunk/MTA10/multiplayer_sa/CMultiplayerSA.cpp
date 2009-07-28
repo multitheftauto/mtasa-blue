@@ -151,6 +151,9 @@ DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
 #define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
 DWORD RETURN_CAnimManager_BlendAnimation =                  0x4D4617;
 
+#define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
+DWORD RETURN_CPed_GetWeaponSkill =                          0x5E3B68;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -260,6 +263,7 @@ void HOOK_CPlantMgr_Render ();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
 void HOOK_CAnimManager_AddAnimation ();
 void HOOK_CAnimManager_BlendAnimation ();
+void HOOK_CPed_GetWeaponSkill ();
 
 void vehicle_lights_init ();
 
@@ -369,7 +373,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 ); 
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
+    HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4000,5 +4005,71 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
         sub     esp,14h 
         mov     ecx,dword ptr [esp+18h]
         jmp     RETURN_CAnimManager_BlendAnimation
+    }
+}
+
+CPedSAInterface * weaponSkillPed;
+eWeaponType weaponSkillWeapon;
+BYTE weaponSkill;
+bool CPed_GetWeaponSkill ()
+{
+    CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) weaponSkillPed );
+    if ( pPed )
+    {
+        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 );
+        if ( pPed != pLocalPlayerPed )
+        {
+            if ( weaponSkillWeapon >= 22 && weaponSkillWeapon <= 32 )
+            {
+                CPlayerPed* playerPed = dynamic_cast < CPlayerPed* > ( pPed ); 
+	            if ( playerPed )
+                {
+		            CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( playerPed );
+                    float stat = data->m_stats.StatTypesFloat [ pGameInterface->GetStats ()->GetSkillStatIndex ( weaponSkillWeapon ) ];
+                    
+                    CWeaponInfo * pPoor = pGameInterface->GetWeaponInfo ( weaponSkillWeapon, WEAPONSKILL_POOR );
+                    CWeaponInfo * pStd = pGameInterface->GetWeaponInfo ( weaponSkillWeapon, WEAPONSKILL_STD );
+                    CWeaponInfo * pPro = pGameInterface->GetWeaponInfo ( weaponSkillWeapon, WEAPONSKILL_PRO );
+
+                    if ( stat >= pPro->GetRequiredStatLevel () ) weaponSkill = WEAPONSKILL_PRO;
+                    else if ( stat >= pStd->GetRequiredStatLevel () ) weaponSkill = WEAPONSKILL_STD;
+                    else weaponSkill = WEAPONSKILL_POOR;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void _declspec(naked) HOOK_CPed_GetWeaponSkill ()
+{
+    _asm
+    {
+        mov     weaponSkillPed, ecx
+        mov     eax, [esp+4]
+        mov     weaponSkillWeapon, eax
+        pushad
+    }
+
+    if ( CPed_GetWeaponSkill () )
+    {
+        _asm
+        {
+            popad
+            mov     al, weaponSkill
+            retn    4
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            push    esi
+            mov     esi, [esp+8]
+            cmp     esi, 16h
+            jmp     RETURN_CPed_GetWeaponSkill
+        }
     }
 }

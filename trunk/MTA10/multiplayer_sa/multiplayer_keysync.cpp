@@ -163,6 +163,7 @@ void PostContextSwitch ( void )
 		bRadioHackInstalled = FALSE;
 	}
 
+    /*
     // ChrML: Force as high stats as we can go before screwing up. Players can't have different
  	// stats or guns don't work. We can't have dual guns either due to some screwups.
  	// Dual gun screwup: Sync code needs update and the gun pointing up needs to.
@@ -177,6 +178,7 @@ void PostContextSwitch ( void )
  	localStatsData.StatTypesFloat [ 77 ] = 999.0f;
  	localStatsData.StatTypesFloat [ 78 ] = 999.0f;
  	localStatsData.StatTypesFloat [ 79 ] = 999.0f;
+    */
 
     // ChrML: This causes the aiming issues
     // Restore the local player stats    
@@ -372,6 +374,7 @@ void SwitchContext ( CPed* thePed )
                         memcpy ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
                     }                 
 
+                    /*
  	                // ChrML: Force as high stats as we can go before screwing up. Players can't have different
  	                //        stats or guns don't work. We can't have dual guns either due to some screwups.
  	                //        Dual gun screwup: Sync code needs update and the gun pointing up needs to.
@@ -387,6 +390,7 @@ void SwitchContext ( CPed* thePed )
  	                pfStats [ 77 ] = 999.0f;
  	                pfStats [ 78 ] = 999.0f;
  	                pfStats [ 79 ] = 999.0f;
+                    */
 
                     CPedSA* thePedSA = dynamic_cast < CPedSA* > ( thePed );
 			        if ( thePedSA )
