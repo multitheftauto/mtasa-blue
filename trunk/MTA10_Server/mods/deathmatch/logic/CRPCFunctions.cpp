@@ -281,7 +281,7 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
             if ( !m_pSourcePlayer->IsDead () && !pTarget->IsDead () )
             {
                 // Are they close enough?
-                if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= 2.0f )
+                if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= STEALTH_KILL_RANGE )
                 {
                     // Start the stealth kill
                     CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );

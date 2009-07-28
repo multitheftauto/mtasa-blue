@@ -146,6 +146,11 @@ DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
+#define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
+DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
+#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
+DWORD RETURN_CAnimManager_BlendAnimation =                  0x4D4617;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -196,6 +201,8 @@ DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
+AddAnimationHandler* m_pAddAnimationHandler = NULL;
+BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -251,6 +258,8 @@ void HOOK_RenderScene_Plants ();
 void HOOK_RenderScene_end ();
 void HOOK_CPlantMgr_Render ();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
+void HOOK_CAnimManager_AddAnimation ();
+void HOOK_CAnimManager_BlendAnimation ();
 
 void vehicle_lights_init ();
 
@@ -359,6 +368,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_RenderScene_end, (DWORD)HOOK_RenderScene_end, 5);
     HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
+    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 ); 
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -960,6 +971,20 @@ void CMultiplayerSA::InitHooks()
 
     // Disable setting players on fire when they're riding burning bmx's (see #4573)
     * ( BYTE * ) ( 0x53A982 ) = 0xEB;
+
+    // Disable stealth-kill aiming (holding knife up)
+    memset ( (void *)0x685DFB, 0x90, 5 );
+    * ( BYTE * ) ( 0x685DFB ) = 0x33;
+    * ( BYTE * ) ( 0x685DFC ) = 0xC0;
+    memset ( (void *)0x685C3E, 0x90, 5 );
+    * ( BYTE * ) ( 0x685C3E ) = 0x33;
+    * ( BYTE * ) ( 0x685C3F ) = 0xC0;    
+    memset ( (void *)0x685DC4, 0x90, 5 );
+    * ( BYTE * ) ( 0x685DC4 ) = 0x33;
+    * ( BYTE * ) ( 0x685DC5 ) = 0xC0;
+    memset ( (void *)0x685DE6, 0x90, 5 );
+    * ( BYTE * ) ( 0x685DE6 ) = 0x33;
+    * ( BYTE * ) ( 0x685DE7 ) = 0xC0;
 }
 
 
@@ -1224,6 +1249,16 @@ void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHan
 void CMultiplayerSA::SetIdleHandler ( IdleHandler * pHandler )
 {
     m_pIdleHandler = pHandler;
+}
+
+void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
+{
+    m_pAddAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
+{
+    m_pBlendAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -3904,5 +3939,66 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
         popad
         call    dw_CEventDamage_AffectsPed
         jmp     RETURN_CEventHandler_ComputeKnockOffBikeResponse
+    }
+}
+
+
+RpClump * animationClump = NULL;
+AssocGroupId animationGroup = 0;
+AnimationId animationID = 0;
+void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
+{
+    _asm
+    {        
+        mov     eax, [esp+4]
+        mov     animationClump, eax
+        mov     eax, [esp+8]
+        mov     animationGroup, eax
+        mov     eax, [esp+12]
+        mov     animationID, eax
+        pushad
+    }
+    
+    if ( m_pAddAnimationHandler  )
+    {
+        m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+    }
+
+    _asm
+    {
+        popad
+        mov     eax,dword ptr [esp+0Ch] 
+        mov     edx,dword ptr ds:[0B4EA34h] 
+        jmp     RETURN_CAnimManager_AddAnimation
+    }
+}
+
+float animationBlendDelta;
+void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
+{
+    _asm
+    {        
+        mov     eax, [esp+4]
+        mov     animationClump, eax
+        mov     eax, [esp+8]
+        mov     animationGroup, eax
+        mov     eax, [esp+12]
+        mov     animationID, eax
+        mov     eax, [esp+16]
+        mov     animationBlendDelta, eax
+        pushad
+    }
+    
+    if ( m_pBlendAnimationHandler  )
+    {
+        m_pBlendAnimationHandler ( animationClump, animationGroup, animationID, animationBlendDelta );
+    }
+
+    _asm
+    {
+        popad
+        sub     esp,14h 
+        mov     ecx,dword ptr [esp+18h]
+        jmp     RETURN_CAnimManager_BlendAnimation
     }
 }

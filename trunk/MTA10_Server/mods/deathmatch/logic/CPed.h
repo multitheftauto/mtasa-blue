@@ -24,6 +24,7 @@
 #define INVALID_VEHICLE_SEAT 0xFF
 #define NUM_PLAYER_STATS 343
 #define WEAPON_SLOTS 13
+#define STEALTH_KILL_RANGE 2.5f
 
 enum ePedMoveAnim
 {
@@ -219,6 +220,9 @@ public:
     void                                        SetSyncable                 ( bool bSynced )                { m_bSyncable = bSynced; };
     CPlayer*                                    m_pSyncer;
 
+    inline bool                                 IsStealthAiming             ( void )                        { return m_bStealthAiming; }
+    inline void                                 SetStealthAiming            ( bool bAiming )                { m_bStealthAiming = bAiming; }
+
 protected:
     unsigned short                              m_usModel;
     CMatrix                                     m_Matrix;    
@@ -255,6 +259,7 @@ protected:
     bool                                        m_bDoingGangDriveby;
     bool                                        m_bHeadless;
     bool                                        m_bFrozen;
+    bool                                        m_bStealthAiming;
 
     CVehicle*                                   m_pVehicle;
     unsigned int                                m_uiVehicleSeat;

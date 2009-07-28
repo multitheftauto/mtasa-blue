@@ -29,6 +29,7 @@ class CClientManager;
 
 #define IS_PED(entity) ((entity)->GetType()==CCLIENTPLAYER||(entity)->GetType()==CCLIENTPED)
 #define IS_PLAYER(entity) ((entity)->GetType()==CCLIENTPLAYER)
+#define IS_REMOTE_PLAYER(player) (IS_PLAYER(player)&&!(player)->IsLocalPlayer())
 #define IS_RADARMARKER(entity) ((entity)->GetType()==CCLIENTRADARMARKER)
 #define IS_VEHICLE(entity) ((entity)->GetType()==CCLIENTVEHICLE)
 #define IS_OBJECT(entity) ((entity)->GetType()==CCLIENTOBJECT)
@@ -227,6 +228,7 @@ public:
     unsigned char                               GetInterior                 ( void );
     virtual void                                SetInterior                 ( unsigned char ucInterior );
     bool                                        IsOnScreen                  ( void );
+    virtual RpClump *                           GetClump                    ( void );
 
 protected:
     CClientManager*                             m_pManager;

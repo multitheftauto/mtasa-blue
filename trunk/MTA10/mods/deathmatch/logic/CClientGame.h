@@ -410,7 +410,9 @@ private:
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticIdleHandler               ( void );
-
+    static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
@@ -420,7 +422,9 @@ private:
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PostWorldProcessHandler         ( void );
     void                                IdleHandler                     ( void );
-
+    void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 

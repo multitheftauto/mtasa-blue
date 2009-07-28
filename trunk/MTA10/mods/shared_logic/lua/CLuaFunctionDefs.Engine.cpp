@@ -210,17 +210,17 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
 {
     // Grab the model ID we're going to restore
-    unsigned short usModelID = ( lua_istype ( luaVM, 1, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) ) ) : 0 );
-
-    // Replacable col model ID?
-    if ( CClientColModelManager::IsReplacableModel ( usModelID ) )
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
-        // Restore it
-        m_pColModelManager->RestoreModel ( usModelID );
+        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
 
-        // Success
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( m_pColModelManager->RestoreModel ( usModelID ) )
+        {
+            // Success
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }  
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "engineRestoreCOL" );

@@ -62,6 +62,8 @@ public:
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
+    void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
+    void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

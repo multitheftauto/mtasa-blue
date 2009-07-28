@@ -96,6 +96,24 @@ CClientPed* CClientPedManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer,
 }
 
 
+CClientPed* CClientPedManager::Get ( RpClump * pClump, bool bCheckPlayers )
+{
+    if ( !pClump ) return NULL;
+
+    CClientPed * pPed = NULL;
+    list < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
+    for ( ; iter != m_StreamedIn.end (); iter++ )
+    {
+        pPed = *iter;
+        if ( pPed->GetClump () == pClump && ( pPed->GetType () == CCLIENTPED || bCheckPlayers ) )
+        {
+            return pPed;
+        }
+    }
+    return NULL;
+}
+
+
 CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
 {
     if ( !pEntity ) return NULL;

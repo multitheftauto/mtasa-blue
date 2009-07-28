@@ -335,6 +335,7 @@ public:
 	void						UpdateTargetPosition	( void );
 
     CClientEntity*              GetTargetedEntity       ( void );    
+    CClientPed*                 GetTargetedPed          ( void );
 
     inline CClientEntity *      GetCurrentContactEntity ( void )                                        { return m_pCurrentContactEntity; }
     inline void                 SetCurrentContactEntity ( CClientEntity * pEntity )                     { m_pCurrentContactEntity = pEntity; }
@@ -381,6 +382,15 @@ public:
 
     bool                        CanReloadWeapon         ( void );
     bool                        ReloadWeapon            ( void );
+
+    bool                        ShouldBeStealthAiming   ( void );
+    inline bool                 IsStealthAiming         ( void )            { return m_bStealthAiming; }
+    void                        SetStealthAiming        ( bool bAiming );
+
+    CAnimBlendAssociation *     AddAnimation            ( AssocGroupId group, AnimationId id );
+    CAnimBlendAssociation *     BlendAnimation          ( AssocGroupId group, AnimationId id, float fBlendDelta );
+    CAnimBlendAssociation *     GetAnimation            ( AnimationId id );
+    CAnimBlendAssociation *     GetFirstAnimation       ( void );
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -520,6 +530,7 @@ public:
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
+    bool                        m_bStealthAiming;
 
     // Time dependent interpolation
     struct

@@ -21,6 +21,7 @@ typedef void ( InRenderer ) ( void );
 
 #include "C3DMarkers.h"
 #include "CAERadioTrackManager.h"
+#include "CAnimBlendAssociation.h"
 #include "CAnimBlock.h"
 #include "CAnimManager.h"
 #include "CAudio.h"

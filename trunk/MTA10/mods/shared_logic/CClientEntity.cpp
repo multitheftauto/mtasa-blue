@@ -1190,3 +1190,14 @@ bool CClientEntity::IsOnScreen ( void )
     }
     return false;
 }
+
+
+RpClump * CClientEntity::GetClump ( void )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        return pEntity->GetRpClump ();
+    }
+    return NULL;
+}
