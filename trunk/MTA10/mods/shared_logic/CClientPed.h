@@ -258,7 +258,8 @@ public:
     bool                        IsChoking                   ( void );
   
     void                        SetWearingGoggles           ( bool bWearing );
-    inline bool                 IsWearingGoggles            ( void );
+    inline bool                 IsWearingGoggles            ( bool bCheckMoving = false );
+    bool                        IsMovingGoggles             ( bool & bPuttingOn );
 
     void                        WorldIgnore                 ( bool bIgnore );
 

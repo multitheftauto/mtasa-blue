@@ -25,8 +25,23 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE	0xFFFFFFFF
 
-#define STEALTH_AIM_ANIM_GROUP 87
-#define STEALTH_AIM_ANIM_ID 347
+enum eAnimGroups
+{    
+    ANIM_GROUP_GOGGLES=32,
+    ANIM_GROUP_STEALTH_KN=87,
+};
+
+enum eAnimIDs
+{
+    ANIM_ID_WALK_CIVI=0,
+    ANIM_ID_RUN_CIVI,
+    ANIM_ID_SPRINT_PANIC,
+    ANIM_ID_IDLE_STANCE,
+    ANIM_ID_WEAPON_CROUCH=55,
+    ANIM_ID_GOGGLES_ON=224,
+    ANIM_ID_STEALTH_AIM=347,
+};
+
 #define STEALTH_KILL_RANGE 2.5f
 
 struct SBodyPartName { char szName [32]; };
@@ -2153,15 +2168,16 @@ void CClientPed::StreamedInPulse ( void )
             {
                 // Check we're not doing any important animations
                 AnimationId animId = pAssoc->GetAnimID ();
-                if ( animId == 0 || animId == 1 || animId == 3 || animId == 55 ||
-                     animId == STEALTH_AIM_ANIM_ID )
+                if ( animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI ||
+                     animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
+                     animId == ANIM_ID_STEALTH_AIM )
                 {
                     // Are our knife anims loaded?
                     CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "KNIFE" );
                     if ( pBlock->IsLoaded () )
                     {
                         // Force the animation
-                        BlendAnimation ( STEALTH_AIM_ANIM_GROUP, STEALTH_AIM_ANIM_ID, 8.0f );
+                        BlendAnimation ( ANIM_GROUP_STEALTH_KN, ANIM_ID_STEALTH_AIM, 8.0f );
                     }
                 }
             }
@@ -3479,40 +3495,63 @@ void CClientPed::SetWearingGoggles ( bool bWearing )
 {
     if ( m_pPlayerPed )
     {
-        // He's going to wear goggles?
-        if ( bWearing )
-        {
-            // He doesn't already wear goggles?
-            if ( bWearing != IsWearingGoggles () )
-            {
-                // Store the old weapon slot and give him a goggle. Then apply the old slot again
-                eWeaponSlot eOldSlot = m_pPlayerPed->GetCurrentWeaponSlot ();
-                GiveWeapon ( static_cast < eWeaponType > ( 44 ), 1 );
-                m_pPlayerPed->SetCurrentWeaponSlot ( eOldSlot );
-            }
-            else
-            {
-                // Make him wear goggles
-                m_pPlayerPed->SetGogglesState ( bWearing );
-            }
-        }
-        else
+        if ( bWearing != IsWearingGoggles () )
         {
             // Make him wear goggles
             m_pPlayerPed->SetGogglesState ( bWearing );
+
+            // Are our goggle anims loaded?
+            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "GOGGLES" );
+            if ( pBlock->IsLoaded () )
+            {
+                BlendAnimation ( ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f );
+            }
         }
     }
     m_bWearingGoggles = bWearing;
 }
 
 
-bool CClientPed::IsWearingGoggles ( void )
+bool CClientPed::IsWearingGoggles ( bool bCheckMoving )
 {
     if ( m_pPlayerPed )
     {
+        if ( bCheckMoving )
+        {
+            bool bPuttingOn;
+            if ( IsMovingGoggles ( bPuttingOn ) ) return bPuttingOn;
+        }
+
         return m_pPlayerPed->IsWearingGoggles ();
     }
     return m_bWearingGoggles;
+}
+
+
+bool CClientPed::IsMovingGoggles ( bool & bPuttingOn )
+{
+    if ( m_pPlayerPed )
+    {
+        CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+        if ( pTask && pTask->GetTaskType () == TASK_COMPLEX_USE_GOGGLES )
+        {
+            pTask = pTask->GetSubTask ();
+            if ( pTask )
+            {
+                if ( pTask->GetTaskType () == TASK_SIMPLE_GOGGLES_ON )
+                {
+                    bPuttingOn = true;
+                    return true;
+                }
+                else if ( pTask->GetTaskType () == TASK_SIMPLE_GOGGLES_OFF )
+                {
+                    bPuttingOn = false;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -4845,7 +4884,7 @@ void CClientPed::SetStealthAiming ( bool bAiming )
         if ( !bAiming )
         {
             // Do we have the aiming animation?
-            CAnimBlendAssociation * pAssoc = GetAnimation ( STEALTH_AIM_ANIM_ID );
+            CAnimBlendAssociation * pAssoc = GetAnimation ( ANIM_ID_STEALTH_AIM );
             if ( pAssoc )
             {
                 // Stop our animation

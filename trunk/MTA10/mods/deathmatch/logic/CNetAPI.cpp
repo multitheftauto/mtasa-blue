@@ -803,14 +803,12 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
         unsigned int uiSlot = slot.data.uiSlot;
         CWeapon* pWeapon = pPlayer->GetWeapon ( static_cast < eWeaponSlot > ( uiSlot ) );
 
-        // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
+        // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
         if ( uiSlot == 11 || uiSlot == 12 || ( pWeapon && pWeapon->GetType () == 43 ) )
             ControllerState.ButtonCircle = 0;
 
-
         if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
-        {
-            
+        {            
             unsigned char ucCurrentWeapon = 0;
             float fWeaponRange = 0.01f;
             if ( pWeapon )
@@ -923,7 +921,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     flags.data.bIsOnGround      = ( pPlayerModel->IsOnGround () == true );
     flags.data.bHasJetPack      = ( pPlayerModel->HasJetPack () == true );
     flags.data.bIsDucked        = ( pPlayerModel->IsDucked () == true );
-    flags.data.bWearsGoogles    = ( pPlayerModel->IsWearingGoggles () == true );
+    flags.data.bWearsGoogles    = ( pPlayerModel->IsWearingGoggles ( true ) == true );
     flags.data.bHasContact      = bInContact;
     flags.data.bIsChoking       = ( pPlayerModel->IsChoking () == true );
     flags.data.bAkimboTargetUp  = ( g_pMultiplayer->GetAkimboTargetUp () == true );
@@ -1360,7 +1358,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
     // Flags
     SVehiclePuresyncFlags flags;
-    flags.data.bIsWearingGoggles = pPlayerModel->IsWearingGoggles ();
+    flags.data.bIsWearingGoggles = pPlayerModel->IsWearingGoggles ( true );
     flags.data.bIsDoingGangDriveby = pPlayerModel->IsDoingGangDriveby ();
     flags.data.bIsSirenOrAlarmActive = pVehicle->IsSirenOrAlarmActive ();
     flags.data.bIsSmokeTrailEnabled = pVehicle->IsSmokeTrailEnabled ();

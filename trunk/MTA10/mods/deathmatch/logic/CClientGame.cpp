@@ -2654,12 +2654,16 @@ void CClientGame::UpdateMimics ( void )
             float fArmor = m_pLocalPlayer->GetArmor ();
             float fCameraRotation = g_pGame->GetCamera ()->GetCameraRotation ();
             bool bDucked = m_pLocalPlayer->IsDucked ();
-            bool bWearingGoggles = m_pLocalPlayer->IsWearingGoggles ();
+            bool bWearingGoggles = m_pLocalPlayer->IsWearingGoggles ( true );
             bool bHasJetpack = m_pLocalPlayer->HasJetPack ();
             bool bChoking = m_pLocalPlayer->IsChoking ();
             bool bSunbathing = m_pLocalPlayer->IsSunbathing ();
             bool bDoingDriveby = m_pLocalPlayer->IsDoingGangDriveby ();
             bool bStealthAiming = m_pLocalPlayer->IsStealthAiming ();
+
+            // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
+            if ( weaponSlot == 11 || weaponSlot == 12 || ucWeaponType == 43 )
+                Controller.ButtonCircle = 0;
 
             CClientVehicle* pVehicle = m_pLocalPlayer->GetOccupiedVehicle ();
             unsigned int uiSeat = m_pLocalPlayer->GetOccupiedVehicleSeat ();
