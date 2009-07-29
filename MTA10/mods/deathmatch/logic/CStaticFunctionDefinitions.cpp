@@ -1937,7 +1937,7 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( CClientVehicle& Vehic
 	// It's a heli?
 	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
 	{
-		fSpeed = Vehicle.GetHelicopterRotorSpeed ();
+		fSpeed = Vehicle.GetHeliRotorSpeed ();
 		return true;
 	}
 
@@ -2549,7 +2549,7 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehic
 	// It's a heli?
 	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
 	{
-		Vehicle.SetHelicopterRotorSpeed ( fSpeed );
+		Vehicle.SetHeliRotorSpeed ( fSpeed );
 		return true;
 	}
 

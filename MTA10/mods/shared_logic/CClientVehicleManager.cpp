@@ -40,11 +40,12 @@ unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3,
 #define VEHICLE_HAS_ADJUSTABLE_PROPERTY 0x008UL //8
 #define VEHICLE_HAS_SMOKE_TRAIL         0x010UL //16
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
+#define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 unsigned long g_ulVehicleAttributes [] = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
-  0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 475-499
+  0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 64, 0, 0,    // 475-499
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8, // 500-524
   8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
@@ -330,10 +331,19 @@ bool CClientVehicleManager::HasSirens ( unsigned long ulModel )
     return ( IsValidModel ( ulModel ) &&
              ( g_ulVehicleAttributes[ ulModel - 400 ] & VEHICLE_HAS_SIRENS ) );
 }
+
+
 bool CClientVehicleManager::HasTaxiLight ( unsigned long ulModel )
 {
     return ( IsValidModel ( ulModel ) &&
              ( g_ulVehicleAttributes[ ulModel - 400 ] & VEHICLE_HAS_TAXI_LIGHTS ) );
+}
+
+
+bool CClientVehicleManager::HasSearchLight ( unsigned long ulModel )
+{
+    return ( IsValidModel ( ulModel ) &&
+             ( g_ulVehicleAttributes[ ulModel - 400 ] & VEHICLE_HAS_SEARCH_LIGHT ) );
 }
 
 

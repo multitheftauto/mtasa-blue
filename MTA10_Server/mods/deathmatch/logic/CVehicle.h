@@ -256,6 +256,9 @@ public:
     inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
     inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
 
+    inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
+    inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
+
     // Functions used to remember where this vehicle spawns
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
     inline void                     SetRespawnPosition      ( const CVector& vecPosition )  { m_vecRespawnPosition = vecPosition; };
@@ -320,9 +323,9 @@ private:
     bool                            m_bDerailed;
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
-
     CPlayer *                       m_pJackingPlayer;
     RGBA                            m_HeadLightColor;
+    bool                            m_bHeliSearchLightVisible;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

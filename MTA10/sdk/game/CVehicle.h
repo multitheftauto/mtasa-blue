@@ -148,7 +148,7 @@ public:
     virtual bool                GetTakeLessDamage                       () = 0;
     virtual bool                GetTyresDontBurst                       () = 0;
     virtual unsigned short      GetAdjustablePropertyValue              () = 0;
-    virtual float               GetHelicopterRotorSpeed                 () = 0;
+    virtual float               GetHeliRotorSpeed                       () = 0;
     virtual unsigned long       GetExplodeTime                          () = 0;
     
     virtual void                SetAlwaysLeaveSkidMarks                 ( bool bAlwaysLeaveSkidMarks ) = 0;
@@ -165,7 +165,7 @@ public:
     virtual void                SetTakeLessDamage                       ( bool bTakeLessDamage ) = 0;
     virtual void                SetTyresDontBurst                       ( bool bTyresDontBurst ) = 0;
     virtual void                SetAdjustablePropertyValue              ( unsigned short usAdjustableProperty ) = 0;
-    virtual void                SetHelicopterRotorSpeed                 ( float fSpeed ) = 0;
+    virtual void                SetHeliRotorSpeed                       ( float fSpeed ) = 0;
     virtual void                SetTaxiLightOn              	        ( bool bLightState ) = 0;
     virtual void                SetExplodeTime                          ( unsigned long ulTime ) = 0;
 
@@ -205,6 +205,9 @@ public:
 
     virtual CObject *            SpawnFlyingComponent                   ( int i_1, unsigned int ui_2 ) = 0;
     virtual void                 SetWheelVisibility                     ( eWheels wheel, bool bVisible ) = 0;
+
+    virtual bool                 IsHeliSearchLightVisible               ( void ) = 0;
+    virtual void                 SetHeliSearchLightVisible              ( bool bVisible ) = 0;
 };
 
 #endif

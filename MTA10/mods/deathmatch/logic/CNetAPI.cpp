@@ -694,7 +694,6 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     {
         WriteSmallVehicleSpecific ( pVehicle, BitStream );
 
-        // Jax: pVehicle was corrupted here (seemingly a global crash)
         CVehicleUpgrades * pUpgrades = pVehicle->GetUpgrades ();
         if ( pUpgrades )
         {
@@ -1161,6 +1160,12 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         {
             pVehicle->SetDerailed ( flags.data.bIsLandingGearDown );
         }
+
+        // Heli search light
+        if ( CClientVehicleManager::HasSearchLight ( iModelID ) )
+        {
+            pVehicle->SetHeliSearchLightVisible ( flags.data.bIsHeliSearchLightVisible );
+        }
     }
 
     if ( flags.data.bHasAWeapon )
@@ -1369,6 +1374,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     flags.data.bIsAircraft = ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
                                pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI );
     flags.data.bHasAWeapon = ( pPlayerWeapon != NULL );
+    flags.data.bIsHeliSearchLightVisible = pVehicle->IsHeliSearchLightVisible ();
 
 
     // Write the flags

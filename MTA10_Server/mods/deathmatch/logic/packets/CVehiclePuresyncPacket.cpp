@@ -323,6 +323,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 pVehicle->SetOnGround ( flags.data.bIsOnGround );
                 pVehicle->SetInWater ( flags.data.bIsInWater );
                 pVehicle->SetDerailed ( flags.data.bIsDerailed );
+                pVehicle->SetHeliSearchLightVisible ( flags.data.bIsHeliSearchLightVisible );
             }
 
             // Read the vehicle_look_left and vehicle_look_right control states
@@ -426,6 +427,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             flags.data.bIsAircraft           = ( pVehicle->GetVehicleType () == VEHICLE_PLANE ||
                                                  pVehicle->GetVehicleType () == VEHICLE_HELI );
             flags.data.bHasAWeapon           = ( ucWeaponType != 0 );
+            flags.data.bIsHeliSearchLightVisible = pVehicle->IsHeliSearchLightVisible ();
             BitStream.Write ( &flags );
 
             // Write the weapon stuff

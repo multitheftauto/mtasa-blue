@@ -212,8 +212,11 @@ public:
 	void						SetLightStatus			( unsigned char ucLight, unsigned char ucStatus );
 
     // TODO: Make the class remember on virtualization
-    float                       GetHelicopterRotorSpeed ( void );
-    void                        SetHelicopterRotorSpeed ( float fSpeed );
+    float                       GetHeliRotorSpeed       ( void );
+    void                        SetHeliRotorSpeed       ( float fSpeed );
+
+    bool                        IsHeliSearchLightVisible    ( void );
+    void                        SetHeliSearchLightVisible   ( bool bVisible );
 
 	void						ReportMissionAudioEvent ( unsigned short usSound );
 
@@ -450,6 +453,8 @@ protected:
 	double						m_dLastRotationTime;
     bool                        m_bBlowNextFrame;
     bool                        m_bIsOnGround;
+    bool                        m_bHeliSearchLightVisible;
+    float                       m_fHeliRotorSpeed;
 
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;

@@ -1689,3 +1689,19 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }
 }
+
+
+bool CVehicleSA::IsHeliSearchLightVisible ( void )
+{
+    // See CHeli::PreRender
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    return * ( bool * ) ( dwThis + 2577 );
+}
+
+
+void CVehicleSA::SetHeliSearchLightVisible ( bool bVisible )
+{
+    // See CHeli::PreRender
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    * ( bool * ) ( dwThis + 2577 ) = bVisible;
+}
