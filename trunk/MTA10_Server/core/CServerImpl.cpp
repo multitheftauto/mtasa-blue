@@ -48,6 +48,10 @@ CServerImpl::CServerImpl ( void )
     #ifdef WIN32
         m_pThreadCommandQueue = pThreadCommandQueue;
         m_fClientFeedback = NULL;
+        m_hConsole = NULL;
+    #else
+        m_wndMenu = NULL;
+        m_wndInput = NULL;
     #endif
 
     // Init our crashhandler
@@ -350,16 +354,22 @@ void CServerImpl::MainLoop ( void )
     while ( !m_bRequestedQuit )
     {
 #ifndef WIN32
-		// Update all the windows, and the physical screen in one burst
-		wnoutrefresh ( m_wndMenu );
-		wnoutrefresh ( m_wndInput );
-		doupdate ( );
-		wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
+        if ( !g_bSilent )
+        {
+		    // Update all the windows, and the physical screen in one burst
+		    wnoutrefresh ( m_wndMenu );
+		    wnoutrefresh ( m_wndInput );
+		    doupdate ( );
+		    wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
+        }
 #endif
-		// Show the info tag, 80 is a fixed length
-		char szInfoTag[80] = { '\0' };
-		m_pModManager->GetTag ( &szInfoTag[0], 80 );
-		ShowInfoTag ( szInfoTag );
+        if ( !g_bSilent )
+        {
+		    // Show the info tag, 80 is a fixed length
+		    char szInfoTag[80] = { '\0' };
+		    m_pModManager->GetTag ( &szInfoTag[0], 80 );
+		    ShowInfoTag ( szInfoTag );
+        }
 
 		// Handle the interpreter input
 		HandleInput ( );
@@ -399,6 +409,8 @@ void CServerImpl::MainLoop ( void )
 /*************************/
 void CServerImpl::ShowInfoTag ( char* szTag )
 {
+    if ( g_bSilent )
+        return;
 #ifdef WIN32
 	// Windows console code
 		// Get the console's width
@@ -521,9 +533,12 @@ void CServerImpl::HandleInput ( void )
 			// Echo a newline
 			Printf ( "\n" );
 #else
-			// Clear the input window
-			wclear ( m_wndInput );
-			printw ( "%s\n", m_szInputBuffer );
+            if ( !g_bSilent )
+            {
+			    // Clear the input window
+			    wclear ( m_wndInput );
+			    printw ( "%s\n", m_szInputBuffer );
+            }
 #endif
 
 			if ( m_uiInputCount > 0 )
@@ -554,7 +569,8 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32
 			Printf ( "%c %c", 0x08, 0x08 );
 #else
-			wprintw ( m_wndInput, "%c %c", 0x08, 0x08 );
+            if ( !g_bSilent )
+    			wprintw ( m_wndInput, "%c %c", 0x08, 0x08 );
 #endif
 			m_uiInputCount--;
 			m_szInputBuffer[m_uiInputCount] = 0;
@@ -563,7 +579,8 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32	// WIN32: we have to use a prefix code, this routine opens an extra switch
 		case KEY_EXTENDED:
 			// Color the text
-			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
+            if ( !g_bSilent )
+			    SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 			if ( kbhit () )
 			{
 				iStdIn = getch();
@@ -586,7 +603,8 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32
 			Printf ( "\r%s", szBuffer );
 #else
-			wprintw ( m_wndInput, "\r%s", szBuffer );
+            if ( !g_bSilent )
+			    wprintw ( m_wndInput, "\r%s", szBuffer );
 #endif
 		    break;
         }
@@ -605,7 +623,8 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32
 			Printf ( "\r%s", szBuffer );
 #else
-			wprintw ( m_wndInput, "\r%s", szBuffer );
+            if ( !g_bSilent )
+			    wprintw ( m_wndInput, "\r%s", szBuffer );
 #endif
 		    break;
         }
@@ -619,7 +638,8 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32	// WIN32: Close the switch again
 			}
 			// Restore the color
-			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
+            if ( !g_bSilent )
+    			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 
 		break;	// KEY_EXTENDED
 #endif
@@ -627,19 +647,22 @@ void CServerImpl::HandleInput ( void )
 		default:
 #ifdef WIN32
 			// Color the text
-			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
+            if ( !g_bSilent )
+			    SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 
 			// Echo the input
 			Printf ( "%c", iStdIn );
 #else
-			wprintw ( m_wndInput, "%c", iStdIn );
+            if ( !g_bSilent )
+			    wprintw ( m_wndInput, "%c", iStdIn );
 #endif
 
 			m_szInputBuffer[m_uiInputCount++] = iStdIn;
 
 #ifdef WIN32
 			// Restore the color
-			SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
+            if ( !g_bSilent )
+			    SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 #endif
 		break;
 	}
@@ -721,9 +744,12 @@ bool CServerImpl::IsKeyPressed ( int iKey )
 void CServerImpl::DestroyWindow ( void )
 {
 #ifndef WIN32
-	delwin ( m_wndMenu );
-	delwin ( m_wndInput );
-    endwin ( );
+    if ( !g_bSilent )
+    {
+	    delwin ( m_wndMenu );
+	    delwin ( m_wndInput );
+        endwin ( );
+    }
 #endif
 }
 
