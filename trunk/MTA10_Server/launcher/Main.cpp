@@ -18,6 +18,8 @@ using namespace std;
 
 #ifdef WIN32
     #include <windows.h>
+#else
+    #include <string.h>
 #endif
 
 #ifdef WIN32
@@ -38,7 +40,7 @@ int main ( int argc, char* argv [] )
 {
     if ( argc == 2 )
     {
-        if ( stricmp ( argv[1], "/?" ) == 0 || stricmp ( argv[1], "--help" ) == 0 )
+        if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 )
         {
             printf ( "Usage: mtaserver [OPTION]\n\n" );
             printf ( "  -s                   Run server in silent mode\n" );
