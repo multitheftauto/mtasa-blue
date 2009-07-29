@@ -158,6 +158,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
     m_bStealthAiming = false;
+    m_fLighting = 0.0f;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -2860,6 +2861,7 @@ void CClientPed::_CreateModel ( void )
         m_pPlayerPed->SetUsesCollision ( m_bUsesCollision );
         m_pPlayerPed->SetHealth ( m_fHealth );
         m_pPlayerPed->SetArmor ( m_fArmor );
+        m_pPlayerPed->SetLighting ( m_fLighting );
         WorldIgnore ( m_bWorldIgnored );
 
         // Set remote players to not fall off bikes locally, let them decide
@@ -2989,6 +2991,7 @@ void CClientPed::_DestroyModel ()
     m_bDucked = IsDucked ();
     m_bWearingGoggles = IsWearingGoggles ();
     m_pPlayerPed->SetOnFire ( false );
+    m_fLighting = m_pPlayerPed->GetLighting ();
 
     /* Eventually remove from vehicle
         MUST use internal-func, to save the the occupied-vehicle (streaming) */

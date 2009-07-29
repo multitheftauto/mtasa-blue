@@ -907,10 +907,21 @@ void CPoolsSA::DeleteAllPeds ( )
     m_pedPool.map.clear ();
 }
 
-
-
-
-
+CEntity * CPoolsSA::GetEntity ( DWORD* pGameInterface )
+{
+    if ( pGameInterface )
+    {
+        CEntitySAInterface * pEntityInterface = ( CEntitySAInterface * ) ( pGameInterface );
+        switch ( pEntityInterface->nType )
+        {
+            case ENTITY_TYPE_PED: return ( CEntity * ) GetPed ( pGameInterface ); break;
+            case ENTITY_TYPE_VEHICLE: return ( CEntity * ) GetVehicle ( pGameInterface ); break;
+            case ENTITY_TYPE_OBJECT: return ( CEntity * ) GetObject ( pGameInterface ); break;
+            default: break;
+        }
+    }
+    return NULL;
+}
 
 
 CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )
