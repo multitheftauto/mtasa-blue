@@ -2645,12 +2645,17 @@ void CKeyBinds::PrintBindsCommand ( const char* szCmdLine )
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole ();
 
-    // Copy the buffer
-    char* szTemp = new char [ strlen ( szCmdLine ) + 16 ];
-    strcpy ( szTemp, szCmdLine );
-
     // Get the key
-    char* szKey = strtok ( szTemp, " " );
+    char * szTemp = NULL;
+    char* szKey = NULL;
+
+    if ( szCmdLine )
+    {
+        // Copy the buffer
+        szTemp = new char [ strlen ( szCmdLine ) + 16 ];
+        strcpy ( szTemp, szCmdLine );    
+        szKey = strtok ( szTemp, " " );
+    }
 
     if ( szKey )
     {
@@ -2718,6 +2723,7 @@ void CKeyBinds::PrintBindsCommand ( const char* szCmdLine )
         if ( bIsEmpty )
             pConsole->Print ( "empty." );
     }
+    if ( szTemp ) delete [] szTemp;
 }
 
 
