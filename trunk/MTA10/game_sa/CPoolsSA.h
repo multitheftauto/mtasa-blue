@@ -99,6 +99,8 @@ public:
     inline unsigned long    GetPedCount         ( ) { return m_pedPool.ulCount; }
     void                    DeleteAllPeds       ( );
 
+    CEntity*                GetEntity           ( DWORD* pGameInterface );
+
     // Others
     CBuilding*              AddBuilding         ( DWORD dwModelID );
     void                    DeleteAllBuildings  ( );

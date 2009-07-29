@@ -47,6 +47,9 @@ public:
     virtual void        GetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation )=0;
     virtual void        SetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation )=0;
 
+    virtual float       GetLighting                 ( void ) = 0;
+    virtual void        SetLighting                 ( float fLighting ) = 0;
+
 /*	virtual VOID		SetMass(FLOAT fMass)=0;
 	virtual FLOAT		GetMass()=0;
 	virtual VOID		SetTurnMass(FLOAT fTurnMass)=0;

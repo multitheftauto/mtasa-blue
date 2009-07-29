@@ -104,6 +104,7 @@ public:
     // Others
     virtual CBuilding*      AddBuilding             ( DWORD dwModelID ) = 0;
     virtual CVehicle*       AddTrain                ( CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection ) = 0;
+    virtual CEntity*        GetEntity               ( DWORD* pGameInterface ) = 0;
 
     virtual int             GetNumberOfUsedSpaces   ( ePools pool ) = 0;
     virtual void            DumpPoolsStatus         ( ) = 0;

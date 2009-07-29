@@ -281,6 +281,18 @@ void CPhysicalSA::SetAttachedOffsets ( CVector & vecPosition, CVector & vecRotat
 }
 
 
+float CPhysicalSA::GetLighting ( void )
+{
+    CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
+    return pInterface->fLighting;
+}
+
+
+void CPhysicalSA::SetLighting ( float fLighting )
+{
+    CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
+    pInterface->fLighting = fLighting;
+}
 
 
 /*

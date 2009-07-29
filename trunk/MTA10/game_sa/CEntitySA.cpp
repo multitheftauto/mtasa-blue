@@ -298,14 +298,14 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
 
 		pGame->GetWorld()->Remove ( this );
 		DWORD dwThis = (DWORD) m_pInterface;
-		DWORD dwFunc = 0x446F90;
+		DWORD dwFunc = 0x446F90;    // CEntity::UpdateRwMatrix
 		_asm
 		{
 			mov		ecx, dwThis
 			call	dwFunc
 		}
 
-		dwFunc = 0x532B00;
+		dwFunc = 0x532B00;          // CEntity::UpdateRwFrame
 		_asm
 		{
 			mov		ecx, dwThis

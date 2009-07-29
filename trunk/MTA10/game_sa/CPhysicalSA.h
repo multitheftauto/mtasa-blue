@@ -67,7 +67,10 @@ public:
 	CEntitySAInterface * pAttachedEntity;   // 252
     CVector vecAttachedPosition;    // 256
     CVector vecAttachedRotation;    // 268
-    BYTE pad3[32];
+    BYTE pad3[20];  // 280
+    float fLighting;        // col lighting? CPhysical::GetLightingFromCol
+    float fLighting_2;      // added to col lighting in CPhysical::GetTotalLighting
+    BYTE pad3a[4];
 };
 
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
@@ -103,7 +106,9 @@ public:
 
     virtual bool InternalAttachEntityToEntity ( DWORD dwEntityInterface, const CVector * vecPosition, const CVector * vecRotation );
 
-	
+	float       GetLighting                 ( void );
+    void        SetLighting                 ( float fLighting );
+
     /*
 	VOID		SetMassMultiplier(FLOAT fMassMultiplier);
 	FLOAT		GetMassMultiplier();

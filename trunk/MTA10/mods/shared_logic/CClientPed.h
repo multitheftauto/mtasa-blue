@@ -532,6 +532,7 @@ public:
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
+    float                       m_fLighting;
 
     // Time dependent interpolation
     struct
