@@ -275,7 +275,7 @@ void CVehicleRPCs::SetHelicopterRotorSpeed ( NetBitStreamInterface& bitStream )
         {
             // Convert the given rotor speed from between 0-100 to 0-0.22
             float fRotorSpeed = ( static_cast < float > ( ucRotorSpeed ) / 100.0f * 0.22f );
-            pVehicle->SetHelicopterRotorSpeed ( fRotorSpeed );
+            pVehicle->SetHeliRotorSpeed ( fRotorSpeed );
         }
     }
 }

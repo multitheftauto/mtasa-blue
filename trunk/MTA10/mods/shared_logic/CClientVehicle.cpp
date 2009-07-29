@@ -129,6 +129,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
     m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
+    m_bHeliSearchLightVisible = false;
+    m_fHeliRotorSpeed = 0.0f;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -1326,23 +1328,44 @@ void CClientVehicle::SetLightStatus ( unsigned char ucLight, unsigned char ucSta
 }
 
 
-float CClientVehicle::GetHelicopterRotorSpeed ( void )
+float CClientVehicle::GetHeliRotorSpeed ( void )
 {
     if ( m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI )
     {
-        return m_pVehicle->GetHelicopterRotorSpeed ();
+        return m_pVehicle->GetHeliRotorSpeed ();
     }
 
-    return 0;
+    return m_fHeliRotorSpeed;
 }
 
 
-void CClientVehicle::SetHelicopterRotorSpeed ( float fSpeed )
+void CClientVehicle::SetHeliRotorSpeed ( float fSpeed )
 {
     if ( m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI )
     {
-        m_pVehicle->SetHelicopterRotorSpeed ( fSpeed );
+        m_pVehicle->SetHeliRotorSpeed ( fSpeed );
     }
+    m_fHeliRotorSpeed = fSpeed;
+}
+
+
+bool CClientVehicle::IsHeliSearchLightVisible ( void )
+{
+    if ( m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI )
+    {
+        return m_pVehicle->IsHeliSearchLightVisible ();
+    }
+    return m_bHeliSearchLightVisible;
+}
+
+
+void CClientVehicle::SetHeliSearchLightVisible ( bool bVisible )
+{
+    if ( m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI )
+    {
+        m_pVehicle->SetHeliSearchLightVisible ( bVisible );
+    }
+    m_bHeliSearchLightVisible = bVisible;
 }
 
 
@@ -2014,6 +2037,12 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
 
+        if ( m_eVehicleType == CLIENTVEHICLE_HELI )
+        {
+            m_pVehicle->SetHeliRotorSpeed ( m_fHeliRotorSpeed );
+            m_pVehicle->SetHeliSearchLightVisible ( m_bHeliSearchLightVisible );
+        }
+
         // Check the paintjob hasn't reset our colors
         if ( m_bColorSaved )
         {
@@ -2164,6 +2193,8 @@ void CClientVehicle::Destroy ( void )
         m_bEngineOn = m_pVehicle->IsEngineOn ();
         m_bIsOnGround = IsOnGround ();
         m_bIsDerailed = IsDerailed ();
+        m_fHeliRotorSpeed = GetHeliRotorSpeed ();
+        m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
 
 	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||

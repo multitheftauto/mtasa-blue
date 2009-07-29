@@ -68,6 +68,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bTaxiLightState = false;
     m_bTrainDirection = true;
     m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
+    m_bHeliSearchLightVisible = false;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
