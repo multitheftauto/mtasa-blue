@@ -2562,7 +2562,7 @@ bool CStaticFunctionDefinitions::AddPedClothes ( CElement* pElement, char* szTex
 
     if ( CPlayerClothes::IsValidClothing ( szTexture, szModel, ucType ) )
     {
-        RUN_CHILDREN ( *iter, szTexture, szModel, ucType );
+        RUN_CHILDREN AddPedClothes ( *iter, szTexture, szModel, ucType );
 
         if ( IS_PED ( pElement ) )
         {
