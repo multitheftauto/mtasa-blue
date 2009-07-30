@@ -62,6 +62,7 @@
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
 #include <CClientProjectileManager.h>
+#include <CClientRadio.h>
 #include <CClientStreamSector.h>
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>

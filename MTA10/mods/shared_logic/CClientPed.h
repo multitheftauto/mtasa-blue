@@ -286,11 +286,6 @@ public:
     bool                        IsOnGround                  ( void );
 
     bool                        IsClimbing                  ( void );
-    bool                        IsRadioOn                   ( void ) { return m_bRadioOn; };
-    void                        NextRadioChannel            ( void );
-    void                        PreviousRadioChannel        ( void );
-    bool                        SetCurrentRadioChannel      ( unsigned char ucChannel );
-    inline unsigned char        GetCurrentRadioChannel      ( void ) { return m_ucRadioChannel; };
 
     inline CTaskManager*        GetTaskManager              ( void ) { return m_pTaskManager; }
 
@@ -421,11 +416,6 @@ protected:
 
     bool                        PerformChecks               ( void );
 
-    // Used to start and stop radio for local player
-    void                        StartRadio                  ( void );
-    void                        StopRadio                   ( void );
-    bool                        m_bDontChangeRadio;
-
 public:
     void                        _GetIntoVehicle             ( CClientVehicle* pVehicle, unsigned int uiSeat );
 
@@ -442,8 +432,6 @@ public:
     int                         m_pRespawnState;
     unsigned long               m_ulModel;	
     CMatrix                     m_matFrozen;
-    bool                        m_bRadioOn;
-    unsigned char               m_ucRadioChannel;
     bool                        m_bHealthLocked;
     bool                        m_bArmorLocked;
     unsigned long               m_ulLastOnScreenTime;

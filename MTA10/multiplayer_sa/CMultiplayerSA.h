@@ -64,6 +64,7 @@ public:
     void                        SetIdleHandler              ( IdleHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
+    void                        SetPreHudDrawHandler        ( PreHudDrawHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

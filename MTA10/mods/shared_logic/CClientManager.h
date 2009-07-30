@@ -34,6 +34,7 @@ class CClientManager;
 #include "CClientPlayerManager.h"
 #include "CClientRadarAreaManager.h"
 #include "CClientRadarMarkerManager.h"
+#include "CClientRadio.h"
 #include "CClientStreamer.h"
 #include "CClientTeamManager.h"
 #include "CClientSoundManager.h"
@@ -90,6 +91,7 @@ public:
     inline CClientExplosionManager*     GetExplosionManager         ( void )        { return m_pExplosionManager; }
     inline CClientPacketRecorder*       GetPacketRecorder           ( void )        { return m_pPacketRecorder; }
     inline CClientWaterManager*         GetWaterManager             ( void )        { return m_pWaterManager; }
+    inline CClientRadio*                GetRadio                    ( void )        { return m_pRadio; }
 
     inline CGUITexture*                 GetConnectionTroubleTexture ( void )        { return m_pConnectionTroubleTexture; }
 
@@ -138,6 +140,7 @@ private:
     CClientExplosionManager*            m_pExplosionManager;
     CGUITexture*                        m_pConnectionTroubleTexture;
     CClientPacketRecorder*              m_pPacketRecorder;
+    CClientRadio*                       m_pRadio;
     bool                                m_bBeingDeleted;
 };
 
