@@ -79,8 +79,8 @@ CClientEntity::~CClientEntity ( void )
         g_pClientGame->GetElementDeleter ()->Unreference ( this );
     }
 
-    // If our managers being deleted, theres no point in pissing about with element trees
-    if ( m_pManager && !m_pManager->IsBeingDeleted () )
+    // If our managers being deleted, theres no point in pissing about with element trees IF WE LIKE CRASH
+    if ( m_pManager /*&& !m_pManager->IsBeingDeleted ()*/ )
     {
         // Unreference us from our eventual parent
         if ( m_pParent && !m_pParent->m_Children.empty () )
