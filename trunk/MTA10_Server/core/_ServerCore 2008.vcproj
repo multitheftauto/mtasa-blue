@@ -414,10 +414,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CCriticalSection.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDynamicLibrary.h"
 				>
 			</File>

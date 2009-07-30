@@ -19,7 +19,6 @@ class CServerImpl;
 #ifndef __CSERVERIMPL_H
 #define __CSERVERIMPL_H
 
-#include "CCriticalSection.h"
 #include "MTAPlatform.h"
 #include <string>
 

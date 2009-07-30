@@ -186,6 +186,22 @@ namespace SharedUtil
     inline SColor COLOR_ARGB ( unsigned char A, unsigned char R, unsigned char G, unsigned char B ) { return SColorRGBA ( R, G, B, A ); }
     inline SColor COLOR_ABGR ( unsigned char A, unsigned char B, unsigned char G, unsigned char R ) { return SColorRGBA ( R, G, B, A ); }
 
+
+    //
+    // Cross platform critical section
+    //
+    class CCriticalSection
+    {
+    public:
+                    CCriticalSection        ( void );
+                    ~CCriticalSection       ( void );
+        void        Lock                    ( void );
+        void        Unlock                  ( void );
+
+    private:
+        void*       m_pCriticalSection;
+    };
+
 };
 
 using namespace SharedUtil;

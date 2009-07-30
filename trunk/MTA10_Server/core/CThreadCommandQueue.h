@@ -15,7 +15,6 @@
 
 #ifdef WIN32
 
-#include "CCriticalSection.h"
 #include <list>
 #include <string>
 
