@@ -897,7 +897,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
 			}
 			else if ( VERIFY_RESOURCE(pResource) )
 			{
-                _snprintf ( szBuffer, length, "#R#%d", pResource->GetName().c_str () );
+                _snprintf ( szBuffer, length, "#R#%s", pResource->GetName().c_str () );
 				return szBuffer;
 			}
 			else
