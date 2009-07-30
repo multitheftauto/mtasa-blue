@@ -1492,7 +1492,7 @@ bool CStaticFunctionDefinitions::TakePlayerMoney ( long lMoney )
 bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, char * szText )
 {
     assert ( szText );
-    RUN_CHILDREN ( **iter, szText );
+    RUN_CHILDREN SetPlayerNametagText ( **iter, szText );
 
     if ( IS_PLAYER ( &Entity ) && g_pClientGame->IsNametagValid ( szText ) )
     {
@@ -1507,7 +1507,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, c
 
 bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB )
 {
-    RUN_CHILDREN ( **iter, ucR, ucG, ucB );
+    RUN_CHILDREN SetPlayerNametagColor ( **iter, ucR, ucG, ucB );
 
     if ( IS_PLAYER ( &Entity ) )
     {
@@ -1536,7 +1536,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagShowing ( CClientEntity& Entity
 
 bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float fRotation )
 {
-    RUN_CHILDREN ( **iter, fRotation );
+    RUN_CHILDREN SetPedRotation ( **iter, fRotation );
 
     if ( IS_PED ( &Entity ) )
     {    
@@ -1636,7 +1636,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigne
 
 bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType )
 {
-    RUN_CHILDREN ( *iter, szTexture, szModel, ucType );
+    RUN_CHILDREN AddPedClothes ( **iter, szTexture, szModel, ucType );
     // Is he a player?
     if ( IS_PED ( &Entity ) )
     {
