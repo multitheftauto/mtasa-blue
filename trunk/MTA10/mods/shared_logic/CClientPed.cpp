@@ -97,13 +97,10 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_uiOccupyingSeat = 0;
     m_uiOccupiedVehicleSeat = 0xFF;
     m_bHealthLocked = false;
-    m_bDontChangeRadio = false;
     m_bArmorLocked = false;
     m_ulLastOnScreenTime = 0;
 	m_pLoadedModelInfo = NULL;
     m_pOutOfVehicleWeaponSlot = WEAPONSLOT_MAX; // WEAPONSLOT_MAX = invalid
-    m_bRadioOn = false;
-    m_ucRadioChannel = 1;
     m_fBeginAimX = 0.0f;
     m_fBeginAimY = 0.0f;
     m_fTargetAimX = 0.0f;
@@ -1154,12 +1151,6 @@ void CClientPed::GetOutOfVehicle ( void )
                 if ( pOutTask )
                 {
                     pOutTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
-
-                    // Turn off the radio if local player
-                    if ( m_bIsLocalPlayer )
-                    {
-                        StopRadio ();
-                    }
                 }
             }
         }
@@ -1269,12 +1260,6 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             return;
     }
 
-    // Turn on the radio if local player and it's not already on.
-    if ( m_bIsLocalPlayer )
-    {
-        StartRadio ();
-    }
-
     RemoveTargetPosition ();
 
     // Make peds stream in when they warp to a vehicle
@@ -1357,13 +1342,6 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     // Reset the interpolation so we won't move from the last known spot to where we exit
     ResetInterpolation ();
-
-    // Local player?
-    if ( m_bIsLocalPlayer )
-    {
-        // Stop the radio
-        StopRadio ();
-    }
 
     // And in our class
     m_pOccupiedVehicle = NULL;
@@ -3099,13 +3077,8 @@ void CClientPed::_ChangeModel ( void )
             // Are we leaving it? Don't warp him back into anything
             if ( pVehicle )
             {
-                // Are we leaving it? Don't warp back into it. If we're not
-                // leaving make sure we don't disturb the radio when we briefly
-                // exit and enter
-                if ( IsLeavingVehicle () )
-                    pVehicle = NULL;
-                else
-                    m_bDontChangeRadio = true;
+                // Are we leaving it? Don't warp back into it.
+                if ( IsLeavingVehicle () ) pVehicle = NULL;
 
                 // Remove him from the vehicle
                 RemoveFromVehicle ();
@@ -3138,7 +3111,6 @@ void CClientPed::_ChangeModel ( void )
             {
                 WarpIntoVehicle ( pVehicle, uiSeat );
             }
-            m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
             if ( m_bLoopAnimation && m_pAnimationBlock )
@@ -3333,13 +3305,6 @@ void CClientPed::InternalRemoveFromVehicle ( CVehicle* pGameVehicle )
         }
 
         m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
-
-        // Local player?
-        if ( m_bIsLocalPlayer )
-        {
-            // Turn off the radio
-            StopRadio ();
-        }
     }
 }
 
@@ -3371,6 +3336,7 @@ bool CClientPed::PerformChecks ( void )
 }
 
 
+/*
 void CClientPed::StartRadio ( void )
 {
     // We use this to avoid radio lags sometimes. Also make sure
@@ -3378,8 +3344,7 @@ void CClientPed::StartRadio ( void )
     if ( !m_bDontChangeRadio && !m_bRadioOn )
     {
         // Turn it on if we're not on channel none
-        if ( m_ucRadioChannel != 0 )
-            g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
+        if ( m_ucRadioChannel != 0 ) g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
 
         m_bRadioOn = true;
     }
@@ -3396,7 +3361,7 @@ void CClientPed::StopRadio ( void )
         m_bRadioOn = false;
     }
 }
-
+*/
 
 void CClientPed::Duck ( bool bDuck )
 {
@@ -3765,13 +3730,11 @@ bool CClientPed::IsClimbing ( void )
 }
 
 
+/*
 void CClientPed::NextRadioChannel ( void )
 {
     // Is our radio on?
-    if ( m_bRadioOn )
-    {
-        SetCurrentRadioChannel ( ( m_ucRadioChannel + 1 ) % 13 );
-    }
+    if ( m_bRadioOn ) SetCurrentRadioChannel ( ( m_ucRadioChannel + 1 ) % 13 );
 }
 
 
@@ -3780,10 +3743,7 @@ void CClientPed::PreviousRadioChannel ( void )
     // Is our radio on?
     if ( m_bRadioOn )
     {
-        if ( m_ucRadioChannel == 0 )
-        {
-            m_ucRadioChannel = 13;
-        }
+        if ( m_ucRadioChannel == 0 ) m_ucRadioChannel = 13;
 
         SetCurrentRadioChannel ( m_ucRadioChannel - 1 );
     }
@@ -3808,13 +3768,13 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
         m_ucRadioChannel = ucChannel;
 
         g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
-        if ( m_ucRadioChannel == 0 )
-            g_pGame->GetAudio ()->StopRadio ();
+        if ( m_ucRadioChannel == 0 ) g_pGame->GetAudio ()->StopRadio ();
 
         return true;
     }
     return false;
 }
+*/
 
 
 void CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVector * pvecGunMuzzle, CVector * pvecFireOffset, float* fAimX, float* fAimY )

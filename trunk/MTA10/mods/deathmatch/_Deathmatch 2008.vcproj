@@ -829,6 +829,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRadio.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.cpp"
 					>
 				</File>
@@ -1716,6 +1720,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRadarMarkerManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRadio.h"
 					>
 				</File>
 				<File

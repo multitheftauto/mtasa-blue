@@ -17,13 +17,13 @@
 class CAERadioTrackManager
 {
 public:
-	virtual BYTE	GetCurrentRadioStationID()=0;
-	virtual BYTE	IsVehicleRadioActive()=0;
-	virtual char	* GetRadioStationName(BYTE bStationID)=0;
-	virtual BOOL	IsRadioOn()=0;
-	virtual VOID	SetBassSetting(DWORD dwBass)=0;
-	virtual VOID	Reset()=0;
-	virtual VOID	StartRadio(BYTE bStationID, BYTE bUnknown)=0;
+	virtual BYTE	    GetCurrentRadioStationID        ( void ) = 0;
+	virtual BYTE	    IsVehicleRadioActive            ( void ) = 0;
+	virtual char *      GetRadioStationName             ( BYTE bStationID ) = 0;
+	virtual BOOL	    IsRadioOn                       ( void ) = 0;
+	virtual VOID	    SetBassSetting                  ( DWORD dwBass ) = 0;
+	virtual VOID	    Reset                           ( void ) = 0;
+	virtual VOID	    StartRadio                      ( BYTE bStationID, BYTE bUnknown ) = 0;
 };
 
 #endif
