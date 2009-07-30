@@ -77,18 +77,23 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 //
 long long SharedUtil::GetTickCount64_ ( void )
 {
-    static long lHightPart = 0;
-    static DWORD dwWas = GetTickCount ();
-    DWORD dwNow = GetTickCount ();
-    DWORD dwDelta = dwNow - dwWas;
+    static CCriticalSection criticalSection;
+    criticalSection.Lock ();
+
+    static long          lHightPart = 0;
+    static unsigned long ulWas      = GetTickCount ();
+    unsigned long        ulNow      = GetTickCount ();
+    unsigned long        ulDelta    = ulNow - ulWas;
 
     // Detect wrap around
-    if( dwDelta > 0x80000000 )
+    if( ulDelta > 0x80000000 )
         lHightPart++;
 
-    dwWas = dwNow;
+    ulWas = ulNow;
 
-    long long Result = ( ( ( ( long long ) lHightPart ) << 32 ) | ( ( long long ) dwNow ) );
+    long long Result = ( ( ( ( long long ) lHightPart ) << 32 ) | ( ( long long ) ulNow ) );
+
+    criticalSection.Unlock ();
     return Result;
 }
 
@@ -100,6 +105,62 @@ double SharedUtil::GetSecondCount ( void )
 {
     return GetTickCount64_ () * ( 1 / 1000.0 );
 }
+
+
+
+//
+// Cross platform critical section
+//
+#ifdef WIN32
+
+    SharedUtil::CCriticalSection::CCriticalSection ( void )
+    {
+        m_pCriticalSection = new CRITICAL_SECTION;
+        InitializeCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+    }
+
+    SharedUtil::CCriticalSection::~CCriticalSection ( void )
+    {
+        DeleteCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+        delete ( CRITICAL_SECTION* ) m_pCriticalSection;
+    }
+
+    void SharedUtil::CCriticalSection::Lock ( void )
+    {
+        EnterCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+    }
+
+    void SharedUtil::CCriticalSection::Unlock ( void )
+    {
+        LeaveCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+    }
+
+#else
+    #include <pthread.h>
+
+    SharedUtil::CCriticalSection::CCriticalSection ( void )
+    {
+        m_pCriticalSection = new pthread_mutex_t;
+        pthread_mutex_init ( ( pthread_mutex_t* ) m_pCriticalSection, NULL );
+    }
+
+    SharedUtil::CCriticalSection::~CCriticalSection ( void )
+    {
+        pthread_mutex_destroy ( ( pthread_mutex_t* ) m_pCriticalSection );
+        delete ( pthread_mutex_t* ) m_pCriticalSection;
+    }
+
+    void SharedUtil::CCriticalSection::Lock ( void )
+    {
+        pthread_mutex_lock ( ( pthread_mutex_t* ) m_pCriticalSection );
+    }
+
+    void SharedUtil::CCriticalSection::Unlock ( void )
+    {
+        pthread_mutex_unlock ( ( pthread_mutex_t* ) m_pCriticalSection );
+    }
+
+#endif
 
 
 // Split into parts
@@ -124,3 +185,42 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
         ulStartPoint = ulPos + strDelim.length ();
     }
 }
+
+
+//
+// Emulate GetTickCount() for linux
+//
+#ifndef WIN32
+
+// Returns the number of milliseconds since some fixed point in time.
+// Wraps every 49.71 days. Should not to jump backwards or forward, even if the system time is changed.
+unsigned long GetTickCount ( void )
+{
+    // Copied from curl\lib\timeval.c
+    /*
+    ** clock_gettime() is granted to be increased monotonically when the
+    ** monotonic clock is queried. Time starting point is unspecified, it
+    ** could be the system start-up time, the Epoch, or something else,
+    ** in any case the time starting point does not change once that the
+    ** system has started up.
+    */
+    struct timeval now;
+    struct timespec tsnow;
+    if(0 == clock_gettime(CLOCK_MONOTONIC, &tsnow)) {
+        now.tv_sec = tsnow.tv_sec;
+        now.tv_usec = tsnow.tv_nsec / 1000;
+    }
+    /*
+    ** Even when the configure process has truly detected monotonic clock
+    ** availability, it might happen that it is not actually available at
+    ** run-time. When this occurs simply fallback to other time source.
+    */
+    else
+        (void)gettimeofday(&now, NULL);
+
+    long long llMilliseconds = ( ( long long ) now.tv_sec ) * 1000 + now.tv_usec / 1000;
+    return llMilliseconds;
+}
+
+#endif
+

@@ -1259,10 +1259,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CCriticalSection.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CDeathmatchObject.h"
 					>
 				</File>

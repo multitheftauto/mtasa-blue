@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 #include "CServerImpl.h"
-#include "CCriticalSection.h"
+#include "SharedUtil.hpp"
 
 #if WIN32
 	#define MTAEXPORT extern "C" __declspec(dllexport)

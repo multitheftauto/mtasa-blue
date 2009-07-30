@@ -14,7 +14,6 @@
 #ifndef __CSERVER_H
 #define __CSERVER_H
 
-#include "CCriticalSection.h"
 #include "CDynamicLibrary.h"
 #include <list>
 #include <string>
