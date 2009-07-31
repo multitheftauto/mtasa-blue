@@ -133,6 +133,7 @@ class CVehicleSA;
 // from CAutomobile
 #define FUNC_CAutomobile__Fix                   0x6A3440
 #define FUNC_CAutomobile__SpawnFlyingComponent  0x6a8580
+#define FUNC_CAutomobile__UpdateMovingCollision 0x6a1460
 
 // from CHeli
 #define FUNC_CHeli__Fix                         0x6C4530
@@ -150,6 +151,8 @@ class CVehicleSA;
 #define NUM_RAILTRACKS                          4
 #define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
 #define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
+
+#define VAR_CVehicle_SpecialColModels           0xc1cc78
 
 typedef struct
 {
@@ -378,7 +381,7 @@ public:
 	unsigned char m_windowsOpenFlags;
 	char m_nNitroBoosts;
 
-	char m_nSpecialColModel;
+	unsigned char m_nSpecialColModel;
 	CEntity *pEntityWeAreOnForVisibilityCheck;
 	CFire *m_pFire;
 
@@ -682,6 +685,9 @@ public:
 
     bool                        IsHeliSearchLightVisible        ( void );
     void                        SetHeliSearchLightVisible       ( bool bVisible );
+
+    CColModel*                  GetSpecialColModel              ( void );
+    bool                        UpdateMovingCollision           ( float fAngle );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };

@@ -580,15 +580,15 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
 
         if ( header.version[3] == 'L' )
         {
-            LoadCollisionModel ( pModelData, pColModel->GetColModel (), NULL );
+            LoadCollisionModel ( pModelData, pColModel->GetInterface (), NULL );
         }
         else if ( header.version[3] == '2' )
         {
-            LoadCollisionModelVer2 ( pModelData, header.size - 0x18, pColModel->GetColModel (), NULL );
+            LoadCollisionModelVer2 ( pModelData, header.size - 0x18, pColModel->GetInterface (), NULL );
         }
         else if ( header.version[3] == '3' )
         {
-            LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetColModel (), NULL );
+            LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetInterface (), NULL );
         }
 
         delete[] pModelData;
@@ -743,7 +743,7 @@ void CRenderWareSA::ReplaceCollisions ( CColModel* pCol, unsigned short usModelI
 	CModelInfoSA * pModelInfoSA = (CModelInfoSA*)(pGame->GetModelInfo ( usModelID ));
 
 	// Apply some low-level hacks (copies the old col area and sets a flag)
-	DWORD pColModelInterface = (DWORD)pColModel->GetColModel ();
+	DWORD pColModelInterface = (DWORD)pColModel->GetInterface ();
 	DWORD pOldColModelInterface = *((DWORD *) pPool [ usModelID ] + 20);
 	*((BYTE *)( pPool [usModelID ] + 0x13 )) |= 8;
 	*((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));

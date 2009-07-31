@@ -198,7 +198,10 @@ public:
 
     inline bool                 HasAdjustableProperty       ( void )                        { return m_bHasAdjustableProperty; };
     unsigned short              GetAdjustablePropertyValue  ( void );
-    void                        SetAdjustablePropertyValue  ( unsigned short usAdjustableProperty );
+    void                        SetAdjustablePropertyValue  ( unsigned short usValue );
+private:
+    void                        _SetAdjustablePropertyValue ( unsigned short usValue );
+public:
 
     bool                        HasDamageModel          ( void )                            { return m_bHasDamageModel; }
     unsigned char               GetDoorStatus           ( unsigned char ucDoor );

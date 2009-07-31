@@ -16,12 +16,8 @@
 #include <windows.h>
 #include <game/CColModel.h>
 
-#define FUNC_CColModel_operator_new		0x40FC30
-#define FUNC_CColModel_constructor		0x40FB60
-#define FUNC_CColModel_destructor       0x40F700
-#define FUNC_CColModel_operator_delete  0x40FC40
-
-#define SIZEOF_CColModel				0x30
+#define FUNC_CColModel_Constructor		0x40FB60
+#define FUNC_CColModel_Destructor       0x40F700
 
 typedef struct
 {
@@ -32,19 +28,23 @@ typedef struct
 
 class CColModelSAInterface
 {
-    BYTE                            pad [ SIZEOF_CColModel ];
+    BYTE                            pad [ 44 ];
+    void *                          pCollision;     // CCollision
 };
 
 class CColModelSA : public CColModel
 {
-private:
-	CColModelSAInterface		    m_Interface;
-
 public:
-									CColModelSA		( void );
+                                    CColModelSA     ( void );
+									CColModelSA		( CColModelSAInterface * pInterface );
 									~CColModelSA	( void );
 
-	inline CColModelSAInterface *	GetColModel		( void ) { return &m_Interface; }
+	inline CColModelSAInterface *	GetInterface    ( void ) { return m_pInterface; }
+    inline void                     Destroy         ( void ) { delete this; }
+
+private:
+	CColModelSAInterface *		    m_pInterface;
+    bool                            m_bDestroyInterface;
 };
 
 #endif

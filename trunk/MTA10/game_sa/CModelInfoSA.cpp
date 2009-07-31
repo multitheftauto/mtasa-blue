@@ -762,7 +762,7 @@ void CModelInfoSA::RestoreOriginalModel ( void )
 void CModelInfoSA::SetColModel ( CColModel* pColModel )
 {
     // Grab the interfaces
-	CColModelSAInterface* pInterface = ((CColModelSA*)pColModel)->GetColModel ();
+	CColModelSAInterface* pInterface = pColModel->GetInterface ();
 
     // Store the col model we set
     m_pCustomColModel = pColModel;

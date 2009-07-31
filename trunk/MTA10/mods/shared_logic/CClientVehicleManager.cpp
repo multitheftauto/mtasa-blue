@@ -318,7 +318,6 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat ( unsigned long ulMo
     return 0xFF;
 }
 
-
 bool CClientVehicleManager::HasTurret ( unsigned long ulModel )
 {
     return ( IsValidModel ( ulModel ) &&
