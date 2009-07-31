@@ -865,7 +865,8 @@ CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const ch
     return NULL;
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* pResource, std::string* pstrPath, std::string* pstrMetaPath )
+// pResource may be changed on return, and it could be NULL if the function returns false.
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     std::string strMetaPath;
@@ -890,7 +891,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
             }
         }
     }
-    else if ( IsValidFilePath ( strInput.c_str() ) )
+    else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
         strMetaPath = strInput;
         if ( pstrMetaPath )

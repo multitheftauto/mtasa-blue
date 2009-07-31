@@ -170,9 +170,9 @@ int CLuaFunctionDefs::GUICreateStaticImage ( lua_State* luaVM )
             SString strFile = lua_tostring ( luaVM, 5 );
             CClientGUIElement* pParent = lua_toguielement ( luaVM, 7 );
 
-            CResource* pResource =  pLuaMain->GetResource();
+            CResource* pResource = pLuaMain->GetResource();
             SString strPath;
-            if ( pResource && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
                 CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage (
                     *pLuaMain,
@@ -568,7 +568,7 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
             // sanitize the input
             SString strFile = lua_tostring ( luaVM, 2 );
             SString strPath;
-            if ( pResource && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
                 // and attempt to load the image
                 CClientEntity* pEntity = lua_toelement ( luaVM, 1 );

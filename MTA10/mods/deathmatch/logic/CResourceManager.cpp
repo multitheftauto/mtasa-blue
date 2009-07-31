@@ -130,6 +130,7 @@ void CResourceManager::StopAll ( void )
     }
 }
 
+// pResource may be changed on return, and it could be NULL if the function returns false.
 bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
@@ -151,7 +152,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
             }
         }
     }
-    else if ( IsValidFilePath ( strInput.c_str() ) )
+    else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
         strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
         strMetaPath = strInput;
