@@ -33,6 +33,7 @@ enum eWinchType
 class CPed;
 class CObject;
 enum eWeaponType;
+class CColModel;
 
 class CVehicle : public virtual CPhysical
 {
@@ -208,6 +209,9 @@ public:
 
     virtual bool                 IsHeliSearchLightVisible               ( void ) = 0;
     virtual void                 SetHeliSearchLightVisible              ( bool bVisible ) = 0;
+
+    virtual CColModel*           GetSpecialColModel                     ( void ) = 0;
+    virtual bool                 UpdateMovingCollision                  ( float fAngle ) = 0;
 };
 
 #endif

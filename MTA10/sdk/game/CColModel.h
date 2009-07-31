@@ -12,10 +12,13 @@
 #ifndef __CGAME_COLMODEL
 #define __CGAME_COLMODEL
 
+class CColModelSAInterface;
+
 class CColModel
 {
 public:
-    virtual                 ~CColModel ( void ) {};
+    virtual CColModelSAInterface *	 GetInterface    ( void ) = 0;
+    virtual void                     Destroy         ( void ) = 0;
 };
 
 #endif

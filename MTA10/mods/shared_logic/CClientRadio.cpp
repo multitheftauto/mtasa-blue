@@ -30,16 +30,19 @@ CClientRadio::CClientRadio ( CClientManager * pManager )
 
 void CClientRadio::DoPulse ( void )
 {
+    bool bCanHearRadio = false;
     CClientPlayer * pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
     if ( pLocalPlayer )
     {
         CClientVehicle * pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-        if ( pVehicle )
+        if ( pVehicle && !pVehicle->IsBlown () && !pLocalPlayer->IsLeavingVehicle () )
         {
-            if ( !IsPlaying () ) Start ();
-        }
-        else if ( IsPlaying () ) Stop ();
+            bCanHearRadio = true;
+        }            
     }
+
+    if ( bCanHearRadio && !IsPlaying () ) Start ();
+    else if ( !bCanHearRadio && IsPlaying () ) Stop ();
 }
 
 

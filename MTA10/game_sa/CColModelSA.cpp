@@ -15,22 +15,36 @@
 
 CColModelSA::CColModelSA ( void )
 {
-    DWORD pInterface = (DWORD)&m_Interface;
-    DWORD CColModel_constructor = FUNC_CColModel_constructor;
+    m_pInterface = new CColModelSAInterface;
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CColModel_Constructor;
     _asm
     {
-        mov ecx, pInterface
-        call CColModel_constructor
+        mov     ecx, dwThis
+        call    dwFunc
     }
+    m_bDestroyInterface = true;
 }
+
+
+CColModelSA::CColModelSA ( CColModelSAInterface * pInterface )
+{
+    m_pInterface = pInterface;
+    m_bDestroyInterface = false;
+}
+
 
 CColModelSA::~CColModelSA ( void )
 {
-    DWORD pInterface = (DWORD)&m_Interface;
-    DWORD CColModel_destructor = FUNC_CColModel_destructor;
-    _asm
+    if ( m_bDestroyInterface )
     {
-        mov ecx, pInterface
-        call CColModel_destructor
+        DWORD dwThis = ( DWORD ) m_pInterface;
+        DWORD dwFunc = FUNC_CColModel_Destructor;
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+        }
+        delete m_pInterface;
     }
 }

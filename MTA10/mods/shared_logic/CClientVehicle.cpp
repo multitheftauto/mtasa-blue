@@ -1157,10 +1157,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue ( void )
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue ();
         // If it's a Hydra invert it with 5000 (as 0 is "forward"), so we can maintain a standard of 0 being "normal"
-        if ( m_usModel == VT_HYDRA )
-        {
-            usPropertyValue = 5000 - usPropertyValue;
-        }
+        if ( m_usModel == VT_HYDRA ) usPropertyValue = 5000 - usPropertyValue;
     }
     else
     {
@@ -1172,24 +1169,34 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue ( void )
 }
 
 
-void CClientVehicle::SetAdjustablePropertyValue ( unsigned short usAdjustableProperty )
+void CClientVehicle::SetAdjustablePropertyValue ( unsigned short usValue )
 {
-    if ( m_usModel == VT_HYDRA )
-    {
-        usAdjustableProperty = 5000 - usAdjustableProperty;
-    }
+    if ( m_usModel == VT_HYDRA ) usValue = 5000 - usValue;
 
+    _SetAdjustablePropertyValue ( usValue );
+}
+
+
+void CClientVehicle::_SetAdjustablePropertyValue ( unsigned short usValue )
+{
     // Set it
     if ( m_pVehicle )
     {
         if ( m_bHasAdjustableProperty )
         {
-            m_pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
+            m_pVehicle->SetAdjustablePropertyValue ( usValue );
+            
+            // Update our collision for this adjustable?
+            if ( m_usModel == VT_FORKLIFT || m_usModel == VT_FIRELA || m_usModel == VT_ANDROM ||
+                 m_usModel == VT_DUMPER || m_usModel == VT_DOZER )
+            {
+                float fAngle = ( float ) usValue / 2499.0f;
+                m_pVehicle->UpdateMovingCollision ( fAngle );
+            }
         }
     }
-    m_usAdjustablePropertyValue = usAdjustableProperty;
+    m_usAdjustablePropertyValue = usValue;
 }
-
 
 unsigned char CClientVehicle::GetDoorStatus ( unsigned char ucDoor )
 {
@@ -2009,7 +2016,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetEngineBroken ( m_bEngineBroken );
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
-        m_pVehicle->SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
+        _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );

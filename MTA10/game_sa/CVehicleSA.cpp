@@ -1705,3 +1705,49 @@ void CVehicleSA::SetHeliSearchLightVisible ( bool bVisible )
     DWORD dwThis = ( DWORD ) GetInterface ();
     * ( bool * ) ( dwThis + 2577 ) = bVisible;
 }
+
+
+CColModel * CVehicleSA::GetSpecialColModel ( void )
+{
+    CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
+    if ( vehicle->m_nSpecialColModel != 0xFF )
+    {
+        CColModelSAInterface * pSpecialColModels = ( CColModelSAInterface * ) VAR_CVehicle_SpecialColModels;
+        CColModelSAInterface * pColModelInterface = &pSpecialColModels [ vehicle->m_nSpecialColModel ];
+        if ( pColModelInterface )
+        {
+            CColModel * pColModel = new CColModelSA ( pColModelInterface );
+            return pColModel;
+        }
+    }
+    return NULL;
+}
+
+
+bool CVehicleSA::UpdateMovingCollision ( float fAngle )
+{
+    // If we dont have a driver, use the local player for this function
+    // It will check a few key-states which shouldn't make any difference as we've specified an angle.
+    CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
+    CPedSAInterface * pDriver = vehicle->pDriver;    
+    if ( !pDriver )
+    {
+        CPed * pLocalPed = pGame->GetPools ()->GetPedFromRef ( 1 );
+        if ( pLocalPed ) vehicle->pDriver = ( CPedSAInterface * ) pLocalPed->GetInterface ();
+    }
+
+    bool bReturn;
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    DWORD dwFunc = FUNC_CAutomobile__UpdateMovingCollision;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    fAngle
+        call    dwFunc
+        mov     bReturn, al
+    }
+
+    // Restore our driver
+    vehicle->pDriver = pDriver;
+    return bReturn;
+}
