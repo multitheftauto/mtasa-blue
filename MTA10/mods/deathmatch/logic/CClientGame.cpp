@@ -4372,7 +4372,7 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     bool bHandled = g_pCore->OnMouseDoubleClick ( Args );
 
     // Only pass on to lua if we haven't handled it yet
-    if ( !bHandled ) {
+    if ( !bHandled && szButton ) {
         CLuaArguments Arguments;
         Arguments.PushString ( szButton );
         Arguments.PushString ( szState );
@@ -4408,15 +4408,18 @@ bool CClientGame::OnMouseButtonDown ( CGUIMouseEventArgs Args )
         break;
     }
 
-    CLuaArguments Arguments;
-    Arguments.PushString ( szButton );
-    Arguments.PushNumber ( Args.position.fX );
-    Arguments.PushNumber ( Args.position.fY );
-
-    CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
-    if ( GetGUIManager ()->Exists ( pGUIElement ) )
+    if ( szButton )
     {
-        pGUIElement->CallEvent ( "onClientGUIMouseDown", Arguments, true );
+        CLuaArguments Arguments;
+        Arguments.PushString ( szButton );
+        Arguments.PushNumber ( Args.position.fX );
+        Arguments.PushNumber ( Args.position.fY );
+
+        CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
+        if ( GetGUIManager ()->Exists ( pGUIElement ) )
+        {
+            pGUIElement->CallEvent ( "onClientGUIMouseDown", Arguments, true );
+        }
     }
 
     return true;
@@ -4442,15 +4445,18 @@ bool CClientGame::OnMouseButtonUp ( CGUIMouseEventArgs Args )
         break;
     }
 
-    CLuaArguments Arguments;
-    Arguments.PushString ( szButton );
-    Arguments.PushNumber ( Args.position.fX );
-    Arguments.PushNumber ( Args.position.fY );
-
-    CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
-    if ( GetGUIManager ()->Exists ( pGUIElement ) )
+    if ( szButton )
     {
-        pGUIElement->CallEvent ( "onClientGUIMouseUp", Arguments, true );
+        CLuaArguments Arguments;
+        Arguments.PushString ( szButton );
+        Arguments.PushNumber ( Args.position.fX );
+        Arguments.PushNumber ( Args.position.fY );
+
+        CClientGUIElement * pGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pWindow );
+        if ( GetGUIManager ()->Exists ( pGUIElement ) )
+        {
+            pGUIElement->CallEvent ( "onClientGUIMouseUp", Arguments, true );
+        }
     }
 
     return true;
