@@ -2322,6 +2322,7 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Game events
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
+    m_Events.AddEvent ( "onClientWorld", "", NULL, false );
 
     // Cursor events
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
@@ -3200,6 +3201,10 @@ void CClientGame::Render3DStuffHandler ( void )
 void CClientGame::PostWorldProcessHandler ( void )
 {
     m_pManager->GetMarkerManager ()->DoPulse ();
+
+    // Call onClientWorld LUA event
+    CLuaArguments Arguments;
+    m_pRootEntity->CallEvent ( "onClientWorld", Arguments, false );
 }
 
 
