@@ -30,8 +30,9 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     else
     {
         // ESEO_USE_3D_BUFFERS in the default options set fucks up gta sounds
-        // on some PCs, so we set the options ourselves
-        m_pSoundEngine = createIrrKlangDevice ( ESOD_AUTO_DETECT, ESEO_MULTI_THREADED );
+        // on some PCs, so we set the options ourselves.
+        // ESEO_MULTI_THREADED is not used as OnSoundStopped() is not thread safe
+        m_pSoundEngine = createIrrKlangDevice ( ESOD_AUTO_DETECT, 0 );
     }
 
     // Load plugins (mp3 in our case)
@@ -53,6 +54,9 @@ CClientSoundManager::~CClientSoundManager ( void )
 
 void CClientSoundManager::DoPulse ( void )
 {
+    // Update needs to be called in single threaded mode
+    m_pSoundEngine->update();
+
     UpdateVolume ();
 
     CClientCamera* pCamera = m_pClientManager->GetCamera();
