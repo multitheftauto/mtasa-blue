@@ -117,16 +117,7 @@ void CClientMarker::UpdateAttaching ( void )
         CMatrix matrix, newMatrix;
         m_pAttachedToEntity->GetMatrix ( matrix );
         AttachedMatrix ( matrix, newMatrix, m_vecAttachedPosition, m_vecAttachedRotation );
-        m_pMarker->SetMatrix ( newMatrix );        
-        
-        // Do we need to move it?
-        if ( newMatrix.vPos != vecCurrentPosition )
-        {
-            SetPosition ( newMatrix.vPos );
-
-			// We have a col shape? Update it's position too
-			if ( m_pCollision ) m_pCollision->SetPosition ( newMatrix.vPos );
-        }
+        m_pMarker->SetMatrix ( newMatrix );
     }
 }
 

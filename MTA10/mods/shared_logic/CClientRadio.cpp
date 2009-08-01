@@ -11,9 +11,8 @@
 
 #include "StdInc.h"
 
-#define CUSTOM_RADIO_COLOR 0xFF00FFFF
-#define DEFAULT_RADIO_COLOR // TODO =D
-#define DEFAULT_RADIO_DROP_COLOR 0xFF000000
+#define RADIO_COLOR 0xFF106290
+#define RADIO_DROP_COLOR 0xFF000000
 #define RADIO_POS_X 0.5f
 #define RADIO_POS_Y 0.05f
 #define RADIO_SCALE_X 0.8f
@@ -35,7 +34,8 @@ void CClientRadio::DoPulse ( void )
     if ( pLocalPlayer )
     {
         CClientVehicle * pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-        if ( pVehicle && !pVehicle->IsBlown () && !pLocalPlayer->IsLeavingVehicle () )
+        if ( pVehicle && !pVehicle->IsBlown () && !pLocalPlayer->IsLeavingVehicle () &&
+             pVehicle->GetVehicleType () != CLIENTVEHICLE_BMX )
         {
             bCanHearRadio = true;
         }            
@@ -72,8 +72,8 @@ void CClientRadio::Render ( void )
                 pFont->SetOrientation ( 0 );
                 pFont->SetRightJustifyWrap ( 0 );
                 pFont->SetEdge ( 1 );
-                pFont->SetDropColor ( DEFAULT_RADIO_DROP_COLOR );
-                pFont->SetColor ( CUSTOM_RADIO_COLOR );
+                pFont->SetDropColor ( RADIO_DROP_COLOR );
+                pFont->SetColor ( RADIO_COLOR );
                 pFont->PrintString ( fX, fY, trackName );
                 pFont->DrawFonts ();
             }
