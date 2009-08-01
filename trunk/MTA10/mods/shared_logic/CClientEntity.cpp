@@ -162,6 +162,7 @@ CClientEntity::~CClientEntity ( void )
                 pModel->m_interp.bHadOriginSource = true;
             }
         }
+        m_OriginSourceUsers.clear ();
     }
 
     // Unlink our contacts
@@ -174,6 +175,7 @@ CClientEntity::~CClientEntity ( void )
             pModel->SetCurrentContactEntity ( NULL );
         }
     }
+    m_Contacts.clear ();
 }
 
 

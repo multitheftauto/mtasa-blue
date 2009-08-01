@@ -173,6 +173,8 @@ void CKeyBinds::Call ( CKeyBind* pKeyBind )
                 }
                 break;
             }
+            default:
+                break;
         }
     }
 }

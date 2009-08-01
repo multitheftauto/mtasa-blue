@@ -212,7 +212,11 @@ CClientPed::~CClientPed ( void )
     m_pManager->UnreferenceEntity ( this );
 
     // Remove our linked contact entity
-    if ( m_pCurrentContactEntity ) m_pCurrentContactEntity->RemoveContact ( this );
+    if ( m_pCurrentContactEntity )
+    {
+        m_pCurrentContactEntity->RemoveContact ( this );
+        m_pCurrentContactEntity = NULL;
+    }
 
     // Make sure we're not requesting any model
     m_pRequester->Cancel ( this, false );
@@ -2958,7 +2962,11 @@ void CClientPed::_CreateLocalModel ( void )
 void CClientPed::_DestroyModel ()
 {
     // Remove our linked contact entity
-    if ( m_pCurrentContactEntity ) m_pCurrentContactEntity->RemoveContact ( this );
+    if ( m_pCurrentContactEntity )
+    {
+        m_pCurrentContactEntity->RemoveContact ( this );
+        m_pCurrentContactEntity = NULL;
+    }
 
     // Remember the player position
     m_Matrix.vPos = *m_pPlayerPed->GetPosition ();
