@@ -350,6 +350,8 @@ public:
     void                        SetHeadLightColor       ( RGBA color );
 
     bool                        IsEnterable             ( void );
+    bool                        HasRadio                ( void );
+    bool                        HasPoliceRadio          ( void );
 
     void                        ReCreate                ( void );
 

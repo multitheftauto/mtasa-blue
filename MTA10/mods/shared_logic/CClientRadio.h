@@ -46,7 +46,7 @@ public:
 
     inline eRadioChannel        GetChannel          ( void )    { return m_Channel; }
     void                        SetChannel          ( eRadioChannel channel );
-    char *                      GetChannelName      ( void );
+    SString                     GetChannelName      ( void );
 
     void                        NextChannel         ( void );
     void                        PreviousChannel     ( void );
@@ -56,6 +56,7 @@ private:
     eRadioChannel               m_Channel;
     bool                        m_bIsPlaying;
     unsigned long               m_ulChangeTick;
+    bool                        m_bPoliceRadio;
 };
 
 

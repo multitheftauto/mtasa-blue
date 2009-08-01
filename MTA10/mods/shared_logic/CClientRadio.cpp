@@ -24,6 +24,7 @@ CClientRadio::CClientRadio ( CClientManager * pManager )
     m_Channel = CHANNEL_PLAYBACK_FM;
     m_bIsPlaying = false;
     m_ulChangeTick = 0;
+    m_bPoliceRadio = false;
 }
 
 
@@ -35,9 +36,10 @@ void CClientRadio::DoPulse ( void )
     {
         CClientVehicle * pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
         if ( pVehicle && !pVehicle->IsBlown () && !pLocalPlayer->IsLeavingVehicle () &&
-             pVehicle->GetVehicleType () != CLIENTVEHICLE_BMX )
+             pVehicle->HasRadio () )
         {
             bCanHearRadio = true;
+            m_bPoliceRadio = pVehicle->HasPoliceRadio ();
         }            
     }
 
@@ -55,8 +57,8 @@ void CClientRadio::Render ( void )
         unsigned long ulTick = GetTickCount ();
         if ( m_ulChangeTick && ulTick <= ( m_ulChangeTick + 2500 ) )
         {
-            char * trackName = g_pGame->GetAERadioTrackManager ()->GetRadioStationName ( ( BYTE ) m_Channel );
-            if ( trackName )
+            SString channelName = GetChannelName ();
+            if ( channelName )
             {
                 // Position and scale correction for resolution
                 CVector2D vecRes = g_pCore->GetGUI ()->GetResolution ();
@@ -74,7 +76,7 @@ void CClientRadio::Render ( void )
                 pFont->SetEdge ( 1 );
                 pFont->SetDropColor ( RADIO_DROP_COLOR );
                 pFont->SetColor ( RADIO_COLOR );
-                pFont->PrintString ( fX, fY, trackName );
+                pFont->PrintString ( fX, fY, const_cast < char * > ( channelName.c_str () ) );
                 pFont->DrawFonts ();
             }
         }
@@ -90,6 +92,8 @@ bool CClientRadio::IsPlaying ( void )
 
 void CClientRadio::Start ( void )
 {    
+    if ( !m_bPoliceRadio && m_Channel == CHANNEL_POLICE ) m_Channel = CHANNEL_PLAYBACK_FM;
+
     g_pGame->GetAudio ()->StartRadio ( ( unsigned int ) m_Channel );
     m_bIsPlaying = true;
     m_ulChangeTick = GetTickCount ();
@@ -114,23 +118,32 @@ void CClientRadio::SetChannel ( eRadioChannel channel )
 }
 
 
-char * CClientRadio::GetChannelName ( void )
+SString CClientRadio::GetChannelName ( void )
 {
-    return g_pGame->GetAERadioTrackManager ()->GetRadioStationName ( ( BYTE ) m_Channel );
+    if ( m_Channel == CHANNEL_POLICE ) return "Police";
+    char * trackName = g_pGame->GetAERadioTrackManager ()->GetRadioStationName ( ( BYTE ) m_Channel );
+    return trackName;
 }
 
 
 void CClientRadio::NextChannel ( void )
 {
-    if ( m_Channel == CHANNEL_RADIO_OFF ) m_Channel = CHANNEL_PLAYBACK_FM;
-    else m_Channel = eRadioChannel ( m_Channel + 1 );
-    SetChannel ( m_Channel );
+    if ( m_bIsPlaying )
+    {
+        if ( m_Channel == CHANNEL_RADIO_OFF )
+            m_Channel = ( m_bPoliceRadio ) ? CHANNEL_POLICE : CHANNEL_PLAYBACK_FM;
+        else m_Channel = eRadioChannel ( m_Channel + 1 );
+        SetChannel ( m_Channel );
+    }
 }
 
 
 void CClientRadio::PreviousChannel ( void )
 {
-    if ( m_Channel == CHANNEL_PLAYBACK_FM ) m_Channel = CHANNEL_RADIO_OFF;
-    else m_Channel = eRadioChannel ( m_Channel - 1 );
-    SetChannel ( m_Channel );
+    if ( m_bIsPlaying )
+    {
+        if ( m_Channel == ( ( m_bPoliceRadio ) ? CHANNEL_POLICE : CHANNEL_PLAYBACK_FM ) ) m_Channel = CHANNEL_RADIO_OFF;
+        else m_Channel = eRadioChannel ( m_Channel - 1 );
+        SetChannel ( m_Channel );
+    }
 }
