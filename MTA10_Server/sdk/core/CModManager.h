@@ -18,7 +18,7 @@ public:
     virtual bool            RequestLoad         ( const char* szModName ) = 0;
 
     virtual const char*     GetModPath          ( void ) = 0;
-    virtual const char*     GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize ) = 0;
+    virtual SString         GetAbsolutePath     ( const char* szRelative ) = 0;
 };
 
 #endif

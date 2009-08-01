@@ -223,20 +223,20 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
     {
 	    // Get the file size,
-	    long lLength = 0;
+	    unsigned long ulLength = 0;
 	    fseek( pFile, 0, SEEK_END );
-	    lLength = ftell( pFile );
+	    ulLength = ftell( pFile );
 	    fseek( pFile, 0, SEEK_SET );
 
         // Load file into a buffer
-        char* pBuffer  = new char[ lLength + 1 ];
-        memset ( pBuffer, 0, lLength + 1 );
-        pBuffer[ lLength ] = 0;
+        char* pBuffer  = new char[ ulLength + 1 ];
+        memset ( pBuffer, 0, ulLength + 1 );
+        pBuffer[ ulLength ] = 0;
 
-        if ( fread ( pBuffer, 1, lLength, pFile ) == lLength )
+        if ( fread ( pBuffer, 1, ulLength, pFile ) == ulLength )
         {
             // assign to the string
-            strFileContents.assign ( pBuffer, lLength );
+            strFileContents.assign ( pBuffer, ulLength );
         }
 
         // Clean up
@@ -487,7 +487,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
         }
 
         char szResult [ 512 ];
-        _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %d) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
+        _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %lu) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
 
         CLogger::LogPrint ( szResult );
     }
@@ -784,19 +784,19 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
         if ( fullPathReplacement.length () )
         {
             void* buf = NULL;
-            int lLength = 0;
+            unsigned long ulLength = 0;
 
             // Get new file into a buffer
             if ( FILE* pFile = fopen ( fullPathReplacement.c_str (), "rb" ) )
             {
                 // Get the file size,
                 fseek( pFile, 0, SEEK_END );
-                lLength = ftell( pFile );
+                ulLength = ftell( pFile );
                 fseek( pFile, 0, SEEK_SET );
 
                 // Load file into a buffer
-                buf = new char[ lLength ];
-                if ( fread ( buf, 1, lLength, pFile ) != lLength )
+                buf = new char[ ulLength ];
+                if ( fread ( buf, 1, ulLength, pFile ) != ulLength )
                 {
                     free( buf );
                     buf = NULL;
@@ -829,7 +829,7 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
                 {free(extrafield); free(commentary); free(local_extra); free(buf); break;}
 
 			// write file
-			if (zipWriteInFileInZip(dzip, buf, lLength)!=UNZ_OK)
+			if (zipWriteInFileInZip(dzip, buf, ulLength)!=UNZ_OK)
                 {free(extrafield); free(commentary); free(local_extra); free(buf); break;}
 
 			if (zipCloseFileInZip(dzip/*, unzfi.uncompressed_size, unzfi.crc*/)!=UNZ_OK)

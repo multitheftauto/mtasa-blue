@@ -52,8 +52,6 @@ public:
     void                            SetPassword                     ( const char* szPassword );
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
-    inline bool                     GetAdminServerEnabled           ( void )        { return m_bAdminServerEnabled; };
-    inline unsigned short           GetAdminPort                    ( void )        { return m_usAdminPort; };
 	inline unsigned short			GetHTTPPort						( void )		{ return m_usHTTPPort; };
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
@@ -87,8 +85,6 @@ private:
 	unsigned int					m_uiPrivatePlayerSlots;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;
-    bool                            m_bAdminServerEnabled;
-    unsigned short                  m_usAdminPort;
 	unsigned short					m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;

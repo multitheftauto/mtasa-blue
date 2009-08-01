@@ -51,7 +51,7 @@ private:
 	inline bool						HasResourceName			( const char *szSetting );
 	inline const char*				GetName					( const char *szSetting, unsigned int uiResourceLength = -1 );
 
-	char					m_szPath[MAX_PATH];
+	SString					m_strPath;
 	CXMLFile*				m_pFile;
 	CXMLNode*				m_pNodeGlobalSettings;
 

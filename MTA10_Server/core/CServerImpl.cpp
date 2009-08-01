@@ -476,7 +476,7 @@ void CServerImpl::ShowInfoTag ( char* szTag )
 	for ( int i = 0 ; i < COLS ; i++ )
 	{
 		// Break if we reached szTag's end
-		if ( szTag[i] == NULL)
+		if ( szTag[i] == '\0' )
 			break;
 
 		// Apply the attributes
@@ -512,10 +512,10 @@ void CServerImpl::HandleInput ( void )
 #else
 	iStdIn = getch();
 	if ( iStdIn == ERR)
-		iStdIn = NULL;
+		iStdIn = 0;
 #endif
 
-	if ( iStdIn == NULL)
+	if ( iStdIn == 0 )
 		return;
 
 	// Add the character to the buffer

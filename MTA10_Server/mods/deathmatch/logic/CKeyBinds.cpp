@@ -124,7 +124,7 @@ void CKeyBinds::Clear ( eKeyBindType bindType )
     list < CKeyBind* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
-        if ( !(*iter)->IsBeingDeleted () && bindType == KEY_BIND_UNDEFINED || (*iter)->GetType () == bindType )
+        if ( ( !(*iter)->IsBeingDeleted () && bindType == KEY_BIND_UNDEFINED ) || (*iter)->GetType () == bindType )
         {
             if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
             else

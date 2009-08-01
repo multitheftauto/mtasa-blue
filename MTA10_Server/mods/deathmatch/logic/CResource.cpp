@@ -122,7 +122,7 @@ bool CResource::Load ( void )
 
         // Register the time we loaded this resource and zero out the time we started it
         time ( &m_timeLoaded );
-        m_timeStarted = NULL;
+        m_timeStarted = 0;
 
         // Register us in the EHS stuff
 	    g_pGame->GetHTTPD()->RegisterEHS ( this, m_strResourceName.c_str () );
@@ -1059,7 +1059,7 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
     else
     {
         //LAZYNESS "Author: %s<BR>Version: %d<BR>Loaded %s<BR>", m_szAuthor, m_uiVersion, asctime(localtime((const time_t *)&m_timeLoaded)) );
-        if ( m_timeStarted != NULL )
+        if ( m_timeStarted != 0 )
             LAZYNESS "Last ran: %s<BR>", asctime(localtime((const time_t *)&m_timeStarted)) );
         LAZYNESS "Last ran: never<BR>" );
     }

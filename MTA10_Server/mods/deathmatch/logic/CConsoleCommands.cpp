@@ -51,7 +51,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
     else if ( szResourceName != NULL && szVersion == NULL )
     {
         CResource * existingResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
-        int currentVersionMajor = 0, currentVersionMinor = 0, currentVersionRevision = 0, currentVersionState = 0;
+        unsigned int currentVersionMajor = 0, currentVersionMinor = 0, currentVersionRevision = 0, currentVersionState = 0;
         if ( existingResource )
         {
             currentVersionMajor = existingResource->GetVersionMajor();
@@ -351,7 +351,7 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
     char szBuffer[256];
     szBuffer[0] = '\0';
 
-	if ( !szBuffer || strlen ( szBuffer ) < 1  )
+	if ( strlen ( szBuffer ) < 1  )
 		return false;
 
     strncpy ( szBuffer, szArguments, 256 );
@@ -1673,7 +1673,7 @@ bool CConsoleCommands::DebugScript ( CConsole* pConsole, const char* szArguments
 
             // Convert to number
             int iLevel = atoi ( szArguments );
-            if ( iLevel != pPlayer->GetScriptDebugLevel () )
+            if ( iLevel != (int)pPlayer->GetScriptDebugLevel () )
             {
                 // Between 0 and 3?
                 if ( iLevel >= 0 && iLevel <= 3 )
@@ -1682,13 +1682,7 @@ bool CConsoleCommands::DebugScript ( CConsole* pConsole, const char* szArguments
                     pPlayer->SetScriptDebugLevel ( iLevel );
 
                     // Tell the player and the console
-                    char szBuffer [256];
-                    szBuffer[0] = '\0';
-
-                    _snprintf ( szBuffer, 256, "debugscript: Your debug mode was set to %i", iLevel );
-                    szBuffer[255] = '\0';
-
-                    pEchoClient->SendEcho ( szBuffer );
+                    pEchoClient->SendEcho ( SString ( "debugscript: Your debug mode was set to %i", iLevel ) );
                     CLogger::LogPrintf ( "SCRIPT: %s set his script debug mode to %i\n", pClient->GetNick (), iLevel );
 
                     // Enable/Disable their debugger
@@ -1800,11 +1794,10 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 		if ( pClient->GetNick () )
 			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
 
-		char szFilename[256] = {0};
-		_snprintf ( szFilename, 255, "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
 		// These modules are late loaded
-		if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, szFilename, true ) )
+		if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
 		{
 				pEchoClient->SendConsole ( "stop: Resource could not be found" );
 				return true;
@@ -1824,10 +1817,9 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
 		if ( pClient->GetNick () )
 			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
 
-		char szFilename[256] = {0};
-		_snprintf ( szFilename, 255, "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, szFilename ) )
+		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
 		{
 				pEchoClient->SendConsole ( "stop: Resource could not be found" );
 				return true;
@@ -1847,10 +1839,9 @@ bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArgument
 		if ( pClient->GetNick () )
 			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
 
-		char szFilename[256] = {0};
-		_snprintf ( szFilename, 255, "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, szFilename ) )
+		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
 		{
 				pEchoClient->SendConsole ( "stop: Resource could not be found" );
 				return true;

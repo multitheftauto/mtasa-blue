@@ -288,7 +288,7 @@ bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
 {
     return ( usPlayerModel == 0 ||
              usPlayerModel == 7 ||
-             usPlayerModel >= 9 &&
+             (usPlayerModel >= 9 &&
              usPlayerModel != 208 &&
              usPlayerModel != 149 &&
              usPlayerModel != 119 &&
@@ -296,9 +296,9 @@ bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
              usPlayerModel != 74 &&
              usPlayerModel != 65 &&
              usPlayerModel != 42 &&
-             usPlayerModel <= 264 ||
-             usPlayerModel >= 274 &&
-             usPlayerModel <= 288 );
+             usPlayerModel <= 264) ||
+             (usPlayerModel >= 274 &&
+             usPlayerModel <= 288) );
 }
 
 

@@ -708,7 +708,7 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
                 szType = lua_tostring ( luaVM, 2 );
-                if ( szType [ 0 ] == NULL )
+                if ( szType [ 0 ] == '\0' )
                     szType = NULL;
             }
 

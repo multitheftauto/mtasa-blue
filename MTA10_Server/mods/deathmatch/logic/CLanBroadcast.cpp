@@ -71,7 +71,7 @@ void CLanBroadcast::DoPulse ( void )
         // to ensure that we repond only to queries with the same version
 		if ( m_strClientMessage.compare ( szBuffer ) == 0 )
 		{
-			int sent = sendto ( m_Socket,
+			/*int sent =*/ sendto ( m_Socket,
 					m_strServerMessage.c_str (),
 					m_strServerMessage.length () + 1,
 					0,

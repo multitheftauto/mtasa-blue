@@ -389,21 +389,21 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // Grab the path to the main config
-    char szBuffer [MAX_PATH];
+    SString strBuffer;
     const char* szMainConfig;
     if ( m_CommandLineParser.GetMainConfig ( szMainConfig ) )
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( szMainConfig, szBuffer, MAX_PATH );
+        strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( szMainConfig );
     }
     else
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf", szBuffer, MAX_PATH );
+        strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
     }
 
     m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
-    if ( !m_pMainConfig->Load ( szBuffer ) )
+    if ( !m_pMainConfig->Load ( strBuffer ) )
         return false;
 
     // Grab the IP to put the server at
@@ -544,13 +544,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     AddBuiltInEvents ();
 
 	// Load the vehicle colors before the main config
-    g_pServerInterface->GetModManager ()->GetAbsolutePath ( "vehiclecolors.conf", szBuffer, 512 );
-    if ( !m_pVehicleManager->GetColorManager ()->Load ( szBuffer ) )
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "vehiclecolors.conf" );
+    if ( !m_pVehicleManager->GetColorManager ()->Load ( strBuffer ) )
     {
         // Try to generate a new one and load it again
-        if ( m_pVehicleManager->GetColorManager ()->Generate ( szBuffer ) )
+        if ( m_pVehicleManager->GetColorManager ()->Generate ( strBuffer ) )
         {
-            if ( !m_pVehicleManager->GetColorManager ()->Load ( szBuffer ) )
+            if ( !m_pVehicleManager->GetColorManager ()->Load ( strBuffer ) )
             {
                 CLogger::ErrorPrintf ( "%s", "Loading 'vehiclecolors.conf' failed\n " );
             }
@@ -566,12 +566,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
 
     // Load the registry
-    g_pServerInterface->GetModManager ()->GetAbsolutePath ( "registry.db", szBuffer, MAX_PATH );
-    m_pRegistry->Load ( szBuffer );
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "registry.db" );
+    m_pRegistry->Load ( strBuffer );
 
     // Load the accounts
-    g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml", szBuffer, MAX_PATH );
-    m_pAccountManager->SetFileName ( szBuffer );
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );
+    m_pAccountManager->SetFileName ( strBuffer );
     m_pAccountManager->Load ();
 
     // Register our packethandler
@@ -600,23 +600,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         {
             // Store the server password
 		    CLogger::LogPrintf ( "Server password set to '%s'\n", szPassword );
-
-            // If remote admin is enabled
-            if ( m_pMainConfig->GetAdminServerEnabled () )
-            {
-			    CLogger::LogPrint ( "Password can be changed from Remote Admin\n" );
-		    }
         }
         else
         {
             CLogger::LogPrint ( "Invalid password in config, no password is used\n" );
         }
 	}
-
-    if ( m_pMainConfig->GetAdminServerEnabled () )
-    {
-        unsigned int uiPort = m_pMainConfig->GetAdminPort ();
-    }
 
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
@@ -669,8 +658,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
 	// Set the autopatcher directory
-	g_pServerInterface->GetModManager ()->GetAbsolutePath ( "", szBuffer, MAX_PATH );
-	g_pNetServer->SetAutoPatcherDirectory ( szBuffer );
+	strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
+	g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
 
 
 #ifdef MTA_VOICE
@@ -694,8 +683,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 #endif
 
     // Run startup commands
-    g_pServerInterface->GetModManager ()->GetAbsolutePath ( "autoexec.conf", szBuffer, MAX_PATH );
-    CCommandFile Autoexec ( szBuffer, *m_pConsole, *m_pConsoleClient );
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "autoexec.conf"  );
+    CCommandFile Autoexec ( strBuffer, *m_pConsole, *m_pConsoleClient );
     if ( Autoexec.IsValid () )
     {
         CLogger::LogPrintf ( "autoexec.conf file found! Executing...\n" );
@@ -2726,17 +2715,20 @@ void CGame::Unlock ( void )
 
 void CGame::SetGlitchEnabled ( std::string strGlitch, bool bEnabled )
 {
-    char cGlitch = m_GlitchNames[strGlitch];
+    eGlitchType cGlitch = m_GlitchNames[strGlitch];
+    assert ( cGlitch >= 0 && cGlitch <= 2 );
     m_Glitches[cGlitch] = bEnabled;
 }
 
 bool CGame::IsGlitchEnabled ( std::string strGlitch )
 {
-    char cGlitch = m_GlitchNames[strGlitch];
+    eGlitchType cGlitch = m_GlitchNames[strGlitch];
+    assert ( cGlitch >= 0 && cGlitch <= 2 );
     return m_Glitches[cGlitch] ? true : false;
 }
-bool CGame::IsGlitchEnabled ( char cGlitch )
+bool CGame::IsGlitchEnabled ( eGlitchType cGlitch )
 {
+    assert ( cGlitch >= 0 && cGlitch <= 2 );
     return m_Glitches[cGlitch] || false;
 }
 
