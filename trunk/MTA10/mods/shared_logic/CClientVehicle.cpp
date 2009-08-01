@@ -2978,6 +2978,32 @@ bool CClientVehicle::IsEnterable ( void )
     return false;
 }
 
+bool CClientVehicle::HasRadio ( void )
+{
+    if ( m_eVehicleType != CLIENTVEHICLE_BMX ) return true;
+    return false;
+}
+
+
+bool CClientVehicle::HasPoliceRadio ( void )
+{
+    switch ( m_usModel )
+    {
+        case VT_COPCARLA:
+        case VT_COPCARSF:
+        case VT_COPCARVG:
+        case VT_COPCARRU:
+        case VT_POLMAV:
+        case VT_COPBIKE:
+        case VT_SWATVAN:
+            return true;
+            break;
+        default:
+            break;
+    }
+    return false;
+}
+
 void CClientVehicle::RemoveAllProjectiles ( void )
 {
     CClientProjectile * pProjectile = NULL;
