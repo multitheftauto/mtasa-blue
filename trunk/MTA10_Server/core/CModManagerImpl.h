@@ -36,7 +36,7 @@ public:
     bool                RequestLoad             ( const char* szModName );
 
     inline const char*  GetModPath              ( void )                    { return m_szModPath; };
-    const char*         GetAbsolutePath         ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize );
+    virtual SString     GetAbsolutePath         ( const char* szRelative );
 
     bool                IsModLoaded             ( void );
     CServerBase*        GetCurrentMod           ( void );

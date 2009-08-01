@@ -123,7 +123,7 @@ void ASE::DoPulse ( void )
         // If our reply buffer isn't empty, send it
         if ( !strReply.empty() )
         {
-            int sent = sendto ( m_Socket,
+            /*int sent =*/ sendto ( m_Socket,
                                 strReply.c_str(),
                                 strReply.length(),
 						        0,
@@ -161,7 +161,7 @@ std::string ASE::QueryFull ( void )
     reply << temp.str();
     // passworded
     reply << ( unsigned char ) 2;
-    reply << ( m_pMainConfig->HasPassword () ) ? 1 : 0;
+    reply << ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
     // players count
     temp.str ( "" );
     temp << m_pPlayerManager->CountJoined ();

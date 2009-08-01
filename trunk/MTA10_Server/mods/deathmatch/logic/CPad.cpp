@@ -159,7 +159,7 @@ void CPad::UpdateKeys ( void )
 
 bool CPad::GetControlState ( char* szControl, bool& bState )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
@@ -181,7 +181,7 @@ bool CPad::GetControlState ( char* szControl, bool& bState )
 
 bool CPad::SetControlState ( char* szControl, bool bState )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
@@ -197,7 +197,7 @@ bool CPad::SetControlState ( char* szControl, bool bState )
 
 bool CPad::IsControlEnabled ( char* szControl, bool& bEnabled )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
@@ -213,7 +213,7 @@ bool CPad::IsControlEnabled ( char* szControl, bool& bEnabled )
 
 bool CPad::SetControlEnabled ( char* szControl, bool bEnabled )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
@@ -229,7 +229,7 @@ bool CPad::SetControlEnabled ( char* szControl, bool bEnabled )
 
 void CPad::SetAllControlsEnabled ( bool bEnabled )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         m_ControlStates [ i ].bEnabled = bEnabled;
     }
@@ -238,7 +238,7 @@ void CPad::SetAllControlsEnabled ( bool bEnabled )
 
 SGTAControl* CPad::GetControlFromString ( char* szControl )
 {
-    for ( int i = 0 ; *g_gtaControls [ i ].szControl != NULL ; i++ )
+    for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
         SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )

@@ -763,7 +763,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
             {
                 char szTableID[10];
-                _snprintf ( szTableID, sizeof(szTableID), "^T^%d", pKnownTables->find ( m_pTableData )->second );
+                _snprintf ( szTableID, sizeof(szTableID), "^T^%lu", pKnownTables->find ( m_pTableData )->second );
                 return json_object_new_string ( szTableID );
             }
             else
@@ -808,7 +808,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
 			if ( pElement && bSerialize )
 			{
 				char szElementID[10] = {0};
-                _snprintf ( szElementID, 9, "^E^%d", pElement->GetID() );
+                _snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
 				return json_object_new_string ( szElementID );
 			}
             else if ( VERIFY_RESOURCE(pResource) )
@@ -892,7 +892,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
 			if ( pElement )
 			{
-                _snprintf ( szBuffer, length, "#E#%d", pElement->GetID() );
+                _snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
 				return szBuffer;
 			}
 			else if ( VERIFY_RESOURCE(pResource) )

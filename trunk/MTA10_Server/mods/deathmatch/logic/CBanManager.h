@@ -59,14 +59,11 @@ public:
     std::string         SafeGetValue            ( CXMLNode* pNode, const char* szKey );
     bool                IsValidIP               ( const char* szIP );
 
-	char*				GetFilePath				( void )			{ return reinterpret_cast <char*> (m_szPath); }
-
     inline list < CBan* > ::const_iterator  IterBegin   ( void )                    { return m_BanManager.begin (); };
     inline list < CBan* > ::const_iterator  IterEnd     ( void )                    { return m_BanManager.end (); };
 
 private:
-    char                m_szFileName            [20];
-    char                m_szPath                [MAX_PATH];
+    SString             m_strPath;
 
     list < CBan* >      m_BanManager;
 

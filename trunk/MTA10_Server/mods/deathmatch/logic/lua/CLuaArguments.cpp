@@ -312,7 +312,7 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 CElement* pElement = (*iter)->GetElement ();
 			    if ( VERIFY_ELEMENT(pElement) )
 			    {
-                    _snprintf ( szValue, 9, "E#%d", pElement->GetID() );
+                    _snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
 			    }
 			    else
 			    {
@@ -580,7 +580,7 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
         if ( pArgument->GetType() == LUA_TNUMBER )
         {
             double num = pArgument->GetNumber();
-            int iNum = static_cast < unsigned int > ( num );
+            unsigned int iNum = static_cast < unsigned int > ( num );
             if ( num == iNum )
             {
                 if ( iArrayPos != iNum ) // check if the value matches its index in the table

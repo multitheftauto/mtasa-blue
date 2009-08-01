@@ -140,8 +140,8 @@ public:
     inline bool                     IsFrozen                ( void )                        { return m_bIsFrozen; };
     inline void                     SetFrozen               ( bool bIsFrozen )              { m_bIsFrozen = bIsFrozen; };
 
-    inline const CVector&           GetPosition             ( void );
-    inline void                     SetPosition             ( const CVector& vecPosition );
+    const CVector&                  GetPosition             ( void );
+    void                            SetPosition             ( const CVector& vecPosition );
     inline void                     GetRotationDegrees      ( CVector& vecRotation )        { vecRotation = m_vecRotationDegrees; };
     inline void                     SetRotationDegrees      ( const CVector& vecRotation )  { m_vecRotationDegrees = vecRotation; };
 

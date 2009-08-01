@@ -21,10 +21,10 @@ CSettings::CSettings ( CResourceManager* pResourceManager )
 	m_pNodeGlobalSettings = NULL;
 
 	// Get the absolute path to the global settings xml file
-	g_pServerInterface->GetModManager ()->GetAbsolutePath ( FILENAME_SETTINGS, m_szPath, MAX_PATH );
+	m_strPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( FILENAME_SETTINGS );
 
 	// Open the XML file and check for validity
-	if ( !( m_pFile = g_pServerInterface->GetXML ()->CreateXML ( m_szPath ) ) ) {
+	if ( !( m_pFile = g_pServerInterface->GetXML ()->CreateXML ( m_strPath ) ) ) {
 		CLogger::ErrorPrintf ( "Could not create XML instance for settings registry! Registry disabled." );
 		return;
 	}

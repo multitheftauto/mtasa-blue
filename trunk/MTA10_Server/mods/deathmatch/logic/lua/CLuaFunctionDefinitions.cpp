@@ -2525,12 +2525,12 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
             SHudComponent hudComponents [] = { { "ammo" }, { "weapon" }, { "health" },
                                                { "breath" }, { "armour" }, { "money" },
                                                { "vehicle_name" }, { "area_name" }, { "radar" },
-                                               { "clock" }, { NULL } };
+                                               { "clock" }, { "\0" } };
 
             if ( szComponent && szComponent [ 0 ] )
             {
                 unsigned char ucComponent = 0xFF;
-                for ( int i = 0 ; hudComponents [ i ].szName [ 0 ] != NULL ; i++ )
+                for ( int i = 0 ; hudComponents [ i ].szName [ 0 ] != '\0' ; i++ )
                 {
                     if ( stricmp ( szComponent, hudComponents [ i ].szName ) == 0 )
                     {
@@ -7477,6 +7477,8 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                                 }
                                 break;
                             }
+                            default:
+                                break;
                         }
                     }
                 }
@@ -7538,6 +7540,8 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
                                 }
                                 break;
                             }
+                            default:
+                                break;
                         }
                     }
                 }

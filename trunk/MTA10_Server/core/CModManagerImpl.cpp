@@ -45,13 +45,10 @@ bool CModManagerImpl::RequestLoad ( const char* szModName )
 }
 
 
-const char* CModManagerImpl::GetAbsolutePath ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize )
+SString CModManagerImpl::GetAbsolutePath ( const char* szRelative )
 {
-    szBuffer [uiBufferSize - 1] = 0;
-	_snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_szModPath, szRelative );
-    return szBuffer;
+    return SString ( "%s/%s", m_szModPath, szRelative );
 }
-
 
 bool CModManagerImpl::IsModLoaded ( void )
 {

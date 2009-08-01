@@ -155,7 +155,7 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
 void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 {
     unsigned char ucType;
-    bool bHitState;
+    bool bHitState = false;
     if ( bitStream.ReadBit () == true )
         ucType = 1;
     else

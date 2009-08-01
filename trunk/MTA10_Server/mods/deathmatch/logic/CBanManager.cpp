@@ -18,11 +18,7 @@
 
 CBanManager::CBanManager ( void )
 {
-	m_szFileName[0] = '\0';
-    strcpy ( m_szFileName, "banlist.xml" );
-
-    g_pServerInterface->GetModManager ()->GetAbsolutePath ( m_szFileName, m_szPath, MAX_PATH );
-
+    m_strPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "banlist.xml" );
     m_tUpdate = 0;
 }
 
@@ -362,7 +358,7 @@ unsigned int CBanManager::GetBansWithBanner ( const char* szBanner )
 bool CBanManager::LoadBanList ( void )
 {
     // Create the XML
-    CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_szPath );
+    CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_strPath );
     if ( !pFile )
     {
         return false;
@@ -438,7 +434,7 @@ bool CBanManager::LoadBanList ( void )
 void CBanManager::SaveBanList ( void )
 {
     // Create the XML file
-    CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_szPath );
+    CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_strPath );
     if ( pFile )
     {
 		// create the root node again as you are outputting all the bans again not just new ones

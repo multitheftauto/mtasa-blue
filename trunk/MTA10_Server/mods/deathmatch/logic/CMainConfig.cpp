@@ -33,8 +33,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiMaxPlayers = 0;
 	m_uiPrivatePlayerSlots = 0;
     m_bAseEnabled = false;
-    m_bAdminServerEnabled = false;
-    m_usAdminPort = 0;
 	m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_bLogFileEnabled = false;
@@ -237,12 +235,10 @@ bool CMainConfig::Load ( const char* szFilename )
     }
 
     // Grab the server logfile
-    char szBuffer [MAX_PATH + 1];
     std::string strBuffer;
     if ( GetString ( m_pRootNode, "logfile", strBuffer, 1 ) == IS_SUCCESS )
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str (), szBuffer, MAX_PATH );
-        m_strLogFile = szBuffer ? szBuffer : "";
+        m_strLogFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
         m_bLogFileEnabled = true;
     }
     else
@@ -253,13 +249,11 @@ bool CMainConfig::Load ( const char* szFilename )
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 255, 1 ) == IS_SUCCESS )
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str (), szBuffer, MAX_PATH );
-        m_strAccessControlListFile = szBuffer ? szBuffer : "";
+        m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
     }
     else
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml", szBuffer, MAX_PATH );
-        m_strAccessControlListFile = szBuffer ? szBuffer : "";
+        m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
 
 	return true;
@@ -269,14 +263,12 @@ bool CMainConfig::Load ( const char* szFilename )
 bool CMainConfig::LoadExtended ( void )
 {
     std::string strBuffer;
-    char szBuffer[MAX_PATH + 1];
     int iTemp = 0, iResult = 0;
 
 	// Grab the script debuglog
     if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 255, 1 ) == IS_SUCCESS )
     {
-        g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str (), szBuffer, MAX_PATH );
-        m_strScriptDebugLogFile = szBuffer ? szBuffer : "";
+        m_strScriptDebugLogFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
         m_bScriptDebugLogEnabled = true;
     }
     else
@@ -327,12 +319,11 @@ bool CMainConfig::LoadExtended ( void )
             if ( pAttribute )
             {
                 std::string strBuffer = pAttribute->GetValue ();
-                char szFilename[256] = {0};
-                _snprintf ( szFilename, 255, "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), strBuffer.c_str () );
+                SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), strBuffer.c_str () );
 
                 if ( IsValidFilePath ( strBuffer.c_str () ) )
                 {
-                    m_pLuaManager->GetLuaModuleManager ()->_LoadModule ( strBuffer.c_str (), szFilename, false );
+                    m_pLuaManager->GetLuaModuleManager ()->_LoadModule ( strBuffer.c_str (), strFilename, false );
                 }
             }
         }

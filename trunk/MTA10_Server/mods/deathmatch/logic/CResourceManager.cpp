@@ -58,8 +58,6 @@ CResourceManager::~CResourceManager ( void )
 bool CResourceManager::Refresh ( bool bRefreshAll )
 {
 
-    char szBuffer [MAX_PATH];
-
     unsigned int uiCount = 0;
 
     UnloadRemovedResources();
@@ -68,7 +66,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
         // Find all .map files in the maps folder
         WIN32_FIND_DATA FindData;
-        HANDLE hFind = FindFirstFile ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/*", szBuffer, MAX_PATH ), &FindData );
+        HANDLE hFind = FindFirstFile ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/*" ), &FindData );
         if ( hFind != INVALID_HANDLE_VALUE )
         {
             // Remove the extension and store the time
@@ -789,14 +787,10 @@ bool CResourceManager::Install ( char * szURL, char * szName )
             {
                 const char* szBuffer = response->GetData ();
 
-                char szResourceRoot[MAX_PATH];
-                g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources", szResourceRoot, MAX_PATH );
-                char szResourceFileName[MAX_PATH];
-                szResourceFileName[MAX_PATH - 1] = '\0';
-                _snprintf ( szResourceFileName, MAX_PATH - 1, "%s/%s.zip", szResourceRoot, szName );
+                SString strResourceRoot = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources" );
+                SString strResourceFileName ( "%s/%s.zip", strResourceRoot.c_str (), szName );
 
-
-                FILE * file = fopen ( szResourceFileName, "wb" );
+                FILE * file = fopen ( strResourceFileName, "wb" );
                 if ( file )
                 {
                     fwrite ( szBuffer, dataLength, 1, file );
