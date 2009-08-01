@@ -53,13 +53,13 @@ public:
     void                            SetDirection                    ( const CVector& vecDirection );
     void                            SetNextPosition                 ( const CVector& vecPosition );
 
-    inline void                     GetMatrix                       ( CMatrix & mat )                   { m_Matrix = mat; };
-    inline void                     SetMatrix                       ( CMatrix & mat )                   { mat = m_Matrix; };
+    void                            GetMatrix                       ( CMatrix & mat );
+    void                            SetMatrix                       ( CMatrix & mat );
 
-    inline bool                     IsVisible                       ( void ) const                      { return m_bVisible; };
+    inline bool                     IsVisible                       ( void ) const                      { return m_bVisible; }
     void                            SetVisible                      ( bool bVisible );
 
-    inline unsigned int             GetIcon                         ( void ) const                      { return m_uiIcon; };
+    inline unsigned int             GetIcon                         ( void ) const                      { return m_uiIcon; }
     void                            SetIcon                         ( unsigned int uiIcon );
     
     inline unsigned long            GetColor                        ( void )                            { return m_rgbaColor; };

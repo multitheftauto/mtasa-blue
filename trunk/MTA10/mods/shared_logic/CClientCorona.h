@@ -22,15 +22,15 @@ public:
                                     CClientCorona                       ( CClientMarker * pThis );
                                     ~CClientCorona                      ( void );
 
-    inline unsigned int             GetMarkerType                       ( void ) const                      { return CClientMarkerCommon::CLASS_CORONA; };
+    inline unsigned int             GetMarkerType                       ( void ) const                      { return CClientMarkerCommon::CLASS_CORONA; }
 
     bool                            IsHit                               ( const CVector& vecPosition ) const;
 
-    inline void                     GetPosition                         ( CVector& vecPosition ) const      { vecPosition = m_Matrix.vPos; };
+    inline void                     GetPosition                         ( CVector& vecPosition ) const      { vecPosition = m_Matrix.vPos; }
     inline void                     SetPosition                         ( const CVector& vecPosition )      { m_Matrix.vPos = vecPosition; }
 
-    inline void                     GetMatrix                           ( CMatrix & mat )                   {};
-    inline void                     SetMatrix                           ( CMatrix & mat )                   {};
+    inline void                     GetMatrix                           ( CMatrix & mat )                   { mat = m_Matrix; }
+    inline void                     SetMatrix                           ( CMatrix & mat )                   { m_Matrix = mat; }
 
     inline bool                     IsVisible                           ( void ) const                      { return m_bVisible; };
     inline void                     SetVisible                          ( bool bVisible )                   { m_bVisible = bVisible; };

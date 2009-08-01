@@ -156,7 +156,17 @@ void CClientCheckpoint::SetDirection ( const CVector& vecDirection )
         }
     }
 }
-    
+
+void CClientCheckpoint::GetMatrix ( CMatrix& mat )
+{
+    mat = m_Matrix;
+}
+
+void CClientCheckpoint::SetMatrix ( CMatrix& mat )
+{
+    SetPosition ( mat.vPos );
+    m_Matrix = mat;
+}
 
 void CClientCheckpoint::SetNextPosition ( const CVector& vecPosition )
 {
