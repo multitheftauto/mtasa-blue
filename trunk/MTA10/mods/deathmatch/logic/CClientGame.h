@@ -575,6 +575,8 @@ private:
     unsigned long                       m_ulBigPacketBytesReceivedBase;
     CTransferBox*                       m_pBigPacketTransferBox;
 
+    double                              m_dLastTimeSeconds;
+
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     bool                                m_bShowSyncingInfo;
     #endif
@@ -615,5 +617,6 @@ private:
 };
 
 extern CClientGame* g_pClientGame;
+extern float        g_fTimeSlice;
 
 #endif

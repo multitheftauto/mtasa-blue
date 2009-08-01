@@ -235,6 +235,8 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
     }

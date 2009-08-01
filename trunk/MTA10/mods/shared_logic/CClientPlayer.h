@@ -170,7 +170,6 @@ public:
     std::vector < SPretendDamage >  m_PretendDamageList;
     float                           m_fPretendHealthSmoothed;
     float                           m_fPretendArmorSmoothed;
-    float                           m_fLastSecondCount;
 
 };
 

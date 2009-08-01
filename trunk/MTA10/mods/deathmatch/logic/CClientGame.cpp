@@ -32,6 +32,9 @@ using std::list;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 
+// Global variable holding the current interval in seconds between this frame and the previous one
+extern float g_fTimeSlice = 0;
+
 // Used by the Voice system
 #ifdef MTA_VOICE
 CVariableBuffer * CClientGame::m_pVoiceBuffer;
@@ -3202,8 +3205,14 @@ void CClientGame::PostWorldProcessHandler ( void )
 {
     m_pManager->GetMarkerManager ()->DoPulse ();
 
+    // Update frame time slice
+    double dTimeSeconds = GetSecondCount ();
+    g_fTimeSlice = Clamp ( 0.0, dTimeSeconds - m_dLastTimeSeconds, 0.1 );
+    m_dLastTimeSeconds = dTimeSeconds;
+
     // Call onClientWorld LUA event
     CLuaArguments Arguments;
+    Arguments.PushNumber ( g_fTimeSlice );
     m_pRootEntity->CallEvent ( "onClientWorld", Arguments, false );
 }
 
@@ -3463,7 +3472,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
 
-                // Ignore the damage if its going to kill us or we dont want the animation
+                // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
                 if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming ) return false;
 
                 // Allow animation and ensure the code below is not executed if health and armor are locked (i.e. remote players)
