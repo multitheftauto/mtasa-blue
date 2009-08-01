@@ -28,6 +28,12 @@ CClientRadio::CClientRadio ( CClientManager * pManager )
 }
 
 
+CClientRadio::~CClientRadio ( void )
+{
+    if ( m_bIsPlaying ) Stop ();
+}
+
+
 void CClientRadio::DoPulse ( void )
 {
     bool bCanHearRadio = false;
