@@ -36,6 +36,7 @@ class CClientRadio
 {
 public:
                                 CClientRadio        ( CClientManager * pManager );
+                                ~CClientRadio       ( void );
 
     void                        DoPulse             ( void );
     void                        Render              ( void );
