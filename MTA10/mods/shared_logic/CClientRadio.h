@@ -46,7 +46,7 @@ public:
 
     inline eRadioChannel        GetChannel          ( void )    { return m_Channel; }
     void                        SetChannel          ( eRadioChannel channel );
-    SString                     GetChannelName      ( void );
+    char *                      GetChannelName      ( void );
 
     void                        NextChannel         ( void );
     void                        PreviousChannel     ( void );

@@ -57,7 +57,7 @@ void CClientRadio::Render ( void )
         unsigned long ulTick = GetTickCount ();
         if ( m_ulChangeTick && ulTick <= ( m_ulChangeTick + 2500 ) )
         {
-            SString channelName = GetChannelName ();
+            char * channelName = GetChannelName ();
             if ( channelName )
             {
                 // Position and scale correction for resolution
@@ -76,7 +76,7 @@ void CClientRadio::Render ( void )
                 pFont->SetEdge ( 1 );
                 pFont->SetDropColor ( RADIO_DROP_COLOR );
                 pFont->SetColor ( RADIO_COLOR );
-                pFont->PrintString ( fX, fY, const_cast < char * > ( channelName.c_str () ) );
+                pFont->PrintString ( fX, fY, channelName );
                 pFont->DrawFonts ();
             }
         }
@@ -118,11 +118,10 @@ void CClientRadio::SetChannel ( eRadioChannel channel )
 }
 
 
-SString CClientRadio::GetChannelName ( void )
+char * CClientRadio::GetChannelName ( void )
 {
     if ( m_Channel == CHANNEL_POLICE ) return "Police";
-    char * trackName = g_pGame->GetAERadioTrackManager ()->GetRadioStationName ( ( BYTE ) m_Channel );
-    return trackName;
+    return g_pGame->GetAERadioTrackManager ()->GetRadioStationName ( ( BYTE ) m_Channel );
 }
 
 
