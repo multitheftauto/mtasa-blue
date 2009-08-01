@@ -530,7 +530,7 @@ void CMainConfig::SetPassword ( const char* szPassword )
 
 void CMainConfig::SetFPSLimit ( unsigned short usFPS )
 {
-    if ( usFPS == 0 || usFPS >= 25 && usFPS <= 100 )
+    if ( usFPS == 0 || ( usFPS >= 25 && usFPS <= 100 ) )
     {
         m_usFPSLimit = usFPS;
         SetInteger ( m_pRootNode, "fpslimit", usFPS );
