@@ -606,7 +606,7 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
         {
             CResource* pResource = pLUA->GetResource();
             SString strFilename;
-            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFilename ) )
+            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 2 ), pResource, strFilename ) )
             {
                 // Grab the source node
                 CXMLNode* pSourceNode = lua_toxmlnode ( luaVM, 1 );
