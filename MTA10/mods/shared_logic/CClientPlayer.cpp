@@ -90,7 +90,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     m_fPretendHealthSmoothed = 0;
     m_fPretendArmorSmoothed = 0;
-    m_fLastSecondCount = 0;
 }
 
 
@@ -292,13 +291,8 @@ void CClientPlayer::GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor )
     if ( fDamage == 0.f && fHealth > 99.f && m_fPretendHealthSmoothed < 1.f )
         m_fPretendHealthSmoothed = fPretendHealth;
 
-    // Calc elapsed time
-    float fSecondCount = static_cast < float > ( GetSecondCount () );
-    float fDeltaSeconds = fSecondCount - m_fLastSecondCount;
-    m_fLastSecondCount = fSecondCount;
-
     // Smooth update
-    float fSmoothAlpha = Min ( 1.f, fDeltaSeconds * 2.f );
+    float fSmoothAlpha = Min ( 1.f, g_fTimeSlice * 2.f );
     m_fPretendHealthSmoothed = Lerp ( m_fPretendHealthSmoothed, fSmoothAlpha, fPretendHealth );
     m_fPretendArmorSmoothed  = Lerp ( m_fPretendArmorSmoothed,  fSmoothAlpha, fPretendArmor  );
 
