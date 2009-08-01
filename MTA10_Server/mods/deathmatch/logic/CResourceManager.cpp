@@ -128,7 +128,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 		struct dirent *DirEntry;
 		char szPath[MAX_PATH] = {0};
 
-		if ( ( Dir = opendir ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/", szBuffer, MAX_PATH ) ) ) )
+		SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
+
+		if ( ( Dir = opendir ( strBuffer ) ) )
 		{
 			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
 			{
@@ -140,9 +142,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 				    bool bDir = false;
 
 				    // Get the path
-				    if ( strlen(szBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
+				    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
                     {
-					    strcpy ( szPath, szBuffer );
+					    strcpy ( szPath, strBuffer );
 					    unsigned long ulPathLength = strlen ( szPath );
 
 					    if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
