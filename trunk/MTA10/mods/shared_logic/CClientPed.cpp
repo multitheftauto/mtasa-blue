@@ -3980,7 +3980,16 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
             if ( bBlow )
             {                
                 pProjectile->GetPosition ( vecPosition );
-                m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE );
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber ( vecPosition.fX );
+                Arguments.PushNumber ( vecPosition.fY );
+                Arguments.PushNumber ( vecPosition.fZ );
+                Arguments.PushNumber ( EXP_TYPE_GRENADE );
+                bool bCancelExplosion = !CallEvent ( "onClientExplosion", Arguments, true );
+                
+                if ( !bCancelExplosion )
+                    m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE );
             }
             if ( bDestroy )
 		    {
