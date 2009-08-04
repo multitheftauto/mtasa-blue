@@ -200,6 +200,7 @@ void CClientManager::DoPulse ( void )
         m_pSoundManager->DoPulse ();
         m_pPlayerManager->DoPulse ();
         m_pRadio->DoPulse ();
+        m_pColManager->DoPulse ();
     }
 }
 

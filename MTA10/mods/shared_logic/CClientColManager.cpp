@@ -20,6 +20,13 @@ CClientColManager::~CClientColManager ( void )
 }
 
 
+void CClientColManager::DoPulse ( void )
+{
+    list < CClientColShape* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ ) (*iter)->DoPulse ();
+}
+
+
 void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity )
 {
     CClientColShape* pShape = NULL;

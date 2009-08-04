@@ -43,6 +43,7 @@ public:
     virtual eColShapeType               GetShapeType                    ( void ) = 0;
 
     void                                DoPulse                         ( void );
+    bool                                IsAttachable                    ( void );
 
     inline eClientEntityType            GetType                         ( void ) const                          { return CCLIENTCOLSHAPE; }
 

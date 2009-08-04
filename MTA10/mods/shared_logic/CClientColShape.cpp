@@ -52,6 +52,19 @@ void CClientColShape::Unlink ( void )
 }
 
 
+void CClientColShape::DoPulse ( void )
+{
+    // Update our position/rotation if we're attached
+    DoAttaching ();
+}
+
+
+bool CClientColShape::IsAttachable ( void )
+{
+    return ( !m_pOwningPickup && !m_pOwningMarker );
+}
+
+
 void CClientColShape::CallHitCallback ( CClientEntity& Entity )
 {
     // Call the callback with us as the shape if it exists
