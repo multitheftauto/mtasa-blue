@@ -94,31 +94,25 @@ void CClientMarker::SetPosition ( const CVector& vecPosition )
 }
 
 
-void CClientMarker::DoPulse ( void )
+bool CClientMarker::SetMatrix ( const CMatrix & matrix )
 {
-    // Move with our attached element?
-    UpdateAttaching ();
+    if ( m_pMarker ) m_pMarker->SetMatrix ( const_cast < CMatrix & > ( matrix ) );
+    if ( m_pCollision ) m_pCollision->SetPosition ( matrix.vPos );
 
-    // Pulse the element we contain
-    if ( m_pMarker ) m_pMarker->DoPulse ();
+    // Update our streaming position
+    UpdateStreamPosition ( matrix.vPos );
+
+    return true;
 }
 
 
-void CClientMarker::UpdateAttaching ( void )
+void CClientMarker::DoPulse ( void )
 {
-    // Attached to an entity
-    if ( m_pAttachedToEntity )
-    {        
-        // Grab our current position
-        CVector vecCurrentPosition;
-        m_pMarker->GetPosition ( vecCurrentPosition );
+    // Update our position/rotation if we're attached
+    DoAttaching ();
 
-        // Grab our new matrix
-        CMatrix matrix, newMatrix;
-        m_pAttachedToEntity->GetMatrix ( matrix );
-        AttachedMatrix ( matrix, newMatrix, m_vecAttachedPosition, m_vecAttachedRotation );
-        m_pMarker->SetMatrix ( newMatrix );
-    }
+    // Pulse the element we contain
+    if ( m_pMarker ) m_pMarker->DoPulse ();
 }
 
 

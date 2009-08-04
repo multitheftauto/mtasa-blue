@@ -143,6 +143,7 @@ public:
     void                                        DeleteAllCustomData     ( CLuaMain* pLuaMain, bool bRecursive );
 
     virtual bool                                GetMatrix               ( CMatrix& matrix ) const;
+    virtual bool                                SetMatrix               ( const CMatrix & matrix );
 
     virtual void                                GetPosition             ( CVector& vecPosition ) const = 0;
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
@@ -170,6 +171,7 @@ public:
     void                                        ReattachEntities        ( void );
     virtual bool                                IsAttachable            ( void );
     virtual bool                                IsAttachToable          ( void );
+    virtual void                                DoAttaching             ( void );
 
     bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated );
     bool                                        CallEvent               ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren );

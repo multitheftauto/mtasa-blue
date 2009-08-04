@@ -212,8 +212,10 @@ float CClientSound::GetMaxDistance ( void )
 
 void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
 {
-    if ( !m_b3D )
-        return;
+    if ( !m_b3D ) return;
+
+    // Update our position/rotation if we're attached
+    DoAttaching ();
 
     if ( m_pSound )
     {

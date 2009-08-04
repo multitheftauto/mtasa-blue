@@ -45,6 +45,9 @@ public:
     void                        Start               ( void );
     void                        Stop                ( void );
 
+    eRadioChannel               GetFirstChannel     ( void );
+    eRadioChannel               GetLastChannel      ( void );
+
     inline eRadioChannel        GetChannel          ( void )    { return m_Channel; }
     void                        SetChannel          ( eRadioChannel channel );
     char *                      GetChannelName      ( void );

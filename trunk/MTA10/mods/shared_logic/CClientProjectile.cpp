@@ -113,6 +113,9 @@ void CClientProjectile::DoPulse ( void )
         m_pProjectileManager->OnInitiate ( this );             
         m_bInitiate = false;
     }
+
+    // Update our position/rotation if we're attached
+    DoAttaching ();
 }
 
 

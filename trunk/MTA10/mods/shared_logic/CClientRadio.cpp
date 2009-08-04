@@ -113,6 +113,19 @@ void CClientRadio::Stop ( void )
 }
 
 
+eRadioChannel CClientRadio::GetFirstChannel ( void )
+{
+    if ( m_bPoliceRadio ) return CHANNEL_POLICE;    
+    return CHANNEL_PLAYBACK_FM;
+}
+
+
+eRadioChannel CClientRadio::GetLastChannel ( void )
+{
+    return CHANNEL_RADIO_OFF;
+}
+
+
 void CClientRadio::SetChannel ( eRadioChannel channel )
 {
     m_Channel = channel;       
@@ -135,8 +148,7 @@ void CClientRadio::NextChannel ( void )
 {
     if ( m_bIsPlaying )
     {
-        if ( m_Channel == CHANNEL_RADIO_OFF )
-            m_Channel = ( m_bPoliceRadio ) ? CHANNEL_POLICE : CHANNEL_PLAYBACK_FM;
+        if ( m_Channel == GetLastChannel () ) m_Channel = GetFirstChannel ();
         else m_Channel = eRadioChannel ( m_Channel + 1 );
         SetChannel ( m_Channel );
     }
@@ -147,7 +159,7 @@ void CClientRadio::PreviousChannel ( void )
 {
     if ( m_bIsPlaying )
     {
-        if ( m_Channel == ( ( m_bPoliceRadio ) ? CHANNEL_POLICE : CHANNEL_PLAYBACK_FM ) ) m_Channel = CHANNEL_RADIO_OFF;
+        if ( m_Channel == GetFirstChannel () ) m_Channel = GetLastChannel ();
         else m_Channel = eRadioChannel ( m_Channel - 1 );
         SetChannel ( m_Channel );
     }

@@ -560,8 +560,20 @@ bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
     const CEntity* pEntity = GetGameEntity ();
     if ( pEntity )
     {
-        if ( pEntity->GetMatrix ( &matrix ) )
-            return true;
+        if ( pEntity->GetMatrix ( &matrix ) ) return true;
+    }
+
+    return false;
+}
+
+
+bool CClientEntity::SetMatrix ( const CMatrix& matrix )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        pEntity->SetMatrix ( const_cast < CMatrix * > ( &matrix ) );
+        return true;
     }
 
     return false;
@@ -1051,6 +1063,7 @@ bool CClientEntity::IsAttachable ( void )
         case CCLIENTOBJECT:
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
+        case CCLIENTSOUND:
         {
             return true;
             break;
@@ -1072,6 +1085,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTOBJECT:
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
+        case CCLIENTSOUND:
         {
             return true;
             break;
@@ -1079,6 +1093,21 @@ bool CClientEntity::IsAttachToable ( void )
         default: break;
     }
     return false;
+}
+
+
+void CClientEntity::DoAttaching ( void )
+{
+    if ( m_pAttachedToEntity )
+    {
+        CMatrix matrix, returnMatrix;
+        if ( !m_pAttachedToEntity->GetMatrix ( matrix ) )
+            m_pAttachedToEntity->GetPosition ( matrix.vPos );
+
+        AttachedMatrix ( matrix, returnMatrix, m_vecAttachedPosition, m_vecAttachedRotation );
+
+        if ( !SetMatrix ( returnMatrix ) ) SetPosition ( returnMatrix.vPos );
+    }
 }
 
 
