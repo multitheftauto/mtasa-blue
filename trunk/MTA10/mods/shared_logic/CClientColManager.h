@@ -23,17 +23,18 @@ class CClientColManager
 {
     friend CClientColShape;
 public:
-                                ~CClientColManager          ( void );
+                                    ~CClientColManager          ( void );
 
-    void                        DoHitDetection              ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
+    void                            DoPulse                     ( void );
+    void                            DoHitDetection              ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
 
-    bool                        Exists                      ( CClientColShape* pShape );
-    void                        DeleteAll                   ( void );
+    bool                            Exists                      ( CClientColShape* pShape );
+    void                            DeleteAll                   ( void );
 
-    inline unsigned int         Count                       ( void )                            { return static_cast < unsigned int > ( m_List.size () ); }
+    inline unsigned int             Count                       ( void )                            { return static_cast < unsigned int > ( m_List.size () ); }
 
 protected:
-    inline void                     AddToList                   ( CClientColShape* pShape )       { m_List.push_back ( pShape ); };
+    inline void                     AddToList                   ( CClientColShape* pShape )         { m_List.push_back ( pShape ); };
     void                            RemoveFromList              ( CClientColShape* pShape );
 
     std::list < CClientColShape* >  m_List;

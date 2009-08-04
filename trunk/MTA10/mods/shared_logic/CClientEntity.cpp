@@ -1064,6 +1064,7 @@ bool CClientEntity::IsAttachable ( void )
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
+        case CCLIENTCOLSHAPE:
         {
             return true;
             break;
@@ -1086,6 +1087,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
+        case CCLIENTCOLSHAPE:
         {
             return true;
             break;
