@@ -2873,19 +2873,9 @@ void CClientVehicle::UpdateTargetPosition ( void )
                                             ulCurrentTime,
                                             m_interp.pos.ulFinishTime );
 
-        // If the factor is bigger or equal to 1.0f, then
-        // we have finished interpolating.
-        if ( fAlpha >= 1.0f )
-        {
-            m_interp.pos.ulFinishTime = 0;
-            vecNewPosition = m_interp.pos.vecTarget;
-        }
-        else
-        {
-            vecNewPosition = SharedUtil::Lerp ( m_interp.pos.vecOrigin,
-                                                fAlpha,
-                                                m_interp.pos.vecTarget );
-        }
+        vecNewPosition = SharedUtil::Lerp ( m_interp.pos.vecOrigin,
+                                            fAlpha,
+                                            m_interp.pos.vecTarget );
         SetPosition ( vecNewPosition, false );
 
 #ifdef MTA_DEBUG
@@ -2937,20 +2927,10 @@ void CClientVehicle::UpdateTargetRotation ( void )
                                             ulCurrentTime,
                                             m_interp.rot.ulFinishTime );
 
-        // If the factor is bigger or equal to 1.0f, then
-        // we have finished interpolating.
-        if ( fAlpha >= 1.0f )
-        {
-            m_interp.rot.ulFinishTime = 0;
-            vecNewRotation = m_interp.rot.vecTarget;
-        }
-        else
-        {
-            vecNewRotation = SharedUtil::Lerp ( CVector (),
-                                                fAlpha,
-                                                m_interp.rot.vecOffset );
-            vecNewRotation += m_interp.rot.vecOrigin;
-        }
+        vecNewRotation = SharedUtil::Lerp ( CVector (),
+                                            fAlpha,
+                                            m_interp.rot.vecOffset );
+        vecNewRotation += m_interp.rot.vecOrigin;
         SetRotationDegrees ( vecNewRotation, false );
     }
 }
