@@ -46,9 +46,9 @@ public:
 
     void                        GetPosition             ( CVector& vecPosition ) const;
     void                        SetPosition             ( const CVector& vecPosition );
+    bool                        SetMatrix               ( const CMatrix & matrix );
 
     void                        DoPulse                 ( void );
-    void                        UpdateAttaching         ( void );
 
     inline eClientEntityType    GetType                 ( void ) const                          { return CCLIENTMARKER; }
 

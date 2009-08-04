@@ -196,8 +196,26 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
 {   
     /* Debug code
     CClientStreamSector * pSector;
-    list < CClientStreamSectorRow * > ::iterator iterRow = m_ExtraRows.begin ();
     list < CClientStreamSector * > ::iterator iterSector;
+    list < CClientStreamSectorRow * > ::iterator iterRow = m_WorldRows.begin ();
+    for ( ; iterRow != m_WorldRows.end () ; iterRow++ )
+    {
+        iterSector = (*iterRow)->Begin ();
+        for ( ; iterSector != (*iterRow)->End () ; iterSector++ )
+        {
+            pSector = *iterSector;
+            if ( !pSector->m_pArea )
+            {
+                pSector->m_pArea = new CClientRadarArea ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID );
+                pSector->m_pArea->SetPosition ( pSector->m_vecBottomLeft );
+                CVector2D vecSize ( pSector->m_vecTopRight.fX - pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY - pSector->m_vecBottomLeft.fY );
+                pSector->m_pArea->SetSize ( vecSize );
+                pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
+            }
+            pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
+        }
+    }
+    iterRow = m_ExtraRows.begin ();    
     for ( ; iterRow != m_ExtraRows.end () ; iterRow++ )
     {
         iterSector = (*iterRow)->Begin ();
@@ -207,20 +225,13 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
             if ( !pSector->m_pArea )
             {
                 pSector->m_pArea = new CClientRadarArea ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID );
-                pSector->m_pArea->SetPosition ( CVector2D ( pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY ) );
+                pSector->m_pArea->SetPosition ( pSector->m_vecBottomLeft );
                 CVector2D vecSize ( pSector->m_vecTopRight.fX - pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY - pSector->m_vecBottomLeft.fY );
                 pSector->m_pArea->SetSize ( vecSize );
-                pSector->m_pArea->SetColor ( 255, 0, 0, 255 );
+                pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
             }
-            pSector->m_pArea->SetColor ( 255, 0, 0, 255 );
+            pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
         }
-    }
-    m_pSector->m_pArea->SetColor ( 0, 255, 0, 255 );
-    CClientStreamSector * pSurrounding [ 8 ];
-    m_pSector->GetSurroundingSectors ( pSurrounding );
-    for ( int i = 0 ; i <  8 ; i++ )
-    {
-        if ( pSurrounding [ i ] ) pSurrounding [ i ]->m_pArea->SetColor ( 0, 0, 255, 255 );
     }
     */
 

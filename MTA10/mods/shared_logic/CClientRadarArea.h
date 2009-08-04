@@ -35,10 +35,10 @@ public:
     inline eClientEntityType    GetType                     ( void ) const                      { return CCLIENTRADARAREA; };
 
     inline const CVector2D&     GetPosition                 ( void ) const                      { return m_vecPosition; };
-    inline void                 GetPosition                 ( CVector2D& vecPosition ) const    { vecPosition = m_vecPosition; };
-    inline void                 GetPosition                 ( CVector& vecPosition ) const      { vecPosition = CVector ( m_vecPosition.fX, m_vecPosition.fY, 0.0f ); };
-    inline void                 SetPosition                 ( const CVector2D& vecPosition )    { m_vecPosition = vecPosition; };
-    inline void                 SetPosition                 ( const CVector& vecPosition )      { m_vecPosition = CVector2D ( vecPosition.fX, vecPosition.fY ); };
+    inline void                 GetPosition                 ( CVector2D& vecBottomLeft ) const  { vecBottomLeft = m_vecPosition; };
+    inline void                 GetPosition                 ( CVector& vecBottomLeft ) const    { vecBottomLeft = CVector ( m_vecPosition.fX, m_vecPosition.fY, 0.0f ); };
+    inline void                 SetPosition                 ( const CVector2D& vecBottomLeft )  { m_vecPosition = vecBottomLeft; };
+    inline void                 SetPosition                 ( const CVector& vecBottomLeft )    { m_vecPosition = CVector2D ( vecBottomLeft.fX, vecBottomLeft.fY ); };
 
     inline const CVector2D&     GetSize                     ( void ) const                      { return m_vecSize; };
     inline void                 GetSize                     ( CVector2D& vecSize )              { vecSize = m_vecSize; };
