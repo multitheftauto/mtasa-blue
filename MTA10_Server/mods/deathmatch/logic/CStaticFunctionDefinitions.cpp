@@ -1382,6 +1382,32 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
 }
 
 
+bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement, CVector & vecPosition, CVector & vecRotation )
+{
+    RUN_CHILDREN SetElementAttachedOffsets ( *iter, vecPosition, vecRotation );
+
+    CVector vecCurrentPos, vecCurrentRot;
+    pElement->GetAttachedOffsets ( vecCurrentPos, vecCurrentRot );
+    if ( vecPosition != vecCurrentPos || vecRotation != vecCurrentRot )
+    {
+        pElement->SetAttachedOffsets ( vecPosition, vecRotation );
+        
+        SPositionSync position ( true );
+        position.data.vecPosition = vecPosition;
+
+        SRotationDegreesSync rotation ( true );
+        rotation.data.vecRotation = vecRotation;
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pElement->GetID () );
+        position.Write ( *BitStream.pBitStream );
+        rotation.Write ( *BitStream.pBitStream );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ATTACHED_OFFSETS, *BitStream.pBitStream ) );
+    }
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::ClearElementVisibleTo ( CElement* pElement )
 {
     RUN_CHILDREN ClearElementVisibleTo ( *iter );

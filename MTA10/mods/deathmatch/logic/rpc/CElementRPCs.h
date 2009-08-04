@@ -33,6 +33,7 @@ public:
 	DECLARE_RPC ( SetElementName );
     DECLARE_RPC ( SetElementHealth );
     DECLARE_RPC ( SetElementModel );
+    DECLARE_RPC ( SetElementAttachedOffsets );
 };
 
 #endif

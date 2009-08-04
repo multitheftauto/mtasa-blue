@@ -12,24 +12,26 @@
 
 #include "StdInc.h"
 #include "CElementRPCs.h"
+#include "net/SyncStructures.h"
 
 using std::list;
 
 void CElementRPCs::LoadFunctions ( void )
 {
-    AddHandler ( SET_ELEMENT_PARENT, SetElementParent, "SetElementParent" );
-    AddHandler ( SET_ELEMENT_DATA, SetElementData, "SetElementData" );
-    AddHandler ( REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData" );
-    AddHandler ( SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition" );
-    AddHandler ( SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity" );
-    AddHandler ( SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior" );
-    AddHandler ( SET_ELEMENT_DIMENSION, SetElementDimension, "" );
-    AddHandler ( ATTACH_ELEMENTS, AttachElements, "AttachElements" );
-    AddHandler ( DETACH_ELEMENTS, DetachElements, "DetachElements" );
-    AddHandler ( SET_ELEMENT_ALPHA, SetElementAlpha, "SetElementAlpha" );
-	AddHandler ( SET_ELEMENT_NAME, SetElementName, "SetElementName" );
-    AddHandler ( SET_ELEMENT_HEALTH, SetElementHealth, "SetElementHealth" );
-    AddHandler ( SET_ELEMENT_MODEL, SetElementModel, "SetElementModel" );
+    AddHandler ( SET_ELEMENT_PARENT,            SetElementParent,           "SetElementParent" );
+    AddHandler ( SET_ELEMENT_DATA,              SetElementData,             "SetElementData" );
+    AddHandler ( REMOVE_ELEMENT_DATA,           RemoveElementData,          "RemoveElementData" );
+    AddHandler ( SET_ELEMENT_POSITION,          SetElementPosition,         "SetElementPosition" );
+    AddHandler ( SET_ELEMENT_VELOCITY,          SetElementVelocity,         "SetElementVelocity" );
+    AddHandler ( SET_ELEMENT_INTERIOR,          SetElementInterior,         "SetElementInterior" );
+    AddHandler ( SET_ELEMENT_DIMENSION,         SetElementDimension,        "SetElementDimension" );
+    AddHandler ( ATTACH_ELEMENTS,               AttachElements,             "AttachElements" );
+    AddHandler ( DETACH_ELEMENTS,               DetachElements,             "DetachElements" );
+    AddHandler ( SET_ELEMENT_ALPHA,             SetElementAlpha,            "SetElementAlpha" );
+	AddHandler ( SET_ELEMENT_NAME,              SetElementName,             "SetElementName" );
+    AddHandler ( SET_ELEMENT_HEALTH,            SetElementHealth,           "SetElementHealth" );
+    AddHandler ( SET_ELEMENT_MODEL,             SetElementModel,            "SetElementModel" );
+    AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,  SetElementAttachedOffsets,  "SetElementAttachedOffsets" );
 }
 
 
@@ -468,6 +470,22 @@ void CElementRPCs::SetElementModel ( NetBitStreamInterface& bitStream )
                     break;
                 }
             }
+        }
+    }
+}
+
+
+void CElementRPCs::SetElementAttachedOffsets ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    SPositionSync position ( true );
+    SRotationDegreesSync rotation ( true );
+    if ( bitStream.Read ( ID ) && position.Read ( bitStream ) && rotation.Read ( bitStream ) )
+    {
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity )
+        {
+            pEntity->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );
         }
     }
 }

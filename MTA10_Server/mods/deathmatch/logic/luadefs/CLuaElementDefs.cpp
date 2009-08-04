@@ -891,6 +891,72 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
 }
 
 
+int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the element to attach and the target
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        CVector vecPosition, vecRotation;
+
+        // Grab the supplied arguments (pos: x y z, rot: x y z)
+        int iArgument2 = lua_type ( luaVM, 2 );
+        if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
+        {
+            vecPosition.fX = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+
+            int iArgument3 = lua_type ( luaVM, 3 );
+            if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
+            {
+                vecPosition.fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+                int iArgument4 = lua_type ( luaVM, 4 );
+                if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
+                {
+                    vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
+
+                    int iArgument5 = lua_type ( luaVM, 5 );
+                    if ( iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNUMBER )
+                    {
+                        vecRotation.fX = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
+
+                        int iArgument6 = lua_type ( luaVM, 6 );
+                        if ( iArgument6 == LUA_TSTRING || iArgument6 == LUA_TNUMBER )
+                        {
+                            vecRotation.fY = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+
+                            int iArgument7 = lua_type ( luaVM, 7 );
+                            if ( iArgument7 == LUA_TSTRING || iArgument7 == LUA_TNUMBER )
+                            {
+                                vecRotation.fZ = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Valid element?
+        if ( pElement )
+        {
+            if ( CStaticFunctionDefinitions::SetElementAttachedOffsets ( pElement, vecPosition, vecRotation ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementAttachedOffsets", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementAttachedOffsets" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaElementDefs::getElementColShape ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
