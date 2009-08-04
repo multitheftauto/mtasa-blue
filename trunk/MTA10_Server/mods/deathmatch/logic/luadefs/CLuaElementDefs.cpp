@@ -923,7 +923,7 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
                         int iArgument6 = lua_type ( luaVM, 6 );
                         if ( iArgument6 == LUA_TSTRING || iArgument6 == LUA_TNUMBER )
                         {
-                            vecRotation.fY = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
+                            vecRotation.fY = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
 
                             int iArgument7 = lua_type ( luaVM, 7 );
                             if ( iArgument7 == LUA_TSTRING || iArgument7 == LUA_TNUMBER )
