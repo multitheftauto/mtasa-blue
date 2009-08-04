@@ -309,20 +309,18 @@ void CMarker::Callback_OnCollision ( CColShape& Shape, CElement& Element )
     // Matching interior?
     if ( GetInterior () == Element.GetInterior () )
     {
-        // Matching dimension?
-        if ( GetDimension () == Element.GetDimension () )
-        {
-            // Call the marker hit event
-            CLuaArguments Arguments;
-            Arguments.PushElement ( &Element );
-            CallEvent ( "onMarkerHit", Arguments );
+        // Call the marker hit event
+        CLuaArguments Arguments;
+        Arguments.PushElement ( &Element ); // Hit element
+        Arguments.PushBoolean ( GetDimension () == Element.GetDimension () );        // Matching dimension?
+        CallEvent ( "onMarkerHit", Arguments );
 
-            if ( IS_PLAYER ( &Element ) )
-            {
-                CLuaArguments Arguments2;
-                Arguments2.PushElement ( this );        // marker
-                Element.CallEvent ( "onPlayerMarkerHit", Arguments2 );
-            }
+        if ( IS_PLAYER ( &Element ) )
+        {
+            CLuaArguments Arguments2;
+            Arguments2.PushElement ( this );        // marker
+            Arguments2.PushBoolean ( GetDimension () == Element.GetDimension () );        // Matching dimension?
+            Element.CallEvent ( "onPlayerMarkerHit", Arguments2 );
         }
     }
 }
@@ -333,20 +331,18 @@ void CMarker::Callback_OnLeave ( CColShape& Shape, CElement& Element )
     // Matching interior?
     if ( GetInterior () == Element.GetInterior () )
     {
-        // Matching dimension?
-        if ( GetDimension () == Element.GetDimension () )
-        {
-            // Call the marker hit event
-            CLuaArguments Arguments;
-            Arguments.PushElement ( &Element );
-            CallEvent ( "onMarkerLeave", Arguments );
+        // Call the marker hit event
+        CLuaArguments Arguments;
+        Arguments.PushElement ( &Element ); // Hit element
+        Arguments.PushBoolean ( GetDimension () == Element.GetDimension () );        // Matching dimension?
+        CallEvent ( "onMarkerLeave", Arguments );
 
-            if ( IS_PLAYER ( &Element ) )
-            {
-                CLuaArguments Arguments2;
-                Arguments2.PushElement ( this );        // marker
-                Element.CallEvent ( "onPlayerMarkerLeave", Arguments2 );
-            }
+        if ( IS_PLAYER ( &Element ) )
+        {
+            CLuaArguments Arguments2;
+            Arguments2.PushElement ( this );        // marker
+            Arguments2.PushBoolean ( GetDimension () == Element.GetDimension () );        // Matching dimension?
+            Element.CallEvent ( "onPlayerMarkerLeave", Arguments2 );
         }
     }
 }
