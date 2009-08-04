@@ -89,6 +89,7 @@ public:
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );
     static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
+    static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );

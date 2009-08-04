@@ -67,10 +67,11 @@ public:
 
     // Attachement
     static int      attachElements                      ( lua_State* luaVM );
-    static int      detachElements            ( lua_State* luaVM );
+    static int      detachElements                      ( lua_State* luaVM );
     static int      isElementAttached                   ( lua_State* luaVM );
     static int      getAttachedElements                 ( lua_State* luaVM );
     static int      getElementAttachedTo                ( lua_State* luaVM );
+    static int      setElementAttachedOffsets           ( lua_State* luaVM );
 
     // Set
     static int      setElementID                        ( lua_State* luaVM );
