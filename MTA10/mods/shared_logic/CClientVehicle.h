@@ -326,12 +326,12 @@ public:
 
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
-    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay );
+    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay, bool bExtrapolateAfterInterpolation = true );
     void                        RemoveTargetPosition    ( void );
     inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 
     inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_interp.rot.vecTarget; }
-    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay );
+    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay, bool bExtrapolateAfterInterpolation = true );
     void                        RemoveTargetRotation    ( void );
     inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
@@ -475,6 +475,7 @@ protected:
             CVector vecTarget;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
+            bool bExtrapolateAfterInterpolation;
         } pos;
 
         struct
@@ -484,6 +485,7 @@ protected:
             CVector vecOffset;
             unsigned long ulStartTime;
             unsigned long ulFinishTime;
+            bool bExtrapolateAfterInterpolation;
         } rot;
     } m_interp;
 
