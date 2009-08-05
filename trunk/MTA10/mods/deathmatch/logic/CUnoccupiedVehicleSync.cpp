@@ -158,8 +158,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStartSync ( NetBitStreamInt
             BitStream.Read ( fHealth );
 
             // Set data for interpolation
-            pVehicle->SetTargetPosition ( vecPosition, TICK_RATE );
-            pVehicle->SetTargetRotation ( vecRotationDegrees, TICK_RATE );
+            pVehicle->SetTargetPosition ( vecPosition, TICK_RATE, false );
+            pVehicle->SetTargetRotation ( vecRotationDegrees, TICK_RATE, false );
             pVehicle->SetMoveSpeed ( vecMoveSpeed );
             pVehicle->SetTurnSpeed ( vecTurnSpeed );
 
@@ -207,8 +207,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             CClientVehicle* pVehicle = m_pVehicleManager->Get ( vehicle.data.vehicleID );
             if ( pVehicle && pVehicle->CanUpdateSync ( vehicle.data.ucTimeContext ) )
             {
-                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition, TICK_RATE );
-                if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation, TICK_RATE );
+                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition, TICK_RATE, false );
+                if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation, TICK_RATE, false );
                 if ( vehicle.data.bSyncVelocity )       pVehicle->SetMoveSpeed ( vehicle.data.vecVelocity );
                 if ( vehicle.data.bSyncTurnVelocity )   pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
                 if ( vehicle.data.bSyncHealth )         pVehicle->SetHealth ( vehicle.data.fHealth );

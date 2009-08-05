@@ -2787,7 +2787,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay )
+void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bExtrapolateAfterInterpolation )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
@@ -2809,6 +2809,7 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         unsigned long ulTime = CClientTime::GetTime ();
         m_interp.pos.ulStartTime = ulTime;
         m_interp.pos.ulFinishTime = ulTime + ulDelay;
+        m_interp.pos.bExtrapolateAfterInterpolation = bExtrapolateAfterInterpolation;
     }
     else
     {
@@ -2824,7 +2825,7 @@ void CClientVehicle::RemoveTargetPosition ( void )
 }
 
 
-void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulDelay )
+void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulDelay, bool bExtrapolateAfterInterpolation )
 {
     // Are we streamed in?
     if ( m_pVehicle )
@@ -2842,6 +2843,7 @@ void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulD
         unsigned long ulTime = CClientTime::GetTime ();
         m_interp.rot.ulStartTime = ulTime;
         m_interp.rot.ulFinishTime = ulTime + ulDelay;
+        m_interp.rot.bExtrapolateAfterInterpolation = bExtrapolateAfterInterpolation;
     }
     else
     {
@@ -2875,7 +2877,8 @@ void CClientVehicle::UpdateTargetPosition ( void )
 
         // If the factor is bigger or equal to 1.0f, then
         // we have finished interpolating.
-        if ( fAlpha >= 1.0f )
+        if ( !m_interp.pos.bExtrapolateAfterInterpolation &&
+              fAlpha >= 1.0f )
         {
             m_interp.pos.ulFinishTime = 0;
             vecNewPosition = m_interp.pos.vecTarget;
@@ -2939,7 +2942,8 @@ void CClientVehicle::UpdateTargetRotation ( void )
 
         // If the factor is bigger or equal to 1.0f, then
         // we have finished interpolating.
-        if ( fAlpha >= 1.0f )
+        if ( !m_interp.rot.bExtrapolateAfterInterpolation &&
+             fAlpha >= 1.0f )
         {
             m_interp.rot.ulFinishTime = 0;
             vecNewRotation = m_interp.rot.vecTarget;
