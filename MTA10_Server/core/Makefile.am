@@ -44,4 +44,4 @@ libcore_la_SOURCES = \
 	sockets/CTCPServerSocketImplManager.cpp \
 	sockets/CTCPServerSocketImplManager.h
 
-libcore_la_LDFLAGS = -lcurses
+libcore_la_LDFLAGS = -lcurses -lrt

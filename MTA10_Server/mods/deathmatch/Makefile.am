@@ -40,7 +40,8 @@ libdeathmatch_la_LIBADD = \
 	-lplatform \
 	-lsqlite3 \
 	-llua \
-	-ljson
+	-ljson \
+	-lrt
 
 libdeathmatch_la_LDFLAGS = \
 	-Wl,-export-dynamic \
