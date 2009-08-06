@@ -292,7 +292,7 @@ void CClientPlayer::GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor )
         m_fPretendHealthSmoothed = fPretendHealth;
 
     // Smooth update
-    float fSmoothAlpha = Min ( 1.f, g_fTimeSlice * 2.f );
+    float fSmoothAlpha = Min ( 1.f, g_pClientGame->GetFrameTimeSlice () * 2.f / 1000.0f );
     m_fPretendHealthSmoothed = Lerp ( m_fPretendHealthSmoothed, fSmoothAlpha, fPretendHealth );
     m_fPretendArmorSmoothed  = Lerp ( m_fPretendArmorSmoothed,  fSmoothAlpha, fPretendArmor  );
 

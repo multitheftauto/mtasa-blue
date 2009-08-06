@@ -196,6 +196,8 @@ public:
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
 
+    DWORD                               GetFrameTimeSlice               ( void ) { return m_dwFrameTimeSlice; }
+
     void                                HandleException                 ( CExceptionInformation* pExceptionInformation );
     static void                         HandleRadioNext                 ( CControlFunctionBind* );
     static void                         HandleRadioPrevious             ( CControlFunctionBind* );
@@ -575,7 +577,8 @@ private:
     unsigned long                       m_ulBigPacketBytesReceivedBase;
     CTransferBox*                       m_pBigPacketTransferBox;
 
-    double                              m_dLastTimeSeconds;
+    DWORD                               m_dwFrameTimeSlice;     // how long it took (in ms) to process the current frame
+    DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     bool                                m_bShowSyncingInfo;
