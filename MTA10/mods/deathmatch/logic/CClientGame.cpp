@@ -32,9 +32,6 @@ using std::list;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 
-// Global variable holding the current interval in seconds between this frame and the previous one
-extern float g_fTimeSlice = 0;
-
 // Used by the Voice system
 #ifdef MTA_VOICE
 CVariableBuffer * CClientGame::m_pVoiceBuffer;
@@ -42,7 +39,7 @@ CRITICAL_SECTION CClientGame::m_crVoice;
 #endif
 
 bool g_bBoundsChecker = true;
-double dHack;
+
 #define DEFAULT_GRAVITY 0.008f
 #define DEFAULT_GAME_SPEED 1.0f
 #define DEFAULT_BLUR_LEVEL 36
@@ -210,6 +207,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
         m_ulTimeStart = 0;
     else
         m_ulTimeStart = CClientTime::GetTime ();
+
+    m_dwFrameTimeSlice = 0;
+    m_dwLastFrameTick = 0;
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -2324,8 +2324,8 @@ void CClientGame::AddBuiltInEvents ( void )
 	m_Events.AddEvent ( "onClientChatMessage", "test, r, g, b", NULL, false );
 
     // Game events
+    m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
-    m_Events.AddEvent ( "onClientWorld", "", NULL, false );
 
     // Cursor events
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
@@ -2877,7 +2877,6 @@ void CClientGame::UpdateMimics ( void )
                     delete pMimicVehicle;
                 }
             }
-            dHack = CClientTime::GetTimeNano ();
         }
     }
 }
@@ -3206,14 +3205,17 @@ void CClientGame::PostWorldProcessHandler ( void )
     m_pManager->GetMarkerManager ()->DoPulse ();
 
     // Update frame time slice
-    double dTimeSeconds = GetSecondCount ();
-    g_fTimeSlice = Clamp ( 0.0, dTimeSeconds - m_dLastTimeSeconds, 0.1 );
-    m_dLastTimeSeconds = dTimeSeconds;
+    DWORD dwCurrentTick = GetTickCount ();
+    if ( m_dwLastFrameTick )
+    {
+        m_dwFrameTimeSlice = dwCurrentTick - m_dwLastFrameTick;
 
-    // Call onClientWorld LUA event
-    CLuaArguments Arguments;
-    Arguments.PushNumber ( g_fTimeSlice );
-    m_pRootEntity->CallEvent ( "onClientWorld", Arguments, false );
+        // Call onClientPreRender LUA event
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( m_dwFrameTimeSlice );
+        m_pRootEntity->CallEvent ( "onClientPreRender", Arguments, false );
+    }
+    m_dwLastFrameTick = dwCurrentTick;
 }
 
 
