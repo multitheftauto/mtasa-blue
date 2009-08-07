@@ -1508,6 +1508,12 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
                         // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a different case)
                         if ( ( szNick && stricmp ( szNick, szName ) == 0 ) || m_pPlayerManager->Get ( szName ) == NULL )
                         {
+                            // Call the event
+                            CLuaArguments Arguments;
+                            Arguments.PushString ( szNick );
+                            Arguments.PushString ( szName );
+                            pPlayer->CallEvent ( "onPlayerChangeNick", Arguments );
+
                             // Tell the console
                             CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szName );
 
