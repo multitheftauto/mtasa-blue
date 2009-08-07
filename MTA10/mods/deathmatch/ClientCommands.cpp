@@ -189,13 +189,27 @@ void COMMAND_EnterPassenger ( const char* szCmdLine )
 
 void COMMAND_RadioNext ( const char* szCmdLine )
 {
-    if ( g_pClientGame ) g_pClientGame->GetManager ()->GetRadio ()->NextChannel ();
+    if ( g_pClientGame )
+    {
+        CClientPlayer* pPlayer = g_pClientGame->GetPlayerManager ()->GetLocalPlayer ();
+        if ( pPlayer )
+        {
+            pPlayer->NextRadioChannel ();
+        }
+    }
 }
 
 
 void COMMAND_RadioPrevious ( const char* szCmdLine )
 {
-    if ( g_pClientGame ) g_pClientGame->GetManager ()->GetRadio ()->PreviousChannel ();
+    if ( g_pClientGame )
+    {
+        CClientPlayer* pPlayer = g_pClientGame->GetPlayerManager ()->GetLocalPlayer ();
+        if ( pPlayer )
+        {
+            pPlayer->PreviousRadioChannel ();
+        }
+    }
 }
 
 /*

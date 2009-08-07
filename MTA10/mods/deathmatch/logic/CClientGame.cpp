@@ -39,7 +39,6 @@ CRITICAL_SECTION CClientGame::m_crVoice;
 #endif
 
 bool g_bBoundsChecker = true;
-
 #define DEFAULT_GRAVITY 0.008f
 #define DEFAULT_GAME_SPEED 1.0f
 #define DEFAULT_BLUR_LEVEL 36
@@ -227,7 +226,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
-    g_pMultiplayer->SetPreHudDrawHandler ( CClientGame::StaticPreHudDrawHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -360,7 +358,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
-    g_pMultiplayer->SetPreHudDrawHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -1073,16 +1070,28 @@ void CClientGame::HandleException ( CExceptionInformation* pExceptionInformation
 
 void CClientGame::HandleRadioNext ( CControlFunctionBind*  )
 {
-    if ( g_pClientGame ) g_pClientGame->GetManager ()->GetRadio ()->NextChannel ();
+    if ( g_pClientGame )
+    {
+        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+        if ( pPlayer )
+        {
+            pPlayer->NextRadioChannel ();
+        }
+    }
 }
 
 
 void CClientGame::HandleRadioPrevious ( CControlFunctionBind*  )
 {
-    if ( g_pClientGame ) g_pClientGame->GetManager ()->GetRadio ()->PreviousChannel ();
+    if ( g_pClientGame )
+    {
+        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+        if ( pPlayer )
+        {
+            pPlayer->PreviousRadioChannel ();
+        }
+    }
 }
-
-
 bool CClientGame::IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nametag. Check that it's not to long or short
@@ -3110,11 +3119,6 @@ void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId a
     g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
-void CClientGame::StaticPreHudDrawHandler ( void )
-{
-    g_pClientGame->PreHudDrawHandler ();
-}
-
 void CClientGame::StaticPostWorldProcessHandler ( void )
 {
     g_pClientGame->PostWorldProcessHandler ();
@@ -3242,17 +3246,9 @@ void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
 }
 
-
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {   
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-}
-
-
-void CClientGame::PreHudDrawHandler ( void )
-{
-    // Render our radio just before the HUD
-    m_pManager->GetRadio ()->Render ();    
 }
 
 

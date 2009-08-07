@@ -45,7 +45,6 @@ static CClientCamera*                               m_pCamera;
 static CClientExplosionManager*                     m_pExplosionManager;
 static CClientProjectileManager*                    m_pProjectileManager;
 static CClientSoundManager*                         m_pSoundManager;
-static CClientRadio*                                m_pRadio;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN list<CClientEntity*>::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
@@ -84,7 +83,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pExplosionManager = pManager->GetExplosionManager ();
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pSoundManager = pManager->GetSoundManager ();
-    m_pRadio = pManager->GetRadio ();
 }
 
 
@@ -1114,18 +1112,13 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
 
 bool CStaticFunctionDefinitions::SetRadioChannel ( unsigned char& ucChannel )
 {
-    if ( ucChannel <= CHANNEL_RADIO_OFF )
-    {
-        m_pRadio->SetChannel ( ( eRadioChannel ) ucChannel );
-        return true;
-    }
-    return false;
+    return m_pPlayerManager->GetLocalPlayer ()->SetCurrentRadioChannel ( ucChannel );
 }
 
 
 bool CStaticFunctionDefinitions::GetRadioChannel ( unsigned char& ucChannel )
 {
-    ucChannel = ( unsigned char ) m_pRadio->GetChannel ();
+    ucChannel = m_pPlayerManager->GetLocalPlayer ()->GetCurrentRadioChannel ();
     return true;
 }
 

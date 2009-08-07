@@ -72,7 +72,7 @@ CGameSA::CGameSA()
 	this->m_p3DMarkers				= new C3DMarkersSA();
 	this->m_pPad					= new CPadSA((CPadSAInterface *)CLASS_CPad);
 	this->m_pTheCarGenerators		= new CTheCarGeneratorsSA();
-	this->m_pCAERadioTrackManager	= new CAERadioTrackManagerSA((CAERadioTrackManagerSAInterface *)CLASS_CAERadioTrackManager);
+	this->m_pCAERadioTrackManager	= new CAERadioTrackManagerSA();
 	this->m_pWeather				= new CWeatherSA();
 	this->m_pMenuManager			= new CMenuManagerSA();
 	this->m_pText					= new CTextSA();
