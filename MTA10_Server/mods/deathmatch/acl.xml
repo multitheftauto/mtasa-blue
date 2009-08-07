@@ -58,11 +58,14 @@
       <right name="command.skipmap" access="false"/>
       <right name="command.restart" access="false"/>
       <right name="command.refresh" access="false"/>
+      <right name="command.refreshall" access="false"/>
       <right name="command.addaccount" access="false"/>
       <right name="command.delaccount" access="false"/>
       <right name="command.debugscript" access="false"/>
       <right name="command.chgpass" access="false"/>
+      <right name="command.loadmodule" access="false"/>
       <right name="command.mute" access="false"/>
+      <right name="command.srun" access="false"/>
       <right name="command.unmute" access="false"/>
       <right name="command.kick" access="false"/>
       <right name="command.ban" access="false"/>
@@ -76,6 +79,8 @@
       <right name="function.executeCommandHandler" access="false"/>
       <right name="function.setPlayerMuted" access="false"/>
       <right name="function.addAccount" access="false"/>
+      <right name="function.addBan" access="false"/>
+      <right name="function.removeBan" access="false"/>
       <right name="function.removeAccount" access="false"/>
       <right name="function.setAccountPassword" access="false"/>
       <right name="function.kickPlayer" access="false"/>
@@ -99,7 +104,7 @@
       <right name="function.removeResourceFile" access="false"/>
       <right name="function.setResourceDefaultSetting" access="false"/>
       <right name="function.removeResourceDefaultSetting" access="false"/>
-	  <right name="function.redirectPlayer" access="false"/>
+      <right name="function.redirectPlayer" access="false"/>
       <right name="function.aclReload" access="false"/>
       <right name="function.aclSave" access="false"/>
       <right name="function.aclCreate" access="false"/>
@@ -145,11 +150,14 @@
       <right name="function.startResource" access="true"/>
       <right name="function.stopResource" access="true"/>
       <right name="function.restartResource" access="true"/>
-	  <right name="function.redirectPlayer" access="true"/>
+      <right name="function.redirectPlayer" access="true"/>
    </acl>
    <acl name="SuperModerator">
       <right name="general.ModifyOtherObjects" access="false"/>
       <right name="command.refresh" access="true"/>
+      <right name="command.refreshall" access="true"/>
+      <right name="command.srun" access="true"/>
+      <right name="command.loadmodule" access="true"/>
       <right name="command.addaccount" access="true"/>
       <right name="command.delaccount" access="true"/>
       <right name="command.chgpass" access="true"/>
@@ -164,6 +172,8 @@
       <right name="command.install" access="true"/>
       <right name="command.aexec" access="true"/>
       <right name="command.debugscript" access="true"/>
+      <right name="function.addBan" access="true"/>
+      <right name="function.removeBan" access="true"/>
       <right name="function.executeCommandHandler" access="true"/>
       <right name="function.setServerPassword" access="true"/>
       <right name="function.getServerPassword" access="true"/>
