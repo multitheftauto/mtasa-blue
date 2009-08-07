@@ -206,7 +206,6 @@ PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
-PreHudDrawHandler* m_pPreHudDrawHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -1267,11 +1266,6 @@ void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler
     m_pBlendAnimationHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPreHudDrawHandler ( PreHudDrawHandler * pHandler )
-{
-    m_pPreHudDrawHandler = pHandler;
-}
-
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
 	bHideRadar = bHide;
@@ -1451,17 +1445,19 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
     }
 }
 
-
 void _declspec(naked) HOOK_CHud_Draw_Caller()
 {
-	/* This hook removes calls CAudioEngine::DisplayRadioStationName and CHud::Draw,
-       the first is handled by MTA and the second is called in this function.
+	/*
 	0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
 	0053E4FF   . E8 DC150500                          CALL gta_sa_u.0058FAE0
 	*/
-	_asm pushad;
+	_asm
+	{
+        pushad
 
-    if ( m_pPreHudDrawHandler ) m_pPreHudDrawHandler ();
+		mov		edx, CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName
+		call	edx
+	}
 
 	if(!bSetCenterOfWorld)
 	{
