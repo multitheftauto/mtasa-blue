@@ -1187,8 +1187,7 @@ void CClientVehicle::_SetAdjustablePropertyValue ( unsigned short usValue )
             m_pVehicle->SetAdjustablePropertyValue ( usValue );
             
             // Update our collision for this adjustable?
-            if ( m_usModel == VT_FORKLIFT || m_usModel == VT_FIRELA || m_usModel == VT_ANDROM ||
-                 m_usModel == VT_DUMPER || m_usModel == VT_DOZER )
+            if ( HasMovingCollision () )
             {
                 float fAngle = ( float ) usValue / 2499.0f;
                 m_pVehicle->UpdateMovingCollision ( fAngle );
@@ -1197,6 +1196,14 @@ void CClientVehicle::_SetAdjustablePropertyValue ( unsigned short usValue )
     }
     m_usAdjustablePropertyValue = usValue;
 }
+
+
+bool CClientVehicle::HasMovingCollision ( void )
+{
+    return ( m_usModel == VT_FORKLIFT || m_usModel == VT_FIRELA || m_usModel == VT_ANDROM ||
+             m_usModel == VT_DUMPER || m_usModel == VT_DOZER || m_usModel == VT_PACKER );
+}
+
 
 unsigned char CClientVehicle::GetDoorStatus ( unsigned char ucDoor )
 {

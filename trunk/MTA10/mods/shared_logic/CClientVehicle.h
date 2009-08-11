@@ -199,6 +199,7 @@ public:
     inline bool                 HasAdjustableProperty       ( void )                        { return m_bHasAdjustableProperty; };
     unsigned short              GetAdjustablePropertyValue  ( void );
     void                        SetAdjustablePropertyValue  ( unsigned short usValue );
+    bool                        HasMovingCollision          ( void );
 private:
     void                        _SetAdjustablePropertyValue ( unsigned short usValue );
 public:
