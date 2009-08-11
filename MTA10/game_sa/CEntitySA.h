@@ -80,14 +80,14 @@ class CReferences
 	CEntity		* pEntity;
 };
 
-class CSimpleTransformSAInterface
+class CSimpleTransformSAInterface   // 16 bytes
 {
 public:
 	CVector							m_translate;
 	FLOAT							m_heading;
 };
 
-class CPlaceableSAInterface
+class CPlaceableSAInterface // 20 bytes
 {
 public:
 	CSimpleTransformSAInterface		m_transform;
