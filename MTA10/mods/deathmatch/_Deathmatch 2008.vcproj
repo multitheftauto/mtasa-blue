@@ -401,10 +401,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CInterpolator.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CLocalServer.cpp"
 					>
 				</File>
