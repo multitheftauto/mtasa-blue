@@ -1063,6 +1063,33 @@ int CLuaFunctionDefs::GetPedCameraRotation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetPedGunMuzzlePosition ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientPed* pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            CVector vecMuzzlePos;
+            if ( CStaticFunctionDefinitions::GetPedGunMuzzlePosition ( *pPed, vecMuzzlePos ) )
+            {
+                lua_pushnumber ( luaVM, vecMuzzlePos.fX );
+                lua_pushnumber ( luaVM, vecMuzzlePos.fY );
+                lua_pushnumber ( luaVM, vecMuzzlePos.fZ );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedGunMuzzlePosition", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedGunMuzzlePosition" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::IsPedOnFire ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
