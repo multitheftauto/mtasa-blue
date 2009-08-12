@@ -154,6 +154,9 @@ DWORD RETURN_CAnimManager_BlendAnimation =                  0x4D4617;
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill =                          0x5E3B68;
 
+#define HOOKPOS_CPed_AddGogglesModel                        0x5E3ACB
+DWORD RETURN_CPed_AddGogglesModel =                         0x5E3AD4;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -264,6 +267,7 @@ void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
 void HOOK_CAnimManager_AddAnimation ();
 void HOOK_CAnimManager_BlendAnimation ();
 void HOOK_CPed_GetWeaponSkill ();
+void HOOK_CPed_AddGogglesModel ();
 
 void vehicle_lights_init ();
 
@@ -375,6 +379,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
+    HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4071,5 +4076,31 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill ()
             cmp     esi, 16h
             jmp     RETURN_CPed_GetWeaponSkill
         }
+    }
+}
+
+// Actually check if the ped putting on goggles is the local player before
+// applying the visual effect
+bool _cdecl CPed_AddGogglesModelCheck ( void* pPedInterface )
+{
+    return pGameInterface->GetPools ()->GetPed ( (DWORD *)pPedInterface ) == pGameInterface->GetPools ()->GetPedFromRef ( 1 );
+}
+
+void _declspec(naked) HOOK_CPed_AddGogglesModel ()
+{
+    _asm
+    {
+        push esi
+        call CPed_AddGogglesModelCheck
+        add esp, 4
+
+        test al, al
+        jz skip
+        mov eax, [esp+0x10]
+        mov [esi+0x500], eax
+        mov byte ptr [eax], 1
+
+    skip:
+        jmp RETURN_CPed_AddGogglesModel
     }
 }
