@@ -2896,6 +2896,15 @@ void CClientVehicle::UpdateTargetPosition ( void )
                                                 fAlpha,
                                                 m_interp.pos.vecTarget );
         }
+
+        // If the new position is close enough to the previous position, smooth the result
+        if ( ( vecPrevPos - vecNewPosition ).Length () < INTERPOLATION_WARP_THRESHOLD )
+        {
+            vecNewPosition = SharedUtil::Lerp ( vecPrevPos,
+                                                0.25f,
+                                                vecNewPosition );
+        }
+
         SetPosition ( vecNewPosition, false );
 
 #ifdef MTA_DEBUG
