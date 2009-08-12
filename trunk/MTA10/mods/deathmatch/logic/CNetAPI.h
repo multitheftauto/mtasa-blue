@@ -100,7 +100,7 @@ private:
     CVector                 m_vecLastSentCameraPosition;
     CVector                 m_vecLastSentCameraLookAt;
 
-    CInterpolator           m_Interpolator;
+    CInterpolator<CVector>  m_Interpolator;
 };
 
 enum eServerRPCFunctions
