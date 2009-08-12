@@ -205,6 +205,7 @@ public:
     LUA_DECLARE ( IsPedHeadless );
     LUA_DECLARE ( IsPedFrozen );
 	LUA_DECLARE ( GetPedCameraRotation );
+    LUA_DECLARE ( GetPedGunMuzzlePosition );
     LUA_DECLARE ( IsPedOnFire );
 
     LUA_DECLARE ( SetPedRotation );
