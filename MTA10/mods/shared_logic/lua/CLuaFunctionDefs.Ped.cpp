@@ -671,11 +671,13 @@ int CLuaFunctionDefs::IsPedInVehicle ( lua_State* luaVM )
         if ( pPed )
         {
             // Find out whether he's in a vehicle or not
-            bool bInVehicle = pPed->GetOccupiedVehicle () != NULL;
-
-            // Return that state
-            lua_pushboolean ( luaVM, bInVehicle );
-            return 1;
+            bool bInVehicle;
+            if ( CStaticFunctionDefinitions::IsPedInVehicle ( *pPed, bInVehicle ) )
+            {
+                // Return that state
+                lua_pushboolean ( luaVM, bInVehicle );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "isPedInVehicle", "ped", 1 );
