@@ -205,6 +205,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefs::GetPedWeapon );
     CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefs::GetPedAmmoInClip );
     CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefs::GetPedTotalAmmo );
+    CLuaCFunctions::AddFunction ( "getPedWeaponMuzzlePosition", CLuaFunctionDefs::GetPedWeaponMuzzlePosition );
     CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaFunctionDefs::GetPedOccupiedVehicle );
     CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaFunctionDefs::GetPedArmor );
     CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaFunctionDefs::GetElementModel );
@@ -402,7 +403,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefs::IsPedHeadless );
     CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefs::IsPedFrozen );
 	CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefs::GetPedCameraRotation );
-    CLuaCFunctions::AddFunction ( "getPedGunMuzzlePosition", CLuaFunctionDefs::GetPedGunMuzzlePosition );
 
     CLuaCFunctions::AddFunction ( "setPedWeaponSlot", CLuaFunctionDefs::SetPedWeaponSlot );
     CLuaCFunctions::AddFunction ( "setPedRotation", CLuaFunctionDefs::SetPedRotation );

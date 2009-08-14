@@ -181,6 +181,7 @@ public:
     LUA_DECLARE ( GetPedWeapon );
     LUA_DECLARE ( GetPedAmmoInClip );
     LUA_DECLARE ( GetPedTotalAmmo );
+    LUA_DECLARE ( GetPedWeaponMuzzlePosition );
     LUA_DECLARE ( GetPedStat );
     LUA_DECLARE ( GetPedOccupiedVehicle );
     LUA_DECLARE ( GetPedArmor );
@@ -205,7 +206,6 @@ public:
     LUA_DECLARE ( IsPedHeadless );
     LUA_DECLARE ( IsPedFrozen );
 	LUA_DECLARE ( GetPedCameraRotation );
-    LUA_DECLARE ( GetPedGunMuzzlePosition );
     LUA_DECLARE ( IsPedOnFire );
 
     LUA_DECLARE ( SetPedRotation );

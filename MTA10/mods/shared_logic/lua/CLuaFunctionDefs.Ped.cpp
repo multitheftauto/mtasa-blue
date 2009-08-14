@@ -238,6 +238,33 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetPedWeaponMuzzlePosition ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientPed* pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            CVector vecMuzzlePos;
+            if ( CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition ( *pPed, vecMuzzlePos ) )
+            {
+                lua_pushnumber ( luaVM, vecMuzzlePos.fX );
+                lua_pushnumber ( luaVM, vecMuzzlePos.fY );
+                lua_pushnumber ( luaVM, vecMuzzlePos.fZ );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWeaponMuzzlePosition", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedWeaponMuzzlePosition" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetPedOccupiedVehicle ( lua_State* luaVM )
 {
     // Correct type?
@@ -1057,33 +1084,6 @@ int CLuaFunctionDefs::GetPedCameraRotation ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getPedCameraRotation" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::GetPedGunMuzzlePosition ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CClientPed* pPed = lua_toped ( luaVM, 1 );
-        if ( pPed )
-        {
-            CVector vecMuzzlePos;
-            if ( CStaticFunctionDefinitions::GetPedGunMuzzlePosition ( *pPed, vecMuzzlePos ) )
-            {
-                lua_pushnumber ( luaVM, vecMuzzlePos.fX );
-                lua_pushnumber ( luaVM, vecMuzzlePos.fY );
-                lua_pushnumber ( luaVM, vecMuzzlePos.fZ );
-                return 3;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedGunMuzzlePosition", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedGunMuzzlePosition" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

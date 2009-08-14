@@ -1288,7 +1288,7 @@ bool CStaticFunctionDefinitions::GetPedCameraRotation ( CClientPed & Ped, float 
 	return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedGunMuzzlePosition ( CClientPed& Ped, CVector& vecPosition )
+bool CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition ( CClientPed& Ped, CVector& vecPosition )
 {
     return Ped.GetShotData ( NULL, NULL, &vecPosition );
 }
