@@ -178,7 +178,7 @@ void CFoo::Test ( const char* szString )
             CVector vecT;
             pVehicle->GetPosition ( vecT );
             vecT.fZ = fdelta;
-            pVehicle->SetTargetPosition ( vecT, TICK_RATE );
+            pVehicle->SetTargetPosition ( vecT );
 
             g_pCore->ChatPrintf ( "Done %f", false, fdelta );
 
@@ -197,7 +197,7 @@ void CFoo::Test ( const char* szString )
             CVector vecT;
             pVehicle->GetRotationDegrees ( vecT );
             vecT.fZ = atof ( szString + 7 );
-            pVehicle->SetTargetRotation ( vecT, TICK_RATE );
+            pVehicle->SetTargetRotation ( vecT );
 
             g_pCore->ChatPrintf ( "Done %f", false, atof ( szString + 7 ) );
 
@@ -429,8 +429,8 @@ void CFoo::Test ( const char* szString )
         CClientVehicle* pVehicle = pLocal->GetOccupiedVehicle ();
         if ( pVehicle )
         {
-            pVehicle->SetTargetPosition ( CVector ( 0, 0, 0 ), TICK_RATE );
-            pVehicle->SetTargetRotation ( CVector ( 0, 0, 0 ), TICK_RATE );
+            pVehicle->SetTargetPosition ( CVector ( 0, 0, 0 ) );
+            pVehicle->SetTargetRotation ( CVector ( 0, 0, 0 ) );
 
             g_pCore->ChatPrintf ( "Done", false );
         }

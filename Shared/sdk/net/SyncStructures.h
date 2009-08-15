@@ -788,11 +788,33 @@ struct SSmallKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( (char *)&data, 8 );
+        bool bState;
+        char cLeftStickX;
+        char cLeftStickY;
+
+        if ( ( bState = bitStream.ReadBits ( (char *)&data, 10 ) ) )
+        {
+            if ( data.bLeftStickXChanged && ( bState = bitStream.Read ( cLeftStickX ) ) )
+                data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
+            if ( bState && data.bLeftStickYChanged && ( bState = bitStream.Read ( cLeftStickY ) ) )
+                data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
+        }
+
+        return bState;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBits ( (const char* )&data, 8 );
+        bitStream.WriteBits ( (const char* )&data, 10 );
+        if ( data.bLeftStickXChanged )
+        {
+            char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
+            bitStream.Write ( cLeftStickX );
+        }
+        if ( data.bLeftStickYChanged )
+        {
+            char cLeftStickY = static_cast < char > ( (float)data.sLeftStickY * 127.0f/128.0f );
+            bitStream.Write ( cLeftStickY );
+        }
     }
 
     struct
@@ -805,6 +827,10 @@ struct SSmallKeysyncSync : public ISyncStructure
         bool bButtonTriangle : 1;
         bool bShockButtonL : 1;
         bool bPedWalk : 1;
+        bool bLeftStickXChanged : 1;
+        bool bLeftStickYChanged : 1;
+        short sLeftStickX;
+        short sLeftStickY;
     } data;
 };
 

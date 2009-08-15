@@ -122,8 +122,7 @@ public:
     bool                        SetMatrix                   ( const CMatrix& Matrix );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
-    void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }
-    void                        SetPosition                 ( const CVector& vecPosition, bool bResetInterpolation );
+    void                        SetPosition                 ( const CVector& vecPosition );
 
     void                        SetInterior                 ( unsigned char ucInterior );
 
@@ -142,6 +141,7 @@ public:
                                                               unsigned short usModel,
                                                               unsigned char ucInterior );
 
+    void                        SetTargetPosition           ( unsigned long ulDelay, const CVector& vecPosition );
     void                        ResetInterpolation          ( void );
 
     float                       GetCurrentRotation          ( void );
@@ -328,10 +328,10 @@ public:
     inline unsigned char        GetAlpha                    ( void )                                    { return m_ucAlpha; }
     void                        SetAlpha                    ( unsigned char ucAlpha );
 
-    inline bool                 HasTargetPosition       ( void )                                        { return ( m_interp.pos.ulFinishTime != 0 ); }
-    inline CClientEntity *      GetTargetOriginSource   ( void )                                        { return m_interp.pTargetOriginSource; }
+    inline bool                 HasTargetPosition       ( void )                                        { return m_bHasTargetPosition; }
+    inline CClientEntity *      GetTargetOriginSource   ( void )                                        { return m_pTargetOriginSource; }
     void                        GetTargetPosition       ( CVector & vecPosition );
-    void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
+    void                        SetTargetPosition       ( CVector& vecPosition, CClientEntity* pOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
 	void						UpdateTargetPosition	( void );
 
@@ -478,6 +478,9 @@ public:
     float                       m_fTargetRotationA;
     float                       m_fBeginCameraRotation;
     float                       m_fTargetCameraRotation;
+    unsigned long               m_ulBeginPositionTime;
+    unsigned long               m_ulEndPositionTime;
+    CVector                     m_vecBeginPosition;
     unsigned long               m_ulBeginTarget;
     unsigned long               m_ulEndTarget;
     CVector                     m_vecBeginSource;
@@ -512,6 +515,10 @@ public:
     eMoveAnim                   m_MoveAnim;
     std::list < CClientProjectile* > m_Projectiles;
     unsigned char               m_ucAlpha;
+    CVector                     m_vecTargetPosition;
+    CClientEntity*              m_pTargetOriginSource;
+    bool                        m_bTargetDirections [ 3 ];
+    bool                        m_bHasTargetPosition;
     float                       m_fTargetRotation;
     int                         m_iVehicleInOutState;
     bool                        m_bRecreatingModel;
@@ -533,25 +540,6 @@ public:
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
     float                       m_fLighting;
-
-    // Time dependent interpolation
-    struct
-    {
-        struct
-        {
-            CVector         vecOrigin;
-            CVector         vecTarget;
-            unsigned long   ulStartTime;
-            unsigned long   ulFinishTime;
-        } pos;
-
-        CClientEntity*      pTargetOriginSource;
-        // These variables are used to track the last known position
-        // of the contact entity for if it's removed during the
-        // interpolation.
-        bool                bHadOriginSource;
-        CVector             vecOriginSourceLastPosition;
-    } m_interp;
 };
 
 #endif
