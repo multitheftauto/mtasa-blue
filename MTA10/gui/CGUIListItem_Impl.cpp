@@ -62,12 +62,27 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 }
 
 
-void CGUIListItem_Impl::SetText ( const char *Text )
+void CGUIListItem_Impl::SetText ( const char *pszText )
 {
 	CEGUI::String strText;
 
-	if ( Text ) strText.assign ( Text );
+	if ( pszText )
+        strText.assign ( pszText );
 	m_pListItem->setText ( strText );
+}
+
+
+void CGUIListItem_Impl::SetData ( const char* pszData )
+{
+    if ( pszData )
+    {
+        m_strData = pszData;
+        m_pData = (void *)m_strData.c_str ();
+    }
+    else
+    {
+        m_pData = NULL;
+    }
 }
 
 
@@ -81,7 +96,7 @@ void CGUIListItem_Impl::SetImage ( CGUIStaticImage* pImage )
 }
 
 
-std::string CGUIListItem_Impl::GetText ( void )
+std::string CGUIListItem_Impl::GetText ( void ) const
 {
     return m_pListItem->getText ().c_str ();
 }
@@ -90,16 +105,6 @@ std::string CGUIListItem_Impl::GetText ( void )
 CEGUI::ListboxItem* CGUIListItem_Impl::GetListItem ( void )
 {
     return m_pListItem;
-}
-
-void* CGUIListItem_Impl::GetData ( void )
-{
-	return m_pData;
-}
-
-void CGUIListItem_Impl::SetData ( void* pData )
-{
-	m_pData = pData;
 }
 
 bool CGUIListItem_Impl::GetSelectedState ( void )

@@ -57,6 +57,7 @@ public:
     virtual char*					GetItemText             ( int iRow, int hColumn ) = 0;
     virtual int                     SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false ) = 0;
 	virtual void					SetItemData				( int iRow, int hColumn, void* pData ) = 0;
+    virtual void					SetItemData				( int iRow, int hColumn, const char* pszData ) = 0;
 	virtual void*					GetItemData				( int iRow, int hColumn ) = 0;
 
 	virtual void					SetHorizontalScrollBar	( bool bEnabled ) = 0;
