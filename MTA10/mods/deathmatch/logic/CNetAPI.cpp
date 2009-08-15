@@ -345,7 +345,9 @@ void CNetAPI::DoPulse ( void )
                 }
 
                 // Display network trouble
-                m_pManager->GetDisplayManager ()->DrawText2D ( "*** NETWORK TROUBLE ***", CVector ( 0.30f, 0.45f, 0 ), 2.0f, 0xFFFF0000 );
+                int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
+                int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 45 / 100;     // 45/100 down
+                g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** NETWORK TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
             }
         }
 
