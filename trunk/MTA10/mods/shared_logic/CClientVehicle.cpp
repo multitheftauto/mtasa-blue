@@ -117,6 +117,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 	m_bJustBlewUp = false;
     m_ucAlpha = 255;
     m_bAlphaChanged = false;
+    m_bHasTargetPosition = false;
+    m_bHasTargetRotation = false;
     m_bBlowNextFrame = false;
     m_bIsOnGround = false;
     m_ulIllegalTowBreakTime = 0;
@@ -138,8 +140,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_szLastSyncType = "none";
 #endif
 
-    m_interp.rot.ulFinishTime = 0;
-    m_interp.pos.ulFinishTime = 0;
+    m_bInterpolationEnabled = false;
+    m_dResetInterpolationTime = 0;
+
 	ResetInterpolation ();
 
     // Check if we have landing gears
@@ -325,7 +328,7 @@ void CClientVehicle::SetWas ( const CVector &vecWas )
 }
 
 
-void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientVehicle::SetPosition ( const CVector& vecPosition )
 {
     if ( m_pVehicle )
     {
@@ -365,8 +368,7 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     }
 
     // Reset interpolation
-    if ( bResetInterpolation )
-        RemoveTargetPosition ();
+    RemoveTargetPosition ();
 }
 
 
@@ -393,7 +395,7 @@ void CClientVehicle::GetRotationRadians ( CVector& vecRotation ) const
 }
 
 
-void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation, bool bResetInterpolation )
+void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation )
 {
     // Convert from degrees to radians
     CVector vecTemp;
@@ -402,11 +404,11 @@ void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation, bool bRese
     vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
 
     // Set the rotation as radians
-    SetRotationRadians ( vecTemp, bResetInterpolation );
+    SetRotationRadians ( vecTemp );
 }
 
 
-void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bResetInterpolation )
+void CClientVehicle::SetRotationRadians ( const CVector& vecRotation )
 {
     // Grab the matrix, apply the rotation to it and set it again
     // ChrML: We flip the actual rotation direction so that the rotation is consistent with
@@ -417,8 +419,7 @@ void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bRese
     SetMatrix ( matTemp );
 
     // Reset target rotatin
-    if ( bResetInterpolation )
-        RemoveTargetRotation ();
+    RemoveTargetRotation ();
 }
 
 
@@ -2000,15 +2001,15 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetStoredPointer ( this );
         
         // Jump straight to the target position if we have one
-        if ( HasTargetPosition () )
+        if ( m_bHasTargetPosition )
         {
-            GetTargetPosition ( m_Matrix.vPos );
+            m_Matrix.vPos = m_vecTargetPosition;
         }
 
         // Jump straight to the target rotation if we have one
-        if ( HasTargetRotation () )
+        if ( m_bHasTargetRotation )
         {
-            CVector vecTemp = m_interp.rot.vecTarget;
+            CVector vecTemp = m_vecTargetRotation;
             ConvertDegreesToRadians ( vecTemp );
             g_pMultiplayer->ConvertEulerAnglesToMatrix ( m_Matrix, ( 2 * PI ) - vecTemp.fX, ( 2 * PI ) - vecTemp.fY, ( 2 * PI ) - vecTemp.fZ );
         }
@@ -2701,12 +2702,30 @@ void CClientVehicle::SetSmokeTrailEnabled ( bool bEnabled )
 
 void CClientVehicle::ResetInterpolation ( void )
 {
-    if ( HasTargetPosition () )
-        SetPosition ( m_interp.pos.vecTarget );
-    if ( HasTargetRotation () )
-        SetRotationDegrees ( m_interp.rot.vecTarget );
-    m_interp.pos.ulFinishTime = 0;
-    m_interp.rot.ulFinishTime = 0;
+	float f[3];
+	double dCurrentTime = CClientTime::GetTimeNano ();
+
+	// Reset the extrapolator with the pure matrix
+	f[0] = m_MatrixPure.vPos.fX;
+	f[1] = m_MatrixPure.vPos.fY;
+	f[2] = m_MatrixPure.vPos.fZ;
+//	m_Extrapolator.Reset ( dCurrentTime, dCurrentTime, f );
+
+	// Set LERP factor to 1
+	m_fLERP = LERP_UNUSED;
+
+	// Reset the source and destination quaternions
+	m_QuatA = m_QuatB = CQuat ( &m_MatrixPure );
+
+    // Turn off interpolation for the first little bit
+    m_bInterpolationEnabled = false;
+
+    // Store the last reset time, so we know when to turn interpolation back on
+    m_dResetInterpolationTime = dCurrentTime;
+
+#ifdef MTA_DEBUG_INTERPOLATION
+	g_pCore->GetGraphics()->DrawTextTTF(300,200,332,216,0xDDDDDDDD, "RESET", 1.0f, 0);
+#endif
 }
 
 
@@ -2794,148 +2813,124 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bExtrapolateAfterInterpolation )
+void CClientVehicle::SetTargetPosition ( CVector& vecPosition )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
     {
-        UpdateTargetPosition ();
-#if 0
-        if ( HasTargetPosition () )
-        {
-            // We didn't have enough time to finish the interpolation,
-            // so we move the vehicle directly there and start from it.
-            SetPosition ( m_interp.pos.vecTarget, false );
-            m_interp.pos.vecOrigin = m_interp.pos.vecTarget;
-        }
-        else
-#endif
-            GetPosition ( m_interp.pos.vecOrigin );
-        m_interp.pos.vecTarget = vecPosition;
-
-        unsigned long ulTime = CClientTime::GetTime ();
-        m_interp.pos.ulStartTime = ulTime;
-        m_interp.pos.ulFinishTime = ulTime + ulDelay;
-        m_interp.pos.bExtrapolateAfterInterpolation = bExtrapolateAfterInterpolation;
+        CVector vecTemp;
+        GetPosition ( vecTemp );
+        m_bTargetPositionDirections [ 0 ] = ( vecTemp.fX < vecPosition.fX );
+        m_bTargetPositionDirections [ 1 ] = ( vecTemp.fY < vecPosition.fY );
+        m_bTargetPositionDirections [ 2 ] = ( vecTemp.fZ < vecPosition.fZ );
+        m_vecTargetPosition = vecPosition;
+        m_bHasTargetPosition = true;
     }
     else
     {
-        // Update our position now
+        // Update our position now and remove any previous target we had
         SetPosition ( vecPosition );
+        m_bHasTargetPosition = false;
     }
 }
 
 
 void CClientVehicle::RemoveTargetPosition ( void )
 {
-    m_interp.pos.ulFinishTime = 0;
+    m_bHasTargetPosition = false;
 }
 
 
-void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulDelay, bool bExtrapolateAfterInterpolation )
+void CClientVehicle::SetTargetRotation ( CVector& vecRotation )
 {
     // Are we streamed in?
     if ( m_pVehicle )
     {
-        UpdateTargetRotation ();
-
-        GetRotationDegrees ( m_interp.rot.vecOrigin );
-        m_interp.rot.vecTarget = vecRotation;
-
-        // Pre-calculate offsets
-        m_interp.rot.vecOffset.fX = GetOffsetDegrees ( m_interp.rot.vecOrigin.fX, m_interp.rot.vecTarget.fX );
-        m_interp.rot.vecOffset.fY = GetOffsetDegrees ( m_interp.rot.vecOrigin.fY, m_interp.rot.vecTarget.fY );
-        m_interp.rot.vecOffset.fZ = GetOffsetDegrees ( m_interp.rot.vecOrigin.fZ, m_interp.rot.vecTarget.fZ );
-
-        unsigned long ulTime = CClientTime::GetTime ();
-        m_interp.rot.ulStartTime = ulTime;
-        m_interp.rot.ulFinishTime = ulTime + ulDelay;
-        m_interp.rot.bExtrapolateAfterInterpolation = bExtrapolateAfterInterpolation;
+        // Set our target rotation
+        m_vecTargetRotation = vecRotation;
+        m_bHasTargetRotation = true;
     }
     else
     {
-        // Update our rotation now
+        // Update our rotation now and remove any previous target we had
         SetRotationDegrees ( vecRotation );
+        m_bHasTargetRotation = false;
     }
 }
 
 
 void CClientVehicle::RemoveTargetRotation ( void )
 {
-    m_interp.rot.ulFinishTime = 0;
+    m_bHasTargetRotation = false;
 }
+
+float fInterpolationStrengthXY = 12;
+float fInterpolationStrengthZ = 12;
+float fInterpolationStrengthR = 8;
 
 void CClientVehicle::UpdateTargetPosition ( void )
 {
-    if ( HasTargetPosition () )
+    // Do we have a position to move towards? and are we streamed in?
+    if ( m_bHasTargetPosition && m_pVehicle )
     {
-        // Grab the previous position to update contact peds
-        CVector vecPrevPos;
-        GetPosition ( vecPrevPos );
+        // Grab the vehicle's current position
+        CVector vecPosition, vecPreviousPosition;
+        GetPosition ( vecPosition );
+        vecPreviousPosition = vecPosition;
 
-        CVector vecNewPosition;
-        unsigned long ulCurrentTime = CClientTime::GetTime ();
+        // Grab the x, y and z distance between target and the real position
+        CVector vecOffset = m_vecTargetPosition - vecPosition;
 
-        // Get the factor of time spent from the interpolation start
-        // to the current time.
-        float fAlpha = SharedUtil::Unlerp ( m_interp.pos.ulStartTime,
-                                            ulCurrentTime,
-                                            m_interp.pos.ulFinishTime );
+        // Grab the distance to between current point and real point
+        float fDistance = DistanceBetweenPoints3D ( m_vecTargetPosition, vecPosition );
 
-        // If the factor is bigger or equal to 1.0f, then
-        // we have finished interpolating.
-        if ( !m_interp.pos.bExtrapolateAfterInterpolation &&
-              fAlpha >= 1.0f )
+        /* Incredibly slow code
+        // Is there anything blocking our path to the target position?
+        CColPoint* pColPoint = NULL;
+        CEntity* pEntity = NULL;
+        bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecPosition,
+                                                                     &m_vecTargetPosition,
+                                                                     &pColPoint,
+                                                                     &pEntity,
+                                                                     true, false, false, true,
+                                                                     false, false, false, false );
+
+        // Destroy the colpoint or we get a leak
+        if ( pColPoint ) pColPoint->Destroy ();
+        */
+
+        // If the distance is above our warping threshold
+        if ( fDistance > INTERPOLATION_WARP_THRESHOLD )
         {
-            m_interp.pos.ulFinishTime = 0;
-            vecNewPosition = m_interp.pos.vecTarget;
+            // Warp to the target
+            vecPosition = m_vecTargetPosition;
+            if ( m_bHasTargetRotation )
+                SetRotationDegrees ( m_vecTargetRotation );
         }
         else
         {
-            vecNewPosition = SharedUtil::Lerp ( m_interp.pos.vecOrigin,
-                                                fAlpha,
-                                                m_interp.pos.vecTarget );
+            // Calculate how much to interpolate and add it as long as this is the direction we're interpolating
+            vecOffset /= CVector ( fInterpolationStrengthXY, fInterpolationStrengthXY, fInterpolationStrengthZ );
+            //if ( ( vecOffset.fX > 0.0f ) == m_bTargetPositionDirections [ 0 ] )
+                vecPosition.fX += vecOffset.fX;
+            //if ( ( vecOffset.fY > 0.0f ) == m_bTargetPositionDirections [ 1 ] )
+                vecPosition.fY += vecOffset.fY;
+            //if ( ( vecOffset.fZ > 0.0f ) == m_bTargetPositionDirections [ 2 ] )
+                vecPosition.fZ += vecOffset.fZ;
         }
 
-        // If the new position is close enough to the previous position, smooth the result
-        if ( ( vecPrevPos - vecNewPosition ).Length () < INTERPOLATION_WARP_THRESHOLD )
-        {
-            vecNewPosition = SharedUtil::Lerp ( vecPrevPos,
-                                                0.25f,
-                                                vecNewPosition );
-        }
-
-        SetPosition ( vecNewPosition, false );
-
-#ifdef MTA_DEBUG
-        if ( g_pClientGame->IsShowingInterpolation () &&
-             g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
-        {
-            // DEBUG
-            SString strBuffer ( "-== Vehicle interpolation ==-\n"
-                                "vecOrigin: %f %f %f\n"
-                                "vecTarget: %f %f %f\n"
-                                "Position: %f %f %f\n"
-                                "Alpha: %f\n"
-                                "Interpolating: %s\n",
-                                m_interp.pos.vecOrigin.fX, m_interp.pos.vecOrigin.fY, m_interp.pos.vecOrigin.fZ,
-                                m_interp.pos.vecTarget.fX, m_interp.pos.vecTarget.fY, m_interp.pos.vecTarget.fZ,
-                                vecNewPosition.fX, vecNewPosition.fY, vecNewPosition.fZ,
-                                fAlpha, ( m_interp.pos.ulFinishTime == 0 ? "no" : "yes" ) );
-            g_pClientGame->GetManager ()->GetDisplayManager ()->DrawText2D ( strBuffer, CVector ( 0.45f, 0.05f, 0 ), 1.0f, 0xFFBBBBFF );
-        }
-#endif
+        // Set the new position
+        m_pVehicle->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
 
         // Update our contact players
         CVector vecPlayerPosition;
-        CVector vecOffset;
         list < CClientPed * > ::iterator iter = m_Contacts.begin ();
         for ( ; iter != m_Contacts.end () ; iter++ )
         {
             CClientPed * pModel = *iter;
             pModel->GetPosition ( vecPlayerPosition );                
-            vecOffset = vecPlayerPosition - vecPrevPos;
-            vecPlayerPosition = vecNewPosition + vecOffset;
+            vecOffset = vecPlayerPosition - vecPreviousPosition;
+            vecPlayerPosition = vecPosition + vecOffset;
             pModel->SetPosition ( vecPlayerPosition );
         }
     }
@@ -2945,33 +2940,23 @@ void CClientVehicle::UpdateTargetPosition ( void )
 void CClientVehicle::UpdateTargetRotation ( void )
 {
     // Do we have a rotation to move towards? and are we streamed in?
-    if ( HasTargetRotation () )
+    if ( m_bHasTargetRotation && m_pVehicle )
     {
-        CVector vecNewRotation;
-        unsigned long ulCurrentTime = CClientTime::GetTime ();
+        CVector vecRotation;
+        GetRotationDegrees ( vecRotation );
 
-        // Get the factor of time spent from the interpolation start
-        // to the current time.
-        float fAlpha = SharedUtil::Unlerp ( m_interp.rot.ulStartTime,
-                                            ulCurrentTime,
-                                            m_interp.rot.ulFinishTime );
+        CVector vecOffset;
+        vecOffset.fX = GetOffsetDegrees ( vecRotation.fX, m_vecTargetRotation.fX );
+        vecOffset.fY = GetOffsetDegrees ( vecRotation.fY, m_vecTargetRotation.fY );
+        vecOffset.fZ = GetOffsetDegrees ( vecRotation.fZ, m_vecTargetRotation.fZ );
 
-        // If the factor is bigger or equal to 1.0f, then
-        // we have finished interpolating.
-        if ( !m_interp.rot.bExtrapolateAfterInterpolation &&
-             fAlpha >= 1.0f )
-        {
-            m_interp.rot.ulFinishTime = 0;
-            vecNewRotation = m_interp.rot.vecTarget;
-        }
-        else
-        {
-            vecNewRotation = SharedUtil::Lerp ( CVector (),
-                                                fAlpha,
-                                                m_interp.rot.vecOffset );
-            vecNewRotation += m_interp.rot.vecOrigin;
-        }
-        SetRotationDegrees ( vecNewRotation, false );
+        vecOffset /= CVector ( fInterpolationStrengthR, fInterpolationStrengthR, fInterpolationStrengthR );
+        vecRotation += vecOffset;
+
+        SetRotationDegrees ( vecRotation );
+
+        // SetRotationDegrees clears m_bHasTargetRotation, and we don't want that
+        m_bHasTargetRotation = true;
     }
 }
 

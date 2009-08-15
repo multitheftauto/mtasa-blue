@@ -2725,7 +2725,7 @@ void CClientGame::UpdateMimics ( void )
 
                 if ( m_bMimicLag )
                 {
-                    pMimic->SetTargetPosition ( vecPosition, TICK_RATE );
+                    pMimic->SetTargetPosition ( vecPosition );
                     pMimic->SetMoveSpeed ( vecMoveSpeed );
                     pMimic->SetControllerState ( Controller );
                     pMimic->SetTargetRotation ( fRotation );
@@ -2826,8 +2826,8 @@ void CClientGame::UpdateMimics ( void )
 
                     if ( m_bMimicLag )
                     {
-                        pMimicVehicle->SetTargetPosition ( vecPosition, TICK_RATE );
-                        pMimicVehicle->SetTargetRotation ( vecRotationDegrees, TICK_RATE );
+                        pMimicVehicle->SetTargetPosition ( vecPosition );
+                        pMimicVehicle->SetTargetRotation ( vecRotationDegrees );
                         pMimicVehicle->SetMoveSpeed ( vecMoveSpeed );
                         pMimicVehicle->SetTurnSpeed ( vecTurnSpeed );
                     }
