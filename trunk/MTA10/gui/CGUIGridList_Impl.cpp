@@ -289,6 +289,17 @@ void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
 }
 
 
+void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, const char* pszData )
+{
+    // Get the current item at that offset and set the text
+    CGUIListItem* pItem = GetItem ( iRow, hColumn );
+    if ( pItem )
+    {
+		pItem->SetData ( pszData );
+    }
+}
+
+
 int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast )
 {
 	try

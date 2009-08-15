@@ -42,7 +42,8 @@ public:
     CGUIListItem*                       GetItem                 ( int iRow, int hColumn );
     char*                               GetItemText             ( int iRow, int hColumn );
     int                                 SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false );
-	void								SetItemData				( int iRow, int hColumn, void* pData );
+    void					            SetItemData				( int iRow, int hColumn, void* pData );
+	void								SetItemData				( int iRow, int hColumn, const char* pszData );
 	void*								GetItemData				( int iRow, int hColumn );
 
 	void								SetHorizontalScrollBar	( bool bEnabled );

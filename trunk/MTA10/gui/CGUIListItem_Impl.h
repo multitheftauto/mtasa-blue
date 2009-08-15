@@ -34,11 +34,12 @@ public:
                             CGUIListItem_Impl       ( const char* szText = "", unsigned int uiType = 0, CGUIStaticImage_Impl* pImage = NULL );
                             ~CGUIListItem_Impl      ( void );
 
-    void                    SetText                 ( const char *Text );
-    std::string             GetText                 ( void );
+    std::string             GetText                 ( void ) const;
+    void                    SetText                 ( const char *pszText );
 
-	void*					GetData					( void );
-	void					SetData					( void* pData );
+    void*					GetData					( void ) const                { return m_pData; }
+    void					SetData					( void* pData )               { m_pData = pData; }
+    void					SetData					( const char* pszData );
 
 	void					SetDisabled				( bool bDisabled );
 	void					SetFont					( const char *szFontName );
@@ -53,7 +54,8 @@ public:
 
 private:
     CEGUI::ListboxItem*		m_pListItem;
-	void*					m_pData;
+    void*                   m_pData;
+    std::string				m_strData;
 };
 
 #endif

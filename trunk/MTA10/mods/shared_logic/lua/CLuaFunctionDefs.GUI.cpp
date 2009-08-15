@@ -1798,7 +1798,9 @@ int CLuaFunctionDefs::GUIGridListRemoveRow ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGridListGetItemText ( lua_State* luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) && lua_istype ( luaVM, 3, LUA_TNUMBER ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
@@ -1824,14 +1826,19 @@ int CLuaFunctionDefs::GUIGridListGetItemText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) && lua_istype ( luaVM, 3, LUA_TNUMBER ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
-            // TODO: Is this safe? Sure the data can't be something else?
-            const char* szData = reinterpret_cast < const char* > ( static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemData ( static_cast < int > ( lua_tonumber ( luaVM, 2 ) ), 
-                static_cast < int > ( lua_tonumber ( luaVM, 3 ) ) ) );
+            const char* szData = reinterpret_cast < const char* > (
+                static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemData (
+                    static_cast < int > ( lua_tonumber ( luaVM, 2 ) ), 
+                    static_cast < int > ( lua_tonumber ( luaVM, 3 ) )
+                )
+            );
             if ( szData )
                 lua_pushstring ( luaVM, szData );
             else
@@ -1851,8 +1858,12 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) && lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
-        lua_istype ( luaVM, 4, LUA_TSTRING ) && lua_istype ( luaVM, 5, LUA_TBOOLEAN ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 4, LUA_TSTRING ) &&
+         lua_istype ( luaVM, 5, LUA_TBOOLEAN ) &&
+         lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
@@ -1864,7 +1875,7 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
                 lua_tostring ( luaVM, 4 ),
                 lua_toboolean ( luaVM, 5 ) ? true : false,
                 lua_toboolean ( luaVM, 6 ) ? true : false
-                );
+            );
 
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1881,8 +1892,10 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) && lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
-        lua_istype ( luaVM, 4, LUA_TSTRING ) )
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 4, LUA_TSTRING ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
@@ -1892,7 +1905,7 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
                 static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
                 lua_tostring ( luaVM, 4 )
-                );
+            );
 
             lua_pushboolean ( luaVM, true );
             return 1;
