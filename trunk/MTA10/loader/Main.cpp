@@ -282,7 +282,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Basic check for the data files
     {
         char szFileName[MAX_PATH] = {'\0'};
-        _snprintf ( szFileName, MAX_PATH, "%s\\mta\\vorbis.ax", szMTASAPath );
+        _snprintf ( szFileName, MAX_PATH, "%s\\mta\\cgui\\CGUI.png", szMTASAPath );
 
         // Check if vorbis.ax exists
         if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
