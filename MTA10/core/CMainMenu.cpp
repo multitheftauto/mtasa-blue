@@ -809,6 +809,9 @@ void CMainMenu::SetItemPosition ( unsigned int uiIndex, CVector2D vecPosition, b
 
 void CMainMenu::LoadMenuOptions ( void )
 {
+    // Force all 3D scene options off
+    CVARS_SET ( "menu_options", 0 );
+
 	int iMenuOptions;
     CVARS_GET ( "menu_options", iMenuOptions );
 	

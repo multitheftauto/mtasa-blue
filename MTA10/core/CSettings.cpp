@@ -434,6 +434,13 @@ CSettings::CSettings ( void )
 	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
 	m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
 
+    // Hide options relating to the 3D scene
+	m_pVideoRenderingLabel->SetVisible ( false );
+	m_pCheckBoxMenuDynamic->SetVisible ( false );
+	m_pCheckBoxMenuVideo->SetVisible ( false );
+	m_pCheckBoxMenuPostEffects->SetVisible ( false );
+    vecTemp.fY -= 72;
+
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
