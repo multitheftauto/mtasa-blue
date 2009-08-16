@@ -64,8 +64,11 @@
       <right name="command.debugscript" access="false"/>
       <right name="command.chgpass" access="false"/>
       <right name="command.loadmodule" access="false"/>
+      <right name="command.upgrade" access="false"/>
       <right name="command.mute" access="false"/>
+      <right name="command.crun" access="false"/>
       <right name="command.srun" access="false"/>
+      <right name="command.run" access="false"/>
       <right name="command.unmute" access="false"/>
       <right name="command.kick" access="false"/>
       <right name="command.ban" access="false"/>
@@ -156,7 +159,6 @@
       <right name="general.ModifyOtherObjects" access="false"/>
       <right name="command.refresh" access="true"/>
       <right name="command.refreshall" access="true"/>
-      <right name="command.srun" access="true"/>
       <right name="command.loadmodule" access="true"/>
       <right name="command.addaccount" access="true"/>
       <right name="command.delaccount" access="true"/>
@@ -172,6 +174,10 @@
       <right name="command.install" access="true"/>
       <right name="command.aexec" access="true"/>
       <right name="command.debugscript" access="true"/>
+      <right name="command.upgrade" access="true"/>
+      <right name="command.crun" access="true"/>
+      <right name="command.srun" access="true"/>
+      <right name="command.run" access="true"/>
       <right name="function.addBan" access="true"/>
       <right name="function.removeBan" access="true"/>
       <right name="function.executeCommandHandler" access="true"/>
