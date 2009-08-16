@@ -28,7 +28,8 @@ enum
 {
     PACKET_RELIABLE = 1,
     PACKET_SEQUENCED = 2,
-    PACKET_LOW_PRIORITY = 4,
+    PACKET_HIGH_PRIORITY = 4,
+    PACKET_LOW_PRIORITY = 8,
 };
 
 class CPacket

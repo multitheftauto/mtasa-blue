@@ -203,8 +203,12 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
             Reliability = PACKET_RELIABILITY_UNRELIABLE;
         }
     }
-    NetServerPacketPriority packetPriority = PACKET_PRIORITY_HIGH;
-    if ( ulFlags & PACKET_LOW_PRIORITY )
+    NetServerPacketPriority packetPriority = PACKET_PRIORITY_MEDIUM;
+    if ( ulFlags & PACKET_HIGH_PRIORITY )
+    {
+        packetPriority = PACKET_PRIORITY_HIGH;
+    }
+    else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
         packetPriority = PACKET_PRIORITY_LOW;
     }

@@ -23,20 +23,20 @@ class CPlayerJoinCompletePacket : public CPacket
 public:
                             CPlayerJoinCompletePacket       ( void );
                             CPlayerJoinCompletePacket       ( ElementID PlayerID,
-                                                      unsigned char ucNumberOfPlayers,
-                                                      ElementID RootElementID,
-                                                      eHTTPDownloadType ucHTTPDownloadType,
-                                                      unsigned short usHTTPDownloadPort,
-                                                      const char* szHTTPDownloadURL );
+                                                              unsigned char ucNumberOfPlayers,
+                                                              ElementID RootElementID,
+                                                              eHTTPDownloadType ucHTTPDownloadType,
+                                                              unsigned short usHTTPDownloadPort,
+                                                              const char* szHTTPDownloadURL );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
-    inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
 
     bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
 
     inline ElementID        GetPlayerID                     ( void )                            { return m_PlayerID; };
     inline unsigned char    GetNumberOfPlayers              ( void )                            { return m_ucNumberOfPlayers; };
-    inline eHTTPDownloadType GetHTTPDownloadType             ( void )                            { return m_ucHTTPDownloadType; };
+    inline eHTTPDownloadType GetHTTPDownloadType            ( void )                            { return m_ucHTTPDownloadType; };
     inline unsigned short   GetHTTPDownloadPort             ( void )                            { return m_usHTTPDownloadPort; };
     inline const char*      GetHTTPDownloadURL              ( void )                            { return m_szHTTPDownloadURL; };
 
