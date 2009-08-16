@@ -1108,22 +1108,21 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
 {
     assert ( pElement );
 
+    if ( pElement->GetType () == CElement::TEAM )
+    {
+        CTeam* pTeam = static_cast < CTeam* > ( pElement );
+        list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+        for ( ; iter != pTeam->PlayersEnd () ; iter++ )
+        {
+            if ( (*iter)->IsSpawned () )
+            {
+                (*iter)->SetDimension ( usDimension );
+            }
+        }
+    }
+
     switch ( pElement->GetType () )
     {
-        // Client side elements
-        case CElement::TEAM:
-        {
-            CTeam* pTeam = static_cast < CTeam* > ( pElement );
-            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
-            for ( ; iter != pTeam->PlayersEnd () ; iter++ )
-            {
-                if ( (*iter)->IsSpawned () )
-                {
-                    (*iter)->SetDimension ( usDimension );
-                }
-            }
-            break;
-        }
         case CElement::PED:
         case CElement::PLAYER:
         {
@@ -1133,6 +1132,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
                 return false;
             }
         }
+        case CElement::TEAM:
         case CElement::COLSHAPE:
         case CElement::DUMMY:
         case CElement::VEHICLE:
