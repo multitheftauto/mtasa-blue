@@ -1331,15 +1331,18 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
             // Grab the element, the element data name and the data to set
             CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
             const char* szName = lua_tostring ( luaVM, 2 );
-            bool bSynchronize = true;
+
+            // Give a warning in case the old syntax is used (elem, name, synchronize, data)
+            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN &&
+                 lua_type ( luaVM, 4 ) != LUA_TNONE && lua_type ( luaVM, 4 ) != LUA_TBOOLEAN )
+                m_pScriptDebugging->LogCustom ( luaVM, "Using outdated setElementData syntax. Consult the wiki" );
+
             CLuaArgument Variable;
-            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN && lua_type ( luaVM, 4 ) != LUA_TNONE )
-            {
-                bSynchronize = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;            
-                Variable.Read ( luaVM, 4 );
-            }
-            else
-                Variable.Read ( luaVM, 3 );
+            Variable.Read ( luaVM, 3 );
+
+            bool bSynchronize = true;
+            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+                bSynchronize = lua_toboolean ( luaVM, 4 ) ? true:false;
 
             // Valid element?
             if ( pEntity )
