@@ -403,7 +403,7 @@ protected:
     void                        StreamedInPulse             ( void );
 
     void                        Interpolate                 ( void );
-    void                        UpdateKeysync               ( void );
+    void                        UpdateKeysync               ( bool bCleanup = false );
 
     // Used to destroy the current game ped and create a new one in the same state.
     void                        ReCreateModel               ( void );

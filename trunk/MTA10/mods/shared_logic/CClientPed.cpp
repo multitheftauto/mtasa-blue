@@ -790,6 +790,9 @@ void CClientPed::AddKeysync ( unsigned long ulDelay, const CControllerState& Con
         pData->bDucking = bDucking;
 
         m_SyncBuffer.push_back ( pData );
+
+        if ( !IsStreamedIn () )
+            UpdateKeysync ( true );
     }
 }
 
@@ -805,6 +808,9 @@ void CClientPed::AddChangeWeapon ( unsigned long ulDelay, eWeaponSlot slot, unsi
         pData->usWeaponAmmo = usWeaponAmmo;
 
         m_SyncBuffer.push_back ( pData );
+
+        if ( !IsStreamedIn () )
+            UpdateKeysync ( true );
     }
 }
 
@@ -819,6 +825,9 @@ void CClientPed::AddMoveSpeed ( unsigned long ulDelay, const CVector& vecMoveSpe
         pData->vecTarget = vecMoveSpeed;
 
         m_SyncBuffer.push_back ( pData );
+
+        if ( !IsStreamedIn () )
+            UpdateKeysync ( true );
     }
 }
 
@@ -2726,7 +2735,7 @@ void CClientPed::Interpolate ( void )
 }
 
 
-void CClientPed::UpdateKeysync ( void )
+void CClientPed::UpdateKeysync ( bool bCleanup )
 {
     // TODO: we should ignore any 'old' keysyncs and set only the latest
 
@@ -2734,7 +2743,9 @@ void CClientPed::UpdateKeysync ( void )
     if ( m_SyncBuffer.size () > 0 )
     {
         // Time to apply it?
-        unsigned long ulCurrentTime = CClientTime::GetTime ();
+        unsigned long ulCurrentTime = 0;
+        if ( !bCleanup )
+            ulCurrentTime = CClientTime::GetTime ();
 
         // Get the sync data at the front
         SDelayedSyncData* pData = m_SyncBuffer.front ();
@@ -2743,7 +2754,7 @@ void CClientPed::UpdateKeysync ( void )
         if ( pData )
         {
             // Check the front data's time (if this isn't valid, nothing else will be either so just leave it in the buffer)
-            if ( ulCurrentTime >= pData->ulTime )
+            if ( bCleanup || ulCurrentTime >= pData->ulTime )
             {
                 // Loop through until one of the conditions are caught
                 do
@@ -2820,7 +2831,7 @@ void CClientPed::UpdateKeysync ( void )
                             m_SyncBuffer.pop_front ();
                         }
                     }
-                } while ( pData && ulCurrentTime >= pData->ulTime );
+                } while ( pData && ( bCleanup || ulCurrentTime >= pData->ulTime ) );
             }
         }
     }
@@ -4519,6 +4530,7 @@ void CClientPed::NotifyCreate ( void )
 void CClientPed::NotifyDestroy ( void )
 {
     m_pManager->GetPedManager ()->OnDestruction ( this );
+    UpdateKeysync ( true );
 }
 
 
