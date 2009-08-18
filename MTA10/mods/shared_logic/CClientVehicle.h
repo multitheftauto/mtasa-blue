@@ -365,6 +365,12 @@ public:
 
     void                        RemoveAllProjectiles    ( void );
 
+    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
+    static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
+    static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );

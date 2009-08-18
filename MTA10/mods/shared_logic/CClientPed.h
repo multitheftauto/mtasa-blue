@@ -449,7 +449,7 @@ public:
     unsigned long               m_ulLastOnScreenTime;
     CClientVehicle*             m_pOccupiedVehicle;
     CClientVehicle*             m_pOccupyingVehicle;
-    unsigned int                m_uiOccupyingSeat;
+    //unsigned int                m_uiOccupyingSeat;
     unsigned int                m_uiOccupiedVehicleSeat;
     bool                        m_bForceGettingIn;
     bool                        m_bForceGettingOut;

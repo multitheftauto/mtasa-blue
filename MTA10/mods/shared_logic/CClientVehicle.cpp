@@ -180,19 +180,15 @@ CClientVehicle::~CClientVehicle ( void )
     // Unreference us from the driving player model (if any)
     if ( m_pDriver )
     {
-        m_pDriver->m_pOccupiedVehicle = NULL;
-        m_pDriver->m_pOccupyingVehicle = NULL;
-
         m_pDriver->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+        UnpairPedAndVehicle( m_pDriver, this );
     }
 
     // And the occupying ones eventually
     if ( m_pOccupyingDriver )
     {
-        m_pOccupyingDriver->m_pOccupiedVehicle = NULL;
-        m_pOccupyingDriver->m_pOccupyingVehicle = NULL;
-
         m_pOccupyingDriver->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+        UnpairPedAndVehicle( m_pOccupyingDriver, this );
     }
 
     // And the passenger models
@@ -201,11 +197,9 @@ CClientVehicle::~CClientVehicle ( void )
     {
         if ( m_pPassengers [i] )
         {
-            m_pPassengers [i]->m_pOccupiedVehicle = NULL;
-            m_pPassengers [i]->m_pOccupyingVehicle = NULL;
             m_pPassengers [i]->m_uiOccupiedVehicleSeat = 0;
-
             m_pPassengers [i]->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+            UnpairPedAndVehicle( m_pPassengers [i], this );
         }
     }
 
@@ -214,11 +208,9 @@ CClientVehicle::~CClientVehicle ( void )
     {
         if ( m_pOccupyingPassengers [i] )
         {
-            m_pOccupyingPassengers [i]->m_pOccupiedVehicle = NULL;
-            m_pOccupyingPassengers [i]->m_pOccupyingVehicle = NULL;
             m_pOccupyingPassengers [i]->m_uiOccupiedVehicleSeat = 0;
-
             m_pOccupyingPassengers [i]->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+            UnpairPedAndVehicle( m_pOccupyingPassengers [i], this );
         }
     }
 
@@ -3048,4 +3040,236 @@ void CClientVehicle::SetHeadLightColor ( RGBA color )
         m_pVehicle->SetHeadLightColor ( color );
     }
     m_HeadLightColor = color;
+}
+
+
+//
+// Below here is basically awful.
+// But there you go.
+//
+
+#if MTA_DEBUG
+    #define INFO(x)    g_pCore->GetConsole ()->Printf x
+    #define WARN(x)    g_pCore->GetConsole ()->Printf x
+#else
+    #define INFO(x)    {}
+    #define WARN(x)    {}
+#endif
+
+std::string GetPlayerName ( CClientPed* pClientPed )
+{
+    if ( !pClientPed )
+        return "null";
+    if ( IS_PLAYER ( pClientPed ) )
+    {
+        CClientPlayer* pPlayer = static_cast < CClientPlayer * > ( pClientPed );
+        return pPlayer->GetNick ();
+    }
+    return "ped";
+}
+
+//
+// Make a ped become an occupied driver/passenger
+// Static function
+//
+void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+{
+    INFO (( "SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+
+    if ( !pClientPed || !pVehicle )
+        return;
+
+    // Vehicle vars
+    if ( uiSeat == 0 )
+    {
+        if ( pVehicle->m_pDriver && pVehicle->m_pDriver != pClientPed )
+        {
+            WARN (( "Emergency occupied driver eject by %s on %s\n", GetPlayerName( pClientPed ).c_str (), GetPlayerName( pVehicle->m_pDriver ).c_str () ));
+            UnpairPedAndVehicle ( pVehicle->m_pDriver, pVehicle );
+        }
+        pVehicle->m_pDriver = pClientPed;
+    }
+    else
+    {
+        assert ( uiSeat <= NUMELMS(pVehicle->m_pPassengers) );
+        if ( pVehicle->m_pPassengers [uiSeat-1] && pVehicle->m_pPassengers [uiSeat-1] != pClientPed )
+        {
+            WARN (( "Emergency occupied passenger eject by %s on %s\n", GetPlayerName( pClientPed ).c_str (), GetPlayerName( pVehicle->m_pPassengers [uiSeat-1] ).c_str () ));
+            UnpairPedAndVehicle ( pVehicle->m_pPassengers [uiSeat-1], pVehicle );
+        }
+        pVehicle->m_pPassengers [uiSeat-1] = pClientPed;
+    }
+
+    // Ped vars
+    pClientPed->m_pOccupiedVehicle = pVehicle;
+    pClientPed->m_uiOccupiedVehicleSeat = uiSeat;
+
+}
+
+
+//
+// Make a ped become an occupying driver/passenger
+// Static function
+//
+void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+{
+    INFO (( "SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+
+    if ( !pClientPed || !pVehicle )
+        return;
+
+    // Vehicle vars
+    if ( uiSeat == 0 )
+    {
+        if ( pVehicle->m_pOccupyingDriver && pVehicle->m_pOccupyingDriver != pClientPed )
+        {
+            WARN (( "Emergency occupying driver eject by %s on %s\n", GetPlayerName( pClientPed ).c_str (), GetPlayerName( pVehicle->m_pOccupyingDriver ).c_str () ));
+            UnpairPedAndVehicle ( pVehicle->m_pOccupyingDriver, pVehicle );
+        }
+        pVehicle->m_pOccupyingDriver = pClientPed;
+    }
+    else
+    {
+        assert ( uiSeat <= NUMELMS(pVehicle->m_pOccupyingPassengers) );
+        if ( pVehicle->m_pOccupyingPassengers [uiSeat-1] && pVehicle->m_pOccupyingPassengers [uiSeat-1] != pClientPed )
+        {
+            WARN (( "Emergency occupying passenger eject by %s on %s\n", GetPlayerName( pClientPed ).c_str (), GetPlayerName( pVehicle->m_pOccupyingPassengers [uiSeat-1] ).c_str () ));
+            UnpairPedAndVehicle ( pVehicle->m_pOccupyingPassengers [uiSeat-1], pVehicle );
+        }
+       pVehicle->m_pOccupyingPassengers [uiSeat-1] = pClientPed;
+    }
+
+    // Ped vars
+    pClientPed->m_pOccupyingVehicle = pVehicle;
+//  if ( uiSeat >= 0 && uiSeat < 8 )
+//      pClientPed->m_uiOccupyingSeat = uiSeat;
+}
+
+
+//
+// Check ped <> vehicle pointers
+// Static function
+//
+void CClientVehicle::ValidatePedAndVehiclePair( CClientPed* pClientPed, CClientVehicle* pVehicle )
+{
+    // Occupied    
+    // Vehicle vars
+    if ( pVehicle->m_pDriver )
+        assert ( pVehicle->m_pDriver->m_pOccupiedVehicle == pVehicle );
+
+    for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pPassengers ) ; i++ )
+        if ( pVehicle->m_pPassengers[i] )
+            assert ( pVehicle->m_pPassengers[i]->m_pOccupiedVehicle == pVehicle );
+
+    // Ped vars
+    if ( pClientPed->m_pOccupiedVehicle )
+    {
+        // Make sure refed once by vehicle
+        int iCount = 0;
+        if ( pClientPed->m_pOccupiedVehicle->m_pDriver == pClientPed )
+            iCount++;
+
+        for ( int i = 0 ; i < NUMELMS ( pClientPed->m_pOccupiedVehicle->m_pPassengers ) ; i++ )
+            if ( pClientPed->m_pOccupiedVehicle->m_pPassengers[i] == pClientPed )
+                iCount++;
+
+        assert ( iCount == 1 );
+    }
+
+    // Occupying
+    // Vehicle vars
+    if ( pVehicle->m_pOccupyingDriver )
+        assert ( pVehicle->m_pOccupyingDriver->m_pOccupyingVehicle == pVehicle );
+
+    for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pOccupyingPassengers ) ; i++ )
+        if ( pVehicle->m_pOccupyingPassengers[i] )
+            assert ( pVehicle->m_pOccupyingPassengers[i]->m_pOccupyingVehicle == pVehicle );
+
+    // Ped vars
+    if ( pClientPed->m_pOccupyingVehicle )
+    {
+         // Make sure refed once by vehicle
+        int iCount = 0;
+        if ( pClientPed->m_pOccupyingVehicle->m_pOccupyingDriver == pClientPed )
+            iCount++;
+
+        for ( int i = 0 ; i < NUMELMS ( pClientPed->m_pOccupyingVehicle->m_pOccupyingPassengers ) ; i++ )
+            if ( pClientPed->m_pOccupyingVehicle->m_pOccupyingPassengers[i] == pClientPed )
+                iCount++;
+
+       assert ( iCount == 1 );
+    }
+}
+
+
+//
+// Make sure there is no association between a ped and a vehicle
+// Static function
+//
+void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed, CClientVehicle* pVehicle )
+{
+    if ( !pClientPed || !pVehicle )
+        return;
+
+    // Checks
+    ValidatePedAndVehiclePair ( pClientPed, pVehicle );
+
+    // Occupied
+    // Vehicle vars
+    if ( pVehicle->m_pDriver == pClientPed )
+    {
+        INFO (( "UnpairPedAndVehicle: m_pDriver:%s from vehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        pVehicle->m_pDriver = NULL;
+    }
+
+
+    for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pPassengers ) ; i++ )
+        if ( pVehicle->m_pPassengers[i] == pClientPed )
+        {
+            INFO (( "UnpairPedAndVehicle: m_pPassenger:%s seat:%d from vehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), i + 1, pVehicle ));
+            pVehicle->m_pPassengers[i] = NULL;
+        }
+
+    // Ped vars
+    if ( pClientPed->m_pOccupiedVehicle == pVehicle )
+    {
+        INFO (( "UnpairPedAndVehicle: pClientPed:%s from m_pOccupiedVehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        pClientPed->m_pOccupiedVehicle = NULL;
+        pClientPed->m_uiOccupiedVehicleSeat = 0xFF;
+    }
+
+    // Occupying
+    // Vehicle vars
+    if ( pVehicle->m_pOccupyingDriver == pClientPed )
+    {
+        INFO (( "UnpairPedAndVehicle: m_pOccupyingDriver:%s from vehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        pVehicle->m_pOccupyingDriver = NULL;
+    }
+
+    for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pOccupyingPassengers ) ; i++ )
+        if ( pVehicle->m_pOccupyingPassengers[i] == pClientPed )
+        {
+            INFO (( "UnpairPedAndVehicle: m_pOccupyingPassenger:%s seat:%d from vehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), i + 1, pVehicle ));
+            pVehicle->m_pOccupyingPassengers[i] = NULL;
+        }
+
+    // Ped vars
+    if ( pClientPed->m_pOccupyingVehicle == pVehicle )
+    {
+        INFO (( "UnpairPedAndVehicle: pClientPed:%s from m_pOccupyingVehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        pClientPed->m_pOccupyingVehicle = NULL;
+        //pClientPed->m_uiOccupyingSeat = 0xFF;
+    }
+}
+
+
+//
+// Make sure there is no association between a ped and its vehicle
+// Static function
+//
+void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
+{
+    UnpairPedAndVehicle ( pClientPed, pClientPed->GetOccupiedVehicle () );
+    UnpairPedAndVehicle ( pClientPed, pClientPed->m_pOccupyingVehicle );
+    UnpairPedAndVehicle ( pClientPed, pClientPed->GetRealOccupiedVehicle () );
 }
