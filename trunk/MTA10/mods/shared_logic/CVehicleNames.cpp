@@ -26,9 +26,9 @@ struct SVehicleName
 SVehicleName VehicleNames [611] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Linerunner"}, {"Perennial"}, {"Sentinel"}, {"Dumper"}, {"Fire Truck"}, {"Trashmaster"}, {"Stretch"}, 
 {"Manana"}, {"Infernus"}, {"Voodoo"}, {"Pony"}, {"Mule"}, {"Cheetah"}, {"Ambulance"}, {"Leviathan"}, {"Moonbeam"}, {"Esperanto"}, 
 {"Taxi"}, {"Washington"}, {"Bobcat"}, {"Mr. Whoopee"}, {"BF Injection"}, {"Hunter"}, {"Premier"}, {"Enforcer"}, {"Securicar"}, {"Banshee"}, 
-{"Predator"}, {"Bus"}, {"Rhino"}, {"Barracks"}, {"Hotknife"}, {""}, {"Previon"}, {"Coach"}, {"Cabbie"}, {"Stallion"}, 
-{"Rumpo"}, {"RC Bandit"}, {"Romero"}, {"Packer"}, {"Monster 1", "Monster"}, {"Admiral"}, {"Squalo"}, {"Seasparrow"}, {"Pizzaboy"}, {""}, 
-{""}, {"Turismo"}, {"Speeder"}, {"Reefer"}, {"Tropic"}, {"Flatbed"}, {"Yankee"}, {"Caddy"}, {"Solair"}, {"Berkley's RC Van"}, 
+{"Predator"}, {"Bus"}, {"Rhino"}, {"Barracks"}, {"Hotknife"}, {"Trailer 1"}, {"Previon"}, {"Coach"}, {"Cabbie"}, {"Stallion"}, 
+{"Rumpo"}, {"RC Bandit"}, {"Romero"}, {"Packer"}, {"Monster 1", "Monster"}, {"Admiral"}, {"Squalo"}, {"Seasparrow"}, {"Pizzaboy"}, {"Tram"}, 
+{"Trailer 2"}, {"Turismo"}, {"Speeder"}, {"Reefer"}, {"Tropic"}, {"Flatbed"}, {"Yankee"}, {"Caddy"}, {"Solair"}, {"Berkley's RC Van"}, 
 {"Skimmer"}, {"PCJ-600"}, {"Faggio"}, {"Freeway"}, {"RC Baron"}, {"RC Raider"}, {"Glendale"}, {"Oceanic"}, {"Sanchez"}, {"Sparrow"}, 
 {"Patriot"}, {"Quadbike"}, {"Coastguard"}, {"Dinghy"}, {"Hermes"}, {"Sabre"}, {"Rustler"}, {"ZR-350"}, {"Walton"}, {"Regina"}, 
 {"Comet"}, {"BMX"}, {"Burrito"}, {"Camper"}, {"Marquis"}, {"Baggage"}, {"Dozer"}, {"Maverick"}, {"News Chopper"}, {"Rancher"}, 
@@ -39,12 +39,12 @@ SVehicleName VehicleNames [611] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {
 {"Forklift"}, {"Tractor"}, {"Combine Harvester"}, {"Feltzer"}, {"Remington"}, {"Slamvan"}, {"Blade"}, {"Freight"}, {"Streak"}, {"Vortex"}, 
 {"Vincent"}, {"Bullet"}, {"Clover"}, {"Sadler"}, {"Fire Truck Ladder"}, {"Hustler"}, {"Intruder"}, {"Primo"}, {"Cargobob"}, {"Tampa"}, 
 {"Sunrise"}, {"Merit"}, {"Utility Van"}, {"Nevada"}, {"Yosemite"}, {"Windsor"}, {"Monster 2"}, {"Monster 3"}, {"Uranus"}, {"Jester"}, 
-{"Sultan"}, {"Stratum"}, {"Elegy"}, {"Raindance"}, {"RC Tiger"}, {"Flash"}, {"Tahoma"}, {"Savanna"}, {"Bandito"}, {""}, 
-{""}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
-{"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {""}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
-{""}, {""}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS", "Police"}, {"Police SF"}, {"Police LV"}, {"Police Ranger", "Ranger"}, 
-{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {""}, {""}, {""}, {"Boxville Mission"}, 
-{""} };
+{"Sultan"}, {"Stratum"}, {"Elegy"}, {"Raindance"}, {"RC Tiger"}, {"Flash"}, {"Tahoma"}, {"Savanna"}, {"Bandito"}, {"Freight Train Flatbed"}, 
+{"Streak Train Trailer"}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
+{"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {"Trailer (Tanker Commando)"}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
+{"Box Freight"}, {"Trailer 3"}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS", "Police"}, {"Police SF"}, {"Police LV"}, {"Police Ranger", "Ranger"}, 
+{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {"Baggage Trailer (covered)"}, {"Baggage Trailer (Uncovered)"}, {"Trailer (Stairs)"}, {"Boxville Mission"}, 
+{"Farm Trailer"} };
 
 SVehicleName VehicleTypes [] = { {"Automobile"}, {"Plane"}, {"Bike"}, {"Helicopter"}, {"Boat"}, {"Train"}, {"Trailer"}, {"BMX"}, {"Monster Truck"}, {"Quad"} };
 
