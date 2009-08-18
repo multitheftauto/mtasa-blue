@@ -603,7 +603,7 @@ void CModelInfoSA::AddRef ( bool bWaitForLoad )
 	if ( !IsLoaded () )
     {
         // Request it. Wait for it to load if we're asked to.
-		Request ( bWaitForLoad, bWaitForLoad );
+		Request ( true, bWaitForLoad );
     }
 
     // Increment the references.
