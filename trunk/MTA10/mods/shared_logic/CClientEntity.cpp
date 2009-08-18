@@ -200,16 +200,7 @@ CClientEntity* CClientEntity::SetParent ( CClientEntity* pParent )
     // Remove us from previous parent's children list
     if ( m_pParent )
     {
-        // Check to see if the parent is being deleted ... if so, don't bother updating them
-        if ( !g_pClientGame->GetElementDeleter ()->IsBeingDeleted ( m_pParent ) )
-        {
-            // Does our parent have any children? (I hope so, or that would make this an orphan)
-            if ( !m_pParent->m_Children.empty () )
-            {
-                // Jax: whats wrong with std::list::remove, instead of the above?
-                m_pParent->m_Children.remove ( this );
-            }
-        }
+        m_pParent->m_Children.remove ( this );
     }
 
     // Set the new parent
