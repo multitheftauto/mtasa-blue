@@ -94,7 +94,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pTaskManager = NULL;
     m_pOccupiedVehicle = NULL;
     m_pOccupyingVehicle = NULL;
-    m_uiOccupyingSeat = 0;
+    //m_uiOccupyingSeat = 0;
     m_uiOccupiedVehicleSeat = 0xFF;
     m_bHealthLocked = false;
     m_bDontChangeRadio = false;
@@ -269,26 +269,7 @@ CClientPed::~CClientPed ( void )
     m_pClothes = NULL;
 
     // Remove us from any occupied vehicle
-    if ( m_pOccupiedVehicle )
-    {
-        if ( m_uiOccupiedVehicleSeat == 0 )
-            m_pOccupiedVehicle->m_pDriver = NULL;
-        else
-            m_pOccupiedVehicle->m_pPassengers [ m_uiOccupiedVehicleSeat - 1 ] = NULL;
-        m_pOccupiedVehicle = NULL;
-    }
-
-    if ( m_pOccupyingVehicle )
-    {
-        if ( m_uiOccupyingSeat == 0 && m_pOccupyingVehicle->m_pOccupyingDriver == this )
-        {
-            m_pOccupyingVehicle->m_pOccupyingDriver = NULL;
-        }
-        else if ( m_pOccupyingVehicle->m_pOccupyingPassengers [ m_uiOccupyingSeat - 1 ] == this )
-        {
-            m_pOccupyingVehicle->m_pOccupyingPassengers [ m_uiOccupyingSeat - 1 ] = NULL;
-        }
-    }
+    CClientVehicle::UnpairPedAndVehicle ( this );
 
     // Delete delayed sync data
     list < SDelayedSyncData* > ::iterator iter = m_SyncBuffer.begin ();
@@ -1165,7 +1146,7 @@ void CClientPed::GetOutOfVehicle ( void )
     CClientVehicle* pVehicle = GetRealOccupiedVehicle ();
     if ( pVehicle )
     {
-        m_pOccupyingVehicle = pVehicle;
+        //m_pOccupyingVehicle = pVehicle;
 
         if ( m_pPlayerPed )
         {
@@ -1218,7 +1199,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
 
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle ();
-    m_uiOccupyingSeat = uiSeat;
+    //m_uiOccupyingSeat = uiSeat;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
 
@@ -1245,9 +1226,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         }
 
         // Update the vehicle and us so we know we've occupied it
-        m_pOccupiedVehicle = pVehicle;
-        m_uiOccupiedVehicleSeat = 0;
-        pVehicle->m_pDriver = this;
+        CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, 0 );
     }
     else
     {
@@ -1284,9 +1263,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             }
 
             // Update us so we know we've occupied it
-            m_pOccupiedVehicle = pVehicle;
-            m_uiOccupiedVehicleSeat = uiSeat;
-            pVehicle->m_pPassengers [uiSeat-1] = this;
+            CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, uiSeat );
         }
         else
             return;
@@ -1357,20 +1334,7 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
             }
         }        
 
-        // Clear our record in the vehicle class
-        if ( m_uiOccupiedVehicleSeat == 0 )
-        {
-            pVehicle->m_pDriver = NULL;
-            pVehicle->m_pOccupyingDriver = NULL;
-        }
-        else
-        {
-            if ( m_uiOccupiedVehicleSeat < 9 )
-            {
-                pVehicle->m_pPassengers [m_uiOccupiedVehicleSeat - 1] = NULL;
-                pVehicle->m_pOccupyingPassengers [m_uiOccupiedVehicleSeat - 1] = NULL;
-            }
-        }
+        CClientVehicle::UnpairPedAndVehicle( this );
 
         if ( m_bIsLocalPlayer )
         {
@@ -1389,9 +1353,11 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
     }
 
     // And in our class
-    m_pOccupiedVehicle = NULL;
-    m_pOccupyingVehicle = NULL;
-    m_uiOccupiedVehicleSeat = 0xFF;
+    CClientVehicle::UnpairPedAndVehicle( this );
+    assert ( m_pOccupiedVehicle == NULL );
+    assert ( m_pOccupyingVehicle == NULL );
+    assert ( m_uiOccupiedVehicleSeat = 0xFF );
+
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
 
@@ -3582,9 +3548,8 @@ bool CClientPed::IsMovingGoggles ( bool & bPuttingOn )
 
 void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
 {
-    // Set our occupying vehicle to it
-    m_pOccupyingVehicle = pVehicle;
-    m_uiOccupyingSeat = uiSeat;
+    assert ( m_pOccupiedVehicle == NULL );
+    assert ( m_pOccupyingVehicle == NULL || m_pOccupyingVehicle == pVehicle );
 
     //Check for swimming task and warp to door.
     CTask* pTask = 0;
@@ -3619,7 +3584,7 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         }
 
         // Tell the vehicle that we're occupying it
-        pVehicle->m_pOccupyingDriver = this;
+        CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
     }
     else
     {
@@ -3653,7 +3618,7 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             }
 
             // Tell the vehicle we're occupying it
-            pVehicle->m_pOccupyingPassengers [uiSeat - 1] = this;
+            CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
         }
     }
 }

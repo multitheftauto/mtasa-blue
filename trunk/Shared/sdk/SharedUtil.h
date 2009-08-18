@@ -28,6 +28,13 @@
     #define _vsnprintf vsnprintf
 #endif
 
+//
+// Macro for counting the number of elements in a static array
+//
+#ifndef NUMELMS     // from DShow.h
+    #define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
+#endif
+
 namespace SharedUtil
 {
     //
