@@ -14,126 +14,69 @@
 
 extern CCore* g_pCore;
 
-const char g_szCredits [] = "== The Multi Theft Auto Development Team ==\n" \
-                            "Cecill \"IJs\" Etheredge\n" \
-                            "Chris \"Cray\" McArthur\n" \
-                            "Christian \"ChrML\" Lundheim\n" \
-                            "Derek \"Slush\" Abdine\n" \
-                            "Ed \"eAi\" Lyons\n" \
-                            "Adge \"Jax\" Cutler\n" \
-                            "Kent \"Kent747\" Simon\n" \
-                            "Kevin \"Kevuwk\" Whiteside\n" \
-                            "Oliver \"Oli\" Brown\n" \
-                            "Stanislav \"lil_Toady\" Bobrov\n"
-                            "Alberto \"ryden\" Alonso\n" \
-                            "\n" \
+const char* g_szCredits = "== Multi Theft Auto: San Andreas v1.0 ==\n"
+                          "\n"
 
-                            "== Special Thanks ==\n" \
-                            "Anne-Jan \"AJH\" Hak\n" \
-                            "Alexandru \"Rzialix\" Panait\n" \
-                            "Bill \"Sintax\" Blaiklock\n" \
-                            "Bloodymess\n" \
-                            "Chris \"RISO\" Hancock\n" \
-                            "Hans \"Blokker\" Roes\n" \
-                            "Headfonez\n" \
-							"kktos\n" \
-							"MrBump\n" \
-							"ohsix\n" \
-                            "Pieter \"trx\" Plantenga\n" \
-							"spec\n" \
-							"xerox\n" \
-							"Wojjie\n" \
-                            "\n" \
+                          "Programming\n"
+                          "\n"
 
-                            "== The Multi Theft Auto Website Development Team ==\n" \
-							"AlienX\n" \
-                            "Arc_\n" \
-                            "driver2\n" \
-                            "lil_Toady\n" \
-                            "\n" \
+                          "Alberto \"ryden\" Alonso\n"
+                          "Marcus \"mabako\" Bauer\n"
+                          "Hendrik \"arc_\" van den Berge\n"
+                          "Stanislav \"lil_Toady\" Bobrov\n"
+                          "Dan \"Talidan\" Chowdhury\n"
+                          "Chris \"ccw\" Cockwanger\n"
+                          "Adge \"Jax\" Cutler\n"
+                          "Cecill \"ijs\" Etheredge\n"
+                          "Ed \"eAi\" Lyons\n"
+                          "Christian \"ChrML\" Myhre Lundheim\n"
+                          "Arushan \"aru\" Raj\n"
+                          "Frank \"Aim\" Spijkerman\n"
+                          "Kevin \"Kevuwk\" Whiteside\n"
+                          "Richard \"Cazomino05\" Whitlock\n"
+                          "\n"
 
-							"== The Multi Theft Auto Quality Assurance Team Managers ==\n" \
-                            "jhxp\n" \
-                            "Ransom\n" \
-							"\n" \
+                          "Game Design / Scripting\n"
+                          "\n"
 
-                            "== The Multi Theft Auto Quality Assurance Team ==\n" \
-                            "AlienX\n" \
-                            "arc_\n" \
-                            "BB101\n" \
-                            "Boss\n" \
-                            "Brophy\n" \
-                            "deez\n" \
-                            "Dragon (Black Dragon)\n" \
-                            "driver2\n" \
-                            "erorr404\n" \
-                            "Fedor\n" \
-                            "Iggy\n" \
-                            "jbeta\n" \
-                            "Johnline\n" \
-                            "Joriz\n" \
-                            "Kcuf\n" \
-                            "lil_Toady\n" \
-                            "Lucif3r\n" \
-                            "MACK\n" \
-                            "MeanpantheR\n" \
-                            "nick\n" \
-                            "norby89\n" \
-                            "Outback\n" \
-                            "Paradox\n" \
-                            "RAF\n" \
-                            "Ratt\n" \
-                            "ryden\n" \
-                            "Scooby\n" \
-                            "SinnerG (TvKe)\n" \
-                            "Sintax\n" \
-                            "Slick\n" \
-                            "Slothman\n" \
-                            "Solide\n" \
-                            "Talidan\n" \
-                            "Tweak\n" \
-                            "Vandalite\n" \
-                            "x16\n" \
-                            "Xanarki\n" \
-                            "xerox\n" \
-			                "\n" \
+                          "John \"Johnline\" Borsberry\n"
+                          "Paul \"Brophy\" Brophy\n"
+                          "Maciej \"MACK\" Cieslak\n"
+                          "Jacek \"jhxp\" Halas vel Lagoda\n"
+                          "Norbert \"norby89\" Juhos\n"
+                          "Kris \"KWKSND\" Kulchisky\n"
+                          "Dustin \"Ransom\" Morren\n"
+                          "\n"
+                       
+                          "erorr404\n"
+                          "Slothman\n"
+                          "\n"
 
-                            "== Past contributors ==\n" \
-                            "Aeron\n" \
-                            "Au{R}oN\n" \
-                            "Bishop\n" \
-                            "Boro\n" \
-                            "Boss (Thesord)\n" \
-                            "Des (Marcel)\n" \
-                            "Dome\n" \
-                            "DominionSpy\n" \
-                            "DracoBlue\n" \
-                            "Dross\n" \
-                            "Fusion\n" \
-                            "Gamefreek\n" \
-                            "Harry\n" \
-                            "HAZJ\n" \
-                            "Hedning\n" \
-                            "JackC\n" \
-                            "Jigga\n" \
-                            "Kalle\n" \
-                            "KriS\n" \
-                            "MAD_BOY\n" \
-                            "Mif\n" \
-                            "Monk\n" \
-                            "ParoXum\n" \
-                            "PhatLooser\n" \
-                            "Prontera\n" \
-                            "rebel (l2ebel)\n" \
-                            "Samppa\n" \
-                            "Samurai_Ohk\n" \
-                            "SGB\n" \
-                            "TheBoas\n" \
-                            "Twig\n" \
-                            "VRocker\n" \
-                            "Welder\n" \
-                            "Zerbian\n" \
-                            "Zircon (Blue Zircon)\n";
+                          "Patch contributors\n"
+                          "\n"
+                          
+                          "Florian \"Flobu\" Busse\n"
+                          "Philip \"Fenix\" Farquharson\n"
+                          "Robin \"robhol\" Holm\n"
+                          "Raphael \"Mr.Hankey\" Leiteritz\n"
+                          "Adam \"50p\" Telega\n"
+                          "\n"
+
+                          "Gamesnert\n"
+                          "lucasc190\n"
+                          "\n"
+
+                          "Special Thanks\n"
+                          "\n"
+
+                          "Derek \"slush\" Abdine\n"
+                          "Javier \"jbeta\" Beta\n"
+                          "Oliver \"Oli\" Brown\n"
+                          "Wojciech \"Wojjie\" Hlibowicki\n"
+                          "Chris \"Cray\" McArthur\n"
+                          "Hans \"Blokker\" Roes\n"
+                          "Kent \"Kent747\" Simon\n"
+                          "\n";
 
 namespace CCreditsGUI
 {
