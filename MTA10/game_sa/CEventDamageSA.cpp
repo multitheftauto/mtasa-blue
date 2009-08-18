@@ -77,9 +77,6 @@ CEntity * CEventDamageSA::GetInflictingEntity ( void )
 	        case ENTITY_TYPE_VEHICLE:
 		        pReturn = pPools->GetVehicle ( (DWORD *)pInterface );
                 break;
-	        case ENTITY_TYPE_OBJECT:
-		        pReturn = pPools->GetObject((DWORD *)pInterface);
-		        break;
 	        default: break;
 	    }
     }
