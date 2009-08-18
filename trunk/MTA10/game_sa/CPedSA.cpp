@@ -23,6 +23,8 @@ CPedSA::CPedSA (  ) :
     m_pPedSound ( NULL )
 {
 	DEBUG_TRACE("CPedSA::CPedSA(  )");
+
+    memset ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
@@ -31,6 +33,8 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
     m_pPedSound ( NULL )
 {
 	DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
+
+    memset ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 VOID CPedSA::SetInterface( CEntitySAInterface * intInterface )
@@ -42,6 +46,12 @@ CPedSA::~CPedSA ( void )
 {
     if ( m_pPedIntelligence ) delete m_pPedIntelligence;
     if ( m_pPedSound ) delete m_pPedSound;
+
+    for ( int i = 0; i < WEAPONSLOT_MAX; i++ )
+    {
+        if ( this->m_pWeapons[i] )
+	    	delete this->m_pWeapons[i];
+    }
 }
 
 // used to init weapons at the moment, called by CPlayerPedSA when its been constructed
