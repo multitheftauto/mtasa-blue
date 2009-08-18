@@ -399,9 +399,7 @@ bool CNetAPI::IsSmallKeySyncNeeded ( CClientPed* pPlayerModel )
              ControllerState.ButtonCircle != LastControllerState.ButtonCircle ||
              ControllerState.ButtonTriangle != LastControllerState.ButtonTriangle ||
              ControllerState.ShockButtonL != LastControllerState.ShockButtonL ||
-             ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk ||
-             ControllerState.LeftStickX != LastControllerState.LeftStickX ||
-             ControllerState.LeftStickY != LastControllerState.LeftStickY );
+             ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk );
 }
 
 
@@ -470,9 +468,18 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     CControllerState LastControllerState;
     pPlayer->GetLastControllerState ( LastControllerState );
 
+    // Grab the current controller state
+    CControllerState CurrentControllerState;
+    pPlayer->GetControllerState ( CurrentControllerState );
+
     // Read out the small keysync data
     CControllerState ControllerState;
     ReadSmallKeysync ( ControllerState, LastControllerState, BitStream );
+
+    // We don't sync the direction keys in keysync, so we set them
+    // to the current ones.
+    ControllerState.LeftStickX = CurrentControllerState.LeftStickX;
+    ControllerState.LeftStickY = CurrentControllerState.LeftStickY;
 
     // Flags
     SKeysyncFlags flags;
@@ -1434,16 +1441,6 @@ bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, const CContr
     ControllerState.ShockButtonL    = 255 * keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = 255 * keys.data.bPedWalk;
 
-    if ( keys.data.bLeftStickXChanged )
-        ControllerState.LeftStickX  = keys.data.sLeftStickX;
-    else
-        ControllerState.LeftStickX  = LastControllerState.LeftStickX;
-
-    if ( keys.data.bLeftStickYChanged )
-        ControllerState.LeftStickY  = keys.data.sLeftStickY;
-    else
-        ControllerState.LeftStickY  = LastControllerState.LeftStickY;
-
     return true;
 }
 
@@ -1459,11 +1456,6 @@ void CNetAPI::WriteSmallKeysync ( const CControllerState& ControllerState, const
     keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
     keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
-
-    keys.data.bLeftStickXChanged    = ( ControllerState.LeftStickX != LastControllerState.LeftStickX );
-    keys.data.bLeftStickYChanged    = ( ControllerState.LeftStickY != LastControllerState.LeftStickY );
-    keys.data.sLeftStickX           = ControllerState.LeftStickX;
-    keys.data.sLeftStickY           = ControllerState.LeftStickY;
 
     // Write it
     BitStream.Write ( &keys );
