@@ -209,7 +209,7 @@ bool CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoin
 	    }
     }
     if ( colCollision ) *colCollision = pColPointSA;
-    else delete pColPointSA;
+    else pColPointSA->Destroy ();
 
 	return bReturn;
 }
