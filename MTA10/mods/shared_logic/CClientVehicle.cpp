@@ -3079,6 +3079,17 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
     if ( !pClientPed || !pVehicle )
         return;
 
+    // Clear ped from any current occupied seat in this vehicle
+    if ( pClientPed->m_pOccupiedVehicle == pVehicle )
+    {
+        if ( pVehicle->m_pDriver == pClientPed )
+            pVehicle->m_pDriver = NULL;
+
+        for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pPassengers ) ; i++ )
+            if ( pVehicle->m_pPassengers[i] == pClientPed )
+                pVehicle->m_pPassengers[i] = NULL;
+    }
+
     // Vehicle vars
     if ( uiSeat == 0 )
     {
@@ -3104,6 +3115,8 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
     pClientPed->m_pOccupiedVehicle = pVehicle;
     pClientPed->m_uiOccupiedVehicleSeat = uiSeat;
 
+    // Checks
+    ValidatePedAndVehiclePair ( pClientPed, pVehicle );
 }
 
 
@@ -3117,6 +3130,17 @@ void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVeh
 
     if ( !pClientPed || !pVehicle )
         return;
+
+    // Clear ped from any current occupying seat in this vehicle
+    if ( pClientPed->m_pOccupyingVehicle == pVehicle )
+    {
+        if ( pVehicle->m_pOccupyingDriver == pClientPed )
+            pVehicle->m_pOccupyingDriver = NULL;
+
+        for ( int i = 0 ; i < NUMELMS ( pVehicle->m_pOccupyingPassengers ) ; i++ )
+            if ( pVehicle->m_pOccupyingPassengers[i] == pClientPed )
+                pVehicle->m_pOccupyingPassengers[i] = NULL;
+    }
 
     // Vehicle vars
     if ( uiSeat == 0 )
@@ -3143,6 +3167,9 @@ void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVeh
     pClientPed->m_pOccupyingVehicle = pVehicle;
 //  if ( uiSeat >= 0 && uiSeat < 8 )
 //      pClientPed->m_uiOccupyingSeat = uiSeat;
+
+    // Checks
+    ValidatePedAndVehiclePair ( pClientPed, pVehicle );
 }
 
 
@@ -3152,6 +3179,7 @@ void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVeh
 //
 void CClientVehicle::ValidatePedAndVehiclePair( CClientPed* pClientPed, CClientVehicle* pVehicle )
 {
+#if MTA_DEBUG
     // Occupied    
     // Vehicle vars
     if ( pVehicle->m_pDriver )
@@ -3199,6 +3227,7 @@ void CClientVehicle::ValidatePedAndVehiclePair( CClientPed* pClientPed, CClientV
 
        assert ( iCount == 1 );
     }
+#endif
 }
 
 
@@ -3272,4 +3301,16 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
     UnpairPedAndVehicle ( pClientPed, pClientPed->GetOccupiedVehicle () );
     UnpairPedAndVehicle ( pClientPed, pClientPed->m_pOccupyingVehicle );
     UnpairPedAndVehicle ( pClientPed, pClientPed->GetRealOccupiedVehicle () );
+
+    if ( pClientPed->m_pOccupiedVehicle )
+    {
+        WARN (( "*** Unexpected m_pOccupiedVehicle:0x%08x for %s\n", pClientPed->m_pOccupiedVehicle, GetPlayerName( pClientPed ).c_str () ));
+        pClientPed->m_pOccupiedVehicle = NULL;
+    }
+
+    if ( pClientPed->m_pOccupyingVehicle )
+    {
+        WARN (( "*** Unexpected m_pOccupyingVehicle:0x%08x for %s\n", pClientPed->m_pOccupyingVehicle, GetPlayerName( pClientPed ).c_str () ));
+        pClientPed->m_pOccupyingVehicle = NULL;
+    }
 }
