@@ -1114,6 +1114,14 @@ void CMultiplayerSA::DisableBirds ( bool bDisabled )
 		*(BYTE *)0x712330 = 0xA1;
 }
 
+void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
+{
+    if ( bDisabled )
+        *(WORD *)0x60B4F6 = 0x08EB;
+    else
+        *(WORD *)0x60B4F6 = 0x027C;
+}
+
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds

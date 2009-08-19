@@ -108,6 +108,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     //Setup game glitch defaults ( false = disabled ).  Remember to update these serverside if you alter them!
     m_Glitches [ GLITCH_QUICKRELOAD ] = false;
+    g_pMultiplayer->DisableQuickReload ( true );
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
 
@@ -1618,23 +1619,9 @@ void CClientGame::UpdatePlayerWeapons ( void )
 
             if ( pWeapon )
             {
+                /* Send a packet to the server with info about the new weapon,
+                   so the server stays in sync reliably */
                 unsigned int uiSlot = static_cast < unsigned int > ( pWeapon->GetSlot () );
-
-                if ( !IsGlitchEnabled ( GLITCH_QUICKRELOAD ) )
-                {
-					CWeapon* pPreviousWeapon = m_pLocalPlayer->GetWeapon ( m_lastWeaponSlot );
-					if ( pPreviousWeapon )
-					{
-						m_wasWeaponAmmoInClip [ m_lastWeaponSlot ] = pPreviousWeapon->GetAmmoInClip();
-					}
-                    if ( m_wasWeaponAmmoInClip [ uiSlot ] > 0 )
-                    {
-                        m_pLocalPlayer->GetWeapon()->SetAmmoInClip ( m_wasWeaponAmmoInClip [ uiSlot ] );
-                    }
-                }
-
-                /* Send a packet to the server with info about the NEW weapon,
-                   so the server stays in sync reliably */        
                 slot.data.uiSlot = uiSlot;
                 BitStream.Write ( &slot );
 
@@ -4691,19 +4678,21 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     m_pBigPacketTransferBox->SetInfoSingleDownload ( "", Min ( ulTotalSize, ulBytesReceived ) );
 }
 
-bool CClientGame::SetGlitchEnabled ( char cGlitch, bool bEnabled )
+bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
 {
-    if ( bEnabled != m_Glitches[cGlitch] )
+    if ( ucGlitch < NUM_GLITCHES && bEnabled != m_Glitches[ucGlitch] )
     {
-        m_Glitches[cGlitch] = bEnabled;
+        m_Glitches[ucGlitch] = bEnabled;
+        if ( ucGlitch == GLITCH_QUICKRELOAD )
+            g_pMultiplayer->DisableQuickReload ( !bEnabled );
         return true;
     }
     return false;
 }
 
-bool CClientGame::IsGlitchEnabled ( char cGlitch )
+bool CClientGame::IsGlitchEnabled ( unsigned char ucGlitch )
 {
-    return m_Glitches[cGlitch] || false;
+    return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
 bool CClientGame::SetCloudsEnabled ( bool bEnabled )
