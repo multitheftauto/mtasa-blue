@@ -49,6 +49,9 @@ public:
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
 	void						DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
+    void                        DisableZoneNames            ( bool bDisabled );
+    void                        DisableBirds                ( bool bDisabled );
+    void                        DisableQuickReload          ( bool bDisable );
 
     bool                        GetExplosionsDisabled       ();
     void                        DisableExplosions           ( bool bDisabled );
@@ -67,8 +70,6 @@ public:
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
-    void                        DisableZoneNames            ( bool bDisabled );
-    void                        DisableBirds                ( bool bDisabled );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
     void                        ResetSky                    ();
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );

@@ -172,6 +172,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        NUM_GLITCHES
     };
     class CStoredWeaponSlot
     {
@@ -322,7 +323,7 @@ public:
 
     void                                ResetMapInfo                    ( void );
 
-    void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15 );
+    void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15, bool bFromDamageHandler = false );
     void                                SendPedWastedPacket                       ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
 
     void                                SetMarkerBounce                 ( float fMarkerBounce ) { m_fMarkerBounce = fMarkerBounce; }
@@ -336,8 +337,8 @@ public:
     inline bool                         GetHudAreaNameDisabled          ( void )                        { return m_bHudAreaNameDisabled; };
     inline void                         SetHudAreaNameDisabled          ( bool bDisabled )              { m_bHudAreaNameDisabled = bDisabled; };
 
-    bool                                SetGlitchEnabled                ( char cGlitch, bool bEnabled );
-    bool                                IsGlitchEnabled                 ( char cGlitch );
+    bool                                SetGlitchEnabled                ( unsigned char cGlitch, bool bEnabled );
+    bool                                IsGlitchEnabled                 ( unsigned char cGlitch );
 
     bool                                SetCloudsEnabled                ( bool bEnabled );
     bool                                GetCloudsEnabled                ( void );
@@ -557,7 +558,7 @@ private:
     float                               m_fGameSpeed;
     long                                m_lMoney;
 
-    bool                                m_Glitches[3];
+    bool                                m_Glitches[NUM_GLITCHES];
 
     //Clouds Enabled
     bool                                m_bCloudsEnabled;

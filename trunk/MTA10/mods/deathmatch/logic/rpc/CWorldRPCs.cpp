@@ -204,7 +204,7 @@ void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )
 
 void CWorldRPCs::SetGlitchEnabled ( NetBitStreamInterface& bitStream )
 {
-	char eGlitch;
+	unsigned char eGlitch;
     unsigned char ucIsEnabled;
 	bitStream.Read ( eGlitch );
     bitStream.Read ( ucIsEnabled );

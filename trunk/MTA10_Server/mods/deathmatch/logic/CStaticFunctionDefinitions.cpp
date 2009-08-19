@@ -7071,7 +7071,7 @@ bool CStaticFunctionDefinitions::SetGlitchEnabled ( std::string strGlitchName, b
         if ( g_pGame->IsGlitchEnabled ( strGlitchName ) != bEnabled )
         {
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( g_pGame->GetGlitchIndex(strGlitchName) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGlitchIndex(strGlitchName) ) );
             BitStream.pBitStream->Write ( bEnabled );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_GLITCH_ENABLED, *BitStream.pBitStream ) );
 

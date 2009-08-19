@@ -105,6 +105,9 @@ public:
 	virtual void						DisablePadHandler           ( bool bDisabled ) = 0;
 	virtual void						DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
+    virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
+    virtual void                        DisableBirds                ( bool bDisabled ) = 0;
+    virtual void                        DisableQuickReload          ( bool bDisable ) = 0;
 
     virtual bool                        GetExplosionsDisabled       () = 0;
     virtual void                        DisableExplosions           ( bool bDisabled ) = 0;
@@ -123,8 +126,6 @@ public:
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
-    virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
-    virtual void                        DisableBirds                ( bool bDisabled ) = 0;
     virtual void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue ) = 0;
     virtual void                        ResetSky                    () = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
