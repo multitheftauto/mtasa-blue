@@ -252,6 +252,21 @@ VOID CCameraSA::Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGun
 	}
 }
 
+float CCameraSA::Find3rdPersonQuickAimPitch ( void )
+{
+	DEBUG_TRACE("float CCameraSA::Find3rdPersonQuickAimPitch ( void )");
+	float fReturn;
+    DWORD dwFunc = FUNC_Find3rdPersonQuickAimPitch;
+	CCameraSAInterface * cameraInterface = this->GetInterface();
+	_asm
+	{
+		mov		ecx, cameraInterface
+		call	dwFunc
+        fstp    fReturn
+	}
+    return fReturn;
+}
+
 BYTE CCameraSA::GetActiveCam()
 {
 	DEBUG_TRACE("BYTE CCameraSA::GetActiveCam()");
