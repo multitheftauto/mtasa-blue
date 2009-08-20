@@ -46,6 +46,10 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = CHAT_WIDTH;
     m_bCanChangeWidth = true;
+    m_iScrollingBack = 0;
+    m_fCssStyleOverrideAlpha = 0.0f;
+    m_fBackgroundAlpha = 0.0f;
+    m_fInputBackgroundAlpha = 0.f;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -128,21 +132,15 @@ void CChat::Draw ( void )
 
     float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
     CVector2D vecPosition ( m_vecBackgroundPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - ( fLineDifference * 1.25f ) );
-    unsigned char ucAlpha = 0;
     unsigned long ulTime = GetTickCount ();
-    unsigned long ulLineAge = 0;
-    bool bShadow = ( m_Color.A == 0 || ( m_bCssStyleText && !m_bInputVisible ) );
-    bool bInputShadow = ( m_InputColor.A == 0 );
+    float fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
+    bool bShadow = ( m_Color.A * m_fBackgroundAlpha == 0.f );
+    bool bInputShadow = ( m_InputColor.A * m_fInputBackgroundAlpha == 0.f );
 
-    bool bDrawBackground = false;
-    if ( m_bCssStyleBackground )
-        bDrawBackground = ( m_bVisible && m_bInputVisible && m_Color.A != 0 );
-    else
-        bDrawBackground = ( m_bVisible && m_Color.A != 0 );
-
-    if ( bDrawBackground )
+    if ( m_Color.A * m_fBackgroundAlpha > 0.f )
     {
         // Hack to draw the background behind the text.
+        m_pBackground->SetAlpha ( m_fBackgroundAlpha );
         m_pBackground->SetVisible ( true );
         m_pBackground->Render ();
         m_pBackground->SetVisible ( false );
@@ -174,27 +172,16 @@ void CChat::Draw ( void )
     // Loop over the circular buffer
     while ( m_Lines [ uiLine ].IsActive () && uiLinesDrawn < m_uiNumLines + (fabsf( m_fSmoothScroll ) > 0.1f ? 1 : 0) )
     {
-        ucAlpha = 255;
-        if ( m_bCssStyleText && !m_bInputVisible )
-        {
-            ulLineAge = ulTime - m_Lines [ uiLine ].GetCreationTime ();
-            if ( ulLineAge > m_ulChatLineLife )
-            {
-                if ( ulLineAge > ( m_ulChatLineLife + m_ulChatLineFadeOut ) )
-                {
-                    ucAlpha = 0;
-                }
-                else
-                {
-                    float fOver = float ( ( m_ulChatLineLife + m_ulChatLineFadeOut ) - ulLineAge );
-                    fOver /= ( float ) m_ulChatLineFadeOut;
-                    ucAlpha = unsigned char ( fOver * 255.0f );
-                }
-            }
-        }
+        // Calculate line alpha
+        long ulLineAge = ulTime - m_Lines [ uiLine ].GetCreationTime ();
+        float fLineAlpha = (long)( m_ulChatLineLife + m_ulChatLineFadeOut - ulLineAge ) * fRcpChatLineFadeOut;
 
-        if ( ucAlpha > 0 )
-            m_Lines [ uiLine ].Draw ( vecPosition, ucAlpha, bShadow, RenderBounds );
+        // Clamp line alpha range and combine with Css override
+        fLineAlpha = Clamp ( 0.0f, fLineAlpha, 1.0f );
+        fLineAlpha += ( 1.0f - fLineAlpha ) * m_fCssStyleOverrideAlpha;
+
+        if ( fLineAlpha > 0.f )
+            m_Lines [ uiLine ].Draw ( vecPosition, static_cast < unsigned char >( fLineAlpha * 255.0f ), bShadow, RenderBounds );
 
         vecPosition.fY -= fLineDifference;
 
@@ -204,19 +191,20 @@ void CChat::Draw ( void )
             break;
     }
 
+    if ( m_InputColor.A * m_fInputBackgroundAlpha > 0.f )
+    {
+        if ( m_pInput )
+        {
+            // Hack to draw the input background behind the text.
+            m_pInput->SetAlpha ( m_fInputBackgroundAlpha );
+            m_pInput->SetVisible ( true );
+            m_pInput->Render ();
+            m_pInput->SetVisible ( false );
+        }
+    }
+
     if ( m_bInputVisible )
     {
-        if ( m_InputColor.A != 0 )
-        {
-            if ( m_pInput )
-            {
-                // Hack to draw the input background behind the text.
-                m_pInput->SetVisible ( true );
-                m_pInput->Render ();
-                m_pInput->SetVisible ( false );
-            }
-        }
-
         CVector2D vecPosition ( m_vecInputPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecInputPosition.fY + ( fLineDifference * 0.125f ) );
         m_InputLine.Draw ( vecPosition, 255, bInputShadow );
     }
@@ -265,6 +253,33 @@ void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
     // Set return values
     *pfPixelScroll = fPixelScroll;
     *piLineScroll = iLineScroll;
+
+    // Update 'scrolling back' flag
+    if ( m_uiScrollOffset != 0 )
+        m_iScrollingBack = 10;
+    else
+        m_iScrollingBack = Max ( 0, m_iScrollingBack - 1 );
+
+    //
+    // Also update CssStyle override alpha
+    //
+    float fTarget = ( !m_bCssStyleText || m_bInputVisible || m_iScrollingBack ) ? 1.0f : 0.0f;
+    float fMaxAmount = fDeltaSeconds * 2.0f;    // 0.5 seconds fade time
+    m_fCssStyleOverrideAlpha += Clamp ( -fMaxAmount, fTarget - m_fCssStyleOverrideAlpha, fMaxAmount );
+
+    //
+    // Also update background alpha
+    //
+    fTarget = ( !m_bCssStyleBackground || m_bInputVisible || m_iScrollingBack ) ? 1.0f : 0.0f;
+    fMaxAmount = fDeltaSeconds * 5.0f;          // 0.2 seconds fade time
+    m_fBackgroundAlpha += Clamp ( -fMaxAmount, fTarget - m_fBackgroundAlpha, fMaxAmount );
+
+    //
+    // Also update input background alpha
+    //
+    fTarget = ( m_bInputVisible ) ? 1.0f : 0.0f;
+    fMaxAmount = fDeltaSeconds * 5.0f;          // 0.2 seconds fade time
+    m_fInputBackgroundAlpha += Clamp ( -fMaxAmount, fTarget - m_fInputBackgroundAlpha, fMaxAmount );
 }
 
 

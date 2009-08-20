@@ -46,6 +46,10 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = DEBUGVIEW_WIDTH;
     m_bCanChangeWidth = false;
+    m_iScrollingBack = 0;
+    m_fCssStyleOverrideAlpha = 0.0f;
+    m_fBackgroundAlpha = 0.0f;
+    m_fInputBackgroundAlpha = 0.f;
     m_Color = CColor ( 0, 0, 0, 100 );
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
     unsigned long ulBackgroundColor = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );

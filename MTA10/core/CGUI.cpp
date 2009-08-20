@@ -644,18 +644,22 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     {
         case WM_KEYDOWN:
         {
-            extern CChat* g_pChat;
-
             if ( wParam == VK_PRIOR )
             {
-                if ( g_pChat )
-                    g_pChat->ScrollUp ();
+                if ( m_pChat )
+                    m_pChat->ScrollUp ();
+
+                if ( m_pDebugView )
+                    m_pDebugView->ScrollUp ();
             }
             else
             if ( wParam == VK_NEXT )
             {
-                if ( g_pChat )
-                    g_pChat->ScrollDown ();
+                if ( m_pChat )
+                    m_pChat->ScrollDown ();
+
+                if ( m_pDebugView )
+                    m_pDebugView->ScrollDown ();
             }
         }
     }

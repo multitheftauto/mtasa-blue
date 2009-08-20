@@ -203,6 +203,10 @@ protected:
 
     bool                        m_bVisible;
     bool                        m_bInputVisible;
+    int                         m_iScrollingBack;           // Non zero if currently scrolling back
+    float                       m_fCssStyleOverrideAlpha;   // For fading out 'CssStyle' effect. (When entering text or scrolling back)
+    float                       m_fBackgroundAlpha;
+    float                       m_fInputBackgroundAlpha;
     
     unsigned int                m_uiNumLines;
     CColor                      m_Color;
