@@ -32,6 +32,7 @@
 #define FUNC_ConeCastCollisionResolve		0x51A5D0
 
 #define FUNC_Find3rdPersonCamTargetVector	0x514970 //##SA##
+#define FUNC_Find3rdPersonQuickAimPitch     0x50AD40
 #define FUNC_TryToStartNewCamMode			0x467AAD
 #define FUNC_VectorTrackLinear				0x50D1D0
 #define FUNC_GetFadingDirection				0x50ADF0
@@ -406,7 +407,8 @@ public:
 	VOID						SetMatrix ( CMatrix * matrix );
 	VOID						SetCamPositionForFixedMode ( CVector * vecPosition, CVector * vecUpOffset );
 	VOID						Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGunMuzzle, CVector * vecSource, CVector * vecTarget );
-	BYTE						GetActiveCam();
+	float                       Find3rdPersonQuickAimPitch ( void );
+    BYTE						GetActiveCam();
 
 	CCam						* GetCam(BYTE bCameraID);
     virtual CCam                * GetCam ( CCamSAInterface* camInterface );

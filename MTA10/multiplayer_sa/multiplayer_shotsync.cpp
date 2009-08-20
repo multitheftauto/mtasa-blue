@@ -147,6 +147,9 @@ VOID WriteGunDirectionDataForPed ( CPedSAInterface * pPedInterface, float * fGun
         // store it
         if ( fGunDirectionX && fGunDirectionY )
         {
+            // Make sure our pitch is updated (fixes first-person weapons not moving)
+            *fGunDirectionY = pGameInterface->GetCamera ()->Find3rdPersonQuickAimPitch ();
+
             LocalShotSyncData.m_fArmDirectionX = *fGunDirectionX;
             LocalShotSyncData.m_fArmDirectionY = *fGunDirectionY;
         }
