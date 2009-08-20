@@ -211,6 +211,7 @@ public:
 #endif
 
     void                        JoinPlayer                  ( CPlayer& Player );
+    void                        InitialDataStream           ( CPlayer& Player );
     void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None", const char* szResponsiblePlayer = "None" );
 
     inline class CLuaManager*   GetLuaManager               ( void )        { return m_pLuaManager; };

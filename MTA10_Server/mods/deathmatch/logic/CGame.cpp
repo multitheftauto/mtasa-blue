@@ -884,14 +884,6 @@ bool CGame::ProcessPacket ( CPacket& Packet )
 
 void CGame::JoinPlayer ( CPlayer& Player )
 {
-    // He's joined now
-    Player.SetStatus ( STATUS_JOINED );
-
-    // Console
-    char szIP [64];
-    Player.GetSourceIP ( szIP );
-    CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), szIP );
-
     // Set the root element as his parent
     // NOTE: Make sure he doesn't get any entities sent to him because we're sending him soon
     Player.SetDoNotSendEntities ( true );
@@ -905,6 +897,17 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPDownloadType (),
                                               m_pMainConfig->GetHTTPPort (),
                                               m_pMainConfig->GetHTTPDownloadURL ().c_str () ) );
+}
+
+void CGame::InitialDataStream ( CPlayer& Player )
+{
+    // He's joined now
+    Player.SetStatus ( STATUS_JOINED );
+
+    // Console
+    char szIP [64];
+    Player.GetSourceIP ( szIP );
+    CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), szIP );
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
@@ -1004,7 +1007,6 @@ void CGame::JoinPlayer ( CPlayer& Player )
         }
     }
 }
-
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
 {

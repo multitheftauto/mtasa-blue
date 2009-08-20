@@ -44,7 +44,7 @@ void CClientPlayerManager::DoPulse ( void )
             // Flag him with connection error if its been more than 6000 ms since last puresync and force his position
             unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
             bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + 6000 && pPlayer->GetOccupiedVehicleSeat () == 0 );
-            if ( bHasConnectionTrouble )
+            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () )
             {
                 pPlayer->SetHasConnectionTrouble ( true );
 
