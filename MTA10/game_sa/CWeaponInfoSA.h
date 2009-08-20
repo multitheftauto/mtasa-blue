@@ -47,7 +47,7 @@ public:
 	
 	// skill settings
 	eWeaponSkill m_SkillLevel;		    // what's the skill level of this weapontype
-	FLOAT		m_nReqStatLevel;		// what stat level is required for this skill level
+	int			m_nReqStatLevel;		// what stat level is required for this skill level
 	FLOAT		m_fAccuracy;			// modify accuracy of weapon
 	FLOAT		m_fMoveSpeed;			// how fast can move with weapon
 

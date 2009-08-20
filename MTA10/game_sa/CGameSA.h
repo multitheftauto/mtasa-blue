@@ -32,8 +32,9 @@
 
 #define		ARRAY_WeaponInfo				0xC8AAB8    // ##SA##
 #define		CLASSSIZE_WeaponInfo			112         // ##SA##
-#define     NUM_WeaponInfoSkills            11
-#define     NUM_WeaponInfo                  WEAPONTYPE_LAST_WEAPONTYPE+(3*NUM_WeaponInfoSkills) // 3 sets of skill weapon infos
+#define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
+#define     NUM_WeaponInfosOtherSkill       11
+#define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
 #define     MODELINFO_LAST_PLAYER_ID        288         // ??
 #define     MODELINFO_MAX                   65535
@@ -58,7 +59,7 @@ class CGameSA : public CGame
     friend class COffsets;
 
 private:
-	CWeaponInfo			* WeaponInfos[NUM_WeaponInfo];
+	CWeaponInfo			* WeaponInfos[NUM_WeaponInfosTotal];
 	CModelInfoSA		ModelInfo[MODELINFO_MAX];
 public:
 	CGameSA(); // constructor
