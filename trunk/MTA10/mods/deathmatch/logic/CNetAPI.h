@@ -106,6 +106,7 @@ private:
 enum eServerRPCFunctions
 {
     PLAYER_INGAME_NOTICE,
+    INITIAL_DATA_STREAM,
     PLAYER_TARGET,
     PLAYER_WEAPON,
     KEY_BIND,

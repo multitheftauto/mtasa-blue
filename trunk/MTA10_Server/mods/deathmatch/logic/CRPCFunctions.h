@@ -46,6 +46,7 @@ public:
 
 protected:
     DECLARE_RPC ( PlayerInGameNotice );
+    DECLARE_RPC ( InitialDataStream );
     DECLARE_RPC ( PlayerTarget );
     DECLARE_RPC ( PlayerWeapon );
     DECLARE_RPC ( KeyBind );
@@ -60,6 +61,7 @@ protected:
     enum eRPCFunctions
     {
         PLAYER_INGAME_NOTICE,
+        INITIAL_DATA_STREAM,
         PLAYER_TARGET,
         PLAYER_WEAPON,
         KEY_BIND,

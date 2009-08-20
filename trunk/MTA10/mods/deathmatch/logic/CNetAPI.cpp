@@ -248,7 +248,7 @@ void CNetAPI::DoPulse ( void )
 			m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
 
             // We should do a puresync?
-            if ( IsPureSyncNeeded () )
+            if ( IsPureSyncNeeded () && !g_pClientGame->IsDownloadingBigPacket () )
             {
                 // Are in a vehicle?
                 if ( pVehicle )
@@ -293,7 +293,7 @@ void CNetAPI::DoPulse ( void )
             else
             {
                 // We should do a keysync?
-                if ( IsSmallKeySyncNeeded ( pPlayer ) )
+                if ( IsSmallKeySyncNeeded ( pPlayer ) && !g_pClientGame->IsDownloadingBigPacket () )
                 {
                     // Send a keysync packet
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -310,7 +310,8 @@ void CNetAPI::DoPulse ( void )
             }
 
             // Time to freeze because of lack of return sync?
-            if ( ( m_bStoredReturnSync ) &&
+            if ( !g_pClientGame->IsDownloadingBigPacket () &&
+                    ( m_bStoredReturnSync ) &&
                     ( m_ulLastPuresyncTime != 0 ) &&
                     ( m_ulLastSyncReturnTime != 0 ) &&
                     ( ulCurrentTime <= m_ulLastPuresyncTime + 5000 ) &&
@@ -1636,7 +1637,7 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
             pBitStream->ResetReadPointer ();
         }
 
-        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
+        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
 }

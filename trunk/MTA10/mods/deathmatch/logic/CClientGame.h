@@ -347,6 +347,7 @@ public:
 
     void                                ChangeVehicleWeapon             ( bool bNext );
     void                                NotifyBigPacketProgress         ( unsigned long ulBytesReceived, unsigned long ulTotalSize );
+    bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
 
 private:
     #ifdef MTA_VOICE
