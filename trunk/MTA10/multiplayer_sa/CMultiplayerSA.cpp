@@ -4032,7 +4032,7 @@ bool CPed_GetWeaponSkill ()
         CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 );
         if ( pPed != pLocalPlayerPed )
         {
-            if ( weaponSkillWeapon >= 22 && weaponSkillWeapon <= 32 )
+            if ( weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9 )
             {
                 CPlayerPed* playerPed = dynamic_cast < CPlayerPed* > ( pPed ); 
 	            if ( playerPed )

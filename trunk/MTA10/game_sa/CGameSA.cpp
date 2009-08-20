@@ -99,16 +99,17 @@ CGameSA::CGameSA()
     this->m_pWaterManager           = new CWaterManagerSA ();
 
     // Normal weapon types (WEAPONSKILL_STD)
-	for ( int i = 0;i < WEAPONTYPE_LAST_WEAPONTYPE;i++)
-		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), (eWeaponType)i);
+	for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
+		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int index;
     for ( int skill = 0; skill < 3 ; skill++ )
     {
-        for ( int i = 0 ; i < NUM_WeaponInfoSkills ; i++ )
+        for ( int i = 0; i < NUM_WeaponInfosOtherSkill; i++ )
         {
-            index = WEAPONTYPE_LAST_WEAPONTYPE+(skill*NUM_WeaponInfoSkills)+i;
-            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index * CLASSSIZE_WeaponInfo), (eWeaponType)(i+WEAPONTYPE_PISTOL));
+            index = NUM_WeaponInfosStdSkill + skill*NUM_WeaponInfosOtherSkill + i;
+            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
         }
     }
 
@@ -126,7 +127,7 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CPlayerInfoSA* > ( m_pPlayerInfo );
 
     
-    for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
+    for ( int i = 0; i < NUM_WeaponInfosTotal; i++ )
     {
         delete reinterpret_cast < CWeaponInfoSA* > ( WeaponInfos [i] );
     }
@@ -165,22 +166,32 @@ CGameSA::~CGameSA ( void )
 	delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
 }
 
-CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill)
+CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 { 
 	DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
 	
-    if (weapon < WEAPONTYPE_LAST_WEAPONTYPE) 
+    if ( (skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
+         (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9) )
     {
         int offset = 0;
         switch ( skill )
         {
-            case WEAPONSKILL_STD: offset = 0; break;
-            case WEAPONSKILL_POOR: offset = 25; break;
-            case WEAPONSKILL_PRO: offset = 36; break;
-            case WEAPONSKILL_SPECIAL: offset = 47; break;
-            default: break;
+            case WEAPONSKILL_STD:
+                offset = 0;
+                break;
+            case WEAPONSKILL_POOR:
+                offset = NUM_WeaponInfosStdSkill - WEAPONTYPE_PISTOL;
+                break;
+            case WEAPONSKILL_PRO:
+                offset = NUM_WeaponInfosStdSkill + NUM_WeaponInfosOtherSkill - WEAPONTYPE_PISTOL;
+                break;
+            case WEAPONSKILL_SPECIAL:
+                offset = NUM_WeaponInfosStdSkill + 2*NUM_WeaponInfosOtherSkill - WEAPONTYPE_PISTOL;
+                break;
+            default:
+                break;
         }
-		return WeaponInfos[weapon+offset]; 
+		return WeaponInfos[offset + weapon]; 
     }
 	else 
 		return NULL; 
