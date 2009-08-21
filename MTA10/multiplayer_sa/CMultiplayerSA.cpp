@@ -157,6 +157,11 @@ DWORD RETURN_CPed_GetWeaponSkill =                          0x5E3B68;
 #define HOOKPOS_CPed_AddGogglesModel                        0x5E3ACB
 DWORD RETURN_CPed_AddGogglesModel =                         0x5E3AD4;
 
+#define FUNC_CWorld_Remove                                  0x563280
+#define FUNC_CTagManager_ShutdownForRestart                 0x49CC60
+unsigned int* VAR_NumTags                                   = (unsigned int *)0xA9AD70;
+DWORD** VAR_TagInfoArray                                    = (DWORD **)0xA9A8C0;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -902,18 +907,6 @@ void CMultiplayerSA::InitHooks()
     // graphics, no damage). Makes e.g. sawnoffs completely ineffective.
     // Remove this check so that no bullets are ignored.
     *(BYTE *)0x73FDF9 = 0xEB;
-
-    // Disallow spraying gang tags
-    // Nop the whole CTagManager::IsTag function and replace its body with:
-    // xor eax, eax
-    // ret
-    // to make it always return false
-    memset ( (void *)0x49CCE0, 0x90, 74 );
-    *(DWORD *)(0x49CCE0) = 0x90C3C033;
-    // Remove also some hardcoded and inlined checks for if it's a tag
-    memset ( (void *)0x53374A, 0x90, 56 );
-    *(BYTE *)(0x4C4403) = 0xEB;
-
 
     // Allow turning on vehicle lights even if the engine is off
     memset ( (void *)0x6E1DBC, 0x90, 8 );
@@ -4110,5 +4103,66 @@ void _declspec(naked) HOOK_CPed_AddGogglesModel ()
 
     skip:
         jmp RETURN_CPed_AddGogglesModel
+    }
+}
+
+void CMultiplayerSA::DeleteAndDisableGangTags ()
+{
+    static bool bDisabled = false;
+    if ( !bDisabled )
+    {
+        bDisabled = true;
+
+        // Destroy all the world tags
+        DWORD dwFunc = FUNC_CWorld_Remove;
+
+        for ( unsigned int i = 0; i < *VAR_NumTags; ++i )
+        {
+            DWORD* pTagInterface = VAR_TagInfoArray [ i << 1 ];
+            if ( pTagInterface )
+            {
+                _asm
+                {
+                    push pTagInterface
+                    call dwFunc
+                    add esp, 4
+                }
+            }
+        }
+
+        dwFunc = FUNC_CTagManager_ShutdownForRestart;
+        _asm call dwFunc
+ 
+        // Disallow spraying gang tags
+        // Nop the whole CTagManager::IsTag function and replace its body with:
+        // xor eax, eax
+        // ret
+        // to make it always return false
+        memset ( (void *)0x49CCE0, 0x90, 74 );
+        *(DWORD *)(0x49CCE0) = 0x90C3C033;
+        // Remove also some hardcoded and inlined checks for if it's a tag
+        memset ( (void *)0x53374A, 0x90, 56 );
+        *(BYTE *)(0x4C4403) = 0xEB;
+
+        // Force all tags to have zero tagged alpha
+        //
+        // Replaces:
+        // call    CVisibilityPlugins::GetUserValue
+        // push    esi
+        // movzx   edi, al
+        // call    CVisibilityPlugins::GetUserValue
+        // movzx   eax, ax
+        //
+        // With:
+        // push    esi
+        // xor     eax, eax
+        // xor     edi, edi
+        //
+        // No need to worry about the push esi, because at 0x49CE8E the stack is restored.
+        // CVisibilityPlugins::GetUserValue is a cdecl.
+        memset ( (void *)0x49CE58, 0x90, 5 );
+        memset ( (void *)0x49CE5E, 0x90, 11 );
+        *(unsigned short *)0x49CE5E = 0xC033;
+        *(unsigned short *)0x49CE60 = 0xFF33;
     }
 }
