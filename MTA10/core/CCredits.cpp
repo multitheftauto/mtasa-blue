@@ -43,13 +43,13 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v1.0 ==\n"
                           "Paul \"Brophy\" Brophy\n"
                           "Maciej \"MACK\" Cieslak\n"
                           "Jacek \"jhxp\" Halas vel Lagoda\n"
+                          "Brad \"Slothman\" Hammond\n"
                           "Norbert \"norby89\" Juhos\n"
                           "Kris \"KWKSND\" Kulchisky\n"
                           "Dustin \"Ransom\" Morren\n"
                           "\n"
                        
                           "erorr404\n"
-                          "Slothman\n"
                           "\n"
 
                           "Patch contributors\n"
@@ -91,7 +91,7 @@ CCredits::CCredits ( void )
 
     // Create our window
 	CVector2D RelativeWindow = CVector2D ( fWindowX / pManager->GetResolution ().fX, fWindowY / pManager->GetResolution ().fY );
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, SString("MTA:SA %s %s", MTA_DM_VERSIONSTRING, MTA_DM_BUILDTYPE).c_str() ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, SString("Multi Theft Auto: San Andreas %s %s", MTA_DM_VERSIONSTRING, MTA_DM_BUILDTYPE).c_str() ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetMovable ( false );
     m_pWindow->SetPosition ( CVector2D ( 0.5f - RelativeWindow.fX*0.5f, 0.5f - RelativeWindow.fY*0.5f ), true );
