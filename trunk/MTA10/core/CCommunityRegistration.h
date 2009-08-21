@@ -15,7 +15,7 @@ class CCommunityRegistration;
 #ifndef __CCOMMUNITYREGISTRATION_H
 #define __CCOMMUNITYREGISTRATION_H
 
-#define REGISTRATION_DELAY              150000
+#define REGISTRATION_DELAY              3000
 #define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
 #define REGISTRATION_DATA_BUFFER_SIZE   100000
 #define REGISTRATION_TEMP_FILE          "MTA\\temp.png"
