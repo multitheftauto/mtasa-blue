@@ -125,6 +125,7 @@ void CCommunity::DoPulse ( void )
         }
         // Check for timeout
         else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {
+            g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
             Logout ();
         }
     }
