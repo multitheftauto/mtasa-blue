@@ -2985,6 +2985,8 @@ void CClientGame::Event_OnIngame ( void )
     pHud->DisableVitalStats ( true );
     pHud->DisableAreaName ( true );
 
+    g_pMultiplayer->DeleteAndDisableGangTags ();
+
     // Switch off peds and traffic
     g_pGame->GetPathFind ()->SwitchRoadsOffInArea ( &CVector(-100000.0f, -100000.0f, -100000.0f), &CVector(100000.0f, 100000.0f, 100000.0f) );
     g_pGame->GetPathFind ()->SwitchPedRoadsOffInArea ( &CVector(-100000.0f, -100000.0f, -100000.0f), &CVector(100000.0f, 100000.0f, 100000.0f) );

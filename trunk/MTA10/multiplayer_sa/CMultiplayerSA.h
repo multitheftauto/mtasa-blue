@@ -118,6 +118,7 @@ public:
     void                        SetAkimboTargetUp           ( bool bUp ) { m_bAkimboTargetUp = bUp; };
 
     void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn );
+    void                        DeleteAndDisableGangTags    ();
     
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
