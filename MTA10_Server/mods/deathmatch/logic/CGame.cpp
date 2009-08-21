@@ -2119,7 +2119,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     pVehicle->SetIdleTime ( 0 );
 
                                     //Update our engine State
-                                    pVehicle->SetEngineOn( false );
+                                    pVehicle->SetEngineOn( true );
 
                                     // Tell everyone he's in (they should warp him in)
                                     CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_RETURN );
