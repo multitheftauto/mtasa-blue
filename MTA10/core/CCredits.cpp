@@ -50,6 +50,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v1.0 ==\n"
                           "\n"
                        
                           "erorr404\n"
+                          "MeKorea\n"
                           "\n"
 
                           "Patch contributors\n"
