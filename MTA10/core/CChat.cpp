@@ -392,7 +392,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
                 if ( m_strInputText.size () < CHAT_MAX_CHAT_LENGTH )
                 {                    
-                    if ( KeyboardArgs.codepoint >= 32 && KeyboardArgs.codepoint <= 126 )
+                    if ( KeyboardArgs.codepoint >= 32 )
                     {
                         m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
                         SetInputText ( m_strInputText.c_str () );

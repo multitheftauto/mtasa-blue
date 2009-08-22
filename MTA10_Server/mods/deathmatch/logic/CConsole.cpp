@@ -42,7 +42,7 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
     char szCommandBuffer [256];
     szCommandBuffer [255] = 0;
     strncpy ( szCommandBuffer, szCommand, 255 );
-    stripString ( szCommandBuffer );
+    stripControlCodes ( szCommandBuffer );
 
     // Split it into two parts: Key and argument
     char* szKey = strtok ( szCommandBuffer, " " );
