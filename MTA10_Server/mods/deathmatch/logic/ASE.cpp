@@ -111,6 +111,11 @@ void ASE::DoPulse ( void )
                 strReply = QueryLight ();
                 break;
             }
+            case 'r':
+            { // Our own lighter query for ingame browser - Release version only
+                strReply = QueryLight ();
+                break;
+            }
             case 'v':
             { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
                 strReply = MTA_DM_ASE_VERSION;
