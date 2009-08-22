@@ -36,7 +36,7 @@ void CClientRadarMarkerManager::DoPulse ( void )
     // Grab the camera position here (so it isn't done for every marker)
     m_pManager->GetCamera ()->GetPosition ( m_vecCameraPosition );
     list < CClientRadarMarker* > ::iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); iter++ )
+    for ( ; iter != m_Markers.end (); ++iter )
     {
         (*iter)->DoPulse ();
     }

@@ -11,6 +11,7 @@
 *               Jax <>
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *****************************************************************************/
 
@@ -56,6 +57,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     strncpy ( m_szTypeName, "unknown", MAX_TYPENAME_LENGTH );
     m_szTypeName [MAX_TYPENAME_LENGTH] = 0;
     m_uiTypeHash = HashString ( m_szTypeName );
+    CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
 
     m_szName [0] = 0;
     m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
@@ -175,13 +177,17 @@ CClientEntity::~CClientEntity ( void )
         }
     }
     m_Contacts.clear ();
+
+    CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
 void CClientEntity::SetTypeName ( const char* szName )
 {
+    CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
     strncpy ( m_szTypeName, szName, MAX_TYPENAME_LENGTH );
     m_uiTypeHash = HashString ( szName );
+    CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -928,7 +934,15 @@ void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMa
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
     unsigned int uiTypeHash = HashString ( szType );
-    FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
+
+    if ( this == g_pClientGame->GetRootEntity () )
+    {
+        GetEntitiesFromRoot ( uiTypeHash, pLuaMain, bStreamedIn );
+    }
+    else
+    {
+        FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
+    }
 }
 
 
@@ -1223,4 +1237,66 @@ RpClump * CClientEntity::GetClump ( void )
         return pEntity->GetRpClump ();
     }
     return NULL;
+}
+
+
+// Entities from root optimization for getElementsByType
+CClientEntity::t_mapEntitiesFromRoot CClientEntity::ms_mapEntitiesFromRoot;
+bool CClientEntity::ms_bEntitiesFromRootInitialized = false;
+
+void CClientEntity::StartupEntitiesFromRoot ()
+{
+    if ( !ms_bEntitiesFromRootInitialized )
+    {
+        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0x00000000 );
+        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
+        ms_bEntitiesFromRootInitialized = true;
+    }
+}
+
+void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* pEntity )
+{
+    std::list < CClientEntity* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    listEntities.push_front ( pEntity );
+}
+
+void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* pEntity )
+{
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        std::list < CClientEntity* >& listEntities = find->second;
+        listEntities.remove ( pEntity );
+        if ( listEntities.size () == 0 )
+            ms_mapEntitiesFromRoot.erase ( find );
+    }
+}
+
+void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn )
+{
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        std::list < CClientEntity* >& listEntities = find->second;
+        CClientEntity* pEntity;
+        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+        unsigned int uiIndex = 0;
+
+        for ( std::list < CClientEntity* >::const_reverse_iterator i = listEntities.rbegin ();
+              i != listEntities.rend ();
+              ++i )
+        {
+            pEntity = *i;
+
+            // Only streamed in elements?
+            if ( !bStreamedIn || !pEntity->IsStreamingCompatibleClass() || 
+                 reinterpret_cast < CClientStreamElement* > ( pEntity )->IsStreamedIn() )
+            {
+                // Add it to the table
+                lua_pushnumber ( luaVM, ++uiIndex );
+                lua_pushelement ( luaVM, pEntity );
+                lua_settable ( luaVM, -3 );
+            }
+        }
+    }    
 }

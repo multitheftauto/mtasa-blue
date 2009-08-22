@@ -9,6 +9,7 @@
 *               Jax <>
 *               Cecill Etheredge <>
 *               lil_Toady <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -54,6 +55,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     }
 
     m_uiTypeHash = HashString ( m_strTypeName.c_str () );
+    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
     // Make an event manager for us
     m_pEventManager = new CMapEventManager;
@@ -115,13 +117,17 @@ CElement::~CElement ( void )
 
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
+
+    CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
 void CElement::SetTypeName ( std::string strTypeName )
 {
+    CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );
     m_strTypeName = strTypeName;
+    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -180,7 +186,15 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
     unsigned int uiTypeHash = HashString ( szType );
-    FindAllChildrenByTypeIndex ( uiTypeHash, pLua, uiIndex );
+
+    if ( this == g_pGame->GetMapManager ()->GetRootElement () )
+    {
+        GetEntitiesFromRoot ( uiTypeHash, pLua );
+    }
+    else
+    {
+        FindAllChildrenByTypeIndex ( uiTypeHash, pLua, uiIndex );
+    }
 }
 
 
@@ -1101,4 +1115,60 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
     return ( m_ucSyncTimeContext == ucRemote ||
              ucRemote == 0 ||
              m_ucSyncTimeContext == 0 );
+}
+
+
+// Entities from root optimization for getElementsByType
+CElement::t_mapEntitiesFromRoot CElement::ms_mapEntitiesFromRoot;
+bool CElement::ms_bEntitiesFromRootInitialized = false;
+
+void CElement::StartupEntitiesFromRoot ()
+{
+    if ( !ms_bEntitiesFromRootInitialized )
+    {
+        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0x00000000 );
+        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
+        ms_bEntitiesFromRootInitialized = true;
+    }
+}
+
+void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
+{
+    std::list < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    listEntities.push_front ( pEntity );
+}
+
+void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
+{
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        std::list < CElement* >& listEntities = find->second;
+        listEntities.remove ( pEntity );
+        if ( listEntities.size () == 0 )
+            ms_mapEntitiesFromRoot.erase ( find );
+    }
+}
+
+void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
+{
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        std::list < CElement* >& listEntities = find->second;
+        CElement* pEntity;
+        unsigned int uiIndex = 0;
+
+        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
+              i != listEntities.rend ();
+              ++i )
+        {
+            pEntity = *i;
+
+            // Add it to the table
+            lua_pushnumber ( pLua, ++uiIndex );
+            lua_pushelement ( pLua, pEntity );
+            lua_settable ( pLua, -3 );
+        }
+    }    
 }

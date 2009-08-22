@@ -51,7 +51,7 @@ void CClientPathManager::DeleteAll ( void )
 void CClientPathManager::DoPulse ( void )
 {
     list < CClientPathNode* > ::const_iterator iter = m_PathNodeList.begin ();
-    for ( ; iter != m_PathNodeList.end () ; iter++ )
+    for ( ; iter != m_PathNodeList.end () ; ++iter )
     {
         (*iter)->DoPulse ();
     }

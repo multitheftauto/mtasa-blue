@@ -313,7 +313,7 @@ void CClientModelRequestManager::DoPulse ( void )
         {
             // Cancel every entity in our cancel list
             list < CClientEntity* > ::iterator iter = m_CancelQueue.begin ();
-            for ( ; iter != m_CancelQueue.end (); iter++ )
+            for ( ; iter != m_CancelQueue.end (); ++iter )
             {
                 Cancel ( *iter, false );
             }

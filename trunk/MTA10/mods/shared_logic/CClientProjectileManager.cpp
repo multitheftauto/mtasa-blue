@@ -45,7 +45,7 @@ void CClientProjectileManager::DoPulse ( void )
     CClientProjectile* pProjectile = NULL;
     list < CClientProjectile* > cloneList = m_List;
     list < CClientProjectile* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         pProjectile = *iter;
 
@@ -69,7 +69,7 @@ void CClientProjectileManager::RemoveAll ( void )
 {
     list < CClientProjectile * > cloneList = m_List;
     list < CClientProjectile* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         delete *iter;
     }

@@ -99,7 +99,7 @@ void CClientRadarAreaManager::DoPulse ( bool bRender )
 {
     // Pulse each radar area marker
     list < CClientRadarArea* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( ; iter != m_List.end (); ++iter )
     {
         (*iter)->DoPulse ( bRender );
     }

@@ -52,14 +52,14 @@ void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
 	// Gather a list over children (we can't use the list as it changes)
 	list < CClientEntity* > Children;
 	list < CClientEntity* > ::const_iterator iterCopy = pElement->IterBegin ();
-	for ( ; iterCopy != pElement->IterEnd (); iterCopy++ )
+	for ( ; iterCopy != pElement->IterEnd (); ++iterCopy )
 	{
 		Children.push_back ( *iterCopy );
 	}
 
 	// Call ourselves on each child of this to go as deep as possible and start deleting there
 	list < CClientEntity* > ::const_iterator iter = Children.begin ();
-	for ( ; iter != Children.end (); iter++ )
+	for ( ; iter != Children.end (); ++iter )
 	{
 		DeleteRecursive ( *iter );
 	}

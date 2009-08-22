@@ -24,6 +24,7 @@ class CClientEntity;
 #include "CClientCommon.h"
 #include <assert.h>
 #include <list>
+#include <google/dense_hash_map>
 
 class CClientManager;
 
@@ -269,6 +270,18 @@ protected:
 
 private:
     static int                                  iCount;
+
+    // Optimization for getElementsByType starting at root
+public:
+    static void                     StartupEntitiesFromRoot ( );
+private:
+    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CClientEntity* pEntity );
+    static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
+    static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn );
+
+    typedef google::dense_hash_map < unsigned int, std::list < CClientEntity* > > t_mapEntitiesFromRoot;
+    static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
+    static bool                     ms_bEntitiesFromRootInitialized;
 };
 
 #endif
