@@ -36,7 +36,7 @@ void CClientPlayerManager::DoPulse ( void )
     unsigned long ulCurrentTime = CClientTime::GetTime ();
     CClientPlayer * pPlayer = NULL;
     list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    for ( ; iter != m_Players.end (); ++iter )
     {
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () )

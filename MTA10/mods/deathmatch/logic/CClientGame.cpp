@@ -146,6 +146,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pCore->GetGUI ()->SetMovedHandler             ( GUI_CALLBACK ( &CClientGame::OnMove, this ) );
     g_pCore->GetGUI ()->SetSizedHandler             ( GUI_CALLBACK ( &CClientGame::OnSize, this ) );
 
+    // Startup "entities from root" optimization for getElementsByType
+    CClientEntity::StartupEntitiesFromRoot ();
+
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
     m_pRootEntity->MakeSystemEntity ();

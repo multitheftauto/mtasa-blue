@@ -106,7 +106,7 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
 void CLuaManager::DoPulse ( void )
 {
     list<CLuaMain *>::iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end(); iter++ )
+    for ( ; iter != m_virtualMachines.end(); ++iter )
     {
         (*iter)->DoPulse ();
     }

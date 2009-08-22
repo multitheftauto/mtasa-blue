@@ -179,7 +179,7 @@ bool CScriptKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eScriptKey
     CScriptKeyBind * pKeyBind = NULL;
     list < CScriptKeyBind* > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         pKeyBind = *iter;
         if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == bindType )
@@ -332,7 +332,7 @@ bool CScriptKeyBinds::KeyFunctionExists ( SScriptBindableKey* pKey, CLuaMain* pL
     bool bFound = false;
 	list < CScriptKeyBind* > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
         {
@@ -375,7 +375,7 @@ void CScriptKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
                 continue;
             }
         }
-        iter++;
+        ++iter;
     }
 }
 
@@ -468,7 +468,7 @@ bool CScriptKeyBinds::RemoveControlFunction ( SScriptBindableGTAControl* pContro
                 }
             }
         }
-        iter++;
+        ++iter;
     }
     return bFound;
 }
@@ -490,7 +490,7 @@ bool CScriptKeyBinds::ControlFunctionExists ( SScriptBindableGTAControl* pContro
     bool bFound = false;
 	list < CScriptKeyBind* > cloneList = m_List;
     list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ;iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
         {

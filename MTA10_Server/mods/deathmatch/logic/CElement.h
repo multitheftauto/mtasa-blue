@@ -9,6 +9,7 @@
 *               Jax <>
 *               Cecill Etheredge <>
 *               lil_Toady <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -248,6 +249,18 @@ protected:
     std::list < class CPed * >                  m_OriginSourceUsers;
     unsigned char                               m_ucInterior;
     bool                                        m_bMapCreated;
+
+    // Optimization for getElementsByType starting at root
+public:
+    static void                     StartupEntitiesFromRoot ( );
+private:
+    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CElement* pEntity );
+    static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CElement* pEntity );
+    static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* pLua );
+
+    typedef google::dense_hash_map < unsigned int, std::list < CElement* > > t_mapEntitiesFromRoot;
+    static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
+    static bool                     ms_bEntitiesFromRootInitialized;
 };
 
 #endif

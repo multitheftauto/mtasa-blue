@@ -296,7 +296,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     CKeyBind* pBind = NULL;
     list < CKeyBind* > cloneList = *m_pList;
     list < CKeyBind* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    for ( ; iter != cloneList.end (); ++iter )
     {
         pBind = *iter;
         if ( pBind->IsBeingDeleted () || !pBind->boundKey ) continue;

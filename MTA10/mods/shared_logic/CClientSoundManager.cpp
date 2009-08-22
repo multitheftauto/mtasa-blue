@@ -75,7 +75,7 @@ void CClientSoundManager::DoPulse ( void )
     else
     {
         list < CClientSound* > ::iterator iter = m_Sounds.begin ();
-        for ( ; iter != m_Sounds.end () ; iter++ )
+        for ( ; iter != m_Sounds.end () ; ++iter )
         {
             (*iter)->Process3D ( vecPosition, vecLookAt );
         }

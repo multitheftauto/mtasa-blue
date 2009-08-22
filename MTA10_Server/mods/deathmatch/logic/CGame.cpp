@@ -356,6 +356,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pVoiceServer = NULL;
 #endif
 
+    // Startup the getElementsByType from root optimizations
+    CElement::StartupEntitiesFromRoot ();
+
 	m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;

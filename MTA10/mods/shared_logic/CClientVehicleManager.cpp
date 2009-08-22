@@ -91,7 +91,7 @@ void CClientVehicleManager::DoPulse ( void )
     // Loop through our streamed-in vehicles
     list < CClientVehicle * > cloneList = m_StreamedIn;
     list < CClientVehicle* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    for ( ; iter != cloneList.end (); ++iter )
     {
         pVehicle = *iter;
         // We should have a game vehicle here

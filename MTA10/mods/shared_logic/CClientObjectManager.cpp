@@ -116,7 +116,7 @@ void CClientObjectManager::DoPulse ( void )
     CClientObject * pObject = NULL;
     // Loop through all our streamed-in objects
     list < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end () ; iter++ )
+    for ( ; iter != m_StreamedIn.end () ; ++iter )
     {
         pObject = *iter;
         // We should have a game-object here

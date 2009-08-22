@@ -202,7 +202,7 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
 	CKeyBind* pKeyBind = NULL;
 	list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         pKeyBind = *iter;
         if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == bindType )
@@ -323,7 +323,7 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
                 }
             }
         }
-        iter++;
+        ++iter;
     }
     return bFound;
 }
@@ -334,7 +334,7 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
     bool bFound = false;
 	list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         if ( (*iter)->GetType () == KEY_BIND_FUNCTION )
         {
@@ -381,7 +381,7 @@ void CKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 				}
 			}
 		}
-        iter++;
+        ++iter;
     }
 }
 
@@ -464,7 +464,7 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
                 }
             }
         }
-        iter++;
+        ++iter;
     }
     return bFound;
 }
@@ -475,7 +475,7 @@ bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMai
     bool bFound = false;
 	list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ;iter++ )
+    for ( ; iter != cloneList.end () ; ++iter )
     {
         if ( (*iter)->GetType () == KEY_BIND_CONTROL_FUNCTION )
         {

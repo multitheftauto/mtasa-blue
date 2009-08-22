@@ -23,7 +23,7 @@ CClientColManager::~CClientColManager ( void )
 void CClientColManager::DoPulse ( void )
 {
     list < CClientColShape* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ ) (*iter)->DoPulse ();
+    for ( ; iter != m_List.end (); ++iter ) (*iter)->DoPulse ();
 }
 
 
@@ -33,7 +33,7 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
     // Call the hit detection event on all our shapes
     list < CClientColShape * > cloneList = m_List;
     list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    for ( ; iter != cloneList.end (); ++iter )
     {
         pShape = *iter;
 
@@ -102,7 +102,7 @@ bool CClientColManager::Exists ( CClientColShape* pShape )
     // Return true if it exists
     list < CClientColShape * > cloneList = m_List;
     list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    for ( ; iter != cloneList.end (); ++iter )
     {
         if ( *iter == pShape )
         {
@@ -119,7 +119,7 @@ void CClientColManager::DeleteAll ( void )
     // Delete all of them
     list < CClientColShape * > cloneList = m_List;
     list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    for ( ; iter != cloneList.end (); ++iter )
     {
         delete *iter;
     }
