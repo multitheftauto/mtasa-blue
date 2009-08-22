@@ -406,7 +406,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripString ( const_cast < char* > ( szArguments ) );
+        stripControlCodes ( const_cast < char* > ( szArguments ) );
 
         // Got a message?
         if ( szArguments )
@@ -538,7 +538,7 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
             if ( pTeam )
             {
                 // Strip any unwanted characters
-                stripString ( const_cast < char* > ( szArguments ) );
+                stripControlCodes ( const_cast < char* > ( szArguments ) );
 
                 // Got a message?
                 if ( szArguments )
@@ -617,7 +617,7 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripString ( const_cast < char* > ( szArguments ) );
+        stripControlCodes ( const_cast < char* > ( szArguments ) );
 
         // Got a message?
         if ( szArguments )
@@ -699,7 +699,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripString ( const_cast < char* > ( szArguments ) );
+        stripControlCodes ( const_cast < char* > ( szArguments ) );
 
         // Got a message?
         if ( szArguments )

@@ -1075,7 +1075,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             szMessage [iNumberOfBytesUsed] = 0;
 
             // Strip it for bad characters
-            StripUnwantedCharacters ( szMessage, ' ' );
+            StripControlCodes ( szMessage, ' ' );
 
 			// Call an event
 			CLuaArguments Arguments;
@@ -1106,7 +1106,7 @@ void CPacketHandler::Packet_ConsoleEcho ( NetBitStreamInterface& bitStream )
         szMessage [iNumberOfBytesUsed] = 0;
 
         // Strip it for bad characters
-        StripUnwantedCharacters ( szMessage, ' ' );
+        StripControlCodes ( szMessage, ' ' );
 
         // Echo it
         g_pCore->GetConsole ()->Echo ( szMessage );
@@ -1153,7 +1153,7 @@ void CPacketHandler::Packet_DebugEcho ( NetBitStreamInterface& bitStream )
         szMessage [iNumberOfBytesUsed] = 0;
 
         // Strip it for bad characters
-        StripUnwantedCharacters ( szMessage, ' ' );
+        StripControlCodes ( szMessage, ' ' );
 
         switch ( ucLevel )
         {

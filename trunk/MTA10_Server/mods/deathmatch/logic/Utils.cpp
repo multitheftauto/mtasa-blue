@@ -224,6 +224,25 @@ void stripString(char* szString)
     }
 }
 
+void stripControlCodes(char* szString)
+{
+    if ( szString )
+    {
+        unsigned char* pWrite = reinterpret_cast < unsigned char* > ( szString );
+        const unsigned char* pRead = pWrite;
+
+        while ( *pRead != '\0' )
+        {
+            if ( *pRead >= 32 )
+            {
+                *pWrite = *pRead;
+                ++pWrite;
+            }
+            ++pRead;
+        }
+        *pWrite = '\0';
+    }
+}
 
 bool StringBeginsWith ( const char* szText, const char* szBegins )
 {

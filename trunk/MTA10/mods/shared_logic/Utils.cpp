@@ -115,11 +115,35 @@ unsigned int StripUnwantedCharacters ( char* szText, unsigned char cReplace )
     return uiReplaced;
 }
 
+unsigned int StripControlCodes ( char* szText, unsigned char cReplace )
+{
+    // Replace any unwanted character with a space
+    unsigned int uiReplaced = 0;
+    char* szTemp = szText;
+    while ( *szTemp != 0 )
+    {
+        if ( IsControlCode ( *szTemp ) )
+        {
+            *szTemp = cReplace;
+            ++uiReplaced;
+        }
+
+        ++szTemp;
+    }
+
+    // Return how many characters we replaced
+    return uiReplaced;
+}
 
 bool IsWantedCharacter ( unsigned char c )
 {
     // 32..126 are visible characters
     return c >= 32 && c <= 126;
+}
+
+bool IsControlCode ( unsigned char c )
+{
+    return c < 32;
 }
 
 

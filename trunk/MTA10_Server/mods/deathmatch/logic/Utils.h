@@ -47,6 +47,7 @@ bool            DoesDirectoryExist          ( const char* szPath );
 bool            IsIn                        ( const char* szShortText, const char* szLongText );
 char*           uppercase                   ( char* s );
 void            stripString                 ( char* szString );
+void            stripControlCodes           ( char* szString );
 bool            StringBeginsWith            ( const char* szText, const char* szBegins );
 bool            IsNumericString             ( const char* szString );
 bool            IsNumericString             ( const char* szString, size_t sizeString );
