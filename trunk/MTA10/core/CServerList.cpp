@@ -309,7 +309,7 @@ void CServerListItem::Query ( void )
 	addr.sin_addr = Address;
 	addr.sin_port = htons ( usQueryPort );
 
-    int ret = sendto ( m_Socket, "b", 1, 0, (sockaddr *) &addr, sizeof(addr) );
+    int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
 	if ( ret == 1 )
         m_ulQueryStart = CClientTime::GetTime ();
 }
