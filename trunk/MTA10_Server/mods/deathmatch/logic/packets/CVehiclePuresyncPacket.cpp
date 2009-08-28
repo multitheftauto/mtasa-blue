@@ -254,13 +254,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 			{
 				// Call the onPlayerDamage event
 				CLuaArguments Arguments;
-				CElement* pKillerElement = pSourcePlayer->GetPlayerAttacker ();
-				if ( pKillerElement )
-					Arguments.PushElement ( pKillerElement );
-				else
-					Arguments.PushNil ();
-				Arguments.PushNumber ( pSourcePlayer->GetAttackWeapon () );
-				Arguments.PushNumber ( pSourcePlayer->GetAttackBodyPart () );
+                Arguments.PushNil ();
+                Arguments.PushNumber ( 0xff );
+				Arguments.PushNumber ( 0xff );
 				Arguments.PushNumber ( fArmorLoss );
 
 				pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );					

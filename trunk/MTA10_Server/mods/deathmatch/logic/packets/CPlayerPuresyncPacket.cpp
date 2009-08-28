@@ -191,8 +191,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( !BitStream.ReadCompressed ( DamagerID ) )
                 return false;
 
-            CElement* pElement = CElementIDs::GetElement ( DamagerID );
-
             SWeaponTypeSync weaponType;
             if ( !BitStream.Read ( &weaponType ) )
                 return false;
@@ -201,7 +199,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( !BitStream.Read ( &bodyPart ) )
                 return false;
 
-            pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
+            pSourcePlayer->SetDamageInfo ( DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
         }
 
         // If we know the player's dead, make sure the health we send on is 0
@@ -221,7 +219,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Call the onPlayerDamage event
             CLuaArguments Arguments;
-            CElement* pKillerElement = pSourcePlayer->GetPlayerAttacker ();
+            CElement* pKillerElement = CElementIDs::GetElement ( pSourcePlayer->GetPlayerAttacker () );
             if ( pKillerElement ) Arguments.PushElement ( pKillerElement );
             else Arguments.PushNil ();
             Arguments.PushNumber ( pSourcePlayer->GetAttackWeapon () );

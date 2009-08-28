@@ -141,10 +141,11 @@ public:
     inline bool                                 IsCamFadedIn                ( void )                        { return m_bCamFadedIn; };
     inline void                                 SetCamFadedIn               ( bool bCamFadedIn )            { m_bCamFadedIn = bCamFadedIn; };
 
-    inline void                                 SetDamageInfo               ( CElement* pElement, unsigned char ucWeapon, unsigned char ucBodyPart )     { m_pPlayerAttacker = pElement, m_ucAttackWeapon = ucWeapon, m_ucAttackBodyPart = ucBodyPart; }
-    inline CElement*                            GetPlayerAttacker           ( void )                        { return m_pPlayerAttacker; }
-    inline unsigned char                        GetAttackWeapon             ( void )                        { return m_ucAttackWeapon; }
-    inline unsigned char                        GetAttackBodyPart           ( void )                        { return m_ucAttackBodyPart; }
+    void                                        SetDamageInfo               ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart );
+    void                                        ValidateDamageInfo          ( void );
+    ElementID                                   GetPlayerAttacker           ( void );
+    unsigned char                               GetAttackWeapon             ( void );
+    unsigned char                               GetAttackBodyPart           ( void );
 
     inline CTeam*                               GetTeam                     ( void )                        { return m_pTeam; }
     void                                        SetTeam                     ( CTeam* pTeam, bool bChangeTeam = false );
@@ -247,9 +248,10 @@ private:
     unsigned long                               m_ulCamFadeColor;
     bool                                        m_bCamFadedIn;
 
-    CElement*                                   m_pPlayerAttacker;
+    ElementID                                   m_PlayerAttackerID;
     unsigned char                               m_ucAttackWeapon;
     unsigned char                               m_ucAttackBodyPart;
+    long long                                   m_llSetDamageInfoTime;
 
     CTeam*                                      m_pTeam;
     CPad*                                       m_pPad;

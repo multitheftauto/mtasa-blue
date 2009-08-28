@@ -55,9 +55,10 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_bCamFadedIn = false;
     SetCamFadeColor ( 0, 0, 0 );
 
-    m_pPlayerAttacker = NULL;
+    m_PlayerAttackerID = INVALID_ELEMENT_ID;
     m_ucAttackWeapon = 0xFF;
     m_ucAttackBodyPart = 0xFF;
+    m_llSetDamageInfoTime = 0;
 
     m_pTeam = NULL;
 
@@ -347,6 +348,48 @@ void CPlayer::SetCamFadeColor ( unsigned char ucRed, unsigned char ucGreen, unsi
 
 	#undef COLOR_ARGB
 	#undef COLOR_RGBA
+}
+
+
+void CPlayer::SetDamageInfo ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart )
+{
+    m_PlayerAttackerID = ElementID;
+    m_ucAttackWeapon = ucWeapon;
+    m_ucAttackBodyPart = ucBodyPart;
+    m_llSetDamageInfoTime = GetTickCount64_ ();
+}
+
+
+void CPlayer::ValidateDamageInfo ( void )
+{
+    if ( m_llSetDamageInfoTime + 100 < GetTickCount64_ () )
+    {
+        // Reset if data is too old
+        m_PlayerAttackerID = INVALID_ELEMENT_ID;
+        m_ucAttackWeapon = 0xFF;
+        m_ucAttackBodyPart = 0xFF;
+    }
+}
+
+
+ElementID CPlayer::GetPlayerAttacker ( void )
+{
+    ValidateDamageInfo ();
+    return m_PlayerAttackerID;
+}
+
+
+unsigned char CPlayer::GetAttackWeapon ( void )
+{
+    ValidateDamageInfo ();
+    return m_ucAttackWeapon;
+}
+
+
+unsigned char CPlayer::GetAttackBodyPart ( void )
+{
+    ValidateDamageInfo ();
+    return m_ucAttackBodyPart;
 }
 
 
