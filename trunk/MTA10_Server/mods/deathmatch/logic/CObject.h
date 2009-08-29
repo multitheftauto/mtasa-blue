@@ -47,8 +47,8 @@ public:
     const CVector&              GetPosition             ( void );
     void                        SetPosition             ( const CVector& vecPosition );
 
-    void                        GetRotation             ( CVector & vecRotatation );
-    void                        SetRotation             ( const CVector& vecRotatation );
+    void                        GetRotation             ( CVector & vecRotation );
+    void                        SetRotation             ( const CVector& vecRotation );
 
     bool                        IsMoving                ( void );
     void                        Move                    ( const CVector& vecPosition, const CVector& vecRotation, unsigned long ulTime );

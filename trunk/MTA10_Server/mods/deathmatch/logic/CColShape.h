@@ -41,7 +41,7 @@ public:
     inline bool                 IsEnabled           ( void )                            { return m_bIsEnabled; };
     inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };
 
-    virtual const CVector&      GetPosition         ( void )                            { return m_vecPosition; };
+    const CVector&              GetPosition         ( void );
     virtual void                SetPosition         ( const CVector& vecPosition )      { m_vecPosition = vecPosition; };
 
     void                        CallHitCallback     ( CElement& Element );

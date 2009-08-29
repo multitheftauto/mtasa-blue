@@ -134,11 +134,8 @@ bool CObject::ReadSpecialData ( void )
 const CVector& CObject::GetPosition ( void )
 {
     // Are we attached to something?
-    if ( m_pAttachedTo )
-    {
-        m_vecPosition = m_pAttachedTo->GetPosition ();
-        m_vecPosition += m_vecAttachedPosition;
-    }
+    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
+
     // Are we moving?
     else if ( IsMoving () )
     {
@@ -189,7 +186,7 @@ void CObject::GetRotation ( CVector & vecRotation )
     vecRotation = m_vecRotation;
 
     // Are we attached to something?
-    if ( m_pAttachedTo ) vecRotation += m_vecAttachedRotation;
+    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
 
     // Are we moving?
     else if ( IsMoving () )

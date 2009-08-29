@@ -142,8 +142,9 @@ public:
 
     const CVector&                  GetPosition             ( void );
     void                            SetPosition             ( const CVector& vecPosition );
-    inline void                     GetRotationDegrees      ( CVector& vecRotation )        { vecRotation = m_vecRotationDegrees; };
-    inline void                     SetRotationDegrees      ( const CVector& vecRotation )  { m_vecRotationDegrees = vecRotation; };
+    inline void                     GetRotation             ( CVector& vecRotation );
+    void                            GetRotationDegrees      ( CVector& vecRotation );
+    void                            SetRotationDegrees      ( const CVector& vecRotation );
 
     inline const CVector&           GetVelocity             ( void )                        { return m_vecVelocity; };
     inline void                     SetVelocity             ( const CVector& vecVelocity )  { m_vecVelocity = vecVelocity; };
