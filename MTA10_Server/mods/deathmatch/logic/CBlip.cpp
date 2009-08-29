@@ -135,11 +135,7 @@ bool CBlip::ReadSpecialData ( void )
 const CVector & CBlip::GetPosition ( void )
 {
     // Are we attached to something?
-    if ( m_pAttachedTo )
-    {
-        // Update our stored position to where we should be, before returning
-        m_vecPosition = m_pAttachedTo->GetPosition () + m_vecAttachedPosition;
-    }
+    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
     return m_vecPosition;
 }
 

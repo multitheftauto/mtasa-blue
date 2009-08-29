@@ -88,9 +88,11 @@ public:
 
     inline ElementID                            GetID                       ( void )                        { return m_ID; };
 
-    virtual const CVector&                      GetPosition                 ( void )                        { return m_vecPosition; };
+    virtual const CVector&                      GetPosition                 ( void );
     virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };
     virtual void                                SetPosition                 ( const CVector& vecPosition )  { m_vecLastPosition = m_vecPosition; m_vecPosition = vecPosition; };
+
+    virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
 
     virtual bool                                IsPerPlayerEntity           ( void )                        { return false; };
 
@@ -180,6 +182,8 @@ public:
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
     virtual bool                                IsAttachToable              ( void );
+    void                                        GetAttachedPosition         ( CVector & vecPosition );
+    void                                        GetAttachedRotation         ( CVector & vecRotation );
 
     inline CElementGroup*                       GetElementGroup             ( void )                        { return m_pElementGroup; }
     inline void                                 SetElementGroup             ( CElementGroup * elementGroup ){ m_pElementGroup = elementGroup; }

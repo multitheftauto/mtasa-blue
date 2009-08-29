@@ -303,11 +303,7 @@ bool CVehicle::ReadSpecialData ( void )
 const CVector & CVehicle::GetPosition ( void )
 {
     // Are we attached to something?
-    if ( m_pAttachedTo )
-    {
-        // Update our stored position to where we should be, before returning
-        m_vecPosition = m_pAttachedTo->GetPosition () + m_vecAttachedPosition;
-    }
+    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
     return m_vecPosition;
 }
 
@@ -324,6 +320,31 @@ void CVehicle::SetPosition ( const CVector & vecPosition )
         m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
     }
+}
+
+
+void CVehicle::GetRotation ( CVector & vecRotation )
+{
+    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
+    else
+    {
+        GetRotationDegrees ( vecRotation );
+        ConvertDegreesToRadians ( vecRotation );
+    }
+}
+
+
+void CVehicle::GetRotationDegrees ( CVector & vecRotation )
+{
+    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
+    else vecRotation = m_vecRotationDegrees;
+}
+
+
+void CVehicle::SetRotationDegrees ( const CVector & vecRotation )
+{
+    if ( m_pAttachedTo ) return;
+    m_vecRotationDegrees = vecRotation;
 }
 
 

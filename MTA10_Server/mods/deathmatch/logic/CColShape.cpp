@@ -48,6 +48,13 @@ void CColShape::Unlink ( void )
 }
 
 
+const CVector & CColShape::GetPosition ( void )
+{
+    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
+    return m_vecPosition;
+}
+
+
 void CColShape::CallHitCallback ( CElement& Element )
 {
     // Call the callback with us as the shape if it exists
