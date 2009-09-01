@@ -21,7 +21,8 @@ CLanBroadcast::CLanBroadcast ( unsigned short usServerPort )
     m_SockAddr.sin_port         = htons ( SERVER_LIST_BROADCAST_PORT );    
     m_SockAddr.sin_addr.s_addr  = INADDR_ANY; 
  
-    setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, "1", sizeof ( "1" ) );
+    int iFlag = 1;
+    setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, &iFlag, sizeof ( iFlag ) );
 
     // Bind the socket
     if ( bind ( m_Socket, ( sockaddr* )&m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
@@ -35,7 +36,7 @@ CLanBroadcast::CLanBroadcast ( unsigned short usServerPort )
     unsigned long ulNonBlock = 1;
     ioctlsocket ( m_Socket, FIONBIO, &ulNonBlock );
     #else
-    fcntl(m_Socket, F_SETFL, O_NONBLOCK); 
+    fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
     #endif
 
     // Set up the query messages
