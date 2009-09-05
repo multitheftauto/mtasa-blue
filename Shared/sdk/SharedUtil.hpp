@@ -7,6 +7,7 @@
 *               Include this file once per dll.
 *  DEVELOPERS:  ccw <chris@codewave.co.uk>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Cecill Etheredge <ijsf@gmx-topmail.de>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -188,15 +189,40 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 
 
 //
-// Emulate GetTickCount() for linux
+// Cross-platform GetTickCount() implementations
+//   Returns the number of milliseconds since some fixed point in time.
+//   Wraps every 49.71 days and should always increase monotonically.
 //
-#ifndef WIN32
+// ACHTUNG: This function should be scrapped and replaced by a cross-platform time class
+//
+#if defined(__APPLE__) && defined(__MACH__)
 
-// Returns the number of milliseconds since some fixed point in time.
-// Wraps every 49.71 days. Should not to jump backwards or forward, even if the system time is changed.
+// Apple / Darwin platforms with Mach monotonic clock support
+#include <mach/mach_time.h>
 unsigned long GetTickCount ( void )
 {
-    // Copied from curl\lib\timeval.c
+    mach_timebase_info_data_t info;
+
+    // Get the absolute time
+    uint64_t nAbsTime = mach_absolute_time();
+
+    // Get the timebase info (could be done once, statically?)
+    mach_timebase_info( &info );
+
+    // Calculate the time in milliseconds
+    uint64_t nNanoTime = nAbsTime * ( info.numer / info.denom );
+    return ( nNanoTime / 1000000 );
+}
+
+#elif !defined(WIN32)
+
+// BSD / Linux platforms with POSIX monotonic clock support
+unsigned long GetTickCount ( void )
+{
+    #if !defined(CLOCK_MONOTONIC)
+    #error "This platform does not have monotonic clock support."
+    #endif
+
     /*
     ** clock_gettime() is granted to be increased monotonically when the
     ** monotonic clock is queried. Time starting point is unspecified, it
@@ -218,9 +244,12 @@ unsigned long GetTickCount ( void )
     else
         (void)gettimeofday(&now, NULL);
 
+    // ACHTUNG: Note that the above gettimeofday fallback is dangerous because it is a wall clock
+    // and thus not guaranteed to be monotonic. Ideally, this function should throw a fatal error
+    // or assertion instead of using a fallback method.
+
     long long llMilliseconds = ( ( long long ) now.tv_sec ) * 1000 + now.tv_usec / 1000;
     return llMilliseconds;
 }
-
 #endif
 
