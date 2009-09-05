@@ -469,8 +469,6 @@ bool IsValidFilePath ( const char *szDir )
 	return true;
 }
 
-#include <malloc.h>
-
 unsigned int HexToInt ( const char * szHex )
 {
     unsigned int value = 0;
