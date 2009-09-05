@@ -1155,13 +1155,12 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        std::list < CElement* >& listEntities = find->second;
+        std::list < CElement* > listEntities = find->second;
+        std::list < CElement* >::reverse_iterator i;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
-        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
-              i != listEntities.rend ();
-              ++i )
+        for ( i = listEntities.rbegin (); i != listEntities.rend (); ++i )
         {
             pEntity = *i;
 
