@@ -21,6 +21,7 @@ CLanBroadcast::CLanBroadcast ( unsigned short usServerPort )
     m_SockAddr.sin_port         = htons ( SERVER_LIST_BROADCAST_PORT );    
     m_SockAddr.sin_addr.s_addr  = INADDR_ANY; 
 
+    // Enable socket reusage
     const int Flags = 1;
     setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
 
