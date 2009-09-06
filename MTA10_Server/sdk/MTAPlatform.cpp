@@ -12,6 +12,10 @@
 #include "StdInc.h"
 #include "MTAPlatform.h"
 
+#if !defined(WIN32)
+#include <sys/stat.h>
+#endif
+
 // Replacement functions
 int mymkdir ( const char* dirname )
 {
