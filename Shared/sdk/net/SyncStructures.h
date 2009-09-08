@@ -15,7 +15,6 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
-#include <ieee754.h>
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -46,23 +45,18 @@ struct SFloatSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        struct
-        {
-            int iMin : integerBits;
-            int iMax : integerBits;
-        } limits;
-        limits.iMax = ( 1 << ( integerBits - 1 ) ) - 1;
-        limits.iMin = limits.iMax + 1;
+        double limitsMax = ( 1 << ( integerBits - 1 ) ) - 1;
+        double limitsMin = 0 - ( 1 << ( integerBits - 1 ) );
+        double scale     = 1 << fractionalBits;
 
-        IEEE754_DP dValue ( data.fValue );
-        assert ( !dValue.isnan () );
-
-        if ( dValue > limits.iMax ) dValue = (double)limits.iMax;
-        else if ( dValue < limits.iMin ) dValue = (double)limits.iMin;
+        double dValue = data.fValue;
+#ifdef WIN32
+        assert ( !_isnan ( dValue ) );
+#endif
+        dValue = Clamp < double > ( limitsMin, dValue, limitsMax );
 
         SFixedPointNumber num;
-        num.iValue = (int)( dValue * (double)( 1 << fractionalBits ));
-
+        num.iValue = static_cast < int > ( dValue * scale );
         bitStream.WriteBits ( (const char* )&num, integerBits + fractionalBits );
     }
 
