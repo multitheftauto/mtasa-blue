@@ -399,6 +399,39 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
     return 0;
 }
 
+void CGUIGridList_Impl::SetItemColor ( int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+{
+    try
+    {
+        CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
+
+        // Get the current item at that offset and set the color
+        CGUIListItem_Impl* pItem = reinterpret_cast < CGUIListItem_Impl* > ( GetItem ( iRow, hColumn ) );
+        if ( pItem )
+        {
+            pItem->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        }
+    }
+    catch ( CEGUI::Exception ) {}
+}
+
+bool CGUIGridList_Impl::GetItemColor ( int iRow, int hColumn, unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha )
+{
+    try
+    {
+        CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
+
+        // Get the current item at that offset and get it's color
+        CGUIListItem_Impl* pItem = reinterpret_cast < CGUIListItem_Impl* > ( GetItem ( iRow, hColumn ) );
+        if ( pItem )
+        {
+            return pItem->GetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        }
+    }
+    catch ( CEGUI::Exception ) {}
+    return false;
+}
+
 void CGUIGridList_Impl::SetColumnSegmentSizingEnabled (int hColumn, bool bEnabled)
 {
     try

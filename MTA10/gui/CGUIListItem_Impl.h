@@ -48,6 +48,9 @@ public:
     bool                    GetSelectedState        ( void );
     void                    SetSelectedState        ( bool bState );
 
+    bool                    GetColor                ( unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha );
+    void                    SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+
     CEGUI::ListboxItem*		GetListItem             ( void );
 
 	unsigned int			ItemType;

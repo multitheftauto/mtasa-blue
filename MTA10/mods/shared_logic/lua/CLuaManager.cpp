@@ -671,6 +671,8 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "guiGridListGetItemText", CLuaFunctionDefs::GUIGridListGetItemText );
 	CLuaCFunctions::AddFunction ( "guiGridListSetItemData", CLuaFunctionDefs::GUIGridListSetItemData );
 	CLuaCFunctions::AddFunction ( "guiGridListGetItemData", CLuaFunctionDefs::GUIGridListGetItemData );
+	CLuaCFunctions::AddFunction ( "guiGridListSetItemColor", CLuaFunctionDefs::GUIGridListSetItemColor );
+	CLuaCFunctions::AddFunction ( "guiGridListGetItemColor", CLuaFunctionDefs::GUIGridListGetItemColor );
 	CLuaCFunctions::AddFunction ( "guiGridListSetSelectionMode", CLuaFunctionDefs::GUIGridListSetSelectionMode );
 	CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItem", CLuaFunctionDefs::GUIGridListGetSelectedItem );
 	CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItems", CLuaFunctionDefs::GUIGridListGetSelectedItems );
