@@ -52,7 +52,7 @@ public:
     bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( void );
     bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL );
-    bool                    SetCommandActive            ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState );
+    bool                    SetCommandActive            ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState );
     void                    SetAllCommandsActive        ( const char* szResource, bool bActive );
     CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL, bool bCheckHitState = false, bool bState = NULL );
     bool                    GetBoundCommands            ( const char* szCommand, std::list < CCommandBind * > & commandsList );
