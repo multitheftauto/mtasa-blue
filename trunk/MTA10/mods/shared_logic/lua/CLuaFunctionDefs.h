@@ -504,6 +504,8 @@ public:
 	LUA_DECLARE ( GUIGridListGetItemText );
 	LUA_DECLARE ( GUIGridListSetItemData );
 	LUA_DECLARE ( GUIGridListGetItemData );
+	LUA_DECLARE ( GUIGridListSetItemColor );
+	LUA_DECLARE ( GUIGridListGetItemColor );
 	LUA_DECLARE ( GUIGridListSetSelectionMode );
 	LUA_DECLARE ( GUIGridListGetSelectedItem );
     LUA_DECLARE ( GUIGridListGetSelectedItems );

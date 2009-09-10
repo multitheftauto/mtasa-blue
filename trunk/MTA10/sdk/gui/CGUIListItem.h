@@ -33,6 +33,9 @@ public:
 
     virtual bool                    GetSelectedState        ( void ) = 0;
     virtual void                    SetSelectedState        ( bool bState ) = 0;
+
+    virtual bool                    GetColor                ( unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha ) = 0;
+    virtual void                    SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha ) = 0;
 };
 
 #endif

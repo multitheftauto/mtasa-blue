@@ -1859,6 +1859,32 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GUIGridListGetItemColor ( lua_State* luaVM )
+{
+    if ( lua_isuserdata ( luaVM, 1 ) && lua_isnumber ( luaVM, 2 ) && lua_isnumber ( luaVM, 3 ) )
+    {
+        CClientGUIElement* pGUIElement = lua_toguielement ( luaVM, 1 );
+        if ( pGUIElement )
+        {
+            unsigned char ucRed = 255, ucGreen = 255, ucBlue = 255, ucAlpha = 255;
+            if ( reinterpret_cast < const char* > ( static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemColor ( lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), ucRed, ucGreen, ucBlue, ucAlpha ) ) )
+            {
+                lua_pushnumber ( luaVM, ucRed );
+                lua_pushnumber ( luaVM, ucGreen );
+                lua_pushnumber ( luaVM, ucBlue );
+                lua_pushnumber ( luaVM, ucAlpha );
+                return 4;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListGetItemColor", "gui-element", 1 );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
@@ -1919,6 +1945,32 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
     }
 
     // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUIGridListSetItemColor ( lua_State* luaVM )
+{
+    if ( lua_isuserdata ( luaVM, 1 ) && lua_isnumber ( luaVM, 2 ) && lua_isnumber ( luaVM, 3 ) && lua_isnumber ( luaVM, 4 ) && lua_isnumber ( luaVM, 5 ) && lua_isnumber ( luaVM, 6 ) )
+    {
+        CClientGUIElement* pGUIElement = lua_toguielement ( luaVM, 1 );
+        if ( pGUIElement )
+        {
+            int iAlpha = 255;
+            if ( lua_isnumber ( luaVM, 7 ) )
+            {
+                iAlpha = lua_tointeger ( luaVM, 7 );
+            }
+            CStaticFunctionDefinitions::GUIGridListSetItemColor( *pGUIElement, lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), lua_tointeger ( luaVM, 4 ), lua_tointeger ( luaVM, 5 ), lua_tointeger ( luaVM, 6 ), iAlpha );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListSetItemColor", "gui-element", 1 );
+    }
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

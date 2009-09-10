@@ -45,6 +45,8 @@ public:
     void					            SetItemData				( int iRow, int hColumn, void* pData );
 	void								SetItemData				( int iRow, int hColumn, const char* pszData );
 	void*								GetItemData				( int iRow, int hColumn );
+    void                                SetItemColor            ( int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    bool                                GetItemColor            ( int iRow, int hColumn, unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha );
 
 	void								SetHorizontalScrollBar	( bool bEnabled );
 	void								SetVerticalScrollBar	( bool bEnabled );

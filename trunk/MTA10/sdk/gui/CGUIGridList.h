@@ -59,6 +59,8 @@ public:
 	virtual void					SetItemData				( int iRow, int hColumn, void* pData ) = 0;
     virtual void					SetItemData				( int iRow, int hColumn, const char* pszData ) = 0;
 	virtual void*					GetItemData				( int iRow, int hColumn ) = 0;
+    virtual void                    SetItemColor            ( int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha ) = 0;
+    virtual bool                    GetItemColor            ( int iRow, int hColumn, unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha ) = 0;
 
 	virtual void					SetHorizontalScrollBar	( bool bEnabled ) = 0;
 	virtual void					SetVerticalScrollBar	( bool bEnabled ) = 0;
