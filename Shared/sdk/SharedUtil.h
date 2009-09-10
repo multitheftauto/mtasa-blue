@@ -96,6 +96,9 @@ namespace SharedUtil
     // Find the relative position of Pos between From and To
     inline const float Unlerp ( const double dFrom, const double dPos, const double dTo )
     {
+        // Avoid dividing by 0 (results in INF values)
+        if ( dFrom == dTo ) return 1.0f;
+
         return static_cast < float > ( ( dPos - dFrom ) / ( dTo - dFrom ) );
     }
 
