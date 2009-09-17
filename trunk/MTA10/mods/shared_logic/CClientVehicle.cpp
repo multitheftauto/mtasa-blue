@@ -2108,7 +2108,8 @@ void CClientVehicle::Create ( void )
             if ( m_pPassengers [i] )
             {
                 m_pPassengers [i]->WarpIntoVehicle ( this, i + 1 );
-                m_pPassengers [i]->StreamIn ( true );
+                if ( m_pPassengers [i] )
+                    m_pPassengers [i]->StreamIn ( true );
             }
         }
 
