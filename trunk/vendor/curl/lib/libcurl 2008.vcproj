@@ -61,6 +61,7 @@
 				ProgramDataBaseFileName=".\DLL-Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
 			/>
 			<Tool
@@ -80,6 +81,11 @@
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				GenerateMapFile="true"
+				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapExports="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="../lib/libcurl2008_imp.lib"
@@ -156,6 +162,7 @@
 				ProgramDataBaseFileName=".\DLL-Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
 			/>
 			<Tool
@@ -175,6 +182,11 @@
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				GenerateMapFile="true"
+				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapExports="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="../lib/libcurl2008_imp.lib"
