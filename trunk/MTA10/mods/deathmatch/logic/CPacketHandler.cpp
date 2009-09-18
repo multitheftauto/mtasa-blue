@@ -921,7 +921,10 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
 
             // Silently remove his satchels
             pPed->DestroySatchelCharges ( false, true );
-			
+
+            // Stop pressing buttons
+            pPed->SetControllerState ( CControllerState () );
+
             // Call the onClientPlayerWasted event
             CLuaArguments Arguments;
             if ( pKiller ) Arguments.PushElement ( pKiller );
