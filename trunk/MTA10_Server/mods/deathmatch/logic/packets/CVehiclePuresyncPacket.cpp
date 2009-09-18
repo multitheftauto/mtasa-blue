@@ -235,6 +235,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Call the onPlayerDamage event
                 CLuaArguments Arguments;
+                Arguments.PushNil ();
+                Arguments.PushNumber ( false );
+                Arguments.PushNumber ( false );
                 Arguments.PushNumber ( fHealthLoss );
                 pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );
             }
@@ -255,8 +258,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 				// Call the onPlayerDamage event
 				CLuaArguments Arguments;
                 Arguments.PushNil ();
-                Arguments.PushNumber ( 0xff );
-				Arguments.PushNumber ( 0xff );
+                Arguments.PushNumber ( false );
+                Arguments.PushNumber ( false );
 				Arguments.PushNumber ( fArmorLoss );
 
 				pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );					
