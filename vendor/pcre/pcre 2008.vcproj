@@ -136,6 +136,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../pcre3.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				GenerateMapFile="true"
+				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapExports="true"
 				ImportLibrary="lib/pcre_2008.lib"
 			/>
 			<Tool
@@ -209,6 +214,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../pcre3.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				GenerateMapFile="true"
+				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapExports="true"
 				ImportLibrary="lib/pcre_2008.lib"
 			/>
 			<Tool
