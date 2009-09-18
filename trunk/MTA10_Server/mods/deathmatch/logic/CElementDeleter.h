@@ -26,6 +26,7 @@ public:
     void                            DoDeleteAll             ( void );
 
     bool                            IsBeingDeleted          ( class CElement* pElement );
+    void                            Unreference             ( CElement* pElement );
 
 private:
     std::list < class CElement* >   m_List;

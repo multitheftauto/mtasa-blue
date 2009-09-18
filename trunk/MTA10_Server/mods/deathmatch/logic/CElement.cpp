@@ -120,6 +120,9 @@ CElement::~CElement ( void )
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
 
+    // Remove our reference from the element deleter
+    g_pGame->GetElementDeleter ()->Unreference ( this );
+
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
 }

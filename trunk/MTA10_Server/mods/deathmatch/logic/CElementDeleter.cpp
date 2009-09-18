@@ -43,18 +43,15 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
 
 void CElementDeleter::DoDeleteAll ( void )
 {
-    // Delete all the elements
-    list < CElement* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        CElement* pElement = *iter;
-        delete pElement;
-    }
-
-    // Clear the list
-    m_List.clear ();
+    // This depends on CElementDeleter::Unreference() being called in ~CElement() 
+    while ( !m_List.empty () )
+        delete *m_List.begin ();
 }
 
+void CElementDeleter::Unreference ( CElement* pElement )
+{
+    m_List.remove ( pElement );
+}
 
 bool CElementDeleter::IsBeingDeleted ( CElement* pElement )
 {
