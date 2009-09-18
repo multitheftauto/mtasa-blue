@@ -3333,7 +3333,7 @@ bool CClientPed::PerformChecks ( void )
     if ( m_pPlayerPed )
     {
         // Is this the local player?
-        if ( m_bIsLocal )
+        if ( m_bIsLocalPlayer )
         {
             // Is GTA's health/armor less than or equal to our health/armor?
             // The player should not be able to gain any health/armor without us knowing..

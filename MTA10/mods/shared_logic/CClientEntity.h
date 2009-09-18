@@ -265,7 +265,6 @@ protected:
     CModelInfo*                                 m_pModelInfo;
     std::list < class CClientColShape* >        m_Collisions;
     CElementGroup*                              m_pElementGroup;
-    bool                                        m_bIsLocal;
     std::list < CClientPed * >                  m_OriginSourceUsers;
     std::list < CClientPed * >                  m_Contacts;
     unsigned char                               m_ucInterior;
