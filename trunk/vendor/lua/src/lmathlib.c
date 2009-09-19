@@ -206,8 +206,12 @@ static int math_random (lua_State *L) {
 
 
 static int math_randomseed (lua_State *L) {
-  srand(luaL_checkint(L, 1));
-  return 0;
+    // lua_tointegerW wraps out of range numbers (luaL_checkint clips values below -1^32 and above 1^32)
+    srand(lua_tointegerW(L, 1));
+    // Do some rands here, as the first few results bear a close relationship to the seed number
+    rand();
+    rand();
+    return 0;
 }
 
 
