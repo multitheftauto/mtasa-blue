@@ -186,9 +186,9 @@ struct SPositionSync : public ISyncStructure
     {
         if ( m_bUseFloats )
         {
-            bitStream.Write ( data.vecPosition.fX );
-            bitStream.Write ( data.vecPosition.fY );
-            bitStream.Write ( data.vecPosition.fZ );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fX, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fY, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fZ, SYNC_POSITION_LIMIT - 1 ) );
         }
         else
         {
@@ -198,7 +198,7 @@ struct SPositionSync : public ISyncStructure
 
             bitStream.Write ( &x );
             bitStream.Write ( &y );
-            bitStream.Write ( data.vecPosition.fZ );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fZ, SYNC_POSITION_LIMIT - 1 ) );
         }
     }
 
@@ -242,8 +242,8 @@ struct SPosition2DSync : public ISyncStructure
     {
         if ( m_bUseFloats )
         {
-            bitStream.Write ( data.vecPosition.fX );
-            bitStream.Write ( data.vecPosition.fY );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fX, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fY, SYNC_POSITION_LIMIT - 1 ) );
         }
         else
         {
