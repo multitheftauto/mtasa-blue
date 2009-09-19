@@ -334,6 +334,21 @@ LUA_API lua_Integer lua_tointeger (lua_State *L, int idx) {
 }
 
 
+LUA_API lua_Integer lua_tointegerW (lua_State *L, int idx) {
+  TValue n;
+  const TValue *o = index2adr(L, idx);
+  if (tonumber(o, &n)) {
+    lua_Integer res;
+    lua_Number num = nvalue(o);
+    num = fmod( num, 0x7fffffff );   // Wrap the number between -2,147,483,647 and 2,147,483,647
+    lua_number2integer(res, num);
+    return res;
+  }
+  else
+    return 0;
+}
+
+
 LUA_API int lua_toboolean (lua_State *L, int idx) {
   const TValue *o = index2adr(L, idx);
   return !l_isfalse(o);
