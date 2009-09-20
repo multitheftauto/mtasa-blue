@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="lua5.1_dll"
 	ProjectGUID="{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
 	RootNamespace="lua5.1_dll"
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="FORCE_BUILD=3"
+				PreprocessorDefinitions="LUA_USE_APICHECK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -51,7 +51,6 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CompileAs="1"
 				DisableSpecificWarnings="4996"
@@ -130,14 +129,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="FORCE_BUILD=3"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
 				CompileAs="1"
 				DisableSpecificWarnings="4996"
@@ -217,14 +214,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="FORCE_BUILD=3"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
 				CompileAs="1"
 				DisableSpecificWarnings="4996"
@@ -406,6 +401,102 @@
 			</File>
 			<File
 				RelativePath="..\src\print.c"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="inc"
+			>
+			<File
+				RelativePath="..\src\lapi.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lauxlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lcode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ldebug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ldo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lfunc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lgc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\llex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\llimits.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lmem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lobject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lopcodes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lparser.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lstate.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lstring.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ltable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ltm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lua.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\luaconf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lualib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lundump.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lvm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\lzio.h"
 				>
 			</File>
 		</Filter>
