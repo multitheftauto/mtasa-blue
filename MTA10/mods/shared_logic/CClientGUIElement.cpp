@@ -78,9 +78,7 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
 			m_szCGUITypeName = "unknown";
 			break;
 	}
-	strcpy ( m_szTypeName, "gui-" );
-	strcat ( m_szTypeName, m_szCGUITypeName );
-    m_uiTypeHash = HashString ( m_szTypeName );
+    SetTypeName ( SString ( "gui-%s", m_szCGUITypeName ) );
 
     // Add us to the list in the manager
     m_pGUIManager->Add ( this );

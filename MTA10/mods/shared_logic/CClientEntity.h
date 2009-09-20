@@ -246,10 +246,12 @@ protected:
 
     unsigned int                                m_uiLine;
 
+private:
     unsigned int                                m_uiTypeHash;
     char                                        m_szTypeName [MAX_TYPENAME_LENGTH + 1];
     char                                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
 
+protected:
     unsigned char                               m_ucSyncTimeContext;
 
     CClientEntity*                              m_pAttachedToEntity;
