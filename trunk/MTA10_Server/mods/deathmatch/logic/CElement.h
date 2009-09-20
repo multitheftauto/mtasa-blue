@@ -254,9 +254,16 @@ protected:
 public:
     static void                     StartupEntitiesFromRoot ( );
 private:
-    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CElement* pEntity );
+    static bool                     IsFromRoot              ( CElement* pEntity );
+    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck = true );
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CElement* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* pLua );
+
+#if MTA_DEBUG
+    static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
+    void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
+    static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
+#endif
 
     typedef google::dense_hash_map < unsigned int, std::list < CElement* > > t_mapEntitiesFromRoot;
     static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
