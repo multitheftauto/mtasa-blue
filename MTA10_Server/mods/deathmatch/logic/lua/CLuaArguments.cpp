@@ -190,6 +190,12 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
     int luaStackPointer = lua_gettop ( luaVM );
+    // Make sure the stack has enough room
+#if MTA_DEBUG
+    lua_checkstack(luaVM, 1);
+#else
+    lua_checkstack(luaVM, 2);
+#endif
 	lua_getref ( luaVM, iLuaFunction );
 
     // Push our arguments onto the stack
