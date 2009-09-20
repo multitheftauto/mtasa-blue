@@ -115,15 +115,18 @@ public:
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
     void                        GetPosition             ( CVector& vecPosition ) const;
-    void                        SetPosition             ( const CVector& vecPosition );
+    void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
+    void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
     void                        SetRoll                 ( const CVector& vecRoll );
     void                        SetDirection            ( const CVector& vecDir );
     void                        SetWas                  ( const CVector& vecWas );
 
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
-    void                        SetRotationDegrees      ( const CVector& vecRotation );
-    void                        SetRotationRadians      ( const CVector& vecRotation );
+    void                        SetRotationDegrees      ( const CVector& vecRotation )      { SetRotationDegrees ( vecRotation, true ); }
+    void                        SetRotationDegrees      ( const CVector& vecRotation, bool bResetInterpolation );
+    void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
+    void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
     
 	void                        AttachTo                ( CClientEntity * pEntity );
 
@@ -320,18 +323,21 @@ public:
 	void						AddMatrix				( CMatrix& Matrix, double dTime, unsigned short usTickRate );
 	void						AddVelocity				( CVector& vecVelocity );
 
-    inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_vecTargetPosition; }
-    void                        SetTargetPosition       ( CVector& vecPosition );
-    void                        RemoveTargetPosition    ( void );
-    inline bool                 HasTargetPosition       ( void )                            { return m_bHasTargetPosition; }
 
-    inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_vecTargetRotation; }
-    void                        SetTargetRotation       ( CVector& vecRotation );
+    // Time dependent interpolation
+    inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
+    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay );
+    void                        RemoveTargetPosition    ( void );
+    inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
+
+    inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_interp.rot.vecTarget; }
+    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay );
     void                        RemoveTargetRotation    ( void );
-    inline bool                 HasTargetRotation       ( void )                            { return m_bHasTargetRotation; }
+    inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
 	void						UpdateTargetPosition	( void );
     void						UpdateTargetRotation	( void );
+
 
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
     inline void                 SetIllegalTowBreakTime  ( unsigned long ulTime )            { m_ulIllegalTowBreakTime = ulTime; }
@@ -404,10 +410,6 @@ protected:
     CMatrix                     m_Matrix;
 	CMatrix						m_MatrixLast;
 	CMatrix						m_MatrixPure;	
-	CQuat						m_QuatA;
-	CQuat						m_QuatB;
-	CQuat						m_QuatLERP;
-	float						m_fLERP;
 	CVector						m_vecMoveSpeedInterpolate;
 	CVector						m_vecMoveSpeedMeters;
 	CVector                     m_vecMoveSpeed;
@@ -469,14 +471,33 @@ protected:
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
 
-    bool                        m_bInterpolationEnabled;
-    double                      m_dResetInterpolationTime;
+    // Time dependent error compensation interpolation
+    struct
+    {
+        struct
+        {
+#ifdef MTA_DEBUG
+            CVector         vecStart;
+#endif
+            CVector         vecTarget;
+            CVector         vecError;
+            float           fLastAlpha;
+            unsigned long   ulStartTime;
+            unsigned long   ulFinishTime;
+        } pos;
 
-    CVector                     m_vecTargetPosition;
-    bool                        m_bTargetPositionDirections [ 3 ];
-    bool                        m_bHasTargetPosition;
-    CVector                     m_vecTargetRotation;
-    bool                        m_bHasTargetRotation;
+        struct
+        {
+#ifdef MTA_DEBUG
+            CVector         vecStart;
+#endif
+            CVector         vecTarget;
+            CVector         vecError;
+            float           fLastAlpha;
+            unsigned long   ulStartTime;
+            unsigned long   ulFinishTime;
+        } rot;
+    } m_interp;
 
     unsigned long               m_ulIllegalTowBreakTime;
 
