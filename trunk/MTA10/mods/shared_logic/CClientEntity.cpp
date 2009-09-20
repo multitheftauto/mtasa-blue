@@ -158,9 +158,10 @@ CClientEntity::~CClientEntity ( void )
         for ( ; iterUsers != m_OriginSourceUsers.end () ; iterUsers++ )
         {
             CClientPed* pModel = *iterUsers;
-            if ( pModel->m_pTargetOriginSource == this )
+            if ( pModel->m_interp.pTargetOriginSource == this )
             {
-                pModel->m_pTargetOriginSource = NULL;
+                pModel->m_interp.pTargetOriginSource = NULL;
+                pModel->m_interp.bHadOriginSource = true;
             }
         }
         m_OriginSourceUsers.clear ();

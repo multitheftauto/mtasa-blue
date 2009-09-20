@@ -877,8 +877,8 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_GETTING_IN ||
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_JACKING )
     {
-        pPlayer->SetTargetPosition ( position.data.vecPosition, pContactEntity );
-        pPlayer->SetTargetRotation ( rotation.data.fRotation );
+        pPlayer->SetTargetPosition ( position.data.vecPosition, TICK_RATE, pContactEntity );
+        pPlayer->SetCurrentRotation ( rotation.data.fRotation );
     }
 
     // Set move speed, controller state and camera rotation + duck state
@@ -1107,8 +1107,8 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        pVehicle->SetTargetPosition ( position.data.vecPosition );
-        pVehicle->SetTargetRotation ( rotation.data.vecRotation );
+        pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE );
+        pVehicle->SetTargetRotation ( rotation.data.vecRotation, TICK_RATE );
 
         // Apply the correct move and turnspeed
         pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
