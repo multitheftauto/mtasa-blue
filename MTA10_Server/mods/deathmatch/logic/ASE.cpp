@@ -53,7 +53,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     // If we are in lan only mode, reuse addr to avoid possible conflicts
     if ( m_bLan )
     {
-        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, "1", sizeof ( "1" ) );
+        const int Flags = 1;
+        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
     }
 
     // Bind the socket
@@ -69,7 +70,7 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     unsigned long ulNonBlock = 1;
     ioctlsocket ( m_Socket, FIONBIO, &ulNonBlock );
     #else
-    fcntl(m_Socket, F_SETFL, O_NONBLOCK); 
+    fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
     #endif
 }
 
