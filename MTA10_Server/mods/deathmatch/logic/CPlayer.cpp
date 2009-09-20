@@ -89,6 +89,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
 
+    m_ulLastReceivedSyncTime = 0;
+
     // Add us to the manager
     pPlayerManager->AddToList ( this );
 }
