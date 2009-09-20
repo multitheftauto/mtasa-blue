@@ -1048,7 +1048,11 @@ void CClientGame::DoPulses ( void )
         UpdateStunts ();
         // Clear last damager if more than 2 seconds old
         if ( CClientTime::GetTime () - m_ulDamageTime > 2000 )
+        {
             m_DamagerID = INVALID_ELEMENT_ID;
+            m_ucDamageWeapon = 0xFF;
+            m_ucDamageBodyPiece = 0xFF;
+        }
         DoWastedCheck ( m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece );
     }
 
