@@ -1237,8 +1237,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     // Same person? Quit the first and let this one join
                     if ( strcmp ( szIP, szTempIP ) == 0 )
                     {
-                        QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
-                        pTempPlayer = NULL;
+                        // Two players could have the same IP, so see if the old player appears inactive before quitting them
+                        if ( pTempPlayer->GetTicksSinceLastReceivedSync () > 5000 )
+                        {
+                            pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, szIP ) ) );
+                            QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
+                            pTempPlayer = NULL;
+                        }
                     }
                 }
                 if ( pTempPlayer == NULL )
@@ -1455,6 +1460,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
+        pPlayer->NotifyReceivedSync ();
         pPlayer->IncrementPuresync ();
 
         // Ignore this packet if he should be in a vehicle
@@ -1558,6 +1564,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
+        pPlayer->NotifyReceivedSync ();
+
         // Grab the vehicle
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
         if ( pVehicle )

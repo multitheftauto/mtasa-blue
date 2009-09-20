@@ -205,6 +205,9 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
+    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount (); }
+    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount () - m_ulLastReceivedSyncTime; }
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -286,6 +289,8 @@ private:
     // Sync stuff
     bool                                        m_bSyncingVelocity;
     unsigned int                                m_uiPuresyncPackets;
+
+    unsigned long                               m_ulLastReceivedSyncTime;
 };
 
 #endif
