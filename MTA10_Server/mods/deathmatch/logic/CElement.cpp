@@ -55,7 +55,8 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     }
 
     m_uiTypeHash = HashString ( m_strTypeName.c_str () );
-    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
+    if ( m_pParent )
+        CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
     // Make an event manager for us
     m_pEventManager = new CMapEventManager;
@@ -70,6 +71,7 @@ CElement::~CElement ( void )
 {
     // Get rid of the children elements
     ClearChildren ();
+    SetParentObject ( NULL );
 
     // Remove ourselves from our element group
     if ( m_pElementGroup )
@@ -118,7 +120,8 @@ CElement::~CElement ( void )
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
 
-    CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
+    // Ensure nothing has inadvertently set a parent
+    assert ( m_pParent == NULL );
 }
 
 
@@ -127,7 +130,8 @@ void CElement::SetTypeName ( std::string strTypeName )
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );
     m_strTypeName = strTypeName;
-    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
+    if ( m_pParent )
+        CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -246,34 +250,17 @@ bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 
 void CElement::ClearChildren ( void )
 {
-    // Got a parent?
-    if ( m_pParent )
-    {
-        // Remove us from parent's list
-        if ( !m_pParent->m_Children.empty() ) m_pParent->m_Children.remove ( this );
+    // Sanity check
+    assert ( m_pParent != this );
 
-        // Process our children
-        list < CElement* > ::const_iterator iter = m_Children.begin ();
-        for ( ; iter != m_Children.end (); iter++ )
-        {
-            // Set it to our parent and add it to our parent's list
-            (*iter)->m_pParent = m_pParent;
-            m_pParent->m_Children.push_back ( *iter );
-        }
-    }
-    else
-    {
-        // Set all our children's parents to NULL
-		if ( !m_Children.empty() ) {
-			list < CElement* > ::const_iterator iter = m_Children.begin ();
-			for ( ; iter != m_Children.end (); iter++ )
-			{
-				// Set it to our parent and add it to our parent's list
-				(*iter)->m_pParent = NULL;
-			}
-		}
-    }
-    m_Children.clear ();
+    // Process our children - Move up to our parent
+	list < CElement* > cloneList = m_Children;
+    list < CElement* > ::const_iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
+        (*iter)->SetParentObject ( m_pParent );
+
+    // This list should now be empty
+    assert ( m_Children.size () == 0 );
 }
 
 
@@ -289,8 +276,16 @@ CElement* CElement::SetParentObject ( CElement* pParent )
             m_pParent->OnSubtreeRemove ( this );
 
             // Eventually unreference us from the previous parent entity
-            if ( !m_pParent->m_Children.empty() ) m_pParent->m_Children.remove ( this );
+            m_pParent->m_Children.remove ( this );
         }
+
+        // Get into/out-of FromRoot info
+        bool bOldFromRoot = CElement::IsFromRoot ( m_pParent );
+        bool bNewFromRoot = CElement::IsFromRoot ( pParent );
+
+        // Moving out of FromRoot?
+        if ( bOldFromRoot && !bNewFromRoot )
+            CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
 
         // Grab the root element now
         CElement* pRoot;
@@ -312,6 +307,10 @@ CElement* CElement::SetParentObject ( CElement* pParent )
         {
             // Add us to the new parent's child list
             pParent->m_Children.push_back ( this );
+
+            // Moving into FromRoot?
+            if ( !bOldFromRoot && bNewFromRoot )
+                CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
             // Call the on children add event on the new parent
             pParent->OnSubtreeAdd ( this );
@@ -1132,14 +1131,40 @@ void CElement::StartupEntitiesFromRoot ()
     }
 }
 
-void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
+// Returns true if top parent is root
+bool CElement::IsFromRoot ( CElement* pEntity )
 {
+    if ( !pEntity )
+        return false;
+    if ( pEntity == g_pGame->GetMapManager ()->GetRootElement () )
+        return true;
+    return CElement::IsFromRoot ( pEntity->GetParentEntity () );
+}
+
+void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck )
+{
+    // Check
+    assert ( CElement::IsFromRoot ( pEntity ) );
+
+    // Insert into list
     std::list < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
+
+    // Apply to child elements as well
+    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
+    for ( ; iter != pEntity->IterEnd (); iter++ )
+        CElement::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
+
+#if MTA_DEBUG
+    if ( bDebugCheck )
+        _CheckEntitiesFromRoot ( uiTypeHash );
+#endif
 }
 
 void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
 {
+    // Remove from list
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
@@ -1148,19 +1173,29 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
+
+    // Apply to child elements as well
+    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
+    for ( ; iter != pEntity->IterEnd (); iter++ )
+        CElement::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
 
 void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 {
+#if MTA_DEBUG
+    _CheckEntitiesFromRoot ( uiTypeHash );
+#endif
+
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        const std::list < CElement* > & listEntities = find->second;
-        std::list < CElement* >::const_reverse_iterator i;
+        std::list < CElement* >& listEntities = find->second;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
-        for ( i = listEntities.rbegin (); i != listEntities.rend (); ++i )
+        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
+              i != listEntities.rend ();
+              ++i )
         {
             pEntity = *i;
 
@@ -1171,3 +1206,101 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
         }
     }    
 }
+
+
+
+#if MTA_DEBUG
+
+//
+// Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
+//
+void CElement::_CheckEntitiesFromRoot ( unsigned int uiTypeHash )
+{
+    std::map < CElement*, int > mapResults1;
+    g_pGame->GetMapManager ()->GetRootElement ()->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults1 );
+
+    std::map < CElement*, int > mapResults2;
+    _GetEntitiesFromRoot ( uiTypeHash, mapResults2 );
+
+    std::map < CElement*, int > :: const_iterator iter1 = mapResults1.begin ();
+    std::map < CElement*, int > :: const_iterator iter2 = mapResults2.begin ();
+
+    for ( ; iter1 != mapResults1.end (); ++iter1 )
+    {
+        CElement* pElement1 = iter1->first;
+
+        if ( mapResults2.find ( pElement1 ) == mapResults2.end () )
+        {
+            OutputDebugString ( SString ( "Server: 0x%08x  %s is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName ().c_str () ) );
+        }
+    }
+
+    for ( ; iter2 != mapResults2.end (); ++iter2 )
+    {
+        CElement* pElement2 = iter2->first;
+
+        if ( mapResults1.find ( pElement2 ) == mapResults1.end () )
+        {
+            OutputDebugString ( SString ( "Server: 0x%08x  %s is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName ().c_str () ) );
+        }
+    }
+
+    assert ( mapResults1 == mapResults2 );
+}
+
+
+void CElement::_FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults )
+{
+    // Our type matches?
+    if ( uiTypeHash == m_uiTypeHash )
+    {
+        // Add it to the table
+        assert ( mapResults.find ( this ) == mapResults.end () );
+        mapResults [ this ] = 1;
+
+        ElementID ID = this->GetID ();
+        assert ( ID != INVALID_ELEMENT_ID );
+        assert ( this == CElementIDs::GetElement ( ID ) );
+        if ( this->IsBeingDeleted () )
+            OutputDebugString ( SString ( "Server: 0x%08x  %s is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName ().c_str () ) );
+    }
+
+    // Call us on the children
+    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        (*iter)->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults );
+    }
+}
+
+
+void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults )
+{
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        const std::list < CElement* >& listEntities = find->second;
+        CElement* pEntity;
+        unsigned int uiIndex = 0;
+
+        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
+              i != listEntities.rend ();
+              ++i )
+        {
+            pEntity = *i;
+
+            assert ( pEntity );
+            ElementID ID = pEntity->GetID ();
+            assert ( ID != INVALID_ELEMENT_ID );
+            assert ( pEntity == CElementIDs::GetElement ( ID ) );
+            if ( pEntity->IsBeingDeleted () )
+                OutputDebugString ( SString ( "Server: 0x%08x  %s is flagged as IsBeingDeleted() but is still in GetEntitiesFromRoot\n", pEntity, pEntity->GetTypeName ().c_str () ) );
+
+            assert ( mapResults.find ( pEntity ) == mapResults.end () );
+            mapResults [ pEntity ] = 1;
+        }
+    }    
+}
+
+
+#endif

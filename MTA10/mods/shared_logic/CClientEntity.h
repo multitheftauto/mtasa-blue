@@ -277,9 +277,16 @@ private:
 public:
     static void                     StartupEntitiesFromRoot ( );
 private:
-    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CClientEntity* pEntity );
+    static bool                     IsFromRoot              ( CClientEntity* pEntity );
+    static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true );
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn );
+
+#if MTA_DEBUG
+    static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
+    void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
+    static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
+#endif
 
     typedef google::dense_hash_map < unsigned int, std::list < CClientEntity* > > t_mapEntitiesFromRoot;
     static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
