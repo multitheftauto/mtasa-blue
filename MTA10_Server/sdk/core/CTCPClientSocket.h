@@ -19,7 +19,7 @@ class CTCPClientSocket : public CTCPSocket
 public:
     virtual                 ~CTCPClientSocket           ( void ) {};
 
-    virtual bool            Connect                     ( const char* szHost, unsigned short usPort ) = 0;
+    virtual bool            Connect                     ( const char* szHost, unsigned short usPort, const char* szLocalIP = NULL ) = 0;
     virtual bool            Disconnect                  ( void ) = 0;
     virtual bool            IsConnected                 ( void ) = 0;
 

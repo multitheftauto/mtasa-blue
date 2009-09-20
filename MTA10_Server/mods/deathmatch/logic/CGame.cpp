@@ -629,6 +629,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 			_snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
 			CHTTPRequest * request = new CHTTPRequest ( szURL );
+            request->SetLocalIP ( szServerIP );
 			CHTTPResponse * response = request->Send ( pTCP );
 			if ( !response )
 				CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );

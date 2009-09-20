@@ -47,7 +47,7 @@ public:
                     CTCPClientSocketImpl            ( void );
                     ~CTCPClientSocketImpl           ( void );
 
-    bool            Connect                         ( const char* szHost, unsigned short usPort );
+    bool            Connect                         ( const char* szHost, unsigned short usPort, const char* szLocalIP = NULL );
     bool            Disconnect                      ( void );
     bool            IsConnected                     ( void );
 
