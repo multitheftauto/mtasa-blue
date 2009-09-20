@@ -71,6 +71,7 @@ private:
     std::string         m_strReferer;
     std::string         m_strRemoteFile;
     std::string         m_strRemoteHost;
+    std::string         m_strLocalIP;
     eHttpVersion        m_version;
     std::list<CHTTPValue*> m_values;
     unsigned short      m_port;
@@ -89,6 +90,7 @@ public:
     void                SetRemoteHost ( const char* szRemoteHost );
     void                SetRemotePath ( const char* szRemotePath );
     long                SetPacketSize ( long lPacketSize ) { m_lPacketSize = lPacketSize; return lPacketSize; };
+    void                SetLocalIP ( const char* szLocalIP ) { m_strLocalIP = szLocalIP ? szLocalIP : ""; }
     void                AddValue ( CHTTPValue * pValue );
     CHTTPResponse *     Send ( CTCP * pTCP );
     void                SetDataSentHandler ( DataSentHandler * handler );

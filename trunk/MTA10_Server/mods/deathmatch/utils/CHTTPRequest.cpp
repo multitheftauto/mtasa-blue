@@ -198,7 +198,7 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
     }
 
     // Connect to the server
-    if ( !pSocket->Connect ( m_strRemoteHost.c_str (), m_port ) )
+    if ( !pSocket->Connect ( m_strRemoteHost.c_str (), m_port, m_strLocalIP.c_str () ) )
     {
         delete pSocket;
         return NULL;

@@ -44,8 +44,11 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     // Set the sock addr
     m_SockAddr.sin_family = AF_INET;         
     m_SockAddr.sin_port = htons ( m_usPort );
-    // If we are in lan broadcasting mode, only let local ips query us
-    m_SockAddr.sin_addr.s_addr = INADDR_ANY;
+    // If a local IP has been specified, ensure it is used for sending
+    if ( m_strIP.length () )
+        m_SockAddr.sin_addr.s_addr = inet_addr( m_strIP.c_str () );
+    else
+        m_SockAddr.sin_addr.s_addr = INADDR_ANY;
 
     // Initialize socket
     m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );

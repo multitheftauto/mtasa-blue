@@ -45,7 +45,7 @@ CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
 }
 
 
-bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
+bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort, const char* szLocalIP )
 {
     // If we're already connected, disconnect
     if ( m_bIsConnected )
@@ -67,6 +67,22 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
     {
         strcpy ( m_szLastError, "Unable to resolve" );
         return false;
+    }
+
+    // If a local IP has been specified, ensure it is used for sending
+    if ( szLocalIP && szLocalIP[0] )
+    {
+        sockaddr_in m_SockAddr;
+        m_SockAddr.sin_family = AF_INET;
+        m_SockAddr.sin_addr.s_addr = inet_addr( szLocalIP );
+        m_SockAddr.sin_port = 0;   
+
+        // Bind the socket
+        if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) == -1 )
+        {
+            strcpy ( m_szLastError, "Unable to bind socket" );
+            return false;
+        }
     }
 
     // Create a sockaddr_in structure and set the data
