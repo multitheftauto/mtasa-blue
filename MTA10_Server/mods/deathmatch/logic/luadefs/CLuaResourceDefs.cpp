@@ -1041,9 +1041,11 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
                     //Lets grab the original hidden variables so we can restore them later
                     lua_getglobal ( targetLuaVM, "sourceResource" );
                     CLuaArgument OldResource ( luaVM, -1 );
+                    lua_pop( targetLuaVM, 1 );
 
                     lua_getglobal ( targetLuaVM, "sourceResourceRoot" );
                     CLuaArgument OldResourceRoot ( luaVM, -1 );
+                    lua_pop( targetLuaVM, 1 );
 
                     //Set the new values for the current sourceResource, and sourceResourceRoot
                     lua_pushresource ( targetLuaVM, resourceThis );
