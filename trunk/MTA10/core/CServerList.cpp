@@ -116,7 +116,19 @@ void CServerList::Remove ( CServerListItem Server )
 
 void CServerList::Refresh ( void )
 {   // Assumes we already have a (saved) list of servers, so we just need to refresh
+
+    // Reinitialize each server list item
+    for ( std::list<CServerListItem*>::iterator iter = m_Servers.begin (); iter != m_Servers.end (); iter++ )
+    {
+        CServerListItem* pOldItem = *iter;
+        *iter = new CServerListItem( *pOldItem );
+        delete pOldItem;
+    }
+
     m_iPass = 1;
+    m_nScanned = 0;
+    m_nSkipped = 0;
+    m_iRevision++;
 }
 
 void CServerListInternet::Refresh ( void )
@@ -250,6 +262,9 @@ void CServerListLAN::Refresh ( void )
 	m_Remote.sin_family			= AF_INET;
 	m_Remote.sin_port			= htons ( SERVER_LIST_BROADCAST_PORT ); 
 	m_Remote.sin_addr.s_addr	= INADDR_BROADCAST;
+
+    // Clear the previous server list
+    Clear ();
 
     // Discover other servers by sending out the broadcast packet
     Discover ();
