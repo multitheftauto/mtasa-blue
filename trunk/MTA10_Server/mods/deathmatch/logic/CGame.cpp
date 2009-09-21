@@ -212,12 +212,9 @@ CGame::~CGame ( void )
 void CGame::GetTag ( char *szInfoTag, int iInfoTag )
 {
 	// Construct the info tag
-    unsigned int uiMaxPlayers;
-    if ( !m_CommandLineParser.GetMaxPlayers ( uiMaxPlayers ) )
-        uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
     _snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
 			   132, 135, szProgress[ucProgress], 132,
-		       130, 130, m_pPlayerManager->Count (), uiMaxPlayers,
+               130, 130, m_pPlayerManager->Count (), m_pMainConfig->GetMaxPlayers (),
                130, 130, m_pResourceManager->GetResourceLoadedCount (),
 			   130, 130, m_usFPS );
 	if (iInfoTag > 0)
@@ -409,21 +406,16 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     if ( !m_pMainConfig->Load ( strBuffer ) )
         return false;
 
-    // Grab the IP to put the server at
-    const char* szServerIP;
-    if ( !m_CommandLineParser.GetIP ( szServerIP ) )
-        szServerIP = m_pMainConfig->GetServerIP ().c_str ();
+    // Let the main config handle selecting settings from the command line where appropriate
+    m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
+
+    const char* szServerIP = m_pMainConfig->GetServerIP ().c_str ();
 
     if ( szServerIP && szServerIP [0] == '\0' )
         szServerIP = NULL;
 
-    unsigned short usServerPort;
-    if ( !m_CommandLineParser.GetPort ( usServerPort ) )
-        usServerPort = m_pMainConfig->GetServerPort ();
-
-    unsigned int uiMaxPlayers;
-    if ( !m_CommandLineParser.GetMaxPlayers ( uiMaxPlayers ) )
-        uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
+    unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+    unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
     // Create the account manager
     m_pAccountManager = new CAccountManager ( NULL );
@@ -469,15 +461,17 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 								"= Log file		: %s\n" \
 								"= Maximum players	: %u\n" \
 								"= MTU packet size	: %u\n" \
+								"= HTTP port		: %u\n" \
 								"===========================================================\n",
 
                                 MTA_DM_VERSIONSTRING,
 								m_pMainConfig->GetServerName ().c_str (),
-								szServerIP,
+								szServerIP ? szServerIP : "",
 								usServerPort,
 								pszLogFileName,
 								uiMaxPlayers,
-								m_pMainConfig->GetMTUSize () );
+								m_pMainConfig->GetMTUSize (),
+                                m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0 );
 
 	if ( !bLogFile )
 		CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );

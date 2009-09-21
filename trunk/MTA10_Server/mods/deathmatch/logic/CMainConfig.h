@@ -41,10 +41,10 @@ public:
 
 	inline unsigned int				GetMTUSize						( void )		{ return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
-    inline const std::string&       GetServerIP                     ( void )        { return m_strServerIP; };
-    inline unsigned short           GetServerPort                   ( void )        { return m_usServerPort; };
-    inline unsigned int             GetMaxPlayers                   ( void )        { return m_uiMaxPlayers; };
-	inline unsigned int				GetPrivatePlayerSlots			( void )		{ return m_uiPrivatePlayerSlots; };
+    std::string                     GetServerIP                     ( void );
+    unsigned short                  GetServerPort                   ( void );
+    unsigned int                    GetMaxPlayers                   ( void );
+    inline bool                     IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
     bool                            IsValidPassword                 ( const char* szPassword, unsigned int& cUnsupportedIndex );
     inline bool                     HasPassword                     ( void )        { return !m_strPassword.empty (); };
@@ -52,7 +52,7 @@ public:
     void                            SetPassword                     ( const char* szPassword );
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
-	inline unsigned short			GetHTTPPort						( void )		{ return m_usHTTPPort; };
+    unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
     inline bool                     GetLogFileEnabled               ( void )        { return m_bLogFileEnabled; };
@@ -70,19 +70,22 @@ public:
 	inline unsigned short			GetFPSLimit						( void )		{ return m_usFPSLimit; };
 	void							SetFPSLimit						( unsigned short usFPS );
 
+    void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
 
     CConsole*                       m_pConsole;
     CLuaManager*                    m_pLuaManager;
     CXMLNode*                       m_pRootNode;
+    CCommandLineParser*             m_pCommandLineParser;
 
 	unsigned int					m_uiMTUSize;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
     unsigned int                    m_uiMaxPlayers;
-	unsigned int					m_uiPrivatePlayerSlots;
+    bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;
 	unsigned short					m_usHTTPPort;

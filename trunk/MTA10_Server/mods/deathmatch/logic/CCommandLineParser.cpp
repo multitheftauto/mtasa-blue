@@ -19,17 +19,13 @@ CCommandLineParser::CCommandLineParser ( void )
     m_bMainConfig = false;
     m_bIP = false;
     m_bPort = false;
+    m_bHTTPPort = false;
     m_bMaxPlayers = false;
-
-    m_bHTTPEnabled = true;
 }
 
 
 bool CCommandLineParser::Parse ( int iArgumentCount, char* szArguments [] )
 {
-    // HTTP is enabld unless otherwize specified
-    m_bHTTPEnabled = true;
-
     // While we're not out of arguments
     int iIndex = 0;
     while ( iIndex < iArgumentCount )
@@ -58,6 +54,14 @@ bool CCommandLineParser::Parse ( int iArgumentCount, char* szArguments [] )
             {
                 m_bPort = true;
                 m_usPort = (unsigned short) atoi ( szArguments [ iIndex ] );
+            }
+        }
+        else if ( stricmp ( szArguments [ iIndex ], "--httpport" ) == 0 )
+        {
+            if ( ++iIndex < iArgumentCount )
+            {
+                m_bHTTPPort = true;
+                m_usHTTPPort = (unsigned short) atoi ( szArguments [ iIndex ] );
             }
         }
         else if ( stricmp ( szArguments [ iIndex ], "--maxplayers" ) == 0 )

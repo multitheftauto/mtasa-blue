@@ -28,10 +28,11 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_pConsole = pConsole;
     m_pLuaManager = pLuaMain;
     m_pRootNode = NULL;
+    m_pCommandLineParser = NULL;
 
     m_usServerPort = 0;
     m_uiMaxPlayers = 0;
-	m_uiPrivatePlayerSlots = 0;
+	m_bHTTPEnabled = true;
     m_bAseEnabled = false;
 	m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
@@ -142,11 +143,16 @@ bool CMainConfig::Load ( const char* szFilename )
         return false;
     }
 
-	// Grab the max private player slots
-    iResult = GetInteger ( m_pRootNode, "privateplayerslots", iTemp, 1, MAX_PLAYER_COUNT );
-    if ( iResult == IS_SUCCESS )
+    // httpserver
+    iResult = GetBoolean ( m_pRootNode, "httpserver", m_bHTTPEnabled );
+    if ( iResult == INVALID_VALUE )
     {
-        m_uiPrivatePlayerSlots = iTemp;
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"httpserver\" tag; defaulting to 1\n" );
+        m_bHTTPEnabled = true;
+    }
+    else if ( iResult == DOESNT_EXIST )
+    {
+        m_bHTTPEnabled = false;
     }
 
     // HTTPD port
@@ -542,4 +548,42 @@ void CMainConfig::RegisterCommand ( const char* szName, FCommandHandler* pFuncti
 {
     // Register the function with the given name and function pointer
     m_pConsole->AddCommand ( pFunction, szName, bRestricted );
+}
+
+
+void CMainConfig::SetCommandLineParser ( CCommandLineParser* pCommandLineParser )
+{
+    m_pCommandLineParser = pCommandLineParser;
+}
+
+std::string CMainConfig::GetServerIP ( void )
+{
+    std::string strServerIP;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetIP ( strServerIP ) )
+        return strServerIP;
+    return m_strServerIP;
+}
+
+unsigned short CMainConfig::GetServerPort ( void )
+{
+    unsigned short usPort;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetPort ( usPort ) )
+        return usPort;
+    return m_usServerPort;
+}
+
+unsigned int CMainConfig::GetMaxPlayers ( void )
+{
+    unsigned int uiMaxPlayers;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
+        return uiMaxPlayers;
+    return m_uiMaxPlayers;
+}
+
+unsigned short CMainConfig::GetHTTPPort ( void )
+{
+    unsigned short usHTTPPort;
+    if ( m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort ( usHTTPPort ) )
+        return usHTTPPort;
+    return m_usHTTPPort;
 }

@@ -23,22 +23,23 @@ public:
     bool                        Parse                           ( int iArgumentCount, char* szArguments [] );
 
     bool                        GetMainConfig                   ( const char*& szMainConfig )  { szMainConfig = m_strMainConfig.c_str (); return m_bMainConfig; }
-    bool                        GetIP                           ( const char*& szIP )          { szIP = m_strIP.c_str (); return m_bIP; }
+    bool                        GetIP                           ( std::string& strIP )         { strIP = m_strIP; return m_bIP; }
     bool                        GetPort                         ( unsigned short& usPort )     { usPort = m_usPort; return m_bPort; }
+    bool                        GetHTTPPort                     ( unsigned short& usHTTPPort ) { usHTTPPort = m_usHTTPPort; return m_bHTTPPort; }
     bool                        GetMaxPlayers                   ( unsigned int& uiMaxPlayers ) { uiMaxPlayers = m_uiMaxPlayers; return m_bMaxPlayers; }
-    bool                        IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
 private:
     bool                        m_bMainConfig;
     bool                        m_bIP;
     bool                        m_bPort;
+    bool                        m_bHTTPPort;
     bool                        m_bMaxPlayers;
 
     std::string                 m_strMainConfig;
     std::string                 m_strIP;
     unsigned short              m_usPort;
+    unsigned short              m_usHTTPPort;
     unsigned int                m_uiMaxPlayers;
-    bool                        m_bHTTPEnabled;
 };
 
 #endif
