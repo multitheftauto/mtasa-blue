@@ -42,8 +42,10 @@ CHTTPD::~CHTTPD ()
     }
 }
 
-void CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
+bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 {
+    bool bResult = false;
+
     // Server not already started?
     if ( !m_bStartedServer )
     {
@@ -68,9 +70,11 @@ void CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 	    parameters[ "mode" ] = "threadpool";		// or "singlethreaded"/"threadpool"
 	    parameters[ "threadcount" ] = 5;				// unnecessary because 1 is the default
 
-	    StartServer ( parameters );
+        bResult = ( StartServer ( parameters ) == STARTSERVER_SUCCESS );
         m_bStartedServer = true;
     }
+
+    return bResult;
 }
 
 
