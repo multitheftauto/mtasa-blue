@@ -32,7 +32,7 @@ public:
 	ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
 								 HttpResponse * ipoHttpResponse );
 	
-	void						StartHTTPD ( const char* szIP, unsigned int port );
+    bool                        StartHTTPD ( const char* szIP, unsigned int port );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
     inline CResource *          GetResource ( void ) { return m_resource; }
     class CAccount *            CheckAuthentication ( HttpRequest * ipoHttpRequest );

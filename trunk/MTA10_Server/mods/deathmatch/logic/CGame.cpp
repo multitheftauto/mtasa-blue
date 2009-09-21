@@ -423,10 +423,14 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 	// Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
 
-    // Enable it if -nohttp is not specified in the commandline
-    if ( m_CommandLineParser.IsHTTPEnabled () )
+    // Enable it if required
+    if ( m_pMainConfig->IsHTTPEnabled () )
     {
-	    m_pHTTPD->StartHTTPD ( szServerIP, m_pMainConfig->GetHTTPPort () );
+        if ( !m_pHTTPD->StartHTTPD ( szServerIP, m_pMainConfig->GetHTTPPort () ) )
+        {
+            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", szServerIP, m_pMainConfig->GetHTTPPort () );
+            return false;
+        }
     }
 
     // Eventually set a logfile
