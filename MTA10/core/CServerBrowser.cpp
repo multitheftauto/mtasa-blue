@@ -30,6 +30,7 @@ CServerBrowser::CServerBrowser ( void )
 
     // Initialize
     m_ulLastUpdateTime = 0;
+    m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
     m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Server Browser" ) );
@@ -295,7 +296,7 @@ void CServerBrowser::Update ( void )
     pList->Pulse ();
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
-    if ( pList->IsUpdated () && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
+    if ( ( pList->IsUpdated () || m_PrevServerBrowserType != GetCurrentServerBrowserType () ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
     {
         // Update the GUI
         UpdateServerList ( GetCurrentServerBrowserType () );
@@ -305,6 +306,9 @@ void CServerBrowser::Update ( void )
 
         // Update last time updated
         m_ulLastUpdateTime = CClientTime::GetTime ();
+
+        // Update last viewed tab
+        m_PrevServerBrowserType = GetCurrentServerBrowserType ();
     }
 }
 
