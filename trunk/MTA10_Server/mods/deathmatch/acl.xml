@@ -123,22 +123,14 @@
    </acl>
    <acl name="Moderator">
       <right name="general.ModifyOtherObjects" access="false"/>
-      <right name="command.start" access="true"/>
-      <right name="command.stop" access="true"/>
-      <right name="command.stopall" access="true"/>
       <right name="command.gamemode" access="true"/>
       <right name="command.changemode" access="true"/>
       <right name="command.changemap" access="true"/>
       <right name="command.stopmode" access="true"/>
       <right name="command.stopmap" access="true"/>
       <right name="command.skipmap" access="true"/>
-      <right name="command.restart" access="true"/>
       <right name="command.mute" access="true"/>
       <right name="command.unmute" access="true"/>
-      <right name="command.kick" access="true"/>
-      <right name="command.ban" access="true"/>
-      <right name="command.banip" access="true"/>
-      <right name="command.unbanip" access="true"/>
       <right name="command.whois" access="true"/>
       <right name="command.whowas" access="true"/>
       <right name="function.setPlayerMuted" access="true"/>
@@ -157,6 +149,13 @@
    </acl>
    <acl name="SuperModerator">
       <right name="general.ModifyOtherObjects" access="false"/>
+      <right name="command.start" access="true"/>
+      <right name="command.stop" access="true"/>
+      <right name="command.restart" access="true"/>
+      <right name="command.kick" access="true"/>
+      <right name="command.ban" access="true"/>
+      <right name="command.banip" access="true"/>
+      <right name="command.unbanip" access="true"/>
       <right name="command.refresh" access="true"/>
       <right name="command.refreshall" access="true"/>
       <right name="command.loadmodule" access="true"/>
