@@ -1139,8 +1139,16 @@ bool CElement::IsFromRoot ( CElement* pEntity )
 {
     if ( !pEntity )
         return false;
-    if ( pEntity == g_pGame->GetMapManager ()->GetRootElement () )
-        return true;
+    if ( g_pGame && g_pGame->GetMapManager () )
+    {
+        if ( pEntity == g_pGame->GetMapManager ()->GetRootElement () )
+            return true;
+    }
+    else
+    {
+        if ( pEntity->GetTypeName () == "root" );
+            return true;
+    }
     return CElement::IsFromRoot ( pEntity->GetParentEntity () );
 }
 
