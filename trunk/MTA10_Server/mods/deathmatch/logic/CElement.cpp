@@ -1146,7 +1146,7 @@ bool CElement::IsFromRoot ( CElement* pEntity )
     }
     else
     {
-        if ( pEntity->GetTypeName () == "root" );
+        if ( pEntity->GetTypeName () == "root" )
             return true;
     }
     return CElement::IsFromRoot ( pEntity->GetParentEntity () );
