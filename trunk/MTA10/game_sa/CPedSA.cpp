@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 
+#define VALID_POSITION_LIMIT 100000
+
 extern CGameSA* pGame;
 
 CPedSA::CPedSA (  ) :
@@ -557,6 +559,12 @@ CVector * CPedSA::GetTransformedBonePosition ( eBone bone, CVector * vecPosition
         mov     ecx, dwThis
         call    dwFunc
     }
+
+    // Clamp to a sane range as this function can occasionally return massive values,
+    // which causes ProcessLineOfSight to effectively freeze
+    vecPosition->fX = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fX, VALID_POSITION_LIMIT );
+    vecPosition->fY = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fY, VALID_POSITION_LIMIT );
+    vecPosition->fZ = Clamp < float > ( -VALID_POSITION_LIMIT, vecPosition->fZ, VALID_POSITION_LIMIT );
 
     return vecPosition;
 }
