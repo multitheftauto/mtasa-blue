@@ -46,6 +46,10 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
     if ( pResponsibleGameEntity )
         pResponsible = m_pManager->FindEntity ( pResponsibleGameEntity, false );
 
+    unsigned short usModel;
+    if ( pResponsible && ( pResponsible->IsLocalEntity () || ( CStaticFunctionDefinitions::GetElementModel ( *pResponsible, usModel ) && CClientObjectManager::IsBreakableModel ( usModel ) ) ) )
+        return true;    // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
+
     eWeaponType explosionWeaponType;
     switch ( explosionType )
     {

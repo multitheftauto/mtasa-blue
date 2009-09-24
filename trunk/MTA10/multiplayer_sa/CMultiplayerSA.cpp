@@ -1737,7 +1737,7 @@ bool CallExplosionHandler ( void )
 
             case ENTITY_TYPE_OBJECT:
             {
-                //pExplosionCreator = pGameInterface->GetPools ()->GetObject ( (DWORD*) pInterface );
+                pExplosionCreator = pGameInterface->GetPools ()->GetObject ( (DWORD*) pInterface );
                 break;
             }
         }
@@ -1762,7 +1762,7 @@ bool CallExplosionHandler ( void )
 
             case ENTITY_TYPE_OBJECT:
             {
-                //pExplodingEntity = pGameInterface->GetPools ()->GetObject ( (CObjectSAInterface*) pExplodingEntityInterface );
+                pExplodingEntity = pGameInterface->GetPools ()->GetObject ( (DWORD*) pExplodingEntityInterface );
                 break;
             }
         }
