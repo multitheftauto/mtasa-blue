@@ -427,6 +427,7 @@ public:
     float                       GetCameraRotation ( void );
     RwMatrix *                  GetLTM ( void );
     CEntity *                   GetTargetEntity ( void );
+    void                        SetCameraClip ( bool bObjects, bool bVehicles );
 
 private:
     static unsigned long        FUNC_RwFrameGetLTM;

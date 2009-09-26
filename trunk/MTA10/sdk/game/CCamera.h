@@ -122,6 +122,7 @@ public:
     virtual float                       GetCameraRotation ( void )=0;
     virtual RwMatrix *                  GetLTM ( void )=0;
     virtual CEntity *                   GetTargetEntity ( void )=0;
+    virtual void                        SetCameraClip ( bool bObjects, bool bVehicles )=0;
 };
 
 

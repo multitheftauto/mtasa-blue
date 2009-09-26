@@ -241,3 +241,13 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
+{
+    bool bObjects   = lua_type ( luaVM, 1 ) != LUA_TBOOLEAN ? true : lua_toboolean ( luaVM, 1 ) ? true : false;
+    bool bVehicles  = lua_type ( luaVM, 2 ) != LUA_TBOOLEAN ? true : lua_toboolean ( luaVM, 2 ) ? true : false;
+
+    m_pManager->GetCamera ()->SetCameraClip ( bObjects, bVehicles );
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
