@@ -110,6 +110,7 @@ void CLuaArguments::ReadTable ( lua_State* luaVM, int iIndexBegin, std::map < co
     // Delete the previous arguments if any
     DeleteArguments ();
 
+    LUA_CHECKSTACK ( luaVM, 1 );
     lua_pushnil(luaVM);  /* first key */
     if ( iIndexBegin < 0 )
         iIndexBegin--;
@@ -189,14 +190,9 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
+    LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
-    // Make sure the stack has enough room
-#if MTA_DEBUG
-    lua_checkstack(luaVM, 1);
-#else
-    lua_checkstack(luaVM, 2);
-#endif
-	lua_getref ( luaVM, iLuaFunction );
+    lua_getref ( luaVM, iLuaFunction );
 
     // Push our arguments onto the stack
     PushArguments ( luaVM );
@@ -238,6 +234,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
+    LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
     lua_pushstring ( luaVM, szFunction );
     lua_gettable ( luaVM, LUA_GLOBALSINDEX );

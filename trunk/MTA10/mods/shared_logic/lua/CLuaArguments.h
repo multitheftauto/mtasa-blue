@@ -27,6 +27,14 @@ extern "C"
 #include "CLuaArgument.h"
 #include <vector>
 
+#if MTA_DEBUG
+    // Tight allocation in debug to find trouble.
+    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space) )
+#else
+    // Extra room in release to avoid trouble.
+    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space)*2 )
+#endif
+
 class CLuaArguments;
 
 class CLuaArguments
