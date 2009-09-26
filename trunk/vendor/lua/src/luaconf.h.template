@@ -1,5 +1,5 @@
 /*
-** $Id: luaconf.h,v 1.82.1.7 2008/02/11 16:25:08 roberto Exp $
+** $Id: luaconf.h,v 1.81 2006/02/10 17:44:06 roberto Exp $
 ** Configuration file for Lua
 ** See Copyright Notice in lua.h
 */
@@ -10,6 +10,19 @@
 
 #include <limits.h>
 #include <stddef.h>
+
+/*
+** =================
+** Autotoolification
+** =================
+*/
+
+/** autotools-patch **/
+#define LUA_USE_POSIX
+#define LUA_DL_DYLD
+#undef LUA_BUILD_AS_DLL
+#define LUA_USE_READLINE
+/** autotools-patch **/
 
 
 /*
@@ -32,18 +45,6 @@
 #if !defined(LUA_ANSI) && defined(_WIN32)
 #define LUA_WIN
 #endif
-
-#if defined(LUA_USE_LINUX)
-#define LUA_USE_POSIX
-#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
-#define LUA_USE_READLINE	/* needs some extra libraries */
-#endif
-
-#if defined(LUA_USE_MACOSX)
-#define LUA_USE_POSIX
-#define LUA_DL_DYLD		/* does not need extra library */
-#endif
-
 
 
 /*
@@ -94,9 +95,17 @@
 	".\\?.dll;"  LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll"
 
 #else
-#define LUA_ROOT	"/usr/local/"
-#define LUA_LDIR	LUA_ROOT "share/lua/5.1/"
-#define LUA_CDIR	LUA_ROOT "lib/lua/5.1/"
+
+/** autotools-patch **/
+#define LUA_LDIR	"%lua_datadir%/lua/5.1/"
+#if defined __alpha__ || defined __ia64__ || defined __powerpc64__ || \
+    defined __s390x__ || defined __sparc64__ || defined __x86_64__
+#define LUA_CDIR	"/usr/lib64/lua/5.1/"
+#else
+#define LUA_CDIR	"/usr/lib/lua/5.1/"
+#endif
+/** autotools-patch **/
+
 #define LUA_PATH_DEFAULT  \
 		"./?.lua;"  LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
 		            LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua"
@@ -360,7 +369,7 @@
 /*
 @@ LUA_COMPAT_OPENLIB controls compatibility with old 'luaL_openlib'
 @* behavior.
-** CHANGE it to undefined as soon as you replace to 'luaL_register'
+** CHANGE it to undefined as soon as you replace to 'luaL_registry'
 ** your uses of 'luaL_openlib'
 */
 #define LUA_COMPAT_OPENLIB
@@ -440,10 +449,10 @@
 @* can use.
 ** CHANGE it if you need lots of (Lua) stack space for your C
 ** functions. This limit is arbitrary; its only purpose is to stop C
-** functions to consume unlimited stack space. (must be smaller than
-** -LUA_REGISTRYINDEX)
+** functions to consume unlimited stack space.
 */
-#define LUAI_MAXCSTACK	8000
+#define LUAI_MCS_AUX	((int)(INT_MAX / (4*sizeof(LUA_NUMBER))))
+#define LUAI_MAXCSTACK	(LUAI_MCS_AUX > SHRT_MAX ? SHRT_MAX : LUAI_MCS_AUX)
 
 
 
@@ -556,24 +565,10 @@
 /* On a Pentium, resort to a trick */
 #if defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \
     (defined(__i386) || defined (_M_IX86) || defined(__i386__))
-
-/* On a Microsoft compiler, use assembler */
-#if defined(_MSC_VER)
-
-#define lua_number2int(i,d)   __asm fld d   __asm fistp i
-#define lua_number2integer(i,n)		lua_number2int(i, n)
-
-/* the next trick should work on any Pentium, but sometimes clashes
-   with a DirectX idiosyncrasy */
-#else
-
 union luai_Cast { double l_d; long l_l; };
 #define lua_number2int(i,d) \
   { volatile union luai_Cast u; u.l_d = (d) + 6755399441055744.0; (i) = u.l_l; }
 #define lua_number2integer(i,n)		lua_number2int(i, n)
-
-#endif
-
 
 /* this option always works, but may be slow */
 #else
@@ -697,10 +692,6 @@ union luai_Cast { double l_d; long l_l; };
 ** options.
 ** By default, _WIN32 gets LUA_DL_DLL and MAC OS X gets LUA_DL_DYLD.
 */
-#if defined(LUA_USE_DLOPEN)
-#define LUA_DL_DLOPEN
-#endif
-
 #if defined(LUA_WIN)
 #define LUA_DL_DLL
 #endif
