@@ -70,6 +70,7 @@ public:
     static bool                         GetElementModel                     ( CClientEntity& Entity, unsigned short& usModel );
     static bool                         IsElementInWater                    ( CClientEntity& Entity, bool & bInWater );
     static bool                         IsElementSyncer                     ( CClientEntity& Entity, bool & bIsSyncer );
+    static bool                         IsElementCollidableWith             ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide );
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
     static bool                         DestroyElement                      ( CClientEntity& Entity );
@@ -88,6 +89,7 @@ public:
     static bool                         SetElementHealth                    ( CClientEntity& Entity, float fHealth );
     static bool                         SetElementModel                     ( CClientEntity& Entity, unsigned short usModel );
     static bool                         SetElementCollisionsEnabled         ( CClientEntity& Entity, bool bEnabled );
+    static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );

@@ -1128,6 +1128,32 @@ int CLuaFunctionDefs::IsElementSyncer ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::IsElementCollidableWith ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab the entity and verify it.
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        CClientEntity* pWithEntity = lua_toelement ( luaVM, 2 );
+        if ( pEntity && pWithEntity )
+        {
+            bool bCanCollide;
+            if ( CStaticFunctionDefinitions::IsElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
+            {
+                lua_pushboolean ( luaVM, bCanCollide );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementCollidableWith" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
 {
@@ -1851,6 +1877,34 @@ int CLuaFunctionDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetElementCollidableWith ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        CClientEntity* pWithEntity = lua_toelement ( luaVM, 2 );
+        if ( pEntity && pWithEntity )
+        {
+            bool bCanCollide = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
+            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
+            {
+                lua_pushboolean ( luaVM, true );    
+                return 1;
+            }        
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollidableWith", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollidableWith" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetElementAlpha ( lua_State* luaVM )
 {

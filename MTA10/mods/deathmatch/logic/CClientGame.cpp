@@ -230,6 +230,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
+    g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -362,6 +363,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
+    g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pNet->StopNetwork ();
@@ -3126,6 +3128,11 @@ void CClientGame::StaticIdleHandler ( void )
     g_pClientGame->IdleHandler ();
 }
 
+bool CClientGame::StaticProcessCollisionHandler ( CEntity * pGameEntity, CEntity * pGameColEntity )
+{
+    return g_pClientGame->ProcessCollisionHandler ( pGameEntity, pGameColEntity );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3247,6 +3254,19 @@ void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGro
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
 }
 
+bool CClientGame::ProcessCollisionHandler ( CEntity * pGameEntity, CEntity * pGameColEntity )
+{
+    // Currently called for each and every element to check for collisions.
+    CClientEntity * pEntity = m_pManager->FindEntity ( pGameEntity, true );
+    CClientEntity * pColEntity = m_pManager->FindEntity ( pGameColEntity, true );
+
+    if ( pEntity && pColEntity )
+    {
+        if ( !pEntity->IsCollidableWith ( pColEntity ) ) return false;
+    }
+
+    return true;
+}
 
 void CClientGame::DownloadFiles ( void )
 {

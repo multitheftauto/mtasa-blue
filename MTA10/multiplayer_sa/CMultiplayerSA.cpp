@@ -162,6 +162,9 @@ DWORD RETURN_CPed_AddGogglesModel =                         0x5E3AD4;
 unsigned int* VAR_NumTags                                   = (unsigned int *)0xA9AD70;
 DWORD** VAR_TagInfoArray                                    = (DWORD **)0xA9A8C0;
 
+#define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
+DWORD RETURN_CPhysical_ProcessCollisionSectorList =         0x54BB9A;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -214,6 +217,7 @@ PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
+ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -273,6 +277,7 @@ void HOOK_CAnimManager_AddAnimation ();
 void HOOK_CAnimManager_BlendAnimation ();
 void HOOK_CPed_GetWeaponSkill ();
 void HOOK_CPed_AddGogglesModel ();
+void HOOK_CPhysical_ProcessCollisionSectorList ();
 
 void vehicle_lights_init ();
 
@@ -385,6 +390,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
+    HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
     
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -1270,6 +1276,11 @@ void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
 void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
 {
     m_pBlendAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHandler )
+{
+    m_pProcessCollisionHandler = pHandler;
 }
 
 void CMultiplayerSA::HideRadar ( bool bHide )
@@ -4164,5 +4175,57 @@ void CMultiplayerSA::DeleteAndDisableGangTags ()
         memset ( (void *)0x49CE5E, 0x90, 11 );
         *(unsigned short *)0x49CE5E = 0xC033;
         *(unsigned short *)0x49CE60 = 0xFF33;
+    }
+}
+
+
+CPhysicalSAInterface * pCollisionPhysicalThis, * pCollisionPhysical;
+bool CPhysical_ProcessCollisionSectorList ()
+{
+    CEntity * pEntity = pGameInterface->GetPools ()->GetEntity ( ( DWORD* ) pCollisionPhysicalThis );
+    CEntity * pColEntity = pGameInterface->GetPools ()->GetEntity ( ( DWORD* ) pCollisionPhysical );
+
+    if ( pEntity && pColEntity )
+    {
+        if ( m_pProcessCollisionHandler && !m_pProcessCollisionHandler ( pEntity, pColEntity ) )
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
+{
+    _asm
+    {
+        mov     pCollisionPhysicalThis, esi
+        mov     pCollisionPhysical, edi
+        pushad
+    }
+
+    // Carry on with collision? (sets the CElement->bUsesCollision flag check)
+    if ( CPhysical_ProcessCollisionSectorList () )
+    {
+        _asm
+        {
+            popad
+            mov     ecx, [eax+4]
+            test    byte ptr [edi+1Ch], 1
+            jmp     RETURN_CPhysical_ProcessCollisionSectorList
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            mov     ecx, [eax+4]
+            mov     edi, 0
+            test    edi, 1
+            mov     edi, pCollisionPhysical
+            jmp     RETURN_CPhysical_ProcessCollisionSectorList
+        }
     }
 }

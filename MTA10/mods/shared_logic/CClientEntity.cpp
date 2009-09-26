@@ -158,6 +158,13 @@ CClientEntity::~CClientEntity ( void )
     }
     m_Contacts.clear ();
 
+    // Unlink disabled-collisions
+    while ( !m_DisabledCollisions.empty () )
+    {
+        CClientEntity * pEntity = m_DisabledCollisions.begin ()->first;
+        SetCollidableWith ( pEntity, true );
+    }
+
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
 }
@@ -1419,3 +1426,25 @@ void CClientEntity::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < C
 }
 
 #endif
+
+
+bool CClientEntity::IsCollidableWith ( CClientEntity * pEntity )
+{
+    return !MapContains ( m_DisabledCollisions, pEntity );
+}
+
+
+void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollide )
+{
+    // quit if no change
+    if ( MapContains( m_DisabledCollisions, pEntity ) != bCanCollide )
+        return;
+
+    if ( bCanCollide )
+        MapRemove ( m_DisabledCollisions, pEntity );
+    else
+        MapSet ( m_DisabledCollisions, pEntity, true );
+
+    // Set in the other entity as well
+    pEntity->SetCollidableWith ( this, bCanCollide );
+}
