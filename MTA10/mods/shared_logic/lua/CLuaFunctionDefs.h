@@ -408,6 +408,7 @@ public:
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera   );
+    LUA_DECLARE ( SetCameraClip );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );

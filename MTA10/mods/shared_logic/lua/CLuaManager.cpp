@@ -616,6 +616,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaFunctionDefs::SetCameraTarget );
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
     CLuaCFunctions::AddFunction ( "fadeCamera", CLuaFunctionDefs::FadeCamera );
+    CLuaCFunctions::AddFunction ( "setCameraClip", CLuaFunctionDefs::SetCameraClip );
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );

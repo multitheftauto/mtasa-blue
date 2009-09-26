@@ -19,6 +19,16 @@
  */
 
 unsigned long CCameraSA::FUNC_RwFrameGetLTM;
+static bool bCameraClipObjects;
+static bool bCameraClipVehicles;
+
+#define VAR_CameraClipVehicles              0x8A5B14
+#define VAR_CameraClipDynamicObjects        0x8A5B15
+#define VAR_CameraClipStaticObjects         0x8A5B16
+
+#define HOOKPOS_Camera_CollisionDetection   0x520190
+DWORD RETURN_Camera_CollisionDetection =    0x520195;
+void HOOK_Camera_CollisionDetection ();
 
 CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)
 { 
@@ -26,6 +36,9 @@ CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)
 	this->internalInterface = cameraInterface;
 	for(int i = 0; i<MAX_CAMS;i++)
 		this->Cams[i] = new CCamSA(&this->internalInterface->Cams[i]);
+    bCameraClipObjects = true;
+    bCameraClipVehicles = true;
+    HookInstall(HOOKPOS_Camera_CollisionDetection, (DWORD)HOOK_Camera_CollisionDetection, 5 );
 }
 
 CCameraSA::~CCameraSA ( void )
@@ -495,3 +508,38 @@ CEntity * CCameraSA::GetTargetEntity ( void )
 	}
 	return pReturn;
 }
+
+void CCameraSA::SetCameraClip ( bool bObjects, bool bVehicles )
+{
+    bCameraClipObjects = bObjects;
+    bCameraClipVehicles = bVehicles;
+}
+
+void _declspec(naked) HOOK_Camera_CollisionDetection ()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if ( !bCameraClipObjects )
+    {
+        *(char*)VAR_CameraClipDynamicObjects = 0;
+        *(char*)VAR_CameraClipStaticObjects = 0;
+    }
+    else
+        *(char*)VAR_CameraClipStaticObjects = 1;
+
+    if ( !bCameraClipVehicles )
+        *(char*)VAR_CameraClipVehicles = 0;
+
+    _asm
+    {
+        popad
+        sub         esp,24h
+        push        ebx 
+        push        ebp
+        jmp         RETURN_Camera_CollisionDetection
+    }
+}
+

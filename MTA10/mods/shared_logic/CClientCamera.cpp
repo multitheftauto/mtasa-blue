@@ -412,6 +412,12 @@ bool CClientCamera::SetCameraMode ( eCamMode eMode )
 }
 
 
+void CClientCamera::SetCameraClip ( bool bObjects, bool bVehicles )
+{
+    m_pCamera->SetCameraClip ( bObjects, bVehicles );
+}
+
+
 void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
 {    
     if ( bEnabled )
