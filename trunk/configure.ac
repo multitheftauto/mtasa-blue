@@ -86,7 +86,7 @@ esac
 AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[])
 
 # Check for zlib
-AC_CHECK_LIB(z, deflate,, AC_MSG_ERROR([can't find zlib]))
+AX_CHECK_ZLIB()
 
 # Check for curses
 AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
