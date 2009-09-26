@@ -120,6 +120,7 @@ public:
 	LUA_DECLARE ( GetElementColShape );
     LUA_DECLARE ( IsElementInWater );
     LUA_DECLARE ( IsElementSyncer );
+    LUA_DECLARE ( IsElementCollidableWith );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -140,6 +141,7 @@ public:
     LUA_DECLARE ( SetElementHealth );
     LUA_DECLARE ( SetElementStreamable );
     LUA_DECLARE ( SetElementModel );
+    LUA_DECLARE ( SetElementCollidableWith );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );

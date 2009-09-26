@@ -300,6 +300,7 @@ void CLuaManager::LoadCFunctions ( void )
 	CLuaCFunctions::AddFunction ( "getElementColShape", CLuaFunctionDefs::GetElementColShape );
     CLuaCFunctions::AddFunction ( "isElementInWater", CLuaFunctionDefs::IsElementInWater );
     CLuaCFunctions::AddFunction ( "isElementSyncer", CLuaFunctionDefs::IsElementSyncer );
+    CLuaCFunctions::AddFunction ( "isElementCollidableWith", CLuaFunctionDefs::IsElementCollidableWith );
     
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
@@ -320,7 +321,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaFunctionDefs::SetElementModel );
     CLuaCFunctions::AddFunction ( "setElementStreamable", CLuaFunctionDefs::SetElementStreamable );
     CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaFunctionDefs::SetElementCollisionsEnabled );
-    
+    CLuaCFunctions::AddFunction ( "setElementCollidableWith", CLuaFunctionDefs::SetElementCollidableWith );
+
 	// Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );
     CLuaCFunctions::AddFunction ( "playSound3D", CLuaFunctionDefs::PlaySound3D );

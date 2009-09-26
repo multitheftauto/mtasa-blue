@@ -643,6 +643,36 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
 }
 
 
+bool CStaticFunctionDefinitions::IsElementCollidableWith ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTOBJECT:
+        case CCLIENTVEHICLE:
+        {
+            switch ( ThisEntity.GetType () )
+            {
+                case CCLIENTPLAYER:
+                case CCLIENTPED:
+                case CCLIENTOBJECT:
+                case CCLIENTVEHICLE:
+                {    
+                    bCanCollide = Entity.IsCollidableWith ( &ThisEntity );
+                    return true;
+                }
+                default: break;
+            }
+            break;
+        }
+        default: break;
+    }
+
+    return false;
+}
+
+
 CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, const char* szTypeName, const char* szID )
 {
     assert ( szTypeName );
@@ -2645,6 +2675,37 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& En
 
     return true;
 }
+
+
+bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Entity, CClientEntity & ThisEntity, bool bCanCollide )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTOBJECT:
+        case CCLIENTVEHICLE:
+        {
+            switch ( ThisEntity.GetType () )
+            {
+                case CCLIENTPLAYER:
+                case CCLIENTPED:
+                case CCLIENTOBJECT:
+                case CCLIENTVEHICLE:
+                {    
+                    Entity.SetCollidableWith ( &ThisEntity, bCanCollide );
+                    return true;
+                }
+                default: break;
+            }
+            break;
+        }
+        default: break;
+    }
+
+    return false;
+}
+
 
 CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation )
 {

@@ -176,6 +176,83 @@ inline float GetOffsetDegrees ( float a, float b )
 }
 
 
+// std::list wrappers
+// Returns true if the item is in the itemList
+template < class T >
+bool ListContains ( std::list < T >& itemList, const T& item )
+{
+    std::list < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+            return true;
+    return false;
+}
+
+// std::vector wrappers
+template < class T >
+bool VectorContains ( std::vector < T >& itemList, const T& item )
+{
+    std::vector < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+            return true;
+    return false;
+}
+template < class T >
+void VectorRemove ( std::vector < T >& itemList, const T& item )
+{
+    std::vector < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+        {
+            itemList.erase ( it );
+            break;
+        }
+}
+
+// std::map wrappers
+template < class T, class V >
+void MapSet ( std::map < T, V >& collection, const T& key, const V& value )
+{
+    collection[ key ] = value;
+}
+
+template < class T, class V >
+V* MapFind ( std::map < T, V >& collection, const T& key )
+{
+    std::map < T, V > ::iterator it = collection.find ( key );
+    if ( it == collection.end () )
+        return &it->second;
+    return NULL;
+}
+
+template < class T, class V >
+bool MapFind ( std::map < T, V >& collection, const T& key, V& value )
+{
+    std::map < T, V > ::iterator it = collection.find ( key );
+    if ( it == collection.end () )
+    {
+        return &it->second;
+        return true;
+    }
+    return NULL;
+}
+
+template < class T, class V >
+bool MapContains ( std::map < T, V >& collection, const T& key )
+{
+    return collection.find ( key ) != collection.end ();
+}
+
+template < class T, class V >
+void MapRemove ( std::map < T, V >& collection, const T& key )
+{
+    std::map < T, V > ::iterator it = collection.find ( key );
+    if ( it != collection.end () )
+        collection.erase ( it );
+}
+
+
 bool            DoesFileExist               ( const char* szFilename );
 
 // Misc utility functions
