@@ -35,21 +35,13 @@ libdeathmatch_la_SOURCES = \
 
 libdeathmatch_la_LIBADD = \
 	@PCRE_LIBS@ \
-	-lehs \
-	-lpme \
 	-lplatform \
-	-lsqlite3 \
-	-llua \
-	-ljson \
-	-lrt
+	-lsqlite3
 
 libdeathmatch_la_LDFLAGS = \
-	-Wl,-export-dynamic \
 	-L../../sdk/ \
-	-L../../../vendor/json-c/ \
-	-L../../../vendor/ehs/ \
-	-L../../../vendor/pme/ \
-	-L../../../libs/ \
-	-L../../../libs/lua \
-	-L/usr/lib
+	$(top_builddir)/vendor/ehs/.libs/libehs.a \
+	$(top_builddir)/vendor/pme/.libs/libpme.a \
+	$(top_builddir)/vendor/lua/src/.libs/liblua.a \
+	$(top_builddir)/vendor/json-c/.libs/libjson.a
 
