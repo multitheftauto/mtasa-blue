@@ -11,6 +11,8 @@
 
 #include "config.h"
 
+#define MIN(x,y) (x<y)?x:y
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -108,7 +110,7 @@ char* strndup(const char* str, size_t n)
 {
   if(str) {
     size_t len = strlen(str);
-    size_t nn = min(len,n);
+    size_t nn = MIN(len,n);
     char* s = (char*)malloc(sizeof(char) * (nn + 1));
 
     if(s) {
@@ -232,7 +234,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_null:
       printbuf_memappend(tok->pb, &c, 1);
       if(strncasecmp(json_null_str, tok->pb->buf,
-		     min(tok->st_pos+1, strlen(json_null_str))) == 0) {
+		     MIN(tok->st_pos+1, strlen(json_null_str))) == 0) {
 	if(tok->st_pos == strlen(json_null_str)) {
 	  current = NULL;
 	  saved_state = json_tokener_state_finish;
@@ -353,7 +355,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_boolean:
       printbuf_memappend(tok->pb, &c, 1);
       if(strncasecmp(json_true_str, tok->pb->buf,
-		     min(tok->st_pos+1, strlen(json_true_str))) == 0) {
+		     MIN(tok->st_pos+1, strlen(json_true_str))) == 0) {
 	if(tok->st_pos == strlen(json_true_str)) {
 	  current = json_object_new_boolean(1);
 	  saved_state = json_tokener_state_finish;
@@ -361,7 +363,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  goto redo_char;
 	}
       } else if(strncasecmp(json_false_str, tok->pb->buf,
-			    min(tok->st_pos+1, strlen(json_false_str))) == 0) {
+			    MIN(tok->st_pos+1, strlen(json_false_str))) == 0) {
 	if(tok->st_pos == strlen(json_false_str)) {
 	  current = json_object_new_boolean(0);
 	  saved_state = json_tokener_state_finish;

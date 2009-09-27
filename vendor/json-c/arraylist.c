@@ -11,6 +11,8 @@
 
 #include "config.h"
 
+#define MAX(x,y) (x>y)?x:y
+
 #if STDC_HEADERS
 # include <stdlib.h>
 # include <string.h>
@@ -62,7 +64,7 @@ static int array_list_expand_internal(struct array_list *this, int _max)
   int new_size;
 
   if(_max < this->size) return 0;
-  new_size = max(this->size << 1, _max);
+  new_size = MAX(this->size << 1, _max);
   if(!(t = realloc(this->array, new_size*sizeof(void*)))) return -1;
   this->array = t;
   (void)memset(this->array + this->size, 0, (new_size-this->size)*sizeof(void*));

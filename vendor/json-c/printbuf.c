@@ -11,6 +11,8 @@
 
 #include "config.h"
 
+#define MAX(x,y) (x>y)?x:y
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +46,7 @@ int printbuf_memappend(struct printbuf *p, char *buf, int size)
 {
   char *t;
   if(p->size - p->bpos <= size) {
-    int new_size = max(p->size * 2, p->bpos + size + 8);
+    int new_size = MAX(p->size * 2, p->bpos + size + 8);
 #ifdef PRINTBUF_DEBUG
     mc_debug("printbuf_memappend: realloc "
 	     "bpos=%d wrsize=%d old_size=%d new_size=%d\n",
