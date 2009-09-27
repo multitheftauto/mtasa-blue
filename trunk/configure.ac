@@ -59,7 +59,7 @@ AX_LIB_SQLITE3()
 # curl
 AC_CHECK_CURL(7)
 
-# Checking for a 64bit system
+# Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
 ARCH=`uname -m`
 case "$ARCH" in
@@ -72,13 +72,25 @@ case "$ARCH" in
 	x86_64*)
 		dnl yay 21st century hardware
 		AC_MSG_RESULT(x64 feel teh power)
-    AC_DEFINE(X64)
+		AC_DEFINE(X64)
 		AC_SUBST(ARCH,x64)
 	;;
 	*)
 		AC_MSG_RESULT(x86 oh noes i ran out of address space)
 		AC_DEFINE(X86)
 		AC_SUBST(ARCH,x86)
+	;;
+esac
+
+# Platform specific rules
+AC_MSG_CHECKING([operating system])
+case $host in
+	*-linux*)
+		AC_MSG_RESULT(linux)
+		AC_CHECK_LIB(rt, clock_gettime)
+	;;
+	*)
+		AC_MSG_RESULT(non-linux)
 	;;
 esac
 
