@@ -18,6 +18,8 @@ endif
 lib_LTLIBRARIES = \
 	libcore.la
 
+libcore_la_LIBTOOLFLAGS = --tag=disable-static
+
 libcore_la_SOURCES = \
 	StdInc.cpp \
 	CCrashHandlerAPI.cpp \
