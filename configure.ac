@@ -151,6 +151,7 @@ fi
 # Configure subdirectories where necessary
 AC_CONFIG_SUBDIRS([
 	vendor/lua
+	vendor/json-c
 	])
 
 # Generate makefiles
@@ -160,7 +161,6 @@ AC_CONFIG_FILES([
 	vendor/tinyxml/Makefile
 	vendor/pme/Makefile
 	vendor/ehs/Makefile
-	vendor/json-c/Makefile
 	Shared/Makefile
 	Shared/XML/Makefile
 	MTA10_Server/Makefile
