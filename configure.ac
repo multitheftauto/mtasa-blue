@@ -104,7 +104,7 @@ AX_CHECK_ZLIB()
 AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
 
 # Define compile/library flags.
-AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -DLINUX $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
+AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.

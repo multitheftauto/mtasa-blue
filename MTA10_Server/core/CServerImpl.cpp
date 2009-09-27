@@ -22,18 +22,8 @@
 #include <cstdio>
 
 // Define libraries
-#ifdef WIN32
-    #ifdef _DEBUG
-        char szNetworkLibName[] = "net_d.dll";
-        char szXMLLibName[]     = "xmll_d.dll";
-    #else
-        char szNetworkLibName[] = "net.dll";
-        char szXMLLibName[]     = "xmll.dll";
-    #endif
-#else
-	char szNetworkLibName [] = "net.so";
-  char szXMLLibName[]      = "xmll.so";
-#endif
+char szNetworkLibName[]	= "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
+char szXMLLibName[]	= "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 
 using namespace std;
 

@@ -20,8 +20,8 @@
 class NetServerPlayerID
 {
 public:
-    ULONG           m_uiBinaryAddress;
-    USHORT          m_usPort;
+    unsigned long   m_uiBinaryAddress;
+    unsigned short  m_usPort;
     char            m_szSerial [ 64 ];
 
 public:
@@ -61,8 +61,8 @@ public:
         return ((left.m_uiBinaryAddress != right.m_uiBinaryAddress) || (left.m_usPort != right.m_usPort));
     };
 
-    inline ULONG        GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
-    inline USHORT       GetPort             ( void ) const                      { return m_usPort; };
+    inline unsigned long    GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
+    inline unsigned short   GetPort             ( void ) const                      { return m_usPort; };
     
     inline void         GetSerial           ( std::string & strSerial ) const   { strSerial = m_szSerial; };
     inline void         SetSerial           ( std::string strSerial )           { SetSerial ( strSerial.c_str() ); };

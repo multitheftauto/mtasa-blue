@@ -110,7 +110,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
     if ( pFunction )
     {
-        return static_cast < BOOL > ( CLuaDefs::CanUseFunction (
+        return static_cast < bool > ( CLuaDefs::CanUseFunction (
             pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) );
     }
 
