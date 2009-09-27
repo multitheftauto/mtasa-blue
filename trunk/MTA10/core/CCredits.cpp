@@ -14,7 +14,7 @@
 
 extern CCore* g_pCore;
 
-const char* g_szCredits = "== Multi Theft Auto: San Andreas v1.0 ==\n"
+const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_VERSIONSTRING " " MTA_DM_BUILDTYPE " ==\n"
                           "\n"
 
                           "Programming\n"
