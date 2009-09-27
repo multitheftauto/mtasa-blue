@@ -883,7 +883,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                 case CElement::WATER:
                 {
                     CWater* pWater = static_cast < CWater* > ( pElement );
-                    BYTE ucNumVertices = (BYTE)pWater->GetNumVertices ();
+                    unsigned char ucNumVertices = (unsigned char)pWater->GetNumVertices ();
                     BitStream.Write ( ucNumVertices );
                     CVector vecVertex;
                     for ( int i = 0; i < ucNumVertices; i++ )
