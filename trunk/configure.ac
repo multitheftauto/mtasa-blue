@@ -161,8 +161,6 @@ AC_CONFIG_FILES([
 	vendor/pme/Makefile
 	vendor/ehs/Makefile
 	vendor/json-c/Makefile
-	vendor/lua/Makefile
-	vendor/lua/src/Makefile
 	Shared/Makefile
 	Shared/XML/Makefile
 	MTA10_Server/Makefile
