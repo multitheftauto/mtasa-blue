@@ -26,6 +26,8 @@ endif
 lib_LTLIBRARIES = \
 	libdeathmatch.la
 
+libdeathmatch_la_LIBTOOLFLAGS = --tag=disable-static
+
 libdeathmatch_la_SOURCES = \
 	Server.cpp \
 	CServer.cpp \
