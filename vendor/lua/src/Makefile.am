@@ -1,8 +1,5 @@
 AM_CFLAGS = -Wall
 
-include_HEADERS = lua.h lualib.h lauxlib.h
-nodist_include_HEADERS = luaconf.h 
-
 noinst_LTLIBRARIES = liblua.la
 liblua_la_LDFLAGS = -release 5.1
 liblua_la_SOURCES = \
