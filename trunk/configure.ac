@@ -126,6 +126,12 @@ else
 	AC_SUBST(MTA_REVISION)
 fi
 
+# Configure subdirectories where necessary
+AC_CONFIG_SUBDIRS([
+	vendor/lua
+	])
+
+# Generate makefiles
 AC_CONFIG_FILES([
 	Makefile
 	vendor/Makefile
@@ -133,6 +139,8 @@ AC_CONFIG_FILES([
 	vendor/pme/Makefile
 	vendor/ehs/Makefile
 	vendor/json-c/Makefile
+	vendor/lua/Makefile
+	vendor/lua/src/Makefile
 	Shared/Makefile
 	Shared/XML/Makefile
 	MTA10_Server/Makefile

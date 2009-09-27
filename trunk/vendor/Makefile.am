@@ -1,1 +1,2 @@
-SUBDIRS = tinyxml pme ehs json-c
+SUBDIRS = tinyxml pme ehs json-c lua
+
