@@ -3,7 +3,7 @@ AM_CFLAGS = -Wall
 include_HEADERS = lua.h lualib.h lauxlib.h
 nodist_include_HEADERS = luaconf.h 
 
-lib_LTLIBRARIES = liblua.la
+noinst_LTLIBRARIES = liblua.la
 liblua_la_LDFLAGS = -release 5.1
 liblua_la_SOURCES = \
 	lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c \
@@ -14,20 +14,6 @@ liblua_la_SOURCES = \
 	lapi.h ldebug.h lgc.h lmem.h lparser.h ltable.h lzio.h ldo.h llex.h \
 	lobject.h lstate.h ltm.h lundump.h lcode.h lfunc.h llimits.h lopcodes.h \
 	lstring.h lvm.h
-
-bin_PROGRAMS = lua luac
-
-lua_SOURCES = lua.c
-lua_LDADD = liblua.la @LUA_LIBS@
-lua_DEPENDENCIES = liblua.la
-
-luac_SOURCES = luac.c print.c
-luac_LDADD = liblua.la @LUA_LIBS@
-luac_DEPENDENCIES = liblua.la
-
-# luac must be linked statically because it uses functions that
-# don't get exported to the shared object
-luac_LDFLAGS = -static
 
 EXTRA_DIST = luaconf.h.template.in
 BUILT_SOURCES = luaconf.h
