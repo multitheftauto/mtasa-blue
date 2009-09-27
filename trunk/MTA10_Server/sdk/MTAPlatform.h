@@ -33,7 +33,7 @@ extern "C" bool g_bSilent;
 	#define MTA_LIB_SUFFIX
 #elif defined(__APPLE__) && defined(__MACH__)
 	#define MTA_OS_STRING		"Mac OS X"
-	#define MTA_LIB_EXTENSION	".dylib"
+	#define MTA_LIB_EXTENSION	".so"
 	#define MTA_LIB_SUFFIX
 #else
 	#error "Unsupported operating system"
