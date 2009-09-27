@@ -23,24 +23,23 @@ clean-local:
 	-rm -f StdInc.h.gch
 endif
 
-lib_LTLIBRARIES = \
-	libdeathmatch.la
-
-libdeathmatch_la_LIBTOOLFLAGS = --tag=disable-static
-
-libdeathmatch_la_SOURCES = \
+libdir = $(outputdir)/mods/deathmatch
+lib_LTLIBRARIES = deathmatch.la
+deathmatch_la_LIBTOOLFLAGS = --tag=disable-static
+deathmatch_la_SOURCES = \
 	Server.cpp \
 	CServer.cpp \
 	$(UTILS) \
 	$(LOGIC) \
 	StdInc.cpp
 
-libdeathmatch_la_LIBADD = \
+deathmatch_la_LIBADD = \
 	@PCRE_LIBS@ \
 	-lplatform \
 	-lsqlite3
 
-libdeathmatch_la_LDFLAGS = \
+deathmatch_la_LDFLAGS = \
+	-module -avoid-version \
 	-L../../sdk/ \
 	$(top_builddir)/vendor/ehs/.libs/libehs.a \
 	$(top_builddir)/vendor/pme/.libs/libpme.a \

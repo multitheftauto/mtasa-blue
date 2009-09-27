@@ -10,6 +10,10 @@ if test x$prefix = xNONE; then
         prefix=/usr/local
 fi
 
+# Output directory
+outputdir=`pwd`/MTA10_Server/output
+
+AC_SUBST(outputdir)
 AC_SUBST(prefix)
 
 AC_SUBST(INCLUDES)
@@ -89,8 +93,14 @@ case $host in
 		AC_MSG_RESULT(linux)
 		AC_CHECK_LIB(rt, clock_gettime)
 	;;
+	*-darwin*)
+		AC_MSG_RESULT(darwin)
+	;;
+	*-bsd*)
+		AC_MSG_RESULT(bsd)
+	;;
 	*)
-		AC_MSG_RESULT(non-linux)
+		AC_MSG_ERROR(unsupported)
 	;;
 esac
 
