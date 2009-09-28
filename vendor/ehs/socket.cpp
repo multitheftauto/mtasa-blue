@@ -237,12 +237,15 @@ void Socket::Close ( )
 
 NetworkAbstraction * Socket::Accept ( )
 {
-
+#ifdef _WIN32
+	int oInternetSocketAddressLength = sizeof ( oInternetSocketAddress );
+#else
 	socklen_t oInternetSocketAddressLength = sizeof ( oInternetSocketAddress );
+#endif
 	int nNewFd = accept ( nAcceptSocket, 
 						  (sockaddr *) &oInternetSocketAddress,
 #ifdef _WIN32
-						  (int *) &oInternetSocketAddressLength 
+						  &oInternetSocketAddressLength 
 #else
 						  &oInternetSocketAddressLength 
 #endif
