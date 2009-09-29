@@ -245,6 +245,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                 {
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM ()->GetVM ();
+                    #if MTA_DEBUG
+                        int luaStackPointer = lua_gettop ( pState );
+                    #endif
 
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );
@@ -320,6 +323,10 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     OldClient.Push ( pState );
                     lua_setglobal ( pState, "client" );
+
+                    #if MTA_DEBUG
+                        assert ( lua_gettop ( pState ) == luaStackPointer );
+                    #endif
                 }
             }
         }

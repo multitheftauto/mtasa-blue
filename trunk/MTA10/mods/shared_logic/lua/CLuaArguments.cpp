@@ -205,20 +205,27 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
         const char* szRes = lua_tostring( luaVM, -1 );		
 		g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
+        // cleanup the stack
+        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
+            lua_pop ( luaVM, 1 );
+
         return false; // the function call failed
     }
-    else if ( returnValues != NULL )
+    else
     {
         int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
-        for ( int i = - iReturns; i <= -1; i++ )
+
+        if ( returnValues != NULL )
         {
-            returnValues->ReadArgument ( luaVM, i );
+            for ( int i = - iReturns; i <= -1; i++ )
+            {
+                returnValues->ReadArgument ( luaVM, i );
+            }
         }
 
-        for ( int h = 0; h < iReturns; h++)
-		{
+        // cleanup the stack
+        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
             lua_pop ( luaVM, 1 );
-		}
     }
         
     return true;
@@ -250,20 +257,27 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
         const char* szRes = lua_tostring( luaVM, -1 );
         g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
+        // cleanup the stack
+        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
+            lua_pop ( luaVM, 1 );
+
         return false; // the function call failed
     }
-    else if ( returnValues != NULL )
+    else
     {
         int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
-        for ( int i = - iReturns; i <= -1; i++ )
+
+        if ( returnValues != NULL )
         {
-            returnValues->ReadArgument ( luaVM, i );
+            for ( int i = - iReturns; i <= -1; i++ )
+            {
+                returnValues->ReadArgument ( luaVM, i );
+            }
         }
 
-        for ( int h = 0; h < iReturns; h++)
-		{
+        // cleanup the stack
+        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
             lua_pop ( luaVM, 1 );
-		}
     }
         
     return true;
