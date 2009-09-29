@@ -41,7 +41,7 @@ typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-typedef bool ( ProcessCollisionHandler ) ( class CEntity * pEntity, class CEntity * pOtherEntity );
+typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
