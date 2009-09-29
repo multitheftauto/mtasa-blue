@@ -218,27 +218,6 @@ void MapSet ( std::map < T, V >& collection, const T& key, const V& value )
 }
 
 template < class T, class V >
-V* MapFind ( std::map < T, V >& collection, const T& key )
-{
-    std::map < T, V > ::iterator it = collection.find ( key );
-    if ( it == collection.end () )
-        return &it->second;
-    return NULL;
-}
-
-template < class T, class V >
-bool MapFind ( std::map < T, V >& collection, const T& key, V& value )
-{
-    std::map < T, V > ::iterator it = collection.find ( key );
-    if ( it == collection.end () )
-    {
-        return &it->second;
-        return true;
-    }
-    return NULL;
-}
-
-template < class T, class V >
 bool MapContains ( std::map < T, V >& collection, const T& key )
 {
     return collection.find ( key ) != collection.end ();

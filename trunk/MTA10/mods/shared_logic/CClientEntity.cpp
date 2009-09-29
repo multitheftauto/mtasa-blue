@@ -1441,10 +1441,15 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
         return;
 
     if ( bCanCollide )
+    {
         MapRemove ( m_DisabledCollisions, pEntity );
+        MapRemove ( g_pClientGame->m_AllDisabledCollisions, pEntity );
+    }
     else
+    {
         MapSet ( m_DisabledCollisions, pEntity, true );
-
+        MapSet ( g_pClientGame->m_AllDisabledCollisions, pEntity, true );
+    }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
 }

@@ -416,7 +416,7 @@ private:
     static void                         StaticIdleHandler               ( void );
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-    static bool                         StaticProcessCollisionHandler   ( CEntity * pGameEntity, CEntity * pGameColEntity );
+    static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -429,7 +429,7 @@ private:
     void                                IdleHandler                     ( void );
     void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-    bool                                ProcessCollisionHandler         ( CEntity * pGameEntity, CEntity * pGameColEntity );
+    bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -581,6 +581,13 @@ private:
 
     DWORD                               m_dwFrameTimeSlice;     // how long it took (in ms) to process the current frame
     DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
+
+    // Cache for speeding up collision processing
+public:
+    std::map < CClientEntity *, bool >                m_AllDisabledCollisions;
+private:
+    std::map < CEntitySAInterface*, CClientEntity* >  m_CachedCollisionMap;
+    bool                                              m_BuiltCollisionMapThisFrame;
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     bool                                m_bShowSyncingInfo;

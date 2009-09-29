@@ -4182,12 +4182,9 @@ void CMultiplayerSA::DeleteAndDisableGangTags ()
 CPhysicalSAInterface * pCollisionPhysicalThis, * pCollisionPhysical;
 bool CPhysical_ProcessCollisionSectorList ()
 {
-    CEntity * pEntity = pGameInterface->GetPools ()->GetEntity ( ( DWORD* ) pCollisionPhysicalThis );
-    CEntity * pColEntity = pGameInterface->GetPools ()->GetEntity ( ( DWORD* ) pCollisionPhysical );
-
-    if ( pEntity && pColEntity )
+    if ( pCollisionPhysicalThis && pCollisionPhysical )
     {
-        if ( m_pProcessCollisionHandler && !m_pProcessCollisionHandler ( pEntity, pColEntity ) )
+        if ( m_pProcessCollisionHandler && !m_pProcessCollisionHandler ( pCollisionPhysicalThis, pCollisionPhysical ) )
         {
             return false;
         }

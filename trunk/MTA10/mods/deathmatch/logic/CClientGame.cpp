@@ -790,6 +790,8 @@ void CClientGame::DoPulsePostFrame ( void )
 
 void CClientGame::DoPulses ( void )
 {
+    m_BuiltCollisionMapThisFrame = false;
+
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
     {
 		g_pCore->GetConsole()->Printf("First playback frame, starting");
@@ -3128,9 +3130,9 @@ void CClientGame::StaticIdleHandler ( void )
     g_pClientGame->IdleHandler ();
 }
 
-bool CClientGame::StaticProcessCollisionHandler ( CEntity * pGameEntity, CEntity * pGameColEntity )
+bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
 {
-    return g_pClientGame->ProcessCollisionHandler ( pGameEntity, pGameColEntity );
+    return g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3254,15 +3256,58 @@ void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGro
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
 }
 
-bool CClientGame::ProcessCollisionHandler ( CEntity * pGameEntity, CEntity * pGameColEntity )
+bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
 {
-    // Currently called for each and every element to check for collisions.
-    CClientEntity * pEntity = m_pManager->FindEntity ( pGameEntity, true );
-    CClientEntity * pColEntity = m_pManager->FindEntity ( pGameColEntity, true );
+    if ( pThisInterface == pOtherInterface )
+        return true;
 
-    if ( pEntity && pColEntity )
+    if ( !m_BuiltCollisionMapThisFrame )
     {
-        if ( !pEntity->IsCollidableWith ( pColEntity ) ) return false;
+        // Build a map of CPhysicalSAInterface*/CClientEntity*'s that have collision disabled
+        m_BuiltCollisionMapThisFrame = true;
+        m_CachedCollisionMap.clear ();
+
+        std::map < CClientEntity*, bool > ::iterator iter = m_AllDisabledCollisions.begin ();
+        for ( ; iter != m_AllDisabledCollisions.end () ; iter++ )
+        {
+            CClientEntity* pEntity = iter->first;
+            CEntity* pGameEntity = pEntity->GetGameEntity ();
+            CEntitySAInterface* pInterface = pGameEntity ? pGameEntity->GetInterface () : NULL;
+
+            if ( pInterface )
+                m_CachedCollisionMap[ pInterface ] = pEntity;
+        }
+    }
+
+    // Check both elements appear in the cached map before doing extra processing
+    std::map < CEntitySAInterface*, CClientEntity* > ::iterator iter1 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pThisInterface );
+    if ( iter1 != m_CachedCollisionMap.end () )
+    {
+        std::map < CEntitySAInterface*, CClientEntity* > ::iterator iter2 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pOtherInterface );
+        if ( iter2 != m_CachedCollisionMap.end () )
+        {
+            // Re-get the entity pointers using a safer method
+            CEntity * pGameEntity = g_pGame->GetPools ()->GetEntity ( ( DWORD* ) pThisInterface );
+            CEntity * pGameColEntity = g_pGame->GetPools ()->GetEntity ( ( DWORD* ) pOtherInterface );
+
+            if ( pGameEntity && pGameColEntity )
+            {        
+                CClientEntity * pEntity = m_pManager->FindEntity ( pGameEntity, true );
+                CClientEntity * pColEntity = m_pManager->FindEntity ( pGameColEntity, true );
+
+                if ( pEntity && pColEntity )
+                {
+                    #if MTA_DEBUG
+                        CClientEntity* ppThisEntity2 = iter1->second;
+                        CClientEntity* ppOtherEntity2 = iter2->second;
+                        // These should match, but its not essential.
+                        assert ( ppThisEntity2 == pEntity );
+                        assert ( ppOtherEntity2 == pColEntity );
+                    #endif
+                    if ( !pEntity->IsCollidableWith ( pColEntity ) ) return false;
+                }
+            }
+        }
     }
 
     return true;
