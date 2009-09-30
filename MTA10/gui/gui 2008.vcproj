@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4204"
-				AdditionalDependencies="shlwapi.lib d3dx9d.lib dxerr9.lib CEGUIBase_d_2008.lib DirectX9GUIRenderer_d_2008.lib CEGUIFalagardBase_d_2008.lib freetype2110_D.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9d.lib dxerr.lib CEGUIBase_d_2008.lib DirectX9GUIRenderer_d_2008.lib CEGUIFalagardBase_d_2008.lib freetype2110_D.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\mta\cgui_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -157,7 +157,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr9.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2110.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2110.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\MTA\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -252,7 +252,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr9.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2110.lib"
+				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2110.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
