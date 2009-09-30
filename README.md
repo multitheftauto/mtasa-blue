@@ -24,7 +24,7 @@ Our project's code repository can be found on the [multitheftauto/multitheftauto
 
 ### Screenshots
 
-![screenshot 1](http://www.mtasa.com/images/c_baronshooters.png "Screenshot 1")
+![screenshot 1](http://www.mtasa.com/images/c_wipeout.png "Screenshot 1")
 ![screenshot 2](http://www.mtasa.com/images/c_bigpeds.png "Screenshot 2")
 ![screenshot 3](http://www.mtasa.com/images/c_yougofirst.png "Screenshot 3")
 
