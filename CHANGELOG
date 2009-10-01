@@ -1,0 +1,1250 @@
+Changelog for Multi Theft Auto
+
+Multi Theft Auto : San Andreas - 1.0.1
+======================================
+Goal: Stability bugfix release
+
+Targets:
+* Fixes for major, high-priority issues and crashes that are present in version 1.0 and are degrading the stability or prevent proper usage of the software
+
+- 0004219: [General] Explosive barrel desynch (ccw) - resolved.
+- 0004930: [Server] Server freeze and download problem with multiple linux servers (IJs) - resolved.
+- 0004309: [Client] Tags are displayed with other tags under them. (ryden) - resolved.
+- 0003119: [Synchronization] Improve player/vehicle interpolation and compensation (ccw) - resolved.
+- 0004903: [Server] Bind IP fails to query (ccw) - resolved.
+- 0002080: [General] 2 players with the same nickname causes network trouble. (ccw) - resolved.
+- 0004969: [Scripting] getElementsByType() does not return gui elements (ccw) - resolved.
+- 0004970: [Scripting] deathmessages can report incorrect information (ccw) - resolved.
+- 0004975: [Scripting] getElementsByType() sometimes returns invalid elements (ccw) - resolved.
+- 0004976: [General] Crashes and continual memory consumption due to lua stack overflow (ccw) - resolved.
+- 0004578: [Client] Vehicle desync when shot with shotgun or pushed (ccw) - resolved.
+- 0004979: [Vehicles] Vehicle desync when driver is killed (ccw) - resolved.
+- 0004980: [Scripting] onPlayerDamage sometimes has incorrect parameters (ccw) - resolved.
+- 0004960: [Scripting] fatal error (6) issue with clients joining a server with many objects in a small area (ccw) - resolved.
+- 0004984: [Scripting] Lua math.randomseed() gets stuck with large numbers (ccw) - resolved.
+- 0004849: [GUI / Menus / Console] Confusing account login (IJs) - resolved.
+- 0004395: [GUI / Menus / Console] Add human readable download error messages (IJs) - resolved.
+- 0004945: [Client] Refreshing favourites doesn't work (ccw) - resolved.
+- 0004992: [Server] Some configuration file and command line parameters are not working correctly (ccw) - resolved.
+- 0004991: [Server] Server silently continues if there is a HTTP port conflict (ccw) - resolved.
+- 0004994: [Admin] ACL rights reset (ccw) - resolved.
+- 0005020: [Server] GCC does not link against vendor/lua libraries (IJs) - resolved.
+- 0004900: [Server] Turn dynamically loaded library dependencies into static libraries (IJs) - resolved.
+- 0005022: [Server] Server does not compile and run on BSD/Mach systems (IJs) - resolved.
+- 0005029: [Client] [Patch] Update (/ver) MTA Copyright. (ccw) - resolved.
+- 0004876: [Client] Crash during Race (ccw) - resolved.
+- 0004874: [Server] setGlitchEnabled is apparently no longer synced (Jax) - resolved.
+- 0004937: [Client] Stealth kill victims turn to south (Jax) - resolved.
+- 0002612: [Scripting] Spawning a player within the ground may damage the player a tiny bit on spawn, with false damage information. (ccw) - resolved.
+- 0004848: [Scripting] colShapes should be made attachable (Jax) - resolved.
+- 0001507: [General] Death Messages not functioning 100% (Jax) - resolved.
+- 0004859: [Scripting] playerSound3D - sound stops when changing to other dimension (Jax) - resolved.
+- 0004785: [GUI] When taking a photo with the camera, chatbox and gui should be hidden (Jax) - resolved.
+- 0004776: [Weapons] Killing peds (dunno if players too) with sniper rifle cases scope view to get back to follow player (Jax) - resolved.
+
+Multi Theft Auto : San Andreas - 1.0
+====================================
+
+First stable build of Multi Theft Auto: San Andreas, released on Saturday, 22. August, 2009.
+
+- 0004081: [General] Spectator doesn't work properly while you're dead. (Jax) - resolved.
+- 0004788: [Server] Compile net.so for older machines (IJs) - resolved.
+- 0004682: [General] "Connection timed out" message being sent if you try to connect to a full server (Arc) - resolved.
+- 0001651: [Synchronization] Police Helicopter search light is 'semi-syncd' (Jax) - resolved.
+- 0004028: [Scripting] setElementAttachedOffsets does not exist server side (Jax) - resolved.
+- 0003097: [Vehicles] Do not use memory to sync the height of vehicles moveable parts, such as the forklift and packer (Jax) - resolved.
+- 0003578: [General] Lighting is not immediately applied to peds after they're created or have skin changed (ChrML) - resolved.
+- 0001216: [General] Player drowns too quickly after running out of oxygen (Jax) - resolved.
+- 0001553: [Weapons] Putting on goggles is not synced (Jax) - resolved.
+ - 0004779: [Client] Goggles effect everyone (Arc) - resolved.
+- 0003466: [Synchronization] Stealth kill attempt animation (when only aiming but still didn't press fire) is not synced (Jax) - resolved.
+- 0004464: [Scripting] allow option to turn off ped voice with setPedVoice (Jax) - resolved.
+- 0004197: [Vehicles] Changing from either a Vortex or Skimmer to car makes wheels uncollidable (Jax) - resolved.
+- 0004573: [Vehicles] When a bicycle stops burning random players can be set on fire (Jax) - resolved.
+- 0004539: [General] Picking up a weapon pickup refills your ammo in clip (Jax) - resolved.
+- 0003848: [Scripting] Wheel models still remain when their state is set to fallen off (Jax) - resolved.
+- 0001455: [Weapons] Flame from mollies stays on weapon switch (Jax) - resolved.
+- 0003974: [General] When jumping next to any vehicle and while in air pressing the enter key haults the player in mid air. (Jax) - resolved.
+- 0003048: [GUI / Menus / Console] Add filters to server browser (Flobu) - resolved.
+- 0004565: [General] sound from playSound pauses if you tab out (Paul_Cortez) - resolved.
+- 0001892: [Scripting] Flame kills don't report correct killer, weapon (Jax) - resolved.
+- 0003808: [Vehicles] camera follows local player when you enter a vehicle in fixed-mode (Jax) - resolved.
+- 0004141: [General] Ability to enable/disable minimizing (ccw) - resolved.
+- 0004209: [GUI / Menus / Console] Add the "window" command as a checkbox in settings -> video (ccw) - resolved.
+- 0003336: [General] Planes collision stays after they blow up (Jax) - resolved.
+- 0004408: [Scripting] Add hardcoded support for streamed blips (Jax) - resolved.
+- 0004440: [General] The Crazy Race EDF Bug™ v1 (ccw) - resolved.
+- 0004108: [Maps] loadMapData is very slow compared to resource map loading (Jax) - resolved.
+- 0003723: [Scripting] Have getPedAnimation() also return whether it's looping and updating position (Jax) - resolved.
+- 0003918: [Scripting] setPedAnimations not being "interruptable" (Jax) - resolved.
+- 0003174: [Scripting] Custom objects deform (shear) when rotating them over X or Y axis (Arc) - resolved.
+- 0002866: [GUI / Menus / Console] Connect attempt if pressing enter, while having the password box selected (mabako) - resolved.
+- 0004316: [Resources] getServerModules() (Cazomino05) - resolved.
+- 0004102: [General] Per-entity vehicle and object alpha is inefficient, and buggy in case of vehicles (ryden) - resolved.
+- 0004110: [Server] Attached offset markers do not rotate with the element they are attached to. (Arc) - resolved.
+- 0003984: [General] When changing to Cinematic camera mode, sometimes the camera gets placed at the current camera matrix (Arc) - resolved.
+- 0004094: [GUI / Menus / Console] Make Tab and Enter keys work in Options and Quick Connect windows (mabako) - resolved.
+- 0003306: [General] Disable jetpack fly up limiting by zHeight of gtasa ground (ryden) - resolved.
+- 0003230: [GUI / Menus / Console] onClientGUIClick should work with Tab buttons (lil_Toady) - resolved.
+- 0004363: [General] Pressing Forward while falling with parachute causes screen to go weird - resolved.
+- 0004122: [General] Add support for generic element attachment (Jax) - resolved.
+- 0004420: [General] Increase FPS limit - resolved.
+- 0003431: [General] Players with different weapon skills can affect shooting (Jax) - resolved.
+- 0004529: [Synchronization] Plane rudder is not synced (ryden) - resolved.
+- 0003754: [Scripting] feature: setting animation intervals (Jax) - resolved.
+- 0002323: [GUI / Menus / Console] Settings menu only changes key bound to "down" state when rebinding commands bound to both states of the same key (Talidan) - resolved.
+- 0003964: [Client] It's not possible to let peds aim and/or shoot (lil_Toady) - resolved.
+- 0003453: [Scripting] request: A new parameter in onVehicleStartEnter to know the door that the player is using (Cazomino05) - resolved.
+- 0003290: [Scripting] setElementAlpha can affect more than one element (ryden) - resolved.
+- 0003480: [Vehicles] Can't force vehicle lights on when engine is switched off (ryden) - resolved.
+- 0002517: [General] Created objects are slippery when walking on them (ryden) - resolved.
+- 0001621: [Vehicles] Cannot enter RC Baron (Cazomino05) - resolved.
+- 0002448: [Maps] Added objects aren't recognized as ground pieces (ryden) - resolved.
+ - 0001980: [General] Jetpack does not recognize added objects as ground pieces, cant get far off real ground (ryden) - resolved.
+ - 0002439: [Weapons] Molotovs' snap-to-ground explosions don't work on placed objects (ryden) - resolved.
+- 0002648: [Synchronization] Sniper's vertical aim doesn't sync visually (Jax) - resolved.
+- 0003960: [General] Changing your screen resolution in mta breaks blur (ccw) - resolved.
+- 0004851: [Server] getVehicleEngineState always return false (Cazomino05) - resolved.
+- 0004840: [Client] Maps loads to slow (Arc) - resolved.
+- 0004843: [Client] Assertion Failure In CClientVehicle.cpp (ccw) - resolved.
+- 0004842: [Weapons] Clip capacity can be inherited from the old weapon of the same type when picking up a new one (Arc) - resolved.
+- 0004401: [GUI / Menus / Console] Update main menu and credits (jhxp) - resolved.
+- 0004665: [Client] MTA Client Verification failed (ryden) - resolved.
+- 0004199: [Server] Default ACL is outdated (Cazomino05) - resolved.
+- 0004777: [Client] *** NETWORK TROUBLE *** isn't centered for widescreen (ccw) - resolved.
+- 0004661: [Client] MTA client crashes if I want to connect to a server (Arc) - resolved.
+- 0004660: [Server] fileCreate stopped working (Arc) - resolved.
+- 0004649: [Client] Assert when using filters while server browser is loading (Arc) - resolved.
+- 0004736: [Client] onClientPlayerRadioSwitch doesn't seem to trigger anymore (Arc) - resolved.
+- 0004581: [Client] A few crashes while playing zombie script - resolved.
+- 0004765: [Client] GCC hash_fun include compilation error on Linux (ccw) - resolved.
+- 0004692: [Synchronization] Packer's adjustible property collision desync (Jax) - resolved.
+- 0004769: [General] Consider reverting r1389 (Fixed 0003994: Radio titles do not always show) (Arc) - resolved.
+- 0004541: [Server] Rename getPlayerFromNick to getPlayerFromName (Paul_Cortez) - resolved.
+- 0004754: [Server] onMarkerHit and onMarkerLeave are called in spite of the marker and the hitting element being in different interiors (Jax) - resolved.
+- 0004752: [Client] xmlCopyFile crash client (Arc) - resolved.
+- 0004725: [Client] Crash when using the "/binds" command (Jax) - resolved.
+- 0004711: [Server] unbindKey doesn't unbind a key if there is no handler function given (Arc) - resolved.
+- 0004705: [Client] getPlayerNametagText always returns false (clientside) (Arc) - resolved.
+- 0004703: [Client] The lateral buttons of my five button mouse causes client crash (ccw) - resolved.
+- 0004687: [Server] getVehicleEngineState() always return Serverside true even car engine is set On (Fenix1053) - resolved.
+- 0004229: [Client] Can't enter train(brown streak) as passenger (g). (Jax) - resolved.
+- 0004755: [Client] onClientExplosion doesn't get triggered with satchels. (Jax) - resolved.
+- 0004762: [Server] onPlayerChangeNick not triggered when using setPlayerName (Cazomino05) - resolved.
+- 0002246: [Vehicles] Car radio after reconnect (Jax) - resolved.
+- 0004702: [Freecam] onClientRender is still async with gta's vehicle update rate (Jax) - resolved.
+- 0004427: [GUI / Menus / Console] When not in the menu, ALT-TAB "freezes" your cursor. (Arc) - resolved.
+- 0004369: [Vehicles] Falling off bikes, random kills (Jax) - resolved.
+- 0004365: [Synchronization] Improve bandwidth usage (ryden) - resolved.
+- 0003901: [Linux] *nix compatibility for server (fspijkerman) - resolved.
+- 0004370: [Server] getObjectRotation() returns acumulated values for attached objects (Jax) - resolved.
+- 0004467: [Client] Some objects submerged in water look as if they are not below the water. (Arc) - resolved.
+- 0004502: [Client] At times you can see the players health bar and name tag through objects. (Talidan) - resolved.
+- 0004512: [Client] Favourites only save servers with ase turned on (Arc) - resolved.
+- 0004526: [Client] Being knocked off a bike can cause inablity to enter any vehicle (Cazomino05) - resolved.
+- 0004576: [Server] Radar area causes server runtime error (Arc) - resolved.
+- 0004585: [Client] Exploding barrels don't explode vehicles always. (ccw) - resolved.
+- 0004630: [Client] Screenshots - minutes missing a 0 (Arc) - resolved.
+- 0004636: [Client] Freindly fire does not work with vehicle weapons (Cazomino05) - resolved.
+- 0004625: [Client] Knife kills from back, can be done when friendly fire is enabled. (Cazomino05) - resolved.
+- 0004589: [Server] Pickups can only be picked up from dimension 0. (Cazomino05) - resolved.
+- 0004394: [Client] [Request]Ability to prevent wasted shaking cam to take over clients view / abort it (Arc) - resolved.
+- 0004577: [Client] Using molotovs can lead to a client crash (ryden) - resolved.
+- 0004522: [Synchronization] When being hit by a car you get pushed back standing (instead of falling) (ccw) - resolved.
+- 0004505: [Scripting] onClientPlayerDamage Not triggering for fire (Arc) - resolved.
+- 0004445: [Client] Shooting after respawn randomly stops working (Jax) - resolved.
+- 0004125: [Resources] in ctf mode, players get stuck in vehicles they died in (Cazomino05) - resolved.
+- 0004535: [Server] Let server owners decide whether the client's framelimiter should be enabled. (mabako) - resolved.
+- 0004524: [Vehicles] Rhino turret desynch (Arc) - resolved.
+- 0004404: [Scripting] onClientResourceStop should trigger on local player quit (Arc) - resolved.
+- 0004498: [Client] Using "window" command in windowed mode crashes MTA (ccw) - resolved.
+- 0004542: [Weapons] Roasting the ground in water with the flamethrower causes a client crash (ryden) - resolved.
+- 0001685: [GUI / Menus / Console] Make full screen map transparency variable (Fenix1053) - resolved.
+- 0004515: [Synchronization] Damage sync crashes (Jax) - resolved.
+- 0004520: [Scripting] onVehicleExplode doesn't trigger when using blowVehicle. (Cazomino05) - resolved.
+- 0004352: [Installer] Add an option in the installer to create a desktop icon. - resolved.
+- 0004513: [Scripting] Loosen nametag restictions (Cazomino05) - resolved.
+- 0004507: [Client] Adding 'cto' or 'ctf' (and perhaps other) definitions to the editor cause a crash (Arc) - resolved.
+- 0004511: [Client] blendPedAnimation "unhandled win32 exception" if blendPedAnimation(getLocalPlayer()) is called as callback function (Jax) - resolved.
+- 0004492: [Client] Screen remains black for a while after going back in-game after being in ALT+TAB mode. (Arc) - resolved.
+- 0004493: [General] GTA audio loops while being in ALT+TAB mode (Arc) - resolved.
+- 0003996: [GUI / Menus / Console] onClientGUIMouseDown/Up should be added (mabako) - resolved.
+- 0004178: [Scripting] guiLabelGetTextExtent does not support multiple lines (mabako) - resolved.
+- 0004506: [Scripting] attachElements with dimensions bug (Cazomino05) - resolved.
+- 0004353: [Scripting] onClientPlayerDamage triggering multiple times for explosion (Cazomino05) - resolved.
+- 0004362: [Client] onClientPlayerChoke is triggered for peds but returns the local player as the source - resolved.
+- 0004463: [Client] dxDrawLine3D cannot be seen if the direction is pure z (or near to the pure z) (Arc) - resolved.
+- 0004488: [Client] Submit new Chatbox crashes under Windows Vista 32Bit (Arc) - resolved.
+- 0004472: [Client] Players being ignored by melee/weapon attacks (ccw) - resolved.
+- 0004489: [Scripting] DX drawing order fail (ccw) - resolved.
+- 0004497: [Scripting] onClientResourceStop is triggering on all resources (Cazomino05) - resolved.
+- 0004491: [GUI / Menus / Console] Sliders in Audio tab in options window don't work properly (Cazomino05) - resolved.
+- 0004347: [General] Remove the splash-screens and the intro videos when you start MTA: SA (Arc) - resolved.
+- 0004079: [GUI / Menus / Console] Changing resolution in Video tab doesn't save after quitting (Arc) - resolved.
+- 0004062: [GUI / Menus / Console] Widescreen setting in Video tab of settings doesn't get saved after restarting MTA (Arc) - resolved.
+- 0004411: [General] Movement lag on attached markers (Jax) - resolved.
+- 0004444: [Client] Pickups are "pickable" from any dimension (Jax) - resolved.
+- 0004470: [Scripting] createExplosion is broken (ccw) - resolved.
+- 0004471: [Scripting] scripted projectiles are broken (ccw) - resolved.
+- 0004484: [Client] weaponanim isn't removed when using setPedWeaponSlot() (Jax) - resolved.
+- 0004487: [Server] setCameraMatrix, the last three arguments set optional. (Jax) - resolved.
+- 0004121: [GUI / Menus / Console] Improve gui icons/cursors/skins for main menu and console (ccw) - resolved.
+- 0001503: [GUI / Menus / Console] Add some new options in the Settings menu (lil_Toady) - resolved.
+- 0004478: [Client] Crash on forcing head light states (Arc) - resolved.
+- 0004454: [Client] Animation problems (Jax) - resolved.
+- 0004448: [Client] If chat input field has alpha 0, then inputted text won't appear (mabako) - resolved.
+- 0004447: [Client] If a ped dies near the moment it's destroyed with destroyElement a player sometimes dies instead (Cazomino05) - resolved.
+- 0004419: [Client] Ability to remove clouds (Cazomino05) - resolved.
+- 0004418: [Client] getScreenFromWorldPosition sometimes returns incorrect values (ccw) - resolved.
+- 0004390: [Server] Sync rate changes for remotely viewed players (ccw) - resolved.
+- 0004340: [Server] Server announcing issues (lil_Toady) - resolved.
+- 0004331: [Client] Settings menu shows you as logged out on resolution changes (Cazomino05) - resolved.
+- 0004269: [Client] Lines in chatbox inputfield gets another color than the first after the first linebreak (Arc) - resolved.
+- 0004132: [Server] Server crash after someone quits. (Arc) - resolved.
+- 0004284: [Client] Login Request window doesnt work (Arc) - resolved.
+- 0004283: [Server] Trailer Server crash (Arc) - resolved.
+- 0004278: [Client] Waterlevel not reset on disconnect - resolved.
+- 0004260: [Client] Entering an ambulance as driver gives the player 20hp (carried over from SP) (lucasc190) - resolved.
+- 0004217: [Client] setSkyGradient Glitch - resolved.
+- 0004043: [Client] Client side peds copy other players on the server (Arc) - resolved.
+- 0004172: [Client] Handle dynamic objects properly (ccw) - resolved.
+- 0004286: [Client] Map download progress bar too obtrusive (ccw) - resolved.
+- 0004303: [Client] Some breakable objects have the incorrect animation (ccw) - resolved.
+- 0004342: [Client] createWater has huge problems with minus values and the 0 0 axes (Arc) - resolved.
+- 0004343: [Server] isTimer() or equivalent - resolved.
+- 0004372: [GUI / Menus / Console] Stopping a resource can cause key binds to stop working in other resources (ccw) - resolved.
+- 0004100: [Client] Sniper not causing damage after certain distance (ryden) - resolved.
+- 0004330: [General] Tab (action key) should not make radar disappear (ryden) - resolved.
+- 0004373: [Client] When a car has more than 1 occupant, sirens bug out (ryden) - resolved.
+- 0003090: [Vehicles] Make engineLoadDFF more safe or split into vehicle and non-vehicle loading functions (Arc) - resolved.
+- 0003429: [Scripting] getElementsByType("player") in onClientResourceStart may not return all players for joining players (Arc) - resolved.
+- 0004031: [Installer] Add an option in installer to prevent creation of start menu item (Arc) - resolved.
+- 0004317: [Client] Passworded server problem (mabako) - resolved.
+- 0004351: [Client] Changing nickname in-game problem ("=" as first letter) (Cazomino05) - resolved.
+- 0004360: [General] AC kicks on exessive setElementHealth (Cazomino05) - resolved.
+- 0004177: [Server] isPedDead always returns false when used on peds - resolved.
+- 0004307: [Server] ase functions loaded after onResourceStart in startup-scripts happened (mabako) - resolved.
+- 0004346: [Scripting] onClientPedWasted does not trigger reliably (Cazomino05) - resolved.
+- 0004280: [Synchronization] Invisibility and desync on respawn (ryden) - resolved.
+- 0004289: [Server] Implement "fun-bugs" server setting that can be enabled (Talidan) - resolved.
+- 0004329: [Server] Minor bugs with setGlitchEnabled - resolved.
+- 0002874: [General] Custom TXD and/or COL loading issues (Arc) - resolved.
+- 0004301: [Client] onClientPlayerExitVehicle & onClientVehicleExit do not fire if you fell off a bike (Cazomino05) - resolved.
+- 0003963: [Scripting] after using removeAccount on an account that is in use, and then the client trying to login or logout crashes the server (Fenix1053) - resolved.
+- 0004016: [Server] Contact client-side element and getElementPosition() - resolved.
+- 0004279: [Client] resetMapInfo resets the state of nametags without the server being aware (Cazomino05) - resolved.
+- 0004257: [Server] setWaterLevel isn't synched on join (Cazomino05) - resolved.
+- 0004203: [Server] Serverside setPedHeadless not synced for new Clients (Cazomino05) - resolved.
+- 0004259: [General] "Host game" and "Map editor" buttons result in connection timeout message box (ryden) - resolved.
+- 0003944: [GUI / Menus / Console] Poor GUI Performance (ccw) - resolved.
+- 0004254: [Multi Theft Auto : San Andreas] Client-side Tick Count Accuracy Patch (ryden) - resolved.
+- 0004214: [Scripting] Setting the dimension of an icon'd blip will cause it to dissappear for ever on f11 map (Fenix1053) - resolved.
+- 0004253: [Multi Theft Auto : San Andreas] Underwater Colour Alpha Patch - resolved.
+- 0004256: [Server] setElementAlpha isn't synched on join for peds (ryden) - resolved.
+- 0004157: [Client] Getting into Skimmer stops Jump from working if you fall into water instead of getting in. (Cazomino05) - resolved.
+- 0004176: [Client] Custom Textures for Buildings no longer load atall. (Arc) - resolved.
+- 0004221: [Client] Server crash when shooting a clientside vehicle with HS rocket (ryden) - resolved.
+- 0004206: [General] Stopping a resource stops all its included resources, even if those includes were started beforehand (ryden) - resolved.
+- 0004213: [Client] Custom vehicles and models have pixelated textures (Arc) - resolved.
+- 0004088: [Client] playSound3D panning left to right is too extreme (Arc) - resolved.
+- 0004078: [Client] Texts are at the wrong place after changing screen resolution (Talidan) - resolved.
+- 0004113: [Client] distance is not calculated on z axis when using playSound3D (Arc) - resolved.
+- 0004127: [Resources] Some global variables missing - a bit of a feature request (Arc) - resolved.
+- 0004187: [Client] MTA does not save the GTA path on Win Vista (ccw) - resolved.
+- 0004204: [Client] setPedCameraRotation (lil_Toady) - resolved.
+- 0004180: [Client] keyBind crashes gta instead of transfering (a) table(s) (Arc) - resolved.
+- 0004002: [Client] onClientPedDamage - cancelling is messed up (ryden) - resolved.
+- 0004208: [Client] Setting an object's alpha crashes the game (ryden) - resolved.
+- 0004200: [Client] Weapon projectiles should be created in the same interior as the creator interior (lil_Toady) - resolved.
+- 0004192: [Client] Feature request: Close splash screen if errors are outputted (Arc) - resolved.
+- 0004041: [Server] warpPedIntoVehicle glitch (ccw) - resolved.
+- 0004119: [Server] Light states of a vehicle's back lights cannot be set separately (Arc) - resolved.
+- 0004161: [Maps] upgrades="" are delimited by spaces rather than commas. (lil_Toady) - resolved.
+- 0004070: [Server] CLuaFunctionDefinitions::ExecuteSQLQuery pushes column index instead of colName (Arc) - resolved.
+- 0004135: [Client] Add setPlayerBlurLevel Clientside (Arc) - resolved.
+- 0004069: [Server] aclGet and aclGetGroup output error when specifying non-existing ACL or ACL group name (lil_Toady) - resolved.
+- 0004097: [Client] Make setElementParent work properly with GUI elements (lil_Toady) - resolved.
+- 0004136: [Server] Network trouble after 'onVehicleStartExit' used removePlayerFromVehicle (Arc) - resolved.
+- 0004190: [Client] Clothes do not reset after game session (lil_Toady) - resolved.
+- 0004142: [Server] isObjectInGroup (ACL function req.) (Arc) - resolved.
+- 0003064: [Scripting] textures dont load for custom objects unless the object already exists and is streamed in for the player (Arc) - resolved.
+- 0003768: [Scripting] Server crash with onVehicleStartEnter and CancelEvent (lil_Toady) - resolved.
+- 0003959: [General] Download Error 9 and 10 when starting resources - resolved.
+- 0004010: [Client] setPedSkin randomly doesn't work. (Arc) - resolved.
+- 0003040: [General] Mouse freezing issues (lil_Toady) - resolved.
+- 0001719: [GUI / Menus / Console] Show taskbar and alt-tab window when minimizing (lil_Toady) - resolved.
+- 0001158: [General] Spraying gang tags possible (ryden) - resolved.
+- 0004006: [Server] Command line startup options to bind a server to a specific port and slot amount (Arc) - resolved.
+- 0003043: [GUI / Menus / Console] Add "connection type" option to Settings window (lil_Toady) - resolved.
+- 0004116: [GUI / Menus / Console] F11 map always draws blips with a border outline of 255 (lil_Toady) - resolved.
+- 0004089: [Scripting] Consider the removal or fix for setCameraInterior (lil_Toady) - resolved.
+- 0003515: [General] When connecting to a server in localhost, the client shouldn't make the download speed check (ryden) - resolved.
+- 0003020: [General] Server HTML-encodes the download URL specified in the config (IJs) - resolved.
+- 0004115: [General] Projectiles active between maps crash the client (Arc) - resolved.
+- 0003953: [Weapons] Projectiles don't sync correctly until player respawns once (Arc) - resolved.
+- 0004101: [General] Improve the pools search performance (ryden) - resolved.
+- 0002629: [Synchronization] First two or three bullets of walking weapons don't hit the target after reloading (Arc) - resolved.
+- 0004086: [Server] attachElementToElement offsets not working for players - returned (ryden) - resolved.
+- 0004029: [Client] Shooting accuracy (corners) (ryden) - resolved.
+- 0004039: [Installer] Uninstaller does not remove Start Menu Items (ryden) - resolved.
+- 0004045: [Server] setElementInterior doesnt work on pickups (ryden) - resolved.
+- 0004040: [Scripting] Airport garages open in the wrong direction (ryden) - resolved.
+- 0004055: [General] Setting a pickup's position resets its interior world to 0 (ryden) - resolved.
+- 0003990: [Synchronization] Unreliable packets can arrive out of order (IJs) - resolved.
+- 0004032: [Client] Bug that allows shooting without losing ammo (Talidan) - resolved.
+- 0003975: [Client] Localhost desynch. (ccw) - resolved.
+- 0003909: [Installer] Server only installation requests GTA SA to be installed (Arc) - resolved.
+- 0003059: [Vehicles] Trains need their "on track" state synced (lil_Toady) - resolved.
+- 0004021: [Client] Chat input opens when pressing T or Y, even when the chat is invisible (Arc) - resolved.
+- 0004012: [GUI / Menus / Console] Clients crash when connecting to another server. (Arc) - resolved.
+- 0003354: [Scripting] getElementsWithinColShape only supports players and vehicles (lil_Toady) - resolved.
+- 0004003: [Scripting] Random object rotations on moving objects after join (lil_Toady) - resolved.
+- 0003989: [Client] Issues with disconnecting/reconnecting concerning community accounts (lil_Toady) - resolved.
+- 0004001: [GUI / Menus / Console] GUI work elements are clickable when Esc menu is displayed (Talidan) - resolved.
+- 0003978: [Scripting] client-side xmlCopyFile function (kevuwk) - resolved.
+- 0003972: [Client] Hunter minigun crash (Arc) - resolved.
+- 0003922: [Server] aclGroupRemoveObject throws assertion error crashing server (Arc) - resolved.
+- 0001293: [General] Sync parachutes (Talidan) - resolved.
+- 0003899: [Installer] Uninstaller should not delete user-created resources (Talidan) - resolved.
+- 0003958: [Vehicles] Attaching a vehicle to another, then attaching the another to the vehicle freezes server and client. (Arc) - resolved.
+- 0004004: [Scripting] Friendly fire affects the local player (Arc) - resolved.
+- 0003412: [Security] change serial bans to usernames (lil_Toady) - resolved.
+- 0003411: [Scripting] add a possibility to choose how banPlayer bans player (ip or serial) and add a reason arg to banSerial (lil_Toady) - resolved.
+- 0003981: [Server] Server event onBan refuses to fire. (lil_Toady) - resolved.
+- 0003983: [Client] guiGetProperty crashes client (lil_Toady) - resolved.
+- 0003988: [Client] Not automatically logging in on my MTA account. (lil_Toady) - resolved.
+- 0003970: [Scripting] resetMapInfo should remove headless state (Arc) - resolved.
+- 0003965: [Client] headless state stays even after serverchange (Arc) - resolved.
+- 0003971: [General] Player interior remains on reconnect/resetMapInfo (Arc) - resolved.
+- 0003968: [Scripting] Make onClientLogin/Logout cancelable (Arc) - resolved.
+- 0003954: [Scripting] onClientPedWasted is called two or more times when you kill one ped - resolved.
+- 0003956: [GUI / Menus / Console] 'Recently played' tab in Server Browser doesn't work as it should (Arc) - resolved.
+- 0003343: [Scripting] function to create colshapes of all shapes (lil_Toady) - resolved.
+- 0002947: [Scripting] getElementData should be able to retrieve JSON strings set in .map (Arc) - resolved.
+- 0002706: [Scripting] get("resource.") ignores settings set from meta.xml (Arc) - resolved.
+- 0003947: [Scripting] executeSQLSelect and executeSQLQuery don't return table elements as numbers (Arc) - resolved.
+- 0003948: [Scripting] executeSQLSelect and executeSQLQuery never return empty tables (Arc) - resolved.
+- 0002771: [Admin] The nametag color still ranges from 0-100 even when the max health is bigger than 100 (Arc) - resolved.
+- 0003750: [General] Changing dimension doesn't hide elements that are in the old dimension (lil_Toady) - resolved.
+- 0003864: [General] Right clicking "MTA: San Andreas" in the taskbar freezes the game process (ccw) - resolved.
+- 0003862: [General] Allow Windows to focus on other applications whilst in windowed mode (ccw) - resolved.
+- 0003941: [Server] mtaserver.conf should enable verifyserials by default (jhxp) - resolved.
+- 0003940: [Server] Default mtaserver.conf does not correctly document module syntax (jhxp) - resolved.
+- 0003497: [Maps] Map parsing should be less strict (Arc) - resolved.
+- 0003869: [GUI / Menus / Console] Have to re-type your pass to re-login to your mta account when logged out. (lil_Toady) - resolved.
+- 0003173: [Vehicles] Remove the ability to get weapons from vehicles (Arc) - resolved.
+- 0003668: [Scripting] When call() parses returned values to send them to another resource, it doesn't do proper table depth checks (Arc) - resolved.
+- 0003868: [Scripting] Make setResourceInfo info changes permanent (lil_Toady) - resolved.
+- 0003296: [Scripting] Be able to redirect players to another server (lil_Toady) - resolved.
+- 0003932: [General] Screenshots are saved to the root of the drive (Arc) - resolved.
+- 0003839: [Scripting] Upon creation of a pickup, the client and server report different interior values (Arc) - resolved.
+- 0003911: [GUI / Menus / Console] Windowing game doesn't apply "dynamic scene rendering" disabled option (Arc) - resolved.
+- 0003930: [GUI / Menus / Console] Getting/setting cvars doesn't work while ingame (Arc) - resolved.
+- 0003447: [Vehicles] Using removePlayerFromVehicle when player is entering or exiting causes player to be unable to enter vehicles (Arc) - resolved.
+- 0003903: [GUI / Menus / Console] Connecting to a server does not work when already connected. (lil_Toady) - resolved.
+- 0003825: [General] Stored community password is not put correctly into textbox (lil_Toady) - resolved.
+- 0001230: [Synchronization] Make different actors voices sound differently (Arc) - resolved.
+- 0001764: [General] Some natural game interiors (not recreated with map objects) force walking (Arc) - resolved.
+- 0003924: [GUI / Menus / Console] Allow more than two keys to be bound to a function from the GUI (IJs) - resolved.
+- 0003755: [Scripting] All animations start from a standing position (lil_Toady) - resolved.
+- 0003921: [Server] Using "list" command on the console of server make it crash (lil_Toady) - resolved.
+- 0003914: [General] 'Host Game' Ignores Nick Settings (lil_Toady) - resolved.
+- 0003920: [Scripting] Add ped voice functions (Arc) - resolved.
+- 0003646: [Scripting] Server crashes when calling get() or set() from within a coroutine (Arc) - resolved.
+- 0002950: [Scripting] set() should allow setting of multiple values (Arc) - resolved.
+- 0003882: [GUI / Menus / Console] In keybinds settings, "binding a primary key" and "secondary key" texts are reversed (Arc) - resolved.
+- 0003871: [GUI / Menus / Console] Switching to windowed mode with "window" resets the login status label to "not logged in" (lil_Toady) - resolved.
+- 0003861: [General] If running on windowed mode, allow returning to fullscreen by using the "window" command again (lil_Toady) - resolved.
+- 0003824: [General] Client randomly kicks you for failed account verification (lil_Toady) - resolved.
+- 0003916: [General] Community registration window is not active when opened (lil_Toady) - resolved.
+- 0003883: [General] Pop up community dialog for first-time users (lil_Toady) - resolved.
+- 0003438: [GUI / Menus / Console] Binding to lshift/rshift in mta settings doesn't work (IJs) - resolved.
+- 0003884: [General] Allow easy one-click registration from within community settings tab (lil_Toady) - resolved.
+- 0003880: [Scripting] addResourceMap and addResourceConfig are broken (lil_Toady) - resolved.
+- 0003888: [Maps] A ped "interior" attribute is not loaded from .map (lil_Toady) - resolved.
+- 0003889: [Installer] Uninstaller doesn't delete public sdk files, if they're chosen to be installed (jhxp) - resolved.
+- 0003898: [Installer] Uninstaller doesn't delete MTA San Andreas directory if it's empty (jhxp) - resolved.
+- 0003617: [Installer] MTA uninstaller will remove GTASA install if installed within it (jhxp) - resolved.
+- 0003017: [Installer] Uninstaller needs to detect if it's being run with or without administrator rights and disallow uninstalling when latter (jhxp) - resolved.
+- 0003114: [Synchronization] Prevent old sync packets from before setElementPosition and spawn commands arriving after the command (ChrML) - resolved.
+- 0003873: [GUI / Menus / Console] Server browser's Players list does not function (lil_Toady) - resolved.
+- 0003216: [GUI / Menus / Console] REOPENED: quick connect field entries change with failure to connect & quick connect gui disappears (ChrML) - resolved.
+- 0003855: [Synchronization] Client script download is broken (download error #0-3) (lil_Toady) - resolved.
+- 0003854: [GUI / Menus / Console] Chat text is squashed vertically (lil_Toady) - resolved.
+- 0003847: [General] Shift keys are not accepted as keys on Binds menu (lil_Toady) - resolved.
+- 0003844: [Scripting] DX drawing functions are broken (lil_Toady) - resolved.
+- 0001953: [GUI / Menus / Console] Radar blips shown over the GUI (lil_Toady) - resolved.
+- 0003814: [Scripting] Clients crash when destroying a ped serverside (lil_Toady) - resolved.
+- 0003823: [Scripting] Serverside cloneElement on a custom element does not send the cloned element to the client (lil_Toady) - resolved.
+- 0003817: [Maps] Some vehicle attributes in .map are ignored or don't function correctly (lil_Toady) - resolved.
+- 0003816: [Maps] Attributes use Space delimitation instead of Comma delimitation (lil_Toady) - resolved.
+- 0003815: [General] Respawning whilst collisionless does not allow restoration of collisionless attribute (lil_Toady) - resolved.
+- 0003810: [Synchronization] Block ped damage for everyone except the syncer (lil_Toady) - resolved.
+- 0001324: [Scripting] Radar area fills radar display when you are near it (lil_Toady) - resolved.
+- 0003486: [GUI / Menus / Console] dxDrawLine with postGUI=true draws the lines also in front of the mouse cursor (ryden) - resolved.
+- 0003717: [General] Peds and players always face the same way as the local player when in water (ryden) - resolved.
+- 0003192: [GUI / Menus / Console] Add to favorites by IP (ryden) - resolved.
+- 0003608: [Map Editor] The main menu "Map editor preview" button doesn't work (ryden) - resolved.
+- 0003804: [General] createPickup() can't create all available pickup types (ryden) - resolved.
+- 0003167: [Scripting] addCommandHandler's 'restricted' argument does nothing (ryden) - resolved.
+- 0003783: [General] Open all garage doors in the world (ryden) - resolved.
+- 0003436: [Scripting] setVehicleSirensOn() returns true even if the vehicle does not have sirens (ryden) - resolved.
+- 0003437: [Scripting] setting setVehicleEngineState () to false still allows to drive with bikes and boats (ryden) - resolved.
+- 0003760: [GUI / Menus / Console] Adding a server to favourites adds the server status to the name (ryden) - resolved.
+- 0003799: [GUI / Menus / Console] The password reminder of /register shows you the hashed password instead of the password itself (lil_Toady) - resolved.
+- 0003720: [GUI / Menus / Console] Request: Allow the mtasa://ip:port [^] uri as parameter for console "connect" command (ryden) - resolved.
+- 0003413: [General] mtasa:// links don't take a password argument (ryden) - resolved.
+- 0003636: [General] Using "cinema cam" mode, one(?) of the alternating views shows only the sky (Arc) - resolved.
+- 0003738: [General] Remove "To stop Carl from entering a car" info text (ryden) - resolved.
+- 0003790: [General] Local player gets streamed out and in when crossing streamer sector boundaries (ryden) - resolved.
+- 0003359: [Synchronization] Sync shooting players in vehicles (ryden) - resolved.
+- 0003795: [General] Attached elements get reverted to their creation position when the element they're attached to streams out (ryden) - resolved.
+- 0003791: [Scripting] createPed always creates peds at (0,0,0) (ryden) - resolved.
+- 0003793: [General] Respawning while alive can make you invisible to other players (ryden) - resolved.
+- 0003792: [General] Peds are not streamed in when warping to them/warping them to you (ryden) - resolved.
+- 0003732: [General] attachElementToElement doesn't stream in the attached element (ryden) - resolved.
+- 0003785: [General] Clientside scripts are often not downloaded (ryden) - resolved.
+- 0003693: [Scripting] request: setPedOnFire(ped) (ryden) - resolved.
+- 0003623: [GUI / Menus / Console] Long entries in up/down console history move field focus; must hit home/end to refocus on shorter ones (lil_Toady) - resolved.
+- 0003357: [Synchronization] Shooting players at minimal distance ( before elbow butt ) shows damaging locally only (ryden) - resolved.
+- 0002256: [Weapons] When on passenger and shooting weapon - Drivers camera decides where bullets will go (up-down axis only) (ryden) - resolved.
+- 0002842: [Vehicles] Origin when doing drivebies is off (ryden) - resolved.
+- 0003772: [Synchronization] Markers interior is not sent to the players (ryden) - resolved.
+- 0003765: [Weapons] While driveby'ing, you need to aim a bit to the right of a player to hit him (ryden) - resolved.
+- 0003769: [Synchronization] Amount of armor is not synced to the other players after first death, respawning with fr's setskin (lil_Toady) - resolved.
+- 0003450: [General] request: make the skins have their native sets of anims (aru) - resolved.
+- 0003630: [Installer] Pricedown font is not included in the installer (IJs) - resolved.
+- 0003759: [General] Client crash 0x0C5DC0F9 (ryden) - resolved.
+- 0003387: [Scripting] setPedRotation doesn't work if triggered in the same frame the ped has been created (ryden) - resolved.
+- 0003767: [General] Infinite resource stopping loop in server (ryden) - resolved.
+- 0003727: [Scripting] Serverside moveObject sets a seemingly random rotation when called on an object that is moving/has moved before (lil_Toady) - resolved.
+- 0003780: [Scripting] Request: make setWeather accept any number, not just <= 19 (lil_Toady) - resolved.
+- 0003067: [General] Two kick/ban messages are being displayed (lil_Toady) - resolved.
+- 0003777: [General] Kick messages are still hardcoded (lil_Toady) - resolved.
+- 0003734: [Scripting] Serverside getObjectRotation() returns wrong values for moving objects (lil_Toady) - resolved.
+- 0003773: [Scripting] removeCommandHandler puts the server in an infinite loop (lil_Toady) - resolved.
+- 0003764: [Scripting] Destroying a pickup manually during the onPickupHit event causes a client crash (lil_Toady) - resolved.
+- 0003763: [Scripting] startResource allows you to start the same resource multiple times (lil_Toady) - resolved.
+- 0003748: [Synchronization] Gang driveby is no longer synced (lil_Toady) - resolved.
+- 0003762: [Weapons] setPedDoingGangDriveby(true) makes player do a phone call instead of starting to driveby (lil_Toady) - resolved.
+- 0003709: [Scripting] Streaming events don't work anymore (lil_Toady) - resolved.
+- 0003736: [General] Missing vehicles when mass spawned with script using .map data (lil_Toady) - resolved.
+- 0003706: [General] Gang drivebys cause the camera to snap to the back of the vehicle as driver (lil_Toady) - resolved.
+- 0003756: [Weapons] Issues introduced with the new weapons system (IJs) - resolved.
+- 0003747: [Weapons] Shotguns appear to do less damage than they should (IJs) - resolved.
+- 0003749: [Weapons] Sniper rifles do no damage (IJs) - resolved.
+- 0003758: [Weapons] No driveby by default when entering a vehicle - revert to gang driveby (lil_Toady) - resolved.
+- 0003753: [GUI / Menus / Console] "Recently played" and "Favourites" in server browser no longer function (lil_Toady) - resolved.
+- 0003745: [Scripting] setPedRotation doesn't allow negative rotation values (lil_Toady) - resolved.
+- 0003740: [General] Various issues with peds (lil_Toady) - resolved.
+- 0003731: [Scripting] Attaching an element to a player in a vehicle doesn't work (Jax) - resolved.
+- 0003733: [General] makePedUseGun() sets the proper animations on the ped but it actually doesn't shoot any bullet (Jax) - resolved.
+- 0003728: [Scripting] startResource(res) doesn't start included resources (lil_Toady) - resolved.
+- 0003297: [General] LAN support (lil_Toady) - resolved.
+- 0003544: [Scripting] request: getVehicleEngineState (Jax) - resolved.
+- 0003724: [Scripting] Client-side colshapes no longer work (Jax) - resolved.
+- 0003716: [GUI / Menus / Console] Hitting server refresh while the "Refreshing..." label is visible will cause it not to disappear again (Jax) - resolved.
+- 0003718: [Synchronization] Jetpacks aren't created on peds when joining a server (Jax) - resolved.
+- 0003679: [General] Many animations move the jaw into the head (Jax) - resolved.
+- 0003696: [Synchronization] If an element data is an element, it's not sent to connecting players (Jax) - resolved.
+- 0003060: [General] Add peds serverside (ChrML) - resolved.
+- 0001857: [Vehicles] Holding a melee/misc weapon while driving a bicycle causes the skin arms to shake (Jax) - resolved.
+- 0003574: [Vehicles] Getting onto a bicycle causes a whiteout within a couple of seconds (Jax) - resolved.
+- 0003622: [Scripting] custom pickups invisible when they respawn (Jax) - resolved.
+- 0003715: [Scripting] warpPlayer/PedIntoVehicle doesn't work correctly when called on a ped or player spawned on the same frame as the vehicle (Jax) - resolved.
+- 0003667: [General] Parameter "persistent" of startResource() doesn't work. (lil_Toady) - resolved.
+- 0003291: [Scripting] Remote players can effect your alpha (Jax) - resolved.
+- 0003462: [Vehicles] You can't drive the Brownstreak (vehicle id 538) (Jax) - resolved.
+- 0003705: [Scripting] dxDrawLine3D no longer works (lil_Toady) - resolved.
+- 0003533: [Synchronization] Remote players cannot shoot out tyres (Jax) - resolved.
+- 0003700: [Scripting] getPedAnimation() can return wrong values when the animation was forced to stop (Jax) - resolved.
+- 0003692: [Scripting] setPedAnimation(ped, false) causes crash (Jax) - resolved.
+- 0003703: [Scripting] Can't attach event handlers to peds (Jax) - resolved.
+- 0003704: [Maps] <team> map elements accept as color attributes colorR="" colorG="" colorB="" when they should accept color="#str" (Jax) - resolved.
+- 0003699: [Scripting] Problems with peds and interiors (Jax) - resolved.
+- 0003698: [Maps] Peds created by maps (<ped> nodes) spawn dead (Jax) - resolved.
+- 0003688: [Synchronization] When applying an animation to yourself and respawning, the animation doesn't stop for remote players (Jax) - resolved.
+- 0003689: [Scripting] Client crash when stopping a resource that created a projectile with a ped as owner (Jax) - resolved.
+- 0003695: [General] Various (lots) interior issues (Jax) - resolved.
+- 0003690: [General] Marker elements are not accepted by get/setElementInterior (Jax) - resolved.
+- 0003691: [General] Setting interiors on an element upon creation returns true but fails (Jax) - resolved.
+- 0003694: [Maps] posX, posY and posZ attributes of a <ped> element in a map file aren't loaded. (Jax) - resolved.
+- 0003078: [Scripting] Killing the local player resets the weather. (Jax) - resolved.
+- 0003024: [Installer] Some people get invalid serial when installing (IJs) - resolved.
+- 0003352: [Scripting] requesting: getPedAnimation() (Jax) - resolved.
+- 0003682: [Scripting] removePedFromVehicle doesn't work with peds (Jax) - resolved.
+- 0003664: [General] Whiteouts when shooting a vehicle from a vehicle (classic driveby) (Jax) - resolved.
+- 0003073: [Scripting] Add marker hit events clientside too (Jax) - resolved.
+- 0002968: [General] Markers exist in all interiors (Jax) - resolved.
+- 0003676: [Scripting] setMarkerColor, setMarkerSize don't work (Jax) - resolved.
+- 0003122: [Installer] Some people have problems with generating serials (IJs) - resolved.
+- 0003624: [General] Falling to death results in the player getting back up and doing death animation while respawning (Jax) - resolved.
+- 0003673: [Scripting] request: A parameter for setPedAnimation to make it update your position (Jax) - resolved.
+- 0003434: [Scripting] request: A way to get out of animations (Jax) - resolved.
+- 0003665: [Scripting] resetMapInfo should also reset players' alpha (Jax) - resolved.
+- 0003632: [Scripting] Request: isVehicle(element?)InWater (Jax) - resolved.
+- 0003396: [Scripting] fixVehicle(), possibly other functions, reset time to 00:00 (Jax) - resolved.
+- 0003666: [Scripting] Add setHelicopterRotorSpeed (lil_Toady) - resolved.
+- 0003261: [Scripting] Setting out of range animation in setPlayerAnimation/setPedAnimation crashes you (Jax) - resolved.
+- 0001378: [Scripting] Arrow marker bounces like hell (Jax) - resolved.
+- 0003513: [Scripting] request: A scripting function to enable/disable the automatic arrow marker bouncing (Jax) - resolved.
+- 0003388: [Scripting] request: getElementColShape, onMarkerHit, onMarkerLeave client side (lil_Toady) - resolved.
+- 0003663: [Scripting] Add an optional "start included resources" bool to startResource and restartResource (Jax) - resolved.
+- 0003656: [Scripting] Request: setPedDoingGangDriveby() client-side (Jax) - resolved.
+- 0003658: [Vehicles] Passengers of bikes get constantly an animation like if trying to get the driver position (Jax) - resolved.
+- 0003660: [General] Player still in gang driveby animation when it runs out of ammo (Jax) - resolved.
+- 0003662: [GUI / Menus / Console] When going down the console history, it should also reach your current input (Jax) - resolved.
+- 0003659: [Scripting] getElementModel for pickups (lil_Toady) - resolved.
+- 0003657: [Weapons] setPedDoingGangDriveby(true) makes player shoot in bursts when on foot (Jax) - resolved.
+- 0003635: [Scripting] Server-side setElementPosition() doesn't work for blips (Jax) - resolved.
+- 0003492: [GUI / Menus / Console] Big debug output text (Jax) - resolved.
+- 0002217: [Synchronization] Motorbike/quadbike passenger uses driver animations (Jax) - resolved.
+- 0003634: [General] When you change a blip color client-side, an ugly and big blip appears covering your screen (Jax) - resolved.
+- 0003490: [General] Changing dimensions causes elements in that dimension not to appear unless the camera is moved (Jax) - resolved.
+- 0003648: [General] Streamer freezes player if an object is hidden during spawn. (Jax) - resolved.
+- 0003645: [Scripting] 2 elements attached with attachElementToElement can't be attached differently without detaching first (Jax) - resolved.
+- 0001856: [Vehicles] Player stuck in driveby animation when finishing a driveby (Jax) - resolved.
+- 0003428: [Scripting] setElementHealth(player, 0) doesn't make player die (Jax) - resolved.
+- 0003467: [General] Any knife aim + hit is considered a stealth kill, even if you are in in the back of the victim. (Jax) - resolved.
+- 0003432: [Scripting] onClientPlayerWasted doesn't work anymore (Jax) - resolved.
+- 0002890: [Vehicles] Tyre States are not truely accurate (Jax) - resolved.
+- 0001115: [Scripting] moveObject starting from origional position even after a move (Jax) - resolved.
+- 0003620: [Scripting] Many serverside element functions are incompatible with peds (Jax) - resolved.
+- 0003602: [GUI / Menus / Console] setCursorPosition() may move the cursor outside the gta window (lil_Toady) - resolved.
+- 0003615: [General] Players are sometimes spawning at 0,0,0 under the map, player strobes/warps as falling (Jax) - resolved.
+- 0003614: [General] Sometimes people sprinting on foot are warped back to previous position constantly (Jax) - resolved.
+- 0003616: [Scripting] Client-side getMarkerColor() returns the colors reversed (Jax) - resolved.
+- 0003601: [Scripting] createMarker() RGB arguments are reversed (Jax) - resolved.
+- 0003440: [General] Crash: 0x****3CC7 (Jax) - resolved.
+- 0003600: [Scripting] setResourceInfo does not accept nil as a value (Jax) - resolved.
+- 0003584: [Scripting] Some serverside ped functions don't work (Jax) - resolved.
+- 0003589: [Scripting] setMarkerType makes cylinder markers loose their alpha values (Jax) - resolved.
+- 0003485: [GUI / Menus / Console] request: setCursorPosition() (lil_Toady) - resolved.
+- 0003577: [Scripting] Serverside setPedRotation doesn't work (Jax) - resolved.
+- 0003576: [General] setMarkerType crashes the client (Jax) - resolved.
+- 0003579: [Scripting] Make xmlNodeGetAttributes return { key = value } instead of { i = key } (lil_Toady) - resolved.
+- 0003514: [GUI / Menus / Console] request: postGUI parameter for all dx functions (lil_Toady) - resolved.
+- 0003444: [Scripting] make loadMapData not take into account the first xml node and saveMapData only save children of the specified parent element (lil_Toady) - resolved.
+- 0003565: [Scripting] Server side created radar areas are always red if no alpha is specified (Jax) - resolved.
+- 0003562: [Weapons] Crash: 0x00738B64 (Jax) - resolved.
+- 0003501: [Scripting] request: setPedRotation serverside (Jax) - resolved.
+- 0003570: [GUI / Menus / Console] Crash with the server browser (Jax) - resolved.
+- 0003567: [General] createMarker crashes the client (Jax) - resolved.
+- 0003569: [Vehicles] Crash just when any explosion happens (Jax) - resolved.
+- 0003541: [Scripting] Add functions for adjusting the FPS limiter (lil_Toady) - resolved.
+- 0003558: [Weapons] giveWeapon often has no effect (Jax) - resolved.
+- 0003557: [Synchronization] Rotation of remote players is 90° to 180° off (Jax) - resolved.
+- 0003303: [Scripting] request: xmlNodeGetName() / xmlNodeSetName() (lil_Toady) - resolved.
+- 0003550: [General] Crash if you drown while being on foot (Jax) - resolved.
+- 0003309: [Scripting] request: xmlNodeGetAttributes() (lil_Toady) - resolved.
+- 0003553: [General] Instant crash on join (Jax) - resolved.
+- 0003549: [Vehicles] Players can get stuck and desynced in vehicles if they try to exit them (Jax) - resolved.
+- 0003547: [General] Client colshapes don't trigger hit/leave events anymore (Jax) - resolved.
+- 0003546: [Scripting] All client functions are gone (IJs) - resolved.
+- 0003493: [Scripting] request: add setResourceInfo (lil_Toady) - resolved.
+- 0003542: [Scripting] Add showChat server-side (lil_Toady) - resolved.
+- 0003494: [Scripting] request: add get/setRadarAreaColor,get/setRadarAreaSize clientside (lil_Toady) - resolved.
+- 0003458: [Scripting] request: add clothes funcs client side (lil_Toady) - resolved.
+- 0003540: [Security] fileDelete is not restricted by ModifyOtherObjects (lil_Toady) - resolved.
+- 0003530: [Vehicles] Drivers or passengers of a Leviathan may stop synching to others until they get out (Jax) - resolved.
+- 0003495: [Scripting] request: add a fileDelete (lil_Toady) - resolved.
+- 0003430: [General] Nametag doesn't update when a player changes his name (lil_Toady) - resolved.
+- 0003426: [General] Add ability to freeze automatic clock advancement for realtime (lil_Toady) - resolved.
+- 0003537: [Vehicles] Aborting a car jacking makes the driver unable to get out or being jacked again (Jax) - resolved.
+- 0003534: [Vehicles] When jacking a passenger while entering a car to get to the driver seat, desync can be caused (Jax) - resolved.
+- 0003524: [Vehicles] Occupied vehicle damage is not properly synced (Jax) - resolved.
+- 0003529: [Vehicles] Passengers get thrown out of the vehicle randomly (Jax) - resolved.
+- 0003491: [Scripting] request: getColorFromString client-side (aru) - resolved.
+- 0003442: [Synchronization] Remote hydra/hunter rockets fly in opposite direction (lil_Toady) - resolved.
+- 0003520: [General] Stopping the script responsible for the vehicle you are in desyncs you (Jax) - resolved.
+- 0003525: [General] make it close the chatbox input when chatbox is being hidden (Jax) - resolved.
+- 0003518: [Vehicles] Vehicles don't properly explode anymore (Jax) - resolved.
+- 0003517: [Weapons] Rockets/missiles don't collide with anything locally and go backwards for remote players (Jax) - resolved.
+- 0003516: [Map Editor] The map editor button in the main menu checks for the existance of a wrong resource (aru) - resolved.
+- 0003349: [Vehicles] weird vehicle handling (Jax) - resolved.
+- 0003394: [Scripting] isElementOnScreen doesnt work with pickups (Jax) - resolved.
+- 0003389: [General] Assert with setCameraTarget(getLocalPlayer()) (Jax) - resolved.
+- 0003500: [Scripting] Serverside setElementModel does not work with peds (Jax) - resolved.
+- 0003502: [General] More problems relating recently created elements that don't appear until you move your camera (Jax) - resolved.
+- 0003503: [General] When you join, existing map objects aren't shown until you change their position (Jax) - resolved.
+- 0003506: [Scripting] Serverside attachElementToElement does not work for peds (Jax) - resolved.
+- 0003512: [Scripting] Changing corona markers to another marker type changes their color (Jax) - resolved.
+- 0003335: [Synchronization] Blowing unoccupied vehicles leaves them non-blackened and burning (Jax) - resolved.
+- 0003460: [General] Dieing by a car explosion standing on it's hood crashes the client (Jax) - resolved.
+- 0002770: [Scripting] Passing "nil" as the value for xmlNodeSetAttribute does nothing (Jax) - resolved.
+- 0003454: [Vehicles] The damage proof attribute of vehicles is not sent to connecting players (Jax) - resolved.
+- 0003474: [Scripting] Client crash with getElementModel when used with objects (Jax) - resolved.
+- 0003475: [Scripting] getElementRotation() returns 360-rotZ for players (Jax) - resolved.
+- 0003477: [Vehicles] Client-side createVehicle doesn't create the vehicle until you move your camera (Jax) - resolved.
+- 0003479: [Scripting] Serverside getVehiclePlateText crashes on vehicles with random plate (Peter) - resolved.
+- 0003433: [Scripting] request: getVehicleType (Peter) - resolved.
+- 0003385: [Scripting] request: textDisplayIsObserver, textDisplayGetObservers (Peter) - resolved.
+- 0003445: [Scripting] matchingDimension param in onMarkerHit always returns false (Peter) - resolved.
+- 0003446: [General] Trains cannot enter/exit Los Santos (1st city) (Peter) - resolved.
+- 0003435: [Scripting] getVehicleLightState() is broken (Peter) - resolved.
+- 0002913: [GUI / Menus / Console] Script debug inteferes with GUI. (Jax) - resolved.
+- 0003236: [General] If you respawn while jacking neither you or the guy you been jacking can enter the car (Jax) - resolved.
+- 0002886: [General] /ceguitext 1 makes nametags very large (Jax) - resolved.
+- 0003417: [Scripting] setElementData sets data on element's children (Jax) - resolved.
+- 0002910: [Scripting] setPlayerSkin() points the player camera North (again) (Jax) - resolved.
+- 0003392: [General] Pickups are not removed in some interiors (Peter) - resolved.
+- 0002767: [Weapons] Bullets go straight when shooting up with a handgun (when not aiming) (Jax) - resolved.
+- 0003083: [Synchronization] Interpolation in un-occupied vehicle sync has caused trailers to not be pull-able. (Jax) - resolved.
+- 0002802: [Synchronization] Streamed in dead players are alive but die about 2-3 seconds after streamin (Jax) - resolved.
+- 0002861: [General] dead bodies block your path (Jax) - resolved.
+- 0002803: [Synchronization] Local and Remote player elements that reach 0HP dont get killed untill 2-3 seconds later (Jax) - resolved.
+- 0002372: [General] setElementVelocity doesn't work for objects (Jax) - resolved.
+- 0003410: [Scripting] onplayerwasted and onplayerdamage not reporting attacker (Jax) - resolved.
+- 0003415: [Scripting] Add an event for detecting stealth kills (Jax) - resolved.
+- 0002809: [Synchronization] Sync instant knife kill (targeting player and slicing from behind with knife) (Jax) - resolved.
+- 0002687: [Scripting] Add 'clock' parameter for showPlayerHudComponent (Peter) - resolved.
+- 0003409: [General] You get kicked for cheating getting Enforcer's armour (Peter) - resolved.
+- 0003110: [Synchronization] Stop the game from creating the death task (ChrML) - resolved.
+- 0003364: [Needs Doing] createBlipAttachedTo leaves blip @ 0,0,0 if last player in server leaves and comes back (Jax) - resolved.
+- 0003393: [Scripting] setVehicleGunsEnabled doesn't work (Jax) - resolved.
+- 0003397: [Scripting] request: xmlNodeGetParent (Jax) - resolved.
+- 0003395: [Scripting] Server crashes when passing a player element to getAccount() instead of a string (Jax) - resolved.
+- 0003390: [Scripting] spawnPlayer sets incorrect rotation (Jax) - resolved.
+- 0003391: [Scripting] Canceling onVehicleStartEnter locks you out of the vehicle even after the event handler is removed (Jax) - resolved.
+- 0003384: [General] Access denied messages (Jax) - resolved.
+- 0003308: [Scripting] Add an cancelable onConnect event (kevuwk) - resolved.
+- 0003113: [Synchronization] Camera focus entities need to be streamed in (ChrML) - resolved.
+- 0003361: [Scripting] createProjectile constantly shoots rockets when player (the creator arg) is in a vehicle with a passenger (Jax) - resolved.
+- 0003188: [Maps] Certain elements defined in MAP file are invisible for joiners (Jax) - resolved.
+- 0003071: [Scripting] setPlayerSkin doesn't unload previous model properly (Jax) - resolved.
+- 0003355: [GUI / Menus / Console] Remove "MTASA:" prefix from browser for game type (Jax) - resolved.
+- 0003350: [Scripting] setVehicleIdleRespawnDelay doesnt' work? (Jax) - resolved.
+- 0001691: [General] Corona markers not appearing (Jax) - resolved.
+- 0002883: [General] Optimize bandwidth usage with many players / Distance based sync taking camera stuff into account (ChrML) - resolved.
+- 0002360: [Scripting] setting the camera mode to "fixed" while in a vehicle issue (IJs) - resolved.
+- 0003334: [General] Camera mode is buggy (server side) (Jax) - resolved.
+- 0003320: [Scripting] Allow mta controls to be used with bindKey (Jax) - resolved.
+- 0003312: [Scripting] setPlayerNametagColour/Text for client-side scripts (Jax) - resolved.
+- 0001427: [Scripting] When onResourceStart triggers a onColShapeHit() while not being in the radius of that ColShape (ChrML) - resolved.
+- 0002714: [Scripting] Client and server getVehiclePlateText returns false for vehicles whose plate wasn't set manually (ChrML) - resolved.
+- 0003204: [Scripting] clientside outputChatBox doesn't accept number values (ChrML) - resolved.
+- 0002796: [GUI / Menus / Console] Connection problem icon is white on remote players (ChrML) - resolved.
+- 0003183: [Scripting] fileIsEOF only returns true after having read *more* than file size (ChrML) - resolved.
+- 0003176: [Scripting] hasObjectPermissionTo always returns false if player argument passed (ChrML) - resolved.
+- 0003168: [Scripting] fileOpen should return false and continue instead of erroring and aborting execution if the specified file doesn't exist (ChrML) - resolved.
+- 0003203: [Scripting] setTimer doesn't work anymore from within a coroutine (ChrML) - resolved.
+- 0003123: [Scripting] toJSON ignores the first argument (ChrML) - resolved.
+- 0001767: [Scripting] Using setElementPosition on a player inside a marker triggers onMarkerHit (ChrML) - resolved.
+- 0003102: [General] kickPlayer does not display the kick reason to the player that was kicked (ChrML) - resolved.
+- 0002724: [Scripting] Certain kinds of functions, like getElementsByType(), don't work from within a coroutine (ChrML) - resolved.
+- 0003156: [Scripting] Add a way to hide default text (ChrML) - resolved.
+- 0003215: [Scripting] setCameraLookAt works crappily (ChrML) - resolved.
+- 0003302: [Scripting] getPlayerTarget doesn't work if target is a ped (ChrML) - resolved.
+- 0003299: [Scripting] request: xmlGetChildNodes() (Jax) - resolved.
+- 0003293: [Scripting] Doing attachElementToElement ( objectA, objectB ) then attachElementToElement ( objectB, objectA ) crashes player (Jax) - resolved.
+- 0002254: [Scripting] setElementVisibleTo does not work on Markers (Jax) - resolved.
+- 0003158: [Scripting] The way setElementVisibleTo works is strange/confusing (Jax) - resolved.
+- 0003279: [Scripting] Cylinder markers always get created at (0, 0, 0) regardless of specified coords (Jax) - resolved.
+- 0003278: [Scripting] removePlayerClothes is broken (Jax) - resolved.
+- 0003280: [Scripting] setCameraInterior is identical to getCameraInterior (Jax) - resolved.
+- 0003272: [Scripting] Interior world carries over after a disconnect while the player is "terminated". (Jax) - resolved.
+- 0003273: [Scripting] Interior world cannot be set on a player who is "terminated" (Jax) - resolved.
+- 0003268: [General] setPedAnimation() returns false (Jax) - resolved.
+- 0003267: [General] setPedSkin() will return false / stack overflow (Jax) - resolved.
+- 0003269: [General] Ped element type is "unknown" rather than "ped" (Jax) - resolved.
+- 0003249: [General] Arrow markers sometimes invisible (Jax) - resolved.
+- 0003260: [Scripting] allow getPlayerMoney to work clientside (Jax) - resolved.
+- 0003262: [GUI / Menus / Console] Quick connect info doesn't get saved (Jax) - resolved.
+- 0003259: [GUI / Menus / Console] Connecting to a server via browser results in the server/port being put in quick connect (Jax) - resolved.
+- 0003121: [Installer] Race ACL is not included in default acl.xml (Jax) - resolved.
+- 0003251: [Scripting] Ped functions whine about a bad argument (Jax) - resolved.
+- 0003250: [Scripting] setTimer() crashes from within a closure (Jax) - resolved.
+- 0003241: [Scripting] cannot attach objects to players (Jax) - resolved.
+- 0003248: [General] vehicle element is passed as the player arg to onVehicleEnter if the player has been warped into the vehicle (Jax) - resolved.
+- 0003081: [GUI / Menus / Console] Inverted mouse - option needs adding to controls menu (Jax) - resolved.
+- 0003246: [General] Motion Blur not resetting when changing server (Jax) - resolved.
+- 0003245: [General] If you die with a jetpack on it remains after respawn (Jax) - resolved.
+- 0002562: [Scripting] Server lockup when passing tables with function values in them through call() (Jax) - resolved.
+- 0002922: [Scripting] Calling setTimer() with a table containing function values locks up server/client (Jax) - resolved.
+- 0003210: [Scripting] bindKey server/client lockup with a table containing functions (Jax) - resolved.
+- 0003237: [Scripting] Money functions does not support a negative amount (Jax) - resolved.
+- 0002908: [General] cant click anything till the player spawns at least once (IJs) - resolved.
+- 0003038: [General] You can't do setCameraPosition and setCameraLookAt in the same frame (Jax) - resolved.
+- 0003181: [Scripting] calling callRemote while a resource is stopped crashes the server (kevuwk) - resolved.
+- 0003180: [General] Using ' in player name gives strange results (Jax) - resolved.
+- 0003172: [Scripting] get/setPickupRespawnTime requested (Jax) - resolved.
+- 0003205: [GUI / Menus / Console] guiGridListGetSelectedItem returns 0 for column but the index starts from 1 (IJs) - resolved.
+- 0003161: [Weapons] Crouching and shooting akimbo weaps doesnt work properly (Jax) - resolved.
+- 0003195: [Scripting] toggleControl reduced functionality (Jax) - resolved.
+- 0003211: [Scripting] make molotovs in createProjectile aimable. (Jax) - resolved.
+- 0003165: [Scripting] A func to pick up a pickup is needed (Jax) - resolved.
+- 0003208: [General] onClientVehicleEnter and onClientPlayerVehicleEnter are not triggered if player has been warped into the vehicle (Jax) - resolved.
+- 0003199: [Scripting] onVehicleStartExit does not trigger if you're being jacked. (Jax) - resolved.
+- 0003057: [General] Setting wanted level to 6 makes the army roadblocks appear in the game. (eAi) - resolved.
+- 0003184: [Scripting] remove isPlayerBetaTester (kevuwk) - resolved.
+- 0003177: [Scripting] Clientside detachElementFromElement() crashes if not attached to anything (kevuwk) - resolved.
+- 0003159: [Scripting] After attaching markers or blips server side, can't get a list of them with client side getAttachedElements() (Jax) - resolved.
+- 0003148: [Scripting] attachElementToElement offsets not working for players. (Jax) - resolved.
+- 0003134: [General] Modules functions don't return the correct value during RegisterFunction (kevuwk) - resolved.
+- 0003124: [General] DebugPrintf from module interface prefixes messags with ERROR (kevuwk) - resolved.
+- 0003115: [General] Download error 9 - Backslashes in URLs (Jax) - resolved.
+- 0003556: [Scripting] onClientGUIClick doesn't trigger on middle mouse button click - closed.
+- 0003401: [General] Issues with attaching + dimensions - closed.
+- 0003870: [GUI / Menus / Console] The "window" command crashes my game. - closed.
+- 0003523: [Vehicles] Ocuppied vehicle's blow twice - closed.
+- 0001885: [Synchronization] Unsynced lateral driveby is possible - closed.
+- 0003885: [General] Automatic logging in of community (lil_Toady) - closed.
+- 0003120: [General] Using certain chars in stuff such as Server names or Player Names causes the string to be cut - closed.
+- 0003845: [General] Client assertion fail: CClien...ger.cpp:284 pEntry->pModel->GetRefCount() > 1 - closed.
+- 0003313: [General] Creating certain elements is quite slow - closed.
+- 0003730: [General] Client crash on pickup pick up - closed.
+- 0003111: [GUI / Menus / Console] Window alpha setting does not affect controls created after it is changed (lil_Toady) - closed.
+
+Multi Theft Auto : San Andreas - mtasadm_v1.0-dp2
+=================================================
+
+Second public release. This version has been released publicly on 10th of January, 2008. 
+
+Bugs fixed since the last release:
+
+- 0003101: [Installer] Uninstaller might tend to remove whole GTA SA folder, when mtasa is installed in it (ChrML) - resolved.
+- 0002314: [Scripting] Blip priorities (Jax) - resolved.
+- 0003108: [Synchronization] Elements interiors are not synced on join (Jax) - resolved.
+- 0003107: [General] Blips rendered above objective markers (Jax) - resolved.
+- 0003087: [General] Support mice with more than 3 buttons. (Jax) - resolved.
+- 0002849: [Scripting] Request for "getControlKeys" (Jax) - resolved.
+- 0003065: [Admin] banSerial crashes the server (kevuwk) - resolved.
+- 0003025: [Admin] banPlayer crashes the server? (Oli) - resolved.
+- 0003029: [GUI / Menus / Console] Have total players/servers count on server browser (Jax) - resolved.
+
+Multi Theft Auto : San Andreas - mtasadm_v1.0-dp1
+=================================================
+
+Initial public release. This version has been released publicly on 2nd of January, 2008. 
+
+Fixed bugs:
+
+- 0002953: [General] Download error 9 with subdirectories. (eAi) - resolved.
+- 0003000: [Scripting] xmlLoadFile can't load files from a zipped resource (Arc) - resolved.
+- 0001610: [Scripting] Static arrow-marker type - resolved.
+- 0002050: [Vehicles] Attempt to increase vehicle type limit (IJs) - resolved.
+- 0001135: [Synchronization] Crouching syncs slowly (eAi) - resolved.
+- 0001450: [GUI / Menus / Console] 'Connect timed out' message (Oli) - resolved.
+- 0002108: [Vehicles] Vehicles created in .map respawn as soon as you exit them (Jax) - resolved.
+- 0001634: [General] Long pause from taking first screenshot (Jax) - resolved.
+- 0003068: [Synchronization] Slidey vehicles (Jax) - resolved.
+- 0002998: [General] Crash when clicking on the 'About' button when animated menu is enabled - resolved.
+- 0002987: [Scripting] Element data set on players client side is not received by joining players (Jax) - resolved.
+- 0002992: [Vehicles] Vehicle can get locked in an unusable state when driver of the hijacked vehicle disconnects while hijacking (Jax) - resolved.
+- 0002971: [General] Jetpack doesn't get removed after player respawns (Jax) - resolved.
+- 0002920: [Scripting] Glued objects are desynced for joining players (Jax) - resolved.
+- 0002927: [General] Remote player spawns affect local interior (Jax) - resolved.
+- 0002951: [Scripting] Client streamer events are not working correctly (Jax) - resolved.
+- 0002918: [Scripting] Clientside setMarkerTarget crashes the client (Jax) - resolved.
+- 0002948: [Scripting] Object rotations in .map are in radians (Jax) - resolved.
+- 0002942: [Scripting] Need a function to lock players to vehicles so they dont fall off bikes. (Jax) - resolved.
+- 0002946: [Scripting] createColCircle always returns false client side (Jax) - resolved.
+- 0002943: [Scripting] setMarkerTarget and setMarkerIcon do not work properly (Jax) - resolved.
+- 0002928: [General] Kicking/Banning when resources are downloading causes download error instead of kick message (kevuwk) - resolved.
+- 0002879: [Scripting] setPlayerSkin() resets camera mode to player (Jax) - resolved.
+- 0002914: [Scripting] Clientside getObjectModel() needed (Jax) - resolved.
+- 0002906: [Scripting] Serverside bindKey doesn't work with control names (Jax) - resolved.
+- 0002892: [General] Crash while clicking cancel on a non-responsive server connection (Jax) - resolved.
+- 0002818: [Scripting] When calling clientside/serverside triggerEvent from an event handler, its client/source variables are set to false (Jax) - resolved.
+- 0002487: [Security] debugfile path is not restricted (kevuwk) - resolved.
+- 0002772: [Scripting] restartResource lacks params from startResource (kevuwk) - resolved.
+- 0002751: [Weapons] Goggles (if equipped) effect get removed whenever a remote player spawns (Jax) - resolved.
+- 0002760: [General] Crash on join [0x533706] - "C++ error" (eAi) - resolved.
+- 0002766: [General] first person aim weapons not removed when out of ammo (Jax) - resolved.
+- 0002764: [Vehicles] Some vehicles slide to the right when entering (Jax) - resolved.
+- 0002763: [Scripting] Add clientside setPlayerRotation() (Jax) - resolved.
+- 0002669: [Weapons] Able to pretend shoot any weapon from any vehicle (read description) (ChrML) - resolved.
+- 0002737: [General] Sometimes after restarting (a mode?) it gives a fatal 6 (ChrML) - resolved.
+- 0002539: [General] When a remote player changes skin to CJ, local clothes & stats apply (Jax) - resolved.
+- 0002757: [Scripting] getAccount - doesn't exist when it should (Jax) - resolved.
+- 0002756: [Synchronization] When a player spawns, any attached elements to your local player fall off, but remain attached to the view of remote players (Jax) - resolved.
+- 0002755: [Vehicles] When a player spawns, all other players are thrown out of their vehicle, causes bad de-sync (Jax) - resolved.
+- 0002752: [Synchronization] Remotely driven vehicles behave strangely when a FPS lag/net lag occours (Jax) - resolved.
+- 0002753: [Scripting] Client debug assertion failure when downloading clientside scripts (ChrML) - resolved.
+- 0002717: [Scripting] Clientside getPickupWeapon always returns 1 on valid weapon pickups (Jax) - resolved.
+- 0002716: [Scripting] Clientside getPickupType always returns 2 on valid pickups (Jax) - resolved.
+- 0002746: [Scripting] Running getResourceInfo to get a non-set info tag attribute returns the attribute's name (Jax) - resolved.
+- 0002742: [Vehicles] Tank shots not synchronized (Jax) - resolved.
+- 0002733: [Vehicles] trying to enter boats or skimmer causes a glitch (Jax) - resolved.
+- 0002731: [Scripting] controls lock up on skin change (Jax) - resolved.
+- 0002735: [General] line after \n is not considered as a new line in outputChatBox() (Jax) - resolved.
+- 0001584: [Scripting] Changing dimensions does not change player visiblity (Jax) - resolved.
+- 0002582: [General] isVehicleOnGround always returns true for unoccupied vehicle (Jax) - resolved.
+- 0002723: [Admin] Request: getTime/Date, Events for pickups client side (Jax) - resolved.
+- 0002713: [Scripting] player skins not updating for remote players (Jax) - resolved.
+- 0002686: [Scripting] Creating a GUI scrollbar or GUI scrollpane crashes the client (IJs) - resolved.
+- 0001327: [General] Laffy Taffy/Roadkill CJ Model (ChrML) - resolved.
+- 0001876: [General] Satchel crash [Crash ID: 27892	Address: 0x42480000] (IJs) - resolved.
+- 0002701: [Weapons] In driveby mode, when all ammo is lost player still preforms shooting animation (Jax) - resolved.
+- 0002534: [Scripting] Camera position resets on setPlayerSkin (Jax) - resolved.
+- 0002695: [General] Remote player's vehicle explosions do not have sound (Jax) - resolved.
+- 0002705: [Scripting] Restarting a resource that contains resource settings and has been updated crashes the server (kevuwk) - resolved.
+- 0002550: [Scripting] Restarting a resource that contains resource configs and has been updated crashes the server (kevuwk) - resolved.
+- 0002528: [Vehicles] No front hood in some vehicles (Jax) - resolved.
+- 0002697: [Scripting] Client freezes when being passed nested tables through triggerClientEvent (eAi) - resolved.
+- 0002696: [Scripting] setBlipSize sets the icon of the blip, rather than the size (kevuwk) - resolved.
+- 0002694: [Vehicles] Vortex has invisible doors (eAi) - resolved.
+- 0002275: [General] A player glued to a vehicle hears the radio playing (eAi) - resolved.
+- 0001193: [General] Glitch to potentially warp you back to car or give you infinite ammo (ChrML) - resolved.
+- 0002691: [General] Serverside scripts are not unloaded if a resource is updated via refresh (eAi) - resolved.
+- 0002569: [Maps] Dimension tags in elements do not work (kevuwk) - resolved.
+- 0002690: [Maps] Interior tags in elements do not work (kevuwk) - resolved.
+- 0002557: [General] Fatal error 8 on join (kevuwk) - resolved.
+- 0002660: [General] Certain gamemodes or resources can cause crashes or assertions/c++ errors for people who want to connect to a server (kevuwk) - resolved.
+- 0001624: [Scripting] removeEventHandler related server crash (eAi) - resolved.
+- 0002677: [General] Serverside getResourceConfig returns an invalid xmlnode pointer for stopped resources (kevuwk) - resolved.
+- 0002291: [Scripting] setVehicleDoorsUndamageable parameter is incorrectly interpreted (eAi) - resolved.
+- 0002551: [Scripting] Clientside event handlers are not always added after restarting (eAi) - resolved.
+- 0002533: [Scripting] Returning Lua functions or coroutines from a http exported function crashes the server (eAi) - resolved.
+- 0001483: [Vehicles] Getting sucked through Combine Harvester causes desync (eAi) - resolved.
+- 0001795: [General] Radio reports all bridges have been opened (eAi) - resolved.
+- 0002672: [GUI / Menus / Console] guiCreateMemo crashes the game (IJs) - resolved.
+- 0002575: [GUI / Menus / Console] Using a table with self-references as element data or a call() parameter causes a crash (eAi) - resolved.
+- 0002553: [Scripting] MAX_HEALTH stat can only be set on the CJ skin (Cray) - resolved.
+- 0001765: [Synchronization] Vehicles randomly desync (ChrML) - resolved.
+- 0002667: [Scripting] addPlayerToTeam and removePlayerFromTeam names are misunderstandable (Jax) - resolved.
+- 0002661: [Maps] comments in .map files crashes the server. (kevuwk) - resolved.
+- 0002662: [Scripting] warpPlayerIntoVehicle crashes the server. (Jax) - resolved.
+- 0002606: [Scripting] wasEventCanceled() always returns false (Jax) - resolved.
+- 0002649: [General] Using warpPlayerIntoVehicle while in passenger seat to a driver seat causes desync (Jax) - resolved.
+- 0002646: [Vehicles] Getting out of a vehicle centers the player under the vehicle (Jax) - resolved.
+- 0002659: [Scripting] resetMapInfo() changes skin to CJ while server is not aware of this. (Jax) - resolved.
+- 0002655: [Scripting] xmlCreateFile + xmlSaveFile doesn't save xml in local resource directory (kevuwk) - resolved.
+- 0002279: [General] FPS Drop Bug (Cray) - resolved.
+- 0002172: [General] Boats invisible when moved with client-side setElementPosition (Jax) - resolved.
+- 0002567: [Synchronization] Players can get desynced (Jax) - resolved.
+- 0002640: [Scripting] killing player in car causes PE34 (Jax) - resolved.
+- 0002549: [Scripting] createElement ID argument is ignored (ChrML) - resolved.
+- 0002555: [General] Entering multilanguage messages in chatbox is not possible (Jax) - resolved.
+- 0002610: [Synchronization] unloading a resource desyncs players that were in vehicles related to the resource (Jax) - resolved.
+- 0002637: [General] Client gamespeed starts ultra fast, world gravity is low (Jax) - resolved.
+- 0002635: [Scripting] Serverside setSkyGradient does not sync for joining players. (Jax) - resolved.
+- 0002636: [Scripting] Sky gradients carry over upon disconnect (Jax) - resolved.
+- 0002556: [General] Ctrl + k adds a wierd code to chatbox messages (Jax) - resolved.
+- 0002628: [Scripting] warpPlayerIntoVehicle does not work correctly for streamed out vehicles. (Jax) - resolved.
+- 0002594: [Scripting] createObject clientside rotations are not in degrees, serverside is (Jax) - resolved.
+- 0002631: [General] Crash upon car collisions of two drivers (Jax) - resolved.
+- 0002630: [General] Crash upon vehicle jacking (Jax) - resolved.
+- 0002627: [Scripting] toggleControl "enter_exit" working sporadically (Jax) - resolved.
+- 0002633: [Scripting] Clientside vehicles "platetext" arg doesnt work (Jax) - resolved.
+- 0002475: [Scripting] When changing a player's vehicle using warpPlayerIntoVehicle, camera stays on the old vehicle (Jax) - resolved.
+- 0002535: [Scripting] Crash when element camera is set to be watching is destroyed (Jax) - resolved.
+- 0002622: [General] Aiming using a single handed weapon crashes all players currently connected (Jax) - resolved.
+- 0002593: [Scripting] killing a player (killPlayer()) with armor needs to be triggered twice (and another bug) (Jax) - resolved.
+- 0002623: [General] banIP issues (kevuwk) - resolved.
+- 0002616: [Scripting] banIP doesn't save the banner name (kevuwk) - resolved.
+- 0002615: [Scripting] onVehicleDamage gets triggered with a negative loss (kevuwk) - resolved.
+- 0002609: [Vehicles] Radio disappears permanently from a certain vehicle (eAi) - resolved.
+- 0002604: [Scripting] getBansXML and unbanIP broken (kevuwk) - resolved.
+- 0002608: [GUI / Menus / Console] guiLabelGetTextExtent always returns 16 (kevuwk) - resolved.
+- 0002597: [General] getBansXML(), unbanIP() (kevuwk) - resolved.
+- 0002330: [Scripting] money functions set bad values (Jax) - resolved.
+- 0002525: [Scripting] Remote players Interior, Dimension, Armour values are not synced (kevuwk) - resolved.
+- 0002602: [General] Reset/remove fall damage on spawn (Jax) - resolved.
+- 0001545: [General] Death caused by eating stat after certain amount of time (eAi) - resolved.
+- 0001129: [Synchronization] Melee rotation goes weird when blocking (jitters from one rotation to the other) (eAi) - resolved.
+- 0002438: [Synchronization] Remote players turn toward the local player when punching (eAi) - resolved.
+- 0002592: [Scripting] killing a player attached to an element, and then respawning him somewhere else doesnt deattach the player on remote screens (Jax) - resolved.
+- 0002541: [Vehicles] Paintjob 4 applies random textures to cars (Jax) - resolved.
+- 0002558: [Scripting] triggerClientEvent always returns false (Jax) - resolved.
+- 0002434: [GUI / Menus / Console] Client crashes if you pass an invalid gui element to a function. (IJs) - resolved.
+- 0002586: [GUI / Menus / Console] Team chat messages should not be colored, (team) denotes them fine (Jax) - resolved.
+- 0002519: [GUI / Menus / Console] F11 Map does not show serverside blips of ID other than 0 anymore (Jax) - resolved.
+- 0002583: [General] Lag compensation is turned off (Jax) - resolved.
+- 0001832: [General] 'Network trouble' text disappears from lagged people nametags after carjacking them (Jax) - resolved.
+- 0002570: [Scripting] onClientPlayerJoin not triggering (Jax) - resolved.
+- 0002510: [Scripting] Elements created from a script aren't correctly placed on the clientside root (kevuwk) - resolved.
+- 0002560: [Scripting] onClientResourceStart's source is the global root instead of the resource's root element (kevuwk) - resolved.
+- 0002573: [General] startResource() and restartResource() only update modified client files one out of two times (kevuwk) - resolved.
+- 0002086: [Scripting] engineImportCOL crashes the client (IJs) - resolved.
+- 0002548: [General] Regular chat messages are appended an unparsed color code before the message (IJs) - resolved.
+- 0002572: [Scripting] onColShapeHit / onElementColShapeHit don't detect empty vehicles (Jax) - resolved.
+- 0001200: [General] Stuck on back after being jacked from a vehicle (Jax) - resolved.
+- 0002563: [Scripting] xmlNodeSetAttribute: Value can only be a string, fails on integer (kevuwk) - resolved.
+- 0002565: [Scripting] stopObject() doesnt really stop the moving object. (Jax) - resolved.
+- 0002559: [Scripting] Restarting a resource that contains includes and has been updated crashes the server (kevuwk) - resolved.
+- 0002515: [Scripting] set returns false when the setting's value was set successfully (kevuwk) - resolved.
+- 0002327: [Scripting] Clientside resource root element may overlap the global root (kevuwk) - resolved.
+- 0002536: [Scripting] createExplosion new parameters don't work (Jax) - resolved.
+- 0002482: [General] Resource root elements aren't destroyed on failed resource start (kevuwk) - resolved.
+- 0002509: [Scripting] onClientClick only works if you enable the cursor from the server - resolved.
+- 0002503: [GUI / Menus / Console] Removing a non-existing GUI row causes a c++ error (Oli) - resolved.
+- 0002486: [Security] xmlLoadFile is not restricted to relative paths. (kevuwk) - resolved.
+- 0002507: [Scripting] Cancelling onPlayerChat doesn't have effect if the cancelEvent() call isn't on the last added handler (Jax) - resolved.
+- 0002494: [Scripting] objects detaching on death (Jax) - resolved.
+- 0002505: [Scripting] setElementHealth on a vehicle breaks onVehicleDamage (Jax) - resolved.
+- 0002500: [Scripting] xmlCreateFile doesn't work (kevuwk) - resolved.
+- 0002504: [Scripting] getElementsWithinColshape on a recently created colshape always returns 0 elements (Jax) - resolved.
+- 0002492: [General] Crash on start 0x007462A7 (Jax) - resolved.
+- 0002493: [General] 0x04E174A0 crash on stopping gamemodes (IJs) - resolved.
+- 0002408: [Scripting] unbindKey interferes with other scripts binds. (Jax) - resolved.
+- 0002499: [General] Crash on disconnect (Jax) - resolved.
+- 0001407: [Vehicles] You can't enter Skimmer or Seasparrow while they are on water (Jax) - resolved.
+- 0002498: [Scripting] Binding the same key two times clientside causes the bind to trigger four times on press (Jax) - resolved.
+- 0002497: [Scripting] Crash when setting skin 0000018 starting from 0 with settimer @ 1.5 second intervals (Jax) - resolved.
+- 0001429: [General] Weapon visible locally after respawn/reconnecting (eAi) - resolved.
+- 0001663: [Scripting] Passing erroneous sound id to playSound crashes client (eAi) - resolved.
+- 0001783: [Scripting] onPlayerDamage triggered when using setPlayerHealth/setPlayerArmor (Jax) - resolved.
+- 0002445: [Scripting] Cannot use tattoos on player (addPlayerClothes function) (Jax) - resolved.
+- 0002489: [Scripting] setplayerskin has same effects of respawning (Jax) - resolved.
+- 0002491: [General] No keys work at all. (Jax) - resolved.
+- 0002490: [Scripting] Cancelling player damage from a client script shows MTA debug output in console (Jax) - resolved.
+- 0001777: [Scripting] Server crash (from createElement) - resolved.
+- 0002343: [General] unbindKey crash: 0x0223F568 (Jax) - resolved.
+- 0002049: [Synchronization] Jetpack desynced (Jax) - resolved.
+- 0002484: [Scripting] Getting a non-spawned player's task crashes the client (Jax) - resolved.
+- 0002382: [Synchronization] Legs go through vehicles (erorr404) - resolved.
+- 0002122: [General] Driveby can't get out of vehicle bug (Jax) - resolved.
+- 0002392: [Synchronization] Vehicles don't blow up when yer not the one closest to them. Desync, etc. (Jax) - resolved.
+- 0002483: [Scripting] Clientside showPlayerHudComponent takes a player argument (Jax) - resolved.
+- 0002224: [Vehicles] Completely blown up planes are still enterable (Jax) - resolved.
+- 0002319: [General] Problem with vehicles getting stuck (Jax) - resolved.
+- 0002381: [Scripting] Serverside showCursor returns false if specified cursor state is already set (Jax) - resolved.
+- 0002473: [Scripting] colshapes created serverside can't be handled clientside (Jax) - resolved.
+- 0002257: [Weapons] Current held weapon does not get set when player enters a vehicle (remote client issue) - resolved.
+- 0002476: [Scripting] Pickups don't respawn using default syntax (kevuwk) - resolved.
+- 0002384: [Scripting] client scripts not stopping (kevuwk) - resolved.
+- 0001141: [Vehicles] Driver is warped back into vehicle if jacking is aborted (Jax) - resolved.
+- 0001514: [Scripting] Make collision shape event(s) detect any elements (not just players) - resolved.
+- 0001635: [Scripting] Allow scripts to attach arrow markers above players heads - resolved.
+- 0001940: [Scripting] Cursor stays after resource stops (Jax) - resolved.
+- 0002262: [Scripting] getCameraRotation gives non-useable values. (Jax) - resolved.
+- 0002344: [Synchronization] Player gets desynched after his car is jacked by other player (Jax) - resolved.
+- 0002318: [Scripting] Creating text displays with a alpha that is lower than 255 causes random text to appear at X:0 Y:0 - resolved.
+- 0001045: [General] Possibility to allow using coloured text in chat and coloured nicknames (Jax) - resolved.
+- 0002469: [Scripting] more Keybinds not working issues (Jax) - resolved.
+- 0002459: [Weapons] Mousewheel zooming issue with snipers or camera (Jax) - resolved.
+- 0002369: [Scripting] Client side script is not updated if a previous version is already downloaded (kevuwk) - resolved.
+- 0002467: [Scripting] keyBinds aint working, gives 'bad argument' (Jax) - resolved.
+- 0002465: [GUI / Menus / Console] chat box default settings (Jax) - resolved.
+- 0002466: [Scripting] colshapes not passed correctly clientside (Jax) - resolved.
+- 0002269: [Synchronization] Attached objects are not re-attached when the object is streamed back in after stream out (Cray) - resolved.
+- 0002460: [Scripting] getElementType returns "unknown" on all GUI elements (Jax) - resolved.
+- 0001371: [Vehicles] VERY strange idle vehicle behavior (Jax) - resolved.
+- 0002458: [GUI / Menus / Console] A server can be added to favourites multiple times (Cray) - resolved.
+- 0002457: [Scripting] getVehiclePlateText causes crashes (Jax) - resolved.
+- 0002456: [Scripting] setTeamName doesn't work (Jax) - resolved.
+- 0002353: [Scripting] Extra vehicle seats don't work correctly (Jax) - resolved.
+- 0001403: [Weapons] Players become immune to bullets (IJs) - resolved.
+- 0002454: [Weapons] toggling fire control should also toggle satchel detonation (Oli) - resolved.
+- 0002418: [Scripting] IDs are not synced between server and client (Talidan) - resolved.
+- 0002440: [Scripting] GUI&world click event merging issues (Jax) - resolved.
+- 0002376: [Synchronization] Bike desync bug (passenger related) (Jax) - resolved.
+- 0002420: [Scripting] getVehicleWheelStates issue (Jax) - resolved.
+- 0002437: [General] lasersight (Jax) - resolved.
+- 0001304: [General] Health Pickups Not Working - Sense of Full Health Lost (eAi) - resolved.
+- 0001773: [Scripting] setObjectRotation & moveObject cannot work in unison (Jax) - resolved.
+- 0001828: [Scripting] Passing negative values into colshape sizes breaks them (Jax) - resolved.
+- 0002435: [Scripting] triggerServerEvent aint working (Jax) - resolved.
+- 0002433: [Scripting] isInsideRadarArea doesn't return the right values (Cray) - resolved.
+- 0002432: [Scripting] createRadarArea Y sizing is inconsistent (Cray) - resolved.
+- 0002430: [Scripting] getPlayerOccupiedVehicle clientside doesnt take a player argument (kevuwk) - resolved.
+- 0002416: [GUI / Menus / Console] Cmd "reconnect" doesn't work propely (Jax) - resolved.
+- 0002427: [Vehicles] Vehicles spawned by .map are spawned with invisible doors (Jax) - resolved.
+- 0002426: [Weapons] No weapon damage when standing on a custom made element (vehicles & objects) (Jax) - resolved.
+- 0001178: [General] Hydra getting stuck in the air after a player disconnecting (Jax) - resolved.
+- 0002424: [Scripting] isInsideRadarArea always returns true (Jax) - resolved.
+- 0002271: [Vehicles] Parked/slow vehicle collisions (Jax) - resolved.
+- 0002324: [Vehicles] Vehicles fall through the ground on spawn (Jax) - resolved.
+- 0002422: [Scripting] setWeatherBlended doesn't work properly clientside (kevuwk) - resolved.
+- 0002417: [Scripting] getPlayerContactElement crashes the game if no contact element exists, or in vehicle (Jax) - resolved.
+- 0002187: [Vehicles] fixVehicle/respawnVehicle on a blown up vehicle sets it as frozen (Jax) - resolved.
+- 0002414: [General] Relative positioning to interpolation crashes when remote player falls off vehicle (Jax) - resolved.
+- 0002402: [Weapons] projectile weapons bugs (Jax) - resolved.
+- 0002216: [Scripting] Not all controls should be disabled with toggleAllControls (Jax) - resolved.
+- 0002308: [Synchronization] Enter vehicle sync (Jax) - resolved.
+- 0002311: [Synchronization] Vehicle Sync Bug (IJs) - resolved.
+- 0002325: [Scripting] getPlayerTotalAmmo returns 0 if that weapon wasnt equiped (Jax) - resolved.
+- 0002044: [Synchronization] Remote players momentarily pause in place, then warp to their true position (Jax) - resolved.
+- 0002374: [Scripting] getPlayerOccupiedVehicleSeat returns wrong values (Jax) - resolved.
+- 0001942: [GUI / Menus / Console] Controls setup wont work (IJs) - resolved.
+- 0002380: [GUI / Menus / Console] Clicking twice on a server in server browser doesn't connect to it if clicked twice on one earlier (IJs) - resolved.
+- 0002400: [Synchronization] new Spawnplayer skin bug (Jax) - resolved.
+- 0002398: [General] All car windows are black (Jax) - resolved.
+- 0001922: [Scripting] Clientside getTeamFriendlyFire return values are wrong (kevuwk) - resolved.
+- 0002388: [Scripting] isPlayerOnGround() is not working correctly/misunderstandable (Jax) - resolved.
+- 0002390: [Scripting] isPlayerUnderWater() isn't working correclty/misunderstandable (Jax) - resolved.
+- 0002391: [Scripting] isInsideRadarArea doesn't work (Jax) - resolved.
+- 0002387: [General] Using a disconnect option crashes other people on the server (Jax) - resolved.
+- 0002389: [Scripting] isPlayerMuted() obselete until there is a mutePlayer() function (kevuwk) - resolved.
+- 0002386: [Scripting] skins not changing properly with spawnplayer. (Cray) - resolved.
+- 0002346: [Scripting] Object rotations are reset when reconnecting. (Jax) - resolved.
+- 0002313: [Vehicles] Improper enter animations for Baggage (Jax) - resolved.
+- 0002373: [Vehicles] Entering clientside vehicle doesn't work (Jax) - resolved.
+- 0002367: [Scripting] setVehicleDamageProof severside? (Jax) - resolved.
+- 0002338: [General] Detached objects are placed in the wrong position (Jax) - resolved.
+- 0002371: [General] Protocol Error 46 (Cray) - resolved.
+- 0002361: [Scripting] onClientColShapeHit is not triggered by a server-side created colshape (Jax) - resolved.
+- 0002315: [Synchronization] low hp desync (Jax) - resolved.
+- 0002352: [Weapons] satchels prematurely exploding (Jax) - resolved.
+- 0002337: [Scripting] Clientside detachElementFromElement doesn't work (Jax) - resolved.
+- 0002234: [General] Changing settings such as quick connect, name change, control config, etc. will not save if MTA crashes (Cray) - resolved.
+- 0002357: [General] Last character of player's nickname stripped when joining a server (Cray) - resolved.
+- 0002238: [Scripting] Manipulating clientside elements serverside crashes it (Talidan) - resolved.
+- 0002329: [Scripting] onClientPlayerChangeNick is triggered before the nick is changed (Cray) - resolved.
+- 0001438: [Weapons] crash : Offset = 0x0072F4DE (IJs) - resolved.
+- 0002198: [General] crash 0x00343CA8 (Cray) - resolved.
+- 0001577: [Installer] Error: missing "msvcp71.dll" on certain systems (eAi) - resolved.
+- 0001809: [General] Crash: 0x6567696C (IJs) - resolved.
+- 0002196: [General] Crash: 0x7C911E58 (IJs) - resolved.
+- 0001221: [Vehicles] Make it possible to flat tires synced - resolved.
+- 0001926: [Scripting] Clientside getPlayerStat returns a boolean for valid stat IDs (kevuwk) - resolved.
+- 0002253: [Vehicles] Vehicles spawned and set to an interior do not set to same interior after re-join (Cray) - resolved.
+- 0002237: [Vehicles] Cars stop respawning if you destroy them when they're created. (Cray) - resolved.
+- 0002280: [Scripting] getResourceRootElement doesn't exist clientside (kevuwk) - resolved.
+- 0002266: [General] Clientside scripts aren't always downloaded (Cray) - resolved.
+- 0002277: [Scripting] triggerClientEvent() and other functions that take arbitrary arguments crash the server (eAi) - resolved.
+- 0002274: [Scripting] addEvent syntax is obsolete (eAi) - resolved.
+- 0002273: [Scripting] createRadarArea syntax is inconsistent (eAi) - resolved.
+- 0002272: [Scripting] getResourceConfig outputs a bad argument warning if no config with the given name exists (eAi) - resolved.
+- 0002267: [Scripting] Can't bind GTA controls anymore (Jax) - resolved.
+- 0002264: [Synchronization] Objects attached (glued) to a vehicle will stream out from their orignal createObject XYZ location (Cray) - resolved.
+- 0002024: [General] Using a /help command in console causes a crash (IJs) - resolved.
+- 0002261: [General] setRuleValue(s) should be removed when a resource that uses them unload (kevuwk) - resolved.
+- 0002265: [Scripting] getColorFromString crashes the server (Jax) - resolved.
+- 0002258: [Scripting] Client scripts don't work (eAi) - resolved.
+- 0002248: [Scripting] onClientResourceStart() gets called only once (kevuwk) - resolved.
+- 0002245: [General] once you logout you can not login anymore (kevuwk) - resolved.
+- 0002205: [General] Crash 0x003C3CA8 (IJs) - resolved.
+- 0002043: [Synchronization] vehicle warping - resolved.
+- 0001730: [Scripting] Element attachment functions should support relative positioning - resolved.
+- 0002228: [Scripting] Client-side getResourceConfig always returns false (kevuwk) - resolved.
+- 0002215: [Vehicles] Remote vehicles underground (Jax) - resolved.
+- 0002213: [GUI / Menus / Console] "Settings" windows appears under the "Main menu" window (Jax) - resolved.
+- 0002174: [Scripting] Downloading Resources doesnt get new files defined in meta.xml (eAi) - resolved.
+- 0001871: [Scripting] Issues with clientside debug output (eAi) - resolved.
+- 0002078: [GUI / Menus / Console] guiGridListSetSelectedItem required (Cray) - resolved.
+- 0002206: [GUI / Menus / Console] Fix white spacing after clearing a gridlist (Cray) - resolved.
+- 0002123: [Scripting] MTA functions and events don't support Lua tables (eAi) - resolved.
+- 0002188: [Scripting] destroyElement(getRootElement()) destroys resource/map root elements (kevuwk) - resolved.
+- 0002181: [Scripting] clientside call() returns lots of junk alongside real value (kevuwk) - resolved.
+- 0001742: [General] Exitting map causes crash [0x074296A0 - 20815, 20816, 20817] - resolved.
+- 0002183: [Vehicles] Improper enter animations for Bandito (Jax) - resolved.
+- 0002166: [GUI / Menus / Console] Passing an invalid path/filename to image function crashes the client (Cray) - resolved.
+- 0002177: [GUI / Menus / Console] Chat lines are drawn behind the chatbox (Jax) - resolved.
+- 0002175: [General] Remove fade when starting a resource (Jax) - resolved.
+- 0001801: [General] Crash 0x007F190F (eAi) - resolved.
+- 0001819: [General] Crash: 0x07F175DC (eAi) - resolved.
+- 0002063: [General] Crash: 0x007F18CF (eAi) - resolved.
+- 0002157: [General] crash: 0x007F18CF (eAi) - resolved.
+- 0001598: [GUI / Menus / Console] Radar area displayed incorrectly on F11 map (Cray) - resolved.
+- 0001603: [GUI / Menus / Console] Radar areas don't flash on full screen map (Cray) - resolved.
+- 0002167: [Scripting] Setting of CLIENTSIDE SetElementInterior does not work properly (Jax) - resolved.
+- 0002112: [Scripting] 'False' is passed to command handlers as last parameter for commands without arguments (Jax) - resolved.
+- 0002114: [General] Stopping a resource while in a car desyncs you (Jax) - resolved.
+- 0002143: [Synchronization] removing jetpack (Jax) - resolved.
+- 0002169: [GUI / Menus / Console] Network trouble icon stuck on screen (Jax) - resolved.
+- 0002148: [GUI / Menus / Console] Radar areas don't appear on mini-map (only on full-screen map) (eAi) - resolved.
+- 0002110: [Scripting] Arrow markers don't appear until you reconnect (Jax) - resolved.
+- 0002145: [GUI / Menus / Console] Once a clientside resource is loaded then stopped, MTA downloads the files for that resource even after it has been stopped (BrophY) - resolved.
+- 0002153: [Scripting] Passing marker to client issue (Jax) - resolved.
+- 0002162: [General] Camera rotation gets focused on local player with CPed::Respawn (eAi) - resolved.
+- 0002158: [Scripting] Destroying an element with player elements as children destroys those (Jax) - resolved.
+- 0002163: [Scripting] Removing a clientside command handler within its code crashes the client (Jax) - resolved.
+- 0002115: [General] Player skin not changing after first set in a resource (Jax) - resolved.
+- 0002161: [Scripting] Client-side getElementsByType doesn't get markers (Jax) - resolved.
+- 0002119: [GUI / Menus / Console] nametags stays on the screen if you turn away from a player (Jax) - resolved.
+- 0001561: [Synchronization] Clothes/stats desync (Jax) - resolved.
+- 0002139: [General] Shooting under a police helicopter light gives you a warning star (eAi) - resolved.
+- 0002146: [Maps] Colours are setting incorrectly when a vehicle is created in .map (Jax) - resolved.
+- 0001442: [Vehicles] Improper enter animations for some vehicles (Jax) - resolved.
+- 0002149: [GUI / Menus / Console] Mouse moves camera when console or menu is open (Jax) - resolved.
+- 0002137: [Scripting] removeEventHandler removes all identical handlers (kevuwk) - resolved.
+- 0002113: [Scripting] Add clientside addCommandHandler (Jax) - resolved.
+- 0002107: [GUI / Menus / Console] Pressing alt gr in console leaves ctrl locked (Jax) - resolved.
+- 0002002: [Scripting] Client-side getCameraRotation() return issues (Jax) - resolved.
+- 0002084: [Scripting] setVehicleFrozen - vehicles don't unfreeze until streamed in (Jax) - resolved.
+- 0001491: [Scripting] setElementPosition doesn't update blips' and radarareas' positions for connected players (Jax) - resolved.
+- 0001220: [General] Invisible player (Jax) - resolved.
+- 0002042: [Synchronization] network trouble on cars (Jax) - resolved.
+- 0001648: [Synchronization] Second-Siren and Horn on Vehicles with Sirens (Jax) - resolved.
+- 0002000: [Synchronization] Skin gets set to CJ locally after changing the skin two times (IJs) - resolved.
+- 0002077: [General] Clientside attachElementToElement doesn't work (Jax) - resolved.
+- 0002066: [General] Markers are not showing, however they still work if u touch them (Jax) - resolved.
+- 0002065: [General] Able to control hydra on death (Jax) - resolved.
+- 0001585: [General] When you die in a vehicle, you can drive it after it respawns (Jax) - resolved.
+- 0001855: [Weapons] driveby innacuracy (Jax) - resolved.
+- 0001486: [General] Stats accumilate like SP (Jax) - resolved.
+- 0002054: [Scripting] Issue With onVehicleExit Event (Oli) - resolved.
+- 0002035: [Weapons] Players in first person view mode slide remotely (eAi) - resolved.
+- 0002016: [General] Remote players getting pickups makes a sound (Jax) - resolved.
+- 0002045: [Scripting] getCursorPosition returns wrong values (Jax) - resolved.
+- 0002051: [Scripting] getPlayerMoney does not retrieve the players actual money (Jax) - resolved.
+- 0002047: [Scripting] Players Money goes back to $0 after death (Jax) - resolved.
+- 0002040: [Weapons] remote sniper shots don't affect you if you're aiming (Jax) - resolved.
+- 0002041: [Scripting] Setting player's dimension causes crash (Jax) - resolved.
+- 0002030: [Scripting] getPlayerContactVehicle doesn't work (Jax) - resolved.
+- 0001906: [Scripting] client getCameraRotation always returns 0, 0, 0 (Jax) - resolved.
+- 0001984: [Scripting] getPlayerTargetStart, getPlayerTargetEnd, getPlayerTargetRange, getPlayerTargetCollision return wrong values (Jax) - resolved.
+- 0001985: [Security] OS library functions should be disabled (kevuwk) - resolved.
+- 0001736: [General] Pickups desyncing (kevuwk) - resolved.
+- 0001973: [Weapons] Satchel explosions have no owner (Jax) - resolved.
+- 0001978: [Scripting] Serverside col objects arent synced to clientside (Jax) - resolved.
+- 0001982: [Scripting] Clientside bindKey crashes the client if functions are bound to controls (Jax) - resolved.
+- 0001977: [Scripting] Gravity unsyncs on client relaunched (Jax) - resolved.
+- 0001972: [GUI / Menus / Console] download window stucks on your screen if you disconnect while it's downloading (kevuwk) - resolved.
+- 0001970: [General] New console commands should be under 'help' command (Jax) - resolved.
+- 0001966: [Scripting] setVehicleDamageProof flags inverted (Jax) - resolved.
+- 0001967: [Scripting] Clientside setVehicleEngineState does not work (Jax) - resolved.
+- 0001961: [Scripting] Gridlist isn't redrawn when item text is updated (IJs) - resolved.
+- 0001965: [Scripting] Crash when moving element out too far from player/camera [0x07B39FB1] (Jax) - resolved.
+- 0001962: [GUI / Menus / Console] New chatbox is out of scale (Jax) - resolved.
+- 0001959: [Scripting] Client getElementsByType doesn't work (Jax) - resolved.
+- 0001938: [Scripting] Clientside playSoundFrontEnd syntax is wrong (Jax) - resolved.
+- 0001937: [Scripting] getVehicleFromID issues for nonexistant indexes (Jax) - resolved.
+- 0001935: [Scripting] Clientside setBlipSize changes the icon instead of the size (Jax) - resolved.
+- 0001934: [Scripting] Clientside destroyBlipsAttachedTo doesn't work (Jax) - resolved.
+- 0001933: [Scripting] getResources returns a table of resource names (Jax) - resolved.
+- 0001920: [Scripting] onConsole/onClientConsole append a space to the text parameter (Jax) - resolved.
+- 0001921: [General] Setting custom data clientside crashes the server (Jax) - resolved.
+- 0001931: [Scripting] Clientside removeEventHandler always returns false (Jax) - resolved.
+- 0001929: [Scripting] Clientside getVehiclePlateText causes a crash (jbeta) - resolved.
+- 0001924: [Scripting] Clientside setPlayerWeaponSlot doesn't work (kevuwk) - resolved.
+- 0001928: [Scripting] getVehicleSirensOn outputs to debugbox if the vehicle doesn't have sirens (kevuwk) - resolved.
+- 0001927: [Scripting] getPlayerAmmoInClip/getPlayerTotalAmmo crash the client (kevuwk) - resolved.
+- 0001925: [Scripting] Serverside getPlayerWeaponSlot returns -1 if bad player pointer's passed (kevuwk) - resolved.
+- 0001923: [Scripting] getPlayerWeaponSlot syntax is wrong (kevuwk) - resolved.
+- 0001914: [Scripting] setCameraLookAt does not work (kevuwk) - resolved.
+- 0001888: [Scripting] Client functions rotateCameraUp and rotateCameraRight don't do anything (eAi) - resolved.
+- 0001919: [General] Jetpack stays equipped after disconnecting (Jax) - resolved.
+- 0001893: [General] Fighting style remains after disconnect. (Jax) - resolved.
+- 0001916: [GUI / Menus / Console] guiGetAlpha always returns false (eAi) - resolved.
+- 0001897: [Scripting] Crash using killTimer on a finished timer (Jax) - resolved.
+- 0001896: [General] Resource load crash [0x07BC850E] (kevuwk) - resolved.
+- 0001915: [Scripting] respawnVehicle respawns vehicle with doors/bonnet/boot missing (Jax) - resolved.
+- 0001913: [Scripting] Boolean event parameters sent between the server and the client are always false (Jax) - resolved.
+- 0001912: [Scripting] Clientside keybinds bound to both keystates crash the client (Jax) - resolved.
+- 0001878: [Scripting] Client-side keybinds crash [Crash ID: 27900	Address: 0x07B671D1] (Jax) - resolved.
+- 0001907: [Scripting] client getVehicleName causes crash [Crash ID: 29031 Address: 0x08EC80D0] (Jax) - resolved.
+- 0001470: [Weapons] Crash on head chop using Katana [0x02A1D3CA & 0x0582DED6] (eAi) - resolved.
+- 0001123: [Vehicles] Passengers trying to get onto bikes will knock off the driver. (eAi) - resolved.
+- 0001744: [Vehicles] Locked Vehicles Able To Be Unlocked By Punching. (Jax) - resolved.
+- 0001408: [Synchronization] Stuntplane smoke isn't showing for remote player(s) (Jax) - resolved.
+- 0001886: [Scripting] getResourceConfig doesn't return a valid xmlnode (kevuwk) - resolved.
+- 0001883: [General] MTA crashes when pressing disconnecting (Jax) - resolved.
+- 0001654: [Scripting] createBlipAttachedTo visibility doesn't work (Jax) - resolved.
+- 0001803: [General] You can kill yourself when you have network trouble (Jax) - resolved.
+- 0001811: [GUI / Menus / Console] Console in GTA splash screen (Jax) - resolved.
+- 0001842: [General] Can't change alpha on checkpoint makers (Jax) - resolved.
+- 0001406: [Weapons] Detonator icon not visible in HUD after satchel charge is thrown (Jax) - resolved.
+- 0001864: [Scripting] getElementPosition returns 0,0,0 for non-hardcoded element types (Jax) - resolved.
+- 0001868: [General] Unwanted marker produced at 0,0,0 with marker creation in close proximity (Jax) - resolved.
+- 0001752: [Scripting] Cursor doesn't disappear on reconnect (Jax) - resolved.
+- 0001840: [Scripting] Debug output for clientside scripts (kevuwk) - resolved.
+- 0001867: [General] Game speed resets to 1 (Jax) - resolved.
+- 0001769: [Scripting] onPlayerTarget isn't always triggered when aiming at an element (Jax) - resolved.
+- 0001863: [Scripting] getColorFromString returns only the first integer (Jax) - resolved.
+- 0001678: [Weapons] Satchel remote detonates all satchels (eAi) - resolved.
+- 0001849: [Scripting] Add createSpawnpoint (jbeta) - resolved.
+- 0001033: [Weapons] Sync projectiles (eAi) - resolved.
+- 0001775: [General] Include resources are loaded BEFORE map elements (kevuwk) - resolved.
+- 0001194: [Synchronization] Sync alternative attacks (eAi) - resolved.
+- 0001847: [Scripting] get/setVehicleLandingGearDown issues (kevuwk) - resolved.
+- 0001684: [Scripting] Lot's of output at the same time crashes the server (IJs) - resolved.
+- 0001833: [Scripting] createElement doesn't return a handle (Jax) - resolved.
+- 0001658: [Vehicles] setElementInterior doesn't work for vehicles (Jax) - resolved.
+- 0001457: [Vehicles] AT-400 entry does not work (Jax) - resolved.
+- 0001845: [General] Ring marker gets created with full alpha (Jax) - resolved.
+- 0001843: [General] "Closest door" text on screen when near vehicle (Jax) - resolved.
+- 0001794: [Vehicles] Warping Player into Vehicle makes vehicle immune (Jax) - resolved.
+- 0001761: [Vehicles] warpPlayerIntoVehicle, streamed out players not seen (Jax) - resolved.
+- 0001808: [GUI / Menus / Console] Connection "cancel" button doesn't work (kevuwk) - resolved.
+- 0001753: [General] Nametag/desync bug (Jax) - resolved.
+- 0001431: [General] Your skin stays the same (locally) after connecting to a different server (or to the same, but after a map change) (Jax) - resolved.
+- 0001804: [GUI / Menus / Console] Remove spectator from controls menu (Jax) - resolved.
+- 0001130: [Vehicles] Water from the firetruck hose only works when you're passenger or driver (ChrML) - resolved.
+- 0001740: [Scripting] xmlNodeGetAttribute ignores spaces in attribute string (IJs) - resolved.
+- 0001772: [GUI / Menus / Console] in chat "/me" not working (Jax) - resolved.
+- 0001768: [Scripting] Cloned custom elements' type can't be retrieved (Jax) - resolved.
+- 0001735: [Weapons] weird screen while aiming (Jax) - resolved.
+- 0001729: [Weapons] Shooting weapons warps remote players (Jax) - resolved.
+- 0001516: [Weapons] Minigun able to freeze another player (Jax) - resolved.
+- 0001728: [Weapons] punching instead of shooting (Jax) - resolved.
+- 0001713: [General] You can't bind 4th and 5th mouse button (Jax) - resolved.
+- 0001722: [Scripting] isElementWithinColShape and getElementsWithinColShape don't recognize vehicles (Jax) - resolved.
+- 0001637: [Scripting] Attaching camera to a player doesn't stream them in (Jax) - resolved.
+- 0001717: [GUI / Menus / Console] Use windows directory variables rather than absolute paths (IJs) - resolved.
+- 0001711: [General] First few shots don't damage armor (Jax) - resolved.
+- 0001712: [Vehicles] cannot warp to inside car (Jax) - resolved.
+- 0001700: [General] Teamchat doesn't work (Jax) - resolved.
+- 0001708: [General] All cars locked by default (Jax) - resolved.
+- 0001707: [GUI / Menus / Console] Error: Connect timed out --> Error: Connection timed out (Jax) - resolved.
+- 0001706: [Synchronization] Locked cars not locked for newly joined players (Jax) - resolved.
+- 0001705: [GUI / Menus / Console] Stuck scoreboard on failed join (Jax) - resolved.
+- 0001698: [Scripting] text displays disappear right after they appeared (Jax) - resolved.
+- 0001703: [Scripting] Text displays broken (Jax) - resolved.
+- 0001613: [General] Giving a knuckle duster causes weapon switching to be disabled (eAi) - resolved.
+- 0001699: [General] Crash when spectating (0x0ADEA7BC ID: 19969-19980) (Jax) - resolved.
+- 0001696: [Scripting] isPlayerScoreboardForced ( player ) doesn't work (Jax) - resolved.
+- 0001697: [Scripting] setClientName doesn't work (Jax) - resolved.
+- 0001679: [General] Weapon skills not assigning sometimes on playerjoin (Jax) - resolved.
+- 0001668: [GUI / Menus / Console] Abnormally long health bar (Jax) - resolved.
+- 0001677: [General] automatic weapon switch toggle? (Jax) - resolved.
+- 0001554: [General] Military installations act as they do in single player (eAi) - resolved.
+- 0001688: [Scripting] Nametag color carries over map changes (Jax) - resolved.
+- 0001682: [General] Quit messages not working correctly (Jax) - resolved.
+- 0001490: [Vehicles] Cars sometimes don't explode (Jax) - resolved.
+- 0001642: [Scripting] setTeamFriendlyFire ( team, bool ) doesn't work (Jax) - resolved.
+- 0001673: [General] LUA ms vs. map file seconds (Jax) - resolved.
+- 0001670: [General] Stats menu appearing (Jax) - resolved.
+- 0001661: [GUI / Menus / Console] Can't type while chat is hidden (Jax) - resolved.
+- 0001108: [GUI / Menus / Console] Tab-character insertion when viewing Player-list while typing. (IJs) - resolved.
+- 0001653: [Weapons] Nightstick spelt wrong (spelt as 'Nitestick') (Jax) - resolved.
+- 0001656: [Scripting] "onTrailerDetach" event should be attached to the trailer, not the tower (Jax) - resolved.
+- 0001646: [Vehicles] Vehicle light state not synced for players on server join (Jax) - resolved.
+- 0001647: [Scripting] Server crash from getWeaponIDFromName (Jax) - resolved.
+- 0001645: [Vehicles] desync while car jacking and laggy movement (Jax) - resolved.
+- 0001591: [Synchronization] Sirens and Horns on vehicles with Sirens (Jax) - resolved.
+- 0001569: [Vehicles] Cars respawn dead (Jax) - resolved.
+- 0001639: [Scripting] setFriendlyFire doesn't work (Jax) - resolved.
+- 0001631: [GUI / Menus / Console] map blocks options menu (Jax) - resolved.
+- 0001627: [General] Blips on entering a server (Jax) - resolved.
+- 0001633: [Scripting] getMarkerType returns bool on "corona" marker type (Jax) - resolved.
+- 0001628: [General] Defining an unbound secondary key does not work in settings menu (Jax) - resolved.
+- 0001629: [Scripting] Event handler related server crash (Jax) - resolved.
+- 0001533: [Vehicles] custom plated dont work immediatly (Jax) - resolved.
+- 0001625: [Scripting] Another server crash (Jax) - resolved.
+- 0001477: [GUI / Menus / Console] Make the rest of the radar icons work (JonChappell) - resolved.
+- 0001588: [Installer] Put Jon's radar icons into the installer package (IJs) - resolved.
+- 0001575: [Scripting] Blips with icons over the ID of 6 cause a crash (JonChappell) - resolved.
+- 0001617: [Synchronization] Vertical angle incorrect when firing without aiming (Jax) - resolved.
+- 0001615: [Synchronization] Incorrect positions for remote players (Jax) - resolved.
+- 0001600: [Vehicles] Hydra spawns with jets up (Jax) - resolved.
+- 0001607: [GUI / Menus / Console] Radar map appears when using full screen map when camera is in "fixed" mode (Jax) - resolved.
+- 0001609: [Scripting] setElementPosition doesn't work for arrow-marker. (Jax) - resolved.
+- 0001605: [Scripting] Map change doesn't fully reset camera functions (Jax) - resolved.
+- 0001616: [GUI / Menus / Console] Healthbar health going out of bounds (Jax) - resolved.
+- 0001394: [Scripting] "Corona" marker types not disappearing (gtasa problem) (eAi) - resolved.
+- 0001219: [General] Strange player warping (Jax) - resolved.
+- 0001612: [Scripting] Col objects exist in all dimensions (Jax) - resolved.
+- 0001608: [Scripting] Stuck controls (Jax) - resolved.
+- 0001604: [Scripting] player tags not showing on people in cars (Jax) - resolved.
+- 0001606: [Scripting] Three keybinds in particular don't work, or are missing. (Jax) - resolved.
+- 0001597: [Scripting] Make team argument optional for spawnpoints - resolved.
+- 0001596: [Scripting] getPlayerTeam() broke within onColShapeHit (Jax) - resolved.
+- 0001599: [Scripting] Script crashes server (Jax) - resolved.
+- 0001593: [Scripting] A12 1011/1010/1009 problems... (Jax) - resolved.
+- 0001594: [Scripting] Don't see interior on spawn (Jax) - resolved.
+- 0001260: [General] Put in interiors (Jax) - resolved.
+- 0001297: [GUI / Menus / Console] Scrolling down in the console using the mouse wheel is impossible (eAi) - resolved.
+- 0001590: [Scripting] getElementsByType doesn't work with "radararea" (Jax) - resolved.
+- 0001551: [General] MTA crashes, instead of exitting (Jax) - resolved.
+- 0001556: [General] Unable to bind some keys / keybinds not working properly (Jax) - resolved.
+- 0001586: [Scripting] Debug box remains after server change (Jax) - resolved.
+- 0001587: [GUI / Menus / Console] Double Clicking '+' icons in Settings->Controls menu causes crash. (Jax) - resolved.
+- 0001555: [Scripting] getWeaponNameFromID deadlocks script if you pass 255 to it (Jax) - resolved.
+- 0001558: [Scripting] Fading a camera to a colour is permanent (Jax) - resolved.
+- 0001572: [General] Can't skip intro movie (Jax) - resolved.
+- 0001582: [Scripting] createTeam() broke (Jax) - resolved.
+- 0001579: [Scripting] destroyElement() doesn't remove Object ingame (Jax) - resolved.
+- 0001307: [GUI / Menus / Console] 'say' command in console does not work properly (ChrML) - resolved.
+- 0001549: [GUI / Menus / Console] Freeze when clicking Settings (IJs) - resolved.
+- 0002749: [Scripting] Events are only cancelled if done from the same resource as they were triggered (Jax) - closed.
+- 0002350: [Scripting] Detachment crash 0x00544403 - closed.
+- 0001126: [Vehicles] Impossible to enter boats (eAi) - closed.
+- 0002412: [Synchronization] Big desyncs and broken stuff - closed.
+- 0002365: [Scripting] Issues with createBlipAttachedTo() - closed.
+- 0002304: [General] Download Error 0000009 - closed.
+- 0002052: [Scripting] setElementPosition has no effect if in vehicle - closed.
+- 0002068: [Scripting] setElementVisibleTo does not work - closed.
+- 0002033: [General] Grouping many resources into one causes un/loading problems. - closed.
