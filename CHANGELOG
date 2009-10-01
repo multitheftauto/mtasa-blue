@@ -42,6 +42,26 @@ Targets:
 - 0004785: [GUI] When taking a photo with the camera, chatbox and gui should be hidden (Jax) - resolved.
 - 0004776: [Weapons] Killing peds (dunno if players too) with sniper rifle cases scope view to get back to follow player (Jax) - resolved.
 
+Resources:
+
+- 0004913: [Optional] Race resource (Mr.Hankey) - resolved.
+- 0005001: [Optional] Players with a High ping get Thrown around thru vehicle changes in Race. (Arc) - resolved.
+- 0005011: [Optional] Collision bug with death or just spawned. in race. (ccw) - resolved.
+- 0005005: [Optional] Ghostmode On in Destruction Derby maps in Race Gamemode. (ccw) - resolved.
+- 0005006: [Optional] Add Race Default Duration to the gamemodes Meta so anyone can change it eaisially. (ccw) - resolved.
+- 0005004: [Optional] Players Quitting restart map votes in Race Gamemode. (ccw) - resolved.
+- 0005009: [Optional] map fails to load correctly in Race Mode. (ccw) - resolved.
+- 0004865: [Optional] Can't move forward with vehicle (ccw) - resolved.
+- 0004894: [Optional] [Race] Make checkpoint blips higher priority than player blips (Arc) - resolved.
+- 0005028: [Optional] Race Timer Ending Restarts vote (Race 465) (ccw) - resolved.
+- 0004952: [Required] Effect of resource "defaultstats" is gone after using resetMapInfo() (ccw) - resolved.
+- 0005014: [Optional] No Respawn race maps do nothing when all players have died. (ccw) - resolved.
+- 0004972: [Optional] Toptimes Recource Needs a deletetime funtion. (ccw) - resolved.
+- 0005000: [Optional] DD Player Bug. (ccw) - resolved.
+- 0004897: [Required] On long-online servers, Votemanager will at some point keep selecting the same resources to vote for. (Arc) - resolved.
+- 0004868: [Optional] ghostmode not working on players who are spawning (race gamemode) (Arc) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.0
 ====================================
 
