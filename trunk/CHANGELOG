@@ -34,13 +34,7 @@ Targets:
 - 0005029: [Client] [Patch] Update (/ver) MTA Copyright. (ccw) - resolved.
 - 0004876: [Client] Crash during Race (ccw) - resolved.
 - 0004874: [Server] setGlitchEnabled is apparently no longer synced (Jax) - resolved.
-- 0004937: [Client] Stealth kill victims turn to south (Jax) - resolved.
 - 0002612: [Scripting] Spawning a player within the ground may damage the player a tiny bit on spawn, with false damage information. (ccw) - resolved.
-- 0004848: [Scripting] colShapes should be made attachable (Jax) - resolved.
-- 0001507: [General] Death Messages not functioning 100% (Jax) - resolved.
-- 0004859: [Scripting] playerSound3D - sound stops when changing to other dimension (Jax) - resolved.
-- 0004785: [GUI] When taking a photo with the camera, chatbox and gui should be hidden (Jax) - resolved.
-- 0004776: [Weapons] Killing peds (dunno if players too) with sniper rifle cases scope view to get back to follow player (Jax) - resolved.
 
 Resources:
 
