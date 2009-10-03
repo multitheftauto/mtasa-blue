@@ -948,6 +948,8 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+        if ( m_bIsBeingDeleted )
+            break;
     }
 }
 
