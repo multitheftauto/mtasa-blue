@@ -2131,6 +2131,10 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ( szButton && szState )
                     {
+                        if ( _isnan( vecCollision.fX ) ) vecCollision.fX = 0;
+                        if ( _isnan( vecCollision.fY ) ) vecCollision.fY = 0;
+                        if ( _isnan( vecCollision.fZ ) ) vecCollision.fZ = 0;
+
                         // Call the event for the client
                         CLuaArguments Arguments;
                         Arguments.PushString ( szButton );
