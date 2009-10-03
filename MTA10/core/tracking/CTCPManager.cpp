@@ -70,6 +70,7 @@ CTCPClientSocket* CTCPManager::CreateClient ( void )
 				// Copy the error details, delete it and return NULL
 				strcpy ( m_szLastError, pSocket->GetLastError () );
 				delete pSocket;
+	            return NULL;
 			}
 			m_pSocket[i] = pSocket;
 			return pSocket;
