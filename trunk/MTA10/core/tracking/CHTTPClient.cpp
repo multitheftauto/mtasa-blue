@@ -50,7 +50,10 @@ bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBuffe
 {
     // Delete any previous socket
     if ( m_pHTTPSocket )
-		delete m_pHTTPSocket;
+    {
+        CTCPManager::GetSingleton ().DestroyClient ( m_pHTTPSocket );
+        m_pHTTPSocket = NULL;
+    }
 
     // Reset
     Reset ();
