@@ -731,6 +731,8 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->CallEventNoParent ( szName, Arguments, pSource );
+            if ( m_bBeingDeleted )
+                break;
         }
     }
 }
