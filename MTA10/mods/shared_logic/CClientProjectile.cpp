@@ -41,16 +41,19 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
     m_pProjectileManager->AddToList ( this );
     m_bLinked = true;
 
-    switch ( pCreator->GetType () )
+    if ( pCreator )
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:               
-            static_cast < CClientPed * > ( pCreator )->AddProjectile ( this );
-            break;
-        case CCLIENTVEHICLE:
-            static_cast < CClientVehicle * > ( pCreator )->AddProjectile ( this );
-            break;
-        default: break;
+        switch ( pCreator->GetType () )
+        {
+            case CCLIENTPLAYER:
+            case CCLIENTPED:               
+                static_cast < CClientPed * > ( pCreator )->AddProjectile ( this );
+                break;
+            case CCLIENTVEHICLE:
+                static_cast < CClientVehicle * > ( pCreator )->AddProjectile ( this );
+                break;
+            default: break;
+        }
     }
 }
 
