@@ -45,6 +45,7 @@ public:
     void						SetColor                ( RGBA rgbaColor );
     void						SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { SetColor ( COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha ) ); };
     void                        SetColorAlpha           ( unsigned char ucAlpha );
+    void                        SetShadowAlpha          ( unsigned char ucShadowAlpha );
 
 	inline float                GetScale                ( void )                                { return m_fScale; };
     void                        SetScale                ( float fScale );
@@ -63,6 +64,7 @@ private:
     float                       m_fScale;
 
     unsigned long               m_ulFormat;
+    unsigned char               m_ucShadowAlpha;
 
     std::list < CClientTextDisplayEffect* > m_EffectList;
     static float                m_fGlobalScale;

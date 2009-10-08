@@ -14,7 +14,7 @@
 
 unsigned long ulUniqueId = 0;
 
-CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, float fScale, unsigned char ucFormat )
+CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, float fScale, unsigned char ucFormat, unsigned char ucShadowAlpha )
 {
     // Assign us an unique ID
     m_ulUniqueId = ulUniqueId++;
@@ -40,6 +40,7 @@ CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPr
     m_fScale = fScale;
     m_ucFormat = ucFormat;
     m_Priority = Priority;
+    m_ucShadowAlpha = ucShadowAlpha;
     m_bDeletable = false;
 }
 
@@ -68,6 +69,7 @@ CTextItem::CTextItem ( const CTextItem& TextItem )
     m_fScale = TextItem.m_fScale;
     m_ucFormat = TextItem.m_ucFormat;
     m_Priority = TextItem.m_Priority;
+    m_ucShadowAlpha = TextItem.m_ucShadowAlpha;
     m_bDeletable = TextItem.m_bDeletable;
 }
 
@@ -98,6 +100,7 @@ bool CTextItem::operator= ( const CTextItem& TextItem )
     m_fScale = TextItem.m_fScale;
     m_ucFormat = TextItem.m_ucFormat;
     m_Priority = TextItem.m_Priority;
+    m_ucShadowAlpha = TextItem.m_ucShadowAlpha;
     m_bDeletable = TextItem.m_bDeletable;
     m_Observers.clear ();
 
