@@ -20,7 +20,7 @@ class CServerTextItemPacket : public CPacket
 {
 public:
                             CServerTextItemPacket       ( void );
-                            CServerTextItemPacket       ( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, char* szText );
+                            CServerTextItemPacket       ( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, unsigned char ucShadowAlpha, char* szText );
                             ~CServerTextItemPacket      ( void );
 
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_TEXT_ITEM; };
@@ -37,6 +37,7 @@ private:
     unsigned char           m_alpha;
     float                   m_fScale;
     unsigned char           m_ucFormat;
+    unsigned char           m_ucShadowAlpha;
     unsigned long           m_ulUniqueId;
     bool                    m_bDeletable;
 };

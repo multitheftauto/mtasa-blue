@@ -3487,7 +3487,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
             float               fX = 0;
             float               fY = 0;
             float               fScale = 0;
-            unsigned char       ucRed=0, ucGreen=0, ucBlue=0, ucAlpha=0, ucFormat=0;
+            unsigned char       ucRed=0, ucGreen=0, ucBlue=0, ucAlpha=0, ucFormat=0, ucShadowAlpha=0;
 
             bitStream.Read ( fX );
             bitStream.Read ( fY );
@@ -3497,6 +3497,8 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
             bitStream.Read ( ucBlue );
             bitStream.Read ( ucAlpha );
             bitStream.Read ( ucFormat );
+            if ( bitStream.Version() >= 0x03 )
+                bitStream.Read ( ucShadowAlpha );
 
             // Read out the text size
             unsigned short usTextLength = 0;
@@ -3531,6 +3533,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
                 pTextDisplay->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
                 pTextDisplay->SetScale ( fScale );
                 pTextDisplay->SetFormat ( ( unsigned long ) ucFormat );
+                pTextDisplay->SetShadowAlpha ( ucShadowAlpha );
 
                 delete [] szText;
             }

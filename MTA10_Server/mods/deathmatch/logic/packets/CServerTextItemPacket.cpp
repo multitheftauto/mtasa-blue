@@ -19,7 +19,7 @@ CServerTextItemPacket::CServerTextItemPacket( void )
 }
 
 
-CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, char* szText )
+CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, unsigned char ucShadowAlpha, char* szText )
 {
     m_ulUniqueId = ulUniqueId;
     m_bDeletable = bDeleteable;
@@ -31,6 +31,7 @@ CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDe
     m_blue = blue;
     m_alpha = alpha;
     m_ucFormat = format;
+    m_ucShadowAlpha = ucShadowAlpha;
     m_szText = new char [strlen ( szText ) + 1];
     strcpy ( m_szText, szText );
 }
@@ -63,6 +64,8 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
         BitStream.Write ( m_blue );
         BitStream.Write ( m_alpha );
         BitStream.Write ( m_ucFormat );
+        if ( BitStream.Version() >= 0x03 )
+            BitStream.Write ( m_ucShadowAlpha );
 
         // Grab the text length
         size_t sizeText = strlen ( m_szText );

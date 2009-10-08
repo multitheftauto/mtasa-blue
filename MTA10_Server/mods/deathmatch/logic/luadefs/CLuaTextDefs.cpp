@@ -97,6 +97,7 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     unsigned char alpha = 255;
     float scale = 1.0f;
     unsigned char format = 0;
+    unsigned char ucShadowAlpha = 0;
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
         szText = lua_tostring ( luaVM, 1 );
 
@@ -150,12 +151,14 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
         else if ( !stricmp ( szTemp, "bottom" ) )
             format |= 0x00000008; // DT_BOTTOM
     }
+    if ( lua_type ( luaVM, 12 ) == LUA_TNUMBER )
+        ucShadowAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 12 ) );
 
     // Grab our virtual machine
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( luaMain )
     {
-        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, red, green, blue, alpha, scale, format );
+        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, red, green, blue, alpha, scale, format, ucShadowAlpha );
         lua_pushtextitem ( luaVM, pTextItem );
         return 1;
     }

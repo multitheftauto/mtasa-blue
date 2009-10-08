@@ -152,13 +152,20 @@ void CClientTextDisplay::Render ( bool bPulseEffects )
 			if ( m_ulFormat & DT_BOTTOM )
 				m_ulFormat |= DT_SINGLELINE;
 
+            unsigned int uiShadowOffset = Max < unsigned int > ( 1, m_fScale * m_fGlobalScale );
+            SColorRGBA rgbaShadowColor( 0, 0, 0, m_rgbaColor.A * m_ucShadowAlpha / 255 );
+
 			if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
 			{
+                if ( rgbaShadowColor.A > 0 )
+                    g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
 			    g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17, uiY, uiX - 17, uiY, m_rgbaColor, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
 			}
 			else
 			{				
-				g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_rgbaColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+                if ( rgbaShadowColor.A > 0 )
+                    g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+                g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_rgbaColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
 			}
 		}
     }
@@ -174,6 +181,11 @@ void CClientTextDisplay::SetColorAlpha ( unsigned char ucAlpha )
     SColor color = GetColor ();
     color.A = ucAlpha;
     SetColor ( color );
+}
+
+void CClientTextDisplay::SetShadowAlpha ( unsigned char ucShadowAlpha )
+{
+    m_ucShadowAlpha = ucShadowAlpha;
 }
 
 void CClientTextDisplay::SetScale ( float fScale )

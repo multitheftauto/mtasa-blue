@@ -32,7 +32,7 @@ class CTextItem
     friend class CPlayerTextManager;
 
 public:
-                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255, unsigned char ucAlpha = 255, float fScale = 1.0f, unsigned char ucFormat = 0 );
+                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255, unsigned char ucAlpha = 255, float fScale = 1.0f, unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0 );
                             CTextItem               ( const CTextItem& TextItem );
                             ~CTextItem              ( void );
 
@@ -68,6 +68,7 @@ private:
     unsigned char               m_ucAlpha;
     float                       m_fScale;
     unsigned char               m_ucFormat;
+    unsigned char               m_ucShadowAlpha;
     unsigned long               m_ulUniqueId;
     eTextPriority               m_Priority;
     bool                        m_bDeletable;
