@@ -71,6 +71,8 @@ public:
     inline void                                 SetGameVersion              ( int iGameVersion )                    { m_iGameVersion = iGameVersion; };
     inline unsigned short                       GetMTAVersion               ( void )                                { return m_usMTAVersion; };
     inline void                                 SetMTAVersion               ( unsigned short usMTAVersion )         { m_usMTAVersion = usMTAVersion; };
+    inline unsigned short                       GetBitStreamVersion         ( void )                                { return m_usBitStreamVersion; };
+    inline void                                 SetBitStreamVersion         ( unsigned short usBitStreamVersion )   { m_usBitStreamVersion = usBitStreamVersion; };
 
     inline bool                                 IsMuted                     ( void )                                { return m_bIsMuted; };
     inline void                                 SetMuted                    ( bool bSetMuted )                      { m_bIsMuted = bSetMuted; };
@@ -221,6 +223,7 @@ private:
     bool                                        m_bDoNotSendEntities;
     int                                         m_iGameVersion;
     unsigned short                              m_usMTAVersion;
+    unsigned short                              m_usBitStreamVersion;
     bool                                        m_bIsMuted;
     int                                         m_iStatus;
     

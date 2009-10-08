@@ -16,8 +16,6 @@
 #include "net/packetenums.h"
 #include "ns_playerid.h"
 
-#define MTA_DM_NET_MODULE_VERSION   0x0000B
-
 const NetServerPlayerID NET_INVALID_PLAYER_ID;
 #define NET_INVALID_PLAYER_INDEX 255;
 

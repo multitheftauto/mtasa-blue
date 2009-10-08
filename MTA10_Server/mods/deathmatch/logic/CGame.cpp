@@ -468,7 +468,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 								"= HTTP port		: %u\n" \
 								"===========================================================\n",
 
-                                MTA_DM_VERSIONSTRING,
+                                MTA_DM_BUILDTAG_LONG,
 								m_pMainConfig->GetServerName ().c_str (),
 								szServerIP ? szServerIP : "",
 								usServerPort,
@@ -1078,6 +1078,9 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         #endif
     }
 
+    // Tell net module connection version info will no longer be required
+    g_pNetServer->ClearClientBitStreamVersion ( Player.GetSocket () );
+
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
     m_ElementDeleter.Delete ( &Player, false );
 }
@@ -1166,11 +1169,13 @@ void CGame::AddBuiltInEvents ( void )
 void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
 {
     // Reply with the mod this server is running
-    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ();
+    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( 0 );
     if ( pBitStream )
     {
         // Write the mod name to the bitstream
         pBitStream->Write ( const_cast < char* > ( "deathmatch" ), 10 );
+        pBitStream->Write ( static_cast < char > ( 0 ) );
+        pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
 
         // Send and destroy the bitstream
         g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream );
@@ -1259,7 +1264,11 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 								pPlayer->SetNick ( szNick );
 								pPlayer->SetGameVersion ( Packet.GetGameVersion () );
 								pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
+								pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
 								pPlayer->SetSerialUser ( Packet.GetSerialUser () );
+
+                                // Set the bitstream version number for this connection
+                                g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
 
                                 // Get the serial number from the packet source
                                 NetServerPlayerID p = Packet.GetSourceSocket ();

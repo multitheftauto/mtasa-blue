@@ -18,8 +18,8 @@
 class CBitStream
 {
 public:
-    inline                          CBitStream  ( void )    { pBitStream = g_pNetServer->AllocateNetServerBitStream (); };
-    inline                          ~CBitStream ( void )    { g_pNetServer->DeallocateNetServerBitStream ( pBitStream ); };
+    inline                          CBitStream  ( unsigned short usBitStreamVersion = 0 )   { pBitStream = g_pNetServer->AllocateNetServerBitStream ( usBitStreamVersion ); };
+    inline                          ~CBitStream ( void )                                    { g_pNetServer->DeallocateNetServerBitStream ( pBitStream ); };
 
     NetBitStreamInterface*          pBitStream;
 };

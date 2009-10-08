@@ -507,6 +507,8 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             // Append version information
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_NETCODE_VERSION ) );
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_VERSION ) );
+            if ( pBitStream->Version () >= 0x02 )
+                pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details

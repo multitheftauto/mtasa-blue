@@ -83,7 +83,7 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
             // Add a log entry.
             char szFilename [256];
-            sprintf ( szFilename, "dumps/server_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTYPE,
+            sprintf ( szFilename, "dumps/server_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG,
                                                                                SystemTime.wMonth,
                                                                                SystemTime.wDay,
                                                                                SystemTime.wYear,

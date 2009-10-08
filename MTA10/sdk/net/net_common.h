@@ -19,8 +19,6 @@
 #include "net/bitstream.h"
 #include "net/packetenums.h"
 
-#define MTA_DM_CLIENT_NET_MODULE_VERSION   0x000B
-
 #define CNET_DOWNLOAD_INVALID		65535
 
 #define NET_CLIENT_PORT				0 // 0 will allow it to automatically choose a port, otherwise, use the value specific

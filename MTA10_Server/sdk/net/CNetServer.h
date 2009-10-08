@@ -34,7 +34,7 @@ public:
 
 	virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
 
-	virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( void ) = 0;
+	virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
 	virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
 	virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
 
@@ -57,6 +57,10 @@ public:
     virtual bool                            AutoPatcherRemoveFile           ( char* szFile ) = 0;
 
     virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( void ) = 0;
+
+    virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
+    virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
+    virtual unsigned short                  GetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID ) = 0;
 };
 
 #endif

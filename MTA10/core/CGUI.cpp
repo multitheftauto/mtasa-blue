@@ -72,7 +72,7 @@ void CLocalGUI::CreateWindows ( void )
 
 	// Create the overlayed version labels
 	CVector2D ScreenSize = pGUI->GetResolution ();
-    m_pLabelVersionTag = reinterpret_cast < CGUILabel* > ( pGUI->CreateLabel ( SString("MTA:SA %s %s", MTA_DM_VERSIONSTRING, stricmp ( MTA_DM_BUILDTYPE, "Release" ) ? MTA_DM_BUILDTYPE : "" ).c_str() ) );
+    m_pLabelVersionTag = reinterpret_cast < CGUILabel* > ( pGUI->CreateLabel ( "MTA:SA " MTA_DM_BUILDTAG_SHORT ) );
 	m_pLabelVersionTag->SetSize ( CVector2D ( 150, 18 ) );
 	m_pLabelVersionTag->SetPosition ( CVector2D ( ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15 ) );
 	m_pLabelVersionTag->SetAlpha ( 0.5f );

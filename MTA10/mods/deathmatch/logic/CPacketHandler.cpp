@@ -209,7 +209,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
      */
 
     // Extract the version string
-    char szVersionString [48];
+    char szVersionString [128];
     szVersionString[0] = '\0';
 
     unsigned short ucSize = 0;

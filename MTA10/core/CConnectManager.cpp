@@ -243,6 +243,15 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             memset ( szModName, 0, BitStream.GetNumberOfBytesUsed () + 1 );
             if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
             {
+                // Backward compatibly examine the bytes following the mod name
+                BitStream.ResetReadPointer ();
+                BitStream.Read ( szModName, strlen ( szModName ) );
+                char cPad;
+                BitStream.Read ( cPad );
+                unsigned short usServerBitStreamVersion = 0x01;
+                BitStream.Read ( usServerBitStreamVersion );    // This will silently fail for < 1.0.2 and leave the bitstream version at 0x01
+                CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
+
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
