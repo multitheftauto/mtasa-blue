@@ -52,7 +52,7 @@ class CCore;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_VERSIONSTRING " " MTA_DM_BUILDTYPE "\n" \
+#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
                                 "Copyright (C) 2003 - 2009 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)

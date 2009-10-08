@@ -143,6 +143,7 @@ public:
         return false;
     }
 
+    virtual unsigned short Version                  ( void ) const = 0;
 };
 
 // Interface for all sync structures

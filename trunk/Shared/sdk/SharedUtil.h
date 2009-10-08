@@ -212,6 +212,12 @@ namespace SharedUtil
         void*       m_pCriticalSection;
     };
 
+
+    //
+    // Expiry stuff
+    //
+    int GetDaysUntilExpire ( void );
+
 };
 
 using namespace SharedUtil;

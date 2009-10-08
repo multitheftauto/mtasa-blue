@@ -34,7 +34,7 @@ public:
     inline void             SetGameVersion              ( unsigned char ucGameVersion )     { m_ucGameVersion = ucGameVersion; };
 
     inline unsigned short   GetMTAVersion               ( void )                            { return m_usMTAVersion; };
-    inline void             SetMTAVersion               ( unsigned short usMTAVersion )     { m_usMTAVersion = usMTAVersion; };
+    inline unsigned short   GetBitStreamVersion         ( void )                            { return m_usBitStreamVersion; };
 
     inline const char*      GetNick                     ( void )                            { return m_szNick; };
     inline void             SetNick                     ( const char* szNick )              { strncpy ( m_szNick, szNick, MAX_NICK_LENGTH ); };
@@ -48,6 +48,7 @@ public:
 private:
     unsigned short          m_usNetVersion;
     unsigned short          m_usMTAVersion;
+    unsigned short          m_usBitStreamVersion;
     unsigned char           m_ucGameVersion;
     char                    m_szNick [MAX_NICK_LENGTH + 1];
     MD5                     m_Password;

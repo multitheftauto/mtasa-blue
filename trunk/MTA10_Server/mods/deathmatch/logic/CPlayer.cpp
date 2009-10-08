@@ -31,6 +31,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_szNick [0] = 0;
     m_iGameVersion = 0;
     m_usMTAVersion = 0;
+    m_usBitStreamVersion = 0;
     m_bIsMuted = false;
     m_lMoney = 0;
     m_bNametagColorOverridden = false;
@@ -217,7 +218,7 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
     }
 
     // Allocate a bitstream for it
-    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ();
+    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( GetBitStreamVersion () );
     if ( pBitStream )
     {
         // Write the content to it and send it
