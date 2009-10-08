@@ -16,6 +16,8 @@
 
 CTCPClientSocketImpl::CTCPClientSocketImpl ( void )
 {
+    m_iRefCount = 1;
+
 	// Init
 	m_bIsConnected = false;
 	m_Socket = 0;
@@ -32,6 +34,8 @@ CTCPClientSocketImpl::CTCPClientSocketImpl ( void )
 
 CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
 {
+    assert ( m_iRefCount == 0 );
+
     // Free our socket
     if ( m_Socket )
     {
@@ -40,6 +44,16 @@ CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
     }
 }
 
+void CTCPClientSocketImpl::AddRef ( void )
+{
+    m_iRefCount++;
+}
+
+void CTCPClientSocketImpl::Release ( void )
+{
+    if ( !--m_iRefCount )
+        delete this;
+}
 
 bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
 {

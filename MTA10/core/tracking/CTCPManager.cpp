@@ -38,9 +38,7 @@ CTCPManager::~CTCPManager ( )
 	// Clean up the array of socket pointers
 	for ( unsigned int i = 0; i < 255; i++ )
 	{
-		if ( m_pSocket[i] != NULL )
-			delete m_pSocket[i];
-		m_pSocket[i] = NULL;
+        SAFE_RELEASE ( m_pSocket[i] )
 	}
 }
 
@@ -69,7 +67,7 @@ CTCPClientSocket* CTCPManager::CreateClient ( void )
 			{
 				// Copy the error details, delete it and return NULL
 				strcpy ( m_szLastError, pSocket->GetLastError () );
-				delete pSocket;
+                SAFE_RELEASE ( pSocket )
 	            return NULL;
 			}
 			m_pSocket[i] = pSocket;
@@ -95,8 +93,7 @@ bool CTCPManager::DestroyClient ( CTCPClientSocket* pClient )
 		{
 			if ( m_pSocket[i] == pClient ) {
 				CCore::GetSingleton().GetConsole()->Printf("Async socket #%u was destroyed.\n", i);
-				delete m_pSocket[i];
-				m_pSocket[i] = NULL;
+                SAFE_RELEASE( m_pSocket[i] )
 				return true;
 			}
 		}

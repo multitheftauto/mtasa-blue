@@ -23,8 +23,11 @@ typedef void (*PFNEVENT) ( void *, void * );
 
 class CTCPSocket
 {
-public:
+protected:
     virtual					~CTCPSocket         ( void ) {};
+public:
+    virtual void            AddRef              ( void ) = 0;
+    virtual void            Release             ( void ) = 0;
 
     virtual int				ReadBuffer          ( void* pOutput, int iSize ) = 0;
     virtual int				WriteBuffer         ( const void* pInput, int iSize ) = 0;
