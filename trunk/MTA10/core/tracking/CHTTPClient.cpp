@@ -27,8 +27,7 @@ CHTTPClient::CHTTPClient ( void )
 
 CHTTPClient::~CHTTPClient ( void )
 {
-	if ( m_pHTTPSocket )
-		delete m_pHTTPSocket;
+    SAFE_RELEASE ( m_pHTTPSocket )
 }
 
 
@@ -52,7 +51,7 @@ bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBuffe
     if ( m_pHTTPSocket )
     {
         CTCPManager::GetSingleton ().DestroyClient ( m_pHTTPSocket );
-        m_pHTTPSocket = NULL;
+        SAFE_RELEASE ( m_pHTTPSocket )
     }
 
     // Reset
@@ -98,6 +97,8 @@ bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBuffe
         m_strStatus = "error: " + std::string ( m_pHTTPSocket->GetLastError () );
         return false;
     }
+
+    m_pHTTPSocket->AddRef ();
 
 	// Create events
 	m_pHTTPSocket->SetEventClass ( this );
@@ -228,8 +229,9 @@ void CHTTPClient::OnClose ( void* pSocketPtr, void* pClassPtr )
         pClass->m_bCompleted = true;
 
 		// Destroy the socket
+        assert ( pClass->m_pHTTPSocket == pSocket );
 		CTCPManager::GetSingleton ().DestroyClient ( pSocket );
-        pClass->m_pHTTPSocket = NULL;
+        SAFE_RELEASE ( pClass->m_pHTTPSocket )
 	}
 }
 

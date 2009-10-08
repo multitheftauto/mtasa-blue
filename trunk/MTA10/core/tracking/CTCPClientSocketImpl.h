@@ -31,7 +31,11 @@ class CTCPClientSocketImpl : public CTCPClientSocket
 {
 public:
                     CTCPClientSocketImpl            ( void );
+protected:
                     ~CTCPClientSocketImpl           ( void );
+public:
+    void            AddRef                          ( void );
+    void            Release                         ( void );
 
     bool            Connect                         ( const char* szHost, unsigned short usPort );
     bool            Disconnect                      ( void );
@@ -55,6 +59,7 @@ public:
 	void			SetEventClose					( PFNEVENT pEvent );
 
 private:
+    int             m_iRefCount;
     bool            m_bIsConnected;
     char            m_szLastError [128];
 

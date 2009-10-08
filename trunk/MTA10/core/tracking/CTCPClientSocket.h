@@ -17,8 +17,9 @@
 
 class CTCPClientSocket : public CTCPSocket
 {
-public:
+protected:
     virtual                 ~CTCPClientSocket           ( void ) {};
+public:
 
     virtual bool            Connect                     ( const char* szHost, unsigned short usPort ) = 0;
     virtual bool            Disconnect                  ( void ) = 0;
