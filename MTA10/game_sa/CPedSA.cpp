@@ -263,6 +263,7 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
 		call	dwFunc
 		add		esp, 20
 	}
+#if 0   // Removed to see if it reduces crashes
 	dwFunc = 0x441440; // CGameLogic::SortOutStreamingAndMemory
 	fUnk = 10.0f;
 	_asm
@@ -272,7 +273,7 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
 		call	dwFunc
 		add		esp, 8
 	}
-
+#endif
     dwFunc = FUNC_RemoveGogglesModel;
     _asm
     {
