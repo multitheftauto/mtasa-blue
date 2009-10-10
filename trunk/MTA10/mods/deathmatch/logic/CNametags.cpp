@@ -429,12 +429,6 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     float fMaxHealth = pPlayer->GetMaxHealth ();
     float fHealth = pPlayer->GetHealth ();
     float fArmor = pPlayer->GetArmor ();
-    // Calculate 'pretend' armor and health scale to apply visual feedback of likely damage to remote players
-    float fPretendArmor;
-    float fPretendHealth;
-    pPlayer->GetPretendHealthAndArmor ( &fPretendHealth, &fPretendArmor );
-    float fPretendArmorScale  = fArmor  > 0.0f ? fPretendArmor  / fArmor  : 1.0f;
-    float fPretendHealthScale = fHealth > 0.0f ? fPretendHealth / fHealth : 1.0f;
 
     // Recalculate that to be within 0-100
     fHealth = fHealth / fMaxHealth * 100;
@@ -500,10 +494,10 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             float fWidth = fResWidth * 0.060f;
             float fTopOffset = fResHeight * 0.025f;
             float fSizeIncreaseBorder = fResWidth * 0.003f;
-            float fRemovedWidth = fWidth - (fHealth * fPretendHealthScale / 512.0f * fWidth);
+            float fRemovedWidth = fWidth - (fHealth / 512.0f * fWidth);
             float fTopArmorOffset = fTopOffset + fHeight - 0.01f * fResWidth;
             float fMaxArmor = 100.0f;
-            float fArmorAlpha = ( fArmor * fPretendArmorScale / fMaxArmor ) * ( ( float ) ucAlpha / 255.0f ); // 0->1
+            float fArmorAlpha = ( fArmor / fMaxArmor ) * ( ( float ) ucAlpha / 255.0f ); // 0->1
             unsigned char ucArmorAlpha = ( unsigned char ) ( 255.0f * fArmorAlpha );
 
             #define ARMOR_BORDER_COLOR COLOR_ARGB(ucArmorAlpha,167,177,179)
