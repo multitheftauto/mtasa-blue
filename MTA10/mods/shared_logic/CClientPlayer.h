@@ -101,10 +101,6 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
-    void                            AddPretendDamage        ( float fDamage, unsigned long ulLatency );
-    void                            GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor );
-    float                           GetTotalPretendDamage   ( void );
-
 private:
     bool                            m_bIsLocalPlayer;
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
@@ -158,18 +154,6 @@ public:
     inline void                     SetShowingWepdata       ( bool bState ) { m_bShowingWepdata = bState; }
     inline bool                     IsShowingWepdata        ( ) const       { return m_bShowingWepdata; }
 #endif
-
-    // For instant feedback on damage caused to remote players
-    struct SPretendDamage
-    {
-        SPretendDamage ( float fInDamage, unsigned long ulInExpireTime ) : fDamage ( fInDamage ), ulExpireTime ( ulInExpireTime ) {}
-        float           fDamage;
-        unsigned long   ulExpireTime;
-    };
-
-    std::vector < SPretendDamage >  m_PretendDamageList;
-    float                           m_fPretendHealthSmoothed;
-    float                           m_fPretendArmorSmoothed;
 
 };
 
