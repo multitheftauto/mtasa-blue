@@ -7550,6 +7550,13 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         }
 
         // Call the event
+        CLuaArguments Arguments1;
+        Arguments1.PushUserData ( pBan );
+        if ( pResponsible )
+            Arguments1.PushUserData ( pResponsible );
+        m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments1 );
+
+        // Call the event
         CLuaArguments Arguments;
         Arguments.PushUserData ( pBan );
         if ( pResponsible )
