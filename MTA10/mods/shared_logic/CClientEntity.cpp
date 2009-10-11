@@ -165,6 +165,9 @@ CClientEntity::~CClientEntity ( void )
         SetCollidableWith ( pEntity, true );
     }
 
+    // Ensure not referenced in the disabled collisions list
+    assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
+
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
 }
@@ -1445,12 +1448,13 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     if ( bCanCollide )
     {
         MapRemove ( m_DisabledCollisions, pEntity );
-        MapRemove ( g_pClientGame->m_AllDisabledCollisions, pEntity );
+        if ( m_DisabledCollisions.empty () )
+            MapRemove ( g_pClientGame->m_AllDisabledCollisions, this );
     }
     else
     {
         MapSet ( m_DisabledCollisions, pEntity, true );
-        MapSet ( g_pClientGame->m_AllDisabledCollisions, pEntity, true );
+        MapSet ( g_pClientGame->m_AllDisabledCollisions, this, true );
     }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
