@@ -16,6 +16,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::vector;
 
 extern CClientGame* g_pClientGame;
 
@@ -958,7 +959,7 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClos
     float fClosestDistance = 0.0f;
     CVector vecVehiclePosition;
     CClientVehicle* pTempVehicle = NULL;
-    list < CClientVehicle * > ::const_iterator iter, listEnd;
+    vector < CClientVehicle * > ::const_iterator iter, listEnd;
     if ( bCheckStreamedOutVehicles )
     {
         iter = m_pManager->GetVehicleManager ()->IterBegin ();

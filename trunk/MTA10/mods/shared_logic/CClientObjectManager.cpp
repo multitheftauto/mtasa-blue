@@ -16,6 +16,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::vector;
 
 static unsigned int g_uiValidObjectModels[] = {
     2, 0, 0, 0, 0, 0, 0, 0, 0, -4096, -1053185, 4194303, 16127, 0, 0, 0, 0, 0, 0, -128,
@@ -115,7 +116,7 @@ void CClientObjectManager::DoPulse ( void )
 
     CClientObject * pObject = NULL;
     // Loop through all our streamed-in objects
-    list < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
+    vector < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end () ; ++iter )
     {
         pObject = *iter;
@@ -161,7 +162,7 @@ CClientObject* CClientObjectManager::Get ( CObject* pObject, bool bValidatePoint
 
     if ( bValidatePointer )
     {
-        list < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
+        vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
         for ( ; iter != m_StreamedIn.end (); iter++ )
         {
             if ( (*iter)->GetGameObject () == pObject )
@@ -183,7 +184,7 @@ CClientObject* CClientObjectManager::GetSafe ( CEntity * pEntity )
     if ( !pEntity ) return NULL;
 
 
-    list < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
+    vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end (); iter++ )
     {
         if ( dynamic_cast < CEntity * > ( (*iter)->GetGameObject () ) == pEntity )
@@ -323,7 +324,7 @@ void CClientObjectManager::OnCreation ( CClientObject * pObject )
 
 void CClientObjectManager::OnDestruction ( CClientObject * pObject )
 {
-    m_StreamedIn.remove ( pObject );
+    ListRemove ( m_StreamedIn, pObject );
     UpdateLimitInfo ();
 }
 

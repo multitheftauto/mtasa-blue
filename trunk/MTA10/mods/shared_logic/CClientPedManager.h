@@ -36,10 +36,10 @@ public:
 
     bool                            Exists                          ( CClientPed* pPed );
 
-    std::list < CClientPed* > ::const_iterator  IterBegin           ( void ) { return m_List.begin (); };
-    std::list < CClientPed* > ::const_iterator  IterEnd             ( void ) { return m_List.end (); };
-    std::list < CClientPed* > ::const_iterator  StreamedBegin       ( void ) { return m_StreamedIn.begin (); };
-    std::list < CClientPed* > ::const_iterator  StreamedEnd         ( void ) { return m_StreamedIn.end (); };
+    std::vector < CClientPed* > ::const_iterator  IterBegin         ( void ) { return m_List.begin (); };
+    std::vector < CClientPed* > ::const_iterator  IterEnd           ( void ) { return m_List.end (); };
+    std::vector < CClientPed* > ::const_iterator  StreamedBegin     ( void ) { return m_StreamedIn.begin (); };
+    std::vector < CClientPed* > ::const_iterator  StreamedEnd       ( void ) { return m_StreamedIn.end (); };
 
 protected:
                                     CClientPedManager               ( class CClientManager* pManager );
@@ -52,8 +52,8 @@ protected:
     void                            OnDestruction                   ( CClientPed * pPed );
 
     CClientManager*                 m_pManager;
-    std::list < CClientPed* >       m_List;    
-    std::list < CClientPed* >       m_StreamedIn;
+    std::vector < CClientPed* >     m_List;    
+    std::vector < CClientPed* >     m_StreamedIn;
     bool                            m_bRemoveFromList;
 };
 

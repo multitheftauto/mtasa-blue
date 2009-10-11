@@ -67,7 +67,7 @@ void CClientObject::Unlink ( void )
 {
     m_pObjectManager->RemoveFromList ( this );
     m_pObjectManager->m_Attached.remove ( this );
-    m_pObjectManager->m_StreamedIn.remove ( this );
+    ListRemove ( m_pObjectManager->m_StreamedIn, this );
 }
 
 

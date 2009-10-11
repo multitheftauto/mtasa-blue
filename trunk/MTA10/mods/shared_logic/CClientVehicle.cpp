@@ -207,7 +207,7 @@ void CClientVehicle::Unlink ( void )
 {
     m_pVehicleManager->RemoveFromList ( this );
     m_pVehicleManager->m_Attached.remove ( this );
-    m_pVehicleManager->m_StreamedIn.remove ( this );
+    ListRemove( m_pVehicleManager->m_StreamedIn, this );
 }
 
 
