@@ -181,7 +181,7 @@ inline float GetOffsetDegrees ( float a, float b )
 template < class T >
 bool ListContains ( std::list < T >& itemList, const T& item )
 {
-    std::list < T > ::iterator it = itemList.begin ();
+    std::list < T > ::const_iterator it = itemList.begin ();
     for ( ; it != itemList.end () ; it++ )
         if ( item == *it )
             return true;
@@ -190,18 +190,19 @@ bool ListContains ( std::list < T >& itemList, const T& item )
 
 // std::vector wrappers
 template < class T >
-bool VectorContains ( std::vector < T >& itemList, const T& item )
+bool ListContains ( std::vector < T >& itemList, const T& item )
 {
-    std::vector < T > ::iterator it = itemList.begin ();
+    std::vector < T > ::const_iterator it = itemList.begin ();
     for ( ; it != itemList.end () ; it++ )
         if ( item == *it )
             return true;
     return false;
 }
+
 template < class T >
-void VectorRemove ( std::vector < T >& itemList, const T& item )
+void ListRemove ( std::vector < T >& itemList, const T& item )
 {
-    std::vector < T > ::iterator it = itemList.begin ();
+    std::vector < T > ::const_iterator it = itemList.begin ();
     for ( ; it != itemList.end () ; it++ )
         if ( item == *it )
         {
@@ -226,7 +227,7 @@ bool MapContains ( std::map < T, V >& collection, const T& key )
 template < class T, class V >
 void MapRemove ( std::map < T, V >& collection, const T& key )
 {
-    std::map < T, V > ::iterator it = collection.find ( key );
+    std::map < T, V > ::const_iterator it = collection.find ( key );
     if ( it != collection.end () )
         collection.erase ( it );
 }

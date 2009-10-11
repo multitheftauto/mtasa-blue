@@ -25,6 +25,7 @@
 
 using SharedUtil::CalcMTASAPath;
 using std::list;
+using std::vector;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
 #pragma warning(disable:4312)
@@ -1668,7 +1669,7 @@ void CClientGame::UpdateTrailers ( void )
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
     unsigned long ulIllegalTowBreakTime;
-    list < CClientVehicle* > ::iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
+    vector < CClientVehicle* > ::iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
     for ( ; iterVehicles != m_pVehicleManager->StreamedEnd (); iterVehicles++ )
     {
         pVehicle = *iterVehicles;
@@ -4649,7 +4650,7 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
     }
 
     CClientVehicle* pVehicle = NULL;
-    list < CClientVehicle* > ::iterator iterVehicle = m_pVehicleManager->IterBegin ();
+    vector < CClientVehicle* > ::iterator iterVehicle = m_pVehicleManager->IterBegin ();
     for ( ; iterVehicle != m_pVehicleManager->IterEnd (); iterVehicle++ )
     {
         // Grab the game address of the vehicle
