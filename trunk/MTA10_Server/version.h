@@ -13,7 +13,14 @@
 #define QUOTE_DEFINE2(c) #c
 #define QUOTE_DEFINE(x) QUOTE_DEFINE2(x)
 
-#if defined(BUILD_CONFIG_)
+#if !defined(WIN32)
+    // Only one type of build for non-windows servers
+    #define MTA_DM_BUILDTYPE        ""
+    #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING
+    #define MTA_DM_BUILDTAG_LONG    MTA_DM_VERSIONSTRING
+    #define MTA_DM_CONNECT_TO_PUBLIC
+
+#elif defined(BUILD_CONFIG_)
 
     #define MTA_DM_BUILDTYPE        "Custom"
     #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING "-" MTA_DM_BUILDTYPE
