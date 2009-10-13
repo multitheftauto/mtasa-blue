@@ -1203,7 +1203,7 @@ void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, b
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CElement::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     if ( bDebugCheck )
         _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
@@ -1229,7 +1229,7 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
 
 void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 {
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
 
@@ -1256,7 +1256,7 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 
 
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
 
 //
 // Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element

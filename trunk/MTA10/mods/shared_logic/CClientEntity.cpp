@@ -1278,7 +1278,7 @@ void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* 
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CClientEntity::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     if ( bDebugCheck )
         _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
@@ -1304,7 +1304,7 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
 
 void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn )
 {
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
 
@@ -1336,7 +1336,7 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLu
 }
 
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
 
 //
 // Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
