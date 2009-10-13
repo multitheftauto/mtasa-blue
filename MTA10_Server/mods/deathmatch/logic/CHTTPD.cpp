@@ -59,12 +59,12 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
         {
             // Convert the dotted ip to a long
             long lIP = inet_addr ( szIP );
-            parameters[ "bindto" ] = lIP;
+            parameters[ "bindip" ] = lIP;
         }
         else
         {
             // Bind to default;
-            parameters[ "bindto" ] = (long) INADDR_ANY;
+            parameters[ "bindip" ] = (long) INADDR_ANY;
         }
 
 	    parameters[ "mode" ] = "threadpool";		// or "singlethreaded"/"threadpool"
