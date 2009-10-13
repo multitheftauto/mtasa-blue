@@ -26,6 +26,9 @@ class CClientEntity;
 #include <list>
 #include <google/dense_hash_map>
 
+// Used to check fast version of getElementsByType
+//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+
 class CClientManager;
 
 #define IS_PED(entity) ((entity)->GetType()==CCLIENTPLAYER||(entity)->GetType()==CCLIENTPED)
@@ -285,7 +288,7 @@ private:
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn );
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
     void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );

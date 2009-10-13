@@ -28,6 +28,9 @@
 #include <cstring>
 #include "CElementGroup.h"
 
+// Used to check fast version of getElementsByType
+//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
 #define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
@@ -263,7 +266,7 @@ private:
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CElement* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* pLua );
 
-#if MTA_DEBUG
+#if CHECK_ENTITIES_FROM_ROOT
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
     void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );

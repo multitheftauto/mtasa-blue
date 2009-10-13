@@ -3083,7 +3083,7 @@ void CClientVehicle::SetHeadLightColor ( RGBA color )
 // But there you go.
 //
 
-#if MTA_DEBUG
+#if OCCUPY_DEBUG_INFO
     #define INFO(x)    g_pCore->GetConsole ()->Printf x
     #define WARN(x)    g_pCore->GetConsole ()->Printf x
 #else
