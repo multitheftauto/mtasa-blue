@@ -16,6 +16,7 @@
 #define REMOTE_PLAYER_CONNECTION_TROUBLE_TIME 6000
 
 using std::list;
+using std::vector;
 
 CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
 {
@@ -24,7 +25,7 @@ CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
     m_bCanRemoveFromList = true;
     m_pLocalPlayer = NULL;
     m_llSyncTroubleCheckTime = 0;
-    m_llSyncTroubleOkTime = 0;
+    m_llSyncTroubleStartTime = 0;
 }
 
 
@@ -39,7 +40,7 @@ void CClientPlayerManager::DoPulse ( void )
 {
     unsigned long ulCurrentTime = CClientTime::GetTime ();
     CClientPlayer * pPlayer = NULL;
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); ++iter )
     {
         pPlayer = *iter;
@@ -94,10 +95,20 @@ void CClientPlayerManager::DoPulse ( void )
     // See issue #4961: Vehicles not getting updated anymore
     // *****************************************************
     // *****************************************************
-    // Do check once every 400ms
-    if ( GetTickCount64_ () - m_llSyncTroubleCheckTime > 400 && !g_pClientGame->IsDownloadingBigPacket () )
+    const long long llCurrentTime =  GetTickCount64_ ();
+
+    // If downloading, reset trouble timer
+    if ( g_pClientGame->IsDownloadingBigPacket () )
+        m_llSyncTroubleStartTime = 0;
+
+    // Do player list check once every 400ms
+    if ( llCurrentTime - m_llSyncTroubleCheckTime > 400 )
     {
-        m_llSyncTroubleCheckTime = GetTickCount64_ ();
+        // If last check was over 2000ms ago, reset trouble timer
+        if ( llCurrentTime - m_llSyncTroubleCheckTime > 2000 )
+            m_llSyncTroubleStartTime = 0;
+
+        m_llSyncTroubleCheckTime = llCurrentTime;
 
         // Count up the number of players who haven't sent us sync info recently, even though they should have
         unsigned long ulConnectionOkCount = 0;
@@ -106,7 +117,7 @@ void CClientPlayerManager::DoPulse ( void )
         unsigned long ulConnectionBadCount = 0;
 
         unsigned long ulCurrentTime = CClientTime::GetTime ();
-        list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+        vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end (); ++iter )
         {
             CClientPlayer * pPlayer = *iter;
@@ -148,12 +159,11 @@ void CClientPlayerManager::DoPulse ( void )
         // and that situation continues unchanged for a further 10 seconds, then assume the problem is local and disconnect
         if ( ulConnectionBadCount > 10 && iPercent > 80 )
         {
-            // Display sync trouble
-            int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
-            int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 40 / 100;     // 40/100 down
-            g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** SYNC TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
+            // Start timer if required
+            if ( !m_llSyncTroubleStartTime )
+                m_llSyncTroubleStartTime = llCurrentTime;
 
-            if ( m_llSyncTroubleOkTime && GetTickCount64_ () - m_llSyncTroubleOkTime > 10000 )
+            if ( llCurrentTime - m_llSyncTroubleStartTime > 10000 )
             {
                 g_pCore->GetConsole ()->Print ( "Other players not responding. Disconnecting..." );
                 g_pCore->GetCommands ()->Execute ( "disconnect" );
@@ -161,8 +171,16 @@ void CClientPlayerManager::DoPulse ( void )
         }
         else
         {
-           m_llSyncTroubleOkTime = GetTickCount64_ ();
+           m_llSyncTroubleStartTime = 0;
         }
+    }
+
+    // Display sync trouble message if timer is running
+    if ( m_llSyncTroubleStartTime )
+    {
+        int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
+        int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 40 / 100;     // 40/100 down
+        g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** SYNC TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
     }
 }
 
@@ -171,7 +189,7 @@ void CClientPlayerManager::DeleteAll ( void )
 {
     // Delete all the players
     m_bCanRemoveFromList = false;
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         delete *iter;
@@ -201,7 +219,7 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
     assert ( szNick );
 
     // Find a player with a matching nick in the list
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         const char* szPtr = (*iter)->GetNick ();
@@ -225,7 +243,7 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
 
     if ( bValidatePointer )
     {
-        list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+        vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end () ; iter++ )
         {
             if ( (*iter)->GetGamePlayer () == pPlayer )
@@ -249,7 +267,7 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
 
 bool CClientPlayerManager::Exists ( CClientPlayer* pPlayer )
 {
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end () ; iter++ )
     {
         if ( *iter == pPlayer )
@@ -290,7 +308,7 @@ bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
 
 void CClientPlayerManager::ResetAll ( void )
 {
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         CClientPlayer * pPlayer = *iter;
@@ -302,10 +320,10 @@ void CClientPlayerManager::ResetAll ( void )
 }
 
 
-list < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClientPlayer* pPlayer )
+vector < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClientPlayer* pPlayer )
 {
     // Find it in our list
-    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( *iter == pPlayer )
@@ -319,10 +337,10 @@ list < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClient
 }
 
 
-list < CClientPlayer* > ::const_reverse_iterator CClientPlayerManager::IterGetReverse ( CClientPlayer* pPlayer )
+vector < CClientPlayer* > ::const_reverse_iterator CClientPlayerManager::IterGetReverse ( CClientPlayer* pPlayer )
 {
     // Find it in our list
-    list < CClientPlayer* > ::reverse_iterator iter = m_Players.rbegin ();
+    vector < CClientPlayer* > ::reverse_iterator iter = m_Players.rbegin ();
     for ( ; iter != m_Players.rend (); iter++ )
     {
         if ( *iter == pPlayer )
@@ -340,6 +358,6 @@ void CClientPlayerManager::RemoveFromList ( CClientPlayer* pPlayer )
 {
     if ( m_bCanRemoveFromList )
     {
-        if ( !m_Players.empty() ) m_Players.remove ( pPlayer );
+        ListRemove ( m_Players, pPlayer );
     }
 }
