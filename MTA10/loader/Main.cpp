@@ -390,11 +390,15 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
-
     // Change the search path and current directory
-    char szOrigPath [ 1024 ];
-    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, sizeof(szOrigPath) );
-    if ( dwGetPathResult == 0 || dwGetPathResult >= sizeof(szOrigPath) )
+    char *szOrigPath = NULL;
+    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", NULL, 0 );
+    if ( dwGetPathResult )
+    {
+        szOrigPath = static_cast < char* > ( _alloca ( dwGetPathResult ) );
+        dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, dwGetPathResult );
+    }
+    if ( dwGetPathResult == 0 )
     {
         if ( hwndSplash )
             DestroyWindow ( hwndSplash );
