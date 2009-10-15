@@ -21,6 +21,7 @@
     #define MTA_DM_CONNECT_TO_PUBLIC
 
 #elif defined(BUILD_CONFIG_)
+    #pragma message("NOTE: It's safe to ignore 'environment variables were not found' warning.")
 
     #define MTA_DM_BUILDTYPE        "Custom"
     #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING "-" MTA_DM_BUILDTYPE

@@ -14,6 +14,7 @@
 #define QUOTE_DEFINE(x) QUOTE_DEFINE2(x)
 
 #if defined(BUILD_CONFIG_)
+    #pragma message("NOTE: It's safe to ignore 'environment variables were not found' warning.")
 
     #define MTA_DM_BUILDTYPE        "Custom"
     #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING "-" MTA_DM_BUILDTYPE
