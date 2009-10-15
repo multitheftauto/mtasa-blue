@@ -41,6 +41,10 @@ class CServerListItem;
 // LAN packet broadcasting interval (in ms)
 #define SERVER_LIST_BROADCAST_REFRESH       2000
 
+// Timeout for one server in the server list to respond to a query (in ms)
+#define SERVER_LIST_ITEM_TIMEOUT       4000
+
+
 class CServerListItem
 {
     friend class CServerList;
