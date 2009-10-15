@@ -751,7 +751,7 @@ void CClientGame::DoPulsePostFrame ( void )
             DrawPlayerDetails ( m_pShowPlayer );
         }
 
-        std::list < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        std::vector < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
         {
             CClientPlayer* pPlayer = *iter;
@@ -2224,7 +2224,7 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     float fDistance = 0.0f, fTemp;
     CVector vecTemp;
     CClientPlayer * pPlayer;
-    list < CClientPlayer * > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    vector < CClientPlayer * > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
     {
         pPlayer = *iter;
@@ -4633,7 +4633,7 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
     #define VTBL_CAUTOMOBILE            0x871120
 
     CClientPlayer* pPlayer = NULL;
-    list < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    vector < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
         pPlayer = *iter;

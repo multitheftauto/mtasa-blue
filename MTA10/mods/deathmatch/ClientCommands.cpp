@@ -15,6 +15,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::vector;
 
 #ifdef MTA_DEBUG
 #include <Tlhelp32.h>
@@ -684,7 +685,7 @@ void COMMAND_DumpPlayers ( const char* szCmdLine )
         fprintf ( pFile, "Used point single link pool: %u\n\n\n", g_pGame->GetPools ()->GetNumberOfUsedSpaces ( POINTER_SINGLE_LINK_POOL ) );
 
         // Loop through all players
-        list < CClientPlayer* > ::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
+        vector < CClientPlayer* > ::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
         for ( ; iter != g_pClientGame->GetPlayerManager ()->IterEnd (); iter++ )
         {
             // Write the player dump
