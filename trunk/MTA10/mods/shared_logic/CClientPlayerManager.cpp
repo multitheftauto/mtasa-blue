@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+#define REMOTE_PLAYER_CONNECTION_TROUBLE_TIME 6000
+
 using std::list;
 
 CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
@@ -21,6 +23,8 @@ CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
     m_pLocalPlayer = NULL;
+    m_llSyncTroubleCheckTime = 0;
+    m_llSyncTroubleOkTime = 0;
 }
 
 
@@ -41,10 +45,10 @@ void CClientPlayerManager::DoPulse ( void )
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () )
         {
-            // Flag him with connection error if its been more than 6000 ms since last puresync and force his position
+            // Flag him with connection error if its been too long since last puresync and force his position
             unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
-            bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + 6000 && pPlayer->GetOccupiedVehicleSeat () == 0 );
-            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () )
+            bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME );
+            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () && !pPlayer->IsDeadOnNetwork () )
             {
                 pPlayer->SetHasConnectionTrouble ( true );
 
@@ -80,6 +84,84 @@ void CClientPlayerManager::DoPulse ( void )
             {
                 pPlayer->SetHasConnectionTrouble ( false );
             }
+        }
+    }
+
+    // *****************************************************
+    // *****************************************************
+    // This covers up a big problem that needs to be fixed
+    //
+    // See issue #4961: Vehicles not getting updated anymore
+    // *****************************************************
+    // *****************************************************
+    // Do check once every 400ms
+    if ( GetTickCount64_ () - m_llSyncTroubleCheckTime > 400 && !g_pClientGame->IsDownloadingBigPacket () )
+    {
+        m_llSyncTroubleCheckTime = GetTickCount64_ ();
+
+        // Count up the number of players who haven't sent us sync info recently, even though they should have
+        unsigned long ulConnectionOkCount = 0;
+        unsigned long ulConnectionIgnoreCount = 0;
+        unsigned long ulConnectionUnknownCount = 0;
+        unsigned long ulConnectionBadCount = 0;
+
+        unsigned long ulCurrentTime = CClientTime::GetTime ();
+        list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+        for ( ; iter != m_Players.end (); ++iter )
+        {
+            CClientPlayer * pPlayer = *iter;
+            if ( !pPlayer->IsLocalPlayer () )
+            {
+                unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
+
+                bool bDoneFirstSync  = ulLastPuresyncTime != 0;
+                bool bSyncTooLongAgo = ulCurrentTime >= ulLastPuresyncTime + 10000;
+                bool bDead           = pPlayer->IsDeadOnNetwork ();
+                bool bFrozen         = pPlayer->GetOccupiedVehicle () ? pPlayer->GetOccupiedVehicle ()->IsFrozen () : pPlayer->IsFrozen ();
+
+                if ( !bDoneFirstSync )
+                    ulConnectionIgnoreCount++;
+                else
+                {
+                    if ( bDead )
+                        ulConnectionUnknownCount++;
+                    else
+                    {
+                        if ( bSyncTooLongAgo && !bFrozen )
+                            ulConnectionBadCount++;
+                        else
+                            ulConnectionOkCount++;
+                    }
+                }
+            }
+        }
+ 
+        int iPercent = ulConnectionBadCount * 100 / Max < int > ( 1, ulConnectionOkCount );
+
+#if SHOW_SYNC_TROUBLE_STATUS
+        SString strText ( "ok:%2d  ign:%2d  unk:%2d  bad:%2d    plrs:%2d  %d percent", ulConnectionOkCount, ulConnectionIgnoreCount, ulConnectionUnknownCount, ulConnectionBadCount, m_Players.size () - 1, iPercent );
+        SColor color = ulConnectionBadCount ? SColorRGBA ( 255, 0, 0, 255 ) : SColorRGBA ( 255, 255, 0, 255 );
+        g_pCore->GetGraphics ()->DrawText ( 400, 100, 400, 100, color, strText, 2.0f, 2.0f, DT_NOCLIP );
+#endif
+
+        // If more than 10 and 80% of players are not sending syncs when they should,
+        // and that situation continues unchanged for a further 10 seconds, then assume the problem is local and disconnect
+        if ( ulConnectionBadCount > 10 && iPercent > 80 )
+        {
+            // Display sync trouble
+            int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
+            int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 40 / 100;     // 40/100 down
+            g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** SYNC TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
+
+            if ( m_llSyncTroubleOkTime && GetTickCount64_ () - m_llSyncTroubleOkTime > 10000 )
+            {
+                g_pCore->GetConsole ()->Print ( "Other players not responding. Disconnecting..." );
+                g_pCore->GetCommands ()->Execute ( "disconnect" );
+            }
+        }
+        else
+        {
+           m_llSyncTroubleOkTime = GetTickCount64_ ();
         }
     }
 }
