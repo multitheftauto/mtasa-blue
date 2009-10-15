@@ -306,7 +306,7 @@ std::string CServerListItem::Pulse ( void )
             return "ParsedQuery";
         }
 
-        if ( CClientTime::GetTime () - m_ulQueryStart > 2000 )
+        if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )
         {
             bSkipped = true;
             return "NoReply";
