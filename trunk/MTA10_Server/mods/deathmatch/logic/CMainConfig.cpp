@@ -38,7 +38,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_bLogFileEnabled = false;
     m_bAutoUpdateAntiCheatEnabled = true;
-    m_bJoinFloodProtectionEnabled = false;
+    m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
 	m_bAutoUpdateIncludedResources = false;
