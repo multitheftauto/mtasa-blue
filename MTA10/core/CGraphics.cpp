@@ -798,7 +798,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 		CCore::GetSingleton ().GetConsole ()->Printf ( "WARNING: Some fonts could not be loaded! Your game will not be able to display any text." );
 
 	// Get the original render target
-	m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget );
+    assert ( !m_pOriginalTarget );
+    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
@@ -808,6 +809,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 {
+    assert ( m_pOriginalTarget );
 	SAFE_RELEASE ( m_pOriginalTarget );
 
     for ( int i = 0; i < NUM_FONTS; i++ )
@@ -827,7 +829,8 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 {
 	// Get the original render target
-	m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget );
+    assert ( !m_pOriginalTarget );
+    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
 
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
@@ -899,6 +902,13 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
 void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 {
+    if ( !g_pCore->IsFocused () )
+    {
+        m_PostGUIQueue.clear ();
+        m_PreGUIQueue.clear ();
+        return;
+    }
+
     // Add it to the correct queue
     if ( bPostGUI )
         m_PostGUIQueue.push_back ( Item );

@@ -129,7 +129,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 		RECT ScreenSize;
 
 		D3DLOCKED_RECT LockedRect;
-		IDirect3DSurface9 *pSurface, *pLockSurface;
+		IDirect3DSurface9 *pSurface = NULL, *pLockSurface = NULL;
 
 		// Define a screen rectangle
 		ScreenSize.top = ScreenSize.left = 0;
@@ -138,7 +138,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 		pDevice->GetRenderTarget ( 0, &pSurface );
 
 		// Create a new render target
-		if ( pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pLockSurface, NULL ) != D3D_OK ) {
+		if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pLockSurface, NULL ) != D3D_OK ) {
 			CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
 		} else {
 			unsigned long ulBeginTime = GetTickCount ();
@@ -211,5 +211,12 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 		}
 
 		CCore::GetSingleton().bScreenShot = false;
+
+        if ( pSurface )
+        {
+            if ( FAILED ( pSurface->Release () ) )
+                std::exception ( "Failed to release the ScreenShot rendertaget surface" );
+            pSurface = NULL;
+        }
 	}
 }

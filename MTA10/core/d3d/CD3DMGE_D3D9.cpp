@@ -75,13 +75,25 @@ void CD3DMGEng::OnDeleteDevice ( void )
 
 void CD3DMGEng::OnInvalidateDevice ( void )
 {
-	SAFE_RELEASE( m_pVB )
+    if ( m_pVB )
+    {
+        if ( FAILED ( m_pVB->Release () ) )
+        {
+            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the VertexBuffer.");
+        }
+        m_pVB = NULL;
+    }
 
     if ( m_pLastFont != NULL )
     {
-        m_pLastFont->Release(); //release font
+        if ( FAILED ( m_pLastFont->Release () ) )   //release font
+        {
+            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the Font.");
+        }
         m_pLastFont = NULL;
     }
+
+    assert ( !m_pDeviceState );
 }
 
 bool CD3DMGEng::Render2DSprite ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pScaling, D3DXVECTOR2 *pTranslation, DWORD dwColor )
