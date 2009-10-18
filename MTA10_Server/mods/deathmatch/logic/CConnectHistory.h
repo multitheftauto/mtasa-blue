@@ -13,30 +13,25 @@
 #ifndef __CCONNECTHISTORY_H
 #define __CCONNECTHISTORY_H
 
-#include <list>
-
 struct CConnectHistoryItem
 {
-    unsigned long   ulIP;
-    unsigned long   ulTime;
-    unsigned char   ucCounter;
+    std::vector < long long > joinTimes;
 };
 
 class CConnectHistory
 {
 public:
                                         CConnectHistory         ( void );
-                                        ~CConnectHistory        ( void );
 
     bool                                IsFlooding              ( unsigned long ulIP );
-
-    CConnectHistoryItem*                Find                    ( unsigned long ulIP );
-    void                                Reset                   ( void );
+    CConnectHistoryItem&                GetHistoryItem          ( unsigned long ulIP );
 
 private:
     void                                RemoveExpired           ( void );
 
-    std::list < CConnectHistoryItem* >  m_List;
+    unsigned long                                    m_SamplePeriod;
+    unsigned long                                    m_MaxConnections;
+    std::map < unsigned long, CConnectHistoryItem >  m_HistoryItemMap;
 };
 
 #endif
