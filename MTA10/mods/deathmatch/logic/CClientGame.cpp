@@ -783,8 +783,8 @@ void CClientGame::DoPulsePostFrame ( void )
         #endif
     }
 
-    // If we are focused we do the pulsing here
-    if ( g_pCore->IsFocused () )
+    // If we are not minimized we do the pulsing here
+    if ( !g_pCore->IsWindowMinimized () )
     {
         DoPulses ();
     }
@@ -3238,7 +3238,7 @@ void CClientGame::PostWorldProcessHandler ( void )
 void CClientGame::IdleHandler ( void )
 {
     // If we are minimized we do the pulsing here
-    if ( !g_pCore->IsFocused() )
+    if ( g_pCore->IsWindowMinimized() )
     {
         DoPulses ();
     }

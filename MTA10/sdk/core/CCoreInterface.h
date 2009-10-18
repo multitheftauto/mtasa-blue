@@ -97,6 +97,7 @@ public:
     virtual void                    HideMainMenu                    ( void ) = 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
 	virtual bool					IsFocused						( void ) = 0;
+    virtual bool                    IsWindowMinimized               ( void ) = 0;
 
     virtual void                    SaveConfig                      ( void ) = 0;
 
