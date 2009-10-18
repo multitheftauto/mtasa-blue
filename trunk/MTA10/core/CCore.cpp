@@ -1124,6 +1124,12 @@ void CCore::DestroyNetwork ( )
 }
 
 
+bool CCore::IsWindowMinimized ( void )
+{
+    return IsIconic ( GetHookedWindow () );
+}
+
+
 void CCore::DoPreFramePulse ( )
 {
     m_pKeyBinds->DoPreFramePulse ();

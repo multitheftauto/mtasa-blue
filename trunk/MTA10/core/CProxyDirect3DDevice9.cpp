@@ -165,6 +165,11 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
     // Call the real reset routine.
     hResult = m_pDevice->Reset ( pPresentationParameters );
 
+    if ( FAILED ( hResult ) )
+    {
+        throw std::exception("Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+    }
+
     GetVideoModeManager ()->PostReset ( pPresentationParameters );
 
     // Update our data.

@@ -178,6 +178,7 @@ public:
 
     void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
     bool                    IsFocused                       ( void )                        { return m_bFocused; };
+    bool                    IsWindowMinimized               ( void );
 
     // Pulse
     void                    DoPreFramePulse                 ( void );

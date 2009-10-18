@@ -902,7 +902,8 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
 void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 {
-    if ( !g_pCore->IsFocused () )
+    // Prevent queuing when minimized
+    if ( g_pCore->IsWindowMinimized () )
     {
         m_PostGUIQueue.clear ();
         m_PreGUIQueue.clear ();
