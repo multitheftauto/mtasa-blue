@@ -526,14 +526,14 @@ int CLuaFunctionDefs::GetVehicleWheelStates ( lua_State* luaVM )
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            unsigned char ucFrontLeft = pVehicle->GetWheelStatus ( 0 );
-            unsigned char ucFrontRight = pVehicle->GetWheelStatus ( 1 );
-            unsigned char ucRearLeft = pVehicle->GetWheelStatus ( 2 );
-            unsigned char ucRearRight = pVehicle->GetWheelStatus ( 3 );
+            unsigned char ucFrontLeft = pVehicle->GetWheelStatus ( FRONT_LEFT_WHEEL );
+            unsigned char ucRearLeft = pVehicle->GetWheelStatus ( REAR_LEFT_WHEEL );
+            unsigned char ucFrontRight = pVehicle->GetWheelStatus ( FRONT_RIGHT_WHEEL );
+            unsigned char ucRearRight = pVehicle->GetWheelStatus ( REAR_RIGHT_WHEEL );
 
             lua_pushnumber ( luaVM, ucFrontLeft );
-            lua_pushnumber ( luaVM, ucFrontRight );
             lua_pushnumber ( luaVM, ucRearLeft );
+            lua_pushnumber ( luaVM, ucFrontRight );
             lua_pushnumber ( luaVM, ucRearRight );
             return 4;
         }
@@ -1545,16 +1545,16 @@ int CLuaFunctionDefs::SetVehicleWheelStates ( lua_State* luaVM )
         ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER ) )
     {
         int iFrontLeft = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-        int iFrontRight = -1, iRearLeft = -1, iRearRight = -1;
+        int iRearLeft = -1, iFrontRight = -1, iRearRight = -1;
 
         int iArgument3 = lua_type ( luaVM, 3 ), iArgument4 = lua_type ( luaVM, 4 ),
             iArgument5 = lua_type ( luaVM, 5 );
 
         if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
-            iFrontRight = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
+            iRearLeft = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
 
         if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
-            iRearLeft = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
+            iFrontRight = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
 
         if ( iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNUMBER )
             iRearRight = static_cast < int > ( lua_tonumber ( luaVM, 5 ) );
@@ -1563,7 +1563,7 @@ int CLuaFunctionDefs::SetVehicleWheelStates ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( *pEntity, iFrontLeft, iFrontRight, iRearLeft, iRearRight ) )
+            if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( *pEntity, iFrontLeft, iRearLeft, iFrontRight, iRearRight ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

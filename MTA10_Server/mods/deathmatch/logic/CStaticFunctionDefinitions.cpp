@@ -3710,15 +3710,14 @@ bool CStaticFunctionDefinitions::GetVehicleDoorState ( CVehicle* pVehicle, unsig
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleWheelStates ( CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucFrontRight, unsigned char& ucRearLeft, unsigned char& ucRearRight )
+bool CStaticFunctionDefinitions::GetVehicleWheelStates ( CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight, unsigned char& ucRearRight )
 {
 	assert ( pVehicle );
 
-    ucFrontLeft = pVehicle->m_ucWheelStates [ 0 ];
-    ucFrontRight = pVehicle->m_ucWheelStates [ 1 ];
-    ucRearLeft = pVehicle->m_ucWheelStates [ 2 ];
-    ucRearRight = pVehicle->m_ucWheelStates [ 3 ];
-
+    ucFrontLeft = pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ];
+    ucRearLeft = pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ];
+    ucFrontRight = pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ];
+    ucRearRight = pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ];
     return true;
 }
 
@@ -4292,28 +4291,33 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CElement* pElement, unsig
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, unsigned char ucFrontLeft, unsigned char ucFrontRight, unsigned char ucRearLeft, unsigned char ucRearRight )
+bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight )
 {
 	assert ( pElement );
-	RUN_CHILDREN SetVehicleWheelStates ( *iter, ucFrontLeft, ucFrontRight, ucRearLeft, ucRearRight );
+	RUN_CHILDREN SetVehicleWheelStates ( *iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight );
 
+    unsigned char a = -1;
+    if ( a == (unsigned char)-1 )
+        a = 2;
 	if ( IS_VEHICLE ( pElement ) )
 	{
 		CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
-        if ( ucFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS && ucRearLeft <= DT_WHEEL_INTACT_COLLISIONLESS &&
-             ucFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS && ucRearRight <= DT_WHEEL_INTACT_COLLISIONLESS )
+        if ( ( iFrontLeft >= -1 && iFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS ) &&
+             ( iRearLeft >= -1 && iRearLeft  <= DT_WHEEL_INTACT_COLLISIONLESS ) &&
+             ( iFrontRight >= -1 && iFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS ) &&
+             ( iRearRight >= -1 && iRearRight <= DT_WHEEL_INTACT_COLLISIONLESS ) )
         {
             // If atleast 1 wheel state is different
-            if ( ( ucFrontLeft != -1 && ucFrontLeft != pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] ) ||
-                 ( ucRearLeft != -1 && ucRearLeft != pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] ) ||
-                 ( ucFrontRight != -1 && ucFrontRight != pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] ) ||
-                 ( ucRearRight != -1 && ucRearRight != pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] ) )
+            if ( ( iFrontLeft != -1 && iFrontLeft != pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] ) ||
+                 ( iRearLeft != -1 && iRearLeft != pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] ) ||
+                 ( iFrontRight != -1 && iFrontRight != pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] ) ||
+                 ( iRearRight != -1 && iRearRight != pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] ) )
             {
-                if ( ucFrontLeft != -1 ) pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] = ucFrontLeft;
-                if ( ucRearLeft != -1 ) pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] = ucRearLeft;
-                if ( ucFrontRight != -1 ) pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] = ucFrontRight;
-                if ( ucRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = ucRearRight;
+                if ( iFrontLeft != -1 ) pVehicle->m_ucWheelStates [ FRONT_LEFT_WHEEL ] = iFrontLeft;
+                if ( iRearLeft != -1 ) pVehicle->m_ucWheelStates [ REAR_LEFT_WHEEL ] = iRearLeft;
+                if ( iFrontRight != -1 ) pVehicle->m_ucWheelStates [ FRONT_RIGHT_WHEEL ] = iFrontRight;
+                if ( iRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = iRearRight;
 
 			    CBitStream BitStream;
 			    BitStream.pBitStream->Write ( pVehicle->GetID () );

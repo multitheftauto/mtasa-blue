@@ -225,7 +225,7 @@ public:
 	static bool					GetVehicleUpgradeSlotName			( unsigned char ucSlot, char* szName );
 	static bool					GetVehicleUpgradeSlotName			( unsigned short usUpgrade, char* szName );
     static bool					GetVehicleDoorState					( CVehicle* pVehicle, unsigned char ucDoor, unsigned char& ucState );
-	static bool					GetVehicleWheelStates				( CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucFrontRight, unsigned char& ucRearLeft, unsigned char& ucRearRight );
+	static bool					GetVehicleWheelStates				( CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight, unsigned char& ucRearRight );
 	static bool					GetVehicleLightState				( CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState );
 	static bool					GetVehiclePanelState				( CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState );
     static bool                 GetVehicleOverrideLights            ( CVehicle* pVehicle, unsigned char& ucLights );
@@ -260,7 +260,7 @@ public:
     static bool                 AddAllVehicleUpgrades               ( CElement* pElement );
     static bool					RemoveVehicleUpgrade				( CElement* pElement, unsigned short usUpgrade );
 	static bool					SetVehicleDoorState					( CElement* pElement, unsigned char ucDoor, unsigned char ucState );
-	static bool					SetVehicleWheelStates				( CElement* pElement, unsigned char ucFrontLeft, unsigned char ucFrontRight = -1, unsigned char ucRearLeft = -1, unsigned char ucRearRight = -1 );
+	static bool					SetVehicleWheelStates				( CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1 );
 	static bool					SetVehicleLightState				( CElement* pElement, unsigned char ucLight, unsigned char ucState );
 	static bool					SetVehiclePanelState				( CElement* pElement, unsigned char ucPanel, unsigned char ucState );
     static bool                 SetVehicleIdleRespawnDelay          ( CElement* pElement, unsigned long ulTime );

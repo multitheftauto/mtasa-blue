@@ -2331,40 +2331,40 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CClientEntity& Entity, un
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CClientEntity& Entity, int iFrontLeft, int iFrontRight, int iRearLeft, int iRearRight )
+bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CClientEntity& Entity, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight )
 {
-	RUN_CHILDREN SetVehicleWheelStates ( **iter, iFrontLeft, iFrontRight, iRearLeft, iRearRight );
+	RUN_CHILDREN SetVehicleWheelStates ( **iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight );
 
 	if ( IS_VEHICLE ( &Entity ) )
 	{
 		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
         // Store the current and new states
-        unsigned char ucFrontLeft, ucNewFrontLeft = ucFrontLeft = Vehicle.GetWheelStatus ( 0 );
-        unsigned char ucFrontRight, ucNewFrontRight = ucFrontRight = Vehicle.GetWheelStatus ( 1 );
-        unsigned char ucRearLeft, ucNewRearLeft = ucRearLeft = Vehicle.GetWheelStatus ( 2 );
-        unsigned char ucRearRight, ucNewRearRight = ucRearRight = Vehicle.GetWheelStatus ( 3 );
+        unsigned char ucFrontLeft, ucNewFrontLeft = ucFrontLeft = Vehicle.GetWheelStatus ( FRONT_LEFT_WHEEL );
+        unsigned char ucRearLeft, ucNewRearLeft = ucRearLeft = Vehicle.GetWheelStatus ( REAR_LEFT_WHEEL );
+        unsigned char ucFrontRight, ucNewFrontRight = ucFrontRight = Vehicle.GetWheelStatus ( FRONT_RIGHT_WHEEL );
+        unsigned char ucRearRight, ucNewRearRight = ucRearRight = Vehicle.GetWheelStatus ( REAR_RIGHT_WHEEL );
 
         // If we have a new state for them, change it
         if ( iFrontLeft >= 0 && iFrontLeft <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewFrontLeft = static_cast < unsigned char > ( iFrontLeft );
-        if ( iFrontRight >= 0 && iFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS )
-            ucNewFrontRight = static_cast < unsigned char > ( iFrontRight );
         if ( iRearLeft >= 0 && iRearLeft <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewRearLeft = static_cast < unsigned char > ( iRearLeft );
+        if ( iFrontRight >= 0 && iFrontRight <= DT_WHEEL_INTACT_COLLISIONLESS )
+            ucNewFrontRight = static_cast < unsigned char > ( iFrontRight );
         if ( iRearRight >= 0 && iRearRight <= DT_WHEEL_INTACT_COLLISIONLESS )
             ucNewRearRight = static_cast < unsigned char > ( iRearRight );
 
         // If atleast 1 wheel state is different
         if ( ucNewFrontLeft != ucFrontLeft ||
-             ucNewFrontRight != ucFrontRight ||
              ucNewRearLeft != ucRearLeft ||
+             ucNewFrontRight != ucFrontRight ||
              ucNewRearRight != ucRearRight )
         {
-			Vehicle.SetWheelStatus ( 0, ucNewFrontLeft, false );
-            Vehicle.SetWheelStatus ( 1, ucNewFrontRight, false );
-            Vehicle.SetWheelStatus ( 2, ucNewRearLeft, false );
-            Vehicle.SetWheelStatus ( 3, ucNewRearRight, false );
+			Vehicle.SetWheelStatus ( FRONT_LEFT_WHEEL, ucNewFrontLeft, false );
+            Vehicle.SetWheelStatus ( REAR_LEFT_WHEEL, ucNewRearLeft, false );
+            Vehicle.SetWheelStatus ( FRONT_RIGHT_WHEEL, ucNewFrontRight, false );
+            Vehicle.SetWheelStatus ( REAR_RIGHT_WHEEL, ucNewRearRight, false );
 
 			return true;
 		}
