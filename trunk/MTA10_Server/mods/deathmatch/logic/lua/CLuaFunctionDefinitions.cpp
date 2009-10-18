@@ -3983,12 +3983,12 @@ int CLuaFunctionDefinitions::GetVehicleWheelStates ( lua_State* luaVM )
 		CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
 		if ( pVehicle )
 		{
-			unsigned char ucFrontLeft, ucFrontRight, ucRearLeft, ucRearRight;
-			if ( CStaticFunctionDefinitions::GetVehicleWheelStates ( pVehicle, ucFrontLeft, ucFrontRight, ucRearLeft, ucRearRight ) )
+			unsigned char ucFrontLeft, ucRearLeft, ucFrontRight, ucRearRight;
+			if ( CStaticFunctionDefinitions::GetVehicleWheelStates ( pVehicle, ucFrontLeft, ucRearLeft, ucFrontRight, ucRearRight ) )
 			{
 				lua_pushnumber ( luaVM, ucFrontLeft );
-                lua_pushnumber ( luaVM, ucFrontRight );
                 lua_pushnumber ( luaVM, ucRearLeft );
+                lua_pushnumber ( luaVM, ucFrontRight );
                 lua_pushnumber ( luaVM, ucRearRight );
 				return 4;
 			}
@@ -4852,16 +4852,16 @@ int CLuaFunctionDefinitions::SetVehicleWheelStates ( lua_State* luaVM )
          ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER ) )
     {
         int iFrontLeft = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-        int iFrontRight = -1, iRearLeft = -1, iRearRight = -1;
+        int iRearLeft = -1, iFrontRight = -1, iRearRight = -1;
 
         int iArgument3 = lua_type ( luaVM, 3 ), iArgument4 = lua_type ( luaVM, 4 ),
             iArgument5 = lua_type ( luaVM, 5 );
 
         if ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER )
-            iFrontRight = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
+            iRearLeft = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
 
         if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
-            iRearLeft = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
+            iFrontRight = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
 
         if ( iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNUMBER )
             iRearRight = static_cast < int > ( lua_tonumber ( luaVM, 5 ) );
@@ -4870,7 +4870,7 @@ int CLuaFunctionDefinitions::SetVehicleWheelStates ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( pElement, iFrontLeft, iFrontRight, iRearLeft, iRearRight ) )
+            if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( pElement, iFrontLeft, iRearLeft, iFrontRight, iRearRight ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
