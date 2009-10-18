@@ -2693,6 +2693,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 		Arguments.PushString ( pPlayer->GetSourceIP ( szIP ) );
 		Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
 		Arguments.PushString ( pPlayer->GetSerial ().c_str() );
+        Arguments.PushNumber ( pPlayer->GetMTAVersion () );
 		if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
 		{
 			// event cancelled, disconnect the player
