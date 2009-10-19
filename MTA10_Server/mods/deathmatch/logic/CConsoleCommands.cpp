@@ -753,17 +753,19 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                                         // Log it
                                         CLogger::LogPrintf ( "MSG: %s to %s: %s\n", szNick, pPlayer->GetNick (), szMessage );
 
-                                        // Send it to the player
-                                        pPlayer->Send ( CChatEchoPacket ( szMsg, CHATCOLOR_INFO ) );
+                                        // Send the message and player pointer to the script
+                                        CLuaArguments Arguments;
+                                        Arguments.PushString ( szArguments );
+                                        Arguments.PushElement ( pPlayer );
+                                        bool bContinue = pSender->CallEvent ( "onPlayerPrivateMessage", Arguments );
+                                        if ( bContinue )
+                                        {
+                                            // Send it to the player
+                                            pPlayer->Send ( CChatEchoPacket ( szMsg, CHATCOLOR_INFO ) );
 
-                                        // Send a reponse to the player who sent it
-                                        char szResponse[256];
-                                        szResponse[0] = '\0';
-
-                                        _snprintf ( szResponse, 256, "-> %s: %s", pPlayer->GetNick (), szMessage );
-                                        szResponse[255] = '\0';
-
-                                        pEchoClient->SendEcho ( szResponse );
+                                            // Send a reponse to the player who sent it
+                                            pEchoClient->SendEcho ( SString ( "-> %s: %s", pPlayer->GetNick (), szMessage ) );
+                                        }
                                         break;
                                     }
                                     case CClient::CLIENT_CONSOLE:

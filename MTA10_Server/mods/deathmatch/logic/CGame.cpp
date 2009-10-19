@@ -1128,6 +1128,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerLogin", "guest_account, account, auto-login", NULL, false );
     m_Events.AddEvent ( "onPlayerLogout", "account, guest_account", NULL, false );
 	m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
+    m_Events.AddEvent ( "onPlayerPrivateMessage", "text, player", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
