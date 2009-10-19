@@ -844,6 +844,9 @@ void CClientGame::DoPulses ( void )
             // No longer waiting for connect
             m_bWaitingForLocalConnect = false;
 
+            // Assume local server has the same bitstream version
+            g_pNet->SetServerBitStreamVersion ( MTA_DM_BITSTREAM_VERSION );
+
             // Run the game normally.
             StartGame ( m_szLocalNick, m_Server.GetPassword().c_str() );
         }

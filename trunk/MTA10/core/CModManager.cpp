@@ -252,6 +252,7 @@ void CModManager::Unload ( void )
         CCore::GetSingleton ().GetGame ()->Reset ();
         CCore::GetSingleton ().GetMultiplayer ()->Reset ();
         CCore::GetSingleton ().GetNetwork ()->Reset ();
+        assert ( CCore::GetSingleton ().GetNetwork ()->GetServerBitStreamVersion () == 0 );
 
         // Enable the console again
         CCore::GetSingleton ().GetConsole ()->SetEnabled ( true );
