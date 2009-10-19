@@ -72,6 +72,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Reset the network
     pNet->Reset ();
+    assert ( pNet->GetServerBitStreamVersion () == 0 );
 
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
