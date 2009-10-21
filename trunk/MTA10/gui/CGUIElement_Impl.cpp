@@ -23,6 +23,9 @@
 CGUIElement_Impl::CGUIElement_Impl ( void )
 {
     m_pData = NULL;
+    m_pWindow = NULL;
+    m_pParent = NULL;
+    m_pManager = NULL;
 }
 
 void CGUIElement_Impl::DestroyElement ( void )
@@ -335,6 +338,10 @@ void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 
 CGUIElement* CGUIElement_Impl::GetParent ( void )
 {
+    // Validate
+    if ( m_pParent && m_pWindow && !m_pWindow->getParent () )
+        return NULL;
+
 	return m_pParent;
 }
 
