@@ -152,7 +152,7 @@ void CClientTextDisplay::Render ( bool bPulseEffects )
 			if ( m_ulFormat & DT_BOTTOM )
 				m_ulFormat |= DT_SINGLELINE;
 
-            unsigned int uiShadowOffset = Max < unsigned int > ( 1, m_fScale * m_fGlobalScale );
+            unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
             SColorRGBA rgbaShadowColor( 0, 0, 0, m_rgbaColor.A * m_ucShadowAlpha / 255 );
 
 			if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
