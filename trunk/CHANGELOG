@@ -1,5 +1,37 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.0.2
+======================================
+Goal: Stability bugfix releas
+
+Targets:
+* Fixes for major, high-priority issues and crashes that are present in version 1.0.1 and are degrading the stability of the software
+
+- 0005046: [General] Crash when firing a projectile (ccw) - resolved.
+- 0004848: [Scripting] colShapes should be made attachable (Jax) - resolved.
+- 0004285: [Synchronization] getElementposition returns the incorrect xyz of an element attached and offset from a vehicle (Jax) - resolved.
+- 0005052: [General] Unable to run Launcher with a very long PATH env (ccw) - resolved.
+- 0004662: [Server] setVehicleWheelStates re-inflates the wheel if -1 is specified, instead of ignoring the wheel (ccw) - resolved.
+- 0004775: [Client] Error when maximizing the game, crash. (ccw) - resolved.
+- 0005050: [Scripting] Add version parameter to onPlayerConnect (ccw) - resolved.
+- 0005061: [Server] Remove or make optional the /msg command (ccw) - resolved.
+- 0004861: [Client] When disconnecting from a server you get a C++ error or a crash! (ccw) - resolved.
+- 0005064: [Server] You can only start the map editor or local server once. (ccw) - resolved.
+- 0005017: [Server] Join flood check doesn't work. (ccw) - resolved.
+- 0005018: [General] More Ghostmode collision issues. (Race 465) (ccw) - resolved.
+- 0005055: [Server] HTTP server can't bind to a specific IP (Arc) - resolved.
+- 0005040: [Client] C++ Assertion failed error on click (ccw) - resolved.
+- 0005044: [General] Crash when deleting parent elements from inside a child event (ccw) - resolved.
+- 0005043: [General] Client freeze on quit (ccw) - resolved.
+
+Resources:
+
+- 0005059: [Optional] [Race] Unable to get player vehicle while handling the 'onPlayerWasted' event (ccw) - resolved.
+- 0005062: [Optional] Patch: race_delay_indicator dont show color codes (ccw) - resolved.
+- 0005066: [Optional] Patch: race_voicepack bug (ccw) - resolved.
+- 0005002: [Required] Vehicle Change Points Screw with player's Rotations. in Race mode. (ccw) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.0.1
 ======================================
 Goal: Stability bugfix release
