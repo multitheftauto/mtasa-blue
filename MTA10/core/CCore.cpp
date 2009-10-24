@@ -1126,7 +1126,7 @@ void CCore::DestroyNetwork ( )
 
 bool CCore::IsWindowMinimized ( void )
 {
-    return IsIconic ( GetHookedWindow () );
+    return IsIconic ( GetHookedWindow () ) ? true : false;
 }
 
 
