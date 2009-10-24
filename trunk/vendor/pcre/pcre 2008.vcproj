@@ -169,7 +169,7 @@
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\vendor\pcre"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -197,7 +197,6 @@
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"

@@ -162,7 +162,7 @@
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="..\..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\obj\vendor\libpng"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			>
@@ -193,9 +193,7 @@
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
-				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough=""
-				ProgramDataBaseFileName="vc70.pdb"
 				WarningLevel="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4996"
