@@ -70,13 +70,13 @@ void CConnectHistory::RemoveExpired ( void )
     long long llCurrentTime = GetTickCount64_ ();
 
     // Step through each IP's connect history
-    map < unsigned long, CConnectHistoryItem > ::iterator mapIt = m_HistoryItemMap.begin ();
+    HistoryItemMap ::iterator mapIt = m_HistoryItemMap.begin ();
     while ( mapIt != m_HistoryItemMap.end () )
     {
         CConnectHistoryItem& historyItem = mapIt->second;
 
         // Find point in the joinTimes list where the time is too old
-        vector < long long > ::const_iterator timesIt = historyItem.joinTimes.begin ();
+        JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin ();
         for ( ; timesIt < historyItem.joinTimes.end () ; ++timesIt )
         {
             if ( *timesIt > llCurrentTime - m_SamplePeriod )
@@ -95,14 +95,10 @@ void CConnectHistory::RemoveExpired ( void )
             historyItem.joinTimes.erase ( historyItem.joinTimes.begin (), timesIt );
         }
 
-        // Remove history item for this IP if there are no join times left
+        // Remove history item for this IP if there are no join times left (postfix ++ here ensures that a copy of the current pointer is used to call erase, hence causing no invalidation)
         if ( historyItem.joinTimes.empty () )
-        {
-            mapIt = m_HistoryItemMap.erase ( mapIt );
-        }
-		else
-        {
-			++mapIt;
-        }
+            m_HistoryItemMap.erase ( mapIt++ );
+        else
+            ++mapIt;
     }
 }
