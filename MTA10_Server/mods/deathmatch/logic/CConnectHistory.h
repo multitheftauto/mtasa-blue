@@ -13,9 +13,12 @@
 #ifndef __CCONNECTHISTORY_H
 #define __CCONNECTHISTORY_H
 
+typedef std::map < unsigned long, class CConnectHistoryItem > HistoryItemMap;
+typedef std::vector < long long > JoinTimesMap;
+
 struct CConnectHistoryItem
 {
-    std::vector < long long > joinTimes;
+    JoinTimesMap joinTimes;
 };
 
 class CConnectHistory
@@ -29,9 +32,9 @@ public:
 private:
     void                                RemoveExpired           ( void );
 
-    unsigned long                                    m_SamplePeriod;
-    unsigned long                                    m_MaxConnections;
-    std::map < unsigned long, CConnectHistoryItem >  m_HistoryItemMap;
+    unsigned long                       m_SamplePeriod;
+    unsigned long                       m_MaxConnections;
+    HistoryItemMap                      m_HistoryItemMap;
 };
 
 #endif
