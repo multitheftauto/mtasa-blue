@@ -488,6 +488,8 @@ bool CMainConfig::LoadExtended ( void )
 	//RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
 	//RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
+    RegisterCommand ( "ver", CConsoleCommands::Ver, false );
+
 	return true;
 }
 
