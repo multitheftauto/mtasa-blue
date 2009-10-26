@@ -468,7 +468,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 								"= HTTP port		: %u\n" \
 								"===========================================================\n",
 
-                                MTA_DM_BUILDTAG_LONG,
+                                MTA_DM_BUILDTAG_SHORT,
 								m_pMainConfig->GetServerName ().c_str (),
 								szServerIP ? szServerIP : "",
 								usServerPort,

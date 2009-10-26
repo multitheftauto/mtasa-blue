@@ -64,6 +64,8 @@ public:
 	static bool			LoadModule		( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 	static bool			UnloadModule	( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 	static bool			ReloadModule	( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+
+    static bool         Ver             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 
 #endif

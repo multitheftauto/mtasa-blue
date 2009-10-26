@@ -1,5 +1,5 @@
-#define MTA_DM_VERSION              0x0102
-#define MTA_DM_VERSIONSTRING        "1.0.2"
+#define MTA_DM_VERSION              0x0103
+#define MTA_DM_VERSIONSTRING        "1.0.3"
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
 #define MTA_DM_BITSTREAM_VERSION    0x03
 
