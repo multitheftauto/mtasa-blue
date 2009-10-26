@@ -97,6 +97,10 @@ void CClientPlayerManager::DoPulse ( void )
     // *****************************************************
     const long long llCurrentTime =  GetTickCount64_ ();
 
+    // Option to turn warning on/off
+    bool bShowSyncTrouble = false;
+    g_pCore->GetCVars ()->Get ( "show_sync_trouble", bShowSyncTrouble );
+
     // If downloading, reset trouble timer
     if ( g_pClientGame->IsDownloadingBigPacket () )
         m_llSyncTroubleStartTime = 0;
@@ -163,7 +167,7 @@ void CClientPlayerManager::DoPulse ( void )
             if ( !m_llSyncTroubleStartTime )
                 m_llSyncTroubleStartTime = llCurrentTime;
 
-            if ( llCurrentTime - m_llSyncTroubleStartTime > 10000 )
+            if ( bShowSyncTrouble && llCurrentTime - m_llSyncTroubleStartTime > 10000 )
             {
                 g_pCore->GetConsole ()->Print ( "Other players not responding. Disconnecting..." );
                 g_pCore->GetCommands ()->Execute ( "disconnect" );
@@ -176,7 +180,7 @@ void CClientPlayerManager::DoPulse ( void )
     }
 
     // Display sync trouble message if timer is running
-    if ( m_llSyncTroubleStartTime )
+    if ( bShowSyncTrouble && m_llSyncTroubleStartTime )
     {
         int iPosX = g_pCore->GetGraphics ()->GetViewportWidth () / 2;             // Half way across
         int iPosY = g_pCore->GetGraphics ()->GetViewportHeight () * 40 / 100;     // 40/100 down
