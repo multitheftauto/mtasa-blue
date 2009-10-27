@@ -527,31 +527,28 @@ bool CBanManager::IsValidIP ( const char* szIP )
 
     if ( szIP1 && szIP2 && szIP3 && szIP4 )
     {
-        if ( IsNumericString ( szIP1 ) &&
-             IsNumericString ( szIP2 ) &&
-             IsNumericString ( szIP3 ) &&
-             IsNumericString ( szIP4 ) )
-        {
-            int iIP1 = atoi ( szIP1 );
-            int iIP2 = atoi ( szIP2 );
-            int iIP3 = atoi ( szIP3 );
-            int iIP4 = atoi ( szIP4 );
-
-            if ( iIP1 >= 0 && iIP1 < 256 )
-            {
-                if ( iIP2 >= 0 && iIP2 < 256 )
-                {
-                    if ( iIP3 >= 0 && iIP3 < 256 )
-                    {
-                        if ( iIP4 >= 0 && iIP4 < 256 )
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
+        if ( IsValidIPPart ( szIP1 ) &&
+             IsValidIPPart ( szIP2 ) &&
+             IsValidIPPart ( szIP3 ) &&
+             IsValidIPPart ( szIP4 ) )
+             return true;
+        
     }
 
     return false;
+}
+
+bool CBanManager::IsValidIPPart ( const char* szIP )
+{
+    if ( IsNumericString ( szIP ) )
+    {
+        int iIP = atoi ( szIP );
+        if ( iIP >= 0 && iIP < 256 )
+            return true;
+    }
+    else if ( strcmp ( szIP, "*" ) == 0 )
+        return true;
+
+    return false;
+
 }
