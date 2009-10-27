@@ -69,6 +69,8 @@ private:
 
     time_t              m_tUpdate;
 
+    bool                IsValidIPPart               ( const char* szIP );
+
 };
 
 #endif
