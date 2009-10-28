@@ -9708,13 +9708,15 @@ int CLuaFunctionDefinitions::ExecuteSQLDropTable ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::ExecuteSQLDelete ( lua_State* luaVM )
 {
+    std::string strError;
 	bool bSuccess = false;
 
 	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
 	{
         bSuccess = CStaticFunctionDefinitions::ExecuteSQLDelete ( std::string ( lua_tostring ( luaVM, 1 ) ), std::string ( lua_tostring ( luaVM, 2 ) ) );
 		if ( !bSuccess ) {
-			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
+			strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
+            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
 		} else {
 			lua_pushboolean ( luaVM, true );
 			return 1;
@@ -9724,12 +9726,14 @@ int CLuaFunctionDefinitions::ExecuteSQLDelete ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "executeSQLDelete" );
 
     lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushstring ( luaVM, strError.c_str () );
+	return 2;
 }
 
 
 int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
 {
+    std::string strError;
 	bool bSuccess = false;
 
 	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
@@ -9741,7 +9745,8 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
 
         bSuccess = CStaticFunctionDefinitions::ExecuteSQLInsert ( std::string ( lua_tostring ( luaVM, 1 ) ), std::string ( lua_tostring ( luaVM, 2 ) ), strColumns );
 		if ( !bSuccess ) {
-			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
+			strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
+            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
 		} else {
 			lua_pushboolean ( luaVM, true );
 			return 1;
@@ -9751,12 +9756,15 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "executeSQLInsert" );
 
     lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushstring ( luaVM, strError.c_str () );
+	return 2;
 }
 
 
 int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
 {
+    std::string strError;
+
 	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) {
 		CLuaArguments Args;
 		CRegistryResult Result;
@@ -9802,19 +9810,23 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
 			}
 			return 1;
 		} else {
-			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
+            strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
+            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
 		}
 	}
     else
         m_pScriptDebugging->LogBadType ( luaVM, "executeSQLQuery" );
 
     lua_pushboolean ( luaVM, false );
-    return 1;
+    lua_pushstring ( luaVM, strError.c_str () );
+    return 2;
 }
 
 
 int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
 {
+    std::string strError;
+
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
 		CRegistryResult Result;
@@ -9869,19 +9881,23 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
 		}
         else
         {
-			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
+			strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
+            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
 		}
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "executeSQLSelect" );
 
     lua_pushboolean ( luaVM, false );
-    return 1;
+    lua_pushstring ( luaVM, strError.c_str () );
+    return 2;
 }
 
 
 int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
 {
+    std::string strError;
+
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING && lua_type ( luaVM, 3 ) == LUA_TSTRING )
     {
         std::string strTable    = std::string ( lua_tostring ( luaVM, 1 ) );
@@ -9893,14 +9909,16 @@ int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
 		} else {
-			m_pScriptDebugging->LogError ( luaVM, "Database query failed: %s", CStaticFunctionDefinitions::SQLGetLastError ().c_str () );
+			strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
+            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
 		}
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "executeSQLUpdate" );
 
     lua_pushboolean ( luaVM, false );
-    return 1;
+    lua_pushstring ( luaVM, strError.c_str () );
+    return 2;
 }
 
 
