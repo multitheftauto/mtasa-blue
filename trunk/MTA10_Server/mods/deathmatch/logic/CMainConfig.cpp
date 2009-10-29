@@ -359,6 +359,7 @@ bool CMainConfig::LoadExtended ( void )
                 CResource * loadedResource = g_pGame->GetResourceManager ()->GetResource ( strBuffer.c_str () );
                 if ( !loadedResource )
                 {
+                    CLogger::LogPrintNoStamp ( "\n" );
                     CLogger::ErrorPrintf ( "Couldn't find resource %s. Check it exists.\n", strBuffer.c_str () );
                     bNoProgress = true;
                 }
