@@ -55,7 +55,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
         itoa ( port, szPort, 10 );
 	    parameters[ "port" ] = szPort;
 
-        if ( szIP )
+        if ( szIP && szIP[0] )
         {
             // Convert the dotted ip to a long
             long lIP = inet_addr ( szIP );
