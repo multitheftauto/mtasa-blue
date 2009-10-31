@@ -18,6 +18,7 @@
 
 #include "CClientCommon.h"
 #include <list>
+#include <vector>
 class CClientStreamSector;
 class CClientStreamSectorRow;
 class CClientStreamElement;
@@ -31,7 +32,11 @@ public:
                                             CClientStreamer             ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance );
                                             ~CClientStreamer            ( void );
 
+    void                                    SetupSectors                ( void );
     
+    static void                             UpdateSectors               ( CVector & vecPosition );
+    static void                             OnEnterSector               ( CClientStreamSector * pSector );
+
     void                                    DoPulse                     ( CVector & vecPosition );
     void                                    SetDimension                ( unsigned short usDimension );
 
@@ -43,12 +48,13 @@ public:
     std::list < CClientStreamElement * > ::iterator  ActiveElementsEnd  ( void )    { return m_ActiveElements.end (); }
 
 private:
-    void                                    CreateSectors               ( std::list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );
-    void                                    ConnectSector               ( CClientStreamSector * pSector );
-    void                                    ConnectRow                  ( CClientStreamSectorRow * pRow );
+    static void                             CreateSectors               ( std::vector < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );
+    static void                             ConnectSector               ( CClientStreamSector * pSector );
+    static void                             ConnectRow                  ( CClientStreamSectorRow * pRow );
 
-    CClientStreamSectorRow *                FindOrCreateRow             ( CVector & vecPosition, CClientStreamSectorRow * pSurrounding = NULL );
-    CClientStreamSectorRow *                FindRow                     ( float fY );
+    static CClientStreamSectorRow *         FindOrCreateRow             ( CVector & vecPosition, CClientStreamSectorRow * pSurrounding = NULL );
+    static CClientStreamSectorRow *         FindRow                     ( float fY );
+    
     void                                    OnUpdateStreamPosition      ( CClientStreamElement * pElement );
     
     void                                    AddElement                  ( CClientStreamElement * pElement );
@@ -60,7 +66,8 @@ private:
     void                                    Restream                    ( void );
     bool                                    ReachedLimit                ( void )    { return m_pLimitReachedFunc (); }
 
-    void                                    OnEnterSector               ( CClientStreamSector * pSector );
+    void                                    OnSectorChange              ( std::vector < CClientStreamSector * > & activateSectors, std::vector < CClientStreamSector * > & deactivateSectors );
+
     void                                    OnElementEnterSector        ( CClientStreamElement * pElement, CClientStreamSector * pSector );
     void                                    OnElementForceStreamIn      ( CClientStreamElement * pElement );
     void                                    OnElementForceStreamOut     ( CClientStreamElement * pElement );
@@ -69,14 +76,17 @@ private:
     float                                   m_fMaxDistanceExp;
     float                                   m_fMaxDistanceThreshold;
     StreamerLimitReachedFunction*           m_pLimitReachedFunc;
-    std::list < CClientStreamSectorRow * >  m_WorldRows;
-    std::list < CClientStreamSectorRow * >  m_ExtraRows;
-    CClientStreamSectorRow *                m_pRow;
-    CClientStreamSector *                   m_pSector;
-    CVector                                 m_vecPosition;
-    unsigned short                          m_usDimension;
     std::list < CClientStreamElement * >    m_ActiveElements;
     std::list < CClientStreamElement * >    m_ToStreamOut;
+    CVector                                 m_vecPosition;
+    unsigned short                          m_usDimension;
+
+    static std::vector < CClientStreamer * > m_Streamers;
+    static std::vector < CClientStreamSectorRow * >  m_WorldRows;
+    static std::vector < CClientStreamSectorRow * >  m_ExtraRows;
+    static CClientStreamSectorRow *         m_pRow;
+    static CClientStreamSector *            m_pSector;
+    static CVector                          m_vecSectorPosition;
 };
 
 #endif

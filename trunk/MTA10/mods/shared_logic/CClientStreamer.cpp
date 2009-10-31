@@ -16,6 +16,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::vector;
 
 // Return the distance between two points ^ 2
 /*
@@ -94,9 +95,20 @@ namespace
 
 }
 
+// Define our static variables
+vector < CClientStreamer * > CClientStreamer::m_Streamers;
+vector < CClientStreamSectorRow * > CClientStreamer::m_WorldRows;
+vector < CClientStreamSectorRow * > CClientStreamer::m_ExtraRows;
+CClientStreamSectorRow * CClientStreamer::m_pRow = NULL;
+CClientStreamSector * CClientStreamer::m_pSector = NULL;
+CVector CClientStreamer::m_vecSectorPosition;
+
 
 CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance )
 {    
+    // Store all streamers
+    m_Streamers.push_back ( this );
+
     // Setup our distance variables
     m_fMaxDistanceExp = fMaxDistance * fMaxDistance;
     m_fMaxDistanceThreshold = ( fMaxDistance + 50.0f ) * ( fMaxDistance + 50.0f );
@@ -105,40 +117,65 @@ CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFu
     // We need the limit reached func
     assert ( m_pLimitReachedFunc = pLimitReachedFunc );
 
-    // Create our main world sectors covering the mainland
-    CreateSectors ( &m_WorldRows,
-                    CVector2D ( SECTOR_SIZE, ROW_SIZE ),
-                    CVector2D ( -WORLD_SIZE, -WORLD_SIZE ),
-                    CVector2D ( WORLD_SIZE, WORLD_SIZE ) );
-
-    // Find our row and sector    
-    m_pRow = FindOrCreateRow ( m_vecPosition );
-    m_pSector = NULL;
-    OnEnterSector ( m_pRow->FindOrCreateSector ( m_vecPosition ) );
+    SetupSectors ();
 }
 
 
 CClientStreamer::~CClientStreamer ( void )
 {
-    // Clear our mainland rows
-    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
-    for ( ; iter != m_WorldRows.end () ; iter++ )
+    // If this is our last streamer, remove our static sectors
+    if ( m_Streamers.size () == 1 )
     {
-        delete *iter;
+        // Clear our mainland rows
+        vector < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+        for ( ; iter != m_WorldRows.end () ; iter++ )
+        {
+            delete *iter;
+        }
+        m_WorldRows.clear ();
+        
+        // Clear our extra rows
+        iter = m_ExtraRows.begin ();
+        for ( ; iter != m_ExtraRows.end () ; iter++ )
+        {
+            delete *iter;
+        }
+        m_ExtraRows.clear ();
     }
-    m_WorldRows.clear ();
-    
-    // Clear our extra rows
-    iter = m_ExtraRows.begin ();
-    for ( ; iter != m_ExtraRows.end () ; iter++ )
-    {
-        delete *iter;
-    }
-    m_ExtraRows.clear ();
+    // Unlink our streamer
+    ListRemove ( m_Streamers, this );
 }
 
 
-void CClientStreamer::CreateSectors ( list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
+void CClientStreamer::SetupSectors ()
+{
+    // Setup our sectors if this is our first instance
+    if ( m_Streamers.size () == 1 )
+    {
+        // Create our main world sectors covering the mainland
+        CreateSectors ( &m_WorldRows,
+                        CVector2D ( SECTOR_SIZE, ROW_SIZE ),
+                        CVector2D ( -WORLD_SIZE, -WORLD_SIZE ),
+                        CVector2D ( WORLD_SIZE, WORLD_SIZE ) );
+
+        // Find our row and sector    
+        m_pRow = FindOrCreateRow ( m_vecSectorPosition );
+        m_pSector = m_pRow->FindOrCreateSector ( m_vecSectorPosition );
+    }
+
+    // Activate the current sector for this streamer
+    vector < CClientStreamSector * > activateSectors, deactivateSectors;
+    CClientStreamSector * pActiveSectors [ 9 ];
+    m_pSector->GetSurroundingSectors ( pActiveSectors );
+    pActiveSectors [ 8 ] = m_pSector;
+    for ( int i = 0 ; i < 9 ; i++ ) activateSectors.push_back ( pActiveSectors [ i ] );
+
+    // Start this streamer at our current sector
+    OnSectorChange ( activateSectors, deactivateSectors );
+}
+
+
+void CClientStreamer::CreateSectors ( vector < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
 {
     // Creates our sectors within rows, filling up our rectangle, connecting each sector and row
     CClientStreamSector * pCurrent = NULL, * pPrevious = NULL, *pPreviousRowSector = NULL;
@@ -192,12 +229,13 @@ void CClientStreamer::ConnectRow ( CClientStreamSectorRow * pRow )
     
 #include "..\deathmatch\logic\CClientGame.h"
 extern CClientGame* g_pClientGame;
-void CClientStreamer::DoPulse ( CVector & vecPosition )
-{   
-    /* Debug code
+void CClientStreamer::UpdateSectors ( CVector & vecPosition )
+{
+    /*
+    // Debugging code
     CClientStreamSector * pSector;
-    list < CClientStreamSector * > ::iterator iterSector;
-    list < CClientStreamSectorRow * > ::iterator iterRow = m_WorldRows.begin ();
+    vector < CClientStreamSector * > ::iterator iterSector;
+    vector < CClientStreamSectorRow * > ::iterator iterRow = m_WorldRows.begin ();
     for ( ; iterRow != m_WorldRows.end () ; iterRow++ )
     {
         iterSector = (*iterRow)->Begin ();
@@ -206,13 +244,17 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
             pSector = *iterSector;
             if ( !pSector->m_pArea )
             {
+                CVector2D vecSize = pSector->m_vecTopRight - pSector->m_vecBottomLeft;
+                CVector2D vecPosition = pSector->m_vecBottomLeft + ( vecSize / CVector2D ( 2.0f, 2.0f ) );
+                
                 pSector->m_pArea = new CClientRadarArea ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID );
-                pSector->m_pArea->SetPosition ( pSector->m_vecBottomLeft );
-                CVector2D vecSize ( pSector->m_vecTopRight.fX - pSector->m_vecBottomLeft.fX, pSector->m_vecTopRight.fY - pSector->m_vecBottomLeft.fY );
-                pSector->m_pArea->SetSize ( vecSize );
+                pSector->m_pArea->SetPosition ( vecPosition );
+                pSector->m_pArea->SetSize ( CVector2D ( 100, 100 ) );
                 pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
             }
-            pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
+            if ( pSector == m_pSector ) pSector->m_pArea->SetColor ( 0, 255, 0, 255 );
+            else if ( pSector->IsActivated () ) pSector->m_pArea->SetColor ( 255, 255, 0, 255 );
+            else pSector->m_pArea->SetColor ( 255, 0, 0, 50 );
         }
     }
     iterRow = m_ExtraRows.begin ();    
@@ -236,9 +278,9 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
     */
 
     // Has our position changed?
-    if ( vecPosition != m_vecPosition )
+    if ( vecPosition != m_vecSectorPosition )
     {
-        m_vecPosition = vecPosition;
+        m_vecSectorPosition = vecPosition;
 
         // Have we changed row?
         if ( !m_pRow->DoesContain ( vecPosition ) )
@@ -252,7 +294,81 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
             // Grab our new sector
             OnEnterSector ( m_pRow->FindOrCreateSector ( vecPosition, m_pSector ) );
         }
+    }
+}
+
+
+void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
+{
+    // Grab a list of the sectors we want to activate/decactivate
+    vector < CClientStreamSector * > activateSectors, deactivateSectors;
+
+    if ( m_pSector )
+    {                
+        // Flag the sectors we want to save deactivating/reactivating the same ones.
+        CClientStreamSector * pDeactivateSectors [ 9 ];
+        m_pSector->GetSurroundingSectors ( pDeactivateSectors );
+        pDeactivateSectors [ 8 ] = m_pSector;
+        for ( int i = 0 ; i < 9 ; i++ ) pDeactivateSectors[i]->SetShouldBeActive ( false );
+
+        CClientStreamSector * pActivateSectors [ 9 ];
+        pSector->GetSurroundingSectors ( pActivateSectors );
+        pActivateSectors [ 8 ] = pSector;
+        for ( int i = 0 ; i < 9 ; i++ ) pActivateSectors[i]->SetShouldBeActive ( true );
+
+        // Sort out our sectors
+        CClientStreamSector * pTempSector = NULL;
+        for ( int i = 0 ; i < 9 ; i++ )
+        {
+            // Deactivate the unwanted ones
+            pTempSector = pDeactivateSectors[i];
+            if ( pTempSector && !pTempSector->ShouldBeActive () && pTempSector->IsActivated () )
+            {
+                pTempSector->SetActivated ( false );
+                deactivateSectors.push_back ( pTempSector );               
+            }
+
+            // activate the wanted ones
+            pTempSector = pActivateSectors[i];
+            if ( pTempSector && pTempSector->ShouldBeActive () && !pTempSector->IsActivated () )
+            {
+                pTempSector->SetActivated ( true );
+                activateSectors.push_back ( pTempSector );
+            }
+        }
+    }
+    else
+    {
+        CClientStreamSector * pActivateSectors [ 9 ];
+        pSector->GetSurroundingSectors ( pActivateSectors );
+        pActivateSectors [ 8 ] = pSector;
+        for ( int i = 0 ; i < 9 ; i++ ) 
+        {
+            if ( pActivateSectors [ i ] ) activateSectors.push_back ( pActivateSectors [ i ] );
+        }
+    }
+    m_pSector = pSector;
+
+    // Update all our sectors
+    vector < CClientStreamer * > ::iterator iter = m_Streamers.begin ();
+    for ( ; iter != m_Streamers.end () ; iter++ )
+    {
+        (*iter)->OnSectorChange ( activateSectors, deactivateSectors );
+    }
+}
+
+
+void CClientStreamer::DoPulse ( CVector & vecPosition )
+{   
+    // Has our position changed?
+    if ( vecPosition != m_vecPosition )
+    {
+        m_vecPosition = vecPosition;
+
+        // Collect new distances
         SetExpDistances ( &m_ActiveElements );
+
+        // Sort our active elements by distance
         m_ActiveElements.sort ( CompareExpDistance );
     }
     Restream ();
@@ -298,7 +414,7 @@ CClientStreamSectorRow * CClientStreamer::FindOrCreateRow ( CVector & vecPositio
 
     // Search through our main world rows
     CClientStreamSectorRow * pRow = NULL;
-    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+    vector < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
     for ( ; iter != m_WorldRows.end () ; iter++ )
     {
         pRow = *iter;
@@ -333,7 +449,7 @@ CClientStreamSectorRow * CClientStreamer::FindRow ( float fY )
 {
     // Search through our main world rows
     CClientStreamSectorRow * pRow = NULL;
-    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+    vector < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
     for ( ; iter != m_WorldRows.end () ; iter++ )
     {
         pRow = *iter;
@@ -430,8 +546,8 @@ void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, 
 
     // Search through our list. Add it behind the first item further away than this
     CClientStreamElement * pTemp = NULL;
-    list < CClientStreamElement* > :: iterator iter = pList->begin ();
-    for ( ; iter != pList->end (); iter++ )
+    list < CClientStreamElement* > :: const_iterator iter = pList->begin (), iterEnd = pList->end ();
+    for ( ; iter != iterEnd; iter++ )
     {
         pTemp = *iter;
 
@@ -457,15 +573,7 @@ bool CClientStreamer::CompareExpDistance ( CClientStreamElement* p1, CClientStre
 
 bool CClientStreamer::IsActiveElement ( CClientStreamElement * pElement )
 {
-    list < CClientStreamElement * > ::iterator iter = m_ActiveElements.begin ();
-    for ( ; iter != m_ActiveElements.end () ; iter++ )
-    {
-        if ( *iter == pElement )
-        {
-            return true;
-        }
-    }
-    return false;
+    return ListContains ( m_ActiveElements, pElement );
 }
 
 
@@ -490,8 +598,8 @@ void CClientStreamer::Restream ( void )
     float fElementDistanceExp;
     bool bReachedLimit = ReachedLimit ();
     // Loop through our active elements list (they should be ordered closest to furthest)
-    list < CClientStreamElement* > ::iterator iter = m_ActiveElements.begin ();
-    for ( ; iter != m_ActiveElements.end (); iter++ )
+    list < CClientStreamElement* > ::const_iterator iter = m_ActiveElements.begin (), iterEnd = m_ActiveElements.end ();
+    for ( ; iter != iterEnd; iter++ )
     {
         pElement = *iter;
         fElementDistanceExp = pElement->GetExpDistance ();
@@ -565,58 +673,36 @@ void CClientStreamer::Restream ( void )
 }
 
 
-void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
+void CClientStreamer::OnSectorChange ( vector < CClientStreamSector * > & activateSectors, vector < CClientStreamSector * > & deactivateSectors )
 {
-    CClientStreamElement * pElement = NULL;
-    if ( m_pSector )
-    {                
-        // Grab the unwanted sectors
-        list < CClientStreamSector * > common, uncommon;
-        pSector->CompareSurroundings ( m_pSector, &common, &uncommon, true );
+    CClientStreamSector * pSector;
+    CClientStreamSectorList * pSectorList;
+    CClientStreamElement * pElement;
+    
+    // First, stream out all the elements in deactive sectors
+    vector < CClientStreamSector * > ::iterator iter = deactivateSectors.begin ();
+    for ( ; iter != deactivateSectors.end () ; iter++ )
+    {
+        pSector = *iter;
+        pSectorList = pSector->GetList ( this );
 
-        // Deactivate the unwanted sectors
-        CClientStreamSector * pTempSector = NULL;
-        list < CClientStreamSector * > ::iterator iter = uncommon.begin ();
-        for ( ; iter != uncommon.end () ; iter++ )
+        list < CClientStreamElement * > ::iterator iterElements = pSectorList->Begin ();
+        for ( ; iterElements != pSectorList->End () ; iterElements++ )
         {
-            pTempSector = *iter;
-            // Make sure we dont unload our new sector
-            if ( pTempSector != pSector )
-            {            
-                if ( pTempSector->IsActivated () )
-                {
-                    list < CClientStreamElement * > ::iterator iter = pTempSector->Begin ();
-                    for ( ; iter != pTempSector->End () ; iter++ )
-                    {
-                        pElement = *iter;
-                        if ( pElement->IsStreamedIn () )
-                        {
-                            // Add it to our streaming out list
-                            m_ToStreamOut.push_back ( pElement );
-                        }
-                    }
-                    pTempSector->RemoveElements ( &m_ActiveElements );
-                    pTempSector->SetActivated ( false );
-                }
-            }
-        }
-
-        // Grab the wanted sectors
-        m_pSector->CompareSurroundings ( pSector, &common, &uncommon, true );
-
-        // Activate the unwanted sectors
-        iter = uncommon.begin ();
-        for ( ; iter != uncommon.end () ; iter++ )
-        {
-            pTempSector = *iter;
-            if ( !pTempSector->IsActivated () )
-            {
-                pTempSector->AddElements ( &m_ActiveElements );
-                pTempSector->SetActivated ( true );
-            }
+            pElement = *iterElements;
+            if ( pElement->IsStreamedIn () ) m_ToStreamOut.push_back ( pElement );
         }
     }
-    m_pSector = pSector;
+
+    // ..add all the elements in active sectors to our active-list
+    iter = activateSectors.begin ();
+    for ( ; iter != activateSectors.end () ; iter++ )
+    {
+        pSector = *iter;
+        pSectorList = pSector->GetList ( this );
+
+        pSectorList->AddElements ( &m_ActiveElements );
+    }
     SetExpDistances ( &m_ActiveElements );
     m_ActiveElements.sort ( CompareExpDistance );
 }
@@ -624,16 +710,20 @@ void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
 
 void CClientStreamer::OnElementEnterSector ( CClientStreamElement * pElement, CClientStreamSector * pSector )
 {
+    CClientStreamSectorList * pSectorList = NULL;
     CClientStreamSector * pPreviousSector = pElement->GetStreamSector ();
     if ( pPreviousSector )
     {
         // Remove the element from its old sector
-        pPreviousSector->Remove ( pElement );
+        pSectorList = pPreviousSector->GetList ( this );
+        pSectorList->Remove ( pElement );
     }
     if ( pSector )
     {
+        pSectorList = pSector->GetList ( this );
+
         // Add the element to its new sector
-        pSector->Add ( pElement );
+        pSectorList->Add ( pElement );
 
         // Is this new sector activated?
         if ( pSector->IsActivated () )
@@ -650,7 +740,7 @@ void CClientStreamer::OnElementEnterSector ( CClientStreamElement * pElement, CC
             // Should we activate this sector?
             if ( pSector->IsExtra () && ( m_pSector->IsMySurroundingSector ( pSector ) || m_pSector == pSector ) )
             {
-                pSector->AddElements ( &m_ActiveElements );
+                pSectorList->AddElements ( &m_ActiveElements );
                 pSector->SetActivated ( true );
             }
             // If we're in a deactivated sector and streamed in, stream us out
