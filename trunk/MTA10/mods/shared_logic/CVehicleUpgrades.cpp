@@ -34,6 +34,12 @@ CVehicleUpgrades::CVehicleUpgrades ( CClientVehicle* pVehicle )
 }
 
 
+bool CVehicleUpgrades::IsUpgrade ( unsigned short usModel )
+{
+    return ( usModel >= 1000 && usModel <= 1193 );
+}
+
+
 bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
 {
     unsigned short usModel = m_pVehicle->GetModel ();
@@ -299,21 +305,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
     unsigned char ucSlot;
 	if ( GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
     {
-        CVehicle* pVehicle = m_pVehicle->GetGameVehicle ();
-        if ( pVehicle )
-        {
-            // Grab the upgrade model
-			CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usUpgrade );
-			if ( pModelInfo )
-			{
-				// Request it
-				pModelInfo->RequestVehicleUpgrade ();
-                pModelInfo->LoadAllRequestedModels ();
-
-				// Add the upgrade
-                pVehicle->AddVehicleUpgrade ( usUpgrade );
-			}
-        }
+        m_pVehicle->RequestUpgrade ( usUpgrade );
 
         // Add it to the slot
 		m_SlotStates [ ucSlot ] = usUpgrade;
@@ -372,7 +364,7 @@ void CVehicleUpgrades::ReAddAll ( void )
     unsigned char ucSlot = 0;
     for ( ; ucSlot < VEHICLE_UPGRADE_SLOTS ; ucSlot++ )
     {
-        if ( m_SlotStates [ ucSlot ] ) AddUpgrade ( m_SlotStates [ ucSlot ] );
+        if ( m_SlotStates [ ucSlot ] ) ForceAddUpgrade ( m_SlotStates [ ucSlot ] );
     }
 }
 

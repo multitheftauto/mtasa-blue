@@ -352,6 +352,8 @@ public:
     bool                        HasRadio                ( void );
     bool                        HasPoliceRadio          ( void );
 
+    void                        RequestUpgrade          ( unsigned short usModel );
+
     void                        ReCreate                ( void );
 
     void                        ModelRequestCallback    ( CModelInfo* pModelInfo );
