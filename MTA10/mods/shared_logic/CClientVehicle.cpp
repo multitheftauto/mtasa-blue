@@ -2014,11 +2014,7 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
         }
-
-        // Re-add all the upgrades
-        if ( m_pUpgrades )
-            m_pUpgrades->ReAddAll ();
-
+        if ( m_pUpgrades ) m_pUpgrades->ReAddAll ();
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
         m_pVehicle->SetRemap ( static_cast < unsigned int > ( m_ucPaintjob ) );
         m_pVehicle->SetBodyDirtLevel ( m_fDirtLevel );
@@ -2032,18 +2028,6 @@ void CClientVehicle::Create ( void )
         {
             m_pVehicle->SetHeliRotorSpeed ( m_fHeliRotorSpeed );
             m_pVehicle->SetHeliSearchLightVisible ( m_bHeliSearchLightVisible );
-        }
-
-        // Check the paintjob hasn't reset our colors
-        if ( m_bColorSaved )
-        {
-            unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
-            m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
-            if ( ucColor1 != m_ucColor1 || ucColor2 != m_ucColor2 ||
-                 ucColor3 != m_ucColor3 || ucColor4 != m_ucColor4 )
-            {
-                m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
-            }
         }
 
         m_pVehicle->SetUnderwater ( IsBelowWater () );
@@ -2272,8 +2256,16 @@ void CClientVehicle::ReCreate ( void )
 
 void CClientVehicle::ModelRequestCallback ( CModelInfo* pModelInfo )
 {
-    // Create the vehicle. The model is now loaded.
-    Create ();
+    DWORD dwModel = pModelInfo->GetModel ();
+    if ( CVehicleUpgrades::IsUpgrade ( ( unsigned short ) dwModel ) )
+    {
+        m_pVehicle->AddVehicleUpgrade ( dwModel );
+    }
+    else
+    {
+        // Create the vehicle. The model is now loaded.
+        Create ();
+    }
 }
 
 
@@ -3075,6 +3067,18 @@ void CClientVehicle::SetHeadLightColor ( RGBA color )
         m_pVehicle->SetHeadLightColor ( color );
     }
     m_HeadLightColor = color;
+}
+
+
+void CClientVehicle::RequestUpgrade ( unsigned short usModel )
+{
+    if ( m_pVehicle )
+    {
+        if ( m_pModelRequester->RequestUpgrade ( usModel, this ) )
+        {
+            m_pVehicle->AddVehicleUpgrade ( usModel );
+        }
+    }
 }
 
 

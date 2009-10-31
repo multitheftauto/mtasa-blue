@@ -23,3 +23,17 @@ void CStreamingSA::RequestAnimations ( int i, int j )
         add     esp, 0x8
     }
 }
+
+bool CStreamingSA::HasVehicleUpgradeLoaded ( int model )
+{
+    bool bReturn;
+    DWORD dwFunc = FUNC_CStreaming_HasVehicleUpgradeLoaded;
+    _asm
+    {
+        push    model
+        call    dwFunc
+        add     esp, 0x4
+        mov     bReturn, al
+    }
+    return bReturn;
+}
