@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-using std::list;
+using std::vector;
 
 CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop )
 {
@@ -25,7 +25,7 @@ CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop )
 CClientStreamSectorRow::~CClientStreamSectorRow ( void )
 {
     // Clear our sectors
-    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    vector < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
     for ( ; iter != m_Sectors.end () ; iter++ )
     {
         delete *iter;
@@ -43,7 +43,15 @@ void CClientStreamSectorRow::Add ( CClientStreamSector * pSector )
 
 void CClientStreamSectorRow::Remove ( CClientStreamSector * pSector )
 {
-    m_Sectors.remove ( pSector );
+    vector < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    for ( ; iter != m_Sectors.end () ; iter++ )
+    {
+        if ( *iter == pSector )
+        {
+            m_Sectors.erase ( iter );
+            break;
+        }
+    }
 }
 
 
@@ -73,7 +81,7 @@ CClientStreamSector * CClientStreamSectorRow::FindOrCreateSector ( CVector & vec
     
     // Search through our row of sectors
     CClientStreamSector * pSector = NULL;
-    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    vector < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
     for ( ; iter != m_Sectors.end () ; iter++ )
     {
         pSector = *iter;
@@ -101,7 +109,7 @@ CClientStreamSector * CClientStreamSectorRow::FindSector ( float fX )
 {    
     // Search through our row of sectors
     CClientStreamSector * pSector = NULL;
-    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    vector < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
     for ( ; iter != m_Sectors.end () ; iter++ )
     {
         pSector = *iter;

@@ -28,8 +28,8 @@ public:
                                                     CClientStreamSectorRow      ( float fBottom, float fTop );
                                                     ~CClientStreamSectorRow     ( void );
 
-    std::list < CClientStreamSector * > ::iterator  Begin                       ( void )                            { return m_Sectors.begin (); }
-    std::list < CClientStreamSector * > ::iterator  End                         ( void )                            { return m_Sectors.end (); }
+    std::vector < CClientStreamSector * > ::iterator  Begin                     ( void )                            { return m_Sectors.begin (); }
+    std::vector < CClientStreamSector * > ::iterator  End                       ( void )                            { return m_Sectors.end (); }
     CClientStreamSector *                           Front                       ( void )                            { return m_Sectors.front (); }
     void                                            Add                         ( CClientStreamSector * pSector );
     void                                            Remove                      ( CClientStreamSector * pSector );
@@ -49,7 +49,7 @@ private:
     void                                            SetExtra                    ( bool bExtra )     { m_bExtra = bExtra; }
 
     float                                           m_fBottom, m_fTop;
-    std::list < CClientStreamSector * >             m_Sectors;
+    std::vector < CClientStreamSector * >           m_Sectors;
     bool                                            m_bExtra;
     CClientStreamSectorRow                          * m_pTop, * m_pBottom;
 };
