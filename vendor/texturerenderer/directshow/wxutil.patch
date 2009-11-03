@@ -1,4 +1,0 @@
-277c277
-<             hr = (*pCoInitializeEx)(0, COINIT_DISABLE_OLE1DDE );
----
->             hr = (*pCoInitializeEx)(0, /*COINIT_DISABLE_OLE1DDE*/4 );
