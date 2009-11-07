@@ -126,29 +126,41 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     
     // Server player list label
     m_pServerPlayerListLabel [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Player List:" ) );
-    m_pServerPlayerListLabel [ type ]->SetPosition ( CVector2D ( 0.83f, 0.29f ), true );
+    m_pServerPlayerListLabel [ type ]->SetPosition ( CVector2D ( 0.83f, 0.34f ), true );
     m_pServerPlayerListLabel [ type ]->AutoSize ( "Player List:" );
 
     // Server player list
     m_pServerPlayerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
-    m_pServerPlayerList [ type ]->SetPosition ( CVector2D ( 0.83f, 0.33f ), true );
-    m_pServerPlayerList [ type ]->SetSize ( CVector2D ( 0.15f, 0.635f ), true );
+    m_pServerPlayerList [ type ]->SetPosition ( CVector2D ( 0.83f, 0.38f ), true );
+    m_pServerPlayerList [ type ]->SetSize ( CVector2D ( 0.15f, 0.585f ), true );
     m_pServerPlayerList [ type ]->SetIgnoreTextSpacer ( true );
 
     // Filters
 
-    // Search edit
-    m_pEditSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
-    m_pEditSearch [ type ]->SetPosition ( CVector2D ( 0.02f, 0.04f ), true );
-    m_pEditSearch [ type ]->SetSize ( CVector2D ( 0.19f, 0.05f ), true );
-    m_pEditSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
+    // Server search edit
+    m_pEditServerSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
+    m_pEditServerSearch [ type ]->SetPosition ( CVector2D ( 0.02f, 0.04f ), true );
+    m_pEditServerSearch [ type ]->SetSize ( CVector2D ( 0.19f, 0.05f ), true );
+    m_pEditServerSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
 
-    // Search icon
-	m_pSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditSearch [ type ] ) );
-	m_pSearchIcon [ type ]->SetPosition ( CVector2D ( 0.85f, 0.15f ), true );
-	m_pSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
-	m_pSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
-    
+    // Server search icon
+	m_pServerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditServerSearch [ type ] ) );
+	m_pServerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.85f, 0.15f ), true );
+	m_pServerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
+	m_pServerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
+
+    // Player search edit
+    m_pEditPlayerSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
+    m_pEditPlayerSearch [ type ]->SetPosition ( CVector2D ( 0.83f, 0.28f ), true );
+    m_pEditPlayerSearch [ type ]->SetSize ( CVector2D ( 0.15f, 0.05f ), true );
+    m_pEditPlayerSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
+
+    // Player search icon
+	m_pPlayerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditPlayerSearch [ type ] ) );
+	m_pPlayerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.8f, 0.15f ), true );
+	m_pPlayerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
+	m_pPlayerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
+
     // Include checkboxes
     m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Empty", true ) );
     m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.225f, 0.045f ), true );
@@ -209,7 +221,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Password edit
     m_pEditPassword [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
     m_pEditPassword [ type ]->SetPosition ( CVector2D ( 0.83f, 0.21f ), true ); 
-    m_pEditPassword [ type ]->SetSize ( CVector2D ( 0.15f, 0.055f ), true );
+    m_pEditPassword [ type ]->SetSize ( CVector2D ( 0.15f, 0.05f ), true );
     m_pEditPassword [ type ]->SetMasked ( true );
     m_pEditPassword [ type ]->SetTextAcceptedHandler( GUI_CALLBACK( &CServerBrowser::OnConnectClick, this ) );
 
@@ -245,8 +257,11 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pLabelPassword [ type ];
     delete m_pEditPassword [ type ];
 
-    delete m_pEditSearch [ type ];
-    delete m_pSearchIcon [ type ];
+    delete m_pEditServerSearch [ type ];
+    delete m_pServerSearchIcon [ type ];
+
+    delete m_pEditPlayerSearch [ type ];
+    delete m_pPlayerSearchIcon [ type ];
 
     delete m_pIncludeEmpty [ type ];
     delete m_pIncludeFull [ type ];
@@ -437,22 +452,57 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
-    bool bSearchFound = true;
+    bool bServerSearchFound = true;
+    bool bPlayerSearchFound = true;
 
-    std::string strSearchText = m_pEditSearch [ Type ]->GetText ();
-    if ( !strSearchText.empty() )
+    std::string strServerSearchText = m_pEditServerSearch [ Type ]->GetText ();
+    std::string strPlayerSearchText = m_pEditPlayerSearch [ Type ]->GetText ();
+
+    if ( !strServerSearchText.empty() )
     {
+        for ( unsigned int i = 0; i < strServerSearchText.length (); i++ ) 
+            strServerSearchText[i] = tolower ( strServerSearchText[i] );
+
         // Search for the search text in the servername
         std::string strServerName = pServer->strName;
-        for ( int i = 0, j = strSearchText.length (); i < j; i ++ ) strSearchText[i] = tolower(strSearchText[i] );
-        for ( int i = 0, j = strServerName.length (); i < j; i ++ ) strServerName[i] = tolower(strServerName[i] );
-        bSearchFound = strServerName.find(strSearchText) != string::npos;
+        for ( unsigned int i = 0; i < strServerName.length (); i ++ ) 
+            strServerName[i] = tolower ( strServerName[i] );
+
+        bServerSearchFound = strServerName.find(strServerSearchText) != string::npos;
+    }
+
+    if ( !strPlayerSearchText.empty() )
+    {
+        bPlayerSearchFound = false;
+
+        if ( pServer->nPlayers > 0 )
+        {
+            for ( unsigned int i = 0; i < strPlayerSearchText.length (); i++ ) 
+                strPlayerSearchText[i] = tolower ( strPlayerSearchText[i] );
+
+            // Search for the search text in the names of the players in the server
+            for ( unsigned int i = 0; i < pServer->vecPlayers.size (); i++ ) 
+            {
+                std::string strPlayerName = pServer->vecPlayers[i].c_str ();
+                std::string strPlayerNameLower = strPlayerName;
+
+                for ( unsigned int j = 0; j < strPlayerNameLower.length (); j++ )
+                    strPlayerNameLower[j] = tolower ( strPlayerNameLower[j] );
+
+                if ( strPlayerNameLower.find(strPlayerSearchText) != string::npos )
+                {
+                    bPlayerSearchFound = true;
+                    int k = m_pServerPlayerList [ Type ]->AddRow ();
+                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str () );
+                }
+            }
+        }
     }
 
     if (
         ( pServer->nPlayers > 0 || bIncludeEmpty ) &&
         ( pServer->nPlayers < pServer->nMaxPlayers || pServer->nPlayers == 0 || pServer->nMaxPlayers == 0 || bIncludeFull ) &&
-        ( !pServer->bPassworded || bIncludeLocked ) && bSearchFound
+        ( !pServer->bPassworded || bIncludeLocked ) && bServerSearchFound && bPlayerSearchFound
        )
     {
         // Create a new row
@@ -647,8 +697,9 @@ bool CServerBrowser::OnRefreshClick ( CGUIElement* pElement )
 
     GetServerList ( Type )->Refresh ();
 
-    //Clear the search field
-    m_pEditSearch [ Type ]->SetText("");
+    //Clear the search fields
+    m_pEditServerSearch [ Type ]->SetText("");
+    m_pEditPlayerSearch [ Type ]->SetText("");
     return true;
 }
 

@@ -102,6 +102,9 @@ protected:
     CGUILabel*          m_pServerPlayerListLabel [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIGridList*       m_pServerPlayerList [ SERVER_BROWSER_TYPE_COUNT ];
 
+    CGUIEdit*           m_pEditServerSearch [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pServerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
+
     CGUICheckBox*       m_pIncludeEmpty [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeFull [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeLocked [ SERVER_BROWSER_TYPE_COUNT ];
@@ -114,8 +117,8 @@ protected:
     CGUILabel*          m_pLabelPassword [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditPassword [ SERVER_BROWSER_TYPE_COUNT ];
 
-    CGUIEdit*           m_pEditSearch [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIStaticImage*    m_pSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIEdit*           m_pEditPlayerSearch [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pPlayerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle			m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
