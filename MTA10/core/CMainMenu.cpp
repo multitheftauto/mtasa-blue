@@ -247,6 +247,9 @@ void CMainMenu::Update ( void )
 		else
 			m_fFader += CORE_MTA_FADER;
 
+		if ( m_fFader > 0.0f )
+			m_bIsVisible = true;     // Make cursor appear faster
+
 		// If the fade is complete
 		if ( m_fFader >= 1 ) {
 			m_ucFade = FADE_VISIBLE;
@@ -285,6 +288,9 @@ void CMainMenu::Update ( void )
 		m_pHeader->SetAlpha ( m_fFader );
 
 		m_fFader -= CORE_MTA_FADER;
+
+		if ( m_fFader < 1.0f )
+			m_bIsVisible = false;    // Make cursor disappear faster
 
 		// If the fade is complete
 		if ( m_fFader <= 0 ) {
