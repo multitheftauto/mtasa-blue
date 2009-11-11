@@ -1702,8 +1702,9 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                 pVehicle->SetPosition ( vecPosition );
                             }
                         }
+#if MTA_DEBUG
                         g_pCore->GetConsole ()->Printf ( "Failed to enter/exit vehicle - id: %u", ucReason );
-
+#endif
                         break;
                     }
 

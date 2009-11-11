@@ -42,7 +42,7 @@ class CServerListItem;
 #define SERVER_LIST_BROADCAST_REFRESH       2000
 
 // Timeout for one server in the server list to respond to a query (in ms)
-#define SERVER_LIST_ITEM_TIMEOUT       4000
+#define SERVER_LIST_ITEM_TIMEOUT       8000
 
 
 class CServerListItem
