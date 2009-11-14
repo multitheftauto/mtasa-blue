@@ -32,7 +32,7 @@ CResourceManager::CResourceManager ( void )
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
 
-    sprintf ( m_szResourceDirectory, "%s/mods/deathmatch/resources", g_pServerInterface->GetServerPath () );
+    sprintf ( m_szResourceDirectory, "%s/resources", g_pServerInterface->GetServerModPath () );
 }
 
 CResourceManager::~CResourceManager ( void )
@@ -816,9 +816,8 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
         return NULL;
 
     // Make a string with the full path to the resource directory
-    const char* szCurrentDirectory = g_pServerInterface->GetServerPath ();
     char szResourceDirectoryPath [ MAX_PATH + 1 ];
-    _snprintf ( szResourceDirectoryPath, MAX_PATH, "%s/mods/deathmatch/resources/%s/", szCurrentDirectory, szResourceName );
+    _snprintf ( szResourceDirectoryPath, MAX_PATH, "%s/resources/%s/", g_pServerInterface->GetServerModPath (), szResourceName );
 
     // Create that folder. Return if we failed
     if ( mymkdir ( szResourceDirectoryPath ) != 0 )

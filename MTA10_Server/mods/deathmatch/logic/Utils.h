@@ -192,5 +192,6 @@ inline bool IsVisibleCharacter ( unsigned char c )
 
 
 void            MakeSureDirExists           ( const char* szPath );
+bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
 #endif

@@ -13,7 +13,7 @@
 #ifndef __CCONNECTHISTORY_H
 #define __CCONNECTHISTORY_H
 
-typedef std::map < unsigned long, class CConnectHistoryItem > HistoryItemMap;
+typedef std::map < unsigned long, struct CConnectHistoryItem > HistoryItemMap;
 typedef std::vector < long long > JoinTimesMap;
 
 struct CConnectHistoryItem

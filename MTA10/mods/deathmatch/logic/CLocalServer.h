@@ -40,11 +40,6 @@ private:
     std::string                 m_strConfig;
     CXMLFile*                   m_pConfig;
 
-    SString                     m_strServerPath;
-    SString                     m_strConfigPath;
-    SString                     m_strResourceDirectoryPath;
-    SString                     m_strResourceCachePath;
-
     CGUI*						m_pGUI;
 
     CGUIWindow*                 m_pWindow;

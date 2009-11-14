@@ -64,7 +64,7 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
 	m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
-    m_strResourceDirectoryPath = SString ( "%s\\resources\\%s", g_pClientGame->GetModRoot (), m_szResourceName );
+    m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), m_szResourceName );
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )

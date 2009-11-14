@@ -31,11 +31,11 @@ public:
                         CModManagerImpl         ( CServerImpl* pServer );
                         ~CModManagerImpl        ( void );
 
-    inline void         SetServerPath           ( const char* szServerPath )    { strncpy ( m_szServerPath, szServerPath, MAX_PATH - 1 ); };
+    inline void         SetServerPath           ( const char* szServerPath )    { m_strServerPath = szServerPath; };
 
     bool                RequestLoad             ( const char* szModName );
 
-    inline const char*  GetModPath              ( void )                    { return m_szModPath; };
+    inline const char*  GetModPath              ( void )                    { return m_strModPath; };
     virtual SString     GetAbsolutePath         ( const char* szRelative );
 
     bool                IsModLoaded             ( void );
@@ -56,8 +56,8 @@ private:
 
     CServerBase*        m_pBase;
     CDynamicLibrary     m_Library;
-    char                m_szServerPath [MAX_PATH];
-    char                m_szModPath [MAX_PATH];
+    SString             m_strServerPath;
+    SString             m_strModPath;
 };
 
 #endif

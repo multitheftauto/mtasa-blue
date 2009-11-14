@@ -865,3 +865,34 @@ void MakeSureDirExists ( const char* szPath )
         ++szIter;
     }
 }
+
+
+// Copies a single file.
+bool FileCopy ( const char* szPathNameSrc, const char* szPathDst )
+{
+    FILE* fhSrc = fopen ( szPathNameSrc, "rb" );
+    if ( !fhSrc )
+    {
+        return false;
+    }
+
+    FILE* fhDst = fopen ( szPathDst, "wb" );
+    if ( !fhDst )
+    {
+        fclose ( fhSrc );
+        return false;
+    }
+
+    char cBuffer[16384];
+    while ( true )
+    {
+        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
+        if ( dataLength == 0 )
+            break;
+        fwrite ( cBuffer, 1, dataLength, fhDst );
+    }
+
+    fclose ( fhSrc );
+    fclose ( fhDst );
+    return true;
+}

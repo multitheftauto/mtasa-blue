@@ -188,6 +188,29 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 }
 
 
+// Not fully tested
+SString SString::Replace ( const char* szOld, const char* szNew ) const
+{
+    int iOldLength = strlen ( szOld );
+    SString strResult = *this;
+    int idx = 0;
+    while( ( idx = strResult.find_first_of ( szOld, idx ) ) >= 0 )
+        strResult.replace ( idx, iOldLength, szNew );
+    return strResult;
+}
+
+
+// Not fully tested
+SString SString::TrimEnd ( const char* szOld ) const
+{
+    int iOldLength = strlen ( szOld );
+    SString strResult = *this;
+    while ( strResult.substr ( strResult.length () - iOldLength ) == szOld )
+        strResult = strResult.substr ( 0, strResult.length () - iOldLength );
+    return strResult;
+}
+
+
 //
 // Cross-platform GetTickCount() implementations
 //   Returns the number of milliseconds since some fixed point in time.

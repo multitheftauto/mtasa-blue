@@ -186,7 +186,9 @@ public:
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
 
-    // Split into parts
+    // Functions
     void        Split               ( const SString& strDelim, std::vector < SString >& outResult ) const;
+    SString     Replace             ( const char* szOld, const char* szNew ) const;
+    SString     TrimEnd             ( const char* szOld ) const;
 
 };
