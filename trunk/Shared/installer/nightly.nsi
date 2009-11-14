@@ -81,8 +81,9 @@ Var RedistInstalled
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-!define MUI_FINISHPAGE_RUN						""
-!define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
+; Don't launch from installer as it can run with elevated rights
+; !define MUI_FINISHPAGE_RUN						""
+; !define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
