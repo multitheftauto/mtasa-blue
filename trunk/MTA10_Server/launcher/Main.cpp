@@ -44,6 +44,7 @@ int main ( int argc, char* argv [] )
         {
             printf ( "Usage: mtaserver [OPTION]\n\n" );
             printf ( "  -s                   Run server in silent mode\n" );
+            printf ( "  -t                   Run server without the info bar at the top of the screen\n" );
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
             printf ( "  --ip [ADDR]          Set IP address\n" );
