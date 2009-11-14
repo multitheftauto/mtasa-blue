@@ -551,7 +551,7 @@ bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
     if ( my_array )
     {
         strJSON = json_object_get_string ( my_array );
-        // json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
+        json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
         return true;
     }
     return false;
@@ -672,6 +672,7 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
     }
 }
 
+
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
     json_object* object = json_tokener_parse ( const_cast < char* > ( szJSON ) );
@@ -692,8 +693,10 @@ bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
                 if ( !bSuccess )
                     break;
             }
+            json_object_put ( object ); // dereference
             return bSuccess;
         }
+        json_object_put ( object ); // dereference
     }
 //    else
 //        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
