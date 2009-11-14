@@ -901,8 +901,19 @@ void CMultiplayerSA::InitHooks()
     // Don't get golf clubs from caddies
     *(BYTE *)0x6D1A1A = 0xEB;
 
-	// Don't get 20 health from ambulances
-	*(BYTE *)0x6D1762 = 0x00;
+    // Don't get 20 health from ambulances
+    *(BYTE *)0x6D1762 = 0x00;
+
+    // Make water visible on all interiors
+    *(BYTE *)0x6E6CC5 = 0x92;
+    *(BYTE *)0x53C4B7 = 0xEB;
+
+    // Prevent vehicles from stalling in water
+    memset((void *)0x6B6302, 0x90, 6);
+    memset((void *)0x6A90C7, 0x90, 6);
+
+    // Don't reset wanted level on respawn
+    memset((void *)0x5623D6, 0x90, 3);
 
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
     memset((void *)0x6F701D, 0x90, 6);
