@@ -245,8 +245,13 @@ void CScriptDebugging::PrintLog ( const char* szText )
     // Got a logfile?
     if ( m_pLogFile )
     {
-        // Log it
-	    fprintf ( m_pLogFile, "%s\n", szText );
+        // Log it, timestamped
+        char szBuffer [64];
+        time_t timeNow;
+        time ( &timeNow );
+        strftime ( szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime ( &timeNow ) );
+
+	    fprintf ( m_pLogFile, "%s - %s\n", szBuffer, szText );
         fflush ( m_pLogFile );
     }
 }
