@@ -48,8 +48,6 @@ CServerImpl::CServerImpl ( void )
     CCrashHandler::Init ();
 
     // Init
-    m_szServerPath [0] = 0;
-    m_szServerPath [MAX_PATH - 1] = 0;
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
@@ -104,7 +102,7 @@ CXML* CServerImpl::GetXML ( void )
 const char* CServerImpl::GetAbsolutePath ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize )
 {
     szBuffer [uiBufferSize-1] = 0;
-    _snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_szServerPath, szRelative );
+    _snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_strServerPath.c_str (), szRelative );
     return szBuffer;
 }
 
@@ -208,31 +206,25 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 #endif
     }
 
-
     // Did we find the path? If not, assume our current
-    if ( m_szServerPath [0] == 0 )
+    if ( m_strServerPath == "" )
     {
-        getcwd ( m_szServerPath, MAX_PATH - 1 );
-    }
-
-    // Make sure it has no trailing slash
-    size_t sizeServerPath = strlen ( m_szServerPath );
-    if ( m_szServerPath [sizeServerPath - 1] == '/' ||
-         m_szServerPath [sizeServerPath - 1] == '\\' )
-    {
-        m_szServerPath [sizeServerPath - 1] = 0;
+        char szBuffer[ MAX_PATH ];
+        getcwd ( szBuffer, MAX_PATH - 1 );
+        m_strServerPath = szBuffer;
     }
 
     // Convert all backslashes to forward slashes
-    size_t i = 0;
-    for ( ; i < sizeServerPath; i++ )
-    {
-        if ( m_szServerPath [i] == '\\' )
-            m_szServerPath [i] = '/';
-    }
+    m_strServerPath = m_strServerPath.Replace ( "\\", "/" );
+
+    // Make sure it has no trailing slash
+    m_strServerPath = m_strServerPath.TrimEnd ( "/" );
+
+    // Set the mod path
+    m_strServerModPath = m_strServerPath + "/mods/deathmatch";
 
     // Tell the mod manager the server path
-    m_pModManager->SetServerPath ( m_szServerPath );
+    m_pModManager->SetServerPath ( m_strServerPath );
 
 	// Welcome text
     if ( !g_bSilent )
@@ -671,7 +663,7 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
             case 'D':
             {
                 // Set it as our current path.
-                strncpy ( m_szServerPath, szArguments [i], MAX_PATH - 1 );
+                m_strServerPath = szArguments [i];
                 ucNext = 0;
                 break;
             }

@@ -25,7 +25,7 @@ public:
     virtual CTCP*           GetTCP              ( void ) = 0;
     virtual CXML*           GetXML              ( void ) = 0;
 
-    virtual const char*     GetServerPath       ( void ) = 0;
+    virtual const char*     GetServerModPath    ( void ) = 0;
     virtual const char*     GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize ) = 0;
 
     virtual void            Printf              ( const char* szFormat, ... ) = 0;

@@ -130,19 +130,15 @@ bool CResource::Load ( void )
 	    this->RegisterEHS ( this, "call" );
 
         // Store the actual directory and zip paths for fast access
-        const char* szCurrentDirectory = g_pServerInterface->GetServerPath ();
+        const char* szServerModPath = g_pServerInterface->GetServerModPath ();
 
         char szBuffer[MAX_PATH];
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/mods/deathmatch/resources/%s/", szCurrentDirectory, m_strResourceName.c_str () );
+        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s/", szServerModPath, m_strResourceName.c_str () );
         m_strResourceDirectoryPath = szBuffer;
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/mods/deathmatch/resourcecache/%s/", szCurrentDirectory, m_strResourceName.c_str () );
+        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resource-cache/unzipped/%s/", szServerModPath, m_strResourceName.c_str () );
         m_strResourceCachePath = szBuffer;
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/mods/deathmatch/resources/%s.zip", szCurrentDirectory, m_strResourceName.c_str () );
+        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
         m_strResourceZip = szBuffer;
-
-        // Make sure the resourcecache directory exists
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/mods/deathmatch/resourcecache", szCurrentDirectory );
-        mymkdir ( szBuffer );
 
         // Open our zip file
         m_zipfile = unzOpen ( m_strResourceZip.c_str () );
@@ -335,6 +331,36 @@ bool CResource::Load ( void )
 
 	    // Generate a CRC for this resource
         m_ulCRC = GenerateCRC();
+
+        // copy client files to http holding directory
+        list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
+        for ( ; iter != this->IterEnd () ; iter++ )
+        {
+            CResourceFile* pResourceFile = *iter;
+            switch ( pResourceFile->GetType () )
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                {
+                    string clientFileShortPath = pResourceFile->GetName();
+                    string strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + this->GetName() + "/" + clientFileShortPath;
+                    string strSrcFilePath;
+                    if ( GetFilePath ( clientFileShortPath.c_str (), strSrcFilePath ) )
+                    {
+                        MakeSureDirExists( strDstFilePath.c_str () );
+                        if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
+                        {
+                            CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                        }
+                    }
+                }
+                break;
+
+                default:
+                    break;
+           }
+        }
 
        // if  ( stricmp ( this->GetName(), "updtest" ) == 0 )
       //      printf ( "0x%X\n", m_ulCRC );

@@ -61,7 +61,7 @@ public:
     CTCP*               GetTCP              ( void );
     CXML*               GetXML              ( void );
 
-    inline const char*  GetServerPath       ( void )                { return m_szServerPath; };
+    inline const char*  GetServerModPath   ( void )                { return m_strServerModPath; };
     const char*         GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize );
 
     void                Printf              ( const char* szText, ... );
@@ -92,7 +92,8 @@ private:
     FClientFeedback*    m_fClientFeedback;
 #endif
 
-    char                m_szServerPath [MAX_PATH];
+    SString             m_strServerPath;
+    SString             m_strServerModPath;
 
     bool                m_bRequestedQuit;
     bool                m_bRequestedReset;
