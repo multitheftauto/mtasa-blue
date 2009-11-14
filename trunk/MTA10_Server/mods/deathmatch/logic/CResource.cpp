@@ -332,34 +332,37 @@ bool CResource::Load ( void )
 	    // Generate a CRC for this resource
         m_ulCRC = GenerateCRC();
 
-        // copy client files to http holding directory
-        list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
-        for ( ; iter != this->IterEnd () ; iter++ )
+        // copy client files to http holding directory if external web server is being used
+        if ( g_pGame->GetConfig ()->GetHTTPDownloadType () == HTTP_DOWNLOAD_ENABLED_URL )
         {
-            CResourceFile* pResourceFile = *iter;
-            switch ( pResourceFile->GetType () )
+            list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
+            for ( ; iter != this->IterEnd () ; iter++ )
             {
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                CResourceFile* pResourceFile = *iter;
+                switch ( pResourceFile->GetType () )
                 {
-                    string clientFileShortPath = pResourceFile->GetName();
-                    string strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + this->GetName() + "/" + clientFileShortPath;
-                    string strSrcFilePath;
-                    if ( GetFilePath ( clientFileShortPath.c_str (), strSrcFilePath ) )
+                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                     {
-                        MakeSureDirExists( strDstFilePath.c_str () );
-                        if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
+                        string clientFileShortPath = pResourceFile->GetName();
+                        string strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + this->GetName() + "/" + clientFileShortPath;
+                        string strSrcFilePath;
+                        if ( GetFilePath ( clientFileShortPath.c_str (), strSrcFilePath ) )
                         {
-                            CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                            MakeSureDirExists( strDstFilePath.c_str () );
+                            if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
+                            {
+                                CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                            }
                         }
                     }
-                }
-                break;
-
-                default:
                     break;
-           }
+
+                    default:
+                        break;
+               }
+            }
         }
 
        // if  ( stricmp ( this->GetName(), "updtest" ) == 0 )
