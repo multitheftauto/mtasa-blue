@@ -581,6 +581,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVersionUpdateChecker.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVideoModeManager.cpp"
 				>
 			</File>
@@ -931,6 +935,10 @@
 			</File>
 			<File
 				RelativePath=".\CText.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVersionUpdateChecker.h"
 				>
 			</File>
 			<File
