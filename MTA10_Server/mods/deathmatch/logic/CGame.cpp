@@ -1328,7 +1328,10 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned)\n", szNick );
 
 									// Tell the player he's banned
-									DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
+                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned - If this is in error, ensure you have the lastest version of MTA." );
+                                    else
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
 									return;
 								}
 
