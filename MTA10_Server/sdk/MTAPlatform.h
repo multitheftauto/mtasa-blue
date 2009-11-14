@@ -13,6 +13,7 @@
 #define __PLATFORM_H
 
 extern "C" bool g_bSilent;
+extern "C" bool g_bNoTopBar;
 
 /** Operating system identifiers **/
 #if defined(WIN32)

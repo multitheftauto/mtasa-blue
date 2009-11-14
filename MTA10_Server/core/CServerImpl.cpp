@@ -28,6 +28,7 @@ char szXMLLibName[]	= "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 using namespace std;
 
 bool g_bSilent = false;
+bool g_bNoTopBar = false;
 
 #ifdef WIN32
 CServerImpl::CServerImpl ( CThreadCommandQueue* pThreadCommandQueue )
@@ -159,7 +160,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 		GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo );
 
 		// Adjust the console's screenbuffer so we can disable a bar at the top
-		ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
+        if ( !g_bNoTopBar )
+            ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
 
 		SetConsoleWindowInfo ( m_hConsole, TRUE, &ScrnBufferInfo.srWindow );
 		SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
@@ -172,7 +174,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 		noecho ( );
 		idlok ( stdscr, FALSE );
 		scrollok ( stdscr, TRUE );
-		setscrreg ( 1, LINES - 1 );
+        if ( !g_bNoTopBar )
+            setscrreg ( 1, LINES - 1 );
+        else
+            setscrreg ( 0, LINES - 1 );
 
 		// Initialize the colors
 	    if ( has_colors ( ) )
@@ -191,11 +196,17 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 		wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
 
 		// Create the menu window
-		m_wndMenu = subwin ( stdscr, 1, COLS, 0, 0 );
-		wbkgd ( m_wndMenu, COLOR_PAIR ( 1 ) );
+        if ( !g_bNoTopBar )
+        {
+            m_wndMenu = subwin ( stdscr, 1, COLS, 0, 0 );
+            wbkgd ( m_wndMenu, COLOR_PAIR ( 1 ) );
+        }
 
 		// Position the cursor and refresh the physical screen
-		move ( 1, 0 );
+        if ( !g_bNoTopBar )
+            move ( 1, 0 );
+        else
+            move ( 0, 0 );
 		refresh ( );
 
 		// Set our STDIN to non-blocking, if we're on POSIX
@@ -339,18 +350,19 @@ void CServerImpl::MainLoop ( void )
         if ( !g_bSilent )
         {
 		    // Update all the windows, and the physical screen in one burst
-		    wnoutrefresh ( m_wndMenu );
+            if ( m_wndMenu )
+                wnoutrefresh ( m_wndMenu );
 		    wnoutrefresh ( m_wndInput );
 		    doupdate ( );
 		    wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
         }
 #endif
-        if ( !g_bSilent )
+        if ( !g_bSilent && !g_bNoTopBar )
         {
-		    // Show the info tag, 80 is a fixed length
-		    char szInfoTag[80] = { '\0' };
-		    m_pModManager->GetTag ( &szInfoTag[0], 80 );
-		    ShowInfoTag ( szInfoTag );
+            // Show the info tag, 80 is a fixed length
+            char szInfoTag[80] = { '\0' };
+            m_pModManager->GetTag ( &szInfoTag[0], 80 );
+            ShowInfoTag ( szInfoTag );
         }
 
 		// Handle the interpreter input
@@ -391,7 +403,7 @@ void CServerImpl::MainLoop ( void )
 /*************************/
 void CServerImpl::ShowInfoTag ( char* szTag )
 {
-    if ( g_bSilent )
+    if ( g_bSilent || g_bNoTopBar )
         return;
 #ifdef WIN32
 	// Windows console code
@@ -690,6 +702,10 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 {
                     g_bSilent = true;
                 }
+                else if ( strcmp ( szArguments [i], "-t" ) == 0 )
+                {
+                    g_bNoTopBar = true;
+                }
 
                 #ifdef WIN32
                 else if ( strcmp ( szArguments [i], "--clientfeedback" ) == 0 )
@@ -728,7 +744,8 @@ void CServerImpl::DestroyWindow ( void )
 #ifndef WIN32
     if ( !g_bSilent )
     {
-	    delwin ( m_wndMenu );
+        if ( m_wndMenu )
+            delwin ( m_wndMenu );
 	    delwin ( m_wndInput );
         endwin ( );
     }
