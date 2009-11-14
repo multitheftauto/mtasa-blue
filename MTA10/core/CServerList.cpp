@@ -134,8 +134,7 @@ void CServerList::Refresh ( void )
 void CServerListInternet::Refresh ( void )
 {   // Gets the server list from the master server and refreshes
     m_ulStartTime = CClientTime::GetTime ();
-    memset ( m_szBuffer, 0, SERVER_LIST_DATA_BUFFER );
-    m_HTTP.Get ( SERVER_LIST_MASTER_URL, m_szBuffer, SERVER_LIST_DATA_BUFFER - 1 );
+    m_HTTP.Get ( SERVER_LIST_MASTER_URL );
     m_iPass = 1;
     m_bUpdated = true;
 
@@ -146,8 +145,6 @@ void CServerListInternet::Refresh ( void )
 
 void CServerListInternet::Pulse ( void )
 {   // We also need to take care of the master server list here
-    char *szBuffer;
-    unsigned int nDataLength;
     unsigned long ulTime = CClientTime::GetTime () - m_ulStartTime;
 
     if ( m_iPass == 1 ) {
@@ -158,9 +155,10 @@ void CServerListInternet::Pulse ( void )
         m_bUpdated = true;
         
         // Attempt to get the HTTP data
-        if ( m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
+        CHTTPBuffer buffer;
+        if ( m_HTTP.GetData ( buffer ) ) {
             // We got the data, parse it and switch pass
-            if ( ParseList ( szBuffer, nDataLength ) ) {
+            if ( ParseList ( buffer.GetData (), buffer.GetSize () ) ) {
                 m_iPass++;
             } else {
                 // Abort
@@ -193,7 +191,7 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
 
     // Add all servers until we hit the count or nLength
     while ( i < ( nLength - 6 ) && uiCount-- ) {
-        CServerListItem item;
+        CServerListItem& item = *new CServerListItem();
 
         // Read the IPv4-address
         item.Address.S_un.S_un_b.s_b1 = szBuffer[i];
@@ -205,7 +203,8 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
         item.usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
 
         // Add the server
-        Add ( item );
+        //Add ( item );
+        m_Servers.push_back ( &item );
         i += 6;
     }
     return true;

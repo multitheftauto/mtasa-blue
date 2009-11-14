@@ -26,9 +26,6 @@ class CServerListItem;
 // Master server list URL
 #define SERVER_LIST_MASTER_URL              "http://1mgg.com/affil/mta-1.0"
 
-// Master server data buffer (16KB should be enough, but be warned)
-#define SERVER_LIST_DATA_BUFFER             16384
-
 // Query response data buffer
 #define SERVER_LIST_QUERY_BUFFER            4096
 
@@ -203,7 +200,6 @@ private:
     bool                                    ParseList               ( const char *szBuffer, unsigned int nLength );
 
     CHTTPClient                             m_HTTP;
-    char                                    m_szBuffer[SERVER_LIST_DATA_BUFFER];
     unsigned long                           m_ulStartTime;
 };
 

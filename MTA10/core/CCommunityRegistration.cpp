@@ -122,8 +122,7 @@ void CCommunityRegistration::Open ( void )
         std::string strURL = std::string ( REGISTRATION_URL ) + "?action=request";
 
         // Perform the HTTP request
-        memset ( m_szBuffer, 0, REGISTRATION_DATA_BUFFER_SIZE );
-        m_HTTP.Get ( strURL, m_szBuffer, REGISTRATION_DATA_BUFFER_SIZE - 1 );
+        m_HTTP.Get ( strURL );
 
         // Store the start time
         m_ulStartTime = CClientTime::GetTime ();
@@ -135,11 +134,13 @@ void CCommunityRegistration::DoPulse ( void )
 {
     if ( m_ulStartTime > 0 )
     {
-        char* szBuffer;
-        unsigned int uiBufferLength;
 
-        if ( m_HTTP.GetData ( &szBuffer, uiBufferLength ) && szBuffer[0] )
+        CHTTPBuffer buffer;
+        if ( m_HTTP.GetData ( buffer ) )
         {
+            char* szBuffer = buffer.GetData ();
+            unsigned int uiBufferLength = buffer.GetSize ();
+
             // Succeed, deal with the response
             m_ulStartTime = 0;
 
@@ -256,8 +257,7 @@ bool CCommunityRegistration::OnButtonClick ( CGUIElement* pElement )
                     "&hash=" + m_strCommunityHash;
 
                 // Perform the HTTP request
-                memset ( m_szBuffer, 0, VERIFICATION_DATA_BUFFER_SIZE );
-                m_HTTP.Get ( strURL, m_szBuffer, VERIFICATION_DATA_BUFFER_SIZE - 1 );
+                m_HTTP.Get ( strURL );
 
                 // Store the start time
                 m_ulStartTime = CClientTime::GetTime ();

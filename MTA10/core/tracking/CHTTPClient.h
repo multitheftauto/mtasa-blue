@@ -26,6 +26,85 @@
 // HTTP buffer size (for OnRead)
 #define HTTP_BUFFER_LENGTH      4096
 
+
+//
+// Output buffer for http queries.
+//
+class CHTTPBuffer : protected std::vector < char >
+{
+    static const unsigned int EXTRA_PADDING = 8;
+    unsigned int uiLogicalSize;
+public:
+    CHTTPBuffer( void )
+    {
+        Clear ();
+    }
+
+    void Clear ( void )
+    {
+        resize ( EXTRA_PADDING );
+        uiLogicalSize = 0;
+        memset ( GetData (), 0, EXTRA_PADDING );
+    }
+
+    // Append bytes at the end of
+    void Append ( const char* srcData, unsigned int uiLength )
+    {
+        resize ( uiLogicalSize + uiLength + EXTRA_PADDING );
+        memcpy ( GetData () + uiLogicalSize, srcData, uiLength );
+        uiLogicalSize += uiLength;
+        memset ( GetData () + uiLogicalSize, 0, EXTRA_PADDING );
+    }
+
+    char* GetData ( void )
+    {
+        return &at( 0 );
+    }
+
+    unsigned int GetSize ( void ) const
+    {
+        return uiLogicalSize;
+    }
+};
+
+
+//
+// Thread safe output buffer for http queries.
+//
+class CHTTPThreadedBuffer
+{
+    CHTTPBuffer m_Contents;
+    CCriticalSection criticalSection;
+public:
+
+    void Clear ( void )
+    {
+        criticalSection.Lock ();
+        m_Contents.Clear ();
+        criticalSection.Unlock ();
+    }
+
+    unsigned int GetSize ( void ) const
+    {
+        return m_Contents.GetSize ();
+    }
+
+    void Append ( const char* srcData, unsigned int uiLength )
+    {
+        criticalSection.Lock ();
+        m_Contents.Append ( srcData, uiLength );
+        criticalSection.Unlock ();
+    }
+
+    void Clone ( CHTTPBuffer& outContents )
+    {
+        criticalSection.Lock ();
+        outContents = m_Contents;
+        criticalSection.Unlock ();
+    }
+};
+
+
 class CHTTPClient
 {
 public:
@@ -34,12 +113,11 @@ public:
 
     void                Reset                   ( void );
 
-    bool                Get                     ( std::string strURL, char * szBuffer, unsigned int nBufferLength );
+    bool                Get                     ( std::string strURL );
     const std::string&  GetStatusMessage        ( void )        { return m_strStatus; };
     unsigned int        GetStatus               ( void )        { return m_Status; };
     
-    char *              GetBuffer               ( void )        { return m_szBuffer; };
-    bool                GetData                 ( char ** szBuffer, unsigned int &nDataLength );
+    bool                GetData                 ( CHTTPBuffer& outBuffer );
 
 	// Callbacks
 	static void			OnRead					( void* pSocketPtr, void* pClassPtr );
@@ -51,9 +129,7 @@ private:
 
     int                 ReadHeader              ( char* pBuffer, unsigned int uiBufferSize );
 
-    char *              m_szBuffer;
-    unsigned int        m_nPointer;
-    unsigned int        m_nBufferLength;
+    CHTTPThreadedBuffer m_Buffer;
 
     unsigned int        m_Status;
     std::string         m_strStatus;
