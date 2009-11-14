@@ -216,9 +216,11 @@ std::string ASE::QueryFull ( void )
         {
             reply << ucFlags;
             // nick
-            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
-            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
-            reply << szTemp;
+            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
+            if ( strPlayerName.length () == 0 )
+                strPlayerName = pPlayer->GetNick ();
+            reply << ( unsigned char ) ( strPlayerName.length () + 1 );
+            reply << strPlayerName.c_str ();
             // team (skip)
             reply << ( unsigned char ) 1;
             // skin (skip)
@@ -272,7 +274,6 @@ std::string ASE::QueryLight ( void )
     reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
 
     // players
-    char szTemp[256] = { '\0' };
     CPlayer* pPlayer = NULL;
 
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
@@ -282,9 +283,11 @@ std::string ASE::QueryLight ( void )
         if ( pPlayer->IsJoined () )
         {
             // nick
-            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
-            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
-            reply << szTemp;
+            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
+            if ( strPlayerName.length () == 0 )
+                strPlayerName = pPlayer->GetNick ();
+            reply << ( unsigned char ) ( strPlayerName.length () + 1 );
+            reply << strPlayerName.c_str ();
 	    }
     }
 

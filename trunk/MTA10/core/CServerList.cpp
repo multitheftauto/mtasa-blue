@@ -419,7 +419,11 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
         if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
         {
-            vecPlayers.push_back ( strPlayer );
+            // Remove color code, unless that results in an empty string
+            std::string strResult = RemoveColorCode ( strPlayer.c_str () );
+            if ( strResult.length () == 0 )
+                strResult = strPlayer;
+            vecPlayers.push_back ( strResult );
         }
     }
 
