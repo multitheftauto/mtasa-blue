@@ -311,3 +311,51 @@ unsigned long GetTickCount ( void )
 
 #endif
 #endif
+
+
+// Copied from CChatLine::RemoveColorCode()
+std::string SharedUtil::RemoveColorCode ( const char* szString )
+{
+    std::string strOut;
+    const char* szStart = szString;
+    const char* szEnd = szString;
+
+    while ( true )
+    {
+        if ( *szEnd == '\0' )
+        {
+            strOut.append ( szStart, szEnd - szStart );
+            break;
+        }
+        else
+        {
+            bool bIsColorCode = false;
+            if ( *szEnd == '#' )
+            {
+                bIsColorCode = true;
+                for ( int i = 0; i < 6; i++ )
+                {
+                    char c = szEnd [ 1 + i ];
+                    if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+                    {
+                        bIsColorCode = false;
+                        break;
+                    }
+                }
+            }
+
+            if ( bIsColorCode )
+            {
+                strOut.append ( szStart, szEnd - szStart );
+                szStart = szEnd + 7;
+                szEnd = szStart;
+            }
+            else
+            {
+                szEnd++;
+            }
+        }
+    }
+
+    return strOut;
+}

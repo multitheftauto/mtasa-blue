@@ -218,6 +218,11 @@ namespace SharedUtil
     //
     int GetDaysUntilExpire ( void );
 
+    //
+    // string stuff
+    //
+    std::string RemoveColorCode ( const char* szString );
+
 };
 
 using namespace SharedUtil;
