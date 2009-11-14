@@ -2397,6 +2397,41 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     static int bAlreadyCalling = false; // a mini-mutex flag, seems to work :)
     // This code runs multithreaded, we need to make sure multiple server requests don't overlap each other... (slows the server down quite a bit)
 
+    // See if the current account is on this functions access list
+    bool bUserOnFunctionAccessList = false;
+    {
+        const char * szQueryString = ipoHttpRequest->sUri.c_str();
+        if ( *szQueryString )
+        {
+            std::string strFuncName;
+            std::vector < std::string > arguments;
+            const char* pQueryArg = strchr ( szQueryString, '?' );
+            if ( !pQueryArg )
+            {
+                strFuncName = szQueryString;
+            }
+            else
+            {
+                strFuncName.assign ( szQueryString, pQueryArg - szQueryString );
+            }
+
+            list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
+            for ( ; iter != m_exportedFunctions.end (); iter++ )
+            {
+                if ( strFuncName == (*iter)->GetFunctionName () )
+                {
+                    if ( (*iter)->IsHTTPAccessible() )
+                    {
+                        if ( (*iter)->IsOnAccessList( (char*)account->GetName().c_str () ) )
+                        {
+                            bUserOnFunctionAccessList = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Check for http general and if we have access to this resource
     // if we're trying to return a http file. Otherwize it's the MTA
     // client trying to download files.
@@ -2406,11 +2441,13 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 											m_strResourceName.c_str (),
 											CAccessControlListRight::RIGHT_TYPE_RESOURCE,
 											true ) ||
-         !aclManager->CanObjectUseRight ( account->GetName().c_str (),
+         ( !aclManager->CanObjectUseRight ( account->GetName().c_str (),
 			                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             "http",
 											CAccessControlListRight::RIGHT_TYPE_GENERAL,
 											true ) )
+        &&
+        !bUserOnFunctionAccessList )
     {
         bAlreadyCalling = false;
         return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
