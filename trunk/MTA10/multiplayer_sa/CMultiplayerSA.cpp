@@ -905,15 +905,23 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x6D1762 = 0x00;
 
     // Make water visible on all interiors
-    *(BYTE *)0x6E6CC5 = 0x92;
+    //*(BYTE *)0x6E6CC5 = 0x92;
+    *(BYTE *)0x6E6CC4 = 0xb0;
+    *(BYTE *)0x6E6CC5 = 0x00;
+    *(BYTE *)0x6E6CC6 = 0x90;
     *(BYTE *)0x53C4B7 = 0xEB;
 
-    // Prevent vehicles from stalling in water
+    // Prevent bikes from stalling in water
     memset((void *)0x6B6302, 0x90, 6);
+    
+    // Prevent automobiles from stalling in water
     memset((void *)0x6A90C7, 0x90, 6);
 
     // Don't reset wanted level on respawn
     memset((void *)0x5623D6, 0x90, 3);
+
+    // Allow objects to be scaled back to 1
+    *(BYTE *)0x59FE18 = 0xEB;
 
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
     memset((void *)0x6F701D, 0x90, 6);
