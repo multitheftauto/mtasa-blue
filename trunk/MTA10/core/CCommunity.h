@@ -20,7 +20,6 @@ typedef void (*VERIFICATIONCALLBACK) ( bool, char*, void* obj );
 
 #define VERIFICATION_DELAY              3000
 #define VERIFICATION_URL                "http://dp3.community.mtasa.com/core/1.0/client.php"
-#define VERIFICATION_DATA_BUFFER_SIZE   1024
 
 enum eVerificationResult
 {
@@ -63,7 +62,6 @@ protected:
 
 private:
     CHTTPClient                 m_HTTP;
-    char                        m_szBuffer[VERIFICATION_DATA_BUFFER_SIZE];
 
     std::string                 m_strUsername;
     std::string                 m_strPassword;

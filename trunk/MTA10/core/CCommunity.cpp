@@ -89,8 +89,7 @@ void CCommunity::Login ( VERIFICATIONCALLBACK pCallBack, void* pObject )
                      szSerial );
 
     // Perform the HTTP request
-    memset ( m_szBuffer, 0, VERIFICATION_DATA_BUFFER_SIZE );
-    m_HTTP.Get ( strURL, m_szBuffer, VERIFICATION_DATA_BUFFER_SIZE - 1 );
+    m_HTTP.Get ( strURL );
 
     // Store the start time
     m_ulStartTime = CClientTime::GetTime ();
@@ -101,12 +100,14 @@ void CCommunity::DoPulse ( void )
 {
     if ( m_ulStartTime )
     {
-        char *szBuffer;
         eVerificationResult Status;
-        unsigned int nDataLength;
 
         // Poll the HTTP client
-        if ( m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
+        CHTTPBuffer buffer;
+        if ( m_HTTP.GetData ( buffer ) ) {
+
+            char *szBuffer = buffer.GetData ();
+            
             // Get the returned status
             Status = (eVerificationResult)(szBuffer[0] - 48);
             m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;

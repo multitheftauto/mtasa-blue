@@ -34,9 +34,7 @@ CHTTPClient::~CHTTPClient ( void )
 void CHTTPClient::Reset ( void )
 {
     m_Status = 0;
-    m_szBuffer = NULL;
-    m_nBufferLength = 0;
-    m_nPointer = 0;
+    m_Buffer.Clear ();
     m_bCompleted = false;
 
 	memset(&m_szProtocol, NULL, sizeof(m_szProtocol));
@@ -45,7 +43,7 @@ void CHTTPClient::Reset ( void )
 }
 
 
-bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBufferLength )
+bool CHTTPClient::Get ( std::string strURL )
 {
     // Delete any previous socket
     if ( m_pHTTPSocket )
@@ -59,8 +57,6 @@ bool CHTTPClient::Get ( std::string strURL, char * szBuffer, unsigned int nBuffe
 
     // Parse the URL into protocol, host, port and path
     m_strStatus = "connecting to " + strURL;
-    m_szBuffer = szBuffer;
-    m_nBufferLength = nBufferLength;
 
     if ( !ParseURL ( strURL.c_str (), m_szProtocol, 64, m_szHost, 256, m_usPort, m_szPath, 1024 ) )
     {
@@ -252,7 +248,7 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
             if ( iRead <= 0 ) break;
 
             // Is this our first chunk of data?
-            if ( pClass->m_nPointer == 0 ) {
+            if ( pClass->m_Buffer.GetSize () == 0 ) {
 			    // Parse the header
                 unsigned int nHeaderSize, uiResponseCode;
                 const char * szData = CHTTPResponse::Parse ( szBuffer, HTTP_BUFFER_LENGTH, nHeaderSize, uiResponseCode );
@@ -260,12 +256,10 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
 
                 // Copy data to buffer
                 unsigned int nToRead = iRead - nHeaderSize;
-                if ( nToRead > 0 && pClass->m_nBufferLength > nToRead )
-                    memcpy ( pClass->m_szBuffer, szBuffer + nHeaderSize, nToRead );
+                pClass->m_Buffer.Append ( szBuffer + nHeaderSize, nToRead );
 
 			    // Set variables
 			    pClass->m_Status = uiResponseCode;
-                pClass->m_nPointer += nToRead;
 
                 // Set status message
                 stringstream ss;
@@ -273,26 +267,21 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
                 pClass->m_strStatus = ss.str ();
             } else {
                 // Append the received data to the buffer
-                unsigned int nBuffer = pClass->m_nBufferLength - pClass->m_nPointer;
-                if ( nBuffer > (unsigned int)iRead )
-                    memcpy ( pClass->m_szBuffer + pClass->m_nPointer, szBuffer, iRead );
-                else
-                    assert ( false );   // Buffer is too small!
-                pClass->m_nPointer += iRead;
+                pClass->m_Buffer.Append ( szBuffer, iRead );
             }
         }
 	}
 }
 
 
-bool CHTTPClient::GetData ( char ** szBuffer, unsigned int &nDataLength )
+bool CHTTPClient::GetData ( CHTTPBuffer& outBuffer )
 {
     // Only return valid data when the response was 200 (success)
     // and the HTTP request was completed
     if ( m_Status != 200 || !m_bCompleted ) return false;
 
-    *szBuffer = m_szBuffer;
-    nDataLength = m_nPointer;
+    // Make a copy
+    m_Buffer.Clone( outBuffer );
     return true;
 }
 
