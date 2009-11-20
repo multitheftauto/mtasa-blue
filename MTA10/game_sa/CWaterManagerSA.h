@@ -15,7 +15,7 @@
 
 #include "CWaterSA.h"
 
-#define DEFAULT_WAVE_LEVEL                 1.0f
+#define DEFAULT_WAVE_LEVEL                 0.0f
 
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
 #define FUNC_CreateWaterVertex             0x6E5A40         // (word x, word y, float z, float unknown, float height, word flow)
