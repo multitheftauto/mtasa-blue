@@ -15,8 +15,7 @@
 class CStreaming
 {
 public:
-    virtual void            RequestAnimations               ( int i, int j ) = 0;
-    virtual bool            HasVehicleUpgradeLoaded         ( int model ) = 0;
+    virtual void            RequestAnimations   ( int i, int j ) = 0;
 };
 
 #endif

@@ -204,59 +204,6 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
 }
 
 
-bool CClientModelRequestManager::RequestUpgrade ( unsigned short usModelID, CClientEntity* pRequester )
-{
-    assert ( pRequester );
-    SClientModelRequest* pEntry;
-
-    // Grab the model info for that model
-    CModelInfo* pInfo = g_pGame->GetModelInfo ( usModelID );
-    if ( pInfo )
-    {
-        // Has it already requested something?
-        list < SClientModelRequest* > ::iterator iter;
-        if ( GetRequestEntry ( pRequester, iter ) )
-        {
-            // Get the entry
-            pEntry = *iter;
-
-            // The same model?
-            if ( pInfo == pEntry->pModel )
-            {
-                pInfo->MakeCustomModel ();
-
-                // He has to wait more for it
-                return false;
-            }
-        }
-
-        // Already loaded? Don't bother adding to the list.
-        if ( pInfo->IsLoaded () )
-        {
-            pInfo->MakeCustomModel ();
-
-            return true;
-        }
-
-        // Request it
-        pInfo->RequestVehicleUpgrade ();
-
-        // Add him to the list over models we're waiting for.
-        pEntry = new SClientModelRequest;
-        pEntry->pModel = pInfo;
-        pEntry->pEntity = pRequester;
-        pEntry->dwTimeRequested = timeGetTime ();
-        m_Requests.push_back ( pEntry );
-
-        // Return false. Caller needs to wait.
-        return false;
-    }
-
-    // Error, model is bad. Caller should not do this.
-    return false;
-}
-
-
 void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQueue )
 {
     assert ( pEntity );
