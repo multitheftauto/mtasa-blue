@@ -55,7 +55,6 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface *     GetInterface            ( void ) = 0;
 
-    virtual DWORD           GetModel                () = 0;
 	virtual BOOL			IsBoat                  () = 0;
 	virtual BOOL			IsCar                   () = 0;
 	virtual BOOL			IsTrain                 () = 0;

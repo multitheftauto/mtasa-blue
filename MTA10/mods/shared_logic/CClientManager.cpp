@@ -195,7 +195,7 @@ void CClientManager::DoPulse ( void )
         m_pProjectileManager->DoPulse ();
         m_pSoundManager->DoPulse ();
         m_pPlayerManager->DoPulse ();
-        m_pColManager->DoPulse ();        
+        m_pColManager->DoPulse ();
     }
 }
 
@@ -208,8 +208,6 @@ void CClientManager::UpdateStreamers ( void )
         // Grab the camera position
         CVector vecTemp;
         GetCamera ()->GetPosition ( vecTemp );
-
-        CClientStreamer::UpdateSectors ( vecTemp );
 
         // Update the streamers
         m_pMarkerStreamer->DoPulse ( vecTemp );

@@ -18,6 +18,8 @@ class CVehicleUpgrades;
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
+#include "CClientVehicle.h"
+
 enum eVehicleUpgrade
 {
     VEHICLEUPGRADE_NITRO_5X = 1008,
@@ -26,14 +28,11 @@ enum eVehicleUpgrade
     VEHICLEUPGRADE_HYDRAULICS = 1087,
 };
 
-class CClientVehicle;
-
 class CVehicleUpgrades
 {
 public:
 							CVehicleUpgrades			( CClientVehicle* pVehicle );
 
-    static bool             IsUpgrade                   ( unsigned short usModel );
 	bool					IsUpgradeCompatible			( unsigned short usUpgrade );
 	static bool				GetSlotFromUpgrade			( unsigned short usUpgrade, unsigned char& ucSlot );
 	
@@ -50,8 +49,8 @@ public:
     void                    RemoveAll                   ( bool bRipFromVehicle );
 
 protected:
-    CClientVehicle*			m_pVehicle;    
 	unsigned short			m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
+	CClientVehicle*			m_pVehicle;
 };
 
 #endif

@@ -13,30 +13,6 @@
 
 using std::list;
 
-void CClientStreamSectorList::AddElements ( list < CClientStreamElement * > * pList )
-{
-    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
-    for ( ; iter != m_Elements.end () ; iter++ )
-    {
-        // Don't add if already in the list
-        if ( ListContains ( *pList, *iter ) )
-            continue;
-
-        pList->push_back ( *iter );
-    }
-}
-
-
-void CClientStreamSectorList::RemoveElements ( list < CClientStreamElement * > * pList )
-{
-    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
-    for ( ; iter != m_Elements.end () ; iter++ )
-    {
-        pList->remove ( *iter );
-    }
-}
-
-
 CClientStreamSector::CClientStreamSector ( CClientStreamSectorRow * pRow, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
 {
     m_pRow = pRow;
@@ -45,7 +21,6 @@ CClientStreamSector::CClientStreamSector ( CClientStreamSectorRow * pRow, CVecto
     m_pLeft = NULL; m_pRight = NULL; m_pTop = NULL; m_pBottom = NULL;
     m_bActivated = false;
     m_bExtra = false;
-    m_bShouldBeActive = false;
 
     m_pArea = NULL;
 }
@@ -154,17 +129,25 @@ void CClientStreamSector::CompareSurroundings ( CClientStreamSector * pSector, l
 }
 
 
-CClientStreamSectorList * CClientStreamSector::GetList ( CClientStreamer * pStreamer )
+void CClientStreamSector::AddElements ( list < CClientStreamElement * > * pList )
 {
-    CClientStreamSectorList * pList;
-    std::vector < CClientStreamSectorList * > ::iterator iter = m_Lists.begin ();
-    for ( ; iter != m_Lists.end () ; iter++ )
+    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
+    for ( ; iter != m_Elements.end () ; iter++ )
     {
-        pList = *iter;
-        if ( pList->m_pStreamer == pStreamer ) return pList;
+        // Don't add if already in the list
+        if ( ListContains ( *pList, *iter ) )
+            continue;
+
+        pList->push_back ( *iter );
     }
-    pList = new CClientStreamSectorList ( pStreamer );
-    m_Lists.push_back ( pList );
-    return pList;
 }
-        
+
+
+void CClientStreamSector::RemoveElements ( list < CClientStreamElement * > * pList )
+{
+    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
+    for ( ; iter != m_Elements.end () ; iter++ )
+    {
+        pList->remove ( *iter );
+    }
+}
