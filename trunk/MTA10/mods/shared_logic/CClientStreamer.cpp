@@ -704,6 +704,7 @@ void CClientStreamer::OnSectorChange ( vector < CClientStreamSector * > & activa
             pElement = *iterElements;
             if ( pElement->IsStreamedIn () ) m_ToStreamOut.push_back ( pElement );
         }
+        pSectorList->RemoveElements ( &m_ActiveElements );
     }
 
     // ..add all the elements in active sectors to our active-list
