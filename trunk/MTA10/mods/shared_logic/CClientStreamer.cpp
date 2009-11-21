@@ -168,7 +168,11 @@ void CClientStreamer::SetupSectors ()
     CClientStreamSector * pActiveSectors [ 9 ];
     m_pSector->GetSurroundingSectors ( pActiveSectors );
     pActiveSectors [ 8 ] = m_pSector;
-    for ( int i = 0 ; i < 9 ; i++ ) activateSectors.push_back ( pActiveSectors [ i ] );
+    for ( int i = 0 ; i < 9 ; i++ )
+    {
+        if ( pActiveSectors [ i ] )
+            activateSectors.push_back ( pActiveSectors [ i ] );
+    }
 
     // Start this streamer at our current sector
     OnSectorChange ( activateSectors, deactivateSectors );
@@ -309,12 +313,20 @@ void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
         CClientStreamSector * pDeactivateSectors [ 9 ];
         m_pSector->GetSurroundingSectors ( pDeactivateSectors );
         pDeactivateSectors [ 8 ] = m_pSector;
-        for ( int i = 0 ; i < 9 ; i++ ) pDeactivateSectors[i]->SetShouldBeActive ( false );
+        for ( int i = 0 ; i < 9 ; i++ )
+        {
+            if ( pDeactivateSectors [ i ] )
+                pDeactivateSectors[i]->SetShouldBeActive ( false );
+        }
 
         CClientStreamSector * pActivateSectors [ 9 ];
         pSector->GetSurroundingSectors ( pActivateSectors );
         pActivateSectors [ 8 ] = pSector;
-        for ( int i = 0 ; i < 9 ; i++ ) pActivateSectors[i]->SetShouldBeActive ( true );
+        for ( int i = 0 ; i < 9 ; i++ )
+        {
+            if ( pActivateSectors [ i ] )
+                pActivateSectors[i]->SetShouldBeActive ( true );
+        }
 
         // Sort out our sectors
         CClientStreamSector * pTempSector = NULL;
