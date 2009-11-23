@@ -15,6 +15,9 @@ class CVideoRenderer : public IVideoRenderer
 		IDirect3DTexture9 *		GetVideoTexture( void );
 		void					SetVideoTexture( IDirect3DTexture9 * pTexture );
 
+		void					GetVideoFormat( long & lWidth, long & lHeight );
+		void					SetVideoFormat( const long lWidth, const long lHeight );
+
 		void					Lock( void ) { EnterCriticalSection ( &m_Lock ); }
 		void					Unlock( void ) { LeaveCriticalSection ( &m_Lock ); }
 
@@ -49,6 +52,8 @@ class CVideoRenderer : public IVideoRenderer
 		IBasicAudio *			m_pBasicAudio;
 
 		long					lDefaultVolume;
+		long					m_lVideoWidth;
+		long					m_lVideoHeight;
 };
 
 #endif
