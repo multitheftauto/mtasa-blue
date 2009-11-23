@@ -19,6 +19,7 @@ CVideoRenderer::CVideoRenderer ( IDirect3DDevice9* pDevice )
 	m_pVideoTexture = NULL;
 	m_dwGraphRegister = 0;
 	m_pDevice = pDevice;
+	m_lVideoWidth = m_lVideoHeight = 0;
 
 	Unlock ();
 }
@@ -60,6 +61,18 @@ IDirect3DTexture9 * CVideoRenderer::GetVideoTexture ( void )
 		return m_pVideoTexture;
 	}
 	return NULL;
+}
+
+void CVideoRenderer::GetVideoFormat( long & lWidth, long & lHeight )
+{
+	lWidth = m_lVideoWidth;
+	lHeight = m_lVideoHeight;
+}
+
+void CVideoRenderer::SetVideoFormat( const long lWidth, const long lHeight )
+{
+	m_lVideoWidth = lWidth;
+	m_lVideoHeight = lHeight;
 }
 
 bool CVideoRenderer::Initialize ( const WCHAR * fileName )

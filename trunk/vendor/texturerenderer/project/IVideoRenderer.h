@@ -20,6 +20,7 @@ class IVideoRenderer
 {
 public:
 	virtual void							SetVideoTexture			( IDirect3DTexture9 * pTexture ) = 0;
+	virtual void							SetVideoFormat			( long lWidth, long lHeight ) = 0;
 
 	virtual LPCRITICAL_SECTION				GetMutex				( void ) = 0;
 

@@ -157,8 +157,9 @@ HRESULT CTextureRenderer::SetMediaType(const CMediaType *pmt)
     }
 
     // Create the texture that maps to this media type
-    hr = m_pDevice->CreateTexture(uintWidth, uintHeight, 1, 0, D3DFMT_X8R8G8B8,D3DPOOL_MANAGED, &m_pTexture, NULL);
-	m_pMaster->SetVideoTexture ( m_pTexture );
+    hr = m_pDevice->CreateTexture( uintWidth, uintHeight, 1, 0, D3DFMT_X8R8G8B8,D3DPOOL_MANAGED, &m_pTexture, NULL );
+	m_pMaster->SetVideoTexture( m_pTexture );
+	m_pMaster->SetVideoFormat( m_lVidWidth, m_lVidHeight );
 
     if( FAILED(hr))
     {
