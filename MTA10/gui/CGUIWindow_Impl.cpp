@@ -38,11 +38,9 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
  
 	// Some window specific style options
 	reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setTitlebarFont ( "default-bold-small" );
-	char *szUpperCaption = new char [ strlen ( szCaption ) + 1 ];
-	strcpy ( szUpperCaption, szCaption );
-	_strupr ( szUpperCaption );
-	m_pWindow->setText ( szUpperCaption );
-	delete [] szUpperCaption;
+	
+	// Give the window a caption
+	m_pWindow->setText ( szCaption );
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );
