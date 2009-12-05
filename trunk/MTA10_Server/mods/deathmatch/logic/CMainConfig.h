@@ -55,6 +55,8 @@ public:
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
+    inline bool                     GetHTTPAutoClientFiles          ( void )        { return m_bHTTPAutoClientFiles; };
+    inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
     inline bool                     GetLogFileEnabled               ( void )        { return m_bLogFileEnabled; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
@@ -91,6 +93,8 @@ private:
 	unsigned short					m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
+    bool                            m_bHTTPAutoClientFiles;
+    int                             m_iHTTPConnectionsPerClient;
     bool                            m_bLogFileEnabled;
     std::string                     m_strLogFile;
     bool                            m_bAutoUpdateAntiCheatEnabled;

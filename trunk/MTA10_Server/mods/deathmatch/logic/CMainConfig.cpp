@@ -36,6 +36,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bAseEnabled = false;
 	m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
+    m_iHTTPConnectionsPerClient = 32;
     m_bLogFileEnabled = false;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
@@ -181,6 +182,15 @@ bool CMainConfig::Load ( const char* szFilename )
         m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
         m_strHTTPDownloadURL = "";
     }
+
+    // httpautoclientfiles
+    iResult = GetBoolean ( m_pRootNode, "httpautoclientfiles", m_bHTTPAutoClientFiles );
+    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
+        m_bHTTPAutoClientFiles = true;
+
+    // httpconnectionsperclient
+    GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
+    m_iHTTPConnectionsPerClient = Clamp ( 0, m_iHTTPConnectionsPerClient, 32 );
 
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
@@ -490,6 +500,7 @@ bool CMainConfig::LoadExtended ( void )
 	//RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
+    RegisterCommand ( "sver", CConsoleCommands::Ver, false );
 
 	return true;
 }

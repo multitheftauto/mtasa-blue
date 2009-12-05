@@ -75,6 +75,8 @@ public:
     // Returns true if the downloads were started, false if an error occured
     virtual bool StartDownloadingQueuedFiles ( void ) = 0;
 
+    // Limit number of concurrent http client connections
+    virtual void SetMaxConnections ( int iMaxConnections ) = 0;
 
 
 
