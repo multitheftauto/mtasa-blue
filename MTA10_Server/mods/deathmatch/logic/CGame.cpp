@@ -519,6 +519,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             fprintf ( fh, "* If the web server is on a separate machine, ensure it has access to\n" );
             fprintf ( fh, "  'http-client-files' via a network path, or maintain a remote copy using\n" );
             fprintf ( fh, "  synchronization software.\n" );
+            fprintf ( fh, "---------------------------------------------------------------------------\n" );
+            fprintf ( fh, "Note: 'http-client-files' will only be updated if:\n" );
+            fprintf ( fh, "       'httpdownloadurl' in mtaserver.conf is not blank\n" );
+            fprintf ( fh, "   and 'httpautoclientfiles' in mtaserver.conf is not set to 0\n" );
+            fprintf ( fh, "---------------------------------------------------------------------------\n\n" );
             fclose ( fh );
         }
     }
@@ -941,7 +946,8 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMapManager->GetRootElement ()->GetID (),
                                               m_pMainConfig->GetHTTPDownloadType (),
                                               m_pMainConfig->GetHTTPPort (),
-                                              m_pMainConfig->GetHTTPDownloadURL ().c_str () ) );
+                                              m_pMainConfig->GetHTTPDownloadURL ().c_str (),
+                                              m_pMainConfig->GetHTTPConnectionsPerClient () ) );
 }
 
 void CGame::InitialDataStream ( CPlayer& Player )

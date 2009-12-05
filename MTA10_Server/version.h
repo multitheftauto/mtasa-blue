@@ -1,7 +1,7 @@
 #define MTA_DM_VERSION              0x0103
 #define MTA_DM_VERSIONSTRING        "1.0.3"
 #define MTA_DM_FULL_STRING          "MTA:SA Server"
-#define MTA_DM_BITSTREAM_VERSION    0x03
+#define MTA_DM_BITSTREAM_VERSION    0x04
 
 // These defines are dependant on the build configuration:
 // MTA_DM_ASE_VERSION
@@ -62,7 +62,7 @@
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
     #define MTA_DM_ASE_VERSION      "1.0"
     #define MTA_DM_NETCODE_VERSION  0x164
-    #define MTA_DM_NET_MODULE_VERSION   0x000D
+    #define MTA_DM_NET_MODULE_VERSION   0x000F
 #else
     #define MTA_DM_ASE_VERSION      "1.0n"
     #define MTA_DM_NETCODE_VERSION  0x165

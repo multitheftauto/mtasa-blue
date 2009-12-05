@@ -333,7 +333,7 @@ bool CResource::Load ( void )
         m_ulCRC = GenerateCRC();
 
         // copy client files to http holding directory if external web server is being used
-        if ( g_pGame->GetConfig ()->GetHTTPDownloadType () == HTTP_DOWNLOAD_ENABLED_URL )
+        if ( g_pGame->GetConfig ()->GetHTTPDownloadType () == HTTP_DOWNLOAD_ENABLED_URL && g_pGame->GetConfig ()->GetHTTPAutoClientFiles () )
         {
             list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
             for ( ; iter != this->IterEnd () ; iter++ )

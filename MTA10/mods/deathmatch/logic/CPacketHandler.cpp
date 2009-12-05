@@ -333,6 +333,12 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
     g_pClientGame->m_pRootEntity->SetID ( RootElementID );
 
+    // Limit number of http request if required by the server
+    int iHTTPConnectionsPerClient = 32;
+    if ( bitStream.Version () >= 0x04 )
+        bitStream.Read ( iHTTPConnectionsPerClient );
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPConnectionsPerClient );
+
     // HTTP Download Type
     unsigned char ucHTTPDownloadType;
     bitStream.Read ( ucHTTPDownloadType );

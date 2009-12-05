@@ -27,25 +27,13 @@ public:
                                                               ElementID RootElementID,
                                                               eHTTPDownloadType ucHTTPDownloadType,
                                                               unsigned short usHTTPDownloadPort,
-                                                              const char* szHTTPDownloadURL );
+                                                              const char* szHTTPDownloadURL,
+                                                              int iHTTPConnectionsPerClient );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
     inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
 
     bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
-
-    inline ElementID        GetPlayerID                     ( void )                            { return m_PlayerID; };
-    inline unsigned char    GetNumberOfPlayers              ( void )                            { return m_ucNumberOfPlayers; };
-    inline eHTTPDownloadType GetHTTPDownloadType            ( void )                            { return m_ucHTTPDownloadType; };
-    inline unsigned short   GetHTTPDownloadPort             ( void )                            { return m_usHTTPDownloadPort; };
-    inline const char*      GetHTTPDownloadURL              ( void )                            { return m_szHTTPDownloadURL; };
-
-    inline void             SetPlayerID                     ( ElementID PlayerID )       { m_PlayerID = PlayerID; };
-    inline void             SetNumberOfPlayers              ( unsigned char ucNumberOfPlayers ) { m_ucNumberOfPlayers = ucNumberOfPlayers; };
-    inline void             SetRootElementID                ( ElementID ID )                    { m_RootElementID = ID; }
-    inline void             SetHTTPDownloadType             ( eHTTPDownloadType ucHTTPDownloadType )       { m_ucHTTPDownloadType = ucHTTPDownloadType; };
-    inline void             SetHTTPDownloadPort             ( unsigned short usHTTPDownloadPort ) { m_usHTTPDownloadPort = usHTTPDownloadPort; };
-    inline void             SetHTTPDownloadURL              ( const char* szHTTPDownloadURL ) { strncpy ( m_szHTTPDownloadURL, szHTTPDownloadURL, MAX_HTTP_DOWNLOAD_URL ); m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL] = 0; };
 
 private:
     ElementID               m_PlayerID;
@@ -54,6 +42,7 @@ private:
     eHTTPDownloadType       m_ucHTTPDownloadType;
     unsigned short          m_usHTTPDownloadPort;
     char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
+    int                     m_iHTTPConnectionsPerClient;
 };
 
 #endif
