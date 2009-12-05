@@ -159,6 +159,15 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
         return true;
     }
 
+    // HACK: if its a 'nick' command, save it here
+    if ( !stricmp ( szCommand, "nick" ) )
+    {
+        if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
+        {
+            CVARS_SET ( "nick", std::string ( szParameters ) );
+        }
+    }
+
     // Try to execute the handler
     if ( m_pfnExecuteHandler )
     {
