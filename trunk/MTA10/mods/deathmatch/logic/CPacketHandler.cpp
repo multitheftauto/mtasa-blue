@@ -1030,7 +1030,11 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
      */
     if ( pPlayer->IsLocalPlayer () )
     {
-        g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
+        // Only allow server to change the nick setting if it has not been changed from the default
+        std::string strNick;
+        g_pCore->GetCVars ()->Get ( "nick", strNick );
+        if ( strNick == "Player" )
+            g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
     }
 
     /*
