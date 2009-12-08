@@ -55,7 +55,7 @@
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
     #define MTA_DM_ASE_VERSION      "1.0"
     #define MTA_DM_NETCODE_VERSION  0x164
-    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x100F
+    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x1010
 #else
     #define MTA_DM_ASE_VERSION      "1.0n"
     #define MTA_DM_NETCODE_VERSION  0x165
