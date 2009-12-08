@@ -21,9 +21,13 @@ public:
 
 private:
     void                    StartVersionCheck       ( void );
+    void                    StartVersionCheck2      ( void );
+    void                    PollVersionCheck        ( void );
+    void                    PollVersionCheck2       ( void );
 
     int                     m_iStage;
     CHTTPClient             m_HTTP;
+    long long               m_llTimeStart;
 };
 
 #endif

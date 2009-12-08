@@ -17,7 +17,7 @@
     // Only one type of build for non-windows servers
     #define MTA_DM_BUILDTYPE        ""
     #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING
-    #define MTA_DM_BUILDTAG_LONG    MTA_DM_VERSIONSTRING "-" "rc2"    // Note: This has to be changed manually for each Linux update
+    #define MTA_DM_BUILDTAG_LONG    MTA_DM_VERSIONSTRING "-" "rc3"    // Note: This has to be changed manually for each Linux update
     #define MTA_DM_CONNECT_TO_PUBLIC
 
 #elif defined(BUILD_CONFIG_)
@@ -62,7 +62,7 @@
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
     #define MTA_DM_ASE_VERSION      "1.0"
     #define MTA_DM_NETCODE_VERSION  0x164
-    #define MTA_DM_NET_MODULE_VERSION   0x000F
+    #define MTA_DM_NET_MODULE_VERSION   0x0010
 #else
     #define MTA_DM_ASE_VERSION      "1.0n"
     #define MTA_DM_NETCODE_VERSION  0x165
