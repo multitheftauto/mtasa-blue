@@ -403,7 +403,7 @@ void CConsole::CreateElements ( CGUIElement* pParent )
 	m_fWindowY *= ScreenSize.fY / NATIVE_RES_Y;
 
     // Create window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pManager->CreateWnd ( pParent, "Console" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pManager->CreateWnd ( pParent, "CONSOLE" ) );
     m_pWindow->SetAlwaysOnTop ( true );
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();

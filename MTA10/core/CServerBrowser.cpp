@@ -33,7 +33,7 @@ CServerBrowser::CServerBrowser ( void )
     m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Server Browser" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SERVER BROWSER" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetMovable ( true );
     m_pWindow->SetSizingEnabled ( true );
