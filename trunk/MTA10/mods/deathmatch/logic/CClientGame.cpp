@@ -484,7 +484,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
     {
         // Display the status box
-        g_pCore->ShowMessageBox ( "Connecting", "Entering the game ...", MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
 
         // Send the initial data to the server
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();

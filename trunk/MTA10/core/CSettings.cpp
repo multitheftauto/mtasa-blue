@@ -51,7 +51,7 @@ CSettings::CSettings ( void )
     CVector2D vecTemp;
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Settings" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SETTINGS" ) );
     m_pWindow->SetCloseButtonEnabled ( true );
     m_pWindow->SetMovable ( true );
 

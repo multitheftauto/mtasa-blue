@@ -28,7 +28,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
     m_pGUI = g_pCore->GetGUI();
 
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pGUI->CreateWnd ( NULL, "Host Game" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pGUI->CreateWnd ( NULL, "HOST GAME" ) );
     m_pWindow->SetMovable ( true );
 
     CVector2D resolution = m_pGUI->GetResolution();

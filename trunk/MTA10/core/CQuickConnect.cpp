@@ -20,7 +20,7 @@ CQuickConnect::CQuickConnect ( void )
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Quick Connect" ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "QUICK CONNECT" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     //m_pWindow->SetMovable ( false );
 
