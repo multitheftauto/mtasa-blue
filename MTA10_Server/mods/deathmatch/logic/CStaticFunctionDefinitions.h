@@ -369,6 +369,7 @@ public:
     static CColRectangle*       CreateColRectangle                  ( CResource* pResource, const CVector& vecPosition, const CVector2D& vecSize );
     static CColPolygon*         CreateColPolygon                    ( CResource* pResource, const CVector& vecPosition );
     static CColTube*            CreateColTube                       ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight );
+    static void                 RefreshColShapeColliders            ( CColShape *pColShape );
 
     // Weapon funcs
     static bool                 GetWeaponNameFromID                 ( unsigned char ucID, char* szName );

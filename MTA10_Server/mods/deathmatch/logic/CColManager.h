@@ -30,18 +30,18 @@ public:
     bool                                        Exists              ( CColShape* pShape );
     void                                        DeleteAll           ( void );
 
-    std::list < CColShape* > ::const_iterator   IterBegin           ( void )                    { return m_List.begin (); }
-    std::list < CColShape* > ::const_iterator   IterEnd             ( void )                    { return m_List.end (); }
+    std::vector < CColShape* > ::const_iterator   IterBegin           ( void )                    { return m_List.begin (); }
+    std::vector < CColShape* > ::const_iterator   IterEnd             ( void )                    { return m_List.end (); }
 
 private:
     inline void                                 AddToList           ( CColShape* pShape )       { m_List.push_back ( pShape ); };
     void                                        RemoveFromList      ( CColShape* pShape );
     void                                        TakeOutTheTrash     ( void );
 
-    std::list < CColShape* >                    m_List;
+    std::vector < CColShape* >                  m_List;
     bool                                        m_bCanRemoveFromList;
     bool                                        m_bIteratingList;
-    std::list < CColShape* >                    m_TrashCan;
+    std::vector < CColShape* >                  m_TrashCan;
 };
 
 #endif

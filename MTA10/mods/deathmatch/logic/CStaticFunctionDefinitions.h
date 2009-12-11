@@ -435,6 +435,7 @@ public:
     static CClientColPolygon*           CreateColPolygon                    ( CResource& Resource, const CVector& vecPosition );
     static CClientColTube*              CreateColTube                       ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight );
 	static CClientColShape*				GetElementColShape					( CClientEntity* pEntity );
+    static void                         RefreshColShapeColliders            ( CClientColShape *pColShape );
 
     // Weapon funcs
     static bool                         GetWeaponNameFromID                 ( unsigned char ucID, char* szName, unsigned short len );

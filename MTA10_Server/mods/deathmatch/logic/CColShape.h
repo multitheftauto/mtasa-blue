@@ -42,7 +42,7 @@ public:
     inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };
 
     const CVector&              GetPosition         ( void );
-    virtual void                SetPosition         ( const CVector& vecPosition )      { m_vecPosition = vecPosition; };
+    virtual void                SetPosition         ( const CVector& vecPosition );
 
     void                        CallHitCallback     ( CElement& Element );
     void                        CallLeaveCallback   ( CElement& Element );

@@ -13,6 +13,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::vector;
 
 CClientColManager::~CClientColManager ( void )
 {
@@ -22,20 +23,48 @@ CClientColManager::~CClientColManager ( void )
 
 void CClientColManager::DoPulse ( void )
 {
-    list < CClientColShape* > ::const_iterator iter = m_List.begin ();
+    vector < CClientColShape* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); ++iter ) (*iter)->DoPulse ();
 }
 
 
-void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity )
+void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity, CClientColShape * pJustThis, bool bChildren )
 {
-    CClientColShape* pShape = NULL;
-    // Call the hit detection event on all our shapes
-    list < CClientColShape * > cloneList = m_List;
-    list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
+    if ( bChildren )
+    {
+        list < CClientEntity* > ::const_iterator iter = pEntity->IterBegin ();
+        for ( ; iter != pEntity->IterEnd (); iter++ )
+        {
+            CVector vecPosition;
+            (*iter)->GetPosition( vecPosition );
+            DoHitDetection ( vecPosition, 0.0f, *iter, pJustThis, true );
+        }
+        if ( IS_COLSHAPE ( pEntity ) ||
+             IS_RADAR_AREA ( pEntity ) ||
+             IS_RADARMARKER ( pEntity ) ||
+             IS_GUI ( pEntity )
+            )
+        {
+            return;
+        }
+    }
+
+    vector < CClientColShape * > cloneList;
+
+    if ( !pJustThis )
+    {
+        // Call the hit detection event on all our shapes
+        cloneList = m_List;
+    }
+    else
+    {
+        cloneList.push_back ( pJustThis );
+    }
+
+    vector < CClientColShape* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
-        pShape = *iter;
+        CClientColShape* pShape = *iter;
 
         // Enabled and not being deleted?
         if ( !pShape->IsBeingDeleted () && pShape->IsEnabled () )
@@ -100,8 +129,8 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
 bool CClientColManager::Exists ( CClientColShape* pShape )
 {
     // Return true if it exists
-    list < CClientColShape * > cloneList = m_List;
-    list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
+    vector < CClientColShape * > cloneList = m_List;
+    vector < CClientColShape* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
         if ( *iter == pShape )
@@ -117,8 +146,8 @@ bool CClientColManager::Exists ( CClientColShape* pShape )
 void CClientColManager::DeleteAll ( void )
 {
     // Delete all of them
-    list < CClientColShape * > cloneList = m_List;
-    list < CClientColShape* > ::const_iterator iter = cloneList.begin ();
+    vector < CClientColShape * > cloneList = m_List;
+    vector < CClientColShape* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
         delete *iter;
@@ -129,5 +158,5 @@ void CClientColManager::DeleteAll ( void )
 
 void CClientColManager::RemoveFromList ( CClientColShape* pShape )
 {
-    m_List.remove ( pShape );
+    ListRemove ( m_List, pShape );
 }
