@@ -173,7 +173,7 @@ void CMapManager::BroadcastMapInformation ( void )
     }
 
     // Add the colshapes to the packet
-    list < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
+    vector < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
     for ( ; iterColShapes != m_pColManager->IterEnd (); iterColShapes++ )
     {
         CColShape * pColShape = *iterColShapes;
@@ -248,7 +248,7 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
     }
 
     // Add the colshapes to the packet
-    list < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
+    vector < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
     for ( ; iterColShapes != m_pColManager->IterEnd (); iterColShapes++ )
     {
         CColShape * pColShape = *iterColShapes;

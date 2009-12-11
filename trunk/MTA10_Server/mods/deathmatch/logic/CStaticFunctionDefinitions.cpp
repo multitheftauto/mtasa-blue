@@ -6635,6 +6635,14 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 }
 
 
+// Make sure all colliders for a colshape are up to date
+void CStaticFunctionDefinitions::RefreshColShapeColliders ( CColShape * pColShape )
+{
+    CElement* pRoot = m_pMapManager->GetRootElement ();
+    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+}
+
+
 bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, char* szName )
 {
     if ( ucID < NUMBER_OF_WEAPON_NAMES )

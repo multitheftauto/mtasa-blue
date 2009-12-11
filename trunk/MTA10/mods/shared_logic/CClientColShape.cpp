@@ -65,6 +65,13 @@ bool CClientColShape::IsAttachable ( void )
 }
 
 
+void CClientColShape::SetPosition ( const CVector& vecPosition )
+{
+    m_vecPosition = vecPosition;
+    CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
+};
+
+
 void CClientColShape::CallHitCallback ( CClientEntity& Entity )
 {
     // Call the callback with us as the shape if it exists
