@@ -1,5 +1,34 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.0.3
+======================================
+Goal: Gameplay bugfix release
+
+Targets:
+* Fixes for issues and crashes that are present in 1.0.2 and are degrading the stability of the software
+* High priority gameplay fixes
+
+- 0005129: [Synchronization] getElementsWithinColshape is buggy if you move the colshape position server or client side (ccw) - resolved.
+- 0005121: [Client] When a colshape is created, getElementsWithinColShape() and isElementWithinColShape() doesnt find player if player does not move (ccw) - resolved.
+- 0005085: [Server] RadarArea Error (ccw) - resolved.
+- 0004875: [Server] Vehicles lag with high player counts (ccw) - resolved.
+- 0005123: [General] Servers can permanently change a players name (ccw) - resolved.
+- 0005124: [General] Clients can overload external web servers when downloading (ccw) - resolved.
+- 0005126: [Server] Add a directory which contains the correct client files for hosting on an external web server (ccw) - resolved.
+- 0005125: [Server] The server information bar at the top of the console has compatibility issues with some Linux utility programs (ccw) - resolved.
+- 0005109: [Client] Sync: No sync with larger amount of players (ccw) - resolved.
+- 0005099: [Scripting] callRemote does not work between MTA servers (ccw) - resolved.
+- 0004961: [Client] Vehicles not getting updated anymore (ccw) - resolved.
+- 0004760: [Synchronization] Players staying in spawn desync (ccw) - resolved.
+- 0004034: [Scripting] executeSQLQuery could return an error message from SQLite engine (Flobu) - resolved.
+- 0005073: [Server] Banning an IP range doesn't work (Flobu) - resolved.
+
+Resources:
+
+- 0005071: [Required] Admin: slapping players always takes 20hp regardless of chosen value (Flobu) - resolved.
+- 0005111: [Required] Admin messages multiply out of control (ccw) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.0.2
 ======================================
 Goal: Stability bugfix releas
