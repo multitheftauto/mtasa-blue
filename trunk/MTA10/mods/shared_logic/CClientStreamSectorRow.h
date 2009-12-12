@@ -12,8 +12,8 @@
 #ifndef __CClientStreamSectorRow_H
 #define __CClientStreamSectorRow_H
 
-#define SECTOR_SIZE         600.0f		// was 300.0f
-#define ROW_SIZE            600.0f		// was 300.0f
+#define SECTOR_SIZE         300.0f		// was 300.0f
+#define ROW_SIZE            300.0f		// was 300.0f
 #define WORLD_SIZE          6000.0f		// was 3000.0f
 
 #include "CClientCommon.h"
