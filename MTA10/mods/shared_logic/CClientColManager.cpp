@@ -39,13 +39,21 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
             (*iter)->GetPosition( vecPosition );
             DoHitDetection ( vecPosition, 0.0f, *iter, pJustThis, true );
         }
-        if ( IS_COLSHAPE ( pEntity ) ||
-             IS_RADAR_AREA ( pEntity ) ||
-             IS_RADARMARKER ( pEntity ) ||
-             IS_GUI ( pEntity )
-            )
+        switch ( pEntity->GetType () )
         {
-            return;
+            case CCLIENTRADARMARKER:
+            case CCLIENTRADARAREA:
+            case CCLIENTTEAM:
+	        case CCLIENTGUI:
+            case CCLIENTCOLSHAPE:
+            case CCLIENTDUMMY:
+            case SCRIPTFILE:
+            case CCLIENTDFF:
+            case CCLIENTCOL:
+            case CCLIENTTXD:
+            case CCLIENTSOUND:
+            case CCLIENTHANDLING:
+                return;
         }
     }
 
