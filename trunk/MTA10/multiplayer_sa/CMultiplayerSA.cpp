@@ -165,6 +165,9 @@ DWORD** VAR_TagInfoArray                                    = (DWORD **)0xA9A8C0
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList =         0x54BB9A;
 
+#define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
+DWORD RETURN_CrashFix_Misc1 =                               0x5D9A74;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -278,6 +281,7 @@ void HOOK_CAnimManager_BlendAnimation ();
 void HOOK_CPed_GetWeaponSkill ();
 void HOOK_CPed_AddGogglesModel ();
 void HOOK_CPhysical_ProcessCollisionSectorList ();
+void HOOK_CrashFix_Misc1 ();
 
 void vehicle_lights_init ();
 
@@ -391,7 +395,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
-    
+    HookInstall(HOOKPOS_CrashFix_Misc1, (DWORD)HOOK_CrashFix_Misc1, 6 );
+
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
     HookInstallCall ( CALL_VehicleCamUp, (DWORD)HOOK_VehicleCamUp );
@@ -4224,5 +4229,23 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
             mov     edi, pCollisionPhysical
             jmp     RETURN_CPhysical_ProcessCollisionSectorList
         }
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc1 ()
+{
+    _asm
+    {
+        // Hooked from 0x5D9A6E
+        mov     eax,dword ptr [esp+18h]
+        test    eax,eax 
+        je      cont
+
+        mov     eax,dword ptr ds:[008D12CCh] 
+        mov     ecx,dword ptr [eax+esi]     // If [eax+esi] is 0, it causes a crash
+        test    ecx,ecx
+    cont:
+        jmp     RETURN_CrashFix_Misc1
     }
 }
