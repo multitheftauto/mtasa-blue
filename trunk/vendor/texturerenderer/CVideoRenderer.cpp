@@ -111,6 +111,7 @@ bool CVideoRenderer::Initialize ( const WCHAR * fileName )
 
 	// --- clean up
 	m_pGraph->Release ();
+	m_pGraph = NULL;
 
 	// --- unlock the mutex
 	Unlock ();
