@@ -64,24 +64,41 @@ namespace
             return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
         }
 
+        // Update cached radius if required
+        if ( --pElement->m_iCachedRadiusCounter < 0 )
+        {
+            CStaticFunctionDefinitions::GetElementRadius ( *pElement, pElement->m_fCachedRadius );
+            pElement->m_iCachedRadiusCounter = 20 + rand() % 50;
+        }
+
         // Do a simple calculation if the element has a small radius
-        float fRadius  = 0;
-        CStaticFunctionDefinitions::GetElementRadius ( *pElement, fRadius );
-        if ( fRadius < 20 )
+        if ( pElement->m_fCachedRadius < 20 )
         {
             CVector vecDif = pElement->GetStreamPosition () - vecPosition;
             return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
         }
 
-        // Get bounding box extents
-        CVector vecMin;
-        CVector vecMax;
-        CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
+        // Update cached bounding box if required
+        if ( --pElement->m_iCachedBoundingBoxCounter < 0 )
+        {
+            // Get bounding box extents
+            CVector vecMin;
+            CVector vecMax;
+            CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
 
-        // Adjust for non-centered bounding box
-        CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
-        vecMin -= vecHalfCenter;
-        vecMax -= vecHalfCenter;
+            // Adjust for non-centered bounding box
+            CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
+            vecMin -= vecHalfCenter;
+            vecMax -= vecHalfCenter;
+
+            pElement->m_vecCachedBoundingBox[0] = vecMin;
+            pElement->m_vecCachedBoundingBox[1] = vecMax;
+
+            pElement->m_iCachedBoundingBoxCounter = 20 + rand() % 50;
+        }
+
+        const CVector& vecMin = pElement->m_vecCachedBoundingBox[0];
+        const CVector& vecMax = pElement->m_vecCachedBoundingBox[1];
 
         // Get bounding box axes
         CMatrix gtaMatrix;

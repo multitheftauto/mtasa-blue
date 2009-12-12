@@ -60,6 +60,11 @@ private:
     bool                        m_bAttemptingToStreamIn;
     bool                        m_bStreamedIn;
     unsigned short              m_usStreamReferences, m_usStreamReferencesScript;
+public:
+    float                       m_fCachedRadius;
+    int                         m_iCachedRadiusCounter;
+    CVector                     m_vecCachedBoundingBox[2];
+    int                         m_iCachedBoundingBoxCounter;
 };
 
 #endif

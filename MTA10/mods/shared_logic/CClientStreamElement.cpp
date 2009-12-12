@@ -25,6 +25,10 @@ CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, Elemen
     m_bAttemptingToStreamIn = false;
     m_usStreamReferences = 0; m_usStreamReferencesScript = 0;
     m_pStreamer->AddElement ( this );
+
+    m_fCachedRadius = 0;
+    m_iCachedRadiusCounter = 0;
+    m_iCachedBoundingBoxCounter = 0;
 }
 
 
