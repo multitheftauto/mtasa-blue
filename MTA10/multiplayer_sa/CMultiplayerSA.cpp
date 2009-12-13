@@ -999,6 +999,18 @@ void CMultiplayerSA::InitHooks()
     memset ( (void *)0x685DE6, 0x90, 5 );
     * ( BYTE * ) ( 0x685DE6 ) = 0x33;
     * ( BYTE * ) ( 0x685DE7 ) = 0xC0;
+
+    // #4937, Disable stealth-kill rotation in CTaskSimpleStealthKill::ProcessPed
+    // Used to face the dying ped away from the killer.
+    memset( (void *)0x62E63F, 0x90, 6 );
+    * ( BYTE * ) ( 0x62E63F ) = 0xDD;
+    * ( BYTE * ) ( 0x62E640 ) = 0xD8;
+    memset( (void *)0x62E659, 0x90, 6 );
+    * ( BYTE * ) ( 0x62E659 ) = 0xDD;
+    * ( BYTE * ) ( 0x62E65A ) = 0xD8;
+    memset( (void *)0x62E692, 0x90, 6 );
+    * ( BYTE * ) ( 0x62E692 ) = 0xDD;
+    * ( BYTE * ) ( 0x62E693 ) = 0xD8;
 }
 
 
