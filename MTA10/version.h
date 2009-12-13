@@ -59,6 +59,6 @@
 #else
     #define MTA_DM_ASE_VERSION      "1.0n"
     #define MTA_DM_NETCODE_VERSION  0x165
-    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x100E
+    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x1410
 #endif
 
