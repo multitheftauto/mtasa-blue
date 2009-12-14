@@ -61,7 +61,7 @@ public:
 
 private:
     std::string                     m_strFunctionName;
-    vector<SString>                 m_accessList;
+    vector<std::string>             m_accessList;
     bool                            m_bHTTPAccess;
 	bool							m_bRestricted;
 
@@ -74,7 +74,20 @@ public:
                                         m_strFunctionName = strFunctionName;
                                         m_bHTTPAccess = bHTTPAccess;
 										m_bRestricted = bRestricted;
-                                        SString ( access ).Split ( ",", m_accessList ); 
+                                        size_t leng = access.length ();
+                                        char szResourceName[MAX_RESOURCE_NAME_LENGTH] = {'\0'};
+                                        size_t s = 0;
+                                        for ( size_t i = 0; i < leng; i++ )
+                                        {
+                                            if ( access[i] != ',' )
+                                                szResourceName[s] = access[i];
+                                            else if ( strlen(szResourceName) != 0 )
+                                            {
+                                                m_accessList.push_back ( szResourceName );
+                                                szResourceName[0] = '\0';
+                                                s = 0;
+                                            }
+                                        }   
                                     }
 
 	inline eExportedFunctionType	GetType ( void ) { return m_ucType; }
@@ -85,7 +98,7 @@ public:
     {
         if ( m_accessList.size() == 0 )
             return false;
-        vector < SString > ::iterator iter = m_accessList.begin ();
+        vector < std::string > ::iterator iter = m_accessList.begin ();
         for ( ; iter != m_accessList.end (); iter++ )
         {
             if ( (*iter).compare ( "*" ) == 0 || (*iter).compare ( strResourceName ) == 0 )
