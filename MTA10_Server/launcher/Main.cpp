@@ -18,8 +18,10 @@ using namespace std;
 
 #ifdef WIN32
     #include <windows.h>
+    #include <direct.h>
 #else
     #include <string.h>
+    #include <alloca.h>
 #endif
 
 #ifdef WIN32
@@ -38,13 +40,30 @@ using namespace std;
 
 int main ( int argc, char* argv [] )
 {
+    // Work out the launched directory and filename
+    int iLength = strlen ( argv[0] );
+    char *szLaunchDirectory = static_cast < char* > ( alloca ( iLength + 1 ) );
+    char *szLaunchFile = NULL;
+
+    strncpy ( szLaunchDirectory, argv[0], iLength + 1 );
+
+    for ( int i = 0 ; i < iLength ; i++ )
+        if ( szLaunchDirectory[i] == '\\' )
+            szLaunchDirectory[i] = '/';
+
+    if ( char* cpPos = strrchr ( szLaunchDirectory, '/' ) )
+    {
+        *cpPos = 0;
+        szLaunchFile = cpPos + 1;
+    }
+
     if ( argc == 2 )
     {
         if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 )
         {
-            printf ( "Usage: mtaserver [OPTION]\n\n" );
+            printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
             printf ( "  -s                   Run server in silent mode\n" );
-            printf ( "  -t                   Run server without the info bar at the top of the screen\n" );
+            printf ( "  -t                   Run server with a simple console\n" );
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
             printf ( "  --ip [ADDR]          Set IP address\n" );
@@ -54,6 +73,14 @@ int main ( int argc, char* argv [] )
             return 1;
         }
     }
+
+    // If we are unable to access the core module, try changing to the directory of the launched file
+    FILE* fh = fopen ( LIB_CORE, "r" );
+    if ( !fh )
+        chdir ( szLaunchDirectory );
+    else
+        fclose ( fh );
+
     // Load the core library
     CDynamicLibrary Core;
     if ( Core.Load ( LIB_CORE ) )
