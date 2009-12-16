@@ -543,6 +543,7 @@ public:
     static const char*          GetVersionBuildType                 ( );
     static unsigned long        GetNetcodeVersion                   ( );
     static const char*          GetOperatingSystemName              ( );
+    static const char*          GetVersionBuildTag                  ( );
 };
 
 #endif

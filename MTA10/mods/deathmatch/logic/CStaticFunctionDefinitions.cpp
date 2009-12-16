@@ -5616,3 +5616,8 @@ const char* CStaticFunctionDefinitions::GetOperatingSystemName ()
 {
     return MTA_OS_STRING;
 }
+
+const char* CStaticFunctionDefinitions::GetVersionBuildTag ()
+{
+    return MTA_DM_BUILDTAG_LONG;
+}
