@@ -438,7 +438,7 @@ private:
     static void                         PostWeaponFire                  ( void );
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
-    bool                                VerifySADataFiles               ( void );
+    bool                                VerifySADataFiles               ( int iEnableClientChecks = 0 );
 
 public:
     void                                SendExplosionSync               ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin = NULL );
@@ -583,8 +583,6 @@ private:
 
     DWORD                               m_dwFrameTimeSlice;     // how long it took (in ms) to process the current frame
     DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
-
-    int                                 m_iEnableClientChecks;
 
     // Cache for speeding up collision processing
 public:
