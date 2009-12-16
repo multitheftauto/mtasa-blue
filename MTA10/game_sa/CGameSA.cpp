@@ -527,3 +527,18 @@ void CGameSA::ResetCheats ()
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ )
         *(it->second) = 0;
 }
+
+bool CGameSA::VerifySADataFileNames ()
+{
+    return !strcmp ( *(char **)0x5B65AE, "DATA\\CARMODS.DAT" ) &&
+           !strcmp ( *(char **)0x5BD839, "DATA" ) &&
+           !strcmp ( *(char **)0x5BD84C, "HANDLING.CFG" ) &&
+           !strcmp ( *(char **)0x5BEEE8, "DATA\\melee.dat" ) &&
+           !strcmp ( *(char **)0x5B925B, "DATA\\OBJECT.DAT" ) &&
+           !strcmp ( *(char **)0x55D0FC, "data\\surface.dat" ) &&
+           !strcmp ( *(char **)0x55F2BB, "data\\surfaud.dat" ) &&
+           !strcmp ( *(char **)0x55EB9E, "data\\surfinfo.dat" ) &&
+           !strcmp ( *(char **)0x6EAEF8, "DATA\\water.dat" ) &&
+           !strcmp ( *(char **)0x6EAEC3, "DATA\\water1.dat" ) &&
+           !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
+}

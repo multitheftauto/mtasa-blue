@@ -162,6 +162,8 @@ public:
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
 
+    bool                    VerifySADataFileNames   ();
+
 private:
 	CPools					* m_pPools;
 	CPlayerInfo				* m_pPlayerInfo;
