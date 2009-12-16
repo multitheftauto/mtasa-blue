@@ -4824,7 +4824,7 @@ bool CClientGame::VerifySADataFiles ( void )
     {
         if ( !g_pGame->VerifySADataFileNames () || !VerifySADataFileNames () )
         {
-            g_pCore->ShowMessageBox ( "Error", "Data file cheating detected", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return false;
         }
@@ -4853,7 +4853,7 @@ bool CClientGame::VerifySADataFiles ( void )
             if ( !hasher.Calculate ( szVerifyData[i], md5 ) ||
                  memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
             {
-                g_pCore->ShowMessageBox ( "Error", "Data file cheating detected", MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return false;
             }
