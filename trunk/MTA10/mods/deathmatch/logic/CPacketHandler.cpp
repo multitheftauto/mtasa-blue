@@ -334,9 +334,9 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_pRootEntity->SetID ( RootElementID );
 
     // Get amount of checking to do, as determined by the server
-    g_pClientGame->m_iEnableClientChecks = -1;
+    int iEnableClientChecks = -1;
     if ( bitStream.Version () >= 0x05 )
-        bitStream.Read ( g_pClientGame->m_iEnableClientChecks );
+        bitStream.Read ( iEnableClientChecks );
 
     // Limit number of http request if required by the server
     int iHTTPConnectionsPerClient = 32;
@@ -401,7 +401,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_pLocalPlayer->CallEvent ( "onClientPlayerJoin", Arguments, true );
 
     // Make sure that the SA data files weren't tampered with
-    g_pClientGame->VerifySADataFiles ();
+    g_pClientGame->VerifySADataFiles ( iEnableClientChecks );
 }
 
 

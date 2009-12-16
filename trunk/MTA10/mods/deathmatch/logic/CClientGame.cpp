@@ -215,8 +215,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_dwFrameTimeSlice = 0;
     m_dwLastFrameTick = 0;
 
-    m_iEnableClientChecks = -1;
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
@@ -4790,45 +4788,12 @@ bool CClientGame::GetCloudsEnabled ( void )
 }
 
 #pragma code_seg(".text")
-
-bool VerifySADataFileNames ()
+bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 {
-    __declspec(allocate(".text")) static struct {
-        char** pPtr;
-        char szName[32];
-    } szVerifyData[] = {
-            (char **)0x5B65AE, "DATA\\CARMODS.DAT",
-            (char **)0x5BD839, "DATA",
-            (char **)0x5BD84C, "HANDLING.CFG",
-            (char **)0x5BEEE8, "DATA\\melee.dat",
-            (char **)0x5B925B, "DATA\\OBJECT.DAT",
-            (char **)0x55D0FC, "data\\surface.dat",
-            (char **)0x55F2BB, "data\\surfaud.dat",
-            (char **)0x55EB9E, "data\\surfinfo.dat",
-            (char **)0x6EAEF8, "DATA\\water.dat",
-            (char **)0x6EAEC3, "DATA\\water1.dat",
-            (char **)0x5BE686, "DATA\\WEAPON.DAT",
-    };
+    int& iCheckStatus = *(int *)0x8A32A8;
 
-    for ( int i = 0; i < NUMELMS ( szVerifyData ); i++ )
-    {
-        if ( strcmp ( *szVerifyData[i].pPtr, szVerifyData[i].szName ) != 0 )
-            return false;
-    }
-    return true;
-}
-
-bool CClientGame::VerifySADataFiles ( void )
-{
-    if ( m_iEnableClientChecks & ( 1 << 11 ) )
-    {
-        if ( !g_pGame->VerifySADataFileNames () || !VerifySADataFileNames () )
-        {
-            g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetModManager ()->RequestUnload ();
-            return false;
-        }
-    }
+    if ( !g_pGame->VerifySADataFileNames () )
+        iCheckStatus |= ( 1 << 11 );
 
     __declspec(allocate(".text")) static char szVerifyData[][32] = {
         "data/carmods.dat",     "\x6c\xbe\x84\x53\x61\xe7\x6a\xae\x35\xdd\xca\x30\x08\x67\xca\xdf",
@@ -4847,17 +4812,19 @@ bool CClientGame::VerifySADataFiles ( void )
     CMD5Hasher hasher;
     for ( int i = 0; i < NUMELMS ( szVerifyData ); i += 2 )
     {
-        if ( m_iEnableClientChecks & ( 1 << i ) )
+        MD5 md5;
+        if ( !hasher.Calculate ( szVerifyData[i], md5 ) ||
+             memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
         {
-            MD5 md5;
-            if ( !hasher.Calculate ( szVerifyData[i], md5 ) ||
-                 memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
-            {
-                g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetModManager ()->RequestUnload ();
-                return false;
-            }
+            iCheckStatus |= ( 1 << i );
         }
+    }
+
+    if ( iCheckStatus & iEnableClientChecks )
+    {
+        g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->GetModManager ()->RequestUnload ();
+        return false;
     }
 
     return true;
