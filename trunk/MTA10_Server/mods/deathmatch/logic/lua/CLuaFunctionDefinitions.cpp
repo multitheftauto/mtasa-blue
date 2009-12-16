@@ -11052,6 +11052,10 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildType () );
     lua_settable   ( luaVM, -3 );
 
+    lua_pushstring ( luaVM, "tag" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildTag () );
+    lua_settable   ( luaVM, -3 );
+
     return 1;
 }
 
