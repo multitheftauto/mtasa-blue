@@ -482,6 +482,12 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     strncpy ( m_szLocalNick, szNick, MAX_PLAYER_NICK_LENGTH );
     m_szLocalNick [MAX_PLAYER_NICK_LENGTH] = 0;
 
+    // Make sure that the SA data files weren't tampered with before we connect
+    // (will be verified again after having joined to prevent modifying the files
+    // during loading)
+    if ( !VerifySADataFiles () )
+        return false;
+
     // Are we connected?
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
     {
@@ -4785,41 +4791,44 @@ bool CClientGame::GetCloudsEnabled ( void )
 
 #pragma code_seg(".text")
 
-namespace
+bool VerifySADataFileNames ()
 {
-    bool VerifySADataFileNames ()
-    {
-        __declspec(allocate(".text")) static struct {
-            char** pPtr;
-            char szName[32];
-        } szVerifyData[]= {
-                (char **)0x5B65AE, "DATA\\CARMODS.DAT",
-                (char **)0x5BD839, "DATA",
-                (char **)0x5BD84C, "HANDLING.CFG",
-                (char **)0x5BEEE8, "DATA\\melee.dat",
-                (char **)0x5B925B, "DATA\\OBJECT.DAT",
-                (char **)0x55D0FC, "data\\surface.dat",
-                (char **)0x55F2BB, "data\\surfaud.dat",
-                (char **)0x55EB9E, "data\\surfinfo.dat",
-                (char **)0x6EAEF8, "DATA\\water.dat",
-                (char **)0x6EAEC3, "DATA\\water1.dat",
-                (char **)0x5BE686, "DATA\\WEAPON.DAT",
-        };
+    __declspec(allocate(".text")) static struct {
+        char** pPtr;
+        char szName[32];
+    } szVerifyData[] = {
+            (char **)0x5B65AE, "DATA\\CARMODS.DAT",
+            (char **)0x5BD839, "DATA",
+            (char **)0x5BD84C, "HANDLING.CFG",
+            (char **)0x5BEEE8, "DATA\\melee.dat",
+            (char **)0x5B925B, "DATA\\OBJECT.DAT",
+            (char **)0x55D0FC, "data\\surface.dat",
+            (char **)0x55F2BB, "data\\surfaud.dat",
+            (char **)0x55EB9E, "data\\surfinfo.dat",
+            (char **)0x6EAEF8, "DATA\\water.dat",
+            (char **)0x6EAEC3, "DATA\\water1.dat",
+            (char **)0x5BE686, "DATA\\WEAPON.DAT",
+    };
 
-        for ( int i = 0; i < NUMELMS ( szVerifyData ); i++ )
-        {
-            if ( strcmp ( *szVerifyData[i].pPtr, szVerifyData[i].szName ) != 0 )
-                return false;
-        }
-        return true;
+    for ( int i = 0; i < NUMELMS ( szVerifyData ); i++ )
+    {
+        if ( strcmp ( *szVerifyData[i].pPtr, szVerifyData[i].szName ) != 0 )
+            return false;
     }
+    return true;
 }
 
-void CClientGame::VerifySADataFiles ( void )
+bool CClientGame::VerifySADataFiles ( void )
 {
     if ( m_iEnableClientChecks & ( 1 << 11 ) )
+    {
         if ( !g_pGame->VerifySADataFileNames () || !VerifySADataFileNames () )
-            RaiseFatalError ( 40 );
+        {
+            g_pCore->ShowMessageBox ( "Error", "Data file cheating detected", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetModManager ()->RequestUnload ();
+            return false;
+        }
+    }
 
     __declspec(allocate(".text")) static char szVerifyData[][32] = {
         "data/carmods.dat",     "\x6c\xbe\x84\x53\x61\xe7\x6a\xae\x35\xdd\xca\x30\x08\x67\xca\xdf",
@@ -4836,16 +4845,20 @@ void CClientGame::VerifySADataFiles ( void )
     };
 
     CMD5Hasher hasher;
-    for ( int i = 0; i < sizeof(szVerifyData)/sizeof(szVerifyData[0]); i += 2 )
+    for ( int i = 0; i < NUMELMS ( szVerifyData ); i += 2 )
     {
         if ( m_iEnableClientChecks & ( 1 << i ) )
         {
             MD5 md5;
-            if ( !hasher.Calculate ( szVerifyData[i], md5 ) )
-                RaiseFatalError ( 41 );
-
-            if ( memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
-                RaiseFatalError ( 42 );
+            if ( !hasher.Calculate ( szVerifyData[i], md5 ) ||
+                 memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
+            {
+                g_pCore->ShowMessageBox ( "Error", "Data file cheating detected", MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetModManager ()->RequestUnload ();
+                return false;
+            }
         }
     }
+
+    return true;
 }

@@ -438,7 +438,7 @@ private:
     static void                         PostWeaponFire                  ( void );
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
-    void                                VerifySADataFiles               ( void );
+    bool                                VerifySADataFiles               ( void );
 
 public:
     void                                SendExplosionSync               ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin = NULL );
