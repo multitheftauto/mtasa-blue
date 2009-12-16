@@ -57,6 +57,7 @@ public:
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
     inline bool                     GetHTTPAutoClientFiles          ( void )        { return m_bHTTPAutoClientFiles; };
     inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
+    inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline bool                     GetLogFileEnabled               ( void )        { return m_bLogFileEnabled; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
@@ -95,6 +96,7 @@ private:
     std::string                     m_strHTTPDownloadURL;
     bool                            m_bHTTPAutoClientFiles;
     int                             m_iHTTPConnectionsPerClient;
+    int                             m_iEnableClientChecks;
     bool                            m_bLogFileEnabled;
     std::string                     m_strLogFile;
     bool                            m_bAutoUpdateAntiCheatEnabled;

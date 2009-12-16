@@ -215,6 +215,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_dwFrameTimeSlice = 0;
     m_dwLastFrameTick = 0;
 
+    m_iEnableClientChecks = -1;
+
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
@@ -4779,4 +4781,71 @@ bool CClientGame::SetCloudsEnabled ( bool bEnabled )
 bool CClientGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+#pragma code_seg(".text")
+
+namespace
+{
+    bool VerifySADataFileNames ()
+    {
+        __declspec(allocate(".text")) static struct {
+            char** pPtr;
+            char szName[32];
+        } szVerifyData[]= {
+                (char **)0x5B65AE, "DATA\\CARMODS.DAT",
+                (char **)0x5BD839, "DATA",
+                (char **)0x5BD84C, "HANDLING.CFG",
+                (char **)0x5BEEE8, "DATA\\melee.dat",
+                (char **)0x5B925B, "DATA\\OBJECT.DAT",
+                (char **)0x55D0FC, "data\\surface.dat",
+                (char **)0x55F2BB, "data\\surfaud.dat",
+                (char **)0x55EB9E, "data\\surfinfo.dat",
+                (char **)0x6EAEF8, "DATA\\water.dat",
+                (char **)0x6EAEC3, "DATA\\water1.dat",
+                (char **)0x5BE686, "DATA\\WEAPON.DAT",
+        };
+
+        for ( int i = 0; i < NUMELMS ( szVerifyData ); i++ )
+        {
+            if ( strcmp ( *szVerifyData[i].pPtr, szVerifyData[i].szName ) != 0 )
+                return false;
+        }
+        return true;
+    }
+}
+
+void CClientGame::VerifySADataFiles ( void )
+{
+    if ( m_iEnableClientChecks & ( 1 << 11 ) )
+        if ( !g_pGame->VerifySADataFileNames () || !VerifySADataFileNames () )
+            RaiseFatalError ( 40 );
+
+    __declspec(allocate(".text")) static char szVerifyData[][32] = {
+        "data/carmods.dat",     "\x6c\xbe\x84\x53\x61\xe7\x6a\xae\x35\xdd\xca\x30\x08\x67\xca\xdf",
+        "data/handling.cfg",    "\x68\x68\xac\xce\xf9\x33\xf1\x85\x5e\xc2\x8c\xe1\x93\xa7\x81\x59",
+        "data/melee.dat",       "\xb2\xf0\x56\x57\x98\x0e\x4a\x69\x3f\x8f\xf5\xea\xdc\xba\xd8\xf8",
+        "data/object.dat",      "\x46\xa5\xe7\xdf\xf9\x00\x78\x84\x2e\x24\xd9\xde\x5e\x92\xcc\x3e",
+        "data/surface.dat",     "\x9e\xb4\xe4\xe4\x74\xab\xd5\xda\x2f\x39\x61\xa5\xef\x54\x9f\x9e",
+        "data/surfaud.dat",     "\xc3\x2c\x58\x6e\x8b\xa3\x57\x42\xe3\x56\xe6\x52\x56\x19\xf7\xc3",
+        "data/surfinfo.dat",    "\x60\x5d\xd0\xbe\xab\xcc\xc7\x97\xce\x94\xa5\x1a\x3e\x4a\x09\xeb",
+        "data/vehicles.ide",    "\xbd\xc3\xa0\xfc\xed\x24\x02\xc5\xbc\x61\x58\x57\x14\x45\x7d\x4b",
+        "data/water.dat",       "\x69\x04\x00\xec\xc9\x21\x69\xd9\xea\xdd\xaa\xa9\x48\x90\x3e\xfb",
+        "data/water1.dat",      "\x16\xfe\x5a\x3e\x8c\x57\xd0\x2e\xb6\x2a\x44\xa9\x6d\x8b\x9d\x39",
+        "data/weapon.dat",      "\x0a\x9b\xb4\x90\x03\x68\x03\x64\xf9\xf9\x76\x8e\x9b\xce\xa9\x82"
+    };
+
+    CMD5Hasher hasher;
+    for ( int i = 0; i < sizeof(szVerifyData)/sizeof(szVerifyData[0]); i += 2 )
+    {
+        if ( m_iEnableClientChecks & ( 1 << i ) )
+        {
+            MD5 md5;
+            if ( !hasher.Calculate ( szVerifyData[i], md5 ) )
+                RaiseFatalError ( 41 );
+
+            if ( memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
+                RaiseFatalError ( 42 );
+        }
+    }
 }

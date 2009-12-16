@@ -37,6 +37,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
 	m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPConnectionsPerClient = 32;
+    m_iEnableClientChecks = -1;
     m_bLogFileEnabled = false;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
@@ -191,6 +192,9 @@ bool CMainConfig::Load ( const char* szFilename )
     // httpconnectionsperclient
     GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
     m_iHTTPConnectionsPerClient = Clamp ( 0, m_iHTTPConnectionsPerClient, 32 );
+
+    // verifyclientsettings
+    GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
