@@ -3,6 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(mta, 1.0-trunk, nospam@mtanet)
+AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -149,10 +150,10 @@ else
 fi
 
 # Configure subdirectories where necessary
-AC_CONFIG_SUBDIRS([
-	vendor/lua
-	vendor/json-c
-	])
+#   NOTE: Put these on separate single lines due to a bug in autoconf
+#   http://readlist.com/lists/lists.sourceforge.net/mingw-users/2/12488.html
+AC_CONFIG_SUBDIRS([vendor/lua])
+AC_CONFIG_SUBDIRS([vendor/json-c])
 
 # Generate makefiles
 AC_CONFIG_FILES([
