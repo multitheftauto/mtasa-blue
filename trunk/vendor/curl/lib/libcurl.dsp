@@ -677,14 +677,25 @@ SOURCE=.\urldata.h
 SOURCE=.\url.h
 # End Source File
 # End Group
-
-# Begin Group "Resource Files"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\libcurl.rc
-# End Source File
-# End Group
-# End Target
-# End Project
+
+
+# Begin Group "Resource Files"
+
+
+
+# PROP Default_Filter ""
+
+# Begin Source File
+
+
+
+SOURCE=.\libcurl.rc
+
+# End Source File
+
+# End Group
+
+# End Target
+
+# End Project
+
