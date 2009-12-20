@@ -1011,6 +1011,9 @@ void CMultiplayerSA::InitHooks()
     memset( (void *)0x62E692, 0x90, 6 );
     * ( BYTE * ) ( 0x62E692 ) = 0xDD;
     * ( BYTE * ) ( 0x62E693 ) = 0xD8;
+
+    // Allow all screen aspect ratios
+    *(WORD *)0x745BC9 = 0x9090;
 }
 
 
