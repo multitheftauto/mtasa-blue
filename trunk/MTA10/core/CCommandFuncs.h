@@ -41,11 +41,17 @@ public:
     DECLARE_COMMAND_HANDLER ( Unbind );
     DECLARE_COMMAND_HANDLER ( Binds );
     DECLARE_COMMAND_HANDLER ( CopyGTAControls );
-    DECLARE_COMMAND_HANDLER ( ClearDebug )
 	DECLARE_COMMAND_HANDLER ( HUD );
 	DECLARE_COMMAND_HANDLER ( ScreenShot );
 	DECLARE_COMMAND_HANDLER ( ConnectionType );
     DECLARE_COMMAND_HANDLER ( SaveConfig );
+    
+    DECLARE_COMMAND_HANDLER ( DebugClear )
+    
+    DECLARE_COMMAND_HANDLER ( ChatScrollUp );
+    DECLARE_COMMAND_HANDLER ( ChatScrollDown );
+    DECLARE_COMMAND_HANDLER ( DebugScrollUp );
+    DECLARE_COMMAND_HANDLER ( DebugScrollDown );
 };
 
 #endif

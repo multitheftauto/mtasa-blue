@@ -1265,11 +1265,16 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "bind",				"binds a key (key control)",		CCommandFuncs::Bind );
     m_pCommands->Add ( "unbind",			"unbinds a key (key)",				CCommandFuncs::Unbind );
     m_pCommands->Add ( "copygtacontrols",	"copies the default gta controls",	CCommandFuncs::CopyGTAControls );
-    m_pCommands->Add ( "cleardebug",		"clears the debug view",			CCommandFuncs::ClearDebug );
 	m_pCommands->Add ( "screenshot",		"outputs a screenshot",				CCommandFuncs::ScreenShot );
     m_pCommands->Add ( "connectiontype",	"sets the connection type (type)",	CCommandFuncs::ConnectionType );
     m_pCommands->Add ( "saveconfig",	    "immediately saves the config",	    CCommandFuncs::SaveConfig );
-    
+
+    m_pCommands->Add ( "cleardebug",		"clears the debug view",			CCommandFuncs::DebugClear );
+    m_pCommands->Add ( "chatscrollup",      "scrolls the chatbox upwards",      CCommandFuncs::ChatScrollUp );
+    m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
+    m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
+    m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
+
 #ifdef MTA_DEBUG
 	//m_pCommands->Add ( "pools",				"read out the pool values",			CCommandFuncs::PoolRelocations );
 #endif

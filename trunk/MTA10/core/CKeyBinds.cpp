@@ -2446,6 +2446,11 @@ void CKeyBinds::LoadDefaultCommands ( void )
     AddCommand ( "num_6", "radar_move_east", NULL, true );
     AddCommand ( "num_4", "radar_move_west", NULL, true );
     AddCommand ( "num_0", "radar_attach", NULL, true );
+    
+    AddCommand ( "pgup",    "chatscrollup",     NULL, true );
+    AddCommand ( "pgdown",  "chatscrolldown",   NULL, true );
+    AddCommand ( "pgup",    "debugscrollup",    NULL, true );
+    AddCommand ( "pgdown",  "debugscrolldown",  NULL, true );
 }
 
 
