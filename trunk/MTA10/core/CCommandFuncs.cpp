@@ -83,7 +83,7 @@ void CCommandFuncs::ScreenShot ( const char* szParameters )
 
 void CCommandFuncs::Vid ( const char* szParameters )
 {
-#if 1
+#if 0
     // ripped from the renderware sdk
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
 
