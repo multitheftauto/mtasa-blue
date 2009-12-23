@@ -124,20 +124,12 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     }
 
     // Change the search path and current directory
-    char *szOrigPath = NULL;
-    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", NULL, 0 );
-    if ( dwGetPathResult )
+    SString strPath ( "%s\\%s", CalcMTASAPath("mods").c_str (), szName );
+    if ( !SetDllDirectory( strPath.c_str() ) )
     {
-        szOrigPath = static_cast < char* > ( _alloca ( dwGetPathResult ) );
-        dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, dwGetPathResult );
-    }
-    if ( dwGetPathResult == 0 )
-    {
-        CCore::GetSingleton ().GetConsole ()->Print ( "Error getting Path environment variable" );
+        CCore::GetSingleton ().GetConsole ()->Printf ( "Error setting DLL path (%u)", GetLastError () );
         return NULL;
     }
-    SString strPath ( "%s\\%s;%s", CalcMTASAPath("mods").c_str (), szName, szOrigPath );
-    SetEnvironmentVariable ( "Path", strPath );
 
     GetCurrentDirectory ( sizeof(szOriginalDirectory), szOriginalDirectory );
     strMTADirectory = CalcMTASAPath ( "mta" );
@@ -165,7 +157,6 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: %s)", szName, szError );
 
         // Return the search path and current directory to its normal
-        SetEnvironmentVariable ( "Path", szOrigPath );
         SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
@@ -185,7 +176,6 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     }
 
     // Return the search path and current directory to its normal
-    SetEnvironmentVariable ( "Path", szOrigPath );
     SetCurrentDirectory ( szOriginalDirectory );
 
     // Call InitClient and store the Client interface in m_pClientBase
@@ -648,3 +638,4 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
         }
     }
 }
+
