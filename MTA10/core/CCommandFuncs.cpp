@@ -375,11 +375,6 @@ void CCommandFuncs::CopyGTAControls ( const char* szParameters )
     }
 }
 
-void CCommandFuncs::ClearDebug ( const char* szParameters )
-{
-    CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ()->Clear ();
-}
-
 void CCommandFuncs::HUD ( const char* szParameters )
 {
     int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
@@ -391,4 +386,33 @@ void CCommandFuncs::SaveConfig ( const char* szParameters )
 {
     CCore::GetSingleton ().SaveConfig ();
     g_pCore->GetConsole ()->Printf ( "Saved configuration file" );
+}
+
+void CCommandFuncs::ChatScrollUp ( const char* szParameters )
+{
+    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ().GetChat ();
+    if( pChat ) pChat->ScrollUp ();
+}
+
+void CCommandFuncs::ChatScrollDown ( const char* szParameters )
+{
+    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ().GetChat ();
+    if( pChat ) pChat->ScrollDown ();
+}
+
+void CCommandFuncs::DebugScrollUp ( const char* szParameters )
+{
+    CDebugView* pDebug = CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ();
+    if( pDebug ) pDebug->ScrollUp ();
+}
+
+void CCommandFuncs::DebugScrollDown ( const char* szParameters )
+{
+    CDebugView* pDebug = CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ();
+    if( pDebug ) pDebug->ScrollDown ();
+}
+
+void CCommandFuncs::DebugClear ( const char* szParameters )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ()->Clear ();
 }
