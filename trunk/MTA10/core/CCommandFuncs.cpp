@@ -390,13 +390,13 @@ void CCommandFuncs::SaveConfig ( const char* szParameters )
 
 void CCommandFuncs::ChatScrollUp ( const char* szParameters )
 {
-    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ().GetChat ();
+    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ()->GetChat ();
     if( pChat ) pChat->ScrollUp ();
 }
 
 void CCommandFuncs::ChatScrollDown ( const char* szParameters )
 {
-    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ().GetChat ();
+    CChat* pChat = CCore::GetSingleton ().GetLocalGUI ()->GetChat ();
     if( pChat ) pChat->ScrollDown ();
 }
 
