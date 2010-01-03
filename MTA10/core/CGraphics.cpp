@@ -110,13 +110,13 @@ int CGraphics::GetTextHeight ( float fScale )
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
-	// Do not accept NULL text strings or invalid sprites
-	if ( !szText || !m_pDXSprite )
-		return;
-    
-	// If no font was specified, use the default font
-	if ( !pDXFont )
-        pDXFont = GetFont ();
+    // Do not accept NULL text strings or invalid sprites
+    if ( !szText || !m_pDXSprite )
+        return;
+
+    // If no font was specified, use the default font
+    if ( !pDXFont )
+    pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
     if ( fScaleX > 1.1f || fScaleY > 1.1f )
@@ -126,7 +126,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
         fScaleY /= 4.0f;
     }
 
-	// Check for a valid font
+    // Check for a valid font
     if ( pDXFont )
     {
         // Prevent the rect from getting scaled along with the size
@@ -402,7 +402,7 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
         fScale /= 4.0f;
     }
 
-	if ( pDXFont )
+    if ( pDXFont )
     {
         D3DXFONT_DESC desc;
         pDXFont->GetDesc ( &desc );
@@ -423,7 +423,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
         fScale /= 4.0f;
     }
 
-	if ( pDXFont )
+    if ( pDXFont )
     {
         HDC dc = pDXFont->GetDC ();
         SIZE size;
@@ -697,15 +697,25 @@ bool CGraphics::LoadFonts ( void )
     bool bSuccess = true;
     for ( int i = 0; bSuccess && i < NUM_FONTS; i++ )
     {
+        m_pDXFonts[i] = m_pBigDXFonts[i] = NULL;
+
         // Normal size
-        bSuccess &= SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
+        if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
             FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
-            &m_pDXFonts[i] ) );
+            &m_pDXFonts[i] ) )
+        {
+            CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", fontInfos[i].szName );
+            bSuccess = false;
+        }
 
         // Big size (4x)
-        bSuccess &= SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
+        if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
             FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
-            &m_pBigDXFonts[i] ) );
+            &m_pBigDXFonts[i] ) )
+        {
+            CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", fontInfos[i].szName );
+            bSuccess = false;
+        }
     }
 
     return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 4 );
@@ -814,8 +824,8 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
-        m_pDXFonts[i]->OnLostDevice ();
-        m_pBigDXFonts[i]->OnLostDevice ();
+        if( m_pDXFonts[i] ) m_pDXFonts[i]->OnLostDevice ();
+        if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnLostDevice ();
     }
 
 	if ( m_pDXSprite )
@@ -834,8 +844,8 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
-        m_pDXFonts[i]->OnResetDevice ();
-        m_pBigDXFonts[i]->OnResetDevice ();
+        if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
+        if( m_pBigDXFonts[i] ) m_pBigDXFonts[i]->OnResetDevice ();
     }
 
     if ( m_pDXSprite )
