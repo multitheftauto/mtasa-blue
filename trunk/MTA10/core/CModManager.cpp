@@ -109,9 +109,6 @@ bool CModManager::IsLoaded ( void )
 
 CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 {
-    char szOriginalDirectory[255] = {'\0'};
-    SString strMTADirectory;
-
     // Make sure we haven't already loaded a mod
     Unload ();
 
@@ -123,20 +120,13 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         return NULL;
     }
 
-    // Change the search path and current directory
-    SString strPath ( "%s\\%s", CalcMTASAPath("mods").c_str (), szName );
-    if ( !SetDllDirectory( strPath.c_str() ) )
-    {
-        CCore::GetSingleton ().GetConsole ()->Printf ( "Error setting DLL path (%u)", GetLastError () );
-        return NULL;
-    }
+    // Ensure DllDirectory has not been changed
+    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
+    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
+    assert ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) == 0 );
 
-    GetCurrentDirectory ( sizeof(szOriginalDirectory), szOriginalDirectory );
-    strMTADirectory = CalcMTASAPath ( "mta" );
-    SetCurrentDirectory ( strMTADirectory );
-    
-    // Load the library
-    m_hClientDLL = LoadLibrary ( itMod->second.c_str () );
+    // Load the library and use the supplied path as an extra place to search for dependencies
+    m_hClientDLL = LoadLibraryEx ( itMod->second.c_str (), NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
     if ( !m_hClientDLL )
     {
         DWORD dwError = GetLastError ();
@@ -155,9 +145,6 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         }
 
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: %s)", szName, szError );
-
-        // Return the search path and current directory to its normal
-        SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
 
@@ -169,14 +156,8 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     {
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (unknown mod)", szName, GetLastError () );
         FreeLibrary ( m_hClientDLL );
-
-        // Return the current directory to its normal
-        SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
-
-    // Return the search path and current directory to its normal
-    SetCurrentDirectory ( szOriginalDirectory );
 
     // Call InitClient and store the Client interface in m_pClientBase
     m_pClientBase = pClientInitializer ();

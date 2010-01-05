@@ -349,6 +349,19 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
+    // Make sure important dll's do not exist in the wrong place
+    char* dllCheckList[] = { "xmll.dll", "cgui.dll", "net.dll", "libcurl.dll" };
+    for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
+    {
+        if ( INVALID_HANDLE_VALUE != FindFirstFile( SString ( "%s\\%s", szGTAPath, dllCheckList[i] ), &fdFileInfo ) )
+        {
+            if ( hwndSplash )
+                DestroyWindow ( hwndSplash );
+            MessageBox( 0, SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "Error!", MB_ICONEXCLAMATION|MB_OK );
+            return 1;
+        }    
+    }
+
     // Launch GTA using CreateProcess
     memset( &piLoadee, 0, sizeof ( PROCESS_INFORMATION ) );
     memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
@@ -390,26 +403,6 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
-    // Change the search path and current directory
-    char *szOrigPath = NULL;
-    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", NULL, 0 );
-    if ( dwGetPathResult )
-    {
-        szOrigPath = static_cast < char* > ( _alloca ( dwGetPathResult ) );
-        dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, dwGetPathResult );
-    }
-    if ( dwGetPathResult == 0 )
-    {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        MessageBox( NULL, "Load failed.  Unable to get the current Path environment variable.",
-                          "Error!", MB_ICONEXCLAMATION|MB_OK );
-        // Kill GTA and return errorcode
-        TerminateProcess ( piLoadee.hProcess, 1 );
-        return 1;
-    }
-    SString strPath ( "%s;%s", szOrigPath, CalcMTASAPath("mta").c_str () );
-    SetEnvironmentVariable ( "Path", strPath );
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( szCoreDLL );
