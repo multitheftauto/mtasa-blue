@@ -25,18 +25,18 @@ class CPEHookUtils
 {
     public:
 
-    DWORD               GetIATAddress   ( std::string ModuleName,
-                                          std::string FunctionName, 
+    DWORD               GetIATAddress   ( const std::string& ModuleName,
+                                          const std::string& FunctionName, 
                                           HANDLE hImgBase );
-    DWORD               WriteIATAddress ( std::string ModuleName,
-                                          std::string FunctionName,
+    DWORD               WriteIATAddress ( const std::string& ModuleName,
+                                          const std::string& FunctionName,
                                           HANDLE hImgBase,
                                           PVOID  pvNewProc );
     PVOID               HookVTableFunc  ( PVOID  pvInterface,
                                           int    nOffset,
                                           PVOID  pvHookFunc,
                                           int    nVtableSlot );
-    void                GetSectionHeader( std::string SectName,
+    void                GetSectionHeader( const std::string& SectName,
                                           const HANDLE hImgBase,
                                           PSECTIONINFO pSectionInfo );
 

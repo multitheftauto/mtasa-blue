@@ -866,7 +866,7 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     return true;
 }
 
-bool CServerBrowser::LoadServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
+bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList )
 {
     CXMLNode* pSubNode = NULL;
     in_addr Address;
@@ -900,7 +900,7 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, std::string strTagName, C
 }
 
 
-bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
+bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList )
 {
     if ( !pNode )
         return false;
@@ -934,7 +934,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, C
     return true;
 }
 
-void CServerBrowser::SetServerPassword ( std::string strHost, std::string strPassword )
+void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::string& strPassword )
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
@@ -950,7 +950,7 @@ void CServerBrowser::SetServerPassword ( std::string strHost, std::string strPas
         {
             if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
             {
-                std::string strXMLHost = pHost->GetValue();
+                const std::string& strXMLHost = pHost->GetValue();
                 if ( strXMLHost == strHost )
                 {
                     CXMLAttribute* pPassword = pAttributes->Create( "password" );
@@ -971,7 +971,7 @@ void CServerBrowser::SetServerPassword ( std::string strHost, std::string strPas
 }
 
 
-std::string CServerBrowser::GetServerPassword ( std::string strHost )
+std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
@@ -987,11 +987,11 @@ std::string CServerBrowser::GetServerPassword ( std::string strHost )
         {
             if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
             {
-                std::string strXMLHost = pHost->GetValue();
-                if ( strXMLHost == strHost )
+                const std::string& strXMLHost = pHost->GetValue();
+                if ( pHost->GetValue() == strHost )
                 {
                     CXMLAttribute* pPassword = pAttributes->Create( "password" );
-                    std::string strPassword = pPassword->GetValue();
+                    const std::string& strPassword = pPassword->GetValue();
                     return strPassword;
                 }
             }

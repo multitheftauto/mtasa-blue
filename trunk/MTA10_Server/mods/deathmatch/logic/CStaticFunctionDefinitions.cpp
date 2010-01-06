@@ -7078,7 +7078,7 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetGlitchEnabled ( std::string strGlitchName, bool bEnabled )
+bool CStaticFunctionDefinitions::SetGlitchEnabled ( const std::string& strGlitchName, bool bEnabled )
 {
     if ( g_pGame->IsGlitch ( strGlitchName ) )
     {
@@ -7097,7 +7097,7 @@ bool CStaticFunctionDefinitions::SetGlitchEnabled ( std::string strGlitchName, b
     return false;
 }
 
-bool CStaticFunctionDefinitions::IsGlitchEnabled ( std::string strGlitchName, bool& bEnabled )
+bool CStaticFunctionDefinitions::IsGlitchEnabled ( const std::string& strGlitchName, bool& bEnabled )
 {
     if ( g_pGame->IsGlitch ( strGlitchName ) )
     {
@@ -7254,13 +7254,13 @@ bool CStaticFunctionDefinitions::RemoveRuleValue ( const char* szKey )
 }
 
 
-void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( std::string strTable, std::string strDefinition )
+void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
 	m_pRegistry->CreateTable ( strTable, strDefinition );
 }
 
 
-bool CStaticFunctionDefinitions::ExecuteSQLQuery ( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
+bool CStaticFunctionDefinitions::ExecuteSQLQuery ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
 {
 	return m_pRegistry->Query ( strQuery, pArgs, pResult );
 }
@@ -7269,31 +7269,31 @@ const std::string& CStaticFunctionDefinitions::SQLGetLastError ( void ) {
 	return m_pRegistry->GetLastError ();
 }
 
-void CStaticFunctionDefinitions::ExecuteSQLDropTable ( std::string strTable )
+void CStaticFunctionDefinitions::ExecuteSQLDropTable ( const std::string& strTable )
 {
 	m_pRegistry->DropTable ( strTable );
 }
 
 
-bool CStaticFunctionDefinitions::ExecuteSQLDelete ( std::string strTable, std::string strWhere )
+bool CStaticFunctionDefinitions::ExecuteSQLDelete ( const std::string& strTable, const std::string& strWhere )
 {
 	return m_pRegistry->Delete ( strTable, strWhere );
 }
 
 
-bool CStaticFunctionDefinitions::ExecuteSQLInsert ( std::string strTable, std::string strValues, std::string strColumns )
+bool CStaticFunctionDefinitions::ExecuteSQLInsert ( const std::string& strTable, const std::string& strValues, const std::string& strColumns )
 {
 	return m_pRegistry->Insert ( strTable, strValues, strColumns );
 }
 
 
-bool CStaticFunctionDefinitions::ExecuteSQLSelect ( std::string strTable, std::string strColumns, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult )
+bool CStaticFunctionDefinitions::ExecuteSQLSelect ( const std::string& strTable, const std::string& strColumns, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult )
 {
 	return m_pRegistry->Select ( strColumns, strTable, strWhere, uiLimit, pResult );
 }
 
 
-bool CStaticFunctionDefinitions::ExecuteSQLUpdate ( std::string strTable, std::string strSet, std::string strWhere )
+bool CStaticFunctionDefinitions::ExecuteSQLUpdate ( const std::string& strTable, const std::string& strSet, const std::string& strWhere )
 {
 	return m_pRegistry->Update ( strTable, strSet, strWhere );
 }
@@ -7643,13 +7643,13 @@ CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsern
 
             if ( !bBan && szUsername )
             {
-                std::string strUsername = (*iter)->GetSerialUser ();
+                const std::string& strUsername = (*iter)->GetSerialUser ();
                 bBan = stricmp ( strUsername.c_str (), szUsername ) == 0;
             }
 
             if ( !bBan && szSerial )
             {
-                std::string strSerial = (*iter)->GetSerial ();
+                const std::string& strSerial = (*iter)->GetSerial ();
                 bBan = stricmp ( strSerial.c_str (), szSerial ) == 0;
             }
 
@@ -7897,7 +7897,7 @@ CElement* CStaticFunctionDefinitions::GetResourceMapRootElement ( CResource* pRe
 }
 
 
-CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, std::string strFilePath, std::string strMapName, int iDimension, CLuaMain* pLUA )
+CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, const std::string& strFilePath, const std::string& strMapName, int iDimension, CLuaMain* pLUA )
 {
     // See if it's loaded
     if ( pResource->IsLoaded () )
@@ -7957,7 +7957,7 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, std
 }
 
 
-CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, std::string strFilePath, std::string strConfigName, int iType, CLuaMain* pLUA )
+CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, const std::string& strFilePath, const std::string& strConfigName, int iType, CLuaMain* pLUA )
 {
     // See if it's loaded
     if ( pResource->IsLoaded () )

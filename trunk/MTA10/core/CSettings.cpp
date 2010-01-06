@@ -1991,7 +1991,7 @@ void CSettings::LoadChatPresets( )
     }
 }
 
-void CSettings::LoadChatColorFromString ( ChatColorType eType, string strColor )
+void CSettings::LoadChatColorFromString ( ChatColorType eType, const string& strColor )
 {
     CColor pColor;
     stringstream ss( strColor );

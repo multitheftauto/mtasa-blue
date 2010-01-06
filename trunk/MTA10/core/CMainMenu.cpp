@@ -829,7 +829,7 @@ void CMainMenu::LoadMenuOptions ( void )
 }
 
 
-void CMainMenu::ChangeCommunityState ( bool bIn, std::string strUsername )
+void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername )
 {
     if ( bIn )
     {

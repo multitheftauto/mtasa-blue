@@ -54,7 +54,7 @@ public:
 
     bool                LoadBanList             ( void );
     void                SaveBanList             ( void );
-    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, std::string strValue );
+    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, const std::string& strValue );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );
     std::string         SafeGetValue            ( CXMLNode* pNode, const char* szKey );
     bool                IsValidIP               ( const char* szIP );

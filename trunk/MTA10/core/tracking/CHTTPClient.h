@@ -113,7 +113,7 @@ public:
 
     void                Reset                   ( void );
 
-    bool                Get                     ( std::string strURL );
+    bool                Get                     ( const std::string& strURL );
     const std::string&  GetStatusMessage        ( void )        { return m_strStatus; };
     unsigned int        GetStatus               ( void )        { return m_Status; };
     

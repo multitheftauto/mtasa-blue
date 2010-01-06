@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CRegistry::CRegistry ( std::string strFileName )
+CRegistry::CRegistry ( const std::string& strFileName )
 {
     m_strLastError = "";
 
@@ -31,7 +31,7 @@ CRegistry::~CRegistry ( void )
 }
 
 
-void CRegistry::Load ( std::string strFileName )
+void CRegistry::Load ( const std::string& strFileName )
 {
 	m_bOpened = false;
 
@@ -46,7 +46,7 @@ void CRegistry::Load ( std::string strFileName )
 }
 
 
-bool CRegistry::Update ( std::string strTable, std::string strSet, std::string strWhere )
+bool CRegistry::Update ( const std::string& strTable, const std::string& strSet, const std::string& strWhere )
 {
 	char *szErrorMsg = NULL;
     std::string strQuery;
@@ -76,7 +76,7 @@ bool CRegistry::Update ( std::string strTable, std::string strSet, std::string s
 }
 
 
-void CRegistry::CreateTable ( std::string strTable, std::string strDefinition )
+void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
 	if ( m_bOpened == false ) {
 		m_strLastError = "SQLite3 was not opened, cannot create table!";
@@ -90,7 +90,7 @@ void CRegistry::CreateTable ( std::string strTable, std::string strDefinition )
 }
 
 
-void CRegistry::DropTable ( std::string strTable )
+void CRegistry::DropTable ( const std::string& strTable )
 {
 	if ( m_bOpened == false ) {
 		m_strLastError = "SQLite3 was not opened, cannot drop table!";
@@ -104,7 +104,7 @@ void CRegistry::DropTable ( std::string strTable )
 }
 
 
-bool CRegistry::Insert ( std::string strTable, std::string strValues, std::string strColumns )
+bool CRegistry::Insert ( const std::string& strTable, const std::string& strValues, const std::string& strColumns )
 {
 	char *szErrorMsg = NULL;
     std::string strQuery;
@@ -129,7 +129,7 @@ bool CRegistry::Insert ( std::string strTable, std::string strValues, std::strin
 }
 
 
-bool CRegistry::Delete ( std::string strTable, std::string strWhere )
+bool CRegistry::Delete ( const std::string& strTable, const std::string& strWhere )
 {
 	char *szErrorMsg = NULL;
 
@@ -223,7 +223,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
 	return true;
 }
 
-bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
+bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
 {
     std::string strParsedQuery = "";
 
@@ -283,7 +283,7 @@ bool CRegistry::Query ( std::string strQuery, CLuaArguments *pArgs, CRegistryRes
 }
 
 
-bool CRegistry::Select ( std::string strColumns, std::string strTable, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult )
+bool CRegistry::Select ( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult )
 {
     char szBuffer[32] = {0};
 

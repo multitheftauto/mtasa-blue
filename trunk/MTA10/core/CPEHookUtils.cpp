@@ -14,8 +14,8 @@
 
 using std::string;
 
-DWORD CPEHookUtils::GetIATAddress   ( string ModuleName,
-                                      string FunctionName, 
+DWORD CPEHookUtils::GetIATAddress   ( const string& ModuleName,
+                                      const string& FunctionName, 
                                       HANDLE hImgBase )
 {
 	PIMAGE_NT_HEADERS image;
@@ -53,8 +53,8 @@ DWORD CPEHookUtils::GetIATAddress   ( string ModuleName,
 	return 0;
 }
 
-DWORD CPEHookUtils::WriteIATAddress ( string ModuleName,
-                                      string FunctionName,
+DWORD CPEHookUtils::WriteIATAddress ( const string& ModuleName,
+                                      const string& FunctionName,
                                       HANDLE hImgBase,
                                       PVOID  pvNewProc )
 {
@@ -123,7 +123,7 @@ PVOID CPEHookUtils::HookVTableFunc  ( PVOID  pvInterface,
     return oldFunction;
 }
 
-VOID  CPEHookUtils::GetSectionHeader( string SectName,
+VOID  CPEHookUtils::GetSectionHeader( const string& SectName,
                                       const HANDLE hImgBase,
                                       PSECTIONINFO pSectionInfo )
 {

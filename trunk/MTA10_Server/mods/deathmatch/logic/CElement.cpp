@@ -135,7 +135,7 @@ const CVector & CElement::GetPosition ( void )
 }
 
 
-void CElement::SetTypeName ( std::string strTypeName )
+void CElement::SetTypeName ( const std::string& strTypeName )
 {
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );

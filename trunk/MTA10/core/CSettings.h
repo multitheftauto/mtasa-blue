@@ -235,7 +235,7 @@ private:
     void                LoadChatPresets         ( void );
     void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );
     void                LoadChatColorFromCVar   ( ChatColorType eType, const char* szCVar );
-    void                LoadChatColorFromString ( ChatColorType eType, std::string strColor );
+    void                LoadChatColorFromString ( ChatColorType eType, const std::string& strColor );
     void                SaveChatColor           ( ChatColorType eType, const char* szCVar );
     CColor              GetChatColorValues      ( ChatColorType eType );
     void                SetChatColorValues      ( ChatColorType eType, CColor pColor );

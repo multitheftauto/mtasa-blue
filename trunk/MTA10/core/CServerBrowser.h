@@ -67,11 +67,11 @@ public:
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
 
-    bool                LoadServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
-    bool                SaveServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
+    bool                LoadServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
+    bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
 
-    void                SetServerPassword       ( std::string strHost, std::string strPassword );
-    std::string         GetServerPassword       ( std::string strHost );
+    void                SetServerPassword       ( const std::string& strHost, const std::string& strPassword );
+    std::string         GetServerPassword       ( const std::string& strHost );
     void                ClearServerPasswords    ( void );
 
 protected:

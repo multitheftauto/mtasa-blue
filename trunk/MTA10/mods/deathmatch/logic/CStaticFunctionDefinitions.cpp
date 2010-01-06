@@ -3552,7 +3552,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMa
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, SString strPath, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strPath, bool bRelative, CClientGUIElement* pParent )
 {
 	CGUIElement *pElement = m_pGUI->CreateStaticImage ( pParent ? pParent->GetCGUIElement () : NULL );
 	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
@@ -3578,7 +3578,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
 }
 
 
-bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity, SString strDir )
+bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity, const SString& strDir )
 {
     RUN_CHILDREN GUIStaticImageLoadImage ( **iter, strDir );
 

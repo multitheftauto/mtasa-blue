@@ -15,7 +15,7 @@
 
 using std::string;
 
-CModuleLoader::CModuleLoader ( string ModuleName )
+CModuleLoader::CModuleLoader ( const string& ModuleName )
 : m_bStatus ( false )
 {
     m_hLoadedModule = 0;
@@ -33,7 +33,7 @@ CModuleLoader::~CModuleLoader ( )
     UnloadModule ( );
 }
 
-bool CModuleLoader::LoadModule ( string ModuleName )
+bool CModuleLoader::LoadModule ( const string& ModuleName )
 {
     m_hLoadedModule = LoadLibrary ( ModuleName.c_str() );
 
@@ -56,7 +56,7 @@ void CModuleLoader::UnloadModule ( )
     m_bStatus = false;
 }
 
-PVOID CModuleLoader::GetFunctionPointer ( string FunctionName )
+PVOID CModuleLoader::GetFunctionPointer ( const string& FunctionName )
 {
     if ( m_bStatus )
     {

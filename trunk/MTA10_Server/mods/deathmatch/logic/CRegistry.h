@@ -26,22 +26,22 @@ struct CRegistryResult;
 class CRegistry
 {
 public:
-                                CRegistry               ( std::string strFileName );
+                                CRegistry               ( const std::string& strFileName );
                                 ~CRegistry              ( void );
 
-    void						Load					( std::string strFileName );
+    void						Load					( const std::string& strFileName );
 
-    void						CreateTable				( std::string strTable, std::string strDefinition );
-	void						DropTable				( std::string strTable );
+    void						CreateTable				( const std::string& strTable, const std::string& strDefinition );
+	void						DropTable				( const std::string& strTable );
 
-    bool						Delete					( std::string strTable, std::string strWhere );
-	bool						Insert					( std::string strTable, std::string strValues, std::string strColumns );
-	bool						Select					( std::string strColumns, std::string strTable, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult );
-	bool						Update					( std::string strTable, std::string strSet, std::string strWhere );
+    bool						Delete					( const std::string& strTable, const std::string& strWhere );
+	bool						Insert					( const std::string& strTable, const std::string& strValues, const std::string& strColumns );
+	bool						Select					( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
+	bool						Update					( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
 
-	bool						Query					( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
+	bool						Query					( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
 
-    std::string&                GetLastError            ( void ) { return m_strLastError; }
+    const std::string&          GetLastError            ( void ) { return m_strLastError; }
 
 protected:
 

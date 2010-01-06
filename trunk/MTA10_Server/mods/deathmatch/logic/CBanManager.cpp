@@ -476,7 +476,7 @@ void CBanManager::SaveBanList ( void )
 }
 
 
-void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, std::string strValue )
+void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, const std::string& strValue )
 {
     if ( !strValue.empty() )
 	{

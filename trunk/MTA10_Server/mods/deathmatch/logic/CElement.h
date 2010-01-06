@@ -146,10 +146,10 @@ public:
     virtual bool                                IsEntity                    ( void )                        { return false; };
     inline unsigned int                         GetTypeHash                 ( void )                        { return m_uiTypeHash; };
     inline const std::string&                   GetTypeName                 ( void )                        { return m_strTypeName; };
-    void                                        SetTypeName                 ( std::string strTypeName );
+    void                                        SetTypeName                 ( const std::string& strTypeName );
 
     inline const std::string&                   GetName                     ( void )                        { return m_strName; };
-    inline void                                 SetName                     ( std::string strName )         { m_strName = strName; };
+    inline void                                 SetName                     ( const std::string& strName )  { m_strName = strName; };
 
     bool                                        LoadFromCustomData          ( CLuaMain* pLuaMain, CEvents* pEvents );
 

@@ -148,7 +148,7 @@ void CXMLConfig::SetInteger ( CXMLNode* pParent, const char* szKey, int iValue )
 }
 
 
-void CXMLConfig::SetString ( CXMLNode* pParent, const char* szKey, std::string strValue )
+void CXMLConfig::SetString ( CXMLNode* pParent, const char* szKey, const std::string& strValue )
 {
     // Create the XML node
     CXMLNode* pNode = pParent->FindSubNode ( szKey );

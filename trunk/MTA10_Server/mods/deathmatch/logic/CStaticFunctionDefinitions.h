@@ -454,8 +454,8 @@ public:
 	static bool                 SetFPSLimit							( unsigned short usLimit );
 	static bool					SetMinuteDuration					( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
-    static bool                 SetGlitchEnabled                    ( std::string strGlitchName, bool bEnabled );
-    static bool                 IsGlitchEnabled                     ( std::string strGlitchName, bool& bEnabled );
+    static bool                 SetGlitchEnabled                    ( const std::string& strGlitchName, bool bEnabled );
+    static bool                 IsGlitchEnabled                     ( const std::string& strGlitchName, bool& bEnabled );
     static bool                 SetCloudsEnabled                    ( bool bEnabled );
     static bool                 GetCloudsEnabled                    ( void );
 
@@ -473,13 +473,13 @@ public:
 
     // Registry funcs
     static const std::string&   SQLGetLastError                     ( void );
-    static void					ExecuteSQLCreateTable				( std::string strTable, std::string strDefinition );
-	static void					ExecuteSQLDropTable					( std::string strTable );
-	static bool					ExecuteSQLDelete					( std::string strTable, std::string strWhere );
-	static bool					ExecuteSQLInsert					( std::string strTable, std::string strValues, std::string strColumns );
-    static bool                 ExecuteSQLSelect					( std::string strTable, std::string strColumns, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult );
-    static bool                 ExecuteSQLUpdate                    ( std::string strTable, std::string strSet, std::string strWhere );
-	static bool					ExecuteSQLQuery						( std::string str, CLuaArguments *pArgs, CRegistryResult* pResult );
+    static void					ExecuteSQLCreateTable				( const std::string& strTable, const std::string& strDefinition );
+	static void					ExecuteSQLDropTable					( const std::string& strTable );
+	static bool					ExecuteSQLDelete					( const std::string& strTable, const std::string& strWhere );
+	static bool					ExecuteSQLInsert					( const std::string& strTable, const std::string& strValues, const std::string& strColumns );
+    static bool                 ExecuteSQLSelect					( const std::string& strTable, const std::string& strColumns, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
+    static bool                 ExecuteSQLUpdate                    ( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
+	static bool					ExecuteSQLQuery						( const std::string& str, CLuaArguments *pArgs, CRegistryResult* pResult );
 
     // Account get funcs
     static CAccount*            GetAccount                          ( const char* szName, const char* szPassword );
@@ -532,8 +532,8 @@ public:
 
     // Resource funcs
     static CElement*            GetResourceMapRootElement           ( CResource* pResource, char* szMap );
-    static CXMLNode*            AddResourceMap                      ( CResource* pResource, std::string strFilePath, std::string strMapName, int iDimension, CLuaMain* pLUA );
-    static CXMLNode*            AddResourceConfig                   ( CResource* pResource, std::string strFilePath, std::string strConfigName, int iType, CLuaMain* pLUA );
+    static CXMLNode*            AddResourceMap                      ( CResource* pResource, const std::string& strFilePath, const std::string& strMapName, int iDimension, CLuaMain* pLUA );
+    static CXMLNode*            AddResourceConfig                   ( CResource* pResource, const std::string& strFilePath, const std::string& strConfigName, int iType, CLuaMain* pLUA );
     static bool                 RemoveResourceFile                  ( CResource* pResource, const char* szFilename );
 
     // Version funcs
