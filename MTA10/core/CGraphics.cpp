@@ -702,7 +702,7 @@ bool CGraphics::LoadFonts ( void )
         // Normal size
         if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
             FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
-            &m_pDXFonts[i] ) )
+            &m_pDXFonts[i] ) ) )
         {
             CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", fontInfos[i].szName );
             bSuccess = false;
@@ -711,7 +711,7 @@ bool CGraphics::LoadFonts ( void )
         // Big size (4x)
         if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
             FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
-            &m_pBigDXFonts[i] ) )
+            &m_pBigDXFonts[i] ) ) )
         {
             CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", fontInfos[i].szName );
             bSuccess = false;
