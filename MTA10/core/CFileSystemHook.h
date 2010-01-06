@@ -49,9 +49,9 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
             void            RemoveHook				( );
             void            ApplyHook				( );
 
-            void            RedirectFile			( std::string RedirectedFileName, std::string DestinationFile );
-            void            RedirectFile			( std::string RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
-            void            RemoveRedirect			( std::string RedirectedFileName );
+            void            RedirectFile			( const std::string& RedirectedFileName, const std::string& DestinationFile );
+            void            RedirectFile			( const std::string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
+            void            RemoveRedirect			( const std::string& RedirectedFileName );
 
     static  HANDLE  WINAPI   API_CreateFileA		( LPCTSTR               lpFileName,
 													  DWORD                 dwDesiredAccess,
@@ -85,7 +85,7 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
 
     private:
 
-            bool            GetRedirectedFile		( std::string                   NativeFileToCheck,
+            bool            GetRedirectedFile		( const std::string&                   NativeFileToCheck,
                                                       std::string &                 RedirectedFileOut,
                                                       bool&                         bRedirectToFileBuffer,
                                                       void**                        pFilebufferOut,

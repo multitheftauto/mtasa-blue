@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, std::string strName, std::string strPassword, std::string strIP, std::string strSerial )
+CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword, const std::string& strIP, const std::string& strSerial )
 {
     m_pClient = NULL;
 
@@ -55,7 +55,7 @@ void CAccount::Register ( const char* szPassword )
 }
 
 
-void CAccount::SetName ( std::string strName )
+void CAccount::SetName ( const std::string& strName )
 {
     m_strName = strName;
 

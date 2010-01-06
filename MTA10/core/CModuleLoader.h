@@ -21,16 +21,16 @@ class CModuleLoader
 {
 public:
     
-                    CModuleLoader       ( std::string ModuleName );
+                    CModuleLoader       ( const std::string& ModuleName );
                     CModuleLoader       ( );
                     ~CModuleLoader      ( ); 
 
-    bool            LoadModule          ( std::string ModuleName );
+    bool            LoadModule          ( const std::string& ModuleName );
     void            UnloadModule        ( );
 
     inline bool     IsOk                ( ) const { return m_bStatus; }
     
-    PVOID           GetFunctionPointer  ( std::string FunctionName );
+    PVOID           GetFunctionPointer  ( const std::string& FunctionName );
 
 private:
     HMODULE     m_hLoadedModule;

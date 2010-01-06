@@ -44,7 +44,7 @@ protected:
     int                         GetRGBA             ( class CXMLNode* pParent, const char* szKey, unsigned char& R, unsigned char& G, unsigned char& B, unsigned char& A );
     void                        SetBoolean          ( class CXMLNode* pParent, const char* szKey, bool bValue );
     void                        SetInteger          ( class CXMLNode* pParent, const char* szKey, int iValue );
-    void                        SetString           ( class CXMLNode* pParent, const char* szKey, std::string strValue );
+    void                        SetString           ( class CXMLNode* pParent, const char* szKey, const std::string& strValue );
     void                        SetRGBA             ( class CXMLNode* pParent, const char* szKey, unsigned char R, unsigned char G, unsigned char B, unsigned char A );
 
     CXMLNode*                   GetNodeForSave      ( CXMLNode* pParent, const char* szKey );

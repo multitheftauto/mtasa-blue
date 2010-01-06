@@ -50,7 +50,7 @@ bool CClientVariables::Load ( void )
 }
 
 
-bool CClientVariables::Get ( const std::string strVariable, CVector &val )
+bool CClientVariables::Get ( const std::string& strVariable, CVector &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -69,7 +69,7 @@ bool CClientVariables::Get ( const std::string strVariable, CVector &val )
 }
 
 
-bool CClientVariables::Get ( const std::string strVariable, CVector2D &val )
+bool CClientVariables::Get ( const std::string& strVariable, CVector2D &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -88,7 +88,7 @@ bool CClientVariables::Get ( const std::string strVariable, CVector2D &val )
 }
 
 
-bool CClientVariables::Get ( const std::string strVariable, CColor &val )
+bool CClientVariables::Get ( const std::string& strVariable, CColor &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -112,7 +112,7 @@ bool CClientVariables::Get ( const std::string strVariable, CColor &val )
 }
 
 
-void CClientVariables::Set ( const std::string strVariable, CVector val )
+void CClientVariables::Set ( const std::string& strVariable, CVector val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -126,7 +126,7 @@ void CClientVariables::Set ( const std::string strVariable, CVector val )
 }
 
 
-void CClientVariables::Set ( const std::string strVariable, CVector2D val )
+void CClientVariables::Set ( const std::string& strVariable, CVector2D val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -140,7 +140,7 @@ void CClientVariables::Set ( const std::string strVariable, CVector2D val )
 }
 
 
-void CClientVariables::Set ( const std::string strVariable, CColor val )
+void CClientVariables::Set ( const std::string& strVariable, CColor val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -154,7 +154,7 @@ void CClientVariables::Set ( const std::string strVariable, CColor val )
 }
 
 
-CXMLNode* CClientVariables::Node ( const std::string strVariable )
+CXMLNode* CClientVariables::Node ( const std::string& strVariable )
 {
     CXMLNode *pNode;
     if ( !m_pStorage ) return NULL;
@@ -169,7 +169,7 @@ CXMLNode* CClientVariables::Node ( const std::string strVariable )
 }
 
 
-bool CClientVariables::Exists ( const std::string strVariable )
+bool CClientVariables::Exists ( const std::string& strVariable )
 {
     // Check whether this node exists, thus if it is a valid cvar
     if ( !m_pStorage ) return false;

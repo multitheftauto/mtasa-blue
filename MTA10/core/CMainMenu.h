@@ -72,7 +72,7 @@ public:
 
 	void				LoadMenuOptions					( void );
 
-    void                ChangeCommunityState            ( bool bIn, std::string strUsername );
+    void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
 private:

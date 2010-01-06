@@ -31,10 +31,10 @@ class CLogger : public CSingleton < CLogger >
             CLogger ( );
            ~CLogger ( );
 
-    void    WriteEvent          ( std::string EventDescription );
-    void    WriteDebugEventInt  ( std::string EventDescription );
-    void    OutputDebugMessage  ( std::string DebugMessage ); 
-    void    WriteErrorEventInt  ( std::string ErrorMessage );
+    void    WriteEvent          ( const std::string& EventDescription );
+    void    WriteDebugEventInt  ( const std::string& EventDescription );
+    void    OutputDebugMessage  ( const std::string& DebugMessage ); 
+    void    WriteErrorEventInt  ( const std::string& ErrorMessage );
     void    ErrorPrintf         ( const char* szFormat, ... );
 
     private:

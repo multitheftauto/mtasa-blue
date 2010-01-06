@@ -23,7 +23,7 @@ CFilePathTranslator::~CFilePathTranslator ( )
 {
 }
 
-bool CFilePathTranslator::GetFileFromModPath ( string FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromModPath ( const string& FileToGet, string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_ModPath;
@@ -33,7 +33,7 @@ bool CFilePathTranslator::GetFileFromModPath ( string FileToGet, string & Transl
     return true;
 }
 
-bool CFilePathTranslator::GetFileFromWorkingDirectory ( string FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromWorkingDirectory ( const string& FileToGet, string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_WorkingDirectory;
@@ -48,14 +48,14 @@ void CFilePathTranslator::GetModPath ( string & ModPathOut )
     ModPathOut = m_ModPath;
 }
 
-void CFilePathTranslator::SetModPath ( string PathBasedOffWorkingDirectory )
+void CFilePathTranslator::SetModPath ( const string& PathBasedOffWorkingDirectory )
 {
     m_ModPath =  m_WorkingDirectory;
     m_ModPath += '\\';
     m_ModPath += PathBasedOffWorkingDirectory;
 }
 
-void CFilePathTranslator::SetCurrentWorkingDirectory ( string PathBasedOffModuleRoot )
+void CFilePathTranslator::SetCurrentWorkingDirectory ( const string& PathBasedOffModuleRoot )
 {
     string RootDirectory;
 

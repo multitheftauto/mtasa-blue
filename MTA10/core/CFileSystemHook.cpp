@@ -270,7 +270,7 @@ BOOL CFileSystemHook::API_CloseHandle ( HANDLE hObject )
     }
 }
 
-void CFileSystemHook::RedirectFile       ( string NativeFile, string RedirectedFile )
+void CFileSystemHook::RedirectFile       ( const string& NativeFile, const string& RedirectedFile )
 {
     FILEREDIRECT RedirectedFileEntry;
 
@@ -286,7 +286,7 @@ void CFileSystemHook::RedirectFile       ( string NativeFile, string RedirectedF
     m_RedirectList.insertAtFront ( RedirectedFileEntry );
 }
 
-void CFileSystemHook::RedirectFile	( string RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly )
+void CFileSystemHook::RedirectFile	( const string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly )
 {
     FILEREDIRECT RedirectedFileEntry;
 
@@ -302,7 +302,7 @@ void CFileSystemHook::RedirectFile	( string RedirectedFileName, void* pFilebuffe
     m_RedirectList.insertAtFront ( RedirectedFileEntry );
 }
 
-void CFileSystemHook::RemoveRedirect     ( string NativeFileToRemove )
+void CFileSystemHook::RemoveRedirect     ( const string& NativeFileToRemove )
 {
 	CLinkedList< FILEREDIRECT >::CIterator iterator;
 
@@ -323,7 +323,7 @@ void CFileSystemHook::RemoveRedirect     ( string NativeFileToRemove )
 	}
 }
 
-bool CFileSystemHook::GetRedirectedFile   ( string NativeFileToCheck, string & RedirectedFileOut, bool& bRedirectToFileBuffer, void** pFilebufferOut, size_t& size, bool& bReadOnly )
+bool CFileSystemHook::GetRedirectedFile   ( const string& NativeFileToCheck, string & RedirectedFileOut, bool& bRedirectToFileBuffer, void** pFilebufferOut, size_t& size, bool& bReadOnly )
 {
 	CLinkedList< FILEREDIRECT >::CIterator iterator;
 

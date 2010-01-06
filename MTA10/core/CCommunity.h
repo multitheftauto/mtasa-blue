@@ -54,8 +54,8 @@ public:
     void                        DoPulse             ( void );
 
 protected:
-    void                        SetUsername         ( std::string strUsername )     { m_strUsername = strUsername; };
-    void                        SetPassword         ( std::string strPassword )     { m_strPassword = strPassword; };
+    void                        SetUsername         ( const std::string& strUsername )     { m_strUsername = strUsername; };
+    void                        SetPassword         ( const std::string& strPassword )     { m_strPassword = strPassword; };
     
     void                        Login               ( VERIFICATIONCALLBACK pCallBack = NULL, void* pObject = NULL );
     void                        Logout              ( void );

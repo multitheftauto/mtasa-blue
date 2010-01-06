@@ -65,7 +65,7 @@ public:
     inline unsigned short   GetPort             ( void ) const                      { return m_usPort; };
     
     inline void         GetSerial           ( std::string & strSerial ) const   { strSerial = m_szSerial; };
-    inline void         SetSerial           ( std::string strSerial )           { SetSerial ( strSerial.c_str() ); };
+    inline void         SetSerial           ( const std::string& strSerial )    { SetSerial ( strSerial.c_str() ); };
 
     inline void         SetSerial           ( const char* szSerial )
     {

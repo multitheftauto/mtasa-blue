@@ -1249,7 +1249,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             const MD5& PacketHash = Packet.GetPassword ();
 
             // Hash our password
-            std::string strPassword = m_pMainConfig->GetPassword ();
+            const std::string& strPassword = m_pMainConfig->GetPassword ();
             MD5 ConfigHash;
             CMD5Hasher Hasher;
             if ( !strPassword.empty () && Hasher.Calculate ( strPassword.c_str (), strPassword.length (), ConfigHash ) )
@@ -2794,14 +2794,14 @@ void CGame::Unlock ( void )
     pthread_mutex_unlock ( &mutexhttp );
 }
 
-void CGame::SetGlitchEnabled ( std::string strGlitch, bool bEnabled )
+void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
     assert ( cGlitch >= 0 && cGlitch <= 2 );
     m_Glitches[cGlitch] = bEnabled;
 }
 
-bool CGame::IsGlitchEnabled ( std::string strGlitch )
+bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
     assert ( cGlitch >= 0 && cGlitch <= 2 );

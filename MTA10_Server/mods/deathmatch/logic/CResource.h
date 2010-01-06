@@ -68,7 +68,7 @@ private:
 	eExportedFunctionType	        m_ucType;
 
 public:
-                                    CExportedFunction ( std::string strFunctionName, std::string access, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted )
+                                    CExportedFunction ( const std::string& strFunctionName, const std::string& access, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted )
                                     {
 								        m_ucType = ucType;
                                         m_strFunctionName = strFunctionName;
@@ -123,7 +123,7 @@ private:
     class CResourceManager *      m_resourceManager;
 
 public:
-    CIncludedResources ( CResourceManager * manager, std::string strResourceName, SVersion svMinVersion, SVersion svMaxVersion, unsigned int uiMinVersion, unsigned int uiMaxVersion, CResource * owner )
+    CIncludedResources ( CResourceManager * manager, const std::string& strResourceName, SVersion svMinVersion, SVersion svMaxVersion, unsigned int uiMinVersion, unsigned int uiMaxVersion, CResource * owner )
     {
         m_resourceManager = manager;
         m_owner = owner;
@@ -154,7 +154,7 @@ private:
     std::string m_strName;
     std::string m_strValue;
 public:
-    CInfoValue ( std::string strName, std::string strValue )
+    CInfoValue ( const std::string& strName, const std::string& strValue )
     {
         m_strName = strName;
         m_strValue = strValue;
@@ -162,9 +162,9 @@ public:
     ~CInfoValue ()
     {
     }
-    inline const std::string&   GetValue ( void )                { return m_strValue; }
-    inline void                 SetValue ( std::string szValue ) { m_strValue = szValue; }
-    inline const std::string&   GetName  ( void )                { return m_strName; }
+    inline const std::string&   GetValue ( void )                       { return m_strValue; }
+    inline void                 SetValue ( const std::string& szValue ) { m_strValue = szValue; }
+    inline const std::string&   GetName  ( void )                       { return m_strName; }
 };
 
 class CResource : public EHS

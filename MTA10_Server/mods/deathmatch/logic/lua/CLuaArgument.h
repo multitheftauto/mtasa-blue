@@ -61,7 +61,7 @@ public:
 
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
-    inline std::string&     GetString           ( void )            { return m_strString; };
+    inline const std::string& GetString         ( void )            { return m_strString; };
     inline void*            GetLightUserData    ( void ) const      { return m_pLightUserData; };
     CElement*               GetElement          ( void ) const;
     bool                    GetAsString         ( char * szBuffer, unsigned int uiLength );

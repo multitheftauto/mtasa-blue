@@ -23,7 +23,7 @@ class CAccountData;
 class CAccount
 {
 public:
-                                CAccount                ( class CAccountManager* pManager, bool bRegistered, std::string strName, std::string strPassword = "", std::string strIP = "", std::string strSerial = "");
+                                CAccount                ( class CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword = "", const std::string& strIP = "", const std::string& strSerial = "");
                                 ~CAccount               ( void );
 
     inline bool                 IsRegistered            ( void )                    { return m_bRegistered; }
@@ -31,7 +31,7 @@ public:
 
     inline unsigned int         GetNameHash             ( void )                    { return m_uiNameHash; }
     inline const std::string&   GetName                 ( void )                    { return m_strName; }
-    void                        SetName                 ( std::string strName );
+    void                        SetName                 ( const std::string& strName );
 
     inline const std::string&   GetPassword             ( void )                    { return m_strPassword; }
     void                        SetPassword             ( const char* szPassword );
@@ -39,10 +39,10 @@ public:
     bool                        IsPassword              ( const char* szPassword );
 
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
-    inline void                 SetIP                   ( std::string strIP )       { m_strIP = strIP; }
+    inline void                 SetIP                   ( const std::string& strIP ){ m_strIP = strIP; }
 
 	inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
-    inline void                 SetSerial               ( std::string strSerial )   { m_strSerial = strSerial; }
+    inline void                 SetSerial               ( const std::string& strSerial ){ m_strSerial = strSerial; }
     
     inline class CClient*       GetClient               ( void )                    { return m_pClient; }
     inline void                 SetClient               ( class CClient* pClient )  { m_pClient = pClient; }
@@ -79,14 +79,14 @@ protected:
 class CAccountData
 {
 public:
-    inline                  CAccountData            ( std::string strKey, CLuaArgument * pArgument )
+    inline                  CAccountData            ( const std::string& strKey, CLuaArgument * pArgument )
     {
         m_strKey = strKey;
         m_Argument = *pArgument;
     }
 
     inline const std::string&   GetKey                  ( void )                    { return m_strKey; }
-    inline void                 SetKey                  ( std::string strKey)       { m_strKey = strKey; }
+    inline void                 SetKey                  ( const std::string& strKey){ m_strKey = strKey; }
     inline CLuaArgument*        GetValue                ( void )                    { return &m_Argument; }
     inline void                 SetValue                ( CLuaArgument* pArgument ) { m_Argument = *pArgument; }
 

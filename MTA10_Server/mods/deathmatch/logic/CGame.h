@@ -236,11 +236,11 @@ public:
     inline bool                 IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
     void                        ResetMapInfo                ( void );
 
-    void                        SetGlitchEnabled            ( std::string strGlitch, bool bEnabled );
-    bool                        IsGlitchEnabled             ( std::string strGlitch );
+    void                        SetGlitchEnabled            ( const std::string& strGlitch, bool bEnabled );
+    bool                        IsGlitchEnabled             ( const std::string& strGlitch );
     bool                        IsGlitchEnabled             ( eGlitchType cGlitch );
-    eGlitchType                 GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
-    bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
+    eGlitchType                 GetGlitchIndex              ( const std::string& strGlitch )    { return m_GlitchNames[strGlitch]; }
+    bool                        IsGlitch                    ( const std::string& strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
 
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );

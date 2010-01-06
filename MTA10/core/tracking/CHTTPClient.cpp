@@ -43,7 +43,7 @@ void CHTTPClient::Reset ( void )
 }
 
 
-bool CHTTPClient::Get ( std::string strURL )
+bool CHTTPClient::Get ( const std::string& strURL )
 {
     // Delete any previous socket
     if ( m_pHTTPSocket )
