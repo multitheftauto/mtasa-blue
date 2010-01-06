@@ -74,6 +74,32 @@ bool TerminateGTAIfRunning ( void )
     return true;
 }
 
+
+//
+// Returns true if the file exists
+//
+bool FileExists ( const SString& strFilename )
+{
+    WIN32_FIND_DATA fdFileInfo;
+    HANDLE hHandle = FindFirstFile ( strFilename, &fdFileInfo );
+    if ( hHandle == INVALID_HANDLE_VALUE )
+        return false;
+    FindClose ( hHandle );
+    return true;
+}
+
+//
+// General error message box
+//
+long DisplayErrorMessageBox ( HWND& hwndSplash, const SString& strMessage )
+{
+    if ( hwndSplash )
+        DestroyWindow ( hwndSplash );
+    MessageBox( 0, strMessage, "Error!", MB_ICONEXCLAMATION|MB_OK );
+    return 1;
+}
+
+
 //
 // Read a registry string value
 //
@@ -160,7 +186,6 @@ void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
 
 int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
 {
-    WIN32_FIND_DATA fdFileInfo;
     char szRegBuffer[MAX_PATH];
     ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szRegBuffer, MAX_PATH - 1 );
 
@@ -174,7 +199,7 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
 
             char szExePath[MAX_PATH];
             sprintf ( szExePath, "%s\\%s", szRegBuffer, MTA_GTAEXE_NAME );
-            if ( INVALID_HANDLE_VALUE != FindFirstFile( szExePath, &fdFileInfo ) )
+            if ( FileExists( szExePath  ) )
             {
                 _snprintf ( szBuffer, sizeBufferSize, "%s", szRegBuffer );
                 return 1;
@@ -201,9 +226,7 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
             imalloc->Release ( );
         }
     
-        char szExePath[MAX_PATH];
-        sprintf ( szExePath, "%s\\gta_sa.exe", szBuffer );
-        if ( INVALID_HANDLE_VALUE != FindFirstFile( szExePath, &fdFileInfo ) )
+        if ( FileExists( SString ( "%s\\gta_sa.exe", szBuffer ) ) )
         {
             WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szBuffer );
         }
@@ -238,7 +261,6 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
 
-    WIN32_FIND_DATA fdFileInfo;
     PROCESS_INFORMATION piLoadee;
     STARTUPINFO siLoadee;
 
@@ -280,52 +302,22 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 
     // Basic check for the data files
+    if ( !FileExists ( SString ( "%s\\mta\\cgui\\CGUI.png", szMTASAPath ) ) )
     {
-        char szFileName[MAX_PATH] = {'\0'};
-        _snprintf ( szFileName, MAX_PATH, "%s\\mta\\cgui\\CGUI.png", szMTASAPath );
-
-        // Check if vorbis.ax exists
-        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
-        {
-            if ( hwndSplash )
-                DestroyWindow ( hwndSplash );
-            MessageBox( NULL, "Load failed.  Please ensure that "
-                              "the data files have been installed "
-                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
-            return 1;
-        }
+        // Check if CGUI.png exists
+        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that the data files have been installed correctly." );
     }
 
     // Check for client file
+    if ( !FileExists ( SString ( "%s\\%s", szMTASAPath, CHECK_DM_CLIENT_NAME ) ) )
     {
-        char szFileName[MAX_PATH] = {'\0'};
-        _snprintf ( szFileName, MAX_PATH, "%s\\%s", szMTASAPath, CHECK_DM_CLIENT_NAME );
-
-        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
-        {
-            if ( hwndSplash )
-                DestroyWindow ( hwndSplash );
-            MessageBox( NULL, "Load failed.  Please ensure that '"
-                              CHECK_DM_CLIENT_NAME "' is installed "
-                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
-            return 1;
-        }
+        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly." );
     }
 
     // Check for lua file
+    if ( !FileExists ( SString ( "%s\\%s", szMTASAPath, CHECK_DM_LUA_NAME ) ) )
     {
-        char szFileName[MAX_PATH] = {'\0'};
-        _snprintf ( szFileName, MAX_PATH, "%s\\%s", szMTASAPath, CHECK_DM_LUA_NAME );
-
-        if ( INVALID_HANDLE_VALUE == FindFirstFile ( szFileName, &fdFileInfo ) )
-        {
-            if ( hwndSplash )
-                DestroyWindow ( hwndSplash );
-            MessageBox( NULL, "Load failed.  Please ensure that '"
-                              CHECK_DM_LUA_NAME "' is installed "
-                              "correctly.", "Error!", MB_ICONEXCLAMATION|MB_OK );
-            return 1;
-        }
+        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly." );
     }
 
     // Grab the MTA folder
@@ -339,26 +331,18 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
    
     // Make sure the gta executable exists
     SetCurrentDirectory ( szGTAPath );
-    if ( INVALID_HANDLE_VALUE == FindFirstFile( szGTAEXEPath, &fdFileInfo ) )
+    if ( !FileExists( szGTAEXEPath ) )
     {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        char szMsg [ 2*MAX_PATH ];
-        _snprintf ( szMsg, sizeof(szMsg), "Load failed. Could not find gta_sa.exe in %s.", szGTAPath );
-        MessageBox( 0, szMsg, "Error!", MB_ICONEXCLAMATION|MB_OK );
-        return 1;
+        return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. Could not find gta_sa.exe in %s.", szGTAPath ) );
     }
 
     // Make sure important dll's do not exist in the wrong place
     char* dllCheckList[] = { "xmll.dll", "cgui.dll", "net.dll", "libcurl.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
-        if ( INVALID_HANDLE_VALUE != FindFirstFile( SString ( "%s\\%s", szGTAPath, dllCheckList[i] ), &fdFileInfo ) )
+        if ( FileExists( SString ( "%s\\%s", szGTAPath, dllCheckList[i] ) ) )
         {
-            if ( hwndSplash )
-                DestroyWindow ( hwndSplash );
-            MessageBox( 0, SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "Error!", MB_ICONEXCLAMATION|MB_OK );
-            return 1;
+            return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ) );
         }    
     }
 
@@ -379,47 +363,40 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                               &siLoadee,
                               &piLoadee ) )
     {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        MessageBox( NULL, "Could not start Grand Theft Auto: San Andreas.  "
+        DisplayErrorMessageBox ( hwndSplash, "Could not start Grand Theft Auto: San Andreas.  "
                           "Please try restarting, or if the problem persists,"
-                          "contact MTA at www.multitheftauto.com.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+                          "contact MTA at www.multitheftauto.com." );
         return 2;
     }
 
-    char szCoreDLL[MAX_PATH] = {'\0'};
-    _snprintf ( szCoreDLL, MAX_PATH, "%s\\mta\\%s", szMTASAPath, MTA_DLL_NAME );
+    SString strCoreDLL ( "%s\\mta\\%s", szMTASAPath, MTA_DLL_NAME );
 
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
-    if ( INVALID_HANDLE_VALUE == FindFirstFile ( szCoreDLL, &fdFileInfo ) )
+    if ( !FileExists ( strCoreDLL ) )
     {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        MessageBox( NULL, "Load failed.  Please ensure that "
+        DisplayErrorMessageBox ( hwndSplash, "Load failed.  Please ensure that "
                           "the file core.dll is in the modules "
-                           "directory within the MTA root directory.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+                           "directory within the MTA root directory." );
+
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
     }
 
-
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
-    HMODULE hCoreModule = LoadLibrary( szCoreDLL );
+    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
     {
-        if ( hwndSplash )
-            DestroyWindow ( hwndSplash );
-        MessageBox( NULL, "Load failed.  Please ensure that \n"
+        DisplayErrorMessageBox ( hwndSplash, "Load failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed.", "Error!", MB_ICONEXCLAMATION|MB_OK );
+                            "and the latest DirectX is correctly installed." );
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
     }
 
     // Inject the core into GTA
-    RemoteLoadLibrary ( piLoadee.hProcess, szCoreDLL );
+    RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
     
     // Resume execution for the game.
     ResumeThread ( piLoadee.hThread );
