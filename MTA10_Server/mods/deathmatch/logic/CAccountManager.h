@@ -49,7 +49,7 @@ protected:
     inline void                 AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
-    inline void                 MarkAsChanged               ( void )                    { m_bChangedSinceSaved = true; };
+    void                        MarkAsChanged               ( CAccount* pAccount );
 
 public:
     void                        RemoveAll                   ( void );
@@ -64,7 +64,7 @@ protected:
     bool                        m_bAutoLogin;
 
     bool                        m_bChangedSinceSaved;
-    unsigned long               m_ulLastTimeSaved;
+    long long                   m_llLastTimeSaved;
 };
 
 #endif
