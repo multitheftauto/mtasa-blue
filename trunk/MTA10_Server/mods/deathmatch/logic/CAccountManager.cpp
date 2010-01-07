@@ -19,7 +19,7 @@ CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
 {
     m_bRemoveFromList = true;
     m_bAutoLogin = false;
-    m_ulLastTimeSaved = GetTime ();
+    m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
 }
 
@@ -35,7 +35,7 @@ void CAccountManager::DoPulse ( void )
 {
     // Save it only once in a while whenever something has changed
     if ( m_bChangedSinceSaved &&
-         GetTime () > m_ulLastTimeSaved + 15000 )
+         GetTickCount64_ () > m_llLastTimeSaved + 15000 )
     {
         // Save it
         Save ();
@@ -253,7 +253,7 @@ bool CAccountManager::Save ( const char* szFileName )
 {
     // Attempted save now
     m_bChangedSinceSaved = false;
-    m_ulLastTimeSaved = GetTime ();
+    m_llLastTimeSaved = GetTickCount64_ ();
 
     if ( szFileName == NULL )
         szFileName = m_strFileName.c_str ();
@@ -293,6 +293,11 @@ bool CAccountManager::Save ( const char* szFileName )
     m_pFile->Write ();
     delete m_pFile;
     m_pFile = NULL;
+
+    long long llDeltaTime = GetTickCount64_ () - m_llLastTimeSaved;
+    if ( llDeltaTime > 5000 )
+        CLogger::LogPrintf ( "INFO: Took %lld seconds to save accounts XML file.\n", llDeltaTime / 1000 );
+
     return true;
 }
 
@@ -537,6 +542,11 @@ void CAccountManager::RemoveFromList ( CAccount* pAccount )
     }
 }
 
+void CAccountManager::MarkAsChanged ( CAccount* pAccount )
+{
+    if ( pAccount->IsRegistered () )
+        m_bChangedSinceSaved = true;
+}
 
 void CAccountManager::RemoveAll ( void )
 {

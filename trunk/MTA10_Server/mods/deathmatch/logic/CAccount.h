@@ -39,10 +39,10 @@ public:
     bool                        IsPassword              ( const char* szPassword );
 
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
-    inline void                 SetIP                   ( const std::string& strIP ){ m_strIP = strIP; }
+    void                        SetIP                   ( const std::string& strIP );
 
 	inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
-    inline void                 SetSerial               ( const std::string& strSerial ){ m_strSerial = strSerial; }
+    void                        SetSerial               ( const std::string& strSerial );
     
     inline class CClient*       GetClient               ( void )                    { return m_pClient; }
     inline void                 SetClient               ( class CClient* pClient )  { m_pClient = pClient; }

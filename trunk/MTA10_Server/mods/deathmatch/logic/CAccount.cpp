@@ -30,7 +30,7 @@ CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::str
     SetSerial ( strSerial );
 
     m_pManager->AddToList ( this );
-    m_pManager->MarkAsChanged ();
+    m_pManager->MarkAsChanged ( this );
 }
 
 
@@ -42,7 +42,7 @@ CAccount::~CAccount ( void )
         m_pClient->SetAccount ( NULL );
 
     m_pManager->RemoveFromList ( this );
-    m_pManager->MarkAsChanged ();
+    m_pManager->MarkAsChanged ( this );
 }
 
 
@@ -51,18 +51,21 @@ void CAccount::Register ( const char* szPassword )
     HashPassword ( szPassword, m_strPassword );
     m_bRegistered = true;
 
-    m_pManager->MarkAsChanged ();
+    m_pManager->MarkAsChanged ( this );
 }
 
 
 void CAccount::SetName ( const std::string& strName )
 {
-    m_strName = strName;
+    if ( m_strName != strName )
+    {
+        m_strName = strName;
 
-    if ( !m_strName.empty () )
-        m_uiNameHash = HashString ( m_strName.c_str () );
+        if ( !m_strName.empty () )
+            m_uiNameHash = HashString ( m_strName.c_str () );
 
-    m_pManager->MarkAsChanged ();
+        m_pManager->MarkAsChanged ( this );
+    }
 }
 
 
@@ -91,8 +94,13 @@ bool CAccount::IsPassword ( const char* szPassword )
 
 void CAccount::SetPassword ( const char* szPassword )
 {
-    HashPassword ( szPassword, m_strPassword );
-    m_pManager->MarkAsChanged ();
+    string strNewPassword;
+    HashPassword ( szPassword, strNewPassword );
+    if ( stricmp ( m_strPassword.c_str (), strNewPassword.c_str () ) != 0 )
+    {
+        m_strPassword = strNewPassword;
+        m_pManager->MarkAsChanged ( this );
+    }
 }
 
 
@@ -109,6 +117,24 @@ bool CAccount::HashPassword ( const char* szPassword, std::string& strHashPasswo
         return true;
 	}
     return false;
+}
+
+void CAccount::SetIP ( const std::string& strIP )
+{
+    if ( m_strIP != strIP )
+    {
+        m_strIP = strIP;
+        m_pManager->MarkAsChanged ( this );
+    }
+}
+
+void CAccount::SetSerial ( const std::string& strSerial )
+{
+    if ( m_strSerial != strSerial )
+    {
+        m_strSerial = strSerial;
+        m_pManager->MarkAsChanged ( this );
+    }
 }
 
 
@@ -139,7 +165,7 @@ void CAccount::SetData ( const char* szKey, CLuaArgument * pArgument )
             m_Data.push_back ( pData );
         }
 
-        m_pManager->MarkAsChanged ();
+        m_pManager->MarkAsChanged ( this );
     }
 }
 
@@ -152,7 +178,7 @@ void CAccount::CopyData ( CAccount* pAccount )
         m_Data.push_back ( new CAccountData ( (*iter)->GetKey (), (*iter)->GetValue () ) );
     }
 
-    m_pManager->MarkAsChanged ();
+    m_pManager->MarkAsChanged ( this );
 }
 
 
@@ -161,24 +187,27 @@ void CAccount::RemoveData ( char* szKey )
     CAccountData* pData = GetDataPointer ( szKey );
     if ( pData )
     {
-        if ( !m_Data.empty() ) m_Data.remove ( pData );
+        m_Data.remove ( pData );
         delete pData;
 
-        m_pManager->MarkAsChanged ();
+        m_pManager->MarkAsChanged ( this );
     }
 }
 
 
 void CAccount::ClearData ( void )
 {
-    list < CAccountData* > ::iterator iter = m_Data.begin ();
-    for ( ; iter != m_Data.end () ; iter++ )
+    if ( !m_Data.empty () )
     {
-        delete *iter;
-    }
+        list < CAccountData* > ::iterator iter = m_Data.begin ();
+        for ( ; iter != m_Data.end () ; iter++ )
+        {
+            delete *iter;
+        }
 
-    m_Data.clear ();
-    m_pManager->MarkAsChanged ();
+        m_Data.clear ();
+        m_pManager->MarkAsChanged ( this );
+    }
 }
 
 
