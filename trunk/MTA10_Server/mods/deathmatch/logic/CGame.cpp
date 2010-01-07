@@ -2763,8 +2763,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 		}
 
 		// Tell the console
-		//char szIP [22];
-		CLogger::LogPrintf ( "CONNECT: %s connected (IP: %s)\n", pPlayer->GetNick(), pPlayer->GetSourceIP ( szIP ) );
+		CLogger::LogPrintf ( "CONNECT: %s connected (IP: %s  Serial: %s)\n", pPlayer->GetNick(), pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
 
 		// Send him the join details
 		pPlayer->Send ( CPlayerConnectCompletePacket () );
