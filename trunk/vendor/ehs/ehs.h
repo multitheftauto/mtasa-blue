@@ -295,6 +295,9 @@ class EHS {
 	virtual ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
 										 HttpResponse * ipoHttpResponse );
 
+	/// This function should be defined by the subclass
+	virtual void HttpPulse ( void ) {};
+
 	/// makes this EHS object get its data from another EHS -- useful for having secure and normal connections share same data
 	void SetSourceEHS ( EHS & iroSourceEHS );
 

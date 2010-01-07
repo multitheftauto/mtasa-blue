@@ -31,6 +31,7 @@ public:
 
 	ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
 								 HttpResponse * ipoHttpResponse );
+    void         HttpPulse     ( void );
 	
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
@@ -48,6 +49,7 @@ private:
     bool                        m_bStartedServer;
 
     class CAccount *            m_pGuestAccount;
+    map < string, long long >   m_LoggedInMap;
 };
 
 #endif

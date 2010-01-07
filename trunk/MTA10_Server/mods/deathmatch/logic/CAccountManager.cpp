@@ -577,7 +577,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
     if ( !pAccount )
     {
         if ( pEchoClient ) pEchoClient->SendEcho( SString( "login: No known account for '%s'", szNick ).c_str() );
-        CLogger::LogPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account)\n", strPlayerName.c_str (), szNick );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account)\n", strPlayerName.c_str (), szNick );
         return false;
     }
 
@@ -589,7 +589,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
     if ( strlen ( szPassword ) > MAX_PASSWORD_LENGTH || !pAccount->IsPassword ( szPassword ) )
     {
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szNick ).c_str() );
-        CLogger::LogPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password\n", strPlayerName.c_str (), szNick );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password\n", strPlayerName.c_str (), szNick );
         return false;
     }
 
@@ -647,7 +647,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
     }
 
     // Tell the console
-    CLogger::LogPrintf ( "LOGIN: %s successfully logged in as '%s'\n", pClient->GetNick (), pAccount->GetName ().c_str () );
+    CLogger::AuthPrintf ( "LOGIN: %s successfully logged in as '%s'\n", pClient->GetNick (), pAccount->GetName ().c_str () );
 
     // Tell the player
     if ( pEchoClient )
@@ -715,7 +715,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
     }
 
     // Tell the console
-    CLogger::LogPrintf ( "LOGOUT: %s logged out as '%s'\n", pClient->GetNick (), pCurrentAccount->GetName ().c_str () );
+    CLogger::AuthPrintf ( "LOGOUT: %s logged out as '%s'\n", pClient->GetNick (), pCurrentAccount->GetName ().c_str () );
 
     // Tell the player
     if ( pEchoClient )
