@@ -175,12 +175,40 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                     std::string strAccountName = account->GetName ();
                     if ( strAccountName.compare ( "Console" ) != 0 )
                     {
+                        // Handle initial login logging
+                        if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
+                            CLogger::AuthPrintf ( "HTTPD: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
+                        m_LoggedInMap[authName] = GetTickCount64_ ();
                         // @@@@@ Check they can access HTTP
                         return account;
                     }
                 }
             }
+            if ( authName.length () > 0 )
+                CLogger::ErrorPrintf ( "HTTPD: Failed login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
         }
     }
     return m_pGuestAccount;
+}
+
+void CHTTPD::HttpPulse ( void )
+{
+
+    long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
+
+    map < string, long long > :: iterator iter = m_LoggedInMap.begin ();
+    while ( iter != m_LoggedInMap.end () )
+    {
+        // Remove if too long since last request
+        if ( iter->second < llExpireTime )
+        {
+            g_pGame->Lock(); // get the mutex (blocking)
+            CLogger::AuthPrintf ( "HTTPD: '%s' no longer connected\n", iter->first.c_str () );
+            m_LoggedInMap.erase ( iter++ );
+            g_pGame->Unlock();
+        }
+        else
+            iter++;
+    }
+
 }

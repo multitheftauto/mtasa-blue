@@ -433,14 +433,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-    // Eventually set a logfile
-	bool bLogFile = true;
-    if ( m_pMainConfig->GetLogFileEnabled () && !m_pMainConfig->GetLogFile ().empty () )
-    {
-        // Try to set the logfile
-        if ( !CLogger::SetLogFile ( m_pMainConfig->GetLogFile ().c_str () ) )
-			bLogFile = false;
-    }
+    // Eventually set the logfiles
+    bool bLogFile = CLogger::SetLogFile ( m_pMainConfig->GetLogFile ().c_str () );
+    CLogger::SetAuthFile ( m_pMainConfig->GetAuthFile ().c_str () );
+    CLogger::SetErrorFile ( m_pMainConfig->GetErrorFile ().c_str () );
 
     // Trim the logfile name for the output
     char szLogFileNameOutput [MAX_PATH];

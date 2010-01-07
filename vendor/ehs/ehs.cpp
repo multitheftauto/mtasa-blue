@@ -906,6 +906,8 @@ void EHSServer::HandleData ( int inTimeoutMilliseconds, ///< milliseconds for ti
 			m_nAccepting = 0;
 			MUTEX_UNLOCK ( m_oMutex );
 
+            // Occasional pulse for updating of things
+            m_poTopLevelEHS->HttpPulse ();
 
 		} // END ACCEPTING
 		
