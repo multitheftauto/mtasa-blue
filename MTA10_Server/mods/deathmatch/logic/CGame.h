@@ -286,7 +286,7 @@ private:
     CPacketTranslator*              m_pPacketTranslator;
     CMapManager*                    m_pMapManager;
     CElementDeleter                 m_ElementDeleter;
-    CConnectHistory                 m_ConnectHistory;
+    CConnectHistory                 m_FloodProtect;
     CLuaManager*                    m_pLuaManager;
     CScriptDebugging*               m_pScriptDebugging;
     CConsole*                       m_pConsole;

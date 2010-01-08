@@ -65,6 +65,7 @@ protected:
 
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
+    CConnectHistory             m_AccountProtect;
 };
 
 #endif
