@@ -262,7 +262,7 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strAuthFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
     // Grab the server access control list
-    if ( GetString ( m_pRootNode, "acl", strBuffer, 255, 1 ) == IS_SUCCESS )
+    if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
     {
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
     }
@@ -281,7 +281,7 @@ bool CMainConfig::LoadExtended ( void )
     int iTemp = 0, iResult = 0;
 
 	// Grab the script debuglog
-    if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 255, 1 ) == IS_SUCCESS )
+    if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 1, 255 ) == IS_SUCCESS )
     {
         m_strScriptDebugLogFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
         m_bScriptDebugLogEnabled = true;
