@@ -22,12 +22,12 @@ CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long
 // Add flood candidate connection attempt and return true if flooding is occurring
 bool CConnectHistory::AddConnect ( const string& strIP )
 {
-    // Get history for this IP
-    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
-
     // See if banned first
     if ( IsFlooding ( strIP ) )
         return true;
+
+    // Get history for this IP
+    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
 
     // Add time of this allowed connection
     historyItem.joinTimes.push_back ( GetTickCount64_ () );
