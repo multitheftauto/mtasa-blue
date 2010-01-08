@@ -16,7 +16,6 @@ using namespace std;
 
 FILE* CLogger::m_pLogFile = NULL;
 FILE* CLogger::m_pAuthFile = NULL;
-FILE* CLogger::m_pErrorFile = NULL;
 bool CLogger::m_bOutputEnabled = true;
 
 #define MAX_STRING_LENGTH 2048
@@ -30,14 +29,14 @@ void CLogger::LogPrintf ( const char* szFormat, ... )
     va_end ( marker );
 
     // Timestamp and send to the console and logfile
-    HandleLogPrint ( true, "", szBuffer, true, true, false, false );
+    HandleLogPrint ( true, "", szBuffer, true, true, false );
 }
 
 
 void CLogger::LogPrint ( const char* szText )
 {
     // Timestamp and send to the console and logfile
-    HandleLogPrint ( true, "", szText, true, true, false, false );
+    HandleLogPrint ( true, "", szText, true, true, false );
 }
 
 
@@ -51,14 +50,14 @@ void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
     va_end ( marker );
 
     // Send to the console and logfile
-    HandleLogPrint ( false, "", szBuffer, true, true, false, false );
+    HandleLogPrint ( false, "", szBuffer, true, true, false );
 }
 
 
 void CLogger::LogPrintNoStamp ( const char* szText )
 {
     // Send to the console and logfile
-    HandleLogPrint ( false, "", szText, true, true, false, false );
+    HandleLogPrint ( false, "", szText, true, true, false );
 }
 
 
@@ -71,8 +70,8 @@ void CLogger::ErrorPrintf ( const char* szFormat, ... )
     _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
-    // Timestamp and send to the console, logfile and errorfile
-    HandleLogPrint ( true, "ERROR: ", szBuffer, true, true, false, true );
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "ERROR: ", szBuffer, true, true, false );
 }
 
 
@@ -87,7 +86,7 @@ void CLogger::DebugPrintf ( const char* szFormat, ... )
         va_end ( marker );
 
         // Timestamp and send to the console and logfile
-        HandleLogPrint ( true, "DEBUG: ", szBuffer, true, true, false, false );
+        HandleLogPrint ( true, "DEBUG: ", szBuffer, true, true, false );
     #endif
 }
 
@@ -102,7 +101,7 @@ void CLogger::AuthPrintf ( const char* szFormat, ... )
     va_end ( marker );
 
     // Timestamp and send to the console, logfile and authfile
-    HandleLogPrint ( true, "", szBuffer, true, true, true, false );
+    HandleLogPrint ( true, "", szBuffer, true, true, true );
 }
 
 
@@ -156,31 +155,6 @@ bool CLogger::SetAuthFile ( const char* szAuthFile )
 }
 
 
-bool CLogger::SetErrorFile ( const char* szErrorFile )
-{
-    // Eventually delete our current file
-    if ( m_pErrorFile )
-    {
-        fclose ( m_pErrorFile );
-        m_pErrorFile = NULL;
-    }
-
-    // Eventually open a new file
-    if ( szErrorFile && szErrorFile[0] )
-    {
-        // Make sure the path to it exists
-        MakeSureDirExists ( szErrorFile );
-
-        // Create the file
-        m_pErrorFile = fopen ( szErrorFile, "a+" );
-        return m_pErrorFile != NULL;
-    }
-
-    // Return true if supplied file name was empty
-    return true;
-}
-
-
 void CLogger::SetOutputEnabled ( bool bEnabled )
 {
     m_bOutputEnabled = bEnabled;
@@ -188,7 +162,7 @@ void CLogger::SetOutputEnabled ( bool bEnabled )
 
 
 // Handle where to send the message
-void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile, bool bToErrorFile )
+void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile )
 {
     if ( !m_bOutputEnabled )
         return;
@@ -230,12 +204,5 @@ void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const cha
     {
         fprintf ( m_pAuthFile, "%s", strOutputLong.c_str () );
         fflush ( m_pAuthFile );
-    }
-
-    // Maybe print it to the error file
-    if ( bToErrorFile && m_pErrorFile )
-    {
-        fprintf ( m_pErrorFile, "%s", strOutputLong.c_str () );
-        fflush ( m_pErrorFile );
     }
 }

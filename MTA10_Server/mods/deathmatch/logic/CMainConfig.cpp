@@ -261,9 +261,6 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( GetString ( m_pRootNode, "authfile", strBuffer, 1 ) == IS_SUCCESS )
         m_strAuthFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
-    if ( GetString ( m_pRootNode, "errorfile", strBuffer, 1 ) == IS_SUCCESS )
-        m_strErrorFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
-
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 255, 1 ) == IS_SUCCESS )
     {

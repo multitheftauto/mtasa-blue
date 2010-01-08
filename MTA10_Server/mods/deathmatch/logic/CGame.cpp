@@ -51,9 +51,6 @@ BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
 
 CGame::CGame ( void )
 {
-#ifdef WIN32
-    InitializeCriticalSection(&m_cs);
-#endif
     // Set our global pointer
     g_pGame = this;
 
@@ -148,9 +145,6 @@ void CGame::ResetMapInfo ( void )
 CGame::~CGame ( void )
 {
 	m_bBeingDeleted = true;
-#ifdef WIN32
-    DeleteCriticalSection(&m_cs);
-#endif
 
     // Remove our console control handler
     #ifdef WIN32
@@ -436,7 +430,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Eventually set the logfiles
     bool bLogFile = CLogger::SetLogFile ( m_pMainConfig->GetLogFile ().c_str () );
     CLogger::SetAuthFile ( m_pMainConfig->GetAuthFile ().c_str () );
-    CLogger::SetErrorFile ( m_pMainConfig->GetErrorFile ().c_str () );
 
     // Trim the logfile name for the output
     char szLogFileNameOutput [MAX_PATH];

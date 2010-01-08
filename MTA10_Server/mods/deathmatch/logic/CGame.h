@@ -206,10 +206,6 @@ public:
     inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
 
-#ifdef WIN32
-    inline CRITICAL_SECTION *   GetCriticalSection          ( void )        { return &m_cs; }
-#endif
-
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
     void                        QuitPlayer                  ( CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None", const char* szResponsiblePlayer = "None" );
@@ -317,10 +313,6 @@ private:
     CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
-
-#ifdef WIN32
-    CRITICAL_SECTION            m_cs; // to prevent odd things happening with the http server, I hope
-#endif
 
 #ifdef MTA_VOICE
     CVoiceServer*               m_pVoiceServer;
