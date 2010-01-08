@@ -50,6 +50,7 @@ BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
 
 
 CGame::CGame ( void )
+    : m_FloodProtect( 4, 30000, 30000 )     // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;
@@ -1298,7 +1299,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         if ( bPasswordIsValid )
                         {
                             // If he's not join flooding
-                            if ( !m_pMainConfig->GetJoinFloodProtectionEnabled () || !m_ConnectHistory.IsFlooding ( Packet.GetSourceIP() ) )
+                            if ( !m_pMainConfig->GetJoinFloodProtectionEnabled () || !m_FloodProtect.AddConnect ( SString ( "%x", Packet.GetSourceIP() ) ) )
                             {
 								// Set the nick and the game version
 								pPlayer->SetNick ( szNick );

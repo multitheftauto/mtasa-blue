@@ -16,6 +16,7 @@
 #include "StdInc.h"
 
 CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
+    , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_bRemoveFromList = true;
     m_bAutoLogin = false;
@@ -569,15 +570,30 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
         return false;
     }
 
-    // Get the players name if relevant
-    string strPlayerName = pClient->GetClientType () == CClient::CLIENT_PLAYER ? static_cast < CPlayer* > ( pClient )->GetNick () : "n/a";
+    // Get the players details if relevant
+    string strPlayerName, strPlayerIP, strPlayerSerial;
+    if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
+    {
+        CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+        char szIP [32] = { "\0" };
+        strPlayerIP = pPlayer->GetSourceIP ( szIP );
+        strPlayerName = pPlayer->GetNick ();
+        strPlayerSerial = pPlayer->GetSerial ();
+    }
+
+    if ( m_AccountProtect.IsFlooding ( strPlayerIP.c_str () ) )
+    {
+        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account locked", szNick ).c_str() );
+        CLogger::AuthPrintf ( "LOGIN: Ignoring %s trying to log in as '%s' (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
+        return false;
+    }
 
     // Grab the account on his nick if any
     CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
     if ( !pAccount )
     {
         if ( pEchoClient ) pEchoClient->SendEcho( SString( "login: No known account for '%s'", szNick ).c_str() );
-        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account)\n", strPlayerName.c_str (), szNick );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account) (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
         return false;
     }
 
@@ -589,7 +605,8 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
     if ( strlen ( szPassword ) > MAX_PASSWORD_LENGTH || !pAccount->IsPassword ( szPassword ) )
     {
         if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szNick ).c_str() );
-        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password\n", strPlayerName.c_str (), szNick );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
+        m_AccountProtect.AddConnect ( strPlayerIP.c_str () );
         return false;
     }
 
@@ -604,14 +621,18 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
     pClient->SetAccount ( pAccount );
     pAccount->SetClient ( pClient );
 
-    // Set IP in account
+    string strPlayerIP, strPlayerSerial;
     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
 
         char szIP [ 25 ];
         pPlayer->GetSourceIP ( szIP );
+        // Set IP in account
         pAccount->SetIP ( szIP );
+        // Get the players details
+        strPlayerIP = szIP;
+        strPlayerSerial = pPlayer->GetSerial ();
     }
 
     // Call the onClientLogin script event
@@ -647,7 +668,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
     }
 
     // Tell the console
-    CLogger::AuthPrintf ( "LOGIN: %s successfully logged in as '%s'\n", pClient->GetNick (), pAccount->GetName ().c_str () );
+    CLogger::AuthPrintf ( "LOGIN: %s successfully logged in as '%s' (IP: %s  Serial: %s)\n", pClient->GetNick (), pAccount->GetName ().c_str (), strPlayerIP.c_str (), strPlayerSerial.c_str () );
 
     // Tell the player
     if ( pEchoClient )

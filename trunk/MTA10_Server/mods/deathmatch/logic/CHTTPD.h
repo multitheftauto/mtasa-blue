@@ -50,6 +50,7 @@ private:
 
     class CAccount *            m_pGuestAccount;
     map < string, long long >   m_LoggedInMap;
+    CConnectHistory             m_BruteForceProtect;
 };
 
 #endif

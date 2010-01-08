@@ -17,6 +17,7 @@
 extern CGame * g_pGame;
 
 CHTTPD::CHTTPD ( void )
+    : m_BruteForceProtect( 4, 30000, 60000 * 5 )     // Max of 4 attempts per 30 seconds, then 5 minute ignore
 {
     m_resource = NULL;
     m_server = NULL;
@@ -165,6 +166,12 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 }
             }
 
+            if ( m_BruteForceProtect.IsFlooding ( ipoHttpRequest->GetAddress ().c_str () ) )
+            {
+                CLogger::AuthPrintf ( "HTTP: Ignoring login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
+                return m_pGuestAccount;
+            }
+
             CAccount * account = g_pGame->GetAccountManager()->Get ( (char *)authName.c_str());
             if ( account )
             {
@@ -177,7 +184,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                     {
                         // Handle initial login logging
                         if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
-                            CLogger::AuthPrintf ( "HTTPD: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
+                            CLogger::AuthPrintf ( "HTTP: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
                         m_LoggedInMap[authName] = GetTickCount64_ ();
                         // @@@@@ Check they can access HTTP
                         return account;
@@ -185,7 +192,10 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 }
             }
             if ( authName.length () > 0 )
-                CLogger::ErrorPrintf ( "HTTPD: Failed login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
+            {
+                m_BruteForceProtect.AddConnect ( ipoHttpRequest->GetAddress ().c_str () );
+                CLogger::AuthPrintf ( "HTTP: Failed login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
+            }
         }
     }
     return m_pGuestAccount;
@@ -203,7 +213,7 @@ void CHTTPD::HttpPulse ( void )
         if ( iter->second < llExpireTime )
         {
             g_pGame->Lock(); // get the mutex (blocking)
-            CLogger::AuthPrintf ( "HTTPD: '%s' no longer connected\n", iter->first.c_str () );
+            CLogger::AuthPrintf ( "HTTP: '%s' no longer connected\n", iter->first.c_str () );
             m_LoggedInMap.erase ( iter++ );
             g_pGame->Unlock();
         }
