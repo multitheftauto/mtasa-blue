@@ -492,8 +492,8 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
                 if ( strPlayerNameLower.find(strPlayerSearchText) != string::npos )
                 {
                     bPlayerSearchFound = true;
-                    int k = m_pServerPlayerList [ Type ]->AddRow ();
-                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str () );
+                    int k = m_pServerPlayerList [ Type ]->AddRow ( true );
+                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str (), false, false, true );
                 }
             }
         }
@@ -555,13 +555,68 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
 
-    m_pServerPlayerList [ Type ]->Clear ();
-
     char buf[32];
+
+    if ( pElement == m_pServerPlayerList [ Type ] && m_pServerPlayerList [ Type ]->GetSelectedCount () >= 1 )
+    {
+        // Get the selected row of the player gridlist
+        int iSelectedIndex = m_pServerPlayerList [ Type ]->GetSelectedItemRow ();
+        std::string strSelectedPlayerName = m_pServerPlayerList [ Type ]->GetItemText ( iSelectedIndex, m_hPlayerName [ Type ] );
+
+        // Walk the server list looking for the player on a server 
+        CServerList * pList = GetServerList ( Type );
+        CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+        for ( i = i_b; i != i_e; i++ ) 
+        {
+            CServerListItem * pServer = *i;
+
+            for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ )
+            {
+                std::string strPlayerName = pServer->vecPlayers[j].c_str ();
+                if ( strPlayerName.compare ( strSelectedPlayerName ) == 0 )
+                {
+                    // We found the server on which the player is
+                    // Walk the server gridlist looking for the server host to get the row index
+                    std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
+                    for ( int k = 0; k < m_pServerList [ Type ]->GetRowCount (); k++ )
+                    {
+                        if ( strEndpoint.compare ( m_pServerList [ Type ]->GetItemText ( k, m_hHost [ Type ] ) ) == 0 )
+                        {
+                            // We found the index, select it
+                            m_pServerList [ Type ]->SetSelectedItem ( k, m_hHost [ Type ], true );
+
+                            // It's not the same server as was selected before, so we update the password
+                            if ( k != m_iSelectedServer[ Type ] )
+                            {
+                                bool bSavedPasswords;
+                                CVARS_GET ( "save_server_passwords", bSavedPasswords );
+                                if ( pServer->bPassworded && bSavedPasswords )
+                                {
+                                    m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
+                                }
+                                else
+                                {
+                                    m_pEditPassword [ Type ]->SetText ( "" );
+                                }
+                            }
+
+                            // save the selected server
+                            m_iSelectedServer [ Type ] = iSelectedIndex;
+
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
  
     // If there is one item selected
     if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
     {
+        // Clear the player list
+        m_pServerPlayerList [ Type ]->Clear ();
+
         // Get the selected row
         int iSelectedIndex = m_pServerList [ Type ]->GetSelectedItemRow ();
 
@@ -765,6 +820,8 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 
 bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
 {
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+
     if ( Args.pWindow == m_pServerList [ ServerBrowserType::INTERNET ] )
     {
         OnClick ( m_pServerList [ ServerBrowserType::INTERNET ] );
@@ -783,6 +840,11 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
     else if ( Args.pWindow == m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] )
     {
         OnClick ( m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] );
+        return true;
+    }
+    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && !m_pEditPlayerSearch [ Type ]->GetText ().empty() )
+    {
+        OnClick ( m_pServerPlayerList [ Type ] );
         return true;
     }
 
