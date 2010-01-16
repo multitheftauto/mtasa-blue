@@ -5,4 +5,4 @@ mta_server_SOURCES = \
 	CDynamicLibrary.cpp \
 	Main.cpp
 
-mta_server_LDADD = -ldl -lz -lcurl
+mta_server_LDADD = -ldl -lz
