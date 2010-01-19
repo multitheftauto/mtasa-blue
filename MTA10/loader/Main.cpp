@@ -24,7 +24,7 @@ using SharedUtil::CalcMTASAPath;
 
 #ifndef _WINDOWS_
 #define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce executable size
-#define _WIN32_WINNT 0x0400     // So we can use IsDebuggerPresent()
+//#define _WIN32_WINNT 0x0400     // So we can use IsDebuggerPresent()
 #include <windows.h>
 #endif
 
@@ -382,6 +382,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
     }
+
+    SetDllDirectory( SString ( "%s\\mta", szMTASAPath ) );
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
