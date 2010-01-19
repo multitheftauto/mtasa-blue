@@ -19,6 +19,7 @@
 
 using namespace std;
 
+#if 0   // Currently unused
 const char* GetFilenameFromPath ( const char* szPath )
 {
     if ( szPath && szPath [ 0 ] )
@@ -34,6 +35,48 @@ const char* GetFilenameFromPath ( const char* szPath )
     }
     return NULL;
 }
+#endif
+
+//
+// Try to make a resource path relative to the 'resources/' directory
+//
+std::string ConformResourcePath ( const char* szRes )
+{
+    // Remove up to first '/resources/'
+    // else
+    // if starts with '...'
+    //  remove up to first '/'
+
+    SString strDelim = "/resources/";
+    SString strText = szRes ? szRes : "";
+#ifdef WIN32
+    char cPathSep = '\\';
+    strDelim = strDelim.Replace ( "/", "\\" );
+    strText = strText.Replace ( "/", "\\" );
+#else
+    char cPathSep = '/';
+    strDelim = strDelim.Replace ( "\\", "/" );
+    strText = strText.Replace ( "\\", "/" );
+#endif
+
+    int iPos = strText.find ( strDelim );
+    if ( iPos >= 0 )
+    {
+        // Remove up to first '/resources/'
+        strText = strText.substr ( iPos + strDelim.length () );
+    }
+    else
+    if ( strText.substr ( 0, 3 ) == "..." )
+    {
+        // Remove up to first '/'
+        int iPos = strText.find ( cPathSep );
+        if ( iPos >= 0 )
+            strText = strText.substr ( iPos + 1 );
+    }
+
+    return strText;
+}
+
 
 bool DoesFileExist ( const char* szFilename )
 {

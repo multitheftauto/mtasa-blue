@@ -44,7 +44,7 @@ public:
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
 
 private:
-    void                            LogString                       ( const char* szText, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
+    void                            LogString                       ( const char* szPrePend, lua_State* luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
     void                            PrintLog                        ( const char* szText );
  
     CLuaManager*                    m_pLuaManager;

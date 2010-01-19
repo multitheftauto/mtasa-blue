@@ -196,7 +196,7 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( GetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "ERROR: Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
 
             // Error out
             lua_pushstring ( luaVM, "Aborting; infinite running script" );
@@ -208,18 +208,17 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
 
 bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 {
-    const char* szRes = NULL;
     if ( m_luaVM )
     {
         // Load the script
         if ( luaL_loadfile ( m_luaVM, szLUAScript ) )
         {
             // Print the error
-            szRes = lua_tostring(m_luaVM, -1);
-            if ( szRes )
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            if ( strRes.length () )
             {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", szRes );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", szRes );
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
             }
             else
             {
@@ -233,8 +232,8 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                szRes = lua_tostring(m_luaVM, -1);
-                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", szRes );
+                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
             }
             return true;
         }
@@ -254,14 +253,14 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                const char* szRes = lua_tostring(m_luaVM, -1);
-                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", szRes );
+                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", strRes.c_str () );
             }
         }
         else
         {
-            const char* szRes = lua_tostring(m_luaVM, -1);
-            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", szRes );
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", strRes.c_str () );
         }
     }
     else

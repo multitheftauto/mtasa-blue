@@ -103,8 +103,7 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const v
     {
         lua_getinfo ( luaVM, "nlS", &debugInfo );
 
-        const char * szFilename = GetFilenameFromPath ( debugInfo.source );
-        if ( szFilename ) m_strFilename = szFilename;
+        m_strFilename = ConformResourcePath ( debugInfo.source );
         m_iLine = debugInfo.currentline;
     }
 }
@@ -261,8 +260,7 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void
     {
         lua_getinfo ( luaVM, "nlS", &debugInfo );
 
-        const char * szFilename = GetFilenameFromPath ( debugInfo.source );
-        if ( szFilename ) m_strFilename = szFilename;
+        m_strFilename = ConformResourcePath ( debugInfo.source );
         m_iLine = debugInfo.currentline;
     }
 
@@ -740,7 +738,7 @@ void CLuaArgument::LogUnableToPacketize ( const char* szMessage ) const
 {
     if ( m_strFilename.length () > 0 )
     {
-        g_pClientGame->GetScriptDebugging ()->LogWarning ( NULL, "%s: %s - Line: %d\n", m_strFilename.c_str (), szMessage, m_iLine );
+        g_pClientGame->GetScriptDebugging ()->LogWarning ( NULL, "%s:%d: %s\n", m_strFilename.c_str (), m_iLine, szMessage );
     }
     else
     {
