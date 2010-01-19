@@ -203,8 +203,8 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        const char* szRes = lua_tostring( luaVM, -1 );		
-		g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
+        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
+        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -261,8 +261,8 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     }
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        const char* szRes = lua_tostring( luaVM, -1 );
-        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
+        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
+        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )

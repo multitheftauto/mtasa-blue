@@ -20,120 +20,75 @@ FILE* CLogger::m_pLogFile = NULL;
 #define MAX_STRING_LENGTH 2048
 void CLogger::LogPrintf ( const char* szFormat, ... )
 {
-    // Put the timestamp at the beginning of the string
+    // Compose the formatted message
     char szBuffer [MAX_STRING_LENGTH];
-    time_t timeNow;
-    time ( &timeNow );
-    tm* pCurrentTime = localtime ( &timeNow );
-    strftime ( szBuffer, 32, "[%H:%M:%S] ", pCurrentTime );
-
-    // Put the rest of the string sent to us into the rest of the buffer
     va_list marker;
     va_start ( marker, szFormat );
-	//vsnprintf ( szBuffer + 11, MAX_STRING_LENGTH - 11, szFormat, marker );
+    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
-    // Print it in the console
-    //g_pServerInterface->Printf ( "%s", szBuffer );
-
-    // If we got a file, print it to that too
-    if ( m_pLogFile )
-    {
-        fprintf ( m_pLogFile, "%s\n", szFormat );
-        fflush ( m_pLogFile );
-    }
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "", szBuffer, true, true );
 }
 
 
 void CLogger::LogPrint ( const char* szText )
 {
-    // Send it to LogPrintf as a non-format string
-    LogPrintf ( szText );
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "", szText, true, true );
 }
 
-
+#if 0   // Currently unused
 void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
 {
-    // Convert to a printable string
+    // Compose the formatted message
     char szBuffer [MAX_STRING_LENGTH];
     va_list marker;
     va_start ( marker, szFormat );
-	//vsnprintf ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
-    // Print it in the console
-    //g_pServerInterface->Printf ( "%s", szBuffer );
-
-    // If we got a file, print it to that too
-    if ( m_pLogFile )
-    {
-        fprintf ( m_pLogFile, "%s", szBuffer );
-        fflush ( m_pLogFile );
-    }
+    // Send to the console and logfile
+    HandleLogPrint ( false, "", szBuffer, true, true );
 }
 
 
 void CLogger::LogPrintNoStamp ( const char* szText )
 {
-    LogPrintfNoStamp ( "%s", szText );
+    // Send to the console and logfile
+    HandleLogPrint ( false, "", szText, true, true );
 }
-
+#endif
 
 void CLogger::ErrorPrintf ( const char* szFormat, ... )
 {
-    // Put the timestamp at the beginning of the string
+    // Compose the formatted message
     char szBuffer [MAX_STRING_LENGTH];
-    time_t timeNow;
-    time ( &timeNow );
-    tm* pCurrentTime = localtime ( &timeNow );
-    strftime ( szBuffer, 32, "[%H:%M:%S] ERROR: ", pCurrentTime );
-
-    // Convert it to a string
     va_list marker;
     va_start ( marker, szFormat );
-    //vsnprintf ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
+    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
-    // Print it to the console
-    //g_pServerInterface->Printf ( "%s", szBuffer );
-
-    // If we got a file, print it to that too
-    if ( m_pLogFile )   
-    {
-        fprintf ( m_pLogFile, "%s", szBuffer );
-        fflush ( m_pLogFile );
-    }
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "ERROR: ", szBuffer, true, true );
 }
 
-
+#if 0   // Currently unused
 void CLogger::DebugPrintf ( const char* szFormat, ... )
 {
     #ifdef MTA_DEBUG
-        // Put the timestamp at the beginning of the string
+        // Compose the formatted message
         char szBuffer [MAX_STRING_LENGTH];
-        time_t timeNow;
-        time ( &timeNow );
-        tm* pCurrentTime = localtime ( &timeNow );
-        strftime ( szBuffer, 32, "[%H:%M:%S] DEBUG: ", pCurrentTime );
-
-        // Convert it to a string
         va_list marker;
         va_start ( marker, szFormat );
-        //vsnprintf ( szBuffer + 18, MAX_STRING_LENGTH - 18, szFormat, marker );
+        _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
         va_end ( marker );
 
-        // Print it to the console
-        //g_pServerInterface->Printf ( "%s", szBuffer );
-
-        // If we got a file, print it to that too
-        if ( m_pLogFile )   
-        {
-            fprintf ( m_pLogFile, "%s", szBuffer );
-            fflush ( m_pLogFile );
-        }
+        // Timestamp and send to the console and logfile
+        HandleLogPrint ( true, "DEBUG: ", szBuffer, true, true );
     #endif
 }
-
+#endif
 
 void CLogger::SetLogFile ( const char* szLogFile )
 {
@@ -145,8 +100,53 @@ void CLogger::SetLogFile ( const char* szLogFile )
     }
 
     // Eventually open a new file
-    if ( szLogFile )
+    if ( szLogFile && szLogFile[0] )
     {
         m_pLogFile = fopen ( szLogFile, "a+" );
+    }
+}
+
+
+// Handle where to send the message
+void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile )
+{
+    // Put the timestamp at the beginning of the string
+#if 0
+    string strOutputShort;
+#endif
+    string strOutputLong;
+    if ( bTimeStamp )
+    {
+        char szBuffer [MAX_STRING_LENGTH] = { "\0" };
+        time_t timeNow;
+        time ( &timeNow );
+        tm* pCurrentTime = localtime ( &timeNow );
+#if 0
+        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%H:%M:%S] ", pCurrentTime ) )
+            szBuffer[0] = 0;
+        strOutputShort = szBuffer;
+#endif
+        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%Y-%m-%d %H:%M:%S] ", pCurrentTime ) )
+            szBuffer[0] = 0;
+        strOutputLong = szBuffer;
+    }
+
+    // Build the final string
+#if 0
+    strOutputShort = strOutputShort + szPrePend + szMessage;
+#endif
+    strOutputLong = strOutputLong + szPrePend + szMessage;
+
+    // Maybe print it in the console
+#if 0   // Printing to the console is not currently used for this class
+    if ( bToConsole )
+        g_pServerInterface->Printf ( "%s", strOutputShort.c_str () );
+#endif
+
+    // Maybe print it to the log file
+    if ( bToLogFile && m_pLogFile )
+    {
+        fprintf ( m_pLogFile, "%s", strOutputLong.c_str () );
+        fflush ( m_pLogFile );
     }
 }

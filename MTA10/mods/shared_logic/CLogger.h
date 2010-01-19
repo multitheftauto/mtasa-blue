@@ -32,6 +32,8 @@ public:
     static void         SetLogFile          ( const char* szLogFile );
 
 private:
+    static void         HandleLogPrint     ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile );
+
     static FILE*        m_pLogFile;
 };
 

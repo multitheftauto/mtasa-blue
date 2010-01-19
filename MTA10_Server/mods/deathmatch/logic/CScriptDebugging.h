@@ -45,7 +45,7 @@ public:
     inline void                     SetHTMLLogLevel                 ( unsigned int uiLevel ) { m_uiHtmlLogLevel = uiLevel; }
 
 private:
-    void                            LogString                       ( lua_State * luaVM, const char* szText, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
+    void                            LogString                       ( const char* szPrePend, lua_State * luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
 
     void                            PrintLog                        ( const char* szText );
     void                            Broadcast                       ( const CPacket& Packet, unsigned int uiMinimumDebugLevel );
