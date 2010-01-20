@@ -114,7 +114,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll_d.dll &quot;..\..\MTA10_Server\output\&quot;"
+				CommandLine="xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -221,7 +221,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;..\..\MTA10_Server\output\&quot;"
+				CommandLine="xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration
