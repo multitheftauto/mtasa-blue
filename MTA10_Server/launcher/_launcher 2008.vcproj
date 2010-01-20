@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../output/MTA Server_d.exe"
+				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -143,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../output/MTA Server.exe"
+				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
