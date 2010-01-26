@@ -53,10 +53,9 @@ void CColManager::DoHitDetection ( const CVector& vecLastPosition, const CVector
     {
         m_bIteratingList = true;
         // Call the hit detection event on all our shapes
-        vector < CColShape* > ::const_iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end (); iter++ )
+        for ( unsigned int i = 0 ; i < m_List.size () ; i++ )
         {
-            CColShape* pShape = *iter;
+            CColShape* pShape = m_List[i];
 
             // Not being deleted and enabled?
             if ( !pShape->IsBeingDeleted () && pShape->IsEnabled () )
