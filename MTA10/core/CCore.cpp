@@ -1324,7 +1324,7 @@ bool CCore::IsValidNick ( const char* szNick )
 {
     // Too long or too short?
     size_t sizeNick = strlen ( szNick );
-    if ( sizeNick > 0 && sizeNick <= 22 )
+    if ( sizeNick >= MIN_PLAYER_NICK_LENGTH && sizeNick <= MAX_PLAYER_NICK_LENGTH )
     {
         // Check each character
         for ( unsigned int i = 0; i < sizeNick; i++ )

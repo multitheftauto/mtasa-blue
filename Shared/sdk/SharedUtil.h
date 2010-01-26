@@ -24,6 +24,15 @@
             (buffer)[(count)-1] = 0; \
     }
 
+//
+// strncpy with null termination
+//
+#define STRNCPY( dest, source, count ) \
+    { \
+        strncpy( dest, source, (count)-1 ); \
+        (dest)[(count)-1] = 0; \
+    }
+
 #ifndef WIN32
     #define _vsnprintf vsnprintf
 #endif
