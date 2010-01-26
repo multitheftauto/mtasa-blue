@@ -645,7 +645,7 @@ bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool b
                 {
                     if ( !bCheckState || pBind->bHitState == bState )
                     {
-                        if ( !szArguments || ( szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                        if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
                         {
                             return true;
                         }
@@ -674,7 +674,7 @@ bool CKeyBinds::SetCommandActive ( const char* szKey, const char* szCommand, boo
                     {
                         if ( !checkHitState || ( pBind->bHitState == bState ) )
                         {
-                            if ( !szArguments || ( strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                            if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
                             {
                                 pBind->bActive = bActive;
                                 return true;
