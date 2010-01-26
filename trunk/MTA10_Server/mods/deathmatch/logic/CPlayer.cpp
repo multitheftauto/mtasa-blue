@@ -162,8 +162,9 @@ void CPlayer::Unlink ( void )
 
 void CPlayer::SetNick ( const char* szNick )
 {
+    assert ( sizeof ( m_szNick ) == MAX_NICK_LENGTH + 1 );
     // Copy the nick to us
-    strncpy ( m_szNick, szNick, MAX_NICK_LENGTH );
+    STRNCPY ( m_szNick, szNick, MAX_NICK_LENGTH + 1 );
 }
 
 

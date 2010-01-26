@@ -44,6 +44,10 @@ typedef unsigned long ElementID;
 #define SERVER_LIST_CLIENT_BROADCAST_STR    "MTA-CLIENT"
 #define SERVER_LIST_SERVER_BROADCAST_STR    "MTA-SERVER"
 
+// Defines the min/max size for the player nick for use in the core module
+#define MIN_PLAYER_NICK_LENGTH          1
+#define MAX_PLAYER_NICK_LENGTH          22
+
 // Windows Specific stuff
 #ifdef WIN32
 #define _DECLSPEC_EX extern "C" _declspec(dllexport) 

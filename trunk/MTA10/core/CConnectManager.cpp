@@ -253,6 +253,10 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 BitStream.Read ( usServerBitStreamVersion );    // This will silently fail for < 1.0.2 and leave the bitstream version at 0x01
                 CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
 
+                // Limit the nick length for servers that have a problem with max length nicks
+                if ( usServerBitStreamVersion < 0x06 )
+                    g_pConnectManager->m_strNick = g_pConnectManager->m_strNick.substr ( 0, MAX_PLAYER_NICK_LENGTH - 1 );
+
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 

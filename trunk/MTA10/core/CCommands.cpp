@@ -91,8 +91,17 @@ bool CCommands::Execute ( const char* szCommandLine )
 }
 
 
-bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool bHandleRemotely )
+bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, bool bHandleRemotely )
 {
+    // Copy szParametersIn so the contents can be changed
+    char* szParameters = NULL;
+    if ( szParametersIn )
+    {
+        size_t sizeParameters = strlen ( szParametersIn ) + 1;
+        szParameters = static_cast < char* > ( alloca ( sizeParameters ) );
+        memcpy ( szParameters, szParametersIn, sizeParameters );
+    }
+
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
     if ( !stricmp ( szCommand, "chatboxsay" ) )
@@ -160,11 +169,19 @@ bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool 
     }
 
     // HACK: if its a 'nick' command, save it here
-    if ( !stricmp ( szCommand, "nick" ) )
+    if ( !stricmp ( szCommand, "nick" ) && szParameters )
     {
         if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
         {
             CVARS_SET ( "nick", std::string ( szParameters ) );
+        }
+
+        if ( strlen ( szParameters ) >= MAX_PLAYER_NICK_LENGTH &&
+             CCore::GetSingleton ().GetNetwork () &&
+             CCore::GetSingleton ().GetNetwork ()->GetServerBitStreamVersion () < 0x06 )
+        {
+            // Limit the nick length for servers that have a problem with max length nicks
+            szParameters [ MAX_PLAYER_NICK_LENGTH - 1 ] = 0;             
         }
     }
 

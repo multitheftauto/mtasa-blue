@@ -310,8 +310,8 @@ CSettings::CSettings ( void )
     // Nick edit
     m_pEditNick = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabMultiplayer ) );
     m_pEditNick->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
-    m_pEditNick->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pEditNick->SetMaxLength ( 16 );
+    m_pEditNick->SetSize ( CVector2D ( 178.0f, 24.0f ) );
+    m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
 
     m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
     m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
@@ -321,7 +321,7 @@ CSettings::CSettings ( void )
     m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
 	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
     m_pComboConnection->GetPosition ( vecTemp, false );
-	m_pComboConnection->SetSize ( CVector2D ( 168.0f, 90.0f ) );
+	m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
     m_pComboConnection->SetReadOnly ( true );
     m_pComboConnection->AddItem ( "Lan" );
     m_pComboConnection->AddItem ( "DSL" );
