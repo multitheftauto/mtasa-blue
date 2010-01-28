@@ -483,18 +483,19 @@ bool CResourceManager::Exists ( CResource* pResource )
 
 unsigned short CResourceManager::GenerateID ( void )
 {
-	bool bMatch = false;
+    // Create a map of all used IDs
+    map < unsigned short, bool > idMap;
+	list < CResource* > ::iterator iter = m_resources.begin ();
+	for ( ; iter != m_resources.end (); iter++ )
+	{
+        idMap[ ( *iter )->GetID () ] = true;
+	}
+
+    // Find an unused ID
 	for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
 	{
-		list < CResource* > ::iterator iter = m_resources.begin ();
-		for ( ; iter != m_resources.end (); iter++ )
-		{
-			if ( ( *iter )->GetID () == i )
-                bMatch = true;
-
-		}
-		if ( !bMatch ) return i;
-		else bMatch = false;
+        if ( idMap.find ( i ) == idMap.end () )
+            return i;
 	}
 	return 0xFFFF;
 }
