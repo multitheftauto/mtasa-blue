@@ -27,7 +27,7 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
                                               1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 255, 0, 0,
                                               1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,
                                               1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,
-                                              3, 1, 255, 255, 255, 3, 255 };
+                                              3, 1, 255, 255, 255, 3, 255, 255 };
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -45,7 +45,7 @@ unsigned long g_ulVehicleAttributes [] = {
   8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
   0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
-  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
@@ -77,12 +77,14 @@ static eVehicleType gs_vehicleTypes [] = {
     VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_BIKE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_TRAIN,
     VEHICLE_TRAILER, VEHICLE_PLANE, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_TRAILER,
-    VEHICLE_NONE
+    VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_TRAILER
 };
 
 CVehicleManager::CVehicleManager ( void )
 {
+    assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
+    assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
+    assert ( NUMELMS ( gs_vehicleTypes ) == 212 );
     // Init
     m_bDontRemoveFromList = false;
 }

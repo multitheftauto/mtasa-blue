@@ -32,7 +32,7 @@ unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3,
                                        1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 255, 0, 0,             // 558->572
                                        1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
                                        1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
-                                       3, 1, 255, 255, 255, 3, 255 };                               // 605->611
+                                       3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -51,11 +51,13 @@ unsigned long g_ulVehicleAttributes [] = {
   8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
   0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
-  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
 {
+    assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
+    assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
