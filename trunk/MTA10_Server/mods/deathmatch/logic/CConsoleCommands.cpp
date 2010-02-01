@@ -432,9 +432,6 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                             _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: #EBDDB2%s", szNick, szArguments );
                             szEcho [MAX_CHATECHO_LENGTH-1] = '\0';
 
-                            // Log it in the console
-                            CLogger::LogPrintf ( "CHAT: %s: %s\n", szNick, szArguments );
-
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString ( szArguments );
@@ -442,6 +439,9 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                             bool bContinue = static_cast < CPlayer* > ( pClient )->CallEvent ( "onPlayerChat", Arguments );
                             if ( bContinue )
                             {
+                                // Log it in the console
+                                CLogger::LogPrintf ( "CHAT: %s: %s\n", szNick, szArguments );
+
 								unsigned char ucR = 0xFF, ucG = 0xFF, ucB = 0xFF;
 								CPlayer * pPlayer = static_cast < CPlayer* > ( pClient );
 								CTeam * pTeam = pPlayer->GetTeam ();
@@ -560,9 +560,6 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                             _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "(TEAM) %s: #EBDDB2%s", szNick, szArguments );
                             szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
 
-                            // Log it in the console
-                            CLogger::LogPrintf ( "TEAMCHAT: %s: %s\n", szNick, szArguments );
-
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString ( szArguments );
@@ -570,6 +567,9 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                             bool bContinue = static_cast < CPlayer* > ( pClient )->CallEvent ( "onPlayerChat", Arguments );
                             if ( bContinue )
                             {
+                                // Log it in the console
+                                CLogger::LogPrintf ( "TEAMCHAT: %s: %s\n", szNick, szArguments );
+
                                 unsigned char ucRed = 0xFF, ucGreen = 0xFF, ucBlue = 0xFF;
                                 pTeam->GetColor ( ucRed, ucGreen, ucBlue );
                                 // Broadcast to all the team members
@@ -971,9 +971,6 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
                     _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "* %s %s", szNick, szArguments );
                     szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
 
-                    // Log it in the console
-                    CLogger::LogPrintf ( "CHAT: %s\n", szEcho );
-
                     // Send the chat message and player pointer to the script IF the client is a player
                     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
                     {
@@ -983,6 +980,9 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
                         bool bContinue = static_cast < CPlayer* > ( pClient )->CallEvent ( "onPlayerChat", Arguments );
                         if ( bContinue )
                         {
+                            // Log it in the console
+                            CLogger::LogPrintf ( "CHAT: %s\n", szEcho );
+
                             // Broadcast the message to all clients
                             pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( szEcho, CHATCOLOR_ME ) );
                         }
