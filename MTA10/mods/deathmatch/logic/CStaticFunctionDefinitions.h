@@ -317,7 +317,7 @@ public:
 	static void					        GUISetPosition						( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
 	static void					        GUISetVisible						( CClientEntity& Element, bool bFlag );
 	static void					        GUISetAlpha							( CClientEntity& Element, float fAlpha );
-	static void					        GUIBringToFront						( CClientEntity& Element );
+	static bool					        GUIBringToFront						( CClientEntity& Element );
 	static void					        GUIMoveToBack						( CClientEntity& Element );
 
 	static void					        GUICheckBoxSetSelected				( CClientEntity& Element, bool bFlag );

@@ -921,7 +921,7 @@ void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
     }
 
     // Add it to the correct queue
-    if ( bPostGUI )
+    if ( bPostGUI && !CCore::GetSingleton ().IsMenuVisible() ) //Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back ( Item );
     else
         m_PreGUIQueue.push_back ( Item );
