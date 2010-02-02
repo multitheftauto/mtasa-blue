@@ -768,10 +768,11 @@ int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            CStaticFunctionDefinitions::GUIBringToFront ( *pEntity );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::GUIBringToFront ( *pEntity ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiBringToFront", "gui-element", 1 );
