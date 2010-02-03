@@ -714,16 +714,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
                     m_pCommunityLogin.SetVisible ( true );
                     return true;
                 }
-                // Get the nick from the config
-                std::string strNick;
-                CVARS_GET ( "nick", strNick );
-
-                // Valid nick?
-                if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
-                {
-                    CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
-                    return true;
-                }
+                
 
                 // Password buffer
                 char szPassword [48];
@@ -735,6 +726,17 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
                 if ( pServer->bPassworded && bSavedPasswords )
                 {
                     SetServerPassword ( strEndpoint, ( std::string )szPassword );
+                }
+
+                // Get the nick from the config
+                std::string strNick;
+                CVARS_GET ( "nick", strNick );
+
+                // Valid nick?
+                if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) || strNick == "Player" )
+                {
+                    m_pNickDialog.SetVisible ( true );
+                    return true;
                 }
                 
 
