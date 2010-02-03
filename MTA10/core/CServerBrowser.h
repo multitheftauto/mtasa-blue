@@ -32,7 +32,6 @@ class CServerBrowser;
 #include "CSingleton.h"
 #include "CFavouritesAddByIP.h"
 #include "CCommunityLogin.h"
-#include "CNickDialog.h"
 #include <ctime>
 
 
@@ -93,7 +92,6 @@ protected:
     // Classes
     CFavouritesAddByIP  m_pFavouritesAddByIP;
     CCommunityLogin     m_pCommunityLogin;
-    CNickDialog         m_pNickDialog;
   
     // Tab controls
     CGUITab*            m_pTab [ SERVER_BROWSER_TYPE_COUNT ];
