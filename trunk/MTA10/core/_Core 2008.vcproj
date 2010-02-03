@@ -493,10 +493,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CNickDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath="Core.cpp"
 				>
 			</File>
@@ -871,10 +867,6 @@
 			</File>
 			<File
 				RelativePath=".\CModuleLoader.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CNickDialog.h"
 				>
 			</File>
 			<File
