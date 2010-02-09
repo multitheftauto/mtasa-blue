@@ -14,6 +14,7 @@
 #include "StdInc.h"
 
 using std::list;
+using std::map;
 
 CClientGUIManager::CClientGUIManager ( void )
 {
