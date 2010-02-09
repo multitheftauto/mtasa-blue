@@ -347,12 +347,12 @@ public:
 	static inline void					GUIGridListRemoveColumn				( CClientGUIElement& GUIElement, unsigned int uiColumn )									{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveColumn ( uiColumn ); };
     static inline void					GUIGridListSetColumnWidth			( CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnWidth ( uiColumn, fWidth, bRelative ); };
 	static void					        GUIGridListSetScrollBars			( CClientEntity& Element, bool bH, bool bV );
-	static inline int					GUIGridListAddRow					( CClientGUIElement& GUIElement )															{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow (); };
+	static inline int					GUIGridListAddRow					( CClientGUIElement& GUIElement, bool bFast )															{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow ( bFast ); };
 	static inline int					GUIGridListInsertRowAfter			( CClientGUIElement& GUIElement, int iRow )												{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow ); };
 	static inline void					GUIGridListRemoveRow				( CClientGUIElement& GUIElement, int iRow )												{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveRow ( iRow ); };
 	static inline void					GUIGridListAutoSizeColumn			( CClientGUIElement& GUIElement, unsigned int uiColumn )									{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
 	static void					        GUIGridListClear					( CClientEntity& Element );
-	static inline void					GUIGridListSetItemText				( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection ); };
+	static inline void					GUIGridListSetItemText				( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber, bool bFast )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection, bFast ); };
 	static inline void					GUIGridListSetItemData				( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szData )				{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( iRow, iColumn, szData ); };
 	static void					        GUIGridListSetSelectionMode			( CClientEntity& Element, unsigned int uiMode );
     static inline void					GUIGridListSetSelectedItem			( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )						{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
