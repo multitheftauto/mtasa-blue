@@ -116,3 +116,34 @@ void CClientGUIManager::Remove ( CClientGUIElement* pGUIElement )
         m_Elements.remove ( pGUIElement );
     }
 }
+
+void CClientGUIManager::DoPulse ( void )
+{
+    FlushDeferedUpdates ();
+}
+
+void CClientGUIManager::DeferGridListUpdate ( CClientGUIElement *pGUIElement )
+{
+    ElementID ID = pGUIElement->GetID ();
+    if ( m_DeferedGridListUpdates.find ( ID ) == m_DeferedGridListUpdates.end () )
+        m_DeferedGridListUpdates[ ID ] = true;
+}
+
+void CClientGUIManager::FlushDeferedUpdates ()
+{
+    map < ElementID, bool >::iterator iter = m_DeferedGridListUpdates.begin ();
+    for ( ; iter != m_DeferedGridListUpdates.end () ; ++iter )
+    {
+        CClientEntity* pEntity = CElementIDs::GetElement ( iter->first );
+        if ( pEntity && !pEntity->IsBeingDeleted () && pEntity->GetType () == CCLIENTGUI )
+        {
+            CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( pEntity );
+            if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
+            {
+                CGUIGridList* pGUIGridList = static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () );
+                pGUIGridList->ForceUpdate ();
+            }
+        }
+    }
+    m_DeferedGridListUpdates.clear ();
+}
