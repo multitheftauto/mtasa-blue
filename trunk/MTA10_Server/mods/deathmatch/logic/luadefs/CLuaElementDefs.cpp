@@ -62,6 +62,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementAttached", CLuaElementDefs::isElementAttached );
     CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaElementDefs::getAttachedElements );
     CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaElementDefs::getElementAttachedTo );
+    CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaElementDefs::setElementAttachedOffsets );
 
     // Element data
     CLuaCFunctions::AddFunction ( "getElementData", CLuaElementDefs::getElementData );
