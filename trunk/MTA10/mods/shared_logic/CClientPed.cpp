@@ -2215,6 +2215,17 @@ void CClientPed::StreamedInPulse ( void )
         else
         {
             m_ulLastTimeAimed = 0;
+            // If we have the aim button pressed but aren't aiming, we're probably sprinting
+            // If we're sprinting with an MP5,Deagle,Fire Extinguisher,Spray can, we shouldnt be able to shoot 
+            // These weapons are weapons you can run with, but can't run with while aiming
+            // This fixes a weapon desync bug involving aiming and sprinting packets arriving simultaneously
+            eWeaponType iCurrentWeapon = GetCurrentWeaponType ();
+            if ( Current.RightShoulder1 != 0 && 
+                ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
+            {
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+            }
         }
 
         // Remember when we start the crouching if we're crouching.
