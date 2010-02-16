@@ -557,7 +557,7 @@ int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
                 m_pScriptDebugging->LogBadPointer ( luaVM, "triggerClientEvent", "element", iStartingArgument + 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "triggerClientEvent", "name", iStartingArgument );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "triggerClientEvent", "element", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "triggerClientEvent" );

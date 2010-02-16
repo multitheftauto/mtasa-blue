@@ -1694,10 +1694,14 @@ CPlayer* CStaticFunctionDefinitions::GetRandomPlayer ( void )
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
-            // This is the given index?
-            if ( i++ == uiRandom )
+            // Check status
+            if ( (*iter)->IsJoined () )
             {
-                return *iter;
+                // This is the given index?
+                if ( i++ == uiRandom )
+                {
+                    return *iter;
+                }
             }
         }
     }
