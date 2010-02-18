@@ -72,9 +72,6 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_pInput->SetVisible ( false );
     SetInputPrefix ( "Say: " );
 
-    // Set handlers
-    m_pManager->SetCharacterKeyHandler ( GUI_CALLBACK_KEY ( &CChat::CharacterKeyHandler, this ) );
-
     // Load cvars and position the GUI
     LoadCVars ();
     UpdateGUI ();
@@ -95,6 +92,11 @@ CChat::~CChat ( void )
         g_pChat = NULL;
 }
 
+void CChat::OnModLoad ( void )
+{
+    // Set handlers
+    m_pManager->SetCharacterKeyHandler ( INPUT_MOD, GUI_CALLBACK_KEY ( &CChat::CharacterKeyHandler, this ) );
+}
 
 void CChat::LoadCVars ( void )
 {

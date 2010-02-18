@@ -381,35 +381,16 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         // while already ingame: the mod module gets unloaded while its doubleclick handler is
         // still running.
 
-        bool bWasAlreadyFading = m_pMainMenu->IsFading ();
         m_pMainMenu->SetVisible ( bVisible );
-        
-        // Only allow the code below to be called once per menu visibility toggle
-        if ( bWasAlreadyFading )
-            return;
 
         CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
         if ( bVisible )
         {
-            m_ModMouseClickHandler = pGUI->GetMouseClickHandler ();
-            m_ModMouseDoubleClickHandler = pGUI->GetMouseDoubleClickHandler ();
-            m_ModMouseButtonDownHandler = pGUI->GetMouseButtonDownHandler ();
-            m_ModMouseButtonUpHandler = pGUI->GetMouseButtonUpHandler ();
-            pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, CCore::GetSingletonPtr () ) );
-            pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, CCore::GetSingletonPtr () ) );
-            pGUI->SetMouseButtonDownHandler ();
-            pGUI->SetMouseButtonUpHandler ();
+            pGUI->SelectInputHandlers ( INPUT_CORE );
         }
         else
         {
-            if ( m_ModMouseClickHandler )
-                pGUI->SetMouseClickHandler ( m_ModMouseClickHandler );
-            if ( m_ModMouseDoubleClickHandler )
-                pGUI->SetMouseDoubleClickHandler ( m_ModMouseDoubleClickHandler );
-            if ( m_ModMouseButtonDownHandler )
-                pGUI->SetMouseButtonDownHandler ( m_ModMouseButtonDownHandler );
-            if ( m_ModMouseButtonUpHandler )
-                pGUI->SetMouseButtonUpHandler ( m_ModMouseButtonUpHandler );
+            pGUI->SelectInputHandlers ( INPUT_MOD );
         }
     }
     else
@@ -984,11 +965,3 @@ void CLocalGUI::KeyDownHandler ( bool bHandled )
 	return;
 }
 
-
-// Called after MOD is unloaded
-void CLocalGUI::OnModUnload ( )
-{
-	// Clear invalid pointers
-    m_ModMouseClickHandler = GUI_CALLBACK_MOUSE ();
-    m_ModMouseDoubleClickHandler = GUI_CALLBACK_MOUSE ();
-}

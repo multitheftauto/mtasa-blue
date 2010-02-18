@@ -43,6 +43,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 	m_pMovedHandler = NULL;
 	m_pSizedHandler = NULL;
     */
+    m_Channel = INPUT_CORE;
 
 	// Create a GUI system and get the windowmanager
     m_pRenderer = new CEGUI::DirectX9Renderer ( pDevice, 0 );
@@ -417,7 +418,7 @@ void CGUI_Impl::GetUniqueName ( char* pBuf )
 
 bool CGUI_Impl::Event_CharacterKey ( const CEGUI::EventArgs& Args )
 {
-	if ( m_CharacterKeyHandler )
+	if ( m_CharacterKeyHandlers[ m_Channel ] )
 	{
 		const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
 		CGUIKeyEventArgs NewArgs;
@@ -431,7 +432,7 @@ bool CGUI_Impl::Event_CharacterKey ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
 		NewArgs.pWindow = pElement;
 
-		m_CharacterKeyHandler ( NewArgs );
+		m_CharacterKeyHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -677,7 +678,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 	}
 
 	// Call the callback if present
-	if ( m_KeyDownHandler )
+	if ( m_KeyDownHandlers[ m_Channel ] )
 	{
 		const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
 		CGUIKeyEventArgs NewArgs;
@@ -691,7 +692,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
 		NewArgs.pWindow = pElement;
 
-		m_KeyDownHandler ( NewArgs );
+		m_KeyDownHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -716,7 +717,7 @@ void CGUI_Impl::SetWorkingDirectory ( const char * szDir )
 
 bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseClickHandler )
+	if ( m_MouseClickHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -740,7 +741,7 @@ bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
 		NewArgs.pWindow = pElement;
 		
-		m_MouseClickHandler ( NewArgs );
+		m_MouseClickHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -748,7 +749,7 @@ bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseDoubleClickHandler )
+	if ( m_MouseDoubleClickHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -772,14 +773,14 @@ bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
 		NewArgs.pWindow = pElement;
 		
-		m_MouseDoubleClickHandler ( NewArgs );
+		m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
 
 bool CGUI_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& Args )
 {
-    if ( m_MouseButtonDownHandler )
+    if ( m_MouseButtonDownHandlers[ m_Channel ] )
     {
         const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
         CGUIMouseEventArgs NewArgs;
@@ -803,14 +804,14 @@ bool CGUI_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseButtonDownHandler ( NewArgs );
+        m_MouseButtonDownHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }
 
 bool CGUI_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& Args )
 {
-    if ( m_MouseButtonUpHandler )
+    if ( m_MouseButtonUpHandlers[ m_Channel ] )
     {
         const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
         CGUIMouseEventArgs NewArgs;
@@ -834,14 +835,14 @@ bool CGUI_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseButtonUpHandler ( NewArgs );
+        m_MouseButtonUpHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }
 
 bool CGUI_Impl::Event_MouseWheel ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseWheelHandler )
+	if ( m_MouseWheelHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -865,7 +866,7 @@ bool CGUI_Impl::Event_MouseWheel ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
 		NewArgs.pWindow = pElement;
 		
-		m_MouseWheelHandler ( NewArgs );
+		m_MouseWheelHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -873,7 +874,7 @@ bool CGUI_Impl::Event_MouseWheel ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_MouseMove ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseMoveHandler )
+	if ( m_MouseMoveHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -897,7 +898,7 @@ bool CGUI_Impl::Event_MouseMove ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
 		NewArgs.pWindow = pElement;
 		
-		m_MouseMoveHandler ( NewArgs );
+		m_MouseMoveHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -905,7 +906,7 @@ bool CGUI_Impl::Event_MouseMove ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_MouseEnter ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseEnterHandler )
+	if ( m_MouseEnterHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -929,7 +930,7 @@ bool CGUI_Impl::Event_MouseEnter ( const CEGUI::EventArgs& Args )
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
 		NewArgs.pWindow = pElement;
 		
-		m_MouseEnterHandler ( NewArgs );
+		m_MouseEnterHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -937,7 +938,7 @@ bool CGUI_Impl::Event_MouseEnter ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_MouseLeave ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseLeaveHandler )
+	if ( m_MouseLeaveHandlers[ m_Channel ] )
 	{
 		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
 		CGUIMouseEventArgs NewArgs;
@@ -969,7 +970,7 @@ bool CGUI_Impl::Event_MouseLeave ( const CEGUI::EventArgs& Args )
 		
 		NewArgs.pWindow = pElement;
 		
-		m_MouseLeaveHandler ( NewArgs );
+		m_MouseLeaveHandlers[ m_Channel ] ( NewArgs );
 	}
 	return true;
 }
@@ -977,14 +978,14 @@ bool CGUI_Impl::Event_MouseLeave ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_Moved ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MovedHandler )
+	if ( m_MovedHandlers[ m_Channel ] )
 	{
 		const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
 
 		// get the CGUIElement
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
 		
-		m_MovedHandler ( pElement );
+		m_MovedHandlers[ m_Channel ] ( pElement );
 	}
 	return true;
 }
@@ -992,14 +993,14 @@ bool CGUI_Impl::Event_Moved ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_Sized ( const CEGUI::EventArgs& Args )
 {
-	if ( m_SizedHandler )
+	if ( m_SizedHandlers[ m_Channel ] )
 	{
 		const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
 
 		// get the CGUIElement
 		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
 		
-		m_SizedHandler ( pElement );
+		m_SizedHandlers[ m_Channel ] ( pElement );
 	}
 	return true;
 }
@@ -1257,4 +1258,21 @@ void CGUI_Impl::CleanDeadPool ()
 {
     if ( m_pWindowManager )
         m_pWindowManager->cleanDeadPool ();
+}
+
+void CGUI_Impl::ClearInputHandlers ( eInputChannel channel )
+{
+    CHECK_CHANNEL ( channel );
+    m_CharacterKeyHandlers[ channel ]       = GUI_CALLBACK_KEY ();
+    m_KeyDownHandlers[ channel ]            = GUI_CALLBACK_KEY ();
+    m_MouseClickHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
+    m_MouseDoubleClickHandlers[ channel ]   = GUI_CALLBACK_MOUSE ();
+    m_MouseButtonDownHandlers[ channel ]    = GUI_CALLBACK_MOUSE ();
+    m_MouseButtonUpHandlers[ channel ]      = GUI_CALLBACK_MOUSE ();
+    m_MouseMoveHandlers[ channel ]          = GUI_CALLBACK_MOUSE ();
+    m_MouseEnterHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
+    m_MouseLeaveHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
+    m_MouseWheelHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
+    m_MovedHandlers[ channel ]              = GUI_CALLBACK ();
+    m_SizedHandlers[ channel ]              = GUI_CALLBACK ();
 }
