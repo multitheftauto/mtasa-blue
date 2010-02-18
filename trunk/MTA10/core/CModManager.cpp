@@ -84,7 +84,6 @@ void CModManager::RequestUnload ( void )
 {
     RequestLoad ( NULL, NULL );
 	CCore::GetSingletonPtr () -> OnModUnload ();
-    CLocalGUI::GetSingleton ().OnModUnload ();
 }
 
 
@@ -174,6 +173,9 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     // HACK: make the console input active if its visible
     if ( CLocalGUI::GetSingleton ().IsConsoleVisible () )
         CLocalGUI::GetSingleton ().GetConsole ()->ActivateInput ();
+
+    // Tell chat to start handling input
+    CLocalGUI::GetSingleton ().GetChat ()->OnModLoad ();
  
     // Return the interface
     return m_pClientBase;
@@ -201,7 +203,6 @@ void CModManager::Unload ( void )
 
         // Call the on mod unload func
         CCore::GetSingletonPtr () -> OnModUnload ();
-        CLocalGUI::GetSingleton ().OnModUnload ();
 
         // Reset chatbox status (so it won't prevent further input), and clear it
         /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );

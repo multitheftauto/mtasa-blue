@@ -224,8 +224,7 @@ CCore::~CCore ( void )
     DestroyGame ();
 
 	// Remove global events
-    g_pCore->GetGUI ()->SetMouseClickHandler ( );
-	g_pCore->GetGUI ()->SetMouseDoubleClickHandler ( );
+    g_pCore->m_pGUI->ClearInputHandlers( INPUT_CORE );
 
     // Remove input hook
 	CMessageLoopHook::GetSingleton ( ).RemoveHook ( );
@@ -1163,8 +1162,9 @@ void CCore::DoPostFramePulse ( )
         ApplyGameSettings ();
         ApplyMenuSettings ();
 
-        m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-        m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+        m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
+        m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
+        m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
     }
@@ -1233,12 +1233,9 @@ void CCore::DoPostFramePulse ( )
 void CCore::OnModUnload ( )
 {
     // reattach the global event
-    m_pGUI->SetMouseClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
-    m_pGUI->SetMouseDoubleClickHandler ( GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
-
+    m_pGUI->SelectInputHandlers( INPUT_CORE );
     // remove unused events
-    m_pGUI->SetMouseButtonDownHandler ();
-    m_pGUI->SetMouseButtonUpHandler ();
+    m_pGUI->ClearInputHandlers( INPUT_MOD );
 }
 
 

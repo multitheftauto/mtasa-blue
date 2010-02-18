@@ -109,8 +109,6 @@ public:
 	int					GetVisibleWindows			( );
 	void				SetVisibleWindows			( bool bEnable );
 
-    void                OnModUnload                 ( void );
-
 private:
     void                    UpdateCursor                ( void );
 
@@ -136,11 +134,6 @@ private:
     bool                    m_bChatboxVisible;
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
-
-    GUI_CALLBACK_MOUSE      m_ModMouseClickHandler;
-    GUI_CALLBACK_MOUSE      m_ModMouseDoubleClickHandler;
-    GUI_CALLBACK_MOUSE      m_ModMouseButtonDownHandler;
-    GUI_CALLBACK_MOUSE      m_ModMouseButtonUpHandler;
 };
 
 #endif

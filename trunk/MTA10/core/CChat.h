@@ -167,6 +167,7 @@ public:
     void                        ScrollDown              ( void );
 
     void                        SetChatFont             ( eChatFont Font );
+    void                        OnModLoad               ( void );
 
 private:
     void                        LoadCVars               ( void );

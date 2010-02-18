@@ -58,6 +58,15 @@ enum CMessageBoxFlag
     MB_ICON_ERROR = 128,
 };
 
+// Input handler switcher
+enum eInputChannel
+{ 
+    INPUT_CORE = 0,
+    INPUT_MOD = 1,
+    INPUT_CHANNEL_COUNT = 2,
+};
+#define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
+
 class CGUI
 {
 public:
@@ -139,44 +148,21 @@ public:
 
 	virtual void				SetWorkingDirectory		( const char * szDir ) = 0;
 
-   	virtual const GUI_CALLBACK_KEY& 	GetCharacterKeyHandler		( void ) = 0;
-	virtual const GUI_CALLBACK_KEY&		GetKeyDownHandler			( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseClickHandler		( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseDoubleClickHandler	( void ) = 0;
-    virtual const GUI_CALLBACK_MOUSE&	GetMouseButtonDownHandler	( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseButtonUpHandler		( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseMoveHandler			( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseEnterHandler		( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseLeaveHandler		( void ) = 0;
-	virtual const GUI_CALLBACK_MOUSE&	GetMouseWheelHandler		( void ) = 0;
-	virtual const GUI_CALLBACK&			GetMovedHandler				( void ) = 0;
-	virtual const GUI_CALLBACK&			GetSizedHandler				( void ) = 0;
+    virtual void                SetCharacterKeyHandler      ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;
+    virtual void                SetKeyDownHandler           ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;
+    virtual void                SetMouseClickHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseDoubleClickHandler  ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseButtonDownHandler   ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseButtonUpHandler     ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseMoveHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseEnterHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseLeaveHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMouseWheelHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
+    virtual void                SetMovedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
+    virtual void                SetSizedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
 
-	virtual void				SetCharacterKeyHandler		( void ) = 0;
-	virtual void				SetKeyDownHandler			( void ) = 0;
-	virtual void				SetMouseClickHandler		( void ) = 0;
-	virtual void				SetMouseDoubleClickHandler	( void ) = 0;
-	virtual void				SetMouseButtonDownHandler	( void ) = 0;
-	virtual void				SetMouseButtonUpHandler		( void ) = 0;
-	virtual void				SetMouseMoveHandler			( void ) = 0;
-	virtual void				SetMouseEnterHandler		( void ) = 0;
-	virtual void				SetMouseLeaveHandler		( void ) = 0;
-	virtual void				SetMouseWheelHandler		( void ) = 0;
-	virtual void				SetMovedHandler				( void ) = 0;
-	virtual void				SetSizedHandler				( void ) = 0;
-
-	virtual void				SetCharacterKeyHandler		( const GUI_CALLBACK_KEY & Callback ) = 0;
-	virtual void				SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback ) = 0;
-	virtual void				SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseButtonDownHandler	( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseButtonUpHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMouseWheelHandler		( const GUI_CALLBACK_MOUSE & Callback ) = 0;
-	virtual void				SetMovedHandler				( const GUI_CALLBACK & Callback ) = 0;
-	virtual void				SetSizedHandler				( const GUI_CALLBACK & Callback ) = 0;
+    virtual void                SelectInputHandlers         ( eInputChannel channel ) = 0;
+    virtual void                ClearInputHandlers          ( eInputChannel channel ) = 0;
 
     virtual bool                IsTransferBoxVisible        ( void ) = 0;
     virtual void                SetTransferBoxVisible       ( bool bVisible ) = 0;

@@ -157,44 +157,21 @@ public:
 	void							SetWorkingDirectory			( const char * szDir );
 	inline const char*				GetWorkingDirectory			( void )	{ return const_cast < const char* > ( m_szWorkingDirectory ); }
 
-   	const GUI_CALLBACK_KEY&			GetCharacterKeyHandler		( void )									{ return m_CharacterKeyHandler; }
-	const GUI_CALLBACK_KEY&			GetKeyDownHandler			( void )									{ return m_KeyDownHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseClickHandler		( void )									{ return m_MouseClickHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseDoubleClickHandler	( void )									{ return m_MouseDoubleClickHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseButtonDownHandler	( void )									{ return m_MouseButtonDownHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseButtonUpHandler		( void )									{ return m_MouseButtonUpHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseMoveHandler			( void )									{ return m_MouseMoveHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseEnterHandler		( void )									{ return m_MouseEnterHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseLeaveHandler		( void )									{ return m_MouseLeaveHandler; }
-	const GUI_CALLBACK_MOUSE&		GetMouseWheelHandler		( void )									{ return m_MouseWheelHandler; }
-	const GUI_CALLBACK&				GetMovedHandler				( void )									{ return m_MovedHandler; }
-	const GUI_CALLBACK&				GetSizedHandler				( void )									{ return m_SizedHandler; }
+    void                            SetCharacterKeyHandler       ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_CharacterKeyHandlers[ channel ] = Callback; }
+    void                            SetKeyDownHandler            ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_KeyDownHandlers[ channel ] = Callback; }
+    void                            SetMouseClickHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseClickHandlers[ channel ] = Callback; }
+    void                            SetMouseDoubleClickHandler   ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseDoubleClickHandlers[ channel ] = Callback; }
+    void                            SetMouseButtonDownHandler    ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseButtonDownHandlers[ channel ] = Callback; }
+    void                            SetMouseButtonUpHandler      ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseButtonUpHandlers[ channel ] = Callback; }
+    void                            SetMouseMoveHandler          ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseMoveHandlers[ channel ] = Callback; }
+    void                            SetMouseEnterHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseEnterHandlers[ channel ] = Callback; }
+    void                            SetMouseLeaveHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseLeaveHandlers[ channel ] = Callback; }
+    void                            SetMouseWheelHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseWheelHandlers[ channel ] = Callback; }
+    void                            SetMovedHandler              ( eInputChannel channel, const GUI_CALLBACK & Callback )        { CHECK_CHANNEL ( channel ); m_MovedHandlers[ channel ] = Callback; }
+    void                            SetSizedHandler              ( eInputChannel channel, const GUI_CALLBACK & Callback )        { CHECK_CHANNEL ( channel ); m_SizedHandlers[ channel ] = Callback; }
 
-	void							SetCharacterKeyHandler		( void )									{ m_CharacterKeyHandler = GUI_CALLBACK_KEY (); }
-	void							SetKeyDownHandler			( void )									{ m_KeyDownHandler = GUI_CALLBACK_KEY (); }
-	void							SetMouseClickHandler		( void )									{ m_MouseClickHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseDoubleClickHandler	( void )									{ m_MouseDoubleClickHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseButtonDownHandler	( void )									{ m_MouseButtonDownHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseButtonUpHandler		( void )									{ m_MouseButtonUpHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseMoveHandler			( void )									{ m_MouseMoveHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseEnterHandler		( void )									{ m_MouseEnterHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseLeaveHandler		( void )									{ m_MouseLeaveHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMouseWheelHandler		( void )									{ m_MouseWheelHandler = GUI_CALLBACK_MOUSE (); }
-	void							SetMovedHandler				( void )									{ m_MovedHandler = GUI_CALLBACK (); }
-	void							SetSizedHandler				( void )									{ m_SizedHandler = GUI_CALLBACK (); }
-
-    void							SetCharacterKeyHandler		( const GUI_CALLBACK_KEY & Callback )       { m_CharacterKeyHandler = Callback; }
-	void							SetKeyDownHandler			( const GUI_CALLBACK_KEY & Callback )		{ m_KeyDownHandler = Callback; }
-	void							SetMouseClickHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseClickHandler = Callback; }
-	void							SetMouseDoubleClickHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseDoubleClickHandler = Callback; }
-	void							SetMouseButtonDownHandler	( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseButtonDownHandler = Callback; }
-	void							SetMouseButtonUpHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseButtonUpHandler = Callback; }
-	void							SetMouseMoveHandler			( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseMoveHandler = Callback; }
-	void							SetMouseEnterHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseEnterHandler = Callback; }
-	void							SetMouseLeaveHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseLeaveHandler = Callback; }
-	void							SetMouseWheelHandler		( const GUI_CALLBACK_MOUSE & Callback )		{ m_MouseWheelHandler = Callback; }
-	void							SetMovedHandler				( const GUI_CALLBACK & Callback )			{ m_MovedHandler = Callback; }
-	void							SetSizedHandler				( const GUI_CALLBACK & Callback )			{ m_SizedHandler = Callback; }
+    void                            SelectInputHandlers          ( eInputChannel channel )                                       { CHECK_CHANNEL ( channel ); m_Channel = channel; }
+    void                            ClearInputHandlers           ( eInputChannel channel );
 
     bool                            IsTransferBoxVisible        ( void )                                    { return m_bTransferBoxVisible; };
     void                            SetTransferBoxVisible       ( bool bVisible )                           { m_bTransferBoxVisible = bVisible; };
@@ -259,18 +236,20 @@ private:
 
 	bool							m_bSwitchGUIInput;
 
-	GUI_CALLBACK_KEY                m_CharacterKeyHandler;
-    GUI_CALLBACK_KEY                m_KeyDownHandler;
-	GUI_CALLBACK_MOUSE              m_MouseClickHandler;
-	GUI_CALLBACK_MOUSE              m_MouseDoubleClickHandler;
-    GUI_CALLBACK_MOUSE              m_MouseButtonDownHandler;
-    GUI_CALLBACK_MOUSE              m_MouseButtonUpHandler;
-	GUI_CALLBACK_MOUSE				m_MouseMoveHandler;
-	GUI_CALLBACK_MOUSE				m_MouseEnterHandler;
-	GUI_CALLBACK_MOUSE  			m_MouseLeaveHandler;
-    GUI_CALLBACK_MOUSE				m_MouseWheelHandler;
-	GUI_CALLBACK					m_MovedHandler;
-	GUI_CALLBACK					m_SizedHandler;
+    GUI_CALLBACK_KEY                m_CharacterKeyHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_KEY                m_KeyDownHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseClickHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseDoubleClickHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseButtonDownHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseButtonUpHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseMoveHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseEnterHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseLeaveHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_MOUSE              m_MouseWheelHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK                    m_MovedHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK                    m_SizedHandlers[ INPUT_CHANNEL_COUNT ];
+
+    eInputChannel                   m_Channel;
 
 	char							m_szWorkingDirectory [ MAX_PATH + 1 ];
 

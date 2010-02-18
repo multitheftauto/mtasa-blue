@@ -135,17 +135,18 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
     // Override CGUI's global events
-    g_pCore->GetGUI ()->SetKeyDownHandler           ( GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
-    g_pCore->GetGUI ()->SetMouseClickHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
-    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseDoubleClick, this ) );
-    g_pCore->GetGUI ()->SetMouseButtonDownHandler   ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonDown, this ) );
-    g_pCore->GetGUI ()->SetMouseButtonUpHandler     ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonUp, this ) );
-    g_pCore->GetGUI ()->SetMouseMoveHandler         ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseMove, this ) );
-    g_pCore->GetGUI ()->SetMouseEnterHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseEnter, this ) );
-    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseLeave, this ) );
-    g_pCore->GetGUI ()->SetMouseWheelHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseWheel, this ) );
-    g_pCore->GetGUI ()->SetMovedHandler             ( GUI_CALLBACK ( &CClientGame::OnMove, this ) );
-    g_pCore->GetGUI ()->SetSizedHandler             ( GUI_CALLBACK ( &CClientGame::OnSize, this ) );
+    g_pCore->GetGUI ()->SetKeyDownHandler           ( INPUT_MOD, GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
+    g_pCore->GetGUI ()->SetMouseClickHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
+    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseDoubleClick, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonDownHandler   ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonDown, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonUpHandler     ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonUp, this ) );
+    g_pCore->GetGUI ()->SetMouseMoveHandler         ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseMove, this ) );
+    g_pCore->GetGUI ()->SetMouseEnterHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseEnter, this ) );
+    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseLeave, this ) );
+    g_pCore->GetGUI ()->SetMouseWheelHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseWheel, this ) );
+    g_pCore->GetGUI ()->SetMovedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnMove, this ) );
+    g_pCore->GetGUI ()->SetSizedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnSize, this ) );
+    g_pCore->GetGUI ()->SelectInputHandlers         ( INPUT_MOD );
 
     // Startup "entities from root" optimization for getElementsByType
     CClientEntity::StartupEntitiesFromRoot ();
@@ -306,15 +307,7 @@ CClientGame::~CClientGame ( void )
 	g_pCore->GetGUI ()->SetGUIInputEnabled ( false );
 
     // Reset CGUI's global events
-    g_pCore->GetGUI ()->SetKeyDownHandler           ( );
-    g_pCore->GetGUI ()->SetMouseClickHandler        ( );
-    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( );
-    g_pCore->GetGUI ()->SetMouseMoveHandler         ( );
-    g_pCore->GetGUI ()->SetMouseEnterHandler        ( );
-    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( );
-    g_pCore->GetGUI ()->SetMouseWheelHandler        ( );
-    g_pCore->GetGUI ()->SetMovedHandler             ( );
-    g_pCore->GetGUI ()->SetSizedHandler             ( );
+    g_pCore->GetGUI ()->ClearInputHandlers ( INPUT_MOD );
 
     // Destroy mimics
     #ifdef MTA_DEBUG
