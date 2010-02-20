@@ -19,6 +19,16 @@
 
 extern CGame* g_pGame;
 
+// Helper function
+static string GetAdminNameForLog ( CClient* pClient )
+{
+    string strName = pClient->GetNick ();
+    string strAccountName = pClient->GetAccount () ? pClient->GetAccount ()->GetName () : "no account";
+    if ( strName == strAccountName )
+        return strName;
+    return SString ( "%s(%s)", strName.c_str (), strAccountName.c_str () );
+}
+
 bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CClient* pClient, CClient* pEchoClient )
 {
     char szBuffer[256];
@@ -182,7 +192,7 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
         if ( resource )
         {
 			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "start: Requested by %s\n", pClient->GetNick () );
+				CLogger::LogPrintf ( "start: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
@@ -222,7 +232,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
         if ( resource )
         {
 			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "restart: Requested by %s\n", pClient->GetNick () );
+				CLogger::LogPrintf ( "restart: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
@@ -297,7 +307,7 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
         if ( resource )
         {
 			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "stop: Requested by %s\n", pClient->GetNick () );
+				CLogger::LogPrintf ( "stop: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
@@ -1218,6 +1228,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                             szMessage[127] = '\0';
 
                             pEchoClient->SendEcho ( szMessage );
+                            CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
                             return true;
                         }
                         else
@@ -1228,7 +1239,8 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                     else
                     {
                         pEchoClient->SendEcho ( "chgmypass: Bad old password" );
-                    }
+                        CLogger::LogPrintf ( "ACCOUNTS: %s failed to change their account password", GetAdminNameForLog ( pClient ).c_str () );
+                   }
                 }
                 else
                 {
@@ -1294,7 +1306,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     pClient->SendEcho ( szMessage );
 
                     // Tell the console
-                    CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", pClient->GetNick (), szNick, szPassword );
+                    CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
                     return true;
                 }
                 else
@@ -1359,7 +1371,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
             pEchoClient->SendEcho ( szMessage );
 
             // Tell the console
-            CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", pClient->GetNick (), szArguments );
+            CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
 
             // Delete it
             delete pAccount;
@@ -1415,7 +1427,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 pEchoClient->SendEcho ( szMessage );
 
                 // Tell the console
-                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", pClient->GetNick (), szNick, szPassword );
+                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
                 return true;
             }
             else
@@ -1450,12 +1462,12 @@ bool CConsoleCommands::Shutdown ( CConsole* pConsole, const char* szArguments, C
         szBuffer [255] = 0;
 
         // Output the action + reason to the console
-        CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", pClient->GetNick (), szBuffer );
+        CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", GetAdminNameForLog ( pClient ).c_str (), szBuffer );
     }
     else
     {
         // Output the action to the console
-        CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (No reason specified)\n", pClient->GetNick () );
+        CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (No reason specified)\n", GetAdminNameForLog ( pClient ).c_str () );
     }
 
     // Shut the server down asap
@@ -1493,7 +1505,7 @@ bool CConsoleCommands::AExec ( CConsole* pConsole, const char* szArguments, CCli
                 if ( pPlayer && pPlayer->IsJoined () )
                 {
                     // Tell the console
-                    CLogger::LogPrintf ( "%s used aexec to make %s do '%s'\n", pClient->GetNick (), pPlayer->GetNick (), szCommand );
+                    CLogger::LogPrintf ( "%s used aexec to make %s do '%s'\n", GetAdminNameForLog ( pClient ).c_str (), pPlayer->GetNick (), szCommand );
 
                     // Execute the command under the player's nick
                     return pConsole->HandleInput ( szCommand, pPlayer, pEchoClient );
@@ -1685,7 +1697,7 @@ bool CConsoleCommands::DebugScript ( CConsole* pConsole, const char* szArguments
 
                     // Tell the player and the console
                     pEchoClient->SendEcho ( SString ( "debugscript: Your debug mode was set to %i", iLevel ) );
-                    CLogger::LogPrintf ( "SCRIPT: %s set his script debug mode to %i\n", pClient->GetNick (), iLevel );
+                    CLogger::LogPrintf ( "SCRIPT: %s set his script debug mode to %i\n", GetAdminNameForLog ( pClient ).c_str (), iLevel );
 
                     // Enable/Disable their debugger
                     if ( iLevel == 0 )
@@ -1794,7 +1806,7 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
     if ( szArguments && szArguments[0] )
 	{
 		if ( pClient->GetNick () )
-			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
+			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
 		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
@@ -1817,7 +1829,7 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
     if ( szArguments && szArguments[0] )
 	{
 		if ( pClient->GetNick () )
-			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
+			CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
 		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
