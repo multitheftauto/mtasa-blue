@@ -13,6 +13,14 @@
 
 #include "StdInc.h"
 
+// Helper function
+static const char* GetResourceName ( lua_State* luaVM )
+{
+    CLuaMain * luaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    return luaMain ? luaMain->GetScriptNamePointer () : "";
+}
+
+
 void CLuaACLDefs::LoadFunctions ( void )
 {
     CLuaCFunctions::AddFunction ( "aclReload", CLuaACLDefs::aclReload );
@@ -86,6 +94,7 @@ int CLuaACLDefs::aclCreate ( lua_State* luaVM )
 	    {
             // Create a new ACL with that name
             pACL = m_pACLManager->AddACL ( szACLName );
+            CLogger::LogPrintf ( "ACL: %s: ACL '%s' created\n", GetResourceName ( luaVM ), pACL->GetName () );
 
             // Return the created ACL
             lua_pushacl ( luaVM, pACL );
@@ -110,6 +119,7 @@ int CLuaACLDefs::aclDestroy ( lua_State* luaVM )
         if ( pACL )
         {
             // Delete it
+            CLogger::LogPrintf ( "ACL: %s: ACL '%s' deleted\n", GetResourceName ( luaVM ), pACL->GetName () );
             m_pACLManager->DeleteACL ( pACL );
 
             // Return true
@@ -299,6 +309,8 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
 			if ( pACLRight )
 			{
                 // Set the new access right
+                if ( pACLRight->GetRightAccess () != bAccess )
+                    CLogger::LogPrintf ( "ACL: %s: Right '%s' changed to %s in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
                 pACLRight->SetRightAccess ( bAccess );
                 lua_pushboolean ( luaVM, true );
 			    return 1;
@@ -309,6 +321,7 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
 			if ( pACLRight )
 			{
                 // Return success
+                CLogger::LogPrintf ( "ACL: %s: Right '%s' %s added in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
 				lua_pushboolean ( luaVM, true );
 				return 1;
 			}
@@ -429,8 +442,11 @@ int CLuaACLDefs::aclRemoveRight ( lua_State* luaVM )
 			}
 
             // Try removing the right
+			CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
+            bool bAccess = pACLRight && pACLRight->GetRightAccess ();
 			if ( pACL->RemoveRight ( szRightAftedDot, eType ) )
 			{
+                CLogger::LogPrintf ( "ACL: %s: Right '%s' %s removed from ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
                 // Return success
 				lua_pushboolean ( luaVM, true );
 				return 1;
@@ -459,6 +475,7 @@ int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
 		{
             // Create the group
             pGroup = m_pACLManager->AddGroup ( szGroup );
+            CLogger::LogPrintf ( "ACL: %s: Group '%s' created\n", GetResourceName ( luaVM ), pGroup->GetGroupName () );
 
             // And return it
             lua_pushaclgroup ( luaVM, pGroup );
@@ -485,6 +502,7 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
         if ( pGroup )
         {
             // Delete it
+            CLogger::LogPrintf ( "ACL: %s: Group '%s' deleted\n", GetResourceName ( luaVM ), pGroup->GetGroupName () );
             m_pACLManager->DeleteGroup ( pGroup );
 
             // Return success
@@ -584,6 +602,7 @@ int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
         {
             // Add the ACL to the group
             pGroup->AddACL ( pACL );
+            CLogger::LogPrintf ( "ACL: %s: ACL '%s' added to group '%s'\n", GetResourceName ( luaVM ), pACL->GetName (), pGroup->GetGroupName () );
 
             // Return success
             lua_pushboolean ( luaVM, true );
@@ -647,6 +666,7 @@ int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
         {
             // Add the ACL to the group
             pGroup->RemoveACL ( pACL );
+            CLogger::LogPrintf ( "ACL: %s: ACL '%s' removed from group '%s'\n", GetResourceName ( luaVM ), pACL->GetName (), pGroup->GetGroupName () );
 
             // Return success
             lua_pushboolean ( luaVM, true );
@@ -698,6 +718,7 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
             {
                 // Set it
                 pGroup->AddObject ( szObjectAfterDot, eType );
+                CLogger::LogPrintf ( "ACL: %s: Object '%s' added to group '%s'\n", GetResourceName ( luaVM ), szObject, pGroup->GetGroupName () );
 
                 // Return success
                 lua_pushboolean ( luaVM, true );
@@ -799,6 +820,7 @@ int CLuaACLDefs::aclGroupRemoveObject ( lua_State* luaVM )
             if ( pGroup->RemoveObject ( szObjectAfterDot, eType ) )
             {
                 // Return success
+                CLogger::LogPrintf ( "ACL: %s: Object '%s' removed from group '%s'\n", GetResourceName ( luaVM ), szObject, pGroup->GetGroupName () );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
