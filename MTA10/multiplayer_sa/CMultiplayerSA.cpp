@@ -1014,6 +1014,9 @@ void CMultiplayerSA::InitHooks()
 
     // Allow all screen aspect ratios
     *(WORD *)0x745BC9 = 0x9090;
+
+    // Allow all screen aspect ratios in multi-monitor dialog
+    *(WORD *)0x7459E1 = 0x9090;
 }
 
 
