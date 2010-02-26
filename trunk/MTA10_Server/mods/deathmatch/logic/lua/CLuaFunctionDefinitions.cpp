@@ -823,7 +823,7 @@ int CLuaFunctionDefinitions::IsPedDoingGangDriveby ( lua_State* luaVM )
             bool bDriveby;
             if ( CStaticFunctionDefinitions::IsPedDoingGangDriveby ( pPed, bDriveby ) )
             {
-                lua_pushnumber ( luaVM, bDriveby );
+                lua_pushboolean ( luaVM, bDriveby );
                 return 1;
             }
         }
