@@ -833,7 +833,7 @@ int CLuaFunctionDefinitions::IsPedDoingGangDriveby ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "isPedDoingGangDriveby" );
 
-    lua_pushnumber ( luaVM, false );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
