@@ -2810,9 +2810,10 @@ bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, float f
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
 		Object.SetScale ( fScale );
+		return true;
     }
 
-    return true;
+	return false;
 }
 
 
@@ -2824,9 +2825,10 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
 		Object.SetStatic ( bStatic );
+		return true;
     }
 
-    return true;
+	return false;
 }
 
 
