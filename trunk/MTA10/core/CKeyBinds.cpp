@@ -216,6 +216,27 @@ SBindableGTAControl g_bcControls[] =
     { "", (eControllerAction)0, (eControlType)0, false, false }
 };
 
+SDefaultCommandBind g_dcbDefaultCommands[] = 
+{ 
+    { "g",       true, "enter_passenger",  NULL },
+    { "F12",     true, "screenshot",       NULL },
+    { "t",       true, "chatbox",          "chatboxsay" },
+    { "y",       true, "chatbox",          "teamsay 255 0 0" },
+    { "F11",     true, "radar",            "-1" },
+    { "num_add", true, "radar_zoom_in",    NULL },
+    { "num_sub", true, "radar_zoom_out",   NULL },
+    { "num_8",   true, "radar_move_north", NULL },
+    { "num_2",   true, "radar_move_south", NULL },
+    { "num_6",   true, "radar_move_east",  NULL },
+    { "num_4",   true, "radar_move_west",  NULL },
+    { "num_0",   true, "radar_attach",     NULL },
+    
+    { "pgup",    true, "chatscrollup",     NULL },
+    { "pgdn",    true, "chatscrolldown",   NULL },
+    { "pgup",    true, "debugscrollup",    NULL },
+    { "pgdn",    true, "debugscrolldown",  NULL }
+};
+
 // HACK: our current shift key states
 bool bPreLeftShift = false, bPreRightShift = false;
 
@@ -2348,7 +2369,7 @@ void CKeyBinds::LoadDefaultBinds ( void )
     Clear ();
     
 	LoadControlsFromGTA ();
-    LoadDefaultCommands ();
+    LoadDefaultCommands ( true );
 }
 
 
@@ -2432,25 +2453,14 @@ void CKeyBinds::LoadDefaultControls ( void )
 }
 
 
-void CKeyBinds::LoadDefaultCommands ( void )
+void CKeyBinds::LoadDefaultCommands ( bool bForce )
 {
-    AddCommand ( "g", "enter_passenger", NULL, true );
-    AddCommand ( "F12", "screenshot", NULL, true );
-    AddCommand ( "t", "chatbox", "chatboxsay", true );
-    AddCommand ( "y", "chatbox", "teamsay 255 0 0", true );
-    AddCommand ( "F11", "radar", "-1", true );
-    AddCommand ( "num_add", "radar_zoom_in", NULL, true );
-    AddCommand ( "num_sub", "radar_zoom_out", NULL, true );
-    AddCommand ( "num_8", "radar_move_north", NULL, true );
-    AddCommand ( "num_2", "radar_move_south", NULL, true );
-    AddCommand ( "num_6", "radar_move_east", NULL, true );
-    AddCommand ( "num_4", "radar_move_west", NULL, true );
-    AddCommand ( "num_0", "radar_attach", NULL, true );
-    
-    AddCommand ( "pgup",  "chatscrollup",     NULL, true );
-    AddCommand ( "pgdn",  "chatscrolldown",   NULL, true );
-    AddCommand ( "pgup",  "debugscrollup",    NULL, true );
-    AddCommand ( "pgdn",  "debugscrolldown",  NULL, true );
+    for ( int i = 0 ; *g_dcbDefaultCommands [ i ].szKey != NULL ; i++ )
+    {
+        SDefaultCommandBind* temp = &g_dcbDefaultCommands [ i ];
+        if ( bForce || !CommandExists ( temp->szKey, temp->szCommand, true, temp->bState ) )
+            AddCommand ( temp->szKey, temp->szCommand, temp->szArguments, temp->bState );
+    }
 }
 
 

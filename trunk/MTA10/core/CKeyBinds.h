@@ -22,6 +22,14 @@ class CKeyBinds;
 #include <core/CCoreInterface.h>
 #include <core/CCommandsInterface.h>
 
+struct SDefaultCommandBind
+{
+    char szKey [20];
+    bool bState;
+    char szCommand [20];
+    char szArguments [20];
+};
+
 class CKeyBinds: public CKeyBindsInterface
 {
 public:
@@ -130,7 +138,7 @@ public:
     bool                    SaveToXML                   ( CXMLNode* pMainNode );
     void                    LoadDefaultBinds            ( void );
     void                    LoadDefaultControls         ( void );
-    void                    LoadDefaultCommands         ( void );
+    void                    LoadDefaultCommands         ( bool bForce );
     void                    LoadControlsFromGTA         ( void );
 
     void                    BindCommand                 ( const char* szCmdLine );
