@@ -218,7 +218,7 @@ public:
     virtual bool                    SaveToXML                   ( class CXMLNode* pMainNode ) = 0;
     virtual void                    LoadDefaultBinds            ( void ) = 0;
     virtual void                    LoadDefaultControls         ( void ) = 0;
-    virtual void                    LoadDefaultCommands         ( void ) = 0;
+    virtual void                    LoadDefaultCommands         ( bool bForce ) = 0;
     virtual void                    LoadControlsFromGTA         ( void ) = 0;
 
     virtual void                    BindCommand                 ( const char* szCmdLine ) = 0;

@@ -1058,6 +1058,9 @@ void CCore::CreateXML ( )
     // Load the keybinds (loads defaults if the subnode doesn't exist)
     GetKeyBinds ()->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
 
+    // Load the default commandbinds if not exist
+    GetKeyBinds ()->LoadDefaultCommands( false );
+
     // Load XML-dependant subsystems
     m_ClientVariables.Load ( );
 }
