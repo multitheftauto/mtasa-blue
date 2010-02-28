@@ -160,6 +160,7 @@ private:
     CServerList             m_ServersRecent;
 
     unsigned long           m_ulLastUpdateTime;
+    bool                    m_firstTimeBrowseServer;
     ServerBrowserType       m_PrevServerBrowserType;
 };
 

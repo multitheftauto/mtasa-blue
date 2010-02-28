@@ -30,6 +30,7 @@ CServerBrowser::CServerBrowser ( void )
 
     // Initialize
     m_ulLastUpdateTime = 0;
+    m_firstTimeBrowseServer = true;
     m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
@@ -377,15 +378,20 @@ void CServerBrowser::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
     m_pWindow->BringToFront ();
+
     // Are we making this window visible?
     if ( bVisible )
     {
-        // Start refreshing all servers
-        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+        if ( m_firstTimeBrowseServer )
         {
-            m_pEditPassword [ i ]->SetText( "" );
-            m_iSelectedServer [ i ] = -1;
-            GetServerList ( (ServerBrowserType)i )->Refresh ();
+            // Start loading all servers
+            for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+            {
+                m_pEditPassword [ i ]->SetText( "" );
+                m_iSelectedServer [ i ] = -1;
+                GetServerList ( (ServerBrowserType)i )->Refresh ();
+            }
+            m_firstTimeBrowseServer = false;
         }
     }
     else
