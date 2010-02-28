@@ -1614,8 +1614,12 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
     // Got any arguments?
     if ( szArguments && strlen ( szArguments ) > 0 )
     {
+        // Make lower case
+        string strArguments ( szArguments );
+        std::transform ( strArguments.begin(), strArguments.end(), strArguments.begin(), ::tolower );
+
         // Is the nick requested anyone?
-        bool bAnyone = strcmp ( szArguments, "*" ) == 0;
+        bool bAnyone = ( strArguments == "*" );
 
         // Start iterating the whowas list
         CWhoWas* pWhoWas = pConsole->GetWhoWas ();
@@ -1626,8 +1630,12 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
             list < SWhoWasEntry > ::const_iterator iter = pWhoWas->IterBegin ();
             for ( ; iter != pWhoWas->IterEnd (); iter++ )
             {
+                // Make player name lower case
+                string strNick ( iter->szNick );
+                std::transform ( strNick.begin(), strNick.end(), strNick.begin(), ::tolower );
+
                 // Matches?
-                if ( bAnyone || stricmp ( szArguments, iter->szNick ) == 0 )
+                if ( bAnyone || strNick.find ( strArguments ) != string::npos )
                 {
                     // Haven't got too many entries printed?
                     if ( ++uiCount <= 20 )
@@ -1638,11 +1646,7 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        char szBuffer [256];
-                        szBuffer[0] = '\0';
-                        _snprintf ( szBuffer, 256, "%s - %s:%u", iter->szNick, szIP, iter->usPort );
-                        szBuffer[255] = '\0';
-                        pClient->SendEcho ( szBuffer );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s", iter->szNick, szIP, iter->strSerial.c_str () ) );
                     }
                     else
                     {

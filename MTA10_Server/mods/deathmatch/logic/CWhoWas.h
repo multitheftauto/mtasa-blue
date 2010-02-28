@@ -20,13 +20,13 @@ struct SWhoWasEntry
 {
     char            szNick [MAX_NICK_LENGTH + 1];
     unsigned long   ulIP;
-    unsigned short  usPort;
+    std::string     strSerial;
 };
 
 class CWhoWas
 {
 public:
-    void                                                Add                 ( const char* szNick, unsigned long ulIP, unsigned short usPort );
+    void                                                Add                 ( const char* szNick, unsigned long ulIP, std::string strSerial );
     inline void                                         Clear               ( void )        { m_List.clear (); };
 
     inline unsigned int                                 Count               ( void )        { return m_List.size (); };

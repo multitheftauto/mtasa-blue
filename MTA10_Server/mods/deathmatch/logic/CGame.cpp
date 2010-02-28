@@ -1256,13 +1256,14 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         CPlayer* pPlayer = m_pPlayerManager->Create ( Packet.GetSourceSocket () );
         if ( pPlayer )
         {
+            char szIP [22];
+            SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
-                char szIP [22];
-                CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP: %s - Invalid Nick)\n", szNick, pPlayer->GetSourceIP ( szIP ) );
+                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid Nick) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                // Tell the player the password was wrong
+                // Tell the player the problem
                 DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid Nick" );
                 return;
             }
@@ -1322,7 +1323,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                      m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
 								{
 									// Tell the console
-									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned)\n", szNick );
+									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
 									// Tell the player he's banned
                                     if ( pPlayer->GetMTAVersion () <= 0x102 )
@@ -1336,7 +1337,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                      m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
 								{
 									// Tell the console
-									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned)\n", szNick );
+									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
 									// Tell the player he's banned
 									DisconnectPlayer ( this, *pPlayer, "Disconnected: Account is banned" );
@@ -1344,7 +1345,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 								}
 
 								// Add him to the whowas list
-								m_WhoWas.Add ( szNick, Packet.GetSourceIP (), Packet.GetSourcePort () );
+								m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial () );
 
                                 // Verify the player's serial if necessary
                                 if ( m_pMainConfig->GetSerialVerificationEnabled () )
@@ -1355,18 +1356,16 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             else
                             {
                                 // Tell the console
-                                char szIP [22];
-                                CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP: %s - Join flood)\n", szNick, pPlayer->GetSourceIP ( szIP ) );
+                                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Join flood) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                                // Tell the player the password was wrong
+                                // Tell the player the problem
                                 DisconnectPlayer ( this, *pPlayer, "Disconnected: Join flood. Please wait a minute, then reconnect." );
                             }
                         }
                         else
                         {
                             // Tell the console
-                            char szIP [22];
-                            CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP: %s - Wrong password)\n", szNick, pPlayer->GetSourceIP ( szIP ) );
+                            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Wrong password) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                             // Tell the player the password was wrong
                             DisconnectPlayer ( this, *pPlayer, "Disconnected: Incorrect password" );
@@ -1375,10 +1374,9 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     else
                     {
                         // Tell the console
-                        char szIP [22];
-                        CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP: %s - Bad version)\n", szNick, pPlayer->GetSourceIP ( szIP ) );
+                        CLogger::LogPrintf ( "CONNECT: %s failed to connect (Bad version) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                        // Tell the player that the version was wrong
+                        // Tell the player that the problem
                         char szReturn [128];
                         _snprintf ( szReturn, 128, "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
                         szReturn [127] = '\0';
@@ -1388,10 +1386,9 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 else
                 {
                     // Tell the console
-                    char szIP [22];
-                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP: %s - Nick already in use)\n", szNick, pPlayer->GetSourceIP ( szIP ) );
+                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Nick already in use) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                    // Tell the player the password was wrong
+                    // Tell the player the problem
                     DisconnectPlayer ( this, *pPlayer, "Disconnected: Nick already in use" );
                 }
             }
@@ -1401,7 +1398,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 char szIP [22];
                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname)\n", pPlayer->GetSourceIP ( szIP ) );
 
-                // Tell the player the password was wrong
+                // Tell the player the problem
                 DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid nickname" );
             }
         }
@@ -2728,6 +2725,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
 
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
+    char szIP [22];
+    SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
 	if ( bSuccess )
 	{
 		// Call the onPlayerConnect event. If it returns false, disconnect the player
@@ -2741,7 +2740,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 		if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
 		{
 			// event cancelled, disconnect the player
-			CLogger::LogPrintf ( "CONNECT: %s failed to connect.\n", pPlayer->GetNick() );
+			CLogger::LogPrintf ( "CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
 			const char* szError = g_pGame->GetEvents()->GetLastError ();
 			if ( szError )
 			{
@@ -2753,7 +2752,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 		}
 
 		// Tell the console
-		CLogger::LogPrintf ( "CONNECT: %s connected (IP: %s  Serial: %s)\n", pPlayer->GetNick(), pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
+		CLogger::LogPrintf ( "CONNECT: %s connected (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
 
 		// Send him the join details
 		pPlayer->Send ( CPlayerConnectCompletePacket () );
@@ -2763,7 +2762,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 	}
 	else
 	{
-		CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid serial)\n", pPlayer->GetNick() );
+		CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid serial) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
 		if ( szError && strlen ( szError ) > 0 )
 			DisconnectPlayer ( g_pGame, *pPlayer, szError );
 		else
