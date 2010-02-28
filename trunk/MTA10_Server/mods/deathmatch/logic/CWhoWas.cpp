@@ -12,14 +12,14 @@
 
 #include "StdInc.h"
 
-void CWhoWas::Add ( const char* szNick, unsigned long ulIP, unsigned short usPort )
+void CWhoWas::Add ( const char* szNick, unsigned long ulIP, std::string strSerial )
 {
     // Create the struct and copy the data over
     SWhoWasEntry Entry;
     Entry.szNick [MAX_NICK_LENGTH] = 0;
     strncpy ( Entry.szNick, szNick, MAX_NICK_LENGTH );
     Entry.ulIP = ulIP;
-    Entry.usPort = usPort;
+    Entry.strSerial  = strSerial ;
 
     // Add it to our list
     m_List.push_front ( Entry );
