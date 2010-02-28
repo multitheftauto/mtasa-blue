@@ -147,6 +147,7 @@ public:
     LUA_DECLARE ( SetRadioChannel );
     LUA_DECLARE ( GetRadioChannel );
 	LUA_DECLARE ( GetRadioChannelName );
+
     // Player get functions
     LUA_DECLARE ( GetLocalPlayer );
     LUA_DECLARE ( GetPlayerName );
@@ -407,7 +408,7 @@ public:
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );
-    LUA_DECLARE ( FadeCamera   );
+    LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
 
     // Cursor funcs
@@ -555,9 +556,10 @@ public:
 	LUA_DECLARE ( GUIWindowGetTitleBarEnabled );
 	LUA_DECLARE ( GUILabelSetColor );
 	LUA_DECLARE ( GUILabelSetVerticalAlign );
-	LUA_DECLARE ( GUILabelSetHorizontalAlign );	
+	LUA_DECLARE ( GUILabelSetHorizontalAlign );
 	LUA_DECLARE ( GUILabelGetTextExtent );
 	LUA_DECLARE ( GUILabelGetFontHeight );
+    LUA_DECLARE ( GUIGetChatboxLayout );
 
 
     // World functions
