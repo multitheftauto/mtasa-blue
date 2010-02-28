@@ -14,6 +14,7 @@
 *               Christian Myhre Lundheim <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -2392,3 +2393,67 @@ int CLuaFunctionDefs::GUILabelSetHorizontalAlign ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    {
+        std::string strCVAR;
+        std::string strCVARCommand = ( std::string ) lua_tostring ( luaVM, 1 );
+
+        g_pCore->GetCVars ()->Get ( strCVARCommand, strCVAR );
+        if ( !strCVAR.empty() )
+        {
+            char szSet [] = ".1234567890";
+            if ( strspn ( strCVAR.c_str (), szSet ) == strlen ( strCVAR.c_str () ) && !strCVAR.empty () )
+            {
+                float fNumber = atof ( strCVAR.c_str() );
+                if ( fNumber >= 0 )
+                {
+                    lua_pushnumber ( luaVM, fNumber );
+                    return 1;
+                }
+            }
+            else if ( strCVARCommand.find("color") != std::string::npos )
+            {
+                char strColor[32] = { '\0' };
+                strcpy ( strColor, strCVAR.c_str() );
+
+                int iRed    = atoi ( strtok ( strColor, " " ) );
+                int iGreen  = atoi ( strtok ( NULL, " " ) );
+                int iBlue   = atoi ( strtok ( NULL, " " ) );
+                int iAlpha  = atoi ( strtok ( NULL, "\r" ) );
+
+                if ( iRed >= 0 && iGreen >= 0 && iBlue >= 0 && iAlpha >= 0 )
+                {
+                    lua_pushnumber ( luaVM, iRed );
+                    lua_pushnumber ( luaVM, iGreen );
+                    lua_pushnumber ( luaVM, iBlue );
+                    lua_pushnumber ( luaVM, iAlpha );
+                    return 4;
+                }
+            }
+            else if ( strCVARCommand == "chat_scale" )
+            {
+                char strPos[16] = { '\0' };
+                strcpy ( strPos, strCVAR.c_str() );
+
+                int iX = atoi ( strtok ( strPos, " " ) );
+                int iY = atoi ( strtok ( NULL, "\r" ) );
+
+                if ( iX >= 0 && iY >= 0 )
+                {
+                    lua_pushnumber ( luaVM, iX );
+                    lua_pushnumber ( luaVM, iY );
+                    return 2;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getChatboxLayout" );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
