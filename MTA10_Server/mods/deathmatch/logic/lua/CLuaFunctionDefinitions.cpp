@@ -3596,6 +3596,40 @@ int CLuaFunctionDefinitions::GetVehicleOccupant ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetVehicleOccupants ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add All Occupants
+            for ( unsigned char ucSeat = 0; ucSeat <= pVehicle->GetMaxPassengers (); ++ ucSeat )
+            {
+                CPed* pPed = pVehicle->GetOccupant ( ucSeat );
+                if ( pPed )
+                {
+                    lua_pushnumber ( luaVM, ucSeat );
+                    lua_pushelement ( luaVM, pPed );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleOccupants", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleOccupants" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetVehicleController ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )

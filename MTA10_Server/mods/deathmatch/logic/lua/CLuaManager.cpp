@@ -348,6 +348,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleName", CLuaFunctionDefinitions::GetVehicleName );
     CLuaCFunctions::AddFunction ( "getVehicleNameFromModel", CLuaFunctionDefinitions::GetVehicleNameFromModel );
     CLuaCFunctions::AddFunction ( "getVehicleOccupant", CLuaFunctionDefinitions::GetVehicleOccupant );
+    CLuaCFunctions::AddFunction ( "getVehicleOccupants", CLuaFunctionDefinitions::GetVehicleOccupants );
     CLuaCFunctions::AddFunction ( "getVehicleController", CLuaFunctionDefinitions::GetVehicleController );
     CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefinitions::GetVehicleRotation );
     CLuaCFunctions::AddFunction ( "getVehicleSirensOn", CLuaFunctionDefinitions::GetVehicleSirensOn );

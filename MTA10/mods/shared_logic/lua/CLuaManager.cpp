@@ -434,6 +434,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleLandingGearDown", CLuaFunctionDefs::GetVehicleLandingGearDown );
     CLuaCFunctions::AddFunction ( "getVehicleMaxPassengers", CLuaFunctionDefs::GetVehicleMaxPassengers );
     CLuaCFunctions::AddFunction ( "getVehicleOccupant", CLuaFunctionDefs::GetVehicleOccupant );
+    CLuaCFunctions::AddFunction ( "getVehicleOccupants", CLuaFunctionDefs::GetVehicleOccupants );
     CLuaCFunctions::AddFunction ( "getVehicleController", CLuaFunctionDefs::GetVehicleController );
     CLuaCFunctions::AddFunction ( "getVehicleSirensOn", CLuaFunctionDefs::GetVehicleSirensOn );
     CLuaCFunctions::AddFunction ( "getVehicleTurnVelocity", CLuaFunctionDefs::GetVehicleTurnVelocity );
