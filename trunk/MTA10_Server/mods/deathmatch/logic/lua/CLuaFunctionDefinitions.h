@@ -182,6 +182,7 @@ public:
     static int      GetVehicleName                      ( lua_State* luaVM );
     static int      GetVehicleNameFromModel             ( lua_State* luaVM );
     static int      GetVehicleOccupant                  ( lua_State* luaVM );
+    static int      GetVehicleOccupants                 ( lua_State* luaVM );
     static int      GetVehicleController                ( lua_State* luaVM );
     static int      GetVehicleRotation                  ( lua_State* luaVM );
     static int      GetVehicleSirensOn                  ( lua_State* luaVM );

@@ -244,6 +244,7 @@ public:
     LUA_DECLARE ( GetVehicleLandingGearDown );
     LUA_DECLARE ( GetVehicleMaxPassengers );
     LUA_DECLARE ( GetVehicleOccupant );
+    LUA_DECLARE ( GetVehicleOccupants );
     LUA_DECLARE ( GetVehicleController );
     LUA_DECLARE ( GetVehicleRotation );
     LUA_DECLARE ( GetVehicleSirensOn );
