@@ -286,7 +286,7 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
             static_cast < float > ( lua_tonumber ( luaVM, 5 ) ),
             static_cast < float > ( lua_tonumber ( luaVM, 6 ) ) );
 
-        bool bCheckBuildings = true, bCheckVehicles = true, bCheckPeds = true, bCheckObjects = true, bCheckDummies = true, bSeeThroughStuff = false, bIgnoreSomeObjectsForCamera = false, bShootThroughStuff = false;
+        bool bCheckBuildings = true, bCheckVehicles = true, bCheckPeds = true, bCheckObjects = true, bCheckDummies = true, bSeeThroughStuff = false, bIgnoreSomeObjectsForCamera = false;
         CEntity* pIgnoredEntity = NULL;
 
         if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
@@ -309,6 +309,7 @@ int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
                                 bSeeThroughStuff = ( lua_toboolean ( luaVM, 12 ) ) ? true:false;
                                 if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN )
                                 {
+                                    bIgnoreSomeObjectsForCamera = ( lua_toboolean ( luaVM, 13 ) ) ? true:false;
                                     if ( lua_type ( luaVM, 14 ) == LUA_TLIGHTUSERDATA )
                                     {
                                         CClientEntity* pEntity = lua_toelement ( luaVM, 14 );
