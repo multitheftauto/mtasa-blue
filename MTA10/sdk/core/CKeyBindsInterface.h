@@ -143,7 +143,7 @@ public:
     virtual bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szResource = NULL ) = 0;
     virtual bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true ) = 0;
     virtual bool                    RemoveAllCommands           ( void ) = 0;
-    virtual bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL ) = 0;
+    virtual bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL ) = 0;
     virtual bool                    SetCommandActive            ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState ) = 0;
     virtual void                    SetAllCommandsActive        ( const char* szResource, bool bActive ) = 0;
     virtual CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL, bool bCheckHitState = false, bool bState = NULL ) = 0;
