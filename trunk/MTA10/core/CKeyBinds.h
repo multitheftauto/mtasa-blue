@@ -5,6 +5,7 @@
 *  FILE:        core/CKeyBinds.h
 *  PURPOSE:     Header file for core keybind manager class
 *  DEVELOPERS:  Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

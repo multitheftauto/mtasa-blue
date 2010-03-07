@@ -5,6 +5,7 @@
 *  FILE:        core/CKeyBinds.cpp
 *  PURPOSE:     Core keybind manager
 *  DEVELOPERS:  Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -315,7 +316,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     // Search through binds
     bool bFound = false;
     CKeyBind* pBind = NULL;
-    list < CCommandBind* >* processedList = new list < CCommandBind* >;
+    list < CCommandBind* > *processedList = new list < CCommandBind* >;
     list < CKeyBind* > cloneList = *m_pList;
     list < CKeyBind* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
@@ -384,10 +385,11 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                                 }
                                             }
 
+                                            //don't fire if its already fired
                                             if ( !bAlreadyProcessed )
                                             {
                                                 Call ( pCommandBind );
-                                                processedList->push_back( pCommandBind );
+                                                processedList->push_back ( pCommandBind );
                                             }
                                         }
                                     }
@@ -2358,7 +2360,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         //If its still the default key dont bother saving it
                         if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
                         {
-                             //pNode->GetParent()->DeleteSubNode(pNode);
+                            pNode->GetParent()->DeleteSubNode(pNode);
                         }
                     }
                 }
