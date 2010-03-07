@@ -315,12 +315,13 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     // Search through binds
     bool bFound = false;
     CKeyBind* pBind = NULL;
+    list < CCommandBind* >* processedList = new list < CCommandBind* >;
     list < CKeyBind* > cloneList = *m_pList;
     list < CKeyBind* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
         pBind = *iter;
-        if ( pBind->IsBeingDeleted () || !pBind->boundKey ) continue;
+        if ( pBind->IsBeingDeleted () || !pBind->bActive || !pBind->boundKey ) continue;
 
         // Does this bind's key match?
         if ( pBind->boundKey == pKey )
@@ -365,8 +366,29 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                             m_pChatBoxBind = pCommandBind;
                                         }                                                                            
                                         else
-                                        {                                    
-                                            Call ( pCommandBind );
+                                        {
+                                            bool bAlreadyProcessed = false;
+                                            list < CCommandBind* > ::iterator iter = processedList->begin ();
+                                            for ( ; iter != processedList->end (); iter++ )
+                                            {
+                                                if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
+                                                {
+                                                    if ( ( *iter )->bHitState == pCommandBind->bHitState )
+                                                    {
+                                                        if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
+                                                        {
+                                                            bAlreadyProcessed = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            if ( !bAlreadyProcessed )
+                                            {
+                                                Call ( pCommandBind );
+                                                processedList->push_back( pCommandBind );
+                                            }
                                         }
                                     }
                                     break;
@@ -652,7 +674,7 @@ bool CKeyBinds::RemoveAllCommands ( void )
 }
 
 
-bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments )
+bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments, const char* szResource )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
@@ -668,7 +690,10 @@ bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool b
                     {
                         if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
                         {
-                            return true;
+                            if ( !szResource || ( pBind->szResource && strcmp ( pBind->szResource, szResource ) == 0 ) )
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -2333,7 +2358,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         //If its still the default key dont bother saving it
                         if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
                         {
-                             pNode->GetParent()->DeleteSubNode(pNode);
+                             //pNode->GetParent()->DeleteSubNode(pNode);
                         }
                     }
                 }

@@ -4950,7 +4950,7 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     {
         bool bHitState = true;
         //Check if its binded already (dont rebind)
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments ) )
+        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
             return true;
@@ -4962,7 +4962,7 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
             bSuccess = true;
         }
         bHitState = false;
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments ) )
+        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
             return true;
