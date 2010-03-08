@@ -31,6 +31,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_vecBackgroundPosition = vecPosition;
 
     // Initialize variables
+    m_iScrollState = 0;
     m_uiMostRecentLine = 0;
     m_uiScrollOffset = 0;
     m_fSmoothScroll = 0;
@@ -217,6 +218,12 @@ void CChat::Draw ( void )
 //
 void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
 {
+
+    if ( m_iScrollState == 1 )
+        ScrollUp ();
+    else if ( m_iScrollState == -1 )
+        ScrollDown ();
+
     // Time to reset?
     if ( m_fSmoothScrollResetTime && m_fSmoothScrollResetTime < GetSecondCount () )
     {
@@ -337,7 +344,6 @@ void CChat::ClearInput ( void )
         m_pInput->SetSize ( m_vecInputSize );
 }
 
-// Not yet integrated/tested
 void CChat::ScrollUp ()
 {
     if ( m_Lines [ (m_uiMostRecentLine + m_uiScrollOffset + m_uiNumLines) % CHAT_MAX_LINES ].IsActive ()
@@ -353,7 +359,6 @@ void CChat::ScrollUp ()
     }
 }
 
-// Not yet integrated/tested
 void CChat::ScrollDown ()
 {
     if ( m_uiScrollOffset <= 0 )
