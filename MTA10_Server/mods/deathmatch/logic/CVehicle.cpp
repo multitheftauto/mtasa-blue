@@ -587,7 +587,11 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
+    
+    CVector vecNull;
 
+    m_vecTurnSpeed = vecNull;
+    m_vecVelocity = vecNull;
     m_vecPosition = vecPosition;
     m_vecRotationDegrees = vecRotation;
 }
