@@ -1256,8 +1256,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         CPlayer* pPlayer = m_pPlayerManager->Create ( Packet.GetSourceSocket () );
         if ( pPlayer )
         {
+            // Get the serial number from the packet source
+            NetServerPlayerID p = Packet.GetSourceSocket ();
+            std::string strSerial;
+            p.GetSerial ( strSerial );
+
             char szIP [22];
-            SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
+            SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str () );
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
@@ -1308,15 +1313,10 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 								pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
 								pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
 								pPlayer->SetSerialUser ( Packet.GetSerialUser () );
+                                pPlayer->SetSerial ( strSerial );
 
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
-
-                                // Get the serial number from the packet source
-                                NetServerPlayerID p = Packet.GetSourceSocket ();
-                                std::string strSerial;
-                                p.GetSerial ( strSerial );
-								pPlayer->SetSerial ( strSerial );
 
 								// Check the serial for validity
                                 if ( !pPlayer->GetSerial ().empty() &&
