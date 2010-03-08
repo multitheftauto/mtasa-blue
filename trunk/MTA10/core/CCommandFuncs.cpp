@@ -391,25 +391,25 @@ void CCommandFuncs::SaveConfig ( const char* szParameters )
 void CCommandFuncs::ChatScrollUp ( const char* szParameters )
 {
     CChat* pChat = CCore::GetSingleton ().GetLocalGUI ()->GetChat ();
-    if( pChat ) pChat->ScrollUp ();
+    if ( pChat ) pChat->Scroll ( atoi ( szParameters ) );
 }
 
 void CCommandFuncs::ChatScrollDown ( const char* szParameters )
 {
     CChat* pChat = CCore::GetSingleton ().GetLocalGUI ()->GetChat ();
-    if( pChat ) pChat->ScrollDown ();
+    if ( pChat ) pChat->Scroll ( atoi ( szParameters ) );
 }
 
 void CCommandFuncs::DebugScrollUp ( const char* szParameters )
 {
     CDebugView* pDebug = CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ();
-    if( pDebug ) pDebug->ScrollUp ();
+    if ( pDebug ) pDebug->Scroll ( atoi ( szParameters ) );
 }
 
 void CCommandFuncs::DebugScrollDown ( const char* szParameters )
 {
     CDebugView* pDebug = CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ();
-    if( pDebug ) pDebug->ScrollDown ();
+    if ( pDebug ) pDebug->Scroll ( atoi ( szParameters ) );
 }
 
 void CCommandFuncs::DebugClear ( const char* szParameters )

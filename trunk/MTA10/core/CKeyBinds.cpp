@@ -219,23 +219,27 @@ SBindableGTAControl g_bcControls[] =
 
 SDefaultCommandBind g_dcbDefaultCommands[] = 
 { 
-    { "g",       true, "enter_passenger",  NULL },
-    { "F12",     true, "screenshot",       NULL },
-    { "t",       true, "chatbox",          "chatboxsay" },
-    { "y",       true, "chatbox",          "teamsay 255 0 0" },
-    { "F11",     true, "radar",            "-1" },
-    { "num_add", true, "radar_zoom_in",    NULL },
-    { "num_sub", true, "radar_zoom_out",   NULL },
-    { "num_8",   true, "radar_move_north", NULL },
-    { "num_2",   true, "radar_move_south", NULL },
-    { "num_6",   true, "radar_move_east",  NULL },
-    { "num_4",   true, "radar_move_west",  NULL },
-    { "num_0",   true, "radar_attach",     NULL },
+    { "g",       true,  "enter_passenger",  NULL },
+    { "F12",     true,  "screenshot",       NULL },
+    { "t",       true,  "chatbox",          "chatboxsay" },
+    { "y",       true,  "chatbox",          "teamsay 255 0 0" },
+    { "F11",     true,  "radar",            "-1" },
+    { "num_add", true,  "radar_zoom_in",    NULL },
+    { "num_sub", true,  "radar_zoom_out",   NULL },
+    { "num_8",   true,  "radar_move_north", NULL },
+    { "num_2",   true,  "radar_move_south", NULL },
+    { "num_6",   true,  "radar_move_east",  NULL },
+    { "num_4",   true,  "radar_move_west",  NULL },
+    { "num_0",   true,  "radar_attach",     NULL },
     
-    { "pgup",    true, "chatscrollup",     NULL },
-    { "pgdn",    true, "chatscrolldown",   NULL },
-    { "pgup",    true, "debugscrollup",    NULL },
-    { "pgdn",    true, "debugscrolldown",  NULL }
+    { "pgup",    true,  "chatscrollup",     "1" },
+    { "pgup",    false, "chatscrollup",     "0" },
+    { "pgdn",    true,  "chatscrolldown",   "-1" },
+    { "pgdn",    false, "chatscrolldown",   "0" },
+    { "pgup",    true,  "debugscrollup",    "1" },
+    { "pgup",    false, "debugscrollup",    "0" },
+    { "pgdn",    true,  "debugscrolldown",  "-1" },
+    { "pgdn",    false, "debugscrolldown",  "0" }
 };
 
 // HACK: our current shift key states
