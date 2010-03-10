@@ -66,7 +66,7 @@ public:
     CLuaArgument*                                       PushString          ( const char* szString );
     CLuaArgument*                                       PushUserData        ( void* pUserData );
     CLuaArgument*                                       PushElement         ( CClientEntity* pElement );
-    CLuaArgument*                                       PushArgument        ( CLuaArgument& argument );
+    CLuaArgument*                                       PushArgument        ( const CLuaArgument& argument );
     CLuaArgument*                                       PushTable           ( CLuaArguments * table );
 
     void                                                DeleteArguments     ( void );

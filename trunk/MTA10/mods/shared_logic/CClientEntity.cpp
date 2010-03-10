@@ -505,7 +505,8 @@ void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Vari
     // Trigger the onClientElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable  );
+    Arguments.PushArgument ( oldVariable );
+    Arguments.PushArgument ( Variable );
     CallEvent ( "onClientElementDataChange", Arguments, true );
 }
 

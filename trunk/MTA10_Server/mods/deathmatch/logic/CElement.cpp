@@ -638,7 +638,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
 {
     assert ( szName );
 
@@ -656,8 +656,9 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Trigger the onElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable  );
-    CallEvent ( "onElementDataChange", Arguments );
+    Arguments.PushArgument ( oldVariable );
+    Arguments.PushArgument ( Variable );
+    CallEvent ( "onElementDataChange", Arguments, pClient );
 }
 
 
