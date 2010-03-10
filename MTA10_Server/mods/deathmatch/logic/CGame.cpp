@@ -1729,7 +1729,7 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             // Change the data
             const char* szName = Packet.GetName ();
             CLuaArgument& Value = Packet.GetValue ();
-            pElement->SetCustomData ( szName, Value, NULL );
+            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
 
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );

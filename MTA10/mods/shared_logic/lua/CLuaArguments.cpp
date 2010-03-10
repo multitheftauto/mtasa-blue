@@ -332,7 +332,7 @@ CLuaArgument* CLuaArguments::PushElement ( CClientEntity* pElement )
 }
 
 
-CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument& Argument )
+CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument& Argument )
 {
     CLuaArgument* pArgument = new CLuaArgument ( Argument );
     m_Arguments.push_back ( pArgument );
