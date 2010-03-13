@@ -85,6 +85,7 @@ public:
     static int      setElementAlpha                     ( lua_State* luaVM );
     static int      setElementHealth                    ( lua_State* luaVM );
     static int      setElementModel                     ( lua_State* luaVM );
+    static int      setElementSyncer                    ( lua_State* luaVM );
 };
 
 #endif
