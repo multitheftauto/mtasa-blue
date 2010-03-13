@@ -84,6 +84,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementAlpha", CLuaElementDefs::setElementAlpha );
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
+    CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
 }
 
 
@@ -1740,6 +1741,33 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementModel" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 2 );
+
+        if ( pElement )
+        {
+            if ( pPlayer )
+            {
+                lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetElementSyncer ( pElement, pPlayer ) );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementSyncer", "player", 2 );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementSyncer", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementSyncer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
