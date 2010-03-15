@@ -24,16 +24,18 @@ struct SWeaponSlot
     char cSlot;
 };
 
-SWeaponName WeaponNames [44] =
-{ {"Melee"}, {"Brassknuckle"}, {"Golfclub"}, {"Nitestick"}, {"Knife"},
+SWeaponName WeaponNames [] =
+{ {"Melee"}, {"Brassknuckle"}, {"Golfclub"}, {"Nightstick"}, {"Knife"},
 {"Bat"}, {"Shovel"}, {"Poolstick"}, {"Katana"}, {"Chainsaw"}, 
 {"Dildo"}, {"Dildo"}, {"Vibrator"}, {"Vibrator"}, {"Flower"},
-{"Cane"}, {"Grenade"}, {"Teargas"}, {"Molotov"}, {""},
-{""}, {""}, {"Colt 45"}, {"Silenced"}, {"Deagle"},
+{"Cane"}, {"Grenade"}, {"Teargas"}, {"Molotov"}, {"Rocket"},
+{"Rocket"}, {"Freefall Bomb"}, {"Colt 45"}, {"Silenced"}, {"Deagle"},
 {"Shotgun"}, {"Sawed-off"}, {"Combat Shotgun"}, {"Uzi"}, {"MP5"},
 {"AK-47"}, {"M4"}, {"Tec-9"}, {"Rifle"}, {"Sniper"},
 {"Rocket Launcher"}, {"Rocket Launcher HS"}, {"Flamethrower"}, {"Minigun"}, {"Satchel"},
-{"Bomb"}, {"Spraycan"}, {"Fire Extinguisher"}, {"Camera"} };
+{"Bomb"}, {"Spraycan"}, {"Fire Extinguisher"}, {"Camera"}, {"Nightvision"}, {"Infrared"},
+{"Parachute"}, {"Last Weapon"}, {"Armour"}, {"Rammed"}, {"Ranover"}, {"Explosion"}, {"Driveby"}, 
+{"Drowned"}, {"Fall"}, {"Unknown"}, {"Melee"}, {"Weapon"}, {"Flare"}, { "Tank Grenade" } };
 
 SWeaponSlot WeaponIDs [] =
 {{0},{0},{1},{1},{1},{1},{1},{1},{1},{1},{10},{10},{10},{-1},{10},{1},{8},{8},
@@ -47,7 +49,7 @@ unsigned char CWeaponNames::GetWeaponID ( const char* szName )
     if ( szName [0] == 0 ) return 0xFF;
 
     // Look for it in our table
-    for ( unsigned int i = 0; i <= 43; i++ )
+    for ( unsigned int i = 0; i < sizeof(WeaponNames); i++ )
     {
         if ( stricmp ( szName, WeaponNames [i].szName ) == 0 )
         {
@@ -61,7 +63,7 @@ unsigned char CWeaponNames::GetWeaponID ( const char* szName )
 
 const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
 {
-    if ( ucID <= 43 )
+    if ( ucID < sizeof(WeaponNames) )
     {
         return WeaponNames [ucID].szName;
     }

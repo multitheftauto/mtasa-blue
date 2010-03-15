@@ -37,7 +37,7 @@ SWeaponName WeaponNames [] =
 {"Rocket"}, {"Freefall Bomb"}, {"Colt 45"}, {"Silenced"}, {"Deagle"},
 {"Shotgun"}, {"Sawed-off"}, {"Combat Shotgun"}, {"Uzi"}, {"MP5"},
 {"AK-47"}, {"M4"}, {"Tec-9"}, {"Rifle"}, {"Sniper"},
-{"Rocket Launcher"}, {"Rocket Launcher HS"}, {"Fire"}/*{"Flamethrower"}*/, {"Minigun"}, {"Satchel"},
+{"Rocket Launcher"}, {"Rocket Launcher HS"}, {"Flamethrower"}, {"Minigun"}, {"Satchel"},
 {"Bomb"}, {"Spraycan"}, {"Fire Extinguisher"}, {"Camera"}, {"Nightvision"}, {"Infrared"},
 {"Parachute"}, {"Last Weapon"}, {"Armour"}, {"Rammed"}, {"Ranover"}, {"Explosion"}, {"Driveby"}, 
 {"Drowned"}, {"Fall"}, {"Unknown"}, {"Melee"}, {"Weapon"}, {"Flare"}, { "Tank Grenade" } };
@@ -69,7 +69,7 @@ unsigned char CWeaponNames::GetWeaponID ( const char* szName )
     if ( szName [0] == 0 ) return 0xFF;
 
     // Look for it in our table
-    for ( unsigned int i = 0; i <= sizeof(WeaponNames); i++ )
+    for ( unsigned int i = 0; i < sizeof(WeaponNames); i++ )
     {
         if ( stricmp ( szName, WeaponNames [i].szName ) == 0 )
         {
