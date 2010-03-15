@@ -15,6 +15,7 @@
 *               Derek Abdine <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -482,6 +483,10 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     // Are we connected?
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
     {
+        // Hide the console when connecting..
+        if ( g_pCore->GetConsole ()->IsVisible () )
+           g_pCore->GetConsole ()->SetVisible ( false );
+
         // Display the status box
         g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
 
