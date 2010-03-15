@@ -8,6 +8,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -796,6 +797,7 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
             if ( currentServerBrowserType == ServerBrowserType::FAVOURITES )
             {
                 m_ServersFavourites.Remove ( pServer );
+                SaveFavouritesList();
             }
             else
             {
@@ -803,6 +805,7 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
                 if ( !m_ServersFavourites.Exists ( pServer ) )
                 {
                     m_ServersFavourites.Add ( pServer );
+                    SaveFavouritesList();
                 }
             }
             UpdateServerList ( ServerBrowserType::FAVOURITES, true );
@@ -925,6 +928,7 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     if ( !m_ServersFavourites.Exists ( Item ) )
     {
         m_ServersFavourites.Add ( Item );
+        SaveFavouritesList();
         UpdateServerList ( ServerBrowserType::FAVOURITES );
     }
 
@@ -965,6 +969,26 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
     }
     pList->SetUpdated ( true );
     return true;
+}
+
+
+void CServerBrowser::SaveRecentlyPlayedList()
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC );
+    if ( !pRecent )
+        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
+    SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, GetRecentList () );
+}
+
+
+void CServerBrowser::SaveFavouritesList()
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pFavourites = pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV );
+    if ( !pFavourites )
+        pFavourites = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_FAV );
+    SaveServerList ( pFavourites, CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList () );
 }
 
 

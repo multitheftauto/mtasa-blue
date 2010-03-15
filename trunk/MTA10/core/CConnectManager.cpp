@@ -6,6 +6,7 @@
 *  PURPOSE:		Manager for connecting to servers
 *  DEVELOPERS:	Christian Myhre Lundheim <>
 *               Jax <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -284,6 +285,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     if ( !pRecentList->Exists ( RecentServer ) )
                     {
                         pRecentList->Add ( RecentServer );
+                        pServerBrowser->SaveRecentlyPlayedList();
                     }
 
                     // Set as our current server for xfire
