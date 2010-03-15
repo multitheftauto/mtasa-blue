@@ -6,6 +6,7 @@
 *  PURPOSE:     2D Main menu graphical user interface
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -158,19 +159,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
 CMainMenu::~CMainMenu ( void )
 {
-    // Save server lists
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-
-    CXMLNode* pFavourites = pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV );
-    if ( !pFavourites )
-        pFavourites = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_FAV );
-    m_ServerBrowser.SaveServerList ( pFavourites, CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
-    
-    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC );
-    if ( !pRecent )
-        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
-    m_ServerBrowser.SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
-
 	// Delete menu items
 	for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
 		if ( m_pItems[i] )

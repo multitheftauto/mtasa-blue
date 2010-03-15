@@ -11,6 +11,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -66,6 +67,9 @@ public:
 
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
+
+    void                SaveRecentlyPlayedList  ( );
+    void                SaveFavouritesList      ( );
 
     bool                LoadServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
     bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
