@@ -27,7 +27,14 @@ CXMLImpl::~CXMLImpl ( void )
 
 CXMLFile* CXMLImpl::CreateXML ( const char* szFilename )
 {
-	return new CXMLFileImpl ( szFilename );
+    CXMLFile* xmlFile = new CXMLFileImpl ( szFilename );
+    if ( xmlFile->IsValid( ) )
+        return xmlFile;
+    else
+    {
+        delete xmlFile;
+        return NULL;
+    }
 }
 
 
@@ -39,7 +46,14 @@ void CXMLImpl::DeleteXML ( CXMLFile* pFile )
 
 CXMLNode* CXMLImpl::CreateDummyNode ( void )
 {
-	return new CXMLNodeImpl ( NULL, NULL, *new TiXmlElement ( "dummy_storage" ) );
+    CXMLNode* xmlNode = new CXMLNodeImpl ( NULL, NULL, *new TiXmlElement ( "dummy_storage" ) );
+    if ( xmlNode->IsValid( ) )
+        return xmlNode;
+    else
+    {
+        delete xmlNode;
+        return NULL;
+    }
 }
 
 

@@ -57,6 +57,8 @@ public:
 
 	virtual CXMLNode*			CopyNode			( CXMLNode* pParent ) = 0;
     virtual bool                CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive ) = 0;
+
+    virtual bool                IsValid             ( void ) = 0;
 };
 
 #endif

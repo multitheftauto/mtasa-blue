@@ -83,7 +83,14 @@ CXMLNode* CXMLNodeImpl::CreateSubNode ( const char* szTagName )
 	m_pNode->LinkEndChild ( pNewNode );
 
     // Create and return the wrapper element
-    return new CXMLNodeImpl ( m_pFile, this, *pNewNode );
+    CXMLNode* xmlNode = new CXMLNodeImpl ( m_pFile, this, *pNewNode );
+    if ( xmlNode->IsValid( ) )
+        return xmlNode;
+    else
+    {
+        delete xmlNode;
+        return NULL;
+    }
 }
 
 
@@ -372,25 +379,27 @@ bool CXMLNodeImpl::CopyChildrenInto ( CXMLNode* pDestination, bool bRecursive )
 
             // Create at the destination
             pNewChildNode = pDestination->CreateSubNode ( strTagName.c_str () );
-
-            // Copy our child's attributes into it
-            int iAttributeCount = pMyChildNode->GetAttributes ().Count ();
-            int i = 0;
-            CXMLAttribute* pAttribute;
-            for ( ; i < iAttributeCount; i++ )
+            if ( pNewChildNode )
             {
-                // Create a copy of every attribute into our destination
-                pAttribute = pMyChildNode->GetAttributes ().Get ( i );
-                if ( pAttribute )
+                // Copy our child's attributes into it
+                int iAttributeCount = pMyChildNode->GetAttributes ().Count ();
+                int i = 0;
+                CXMLAttribute* pAttribute;
+                for ( ; i < iAttributeCount; i++ )
                 {
-                    pNewChildNode->GetAttributes ().Create ( *pAttribute );
+                    // Create a copy of every attribute into our destination
+                    pAttribute = pMyChildNode->GetAttributes ().Get ( i );
+                    if ( pAttribute )
+                    {
+                        pNewChildNode->GetAttributes ().Create ( *pAttribute );
+                    }
                 }
-            }
 
-            // Run it recursively if asked to. Copy child child nodes etc..
-            if ( bRecursive )
-            {
-                pMyChildNode->CopyChildrenInto ( pNewChildNode, true );
+                // Run it recursively if asked to. Copy child child nodes etc..
+                if ( bRecursive )
+                {
+                    pMyChildNode->CopyChildrenInto ( pNewChildNode, true );
+                }
             }
         }
     }

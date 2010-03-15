@@ -40,9 +40,10 @@ unsigned long CXMLArray::PopUniqueID ( CXMLCommon* pEntry )
          ulID < MAX_XML )
     {
         m_Elements [ulID] = pEntry;
+        return MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + ulID;
     }
-
-    return MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + ulID;
+    
+     return INVALID_XML_ID;
 }
 
 
