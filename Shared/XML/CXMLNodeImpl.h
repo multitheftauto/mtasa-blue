@@ -73,6 +73,8 @@ public:
     void                    RemoveFromList      ( CXMLNode* pNode );
     void                    RemoveAllFromList   ( void );
 
+    bool                    IsValid             ( void ) { return m_ulID != INVALID_XML_ID; };
+
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );
 

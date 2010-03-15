@@ -356,8 +356,11 @@ int CLuaXMLDefs::xmlCreateChild ( lua_State* luaVM )
 			if ( szSubNodeName )
 			{
 				CXMLNode* pXMLSubNode = pXMLNode->CreateSubNode ( szSubNodeName );
-				lua_pushxmlnode ( luaVM, pXMLSubNode );
-				return 1;
+                if ( pXMLSubNode )
+                {
+                    lua_pushxmlnode ( luaVM, pXMLSubNode );
+                    return 1;
+                }
 			}
         }
     }

@@ -47,6 +47,7 @@ public:
 
     eXMLClass                       GetClassType        ( void )    { return CXML_FILE; };
     unsigned long                   GetID               ( void )    { return m_ulID; };
+    bool                            IsValid             ( void )    { return m_ulID != INVALID_XML_ID; };
 
 private:
     void                            BuildWrapperTree    ( void );
