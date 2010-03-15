@@ -398,8 +398,17 @@ bool CXMLNodeImpl::CopyChildrenInto ( CXMLNode* pDestination, bool bRecursive )
                 // Run it recursively if asked to. Copy child child nodes etc..
                 if ( bRecursive )
                 {
-                    pMyChildNode->CopyChildrenInto ( pNewChildNode, true );
+                    if ( !pMyChildNode->CopyChildrenInto ( pNewChildNode, true ) )
+                    {
+                        pDestination->DeleteAllSubNodes ();
+                        return false;
+                    }
                 }
+            }
+            else
+            {
+                pDestination->DeleteAllSubNodes ();
+                return false;
             }
         }
     }

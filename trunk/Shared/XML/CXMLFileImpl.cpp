@@ -74,9 +74,16 @@ bool CXMLFileImpl::Parse ( void )
         if ( m_pDocument->LoadFile ( m_strFilename.c_str () ) )
         {
             // Build our wrapper
-		    BuildWrapperTree ();
-		    ResetLastError ();
-		    return true;
+            if ( BuildWrapperTree () )
+            {
+                ResetLastError ();
+                return true;
+            }
+            else
+            {
+                SetLastError ( CXMLErrorCodes::OtherError, "Out of Elements" );
+                return false;
+            }
         }
 
         // Bad XML file
@@ -186,7 +193,7 @@ TiXmlDocument* CXMLFileImpl::GetDocument ( void )
 }
 
 
-void CXMLFileImpl::BuildWrapperTree ( void )
+bool CXMLFileImpl::BuildWrapperTree ( void )
 {
     // Clear the previous tree
     ClearWrapperTree ();
@@ -199,12 +206,18 @@ void CXMLFileImpl::BuildWrapperTree ( void )
         m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
 
         // And build all sub-nodes
-        BuildSubElements ( m_pRootNode );
+        if ( !BuildSubElements ( m_pRootNode ) )
+        {
+            Reset ( );
+            return false;
+        }
+        return true;
     }
+    return false;
 }
 
 
-void CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
+bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
 {
     // Grab the node
     TiXmlElement* pRawNode = pNode->GetNode ();
@@ -220,11 +233,24 @@ void CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
             if ( pElement = pChild->ToElement () )
             {
                 // Create the child and build its subnodes again
-			    CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
-			    BuildSubElements ( pTempNode );
+                CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
+                if ( pTempNode->IsValid ( ) )
+                {
+                    if ( !BuildSubElements ( pTempNode ) )
+                    {
+                        delete pTempNode;
+                        return false;
+                    }
+                }
+                else
+                {
+                    delete pTempNode;
+                    return false;
+                }
             }
-		}
-	}
+        }
+    }
+    return true;
 }
 
 

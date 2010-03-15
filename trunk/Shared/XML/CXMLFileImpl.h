@@ -50,8 +50,8 @@ public:
     bool                            IsValid             ( void )    { return m_ulID != INVALID_XML_ID; };
 
 private:
-    void                            BuildWrapperTree    ( void );
-    void                            BuildSubElements    ( class CXMLNodeImpl* pNode );
+    bool                            BuildWrapperTree    ( void );
+    bool                            BuildSubElements    ( class CXMLNodeImpl* pNode );
     void                            ClearWrapperTree    ( void );
 
     std::string                     m_strFilename;
