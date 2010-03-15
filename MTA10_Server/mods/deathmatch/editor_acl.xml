@@ -1,4 +1,14 @@
-<group name="Everyone">
-	<object name="user.*" />
-	<object name="resource.*" />
-</group>
+<acl>
+	<group name="Everyone">
+        <object name="user.*" />
+        <object name="resource.*" />
+    </group>
+	<group name="MapEditor">
+        <acl name="MapEditor" />
+        <object name="resource.editor_main" />
+        <object name="resource.edf" />
+    </group>
+	<acl name="MapEditor">
+        <right name="general.ModifyOtherObjects" access="true" />
+    </acl>
+</acl>
