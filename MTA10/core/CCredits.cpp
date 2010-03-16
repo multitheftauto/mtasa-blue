@@ -159,6 +159,7 @@ CCredits::CCredits ( void )
 
     // Set up the event handlers
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
+    m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
 }
 
 
