@@ -74,7 +74,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     }
 
 	// Set the KeyDown handler
-	m_pWindow->SetKeyDownHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnKeyDownHandler, this ) );
+	m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
 
 	// And finally set the focus to our window
 	m_pWindow->Activate ();
@@ -124,32 +124,6 @@ void CGUIMessageBox_Impl::SetVisible ( bool bVisible )
 bool CGUIMessageBox_Impl::IsVisible ( void )
 {
     return m_pWindow->IsVisible ();
-}
-
-
-bool CGUIMessageBox_Impl::OnKeyDownHandler ( CGUIElement* pElement )
-{
-	// Cast it to a set of keyboard arguments
-	/*
-	const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
-
-	switch ( KeyboardArgs.scancode )
-	{
-		// Return key
-		case CEGUI::Key::Return:
-		{
-			// Fire the clicking event on the main button
-            if ( m_pButton )
-            {
-			    m_pButton->Click ();
-            }
-
-			break;
-		}
-	}
-	*/
-
-	return true;
 }
 
 

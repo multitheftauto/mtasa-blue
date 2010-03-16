@@ -313,6 +313,7 @@ CSettings::CSettings ( void )
     m_pEditNick->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
     m_pEditNick->SetSize ( CVector2D ( 178.0f, 24.0f ) );
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
+    m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
 
     m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
     m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
@@ -637,6 +638,7 @@ CSettings::CSettings ( void )
     }
 
     // Set up the events
+    m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
 	m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );

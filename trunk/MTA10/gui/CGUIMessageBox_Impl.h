@@ -36,7 +36,6 @@ public:
 	CGUIWindow*				GetWindow					( void );
 private:
     bool					OnResponseHandler           ( CGUIElement* pElement );
-	bool					OnKeyDownHandler			( CGUIElement* pElement );
 
     CGUIWindow*				m_pWindow;
     CGUIStaticImage*		m_pIcon;

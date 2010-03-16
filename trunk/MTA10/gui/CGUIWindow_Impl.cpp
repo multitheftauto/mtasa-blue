@@ -141,6 +141,12 @@ void CGUIWindow_Impl::SetKeyDownHandler ( GUI_CALLBACK Callback )
 }
 
 
+void CGUIWindow_Impl::SetEnterKeyHandler ( GUI_CALLBACK Callback )
+{
+    m_OnEnter = Callback;
+}
+
+
 bool CGUIWindow_Impl::Event_OnCloseClick ( const CEGUI::EventArgs& e )
 {
 	if ( m_OnCloseClick )
@@ -151,7 +157,24 @@ bool CGUIWindow_Impl::Event_OnCloseClick ( const CEGUI::EventArgs& e )
 
 bool CGUIWindow_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
 {
+	CGUIElement * pCGUIElement = reinterpret_cast < CGUIElement* > ( this );
 	if ( m_OnKeyDown )
-		m_OnKeyDown ( reinterpret_cast < CGUIElement* > ( this ) );
+		m_OnKeyDown ( pCGUIElement );
+
+	if ( m_OnEnter )
+	{
+		const CEGUI::KeyEventArgs& Args = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
+		switch ( Args.scancode )
+		{
+			// Return key
+			case CEGUI::Key::NumpadEnter:
+			case CEGUI::Key::Return:
+			{
+				// Fire the event
+				m_OnEnter ( pCGUIElement );
+				break;
+			}
+		}
+	}
     return true;
 }
