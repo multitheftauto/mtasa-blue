@@ -10,27 +10,6 @@
 *
 *****************************************************************************/
 
-//////////////////////////////////////////////////////////
-//
-// NOTE:
-//
-//    GetBindableFromKey in
-//    MTA10\mods\deathmatch\logic\CScriptKeyBinds.cpp and
-//    MTA10_Server\mods\deathmatch\logic\CKeyBinds.cpp
-//    does not know about the joystick buttons. The implications of which
-//    I'm not sure of. If it just means the script can't bind the joystick
-//    buttons, then that maybe a good thing, or not
-//
-//   TO DO.
-//          1. Axis config              - Done
-//          2. Them thar script binds
-//          3. POV hat as buttons       - Done
-//          4. Axis switch off
-//          5. Axis as buttons
-//
-//
-//////////////////////////////////////////////////////////
-
 #include "StdInc.h"
 #include <game/CPad.h>
 
@@ -173,8 +152,8 @@ public:
     virtual void        SetDeadZone                 ( int iDeadZone );
     virtual void        SetSaturation               ( int iSaturation );
     virtual int         GetSettingsRevision         ( void );
-    virtual void        LoadDefaultConfig           ( void );
-    virtual bool        SaveConfig                  ( void );
+    virtual void        SetDefaults                 ( void );
+    virtual bool        SaveToXML                   ( void );
 
     // Binding
     virtual int         GetOutputCount              ( void );
@@ -192,7 +171,7 @@ private:
     void                EnumAxes                    ( void );
     void                ReadCurrentState            ( void );
     CXMLNode*           GetConfigNode               ( bool bCreateIfRequired );
-    bool                LoadConfig                  ( void );
+    bool                LoadFromXML                 ( void );
 
     int                     m_SettingsRevision;
     SInputDeviceInfo        m_DevInfo;
@@ -234,7 +213,7 @@ CJoystickManagerInterface* GetJoystickManager ( void )
 ///////////////////////////////////////////////////////////////
 CJoystickManager::CJoystickManager ( void )
 {
-    LoadDefaultConfig();
+    SetDefaults();
 }
 
 
@@ -398,9 +377,9 @@ void CJoystickManager::EnumAxes ( void )
         m_DevInfo.guidProduct = didi.guidProduct;
         m_DevInfo.strProductName = didi.tszProductName;
         m_DevInfo.strGuid = GUIDToString ( m_DevInfo.guidProduct );
-        if ( !LoadConfig () )
+        if ( !LoadFromXML () )
         {
-            LoadDefaultConfig();
+            SetDefaults();
         }
     }
 
@@ -863,12 +842,12 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::LoadDefaultConfig
+// CJoystickManager::SetDefaults
 //
 // Set the default axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-void CJoystickManager::LoadDefaultConfig ( void )
+void CJoystickManager::SetDefaults ( void )
 {
     m_SettingsRevision++;
 
@@ -926,12 +905,12 @@ void CJoystickManager::LoadDefaultConfig ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::LoadConfig
+// CJoystickManager::LoadFromXML
 //
 // Load axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-bool CJoystickManager::LoadConfig ( void )
+bool CJoystickManager::LoadFromXML ( void )
 {
     m_SettingsRevision++;
 
@@ -1028,12 +1007,12 @@ bool CJoystickManager::LoadConfig ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::SaveConfig
+// CJoystickManager::SaveToXML
 //
 // Save axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-bool CJoystickManager::SaveConfig ( void )
+bool CJoystickManager::SaveToXML ( void )
 {
     if ( !IsJoypadValid () )
         return false;
