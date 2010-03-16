@@ -34,8 +34,8 @@ public:
     virtual void        SetDeadZone                 ( int iDeadZone ) = 0;
     virtual void        SetSaturation               ( int iSaturation ) = 0;
     virtual int         GetSettingsRevision         ( void ) = 0;
-    virtual void        LoadDefaultConfig           ( void ) = 0;
-    virtual bool        SaveConfig                  ( void ) = 0;
+    virtual void        SetDefaults                 ( void ) = 0;
+    virtual bool        SaveToXML                   ( void ) = 0;
 
     // Binding
     virtual int         GetOutputCount              ( void ) = 0;

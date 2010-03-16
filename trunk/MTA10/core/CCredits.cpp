@@ -59,6 +59,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Florian \"Flobu\" Busse\n"
                           "Philip \"Fenix\" Farquharson\n"
                           "Robin \"robhol\" Holm\n"
+                          "Sebas \"x86\" Lamers\n"
                           "Raphael \"Mr.Hankey\" Leiteritz\n"
                           "Adam \"50p\" Telega\n"
                           "\n"

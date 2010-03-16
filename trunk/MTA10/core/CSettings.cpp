@@ -673,7 +673,7 @@ void CSettings::ProcessJoypad( void )
     GetJoystickManager ()->SetDeadZone ( atoi ( m_pEditDeadzone->GetText ().c_str () ) );
     GetJoystickManager ()->SetSaturation ( atoi ( m_pEditSaturation->GetText ().c_str () ) );
 
-    GetJoystickManager ()->SaveConfig ();
+    GetJoystickManager ()->SaveToXML ();
 }
 
 
@@ -798,7 +798,7 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
 bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
 {
 	// Load the default binds
-	GetJoystickManager ()->LoadDefaultConfig ();
+	GetJoystickManager ()->SetDefaults ();
 
 	// Update the GUI
 	UpdateJoypadTab ();
