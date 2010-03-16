@@ -82,7 +82,7 @@ CQuickConnect::CQuickConnect ( void )
     // Set up event handlers
     m_pButtonConnect->SetClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnConnectButtonClick, this ) );
     m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnBackButtonClick, this ) );
-    m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CQuickConnect::OnBackButtonClick, this ) );
+    m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CQuickConnect::OnConnectButtonClick, this ) );
 }
 
 
