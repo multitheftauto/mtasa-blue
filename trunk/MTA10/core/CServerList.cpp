@@ -87,7 +87,7 @@ void CServerList::Pulse ( void )
     }
 
     // Update our status message
-    m_strStatus = ss.str ();
+    m_strStatus = ss.str () + m_strStatus2;
 }
 
 
@@ -152,6 +152,7 @@ void CServerListInternet::Pulse ( void )
         stringstream ss;
         ss << "Requesting master server list (" << ulTime << "ms elapsed)";
         m_strStatus = ss.str ();
+        m_strStatus2 = "";
         m_bUpdated = true;
         
         // Attempt to get the HTTP data
@@ -173,6 +174,19 @@ void CServerListInternet::Pulse ( void )
                 m_iPass = 0;
             }
         }
+        if ( m_iPass == 0 )
+        {
+            // If query failed, load from backup
+            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->LoadInternetList();
+            m_strStatus2 = string ( "  (Backup server list)" );
+            m_iPass = 2;
+        }
+        else
+        if ( m_iPass == 2 )
+        {
+            // If query succeeded, save to backup
+            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->SaveInternetList();
+        }
     } else if ( m_iPass == 2 ) {
         // We are scanning our known servers (second pass)
         CServerList::Pulse ();
@@ -191,19 +205,19 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
 
     // Add all servers until we hit the count or nLength
     while ( i < ( nLength - 6 ) && uiCount-- ) {
-        CServerListItem& item = *new CServerListItem();
 
         // Read the IPv4-address
-        item.Address.S_un.S_un_b.s_b1 = szBuffer[i];
-        item.Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
-        item.Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
-        item.Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
+        in_addr _Address;
+        _Address.S_un.S_un_b.s_b1 = szBuffer[i];
+        _Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
+        _Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
+        _Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
 
         // Read the query port
-        item.usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
+        unsigned short _usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
+        CServerListItem& item = *new CServerListItem ( _Address, _usQueryPort );
 
         // Add the server
-        //Add ( item );
         m_Servers.push_back ( &item );
         i += 6;
     }

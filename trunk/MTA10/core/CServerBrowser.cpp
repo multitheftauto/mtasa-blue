@@ -972,6 +972,24 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
 }
 
 
+void CServerBrowser::LoadInternetList()
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ),
+            CONFIG_INTERNET_LIST_TAG, GetInternetList () );
+}
+
+
+void CServerBrowser::SaveInternetList()
+{
+    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
+    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT );
+    if ( !pRecent )
+        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_INT );
+    SaveServerList ( pRecent, CONFIG_INTERNET_LIST_TAG, GetInternetList () );
+}
+
+
 void CServerBrowser::SaveRecentlyPlayedList()
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
