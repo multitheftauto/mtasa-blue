@@ -209,7 +209,8 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) )
             {
                 // We have access to modify this resource?
-                if ( m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                if ( pResource == pThisResource ||
+                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
                                                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                                                     "ModifyOtherObjects",
                                                     CAccessControlListRight::RIGHT_TYPE_GENERAL,
