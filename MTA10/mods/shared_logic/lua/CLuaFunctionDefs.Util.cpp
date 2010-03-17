@@ -169,6 +169,28 @@ int CLuaFunctionDefs::KillTimer ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::ResetTimer ( lua_State* luaVM )
+{
+    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( luaMain )
+    {
+        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
+        if ( pLuaTimer )
+        {
+            luaMain->GetTimerManager ()->ResetTimer ( pLuaTimer );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "resetTimer" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
 {
     // Find our VM

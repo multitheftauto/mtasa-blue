@@ -451,6 +451,7 @@ public:
     LUA_DECLARE ( Split );
     LUA_DECLARE ( SetTimer );
 	LUA_DECLARE ( KillTimer );
+    LUA_DECLARE ( ResetTimer );
 	LUA_DECLARE ( GetTimers );
 	LUA_DECLARE ( IsTimer );
     LUA_DECLARE ( GetTickCount_ );

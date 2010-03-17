@@ -81,6 +81,15 @@ void CLuaTimerManager::RemoveAllTimers ( void )
 }
 
 
+void CLuaTimerManager::ResetTimer ( CLuaTimer* pLuaTimer )
+{
+    assert ( pLuaTimer );
+
+    unsigned long ulCurrentTime = GetTime ();
+    pLuaTimer->SetStartTime ( ulCurrentTime );
+}
+
+
 bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
 {
     // Return true if we find it
