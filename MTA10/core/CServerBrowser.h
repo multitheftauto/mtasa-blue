@@ -65,9 +65,12 @@ public:
 
     static void         CompleteConnect         ( void );
 
+    CServerList*        GetInternetList         ( void ) { return &m_ServersInternet; };
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
 
+    void                LoadInternetList        ( );
+    void                SaveInternetList        ( );
     void                SaveRecentlyPlayedList  ( );
     void                SaveFavouritesList      ( );
 

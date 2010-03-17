@@ -187,6 +187,7 @@ protected:
     int                                     m_iRevision;
     std::list < CServerListItem* >          m_Servers;
     std::string                             m_strStatus;
+    std::string                             m_strStatus2;
 };
 
 // Internet list (grabs the master server list on refresh)
