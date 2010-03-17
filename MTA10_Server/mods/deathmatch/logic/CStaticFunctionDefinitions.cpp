@@ -2764,7 +2764,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CElement* pElement, unsigned i
 
 
 #define MAX_GRAVITY 1.0f
-#define MIN_GRAVITY 0.0f
+#define MIN_GRAVITY -1.0f
 
 bool CStaticFunctionDefinitions::SetPedGravity ( CElement* pElement, float fGravity )
 {

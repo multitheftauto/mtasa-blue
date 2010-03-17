@@ -4806,7 +4806,7 @@ bool CStaticFunctionDefinitions::SetWeatherBlended ( unsigned char ucWeather )
 }
 
 #define MAX_GRAVITY 1.0f
-#define MIN_GRAVITY 0.0f
+#define MIN_GRAVITY -1.0f
 
 bool CStaticFunctionDefinitions::SetGravity ( float fGravity )
 {
