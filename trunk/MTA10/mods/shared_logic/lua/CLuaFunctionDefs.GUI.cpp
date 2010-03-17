@@ -994,7 +994,7 @@ int CLuaFunctionDefs::GUIProgressBarGetProgress ( lua_State* luaVM )
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_PROGRESSBAR ( pGUIElement ) )
         {
-            int iProgress = ( int ) ( static_cast < CGUIProgressBar* > ( pGUIElement->GetCGUIElement () ) -> GetProgress () * 100.0f );
+            int iProgress = ( int ) ( static_cast < CGUIProgressBar* > ( pGUIElement->GetCGUIElement () ) -> GetProgress () * 100.0f + 0.5f );
             lua_pushnumber ( luaVM, iProgress );
             return 1;
         }
