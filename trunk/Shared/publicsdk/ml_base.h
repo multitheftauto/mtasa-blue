@@ -21,6 +21,7 @@
 #define	MODULE_AUTHOR		"anon"
 #define MODULE_VERSION		1.0
 
+#include <string.h>
 #include "Common.h"
 #include "CFunctions.h"
 #include "include/ILuaModuleManager.h"
