@@ -307,16 +307,17 @@ CServerBrowser::ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( 
 
 void CServerBrowser::Update ( void )
 {
-    CServerList *pList = GetServerList ( GetCurrentServerBrowserType () );
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+    CServerList *pList = GetServerList ( Type );
 
     // Update the current server list class
     pList->Pulse ();
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
-    if ( ( pList->IsUpdated () || m_PrevServerBrowserType != GetCurrentServerBrowserType () ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
+    if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
     {
         // Update the GUI
-        UpdateServerList ( GetCurrentServerBrowserType () );
+        UpdateServerList ( Type , Type == RECENTLY_PLAYED );
 
         // Set the status string
         m_pServerListStatus->SetText ( pList->GetStatus ().c_str () );
@@ -325,7 +326,7 @@ void CServerBrowser::Update ( void )
         m_ulLastUpdateTime = CClientTime::GetTime ();
 
         // Update last viewed tab
-        m_PrevServerBrowserType = GetCurrentServerBrowserType ();
+        m_PrevServerBrowserType = Type;
     }
 }
 

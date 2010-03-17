@@ -282,11 +282,9 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
                     CServerList* pRecentList = pServerBrowser->GetRecentList ();
                     CServerListItem RecentServer ( Address, g_pConnectManager->m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-                    if ( !pRecentList->Exists ( RecentServer ) )
-                    {
-                        pRecentList->Add ( RecentServer );
-                        pServerBrowser->SaveRecentlyPlayedList();
-                    }
+                    pRecentList->Remove ( RecentServer );
+                    pRecentList->Add ( RecentServer, true );
+                    pServerBrowser->SaveRecentlyPlayedList();
 
                     // Set as our current server for xfire
                     if ( XfireIsLoaded () )

@@ -169,7 +169,7 @@ public:
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
     unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
 
-    void                                    Add                     ( CServerListItem Server )      { m_Servers.push_back ( new CServerListItem ( Server ) ); };
+    void                                    Add                     ( CServerListItem Server, bool addAtFront = false );
     void                                    Remove                  ( CServerListItem* pServer )    { m_Servers.remove ( pServer ); delete pServer; };
     void                                    Clear                   ( void );
     bool                                    Exists                  ( CServerListItem Server );
