@@ -38,7 +38,6 @@ AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
 AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
-AH_TEMPLATE([MTA_REVISION], The revision of the latest checkout)
 
 # Flags 
 
@@ -135,19 +134,6 @@ AC_LANG(C++)
 AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google sparse_hash_map]))
 
 # Checks for library functions.
-
-# Extract the latest SVN revision
-AC_CHECK_PROG([SVNVERSION], [svnversion], yes)
-if test -z "$SVNVERSION"; then
-	AC_MSG_ERROR(Subversion 'svnversion' not found)
-else
-	MTA_REVISION=`/usr/bin/env svnversion -n`
-	if test -z "$MTA_REVISION"; then MTA_REVISION="n/a"; fi
-
-	AC_MSG_NOTICE(Extracted SVN version: $MTA_REVISION)
-	AC_DEFINE_UNQUOTED(MTA_REVISION,["\$Rev: $MTA_REVISION \$"])
-	AC_SUBST(MTA_REVISION)
-fi
 
 # Configure subdirectories where necessary
 #   NOTE: Put these on separate single lines due to a bug in autoconf
