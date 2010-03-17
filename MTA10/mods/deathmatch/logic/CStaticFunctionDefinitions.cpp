@@ -5345,7 +5345,7 @@ bool CStaticFunctionDefinitions::IsPlayerMapForced ( bool & bForced )
 
 bool CStaticFunctionDefinitions::IsPlayerMapVisible ( bool & bVisible )
 {
-    bVisible = m_pRadarMap->GetRadarEnabled ();
+    bVisible = m_pRadarMap->IsRadarShowing ();
     return true;
 }
 
