@@ -583,6 +583,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefinitions::GetTok );
     CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefinitions::SetTimer );
     CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefinitions::KillTimer );
+    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefinitions::ResetTimer );
     CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefinitions::GetTimers );
     CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefinitions::IsTimer );
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
