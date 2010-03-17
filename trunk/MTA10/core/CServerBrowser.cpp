@@ -32,6 +32,7 @@ CServerBrowser::CServerBrowser ( void )
     // Initialize
     m_ulLastUpdateTime = 0;
     m_firstTimeBrowseServer = true;
+    m_OptionsLoaded = false;
     m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
@@ -96,6 +97,12 @@ CServerBrowser::CServerBrowser ( void )
     // Login dialog
     m_pCommunityLogin.SetVisible ( false );
     m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
+
+	// Load options
+    LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS ) );
+
+    // Save the active tab, needs to be done after at least one tab exists
+    m_pTabs->SetSelectionHandler ( GUI_CALLBACK( &CServerBrowser::OnTabChanged, this ) );
 }
 
 
@@ -891,6 +898,14 @@ bool CServerBrowser::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 {
     UpdateServerList ( GetCurrentServerBrowserType (), true );
+    SaveOptions ( );
+
+    return true;
+}
+
+bool CServerBrowser::OnTabChanged ( CGUIElement* pElement )
+{
+    SaveOptions ( );
 
     return true;
 }
@@ -1043,6 +1058,126 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
         }
     }
     return true;
+}
+
+void CServerBrowser::LoadOptions ( CXMLNode* pNode )
+{
+    if ( !pNode )
+        return;
+
+    // loop through all subnodes
+    unsigned int uiCount = pNode->GetSubNodeCount ( ); 
+    for ( unsigned int ui = 0; ui < uiCount; ui ++ )
+    {
+        CXMLNode * pSubNode = pNode->GetSubNode ( ui );
+        if ( pSubNode && pSubNode->GetTagName ( ).compare ( "list" ) == 0 )
+        {
+            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Find ( "id" );
+            if ( pListID )
+            {
+                // Check for a valid list ID
+                int i = atoi ( pListID->GetValue ().c_str () );
+                if ( i >= 0 && i < SERVER_BROWSER_TYPE_COUNT )
+                {
+                    // load all checkbox options
+                    CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Find ( "include_empty" );
+                    if ( pIncludeEmpty )
+                        m_pIncludeEmpty[ i ]->SetSelected ( pIncludeEmpty->GetValue ( ).compare ( "1" ) == 0 );
+
+                    CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Find ( "include_full" );
+                    if ( pIncludeFull )
+                        m_pIncludeFull[ i ]->SetSelected ( pIncludeFull->GetValue ( ).compare ( "1" ) == 0 );
+
+                    CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Find ( "include_locked" );
+                    if ( pIncludeLocked )
+                        m_pIncludeLocked[ i ]->SetSelected ( pIncludeLocked->GetValue ( ).compare ( "1" ) == 0 );
+
+                    // load 'include offline' if the checkbox exists
+                    if ( m_pIncludeOffline[ i ] )
+                    {
+                        CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Find ( "include_offline" );
+                        if ( pIncludeOffline )
+                            m_pIncludeOffline[ i ]->SetSelected ( pIncludeOffline->GetValue ( ).compare ( "1" ) == 0 );
+                    }
+
+                    // restore the active tab
+                    CXMLAttribute* pActiveTab = pSubNode->GetAttributes ( ).Find ( "active" );
+                    if ( pActiveTab && pActiveTab->GetValue ( ).compare ( "1" ) == 0 )
+                        m_pTabs->SetSelectedTab ( m_pTab [ i ] );
+
+                    // restore the search field contents
+                    std::string strSearch = pSubNode->GetTagContent ( );
+                    if ( strSearch.length ( ) > 0 )
+                        m_pEditServerSearch [ i ]->SetText ( strSearch.c_str ( ) );
+                }
+            }
+        }
+    }
+    m_OptionsLoaded = true;
+}
+
+void CServerBrowser::SaveOptions ( )
+{
+    // Check to make sure if the options were loaded yet, if not the 'changed' events might screw up
+    if ( !m_OptionsLoaded )
+        return;
+
+    CXMLNode* pConfig = CCore::GetSingletonPtr ( )->GetConfig ( );
+    CXMLNode* pOptions = pConfig->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS );
+    if ( !pOptions )
+    {
+        pOptions = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_OPTIONS );
+    }
+    else
+    {
+        // start with a clean node
+        pOptions->DeleteAllSubNodes ( );
+    }
+
+    int iCurrentType = GetCurrentServerBrowserType ( );
+
+    // Save the options for all four lists
+    for ( unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++ )
+    {
+        CXMLNode * pSubNode = pOptions->CreateSubNode ( "list" );
+        if ( pSubNode ) 
+        {
+            // ID of the list to save
+            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Create ( "id" );
+            pListID->SetValue ( ui );
+
+            // Checkboxes
+            CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Create ( "include_empty" );
+            pIncludeEmpty->SetValue ( m_pIncludeEmpty [ ui ]->GetSelected ( ) );
+
+            CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Create ( "include_full" );
+            pIncludeFull->SetValue ( m_pIncludeFull [ ui ]->GetSelected ( ) );
+
+            CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Create ( "include_locked" );
+            pIncludeLocked->SetValue ( m_pIncludeLocked [ ui ]->GetSelected ( ) );
+
+            // Only recently played & favorites have 'Include offline'
+            if ( m_pIncludeOffline [ ui ] )
+            {
+                CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Create ( "include_offline" );
+                pIncludeOffline->SetValue ( m_pIncludeOffline [ ui ]->GetSelected ( ) );
+            }
+
+            // Save the active Tab
+            if ( iCurrentType == ui )
+            {
+                CXMLAttribute* pActive = pSubNode->GetAttributes ( ).Create ( "active" );
+                pActive->SetValue ( 1 );
+            }
+
+            // save the search box content
+            std::string strSearch = m_pEditServerSearch [ ui ]->GetText ( );
+            if ( strSearch.length ( ) > 0 )
+            {
+                pSubNode->SetTagContent ( strSearch.c_str ( ) );
+            }
+        }
+    }
 }
 
 void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::string& strPassword )

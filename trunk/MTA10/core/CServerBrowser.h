@@ -74,6 +74,9 @@ public:
     void                SaveRecentlyPlayedList  ( );
     void                SaveFavouritesList      ( );
 
+    void                LoadOptions             ( CXMLNode* pNode );
+    void                SaveOptions             ( );
+
     bool                LoadServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
     bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
 
@@ -155,6 +158,7 @@ private:
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
+    bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnFavouritesByIPClick           ( CGUIElement* pElement );
     bool                    OnFavouritesByIPAddClick        ( CGUIElement* pElement );
     bool                    OnWindowSize                    ( CGUIElement* pElement );
@@ -168,6 +172,7 @@ private:
 
     unsigned long           m_ulLastUpdateTime;
     bool                    m_firstTimeBrowseServer;
+    bool                    m_OptionsLoaded;
     ServerBrowserType       m_PrevServerBrowserType;
 };
 
