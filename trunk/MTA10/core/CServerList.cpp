@@ -99,6 +99,13 @@ bool CServerList::Exists ( CServerListItem Server )
     return false;
 }
 
+void CServerList::Add ( CServerListItem Server, bool addAtFront )
+{
+    if ( addAtFront )
+        m_Servers.push_front ( new CServerListItem ( Server ) );
+    else
+        m_Servers.push_back ( new CServerListItem ( Server ) );
+}
 
 void CServerList::Remove ( CServerListItem Server )
 {
