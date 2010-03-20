@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CSettingsSA.cpp
 *  PURPOSE:     Game settings
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -16,6 +17,7 @@ unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
+unsigned long CSettingsSA::FUNC_SetDrawDistance;
 
 CSettingsSA::CSettingsSA ( void )
 {
@@ -132,6 +134,48 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 float CSettingsSA::GetDrawDistance ( void )
 {
     return m_pInterface->fDrawDistance;
+}
+
+void CSettingsSA::SetDrawDistance ( float fDistance )
+{
+    _asm
+    {
+        push    fDistance
+        call    FUNC_SetDrawDistance
+        add     esp, 4
+    }
+    m_pInterface->fDrawDistance = fDistance;
+}
+
+unsigned int CSettingsSA::GetBrightness ( )
+{
+    // up to 384
+    return m_pInterface->dwBrightness;
+}
+
+void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
+{
+    m_pInterface->dwBrightness = uiBrightness;
+    _asm
+    {
+        mov ecx, CLASS_CGamma
+        mov eax, FUNC_CGamma_SetGamma
+        push 1
+        push uiBrightness
+        call eax
+    }
+}
+
+unsigned int CSettingsSA::GetFXQuality ( )
+{
+    // 0 = low, 1 = medium, 2 = high, 3 = very high
+    return *(BYTE*)VAR_fFxQuality;
+}
+
+void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
+{
+    *(BYTE *)VAR_fFxQuality = fxQualityId;
+    m_pInterface->fFxQuality = fxQualityId;
 }
 
 void CSettingsSA::Save ()

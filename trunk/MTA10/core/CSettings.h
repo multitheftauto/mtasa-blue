@@ -11,6 +11,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Marcus Bauer <mabako@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -133,6 +134,14 @@ protected:
 	CGUICheckBox*	    m_pCheckBoxMenuVideo;
 	CGUICheckBox*	    m_pCheckBoxMenuPostEffects;
     CGUILabel*          m_pMapRenderingLabel;
+    CGUIComboBox*       m_pComboFxQuality;
+    CGUILabel*          m_pFXQualityLabel;
+    CGUILabel*          m_pDrawDistanceLabel;
+    CGUIScrollBar*      m_pDrawDistance;
+    CGUILabel*          m_pDrawDistanceValueLabel;
+    CGUILabel*          m_pBrightnessLabel;
+    CGUIScrollBar*      m_pBrightness;
+    CGUILabel*          m_pBrightnessValueLabel;
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
@@ -213,6 +222,8 @@ protected:
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
 	bool				OnLoginButtonClick		( CGUIElement* pElement );
     bool				OnRegisterButtonClick	( CGUIElement* pElement );
+    bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
+    bool                OnBrightnessChanged     ( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );

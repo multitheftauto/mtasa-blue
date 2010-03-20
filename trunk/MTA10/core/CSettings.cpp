@@ -11,6 +11,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Marcus Bauer <mabako@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -412,6 +413,32 @@ CSettings::CSettings ( void )
     m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
 
     vecTemp.fY += 8;
+    m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Draw Distance:" ) );
+    m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
+    m_pDrawDistanceLabel->AutoSize ( "Draw Distance: " );
+
+    m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
+    m_pDrawDistance->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+    m_pDrawDistanceValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
+    m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
+    m_pDrawDistanceValueLabel->AutoSize ( "100% " );
+
+    m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
+    m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pBrightnessLabel->GetPosition ( vecTemp, false );
+    m_pBrightnessLabel->AutoSize ( "Brightness: " );
+
+    m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
+    m_pBrightness->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+
+    m_pBrightnessValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
+    m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
+    m_pBrightnessValueLabel->AutoSize ( "100% " );
+
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
     m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
@@ -439,21 +466,35 @@ CSettings::CSettings ( void )
 	m_pCheckBoxMenuDynamic->SetVisible ( false );
 	m_pCheckBoxMenuVideo->SetVisible ( false );
 	m_pCheckBoxMenuPostEffects->SetVisible ( false );
-    vecTemp.fY -= 72;
+    vecTemp.fY -= 60;
+
+	m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
+    m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pFXQualityLabel->GetPosition ( vecTemp, false );
+    m_pFXQualityLabel->AutoSize ( "FX Quality: " );
+
+    m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
+	m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+	m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 160.0f ) );
+	m_pComboFxQuality->AddItem ( "Low" )->SetData ( (void*)0 );
+	m_pComboFxQuality->AddItem ( "Medium" )->SetData ( (void*)1 );
+	m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
+	m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
+    m_pComboFxQuality->SetReadOnly ( true );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
-    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
+    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 42.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
     m_pMapRenderingLabel->AutoSize ( "Map rendering options " );
     m_pMapRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Opacity:" ) );
-    m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pMapAlphaLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaLabel->AutoSize ( "Opacity: " );
 
     m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 50.0f, vecTemp.fY ) );
+    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
     m_pMapAlpha->GetPosition ( vecTemp, false );
     m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pMapAlpha->SetProperty ( "StepSize", "0.01" );
@@ -462,7 +503,7 @@ CSettings::CSettings ( void )
     m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 170.0f, vecTemp.fY ) );
     m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaValueLabel->AutoSize ( "100% " );
-	
+
     /**
      * Chat Tab
      **/
@@ -608,6 +649,8 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
     m_pAudioSFXVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnSFXVolumeChanged, this ) );
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
+    m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
+    m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
 	/*
 	// Give a warning if no community account settings were stored in config
 	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1631,6 +1674,14 @@ void CSettings::LoadData ( void )
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
+    m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
+    m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
+
+    int FxQuality = gameSettings->GetFXQuality();
+    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
+    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
+    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
+    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1789,6 +1840,14 @@ void CSettings::SaveData ( void )
         CCore::GetSingleton ().ShowMessageBox ( "Information", SString ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" ), MB_BUTTON_OK | MB_ICON_INFO );
 
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
+    gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
+    gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
+
+    // Visual FX Quality
+    if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
+    {
+        gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
+    }
 
     // Map alpha
     SString sText = m_pMapAlphaValueLabel->GetText ();
@@ -2127,6 +2186,22 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
             }
         }
     }
+    return true;
+}
+
+bool CSettings::OnDrawDistanceChanged ( CGUIElement* pElement )
+{
+    int iDrawDistance = ( m_pDrawDistance->GetScrollPosition () ) * 100;
+
+    m_pDrawDistanceValueLabel->SetText ( SString("%i%%", iDrawDistance).c_str() );
+    return true;
+}
+
+bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
+{
+    int iBrightness = ( m_pBrightness->GetScrollPosition () ) * 100;
+
+    m_pBrightnessValueLabel->SetText ( SString("%i%%", iBrightness).c_str() );
     return true;
 }
 
