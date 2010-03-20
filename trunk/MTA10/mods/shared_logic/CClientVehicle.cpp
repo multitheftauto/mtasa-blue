@@ -833,6 +833,13 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {
+            // Preload the model
+            if( !m_pModelInfo->IsLoaded () )
+            {
+                m_pModelInfo->Request ( true, true );
+                m_pModelInfo->MakeCustomModel ();
+            }
+
             // Create the vehicle now. Don't prerequest the model ID for this func.
             Create ();
         }
