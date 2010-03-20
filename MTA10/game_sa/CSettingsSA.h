@@ -41,7 +41,6 @@ struct CSettingsSAInterface // see code around 0x57CE9A for where these are
     BYTE pad2[0x34];
     DWORD dwBrightness;
     float fDrawDistance;
-    BYTE fFxQuality;
     bool bSubtitles;            // 0x44
     bool pad3[5];
     bool bLegend;               // 0x4A

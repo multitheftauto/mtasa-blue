@@ -175,7 +175,6 @@ unsigned int CSettingsSA::GetFXQuality ( )
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
     *(BYTE *)VAR_fFxQuality = fxQualityId;
-    m_pInterface->fFxQuality = fxQualityId;
 }
 
 void CSettingsSA::Save ()
