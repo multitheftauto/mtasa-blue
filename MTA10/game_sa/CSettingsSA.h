@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CSettingsSA.h
 *  PURPOSE:     Header file for game settings class
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -24,18 +25,23 @@
 
 #define VAR_bMouseSteering      0xC1CC02
 #define VAR_bMouseFlying        0xC1CC03
+#define VAR_fFxQuality          0xA9AE54
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
 #define FUNC_CAudioEngine_SetMusicMasterVolume 0x506DE0
+
+#define CLASS_CGamma 0xC92134
+#define FUNC_CGamma_SetGamma 0x747200
 
 struct CSettingsSAInterface // see code around 0x57CE9A for where these are
 {
     BYTE pad1[4];
     float fStatsScrollSpeed;    // 0x4
     BYTE pad2[0x34];
-    float fBrightness;          // 0x3C
-    float fDrawDistance;        // 0x40
+    DWORD dwBrightness;
+    float fDrawDistance;
+    BYTE fFxQuality;
     bool bSubtitles;            // 0x44
     bool pad3[5];
     bool bLegend;               // 0x4A
@@ -83,7 +89,15 @@ public:
     void                    SetRadioVolume              ( unsigned char ucVolume );
     unsigned char           GetSFXVolume                ( void );
     void                    SetSFXVolume                ( unsigned char ucVolume );
+
     float                   GetDrawDistance             ( void );
+    void                    SetDrawDistance             ( float fDrawDistance );
+ 
+    unsigned int            GetBrightness               ( void );
+    void                    SetBrightness               ( unsigned int uiBrightness );
+
+    unsigned int            GetFXQuality                ( void );
+    void                    SetFXQuality                ( unsigned int fxQualityId );
 
     void                    Save                        ( void );
 
@@ -93,6 +107,7 @@ private:
     static unsigned long    FUNC_GetCurrentVideoMode;
     static unsigned long    FUNC_SetCurrentVideoMode;
     static unsigned long    FUNC_SetRadioVolume;
+	static unsigned long    FUNC_SetDrawDistance;
 };
 
 #endif
