@@ -28,12 +28,7 @@ public:
 private:
     static void                 PushUniqueID        ( unsigned long ulID );
 
-    static unsigned long        PopStack            ( void );
-    static void                 PushStack           ( unsigned long ulID );
-
-    static unsigned long        m_ulIDStack [MAX_XML];
-    static unsigned long        m_ulStackPosition;
-
+    static CStack < unsigned long, MAX_XML, INVALID_XML_ID > m_IDStack;
     static CXMLCommon*          m_Elements [MAX_XML];
 };
 

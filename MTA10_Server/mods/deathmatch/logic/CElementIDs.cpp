@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CStack < ElementID > CElementIDs::m_UniqueIDs;
+CStack <ElementID, MAX_SERVER_ELEMENTS, INVALID_ELEMENT_ID > CElementIDs::m_UniqueIDs;
 CElement* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS];
 
 void CElementIDs::Initialize ( void )

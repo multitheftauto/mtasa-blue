@@ -13,6 +13,7 @@
 
 #pragma once
 #include "SString.h"
+#include <deque>
 
 //
 // _vsnprintf with buffer full check
@@ -97,7 +98,7 @@ namespace SharedUtil
 
     // Lerps between two values depending on the weight
     template< class T >
-    T Lerp ( T& from, float fAlpha, T& to )
+    T Lerp ( const T& from, float fAlpha, const T& to )
     {
         return ( to - from ) * fAlpha + from;
     }
@@ -231,6 +232,49 @@ namespace SharedUtil
     // string stuff
     //
     std::string RemoveColorCode ( const char* szString );
+
+
+    //
+    // ID 'stack'
+    //
+    template < typename T, unsigned long MAX_STACK_SIZE, unsigned long INVALID_STACK_ID = 0xFFFFFFFF >
+    class CStack
+    {
+    public:
+        inline CStack ( void )
+        {
+            // Initialize with valid ID's
+            for ( T i = 0; i < MAX_STACK_SIZE - 1; ++i )
+            {
+                m_Queue.push_back( MAX_STACK_SIZE - 1 - i );
+            }
+        }
+
+        inline T Pop ( void )
+        {
+            // Got any items? Pop from the back
+            if ( m_Queue.size () > 0 )
+            {
+                T ID = m_Queue.back();
+                m_Queue.pop_back ();
+                return ID;
+            }
+
+            // No IDs left
+            return INVALID_STACK_ID;
+        }
+
+        inline void Push ( T ID )
+        {
+            assert ( m_Queue.size () < MAX_STACK_SIZE - 1 );
+            // Push to the front
+            return m_Queue.push_front ( ID );
+        }
+
+    private:
+        std::deque < T >    m_Queue;
+    };
+
 
 };
 

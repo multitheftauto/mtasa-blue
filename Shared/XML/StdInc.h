@@ -19,13 +19,13 @@
 // SDK includes
 
 #include "Common.h"
-#include "CXMLArray.h"
 #include "CXMLAttributeImpl.h"
 #include "CXMLAttributesImpl.h"
 #include "CXMLFileImpl.h"
 #include "CXMLNodeImpl.h"
 #include "CXMLImpl.h"
 #include "SharedUtil.h"
+#include "CXMLArray.h"
 #include "SString.h"
 
 // XML includes
