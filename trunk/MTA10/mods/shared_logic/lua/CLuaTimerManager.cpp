@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Marcus Bauer <mabako@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,30 +22,38 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
     unsigned long ulCurrentTime = timeGetTime ();
     m_bIteratingList = true;
     list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
-    for ( ; iter != m_TimerList.end (); iter++ )
+    for ( ; iter != m_TimerList.end (); )
     {
         CLuaTimer* pLuaTimer = *iter;
-		unsigned long ulStartTime = pLuaTimer->GetStartTime ();
-		unsigned long ulDelay = pLuaTimer->GetDelay ();
-		unsigned int uiRepeats = pLuaTimer->GetRepeats ();
+        unsigned long ulStartTime = pLuaTimer->GetStartTime ();
+        unsigned long ulDelay = pLuaTimer->GetDelay ();
+        unsigned int uiRepeats = pLuaTimer->GetRepeats ();
 
-		// Is the time up
+        // Is the time up
         if ( ulCurrentTime >= ( ulStartTime + ulDelay ) )
         {
             pLuaTimer->ExecuteTimer ( pLuaMain );
 
-			// If this is the last repeat, remove
-			if ( uiRepeats == 1 )
-			{
+            // If this is the last repeat, remove
+            if ( uiRepeats == 1 )
+            {
                 delete pLuaTimer;
-				m_TimerList.erase ( iter );
-				break;
-			}
-			// Decrease repeats if not infinite
-			else if ( uiRepeats != 0 )
-				(*iter)->SetRepeats ( uiRepeats - 1 );
+                m_TimerList.erase ( iter++ );
+            }
+            else
+            {
+                // Decrease repeats if not infinite
+                if ( uiRepeats != 0 )
+                    (*iter)->SetRepeats ( uiRepeats - 1 );
 
-			pLuaTimer->SetStartTime ( ulCurrentTime );
+                pLuaTimer->SetStartTime ( ulCurrentTime );
+
+                iter++;
+            }
+        }
+        else
+        {
+            iter ++;
         }
     }
     m_bIteratingList = false;
