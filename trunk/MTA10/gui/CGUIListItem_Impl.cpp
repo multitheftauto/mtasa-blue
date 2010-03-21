@@ -134,19 +134,19 @@ bool CGUIListItem_Impl::GetColor ( unsigned char & ucRed, unsigned char & ucGree
     if ( ItemType == Type::TextItem )
     {
         CEGUI::colour color = reinterpret_cast < CEGUI::ListboxTextItem* > ( m_pListItem )->getTextColours ().d_top_left;
-        ucRed = color.getRed () * 255;
-        ucGreen = color.getGreen () * 255;
-        ucBlue = color.getBlue () * 255;
-        ucAlpha = color.getAlpha () * 255;
+        ucRed = static_cast < unsigned char > ( color.getRed () * 255 );
+        ucGreen = static_cast < unsigned char > ( color.getGreen () * 255 );
+        ucBlue = static_cast < unsigned char > ( color.getBlue () * 255 );
+        ucAlpha = static_cast < unsigned char > ( color.getAlpha () * 255 );
         return true;
     }
     else if ( ItemType == Type::NumberItem )
     {
         CEGUI::colour color = reinterpret_cast < CEGUI::ListboxNumberItem* > ( m_pListItem )->getTextColours ().d_top_left;
-        ucRed = color.getRed () * 255;
-        ucGreen = color.getGreen () * 255;
-        ucBlue = color.getBlue () * 255;
-        ucAlpha = color.getAlpha () * 255;
+        ucRed = static_cast < unsigned char > ( color.getRed () * 255 );
+        ucGreen = static_cast < unsigned char > ( color.getGreen () * 255 );
+        ucBlue = static_cast < unsigned char > ( color.getBlue () * 255 );
+        ucAlpha = static_cast < unsigned char > ( color.getAlpha () * 255 );
         return true;
     }
     return false;

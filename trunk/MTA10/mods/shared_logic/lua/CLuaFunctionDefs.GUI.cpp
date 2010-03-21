@@ -2459,7 +2459,7 @@ int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
             char szSet [] = ".1234567890";
             if ( strspn ( strCVAR.c_str (), szSet ) == strlen ( strCVAR.c_str () ) && !strCVAR.empty () )
             {
-                float fNumber = atof ( strCVAR.c_str() );
+                float fNumber = static_cast < float > ( atof ( strCVAR.c_str() ) );
                 if ( fNumber >= 0 )
                 {
                     lua_pushnumber ( luaVM, fNumber );
