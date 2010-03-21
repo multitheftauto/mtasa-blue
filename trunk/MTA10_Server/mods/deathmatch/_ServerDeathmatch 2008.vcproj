@@ -1746,10 +1746,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CStack.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.h"
 					>
 				</File>

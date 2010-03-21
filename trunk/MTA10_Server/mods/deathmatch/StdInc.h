@@ -211,7 +211,6 @@
 #include "CScriptFile.h"
 #include "CSerialManager.h"
 #include "CSettings.h"
-#include "CStack.h"
 #include "CTeam.h"
 #include "CTeamManager.h"
 #include "CTextDisplay.h"

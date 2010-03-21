@@ -1839,10 +1839,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CStack.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVariableBuffer.h"
 					>
 				</File>
