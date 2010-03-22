@@ -230,7 +230,7 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
     if ( pp->Windowed )
     {
         // Add frame
-        LONG Style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | WS_DLGFRAME | WS_SYSMENU;
+        LONG Style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
         SetWindowLong ( m_hDeviceWindow, GWL_STYLE, Style );
 
         LONG ExStyle = 0;//WS_EX_WINDOWEDGE;
