@@ -7335,7 +7335,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const cha
     assert ( szPassword );
 
     CAccount* pCurrentAccount = m_pAccountManager->Get ( szName );
-    if ( pCurrentAccount == NULL && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword) <= MAX_PASSWORD_LENGTH )
+    if ( pCurrentAccount == NULL && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
     {
         CAccount* pAccount = new CAccount ( m_pAccountManager, true, szName );
 		pAccount->SetPassword ( szPassword );
@@ -7411,7 +7411,7 @@ bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, const 
 
     if ( pAccount->IsRegistered () )
     {
-        if ( strcmp ( pAccount->GetPassword ().c_str (), szPassword ) )
+        if ( strcmp ( pAccount->GetPassword ().c_str (), szPassword ) && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
         {
             pAccount->SetPassword ( szPassword );
             return true;
