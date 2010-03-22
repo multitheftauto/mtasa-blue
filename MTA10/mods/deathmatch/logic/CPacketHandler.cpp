@@ -2835,6 +2835,35 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( &alpha );
                     pPed->SetAlpha ( alpha.data.ucAlpha );
 
+                    // clothes
+                    unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;
+                    if ( bitStream.Read ( ucNumClothes ) )
+                    {
+                        if ( ucNumClothes > 0 )
+                        {
+                            for ( unsigned short uc = 0 ; uc < ucNumClothes ; uc )
+                            {
+                                // Read out the texture
+                                bitStream.Read ( ucTextureLength );
+                                char* szTexture = new char [ ucTextureLength  1 ]; szTexture [ ucTextureLength ] = 0;
+                                bitStream.Read ( szTexture, ucTextureLength );
+
+                                // Read out the model
+                                bitStream.Read ( ucModelLength );
+                                char* szModel = new char [ ucModelLength  1 ]; szModel [ ucModelLength ] = 0;
+                                bitStream.Read ( szModel, ucModelLength );
+
+                                // Read out the type
+                                bitStream.Read ( ucType );
+                                pPed->GetClothes ()->AddClothes ( szTexture, szModel, ucType, false );
+
+                                // Clean up
+                                delete [] szModel;
+                                delete [] szTexture;
+                            }
+                            pPed->RebuildModel ( true );
+                        }
+                    }
                     break;
                 }
 
