@@ -38,6 +38,7 @@ struct SBindableKey
     int iGTARelative;
     eKeyData data;
     unsigned char ucNumpadRelative;
+    bool bIgnoredByGUI;
 };
 
 enum eControlType
