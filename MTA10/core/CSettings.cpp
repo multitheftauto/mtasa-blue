@@ -476,7 +476,7 @@ CSettings::CSettings ( void )
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
 	m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
-	m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 160.0f ) );
+	m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
 	m_pComboFxQuality->AddItem ( "Low" )->SetData ( (void*)0 );
 	m_pComboFxQuality->AddItem ( "Medium" )->SetData ( (void*)1 );
 	m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
