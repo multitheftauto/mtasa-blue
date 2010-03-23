@@ -66,7 +66,7 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_iHTTPConnectionsPerClient );
 
     // Tell unaware clients to use the builtin web server if http flood protection is hinted
-    unsigned char ucHTTPDownloadType = ( m_iHTTPConnectionsPerClient < 32 && BitStream.Version () < 0x04 ) ? HTTP_DOWNLOAD_ENABLED_PORT : m_ucHTTPDownloadType;
+    unsigned char ucHTTPDownloadType = ( m_iHTTPConnectionsPerClient < 32 && BitStream.Version () < 0x04 && m_ucHTTPDownloadType != HTTP_DOWNLOAD_DISABLED ) ? HTTP_DOWNLOAD_ENABLED_PORT : m_ucHTTPDownloadType;
 
     BitStream.Write ( static_cast < unsigned char > ( ucHTTPDownloadType ) );
 
