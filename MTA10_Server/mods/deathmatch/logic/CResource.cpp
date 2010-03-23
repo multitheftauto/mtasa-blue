@@ -784,12 +784,12 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( !m_pResourceElement->CallEvent ( "onResourceStart", Arguments ) )
         {
 			// We're no longer active. stop the resource
-            m_bActive = false;
             char szBuffer[255] = {0};
             CLogger::LogPrintf ( "Start up of resource %s cancelled by script\n", m_strResourceName.c_str () );
             _snprintf ( szBuffer, 254, "Start up of resource cancelled by script\n" );
             m_strFailureReason = szBuffer;
-            Stop ();
+            Stop ( true );
+            m_bActive = false;
             return false;
         }
 
