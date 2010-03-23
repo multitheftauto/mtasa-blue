@@ -566,19 +566,22 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
 
+                    if ( BitStream.Version () < 0x07 )
+                        break;
+
                     // clothes
                     unsigned char ucNumClothes = 0;
                     CPlayerClothes* pClothes = pPed->GetClothes ( );
-                    for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType )
+                    for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
                         SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
                         {
-                            ucNumClothes ;
+                            ucNumClothes++;
                         }
                     }
                     BitStream.Write ( ucNumClothes );
-                    for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType )
+                    for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
                         SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
