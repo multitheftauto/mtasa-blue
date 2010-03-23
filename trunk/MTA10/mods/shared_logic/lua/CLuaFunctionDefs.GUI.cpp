@@ -1964,6 +1964,7 @@ int CLuaFunctionDefs::GUIGridListSetItemColor ( lua_State* luaVM )
             }
             CStaticFunctionDefinitions::GUIGridListSetItemColor( *pGUIElement, lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), lua_tointeger ( luaVM, 4 ), lua_tointeger ( luaVM, 5 ), lua_tointeger ( luaVM, 6 ), iAlpha );
 
+            m_pGUIManager->DeferGridListUpdate ( pGUIElement );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
