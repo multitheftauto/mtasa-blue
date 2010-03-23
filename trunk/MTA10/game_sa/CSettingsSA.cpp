@@ -156,14 +156,6 @@ unsigned int CSettingsSA::GetBrightness ( )
 void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 {
     m_pInterface->dwBrightness = uiBrightness;
-    _asm
-    {
-        mov ecx, CLASS_CGamma
-        mov eax, FUNC_CGamma_SetGamma
-        push 1
-        push uiBrightness
-        call eax
-    }
 }
 
 unsigned int CSettingsSA::GetFXQuality ( )
