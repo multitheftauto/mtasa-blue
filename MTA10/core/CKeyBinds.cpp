@@ -29,23 +29,23 @@ SBindableKey g_bkKeys[] =
     { "tab",     0x09,          GTA_KEY_TAB,            DATA_NONE,              0 }, 
     { "lshift",  0x10,          GTA_KEY_LSHIFT,         DATA_NOT_EXTENDED,      0 },
     { "rshift",  0x10,          GTA_KEY_RSHIFT,         DATA_EXTENDED,          0 }, // 10
-    { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0 }, 
-    { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0 },
-    { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0 },
-    { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0 },
-    { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0 },
+    { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0,      true }, 
+    { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0,      true },
+    { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0,      true },
+    { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0,      true },
+    { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0,      true },
     { "capslock",0x14,          GTA_KEY_CAPSLOCK,       DATA_NONE,              0 },
     { "enter",   0x0D,          GTA_KEY_RETURN,         DATA_NOT_EXTENDED,      0 },
     { "space",   0x20,          GTA_KEY_SPACE,          DATA_NONE,              0 },
-    { "pgup",    0x21,          GTA_KEY_PGUP,           DATA_NUMPAD,            74 },
-    { "pgdn",    0x22,          GTA_KEY_PGDN,           DATA_NUMPAD,            68 }, // 20
+    { "pgup",    0x21,          GTA_KEY_PGUP,           DATA_NUMPAD,            74,     true },
+    { "pgdn",    0x22,          GTA_KEY_PGDN,           DATA_NUMPAD,            68,     true }, // 20
     { "end",     0x23,          GTA_KEY_END,            DATA_NUMPAD,            66 },
     { "home",    0x24,          GTA_KEY_HOME,           DATA_NUMPAD,            72 },
     { "arrow_l", 0x25,          GTA_KEY_LEFT,           DATA_NUMPAD,            69 },
     { "arrow_u", 0x26,          GTA_KEY_UP,             DATA_NUMPAD,            73 },
     { "arrow_r", 0x27,          GTA_KEY_RIGHT,          DATA_NUMPAD,            71 }, 
     { "arrow_d", 0x28,          GTA_KEY_DOWN,           DATA_NUMPAD,            67 },
-    { "insert",  0x2D,          GTA_KEY_INSERT,         DATA_NUMPAD,            65 }, 
+    { "insert",  0x2D,          GTA_KEY_INSERT,         DATA_NUMPAD,            65,     true }, 
     { "delete",  0x2E,          GTA_KEY_DELETE,         DATA_NUMPAD,            79 },
     { "0",       0x30,          GTA_KEY_0,              DATA_NONE,              0 }, 
     { "1",       0x31,          GTA_KEY_1,              DATA_NONE,              0 }, // 30
@@ -99,19 +99,19 @@ SBindableKey g_bkKeys[] =
     { "num_sub", 0x6D,          GTA_KEY_SUBTRACT,       DATA_NONE,              0 },
     { "num_dec", 0x6E,          GTA_KEY_DECIMAL,        DATA_NONE,              0 },
     { "num_div", 0x6F,          GTA_KEY_DIVIDE,         DATA_NONE,              0 }, // 80
-    { "F1",      0x70,          GTA_KEY_F1,             DATA_NONE,              0 }, 
-    { "F2",      0x71,          GTA_KEY_F2,             DATA_NONE,              0 }, 
-    { "F3",      0x72,          GTA_KEY_F3,             DATA_NONE,              0 }, 
-    { "F4",      0x73,          GTA_KEY_F4,             DATA_NONE,              0 }, 
-    { "F5",      0x74,          GTA_KEY_F5,             DATA_NONE,              0 },
-    { "F6",      0x75,          GTA_KEY_F6,             DATA_NONE,              0 }, 
-    { "F7",      0x76,          GTA_KEY_F7,             DATA_NONE,              0 }, 
+    { "F1",      0x70,          GTA_KEY_F1,             DATA_NONE,              0,     true }, 
+    { "F2",      0x71,          GTA_KEY_F2,             DATA_NONE,              0,     true }, 
+    { "F3",      0x72,          GTA_KEY_F3,             DATA_NONE,              0,     true }, 
+    { "F4",      0x73,          GTA_KEY_F4,             DATA_NONE,              0,     true }, 
+    { "F5",      0x74,          GTA_KEY_F5,             DATA_NONE,              0,     true },
+    { "F6",      0x75,          GTA_KEY_F6,             DATA_NONE,              0,     true }, 
+    { "F7",      0x76,          GTA_KEY_F7,             DATA_NONE,              0,     true }, 
     //{ "F8",    0x77,          GTA_KEY_F8,             DATA_NONE },  * Used for console
-    { "F9",      0x78,          GTA_KEY_F9,             DATA_NONE,              0 },
-    { "F10",     0x79,          GTA_KEY_F10,            DATA_NONE,              0 },
-    { "F11",     0x7A,          GTA_KEY_F11,            DATA_NONE,              0 }, // 90
-    { "F12",     0x7B,          GTA_KEY_F12,            DATA_NONE,              0 },
-    { "scroll",  0x91,          GTA_KEY_SCROLL,         DATA_NONE,              0 },
+    { "F9",      0x78,          GTA_KEY_F9,             DATA_NONE,              0,     true },
+    { "F10",     0x79,          GTA_KEY_F10,            DATA_NONE,              0,     true },
+    { "F11",     0x7A,          GTA_KEY_F11,            DATA_NONE,              0,     true }, // 90
+    { "F12",     0x7B,          GTA_KEY_F12,            DATA_NONE,              0,     true },
+    { "scroll",  0x91,          GTA_KEY_SCROLL,         DATA_NONE,              0,     true },
     { ";",       0xBA,          GTA_KEY_SEMICOLON,      DATA_NONE,              0 },
     { "=",       0xBB,          GTA_KEY_EQUALS,         DATA_NONE,              0 },
     { ",",       0xBC,          GTA_KEY_COMMA,          DATA_NONE,              0 },
@@ -286,9 +286,9 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     static bool bInputGoesToGUI = false;
     static bool bIsCursorForced = false;
     if ( m_pCore->IsMenuVisible () ||
-         m_pCore->GetConsole ()->IsVisible () ||
+         ( m_pCore->GetConsole ()->IsVisible () ||
          m_pCore->IsChatInputEnabled () ||
-		 m_pCore->GetGUI ()->GetGUIInputEnabled () )
+		 m_pCore->GetGUI ()->GetGUIInputEnabled () ) && !pKey->bIgnoredByGUI )
     {
         if ( !bInputGoesToGUI )
         {
