@@ -74,7 +74,8 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
             // Add each file
             do
             {
-                if ( strcmp ( FindData.cFileName, ".." ) != 0 && strcmp ( FindData.cFileName, "." ) != 0 && strcmp ( FindData.cFileName, ".svn" ) != 0 )
+                // Skip dotted entries
+                if ( FindData.cFileName[0] != '.' )
                 {
                     char * extn = NULL;
                     if ( ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != FILE_ATTRIBUTE_DIRECTORY )
@@ -134,10 +135,8 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 		{
 			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
 			{
-                // Skip . and .. entry
-                if ( strcmp ( DirEntry->d_name, "." ) != 0 &&
-                     strcmp ( DirEntry->d_name, ".." ) != 0 ) &&
-                     strcmp ( DirEntry->d_name, ".svn" ) != 0 )
+                // Skip dotted entries
+                if ( DirEntry->d_name[0] != '.' )
                 {
 				    struct stat Info;
 				    bool bDir = false;
