@@ -404,8 +404,18 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
         }
 
         ID3DXFont * pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-        float fWidth = g_pCore->GetGraphics ()->GetDXTextExtent ( szText, fScale, pFont );
 
+        // Retrieve the longest line's extent
+        std::stringstream ssText ( szText );
+        std::string sLineText;
+        float fWidth = 0.0f, fLineExtent = 0.0f;
+
+        while( std::getline ( ssText, sLineText ) )
+        {
+            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pFont );
+            if ( fLineExtent > fWidth )
+                fWidth = fLineExtent;
+        }
         // Success
         lua_pushnumber ( luaVM, fWidth );
         return 1;
