@@ -87,6 +87,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                     CResource* pResource = GetResource ( FindData.cFileName );
 
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+                         !strchr ( FindData.cFileName, '.' ) &&
                          ( bRefreshAll ||
                            !pResource ||
                            !pResource->CheckIfStartable()
@@ -126,53 +127,54 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
         }
     #else
         DIR *Dir;
-		struct dirent *DirEntry;
-		char szPath[MAX_PATH] = {0};
+        struct dirent *DirEntry;
+        char szPath[MAX_PATH] = {0};
 
-		SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
+        SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
 
-		if ( ( Dir = opendir ( strBuffer ) ) )
-		{
-			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
-			{
+        if ( ( Dir = opendir ( strBuffer ) ) )
+        {
+            while ( ( DirEntry = readdir ( Dir ) ) != NULL )
+            {
                 // Skip dotted entries
                 if ( DirEntry->d_name[0] != '.' )
                 {
-				    struct stat Info;
-				    bool bDir = false;
+                    struct stat Info;
+                    bool bDir = false;
 
-				    // Get the path
-				    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
+                    // Get the path
+                    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
                     {
-					    strcpy ( szPath, strBuffer );
-					    unsigned long ulPathLength = strlen ( szPath );
+                        strcpy ( szPath, strBuffer );
+                        unsigned long ulPathLength = strlen ( szPath );
 
-					    if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
+                        if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
 
-					    strcat ( szPath, DirEntry->d_name );
+                        strcat ( szPath, DirEntry->d_name );
 
-					    // Determine the file stats
-					    if ( lstat ( szPath, &Info ) != -1 )
-						    bDir = S_ISDIR ( Info.st_mode );
-					    else
-						    CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
+                        // Determine the file stats
+                        if ( lstat ( szPath, &Info ) != -1 )
+                            bDir = S_ISDIR ( Info.st_mode );
+                        else
+                            CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
 
-				        // Chop off the extension if it's not a dir
-				        char * extn = NULL;
-				        if ( !bDir )
+                        // Chop off the extension if it's not a dir
+                        char * extn = NULL;
+                        if ( !bDir )
                         {
-					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
-				        }
+                            extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
+                            DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
+                        }
 
-				        CResource* pResource = GetResource ( DirEntry->d_name );
+                        CResource* pResource = GetResource ( DirEntry->d_name );
 
-						if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-							 ( bRefreshAll ||
-							   !pResource ||
-							   !pResource->CheckIfStartable()
-							  )
-							)
+                        if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+                             !strchr ( DirEntry->d_name, '.' ) &&
+                             ( bRefreshAll ||
+                               !pResource ||
+                               !pResource->CheckIfStartable()
+                              )
+                            )
                         {
                             // Add the resource
                             Load ( DirEntry->d_name );
@@ -181,11 +183,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                             uiCount++;
                         }
 
-				    }
+                    }
                 }
 
 
-			}
+            }
 
             CheckResourceDependencies();
 
@@ -204,11 +206,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
             s_bNotFirstTime = true;
 
-            return true;
+            // Close the directory handle
+            closedir ( Dir );
 
-			// Close the directory handle
-			closedir ( Dir );
-		}
+            return true;
+        }
     #endif
 
     // The list hasn't changed
