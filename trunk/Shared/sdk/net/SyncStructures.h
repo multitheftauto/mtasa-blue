@@ -1579,6 +1579,22 @@ struct SColorSync : public ISyncStructure
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 32 );
     }
 
+    // From SColor
+    SColorSync( void ) {}
+    SColorSync( SColor color )
+    {
+        data.ucR = color.R;
+        data.ucG = color.G;
+        data.ucB = color.B;
+        data.ucA = color.A;
+    }
+
+    // To SColor
+    operator SColor( void ) const
+    {
+        return SColorRGBA ( data.ucR, data.ucG, data.ucB, data.ucA );
+    }
+
     struct
     {
         unsigned char ucR;

@@ -21,7 +21,7 @@ CClient3DMarker::CClient3DMarker ( CClientMarker * pThis )
     m_pThis = pThis;
     m_bMarkerStreamedIn = false;
     m_bVisible = true;
-    m_rgbaColor = COLOR_RGBA ( 255, 0, 0, 128 );
+    m_Color = SColorRGBA ( 255, 0, 0, 128 );
     m_fSize = 4.0f;
     m_dwType = MARKER3D_CYLINDER2;
     m_pMarker = NULL;
@@ -75,20 +75,6 @@ bool CClient3DMarker::IsHit ( const CVector& vecPosition ) const
     return IsPointNearPoint3D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
 }
 
-void CClient3DMarker::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
-{
-    Red   = m_rgbaColor.R;
-    Green = m_rgbaColor.G;
-    Blue  = m_rgbaColor.B;
-    Alpha = m_rgbaColor.A;
-}
-
-
-void CClient3DMarker::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
-{
-    SetColor ( SColorARGB ( Alpha, Red, Green, Blue ) );
-}
-
 
 void CClient3DMarker::StreamIn ( void )
 {
@@ -109,18 +95,18 @@ void CClient3DMarker::DoPulse ( void )
 {    
     if ( m_bMarkerStreamedIn && m_bVisible && m_pThis->GetInterior () == g_pGame->GetWorld ()->GetCurrentArea () )
     {       
-        unsigned char R, G, B, A;
-        GetColor ( R, G, B, A );
-        m_pMarker = g_pGame->Get3DMarkers ()->CreateMarker ( m_ulIdentifier, static_cast < e3DMarkerType > ( m_dwType ), &m_Matrix.vPos, m_fSize, 0.2f, R, G, B, A );
+        SColor color = GetColor ();
+        m_pMarker = g_pGame->Get3DMarkers ()->CreateMarker ( m_ulIdentifier, static_cast < e3DMarkerType > ( m_dwType ), &m_Matrix.vPos, m_fSize, 0.2f, color.R, color.G, color.B, color.A );
         if ( m_pMarker )
         {
             // Make sure it doesn't get cleaned up
             m_pMarker->SetActive ();
-            m_pMarker->SetColor ( m_rgbaColor );
+            m_pMarker->SetColor ( m_Color );
             m_pMarker->SetSize ( m_fSize );
             m_pMarker->SetMatrix ( &m_Matrix );
 
-            g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( ( RpClump * ) m_pMarker->GetRwObject (), A );
+            // This appears to do nothing
+            g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( ( RpClump * ) m_pMarker->GetRwObject (), m_Color.A );
         }
     }
 }

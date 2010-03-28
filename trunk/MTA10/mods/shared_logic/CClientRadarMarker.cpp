@@ -31,10 +31,7 @@ CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID,
     m_pMarker = NULL;
     m_usScale = 2;
     m_ulSprite = 0;
-    m_ucRed = 0;
-    m_ucGreen = 0;
-    m_ucBlue = 255;
-    m_ucAlpha = 255;
+    m_Color = SColorRGBA ( 0, 0, 255, 255 );
     m_pMapMarkerImage = NULL;
     m_eMapMarkerState = MAP_MARKER_OTHER;
     m_sOrdering = sOrdering;
@@ -142,33 +139,26 @@ void CClientRadarMarker::SetScale ( unsigned short usScale )
 }
 
 
-void CClientRadarMarker::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+void CClientRadarMarker::SetColor ( const SColor color )
 {
     // Store the color
-    m_ucRed = ucRed;
-    m_ucGreen = ucGreen;
-    m_ucBlue = ucBlue;
-    m_ucAlpha = ucAlpha;
-
-    DWORD dwColor;
-
-    // Supposed to be black? Make it almost black as entirely black
-    // might make us hit some reserved colors. Which'd be unexpected.
-    if ( ucRed == 0 &&
-         ucGreen == 0 &&
-         ucBlue == 0 )
-    {
-        dwColor = COLOR_ARGB ( 1, 1, 1, ucAlpha );
-    }
-    else
-    {
-        dwColor = COLOR_ARGB ( ucRed, ucGreen, ucBlue, ucAlpha );
-    }
+    m_Color = color;
 
     // Set the color
     if ( m_pMarker )
     {
-        m_pMarker->SetColor ( dwColor );
+        // Supposed to be black? Make it almost black as entirely black
+        // might make us hit some reserved colors. Which'd be unexpected.
+        if ( m_Color.R == 0 &&
+             m_Color.G == 0 &&
+             m_Color.B == 0 )
+        {
+            m_pMarker->SetColor ( SColorRGBA ( 1, 1, 1, m_Color.A ) );
+        }
+        else
+        {
+            m_pMarker->SetColor ( m_Color );
+        }
     }
 
     SetMapMarkerState ( m_eMapMarkerState );
@@ -276,25 +266,21 @@ void CClientRadarMarker::CreateMarker ( void )
             m_pMarker = g_pGame->GetRadar ()->CreateMarker ( &m_vecPosition );
             if ( m_pMarker )
             {
-                DWORD dwColor;
+                SColor color = m_Color;
 
                 // Supposed to be black? Make it almost black as entirely black
                 // might make us hit some reserved colors. Which'd be unexpected.
-                if ( m_ucRed == 0 &&
-                    m_ucGreen == 0 &&
-                    m_ucBlue == 0 )
+                if ( color.R == 0 &&
+                     color.G == 0 &&
+                     color.B == 0 )
                 {
-                    dwColor = COLOR_ARGB ( 1, 1, 1, m_ucAlpha );
-                }
-                else
-                {
-                    dwColor = COLOR_ARGB ( m_ucRed, m_ucGreen, m_ucBlue, m_ucAlpha );
+                    color = SColorRGBA ( 1, 1, 1, color.A );
                 }
 
                 // Set the properties
                 m_pMarker->SetPosition ( &m_vecPosition );
                 m_pMarker->SetScale ( m_usScale );
-                m_pMarker->SetColor ( dwColor );
+                m_pMarker->SetColor ( color );
                 m_pMarker->SetSprite ( static_cast < eMarkerSprite > ( m_ulSprite ) );
             }
         }
@@ -396,8 +382,8 @@ bool CClientRadarMarker::IsInVisibleDistance ( void )
 void CClientRadarMarker::GetSquareTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
-    DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
+    DWORD dwB = COLOR_ARGB ( m_Color.A, 0, 0, 0 );
+    DWORD dwC = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
     {
@@ -430,8 +416,8 @@ void CClientRadarMarker::GetSquareTexture ( DWORD dwBitMap[] )
 void CClientRadarMarker::GetUpTriangleTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
-    DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
+    DWORD dwB = COLOR_ARGB ( m_Color.A, 0, 0, 0 );
+    DWORD dwC = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
     {
@@ -464,8 +450,8 @@ void CClientRadarMarker::GetUpTriangleTexture ( DWORD dwBitMap[] )
 void CClientRadarMarker::GetDownTriangleTexture ( DWORD dwBitMap[] )
 {
     DWORD dwA = COLOR_ARGB ( 0, 0, 0, 0 );
-    DWORD dwB = COLOR_ARGB ( m_ucAlpha, 0, 0, 0 );
-    DWORD dwC = COLOR_ARGB ( m_ucAlpha, m_ucRed, m_ucGreen, m_ucBlue );
+    DWORD dwB = COLOR_ARGB ( m_Color.A, 0, 0, 0 );
+    DWORD dwC = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
 
     DWORD dwBitMapTemp[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT] = 
     {

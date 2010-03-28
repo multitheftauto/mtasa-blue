@@ -171,7 +171,7 @@ public:
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
-    static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, RGBA & color );
+    static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -205,7 +205,7 @@ public:
     static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
     static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
-    static bool                         SetVehicleHeadLightColor            ( CClientVehicle& Vehicle, RGBA color );
+    static bool                         SetVehicleHeadLightColor            ( CClientVehicle& Vehicle, const SColor color );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
@@ -219,11 +219,11 @@ public:
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     
     // Radar-area get funcs
-    static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
-	static bool							GetRadarAreaColor					( CClientRadarArea* RadarArea, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB, unsigned char& ucA );
+    static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );
+	static bool							GetRadarAreaColor					( CClientRadarArea* RadarArea, SColor& outColor );
 	static bool							GetRadarAreaSize					( CClientRadarArea* RadarArea, CVector2D& vecSize );
 	static bool							IsRadarAreaFlashing					( CClientRadarArea* RadarArea, bool& flashing );
-	static bool							SetRadarAreaColor					( CClientRadarArea* RadarArea, unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA );
+	static bool							SetRadarAreaColor					( CClientRadarArea* RadarArea, const SColor color );
 	static bool							SetRadarAreaSize					( CClientRadarArea* RadarArea, CVector2D vecSize );
 	static bool							SetRadarAreaFlashing				( CClientRadarArea* RadarArea, bool flashing );
 	static bool							IsInsideRadarArea					( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside );
@@ -247,16 +247,16 @@ public:
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
 
     // Blip funcs
-    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance );
-    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance );
+    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance );
+    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance );
 
     static bool                         SetBlipIcon                         ( CClientEntity& Entity, unsigned char ucIcon );
     static bool                         SetBlipSize                         ( CClientEntity& Entity, unsigned char ucSize );
-    static bool                         SetBlipColor                        ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                         SetBlipColor                        ( CClientEntity& Entity, const SColor color );
     static bool                         SetBlipOrdering                     ( CClientEntity& Entity, short sOrdering );
 
     // Marker create/destroy funcs
-    static CClientMarker*               CreateMarker                        ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static CClientMarker*               CreateMarker                        ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color );
 
     // Marker get funcs
     static bool                         GetMarkerTarget                     ( CClientMarker& Marker, CVector& vecTarget );
@@ -264,7 +264,7 @@ public:
     // Marker set functions
     static bool                         SetMarkerType                       ( CClientEntity& Entity, const char* szType );
     static bool                         SetMarkerSize                       ( CClientEntity& Entity, float fSize );
-    static bool                         SetMarkerColor                      ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                         SetMarkerColor                      ( CClientEntity& Entity, const SColor color );
     static bool                         SetMarkerTarget                     ( CClientEntity& Entity, const CVector* pTarget );
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 

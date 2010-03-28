@@ -498,7 +498,7 @@ private:
     bool                        m_bIsDerailable;
     unsigned char               m_ucAlpha;
     CVector                     m_vecGravity;
-    RGBA                        m_HeadLightColor;
+    SColor                      m_HeadLightColor;
     RwObject                    m_WheelObjects[4];
 
 public:
@@ -677,8 +677,8 @@ public:
     void                        GetGravity                      ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
     void                        SetGravity                      ( const CVector* pvecGravity );
 
-    inline RGBA                 GetHeadLightColor               ( void )        { return m_HeadLightColor; }
-    inline void                 SetHeadLightColor               ( RGBA color )  { m_HeadLightColor = color; }
+    inline SColor               GetHeadLightColor               ( void )        { return m_HeadLightColor; }
+    inline void                 SetHeadLightColor               ( const SColor color )  { m_HeadLightColor = color; }
 
     CObject *                   SpawnFlyingComponent            ( int i_1, unsigned int ui_2 );
     void                        SetWheelVisibility              ( eWheels wheel, bool bVisible );

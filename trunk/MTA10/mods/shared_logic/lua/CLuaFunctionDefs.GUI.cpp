@@ -1549,7 +1549,7 @@ int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
         {
             iRet = CStaticFunctionDefinitions::GUIGridListAddRow ( *pGUIElement, true );
             if ( iRet >= 0 ) {
-                m_pGUIManager->DeferGridListUpdate ( pGUIElement );
+                m_pGUIManager->QueueGridListUpdate ( pGUIElement );
                 lua_pushnumber ( luaVM, iRet );
                 return 1;
             }
@@ -1906,7 +1906,7 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
                 lua_toboolean ( luaVM, 6 ) ? true : false,
                 true
             );
-            m_pGUIManager->DeferGridListUpdate ( pGUIElement );
+            m_pGUIManager->QueueGridListUpdate ( pGUIElement );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -1964,7 +1964,7 @@ int CLuaFunctionDefs::GUIGridListSetItemColor ( lua_State* luaVM )
             }
             CStaticFunctionDefinitions::GUIGridListSetItemColor( *pGUIElement, lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), lua_tointeger ( luaVM, 4 ), lua_tointeger ( luaVM, 5 ), lua_tointeger ( luaVM, 6 ), iAlpha );
 
-            m_pGUIManager->DeferGridListUpdate ( pGUIElement );
+            m_pGUIManager->QueueGridListUpdate ( pGUIElement );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

@@ -14,7 +14,7 @@
 
 unsigned long ulUniqueId = 0;
 
-CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, float fScale, unsigned char ucFormat, unsigned char ucShadowAlpha )
+CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, unsigned char ucFormat, unsigned char ucShadowAlpha )
 {
     // Assign us an unique ID
     m_ulUniqueId = ulUniqueId++;
@@ -33,10 +33,7 @@ CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPr
 
     // Assign the properties
     m_vecPosition = vecPosition;
-    m_ucRed = ucRed;
-    m_ucGreen = ucGreen;
-    m_ucBlue = ucBlue;
-    m_ucAlpha = ucAlpha;
+    m_Color = color;
     m_fScale = fScale;
     m_ucFormat = ucFormat;
     m_Priority = Priority;
@@ -62,10 +59,7 @@ CTextItem::CTextItem ( const CTextItem& TextItem )
     // Copy over the properties
     m_ulUniqueId = TextItem.m_ulUniqueId;
     m_vecPosition = TextItem.m_vecPosition;
-    m_ucRed = TextItem.m_ucRed;
-    m_ucGreen = TextItem.m_ucGreen;
-    m_ucBlue = TextItem.m_ucBlue;
-    m_ucAlpha = TextItem.m_ucAlpha;
+    m_Color = TextItem.m_Color;
     m_fScale = TextItem.m_fScale;
     m_ucFormat = TextItem.m_ucFormat;
     m_Priority = TextItem.m_Priority;
@@ -93,10 +87,7 @@ bool CTextItem::operator= ( const CTextItem& TextItem )
     // Copy the properties
     m_ulUniqueId = TextItem.m_ulUniqueId;
     m_vecPosition = TextItem.m_vecPosition;
-    m_ucRed = TextItem.m_ucRed;
-    m_ucGreen = TextItem.m_ucGreen;
-    m_ucBlue = TextItem.m_ucBlue;
-    m_ucAlpha = TextItem.m_ucAlpha;
+    m_Color = TextItem.m_Color;
     m_fScale = TextItem.m_fScale;
     m_ucFormat = TextItem.m_ucFormat;
     m_Priority = TextItem.m_Priority;
@@ -188,30 +179,19 @@ void CTextItem::SetPosition ( const CVector2D& vecPosition )
 }
 
 
-void CTextItem::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+void CTextItem::SetColor ( const SColor color )
 {
     // If the color has changed
-    if ( m_ucRed != ucRed || m_ucGreen != ucGreen || m_ucBlue != ucBlue || m_ucAlpha != ucAlpha )
+    if ( m_Color != color )
     {
-        // Set them
-        m_ucRed = ucRed;
-        m_ucGreen = ucGreen;
-        m_ucBlue = ucBlue;
-        m_ucAlpha = ucAlpha;
+        // Set it
+        m_Color = color;
 
         // Tell the text displays
         NotifyObservers ();
     }
 }
 
-
-void CTextItem::GetColor ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
-{
-    ucRed = m_ucRed;
-    ucGreen = m_ucGreen;
-    ucBlue = m_ucBlue;
-    ucAlpha = m_ucAlpha;
-}
 
 
 void CTextItem::SetScale ( float fScale )

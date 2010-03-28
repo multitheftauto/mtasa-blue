@@ -52,7 +52,7 @@ public:
 	VOID				ClearMarkerForEntity(CObject * object);
 	VOID				ClearMarkerForEntity(CPed * ped);
 
-    VOID                DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, DWORD abgr );
+    VOID                DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color );
 };
 
 #endif

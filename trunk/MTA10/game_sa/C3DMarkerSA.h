@@ -33,7 +33,7 @@ public:
 	bool			m_bIsUsed;	// has this marker been allocated this frame?	 // 82
 	DWORD			m_nIdentifier; // 84
 
-	RGBA			rwColour; // 88 
+	DWORD			rwColour; // 88 
 	WORD			m_nPulsePeriod; // 92
 	short			m_nRotateRate;	// deg per frame (in either direction) // 94
 	DWORD			m_nStartTime; // 96
@@ -71,8 +71,8 @@ public:
 	void			SetType(DWORD dwType); // doesn't work propperly (not virtualed)
 	BOOL			IsActive();
 	DWORD			GetIdentifier();
-	RGBA			GetColor();
-	void			SetColor(RGBA color); // actually BGRA
+	SColor			GetColor();
+	void			SetColor(const SColor color); // actually BGRA
 	void			SetPulsePeriod(WORD wPulsePeriod);
 	void			SetRotateRate(short RotateRate);
 	FLOAT			GetSize();

@@ -865,22 +865,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayEffect.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientTime.cpp"
 					>
 				</File>
@@ -1752,22 +1736,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayEffect.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.h"
 					>
 				</File>
 				<File

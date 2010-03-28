@@ -65,14 +65,8 @@ public:
     bool                        IsVisible               ( void ) const;
     void                        SetVisible              ( bool bVisible );
 
-    unsigned long               GetColor                ( void );
-    void                        GetColor                ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
-    unsigned char               GetColorRed             ( void ) const;
-    unsigned char               GetColorGreen           ( void ) const;
-    unsigned char               GetColorBlue            ( void ) const;
-    unsigned char               GetColorAlpha           ( void ) const;
-    void                        SetColor                ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
-    void                        SetColor                ( unsigned long ulColor );
+    SColor                      GetColor                ( void ) const;
+    void                        SetColor                ( const SColor color );
 
     float                       GetSize                 ( void ) const;
     void                        SetSize                 ( float fSize );

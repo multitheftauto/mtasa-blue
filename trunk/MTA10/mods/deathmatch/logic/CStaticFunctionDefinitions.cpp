@@ -1056,9 +1056,9 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CClientEntity& Entity, unsign
         case CCLIENTMARKER:
         {
             CClientMarker & Marker = static_cast < CClientMarker & > ( Entity );
-            unsigned char R, G, B, A;
-            Marker.GetColor ( R, G, B, A );
-            Marker.SetColor ( R, G, B, ucAlpha );
+            SColor color = Marker.GetColor ();
+            color.A = ucAlpha;
+            Marker.SetColor ( color );
             break;
         }
 
@@ -2086,9 +2086,9 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool&
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA & color )
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, SColor& outColor )
 {
-    color = Vehicle.GetHeadLightColor ();
+    outColor = Vehicle.GetHeadLightColor ();
     return true;
 }
 
@@ -2639,7 +2639,7 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientVehicle& Vehicle, RGBA color )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientVehicle& Vehicle, const SColor color )
 {
     Vehicle.SetHeadLightColor ( color );
     return true;
@@ -2832,7 +2832,7 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
 }
 
 
-CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color )
 {
     // Create it
     CClientRadarArea* pRadarArea = new CClientRadarArea ( m_pManager, INVALID_ELEMENT_ID );
@@ -2841,7 +2841,7 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resou
 		pRadarArea->SetParent ( Resource.GetResourceDynamicEntity () );
         pRadarArea->SetPosition ( vecPosition2D );
         pRadarArea->SetSize ( vecSize );        
-        pRadarArea->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pRadarArea->SetColor ( color );
 
         return pRadarArea;
     }
@@ -2850,15 +2850,11 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resou
 }
 
 
-bool CStaticFunctionDefinitions::GetRadarAreaColor ( CClientRadarArea* RadarArea, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB, unsigned char& ucA )
+bool CStaticFunctionDefinitions::GetRadarAreaColor ( CClientRadarArea* RadarArea, SColor& outColor )
 {
 	if ( RadarArea )
 	{
-		unsigned long ulColor = RadarArea->GetColor();
-		ucR = static_cast < unsigned char > ( ulColor & 0xFF );
-		ucG = static_cast < unsigned char > ( ( ulColor >> 8 ) & 0xFF );
-		ucB = static_cast < unsigned char > ( ( ulColor >> 16 ) & 0xFF );
-		ucA = static_cast < unsigned char > ( ( ulColor >> 24 ) & 0xFF );
+        outColor = RadarArea->GetColor ();
 		return true;
 	}
 	return false;
@@ -2887,11 +2883,11 @@ bool CStaticFunctionDefinitions::IsRadarAreaFlashing ( CClientRadarArea* RadarAr
 }
 
 
-bool CStaticFunctionDefinitions::SetRadarAreaColor ( CClientRadarArea* RadarArea, unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA )
+bool CStaticFunctionDefinitions::SetRadarAreaColor ( CClientRadarArea* RadarArea, const SColor color )
 {
 	if ( RadarArea )
 	{
-		RadarArea->SetColor ( ucR, ucG, ucB, ucA );
+		RadarArea->SetColor ( color );
 		return true;
 	}
 	return false;
@@ -3112,7 +3108,7 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
@@ -3121,13 +3117,13 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
         pBlip->SetPosition ( vecPosition );
         pBlip->SetSprite ( ucIcon );
         pBlip->SetScale ( ucSize );
-        pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pBlip->SetColor ( color );
     }
     return pBlip;
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
@@ -3136,7 +3132,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource
         pBlip->AttachTo ( &Entity );
         pBlip->SetSprite ( ucIcon );
         pBlip->SetScale ( ucSize );
-        pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pBlip->SetColor ( color );
     }
     return pBlip;
 }
@@ -3174,15 +3170,15 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CClientEntity& Entity, unsigned c
 }
 
 
-bool CStaticFunctionDefinitions::SetBlipColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetBlipColor ( CClientEntity& Entity, const SColor color )
 {
-    RUN_CHILDREN SetBlipColor ( **iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetBlipColor ( **iter, color );
 
     if ( IS_RADARMARKER ( &Entity ) )
     {
         CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
 
-        Marker.SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        Marker.SetColor ( color );
         return true;
     }
 
@@ -3206,7 +3202,7 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CClientEntity& Entity, short 
 }
 
 
-CClientMarker* CStaticFunctionDefinitions::CreateMarker ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+CClientMarker* CStaticFunctionDefinitions::CreateMarker ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color )
 {
     assert ( szType );
 
@@ -3220,7 +3216,7 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker ( CResource& Resource, c
         // Set its parent and its properties
 	    pMarker->SetParent ( Resource.GetResourceDynamicEntity() );
         pMarker->SetPosition ( vecPosition );
-        pMarker->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pMarker->SetColor ( color );
         pMarker->SetSize ( fSize );
 
         // Return it
@@ -3288,16 +3284,16 @@ bool CStaticFunctionDefinitions::SetMarkerSize ( CClientEntity& Entity, float fS
 }
 
 
-bool CStaticFunctionDefinitions::SetMarkerColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetMarkerColor ( CClientEntity& Entity, const SColor color )
 {
-    RUN_CHILDREN SetMarkerColor ( **iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetMarkerColor ( **iter, color );
 
     // Is this a marker?
     if ( IS_MARKER ( &Entity ) )
     {
         // Set the new color
         CClientMarker& Marker = static_cast < CClientMarker& > ( Entity );
-        Marker.SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        Marker.SetColor ( color );
     }
 
     return true;

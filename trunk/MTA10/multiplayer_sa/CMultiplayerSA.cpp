@@ -3609,20 +3609,17 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights ()
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, float fG, float fB )
 {
-    unsigned char R = 255, G = 255, B = 255;
+    SColor color = SColorRGBA ( 255, 255, 255, 255 );
     CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pInterface );
     if ( pVehicle )
     {
-        RGBA color = pVehicle->GetHeadLightColor ();
-        R = COLOR_RGBA_R ( color );
-        G = COLOR_RGBA_G ( color );
-        B = COLOR_RGBA_B ( color );
+        color = pVehicle->GetHeadLightColor ();
     }
     
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char) Min ( 255.f, R * ( 1 / 255.0f ) * fR );
-    ulHeadLightG = (unsigned char) Min ( 255.f, G * ( 1 / 255.0f ) * fG );
-    ulHeadLightB = (unsigned char) Min ( 255.f, B * ( 1 / 255.0f ) * fB );
+    ulHeadLightR = (unsigned char) Min ( 255.f, color.R * ( 1 / 255.0f ) * fR );
+    ulHeadLightG = (unsigned char) Min ( 255.f, color.G * ( 1 / 255.0f ) * fG );
+    ulHeadLightB = (unsigned char) Min ( 255.f, color.B * ( 1 / 255.0f ) * fB );
 }
 
 CVehicleSAInterface * pHeadLightBeamVehicleInterface = NULL;

@@ -24,7 +24,7 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
     SetTypeName ( "marker" );
     m_ucType = TYPE_CHECKPOINT;
     m_fSize = 4.0f;
-    m_ulColor = 0xFFFFFFFF;
+    m_Color = SColorRGBA ( 255, 255, 255, 255 );
     m_bHasTarget = false;
     m_ucIcon = ICON_NONE;
 
@@ -104,7 +104,7 @@ bool CMarker::ReadSpecialData ( void )
     if ( GetCustomDataString ( "color", szBuffer, 128, true ) )
     {
         // Convert the HTML-style color to RGB
-        if ( !XMLColorToInt ( szBuffer, m_ulColor ) )
+        if ( !XMLColorToInt ( szBuffer, m_Color.R, m_Color.G, m_Color.B, m_Color.A ) )
         {
             CLogger::ErrorPrintf ( "Bad 'color' specified in <marker> (line %u)\n", m_uiLine );
             return false;
@@ -112,7 +112,7 @@ bool CMarker::ReadSpecialData ( void )
     }
     else
     {
-        SetColor ( 255, 0, 0, 255 );
+        SetColor ( SColorRGBA( 255, 0, 0, 255 ) );
     }
 
     float fSize;
@@ -213,15 +213,6 @@ void CMarker::SetTarget ( const CVector* pTargetVector )
 }
 
 
-void CMarker::GetColor ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A )
-{
-    R = static_cast < unsigned char > ( m_ulColor );
-    G = static_cast < unsigned char > ( m_ulColor >> 8 );
-    B = static_cast < unsigned char > ( m_ulColor >> 16 );
-    A = static_cast < unsigned char > ( m_ulColor >> 24 );
-}
-
-
 void CMarker::SetMarkerType ( unsigned char ucType )
 {
     // Different from our current type?
@@ -265,27 +256,23 @@ void CMarker::SetSize ( float fSize )
 }
 
 
-void CMarker::SetColor ( unsigned long ulColor )
+void CMarker::SetColor ( const SColor color )
 {
     // Different from our current color?
-    if ( ulColor != m_ulColor )
+    if ( color != m_Color )
     {
         // Set the new color
-        m_ulColor = ulColor;
+        m_Color = color;
 
         // Tell all the players
         CBitStream BitStream;
         BitStream.pBitStream->Write ( m_ID );
-        BitStream.pBitStream->Write ( ulColor );
+        BitStream.pBitStream->Write ( color.B  );
+        BitStream.pBitStream->Write ( color.G );
+        BitStream.pBitStream->Write ( color.R );
+        BitStream.pBitStream->Write ( color.A );
         BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_COLOR, *BitStream.pBitStream ) );
     }
-}
-
-
-void CMarker::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
-{
-    // Set the new color
-    SetColor ( COLOR_ARGB ( ucAlpha, ucRed, ucGreen, ucBlue ) );
 }
 
 

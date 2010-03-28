@@ -24,7 +24,7 @@ public:
 	bool		m_bIsUsed;
 	bool		m_rotFlag;
 	DWORD		m_nIdentifier;
-	RGBA		rwColour;
+	DWORD		rwColour;
 	WORD 		m_nPulsePeriod;
 	short		m_nRotateRate;	// deg per frame (in either direction)
 	CVector		m_pos;
@@ -55,8 +55,8 @@ public:
 	VOID			Activate();
 	DWORD			GetIdentifier();
 	VOID			SetIdentifier(DWORD dwIdentifier);
-	RGBA			GetColor();
-	VOID			SetColor(RGBA color);
+	SColor			GetColor();
+	VOID			SetColor(const SColor color);
 	VOID			SetPulsePeriod(WORD wPulsePeriod);
 	VOID			SetRotateRate(short RotateRate);
 	FLOAT			GetSize();

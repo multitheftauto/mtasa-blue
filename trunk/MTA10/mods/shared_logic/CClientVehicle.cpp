@@ -113,7 +113,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
-    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
+    m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
 
@@ -3065,7 +3065,7 @@ void CClientVehicle::SetGravity ( const CVector& vecGravity )
 }
 
 
-RGBA CClientVehicle::GetHeadLightColor ( void )
+SColor CClientVehicle::GetHeadLightColor ( void )
 {
     if ( m_pVehicle )
     {
@@ -3075,7 +3075,7 @@ RGBA CClientVehicle::GetHeadLightColor ( void )
 }
 
 
-void CClientVehicle::SetHeadLightColor ( RGBA color )
+void CClientVehicle::SetHeadLightColor ( const SColor color )
 {
     if ( m_pVehicle )
     {

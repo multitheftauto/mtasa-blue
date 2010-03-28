@@ -349,16 +349,13 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( &alpha );	
 
                     // Write headlight color
-                    RGBA color = pVehicle->GetHeadLightColor ();
-                    unsigned char R = COLOR_RGBA_R ( color );
-                    unsigned char G = COLOR_RGBA_G ( color );
-                    unsigned char B = COLOR_RGBA_B ( color );
-                    if ( R != 255 || G != 255 || B != 255 )
+                    SColor color = pVehicle->GetHeadLightColor ();
+                    if ( color.R != 255 || color.G != 255 || color.B != 255 )
                     {
                         BitStream.WriteBit ( true );
-                        BitStream.Write ( R );
-                        BitStream.Write ( G );
-                        BitStream.Write ( B );
+                        BitStream.Write ( color.R );
+                        BitStream.Write ( color.G );
+                        BitStream.Write ( color.B );
                     }
                     else
                         BitStream.WriteBit ( false );
@@ -385,10 +382,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Colour
                     SColorSync color;
-                    color.data.ucR = pMarker->GetColorRed ();
-                    color.data.ucG = pMarker->GetColorGreen ();
-                    color.data.ucB = pMarker->GetColorBlue ();
-                    color.data.ucA = pMarker->GetColorAlpha ();
+                    color = pMarker->GetColor ();
                     BitStream.Write ( &color );
 
                     // Write the target position vector eventually
@@ -433,11 +427,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                         // Write the color
                         SColorSync color;
-                        unsigned long ulColor = pBlip->GetColor ();
-                        color.data.ucR = ulColor & 0xFF;
-                        color.data.ucG = ( ulColor >> 8 ) & 0xFF;
-                        color.data.ucB = ( ulColor >> 16 ) & 0xFF;
-                        color.data.ucA = ( ulColor >> 24 ) & 0xFF;
+                        color = pBlip->GetColor ();
                         BitStream.Write ( &color );
                     }                    
 
@@ -459,7 +449,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( &size2D );
 
                     // And the color
-                    BitStream.Write ( pArea->GetColor () );
+                    SColor color = pArea->GetColor ();
+                    BitStream.Write ( color.R );
+                    BitStream.Write ( color.G );
+                    BitStream.Write ( color.B );
+                    BitStream.Write ( color.A );
 
                     // Write whether it is flashing
                     bool bIsFlashing = pArea->IsFlashing ();

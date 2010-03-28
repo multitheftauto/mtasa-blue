@@ -120,20 +120,20 @@ void CClientGUIManager::Remove ( CClientGUIElement* pGUIElement )
 
 void CClientGUIManager::DoPulse ( void )
 {
-    FlushDeferedUpdates ();
+    FlushQueuedUpdates ();
 }
 
-void CClientGUIManager::DeferGridListUpdate ( CClientGUIElement *pGUIElement )
+void CClientGUIManager::QueueGridListUpdate ( CClientGUIElement *pGUIElement )
 {
     ElementID ID = pGUIElement->GetID ();
-    if ( m_DeferedGridListUpdates.find ( ID ) == m_DeferedGridListUpdates.end () )
-        m_DeferedGridListUpdates[ ID ] = true;
+    if ( m_QueuedGridListUpdates.find ( ID ) == m_QueuedGridListUpdates.end () )
+        m_QueuedGridListUpdates[ ID ] = true;
 }
 
-void CClientGUIManager::FlushDeferedUpdates ()
+void CClientGUIManager::FlushQueuedUpdates ()
 {
-    map < ElementID, bool >::iterator iter = m_DeferedGridListUpdates.begin ();
-    for ( ; iter != m_DeferedGridListUpdates.end () ; ++iter )
+    map < ElementID, bool >::iterator iter = m_QueuedGridListUpdates.begin ();
+    for ( ; iter != m_QueuedGridListUpdates.end () ; ++iter )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( iter->first );
         if ( pEntity && !pEntity->IsBeingDeleted () && pEntity->GetType () == CCLIENTGUI )
@@ -146,5 +146,5 @@ void CClientGUIManager::FlushDeferedUpdates ()
             }
         }
     }
-    m_DeferedGridListUpdates.clear ();
+    m_QueuedGridListUpdates.clear ();
 }

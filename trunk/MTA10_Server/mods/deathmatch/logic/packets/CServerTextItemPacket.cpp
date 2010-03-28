@@ -19,17 +19,14 @@ CServerTextItemPacket::CServerTextItemPacket( void )
 }
 
 
-CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, unsigned char ucShadowAlpha, char* szText )
+CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format, unsigned char ucShadowAlpha, char* szText )
 {
     m_ulUniqueId = ulUniqueId;
     m_bDeletable = bDeleteable;
     m_fX = fX;
     m_fY = fY;
     m_fScale = fScale;
-    m_red = red;
-    m_green = green;
-    m_blue = blue;
-    m_alpha = alpha;
+    m_Color = color;
     m_ucFormat = format;
     m_ucShadowAlpha = ucShadowAlpha;
     m_szText = new char [strlen ( szText ) + 1];
@@ -59,10 +56,10 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
         BitStream.Write ( m_fX );
         BitStream.Write ( m_fY );
         BitStream.Write ( m_fScale );
-        BitStream.Write ( m_red );
-        BitStream.Write ( m_green );
-        BitStream.Write ( m_blue );
-        BitStream.Write ( m_alpha );
+        BitStream.Write ( m_Color.R );
+        BitStream.Write ( m_Color.G );
+        BitStream.Write ( m_Color.B );
+        BitStream.Write ( m_Color.A );
         BitStream.Write ( m_ucFormat );
         if ( BitStream.Version() >= 0x03 )
             BitStream.Write ( m_ucShadowAlpha );

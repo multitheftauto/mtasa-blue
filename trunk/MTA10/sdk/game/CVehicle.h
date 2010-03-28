@@ -201,8 +201,8 @@ public:
     virtual void                 GetGravity                             ( CVector* pvecGravity ) const = 0;
     virtual void                 SetGravity                             ( const CVector* pvecGravity ) = 0;
 
-    virtual RGBA                 GetHeadLightColor                      ( void ) = 0;
-    virtual void                 SetHeadLightColor                      ( RGBA color ) = 0;
+    virtual SColor               GetHeadLightColor                      ( void ) = 0;
+    virtual void                 SetHeadLightColor                      ( const SColor color ) = 0;
 
     virtual CObject *            SpawnFlyingComponent                   ( int i_1, unsigned int ui_2 ) = 0;
     virtual void                 SetWheelVisibility                     ( eWheels wheel, bool bVisible ) = 0;

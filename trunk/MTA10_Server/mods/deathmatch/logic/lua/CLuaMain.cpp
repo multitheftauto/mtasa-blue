@@ -399,9 +399,9 @@ void CLuaMain::DestroyDisplay ( CTextDisplay * pDisplay )
 }
 
 
-CTextItem * CLuaMain::CreateTextItem ( const char* szText, float fX, float fY, eTextPriority priority, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, float fScale, unsigned char format, unsigned char ucShadowAlpha )
+CTextItem * CLuaMain::CreateTextItem ( const char* szText, float fX, float fY, eTextPriority priority, const SColor color, float fScale, unsigned char format, unsigned char ucShadowAlpha )
 {
-    CTextItem * pTextItem = new CTextItem( szText, CVector2D ( fX, fY ), priority, red, green, blue, alpha, fScale, format, ucShadowAlpha );
+    CTextItem * pTextItem = new CTextItem( szText, CVector2D ( fX, fY ), priority, color, fScale, format, ucShadowAlpha );
     m_TextItems.push_back ( pTextItem );
     return pTextItem;
 }

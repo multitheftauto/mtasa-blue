@@ -60,6 +60,12 @@ int CLuaFunctionDefs::CreateRadarArea ( lua_State* luaVM )
             dBlue >= 0 && dBlue <= 255 &&
             dAlpha >= 0 && dAlpha <= 255 )
         {     
+            SColor color;
+            color.R = static_cast < unsigned char > ( dRed );
+            color.G = static_cast < unsigned char > ( dGreen );
+            color.B = static_cast < unsigned char > ( dBlue );
+            color.A = static_cast < unsigned char > ( dAlpha );
+
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {
@@ -67,7 +73,7 @@ int CLuaFunctionDefs::CreateRadarArea ( lua_State* luaVM )
                 if ( pResource )
                 {
                     // Create it
-                    CClientRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( *pResource, vecPosition, vecSize, static_cast < unsigned char > ( dRed ), static_cast < unsigned char > ( dGreen ), static_cast < unsigned char > ( dBlue ), static_cast < unsigned char > ( dAlpha ) );
+                    CClientRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( *pResource, vecPosition, vecSize, color );
                     if ( pRadarArea )
                     {
                         CElementGroup * pGroup = pResource->GetElementGroup();
@@ -99,17 +105,13 @@ int CLuaFunctionDefs::GetRadarAreaColor ( lua_State* luaVM )
         CClientRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
         if ( pRadarArea )
         {
-            unsigned char ucRed = 0;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
-            unsigned char ucAlpha = 0;
-
-            if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            SColor color;
+            if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, color ) )
             {
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucRed ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucGreen ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucBlue ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucAlpha ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
                 return 4;
             }
         }
@@ -197,10 +199,16 @@ int CLuaFunctionDefs::SetRadarAreaColor ( lua_State* luaVM )
             dBlue >= 0 && dBlue <= 255 &&
             dAlpha >= 0 && dAlpha <= 255 )
         {
+            SColor color;
+            color.R = static_cast < unsigned char > ( dRed );
+            color.G = static_cast < unsigned char > ( dGreen );
+            color.B = static_cast < unsigned char > ( dBlue );
+            color.A = static_cast < unsigned char > ( dAlpha );
+
             CClientRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
             if ( pRadarArea )
             {
-                if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pRadarArea, static_cast < unsigned char > ( dRed ), static_cast < unsigned char > ( dGreen ), static_cast < unsigned char > ( dBlue ), static_cast < unsigned char > ( dAlpha ) ) )
+                if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pRadarArea, color ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

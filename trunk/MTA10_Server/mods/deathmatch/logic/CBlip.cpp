@@ -93,7 +93,7 @@ bool CBlip::ReadSpecialData ( void )
     if ( GetCustomDataString ( "color", szColor, 64, true ) )
     {
         // Convert it to RGBA
-        if ( !XMLColorToInt ( szColor, m_ucColorRed, m_ucColorGreen, m_ucColorBlue, m_ucColorAlpha ) )
+        if ( !XMLColorToInt ( szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A ) )
         {
             CLogger::ErrorPrintf ( "Bad 'color' value specified in <blip> (line %u)\n", m_uiLine );
             return false;
@@ -101,10 +101,7 @@ bool CBlip::ReadSpecialData ( void )
     }
     else
     {
-        m_ucColorRed = 0;
-        m_ucColorGreen = 0;
-        m_ucColorBlue = 255;
-        m_ucColorAlpha = 255;
+        m_Color = SColorRGBA ( 0, 0, 255, 255 );
     }
 
 	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
@@ -152,16 +149,6 @@ void CBlip::SetPosition ( const CVector& vecPosition )
         m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
     }
-}
-
-
-void CBlip::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
-{
-    // Set the new color
-    m_ucColorRed = ucRed;
-    m_ucColorGreen = ucGreen;
-    m_ucColorBlue = ucBlue;
-    m_ucColorAlpha = ucAlpha;
 }
 
 

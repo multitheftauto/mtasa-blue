@@ -91,10 +91,7 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     float fX = 0.5f;
     float fY = 0.5f;
     int priority = PRIORITY_LOW;
-    unsigned char red = 255;
-    unsigned char green = 255;
-    unsigned char blue = 255;
-    unsigned char alpha = 255;
+    SColorRGBA color ( 255, 255, 255, 255 );
     float scale = 1.0f;
     unsigned char format = 0;
     unsigned char ucShadowAlpha = 0;
@@ -121,16 +118,16 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     }
         
     if ( lua_type ( luaVM, 5 ) == LUA_TNUMBER )
-        red = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
     if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER )
-        green = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
     if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER )
-        blue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+        color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
     if ( lua_type ( luaVM, 8 ) == LUA_TNUMBER )
-        alpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+        color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
 
     if ( lua_type ( luaVM, 9 ) == LUA_TNUMBER )
         scale = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
@@ -158,7 +155,7 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( luaMain )
     {
-        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, red, green, blue, alpha, scale, format, ucShadowAlpha );
+        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, color, scale, format, ucShadowAlpha );
         lua_pushtextitem ( luaVM, pTextItem );
         return 1;
     }
@@ -555,7 +552,12 @@ int CLuaTextDefs::textItemSetColor ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                pTextItem->SetColor ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) ) );
+                SColor color;
+                color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+                color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                pTextItem->SetColor ( color );
 
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -580,13 +582,11 @@ int CLuaTextDefs::textItemGetColor ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
-                pTextItem->GetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
-
-                lua_pushnumber ( luaVM, ucRed );
-                lua_pushnumber ( luaVM, ucGreen );
-                lua_pushnumber ( luaVM, ucBlue );
-                lua_pushnumber ( luaVM, ucAlpha );
+                SColor color = pTextItem->GetColor ();
+                lua_pushnumber ( luaVM, color.R );
+                lua_pushnumber ( luaVM, color.G );
+                lua_pushnumber ( luaVM, color.B );
+                lua_pushnumber ( luaVM, color.A );
                 return 4;
             }
         }

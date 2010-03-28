@@ -64,7 +64,7 @@ public:
 	VOID				SetDisplay ( eMarkerDisplay wDisplay );
 	VOID				SetScale ( WORD wScale );
 	VOID				SetColor ( eMarkerColor color );
-	VOID				SetColor ( RGBA color );
+	VOID				SetColor ( const SColor color );
 	VOID				Remove ( );
 	BOOL				IsActive (  );
 	VOID				SetPosition ( CVector * vecPosition );

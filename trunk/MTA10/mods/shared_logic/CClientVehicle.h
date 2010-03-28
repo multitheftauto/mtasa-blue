@@ -345,8 +345,8 @@ public:
     void                        GetGravity              ( CVector& vecGravity ) const       { vecGravity = m_vecGravity; }
     void                        SetGravity              ( const CVector& vecGravity );
 
-    RGBA                        GetHeadLightColor       ( void );
-    void                        SetHeadLightColor       ( RGBA color );
+    SColor                      GetHeadLightColor       ( void );
+    void                        SetHeadLightColor       ( const SColor color );
 
     bool                        IsEnterable             ( void );
     bool                        HasRadio                ( void );
@@ -510,7 +510,7 @@ protected:
     bool                        m_bIsInWater;
 
     CVector                     m_vecGravity;
-    RGBA                        m_HeadLightColor;
+    SColor                      m_HeadLightColor;
 
 public:
     CClientPlayer *             m_pLastSyncer;

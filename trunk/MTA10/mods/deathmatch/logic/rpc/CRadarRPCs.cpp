@@ -53,16 +53,19 @@ void CRadarRPCs::SetRadarAreaColor ( NetBitStreamInterface& bitStream )
 {
     // Read out the radar area id and the color
     ElementID ID;
-    unsigned long ulColor;
+    SColor color;
     if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ulColor ) )
+         bitStream.Read ( color.R ) &&
+         bitStream.Read ( color.G ) &&
+         bitStream.Read ( color.B ) &&
+         bitStream.Read ( color.A ) )
     {
         // Grab the radar area
         CClientRadarArea* pArea = m_pRadarAreaManager->Get ( ID );
         if ( pArea )
         {
             // Set the new color
-            pArea->SetColor ( ulColor );
+            pArea->SetColor ( color );
         }
     }
 }

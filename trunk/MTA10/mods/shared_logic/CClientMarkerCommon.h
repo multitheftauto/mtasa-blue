@@ -44,14 +44,8 @@ public:
     virtual bool                IsVisible               ( void ) const = 0;
     virtual void                SetVisible              ( bool bVisible ) = 0;
 
-    virtual unsigned long       GetColor                ( void ) = 0;
-    virtual void                GetColor                ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const = 0;
-    virtual unsigned char       GetColorRed             ( void ) const = 0;
-    virtual unsigned char       GetColorGreen           ( void ) const = 0;
-    virtual unsigned char       GetColorBlue            ( void ) const = 0;
-    virtual unsigned char       GetColorAlpha           ( void ) const = 0;
-    virtual void                SetColor                ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha ) = 0;
-    virtual void                SetColor                ( unsigned long ulColor ) = 0;
+    virtual SColor              GetColor                ( void ) const = 0;
+    virtual void                SetColor                ( const SColor color ) = 0;
 
     virtual void                GetPosition             ( CVector& vecPosition ) const = 0;
     virtual void                SetPosition             ( const CVector& vecPosition ) = 0;

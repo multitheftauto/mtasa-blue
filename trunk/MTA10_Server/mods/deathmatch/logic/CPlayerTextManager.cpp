@@ -152,8 +152,8 @@ void CPlayerTextManager::Process ()
     {
         // Tell the player
         m_pPlayer->Send ( CServerTextItemPacket( textItem->m_ulUniqueId, textItem->m_bDeletable, textItem->m_vecPosition.fX, 
-                                                 textItem->m_vecPosition.fY, textItem->m_fScale, textItem->m_ucRed, 
-                                                 textItem->m_ucGreen, textItem->m_ucBlue, textItem->m_ucAlpha, textItem->m_ucFormat, textItem->m_ucShadowAlpha, textItem->m_szText ) );
+                                                 textItem->m_vecPosition.fY, textItem->m_fScale, 
+                                                 textItem->m_Color, textItem->m_ucFormat, textItem->m_ucShadowAlpha, textItem->m_szText ) );
 
         // Delete the text item created on the queue
         delete textItem;

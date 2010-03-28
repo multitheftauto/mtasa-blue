@@ -18,7 +18,7 @@ CClientDisplay::CClientDisplay ( CClientDisplayManager* pDisplayManager, unsigne
 
     m_ulExpirationTime = 0;
     m_bVisible = true;
-    m_rgbaColor = 0xFFFFFFFF;
+    m_Color = SColorRGBA ( 255, 255, 255, 255 );
 
     m_pDisplayManager->AddToList ( this );
 }
@@ -33,7 +33,5 @@ CClientDisplay::~CClientDisplay ( void )
 
 void CClientDisplay::SetColorAlpha ( unsigned char ucAlpha )
 {
-    SColor color = GetColor ();
-    color.A = ucAlpha;
-    SetColor ( color );
+    m_Color.A = ucAlpha;
 }

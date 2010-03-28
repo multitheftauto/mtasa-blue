@@ -60,7 +60,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     // Create the text display for the mode text
     m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pModeText->SetCaption ( "Current Mode: Free Move" );
-    m_pModeText->SetColor ( 255, 255, 255, 200 );
+    m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
     m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
     m_pModeText->SetFormat ( DT_CENTER | DT_VCENTER );
     m_pModeText->SetScale ( 1.5f );
@@ -112,7 +112,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     // Create the text displays for the help text
     m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
-    m_pHelpTextZooming->SetColor( 255, 255, 255, 255 );
+    m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
     m_pHelpTextZooming->SetFormat ( DT_CENTER | DT_VCENTER );
     m_pHelpTextZooming->SetScale ( 1.0f );
@@ -120,7 +120,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 
     m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
-    m_pHelpTextMovement->SetColor( 255, 255, 255, 255 );
+    m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
     m_pHelpTextMovement->SetFormat ( DT_CENTER | DT_VCENTER );
     m_pHelpTextMovement->SetScale ( 1.0f );
@@ -128,7 +128,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 
     m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
-    m_pHelpTextAttachment->SetColor( 255, 255, 255, 255 );
+    m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );
     m_pHelpTextAttachment->SetFormat ( DT_CENTER | DT_VCENTER );
     m_pHelpTextAttachment->SetScale ( 1.0f );
@@ -238,15 +238,7 @@ void CRadarMap::DoPulse ( void )
                 // Calculate the size of the area
                 vecSize.fX = static_cast < float > ( fX / fRatio );
                 vecSize.fY = static_cast < float > ( fY / fRatio );
-                unsigned long ulColor = pArea->GetColor ();
-
-                // Convert the color from ABGR to ARGB
-                ulColor = ( ulColor & 0xFF000000 ) |            // a
-                        ( ( ulColor & 0x000000FF ) << 16 ) |  // r
-                        ( ulColor & 0x0000FF00 ) |            // g
-                        ( ( ulColor & 0x00FF0000 ) >> 16 );   // b
-
-                g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, ulColor );
+                g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, pArea->GetColor () );
             }
         }
 
@@ -387,13 +379,13 @@ void CRadarMap::DoPulse ( void )
 
         if ( m_bTextVisible )
         {
-            m_pModeText->Render ( true );
+            m_pModeText->Render ();
             if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->Render ( true );
+                m_pHelpTextZooming->Render ();
             if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->Render ( true );
+                m_pHelpTextMovement->Render ();
             if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->Render ( true );
+                m_pHelpTextAttachment->Render ();
         }
     }
     else
