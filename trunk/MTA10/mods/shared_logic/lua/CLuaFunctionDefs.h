@@ -70,6 +70,8 @@ public:
     LUA_DECLARE ( IsSoundPaused );
     LUA_DECLARE ( SetSoundVolume );
     LUA_DECLARE ( GetSoundVolume );
+    LUA_DECLARE ( SetSoundSpeed );
+    LUA_DECLARE ( GetSoundSpeed );
     LUA_DECLARE ( SetSoundMinDistance );
     LUA_DECLARE ( GetSoundMinDistance );
     LUA_DECLARE ( SetSoundMaxDistance );

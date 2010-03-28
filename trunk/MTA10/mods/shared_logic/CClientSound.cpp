@@ -7,6 +7,7 @@
 *  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *               arc_
+*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -27,6 +28,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     RelateDimension ( pManager->GetSoundManager ()->GetDimension () );
 
     m_fVolume = 1.0f;
+    m_fSpeed = 1.0f;
     m_fMinDistance = 2.0f;
     m_usDimension = 0;
     m_b3D = false;
@@ -143,6 +145,20 @@ void CClientSound::SetVolume ( float fVolume )
     if ( m_pSound && !m_b3D && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
     {
         m_pSound->setVolume ( fVolume );
+    }
+}
+
+float CClientSound::GetPlaybackSpeed ( void )
+{
+    return m_fSpeed;
+}
+
+void CClientSound::SetPlaybackSpeed ( float fSpeed )
+{
+    m_fSpeed = fSpeed;
+    if ( m_pSound )
+    {
+        m_pSound->setPlaybackSpeed ( fSpeed );
     }
 }
 

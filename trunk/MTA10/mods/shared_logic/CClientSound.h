@@ -6,6 +6,7 @@
 *  FILE:        mods/shared_logic/CClientSound.h
 *  PURPOSE:     Sound entity class header
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -50,6 +51,9 @@ public:
     void                    SetVolume               ( float fVolume );
     float                   GetVolume               ( void );
 
+    void                    SetPlaybackSpeed        ( float fSpeed );
+    float                   GetPlaybackSpeed        ( void );
+
     void                    SetMinDistance          ( float fDistance );
     float                   GetMinDistance          ( void );
 
@@ -73,6 +77,7 @@ protected:
 private:
 
     float                   m_fVolume;
+    float                   m_fSpeed;
     float                   m_fMinDistance;
 
     CVector                 m_vecPosition;
