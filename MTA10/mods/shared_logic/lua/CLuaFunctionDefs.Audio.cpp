@@ -260,6 +260,47 @@ int CLuaFunctionDefs::GetSoundVolume ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetSoundSpeed ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+        lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fSpeed = ( float ) lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundSpeed ( *pSound, fSpeed ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetSoundSpeed ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            float fSpeed = 0.0f;
+            if ( CStaticFunctionDefinitions::GetSoundSpeed ( *pSound, fSpeed ) )
+            {
+                lua_pushnumber ( luaVM, fSpeed );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetSoundMinDistance ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&

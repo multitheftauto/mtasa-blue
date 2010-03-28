@@ -5525,6 +5525,20 @@ bool CStaticFunctionDefinitions::GetSoundVolume ( CClientSound& Sound, float& fV
 }
 
 
+bool CStaticFunctionDefinitions::SetSoundSpeed ( CClientSound& Sound, float fSpeed )
+{
+    Sound.SetPlaybackSpeed ( fSpeed );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
+{
+    fSpeed = Sound.GetPlaybackSpeed ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetSoundMinDistance ( CClientSound& Sound, float fDistance )
 {
     Sound.SetMinDistance ( fDistance );
