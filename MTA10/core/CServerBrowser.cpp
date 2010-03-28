@@ -938,7 +938,7 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     }
 
     // Construct list item
-    CServerListItem Item ( Address, iPort );
+    CServerListItem Item ( Address, iPort, strHost );
 
     // Add the item if it doesn't already exist
     if ( !m_ServersFavourites.Exists ( Item ) )
@@ -1049,7 +1049,10 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
             if ( pSubNode )
             {
                 CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
-				pHostAttribute->SetValue ( pServer->strHost.c_str () );
+                std:string strHost = pServer->strHost;
+                if ( !pServer->strHostName.empty () )
+                    strHost = pServer->strHostName;
+				pHostAttribute->SetValue ( strHost.c_str () );
                 
                 CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
 				pPortAttribute->SetValue ( pServer->usGamePort );
