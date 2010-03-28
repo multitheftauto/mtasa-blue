@@ -32,7 +32,7 @@ CCheckpointsSA::~CCheckpointsSA ( void )
 /**
  * \todo Update default color to SA's orange instead of VC's pink
  */
-CCheckpoint * CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector * vecPosition, CVector * vecPointDir, FLOAT fSize, FLOAT fPulseFraction, RGBA Color)
+CCheckpoint * CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector * vecPosition, CVector * vecPointDir, FLOAT fSize, FLOAT fPulseFraction, const SColor color)
 {
 	DEBUG_TRACE("CCheckpoint * CCheckpointsSA::CreateCheckpoint(DWORD Identifier, DWORD wType, CVector * vecPosition, CVector * vecPointDir, FLOAT fSize, FLOAT fPulseFraction, RGBA Color)");
 	/*
@@ -49,7 +49,7 @@ CCheckpoint * CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVe
 		Checkpoint->SetPosition(vecPosition);
 		Checkpoint->SetPointDirection(vecPointDir);
 		Checkpoint->SetSize(fSize);
-		Checkpoint->SetColor(Color);
+		Checkpoint->SetColor(color);
 		Checkpoint->SetPulsePeriod(1024);
 		((CCheckpointSA *)(Checkpoint))->SetPulseFraction(fPulseFraction);
 		Checkpoint->SetRotateRate(1);

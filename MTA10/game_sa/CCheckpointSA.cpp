@@ -72,15 +72,20 @@ VOID CCheckpointSA::SetIdentifier(DWORD dwIdentifier)
 	this->GetInterface()->m_nIdentifier = dwIdentifier;
 }
 
-RGBA CCheckpointSA::GetColor()
+SColor CCheckpointSA::GetColor()
 {
 	DEBUG_TRACE("RGBA CCheckpointSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-	return ( ulABGR >> 24 ) | ulABGR | ( ulABGR >> 8 ) | ( ulABGR >> 16 );
+    SColor color;
+    color.A = ( ulABGR >> 24 ) && 0xff;
+    color.B = ( ulABGR >> 16 ) && 0xff;
+    color.G = ( ulABGR >> 8 ) && 0xff;
+    color.R = ulABGR && 0xff;
+    return color;
 }
 
-VOID CCheckpointSA::SetColor(RGBA color)
+VOID CCheckpointSA::SetColor(const SColor color)
 {
 	DEBUG_TRACE("VOID CCheckpointSA::SetColor(RGBA color)");
     // To ABGR

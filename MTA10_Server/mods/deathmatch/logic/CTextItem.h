@@ -32,7 +32,7 @@ class CTextItem
     friend class CPlayerTextManager;
 
 public:
-                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255, unsigned char ucAlpha = 255, float fScale = 1.0f, unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0 );
+                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f, unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0 );
                             CTextItem               ( const CTextItem& TextItem );
                             ~CTextItem              ( void );
 
@@ -44,8 +44,8 @@ public:
     inline const CVector2D& GetPosition             ( void )                            { return m_vecPosition; };
     void                    SetPosition             ( const CVector2D& vecPosition );
 
-    void                    SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
-    void                    GetColor                ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
+    void                    SetColor                ( const SColor color );
+    SColor                  GetColor                ( void ) const                      { return m_Color; }
 
     inline float            GetScale                ( void )                            { return m_fScale; };
     void                    SetScale                ( float fScale );
@@ -62,10 +62,7 @@ public:
 private:
     char *                      m_szText;
     CVector2D                   m_vecPosition;
-    unsigned char               m_ucRed;
-    unsigned char               m_ucGreen;
-    unsigned char               m_ucBlue;
-    unsigned char               m_ucAlpha;
+    SColor                      m_Color;
     float                       m_fScale;
     unsigned char               m_ucFormat;
     unsigned char               m_ucShadowAlpha;

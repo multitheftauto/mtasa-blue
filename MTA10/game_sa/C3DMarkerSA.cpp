@@ -69,15 +69,20 @@ DWORD C3DMarkerSA::GetIdentifier()
 	return this->GetInterface()->m_nIdentifier;
 }
 
-RGBA C3DMarkerSA::GetColor()
+SColor C3DMarkerSA::GetColor()
 {
 	DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
     // From ABGR
-    unsigned long ulABGR = this->GetInterface()->rwColour;
-	return ( ulABGR >> 24 ) | ulABGR | ( ulABGR >> 8 ) | ( ulABGR >> 16 );
+	unsigned long ulABGR = this->GetInterface()->rwColour;
+    SColor color;
+    color.A = ( ulABGR >> 24 ) && 0xff;
+    color.B = ( ulABGR >> 16 ) && 0xff;
+    color.G = ( ulABGR >> 8 ) && 0xff;
+    color.R = ulABGR && 0xff;
+    return color;
 }
 
-VOID C3DMarkerSA::SetColor(RGBA color)
+VOID C3DMarkerSA::SetColor(const SColor color)
 {
     // To ABGR
 	this->GetInterface()->rwColour = ( color.A << 24 ) | ( color.B << 16 ) | ( color.G << 8 ) | color.R;

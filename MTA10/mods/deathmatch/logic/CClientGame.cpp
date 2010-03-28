@@ -2930,12 +2930,12 @@ void CClientGame::DoPaintballs ( void )
         if ( bCollision && pCollision )
         {
             pCorona->SetPosition ( *pCollision->GetPosition () );
-            pCorona->SetColor ( 255, 0, 0, 255 );
+            pCorona->SetColor ( SColorRGBA ( 255, 0, 0, 255 ) );
         }
         else
         {
             pCorona->SetPosition ( vecTarget );
-            pCorona->SetColor ( 255, 255, 0, 255 );
+            pCorona->SetColor ( SColorRGBA ( 255, 255, 0, 255 ) );
         }
 
         // Destroy the colpoint

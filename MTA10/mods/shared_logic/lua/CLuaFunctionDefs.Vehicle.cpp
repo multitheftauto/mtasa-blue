@@ -1236,16 +1236,12 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            RGBA color;
+            SColor color;
             if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, color ) )
             {
-                unsigned char R = COLOR_RGBA_R ( color );
-                unsigned char G = COLOR_RGBA_G ( color );
-                unsigned char B = COLOR_RGBA_B ( color );
-
-                lua_pushnumber ( luaVM, R );
-                lua_pushnumber ( luaVM, G );
-                lua_pushnumber ( luaVM, B );
+                lua_pushnumber ( luaVM, color.R );
+                lua_pushnumber ( luaVM, color.G );
+                lua_pushnumber ( luaVM, color.B );
                 return 3;
             }
         }
@@ -2217,10 +2213,11 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            unsigned char R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-            RGBA color = COLOR_RGBA ( R, G, B, 255 );
+            SColor color;
+            color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            color.A = 255;
 
             if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pVehicle, color ) )
             {

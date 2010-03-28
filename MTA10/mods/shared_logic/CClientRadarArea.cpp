@@ -22,7 +22,7 @@ CClientRadarArea::CClientRadarArea ( class CClientManager* pManager, ElementID I
     // Init
     m_pManager = pManager;
     m_pRadarAreaManager = pManager->GetRadarAreaManager ();
-    SetColor ( 0xFFFFFFFF );
+    m_Color = SColorRGBA ( 255, 255, 255, 255 );
     m_bFlashing = false;
     m_ulFlashCycleStart = 0;
     m_bStreamedIn = true;
@@ -64,7 +64,7 @@ void CClientRadarArea::DoPulse ( bool bRender )
     if ( m_bStreamedIn )
     {
         // If it's flashing, calculate a new alpha
-        unsigned long ulColor = m_ulColor;
+        SColor color = m_Color;
      
         if ( m_bFlashing )
         {
@@ -96,9 +96,7 @@ void CClientRadarArea::DoPulse ( bool bRender )
             }
 
             // Multiply the alpha-factor with the alpha we're supposed to have to find what alpha to use and set it
-            unsigned char ucAlpha = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( ( ulColor & 0xFF000000 ) >> 24 ) );
-            ulColor &= 0x00FFFFFF;
-            ulColor |= ucAlpha << 24;
+            color.A = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( color.A ) );
         }
 
 	    // Only render the radar area if we are told to
@@ -107,21 +105,9 @@ void CClientRadarArea::DoPulse ( bool bRender )
 		    // Draw it
 		    g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
                                                     m_vecPosition.fX, m_vecPosition.fY + m_vecSize.fY,
-												    ulColor );
+                                                    color );
 	    }
     }
-}
-
-
-void CClientRadarArea::SetColor ( unsigned long ulColor )
-{
-    m_ulColor = ulColor;
-}
-
-
-void CClientRadarArea::SetColor ( unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA )
-{
-	m_ulColor = (((((ucA)&0xff)<<24)|(((ucB)&0xff)<<16)|(((ucG)&0xff)<<8)|((ucR)&0xff)));
 }
 
 

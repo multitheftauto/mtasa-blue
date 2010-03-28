@@ -18,7 +18,7 @@ CClientCorona::CClientCorona ( CClientMarker * pThis )
     m_pThis = pThis;
     m_bStreamedIn = false;
     m_bVisible = true;
-    m_rgbaColor = COLOR_RGBA ( 255, 0, 0, 255 );
+    m_Color = SColorRGBA ( 255, 0, 0, 255 );
     m_fSize = 4.0f;
     m_pCoronas = g_pGame->GetCoronas ();
 
@@ -42,32 +42,6 @@ CClientCorona::~CClientCorona ( void )
 bool CClientCorona::IsHit ( const CVector& vecPosition ) const
 {
     return IsPointNearPoint3D ( m_Matrix.vPos, vecPosition, m_fSize + 4 );
-}
-
-
-void CClientCorona::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
-{
-    Red   = m_rgbaColor.R;
-    Green = m_rgbaColor.G;
-    Blue  = m_rgbaColor.B;
-    Alpha = m_rgbaColor.A;
-}
-
-
-void CClientCorona::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
-{
-    SetColor ( SColorARGB ( Alpha, Red, Green, Blue ) );
-}
-
-
-void CClientCorona::SetColor ( unsigned long ulColor )
-{
-    // Different from our current color?
-    if ( m_rgbaColor != ulColor )
-    {
-        // Set it
-        m_rgbaColor = ulColor;
-    }
 }
 
 
@@ -100,9 +74,8 @@ void CClientCorona::DoPulse ( void )
         CRegisteredCorona* pCorona = m_pCoronas->CreateCorona ( m_ulIdentifier, &m_Matrix.vPos );
         if ( pCorona )
         {
-            unsigned char R, G, B, A;
-            GetColor ( R, G, B, A );
-            pCorona->SetColor ( R, G, B, A );
+            SColor color = GetColor ();
+            pCorona->SetColor ( color.R, color.G, color.B, color.A );
             pCorona->SetSize ( m_fSize );
         }
     }

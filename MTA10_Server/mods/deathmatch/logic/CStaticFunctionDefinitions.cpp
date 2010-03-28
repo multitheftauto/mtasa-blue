@@ -404,8 +404,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
             {
                 pTemp->m_ucIcon = pBlip->m_ucIcon;
                 pTemp->m_ucSize = pBlip->m_ucSize;
-                pTemp->SetColor ( pBlip->m_ucColorRed, pBlip->m_ucColorGreen,
-                                  pBlip->m_ucColorBlue, pBlip->m_ucColorAlpha );
+                pTemp->SetColor ( pBlip->GetColor () );
 
                 pNewElement = pTemp;
             }
@@ -1256,9 +1255,9 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
         case CElement::MARKER:
         {
             CMarker * pMarker = static_cast < CMarker* > ( pElement );
-            unsigned char R, G, B, A;
-            pMarker->GetColor ( R, G, B, A );
-            pMarker->SetColor ( R, G, B, ucAlpha );
+            SColor color = pMarker->GetColor ();
+            color.A = ucAlpha;
+            pMarker->SetColor ( color );
             break;
         }
         default: return false;
@@ -3280,12 +3279,7 @@ bool CStaticFunctionDefinitions::FadeCamera ( CElement * pElement, bool bFadeIn,
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
 
-        pPlayer->SetCamFadedIn ( bFadeIn );
-
         unsigned char ucFadeIn = bFadeIn ? 1:0;
-
-        if ( !bFadeIn )
-            pPlayer->SetCamFadeColor ( ucRed, ucGreen, ucBlue );
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucFadeIn );
@@ -3933,11 +3927,11 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, RGBA & color )
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle, SColor& outColor )
 {
     assert ( pVehicle );
     
-    color = pVehicle->GetHeadLightColor ();
+    outColor = pVehicle->GetHeadLightColor ();
     return true;
 }
 
@@ -4857,24 +4851,19 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpee
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, RGBA color )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, const SColor color )
 {
     assert ( pVehicle );
 
-    RGBA _color = pVehicle->GetHeadLightColor ();
-    if ( color != _color )
+    if ( color != pVehicle->GetHeadLightColor () )
     {
         pVehicle->SetHeadLightColor ( color );
 
-        unsigned char R = COLOR_RGBA_R ( color );
-        unsigned char G = COLOR_RGBA_G ( color );
-        unsigned char B = COLOR_RGBA_B ( color );
-
         CBitStream BitStream;
         BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( R );
-        BitStream.pBitStream->Write ( G );
-        BitStream.pBitStream->Write ( B );
+        BitStream.pBitStream->Write ( color.R );
+        BitStream.pBitStream->Write ( color.G );
+        BitStream.pBitStream->Write ( color.B );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream ) );
     }
 
@@ -4882,7 +4871,7 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
 }
 
 
-CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo )
+CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo )
 {
     assert ( szType );
 
@@ -4898,7 +4887,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const 
             // Set the properties
             pMarker->SetPosition ( vecPosition );
             pMarker->SetMarkerType ( ucType );
-            pMarker->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+            pMarker->SetColor ( color );
             pMarker->SetSize ( fSize );
 
             // Make him visible to the given element
@@ -4943,14 +4932,11 @@ bool CStaticFunctionDefinitions::GetMarkerSize ( CMarker* pMarker, float& fSize 
 }
 
 
-bool CStaticFunctionDefinitions::GetMarkerColor ( CMarker* pMarker, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
+bool CStaticFunctionDefinitions::GetMarkerColor ( CMarker* pMarker, SColor& outColor )
 {
     assert ( pMarker );
 
-    ucRed = pMarker->GetColorRed ();
-    ucGreen = pMarker->GetColorGreen ();
-    ucBlue = pMarker->GetColorBlue ();
-    ucAlpha = pMarker->GetColorAlpha ();
+    outColor = pMarker->GetColor ();
     return true;
 }
 
@@ -5020,17 +5006,17 @@ bool CStaticFunctionDefinitions::SetMarkerSize ( CElement* pElement, float fSize
 }
 
 
-bool CStaticFunctionDefinitions::SetMarkerColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetMarkerColor ( CElement* pElement, const SColor color )
 {
     assert ( pElement );
-    RUN_CHILDREN SetMarkerColor ( *iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetMarkerColor ( *iter, color );
 
     // Is this a marker?
     if ( IS_MARKER ( pElement ) )
     {
         // Set the new color
         CMarker* pMarker = static_cast < CMarker* > ( pElement );
-        pMarker->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pMarker->SetColor ( color );
     }
 
     return true;
@@ -5083,7 +5069,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CElement* pElement, const char*
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
 {
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
@@ -5097,7 +5083,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
             pBlip->SetPosition ( vecPosition );
             pBlip->m_ucIcon = ucIcon;
             pBlip->m_ucSize = ucSize;
-            pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+            pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
             pBlip->m_fVisibleDistance = fVisibleDistance;
 
@@ -5119,7 +5105,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
 {
     assert ( pElement );
     // Valid icon and size?
@@ -5131,7 +5117,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
             // Set the properties
             pBlip->m_ucIcon = ucIcon;
             pBlip->m_ucSize = ucSize;
-            pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+            pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
             pBlip->m_fVisibleDistance = fVisibleDistance;
 
@@ -5172,14 +5158,11 @@ bool CStaticFunctionDefinitions::GetBlipSize ( CBlip* pBlip, unsigned char& ucSi
 }
 
 
-bool CStaticFunctionDefinitions::GetBlipColor ( CBlip* pBlip, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
+bool CStaticFunctionDefinitions::GetBlipColor ( CBlip* pBlip, SColor& outColor )
 {
     assert ( pBlip );
 
-    ucRed = pBlip->m_ucColorRed;
-    ucGreen = pBlip->m_ucColorGreen;
-    ucBlue = pBlip->m_ucColorBlue;
-    ucAlpha = pBlip->m_ucColorAlpha;
+    outColor = pBlip->m_Color;
     return true;
 }
 
@@ -5253,27 +5236,24 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
 }
 
 
-bool CStaticFunctionDefinitions::SetBlipColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetBlipColor ( CElement* pElement, const SColor color )
 {
-    RUN_CHILDREN SetBlipColor ( *iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetBlipColor ( *iter, color );
 
     if ( IS_BLIP ( pElement ) )
     {
         // Grab the blip and set the new color
         CBlip* pBlip = static_cast < CBlip* > ( pElement );
-        if ( pBlip->m_ucColorRed != ucRed ||
-             pBlip->m_ucColorGreen != ucGreen ||
-             pBlip->m_ucColorBlue != ucBlue ||
-             pBlip->m_ucColorAlpha != ucAlpha )
+        if ( pBlip->m_Color != color )
         {
-            pBlip->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+            pBlip->SetColor ( color );
 
             CBitStream bitStream;
             bitStream.pBitStream->Write ( pBlip->GetID () );
-            bitStream.pBitStream->Write ( ucRed );
-            bitStream.pBitStream->Write ( ucGreen );
-            bitStream.pBitStream->Write ( ucBlue );
-            bitStream.pBitStream->Write ( ucAlpha );
+            bitStream.pBitStream->Write ( color.R );
+            bitStream.pBitStream->Write ( color.G );
+            bitStream.pBitStream->Write ( color.B );
+            bitStream.pBitStream->Write ( color.A );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_COLOR, *bitStream.pBitStream ) );
 
             return true;
@@ -5450,7 +5430,7 @@ bool CStaticFunctionDefinitions::StopObject ( CElement* pElement )
 }
 
 
-CRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo )
+CRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo )
 {
     // Create it
     //CRadarArea* pRadarArea = m_pRadarAreaManager->Create ( m_pMapManager->GetRootElement (), NULL );
@@ -5461,7 +5441,7 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource* pResource, 
         CVector vecPosition = CVector ( vecPosition2D.fX, vecPosition2D.fY, 0.0f );
         pRadarArea->SetPosition ( vecPosition );
         pRadarArea->SetSize ( vecSize );
-        pRadarArea->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pRadarArea->SetColor ( color );
 
         // Make him visible to the root
         if ( pVisibleTo )
@@ -5488,14 +5468,10 @@ bool CStaticFunctionDefinitions::GetRadarAreaSize ( CRadarArea* pRadarArea, CVec
 }
 
 
-bool CStaticFunctionDefinitions::GetRadarAreaColor ( CRadarArea* pRadarArea, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
+bool CStaticFunctionDefinitions::GetRadarAreaColor ( CRadarArea* pRadarArea, SColor& outColor )
 {
     assert ( pRadarArea );
-
-    ucRed = pRadarArea->GetColorRed ();
-    ucGreen = pRadarArea->GetColorGreen ();
-    ucBlue = pRadarArea->GetColorBlue ();
-    ucAlpha = pRadarArea->GetColorAlpha ();
+    outColor = pRadarArea->GetColor ();
     return true;
 }
 
@@ -5543,15 +5519,15 @@ bool CStaticFunctionDefinitions::SetRadarAreaSize ( CElement* pElement, const CV
 }
 
 
-bool CStaticFunctionDefinitions::SetRadarAreaColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetRadarAreaColor ( CElement* pElement, const SColor color )
 {
     assert ( pElement );
-    RUN_CHILDREN SetRadarAreaColor ( *iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetRadarAreaColor ( *iter, color );
 
     if ( IS_RADAR_AREA ( pElement ) )
     {
         CRadarArea* pRadarArea = static_cast < CRadarArea* > ( pElement );
-        pRadarArea->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        pRadarArea->SetColor ( color );
     }
 
     return true;

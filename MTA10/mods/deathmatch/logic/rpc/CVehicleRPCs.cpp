@@ -594,16 +594,15 @@ void CVehicleRPCs::SetTrainSpeed ( NetBitStreamInterface& bitStream )
 void CVehicleRPCs::SetVehicleHeadLightColor ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
-    unsigned char ucR, ucG, ucB;
+    SColorRGBA color ( 255, 255, 255, 255 );
     if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucR ) &&
-         bitStream.Read ( ucG ) &&
-         bitStream.Read ( ucB ) )
+         bitStream.Read ( color.R ) &&
+         bitStream.Read ( color.G ) &&
+         bitStream.Read ( color.B ) )
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            RGBA color = COLOR_RGBA ( ucR, ucG, ucB, 255 );
             pVehicle->SetHeadLightColor ( color );
         }
     }

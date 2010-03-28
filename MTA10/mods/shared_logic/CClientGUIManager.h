@@ -37,20 +37,20 @@ public:
 	bool									Exists					( CGUIElement* pCGUIElement );
     inline unsigned int						Count                   ( void )									{ return static_cast < unsigned int > ( m_Elements.size () ); };
 
-    CClientGUIElement*                      Get                    ( CGUIElement* pCGUIElement );
+    CClientGUIElement*                      Get                     ( CGUIElement* pCGUIElement );
 
     void                                    DoPulse                 ( void );
-    void                                    DeferGridListUpdate     ( CClientGUIElement *pGUIElement );
+    void                                    QueueGridListUpdate     ( CClientGUIElement *pGUIElement );
 
 private:
     void            	                    Add 					( CClientGUIElement* pGUIElement );
 	void                                    Remove					( CClientGUIElement* pGUIElement );
-    void                                    FlushDeferedUpdates     ( void );
+    void                                    FlushQueuedUpdates      ( void );
 
 private:
     bool                                    m_bCanRemoveFromList;
     std::list < CClientGUIElement* >        m_Elements;
-    std::map < ElementID, bool >            m_DeferedGridListUpdates;
+    std::map < ElementID, bool >            m_QueuedGridListUpdates;
 };
 
 #endif

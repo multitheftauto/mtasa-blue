@@ -57,23 +57,14 @@ public:
     inline const CVector&   GetTarget               ( void )                                        { return m_vecTarget; };
     inline unsigned char    GetMarkerType           ( void )                                        { return m_ucType; };
     inline float            GetSize                 ( void )                                        { return m_fSize; };
-    void                    GetColor                ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A );
-    inline unsigned long    GetColor                ( void )                                        { return m_ulColor; };
-    inline unsigned char    GetColorRed             ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 16 ); };
-    inline unsigned char    GetColorGreen           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 8 ); };
-    inline unsigned char    GetColorBlue            ( void )                                        { return static_cast < unsigned char > ( m_ulColor ); };
-    inline unsigned char    GetColorAlpha           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 24 ); };
+    inline SColor           GetColor                ( void ) const                                  { return m_Color; };
     inline unsigned char    GetIcon                 ( void )                                        { return m_ucIcon; }
     
     void                    SetPosition             ( const CVector& vecPosition );
     void                    SetTarget               ( const CVector* pTargetVector );
     void                    SetMarkerType           ( unsigned char ucType );
     void                    SetSize                 ( float fSize );
-    void                    SetColor                ( unsigned long ulColor );
-    void                    SetColor                ( unsigned char ucRed,
-                                                      unsigned char ucGreen,
-                                                      unsigned char ucBlue,
-                                                      unsigned char ucAlpha );
+    void                    SetColor                ( const SColor color );
 
     void                    SetIcon                 ( unsigned char ucIcon );
 
@@ -92,7 +83,7 @@ private:
     CVector                 m_vecTarget;
     unsigned char           m_ucType;
     float                   m_fSize;
-    unsigned long           m_ulColor;
+    SColor                  m_Color;
     unsigned char           m_ucIcon;
 
     CColShape*              m_pCollision;

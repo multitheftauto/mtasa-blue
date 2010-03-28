@@ -237,7 +237,7 @@ namespace SharedUtil
     //
     // ID 'stack'
     //
-    template < typename T, unsigned long MAX_STACK_SIZE, unsigned long INVALID_STACK_ID = 0xFFFFFFFF >
+    template < typename T, unsigned long MAX_STACK_SIZE, T INVALID_STACK_ID >
     class CStack
     {
     public:
@@ -267,6 +267,7 @@ namespace SharedUtil
         inline void Push ( T ID )
         {
             assert ( m_Queue.size () < MAX_STACK_SIZE - 1 );
+            assert ( ID != INVALID_STACK_ID );
             // Push to the front
             return m_Queue.push_front ( ID );
         }

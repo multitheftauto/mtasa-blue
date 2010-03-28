@@ -4514,16 +4514,12 @@ int CLuaFunctionDefinitions::GetVehicleHeadLightColor ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            RGBA color;
+            SColor color;
             if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( pVehicle, color ) )
             {
-                unsigned char R = COLOR_RGBA_R ( color );
-                unsigned char G = COLOR_RGBA_G ( color );
-                unsigned char B = COLOR_RGBA_B ( color );
-
-                lua_pushnumber ( luaVM, R );
-                lua_pushnumber ( luaVM, G );
-                lua_pushnumber ( luaVM, B );
+                lua_pushnumber ( luaVM, color.R );
+                lua_pushnumber ( luaVM, color.G );
+                lua_pushnumber ( luaVM, color.B );
                 return 3;
             }
         }
@@ -5639,11 +5635,12 @@ int CLuaFunctionDefinitions::SetVehicleHeadLightColor ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            unsigned char ucR = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucG = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char ucB = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            SColor color;
+            color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            color.A = 255;
 
-            RGBA color = COLOR_RGBA ( ucR, ucG, ucB, 255 );
             if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( pVehicle, color ) )
             {
                 lua_pushboolean ( luaVM, true );
@@ -5679,10 +5676,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 
         // Other defaulted arguments
         float fSize = 4.0f;
-        unsigned char ucRed = 0;
-        unsigned char ucGreen = 0;
-        unsigned char ucBlue = 255;
-        unsigned char ucAlpha = 255;
+        SColorRGBA color ( 0, 0, 255, 255 );
         CElement* pVisibleTo = m_pRootElement;
 
         // Optional type argument
@@ -5712,7 +5706,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
             lua_Number nRed = lua_tonumber ( luaVM, 6 );
             if ( nRed >= 0 && nRed <= 255 )
             {
-                ucRed = static_cast < unsigned char > ( nRed );
+                color.R = static_cast < unsigned char > ( nRed );
             }
         }
 
@@ -5723,7 +5717,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
             lua_Number nGreen = lua_tonumber ( luaVM, 7 );
             if ( nGreen >= 0 && nGreen <= 255 )
             {
-                ucGreen = static_cast < unsigned char > ( nGreen );
+                color.G = static_cast < unsigned char > ( nGreen );
             }
         }
 
@@ -5734,7 +5728,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
             lua_Number nBlue = lua_tonumber ( luaVM, 8 );
             if ( nBlue >= 0 && nBlue <= 255 )
             {
-                ucBlue = static_cast < unsigned char > ( nBlue );
+                color.B = static_cast < unsigned char > ( nBlue );
             }
         }
 
@@ -5745,7 +5739,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
             lua_Number nAlpha = lua_tonumber ( luaVM, 9 );
             if ( nAlpha >= 0 && nAlpha <= 255 )
             {
-                ucAlpha = static_cast < unsigned char > ( nAlpha );
+                color.A = static_cast < unsigned char > ( nAlpha );
             }
         }
 
@@ -5768,7 +5762,7 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 			if ( pResource )
 			{
 				// Create it
-				CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker ( pResource, vecPosition, szType, fSize, ucRed, ucGreen, ucBlue, ucAlpha, pVisibleTo );
+				CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker ( pResource, vecPosition, szType, fSize, color, pVisibleTo );
 				if ( pMarker )
 				{
 					CElementGroup * pGroup = pResource->GetElementGroup();
@@ -5861,16 +5855,13 @@ int CLuaFunctionDefinitions::GetMarkerColor ( lua_State* luaVM )
         CMarker* pMarker = lua_tomarker ( luaVM, 1 );
         if ( pMarker )
         {
-            unsigned char ucRed;
-            unsigned char ucGreen;
-            unsigned char ucBlue;
-            unsigned char ucAlpha;
-            if ( CStaticFunctionDefinitions::GetMarkerColor ( pMarker, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            SColor color;
+            if ( CStaticFunctionDefinitions::GetMarkerColor ( pMarker, color ) )
             {
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucRed ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucGreen ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucBlue ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucAlpha ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
                 return 4;
             }
         }
@@ -6018,13 +6009,14 @@ int CLuaFunctionDefinitions::SetMarkerColor ( lua_State* luaVM )
                  dBlue >= 0 && dBlue <= 255 &&
                  dAlpha >= 0 && dAlpha <= 255 )
             {
-                unsigned char ucRed = static_cast < unsigned char > ( dRed );
-                unsigned char ucGreen = static_cast < unsigned char > ( dGreen );
-                unsigned char ucBlue = static_cast < unsigned char > ( dBlue );
-                unsigned char ucAlpha = static_cast < unsigned char > ( dAlpha );
+                SColor color;
+                color.R = static_cast < unsigned char > ( dRed );
+                color.G = static_cast < unsigned char > ( dGreen );
+                color.B = static_cast < unsigned char > ( dBlue );
+                color.A = static_cast < unsigned char > ( dAlpha );
 
                 // Set the new color
-                if ( CStaticFunctionDefinitions::SetMarkerColor ( pElement, ucRed, ucGreen, ucBlue, ucAlpha ) )
+                if ( CStaticFunctionDefinitions::SetMarkerColor ( pElement, color ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -6143,10 +6135,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
         // Default colors and size
         unsigned char ucIcon = 0;
         unsigned char ucSize = 2;
-        unsigned char ucRed = 255;
-        unsigned char ucGreen = 0;
-        unsigned char ucBlue = 0;
-        unsigned char ucAlpha = 255;
+        SColorRGBA color ( 255, 0, 0, 255 );
         short sOrdering = 0;
         float fVisibleDistance = 99999.0f;
         CElement* pVisibleTo = m_pRootElement;
@@ -6165,22 +6154,22 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
                 int iArgument6 = lua_type ( luaVM, 6 );
                 if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
                 {
-                    ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                    color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
                     int iArgument7 = lua_type ( luaVM, 7 );
                     if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
                     {
-                        ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
                         int iArgument8 = lua_type ( luaVM, 8 );
                         if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
                         {
-                            ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+                            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
 
                             int iArgument9 = lua_type ( luaVM, 9 );
                             if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
                             {
-                                ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 9 ) );
+                                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 9 ) );
 
                                 int iArgument10 = lua_type ( luaVM, 10 );
                                 if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
@@ -6218,7 +6207,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
 			if ( pResource )
 			{
 				// Create the blip
-				CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance, pVisibleTo );
+				CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, color, sOrdering, fVisibleDistance, pVisibleTo );
 				if ( pBlip )
 				{
 					CElementGroup * pGroup = pResource->GetElementGroup();
@@ -6252,10 +6241,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
             // Default colors and size
             unsigned char ucIcon = 0;
             unsigned char ucSize = 2;
-            unsigned char ucRed = 255;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
-            unsigned char ucAlpha = 255;
+            SColorRGBA color ( 255, 0, 0, 255 );
             short sOrdering = 0;
             float fVisibleDistance = 99999.0f;
             CElement* pVisibleTo = m_pRootElement;
@@ -6274,22 +6260,22 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                     int iArgument4 = lua_type ( luaVM, 4 );
                     if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
                     {
-                        ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+                        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
 
                         int iArgument5 = lua_type ( luaVM, 5 );
                         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
                         {
-                            ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
                             int iArgument6 = lua_type ( luaVM, 6 );
                             if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
                             {
-                                ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
                                 int iArgument7 = lua_type ( luaVM, 7 );
                                 if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
                                 {
-                                    ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                                    color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
                                     int iArgument8 = lua_type ( luaVM, 8 );
                                     if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
@@ -6326,7 +6312,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                 if ( resource )
                 {
 					// Create the blip
-					CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance, pVisibleTo );
+					CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, color, sOrdering, fVisibleDistance, pVisibleTo );
 					if ( pBlip )
 					{
                         pBlip->SetParentObject ( resource->GetDynamicElementRoot() );
@@ -6409,17 +6395,13 @@ int CLuaFunctionDefinitions::GetBlipColor ( lua_State* luaVM )
         CBlip* pBlip = lua_toblip ( luaVM, 1 );
         if ( pBlip )
         {
-            unsigned char ucRed;
-            unsigned char ucGreen;
-            unsigned char ucBlue;
-            unsigned char ucAlpha;
-
-            if ( CStaticFunctionDefinitions::GetBlipColor ( pBlip, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            SColor color;
+            if ( CStaticFunctionDefinitions::GetBlipColor ( pBlip, color ) )
             {
-                lua_pushnumber ( luaVM, ucRed );
-                lua_pushnumber ( luaVM, ucGreen );
-                lua_pushnumber ( luaVM, ucBlue );
-                lua_pushnumber ( luaVM, ucAlpha );
+                lua_pushnumber ( luaVM, color.R );
+                lua_pushnumber ( luaVM, color.G );
+                lua_pushnumber ( luaVM, color.B );
+                lua_pushnumber ( luaVM, color.A );
                 return 4;
             }
         }
@@ -6530,12 +6512,13 @@ int CLuaFunctionDefinitions::SetBlipColor ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            unsigned char ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-            unsigned char ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+            SColor color;
+            color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
-            if ( CStaticFunctionDefinitions::SetBlipColor ( pElement, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            if ( CStaticFunctionDefinitions::SetBlipColor ( pElement, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -6850,6 +6833,12 @@ int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
              dBlue >= 0 && dBlue <= 255 &&
              dAlpha >= 0 && dAlpha <= 255 )
         {
+            SColor color;
+            color.R = static_cast < unsigned char > ( dRed );
+            color.G = static_cast < unsigned char > ( dGreen );
+            color.B = static_cast < unsigned char > ( dBlue );
+            color.A = static_cast < unsigned char > ( dAlpha );
+
             // Read out optional visibleTo argument
             CElement* pVisibleTo = m_pRootElement;
             int iArgument9 = lua_type ( luaVM, 9 );
@@ -6869,7 +6858,7 @@ int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
 				if ( pResource )
 				{
 					// Create it
-					CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( pResource, vecPosition, vecSize, static_cast < unsigned char > ( dRed ), static_cast < unsigned char > ( dGreen ), static_cast < unsigned char > ( dBlue ), static_cast < unsigned char > ( dAlpha ), pVisibleTo );
+					CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( pResource, vecPosition, vecSize, color, pVisibleTo );
 					if ( pRadarArea )
 					{
 						CElementGroup * pGroup = pResource->GetElementGroup();
@@ -6928,17 +6917,13 @@ int CLuaFunctionDefinitions::GetRadarAreaColor ( lua_State* luaVM )
         CRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
         if ( pRadarArea )
         {
-            unsigned char ucRed = 0;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
-            unsigned char ucAlpha = 0;
-
-            if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            SColor color;
+            if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, color ) )
             {
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucRed ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucGreen ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucBlue ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucAlpha ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
+                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
                 return 4;
             }
         }
@@ -7058,10 +7043,16 @@ int CLuaFunctionDefinitions::SetRadarAreaColor ( lua_State* luaVM )
              dBlue >= 0 && dBlue <= 255 &&
              dAlpha >= 0 && dAlpha <= 255 )
         {
+            SColor color;
+            color.R = static_cast < unsigned char > ( dRed );
+            color.G = static_cast < unsigned char > ( dGreen );
+            color.B = static_cast < unsigned char > ( dBlue );
+            color.A = static_cast < unsigned char > ( dAlpha );
+
             CElement* pElement = lua_toelement ( luaVM, 1 );
             if ( pElement )
             {
-                if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pElement, static_cast < unsigned char > ( dRed ), static_cast < unsigned char > ( dGreen ), static_cast < unsigned char > ( dBlue ), static_cast < unsigned char > ( dAlpha ) ) )
+                if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pElement, color ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

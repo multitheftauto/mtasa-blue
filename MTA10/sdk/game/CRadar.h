@@ -36,7 +36,7 @@ public:
 	virtual VOID				ClearMarkerForEntity(CObject * object)=0;
 	virtual VOID				ClearMarkerForEntity(CPed * ped)=0;
 
-    virtual VOID                DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, DWORD bgra )=0;
+    virtual VOID                DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color )=0;
 };
 
 #endif

@@ -182,8 +182,10 @@ struct CRect {
     float fX1, fY1, fX2, fY2;
 };
 
-VOID CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, DWORD abgr )
+VOID CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color )
 {
+    // Convert color to required abgr at the last moment
+    unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
     CRect myRect;
     myRect.fX1 = fX1;
     myRect.fY1 = fY1;

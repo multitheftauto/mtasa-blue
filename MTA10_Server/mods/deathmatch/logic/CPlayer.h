@@ -137,12 +137,6 @@ public:
     inline unsigned int                         GetScriptDebugLevel         ( void )                        { return m_uiScriptDebugLevel; };
     bool                                        SetScriptDebugLevel         ( unsigned int uiLevel );
 
-    inline unsigned long                        GetCamFadeColor             ( void )                        { return m_ulCamFadeColor; };
-    void                                        SetCamFadeColor             ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-
-    inline bool                                 IsCamFadedIn                ( void )                        { return m_bCamFadedIn; };
-    inline void                                 SetCamFadedIn               ( bool bCamFadedIn )            { m_bCamFadedIn = bCamFadedIn; };
-
     void                                        SetDamageInfo               ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart );
     void                                        ValidateDamageInfo          ( void );
     ElementID                                   GetPlayerAttacker           ( void );
@@ -250,9 +244,6 @@ private:
     std::list < CPed* >                         m_SyncingPeds;
 
     unsigned int                                m_uiScriptDebugLevel;	
-
-    unsigned long                               m_ulCamFadeColor;
-    bool                                        m_bCamFadedIn;
 
     ElementID                                   m_PlayerAttackerID;
     unsigned char                               m_ucAttackWeapon;

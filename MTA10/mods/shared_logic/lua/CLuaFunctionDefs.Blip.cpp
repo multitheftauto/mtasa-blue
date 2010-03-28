@@ -38,10 +38,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
         // Default colors and size
         unsigned char ucIcon = 0;
         unsigned char ucSize = 2;
-        unsigned char ucRed = 255;
-        unsigned char ucGreen = 0;
-        unsigned char ucBlue = 0;
-        unsigned char ucAlpha = 255;
+        SColorRGBA color ( 255, 0, 0, 255 );
         short sOrdering = 0;
         float fVisibleDistance = 99999.0f;
 
@@ -59,22 +56,22 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
                 int iArgument6 = lua_type ( luaVM, 6 );
                 if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
                 {
-                    ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                    color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
                     int iArgument7 = lua_type ( luaVM, 7 );
                     if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
                     {
-                        ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
                         int iArgument8 = lua_type ( luaVM, 8 );
                         if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
                         {
-                            ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+                            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
 
                             int iArgument9 = lua_type ( luaVM, 9 );
                             if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
                             {
-                                ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 9 ) );
+                                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 9 ) );
 
                                 int iArgument10 = lua_type ( luaVM, 10 );
                                 if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
@@ -101,7 +98,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the blip
-                CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlip ( *pResource, vecPosition, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance );
+                CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlip ( *pResource, vecPosition, ucIcon, ucSize, color, sOrdering, fVisibleDistance );
                 if ( pMarker )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -136,10 +133,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             // Default colors and size
             unsigned char ucIcon = 0;
             unsigned char ucSize = 2;
-            unsigned char ucRed = 255;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
-            unsigned char ucAlpha = 255;
+            SColorRGBA color ( 255, 0, 0, 255 );
             short sOrdering = 0;
             float fVisibleDistance = 99999.0f;
 
@@ -157,22 +151,22 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
                     int iArgument4 = lua_type ( luaVM, 4 );
                     if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
                     {
-                        ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+                        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
 
                         int iArgument5 = lua_type ( luaVM, 5 );
                         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
                         {
-                            ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+                            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
                             int iArgument6 = lua_type ( luaVM, 6 );
                             if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
                             {
-                                ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+                                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
                                 int iArgument7 = lua_type ( luaVM, 7 );
                                 if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
                                 {
-                                    ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+                                    color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
                                     int iArgument8 = lua_type ( luaVM, 8 );
                                     if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
@@ -199,7 +193,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
                 if ( pResource )
                 {
                     // Create the blip
-                    CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, ucRed, ucGreen, ucBlue, ucAlpha, sOrdering, fVisibleDistance );
+                    CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, color, sOrdering, fVisibleDistance );
                     if ( pMarker )
                     {
                         CElementGroup * pGroup = pResource->GetElementGroup();
@@ -275,15 +269,11 @@ int CLuaFunctionDefs::GetBlipColor ( lua_State* luaVM )
         CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
         if ( pMarker )
         {
-            unsigned char ucRed = pMarker->GetColorRed ();
-            unsigned char ucGreen = pMarker->GetColorGreen ();
-            unsigned char ucBlue = pMarker->GetColorBlue ();
-            unsigned char ucAlpha = pMarker->GetColorAlpha ();
-
-            lua_pushnumber ( luaVM, ucRed );
-            lua_pushnumber ( luaVM, ucGreen );
-            lua_pushnumber ( luaVM, ucBlue );
-            lua_pushnumber ( luaVM, ucAlpha );
+            SColor color = pMarker->GetColor ();
+            lua_pushnumber ( luaVM, color.R );
+            lua_pushnumber ( luaVM, color.G );
+            lua_pushnumber ( luaVM, color.B );
+            lua_pushnumber ( luaVM, color.A );
             return 4;
         }
         else
@@ -390,12 +380,13 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            unsigned char ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned char ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-            unsigned char ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+            SColor color;
+            color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+            color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+            color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
-            if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, ucRed, ucGreen, ucBlue, ucAlpha ) )
+            if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

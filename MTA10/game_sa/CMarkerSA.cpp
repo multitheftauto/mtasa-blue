@@ -89,12 +89,13 @@ VOID CMarkerSA::SetColor ( eMarkerColor color )
 
 /**
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
- * @param color RGBA containing a valid colour in RGBA format. Use the COLOR_RGBA macro to convert.
+ * @param color RGBA containing a valid colour in RGBA format.
  */
-VOID CMarkerSA::SetColor ( RGBA color )
+VOID CMarkerSA::SetColor ( const SColor color )
 {
 	DEBUG_TRACE("VOID CMarkerSA::SetColor ( RGBA color )");
-	internalInterface->nColour = color;
+	// Convert to required rgba at the last moment
+	internalInterface->nColour = color.R << 24 | color.G << 16 | color.B << 8 | color.A;
 }
 
 /**

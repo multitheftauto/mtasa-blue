@@ -30,8 +30,8 @@ public:
     const CVector&              GetPosition              ( void );
     void                        SetPosition              ( const CVector& vecPosition );
 
-    inline unsigned long        GetColor                 ( void )                        { return m_ucColorRed | m_ucColorGreen << 8 | m_ucColorBlue << 16 | m_ucColorAlpha << 24; };
-    void                        SetColor                 ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    inline SColor               GetColor                 ( void ) const                     { return m_Color; }
+    void                        SetColor                 ( const SColor color )             { m_Color = color; }
     
     void                        AttachTo                 ( CElement* pElement );
 
@@ -42,10 +42,7 @@ private:
 public:
     unsigned char               m_ucSize;
     unsigned char               m_ucIcon;
-    unsigned char               m_ucColorRed;
-    unsigned char               m_ucColorGreen;
-    unsigned char               m_ucColorBlue;
-    unsigned char               m_ucColorAlpha;
+    SColor                      m_Color;
     short                       m_sOrdering;
     float                       m_fVisibleDistance;
 };

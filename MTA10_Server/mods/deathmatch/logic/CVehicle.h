@@ -254,8 +254,8 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
-    inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
-    inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
+    inline SColor                   GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
+    inline void                     SetHeadLightColor       ( const SColor color )          { m_HeadLightColor = color; }
 
     inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
     inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
@@ -325,7 +325,7 @@ private:
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
     CPlayer *                       m_pJackingPlayer;
-    RGBA                            m_HeadLightColor;
+    SColor                          m_HeadLightColor;
     bool                            m_bHeliSearchLightVisible;
 
     // Used to remember where this vehicle spawns

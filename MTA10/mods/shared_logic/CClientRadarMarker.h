@@ -59,7 +59,7 @@ public:
 
     void                                DoPulse                         ( void );
 
-    inline bool                         IsVisible                       ( void )        { return m_bIsVisible; }
+    inline bool                         IsVisible                       ( void )                        { return m_bIsVisible; }
 
     void                                SetPosition                     ( const CVector& vecPosition );
     void                                GetPosition                     ( CVector& vecPosition ) const;
@@ -67,11 +67,8 @@ public:
     inline unsigned short               GetScale                        ( void )                        { return m_usScale; };
     void                                SetScale                        ( unsigned short usScale );
 
-    void                                SetColor                        ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
-    inline unsigned char                GetColorRed                     ( void ) const                  { return m_ucRed; };
-    inline unsigned char                GetColorGreen                   ( void ) const                  { return m_ucGreen; };
-    inline unsigned char                GetColorBlue                    ( void ) const                  { return m_ucBlue; };
-    inline unsigned char                GetColorAlpha                   ( void ) const                  { return m_ucAlpha; };
+    inline SColor                       GetColor                        ( void ) const                  { return m_Color; }
+    void                                SetColor                        ( const SColor color );
 
     inline unsigned long                GetSprite                       ( void ) const                  { return m_ulSprite; };
     void                                SetSprite                       ( unsigned long ulSprite );
@@ -109,10 +106,7 @@ private:
 
     CVector                             m_vecPosition;
     unsigned short                      m_usScale;
-    unsigned char                       m_ucRed;
-    unsigned char                       m_ucGreen;
-    unsigned char                       m_ucBlue;
-    unsigned char                       m_ucAlpha;
+    SColor                              m_Color;
     unsigned long                       m_ulSprite;
 
     IDirect3DTexture9*                  m_pMapMarkerImage;

@@ -2553,17 +2553,14 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pVehicle->SetAlpha ( alpha.data.ucAlpha );	
 
                     // Read our headlight color
-                    unsigned char ucHeadLightR = 255;
-                    unsigned char ucHeadLightG = 255;
-                    unsigned char ucHeadLightB = 255;
+                    SColorRGBA color ( 255, 255, 255, 255 );
                     if ( bitStream.ReadBit () == true )
                     {
-                        bitStream.Read ( ucHeadLightR );
-                        bitStream.Read ( ucHeadLightG );
-                        bitStream.Read ( ucHeadLightB );
+                        bitStream.Read ( color.R );
+                        bitStream.Read ( color.G );
+                        bitStream.Read ( color.B );
                     }
-                    RGBA headLightColor = COLOR_RGBA ( ucHeadLightR, ucHeadLightG, ucHeadLightB, 255 );
-                    pVehicle->SetHeadLightColor ( headLightColor );
+                    pVehicle->SetHeadLightColor ( color );
 
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
@@ -2593,7 +2590,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             CClientMarker* pMarker = new CClientMarker ( g_pClientGame->m_pManager, EntityID, ucType );
                             pMarker->SetPosition ( position.data.vecPosition );
                             pMarker->SetSize ( fSize );
-                            pMarker->SetColor ( color.data.ucR, color.data.ucG, color.data.ucB, color.data.ucA );
+                            pMarker->SetColor ( color );
 
                             // Entity is this
                             pEntity = pMarker;
@@ -2658,7 +2655,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Set the icon if it's valid
                     if ( ucIcon <= RADAR_MARKER_LIMIT ) pBlip->SetSprite ( ucIcon );
 
-                    unsigned char ucSize = 0, ucRed = 0, ucGreen = 0, ucBlue = 0, ucAlpha = 0;
+                    unsigned char ucSize = 0;
 
                     // Read out size and color if there's no icon
                     if ( ucIcon == 0 )
@@ -2671,7 +2668,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bitStream.Read ( &color );
 
                         pBlip->SetScale ( ucSize );
-                        pBlip->SetColor ( color.data.ucR, color.data.ucG, color.data.ucB, color.data.ucA );
+                        pBlip->SetColor ( color );
                     }                    
 
                     break;
@@ -2682,11 +2679,14 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Read out the radar area id, position, size and color
                     SPosition2DSync position2D ( false );
                     SPosition2DSync size2D ( false );
-                    unsigned long ulColor;
+                    SColor color;
                     bool bIsFlashing;
                     if ( bitStream.Read ( &position2D ) &&
                          bitStream.Read ( &size2D ) &&
-                         bitStream.Read ( ulColor ) &&
+                         bitStream.Read ( color.R ) &&
+                         bitStream.Read ( color.G ) &&
+                         bitStream.Read ( color.B ) &&
+                         bitStream.Read ( color.A ) &&
                          bitStream.ReadBit ( bIsFlashing ) )
                     {
                         // Create the radar area
@@ -2697,7 +2697,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             // Set the position, size and color
                             pArea->SetPosition ( position2D.data.vecPosition );
                             pArea->SetSize ( size2D.data.vecPosition );
-                            pArea->SetColor ( ulColor );
+                            pArea->SetColor ( color );
                             pArea->SetFlashing ( bIsFlashing );
                         }
                     }
@@ -3544,15 +3544,16 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
             float               fX = 0;
             float               fY = 0;
             float               fScale = 0;
-            unsigned char       ucRed=0, ucGreen=0, ucBlue=0, ucAlpha=0, ucFormat=0, ucShadowAlpha=0;
+            SColor              color;
+            unsigned char       ucFormat=0, ucShadowAlpha=0;
 
             bitStream.Read ( fX );
             bitStream.Read ( fY );
             bitStream.Read ( fScale );
-            bitStream.Read ( ucRed );
-            bitStream.Read ( ucGreen );
-            bitStream.Read ( ucBlue );
-            bitStream.Read ( ucAlpha );
+            bitStream.Read ( color.R );
+            bitStream.Read ( color.G );
+            bitStream.Read ( color.B );
+            bitStream.Read ( color.A );
             bitStream.Read ( ucFormat );
             if ( bitStream.Version() >= 0x03 )
                 bitStream.Read ( ucShadowAlpha );
@@ -3587,7 +3588,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
                 // Set the text properties
                 pTextDisplay->SetCaption ( szText );
                 pTextDisplay->SetPosition ( CVector ( fX, fY, 0 ) );
-                pTextDisplay->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+                pTextDisplay->SetColor ( color );
                 pTextDisplay->SetScale ( fScale );
                 pTextDisplay->SetFormat ( ( unsigned long ) ucFormat );
                 pTextDisplay->SetShadowAlpha ( ucShadowAlpha );

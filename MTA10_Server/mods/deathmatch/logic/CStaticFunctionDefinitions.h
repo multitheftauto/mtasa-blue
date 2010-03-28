@@ -243,7 +243,7 @@ public:
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
     static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
-    static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, RGBA & color );
+    static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, SColor& outColor );
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
@@ -284,41 +284,41 @@ public:
     static bool                 SetTrainDerailable                  ( CVehicle* pVehicle, bool bDerailable );
     static bool                 SetTrainDirection                   ( CVehicle* pVehicle, bool bDireciton );
     static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
-    static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, RGBA color );
+    static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
 
     // Marker create/destroy functions
-    static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo );
+    static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo );
 
     // Marker get functions
     static bool                 GetMarkerCount                      ( unsigned int& uiCount );
     static bool                 GetMarkerType                       ( CMarker* pMarker, char* szType );
     static bool                 GetMarkerSize                       ( CMarker* pMarker, float& fSize );
-    static bool                 GetMarkerColor                      ( CMarker* pMarker, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
+    static bool                 GetMarkerColor                      ( CMarker* pMarker, SColor& outColor );
     static bool                 GetMarkerTarget                     ( CMarker* pMarker, CVector& vecTarget );
     static bool                 GetMarkerIcon                       ( CMarker* pMarker, char* szIcon );
 
     // Marker set functions
     static bool                 SetMarkerType                       ( CElement* pElement, const char* szType );
     static bool                 SetMarkerSize                       ( CElement* pElement, float fSize );
-    static bool                 SetMarkerColor                      ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                 SetMarkerColor                      ( CElement* pElement, const SColor color );
     static bool                 SetMarkerTarget                     ( CElement* pElement, const CVector* pTarget );
     static bool                 SetMarkerIcon                       ( CElement* pElement, const char* szIcon );
 
     // Blip create/destroy functions
-    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
-    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
+    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
+    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
     static bool                 DestroyBlipsAttachedTo              ( CElement* pElement );
 
     // Blip get functions
     static bool                 GetBlipIcon                         ( CBlip* pBlip, unsigned char& ucIcon );
     static bool                 GetBlipSize                         ( CBlip* pBlip, unsigned char& ucSize );
-    static bool                 GetBlipColor                        ( CBlip* pBlip, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
+    static bool                 GetBlipColor                        ( CBlip* pBlip, SColor& outColor );
     static bool                 GetBlipOrdering                     ( CBlip* pBlip, short& sOrdering );
 
     // Blip set functions
     static bool                 SetBlipIcon                         ( CElement* pElement, unsigned char ucIcon );
     static bool                 SetBlipSize                         ( CElement* pElement, unsigned char ucSize );
-    static bool                 SetBlipColor                        ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                 SetBlipColor                        ( CElement* pElement, const SColor color );
     static bool                 SetBlipOrdering                     ( CElement* pElement, short sOrdering );
 
     // Object create/destroy functions
@@ -333,17 +333,17 @@ public:
     static bool                 StopObject                          ( CElement* pElement );
 
     // Radar area create/destroy funcs
-    static CRadarArea*          CreateRadarArea                     ( CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha, CElement* pVisibleTo );
+    static CRadarArea*          CreateRadarArea                     ( CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo );
 
     // Radar area get funcs
     static bool                 GetRadarAreaSize                    ( CRadarArea* pRadarArea, CVector2D& vecSize );
-    static bool                 GetRadarAreaColor                   ( CRadarArea* pRadarArea, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
+    static bool                 GetRadarAreaColor                   ( CRadarArea* pRadarArea, SColor& outColor );
     static bool                 IsRadarAreaFlashing                 ( CRadarArea* pRadarArea );
     static bool                 IsInsideRadarArea                   ( CRadarArea* pRadarArea, const CVector2D& vecPosition, bool& bInside );
 
     // Radar area set funcs
     static bool                 SetRadarAreaSize                    ( CElement* pElement, const CVector2D& vecSize );
-    static bool                 SetRadarAreaColor                   ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                 SetRadarAreaColor                   ( CElement* pElement, const SColor color );
     static bool                 SetRadarAreaFlashing                ( CElement* pElement, bool bFlashing );
 
     // Pickup create/destroy funcs

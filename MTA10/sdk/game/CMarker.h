@@ -31,7 +31,7 @@ public:
 	virtual VOID				SetDisplay ( eMarkerDisplay wDisplay )=0;
 	virtual VOID				SetScale ( WORD wScale )=0;
 	virtual VOID				SetColor ( eMarkerColor color )=0;
-	virtual VOID				SetColor ( RGBA color )=0;
+	virtual VOID				SetColor ( const SColor color )=0;
 	virtual VOID				Remove ( )=0;
 	virtual BOOL				IsActive (  )=0;
 	virtual VOID				SetPosition ( CVector * vecPosition )=0;

@@ -62,14 +62,8 @@ public:
     inline unsigned int             GetIcon                         ( void ) const                      { return m_uiIcon; }
     void                            SetIcon                         ( unsigned int uiIcon );
     
-    inline unsigned long            GetColor                        ( void )                            { return m_rgbaColor; };
-    void                            GetColor                        ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
-    inline unsigned char            GetColorRed                     ( void ) const                      { return m_rgbaColor.R; };
-    inline unsigned char            GetColorGreen                   ( void ) const                      { return m_rgbaColor.G; };
-    inline unsigned char            GetColorBlue                    ( void ) const                      { return m_rgbaColor.B; };
-    inline unsigned char            GetColorAlpha                   ( void ) const                      { return m_rgbaColor.A; };
-    void                            SetColor                        ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
-    void                            SetColor                        ( unsigned long ulColor );
+    inline SColor                   GetColor                        ( void ) const                      { return m_Color; }
+    void                            SetColor                        ( const SColor color );
 
     inline float                    GetSize                         ( void ) const                      { return m_fSize; };
     void                            SetSize                         ( float fSize );
@@ -77,7 +71,7 @@ public:
     inline bool                     HasTarget                       ( void )                            { return m_bHasTarget; }
     inline void                     SetHasTarget                    ( bool bHasTarget )                 { m_bHasTarget = bHasTarget; }
     inline void                     GetTarget                       ( CVector& vecTarget )              { vecTarget = m_vecTarget; }
-    inline void                     SetTarget                       ( const CVector& vecTarget )              { m_vecTarget = vecTarget; }
+    inline void                     SetTarget                       ( const CVector& vecTarget )        { m_vecTarget = vecTarget; }
 
     static unsigned char            StringToIcon                    ( const char* szString );
     static bool                     IconToString                    ( unsigned char ucIcon, char* szString );
@@ -101,7 +95,7 @@ private:
     unsigned int                    m_uiIcon;
     DWORD                           m_dwType;
     float                           m_fSize;
-    RGBA                            m_rgbaColor;
+    SColor                          m_Color;
     CCheckpoint*                    m_pCheckpoint;
 
     DWORD                           m_dwIdentifier;    

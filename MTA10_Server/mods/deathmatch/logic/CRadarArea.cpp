@@ -18,7 +18,7 @@ CRadarArea::CRadarArea ( CRadarAreaManager* pRadarAreaManager, CElement* pParent
     m_iType = CElement::RADAR_AREA;
     SetTypeName ( "radararea" );
     m_pRadarAreaManager = pRadarAreaManager;
-    m_ulColor = 0xFFFFFFFF;
+    m_Color = SColorRGBA ( 255, 255, 255, 255 );
     m_bIsFlashing = false;
 
     // Pop an id for us and add us to the manger's list
@@ -75,7 +75,7 @@ bool CRadarArea::ReadSpecialData ( void )
     if ( GetCustomDataString ( "color", szColor, 64, true ) )
     {
         // Convert it to RGBA
-        if ( !XMLColorToInt ( szColor, m_ulColor ) )
+        if ( !XMLColorToInt ( szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A ) )
         {
             CLogger::ErrorPrintf ( "Bad 'color' value specified in <radararea> (line %u)\n", m_uiLine );
             return false;
@@ -83,7 +83,7 @@ bool CRadarArea::ReadSpecialData ( void )
     }
     else
     {
-        m_ulColor = 0xFF0000FF;
+        m_Color = SColorRGBA ( 255, 0, 0, 255 );
     }
 
 	int iTemp;
@@ -139,38 +139,23 @@ void CRadarArea::SetSize ( const CVector2D& vecSize )
 }
 
 
-void CRadarArea::SetColor ( unsigned long ulColor )
+void CRadarArea::SetColor ( const SColor color )
 {
     // Different from our current color?
-    if ( ulColor != m_ulColor )
+    if ( color != m_Color )
     {
         // Update the color
-        m_ulColor = ulColor;
+        m_Color = color;
 
         // Tell all the players that know about us
         CBitStream BitStream;
         BitStream.pBitStream->Write ( m_ID );
-        BitStream.pBitStream->Write ( ulColor );
+        BitStream.pBitStream->Write ( color.R );
+        BitStream.pBitStream->Write ( color.G );
+        BitStream.pBitStream->Write ( color.B );
+        BitStream.pBitStream->Write ( color.A );
         BroadcastOnlyVisible ( CLuaPacket ( SET_RADAR_AREA_COLOR, *BitStream.pBitStream ) );
     }
-}
-
-
-// TODO: Move
-#define COLOR_ARGB(a,r,g,b) \
-    (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
-#define COLOR_RGBA(r,g,b,a) \
-    (((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
-
-#define COLOR_ABGR(a,b,g,r) \
-    (((((a)&0xff)<<24)|(((b)&0xff)<<16)|(((g)&0xff)<<8)|((r)&0xff)))
-#define COLOR_BGRA(b,g,r,a) \
-    (((((b)&0xff)<<24)|(((g)&0xff)<<16)|(((r)&0xff)<<8)|((a)&0xff)))
-
-
-void CRadarArea::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
-{
-    SetColor ( COLOR_ABGR ( ucAlpha, ucBlue, ucGreen, ucRed ) );
 }
 
 

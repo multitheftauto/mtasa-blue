@@ -34,8 +34,8 @@ public:
 	virtual DWORD			GetType()=0; // need enum?
 	virtual BOOL			IsActive()=0;
 	virtual DWORD			GetIdentifier()=0;
-    virtual SharedUtil::RGBA GetColor()=0;
-	virtual VOID			SetColor(RGBA color)=0;
+    virtual SColor          GetColor()=0;
+	virtual VOID			SetColor(const SColor color)=0;
 	virtual VOID			SetPulsePeriod(WORD wPulsePeriod)=0;
 	virtual VOID			SetPulseFraction(FLOAT fPulseFraction)=0;
 	virtual VOID			SetRotateRate(short RotateRate)=0;
