@@ -5,6 +5,7 @@
 *  FILE:        core/CServerList.h
 *  PURPOSE:     Header file for master server/LAN querying list
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -63,11 +64,21 @@ public:
         Init ();
     }
 
+    CServerListItem ( in_addr _Address, unsigned short _usQueryPort, std::string _strHostName )
+    {
+        Address = _Address;
+        usQueryPort = _usQueryPort;
+        usGamePort = _usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET;
+        strHostName = _strHostName;
+        Init ();
+    }
+
     CServerListItem ( const CServerListItem & copy )
     {
         Address.S_un.S_addr = copy.Address.S_un.S_addr;
         usQueryPort = copy.usQueryPort;
         usGamePort = copy.usGamePort;
+        strHostName = copy.strHostName;
         Init ();
     }
 
@@ -141,7 +152,8 @@ public:
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version
     std::string         strName;        // Server name
-    std::string         strHost;        // Server hostname
+    std::string         strHost;        // Server host as IP
+    std::string         strHostName;    // Server host as name
     std::string         strType;        // Game type
     std::string         strMap;         // Map name
 
