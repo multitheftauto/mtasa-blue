@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               lil_Toady <>
 *               Cecill Etheredge <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -19,6 +20,7 @@
 void CLuaFileDefs::LoadFunctions ( void )
 {
     CLuaCFunctions::AddFunction ( "fileCreate", CLuaFileDefs::fileCreate );
+    CLuaCFunctions::AddFunction ( "fileExists", CLuaFileDefs::fileExists );
     CLuaCFunctions::AddFunction ( "fileOpen", CLuaFileDefs::fileOpen );
     CLuaCFunctions::AddFunction ( "fileIsEOF", CLuaFileDefs::fileIsEOF );
     CLuaCFunctions::AddFunction ( "fileGetPos", CLuaFileDefs::fileGetPos );
@@ -117,6 +119,50 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 }
 
 
+int CLuaFileDefs::fileExists ( lua_State* luaVM )
+{
+    // Grab our lua VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Check argument types
+        if ( argtype ( 1, LUA_TSTRING ) )
+        {
+            // Grab the filename
+            std::string strFile = lua_tostring ( luaVM, 1 );
+            std::string strAbsPath;
+            std::string strSubPath;
+
+            // We have a resource argument?
+            CResource* pThisResource = pLuaMain->GetResource ();
+			CResource* pResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) )
+            {
+                string strFilePath;
+
+                // Does file exist?
+			    if ( pResource->GetFilePath ( strSubPath.c_str(), strFilePath ) )
+			    {
+				    lua_pushboolean ( luaVM, true );
+				    return 1;
+			    }
+                else
+                {
+                    lua_pushboolean ( luaVM, false );
+				    return 1;
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "fileExists" );
+    }
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 3 ) == LUA_TLIGHTUSERDATA )
@@ -198,7 +244,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 				    }
 			    }
 			    else
-				    m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+				    m_pScriptDebugging->LogError ( luaVM, "fileOpen failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
