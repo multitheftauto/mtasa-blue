@@ -52,7 +52,7 @@ void CClientRadarArea::Unlink ( void )
 
 void CClientRadarArea::DoPulse ( void )
 {
-	DoPulse ( true );
+    DoPulse ( true );
 }
 
 
@@ -99,14 +99,14 @@ void CClientRadarArea::DoPulse ( bool bRender )
             color.A = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( color.A ) );
         }
 
-	    // Only render the radar area if we are told to
-	    if ( bRender )
-	    {
-		    // Draw it
-		    g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
+        // Only render the radar area if we are told to
+        if ( bRender )
+        {
+            // Draw it
+            g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
                                                     m_vecPosition.fX, m_vecPosition.fY + m_vecSize.fY,
                                                     color );
-	    }
+        }
     }
 }
 

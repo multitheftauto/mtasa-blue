@@ -44,11 +44,11 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_eVehicleType = CClientVehicleManager::GetVehicleType ( usModel );
     m_bHasDamageModel = CClientVehicleManager::HasDamageModel ( m_eVehicleType );
     m_pVehicle = NULL;
-	m_pUpgrades = new CVehicleUpgrades ( this );
-	m_pClump = NULL;
+    m_pUpgrades = new CVehicleUpgrades ( this );
+    m_pClump = NULL;
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
     m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
-	m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
+    m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
 
     SetTypeName ( "vehicle" );
 
@@ -66,8 +66,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_Matrix.vFront.fY = 1.0f;
     m_Matrix.vUp.fZ = 1.0f;
     m_Matrix.vRight.fX = 1.0f;
-	m_MatrixLast = m_Matrix;
-	m_dLastRotationTime = 0;
+    m_MatrixLast = m_Matrix;
+    m_dLastRotationTime = 0;
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fTurretHorizontal = 0.0f;
     m_fTurretVertical = 0.0f;
@@ -102,7 +102,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_ucPaintjob = 3;
     m_fDirtLevel = 0.0f;
     m_bSmokeTrail = false;
-	m_bJustBlewUp = false;
+    m_bJustBlewUp = false;
     m_ucAlpha = 255;
     m_bAlphaChanged = false;
     m_bBlowNextFrame = false;
@@ -128,7 +128,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     m_interp.rot.ulFinishTime = 0;
     m_interp.pos.ulFinishTime = 0;
-	ResetInterpolation ();
+    ResetInterpolation ();
 
     // Check if we have landing gears
     m_bHasLandingGear = DoCheckHasLandingGear ();
@@ -150,7 +150,7 @@ CClientVehicle::~CClientVehicle ( void )
     if ( m_pTowedByVehicle )
         m_pTowedByVehicle->m_pTowedVehicle = NULL;
 
-	AttachTo ( NULL );
+    AttachTo ( NULL );
 
     // Remove all our projectiles
     RemoveAllProjectiles ();
@@ -202,8 +202,8 @@ CClientVehicle::~CClientVehicle ( void )
     // Remove us from the vehicle list
     Unlink ();
 
-	delete m_pUpgrades;
-	delete m_pHandlingEntry;
+    delete m_pUpgrades;
+    delete m_pHandlingEntry;
 }
 
 
@@ -405,9 +405,9 @@ void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bRese
 
 void CClientVehicle::ReportMissionAudioEvent ( unsigned short usSound )
 {
-	if ( m_pVehicle )
+    if ( m_pVehicle )
     {
-//		g_pGame->GetAudio ()->ReportMissionAudioEvent ( m_pVehicle, usSound );
+//      g_pGame->GetAudio ()->ReportMissionAudioEvent ( m_pVehicle, usSound );
     }
 }
 
@@ -475,7 +475,7 @@ bool CClientVehicle::SetMatrix ( const CMatrix& Matrix )
 
     m_Matrix = Matrix;
     m_matFrozen = Matrix;
-	m_MatrixPure = Matrix;
+    m_MatrixPure = Matrix;
 
     // If we have any occupants, update their positions
     if ( m_pDriver ) m_pDriver->SetPosition ( m_Matrix.vPos );
@@ -515,7 +515,7 @@ void CClientVehicle::GetMoveSpeedMeters ( CVector& vecMoveSpeed ) const
 {
     if ( m_bIsFrozen )
     {
-        vecMoveSpeed = CVector ( 0, 0, 0 );		
+        vecMoveSpeed = CVector ( 0, 0, 0 );     
     }
     else
     {
@@ -688,7 +688,7 @@ void CClientVehicle::Blow ( bool bAllowMovement )
     if ( m_pVehicle )
     {
         // Make sure it can be damaged
-        m_pVehicle->SetCanBeDamaged ( true );		
+        m_pVehicle->SetCanBeDamaged ( true );       
 
         // Grab our current speeds
         CVector vecMoveSpeed, vecTurnSpeed;
@@ -696,18 +696,18 @@ void CClientVehicle::Blow ( bool bAllowMovement )
         GetTurnSpeed ( vecTurnSpeed );
 
         // Set the health to 0
-        m_pVehicle->SetHealth ( 0.0f );		
+        m_pVehicle->SetHealth ( 0.0f );     
 
-		// "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
-		FuckCarCompletely ( true );		
+        // "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
+        FuckCarCompletely ( true );     
 
         m_pVehicle->BlowUp ( NULL, 0 );
 
         // And force the wheel states to "burst"
-		SetWheelStatus ( FRONT_LEFT_WHEEL, DT_WHEEL_BURST );
-		SetWheelStatus ( FRONT_RIGHT_WHEEL, DT_WHEEL_BURST );
-		SetWheelStatus ( REAR_LEFT_WHEEL, DT_WHEEL_BURST );
-		SetWheelStatus ( REAR_RIGHT_WHEEL, DT_WHEEL_BURST );
+        SetWheelStatus ( FRONT_LEFT_WHEEL, DT_WHEEL_BURST );
+        SetWheelStatus ( FRONT_RIGHT_WHEEL, DT_WHEEL_BURST );
+        SetWheelStatus ( REAR_LEFT_WHEEL, DT_WHEEL_BURST );
+        SetWheelStatus ( REAR_RIGHT_WHEEL, DT_WHEEL_BURST );
 
         if ( !bAllowMovement )
         {
@@ -744,7 +744,7 @@ void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, 
 {
     if ( m_pVehicle )
     {
-	    m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
     }
     m_ucColor1 = ucColor1;
     m_ucColor2 = ucColor2;
@@ -759,17 +759,17 @@ void CClientVehicle::GetTurretRotation ( float& fHorizontal, float& fVertical )
     if ( m_pVehicle )
     {
         // Car, plane or quad?
-	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
-		    m_pVehicle->GetTurretRotation ( &fHorizontal, &fVertical );
+            m_pVehicle->GetTurretRotation ( &fHorizontal, &fVertical );
         }
-	    else
-	    {
-		    fHorizontal = 0;
-		    fVertical = 0;
-	    }
+        else
+        {
+            fHorizontal = 0;
+            fVertical = 0;
+        }
     }
     else
     {
@@ -784,11 +784,11 @@ void CClientVehicle::SetTurretRotation ( float fHorizontal, float fVertical )
     if ( m_pVehicle )
     {
         // Car, plane or quad?
-	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
-		    m_pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+            m_pVehicle->SetTurretRotation ( fHorizontal, fVertical );
         }
     }
     m_fTurretHorizontal = fHorizontal;
@@ -834,10 +834,10 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
 
-		// Reset handling to fit the vehicle
-		m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
-		m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
-		m_pHandlingEntry->Recalculate ();
+        // Reset handling to fit the vehicle
+        m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
+        m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
+        m_pHandlingEntry->Recalculate ();
 
 
         // Create the vehicle if we're streamed in
@@ -1439,7 +1439,7 @@ void CClientVehicle::SetAlpha ( unsigned char ucAlpha )
     {
         if ( m_pVehicle )
         {
-	        m_pVehicle->SetAlpha ( ucAlpha );
+            m_pVehicle->SetAlpha ( ucAlpha );
         }
         m_ucAlpha = ucAlpha;
         m_bAlphaChanged = true;
@@ -1775,7 +1775,7 @@ void CClientVehicle::StreamedInPulse ( void )
     // Make sure the vehicle doesn't go too far down
     if ( m_pVehicle )
     {
-		if ( m_bBlowNextFrame )
+        if ( m_bBlowNextFrame )
         {
             Blow ( false );
             m_bBlowNextFrame = false;
@@ -1820,14 +1820,14 @@ void CClientVehicle::StreamedInPulse ( void )
                 // Added by ChrML 27. Nov: Shouldn't cause any problems
                 m_pVehicle->SetUsesCollision ( false );
             }
-		}
+        }
 
-		// Calculate the velocity
-		CMatrix MatrixCurrent;
-		m_pVehicle->GetMatrix ( &MatrixCurrent );
-		m_vecMoveSpeedMeters = ( MatrixCurrent.vPos - m_MatrixLast.vPos ) * g_pGame->GetFPS ();
-		// Store the current matrix
-		m_MatrixLast = MatrixCurrent;        
+        // Calculate the velocity
+        CMatrix MatrixCurrent;
+        m_pVehicle->GetMatrix ( &MatrixCurrent );
+        m_vecMoveSpeedMeters = ( MatrixCurrent.vPos - m_MatrixLast.vPos ) * g_pGame->GetFPS ();
+        // Store the current matrix
+        m_MatrixLast = MatrixCurrent;        
 
         // We dont interpolate attached trailers
         if ( m_pTowedByVehicle )
@@ -1864,9 +1864,9 @@ void CClientVehicle::StreamedInPulse ( void )
         // Have we moved?
         if ( vecPosition != m_Matrix.vPos )
         {
-		    // If we're setting the position, check whether we're under-water.
-		    // If so, we need to set the Underwater flag so the render draw order is changed.
-		    m_pVehicle->SetUnderwater ( IsBelowWater () );
+            // If we're setting the position, check whether we're under-water.
+            // If so, we need to set the Underwater flag so the render draw order is changed.
+            m_pVehicle->SetUnderwater ( IsBelowWater () );
 
             // Store our new position
             m_Matrix.vPos = vecPosition;
@@ -1990,7 +1990,7 @@ void CClientVehicle::Create ( void )
             return;
         }
 
-		// Put our pointer in its custom data
+        // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer ( this );
         
         // Jump straight to the target position if we have one
@@ -2093,7 +2093,7 @@ void CClientVehicle::Create ( void )
         }
 
         // Restore turret rotation
-	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
@@ -2170,8 +2170,8 @@ void CClientVehicle::Create ( void )
         // Set the frozen matrix to our position
         m_matFrozen = m_Matrix;
 
-		// Reset the interpolation
-		ResetInterpolation ();
+        // Reset the interpolation
+        ResetInterpolation ();
 
         // Re-apply handling entry
         if ( m_pHandlingEntry )
@@ -2212,7 +2212,7 @@ void CClientVehicle::Destroy ( void )
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
         m_pHandlingEntry = m_pVehicle->GetHandlingData();
 
-	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
@@ -2666,18 +2666,18 @@ bool CClientVehicle::IsOnGround ( void )
 
 void CClientVehicle::LockSteering ( bool bLock )
 {
-	// STATUS_TRAIN_MOVING or STATUS_PLAYER_DISABLED will do. STATUS_TRAIN_NOT_MOVING is neater but will screw up planes (turns off the engine).
+    // STATUS_TRAIN_MOVING or STATUS_PLAYER_DISABLED will do. STATUS_TRAIN_NOT_MOVING is neater but will screw up planes (turns off the engine).
 
-	eEntityStatus Status = m_pVehicle->GetEntityStatus ();
-	
-	if ( bLock && Status != STATUS_TRAIN_MOVING ) {
-		m_NormalStatus = Status;
-		m_pVehicle->SetEntityStatus ( STATUS_TRAIN_MOVING );
-	} else if ( !bLock && Status == STATUS_TRAIN_MOVING ) {
-		m_pVehicle->SetEntityStatus ( m_NormalStatus );
-	}
+    eEntityStatus Status = m_pVehicle->GetEntityStatus ();
+    
+    if ( bLock && Status != STATUS_TRAIN_MOVING ) {
+        m_NormalStatus = Status;
+        m_pVehicle->SetEntityStatus ( STATUS_TRAIN_MOVING );
+    } else if ( !bLock && Status == STATUS_TRAIN_MOVING ) {
+        m_pVehicle->SetEntityStatus ( m_NormalStatus );
+    }
 
-	return;
+    return;
 }
 
 
@@ -2715,40 +2715,40 @@ void CClientVehicle::ResetInterpolation ( void )
 void CClientVehicle::AddMatrix ( CMatrix& Matrix, double dTime, unsigned short usTickRate )
 {
     /*
-	// See if we need an update yet (since the rotation could have a lower tick rate)
-	if ( ( ( dTime - m_dLastRotationTime ) * 1000 ) >= usTickRate ) {
-		m_fLERP = LERP_FACTOR;
+    // See if we need an update yet (since the rotation could have a lower tick rate)
+    if ( ( ( dTime - m_dLastRotationTime ) * 1000 ) >= usTickRate ) {
+        m_fLERP = LERP_FACTOR;
 
-		// Set the source quaternion to whatever we have right now
-		m_QuatA = m_QuatLERP;
+        // Set the source quaternion to whatever we have right now
+        m_QuatA = m_QuatLERP;
 
-		// Set the destination quaternion to whatever we just received
-		m_QuatB = CQuat ( &Matrix );
+        // Set the destination quaternion to whatever we just received
+        m_QuatB = CQuat ( &Matrix );
 
-		// Store the matrix into the pure matrix
-		m_MatrixPure = Matrix;
+        // Store the matrix into the pure matrix
+        m_MatrixPure = Matrix;
 
-		// Debug stuff
-		#ifdef MTA_DEBUG_INTERPOLATION
-		g_pCore->GetGraphics()->DrawTextTTF(232,200,300,216,0xDDDDDDDD, "RENEW", 1.0f, 0);
-		#endif
+        // Debug stuff
+        #ifdef MTA_DEBUG_INTERPOLATION
+        g_pCore->GetGraphics()->DrawTextTTF(232,200,300,216,0xDDDDDDDD, "RENEW", 1.0f, 0);
+        #endif
 
-		// Store the time for this rotation
-		m_dLastRotationTime = dTime;
-	}
+        // Store the time for this rotation
+        m_dLastRotationTime = dTime;
+    }
     */
 }
 
 
 void CClientVehicle::AddVelocity ( CVector& vecVelocity )
 {
-	m_vecMoveSpeedInterpolate = vecVelocity;
+    m_vecMoveSpeedInterpolate = vecVelocity;
 }
 
 
 void CClientVehicle::Interpolate ( void )
 {
-	// Interpolate it if: It has a driver and it's not local and we're not syncing it or
+    // Interpolate it if: It has a driver and it's not local and we're not syncing it or
     //                    It has no driver and we're not syncing it.
     if ( ( m_pDriver && !m_pDriver->IsLocalPlayer () && !static_cast < CDeathmatchVehicle* > ( this ) ->IsSyncing () ) ||
          ( !m_pDriver && !static_cast < CDeathmatchVehicle* > ( this ) ->IsSyncing () ) )
@@ -3379,8 +3379,8 @@ void CClientVehicle::ApplyHandling( void )
     if ( m_pVehicle )
     {
         m_pVehicle->GetHandlingData()->Recalculate();
-		// Update vehicle settings
-		m_pVehicle->UpdateHandlingStatus ();
+        // Update vehicle settings
+        m_pVehicle->UpdateHandlingStatus ();
     }
 }
 

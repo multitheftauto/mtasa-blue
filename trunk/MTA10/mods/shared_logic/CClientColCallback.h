@@ -19,7 +19,7 @@ class CClientColCallback
 {
 public:
     virtual void        Callback_OnCollision            ( CClientColShape& Shape, CClientEntity& Entity ) = 0;
-	virtual void        Callback_OnLeave                ( CClientColShape& Shape, CClientEntity& Entity ) = 0;
+    virtual void        Callback_OnLeave                ( CClientColShape& Shape, CClientEntity& Entity ) = 0;
 };
 
 #endif

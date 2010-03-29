@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CObjectSA.cpp
-*  PURPOSE:		Object entity
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CObjectSA.cpp
+*  PURPOSE:     Object entity
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Christian Myhre Lundheim <>
 *
@@ -33,14 +33,14 @@ struct CFileObjectInstance
 
 CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
 {
-	DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
-	this->SetInterface(objectInterface);
+    DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
+    this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 }
 
 CObjectSA::CObjectSA( DWORD dwModel )
 {
-	DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
+    DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
     CWorldSA * world = (CWorldSA *)pGame->GetWorld();
 
@@ -121,25 +121,25 @@ CObjectSA::CObjectSA( DWORD dwModel )
 #else
 
 
-	DWORD CObjectCreate = FUNC_CObject_Create;	
-	DWORD dwObjectPtr = 0;
-	_asm
-	{
-		push	1
-		push	dwModel
-		call	CObjectCreate
-		add		esp, 8
-		mov		dwObjectPtr, eax
-	}
+    DWORD CObjectCreate = FUNC_CObject_Create;  
+    DWORD dwObjectPtr = 0;
+    _asm
+    {
+        push    1
+        push    dwModel
+        call    CObjectCreate
+        add     esp, 8
+        mov     dwObjectPtr, eax
+    }
     if ( dwObjectPtr )
     {
-	    this->SetInterface((CEntitySAInterface *)dwObjectPtr);
+        this->SetInterface((CEntitySAInterface *)dwObjectPtr);
 
-	    world->Add( m_pInterface );
+        world->Add( m_pInterface );
 
         // Setup some flags
         this->BeingDeleted = FALSE;
-	    this->DoNotRemoveFromGame = FALSE;
+        this->DoNotRemoveFromGame = FALSE;
         *(BYTE *)(dwObjectPtr + 316) = 6;   // Related to moving stuff (eg: fire hydrants, default is 2)
         m_pInterface->bStreamingDontDelete = true;
     }
@@ -157,31 +157,31 @@ CObjectSA::CObjectSA( DWORD dwModel )
 
 CObjectSA::~CObjectSA( )
 {
-	DEBUG_TRACE("CObjectSA::~CObjectSA( )");
+    DEBUG_TRACE("CObjectSA::~CObjectSA( )");
     //OutputDebugString("Attempting to destroy Object\n");
-	if(!this->BeingDeleted && DoNotRemoveFromGame == false)
-	{
-		DWORD dwInterface = (DWORD)this->GetInterface();
+    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    {
+        DWORD dwInterface = (DWORD)this->GetInterface();
         if ( dwInterface )
-        {		
-		    CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-		    world->Remove(this->GetInterface());
-    	
+        {       
+            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+            world->Remove(this->GetInterface());
+        
             DWORD dwThis = (DWORD)this->GetInterface();
             DWORD dwFunc = this->GetInterface()->vtbl->Remove;
             _asm
             {
-                mov		ecx, dwThis
+                mov     ecx, dwThis
                 call    dwFunc
             }
 
-		    dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-		    _asm	
-		    {
-			    mov		ecx, dwThis
-			    push	1			//delete too
-			    call	dwFunc
-		    }
+            dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+            _asm    
+            {
+                mov     ecx, dwThis
+                push    1           //delete too
+                call    dwFunc
+            }
         
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
             DWORD dwModelID = this->internalInterface->m_nModelIndex;
@@ -200,37 +200,37 @@ CObjectSA::~CObjectSA( )
 #endif
         }
 
-		this->BeingDeleted = true;
-		((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
+        this->BeingDeleted = true;
+        ((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
 
         //OutputDebugString("Destroying Object\n");
-	}
+    }
 }
 
 void CObjectSA::Explode()
 {
-	DWORD dwFunc = FUNC_CObject_Explode;
-	DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = FUNC_CObject_Explode;
+    DWORD dwThis = (DWORD)this->GetInterface();
 
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunc
-	}
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
 }
 
 void CObjectSA::SetScale( float faScale )
 {
-	DWORD dwFunc = 0x4745E0;
-	DWORD dwThis = (DWORD)this->GetInterface();
-	_asm
-	{
-		push	faScale
-		mov		ecx, dwThis
-		call	dwFunc
-	}
+    DWORD dwFunc = 0x4745E0;
+    DWORD dwThis = (DWORD)this->GetInterface();
+    _asm
+    {
+        push    faScale
+        mov     ecx, dwThis
+        call    dwFunc
+    }
 
-//	*(FLOAT *)(this->GetInterface() + 348) = fScale;
+//  *(FLOAT *)(this->GetInterface() + 348) = fScale;
 }
 
 void CObjectSA::SetHealth ( float fHealth )
@@ -247,11 +247,11 @@ void CObjectSA::SetModelIndex ( unsigned long ulModel )
 {
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
     DWORD dwFunc = this->GetInterface()->vtbl->SetModelIndex;
-	DWORD dwThis = (DWORD)this->GetInterface();
-	_asm	
-	{
-		mov		ecx, dwThis
-		push	ulModel
-		call	dwFunc
-	}
+    DWORD dwThis = (DWORD)this->GetInterface();
+    _asm    
+    {
+        mov     ecx, dwThis
+        push    ulModel
+        call    dwFunc
+    }
 }

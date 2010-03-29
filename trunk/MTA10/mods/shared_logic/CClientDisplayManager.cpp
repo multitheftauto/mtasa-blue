@@ -112,7 +112,7 @@ void CClientDisplayManager::DoPulse ( void )
         }
         else
         {
-			++iter;
+            ++iter;
             pObject->Render ();
         }
     }

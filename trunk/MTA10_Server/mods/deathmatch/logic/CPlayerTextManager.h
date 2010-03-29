@@ -42,7 +42,7 @@ public:
     void                        Update                      ( CTextItem * textItem, bool bRemovedFromDisplay = false );
     void                        Process                     ( void );
 
-	CPlayer*                    GetPlayer                   ( void );
+    CPlayer*                    GetPlayer                   ( void );
 };
 
 #endif

@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CControllerConfigManagerSA.h
-*  PURPOSE:		Header file for controller configuration manager class
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CControllerConfigManagerSA.h
+*  PURPOSE:     Header file for controller configuration manager class
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -26,7 +26,7 @@
 class CControllerConfigManagerSA : public CControllerConfigManager
 {
 public:
-							CControllerConfigManagerSA();
+                            CControllerConfigManagerSA();
         void                SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType );
         int                 GetControllerKeyAssociatedWithAction ( eControllerAction action, eControllerType controllerType );
         int                 GetNumOfSettingsForAction ( eControllerAction action );

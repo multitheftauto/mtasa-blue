@@ -35,21 +35,21 @@ void CPlayerCamera::GetMode ( eCameraMode Mode, char* szBuffer, size_t sizeBuffe
         case CAMERAMODE_PLAYER:
         {
             strncpy ( szBuffer, "player", sizeBuffer );
-	        szBuffer [sizeBuffer - 1] = 0;
+            szBuffer [sizeBuffer - 1] = 0;
             break;
         }
 
         case CAMERAMODE_FIXED:
         {
             strncpy ( szBuffer, "fixed", sizeBuffer );
-			szBuffer [sizeBuffer - 1] = 0;
+            szBuffer [sizeBuffer - 1] = 0;
             break;
         }
 
         default:
         {
             strncpy ( szBuffer, "invalid", sizeBuffer );
-			szBuffer [sizeBuffer - 1] = 0;
+            szBuffer [sizeBuffer - 1] = 0;
             break;
         }
     }

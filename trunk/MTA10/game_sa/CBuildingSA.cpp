@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CBuildingSA.cpp
-*  PURPOSE:		Building physical entity
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CBuildingSA.cpp
+*  PURPOSE:     Building physical entity
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -14,66 +14,66 @@
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)
 {
-	DEBUG_TRACE("CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)");
-	this->SetInterface(objectInterface);
+    DEBUG_TRACE("CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)");
+    this->SetInterface(objectInterface);
 }
 
 CBuildingSA::CBuildingSA( DWORD dwModel )
 {
-	DEBUG_TRACE("CBuildingSA::CBuildingSA( DWORD dwModel )");
-	/*
-	DWORD CBuilding_operator_new = FUNC_CBuilding_operator_new;
-	DWORD CBuilding_constructor = FUNC_CBuilding_Constructor;
-	
-	DWORD dwBuildingPtr = 0;
-	_asm
-	{
-		push	SIZEOF_CBuilding
-		call	CBuilding_operator_new
-		add		esp, 4
-		mov		dwBuildingPtr, eax
-	}
+    DEBUG_TRACE("CBuildingSA::CBuildingSA( DWORD dwModel )");
+    /*
+    DWORD CBuilding_operator_new = FUNC_CBuilding_operator_new;
+    DWORD CBuilding_constructor = FUNC_CBuilding_Constructor;
+    
+    DWORD dwBuildingPtr = 0;
+    _asm
+    {
+        push    SIZEOF_CBuilding
+        call    CBuilding_operator_new
+        add     esp, 4
+        mov     dwBuildingPtr, eax
+    }
 
-	if ( dwBuildingPtr )
-	{
-		_asm
-		{
-			mov		ecx, dwBuildingPtr
-			call	CBuilding_constructor
-		}
-	}
+    if ( dwBuildingPtr )
+    {
+        _asm
+        {
+            mov     ecx, dwBuildingPtr
+            call    CBuilding_constructor
+        }
+    }
 
-	this->SetInterface((CEntitySAInterface *)dwBuildingPtr);
+    this->SetInterface((CEntitySAInterface *)dwBuildingPtr);
 
-	DWORD dwThis = (DWORD)this->GetInterface();
-	DWORD dwFunc = this->GetInterface()->vtbl->SetModelIndexNoCreate; 
-	_asm	
-	{
-		mov		ecx, dwThis
-		push	dwModel			
-		call	dwFunc
-	}*/
+    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = this->GetInterface()->vtbl->SetModelIndexNoCreate; 
+    _asm    
+    {
+        mov     ecx, dwThis
+        push    dwModel         
+        call    dwFunc
+    }*/
 
-	/*dwFunc = 0x54F4C0; // CPlaceable::AllocateStaticMatrix
-	_asm 
-	{
-		mov		ecx, dwThis
-		call	dwFunc
-	}*/
+    /*dwFunc = 0x54F4C0; // CPlaceable::AllocateStaticMatrix
+    _asm 
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }*/
 
-	/*dwFunc = 0x533150; // setup big building
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunc
-	}*/
+    /*dwFunc = 0x533150; // setup big building
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }*/
 
-	CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-	//world->Add(this->GetInterface());
-	//this->GetInterface()->bIsStatic = true;
+    CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+    //world->Add(this->GetInterface());
+    //this->GetInterface()->bIsStatic = true;
 
 
-	//CBuildingSAInterface * building = (CBuildingSAInterface*)this->GetInterface();
+    //CBuildingSAInterface * building = (CBuildingSAInterface*)this->GetInterface();
     //building->bBackfaceCulled = true;
     //building->m_areaCode = *(DWORD *)0xB72914;
     //_asm int 3
@@ -150,9 +150,9 @@ CBuildingSA::CBuildingSA( DWORD dwModel )
 
     //world->Add(this->GetInterface());
 
-	//this->BeingDeleted = FALSE;
-	//this->DoNotRemoveFromGame = FALSE;
-	
+    //this->BeingDeleted = FALSE;
+    //this->DoNotRemoveFromGame = FALSE;
+    
 
     //this->internalInterface->bStreamingDontDelete = true;
     //this->internalInterface->bDontStream = true;
@@ -160,24 +160,24 @@ CBuildingSA::CBuildingSA( DWORD dwModel )
 
 CBuildingSA::~CBuildingSA( )
 {
-	DEBUG_TRACE("CBuildingSA::~CBuildingSA( )");
-	if(!this->BeingDeleted && DoNotRemoveFromGame == false)
-	{
-		DWORD dwInterface = (DWORD)this->GetInterface();
-		
-		CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-		world->Remove(this->GetInterface());
-	
-		DWORD dwThis = (DWORD)this->GetInterface();
-		DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-		_asm	
-		{
-			mov		ecx, dwThis
-			push	1			//delete too
-			call	dwFunc
-		}
+    DEBUG_TRACE("CBuildingSA::~CBuildingSA( )");
+    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    {
+        DWORD dwInterface = (DWORD)this->GetInterface();
+        
+        CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+        world->Remove(this->GetInterface());
+    
+        DWORD dwThis = (DWORD)this->GetInterface();
+        DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+        _asm    
+        {
+            mov     ecx, dwThis
+            push    1           //delete too
+            call    dwFunc
+        }
 
-		this->BeingDeleted = true;
-		//((CPoolsSA *)pGame->GetPools())->RemoveBuilding((CBuilding *)(CBuildingSA *)this);
-	}
+        this->BeingDeleted = true;
+        //((CPoolsSA *)pGame->GetPools())->RemoveBuilding((CBuilding *)(CBuildingSA *)this);
+    }
 }

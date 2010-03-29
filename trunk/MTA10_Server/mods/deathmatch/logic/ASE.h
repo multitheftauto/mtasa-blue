@@ -19,14 +19,14 @@ class ASE;
 #define __ASE_H__
 
 #ifdef WIN32
-	#include <conio.h>
-	#include <winsock.h>
+    #include <conio.h>
+    #include <winsock.h>
     #define sockclose closesocket
 #else
-	#include <sys/socket.h>
-	#include <sys/stat.h>
-	#include <netinet/in.h>
-	#define sockclose close
+    #include <sys/socket.h>
+    #include <sys/stat.h>
+    #include <netinet/in.h>
+    #define sockclose close
 #endif
 
 #include <string.h>
@@ -43,10 +43,10 @@ class CASERule;
 class ASE
 {
 public:
-	                        ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
-	                        ~ASE                ( void );
+                            ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
+                            ~ASE                ( void );
 
-	void                    DoPulse             ( void );
+    void                    DoPulse             ( void );
 
     static ASE*             GetInstance         ( void )                { return _instance; }
 
@@ -85,14 +85,14 @@ private:
 
     list < CASERule* >      m_Rules;
 
-    unsigned int			m_Socket;
+    unsigned int            m_Socket;
     sockaddr_in             m_SockAddr;
 
     bool                    m_bLan;
     unsigned short          m_usPort;
 
 protected:
-	void                    GetStatusVals();
+    void                    GetStatusVals();
 
 };
 

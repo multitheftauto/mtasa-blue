@@ -89,7 +89,7 @@ void ASE::DoPulse ( void )
 {
     sockaddr_in SockAddr;
 #ifndef WIN32
-	socklen_t nLen = sizeof ( sockaddr );
+    socklen_t nLen = sizeof ( sockaddr );
 #else
     int nLen = sizeof ( sockaddr );
 #endif
@@ -135,9 +135,9 @@ void ASE::DoPulse ( void )
             /*int sent =*/ sendto ( m_Socket,
                                 strReply.c_str(),
                                 strReply.length(),
-						        0,
-						        (sockaddr*)&SockAddr,
-						        nLen );
+                                0,
+                                (sockaddr*)&SockAddr,
+                                nLen );
         }
     }
 }
@@ -233,7 +233,7 @@ std::string ASE::QueryFull ( void )
             reply << szTemp;
             // time (skip)
             reply << ( unsigned char ) 1;
-	    }
+        }
     }
 
     return reply.str();
@@ -288,7 +288,7 @@ std::string ASE::QueryLight ( void )
                 strPlayerName = pPlayer->GetNick ();
             reply << ( unsigned char ) ( strPlayerName.length () + 1 );
             reply << strPlayerName.c_str ();
-	    }
+        }
     }
 
     return reply.str();
@@ -343,11 +343,11 @@ void ASE::SetRuleValue ( const char* szKey, const char* szValue )
                 }
                 else
                 {
-					// Remove from the list
+                    // Remove from the list
                     delete pRule;
                     m_Rules.erase ( iter );
                 }
-				// And return
+                // And return
                 return;
             }
         }

@@ -23,7 +23,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     m_pImageset         = NULL;
     m_pImage            = NULL;
     m_pGUI              = pGUI;
-	m_pManager = pGUI;
+    m_pManager = pGUI;
     m_pTexture = NULL;
     m_bCreatedTexture = false;
 
@@ -35,10 +35,10 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUISTATICIMAGE_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect ( 0.0f, 0.0f, 1.0f, 1.0f ) );
-	reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setBackgroundEnabled ( false );
+    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setBackgroundEnabled ( false );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
@@ -50,7 +50,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 

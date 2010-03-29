@@ -98,9 +98,9 @@ void CFilePathTranslator::GetGTARootDirectory ( string & ModuleRootDirOut )
 
 void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
 {
-	static char szInstallRoot[MAX_PATH] = "";
-	if( !szInstallRoot[0] )
-	{
+    static char szInstallRoot[MAX_PATH] = "";
+    if( !szInstallRoot[0] )
+    {
         memset ( szInstallRoot, 0, MAX_PATH );
 
         HKEY hkey = NULL;
@@ -116,10 +116,10 @@ void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
                 RegCloseKey ( hkey );
                 TerminateProcess ( GetCurrentProcess (), 9 );
             }
-			RegCloseKey ( hkey );
+            RegCloseKey ( hkey );
         }
-	}
-	InstallRootDirOut = szInstallRoot;
+    }
+    InstallRootDirOut = szInstallRoot;
 }
 
 

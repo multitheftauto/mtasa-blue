@@ -35,21 +35,21 @@ bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, in
     assert ( pLuaMain );
     assert ( szKey );
 
-	// Check if we already have this key and handler
-	SCommand* pCommand = GetCommand ( szKey, pLuaMain );
-	if ( pCommand &&
-		 iLuaFunction == pCommand->iLuaFunction )
-	{
-		return false;
-	}
+    // Check if we already have this key and handler
+    SCommand* pCommand = GetCommand ( szKey, pLuaMain );
+    if ( pCommand &&
+         iLuaFunction == pCommand->iLuaFunction )
+    {
+        return false;
+    }
 
     // Create the entry
     pCommand = new SCommand;
     pCommand->pLuaMain = pLuaMain;
     strncpy ( pCommand->szKey, szKey, MAX_REGISTERED_COMMAND_LENGTH );
     pCommand->szKey [MAX_REGISTERED_COMMAND_LENGTH] = 0;
-	pCommand->iLuaFunction = iLuaFunction;
-	pCommand->bRestricted = bRestricted;
+    pCommand->iLuaFunction = iLuaFunction;
+    pCommand->bRestricted = bRestricted;
     pCommand->bCaseSensitive = bCaseSensitive;
 
     // Add it to our list
@@ -64,7 +64,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey,
     assert ( szKey );
 
     // Call the handler for every virtual machine that matches the given key
-	bool bFound = false;
+    bool bFound = false;
     list < SCommand* > ::iterator iter = m_Commands.begin ();
     int iCompareResult;
 
@@ -78,27 +78,27 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey,
         // Matching vm's and names?
         if ( (*iter)->pLuaMain == pLuaMain && iCompareResult == 0 )
         {
-			if ( iLuaFunction && (*iter)->iLuaFunction != iLuaFunction )
-			{
-				iter++;
-				continue;
-			}
+            if ( iLuaFunction && (*iter)->iLuaFunction != iLuaFunction )
+            {
+                iter++;
+                continue;
+            }
 
             // Delete it and remove it from our list
             if ( m_bIteratingList )
             {
                 m_TrashCan.push_back ( *iter );
-				++iter;
+                ++iter;
             }
             else
             {
                 delete *iter;
                 iter = m_Commands.erase ( iter );
             }
-			bFound = true;
+            bFound = true;
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 
     return bFound;
@@ -170,11 +170,11 @@ bool CRegisteredCommands::ProcessCommand ( const char* szKey, const char* szArgu
         // Matching names?
         if ( iCompareResult == 0 )
         {
-			if ( m_pACLManager->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (),
-				                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
-													szKey,
-													CAccessControlListRight::RIGHT_TYPE_COMMAND,
-													!(*iter)->bRestricted ) )	// If this command is restricted, the default access should be false unless granted specially
+            if ( m_pACLManager->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (),
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                    szKey,
+                                                    CAccessControlListRight::RIGHT_TYPE_COMMAND,
+                                                    !(*iter)->bRestricted ) )   // If this command is restricted, the default access should be false unless granted specially
             {
                 // Call it
                 CallCommandHandler ( (*iter)->pLuaMain, (*iter)->iLuaFunction, szKey, szArguments, pClient );

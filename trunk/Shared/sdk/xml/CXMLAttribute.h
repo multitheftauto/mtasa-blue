@@ -29,8 +29,8 @@ public:
     virtual void                SetValue                ( int iValue ) = 0;
     virtual void                SetValue                ( unsigned int uiValue ) = 0;
     virtual void                SetValue                ( float fValue ) = 0;
-	
-	virtual void				DeleteWrapper           ( void ) = 0;
+    
+    virtual void                DeleteWrapper           ( void ) = 0;
 };
 
 #endif

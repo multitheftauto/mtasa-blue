@@ -207,7 +207,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             fHealth = 0.0f;
 
         float fOldHealth = pSourcePlayer->GetHealth ();
-		float fHealthLoss = fOldHealth - fHealth;
+        float fHealthLoss = fOldHealth - fHealth;
         pSourcePlayer->SetHealth ( fHealth );
 
         // Less than last packet's frame?
@@ -367,9 +367,9 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( usWeaponAmmoInClip );
 
             if ( sent.bAimDirectionX )
-			    BitStream.Write ( fAimDirectionX );
+                BitStream.Write ( fAimDirectionX );
             if ( sent.bAimDirectionY )
-			    BitStream.Write ( fAimDirectionY );
+                BitStream.Write ( fAimDirectionY );
 
             etc...
 */

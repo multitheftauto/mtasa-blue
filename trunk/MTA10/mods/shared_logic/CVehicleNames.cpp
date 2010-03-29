@@ -49,14 +49,14 @@ SVehicleName VehicleNames [611] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {
 SVehicleName VehicleTypes [] = { {"Automobile"}, {"Plane"}, {"Bike"}, {"Helicopter"}, {"Boat"}, {"Train"}, {"Trailer"}, {"BMX"}, {"Monster Truck"}, {"Quad"} };
 
 unsigned char ucVehicleTypes [] = { 
-	0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
-	0, 0, 4, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 4, 3, 2, 5, 6, 0, 4, 4, 4, 0,
-	0, 0, 0, 0, 1, 2, 2, 2, 1, 3, 0, 0, 2, 3, 0, 9, 4, 4, 0, 0, 1, 0, 0, 0, 0, 7, 0, 0,
-	4, 0, 0, 3, 3, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 7, 7, 1,
-	1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1,
-	0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
-	0, 5, 5, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6
+    0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
+    0, 0, 4, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 4, 3, 2, 5, 6, 0, 4, 4, 4, 0,
+    0, 0, 0, 0, 1, 2, 2, 2, 1, 3, 0, 0, 2, 3, 0, 9, 4, 4, 0, 0, 1, 0, 0, 0, 0, 7, 0, 0,
+    4, 0, 0, 3, 3, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 7, 7, 1,
+    1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+    0, 5, 5, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6
 };
 
 bool CVehicleNames::IsValidModel ( unsigned long ulModel )
@@ -105,12 +105,12 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
 
 const char* CVehicleNames::GetVehicleTypeName ( unsigned long ulModel )
 {
-	// Check whether the model is valid
-	if ( IsValidModel ( ulModel ) && ((ulModel-400) < sizeof(ucVehicleTypes)) )
-	{
-		int iVehicleType = ucVehicleTypes [ulModel - 400];
-		return VehicleTypes [iVehicleType].szName;
-	}
-	
-	return szVehicleNameEmpty;
+    // Check whether the model is valid
+    if ( IsValidModel ( ulModel ) && ((ulModel-400) < sizeof(ucVehicleTypes)) )
+    {
+        int iVehicleType = ucVehicleTypes [ulModel - 400];
+        return VehicleTypes [iVehicleType].szName;
+    }
+    
+    return szVehicleNameEmpty;
 }

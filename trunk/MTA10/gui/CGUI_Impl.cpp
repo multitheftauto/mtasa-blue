@@ -17,35 +17,35 @@
 
 using std::list;
 
-#define CGUI_MTA_DEFAULT_FONT		"tahoma.ttf"		// %WINDIR%/font/<...>
-#define CGUI_MTA_DEFAULT_FONT_BOLD	"tahomabd.ttf"		// %WINDIR%/font/<...>
-#define CGUI_MTA_CLEAR_FONT			"verdana.ttf"		// %WINDIR%/font/<...>
-#define CGUI_MTA_SANS_FONT			"cgui/sans.ttf"		// GTA/MTA/<...>
-#define CGUI_SA_HEADER_FONT			"cgui/saheader.ttf"	// GTA/MTA/<...>
-#define CGUI_SA_GOTHIC_FONT			"cgui/sagothic.ttf"	// GTA/MTA/<...>
-#define CGUI_SA_HEADER_SIZE			26
-#define CGUI_SA_GOTHIC_SIZE			47
-#define CGUI_MTA_SANS_FONT_SIZE		9
+#define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
+#define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
+#define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+#define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
+#define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
+#define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
+#define CGUI_SA_HEADER_SIZE         26
+#define CGUI_SA_GOTHIC_SIZE         47
+#define CGUI_MTA_SANS_FONT_SIZE     9
 
 CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 {
     // Init
     m_pDevice = pDevice;
     /*
-	m_pCharacterKeyHandler = NULL;
+    m_pCharacterKeyHandler = NULL;
     m_pKeyDownHandler = NULL;
-	m_pMouseClickHandler = NULL;
-	m_pMouseDoubleClickHandler = NULL;
-	m_pMouseWheelHandler = NULL;
-	m_pMouseMoveHandler = NULL;
-	m_pMouseEnterHandler = NULL;
-	m_pMouseLeaveHandler = NULL;
-	m_pMovedHandler = NULL;
-	m_pSizedHandler = NULL;
+    m_pMouseClickHandler = NULL;
+    m_pMouseDoubleClickHandler = NULL;
+    m_pMouseWheelHandler = NULL;
+    m_pMouseMoveHandler = NULL;
+    m_pMouseEnterHandler = NULL;
+    m_pMouseLeaveHandler = NULL;
+    m_pMovedHandler = NULL;
+    m_pSizedHandler = NULL;
     */
     m_Channel = INPUT_CORE;
 
-	// Create a GUI system and get the windowmanager
+    // Create a GUI system and get the windowmanager
     m_pRenderer = new CEGUI::DirectX9Renderer ( pDevice, 0 );
     m_pSystem = new CEGUI::System ( m_pRenderer );
 
@@ -55,28 +55,28 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     m_pSchemeManager = CEGUI::SchemeManager::getSingletonPtr ();
     m_pWindowManager = CEGUI::WindowManager::getSingletonPtr ();
 
-	// Set logging to Informative for debug and Standard for release
+    // Set logging to Informative for debug and Standard for release
 #if _DEBUG
-	CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
+    CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
 #else
-	CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
+    CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
 #endif
-	CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
+    CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
 
-	// Load our fonts
-	char szWinDir[64], szFont[128];
-	GetWindowsDirectory ( szWinDir, 64 );
-	_snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
+    // Load our fonts
+    char szWinDir[64], szFont[128];
+    GetWindowsDirectory ( szWinDir, 64 );
+    _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
     m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9 );
-	m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
-	_snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-	m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
-	_snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
-	m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-	m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
-	m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
-	m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
-	// ACHTUNG: These font creations can throw exceptions!
+    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
+    _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
+    _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
+    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
+    // ACHTUNG: These font creations can throw exceptions!
 
     // Load bluescheme
     CEGUI::SchemeManager::getSingleton().loadScheme("cgui/CGUI.xml");
@@ -86,8 +86,8 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     m_pTop = reinterpret_cast < CEGUI::DefaultWindow* > ( m_pWindowManager->createWindow ( "DefaultWindow", "guiroot" ) );
     m_pSystem->setGUISheet ( m_pTop );
 
-	// Disable single click timeouts
-	m_pSystem->setSingleClickTimeout ( 100000000.0f );
+    // Disable single click timeouts
+    m_pSystem->setSingleClickTimeout ( 100000000.0f );
 
     // Set our default font
     m_pSystem->setDefaultFont ( m_pDefaultFont->GetFont () );
@@ -98,28 +98,28 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Used to create unique names for widget instances
     m_ulPreviousUnique = 0;
 
-	// Mouse events
-	CEGUI::GlobalEventSet * pEvents = CEGUI::GlobalEventSet::getSingletonPtr ();
+    // Mouse events
+    CEGUI::GlobalEventSet * pEvents = CEGUI::GlobalEventSet::getSingletonPtr ();
 
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventCharacterKey		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_CharacterKey, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventKeyDown			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_KeyDown, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseClick		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseClick, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseDoubleClick	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseDoubleClick, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonDown	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonDown, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonUp		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonUp, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseWheel		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseWheel, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseMove			, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseMove, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseEnters		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseEnter, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseLeaves		, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseLeave, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved				, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Moved, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized				, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Sized, this ) );
-	pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested	, CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventCharacterKey      , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_CharacterKey, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventKeyDown           , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_KeyDown, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseClick        , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseClick, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseDoubleClick  , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseDoubleClick, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonDown   , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonDown, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseButtonUp     , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseButtonUp, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseWheel        , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseWheel, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseMove         , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseMove, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseEnters       , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseEnter, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMouseLeaves       , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_MouseLeave, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Moved, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Sized, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested   , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
 
-	// Disallow input routing to the GUI
-	m_bSwitchGUIInput = false;
+    // Disallow input routing to the GUI
+    m_bSwitchGUIInput = false;
 
-	// Reset the working directory
-	m_szWorkingDirectory[MAX_PATH] = 0;
+    // Reset the working directory
+    m_szWorkingDirectory[MAX_PATH] = 0;
 
     // The transfer box is not visible by default
     m_bTransferBoxVisible = false;
@@ -134,13 +134,13 @@ CGUI_Impl::~CGUI_Impl ( void )
 
 CVector2D CGUI_Impl::GetResolution ( void )
 {
-	return CVector2D ( m_pRenderer->getWidth(), m_pRenderer->getHeight() );
+    return CVector2D ( m_pRenderer->getWidth(), m_pRenderer->getHeight() );
 }
 
 
 void CGUI_Impl::SetResolution ( float fWidth, float fHeight )
 {
-	reinterpret_cast < CEGUI::DirectX9Renderer* > ( m_pRenderer ) -> setDisplaySize ( CEGUI::Size ( fWidth, fHeight ) );
+    reinterpret_cast < CEGUI::DirectX9Renderer* > ( m_pRenderer ) -> setDisplaySize ( CEGUI::Size ( fWidth, fHeight ) );
 }
 
 
@@ -206,10 +206,10 @@ void CGUI_Impl::ProcessMouseInput ( CGUIMouseInput eMouseInput, unsigned long ul
             break;
 
         case CGUI_MI_MOUSEWHEEL:
-			if ( (signed long)ulX > 0 )
-				m_pSystem->injectMouseWheelChange ( +1 );
-			else
-				m_pSystem->injectMouseWheelChange ( -1 );
+            if ( (signed long)ulX > 0 )
+                m_pSystem->injectMouseWheelChange ( +1 );
+            else
+                m_pSystem->injectMouseWheelChange ( -1 );
             break;
     }
 }
@@ -229,14 +229,14 @@ void CGUI_Impl::ProcessKeyboardInput ( unsigned long ulKey, bool bIsDown )
 
 
 void CGUI_Impl::SetGUIInputEnabled ( bool bEnabled )
-{	// inline?
-	m_bSwitchGUIInput = bEnabled;
+{   // inline?
+    m_bSwitchGUIInput = bEnabled;
 }
 
 
 bool CGUI_Impl::GetGUIInputEnabled ( void )
-{	// inline?
-	return m_bSwitchGUIInput;
+{   // inline?
+    return m_bSwitchGUIInput;
 }
 
 
@@ -248,7 +248,7 @@ void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 
 CGUIMessageBox* CGUI_Impl::CreateMessageBox ( const char* szTitle, const char* szMessage, unsigned int uiFlags )
 {
-	return new CGUIMessageBox_Impl ( this, szTitle, szMessage, uiFlags );
+    return new CGUIMessageBox_Impl ( this, szTitle, szMessage, uiFlags );
 }
 
 
@@ -411,97 +411,97 @@ CEGUI::WindowManager* CGUI_Impl::GetWindowManager ( void )
 
 void CGUI_Impl::GetUniqueName ( char* pBuf )
 {
-	_snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
-	m_ulPreviousUnique++;
+    _snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
+    m_ulPreviousUnique++;
 }
 
 
 bool CGUI_Impl::Event_CharacterKey ( const CEGUI::EventArgs& Args )
 {
-	if ( m_CharacterKeyHandlers[ m_Channel ] )
-	{
-		const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
-		CGUIKeyEventArgs NewArgs;
+    if ( m_CharacterKeyHandlers[ m_Channel ] )
+    {
+        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
+        CGUIKeyEventArgs NewArgs;
 
-		// copy the variables
-		NewArgs.codepoint = e.codepoint;
-		NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
-		NewArgs.sysKeys = e.sysKeys;
+        // copy the variables
+        NewArgs.codepoint = e.codepoint;
+        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
+        NewArgs.sysKeys = e.sysKeys;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-		NewArgs.pWindow = pElement;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        NewArgs.pWindow = pElement;
 
-		m_CharacterKeyHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        m_CharacterKeyHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 CGUIFont* CGUI_Impl::GetDefaultFont ( void )
 {
-	return m_pDefaultFont;
+    return m_pDefaultFont;
 }
 
 
 CGUIFont* CGUI_Impl::GetSmallFont ( void )
 {
-	return m_pSmallFont;
+    return m_pSmallFont;
 }
 
 
 CGUIFont* CGUI_Impl::GetBoldFont ( void )
 {
-	return m_pBoldFont;
+    return m_pBoldFont;
 }
 
 
 CGUIFont* CGUI_Impl::GetClearFont ( void )
 {
-	return m_pClearFont;
+    return m_pClearFont;
 }
 
 
 CGUIFont* CGUI_Impl::GetSAHeaderFont ( void )
 {
-	return m_pSAHeaderFont;
+    return m_pSAHeaderFont;
 }
 
 
 CGUIFont* CGUI_Impl::GetSAGothicFont ( void )
 {
-	return m_pSAGothicFont;
+    return m_pSAGothicFont;
 }
 
 CGUIFont* CGUI_Impl::GetSansFont ( void )
 {
-	return m_pSansFont;
+    return m_pSansFont;
 }
 
 bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 {
-	// Cast it to a set of keyboard arguments
-	const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
+    // Cast it to a set of keyboard arguments
+    const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
 
-	switch ( KeyboardArgs.scancode )
-	{
+    switch ( KeyboardArgs.scancode )
+    {
         // Cut/Copy keys
         case CEGUI::Key::Scan::X:
-		case CEGUI::Key::Scan::C:
+        case CEGUI::Key::Scan::C:
         {
-			if ( KeyboardArgs.sysKeys & CEGUI::Control )
+            if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
                 // Data to copy
                 CEGUI::String strTemp;
 
                 // Edit boxes
-				CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
-				if ( Wnd->getType () == "CGUI/Editbox" )
+                CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
+                if ( Wnd->getType () == "CGUI/Editbox" )
                 {
-					// Turn our event window into an editbox
-					CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
+                    // Turn our event window into an editbox
+                    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
-					// Get the text from the editbox
+                    // Get the text from the editbox
                     size_t sizeSelectionStart = WndEdit->getSelectionStartIndex ();
                     size_t sizeSelectionLength = WndEdit->getSelectionLength ();
                     strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
@@ -518,15 +518,15 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             WndEdit->setText ( strTemp2 );
                         }
                     }
-				}
+                }
 
                 // Multiline editboxes
-				if ( Wnd->getType () == "CGUI/MultiLineEditbox" )
+                if ( Wnd->getType () == "CGUI/MultiLineEditbox" )
                 {
-					// Turn our event window into an editbox
-					CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );
+                    // Turn our event window into an editbox
+                    CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );
 
-					// Get the text from the editbox
+                    // Get the text from the editbox
                     size_t sizeSelectionStart = WndEdit->getSelectionStartIndex ();
                     size_t sizeSelectionLength = WndEdit->getSelectionLength ();
                     strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
@@ -543,7 +543,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             WndEdit->setText ( strTemp2 );
                         }
                     }
-				}
+                }
 
                 // If we got something to copy
                 if ( strTemp.length () > 0 )
@@ -564,27 +564,27 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     // Close the clipboard
                     CloseClipboard( );
                 }
-			}
+            }
 
-			break;
+            break;
         }
 
         // Paste keys
-		case CEGUI::Key::Scan::V:
+        case CEGUI::Key::Scan::V:
         {
-			if ( KeyboardArgs.sysKeys & CEGUI::Control )
+            if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
-				CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
-				if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
+                if ( Wnd->getType ( ) == "CGUI/Editbox" )
                 {
-					// Open the clipboard
-					OpenClipboard( NULL );
+                    // Open the clipboard
+                    OpenClipboard( NULL );
 
-					// Turn our event window into an editbox
-					CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
+                    // Turn our event window into an editbox
+                    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
-					// Get the clipboard's data and put it into a char array
-					const char * ClipboardBuffer = reinterpret_cast < const char* > ( GetClipboardData ( CF_TEXT ) );
+                    // Get the clipboard's data and put it into a char array
+                    const char * ClipboardBuffer = reinterpret_cast < const char* > ( GetClipboardData ( CF_TEXT ) );
 
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
@@ -613,9 +613,9 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             }
                         } while ( iNewlineIndex != SString::npos );
 
-					    // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-					    CEGUI::String tmp = WndEdit->getText ();
-					    if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
+                        // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
+                        CEGUI::String tmp = WndEdit->getText ();
+                        if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;
@@ -629,153 +629,153 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-						        tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str (), strClipboardText.length () );
+                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str (), strClipboardText.length () );
                                 sizeCaratIndex = WndEdit->getCaratIndex () + strClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
                             WndEdit->setText ( tmp );
                             WndEdit->setCaratIndex ( sizeCaratIndex );
-					    }
+                        }
                         else
                         {
-						    // Fire an event if the editbox is full
-						    WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
-					    }
+                            // Fire an event if the editbox is full
+                            WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                        }
                     }
 
-					// Close the clipboard
-					CloseClipboard( );
-				}
-			}
+                    // Close the clipboard
+                    CloseClipboard( );
+                }
+            }
 
-			break;
+            break;
         }
 
         // Select all key
         case CEGUI::Key::Scan::A:
         {
-			if ( KeyboardArgs.sysKeys & CEGUI::Control )
+            if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
                 // Edit boxes
-			    CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
-			    if ( Wnd->getType () == "CGUI/Editbox" )
+                CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
+                if ( Wnd->getType () == "CGUI/Editbox" )
                 {
-				    // Turn our event window into an editbox
-				    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
+                    // Turn our event window into an editbox
+                    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
                     WndEdit->setSelection ( 0, WndEdit->getText ().size () );
                 }
                 else if ( Wnd->getType () == "CGUI/MultiLineEditbox" )
                 {
-				    // Turn our event window into a multiline editbox
-				    CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );
+                    // Turn our event window into a multiline editbox
+                    CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );
                     WndEdit->setSelection ( 0, WndEdit->getText ().size () );
                 }
             }
 
             break;
         }
-	}
+    }
 
-	// Call the callback if present
-	if ( m_KeyDownHandlers[ m_Channel ] )
-	{
-		const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
-		CGUIKeyEventArgs NewArgs;
+    // Call the callback if present
+    if ( m_KeyDownHandlers[ m_Channel ] )
+    {
+        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
+        CGUIKeyEventArgs NewArgs;
 
-		// copy the variables
-		NewArgs.codepoint = e.codepoint;
-		NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
-		NewArgs.sysKeys = e.sysKeys;
+        // copy the variables
+        NewArgs.codepoint = e.codepoint;
+        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
+        NewArgs.sysKeys = e.sysKeys;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-		NewArgs.pWindow = pElement;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        NewArgs.pWindow = pElement;
 
-		m_KeyDownHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        m_KeyDownHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 void CGUI_Impl::SetWorkingDirectory ( const char * szDir )
 {
-	unsigned int uiDirLen = ( unsigned int ) strlen ( szDir );
+    unsigned int uiDirLen = ( unsigned int ) strlen ( szDir );
 
-	// Check if the worst possible size fits in the buffer
-	if ( ( uiDirLen + 1 ) > MAX_PATH ) return;
+    // Check if the worst possible size fits in the buffer
+    if ( ( uiDirLen + 1 ) > MAX_PATH ) return;
 
-	strncpy ( m_szWorkingDirectory, szDir, MAX_PATH );
+    strncpy ( m_szWorkingDirectory, szDir, MAX_PATH );
 
-	// We need a trailing slash, so check for one
-	if ( szDir [ uiDirLen - 1 ] != '/' && szDir [ uiDirLen - 1 ] != '\\' ) {
-		m_szWorkingDirectory [ uiDirLen ] = '/';
-		m_szWorkingDirectory [ uiDirLen + 1 ] = NULL;
-	}
+    // We need a trailing slash, so check for one
+    if ( szDir [ uiDirLen - 1 ] != '/' && szDir [ uiDirLen - 1 ] != '\\' ) {
+        m_szWorkingDirectory [ uiDirLen ] = '/';
+        m_szWorkingDirectory [ uiDirLen + 1 ] = NULL;
+    }
 }
 
 
 bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseClickHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseClickHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
-		NewArgs.pWindow = pElement;
-		
-		m_MouseClickHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseClickHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseDoubleClickHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseDoubleClickHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
-		NewArgs.pWindow = pElement;
-		
-		m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 bool CGUI_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& Args )
@@ -842,123 +842,123 @@ bool CGUI_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& Args )
 
 bool CGUI_Impl::Event_MouseWheel ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseWheelHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseWheelHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
-		NewArgs.pWindow = pElement;
-		
-		m_MouseWheelHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseWheelHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_MouseMove ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseMoveHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseMoveHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
-		NewArgs.pWindow = pElement;
-		
-		m_MouseMoveHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseMoveHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_MouseEnter ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseEnterHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseEnterHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
-		NewArgs.pWindow = pElement;
-		
-		m_MouseEnterHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_MouseEnterHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_MouseLeave ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MouseLeaveHandlers[ m_Channel ] )
-	{
-		const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
-		CGUIMouseEventArgs NewArgs;
+    if ( m_MouseLeaveHandlers[ m_Channel ] )
+    {
+        const CEGUI::MouseEventArgs& e = reinterpret_cast < const CEGUI::MouseEventArgs& > ( Args );
+        CGUIMouseEventArgs NewArgs;
 
-		// get the approriate cegui window
-		CEGUI::Window * wnd = e.window;
+        // get the approriate cegui window
+        CEGUI::Window * wnd = e.window;
 
-		// if its a title- or scrollbar, get the appropriate parent
-		if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
-			 wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
-			 wnd = wnd->getParent ();
+        // if its a title- or scrollbar, get the appropriate parent
+        if ( wnd->testClassName ( CEGUI::Titlebar::EventNamespace ) ||
+             wnd->testClassName ( CEGUI::Scrollbar::EventNamespace ) )
+             wnd = wnd->getParent ();
 
-		// copy the variables
-		NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
-		NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
-		NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
-		NewArgs.sysKeys = e.sysKeys;
-		NewArgs.wheelChange = e.wheelChange;
+        // copy the variables
+        NewArgs.button = static_cast < CGUIMouse::MouseButton > ( e.button );
+        NewArgs.moveDelta = CVector2D ( e.moveDelta.d_x, e.moveDelta.d_y );
+        NewArgs.position = CGUIPosition ( e.position.d_x, e.position.d_y );
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
 
-		// get the CGUIElement
+        // get the CGUIElement
         // ChrML: Need to nullcheck wnd again or it crashes if the window is destroyed
         //        while it is dragged.
         CGUIElement * pElement = NULL;
@@ -967,42 +967,42 @@ bool CGUI_Impl::Event_MouseLeave ( const CEGUI::EventArgs& Args )
             pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         }
 
-		
-		NewArgs.pWindow = pElement;
-		
-		m_MouseLeaveHandlers[ m_Channel ] ( NewArgs );
-	}
-	return true;
+        
+        NewArgs.pWindow = pElement;
+        
+        m_MouseLeaveHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_Moved ( const CEGUI::EventArgs& Args )
 {
-	if ( m_MovedHandlers[ m_Channel ] )
-	{
-		const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
+    if ( m_MovedHandlers[ m_Channel ] )
+    {
+        const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-		
-		m_MovedHandlers[ m_Channel ] ( pElement );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        
+        m_MovedHandlers[ m_Channel ] ( pElement );
+    }
+    return true;
 }
 
 
 bool CGUI_Impl::Event_Sized ( const CEGUI::EventArgs& Args )
 {
-	if ( m_SizedHandlers[ m_Channel ] )
-	{
-		const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
+    if ( m_SizedHandlers[ m_Channel ] )
+    {
+        const CEGUI::WindowEventArgs& e = reinterpret_cast < const CEGUI::WindowEventArgs& > ( Args );
 
-		// get the CGUIElement
-		CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-		
-		m_SizedHandlers[ m_Channel ] ( pElement );
-	}
-	return true;
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        
+        m_SizedHandlers[ m_Channel ] ( pElement );
+    }
+    return true;
 }
 
 

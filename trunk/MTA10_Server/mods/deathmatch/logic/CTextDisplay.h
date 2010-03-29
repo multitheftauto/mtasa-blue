@@ -27,8 +27,8 @@ public:
 
     void                                AddObserver                 ( CPlayer* pPlayer );
     void                                RemoveObserver              ( CPlayer* pPlayer );
-	bool                                IsObserver                  ( CPlayer* pPlayer );
-	void                                GetObservers                ( lua_State* pLua );
+    bool                                IsObserver                  ( CPlayer* pPlayer );
+    void                                GetObservers                ( lua_State* pLua );
     void                                AddObserver                 ( CPlayerTextManager* pTextManager );
     void                                RemoveObserver              ( CPlayerTextManager* pTextManager );
     void                                Update                      ( CTextItem* pTextItem, bool bRemovedFromDisplay = false );

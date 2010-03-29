@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskIKSA.cpp
-*  PURPOSE:		Inverse kinematics game tasks
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskIKSA.cpp
+*  PURPOSE:     Inverse kinematics game tasks
+*  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,7 +18,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA ( char* idString, int effectorBoneTag
 {
     DWORD dwFunc = FUNC_CTaskSimpleIKChain__Constructor;
     // TODO: Find out the real size
-	this->CreateTaskInterface ( 1024 );
+    this->CreateTaskInterface ( 1024 );
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
@@ -26,7 +26,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA ( char* idString, int effectorBoneTag
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     _asm
     {
-        mov		ecx, dwThisInterface
+        mov     ecx, dwThisInterface
         push    blendTime
         push    time
         push    speed
@@ -49,14 +49,14 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA ( char* idString, CEntity* pEntity,
 {
     DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
     // TODO: Find out the real size
-	this->CreateTaskInterface ( 1024 );
+    this->CreateTaskInterface ( 1024 );
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     _asm
     {
-        mov		ecx, dwThisInterface
+        mov     ecx, dwThisInterface
         push    m_priority
         push    blendTime
         push    speed
@@ -144,14 +144,14 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA ( CEntity* pEntity, int t
 {
     DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;
     // TODO: Find out the real size
-	this->CreateTaskInterface ( 1024 );
+    this->CreateTaskInterface ( 1024 );
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     _asm
     {
-        mov		ecx, dwThisInterface
+        mov     ecx, dwThisInterface
         push    priority
         push    blendTime
         push    speed

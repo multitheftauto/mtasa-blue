@@ -19,7 +19,7 @@ CEvents::CEvents ( void )
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
-	m_szLastError = NULL;
+    m_szLastError = NULL;
 }
 
 
@@ -77,14 +77,14 @@ void CEvents::RemoveAllEvents ( class CLuaMain* pMain )
         // If they match, delete it null it and set the bool
         if ( (*iter)->pLuaMain == pMain )
         {
-			// Delete the object
+            // Delete the object
             delete *iter;
 
-			// Remove from list
-			iter = m_Events.erase ( iter );
+            // Remove from list
+            iter = m_Events.erase ( iter );
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 }
 
@@ -154,11 +154,11 @@ void CEvents::CancelEvent ( bool bCancelled, char* szReason )
         delete [] m_szLastError;
         m_szLastError = NULL;
     }
-	if ( szReason )
-	{
-		m_szLastError = new char [ strlen ( szReason ) + 1 ];
-		strcpy ( m_szLastError, szReason );
-	}
+    if ( szReason )
+    {
+        m_szLastError = new char [ strlen ( szReason ) + 1 ];
+        strcpy ( m_szLastError, szReason );
+    }
 }
 
 bool CEvents::WasEventCancelled ( void )
@@ -168,6 +168,6 @@ bool CEvents::WasEventCancelled ( void )
 
 const char* CEvents::GetLastError ( void )
 {
-	return m_szLastError;
+    return m_szLastError;
 }
 

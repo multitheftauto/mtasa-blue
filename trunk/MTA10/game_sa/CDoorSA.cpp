@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CDoorSA.cpp
-*  PURPOSE:		Vehicle door entity
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CDoorSA.cpp
+*  PURPOSE:     Vehicle door entity
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,17 +18,17 @@
  */
 FLOAT CDoorSA::GetAngleOpenRatio ( )
 {
-	DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
-	DWORD dwFunction = FUNC_GetAngleOpenRatio;
-	DWORD dwPointer = (DWORD)this;
-	FLOAT fReturn = 0.0f;
-	_asm
-	{
-		mov		ecx, dwPointer
-		call	dwFunction
-		fstp	fReturn
-	}
-	return fReturn;
+    DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
+    DWORD dwFunction = FUNC_GetAngleOpenRatio;
+    DWORD dwPointer = (DWORD)this;
+    FLOAT fReturn = 0.0f;
+    _asm
+    {
+        mov     ecx, dwPointer
+        call    dwFunction
+        fstp    fReturn
+    }
+    return fReturn;
 }
 
 /**
@@ -37,17 +37,17 @@ FLOAT CDoorSA::GetAngleOpenRatio ( )
  */
 BOOL CDoorSA::IsClosed (  )
 {
-	DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
-	DWORD dwFunction = FUNC_IsClosed;
-	DWORD dwPointer = (DWORD)this;
-	BYTE bReturn = 0;
-	_asm
-	{
-		mov		ecx, dwPointer
-		call	dwFunction
-		mov		bReturn, al
-	}
-	return bReturn;
+    DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
+    DWORD dwFunction = FUNC_IsClosed;
+    DWORD dwPointer = (DWORD)this;
+    BYTE bReturn = 0;
+    _asm
+    {
+        mov     ecx, dwPointer
+        call    dwFunction
+        mov     bReturn, al
+    }
+    return bReturn;
 }
 
 /**
@@ -57,17 +57,17 @@ BOOL CDoorSA::IsClosed (  )
  */
 BOOL CDoorSA::IsFullyOpen (  )
 {
-	DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
-	DWORD dwFunction = FUNC_IsFullyOpen;
-	DWORD dwPointer = (DWORD)this;
-	BYTE bReturn = 0;
-	_asm
-	{
-		mov		ecx, dwPointer
-		call	dwFunction
-		mov		bReturn, al
-	}
-	return bReturn;
+    DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
+    DWORD dwFunction = FUNC_IsFullyOpen;
+    DWORD dwPointer = (DWORD)this;
+    BYTE bReturn = 0;
+    _asm
+    {
+        mov     ecx, dwPointer
+        call    dwFunction
+        mov     bReturn, al
+    }
+    return bReturn;
 }
 
 /**
@@ -77,13 +77,13 @@ BOOL CDoorSA::IsFullyOpen (  )
  */
 VOID CDoorSA::Open ( float fUnknown )
 {
-	DEBUG_TRACE("VOID CDoorSA::Open ( float fUnknown )");
-	DWORD dwFunction = FUNC_Open;
-	DWORD dwPointer = (DWORD)this;
-	_asm
-	{
-		mov		ecx, dwPointer
-		push	fUnknown
-		call	dwFunction
-	}
+    DEBUG_TRACE("VOID CDoorSA::Open ( float fUnknown )");
+    DWORD dwFunction = FUNC_Open;
+    DWORD dwPointer = (DWORD)this;
+    _asm
+    {
+        mov     ecx, dwPointer
+        push    fUnknown
+        call    dwFunction
+    }
 }

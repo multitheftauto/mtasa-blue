@@ -189,7 +189,7 @@ eVehicleType CVehicleManager::GetVehicleType ( unsigned short usModel )
 
 bool CVehicleManager::IsValidUpgrade ( unsigned short usUpgrade )
 {
-	return ( usUpgrade >= 1000 && usUpgrade <= 1193 );
+    return ( usUpgrade >= 1000 && usUpgrade <= 1193 );
 }
 
 
@@ -197,7 +197,7 @@ unsigned int CVehicleManager::GetMaxPassengers ( unsigned int uiVehicleModel )
 {
     if ( uiVehicleModel >= 400 && uiVehicleModel <= 611 )
     {
-		return g_ucMaxPassengers [uiVehicleModel - 400];
+        return g_ucMaxPassengers [uiVehicleModel - 400];
     }
 
     return 0xFF;
@@ -264,17 +264,17 @@ CVehicleColor CVehicleManager::GetRandomColor ( unsigned short usModel )
 
 void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, CLuaMain* pLuaMain )
 {
-	assert ( pLuaMain );
+    assert ( pLuaMain );
 
     // Add all the matching vehicles to the table
     unsigned int uiIndex = 0;
-	list < CVehicle* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
-		// Add it to the table
-		lua_State* luaVM = pLuaMain->GetVirtualMachine ();
-		lua_pushnumber ( luaVM, ++uiIndex );
-		lua_pushelement ( luaVM, *iter );
-		lua_settable ( luaVM, -3 );
-	}
+    list < CVehicle* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        // Add it to the table
+        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+        lua_pushnumber ( luaVM, ++uiIndex );
+        lua_pushelement ( luaVM, *iter );
+        lua_settable ( luaVM, -3 );
+    }
 }

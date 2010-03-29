@@ -23,8 +23,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGravity", CLuaWorldDefs::getGravity );
     CLuaCFunctions::AddFunction ( "getGameSpeed", CLuaWorldDefs::getGameSpeed );
     CLuaCFunctions::AddFunction ( "getWaveHeight", CLuaWorldDefs::getWaveHeight );
-	CLuaCFunctions::AddFunction ( "getFPSLimit", CLuaWorldDefs::getFPSLimit );
-	CLuaCFunctions::AddFunction ( "getMinuteDuration", CLuaWorldDefs::getMinuteDuration );
+    CLuaCFunctions::AddFunction ( "getFPSLimit", CLuaWorldDefs::getFPSLimit );
+    CLuaCFunctions::AddFunction ( "getMinuteDuration", CLuaWorldDefs::getMinuteDuration );
     CLuaCFunctions::AddFunction ( "isGarageOpen", CLuaWorldDefs::isGarageOpen );
 
     // Set
@@ -36,8 +36,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWaveHeight", CLuaWorldDefs::setWaveHeight );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaWorldDefs::setSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
-	CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
-	CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaWorldDefs::setMinuteDuration );
+    CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
+    CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaWorldDefs::setMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaWorldDefs::setGarageOpen );
     CLuaCFunctions::AddFunction ( "setGlitchEnabled", CLuaWorldDefs::setGlitchEnabled );
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
@@ -72,7 +72,7 @@ int CLuaWorldDefs::getWeather ( lua_State* luaVM )
         lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeather ) );
 
         if ( ucWeatherBlendingTo != 0xFF )
-		    lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeatherBlendingTo ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeatherBlendingTo ) );
         else
             lua_pushnil ( luaVM );
 
@@ -419,9 +419,9 @@ int CLuaWorldDefs::setMinuteDuration ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-	}
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaWorldDefs::setGarageOpen ( lua_State* luaVM )

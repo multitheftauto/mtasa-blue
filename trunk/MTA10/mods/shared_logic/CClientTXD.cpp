@@ -72,7 +72,7 @@ bool CClientTXD::LoadTXD ( const char* szFile )
             // We succeeded if we got any textures
             return m_Textures.size () > 0;
         }
-	}
+    }
 
     // Failed
     return false;

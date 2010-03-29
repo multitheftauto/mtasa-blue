@@ -35,8 +35,8 @@ void CGUIElement_Impl::DestroyElement ( void )
     // Destroy the control
     m_pManager->GetWindowManager ()->destroyWindow ( m_pWindow );
 
-	// Destroy the properties list
-	EmptyProperties ();
+    // Destroy the properties list
+    EmptyProperties ();
 }
 
 void CGUIElement_Impl::SetVisible ( bool bVisible )
@@ -91,13 +91,13 @@ void CGUIElement_Impl::MoveToBack ( void )
 void CGUIElement_Impl::SetPosition ( const CVector2D& Position, bool bRelative )
 {
     CEGUI::Point Temp = CEGUI::Point ( Position.fX, Position.fY );
-	
-	if ( bRelative )
-		m_pWindow->setPosition ( CEGUI::Relative, Temp );
-	else
-		m_pWindow->setPosition ( CEGUI::Absolute, Temp );
+    
+    if ( bRelative )
+        m_pWindow->setPosition ( CEGUI::Relative, Temp );
+    else
+        m_pWindow->setPosition ( CEGUI::Absolute, Temp );
 
-	CorrectEdges ();
+    CorrectEdges ();
 }
 
 
@@ -105,10 +105,10 @@ CVector2D CGUIElement_Impl::GetPosition ( bool bRelative )
 {
     CEGUI::Point CEGUITemp;
 
-	if ( bRelative )
-		CEGUITemp = m_pWindow->getPosition ( CEGUI::Relative );
-	else
-		CEGUITemp = m_pWindow->getPosition ( CEGUI::Absolute );
+    if ( bRelative )
+        CEGUITemp = m_pWindow->getPosition ( CEGUI::Relative );
+    else
+        CEGUITemp = m_pWindow->getPosition ( CEGUI::Absolute );
 
     return CVector2D ( CEGUITemp.d_x, CEGUITemp.d_y );
 }
@@ -116,12 +116,12 @@ CVector2D CGUIElement_Impl::GetPosition ( bool bRelative )
 
 void CGUIElement_Impl::GetPosition ( CVector2D& vecPosition, bool bRelative )
 {
-	CEGUI::MetricsMode type = CEGUI::Absolute;
+    CEGUI::MetricsMode type = CEGUI::Absolute;
 
-	if ( bRelative )
-		type = CEGUI::Relative;
+    if ( bRelative )
+        type = CEGUI::Relative;
 
-	CEGUI::Point& Temp = m_pWindow->getPosition ( type );
+    CEGUI::Point& Temp = m_pWindow->getPosition ( type );
 
     vecPosition.fX = Temp.d_x;
     vecPosition.fY = Temp.d_y;
@@ -130,54 +130,54 @@ void CGUIElement_Impl::GetPosition ( CVector2D& vecPosition, bool bRelative )
 
 void CGUIElement_Impl::SetWidth ( float fX, bool bRelative )
 {
-	if ( bRelative )
-		m_pWindow->setWidth ( CEGUI::Relative, fX );
-	else
-		m_pWindow->setWidth ( CEGUI::Absolute, fX );
+    if ( bRelative )
+        m_pWindow->setWidth ( CEGUI::Relative, fX );
+    else
+        m_pWindow->setWidth ( CEGUI::Absolute, fX );
 }
 
 
 void CGUIElement_Impl::SetHeight ( float fY, bool bRelative )
 {
-	if ( bRelative )
-		m_pWindow->setHeight ( CEGUI::Relative, fY );
-	else
-		m_pWindow->setHeight ( CEGUI::Absolute, fY );
+    if ( bRelative )
+        m_pWindow->setHeight ( CEGUI::Relative, fY );
+    else
+        m_pWindow->setHeight ( CEGUI::Absolute, fY );
 }
 
 
 void CGUIElement_Impl::SetSize ( const CVector2D& vecSize, bool bRelative )
 {
-	if ( bRelative )
-		m_pWindow->setSize ( CEGUI::Relative, CEGUI::Size ( vecSize.fX, vecSize.fY ) );
-	else
-		m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( vecSize.fX, vecSize.fY ) );
+    if ( bRelative )
+        m_pWindow->setSize ( CEGUI::Relative, CEGUI::Size ( vecSize.fX, vecSize.fY ) );
+    else
+        m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( vecSize.fX, vecSize.fY ) );
 
-	CorrectEdges ();
+    CorrectEdges ();
 }
 
 
 CVector2D CGUIElement_Impl::GetSize ( bool bRelative )
 {
-	CEGUI::Size TempSize;
+    CEGUI::Size TempSize;
 
-	if ( bRelative )
-		TempSize = m_pWindow->getRelativeSize ();
-	else
-		TempSize = m_pWindow->getAbsoluteSize ();
+    if ( bRelative )
+        TempSize = m_pWindow->getRelativeSize ();
+    else
+        TempSize = m_pWindow->getAbsoluteSize ();
 
-	return CVector2D ( TempSize.d_width, TempSize.d_height );
+    return CVector2D ( TempSize.d_width, TempSize.d_height );
 }
 
 
 void CGUIElement_Impl::GetSize ( CVector2D& vecSize, bool bRelative )
 {
-	CEGUI::Size TempSize;
+    CEGUI::Size TempSize;
 
-	if ( bRelative )
-		TempSize = m_pWindow->getRelativeSize ();
-	else
-		TempSize = m_pWindow->getAbsoluteSize ();
+    if ( bRelative )
+        TempSize = m_pWindow->getRelativeSize ();
+    else
+        TempSize = m_pWindow->getAbsoluteSize ();
 
     vecSize.fX = TempSize.d_width;
     vecSize.fY = TempSize.d_height;
@@ -186,8 +186,8 @@ void CGUIElement_Impl::GetSize ( CVector2D& vecSize, bool bRelative )
 
 void CGUIElement_Impl::SetMinimumSize ( const CVector2D& vecSize )
 {
-	m_pWindow->setMetricsMode ( CEGUI::Absolute );
-	m_pWindow->setMinimumSize ( CEGUI::Size ( vecSize.fX, vecSize.fY ) );
+    m_pWindow->setMetricsMode ( CEGUI::Absolute );
+    m_pWindow->setMinimumSize ( CEGUI::Size ( vecSize.fX, vecSize.fY ) );
 }
 
 
@@ -229,9 +229,9 @@ void CGUIElement_Impl::GetMaximumSize ( CVector2D& vecSize )
 
 void CGUIElement_Impl::SetText ( const char *szText )
 {
-	CEGUI::String strText;
+    CEGUI::String strText;
 
-	if ( szText ) strText.assign ( szText );
+    if ( szText ) strText.assign ( szText );
     m_pWindow->setText ( strText );
 }
 
@@ -330,9 +330,9 @@ CVector2D CGUIElement_Impl::RelativeToAbsolute ( const CVector2D& Vector )
 
 void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 {
-	if ( pParent )
-		((CGUIElement_Impl*)pParent)->m_pWindow->addChildWindow ( m_pWindow );
-	m_pParent = pParent;
+    if ( pParent )
+        ((CGUIElement_Impl*)pParent)->m_pWindow->addChildWindow ( m_pWindow );
+    m_pParent = pParent;
 }
 
 
@@ -342,7 +342,7 @@ CGUIElement* CGUIElement_Impl::GetParent ( void )
     if ( m_pParent && m_pWindow && !m_pWindow->getParent () )
         return NULL;
 
-	return m_pParent;
+    return m_pParent;
 }
 
 
@@ -354,71 +354,71 @@ CEGUI::Window* CGUIElement_Impl::GetWindow ( void )
 
 void CGUIElement_Impl::CorrectEdges ( void )
 {
-	CEGUI::Point currentPoint = m_pWindow->getPosition( CEGUI::Absolute );
-	CEGUI::Size currentSize = m_pWindow->getSize( CEGUI::Absolute );
-	// Label turns out to be buggy
-	if(m_pWindow->getType( ) == "CGUI/StaticText") return;
+    CEGUI::Point currentPoint = m_pWindow->getPosition( CEGUI::Absolute );
+    CEGUI::Size currentSize = m_pWindow->getSize( CEGUI::Absolute );
+    // Label turns out to be buggy
+    if(m_pWindow->getType( ) == "CGUI/StaticText") return;
 
-	if(m_pWindow->getParent( )->getType( ) == "CGUI/FrameWindow") {
-		CEGUI::Size parentSize = m_pWindow->getParent( )->getSize( CEGUI::Absolute );
-		if ( currentPoint.d_x < CGUI_NODRAW_LEFT )
-			currentPoint.d_x += CGUI_NODRAW_LEFT - currentPoint.d_x;
-		if ( currentPoint.d_y < CGUI_NODRAW_TOP )
-			currentPoint.d_y += CGUI_NODRAW_TOP - currentPoint.d_x;
-		if ( ( currentSize.d_height + currentPoint.d_y ) > ( parentSize.d_height - CGUI_NODRAW_BOTTOM ) )
-			currentSize.d_height -= ( currentSize.d_height + currentPoint.d_y ) - ( parentSize.d_height - CGUI_NODRAW_BOTTOM );
-		if ( ( currentSize.d_width + currentPoint.d_x ) > ( parentSize.d_width - CGUI_NODRAW_RIGHT ) )
-			currentSize.d_width -= ( currentSize.d_width + currentPoint.d_x ) - ( parentSize.d_width - CGUI_NODRAW_RIGHT );
-		m_pWindow->setPosition( CEGUI::Absolute, currentPoint );
-		m_pWindow->setSize( CEGUI::Absolute, currentSize );
-	}
+    if(m_pWindow->getParent( )->getType( ) == "CGUI/FrameWindow") {
+        CEGUI::Size parentSize = m_pWindow->getParent( )->getSize( CEGUI::Absolute );
+        if ( currentPoint.d_x < CGUI_NODRAW_LEFT )
+            currentPoint.d_x += CGUI_NODRAW_LEFT - currentPoint.d_x;
+        if ( currentPoint.d_y < CGUI_NODRAW_TOP )
+            currentPoint.d_y += CGUI_NODRAW_TOP - currentPoint.d_x;
+        if ( ( currentSize.d_height + currentPoint.d_y ) > ( parentSize.d_height - CGUI_NODRAW_BOTTOM ) )
+            currentSize.d_height -= ( currentSize.d_height + currentPoint.d_y ) - ( parentSize.d_height - CGUI_NODRAW_BOTTOM );
+        if ( ( currentSize.d_width + currentPoint.d_x ) > ( parentSize.d_width - CGUI_NODRAW_RIGHT ) )
+            currentSize.d_width -= ( currentSize.d_width + currentPoint.d_x ) - ( parentSize.d_width - CGUI_NODRAW_RIGHT );
+        m_pWindow->setPosition( CEGUI::Absolute, currentPoint );
+        m_pWindow->setSize( CEGUI::Absolute, currentSize );
+    }
 }
 
 
 bool CGUIElement_Impl::SetFont ( const char * szFontName )
 {
-	try {
-		m_pWindow->setFont ( CEGUI::String ( szFontName ) );
-		return true;
-	} catch ( CEGUI::Exception e ) {
-		return false;
-	}
+    try {
+        m_pWindow->setFont ( CEGUI::String ( szFontName ) );
+        return true;
+    } catch ( CEGUI::Exception e ) {
+        return false;
+    }
 }
 
 
 std::string CGUIElement_Impl::GetFont ( void )
 {
-	try
-	{
-		const CEGUI::Font *pFont = m_pWindow->getFont ();
-		if ( pFont )
-		{
-			// Return the contname. std::string will copy it.
-			CEGUI::String strFontName = pFont->getName ();
-			return strFontName.c_str ();
-		}
-	}
-	catch ( CEGUI::Exception e ) {}
+    try
+    {
+        const CEGUI::Font *pFont = m_pWindow->getFont ();
+        if ( pFont )
+        {
+            // Return the contname. std::string will copy it.
+            CEGUI::String strFontName = pFont->getName ();
+            return strFontName.c_str ();
+        }
+    }
+    catch ( CEGUI::Exception e ) {}
 
-	return "";
+    return "";
 }
 
 void CGUIElement_Impl::SetProperty ( const char *szProperty, const char *szValue )
 {
-	try {
-		m_pWindow->setProperty ( szProperty, szValue );
-	} catch ( CEGUI::Exception e ) {}
+    try {
+        m_pWindow->setProperty ( szProperty, szValue );
+    } catch ( CEGUI::Exception e ) {}
 }
 
 
 std::string CGUIElement_Impl::GetProperty ( const char *szProperty )
 {
     CEGUI::String strValue;
-	try
+    try
     {
-		// Return the string. std::string will copy it
-		strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
-	}
+        // Return the string. std::string will copy it
+        strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
+    }
     catch ( CEGUI::Exception e )
     {}
 
@@ -428,70 +428,70 @@ std::string CGUIElement_Impl::GetProperty ( const char *szProperty )
 
 void CGUIElement_Impl::FillProperties ( void )
 {
-	CEGUI::Window::PropertyIterator itPropertySet = ((CEGUI::PropertySet*)m_pWindow)->getIterator ();
-	while ( !itPropertySet.isAtEnd () ) {
-		CEGUI::String strKey = itPropertySet.getCurrentKey ();
-		CEGUI::String strValue = m_pWindow->getProperty ( strKey );
+    CEGUI::Window::PropertyIterator itPropertySet = ((CEGUI::PropertySet*)m_pWindow)->getIterator ();
+    while ( !itPropertySet.isAtEnd () ) {
+        CEGUI::String strKey = itPropertySet.getCurrentKey ();
+        CEGUI::String strValue = m_pWindow->getProperty ( strKey );
 
-		const char *szKey = strKey.c_str ();
-		const char *szValue = strValue.c_str ();
+        const char *szKey = strKey.c_str ();
+        const char *szValue = strValue.c_str ();
 
-		CGUIProperty* pProperty = new CGUIProperty;
-		pProperty->szKey = new char[strlen ( szKey ) + 1];
-		pProperty->szValue = new char[strlen ( szValue ) + 1];
+        CGUIProperty* pProperty = new CGUIProperty;
+        pProperty->szKey = new char[strlen ( szKey ) + 1];
+        pProperty->szValue = new char[strlen ( szValue ) + 1];
 
-		strcpy ( pProperty->szKey, szKey );
-		strcpy ( pProperty->szValue, szValue );
+        strcpy ( pProperty->szKey, szKey );
+        strcpy ( pProperty->szValue, szValue );
 
-		m_Properties.push_back ( pProperty );
-		itPropertySet++;
-	}
+        m_Properties.push_back ( pProperty );
+        itPropertySet++;
+    }
 }
 
 void CGUIElement_Impl::EmptyProperties ( void )
 {
-	if ( !m_Properties.empty() ) {
-		CGUIPropertyIter iter = m_Properties.begin ();
-		CGUIPropertyIter iterEnd = m_Properties.end ();
-		for ( ; iter != iterEnd; iter++ ) {
-			if (*iter) {
-				delete (*iter)->szKey;
-				delete (*iter)->szValue;
-				delete (*iter);
-			}
-		}
-	}
+    if ( !m_Properties.empty() ) {
+        CGUIPropertyIter iter = m_Properties.begin ();
+        CGUIPropertyIter iterEnd = m_Properties.end ();
+        for ( ; iter != iterEnd; iter++ ) {
+            if (*iter) {
+                delete (*iter)->szKey;
+                delete (*iter)->szValue;
+                delete (*iter);
+            }
+        }
+    }
 }
 
 CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin ( void )
 {
-	try {
-		// Fill the properties list, if it's still empty (on first call)
-		if ( m_Properties.empty() )
-			FillProperties ();
+    try {
+        // Fill the properties list, if it's still empty (on first call)
+        if ( m_Properties.empty() )
+            FillProperties ();
 
-		// Return the list begin iterator
-		return m_Properties.begin ();
+        // Return the list begin iterator
+        return m_Properties.begin ();
 
-	} catch ( CEGUI::Exception e ) {
-		return *(CGUIPropertyIter*)NULL;
-	}
+    } catch ( CEGUI::Exception e ) {
+        return *(CGUIPropertyIter*)NULL;
+    }
 }
 
 
 CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd ( void )
 {
-	try {
-		// Fill the properties list, if it's still empty (on first call)
-		if ( m_Properties.empty() )
-			FillProperties ();
+    try {
+        // Fill the properties list, if it's still empty (on first call)
+        if ( m_Properties.empty() )
+            FillProperties ();
 
-		// Return the list begin iterator
-		return m_Properties.end ();
+        // Return the list begin iterator
+        return m_Properties.end ();
 
-	} catch ( CEGUI::Exception e ) {
-		return *(CGUIPropertyIter*)NULL;
-	}
+    } catch ( CEGUI::Exception e ) {
+        return *(CGUIPropertyIter*)NULL;
+    }
 }
 
 
@@ -509,19 +509,19 @@ void CGUIElement_Impl::SetSizedHandler ( GUI_CALLBACK Callback )
 
 void CGUIElement_Impl::SetClickHandler ( GUI_CALLBACK Callback )
 {
-	m_OnClick = Callback;
+    m_OnClick = Callback;
 }
 
 
 void CGUIElement_Impl::SetMouseEnterHandler ( GUI_CALLBACK Callback )
 {
-	m_OnMouseEnter = Callback;
+    m_OnMouseEnter = Callback;
 }
 
 
 void CGUIElement_Impl::SetMouseLeaveHandler ( GUI_CALLBACK Callback )
 {
-	m_OnMouseLeave = Callback;
+    m_OnMouseLeave = Callback;
 }
 
 
@@ -530,48 +530,48 @@ void CGUIElement_Impl::AddEvents ( void )
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMoved, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMoved, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventSized, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnSized, this ) );
-	m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnClick, this ) );
-	m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseEnters, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseEnter, this ) );
-	m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseLeaves, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseLeave, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnClick, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseEnters, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseEnter, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseLeaves, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseLeave, this ) );
 }
 
 
 bool CGUIElement_Impl::Event_OnMoved ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnMoved )
-		m_OnMoved ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnMoved )
+        m_OnMoved ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnSized ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnSized )
-		m_OnSized ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnSized )
+        m_OnSized ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnClick ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnClick )
-		m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnClick )
+        m_OnClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnMouseEnter ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnMouseEnter )
-		m_OnMouseEnter ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnMouseEnter )
+        m_OnMouseEnter ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIElement_Impl::Event_OnMouseLeave ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnMouseLeave )
-		m_OnMouseLeave ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnMouseLeave )
+        m_OnMouseLeave ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

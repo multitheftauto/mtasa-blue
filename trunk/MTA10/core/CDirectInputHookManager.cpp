@@ -24,24 +24,24 @@ CDirectInputHookManager::~CDirectInputHookManager ( )
 {
     WriteDebugEvent ( "CDirectInputHookManager::~CDirectInputHookManager" );
 
-	// Delete our hook object.
+    // Delete our hook object.
     SAFE_DELETE ( m_pDirectInputHook8 );
 }
 
 void CDirectInputHookManager::ApplyHook ( )
 {
-	PBYTE pbDirectInput8;
+    PBYTE pbDirectInput8;
 
-	// First load the module(s).
-	pbDirectInput8 = reinterpret_cast < PBYTE > ( LoadLibrary ( "DINPUT8.DLL" ) );
+    // First load the module(s).
+    pbDirectInput8 = reinterpret_cast < PBYTE > ( LoadLibrary ( "DINPUT8.DLL" ) );
 
-	// If we have a valid pointer, we can hook the respective library.
-	if ( pbDirectInput8 != NULL )
-	{
-		m_pDirectInputHook8 = new CDirectInputHook8 ( );
-		m_pDirectInputHook8->ApplyHook ( );
-		// Self-maintaining code.  Will delete on shutdown...
-	}
+    // If we have a valid pointer, we can hook the respective library.
+    if ( pbDirectInput8 != NULL )
+    {
+        m_pDirectInputHook8 = new CDirectInputHook8 ( );
+        m_pDirectInputHook8->ApplyHook ( );
+        // Self-maintaining code.  Will delete on shutdown...
+    }
 }
 
 void CDirectInputHookManager::RemoveHook ( )

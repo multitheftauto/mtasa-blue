@@ -21,8 +21,8 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     m_pDevice       = pDevice;
 
     // Give ourself a matching refcount.
-	pDevice->AddRef ( );
-	m_dwRefCount = pDevice->Release ( );
+    pDevice->AddRef ( );
+    m_dwRefCount = pDevice->Release ( );
 
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
@@ -65,8 +65,8 @@ ULONG   CProxyDirect3DDevice9::Release                        ( VOID )
     {
         WriteDebugEvent ( "Releasing IDirect3DDevice9 Proxy..." );
 
-		// Call event handler
-		CDirect3DEvents9::OnDirect3DDeviceDestroy ( m_pDevice );
+        // Call event handler
+        CDirect3DEvents9::OnDirect3DDeviceDestroy ( m_pDevice );
 
         // Save device so we can destroy it after.
         pDestroyedDevice = m_pDevice;
@@ -74,13 +74,13 @@ ULONG   CProxyDirect3DDevice9::Release                        ( VOID )
         // Destroy...
         delete this;
 
-		// Release device...
+        // Release device...
         ulResult = pDestroyedDevice->Release ( );
 
-		return ulResult;
+        return ulResult;
     }
-	
-	ulResult = m_pDevice->Release ( );
+    
+    ulResult = m_pDevice->Release ( );
 
     return ulResult;
 }
@@ -153,7 +153,7 @@ UINT    CProxyDirect3DDevice9::GetNumberOfSwapChains          ( VOID )
 
 HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
-	WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
+    WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
 
     GetVideoModeManager ()->PreReset ( pPresentationParameters );
 
@@ -238,7 +238,7 @@ HRESULT CProxyDirect3DDevice9::CreateCubeTexture              ( UINT EdgeLength,
 
 HRESULT CProxyDirect3DDevice9::CreateVertexBuffer             ( UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle )
 {
-	return m_pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
+    return m_pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateIndexBuffer              ( UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle )
@@ -335,7 +335,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
         return hResult;
     }
 
-	return D3D_OK;
+    return D3D_OK;
 }
 
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
@@ -345,10 +345,10 @@ HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONS
 
 HRESULT CProxyDirect3DDevice9::SetTransform                   ( D3DTRANSFORMSTATETYPE State,CONST D3DMATRIX* pMatrix )
 {
-	// Store the matrix
-	m_pData->StoreTransform ( State, pMatrix );
+    // Store the matrix
+    m_pData->StoreTransform ( State, pMatrix );
 
-	// Call original
+    // Call original
     return m_pDevice->SetTransform ( State, pMatrix );
 }
 
@@ -364,10 +364,10 @@ HRESULT CProxyDirect3DDevice9::MultiplyTransform              ( D3DTRANSFORMSTAT
 
 HRESULT CProxyDirect3DDevice9::SetViewport                    ( CONST D3DVIEWPORT9* pViewport )
 {
-	// Store matrix in m_Data
-	m_pData->StoreViewport ( pViewport->X, pViewport->Y, pViewport->Width, pViewport->Height );
+    // Store matrix in m_Data
+    m_pData->StoreViewport ( pViewport->X, pViewport->Y, pViewport->Width, pViewport->Height );
 
-	// Call original
+    // Call original
     return m_pDevice->SetViewport ( pViewport );
 }
 

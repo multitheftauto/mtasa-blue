@@ -45,7 +45,7 @@ public:
     float                   GetFontHeight               ( void );
     float                   GetTextExtent               ( void );
 
-	eCGUIType				GetType						( void ) { return CGUI_LABEL; };
+    eCGUIType               GetType                     ( void ) { return CGUI_LABEL; };
 
     #define EXCLUDE_SET_TEXT
     #include "CGUIElement_Inc.h"

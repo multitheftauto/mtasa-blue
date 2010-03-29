@@ -125,7 +125,7 @@ CTextItem* CPlayerTextManager::GetTextItemOnQueue ( CTextItem* textItem )
 
 CPlayer* CPlayerTextManager::GetPlayer ()
 {
-	return m_pPlayer;
+    return m_pPlayer;
 }
 
 void CPlayerTextManager::Process ()

@@ -19,20 +19,20 @@ class CGUIElement;
 #include "CGUITypes.h"
 
 enum eCGUIType {
-	CGUI_BUTTON,
-	CGUI_CHECKBOX,
-	CGUI_EDIT,
-	CGUI_GRIDLIST,
-	CGUI_LABEL,
-	CGUI_MEMO,
-	CGUI_PROGRESSBAR,
-	CGUI_RADIOBUTTON,
-	CGUI_STATICIMAGE,
-	CGUI_TAB,
-	CGUI_TABPANEL,
-	CGUI_WINDOW,
-	CGUI_SCROLLPANE,
-	CGUI_SCROLLBAR,
+    CGUI_BUTTON,
+    CGUI_CHECKBOX,
+    CGUI_EDIT,
+    CGUI_GRIDLIST,
+    CGUI_LABEL,
+    CGUI_MEMO,
+    CGUI_PROGRESSBAR,
+    CGUI_RADIOBUTTON,
+    CGUI_STATICIMAGE,
+    CGUI_TAB,
+    CGUI_TABPANEL,
+    CGUI_WINDOW,
+    CGUI_SCROLLPANE,
+    CGUI_SCROLLBAR,
     CGUI_COMBOBOX
 };
 
@@ -56,15 +56,15 @@ public:
     virtual CVector2D           GetPosition                 ( bool bRelative = false ) = 0;
     virtual void                GetPosition                 ( CVector2D& vecPosition, bool bRelative = false ) = 0;
 
-	virtual void				SetWidth					( float fX, bool bRelative = false ) = 0;
-	virtual void				SetHeight					( float fY, bool bRelative = false ) = 0;
+    virtual void                SetWidth                    ( float fX, bool bRelative = false ) = 0;
+    virtual void                SetHeight                   ( float fY, bool bRelative = false ) = 0;
 
     virtual void                SetSize                     ( const CVector2D& vecSize, bool bRelative = false ) = 0;
     virtual CVector2D           GetSize                     ( bool bRelative = false ) = 0;
     virtual void                GetSize                     ( CVector2D& vecSize, bool bRelative = false ) = 0;
 
-	virtual void				SetProperty					( const char *szProperty, const char *szValue ) = 0;
-    virtual std::string			GetProperty					( const char *szProperty ) = 0;
+    virtual void                SetProperty                 ( const char *szProperty, const char *szValue ) = 0;
+    virtual std::string         GetProperty                 ( const char *szProperty ) = 0;
 
     virtual void                SetMinimumSize              ( const CVector2D& vecSize ) = 0;
     virtual CVector2D           GetMinimumSize              ( void ) = 0;
@@ -77,10 +77,10 @@ public:
     virtual void                SetText                     ( const char *Text ) = 0;
     virtual std::string         GetText                     ( void ) = 0;
 
-	virtual bool				SetFont						( const char *szFontName ) = 0;
-    virtual std::string			GetFont						( void ) = 0;
+    virtual bool                SetFont                     ( const char *szFontName ) = 0;
+    virtual std::string         GetFont                     ( void ) = 0;
 
-	virtual void                SetAlpha                    ( float fAlpha ) = 0;
+    virtual void                SetAlpha                    ( float fAlpha ) = 0;
     virtual float               GetAlpha                    ( void ) = 0;
     virtual void                SetInheritsAlpha            ( bool bInheritsAlpha ) = 0;
     virtual bool                GetInheritsAlpha            ( void ) = 0;
@@ -101,21 +101,21 @@ public:
     virtual CVector2D           RelativeToAbsolute          ( const CVector2D& Vector ) = 0;
 
     virtual void                SetParent                   ( CGUIElement* pParent ) = 0;
-	virtual CGUIElement*		GetParent					( void ) = 0;
+    virtual CGUIElement*        GetParent                   ( void ) = 0;
 
-	virtual void				SetUserData					( void* pData ) = 0;
-	virtual void*				GetUserData					( void ) = 0;
+    virtual void                SetUserData                 ( void* pData ) = 0;
+    virtual void*               GetUserData                 ( void ) = 0;
 
-	virtual eCGUIType			GetType						( void ) = 0;
+    virtual eCGUIType           GetType                     ( void ) = 0;
 
-	virtual CGUIPropertyIter	GetPropertiesBegin			( void ) = 0;
-	virtual CGUIPropertyIter	GetPropertiesEnd			( void ) = 0;
+    virtual CGUIPropertyIter    GetPropertiesBegin          ( void ) = 0;
+    virtual CGUIPropertyIter    GetPropertiesEnd            ( void ) = 0;
 
     virtual void                SetMovedHandler             ( GUI_CALLBACK Callback ) = 0;
-	virtual void                SetSizedHandler		        ( GUI_CALLBACK Callback ) = 0;
-	virtual void                SetClickHandler		        ( GUI_CALLBACK Callback ) = 0;
-	virtual void                SetMouseEnterHandler		( GUI_CALLBACK Callback ) = 0;
-	virtual void                SetMouseLeaveHandler		( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetSizedHandler             ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetClickHandler             ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetMouseEnterHandler        ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif

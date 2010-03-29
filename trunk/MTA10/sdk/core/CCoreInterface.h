@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/core/CCoreInterface.h
-*  PURPOSE:		Core interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/core/CCoreInterface.h
+*  PURPOSE:     Core interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -71,7 +71,7 @@ public:
     virtual void                    ChatPrintfColor                 ( const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ... ) = 0;
     virtual void                    SetChatVisible                  ( bool bVisible ) = 0;
     virtual bool                    IsChatVisible                   ( void ) = 0;
-	virtual void					TakeScreenShot					( void ) = 0;
+    virtual void                    TakeScreenShot                  ( void ) = 0;
     virtual void                    EnableChatInput                 ( char* szCommand, DWORD dwColor ) = 0;
     virtual bool                    IsChatInputEnabled              ( void ) = 0;
     virtual bool                    IsSettingsVisible               ( void ) = 0;
@@ -83,8 +83,8 @@ public:
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
 
-	virtual bool					IsConnected						( void ) = 0;
-	virtual bool					Reconnect						( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
+    virtual bool                    IsConnected                     ( void ) = 0;
+    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
     virtual SString                 GetModInstallRoot               ( char * szModName )=0;
@@ -96,17 +96,17 @@ public:
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
     virtual void                    HideMainMenu                    ( void ) = 0;
     virtual HWND                    GetHookedWindow                 ( void ) = 0;
-	virtual bool					IsFocused						( void ) = 0;
+    virtual bool                    IsFocused                       ( void ) = 0;
     virtual bool                    IsWindowMinimized               ( void ) = 0;
 
     virtual void                    SaveConfig                      ( void ) = 0;
 
-	virtual void					SwitchRenderWindow				( HWND hWnd, HWND hWndInput ) = 0;
-	virtual void					SetCenterCursor					( bool bEnabled ) = 0;
+    virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
+    virtual void                    SetCenterCursor                 ( bool bEnabled ) = 0;
 
-	// CGUI Callbacks
-	virtual bool					OnMouseClick					( CGUIMouseEventArgs Args ) = 0;
-	virtual bool					OnMouseDoubleClick				( CGUIMouseEventArgs Args ) = 0;
+    // CGUI Callbacks
+    virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
+    virtual bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args ) = 0;
 
     virtual void                    Quit                            ( bool bInstantly = true) = 0;
 };

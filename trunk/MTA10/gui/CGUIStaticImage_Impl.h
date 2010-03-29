@@ -34,11 +34,11 @@ public:
     void                        SetFrameEnabled         ( bool bFrameEnabled );
     bool                        IsFrameEnabled          ( void );
 
-    CEGUI::Image*               GetDirectImage			( void );
+    CEGUI::Image*               GetDirectImage          ( void );
 
     void                        Render                  ( void );
 
-	eCGUIType					GetType					( void ) { return CGUI_STATICIMAGE; }
+    eCGUIType                   GetType                 ( void ) { return CGUI_STATICIMAGE; }
 
 private:
     class CGUI_Impl*            m_pGUI;

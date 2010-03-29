@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/utils/CMD5Hasher.cpp
-*  PURPOSE:		MD5 hasher utility class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/utils/CMD5Hasher.cpp
+*  PURPOSE:     MD5 hasher utility class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

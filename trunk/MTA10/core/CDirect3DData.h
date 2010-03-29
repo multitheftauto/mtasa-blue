@@ -20,33 +20,33 @@
 class CDirect3DData : public CSingleton < CDirect3DData >
 {
 public:
-	            CDirect3DData       ( void );
-	           ~CDirect3DData       ( void );
+                CDirect3DData       ( void );
+               ~CDirect3DData       ( void );
 
-	void        StoreTransform      ( D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix );
-	void        GetTransform        ( D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX * pMatrixOut );
+    void        StoreTransform      ( D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix );
+    void        GetTransform        ( D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX * pMatrixOut );
 
     inline HWND GetDeviceWindow     ( void )                                                    { return m_hDeviceWindow; };
     inline void StoreDeviceWindow   ( HWND hDeviceWindow )                                      { m_hDeviceWindow = hDeviceWindow; };
 
-	void        StoreViewport       ( DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight );
+    void        StoreViewport       ( DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight );
 
-	DWORD       GetViewportX        ( void );
-	DWORD       GetViewportY        ( void );
-	DWORD       GetViewportWidth    ( void );
-	DWORD       GetViewportHeight   ( void );
+    DWORD       GetViewportX        ( void );
+    DWORD       GetViewportY        ( void );
+    DWORD       GetViewportWidth    ( void );
+    DWORD       GetViewportHeight   ( void );
 
 private:
-	D3DMATRIX   m_mViewMatrix;
+    D3DMATRIX   m_mViewMatrix;
     D3DMATRIX   m_mProjMatrix;
     D3DMATRIX   m_mWorldMatrix;
 
     HWND        m_hDeviceWindow;
 
-	DWORD       m_dwViewportX;
-	DWORD       m_dwViewportY;
-	DWORD       m_dwViewportWidth;
-	DWORD       m_dwViewportHeight;
+    DWORD       m_dwViewportX;
+    DWORD       m_dwViewportY;
+    DWORD       m_dwViewportWidth;
+    DWORD       m_dwViewportHeight;
 };
 
 #endif

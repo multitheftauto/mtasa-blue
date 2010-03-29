@@ -19,15 +19,15 @@
 
 class CQuadBikeSAInterface : public CAutomobileSAInterface
 {
-	// fill this
+    // fill this
 };
 
 class CQuadBikeSA : public virtual CQuadBike, public virtual CAutomobileSA
 {
 private:
 public:
-	                            CQuadBikeSA( CQuadBikeSAInterface * quadbike );
-	                            CQuadBikeSA( eVehicleTypes dwModelID );
+                                CQuadBikeSA( CQuadBikeSAInterface * quadbike );
+                                CQuadBikeSA( eVehicleTypes dwModelID );
 
     virtual                     ~CQuadBikeSA ( void ) {}
 };

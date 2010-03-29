@@ -244,13 +244,13 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 // Grab the delta health
                                 float fDeltaHealth = fPreviousHealth - vehicle.data.fHealth;
 
-						        if ( fDeltaHealth > FLOAT_EPSILON )
-						        {
-							        // Call the onVehicleDamage event
-							        CLuaArguments Arguments;
-							        Arguments.PushNumber ( fDeltaHealth );
-							        pVehicle->CallEvent ( "onVehicleDamage", Arguments );
-						        }
+                                if ( fDeltaHealth > FLOAT_EPSILON )
+                                {
+                                    // Call the onVehicleDamage event
+                                    CLuaArguments Arguments;
+                                    Arguments.PushNumber ( fDeltaHealth );
+                                    pVehicle->CallEvent ( "onVehicleDamage", Arguments );
+                                }
                             }
                         }
 
@@ -356,7 +356,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 
                         // Run colpoint checks on vehicle
-					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+                        g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
                         // Send this sync
                         data.bSend = true;

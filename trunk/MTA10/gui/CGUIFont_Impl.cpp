@@ -20,10 +20,10 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
     m_pFont = m_pFontManager->createFont ( szFontName, szFontFile, uSize, uFlags );
 
     // Define our glyphs
-	if ( uExtraGlyphs ) {
-		m_pFont->defineFontGlyphs( m_pFont->getAvailableGlyphs() + (CEGUI::utf32)*uExtraGlyphs );
-	} else
-		m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
+    if ( uExtraGlyphs ) {
+        m_pFont->defineFontGlyphs( m_pFont->getAvailableGlyphs() + (CEGUI::utf32)*uExtraGlyphs );
+    } else
+        m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
 
     // Set default attributes
     SetNativeResolution ( 1024, 768 );
@@ -45,16 +45,16 @@ void CGUIFont_Impl::SetAntiAliasingEnabled ( bool bAntialiased )
 
 void CGUIFont_Impl::DrawTextString ( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY )
 {
-	CEGUI::TextFormatting fmt;
+    CEGUI::TextFormatting fmt;
 
-	if ( ulFormat == DT_CENTER )
-		fmt = CEGUI::Centred;
-	else if ( ulFormat == DT_RIGHT )
-		fmt = CEGUI::RightAligned;
-	else
-		fmt = CEGUI::LeftAligned;
+    if ( ulFormat == DT_CENTER )
+        fmt = CEGUI::Centred;
+    else if ( ulFormat == DT_RIGHT )
+        fmt = CEGUI::RightAligned;
+    else
+        fmt = CEGUI::LeftAligned;
 
-	m_pFont->drawText ( szText ? CEGUI::String ( szText ) : CEGUI::String (), CEGUI::Rect ( DrawArea.fX1, DrawArea.fY1, DrawArea.fX2, DrawArea.fY2 ), fZ, CEGUI::Rect ( ClipRect.fX1, ClipRect.fY1, ClipRect.fX2, ClipRect.fY2 ), fmt, CEGUI::ColourRect ( CEGUI::colour ( ( CEGUI::argb_t ) ulColor ) ), fScaleX, fScaleY );
+    m_pFont->drawText ( szText ? CEGUI::String ( szText ) : CEGUI::String (), CEGUI::Rect ( DrawArea.fX1, DrawArea.fY1, DrawArea.fX2, DrawArea.fY2 ), fZ, CEGUI::Rect ( ClipRect.fX1, ClipRect.fY1, ClipRect.fX2, ClipRect.fY2 ), fmt, CEGUI::ColourRect ( CEGUI::colour ( ( CEGUI::argb_t ) ulColor ) ), fScaleX, fScaleY );
 }
 
 bool CGUIFont_Impl::IsAntiAliasingEnabled ( void )
@@ -93,8 +93,8 @@ float CGUIFont_Impl::GetCharacterWidth ( int iChar, float fScale )
 
 float CGUIFont_Impl::GetFontHeight ( float fScale )
 {
-	float fHeight = m_pFont->getFontHeight ( fScale );	// average height.. not the maximum height for long characters such as 'g' or 'j'
-	fHeight += 2.0f;									// so hack it
+    float fHeight = m_pFont->getFontHeight ( fScale );  // average height.. not the maximum height for long characters such as 'g' or 'j'
+    fHeight += 2.0f;                                    // so hack it
 
     return fHeight;
 }
@@ -102,10 +102,10 @@ float CGUIFont_Impl::GetFontHeight ( float fScale )
 
 float CGUIFont_Impl::GetTextExtent ( const char* szText, float fScale )
 {
-	CEGUI::String strText;
+    CEGUI::String strText;
 
-	if ( szText ) strText.assign ( szText );
-	return m_pFont->getTextExtent ( strText, fScale );
+    if ( szText ) strText.assign ( szText );
+    return m_pFont->getTextExtent ( strText, fScale );
 }
 
 

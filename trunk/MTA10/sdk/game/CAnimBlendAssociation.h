@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CAnimBlendAssociation.h
-*  PURPOSE:		Animation blend association interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CAnimBlendAssociation.h
+*  PURPOSE:     Animation blend association interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

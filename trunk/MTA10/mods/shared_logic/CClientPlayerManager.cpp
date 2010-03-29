@@ -66,7 +66,7 @@ void CClientPlayerManager::DoPulse ( void )
                         pVehicle->SetPosition ( pPlayer->GetLastPuresyncPosition () );
                         pVehicle->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
                         pVehicle->SetTurnSpeed ( CVector ( 0, 0, 0 ) );
-			            pPlayer->ResetInterpolation ();
+                        pPlayer->ResetInterpolation ();
                     }
                 }
                 else
@@ -75,7 +75,7 @@ void CClientPlayerManager::DoPulse ( void )
                     pPlayer->SetPosition ( pPlayer->GetLastPuresyncPosition () );
                     pPlayer->ResetInterpolation ();
                     pPlayer->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
-			        pPlayer->ResetInterpolation ();
+                    pPlayer->ResetInterpolation ();
                 }
             }
             else

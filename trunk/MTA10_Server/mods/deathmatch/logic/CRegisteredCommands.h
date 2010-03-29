@@ -30,7 +30,7 @@ class CRegisteredCommands
         class CLuaMain* pLuaMain;
         char szKey [MAX_REGISTERED_COMMAND_LENGTH + 1];
         int iLuaFunction;
-		bool bRestricted;
+        bool bRestricted;
         bool bCaseSensitive;
     };
 

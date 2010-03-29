@@ -75,11 +75,11 @@ private:
     bool                IsKeyPressed        ( int iKey );
     void                WaitForKey          ( int iKey );
 
-	void				ShowInfoTag			( char *szTag );
-	void				HandleInput			( void );
+    void                ShowInfoTag         ( char *szTag );
+    void                HandleInput         ( void );
 
     void                SleepMs             ( unsigned long ulMs );
-	void				DestroyWindow		( void );
+    void                DestroyWindow       ( void );
 
     CDynamicLibrary     m_NetworkLibrary;
     CDynamicLibrary     m_XMLLibrary;
@@ -98,19 +98,19 @@ private:
     bool                m_bRequestedQuit;
     bool                m_bRequestedReset;
 
-	char				m_szInputBuffer[255];
-	unsigned int		m_uiInputCount;
-	
-	char				m_szTag[80];
+    char                m_szInputBuffer[255];
+    unsigned int        m_uiInputCount;
+    
+    char                m_szTag[80];
 
 #ifdef WIN32
-	HANDLE				m_hConsole;
-	CHAR_INFO			m_ScrnBuffer[256];
+    HANDLE              m_hConsole;
+    CHAR_INFO           m_ScrnBuffer[256];
 
     CThreadCommandQueue*    m_pThreadCommandQueue;
 #else
-	WINDOW*				m_wndMenu;
-	WINDOW*				m_wndInput;
+    WINDOW*             m_wndMenu;
+    WINDOW*             m_wndInput;
 #endif
 };
 

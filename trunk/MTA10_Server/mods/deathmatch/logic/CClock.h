@@ -22,12 +22,12 @@ public:
     void                    Get                     ( unsigned char& ucHour, unsigned char& ucMinute );
     void                    Set                     ( unsigned char ucHour, unsigned char ucMinute );
 
-	void					SetMinuteDuration		( unsigned long ulDuration );
-	unsigned long			GetMinuteDuration		( void );
+    void                    SetMinuteDuration       ( unsigned long ulDuration );
+    unsigned long           GetMinuteDuration       ( void );
 
 private:
     unsigned long           m_ulMidnightTime;
-	unsigned long			m_ulMinuteDuration;
+    unsigned long           m_ulMinuteDuration;
 };
 
 #endif

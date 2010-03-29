@@ -15,13 +15,13 @@
 class CGUISize
 {
     public:
-	            CGUISize        ( void ) {}
-	            CGUISize        ( float width, float height ) : fWidth ( width ), fHeight (height ) {}
+                CGUISize        ( void ) {}
+                CGUISize        ( float width, float height ) : fWidth ( width ), fHeight (height ) {}
 
-	bool        operator==      ( const CGUISize& other ) const;
-	bool        operator!=      ( const CGUISize& other ) const;
+    bool        operator==      ( const CGUISize& other ) const;
+    bool        operator!=      ( const CGUISize& other ) const;
 
-	float       fWidth;
+    float       fWidth;
     float       fHeight;
 };
 

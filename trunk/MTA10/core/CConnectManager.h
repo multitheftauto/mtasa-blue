@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CConnectManager.h
-*  PURPOSE:		Header file for connect manager
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CConnectManager.h
+*  PURPOSE:     Header file for connect manager
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -18,9 +18,9 @@
 #include <gui/CGUI.h>
 #include <xfire.h>
 
-#define	NET_MTU_MODEM		576
-#define NET_MTU_DSL			1400
-#define NET_MTU_LAN			1492
+#define NET_MTU_MODEM       576
+#define NET_MTU_DSL         1400
+#define NET_MTU_LAN         1492
 
 class CConnectManager
 {
@@ -38,13 +38,13 @@ public:
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
-	inline void		SetMTUSize			( unsigned short usMTUSize )											{ m_usMTUSize = usMTUSize; };
+    inline void     SetMTUSize          ( unsigned short usMTUSize )                                            { m_usMTUSize = usMTUSize; };
 
 
 private:
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
-	unsigned short	m_usMTUSize;
+    unsigned short  m_usMTUSize;
     std::string     m_strHost;
     unsigned short  m_usPort;
     std::string     m_strNick;
@@ -55,7 +55,7 @@ private:
 
     GUI_CALLBACK*   m_pOnCancelClick;
 
-	bool CheckNickProvided ( const char* szNick );
+    bool CheckNickProvided ( const char* szNick );
 };
 
 #endif

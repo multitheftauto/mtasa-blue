@@ -66,7 +66,7 @@ void CPickup::Unlink ( void )
 
 bool CPickup::ReadSpecialData ( void )
 {
-	unsigned short usBuffer = 0;
+    unsigned short usBuffer = 0;
     // Grab the "posX" data
     if ( !GetCustomDataFloat ( "posX", m_vecPosition.fX, true ) )
     {
@@ -108,15 +108,15 @@ bool CPickup::ReadSpecialData ( void )
             m_ucType = ARMOR;
             m_usModel = CPickupManager::GetArmorModel ();
         }
-		else if ( IsNumericString ( szBuffer ) )
-		{	// could be a weapon
-			usBuffer = atoi ( szBuffer );
-			if ( CPickupManager::IsValidWeaponID ( usBuffer ) )
-			{ // its a weapon
-				m_ucType = WEAPON;
-				m_usModel = CPickupManager::GetWeaponModel ( m_ucWeaponType );
-			}
-		}
+        else if ( IsNumericString ( szBuffer ) )
+        {   // could be a weapon
+            usBuffer = atoi ( szBuffer );
+            if ( CPickupManager::IsValidWeaponID ( usBuffer ) )
+            { // its a weapon
+                m_ucType = WEAPON;
+                m_usModel = CPickupManager::GetWeaponModel ( m_ucWeaponType );
+            }
+        }
         else if ( stricmp ( szBuffer, "custom" ) == 0 )
         {
             m_ucType = CUSTOM;
@@ -242,7 +242,7 @@ bool CPickup::ReadSpecialData ( void )
         }
     }
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     // Success

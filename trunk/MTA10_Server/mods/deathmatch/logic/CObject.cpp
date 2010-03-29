@@ -62,9 +62,9 @@ CObject::~CObject ( void )
 
 void CObject::Unlink ( void )
 {
-	// Remove us from the manager's list
-	m_pObjectManager->RemoveFromList ( this );
-	m_pObjectManager->m_Attached.remove ( this );
+    // Remove us from the manager's list
+    m_pObjectManager->RemoveFromList ( this );
+    m_pObjectManager->m_Attached.remove ( this );
 }
 
 
@@ -120,10 +120,10 @@ bool CObject::ReadSpecialData ( void )
         return false;
     }
 
-	if ( GetCustomDataInt ( "interior", iTemp, true ) )
+    if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     // Success
@@ -289,12 +289,12 @@ void CObject::StopMoving ( void )
         // Calculate our current Position
         unsigned long ulCurrentTime = GetTime ();
 
-		if ( ulCurrentTime >= m_moveData.ulTimeStop )
-		{
-			m_vecPosition = m_moveData.vecStopPosition;
-			m_vecRotation = m_moveData.vecStopRotation;
-			return;
-		}
+        if ( ulCurrentTime >= m_moveData.ulTimeStop )
+        {
+            m_vecPosition = m_moveData.vecStopPosition;
+            m_vecRotation = m_moveData.vecStopRotation;
+            return;
+        }
 
         // Grab the difference between start and finish
         CVector vecJourney = m_moveData.vecStopPosition - m_moveData.vecStartPosition;

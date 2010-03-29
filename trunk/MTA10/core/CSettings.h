@@ -73,7 +73,7 @@ class CColor;
 
 class CSettings
 {
-	friend class CCore;
+    friend class CCore;
 
     typedef enum ChatColorType
     {
@@ -88,10 +88,10 @@ public:
                         CSettings               ( void );
                         ~CSettings              ( void );
 
-	bool			    ProcessMessage			( UINT uMsg, WPARAM wParam, LPARAM lParam );
+    bool                ProcessMessage          ( UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-    void                Update					( void );
-	void			    Initialize				( void );
+    void                Update                  ( void );
+    void                Initialize              ( void );
 
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
@@ -112,27 +112,27 @@ public:
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
-	// Keep these protected so we can access them in the event handlers of CClientGame
+    // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIWindow*         m_pWindow;
-	CGUITabPanel*	    m_pTabs;
+    CGUITabPanel*       m_pTabs;
     CGUIButton*         m_pButtonOK;
-	CGUIButton*		    m_pButtonCancel;
+    CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
     CGUILabel*          m_pLabelConnection;
     CGUIComboBox*       m_pComboConnection;
-	CGUICheckBox*	    m_pSavePasswords;
+    CGUICheckBox*       m_pSavePasswords;
 
-    CGUILabel*		    m_pVideoGeneralLabel;
-    CGUILabel*		    m_pVideoResolutionLabel;
+    CGUILabel*          m_pVideoGeneralLabel;
+    CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
-	CGUILabel*		    m_pVideoRenderingLabel;
-	CGUICheckBox*	    m_pCheckBoxMenuDynamic;
-	CGUICheckBox*	    m_pCheckBoxMenuVideo;
-	CGUICheckBox*	    m_pCheckBoxMenuPostEffects;
+    CGUILabel*          m_pVideoRenderingLabel;
+    CGUICheckBox*       m_pCheckBoxMenuDynamic;
+    CGUICheckBox*       m_pCheckBoxMenuVideo;
+    CGUICheckBox*       m_pCheckBoxMenuPostEffects;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
@@ -145,7 +145,7 @@ protected:
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
-	
+    
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -156,9 +156,9 @@ protected:
     CGUIScrollBar*      m_pAudioSFXVolume;
     CGUIScrollBar*      m_pAudioMTAVolume;
 
-	CGUIGridList*	    m_pBindsList;
-	CGUIButton*		    m_pBindsDefButton;
-	CGUIHandle		    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
+    CGUIGridList*       m_pBindsList;
+    CGUIButton*         m_pBindsDefButton;
+    CGUIHandle          m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
     CGUILabel*                  m_pJoypadName;
     CGUILabel*                  m_pJoypadUnderline;
@@ -168,13 +168,13 @@ protected:
     std::vector < CGUIButton* > m_pJoypadButtons;
     int                         m_JoypadSettingsRevision;
 
-	CGUILabel*			m_pLabelCommunity;
-	CGUILabel*			m_pLabelUser;
-	CGUILabel*			m_pLabelPass;
-	CGUIEdit*			m_pEditUser;
-	CGUIEdit*			m_pEditPass;
-	CGUIButton*			m_pButtonLogin;
-    CGUIButton*			m_pButtonRegister;
+    CGUILabel*          m_pLabelCommunity;
+    CGUILabel*          m_pLabelUser;
+    CGUILabel*          m_pLabelPass;
+    CGUIEdit*           m_pEditUser;
+    CGUIEdit*           m_pEditPass;
+    CGUIButton*         m_pButtonLogin;
+    CGUIButton*         m_pButtonRegister;
 
     CGUILabel*          m_pControlsMouseLabel;
     CGUICheckBox*       m_pInvertMouse;
@@ -212,16 +212,16 @@ protected:
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
 
-    bool			    OnJoypadTextChanged	    ( CGUIElement* pElement );
-	bool			    OnAxisSelectClick       ( CGUIElement* pElement );
-	bool			    OnJoypadDefaultClick    ( CGUIElement* pElement );
-	bool			    OnBindsDefaultClick		( CGUIElement* pElement );
-	bool			    OnBindsListClick		( CGUIElement* pElement );
-	bool			    OnCheckBoxClick         ( CGUIElement* pElement );
+    bool                OnJoypadTextChanged     ( CGUIElement* pElement );
+    bool                OnAxisSelectClick       ( CGUIElement* pElement );
+    bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
+    bool                OnBindsDefaultClick     ( CGUIElement* pElement );
+    bool                OnBindsListClick        ( CGUIElement* pElement );
+    bool                OnCheckBoxClick         ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
-	bool				OnLoginButtonClick		( CGUIElement* pElement );
-    bool				OnRegisterButtonClick	( CGUIElement* pElement );
+    bool                OnLoginButtonClick      ( CGUIElement* pElement );
+    bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
@@ -233,13 +233,13 @@ protected:
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
 
-	bool			    OnMouseDoubleClick		( CGUIMouseEventArgs Args );
+    bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
 private:
-	void			    ProcessKeyBinds			( void );
-	void			    ProcessJoypad			( void );
+    void                ProcessKeyBinds         ( void );
+    void                ProcessJoypad           ( void );
 
     void                SaveData                ( void );
 
@@ -253,7 +253,7 @@ private:
     int                 GetMilliseconds         ( CGUIEdit* pEdit );
     void                SetMilliseconds         ( CGUIEdit* pEdit, int milliseconds );
 
-	unsigned int	    m_uiCaptureKey;
+    unsigned int        m_uiCaptureKey;
     bool                m_bCaptureKey;
     bool                m_bCaptureAxis;
 
@@ -261,17 +261,22 @@ private:
     unsigned char       m_ucOldSFXVolume;
     float               m_fOldMTAVolume;
 
+<<<<<<< HEAD
 	CGUIListItem*	    m_pSelectedBind;
+=======
+    CGUIListItem*       m_pSelectedBind;
+    CGUITab*            m_pTabMultiplayer;
+>>>>>>> 22eb218... replace all tabs to spaces
 
-	DWORD			    m_dwFrameCount;
+    DWORD               m_dwFrameCount;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
-	enum eCheckBox {
-		CHECKBOX_MENU_DYNAMIC,
-		CHECKBOX_MENU_VIDEO,
-		CHECKBOX_MENU_POSTEFFECTS
-	};
+    enum eCheckBox {
+        CHECKBOX_MENU_DYNAMIC,
+        CHECKBOX_MENU_VIDEO,
+        CHECKBOX_MENU_POSTEFFECTS
+    };
 };
 
 #endif

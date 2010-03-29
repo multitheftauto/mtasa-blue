@@ -29,12 +29,12 @@ public:
             bool                    ApplyHook           ( );
             bool                    RemoveHook          ( );
 
-			inline void				SetHookingEnabled	( bool bEnabled ) { m_bHookingEnabled = bEnabled; }
+            inline void             SetHookingEnabled   ( bool bEnabled ) { m_bHookingEnabled = bEnabled; }
 
     pDirect3DCreate     m_pfnDirect3DCreate9;
 
 private:
-	bool				m_bHookingEnabled;
+    bool                m_bHookingEnabled;
 };
 
 #endif

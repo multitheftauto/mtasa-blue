@@ -23,7 +23,7 @@ class CParticleSAInterface
 class CParticleSA : public CParticle
 {
 private:
-	CParticleSAInterface		* internalInterface;
+    CParticleSAInterface        * internalInterface;
 public:
 };
 

@@ -171,7 +171,7 @@ HRESULT ConnectFilters(
     IGraphBuilder *pGraph, 
     IBaseFilter *pSrc, 
     IBaseFilter *pDest,
-	IPin **ppOut)
+    IPin **ppOut)
 {
     if ((pGraph == NULL) || (pSrc == NULL) || (pDest == NULL))
     {
@@ -188,7 +188,7 @@ HRESULT ConnectFilters(
     hr = ConnectFilters(pGraph, pOut, pDest);
     pOut->Release();
 
-	*ppOut = pOut;
+    *ppOut = pOut;
     return hr;
 }
 

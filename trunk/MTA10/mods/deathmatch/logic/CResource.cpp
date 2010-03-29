@@ -25,7 +25,7 @@ int CResource::m_iShowingCursor = 0;
 CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
     m_usID = usID;
-	m_bActive = false;
+    m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
 
@@ -42,26 +42,26 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
     m_pDefaultElementGroup = new CElementGroup ( this );
     m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
     m_pResourceEntity = pResourceEntity;
-	m_pResourceDynamicEntity = pResourceDynamicEntity;
+    m_pResourceDynamicEntity = pResourceDynamicEntity;
 
-	// Create our GUI root element. We set its parent when we're loaded.
+    // Create our GUI root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
-	m_pResourceGUIEntity = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "guiroot" );
+    m_pResourceGUIEntity = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "guiroot" );
     m_pResourceGUIEntity->MakeSystemEntity ();
 
-	// Create our COL root element. We set its parent when we're loaded.
+    // Create our COL root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
-	m_pResourceCOLRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "colmodelroot" );
+    m_pResourceCOLRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "colmodelroot" );
     m_pResourceCOLRoot->MakeSystemEntity ();
 
     // Create our DFF root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
-	m_pResourceDFFEntity = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "dffroot" );
+    m_pResourceDFFEntity = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "dffroot" );
     m_pResourceDFFEntity->MakeSystemEntity ();
 
     // Create our TXD root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
-	m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
+    m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), m_szResourceName );
@@ -88,20 +88,20 @@ CResource::~CResource ( void )
     g_pCore->GetKeyBinds()->SetAllCommandsActive ( m_szResourceName, false );
 
     // Destroy the txd root so all dff elements are deleted except those moved out
-	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
-	m_pResourceTXDRoot = NULL;
+    g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
+    m_pResourceTXDRoot = NULL;
 
     // Destroy the ddf root so all dff elements are deleted except those moved out
-	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceDFFEntity );
-	m_pResourceDFFEntity = NULL;
+    g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceDFFEntity );
+    m_pResourceDFFEntity = NULL;
 
     // Destroy the colmodel root so all colmodel elements are deleted except those moved out
-	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceCOLRoot );
-	m_pResourceCOLRoot = NULL;
+    g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceCOLRoot );
+    m_pResourceCOLRoot = NULL;
 
-	// Destroy the gui root so all gui elements are deleted except those moved out
-	g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceGUIEntity );
-	m_pResourceGUIEntity = NULL;
+    // Destroy the gui root so all gui elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceGUIEntity );
+    m_pResourceGUIEntity = NULL;
 
     // Undo all changes to water
     g_pGame->GetWaterManager ()->UndoChanges ( this );
@@ -133,13 +133,13 @@ CResource::~CResource ( void )
     }
     m_ConfigFiles.empty ();
 
-	// Delete the exported functions
-	list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
-	for ( ; iterExportedFunction != m_exportedFunctions.end(); iterExportedFunction++ )
-	{
-		delete ( *iterExportedFunction );
-	}
-	m_exportedFunctions.empty();
+    // Delete the exported functions
+    list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
+    for ( ; iterExportedFunction != m_exportedFunctions.end(); iterExportedFunction++ )
+    {
+        delete ( *iterExportedFunction );
+    }
+    m_exportedFunctions.empty();
 }
 
 CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, unsigned long ulServerCRC )
@@ -173,7 +173,7 @@ CDownloadableResource* CResource::AddConfigFile ( char *szFileName, unsigned lon
 
 void CResource::AddExportedFunction ( char *szFunctionName )
 {
-	m_exportedFunctions.push_back(new CExportedFunction ( szFunctionName ) );
+    m_exportedFunctions.push_back(new CExportedFunction ( szFunctionName ) );
 }
 
 bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
@@ -184,9 +184,9 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
         if ( strcmp ( (*iter)->GetFunctionName(), szFunctionName ) == 0 )
         {
             if ( args.CallGlobal ( m_pLuaVM, szFunctionName, &returns ) )
-			{
+            {
                 return true;
-			}
+            }
         }
     }
     return false;
@@ -265,16 +265,16 @@ void CResource::Load ( CClientEntity *pRootEntity )
     m_pRootEntity = pRootEntity;
     if ( m_pRootEntity )
     {
-		// Set the GUI parent to the resource root entity
+        // Set the GUI parent to the resource root entity
         m_pResourceCOLRoot->SetParent ( m_pResourceEntity );
         m_pResourceDFFEntity->SetParent ( m_pResourceEntity );
-		m_pResourceGUIEntity->SetParent ( m_pResourceEntity );
+        m_pResourceGUIEntity->SetParent ( m_pResourceEntity );
         m_pResourceTXDRoot->SetParent ( m_pResourceEntity );
     }
 
     CLogger::LogPrintf ( "> Starting resource '%s'", m_szResourceName );
 
-	char szBuffer [ MAX_PATH ] = { 0 };
+    char szBuffer [ MAX_PATH ] = { 0 };
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
     for ( ; iterc != m_ConfigFiles.end (); iterc++ )
     {
@@ -284,7 +284,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
         }
     }
 
-	// Load the files that are queued in the list "to be loaded"
+    // Load the files that are queued in the list "to be loaded"
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
     for ( ; iter != m_ResourceFiles.end (); iter++ )
     {
@@ -292,7 +292,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
         if ( ( *iter )->GetResourceType () == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
         {
             // Load the resource file
-		    m_pLuaVM->LoadScriptFromFile ( ( *iter )->GetName () );
+            m_pLuaVM->LoadScriptFromFile ( ( *iter )->GetName () );
         }
         else
         if ( CheckFileForCorruption ( ( *iter )->GetName () ) )
@@ -302,27 +302,27 @@ void CResource::Load ( CClientEntity *pRootEntity )
         }
     }
 
-	// Set active flag
-	m_bActive = true;
+    // Set active flag
+    m_bActive = true;
 
-	// Did we get a resource root entity?
-	if ( m_pResourceEntity )
-	{
-		// Call the Lua "onClientResourceStart" event
-		CLuaArguments Arguments;
-		Arguments.PushUserData ( this );
-		m_pResourceEntity->CallEvent ( "onClientResourceStart", Arguments, true );
-	}
-	else
-		assert ( 0 );
+    // Did we get a resource root entity?
+    if ( m_pResourceEntity )
+    {
+        // Call the Lua "onClientResourceStart" event
+        CLuaArguments Arguments;
+        Arguments.PushUserData ( this );
+        m_pResourceEntity->CallEvent ( "onClientResourceStart", Arguments, true );
+    }
+    else
+        assert ( 0 );
 }
 
 
 void CResource::DeleteClientChildren ( void )
 {
-	// Run this on our resource entity if we have one
-	if ( m_pResourceEntity )
-		m_pResourceEntity->DeleteClientChildren ();
+    // Run this on our resource entity if we have one
+    if ( m_pResourceEntity )
+        m_pResourceEntity->DeleteClientChildren ();
 }
 
 

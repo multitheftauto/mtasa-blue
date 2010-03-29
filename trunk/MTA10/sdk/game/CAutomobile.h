@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CAutomobile.h
-*  PURPOSE:		Automobile vehicle entity interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CAutomobile.h
+*  PURPOSE:     Automobile vehicle entity interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -59,7 +59,7 @@ public:
     virtual void                    SetTowLink ( CVehicle* pVehicle, bool bRemoveAdd ) = 0;
     virtual CPhysical*              SpawnFlyingComponent ( int iCarNodeIndex, int iUnknown ) = 0;
 
-	virtual CDoor					* GetDoor(eDoors doorID) = 0;
+    virtual CDoor                   * GetDoor(eDoors doorID) = 0;
 };
 
 #endif

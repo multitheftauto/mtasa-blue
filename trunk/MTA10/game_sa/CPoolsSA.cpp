@@ -18,12 +18,12 @@
 
 CPoolsSA::CPoolsSA()
 {
-	DEBUG_TRACE("CPoolsSA::CPoolsSA()");
-	
+    DEBUG_TRACE("CPoolsSA::CPoolsSA()");
+    
     m_bGetVehicleEnabled = true;
-	m_ulBuildingCount= 0;
+    m_ulBuildingCount= 0;
 
-	memset(&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
+    memset(&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
 
     EntryInfoNodePool = new CEntryInfoNodePoolSA();
     PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
@@ -156,7 +156,7 @@ CVehicle* CPoolsSA::AddVehicle ( DWORD* pGameInterface )
 
 void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )
 {
-	DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )");
+    DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )");
 
     static bool bIsDeletingVehicleAlready = false; // to prevent delete being called twice
     if ( !bIsDeletingVehicleAlready ) 
@@ -253,8 +253,8 @@ DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -274,8 +274,8 @@ DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -286,17 +286,17 @@ CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )");
 
-	DWORD dwReturn;
-	DWORD dwFunction = FUNC_GetVehicle;
+    DWORD dwReturn;
+    DWORD dwFunction = FUNC_GetVehicle;
 
-	_asm
-	{
-		mov		ecx, dword ptr ds:[CLASS_CPool_Vehicle]
-		push	dwGameRef
-		call	dwFunction
-		add		esp, 0x4
-		mov		dwReturn, eax
-	}
+    _asm
+    {
+        mov     ecx, dword ptr ds:[CLASS_CPool_Vehicle]
+        push    dwGameRef
+        call    dwFunction
+        add     esp, 0x4
+        mov     dwReturn, eax
+    }
 
     CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
     if ( pInterface )
@@ -416,7 +416,7 @@ CObject* CPoolsSA::AddObject ( DWORD* pGameInterface )
 
 void CPoolsSA::RemoveObject ( unsigned long ulID, bool )
 {
-	DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");
+    DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");
 
     static bool bIsDeletingObjectAlready = false; // to prevent delete being called twice
     if ( !bIsDeletingObjectAlready ) 
@@ -510,8 +510,8 @@ DWORD CPoolsSA::GetObjectRef ( CObject* pObject )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -531,8 +531,8 @@ DWORD CPoolsSA::GetObjectRef ( DWORD* pGameInterface )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -543,17 +543,17 @@ CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )");
 
-	DWORD dwReturn;
-	DWORD dwFunction = FUNC_GetObject;
+    DWORD dwReturn;
+    DWORD dwFunction = FUNC_GetObject;
 
-	_asm
-	{
-		mov		ecx, dword ptr ds:[CLASS_CPool_Object]
-		push	dwGameRef
-		call	dwFunction
-		add		esp, 0x4
-		mov		dwReturn, eax
-	}
+    _asm
+    {
+        mov     ecx, dword ptr ds:[CLASS_CPool_Object]
+        push    dwGameRef
+        call    dwFunction
+        add     esp, 0x4
+        mov     dwReturn, eax
+    }
 
     CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
     if ( pInterface )
@@ -708,7 +708,7 @@ CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )
 
 void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )
 {
-	DEBUG_TRACE("void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )");
+    DEBUG_TRACE("void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )");
 
     static bool bIsDeletingPedAlready = false; // to prevent delete being called twice
     if ( !bIsDeletingPedAlready ) 
@@ -831,8 +831,8 @@ DWORD CPoolsSA::GetPedRef ( CPed* pPed )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -852,8 +852,8 @@ DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )
         {
             push    pInterface
             call    dwFunc
-            add	    esp, 0x4
-            mov	    dwRef, eax
+            add     esp, 0x4
+            mov     dwRef, eax
         }
     }
 
@@ -882,17 +882,17 @@ CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )
 {
     DEBUG_TRACE("CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )");
 
-	DWORD dwReturn;
-	DWORD dwFunction = FUNC_GetPed;
+    DWORD dwReturn;
+    DWORD dwFunction = FUNC_GetPed;
 
-	_asm
-	{
-		mov		ecx, dword ptr ds:[CLASS_CPool_Ped]
-		push	dwGameRef
-		call	dwFunction
-		add		esp, 0x4
-		mov		dwReturn, eax
-	}
+    _asm
+    {
+        mov     ecx, dword ptr ds:[CLASS_CPool_Ped]
+        push    dwGameRef
+        call    dwFunction
+        add     esp, 0x4
+        mov     dwReturn, eax
+    }
 
     CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
     return pInterface;
@@ -926,23 +926,23 @@ CEntity * CPoolsSA::GetEntity ( DWORD* pGameInterface )
 
 CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )
 {
-	DEBUG_TRACE("CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )");
-	if(m_ulBuildingCount <= MAX_BUILDINGS)
-	{
-		for(int i = 0;i<MAX_BUILDINGS;i++)
-		{
-			if(Buildings[i] == 0)
-			{
+    DEBUG_TRACE("CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )");
+    if(m_ulBuildingCount <= MAX_BUILDINGS)
+    {
+        for(int i = 0;i<MAX_BUILDINGS;i++)
+        {
+            if(Buildings[i] == 0)
+            {
                 CBuildingSA * pBuilding = new CBuildingSA(dwModelID);
                 Buildings[i] = pBuilding;
                 pBuilding->SetArrayID ( i );
-				m_ulBuildingCount++;
+                m_ulBuildingCount++;
 
-				return pBuilding;
-			}
-		}
-	}
-	return NULL;
+                return pBuilding;
+            }
+        }
+    }
+    return NULL;
 }
 
 
@@ -989,7 +989,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
         push    fZ // z
         push    fY // y
         push    fX // x
-        call	dwFunc
+        call    dwFunc
         add     esp, 0x28   
     }
 
@@ -1017,8 +1017,8 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
         
         while ( carriage )
         {
-		    if ( m_vehiclePool.ulCount < MAX_VEHICLES)
-		    {
+            if ( m_vehiclePool.ulCount < MAX_VEHICLES)
+            {
                 CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain ();
                 if ( vehCarriage )
                 {
@@ -1037,9 +1037,9 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
         }
     }
 
-	// Stops the train from moving at ludacrist speeds right after creation
-	// due to some glitch in the node finding in CreateMissionTrain
-	trainHead->SetMoveSpeed ( &CVector ( 0, 0, 0 ) );
+    // Stops the train from moving at ludacrist speeds right after creation
+    // due to some glitch in the node finding in CreateMissionTrain
+    trainHead->SetMoveSpeed ( &CVector ( 0, 0, 0 ) );
 
     return trainHead;
 }

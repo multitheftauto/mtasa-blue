@@ -79,8 +79,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     // Add all our events and functions
     InitVM();
 
-	// Initialize security restrictions. Very important to prevent lua trojans and viruses!
-	InitSecurity();
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity();
 }
 
 
@@ -132,10 +132,10 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-	lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
-	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaFunctionDefinitions::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
 }
@@ -156,7 +156,7 @@ void CLuaMain::InitVM ( void )
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
 
-	// Create the callback table (at location 1 in the registry)
+    // Create the callback table (at location 1 in the registry)
     lua_pushnumber ( m_luaVM, 1 );
     lua_newtable ( m_luaVM );
     lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
@@ -166,15 +166,15 @@ void CLuaMain::InitVM ( void )
 
     // Oli: Don't forget to add new ones to CLuaManager::LoadCFunctions. Thanks!
 
-	// create global vars
-	lua_pushelement ( m_luaVM, g_pGame->GetMapManager()->GetRootElement() );
-	lua_setglobal ( m_luaVM, "root" );
+    // create global vars
+    lua_pushelement ( m_luaVM, g_pGame->GetMapManager()->GetRootElement() );
+    lua_setglobal ( m_luaVM, "root" );
 
-	lua_pushresource ( m_luaVM, m_pResource );
-	lua_setglobal ( m_luaVM, "resource" );
+    lua_pushresource ( m_luaVM, m_pResource );
+    lua_setglobal ( m_luaVM, "resource" );
 
-	lua_pushelement ( m_luaVM, m_pResource->GetResourceRootElement () );
-	lua_setglobal ( m_luaVM, "resourceRoot" );
+    lua_pushelement ( m_luaVM, m_pResource->GetResourceRootElement () );
+    lua_setglobal ( m_luaVM, "resourceRoot" );
 
     // Load pre-loaded lua code
     LoadScript ( szPreloadedScript );
@@ -287,13 +287,13 @@ void CLuaMain::UnloadScript ( void )
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
-	// Delete all keybinds
+    // Delete all keybinds
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
         if ( (*iter)->IsJoined () )
-			(*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
-	}
+            (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
+    }
 }
 
 

@@ -42,7 +42,7 @@ public:
 
 private:
     void                                                    DoPulse                             ( void );
-	void													DoPulse								( bool bRender );
+    void                                                    DoPulse                             ( bool bRender );
 
     inline void                                             AddToList                           ( CClientRadarArea* pRadarArea )        { m_List.push_back ( pRadarArea ); };
     void                                                    RemoveFromList                      ( CClientRadarArea* pRadarArea );

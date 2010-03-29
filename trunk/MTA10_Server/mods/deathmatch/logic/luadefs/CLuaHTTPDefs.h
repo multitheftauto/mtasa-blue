@@ -23,11 +23,11 @@ public:
     static void     LoadFunctions                       ( lua_State* luaVM );
 
     static int      httpWrite                           ( lua_State* luaVM );
-	static int		httpSetResponseHeader				( lua_State* luaVM );
-	static int		httpSetResponseCookie				( lua_State* luaVM );
-	static int		httpSetResponseCode					( lua_State* luaVM );
-	static int		httpClear							( lua_State* luaVM );
-	static int		httpRequestLogin					( lua_State* luaVM );
+    static int      httpSetResponseHeader               ( lua_State* luaVM );
+    static int      httpSetResponseCookie               ( lua_State* luaVM );
+    static int      httpSetResponseCode                 ( lua_State* luaVM );
+    static int      httpClear                           ( lua_State* luaVM );
+    static int      httpRequestLogin                    ( lua_State* luaVM );
 };
 
 #endif

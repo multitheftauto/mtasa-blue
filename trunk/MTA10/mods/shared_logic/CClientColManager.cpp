@@ -44,7 +44,7 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
             case CCLIENTRADARMARKER:
             case CCLIENTRADARAREA:
             case CCLIENTTEAM:
-	        case CCLIENTGUI:
+            case CCLIENTGUI:
             case CCLIENTCOLSHAPE:
             case CCLIENTDUMMY:
             case SCRIPTFILE:
@@ -126,7 +126,7 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
                     Arguments2.PushBoolean ( ( pShape->GetDimension () == pEntity->GetDimension () ) );
                     pEntity->CallEvent ( "onClientElementColShapeLeave", Arguments2, true );
 
-					pShape->CallLeaveCallback ( *pEntity );
+                    pShape->CallLeaveCallback ( *pEntity );
                 }
             }
         }

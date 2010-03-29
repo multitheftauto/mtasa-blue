@@ -31,26 +31,26 @@ enum eVehicleUpgrade
 class CVehicleUpgrades
 {
 public:
-							CVehicleUpgrades			( CClientVehicle* pVehicle );
+                            CVehicleUpgrades            ( CClientVehicle* pVehicle );
 
-	bool					IsUpgradeCompatible			( unsigned short usUpgrade );
-	static bool				GetSlotFromUpgrade			( unsigned short usUpgrade, unsigned char& ucSlot );
-	
-	bool					AddUpgrade					( unsigned short usUpgrade );
+    bool                    IsUpgradeCompatible         ( unsigned short usUpgrade );
+    static bool             GetSlotFromUpgrade          ( unsigned short usUpgrade, unsigned char& ucSlot );
+    
+    bool                    AddUpgrade                  ( unsigned short usUpgrade );
     void                    AddAllUpgrades              ( void );
     void                    ForceAddUpgrade             ( unsigned short usUpgrade );
-	bool					HasUpgrade					( unsigned short usUpgrade );
-	bool					RemoveUpgrade				( unsigned short usUpgrade );
-	unsigned short			GetSlotState				( unsigned char ucSlot );
-    inline unsigned short*	GetSlotStates				( void )		{ return m_SlotStates; }
-    static const char*		GetSlotName					( unsigned char ucSlot );
+    bool                    HasUpgrade                  ( unsigned short usUpgrade );
+    bool                    RemoveUpgrade               ( unsigned short usUpgrade );
+    unsigned short          GetSlotState                ( unsigned char ucSlot );
+    inline unsigned short*  GetSlotStates               ( void )        { return m_SlotStates; }
+    static const char*      GetSlotName                 ( unsigned char ucSlot );
 
     void                    ReAddAll                    ( void );
     void                    RemoveAll                   ( bool bRipFromVehicle );
 
 protected:
-	unsigned short			m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
-	CClientVehicle*			m_pVehicle;
+    unsigned short          m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
+    CClientVehicle*         m_pVehicle;
 };
 
 #endif

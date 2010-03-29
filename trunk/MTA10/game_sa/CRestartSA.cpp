@@ -17,8 +17,8 @@
  */
 VOID CRestartSA::CancelOverrideRestart (  )
 {
-	DEBUG_TRACE("VOID CRestartSA::CancelOverrideRestart (  )");
-	*(BYTE *)VAR_OverrideNextRestart = 0;
+    DEBUG_TRACE("VOID CRestartSA::CancelOverrideRestart (  )");
+    *(BYTE *)VAR_OverrideNextRestart = 0;
 }
 
 /**
@@ -29,10 +29,10 @@ VOID CRestartSA::CancelOverrideRestart (  )
  */
 VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )
 {
-	DEBUG_TRACE("VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )");
-	*(BYTE *)VAR_OverrideNextRestart = 1;
-	memcpy((void *)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
-	*(FLOAT *)VAR_OverrideNextRestartRotation = fRotation;
+    DEBUG_TRACE("VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )");
+    *(BYTE *)VAR_OverrideNextRestart = 1;
+    memcpy((void *)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
+    *(FLOAT *)VAR_OverrideNextRestartRotation = fRotation;
 }
 
 /**
@@ -43,16 +43,16 @@ VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )
  */
 VOID CRestartSA::FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )
 {
-	DEBUG_TRACE("VOID CRestartSA::FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
-	DWORD dwFunction = FUNC_FindClosestPoliceRestartPoint;
-	_asm
-	{
-		push	fRotation
-		push	vecClosestRestartPoint
-		push	vecClosestTo
-		call	dwFunction
-		add		esp, 0xC
-	}
+    DEBUG_TRACE("VOID CRestartSA::FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
+    DWORD dwFunction = FUNC_FindClosestPoliceRestartPoint;
+    _asm
+    {
+        push    fRotation
+        push    vecClosestRestartPoint
+        push    vecClosestTo
+        call    dwFunction
+        add     esp, 0xC
+    }
 }
 
 /**
@@ -63,16 +63,16 @@ VOID CRestartSA::FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector
  */
 VOID CRestartSA::FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )
 {
-	DEBUG_TRACE("VOID CRestartSA::FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
-	DWORD dwFunction = FUNC_FindClosestHospitalRestartPoint;
-	_asm
-	{
-		push	fRotation
-		push	vecClosestRestartPoint
-		push	vecClosestTo
-		call	dwFunction
-		add		esp, 0xC
-	}
+    DEBUG_TRACE("VOID CRestartSA::FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
+    DWORD dwFunction = FUNC_FindClosestHospitalRestartPoint;
+    _asm
+    {
+        push    fRotation
+        push    vecClosestRestartPoint
+        push    vecClosestTo
+        call    dwFunction
+        add     esp, 0xC
+    }
 }
 
 /**
@@ -83,15 +83,15 @@ VOID CRestartSA::FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVect
  */
 VOID CRestartSA::AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation )
 {
-	DEBUG_TRACE("VOID CRestartSA::AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
-	DWORD dwFunction = FUNC_AddPoliceRestartPoint;
-	_asm
-	{
-		push	fRotation
-		push	vecPosition
-		call	dwFunction
-		add		esp, 8
-	}
+    DEBUG_TRACE("VOID CRestartSA::AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
+    DWORD dwFunction = FUNC_AddPoliceRestartPoint;
+    _asm
+    {
+        push    fRotation
+        push    vecPosition
+        call    dwFunction
+        add     esp, 8
+    }
 }
 
 /**
@@ -102,15 +102,15 @@ VOID CRestartSA::AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation 
  */
 VOID CRestartSA::AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotation )
 {
-	DEBUG_TRACE("VOID CRestartSA::AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
-	DWORD dwFunction = FUNC_AddHospitalRestartPoint;
-	_asm
-	{
-		push	fRotation
-		push	vecPosition
-		call	dwFunction
-		add		esp, 8
-	}
+    DEBUG_TRACE("VOID CRestartSA::AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
+    DWORD dwFunction = FUNC_AddHospitalRestartPoint;
+    _asm
+    {
+        push    fRotation
+        push    vecPosition
+        call    dwFunction
+        add     esp, 8
+    }
 }
 
 /**
@@ -119,15 +119,15 @@ VOID CRestartSA::AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotatio
  */
 BOOL CRestartSA::IsRestartingAfterArrest  (  )
 {
-	DEBUG_TRACE("BOOL CRestartSA::IsRestartingAfterArrest  (  )");
-	DWORD dwFunction = FUNC_IsRestartingAfterArrest;
-	DWORD dwReturn = 0;
-	_asm
-	{
-		call	dwFunction
-		mov		dwReturn, eax
-	}
-	return dwReturn;
+    DEBUG_TRACE("BOOL CRestartSA::IsRestartingAfterArrest  (  )");
+    DWORD dwFunction = FUNC_IsRestartingAfterArrest;
+    DWORD dwReturn = 0;
+    _asm
+    {
+        call    dwFunction
+        mov     dwReturn, eax
+    }
+    return dwReturn;
 }
 
 /**
@@ -136,13 +136,13 @@ BOOL CRestartSA::IsRestartingAfterArrest  (  )
  */
 BOOL CRestartSA::IsRestartingAfterDeath (  )
 {
-	DEBUG_TRACE("BOOL CRestartSA::IsRestartingAfterDeath (  )");
-	DWORD dwFunction = FUNC_IsRestartingAfterDeath;
-	DWORD dwReturn = 0;
-	_asm
-	{
-		call	dwFunction
-		mov		dwReturn, eax
-	}
-	return dwReturn;
+    DEBUG_TRACE("BOOL CRestartSA::IsRestartingAfterDeath (  )");
+    DWORD dwFunction = FUNC_IsRestartingAfterDeath;
+    DWORD dwReturn = 0;
+    _asm
+    {
+        call    dwFunction
+        mov     dwReturn, eax
+    }
+    return dwReturn;
 }

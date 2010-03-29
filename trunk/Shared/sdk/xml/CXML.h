@@ -22,7 +22,7 @@ class CXML
 public:
     virtual CXMLFile*           CreateXML           ( const char* szFilename ) = 0;
     virtual void                DeleteXML           ( CXMLFile* pFile ) = 0;
-	virtual CXMLNode*			CreateDummyNode		( void ) = 0;
+    virtual CXMLNode*           CreateDummyNode     ( void ) = 0;
 
     virtual CXMLAttribute*      GetAttrFromID       ( unsigned long ulID ) = 0;
     virtual CXMLFile*           GetFileFromID       ( unsigned long ulID ) = 0;

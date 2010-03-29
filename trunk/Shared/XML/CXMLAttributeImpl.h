@@ -25,7 +25,7 @@ class CXMLAttributeImpl : public CXMLAttribute
 public:
                             CXMLAttributeImpl           ( class CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName );
                             CXMLAttributeImpl           ( class CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute );
-	virtual					~CXMLAttributeImpl          ( void );
+    virtual                 ~CXMLAttributeImpl          ( void );
 
     const std::string       GetName                     ( void ) const;
     const std::string&      GetValue                    ( void ) const;

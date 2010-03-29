@@ -24,7 +24,7 @@ public:
                                 CGUIComboBox_Impl           ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
                                 ~CGUIComboBox_Impl          ( void );
 
-	eCGUIType					GetType						( void ) { return CGUI_COMBOBOX; };
+    eCGUIType                   GetType                     ( void ) { return CGUI_COMBOBOX; };
 
     CGUIListItem*               AddItem                     ( const char* szText );
     CGUIListItem*               GetSelectedItem             ( void );

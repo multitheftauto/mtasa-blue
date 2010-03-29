@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskPhysicalResponseSA.cpp
-*  PURPOSE:		Physical response game tasks
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskPhysicalResponseSA.cpp
+*  PURPOSE:     Physical response game tasks
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -32,7 +32,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA ( CPed* pAttacker, bool bIsTearGas )
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     _asm
     {
-        mov		ecx, dwThisInterface
+        mov     ecx, dwThisInterface
         push    ebx
         push    bIsTearGas
         push    pAttackerInterface
@@ -81,7 +81,7 @@ void CTaskSimpleChokingSA::UpdateChoke ( CPed* pPed, CPed* pAttacker, bool bIsTe
 {
     // Get game interfaces
     CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-	if ( !pPedSA ) return;
+    if ( !pPedSA ) return;
 
     CPedSAInterface* pPedInterface = pPedSA->GetPedInterface ();
 
@@ -89,8 +89,8 @@ void CTaskSimpleChokingSA::UpdateChoke ( CPed* pPed, CPed* pAttacker, bool bIsTe
     if ( pAttacker )
     {
         CPedSA* pAttackerSA = dynamic_cast < CPedSA* > ( pAttacker );
-		if ( pAttackerSA )
-			pAttackerInterface = pAttackerSA->GetPedInterface ();
+        if ( pAttackerSA )
+            pAttackerInterface = pAttackerSA->GetPedInterface ();
     }
 
     // Call the func

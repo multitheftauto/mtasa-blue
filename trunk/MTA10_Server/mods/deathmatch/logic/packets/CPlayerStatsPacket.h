@@ -19,24 +19,24 @@
 
 struct sPlayerStat
 {
-	unsigned short id;
-	float value;
+    unsigned short id;
+    float value;
 };
 
 class CPlayerStatsPacket : public CPacket
 {
 public:
-								~CPlayerStatsPacket			( void );
+                                ~CPlayerStatsPacket         ( void );
 
-    inline ePacketID			GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_STATS; };
-    inline unsigned long		GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_STATS; };
+    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool						Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
-	void						Add							( unsigned short usID, float fValue );
+    void                        Add                         ( unsigned short usID, float fValue );
 
 private:
-	vector < sPlayerStat* >		m_List;
+    vector < sPlayerStat* >     m_List;
 };
 
 #endif

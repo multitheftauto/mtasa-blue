@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CChat.cpp
-*  PURPOSE:		In-game chat box user interface implementation
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CChat.cpp
+*  PURPOSE:     In-game chat box user interface implementation
+*  DEVELOPERS:  Jax <>
 *               arc_
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -315,10 +315,10 @@ void CChat::Outputf ( bool bColorCoded, const char* szFormat, ... )
 {
     SString str;
     
-	va_list ap;
-	va_start ( ap, szFormat );
+    va_list ap;
+    va_start ( ap, szFormat );
     str.vFormat ( szFormat, ap );
-	va_end ( ap );
+    va_end ( ap );
 
     Output ( str.c_str (), bColorCoded );
 }
@@ -400,9 +400,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 // If theres a command to call, call it
                 if ( !m_strCommand.empty () && !m_strInputText.empty () )
                     CCommands::GetSingleton().Execute ( m_strCommand.c_str (), m_strInputText.c_str () );
-    		
-				// Deactivate the VisibleWindows counter
-				CLocalGUI::GetSingleton ().SetVisibleWindows ( false );
+            
+                // Deactivate the VisibleWindows counter
+                CLocalGUI::GetSingleton ().SetVisibleWindows ( false );
                 SetInputVisible ( false );
 
                 m_fSmoothScrollResetTime = GetSecondCount ();
@@ -425,7 +425,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
         }
     }
 
-	return true;
+    return true;
 }
 
 
@@ -467,18 +467,18 @@ void CChat::SetChatFont ( eChatFont Font )
     {
         case CHAT_FONT_DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
-			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
             break;
         case CHAT_FONT_CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
-			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
             break;
         case CHAT_FONT_BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD );
             break;
         case CHAT_FONT_ARIAL:
-			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
+            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
             break;                
     }
 

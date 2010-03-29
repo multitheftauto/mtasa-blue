@@ -19,17 +19,17 @@
 
 class CPlaneSAInterface : public CAutomobileSAInterface
 {
-	// + 2508 = undercarrige possition (float - 1.0 = up, 0.0 = down)
-	// fill this
+    // + 2508 = undercarrige possition (float - 1.0 = up, 0.0 = down)
+    // fill this
 };
 
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {
 private:
-//	CBoatSAInterface		* internalInterface;
+//  CBoatSAInterface        * internalInterface;
 public:
-	CPlaneSA( CPlaneSAInterface * plane );
-	CPlaneSA( eVehicleTypes dwModelID );
+    CPlaneSA( CPlaneSAInterface * plane );
+    CPlaneSA( eVehicleTypes dwModelID );
 };
 
 #endif

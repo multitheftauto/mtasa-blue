@@ -36,8 +36,8 @@ bool CColRectangle::DoHitDetection ( const CVector& vecLastPosition, const CVect
 
 bool CColRectangle::ReadSpecialData ( void )
 {
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     float fWidth = 1.0f, fDepth = 1.0f;

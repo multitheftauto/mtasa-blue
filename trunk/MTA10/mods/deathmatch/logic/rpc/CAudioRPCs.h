@@ -24,11 +24,11 @@ public:
 
 private:
     enum
-	{
-		AUDIO_FRONTEND,
-		AUDIO_MISSION_PRELOAD,
-		AUDIO_MISSION_PLAY
-	};
+    {
+        AUDIO_FRONTEND,
+        AUDIO_MISSION_PRELOAD,
+        AUDIO_MISSION_PLAY
+    };
 };
 
 #endif

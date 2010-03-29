@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		mods/deathmatch/logic/lua/CLuaCFunctions.cpp
-*  PURPOSE:		Lua C-function extension class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/lua/CLuaCFunctions.cpp
+*  PURPOSE:     Lua C-function extension class
 *  DEVELOPERS:  Oliver Brown <>
 *               Christian Myhre Lundheim <>
 *               Alberto Alonso <rydencillo@gmail.com>

@@ -14,44 +14,44 @@
 
 CPlayerStats::~CPlayerStats ( void )
 {
-	vector < sStat* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
-		delete (*iter);
-	}
-	m_List.clear ();
+    vector < sStat* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        delete (*iter);
+    }
+    m_List.clear ();
 }
 
 
 bool CPlayerStats::GetStat ( unsigned short usID, float& fValue )
 {
-	vector < sStat* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
-		if ( (*iter)->id == usID )
-		{
-			fValue = (*iter)->value;
-			return true;
-		}
-	}
+    vector < sStat* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        if ( (*iter)->id == usID )
+        {
+            fValue = (*iter)->value;
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 void CPlayerStats::SetStat ( unsigned short usID, float fValue )
 {
-	vector < sStat* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
-		if ( (*iter)->id == usID )
-		{
-			(*iter)->value = fValue;
-			return;
-		}
-	}
-	sStat* stat = new sStat;
-	stat->id = usID;
-	stat->value = fValue;
-	m_List.push_back ( stat );
+    vector < sStat* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        if ( (*iter)->id == usID )
+        {
+            (*iter)->value = fValue;
+            return;
+        }
+    }
+    sStat* stat = new sStat;
+    stat->id = usID;
+    stat->value = fValue;
+    m_List.push_back ( stat );
 }

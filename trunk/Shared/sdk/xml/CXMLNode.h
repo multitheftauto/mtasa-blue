@@ -55,7 +55,7 @@ public:
     virtual void                SetTagContent       ( float fContent ) = 0;
     virtual void                SetTagContentf      ( const char* szFormat, ... ) = 0;
 
-	virtual CXMLNode*			CopyNode			( CXMLNode* pParent ) = 0;
+    virtual CXMLNode*           CopyNode            ( CXMLNode* pParent ) = 0;
     virtual bool                CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive ) = 0;
 
     virtual bool                IsValid             ( void ) = 0;

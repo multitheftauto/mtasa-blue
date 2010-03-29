@@ -15,10 +15,10 @@
 
 CPedIntelligenceSA::CPedIntelligenceSA ( CPedIntelligenceSAInterface * pedIntelligenceSAInterface, CPed * ped )
 {
-	this->internalInterface = pedIntelligenceSAInterface;
-	this->ped = ped;
+    this->internalInterface = pedIntelligenceSAInterface;
+    this->ped = ped;
     CTaskManagerSAInterface * pTaskManagerInterface = (CTaskManagerSAInterface * )&(pedIntelligenceSAInterface->taskManager);
-	this->TaskManager = new CTaskManagerSA(pTaskManagerInterface, this->ped );
+    this->TaskManager = new CTaskManagerSA(pTaskManagerInterface, this->ped );
     CVehicleScannerSAInterface * pVehicleScannerInterface = (CVehicleScannerSAInterface *)&(pedIntelligenceSAInterface->vehicleScanner);
     this->VehicleScanner = new CVehicleScannerSA(pVehicleScannerInterface);
 }
@@ -30,8 +30,8 @@ CPedIntelligenceSA::~CPedIntelligenceSA ()
 
 CTaskManager * CPedIntelligenceSA::GetTaskManager( void )
 {
-	DEBUG_TRACE("CTaskManager * CPedSA::GetTaskManager( void )");
-	return this->TaskManager;
+    DEBUG_TRACE("CTaskManager * CPedSA::GetTaskManager( void )");
+    return this->TaskManager;
 }
 
 CVehicleScanner * CPedIntelligenceSA::GetVehicleScanner( void )
@@ -41,29 +41,29 @@ CVehicleScanner * CPedIntelligenceSA::GetVehicleScanner( void )
 
 bool CPedIntelligenceSA::IsRespondingToEvent ( void )
 {
-	DWORD dwFunc = FUNC_IsRespondingToEvent;
+    DWORD dwFunc = FUNC_IsRespondingToEvent;
 
-		
-	return false;
+        
+    return false;
 }
 
 int CPedIntelligenceSA::GetCurrentEventType ( void )
 {
-	DWORD dwFunc = FUNC_GetCurrentEventType;
-	DWORD dwRet = 0;
-	DWORD dwThis = (DWORD)this->GetInterface();
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunc
-		mov		dwRet, eax
-	}
-	return dwRet;
+    DWORD dwFunc = FUNC_GetCurrentEventType;
+    DWORD dwRet = 0;
+    DWORD dwThis = (DWORD)this->GetInterface();
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     dwRet, eax
+    }
+    return dwRet;
 }
 
 CEvent * CPedIntelligenceSA::GetCurrentEvent ( void )
 {
-	return NULL;
+    return NULL;
 }
 
 

@@ -28,7 +28,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( ATTACH_ELEMENTS,               AttachElements,             "AttachElements" );
     AddHandler ( DETACH_ELEMENTS,               DetachElements,             "DetachElements" );
     AddHandler ( SET_ELEMENT_ALPHA,             SetElementAlpha,            "SetElementAlpha" );
-	AddHandler ( SET_ELEMENT_NAME,              SetElementName,             "SetElementName" );
+    AddHandler ( SET_ELEMENT_NAME,              SetElementName,             "SetElementName" );
     AddHandler ( SET_ELEMENT_HEALTH,            SetElementHealth,           "SetElementHealth" );
     AddHandler ( SET_ELEMENT_MODEL,             SetElementModel,            "SetElementModel" );
     AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,  SetElementAttachedOffsets,  "SetElementAttachedOffsets" );
@@ -66,7 +66,7 @@ void CElementRPCs::SetElementData ( NetBitStreamInterface& bitStream )
     if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
-		szName [ usNameLength ] = NULL;
+        szName [ usNameLength ] = NULL;
 
         CLuaArgument Argument;
         if ( bitStream.Read ( szName, usNameLength ) && Argument.ReadFromBitStream ( bitStream ) )
@@ -92,7 +92,7 @@ void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
     {
         // Allocate a buffer for the name
         char* szName = new char [ usNameLength + 1 ];
-		szName [ usNameLength ] = NULL;
+        szName [ usNameLength ] = NULL;
 
         // Read it out plus whether it's recursive or not
         if ( bitStream.Read ( szName, usNameLength ) &&
@@ -385,14 +385,14 @@ void CElementRPCs::SetElementName ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ID ) && bitStream.Read ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
-		szName [ usNameLength ] = 0;
+        szName [ usNameLength ] = 0;
 
         if ( bitStream.Read ( szName, usNameLength ) )
         {
             CClientEntity* pEntity = CElementIDs::GetElement ( ID );
             if ( pEntity )
             {
-				pEntity->SetName ( szName );
+                pEntity->SetName ( szName );
             }
         }            
         delete [] szName;

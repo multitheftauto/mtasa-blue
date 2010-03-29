@@ -27,37 +27,37 @@ static CWantedSAInterface* pLocalWanted = 0;
 
 CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
 {
-	DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
-	// based on CPlayerPed::SetupPlayerPed (R*)
-	DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
-	DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
+    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
+    // based on CPlayerPed::SetupPlayerPed (R*)
+    DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
+    DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
-	DWORD dwPedPointer = 0;
-	_asm
-	{
-		push	SIZEOF_CPLAYERPED
-		call	CPedOperatorNew
-		add		esp, 4
+    DWORD dwPedPointer = 0;
+    _asm
+    {
+        push    SIZEOF_CPLAYERPED
+        call    CPedOperatorNew
+        add     esp, 4
 
-		mov		dwPedPointer, eax
+        mov     dwPedPointer, eax
 
-		mov		ecx, eax
-		push	0 // set to 0 and they'll behave like AI peds
-		push	1
-		call	CPlayerPedConstructor
-	}
+        mov     ecx, eax
+        push    0 // set to 0 and they'll behave like AI peds
+        push    1
+        call    CPlayerPedConstructor
+    }
 
     this->SetInterface((CEntitySAInterface *)dwPedPointer);
 
-	this->Init(); // init our interfaces 
-	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools ( );
-	this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
-	CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-	
-	this->SetModelIndex(pedType);
-	this->BeingDeleted = FALSE;
-	this->DoNotRemoveFromGame = FALSE;
-	this->SetType ( PLAYER_PED );
+    this->Init(); // init our interfaces 
+    CPoolsSA * pools = (CPoolsSA *)pGame->GetPools ( );
+    this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
+    CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+    
+    this->SetModelIndex(pedType);
+    this->BeingDeleted = FALSE;
+    this->DoNotRemoveFromGame = FALSE;
+    this->SetType ( PLAYER_PED );
 
     // Allocate a player data struct and set it as the players
     m_bIsLocal = false;
@@ -65,8 +65,8 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
 
     // Copy the local player data so we're defaulted to something good
     CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)1 ) );
-	if ( pLocalPlayerSA )
-		memcpy ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
+    if ( pLocalPlayerSA )
+        memcpy ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
 
     // Replace the player ped data in our ped interface with the one we just created
     GetPlayerPedInterface ()->pPlayerData = m_pData;
@@ -81,8 +81,8 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
 
     SetIsStanding ( true );
 
-	GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
-	GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
+    GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
+    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
     // Stop remote players targeting eachother, this also stops the local player targeting them (needs to be fixed)
     GetPlayerPedInterface ()->pedFlags.bNeverEverTargetThisPed = true;
     GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
@@ -95,21 +95,21 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
 
 CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
 {
-	DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
-	// based on CPlayerPed::SetupPlayerPed (R*)
-	this->SetInterface((CEntitySAInterface *)pPlayer);
+    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
+    // based on CPlayerPed::SetupPlayerPed (R*)
+    this->SetInterface((CEntitySAInterface *)pPlayer);
 
-	this->Init();
-	CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
-	this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
-	this->SetType ( PLAYER_PED );
+    this->Init();
+    CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
+    this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
+    this->SetType ( PLAYER_PED );
 
     m_bIsLocal = true;
     m_pData = GetPlayerPedInterface ()->pPlayerData;
     m_pWanted = NULL;
 
     GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
-	GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;    
+    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;    
     GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
     GetPlayerPedInterface ()->fRotationSpeed = 7.5;
 
@@ -119,7 +119,7 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
 
     GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
     // Something resets this, constantly
-	GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
+    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
     // Stop remote players targeting the local (need to stop them targeting eachother too)
     GetPlayerPedInterface ()->pedFlags.bNeverEverTargetThisPed = true;
 }
@@ -127,28 +127,28 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
 
 CPlayerPedSA::~CPlayerPedSA ( void )
 {
-	DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
-	if(!this->BeingDeleted && DoNotRemoveFromGame == false)
-	{
-		DWORD dwInterface = (DWORD) m_pInterface;
-		
-		if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
-		{
-			CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-			world->Remove ( m_pInterface );
-		
-			DWORD dwThis = (DWORD) m_pInterface;
-			DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-			_asm	
-			{
-				mov		ecx, dwThis
-				push	1			//delete too
-				call	dwFunc
-			}
-		}
-		this->BeingDeleted = true;
-		((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
-	}
+    DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
+    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    {
+        DWORD dwInterface = (DWORD) m_pInterface;
+        
+        if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
+        {
+            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+            world->Remove ( m_pInterface );
+        
+            DWORD dwThis = (DWORD) m_pInterface;
+            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+            _asm    
+            {
+                mov     ecx, dwThis
+                push    1           //delete too
+                call    dwFunc
+            }
+        }
+        this->BeingDeleted = true;
+        ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
+    }
 
     // Delete the player data
     if ( !m_bIsLocal )
@@ -166,22 +166,22 @@ CWanted* CPlayerPedSA::GetWanted ( void )
 
 float CPlayerPedSA::GetSprintEnergy ( void )
 {
-	/*
-	OutputDebugString("GetSprintEnergy HACK\n");
+    /*
+    OutputDebugString("GetSprintEnergy HACK\n");
 
-	m_pData->bCanBeDamaged = true;
-	m_pData->m_bRenderWeapon = true;
-	m_pData->m_bDontAllowWeaponChange = true;
+    m_pData->bCanBeDamaged = true;
+    m_pData->m_bRenderWeapon = true;
+    m_pData->m_bDontAllowWeaponChange = true;
 
-	((CPedSAInterface*)GetInterface())->pedFlags.bUpdateAnimHeading = true;
-	((CPedSAInterface*)GetInterface())->pedFlags.bHeadStuckInCollision = true;
-	((CPedSAInterface*)GetInterface())->pedFlags.bDonePositionOutOfCollision = true;
-	((CPedSAInterface*)GetInterface())->pedFlags.bIsRestoringGun = true;
+    ((CPedSAInterface*)GetInterface())->pedFlags.bUpdateAnimHeading = true;
+    ((CPedSAInterface*)GetInterface())->pedFlags.bHeadStuckInCollision = true;
+    ((CPedSAInterface*)GetInterface())->pedFlags.bDonePositionOutOfCollision = true;
+    ((CPedSAInterface*)GetInterface())->pedFlags.bIsRestoringGun = true;
 
-	RebuildPlayer ();
-	*/
+    RebuildPlayer ();
+    */
 
-	return m_pData->m_fSprintEnergy;
+    return m_pData->m_fSprintEnergy;
 }
 
 
@@ -194,14 +194,14 @@ void CPlayerPedSA::SetSprintEnergy ( float fSprintEnergy )
 void CPlayerPedSA::SetInitialState ( void )
 {
     DWORD dwUnknown = 1;
-	DWORD dwFunction = FUNC_SetInitialState;
-	DWORD dwThis = (DWORD) m_pInterface;
-	_asm
-	{
+    DWORD dwFunction = FUNC_SetInitialState;
+    DWORD dwThis = (DWORD) m_pInterface;
+    _asm
+    {
         push    dwUnknown
-		mov		ecx, dwThis
-		call	dwFunction
-	}
+        mov     ecx, dwThis
+        call    dwFunction
+    }
 
     // Avoid direction locks for respawning after a jump
     GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
@@ -236,9 +236,9 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
  * Gets information on the player's wanted status
  * @return Pointer to a CWanted class containing the wanted information for the PlayerPed.
  */
-//CWanted	* CPlayerPedSA::GetWanted (  )
+//CWanted   * CPlayerPedSA::GetWanted (  )
 //{
-	//return internalInterface->Wanted;
+    //return internalInterface->Wanted;
 //}
 
 /**
@@ -248,7 +248,7 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
  */
 /*DWORD CPlayerPedSA::GetCurrentWeaponType (  )
 {
-	return internalInterface->CurrentWeapon;
+    return internalInterface->CurrentWeapon;
 }*/
 
 /** 
@@ -257,7 +257,7 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
  */
 /*DWORD CPlayerPedSA::GetLastShotTime (  )
 {
-	return internalInterface->LastShotTime;
+    return internalInterface->LastShotTime;
 }
 */
 /**
@@ -268,7 +268,7 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
 /*
 BOOL CPlayerPedSA::IsStationaryOnFoot (  )
 {
-	return internalInterface->StationaryOnFoot;
+    return internalInterface->StationaryOnFoot;
 }*/
 
 /**
@@ -278,13 +278,13 @@ BOOL CPlayerPedSA::IsStationaryOnFoot (  )
 /*
 VOID CPlayerPedSA::ResetToInitialState (  )
 {
-	DWORD dwFunction = FUNC_SetInitialState;
-	DWORD dwThis = (DWORD)internalInterface;
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunction
-	}
+    DWORD dwFunction = FUNC_SetInitialState;
+    DWORD dwThis = (DWORD)internalInterface;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunction
+    }
 }*/
 
 /**
@@ -293,11 +293,11 @@ VOID CPlayerPedSA::ResetToInitialState (  )
 /*
 VOID CPlayerPedSA::ClearWeaponTarget (  )
 {
-	DWORD dwFunction = FUNC_ClearWeaponTarget;
-	DWORD dwThis = (DWORD)internalInterface;
-	_asm
-	{
-		mov		ecx, dwThis
-		call	dwFunction
-	}
+    DWORD dwFunction = FUNC_ClearWeaponTarget;
+    DWORD dwThis = (DWORD)internalInterface;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunction
+    }
 }*/

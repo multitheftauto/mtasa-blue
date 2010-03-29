@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskBasicSA.h
-*  PURPOSE:		Basic game tasks
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskBasicSA.h
+*  PURPOSE:     Basic game tasks
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
 *               Alberto Alonso <rydencillo@gmail.com>
 *
@@ -38,10 +38,10 @@
 class CTaskComplexUseMobilePhoneSAInterface : public CTaskComplexSAInterface
 {
 public:
-	int m_iDuration;
-	CTaskTimer m_timer;
-	bool m_bIsAborting;
-	bool m_bQuit;
+    int m_iDuration;
+    CTaskTimer m_timer;
+    bool m_bIsAborting;
+    bool m_bQuit;
 };
 
 
@@ -49,7 +49,7 @@ class CTaskComplexUseMobilePhoneSA : public virtual CTaskComplexSA, public virtu
 {
 public:
     CTaskComplexUseMobilePhoneSA ( void ) {};
-	CTaskComplexUseMobilePhoneSA ( const int iDuration ); // Default is -1
+    CTaskComplexUseMobilePhoneSA ( const int iDuration ); // Default is -1
 };
 
 
@@ -64,17 +64,17 @@ class CTaskSimpleAnimSAInterface: public CTaskSimpleSAInterface
 {
 public:
     CAnimBlendAssociation*      m_pAnim;
-    char                        m_bIsFinished		:1;
-    char                        m_bDontInterrupt	:1;
-    char                        m_bHoldLastFrame	:1;
+    char                        m_bIsFinished       :1;
+    char                        m_bDontInterrupt    :1;
+    char                        m_bHoldLastFrame    :1;
 
     // These flags are used in CTaskSimpleRunAnim only
-    char                        m_bDontBlendOut	    :1;
+    char                        m_bDontBlendOut     :1;
 
-    // These flags are used in 	CTaskSimpleRunNamedAnim only
+    // These flags are used in  CTaskSimpleRunNamedAnim only
     char                        m_bRunInSequence    :1;
-    char                        m_bOffsetAtEnd		:1;
-    char                        m_bOffsetAvailable	:1;
+    char                        m_bOffsetAtEnd      :1;
+    char                        m_bOffsetAvailable  :1;
 };
 
 
@@ -117,7 +117,7 @@ public:
     CTaskTimer              m_timer;
     CVector                 m_offsetAtEnd;
     int                   m_flags;    
-    short                   m_animID;	
+    short                   m_animID;   
 };
 
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim

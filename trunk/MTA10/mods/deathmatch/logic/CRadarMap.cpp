@@ -441,8 +441,8 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pCore->SetChatVisible ( false );
         g_pCore->SetDebugVisible ( false );
 
-		// Disable graphical effects
-		g_pMultiplayer->DisableHeatHazeEffect ( true );
+        // Disable graphical effects
+        g_pMultiplayer->DisableHeatHazeEffect ( true );
     }
     else
     {
@@ -451,9 +451,9 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pCore->SetChatVisible ( m_bChatVisible );
         g_pCore->SetDebugVisible ( m_bDebugVisible );
 
-		// Enable graphical effects
-		g_pMultiplayer->DisableHeatHazeEffect ( false );
-	}
+        // Enable graphical effects
+        g_pMultiplayer->DisableHeatHazeEffect ( false );
+    }
 }
 
 
@@ -769,19 +769,19 @@ bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
 {
     // If our radar image exists (Values are not calculated unless map is showing)
     if ( IsRadarShowing () )
-	{
-		vecMin.fX = static_cast < float > ( m_iMapMinX );
-		vecMin.fY = static_cast < float > ( m_iMapMinY );
+    {
+        vecMin.fX = static_cast < float > ( m_iMapMinX );
+        vecMin.fY = static_cast < float > ( m_iMapMinY );
 
-		vecMax.fX = static_cast < float > ( m_iMapMaxX );
-		vecMax.fY = static_cast < float > ( m_iMapMaxY );
+        vecMax.fX = static_cast < float > ( m_iMapMaxX );
+        vecMax.fY = static_cast < float > ( m_iMapMaxY );
 
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void CRadarMap::SetRadarAlpha ( int iRadarAlpha )

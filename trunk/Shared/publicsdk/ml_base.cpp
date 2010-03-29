@@ -23,33 +23,33 @@ ILuaModuleManager10 *pModuleManager = NULL;
 // Initialisation function (module entrypoint)
 MTAEXPORT bool InitModule ( ILuaModuleManager10 *pManager, char *szModuleName, char *szAuthor, float *fVersion )
 {
-	pModuleManager = pManager;
+    pModuleManager = pManager;
 
-	// Set the module info
-	strncpy ( szModuleName, MODULE_NAME, MAX_INFO_LENGTH );
-	strncpy ( szAuthor, MODULE_AUTHOR, MAX_INFO_LENGTH );
-	(*fVersion) = MODULE_VERSION;
+    // Set the module info
+    strncpy ( szModuleName, MODULE_NAME, MAX_INFO_LENGTH );
+    strncpy ( szAuthor, MODULE_AUTHOR, MAX_INFO_LENGTH );
+    (*fVersion) = MODULE_VERSION;
 
-	return true;
+    return true;
 }
 
 
 MTAEXPORT void RegisterFunctions ( lua_State * luaVM )
 {
-	if ( pModuleManager && luaVM )
-	{
-		pModuleManager->RegisterFunction ( luaVM, "helloWorld", CFunctions::HelloWorld );
-	}
+    if ( pModuleManager && luaVM )
+    {
+        pModuleManager->RegisterFunction ( luaVM, "helloWorld", CFunctions::HelloWorld );
+    }
 }
 
 
 MTAEXPORT bool DoPulse ( void )
 {
-	return true;
+    return true;
 }
 
 MTAEXPORT bool ShutdownModule ( void )
 {
-	
-	return true;
+    
+    return true;
 }

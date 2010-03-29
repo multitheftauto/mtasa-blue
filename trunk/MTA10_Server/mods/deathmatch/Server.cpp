@@ -22,7 +22,7 @@ MTAEXPORT CServerBase* InitServer ( void )
         g_pServer = new CServer;
     }
 
-	return g_pServer;
+    return g_pServer;
 }
 
 
@@ -37,7 +37,7 @@ MTAEXPORT void ReleaseServer ( void )
 }
 
 
-#ifdef WIN32	/* Win32 DllMain entry */
+#ifdef WIN32    /* Win32 DllMain entry */
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
@@ -49,7 +49,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     return TRUE;
 }
 
-#else			/* POSIX library destructor */
+#else           /* POSIX library destructor */
 
 void __attribute__ ((destructor)) ReleaseServer(void);
 

@@ -104,7 +104,7 @@ short CPedSoundSA::GetVoiceIDFromName ( short sVoiceTypeID, const char* szVoiceN
         push    eax
         push    szVoiceName
         call    dwFunc
-        add		esp, 8
+        add     esp, 8
         mov     sVoiceID, ax
     }
     return sVoiceID;

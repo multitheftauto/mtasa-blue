@@ -61,7 +61,7 @@ bool CClientSound::Play3D ( const char* szPath, CVector vecPosition, bool bLoop 
 {
     m_vecPosition = vecPosition;
     vec3df pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-	m_pSound = m_pSoundManager->GetEngine()->play3D ( szPath, pos, bLoop, false, true );
+    m_pSound = m_pSoundManager->GetEngine()->play3D ( szPath, pos, bLoop, false, true );
     if ( m_pSound )
     {
         m_b3D = true;

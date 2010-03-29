@@ -103,13 +103,13 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     // Grab the delta health
                     float fDeltaHealth = fPreviousHealth - fHealth;
 
-					if ( fDeltaHealth > 0.0f )
-					{
-						// Call the onVehicleDamage event
-						CLuaArguments Arguments;
-						Arguments.PushNumber ( fDeltaHealth );
-						pVehicle->CallEvent ( "onVehicleDamage", Arguments );
-					}
+                    if ( fDeltaHealth > 0.0f )
+                    {
+                        // Call the onVehicleDamage event
+                        CLuaArguments Arguments;
+                        Arguments.PushNumber ( fDeltaHealth );
+                        pVehicle->CallEvent ( "onVehicleDamage", Arguments );
+                    }
                 }
                 pVehicle->SetHealth ( fHealth );
 
@@ -228,7 +228,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             float fHealth = health.data.fValue;
 
             float fOldHealth = pSourcePlayer->GetHealth ();
-			float fHealthLoss = fOldHealth - fHealth;
+            float fHealthLoss = fOldHealth - fHealth;
 
             // Less than last packet's frame?
             if ( fHealth < fOldHealth && fHealthLoss > 0 )
@@ -243,27 +243,27 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             }
             pSourcePlayer->SetHealth ( fHealth );
 
-			// Armor
+            // Armor
             SPlayerArmorSync armor;
             if ( !BitStream.Read ( &armor ) )
                 return false;
             float fArmor = armor.data.fValue;
 
-			float fOldArmor = pSourcePlayer->GetArmor ();
-			float fArmorLoss = fOldArmor - fArmor;
+            float fOldArmor = pSourcePlayer->GetArmor ();
+            float fArmorLoss = fOldArmor - fArmor;
 
-			// Less than last packet's frame?
-			if ( fArmor < fOldArmor && fArmorLoss > 0 )
-			{
-				// Call the onPlayerDamage event
-				CLuaArguments Arguments;
+            // Less than last packet's frame?
+            if ( fArmor < fOldArmor && fArmorLoss > 0 )
+            {
+                // Call the onPlayerDamage event
+                CLuaArguments Arguments;
                 Arguments.PushNil ();
                 Arguments.PushNumber ( false );
                 Arguments.PushNumber ( false );
-				Arguments.PushNumber ( fArmorLoss );
+                Arguments.PushNumber ( fArmorLoss );
 
-				pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );					
-			}
+                pSourcePlayer->CallEvent ( "onPlayerDamage", Arguments );                   
+            }
             pSourcePlayer->SetArmor ( fArmor );
 
             // Flags

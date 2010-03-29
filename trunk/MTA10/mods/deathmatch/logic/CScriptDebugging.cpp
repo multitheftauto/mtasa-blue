@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
 *  PURPOSE:     Script debugging
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*				Ed Lyons <eai@opencoding.net>
+*               Ed Lyons <eai@opencoding.net>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -124,7 +124,7 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, unsigned char ucRed, unsign
 
     // Copy it to a buffer
     va_list ap;
-	va_start ( ap, szFormat );
+    va_start ( ap, szFormat );
     //vsnprintf ( szBuffer, 248, szFormat, ap );
     va_end ( ap );
 
@@ -143,7 +143,7 @@ void CScriptDebugging::LogInformation ( lua_State* luaVM, const char* szFormat, 
 
     // Copy it to a buffer
     va_list ap;
-	va_start ( ap, szFormat );
+    va_start ( ap, szFormat );
     //vsnprintf ( szBuffer + 6, 248, szFormat, ap );
     va_end ( ap );
 
@@ -163,7 +163,7 @@ void CScriptDebugging::LogWarning ( lua_State* luaVM, const char* szFormat, ... 
 
     // Copy it to a buffer
     va_list ap;
-	va_start ( ap, szFormat );
+    va_start ( ap, szFormat );
     //vsnprintf ( szBuffer + 9, 245, szFormat, ap );
     va_end ( ap );
 
@@ -183,7 +183,7 @@ void CScriptDebugging::LogError ( lua_State* luaVM, const char* szFormat, ... )
 
     // Copy it to a buffer
     va_list ap;
-	va_start ( ap, szFormat );
+    va_start ( ap, szFormat );
     //vsnprintf ( szBuffer + 7, 247, szFormat, ap );
     va_end ( ap );
 
@@ -284,7 +284,7 @@ void CScriptDebugging::PrintLog ( const char* szText )
     if ( m_pLogFile )
     {
         // Log it
-	    fprintf ( m_pLogFile, "%s\n", szText );
+        fprintf ( m_pLogFile, "%s\n", szText );
         fflush ( m_pLogFile );
     }
 }

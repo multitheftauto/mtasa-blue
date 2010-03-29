@@ -236,11 +236,11 @@ void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQue
                     // Unreference the reference we added to it.
                     pEntry->pModel->RemoveRef ();
 
-				    // Delete the entry
+                    // Delete the entry
                     delete *iter;
                     
-				    // Remove from the list
-				    iter = m_Requests.erase ( iter );
+                    // Remove from the list
+                    iter = m_Requests.erase ( iter );
                 }
                 else
                 {
@@ -283,9 +283,9 @@ void CClientModelRequestManager::DoPulse ( void )
                 // Unreference us from the model (callback should've added a reference!)
                 pEntry->pModel->RemoveRef ();
 
-				// Delete the request entry. Remove from the list and continue from after it
+                // Delete the request entry. Remove from the list and continue from after it
                 delete *iter;
-				iter = m_Requests.erase ( iter );
+                iter = m_Requests.erase ( iter );
             }
             else
             {

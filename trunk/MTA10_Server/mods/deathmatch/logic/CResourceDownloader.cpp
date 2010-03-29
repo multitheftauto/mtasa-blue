@@ -111,97 +111,97 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
         CResource * resource = g_pGame->GetResourceManager()->Load ( m_strName.c_str () );
         if ( resource )
         {
-			if ( resource->GetIncludedResourcesCount() > 0 )
-			{
-				// We need a check on the versions of any included resources
-				list < CIncludedResources* >::iterator iter = resource->GetIncludedResourcesBegin();
-				for ( ; iter != resource->GetIncludedResourcesEnd(); iter++ )
-				{
-					CIncludedResources* pIncludedResource = *iter;
-					CResource* pResource = g_pGame->GetResourceManager()->GetResource ( pIncludedResource->GetName ().c_str () );
-					if ( pResource )
-					{
-						// Compare the versions
-						if ( !IsVersionSafe ( pResource->GetVersionMajor(), pResource->GetVersionMinor(), pResource->GetVersionRevision(), pIncludedResource->GetMinVersion(), pIncludedResource->GetMaxVersion() ) )
-						{
-							// Version isn't safe, is it too low?
-							if ( IsVersionTooLow ( pResource->GetVersionMajor(), pResource->GetVersionMinor(), pResource->GetVersionRevision(), pIncludedResource->GetMinVersion() ) )
-							{
-								if ( g_pGame->GetConfig()->GetAutoUpdateIncludedResourcesEnabled() )
-								{
-									// Version is too low, check for (and download) a higher version within the versions the resource can take
-									g_pGame->GetResourceDownloader()->FindUpdates ( pIncludedResource->GetName ().c_str (), pIncludedResource->GetMinVersion (), pIncludedResource->GetMaxVersion () );
+            if ( resource->GetIncludedResourcesCount() > 0 )
+            {
+                // We need a check on the versions of any included resources
+                list < CIncludedResources* >::iterator iter = resource->GetIncludedResourcesBegin();
+                for ( ; iter != resource->GetIncludedResourcesEnd(); iter++ )
+                {
+                    CIncludedResources* pIncludedResource = *iter;
+                    CResource* pResource = g_pGame->GetResourceManager()->GetResource ( pIncludedResource->GetName ().c_str () );
+                    if ( pResource )
+                    {
+                        // Compare the versions
+                        if ( !IsVersionSafe ( pResource->GetVersionMajor(), pResource->GetVersionMinor(), pResource->GetVersionRevision(), pIncludedResource->GetMinVersion(), pIncludedResource->GetMaxVersion() ) )
+                        {
+                            // Version isn't safe, is it too low?
+                            if ( IsVersionTooLow ( pResource->GetVersionMajor(), pResource->GetVersionMinor(), pResource->GetVersionRevision(), pIncludedResource->GetMinVersion() ) )
+                            {
+                                if ( g_pGame->GetConfig()->GetAutoUpdateIncludedResourcesEnabled() )
+                                {
+                                    // Version is too low, check for (and download) a higher version within the versions the resource can take
+                                    g_pGame->GetResourceDownloader()->FindUpdates ( pIncludedResource->GetName ().c_str (), pIncludedResource->GetMinVersion (), pIncludedResource->GetMaxVersion () );
 
-									g_pGame->GetResourceManager()->Unload ( pResource ); // remove it so resource just downloaded doesn't think it is still there
+                                    g_pGame->GetResourceManager()->Unload ( pResource ); // remove it so resource just downloaded doesn't think it is still there
 
-									if ( m_bStartWhenDownloaded )
-									{
-										CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
-										g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
-									}
-									if ( m_updateResourceVersion )
-										m_updateResourceVersion->DownloadComplete(true);
-								}
-								else
-								{
-									if ( m_bStartWhenDownloaded )
-									{
-										CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
-										resource->Start ( NULL, true );
-									}
-									if ( m_updateResourceVersion )
-										m_updateResourceVersion->DownloadComplete(true);
-								}
-							}
-							else
-							{
-								if ( m_bStartWhenDownloaded )
-								{
-									CLogger::LogPrintf ( "Version of %s too high for '%s' attempting to start anyway\n", pIncludedResource->GetName().c_str (), resource->GetName().c_str () );
-									resource->Start ( NULL, true );
-								}
-								if ( m_updateResourceVersion )
-									m_updateResourceVersion->DownloadComplete(true);
-							}
-						}
-					}
-					// It obviously doesnt exist, download a version within the minimum and maximum that the resource can take
-					else
-					{
-						if ( g_pGame->GetConfig()->GetAutoUpdateIncludedResourcesEnabled() )
-						{
-							// find (and download) a suitable version
-							g_pGame->GetResourceDownloader()->FindUpdates ( pIncludedResource->GetName ().c_str (), pIncludedResource->GetMinVersion(), pIncludedResource->GetMaxVersion() );
+                                    if ( m_bStartWhenDownloaded )
+                                    {
+                                        CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
+                                        g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
+                                    }
+                                    if ( m_updateResourceVersion )
+                                        m_updateResourceVersion->DownloadComplete(true);
+                                }
+                                else
+                                {
+                                    if ( m_bStartWhenDownloaded )
+                                    {
+                                        CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
+                                        resource->Start ( NULL, true );
+                                    }
+                                    if ( m_updateResourceVersion )
+                                        m_updateResourceVersion->DownloadComplete(true);
+                                }
+                            }
+                            else
+                            {
+                                if ( m_bStartWhenDownloaded )
+                                {
+                                    CLogger::LogPrintf ( "Version of %s too high for '%s' attempting to start anyway\n", pIncludedResource->GetName().c_str (), resource->GetName().c_str () );
+                                    resource->Start ( NULL, true );
+                                }
+                                if ( m_updateResourceVersion )
+                                    m_updateResourceVersion->DownloadComplete(true);
+                            }
+                        }
+                    }
+                    // It obviously doesnt exist, download a version within the minimum and maximum that the resource can take
+                    else
+                    {
+                        if ( g_pGame->GetConfig()->GetAutoUpdateIncludedResourcesEnabled() )
+                        {
+                            // find (and download) a suitable version
+                            g_pGame->GetResourceDownloader()->FindUpdates ( pIncludedResource->GetName ().c_str (), pIncludedResource->GetMinVersion(), pIncludedResource->GetMaxVersion() );
 
-							if ( m_bStartWhenDownloaded )
-							{
-								CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
-								g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
-							}
-							if ( m_updateResourceVersion )
-								m_updateResourceVersion->DownloadComplete(true);
-						}
-						else
-						{
-							if ( m_bStartWhenDownloaded )
-							{
-								CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
-								resource->Start ( NULL, true );
-							}
-							if ( m_updateResourceVersion )
-								m_updateResourceVersion->DownloadComplete(true);
-						}
-					}
-				}
-			}
-			else
-			{
-				if ( m_bStartWhenDownloaded )
-	                resource->Start ( NULL, true );
-				if ( m_updateResourceVersion )
-					m_updateResourceVersion->DownloadComplete(true);
+                            if ( m_bStartWhenDownloaded )
+                            {
+                                CLogger::LogPrintf ( "'%s' should be started when the included resources are started\n", resource->GetName().c_str () );
+                                g_pGame->GetResourceDownloader()->AddWaitingResource ( resource ); // add it to the list of waiting resources
+                            }
+                            if ( m_updateResourceVersion )
+                                m_updateResourceVersion->DownloadComplete(true);
+                        }
+                        else
+                        {
+                            if ( m_bStartWhenDownloaded )
+                            {
+                                CLogger::LogPrintf ( "Server doesn't have permission to auto-update resources, trying to start '%s' anyway\n", resource->GetName().c_str () );
+                                resource->Start ( NULL, true );
+                            }
+                            if ( m_updateResourceVersion )
+                                m_updateResourceVersion->DownloadComplete(true);
+                        }
+                    }
+                }
             }
-			g_pGame->GetResourceDownloader()->CheckWaitingResources (); // check resources that are waiting to be downloaded as this resource is now available
+            else
+            {
+                if ( m_bStartWhenDownloaded )
+                    resource->Start ( NULL, true );
+                if ( m_updateResourceVersion )
+                    m_updateResourceVersion->DownloadComplete(true);
+            }
+            g_pGame->GetResourceDownloader()->CheckWaitingResources (); // check resources that are waiting to be downloaded as this resource is now available
         }
     }
     //m_files.remove ( file );
@@ -277,33 +277,33 @@ void CResourceDownload::ParseMeta()
 
 bool CResourceDownload::IsVersionSafe ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion, SVersion* pMaxVersion )
 {
-	if ( ( pMinVersion->m_uiMajor < uiMajor ) && ( pMaxVersion->m_uiMajor > uiMajor ) )
-		return true; // It's between the versions so return true
-	else if ( ( pMinVersion->m_uiMajor <= uiMajor ) && ( pMaxVersion->m_uiMajor >= uiMajor ) )
-	{
-		if ( ( pMinVersion->m_uiMinor < uiMinor ) && ( pMaxVersion->m_uiMinor > uiMinor ) )
-			return true; // It's between the versions so return true
-		else if ( ( pMinVersion->m_uiMinor <= uiMinor ) && ( pMaxVersion->m_uiMinor >= uiMinor ) )
-		{
-			if ( ( pMinVersion->m_uiRevision <= uiRevision ) && ( pMaxVersion->m_uiRevision >= uiRevision ) )
-				return true; // It's between the versions so return true
-			else
-				return false;
-		}
-	}
-	return false;
+    if ( ( pMinVersion->m_uiMajor < uiMajor ) && ( pMaxVersion->m_uiMajor > uiMajor ) )
+        return true; // It's between the versions so return true
+    else if ( ( pMinVersion->m_uiMajor <= uiMajor ) && ( pMaxVersion->m_uiMajor >= uiMajor ) )
+    {
+        if ( ( pMinVersion->m_uiMinor < uiMinor ) && ( pMaxVersion->m_uiMinor > uiMinor ) )
+            return true; // It's between the versions so return true
+        else if ( ( pMinVersion->m_uiMinor <= uiMinor ) && ( pMaxVersion->m_uiMinor >= uiMinor ) )
+        {
+            if ( ( pMinVersion->m_uiRevision <= uiRevision ) && ( pMaxVersion->m_uiRevision >= uiRevision ) )
+                return true; // It's between the versions so return true
+            else
+                return false;
+        }
+    }
+    return false;
 }
 
 bool CResourceDownload::IsVersionTooLow ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion )
 {
-	if ( pMinVersion->m_uiMajor > uiMajor )
-		return true;
-	else if ( pMinVersion->m_uiMinor > uiMinor )
-		return true;
-	else if ( pMinVersion->m_uiRevision > uiRevision )
-		return true;
+    if ( pMinVersion->m_uiMajor > uiMajor )
+        return true;
+    else if ( pMinVersion->m_uiMinor > uiMinor )
+        return true;
+    else if ( pMinVersion->m_uiRevision > uiRevision )
+        return true;
 
-	return false;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -490,7 +490,7 @@ void CUpdateResource::FindUpdates ( SVersion* pMinVersion, SVersion* pMaxVersion
     for ( ; iter != m_versions.end (); iter++ )
     {
         CUpdateResourceVersion * version = (*iter);
-		if ( CResourceDownload::IsVersionSafe ( version->GetMajor(), version->GetMinor(), version->GetRevision(), pMinVersion, pMaxVersion ) )
+        if ( CResourceDownload::IsVersionSafe ( version->GetMajor(), version->GetMinor(), version->GetRevision(), pMinVersion, pMaxVersion ) )
         {
             bool bSkip = false;
             list < CUpdateResourceVersion* > ::iterator iter2 = updates->begin ();
@@ -767,54 +767,54 @@ void CResourceDownloader::FindUpdates ( const char * szResourceName, unsigned in
 
 bool CResourceDownloader::FindUpdates ( const char * szResourceName, SVersion* pMinVersion, SVersion* pMaxVersion )
 {
-	list<CUpdateResourceVersion*> updates;
+    list<CUpdateResourceVersion*> updates;
     list < CUpdateSite* > ::iterator iter = m_updateSites.begin ();
     for ( ; iter != m_updateSites.end (); iter++ )
     {
         (*iter)->FindUpdates ( szResourceName, pMinVersion, pMaxVersion, &updates );
-	}
-	if ( updates.size() != 0 )
-	{
-		list < CUpdateResourceVersion* > ::iterator iter = updates.begin ();
-		CUpdateResourceVersion* pLatest = *iter;
-		for ( iter++; iter != updates.end(); iter++ )
-		{
-			if ( (*iter)->GetState() == 2 &&
-					pLatest->GetState() !=2 )
-			{
-				pLatest = *iter;
-			}
-			else if ( (*iter)->GetMajor() > pLatest->GetMajor() )
-			{
-				pLatest = *iter;
-			}
-			else if ( (*iter)->GetMajor() == pLatest->GetMajor() )
-			{
-				if ( (*iter)->GetMinor() > pLatest->GetMajor() )
-				{
-					pLatest = *iter;
-				}
-				else if ( (*iter)->GetMinor() == pLatest->GetMinor() )
-				{
-					if ( (*iter)->GetRevision() > pLatest->GetRevision() )
-					{
-						pLatest = *iter;
-					}
-				}
-			}
-		}
-		if ( pLatest && pLatest->GetState() == 2 )
-		{
-			CUpdateResourceVersion * update = Get ( szResourceName, pLatest->GetMajor(), pLatest->GetMinor(), pLatest->GetRevision(), pLatest->GetState() );
-			if ( update )
-			{
-				CLogger::LogPrintf ( "Downloading v%i.%i.%i of %s\n", pLatest->GetMajor(), pLatest->GetMinor(), pLatest->GetRevision(), szResourceName );
-				update->Download ( false );
-				return true;
-			}
-		}
     }
-	return false;
+    if ( updates.size() != 0 )
+    {
+        list < CUpdateResourceVersion* > ::iterator iter = updates.begin ();
+        CUpdateResourceVersion* pLatest = *iter;
+        for ( iter++; iter != updates.end(); iter++ )
+        {
+            if ( (*iter)->GetState() == 2 &&
+                    pLatest->GetState() !=2 )
+            {
+                pLatest = *iter;
+            }
+            else if ( (*iter)->GetMajor() > pLatest->GetMajor() )
+            {
+                pLatest = *iter;
+            }
+            else if ( (*iter)->GetMajor() == pLatest->GetMajor() )
+            {
+                if ( (*iter)->GetMinor() > pLatest->GetMajor() )
+                {
+                    pLatest = *iter;
+                }
+                else if ( (*iter)->GetMinor() == pLatest->GetMinor() )
+                {
+                    if ( (*iter)->GetRevision() > pLatest->GetRevision() )
+                    {
+                        pLatest = *iter;
+                    }
+                }
+            }
+        }
+        if ( pLatest && pLatest->GetState() == 2 )
+        {
+            CUpdateResourceVersion * update = Get ( szResourceName, pLatest->GetMajor(), pLatest->GetMinor(), pLatest->GetRevision(), pLatest->GetState() );
+            if ( update )
+            {
+                CLogger::LogPrintf ( "Downloading v%i.%i.%i of %s\n", pLatest->GetMajor(), pLatest->GetMinor(), pLatest->GetRevision(), szResourceName );
+                update->Download ( false );
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -841,33 +841,33 @@ void CResourceDownloader::GetAvailableResources ( list<CUpdateResource *> * upda
 
 void CResourceDownloader::CheckWaitingResources ( void )
 {
-	if ( m_WaitingResources.size() == 0 )
-		return ;
-	list < CResource* > resourcesToRemove;
-	list < CResource* >::iterator iter = m_WaitingResources.begin();
-	for ( ; iter != m_WaitingResources.end(); iter++ )
-	{
-		bool bAllExist = true;
-		CResource* pResource = NULL;
-		list < CIncludedResources* >::iterator iterir = (*iter)->GetIncludedResourcesBegin();
-		for ( ; iterir != (*iter)->GetIncludedResourcesEnd(); iterir++ )
-		{
-			pResource = g_pGame->GetResourceManager()->GetResource ( (*iterir)->GetName ().c_str () );
-			if ( !pResource )
-				bAllExist = false;
-		}
-		if ( bAllExist )
-		{
-			if ( (*iter)->Start ( NULL, true ) ) // start the resource
-				resourcesToRemove.push_back ( *iter );
-		}
-	}
-	iter = resourcesToRemove.begin();
-	for ( ; iter != resourcesToRemove.end(); iter++ )
-	{
-		m_WaitingResources.remove ( *iter );
-	}
-	resourcesToRemove.clear();
+    if ( m_WaitingResources.size() == 0 )
+        return ;
+    list < CResource* > resourcesToRemove;
+    list < CResource* >::iterator iter = m_WaitingResources.begin();
+    for ( ; iter != m_WaitingResources.end(); iter++ )
+    {
+        bool bAllExist = true;
+        CResource* pResource = NULL;
+        list < CIncludedResources* >::iterator iterir = (*iter)->GetIncludedResourcesBegin();
+        for ( ; iterir != (*iter)->GetIncludedResourcesEnd(); iterir++ )
+        {
+            pResource = g_pGame->GetResourceManager()->GetResource ( (*iterir)->GetName ().c_str () );
+            if ( !pResource )
+                bAllExist = false;
+        }
+        if ( bAllExist )
+        {
+            if ( (*iter)->Start ( NULL, true ) ) // start the resource
+                resourcesToRemove.push_back ( *iter );
+        }
+    }
+    iter = resourcesToRemove.begin();
+    for ( ; iter != resourcesToRemove.end(); iter++ )
+    {
+        m_WaitingResources.remove ( *iter );
+    }
+    resourcesToRemove.clear();
 }
 
 // get the latest version - highest version number with the state specified

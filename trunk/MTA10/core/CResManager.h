@@ -12,29 +12,29 @@
 *  Original code by Ashley Matheson
 *  http://www.gamedev.net/reference/articles/article1009.asp
 *
-*  Class:	ResManager
-*  Date:	Aug 15, 1999
-*  Desc:	A wrapper class for enumeration of display modes, <nl>
-*			resolution changing, and restoration of video modes.
+*  Class:   ResManager
+*  Date:    Aug 15, 1999
+*  Desc:    A wrapper class for enumeration of display modes, <nl>
+*           resolution changing, and restoration of video modes.
 * 
 *  Method Overview ----------------------------------------------
-*  +ResManager()	
-*		-> Default Constructior.  Enumerates the Video Modes
-*	+ResManager(int width, int Height, int depth)
-*		-> Paramaterized constructior.  Calls the default construction and sets the desired video mode.
-*	+~ResManager()
-*		-> Default Destructior.
-*	+void ChangeRes(int width, int height, int depth)
-*		-> Sets the desired video mode.
-*	+void RestoreResolution();
-*		-> Restores the resolution to the initial Video mode.
+*  +ResManager()    
+*       -> Default Constructior.  Enumerates the Video Modes
+*   +ResManager(int width, int Height, int depth)
+*       -> Paramaterized constructior.  Calls the default construction and sets the desired video mode.
+*   +~ResManager()
+*       -> Default Destructior.
+*   +void ChangeRes(int width, int height, int depth)
+*       -> Sets the desired video mode.
+*   +void RestoreResolution();
+*       -> Restores the resolution to the initial Video mode.
 *  Property Overview -------------------------------------------
-*	-DEVMODE m_Current
-*		-> The current Video mode
-*	-list<DEVMODE> m_stdDeviceModes
-*		-> A list containing the available video modes.
-*	History:
-*	08/15/99	devint	AWM	Creation
+*   -DEVMODE m_Current
+*       -> The current Video mode
+*   -list<DEVMODE> m_stdDeviceModes
+*       -> A list containing the available video modes.
+*   History:
+*   08/15/99    devint  AWM Creation
 *
 *****************************************************************************/
 
@@ -49,19 +49,19 @@
 class CResManager
 {
 public:
-	CResManager();
-	CResManager(int width, int height, int depth);
-	~CResManager();
+    CResManager();
+    CResManager(int width, int height, int depth);
+    ~CResManager();
 
     void Init();
 
-	void ChangeRes(int width, int height, int depth);
-	void RestoreResolution();
+    void ChangeRes(int width, int height, int depth);
+    void RestoreResolution();
     void RestoreCurrent();
 private:
     bool m_bModeHasBeenSet;
-	DEVMODE m_Current;
-	std::list<DEVMODE> m_stdDeviceModes;
+    DEVMODE m_Current;
+    std::list<DEVMODE> m_stdDeviceModes;
 
 };
 

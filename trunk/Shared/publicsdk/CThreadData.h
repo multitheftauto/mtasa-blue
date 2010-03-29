@@ -26,12 +26,12 @@ class CThreadData;
 class CThreadData
 {
 public:
-						CThreadData			( void );
-						~CThreadData		( void );
+                        CThreadData         ( void );
+                        ~CThreadData        ( void );
 
-	bool				bAbortThread;
-	ThreadMutex			MutexPrimary;		// primary mutex for suspend/resume operations
-	ThreadMutex			MutexLogical;		// logical mutex for proper CThreadData sync
+    bool                bAbortThread;
+    ThreadMutex         MutexPrimary;       // primary mutex for suspend/resume operations
+    ThreadMutex         MutexLogical;       // logical mutex for proper CThreadData sync
 };
 
 #endif

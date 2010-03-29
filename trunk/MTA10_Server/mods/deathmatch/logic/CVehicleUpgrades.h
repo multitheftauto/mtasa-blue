@@ -30,25 +30,25 @@ enum eVehicleUpgrade
 class CVehicleUpgrades
 {
 public:
-							CVehicleUpgrades			( CVehicle* pVehicle );
+                            CVehicleUpgrades            ( CVehicle* pVehicle );
                             CVehicleUpgrades            ( CVehicle* pVehicle, CVehicleUpgrades* pUpgrades );
 
-	bool					IsUpgradeCompatible			( unsigned short usUpgrade );
-	static bool				GetSlotFromUpgrade			( unsigned short usUpgrade, unsigned char& ucSlot );
-	void					SetSlotState				( unsigned char ucSlot, unsigned short usUpgrade );
-	unsigned short			GetSlotState				( unsigned char ucSlot );
-	bool					AddUpgrade					( unsigned short usUpgrade );
+    bool                    IsUpgradeCompatible         ( unsigned short usUpgrade );
+    static bool             GetSlotFromUpgrade          ( unsigned short usUpgrade, unsigned char& ucSlot );
+    void                    SetSlotState                ( unsigned char ucSlot, unsigned short usUpgrade );
+    unsigned short          GetSlotState                ( unsigned char ucSlot );
+    bool                    AddUpgrade                  ( unsigned short usUpgrade );
     void                    AddAllUpgrades              ( void );
-	bool					HasUpgrade					( unsigned short usUpgrade );
-	inline unsigned short*	GetSlotStates				( void )		{ return m_SlotStates; }
+    bool                    HasUpgrade                  ( unsigned short usUpgrade );
+    inline unsigned short*  GetSlotStates               ( void )        { return m_SlotStates; }
     unsigned char           Count                       ( void );
-	
-	static const char*		GetSlotName					( unsigned char ucSlot );
+    
+    static const char*      GetSlotName                 ( unsigned char ucSlot );
     static bool             IsValidUpgrade              ( unsigned short usUpgrade );
 
 protected:
-	unsigned short			m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
-	CVehicle*				m_pVehicle;
+    unsigned short          m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
+    CVehicle*               m_pVehicle;
 };
 
 #endif

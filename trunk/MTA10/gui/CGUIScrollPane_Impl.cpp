@@ -17,10 +17,10 @@
 
 CGUIScrollPane_Impl::CGUIScrollPane_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
-	// Initialize
-	m_pGUI = pGUI;
+    // Initialize
+    m_pGUI = pGUI;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -31,8 +31,8 @@ CGUIScrollPane_Impl::CGUIScrollPane_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.9f, 0.9f, 0.9f, 0.9f) );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the m_pManager
@@ -43,10 +43,10 @@ CGUIScrollPane_Impl::CGUIScrollPane_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
-	SetHorizontalScrollStepSize ( 100.0f );
-	SetVerticalScrollStepSize ( 100.0f );
+    SetHorizontalScrollStepSize ( 100.0f );
+    SetVerticalScrollStepSize ( 100.0f );
 }
 
 CGUIScrollPane_Impl::~CGUIScrollPane_Impl ( void )
@@ -57,75 +57,75 @@ CGUIScrollPane_Impl::~CGUIScrollPane_Impl ( void )
 
 void CGUIScrollPane_Impl::SetHorizontalScrollBar ( bool bEnabled )
 {
-	reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setShowHorzScrollbar ( bEnabled );
+    reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setShowHorzScrollbar ( bEnabled );
 }
 
 
 void CGUIScrollPane_Impl::SetVerticalScrollBar ( bool bEnabled )
 {
-	reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setShowVertScrollbar ( bEnabled );
+    reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setShowVertScrollbar ( bEnabled );
 }
 
 
 void CGUIScrollPane_Impl::SetHorizontalScrollPosition ( float fPosition )
 {
-	try {
-		reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setHorizontalScrollPosition ( fPosition );
-	} catch ( CEGUI::Exception ) {}
+    try {
+        reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setHorizontalScrollPosition ( fPosition );
+    } catch ( CEGUI::Exception ) {}
 }
 
 
 void CGUIScrollPane_Impl::SetVerticalScrollPosition ( float fPosition )
 {
-	try {
-		reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setVerticalScrollPosition ( fPosition );
-	} catch ( CEGUI::Exception ) {}
+    try {
+        reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setVerticalScrollPosition ( fPosition );
+    } catch ( CEGUI::Exception ) {}
 }
 
 
 float CGUIScrollPane_Impl::GetHorizontalScrollPosition ( void )
 {
-	try {
-		return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getHorizontalScrollPosition ();
-	} catch ( CEGUI::Exception ) { return 0; }
+    try {
+        return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getHorizontalScrollPosition ();
+    } catch ( CEGUI::Exception ) { return 0; }
 }
 
 
 float CGUIScrollPane_Impl::GetVerticalScrollPosition ( void )
 {
-	try {
-		return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getVerticalScrollPosition ();
-	} catch ( CEGUI::Exception ) { return 0; }
+    try {
+        return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getVerticalScrollPosition ();
+    } catch ( CEGUI::Exception ) { return 0; }
 }
 
 
 void CGUIScrollPane_Impl::SetHorizontalScrollStepSize ( float fPosition )
 {
-	try {
-		reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setHorizontalStepSize ( fPosition );
-	} catch ( CEGUI::Exception ) {}
+    try {
+        reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setHorizontalStepSize ( fPosition );
+    } catch ( CEGUI::Exception ) {}
 }
 
 
 void CGUIScrollPane_Impl::SetVerticalScrollStepSize ( float fPosition )
 {
-	try {
-		reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setVerticalStepSize ( fPosition );
-	} catch ( CEGUI::Exception ) {}
+    try {
+        reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> setVerticalStepSize ( fPosition );
+    } catch ( CEGUI::Exception ) {}
 }
 
 
 float CGUIScrollPane_Impl::GetHorizontalScrollStepSize ( void )
 {
-	try {
-		return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getHorizontalStepSize ();
-	} catch ( CEGUI::Exception ) { return 0; }
+    try {
+        return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getHorizontalStepSize ();
+    } catch ( CEGUI::Exception ) { return 0; }
 }
 
 
 float CGUIScrollPane_Impl::GetVerticalScrollStepSize ( void )
 {
-	try {
-		return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getVerticalStepSize ();
-	} catch ( CEGUI::Exception ) { return 0; }
+    try {
+        return reinterpret_cast < CEGUI::ScrollablePane* > ( m_pWindow ) -> getVerticalStepSize ();
+    } catch ( CEGUI::Exception ) { return 0; }
 }

@@ -22,7 +22,7 @@ class CLuaTimer;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL		50
+#define LUA_TIMER_MIN_INTERVAL      50
 
 class CLuaTimer
 {
@@ -30,30 +30,30 @@ public:
 
                             CLuaTimer                   ( void );
                             CLuaTimer                   ( int iLuaFunction, const CLuaArguments& Arguments );
-							~CLuaTimer					( void );
+                            ~CLuaTimer                  ( void );
 
-	inline int				GetLuaFunction				( void )						{ return m_iLuaFunction; };
-	inline void				SetLuaFunction				( int iLuaFunction )			{ m_iLuaFunction = iLuaFunction; };
+    inline int              GetLuaFunction              ( void )                        { return m_iLuaFunction; };
+    inline void             SetLuaFunction              ( int iLuaFunction )            { m_iLuaFunction = iLuaFunction; };
 
     inline unsigned long    GetStartTime                ( void ) const                  { return m_ulStartTime; };
     inline void             SetStartTime                ( unsigned long ulStartTime )   { m_ulStartTime = ulStartTime; };
 
-	inline unsigned long    GetDelay					( void ) const                  { return m_ulDelay; };
-    inline void             SetDelay					( unsigned long ulDelay )		{ m_ulDelay = ulDelay; };
+    inline unsigned long    GetDelay                    ( void ) const                  { return m_ulDelay; };
+    inline void             SetDelay                    ( unsigned long ulDelay )       { m_ulDelay = ulDelay; };
 
-	inline unsigned int		GetRepeats					( void ) const					{ return m_uiRepeats; };
-	inline void				SetRepeats					( unsigned int uiRepeats )		{ m_uiRepeats = uiRepeats; }
+    inline unsigned int     GetRepeats                  ( void ) const                  { return m_uiRepeats; };
+    inline void             SetRepeats                  ( unsigned int uiRepeats )      { m_uiRepeats = uiRepeats; }
 
     void                    ExecuteTimer                ( class CLuaMain* pLuaMain );
 
     inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
     inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
 private:
-    int						m_iLuaFunction;
+    int                     m_iLuaFunction;
     CLuaArguments           m_Arguments;
     unsigned long           m_ulStartTime;
-	unsigned long			m_ulDelay;
-	unsigned int			m_uiRepeats;
+    unsigned long           m_ulDelay;
+    unsigned int            m_uiRepeats;
     bool                    m_bBeingDeleted;
 };
 

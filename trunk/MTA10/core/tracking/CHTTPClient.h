@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/tracking/CHTTPClient.h
-*  PURPOSE:		Header file for HTTP client class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/tracking/CHTTPClient.h
+*  PURPOSE:     Header file for HTTP client class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *
@@ -119,13 +119,13 @@ public:
     
     bool                GetData                 ( CHTTPBuffer& outBuffer );
 
-	// Callbacks
-	static void			OnRead					( void* pSocketPtr, void* pClassPtr );
-	static void			OnConnect				( void* pSocketPtr, void* pClassPtr );
-	static void			OnClose					( void* pSocketPtr, void* pClassPtr );
+    // Callbacks
+    static void         OnRead                  ( void* pSocketPtr, void* pClassPtr );
+    static void         OnConnect               ( void* pSocketPtr, void* pClassPtr );
+    static void         OnClose                 ( void* pSocketPtr, void* pClassPtr );
 
 private:
-    bool				ParseURL                ( const char* szURL, char* szProtocol, unsigned int uiProtocolSize, char* szHost, unsigned int uiSizeHost, unsigned short& usPort, char* szPath, unsigned int uiSizePath );
+    bool                ParseURL                ( const char* szURL, char* szProtocol, unsigned int uiProtocolSize, char* szHost, unsigned int uiSizeHost, unsigned short& usPort, char* szPath, unsigned int uiSizePath );
 
     int                 ReadHeader              ( char* pBuffer, unsigned int uiBufferSize );
 
@@ -135,12 +135,12 @@ private:
     std::string         m_strStatus;
     bool                m_bCompleted;
 
-    char				m_szProtocol[64];
-    char				m_szHost[256];
-    char				m_szPath[1024];
-    unsigned short		m_usPort;
+    char                m_szProtocol[64];
+    char                m_szHost[256];
+    char                m_szPath[1024];
+    unsigned short      m_usPort;
 
-	CTCPClientSocket*	m_pHTTPSocket;
+    CTCPClientSocket*   m_pHTTPSocket;
 };
 
 #endif

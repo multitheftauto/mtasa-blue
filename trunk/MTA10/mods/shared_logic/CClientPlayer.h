@@ -57,11 +57,11 @@ public:
     void                            RemoveNametagOverrideColor  ( void );
     inline bool                     IsNametagColorOverridden( void )                                { return m_bNametagColorOverridden; }
 
-    inline const char*              GetNametagText          ( void )								{ return m_strNametag.c_str (); }
-	inline void                     SetNametagText          ( const char* szText );
-    inline bool                     IsNametagShowing        ( void )								{ return m_bNametagShowing; }
-    inline void                     SetNametagShowing       ( bool bShowing )						{ m_bNametagShowing = bShowing; }
-	inline CGUIStaticImage*			GetStatusIcon			( void )								{ return m_pStatusIcon; }
+    inline const char*              GetNametagText          ( void )                                { return m_strNametag.c_str (); }
+    inline void                     SetNametagText          ( const char* szText );
+    inline bool                     IsNametagShowing        ( void )                                { return m_bNametagShowing; }
+    inline void                     SetNametagShowing       ( bool bShowing )                       { m_bNametagShowing = bShowing; }
+    inline CGUIStaticImage*         GetStatusIcon           ( void )                                { return m_pStatusIcon; }
     inline unsigned long            GetLastNametagShow      ( void )                                { return m_ulLastNametagShow; }
     inline void                     SetLastNametagShow      ( unsigned long ulTime )                { m_ulLastNametagShow = ulTime; }
 
@@ -132,8 +132,8 @@ private:
 
     CClientTeam*                    m_pTeam;
 
-	CGUIStaticImage*				m_pStatusIcon;
-	bool							m_bNametagShowing;
+    CGUIStaticImage*                m_pStatusIcon;
+    bool                            m_bNametagShowing;
     unsigned long                   m_ulLastNametagShow;
     unsigned char                   m_ucNametagColorR, m_ucNametagColorG, m_ucNametagColorB;
     bool                            m_bNametagColorOverridden;

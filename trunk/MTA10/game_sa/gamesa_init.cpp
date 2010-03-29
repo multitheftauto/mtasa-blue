@@ -22,10 +22,10 @@ CGameSA* pGame = NULL;
 extern "C" _declspec(dllexport)
 CGame * GetGameInterface()
 {
-	DEBUG_TRACE("CGame * GetGameInterface()");
-	pGame = new CGameSA;
+    DEBUG_TRACE("CGame * GetGameInterface()");
+    pGame = new CGameSA;
 
-	return (CGame *)pGame;
+    return (CGame *)pGame;
 }
 
 //-----------------------------------------------------------

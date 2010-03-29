@@ -40,7 +40,7 @@ public:
 private:
     struct STaskListItem
     {
-	    CTaskSAInterface*   taskInterface;
+        CTaskSAInterface*   taskInterface;
         CTaskSA*            pTaskSA;
     };
 

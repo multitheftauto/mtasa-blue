@@ -23,16 +23,16 @@ CMultiplayerSA* pMultiplayer = 0;
 
 extern "C" _declspec(dllexport)
 CMultiplayer* InitMultiplayerInterface(CGame* pGame)
-{	
+{   
     // set the internal pointer to the game class
-	pGameInterface = pGame;
+    pGameInterface = pGame;
 
-	// create an instance of our multiplayer class
-	pMultiplayer = new CMultiplayerSA;
-	pMultiplayer->InitHooks();
+    // create an instance of our multiplayer class
+    pMultiplayer = new CMultiplayerSA;
+    pMultiplayer->InitHooks();
 
-	// return the multiplayer class ptr
-	return (CMultiplayer*) pMultiplayer;
+    // return the multiplayer class ptr
+    return (CMultiplayer*) pMultiplayer;
 }
 
 //-----------------------------------------------------------

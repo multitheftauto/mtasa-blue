@@ -23,18 +23,18 @@ public:
     enum eExplosionType
     {
         EXPLOSION_GRENADE,
-	    EXPLOSION_MOLOTOV,
-	    EXPLOSION_ROCKET,
-	    EXPLOSION_ROCKET_WEAK,
-	    EXPLOSION_CAR,
-	    EXPLOSION_CAR_QUICK,
-	    EXPLOSION_BOAT,
-	    EXPLOSION_HELI,
-	    EXPLOSION_MINE,
-	    EXPLOSION_OBJECT,
-	    EXPLOSION_TANK_GRENADE,
-	    EXPLOSION_SMALL,
-	    EXPLOSION_TINY,
+        EXPLOSION_MOLOTOV,
+        EXPLOSION_ROCKET,
+        EXPLOSION_ROCKET_WEAK,
+        EXPLOSION_CAR,
+        EXPLOSION_CAR_QUICK,
+        EXPLOSION_BOAT,
+        EXPLOSION_HELI,
+        EXPLOSION_MINE,
+        EXPLOSION_OBJECT,
+        EXPLOSION_TANK_GRENADE,
+        EXPLOSION_SMALL,
+        EXPLOSION_TINY,
     };
 
                             CExplosionSyncPacket        ( void );

@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/tracking/CTCPClientSocketImpl.cpp
-*  PURPOSE:		TCP client socket wrapper
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/tracking/CTCPClientSocketImpl.cpp
+*  PURPOSE:     TCP client socket wrapper
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *
@@ -18,17 +18,17 @@ CTCPClientSocketImpl::CTCPClientSocketImpl ( void )
 {
     m_iRefCount = 1;
 
-	// Init
-	m_bIsConnected = false;
-	m_Socket = 0;
-	m_szLastError [0] = 0;
+    // Init
+    m_bIsConnected = false;
+    m_Socket = 0;
+    m_szLastError [0] = 0;
 
-	// Events
-	m_pEventRead = NULL;
-	m_pEventWrite = NULL;
-	m_pEventConnect = NULL;
-	m_pEventClose = NULL;
-	m_pClass = NULL;
+    // Events
+    m_pEventRead = NULL;
+    m_pEventWrite = NULL;
+    m_pEventConnect = NULL;
+    m_pEventClose = NULL;
+    m_pClass = NULL;
 }
 
 
@@ -72,7 +72,7 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
     }
 
     // Resolve it
-    hostent* pHostInfo = gethostbyname ( szHost );		// Windows function, uses blocking sockets
+    hostent* pHostInfo = gethostbyname ( szHost );      // Windows function, uses blocking sockets
     if ( !pHostInfo )
     {
         strcpy ( m_szLastError, "Unable to resolve" );
@@ -92,7 +92,7 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
     }
 
     // Mark us as connected and return success
-	// ACHTUNG: m_bIsConnected should be set by OnConnect!
+    // ACHTUNG: m_bIsConnected should be set by OnConnect!
     //m_bIsConnected = true;
     return true;
 }
@@ -145,39 +145,39 @@ const char* CTCPClientSocketImpl::GetLastError ( void )
 
 int CTCPClientSocketImpl::ReadBuffer ( void* pOutput, int iSize )
 {
-	// Try to read something
-	int iReturn = recv ( m_Socket, (char*)pOutput, iSize, 0 );
-	if ( !iReturn )
-	{
-		// TODO: Store somewhere
+    // Try to read something
+    int iReturn = recv ( m_Socket, (char*)pOutput, iSize, 0 );
+    if ( !iReturn )
+    {
+        // TODO: Store somewhere
 #ifdef WIN32
-		WSAGetLastError ();
+        WSAGetLastError ();
 #endif
-		return -1;
-	}
+        return -1;
+    }
 
-	// Return number of bytes actually read
-	m_szLastError [0] = 0;
-	return iReturn;
+    // Return number of bytes actually read
+    m_szLastError [0] = 0;
+    return iReturn;
 }
 
 
 int CTCPClientSocketImpl::WriteBuffer ( const void* pInput, int iSize )
 {
-	// Try to write the stuff
-	int iReturn = send ( m_Socket, (const char*)pInput, iSize, 0 );
-	if ( !iReturn )
-	{
-		// TODO: Store somewhere
+    // Try to write the stuff
+    int iReturn = send ( m_Socket, (const char*)pInput, iSize, 0 );
+    if ( !iReturn )
+    {
+        // TODO: Store somewhere
 #ifdef WIN32
-		WSAGetLastError ();
+        WSAGetLastError ();
 #endif
-		return -1;
-	}
+        return -1;
+    }
 
-	// Return number of bytes actually written
-	m_szLastError [0] = 0;
-	return iReturn;
+    // Return number of bytes actually written
+    m_szLastError [0] = 0;
+    return iReturn;
 }
 
 
@@ -191,7 +191,7 @@ bool CTCPClientSocketImpl::Initialize ( unsigned int uiID )
         return false;
     }
 
-	// So, make it asynchronous and enable some useful window messages
+    // So, make it asynchronous and enable some useful window messages
     WSAAsyncSelect ( m_Socket, CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + uiID, FD_READ | FD_WRITE | FD_CONNECT | FD_CLOSE );
 
     return true;
@@ -199,54 +199,54 @@ bool CTCPClientSocketImpl::Initialize ( unsigned int uiID )
 
 void CTCPClientSocketImpl::FireEvent ( LPARAM lType )
 {
-	// Check event type
-	switch ( WSAGETSELECTEVENT ( lType ) )
-	{
-		case FD_READ:
-			if ( m_pEventRead )
-				m_pEventRead ( this, m_pClass );
-			break;
-		case FD_WRITE:
-			if ( m_pEventWrite )
-				m_pEventWrite ( this, m_pClass );
-			break;
-		case FD_CONNECT:	// Client only
-			if ( m_pEventConnect )
-				m_pEventConnect ( this, m_pClass );
-			break;
-		case FD_CLOSE:
-			if ( m_pEventClose )
-				m_pEventClose ( this, m_pClass );
-			break;
-		/*
-		case FD_ACCEPT:		// Server only
-			break;
-		*/
-	}
+    // Check event type
+    switch ( WSAGETSELECTEVENT ( lType ) )
+    {
+        case FD_READ:
+            if ( m_pEventRead )
+                m_pEventRead ( this, m_pClass );
+            break;
+        case FD_WRITE:
+            if ( m_pEventWrite )
+                m_pEventWrite ( this, m_pClass );
+            break;
+        case FD_CONNECT:    // Client only
+            if ( m_pEventConnect )
+                m_pEventConnect ( this, m_pClass );
+            break;
+        case FD_CLOSE:
+            if ( m_pEventClose )
+                m_pEventClose ( this, m_pClass );
+            break;
+        /*
+        case FD_ACCEPT:     // Server only
+            break;
+        */
+    }
 }
 
 void CTCPClientSocketImpl::SetEventClass ( void* pClass )
 {
-	m_pClass = pClass;
+    m_pClass = pClass;
 }
 
 void CTCPClientSocketImpl::SetEventRead ( PFNEVENT pEvent )
 {
-	m_pEventRead = pEvent;
+    m_pEventRead = pEvent;
 }
 
 void CTCPClientSocketImpl::SetEventWrite ( PFNEVENT pEvent )
 {
-	m_pEventWrite = pEvent;
+    m_pEventWrite = pEvent;
 }
 
 void CTCPClientSocketImpl::SetEventConnect ( PFNEVENT pEvent )
 {
-	m_pEventConnect = pEvent;
+    m_pEventConnect = pEvent;
 }
 
 void CTCPClientSocketImpl::SetEventClose ( PFNEVENT pEvent )
 {
-	m_pEventClose = pEvent;
+    m_pEventClose = pEvent;
 }
 

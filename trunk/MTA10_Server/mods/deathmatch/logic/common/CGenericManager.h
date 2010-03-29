@@ -104,8 +104,8 @@ public:
 
     virtual void RemoveAll ( void )
     {
-		typename std::list< TManaged* >::const_iterator iter;
-		m_bCanRemoveFromList = false;
+        typename std::list< TManaged* >::const_iterator iter;
+        m_bCanRemoveFromList = false;
 
         for ( iter = this->begin (); iter != this->end (); iter++ )
         {

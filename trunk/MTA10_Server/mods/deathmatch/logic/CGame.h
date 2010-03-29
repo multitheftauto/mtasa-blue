@@ -158,8 +158,8 @@ public:
                                 CGame                       ( void );
                                 ~CGame                      ( void );
 
-	void						GetTag						( char* szInfoTag, int iInfoTag );
-	void						HandleInput					( char* szCommand );
+    void                        GetTag                      ( char* szInfoTag, int iInfoTag );
+    void                        HandleInput                 ( char* szCommand );
 
     void                        DoPulse                     ( void );
 
@@ -196,9 +196,9 @@ public:
     inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; }
     inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; }
     inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; }
-	inline CSettings*			    GetSettings					( void )		{ return m_pSettings; }
+    inline CSettings*               GetSettings                 ( void )        { return m_pSettings; }
     inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
-	inline CBanManager*			    GetBanManager				( void )		{ return m_pBanManager; }
+    inline CBanManager*             GetBanManager               ( void )        { return m_pBanManager; }
     inline CRemoteCalls*            GetRemoteCalls              ( void )        { return m_pRemoteCalls; }
     inline CResourceDownloader*     GetResourceDownloader       ( void )        { return m_pResourceDownloader; }
     inline CZoneNames*              GetZoneNames                ( void )        { return m_pZoneNames; }
@@ -265,7 +265,7 @@ private:
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
 
-	static void					PlayerCompleteConnect		( CPlayer* pPlayer, bool bSuccess, const char* szError );
+    static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -304,12 +304,12 @@ private:
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
-    CSettings*					    m_pSettings;
+    CSettings*                      m_pSettings;
     CZoneNames*                     m_pZoneNames;
     ASE*                            m_pASE;
     CHandlingManager*               m_pHandlingManager;
     CRPCFunctions*                  m_pRPCFunctions;
-	CLanBroadcast*                  m_pLanBroadcast;
+    CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
@@ -318,7 +318,7 @@ private:
     CVoiceServer*               m_pVoiceServer;
 #endif
 
-	char*						m_szCurrentFileName;
+    char*                       m_szCurrentFileName;
 
     // This client represents the console input
     CConsoleClient*             m_pConsoleClient;
@@ -332,10 +332,10 @@ private:
 
     bool                        m_bGarageStates[MAX_GARAGES];
 
-	// FPS statistics
-	unsigned long				m_ulLastFPSTime;
-	unsigned short				m_usFrames;
-	unsigned short				m_usFPS;
+    // FPS statistics
+    unsigned long               m_ulLastFPSTime;
+    unsigned short              m_usFrames;
+    unsigned short              m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
     bool                        m_Glitches[3];
 

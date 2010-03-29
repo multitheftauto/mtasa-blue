@@ -20,15 +20,15 @@ template<> CDirect3DData * CSingleton< CDirect3DData >::m_pSingleton = NULL;
 CDirect3DData::CDirect3DData ( void ) 
 {
     // Zero out our matricies.
-	memset ( &m_mViewMatrix, 0, sizeof ( D3DMATRIX ) );
+    memset ( &m_mViewMatrix, 0, sizeof ( D3DMATRIX ) );
     memset ( &m_mProjMatrix, 0, sizeof ( D3DMATRIX ) );
     memset ( &m_mWorldMatrix, 0, sizeof ( D3DMATRIX ) );
 
     m_hDeviceWindow     = 0;
-	m_dwViewportX       = 0;
-	m_dwViewportY       = 0;
-	m_dwViewportWidth   = 0;
-	m_dwViewportHeight  = 0;
+    m_dwViewportX       = 0;
+    m_dwViewportY       = 0;
+    m_dwViewportWidth   = 0;
+    m_dwViewportHeight  = 0;
 }
 
 CDirect3DData::~CDirect3DData ( void ) 
@@ -87,33 +87,33 @@ void CDirect3DData::GetTransform ( D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DM
 
 void CDirect3DData::StoreViewport ( DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight ) 
 {
-	m_dwViewportX       = dwX;
-	m_dwViewportY       = dwY;
-	m_dwViewportWidth   = dwWidth;
-	m_dwViewportHeight  = dwHeight;
+    m_dwViewportX       = dwX;
+    m_dwViewportY       = dwY;
+    m_dwViewportWidth   = dwWidth;
+    m_dwViewportHeight  = dwHeight;
 }
 
 
 DWORD CDirect3DData::GetViewportX ( void ) 
 {
-	return m_dwViewportX;
+    return m_dwViewportX;
 }
 
 
 DWORD CDirect3DData::GetViewportY ( void ) 
 {
-	return m_dwViewportY;
+    return m_dwViewportY;
 }
 
 
 DWORD CDirect3DData::GetViewportWidth ( void ) 
 {
-	return m_dwViewportWidth;
+    return m_dwViewportWidth;
 }
 
 
 DWORD CDirect3DData::GetViewportHeight ( void ) 
 {
-	return m_dwViewportHeight;
+    return m_dwViewportHeight;
 }
 

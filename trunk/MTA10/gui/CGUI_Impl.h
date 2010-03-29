@@ -76,62 +76,62 @@ public:
     void                            ProcessKeyboardInput        ( unsigned long ulKey, bool bIsDown );
     void                            ProcessCharacter            ( unsigned long ulCharacter );
 
-	//
-	void							SetGUIInputEnabled			( bool bEnabled );
-	bool							GetGUIInputEnabled			( void );
+    //
+    void                            SetGUIInputEnabled          ( bool bEnabled );
+    bool                            GetGUIInputEnabled          ( void );
 
-	//
-	CGUIMessageBox*					CreateMessageBox			( const char* szTitle, const char* szMessage, unsigned int uiFlags );
+    //
+    CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
 
-	CGUIButton*						CreateButton				( CGUIElement* pParent = NULL, const char* szCaption = "" );
-	CGUIButton*						CreateButton				( CGUITab* pParent = NULL, const char* szCaption = "" );
+    CGUIButton*                     CreateButton                ( CGUIElement* pParent = NULL, const char* szCaption = "" );
+    CGUIButton*                     CreateButton                ( CGUITab* pParent = NULL, const char* szCaption = "" );
 
-	CGUICheckBox*					CreateCheckBox				( CGUIElement* pParent = NULL, const char* szCaption = "", bool bChecked = false );
-	CGUICheckBox*					CreateCheckBox				( CGUITab* pParent = NULL, const char* szCaption = "", bool bChecked = false );
+    CGUICheckBox*                   CreateCheckBox              ( CGUIElement* pParent = NULL, const char* szCaption = "", bool bChecked = false );
+    CGUICheckBox*                   CreateCheckBox              ( CGUITab* pParent = NULL, const char* szCaption = "", bool bChecked = false );
 
-	CGUIRadioButton*				CreateRadioButton			( CGUIElement* pParent = NULL, const char* szCaption = "" );
-	CGUIRadioButton*				CreateRadioButton			( CGUITab* pParent = NULL, const char* szCaption = "" );
+    CGUIRadioButton*                CreateRadioButton           ( CGUIElement* pParent = NULL, const char* szCaption = "" );
+    CGUIRadioButton*                CreateRadioButton           ( CGUITab* pParent = NULL, const char* szCaption = "" );
 
-	CGUIEdit*                       CreateEdit                  ( CGUIElement* pParent = NULL, const char* szText = "" );
-	CGUIEdit*                       CreateEdit                  ( CGUITab* pParent = NULL, const char* szText = "" );
+    CGUIEdit*                       CreateEdit                  ( CGUIElement* pParent = NULL, const char* szText = "" );
+    CGUIEdit*                       CreateEdit                  ( CGUITab* pParent = NULL, const char* szText = "" );
 
     CGUIGridList*                   CreateGridList              ( CGUIElement* pParent = NULL, bool bFrame = true );
     CGUIGridList*                   CreateGridList              ( CGUITab* pParent = NULL, bool bFrame = true );
 
     CGUILabel*                      CreateLabel                 ( CGUIElement* pParent, const char* szCaption = "" );
-	CGUILabel*                      CreateLabel                 ( CGUITab* pParent, const char* szCaption = "" );
-	CGUILabel*                      CreateLabel                 ( const char* szCaption = "" );
+    CGUILabel*                      CreateLabel                 ( CGUITab* pParent, const char* szCaption = "" );
+    CGUILabel*                      CreateLabel                 ( const char* szCaption = "" );
 
     CGUIProgressBar*                CreateProgressBar           ( CGUIElement* pParent );
-	CGUIProgressBar*                CreateProgressBar           ( CGUITab* pParent );
+    CGUIProgressBar*                CreateProgressBar           ( CGUITab* pParent );
 
-	CGUIMemo*                       CreateMemo                  ( CGUIElement* pParent = NULL, const char* szText = "" );
-	CGUIMemo*                       CreateMemo                  ( CGUITab* pParent = NULL, const char* szText = "" );
+    CGUIMemo*                       CreateMemo                  ( CGUIElement* pParent = NULL, const char* szText = "" );
+    CGUIMemo*                       CreateMemo                  ( CGUITab* pParent = NULL, const char* szText = "" );
 
     CGUIStaticImage*                CreateStaticImage           ( CGUIElement* pParent );
-	CGUIStaticImage*                CreateStaticImage           ( CGUITab* pParent );
-	CGUIStaticImage*                CreateStaticImage           ( CGUIGridList* pParent );
-	CGUIStaticImage*                CreateStaticImage           ( void );
+    CGUIStaticImage*                CreateStaticImage           ( CGUITab* pParent );
+    CGUIStaticImage*                CreateStaticImage           ( CGUIGridList* pParent );
+    CGUIStaticImage*                CreateStaticImage           ( void );
 
     CGUITabPanel*                   CreateTabPanel              ( CGUIElement* pParent = NULL );
-	CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent = NULL );
+    CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent = NULL );
 
     CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent = NULL );
-	CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );
 
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUIElement* pParent = NULL );
-	CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );
+    CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );
 
-    CGUIComboBox*					CreateComboBox				( CGUIElement* pParent = NULL, const char* szCaption = "" );
-	CGUIComboBox*					CreateComboBox				( CGUIComboBox* pParent = NULL, const char* szCaption = "" );
+    CGUIComboBox*                   CreateComboBox              ( CGUIElement* pParent = NULL, const char* szCaption = "" );
+    CGUIComboBox*                   CreateComboBox              ( CGUIComboBox* pParent = NULL, const char* szCaption = "" );
 
-	CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
-	//
+    CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
+    //
 
     CGUITexture*                    CreateTexture               ( void );
     CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false );
 
-	void                            SetCursorEnabled            ( bool bEnabled );
+    void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );
 
     void                            AddChild                    ( CGUIElement_Impl* pChild );
@@ -143,19 +143,19 @@ public:
     CEGUI::WindowManager*           GetWindowManager            ( void );
     void                            GetUniqueName               ( char* pBuf );
 
-	CVector2D						GetResolution				( void );
-	void							SetResolution				( float fWidth, float fHeight );
+    CVector2D                       GetResolution               ( void );
+    void                            SetResolution               ( float fWidth, float fHeight );
 
-	CGUIFont*						GetDefaultFont				( void );
-	CGUIFont*						GetSmallFont				( void );
-	CGUIFont*						GetBoldFont					( void );
-	CGUIFont*						GetClearFont				( void );
-	CGUIFont*						GetSAHeaderFont				( void );
-	CGUIFont*						GetSAGothicFont				( void );
-	CGUIFont*						GetSansFont					( void );
+    CGUIFont*                       GetDefaultFont              ( void );
+    CGUIFont*                       GetSmallFont                ( void );
+    CGUIFont*                       GetBoldFont                 ( void );
+    CGUIFont*                       GetClearFont                ( void );
+    CGUIFont*                       GetSAHeaderFont             ( void );
+    CGUIFont*                       GetSAGothicFont             ( void );
+    CGUIFont*                       GetSansFont                 ( void );
 
-	void							SetWorkingDirectory			( const char * szDir );
-	inline const char*				GetWorkingDirectory			( void )	{ return const_cast < const char* > ( m_szWorkingDirectory ); }
+    void                            SetWorkingDirectory         ( const char * szDir );
+    inline const char*              GetWorkingDirectory         ( void )    { return const_cast < const char* > ( m_szWorkingDirectory ); }
 
     void                            SetCharacterKeyHandler       ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_CharacterKeyHandlers[ channel ] = Callback; }
     void                            SetKeyDownHandler            ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback )    { CHECK_CHANNEL ( channel ); m_KeyDownHandlers[ channel ] = Callback; }
@@ -176,18 +176,18 @@ public:
     bool                            IsTransferBoxVisible        ( void )                                    { return m_bTransferBoxVisible; };
     void                            SetTransferBoxVisible       ( bool bVisible )                           { m_bTransferBoxVisible = bVisible; };
 
-	bool							Event_CharacterKey			( const CEGUI::EventArgs& e );
-	bool							Event_KeyDown				( const CEGUI::EventArgs& e );
-	bool							Event_MouseClick			( const CEGUI::EventArgs& e );
-	bool							Event_MouseDoubleClick		( const CEGUI::EventArgs& e );
-	bool							Event_MouseButtonDown		( const CEGUI::EventArgs& e );
-	bool							Event_MouseButtonUp			( const CEGUI::EventArgs& e );
-	bool							Event_MouseWheel			( const CEGUI::EventArgs& e );
-	bool							Event_MouseMove				( const CEGUI::EventArgs& e );
-	bool							Event_MouseEnter			( const CEGUI::EventArgs& e );
-	bool							Event_MouseLeave			( const CEGUI::EventArgs& e );
-	bool							Event_Moved					( const CEGUI::EventArgs& e );
-	bool							Event_Sized					( const CEGUI::EventArgs& e );
+    bool                            Event_CharacterKey          ( const CEGUI::EventArgs& e );
+    bool                            Event_KeyDown               ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseClick            ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseDoubleClick      ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseButtonDown       ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseButtonUp         ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseWheel            ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseMove             ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseEnter            ( const CEGUI::EventArgs& e );
+    bool                            Event_MouseLeave            ( const CEGUI::EventArgs& e );
+    bool                            Event_Moved                 ( const CEGUI::EventArgs& e );
+    bool                            Event_Sized                 ( const CEGUI::EventArgs& e );
     bool                            Event_RedrawRequested       ( const CEGUI::EventArgs& e );
 
     void                            AddToRedrawQueue            ( CGUIElement* pWindow );
@@ -202,12 +202,12 @@ private:
     CGUIEdit*                       _CreateEdit                 ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
     CGUIGridList*                   _CreateGridList             ( CGUIElement_Impl* pParent = NULL, bool bFrame = true );
     CGUILabel*                      _CreateLabel                ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
-	CGUIProgressBar*				_CreateProgressBar			( CGUIElement_Impl* pParent = NULL );
+    CGUIProgressBar*                _CreateProgressBar          ( CGUIElement_Impl* pParent = NULL );
     CGUIMemo*                       _CreateMemo                 ( CGUIElement_Impl* pParent = NULL, const char* szText = "" );
     CGUIStaticImage*                _CreateStaticImage          ( CGUIElement_Impl* pParent = NULL );
     CGUITabPanel*                   _CreateTabPanel             ( CGUIElement_Impl* pParent = NULL );
-	CGUIScrollPane*                 _CreateScrollPane           ( CGUIElement_Impl* pParent = NULL );
-	CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
+    CGUIScrollPane*                 _CreateScrollPane           ( CGUIElement_Impl* pParent = NULL );
+    CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 
     IDirect3DDevice9*               m_pDevice;
@@ -223,18 +223,18 @@ private:
     const CEGUI::Image*             m_pCursor;
 
     CGUIFont_Impl*                  m_pDefaultFont;
-	CGUIFont_Impl*					m_pSmallFont;
-	CGUIFont_Impl*					m_pBoldFont;
-	CGUIFont_Impl*					m_pClearFont;
-	CGUIFont_Impl*					m_pSAHeaderFont;
-	CGUIFont_Impl*					m_pSAGothicFont;
-	CGUIFont_Impl*					m_pSansFont;
+    CGUIFont_Impl*                  m_pSmallFont;
+    CGUIFont_Impl*                  m_pBoldFont;
+    CGUIFont_Impl*                  m_pClearFont;
+    CGUIFont_Impl*                  m_pSAHeaderFont;
+    CGUIFont_Impl*                  m_pSAGothicFont;
+    CGUIFont_Impl*                  m_pSansFont;
                 
     std::list < CGUIElement* >      m_RedrawQueue;
 
-	unsigned long                   m_ulPreviousUnique;
+    unsigned long                   m_ulPreviousUnique;
 
-	bool							m_bSwitchGUIInput;
+    bool                            m_bSwitchGUIInput;
 
     GUI_CALLBACK_KEY                m_CharacterKeyHandlers[ INPUT_CHANNEL_COUNT ];
     GUI_CALLBACK_KEY                m_KeyDownHandlers[ INPUT_CHANNEL_COUNT ];
@@ -251,7 +251,7 @@ private:
 
     eInputChannel                   m_Channel;
 
-	char							m_szWorkingDirectory [ MAX_PATH + 1 ];
+    char                            m_szWorkingDirectory [ MAX_PATH + 1 ];
 
     bool                            m_bTransferBoxVisible;
 };

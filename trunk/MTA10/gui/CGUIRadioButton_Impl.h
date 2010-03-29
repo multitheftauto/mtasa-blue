@@ -22,10 +22,10 @@ public:
                             CGUIRadioButton_Impl        ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
                             ~CGUIRadioButton_Impl       ( void );
 
-	void					SetSelected					( bool bChecked );
-	bool					GetSelected					( void );
+    void                    SetSelected                 ( bool bChecked );
+    bool                    GetSelected                 ( void );
 
-	eCGUIType				GetType						( void ) { return CGUI_RADIOBUTTON; };
+    eCGUIType               GetType                     ( void ) { return CGUI_RADIOBUTTON; };
 
     #include "CGUIElement_Inc.h"
 

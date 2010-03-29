@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CMapLoader.h
 *  PURPOSE:     Header for map loader class
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*				Jax <>
+*               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

@@ -38,7 +38,7 @@ CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortNa
     m_pLuaManager = g_pGame->GetLuaManager();
     m_pEvents = g_pGame->GetEvents();
     m_pScriptDebugging = g_pGame->GetScriptDebugging();
-	m_pElementGroup = NULL;
+    m_pElementGroup = NULL;
 
     m_iDimension = iDimension;
 
@@ -53,7 +53,7 @@ CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortNa
 
 CResourceMapItem::~CResourceMapItem ( void )
 {
-	Stop ();
+    Stop ();
 }
 
 
@@ -74,12 +74,12 @@ bool CResourceMapItem::Start ( void )
 
 bool CResourceMapItem::Stop ( void )
 {
-	// Delete our element group, including all the elements in it
-	if ( m_pElementGroup )
+    // Delete our element group, including all the elements in it
+    if ( m_pElementGroup )
     {
-		delete m_pElementGroup;
-		m_pElementGroup = NULL;
-	}
+        delete m_pElementGroup;
+        m_pElementGroup = NULL;
+    }
 
     // Destroy our XML too
     if ( m_pXMLFile )
@@ -241,11 +241,11 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     {
         pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
-	else if ( strBuffer.empty () )
-	{
-		// Comment, return true
-		return true;
-	}
+    else if ( strBuffer.empty () )
+    {
+        // Comment, return true
+        return true;
+    }
     else
     {
         pNode = m_pGroups->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );

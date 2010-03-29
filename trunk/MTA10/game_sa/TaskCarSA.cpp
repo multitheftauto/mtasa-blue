@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskCarSA.cpp
-*  PURPOSE:		Car game tasks
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskCarSA.cpp
+*  PURPOSE:     Car game tasks
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *
@@ -33,26 +33,26 @@ CTaskComplexEnterCarSA::CTaskComplexEnterCarSA ( CVehicle* pTargetVehicle, const
 
 CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA ( CVehicle* pTargetVehicle):CTaskComplexEnterCarSA ( pTargetVehicle, true, false, false, false )
 {
-	DEBUG_TRACE("CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle)");
+    DEBUG_TRACE("CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle)");
 
     CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
 
-	if ( pTargetVehicleSA )
-	{
-		this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsDriverSAInterface));
-		DWORD dwFunc = FUNC_CTaskComplexEnterCarAsDriver__Constructor;
-		DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-		DWORD dwThisInterface = (DWORD)this->GetInterface();
+    if ( pTargetVehicleSA )
+    {
+        this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsDriverSAInterface));
+        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsDriver__Constructor;
+        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
+        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-		_asm
-		{
-			mov		ecx, dwThisInterface
-			push	dwVehiclePtr
-			call	dwFunc
-		}
-	} else {
-		DEBUG_TRACE("pTargetVehicleSA was invalid!");
-	}
+        _asm
+        {
+            mov     ecx, dwThisInterface
+            push    dwVehiclePtr
+            call    dwFunc
+        }
+    } else {
+        DEBUG_TRACE("pTargetVehicleSA was invalid!");
+    }
 }
 
 
@@ -63,32 +63,32 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA ( CVehicle* pTarg
 
 CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA ( CVehicle* pTargetVehicle, const int iTargetSeat, const bool bCarryOnAfterFallingOff ):CTaskComplexEnterCarSA ( pTargetVehicle, false, false, false, false )
 {
-	DEBUG_TRACE("CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle)");
+    DEBUG_TRACE("CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle)");
 
     CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
 
-	if ( pTargetVehicleSA )
-	{
-		this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsPassengerSAInterface));
-		DWORD dwFunc = FUNC_CTaskComplexEnterCarAsPassenger__Constructor;
-		DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface ();
-		DWORD dwThisInterface = (DWORD)this->GetInterface();
+    if ( pTargetVehicleSA )
+    {
+        this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsPassengerSAInterface));
+        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsPassenger__Constructor;
+        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface ();
+        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-		_asm
-		{
-			push    edx
-			xor     edx, edx
-			movzx   edx, bCarryOnAfterFallingOff
-			mov		ecx, dwThisInterface
-			push    edx
-			push    iTargetSeat
-			push	dwVehiclePtr
-			call	dwFunc
-			pop     edx
-		}
-	} else {
-		DEBUG_TRACE("pTargetVehicleSA was invalid!");
-	}
+        _asm
+        {
+            push    edx
+            xor     edx, edx
+            movzx   edx, bCarryOnAfterFallingOff
+            mov     ecx, dwThisInterface
+            push    edx
+            push    iTargetSeat
+            push    dwVehiclePtr
+            call    dwFunc
+            pop     edx
+        }
+    } else {
+        DEBUG_TRACE("pTargetVehicleSA was invalid!");
+    }
 }
 
 // ##############################################################################
@@ -98,26 +98,26 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA ( CVehicle*
 
 CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTargetVehicle ):CTaskComplexSA ( )
 {
-	DEBUG_TRACE("CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle)");
+    DEBUG_TRACE("CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle)");
 
     CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
 
-	if ( pTargetVehicleSA )
-	{
-		this->CreateTaskInterface(sizeof(CTaskComplexEnterBoatAsDriverSAInterface));
-		DWORD dwFunc = FUNC_CTaskComplexEnterBoatAsDriver__Constructor;
-		DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-		DWORD dwThisInterface = (DWORD)this->GetInterface();
+    if ( pTargetVehicleSA )
+    {
+        this->CreateTaskInterface(sizeof(CTaskComplexEnterBoatAsDriverSAInterface));
+        DWORD dwFunc = FUNC_CTaskComplexEnterBoatAsDriver__Constructor;
+        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
+        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-		_asm
-		{
-			mov		ecx, dwThisInterface
-			push	dwVehiclePtr
-			call	dwFunc
-		}
-	} else {
-		DEBUG_TRACE("pTargetVehicleSA was invalid!");
-	}
+        _asm
+        {
+            mov     ecx, dwThisInterface
+            push    dwVehiclePtr
+            call    dwFunc
+        }
+    } else {
+        DEBUG_TRACE("pTargetVehicleSA was invalid!");
+    }
 }
 
 
@@ -128,33 +128,33 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTa
 
 CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, const bool bForceGetOut ):CTaskComplexSA ( )
 {
-	DEBUG_TRACE("CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, const bool bForceGetOut )");
+    DEBUG_TRACE("CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, const bool bForceGetOut )");
 
     CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
 
-	if ( pTargetVehicleSA )
-	{
-		this->CreateTaskInterface(sizeof(CTaskComplexLeaveCarSAInterface));
-		DWORD dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
-		DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-		DWORD dwThisInterface = (DWORD)this->GetInterface();
+    if ( pTargetVehicleSA )
+    {
+        this->CreateTaskInterface(sizeof(CTaskComplexLeaveCarSAInterface));
+        DWORD dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
+        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
+        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-		_asm
-		{
-			mov		ecx, dwThisInterface
-			push    ebx
-			xor     ebx, ebx
-			movzx   ebx, bForceGetOut
-			push    ebx
-			movzx   ebx, bSensibleLeaveCar
-			push    ebx
-			push    iDelayTime
-			push    iTargetDoor
-			push	dwVehiclePtr
-			call	dwFunc
-			pop     ebx
-		}
-	} else {
-		DEBUG_TRACE("pTargetVehicleSA was invalid!");
-	}
+        _asm
+        {
+            mov     ecx, dwThisInterface
+            push    ebx
+            xor     ebx, ebx
+            movzx   ebx, bForceGetOut
+            push    ebx
+            movzx   ebx, bSensibleLeaveCar
+            push    ebx
+            push    iDelayTime
+            push    iTargetDoor
+            push    dwVehiclePtr
+            call    dwFunc
+            pop     ebx
+        }
+    } else {
+        DEBUG_TRACE("pTargetVehicleSA was invalid!");
+    }
 }

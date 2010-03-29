@@ -20,23 +20,23 @@ using namespace std;
 
 struct sStat
 {
-	unsigned short id;
-	float value;
+    unsigned short id;
+    float value;
 };
 
 class CPlayerStats
 {
 public:
-										~CPlayerStats			( void );
+                                        ~CPlayerStats           ( void );
 
-	bool								GetStat					( unsigned short usID, float& fValue );
-	void								SetStat					( unsigned short usID, float fValue );
-	vector < sStat* > ::const_iterator	IterBegin				( void )		{ return m_List.begin (); }
-	vector < sStat* > ::const_iterator	IterEnd					( void )		{ return m_List.end (); }
-	unsigned short						GetSize					( void )		{ return static_cast < unsigned short > ( m_List.size () ); }
+    bool                                GetStat                 ( unsigned short usID, float& fValue );
+    void                                SetStat                 ( unsigned short usID, float fValue );
+    vector < sStat* > ::const_iterator  IterBegin               ( void )        { return m_List.begin (); }
+    vector < sStat* > ::const_iterator  IterEnd                 ( void )        { return m_List.end (); }
+    unsigned short                      GetSize                 ( void )        { return static_cast < unsigned short > ( m_List.size () ); }
 
 private:
-	vector < sStat* >					m_List;
+    vector < sStat* >                   m_List;
 };
 
 #endif

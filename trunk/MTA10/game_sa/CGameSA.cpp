@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CGameSA.cpp
-*  PURPOSE:		Base game logic handling
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CGameSA.cpp
+*  PURPOSE:     Base game logic handling
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
@@ -56,36 +56,36 @@ CGameSA::CGameSA()
         ModelInfo [i].SetModelID ( i );
     }
 
-	DEBUG_TRACE("CGameSA::CGameSA()");
-	this->m_pAudio					= new CAudioSA();
-	this->m_pWorld					= new CWorldSA();
-	this->m_pPools					= new CPoolsSA();
-	this->m_pClock					= new CClockSA();
-	this->m_pRadar 					= new CRadarSA();
-	this->m_pCamera					= new CCameraSA((CCameraSAInterface *)CLASS_CCamera);
-	this->m_pCoronas				= new CCoronasSA();
-	this->m_pCheckpoints			= new CCheckpointsSA();
-	this->m_pPickups				= new CPickupsSA();
-	this->m_pExplosionManager		= new CExplosionManagerSA();
-	this->m_pHud					= new CHudSA();
-	this->m_pFireManager			= new CFireManagerSA();
-	this->m_p3DMarkers				= new C3DMarkersSA();
-	this->m_pPad					= new CPadSA((CPadSAInterface *)CLASS_CPad);
-	this->m_pTheCarGenerators		= new CTheCarGeneratorsSA();
-	this->m_pCAERadioTrackManager	= new CAERadioTrackManagerSA();
-	this->m_pWeather				= new CWeatherSA();
-	this->m_pMenuManager			= new CMenuManagerSA();
-	this->m_pText					= new CTextSA();
-	this->m_pStats					= new CStatsSA();
-	this->m_pFont					= new CFontSA();
-	this->m_pPathFind				= new CPathFindSA();
-	this->m_pPopulation				= new CPopulationSA();
+    DEBUG_TRACE("CGameSA::CGameSA()");
+    this->m_pAudio                  = new CAudioSA();
+    this->m_pWorld                  = new CWorldSA();
+    this->m_pPools                  = new CPoolsSA();
+    this->m_pClock                  = new CClockSA();
+    this->m_pRadar                  = new CRadarSA();
+    this->m_pCamera                 = new CCameraSA((CCameraSAInterface *)CLASS_CCamera);
+    this->m_pCoronas                = new CCoronasSA();
+    this->m_pCheckpoints            = new CCheckpointsSA();
+    this->m_pPickups                = new CPickupsSA();
+    this->m_pExplosionManager       = new CExplosionManagerSA();
+    this->m_pHud                    = new CHudSA();
+    this->m_pFireManager            = new CFireManagerSA();
+    this->m_p3DMarkers              = new C3DMarkersSA();
+    this->m_pPad                    = new CPadSA((CPadSAInterface *)CLASS_CPad);
+    this->m_pTheCarGenerators       = new CTheCarGeneratorsSA();
+    this->m_pCAERadioTrackManager   = new CAERadioTrackManagerSA();
+    this->m_pWeather                = new CWeatherSA();
+    this->m_pMenuManager            = new CMenuManagerSA();
+    this->m_pText                   = new CTextSA();
+    this->m_pStats                  = new CStatsSA();
+    this->m_pFont                   = new CFontSA();
+    this->m_pPathFind               = new CPathFindSA();
+    this->m_pPopulation             = new CPopulationSA();
     this->m_pTaskManagementSystem   = new CTaskManagementSystemSA();
     this->m_pSettings               = new CSettingsSA();
     this->m_pCarEnterExit           = new CCarEnterExitSA();
     this->m_pControllerConfigManager = new CControllerConfigManagerSA();
     this->m_pProjectileInfo         = new CProjectileInfoSA();
-	this->m_pRenderWare				= new CRenderWareSA( version );
+    this->m_pRenderWare             = new CRenderWareSA( version );
     this->m_pHandlingManager        = new CHandlingManagerSA ();
     this->m_pEventList              = new CEventListSA();
     this->m_pGarages                = new CGaragesSA ( (CGaragesSAInterface *)CLASS_CGarages);
@@ -99,8 +99,8 @@ CGameSA::CGameSA()
     this->m_pWaterManager           = new CWaterManagerSA ();
 
     // Normal weapon types (WEAPONSKILL_STD)
-	for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
-		WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+    for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
+        WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
 
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int index;
@@ -113,7 +113,7 @@ CGameSA::CGameSA()
         }
     }
 
-	m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
+    m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
 
     // Init cheat name => address map
     m_Cheats [ CHEAT_HOVERINGCARS  ] = (BYTE *)VAR_HoveringCarsEnabled;
@@ -163,13 +163,13 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CClockSA* > ( m_pClock );
     delete reinterpret_cast < CPoolsSA* > ( m_pPools );
     delete reinterpret_cast < CWorldSA* > ( m_pWorld );
-	delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
+    delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
 }
 
-CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
+CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 { 
-	DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
-	
+    DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
+    
     if ( (skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
          (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9) )
     {
@@ -191,20 +191,20 @@ CWeaponInfo	* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
             default:
                 break;
         }
-		return WeaponInfos[offset + weapon]; 
+        return WeaponInfos[offset + weapon]; 
     }
-	else 
-		return NULL; 
+    else 
+        return NULL; 
 }
 
 VOID CGameSA::Pause ( bool bPaused )
 {
-	*VAR_GamePaused = bPaused;
+    *VAR_GamePaused = bPaused;
 }
 
 bool CGameSA::IsPaused ( )
 {
-	return *VAR_GamePaused;
+    return *VAR_GamePaused;
 }
 
 bool CGameSA::IsInForeground ()
@@ -212,10 +212,10 @@ bool CGameSA::IsInForeground ()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo	* CGameSA::GetModelInfo(DWORD dwModelID )
+CModelInfo  * CGameSA::GetModelInfo(DWORD dwModelID )
 { 
-	DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
-	if (dwModelID < MODELINFO_MAX) 
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
+    if (dwModelID < MODELINFO_MAX) 
     {
         if ( ModelInfo [dwModelID ].IsValid () )
         {
@@ -226,9 +226,9 @@ CModelInfo	* CGameSA::GetModelInfo(DWORD dwModelID )
             return NULL;
         }
     }
-	else
+    else
     {
-		return NULL; 
+        return NULL; 
     }
 }
 
@@ -238,12 +238,12 @@ CModelInfo	* CGameSA::GetModelInfo(DWORD dwModelID )
  */
 VOID CGameSA::StartGame()
 {
-	DEBUG_TRACE("VOID CGameSA::StartGame()");
-//	InitScriptInterface();
-	//*(BYTE *)VAR_StartGame = 1;
-	this->SetSystemState(GS_INIT_PLAYING_GAME);
-	*(BYTE *)0xB7CB49 = 0; // game not paused
-	*(BYTE *)0xBA67A4 = 0; // menu not visible
+    DEBUG_TRACE("VOID CGameSA::StartGame()");
+//  InitScriptInterface();
+    //*(BYTE *)VAR_StartGame = 1;
+    this->SetSystemState(GS_INIT_PLAYING_GAME);
+    *(BYTE *)0xB7CB49 = 0; // game not paused
+    *(BYTE *)0xBA67A4 = 0; // menu not visible
 }
 
 /**
@@ -252,14 +252,14 @@ VOID CGameSA::StartGame()
  */
 VOID CGameSA::SetSystemState( eSystemState State )
 {
-	DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
-	*VAR_SystemState = (DWORD)State;
+    DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
+    *VAR_SystemState = (DWORD)State;
 }
 
 eSystemState CGameSA::GetSystemState( )
 {
-	DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
-	return (eSystemState)*VAR_SystemState;
+    DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
+    return (eSystemState)*VAR_SystemState;
 }
 
 /**
@@ -268,7 +268,7 @@ eSystemState CGameSA::GetSystemState( )
  */
 BOOL CGameSA::InitLocalPlayer(  )
 {
-	DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
+    DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
 
     // Added by ChrML - Looks like it isn't safe to call this more than once but mod code might do
     static bool bAlreadyInited = false;
@@ -278,21 +278,21 @@ BOOL CGameSA::InitLocalPlayer(  )
     }
     bAlreadyInited = true;
 
-	CPoolsSA * pools = (CPoolsSA *)this->GetPools ();
-	if ( pools )
-	{
-		//* HACKED IN HERE FOR NOW *//
+    CPoolsSA * pools = (CPoolsSA *)this->GetPools ();
+    if ( pools )
+    {
+        //* HACKED IN HERE FOR NOW *//
         CPedSAInterface* pInterface = pools->GetPedInterface ( (DWORD)1 );
 
         if ( pInterface )
         {
             pools->AddPed ( (DWORD*)pInterface );
             return TRUE;
-		}
+        }
 
-		return FALSE;
-	}
-	return FALSE;
+        return FALSE;
+    }
+    return FALSE;
 }
 
 float CGameSA::GetGravity ( void )
@@ -318,29 +318,29 @@ void CGameSA::SetGameSpeed ( float fSpeed )
 // this prevents some crashes (respawning mainly)
 VOID CGameSA::DisableRenderer( bool bDisabled )
 {
-	// ENABLED:
-	// 0053DF40   D915 2C13C800    FST DWORD PTR DS:[C8132C]
-	// DISABLED:
-	// 0053DF40   C3               RETN
+    // ENABLED:
+    // 0053DF40   D915 2C13C800    FST DWORD PTR DS:[C8132C]
+    // DISABLED:
+    // 0053DF40   C3               RETN
 
-	if ( bDisabled )
-	{
-		*(BYTE *)0x53DF40 = 0xC3;
-	}
-	else
-	{
-		*(BYTE *)0x53DF40 = 0xD9;
-	}
+    if ( bDisabled )
+    {
+        *(BYTE *)0x53DF40 = 0xC3;
+    }
+    else
+    {
+        *(BYTE *)0x53DF40 = 0xD9;
+    }
 }
 
 VOID CGameSA::SetRenderHook ( InRenderer* pInRenderer )
 {
-	if ( pInRenderer )
-		HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
-	else
-	{
-		*(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
-	}
+    if ( pInRenderer )
+        HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
+    else
+    {
+        *(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
+    }
 }
 
 
@@ -386,7 +386,7 @@ void CGameSA::Reset ( void )
 
         // Restore the HUD
         m_pHud->Disable ( false );
-		m_pHud->DisableAll ( false );
+        m_pHud->DisableAll ( false );
     }
 }
 

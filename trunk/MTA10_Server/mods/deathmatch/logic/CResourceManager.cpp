@@ -487,19 +487,19 @@ unsigned short CResourceManager::GenerateID ( void )
 {
     // Create a map of all used IDs
     map < unsigned short, bool > idMap;
-	list < CResource* > ::iterator iter = m_resources.begin ();
-	for ( ; iter != m_resources.end (); iter++ )
-	{
+    list < CResource* > ::iterator iter = m_resources.begin ();
+    for ( ; iter != m_resources.end (); iter++ )
+    {
         idMap[ ( *iter )->GetID () ] = true;
-	}
+    }
 
     // Find an unused ID
-	for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
-	{
+    for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
+    {
         if ( idMap.find ( i ) == idMap.end () )
             return i;
-	}
-	return 0xFFFF;
+    }
+    return 0xFFFF;
 }
 
 
@@ -571,25 +571,25 @@ bool CResourceManager::StartResource ( CResource* pResource, list < CResource* >
         if ( Reload ( pResource ) )
         {
             // Start the resource
-		    return pResource->Start( NULL, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
+            return pResource->Start( NULL, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
         }
         else
             return false;
     }
-	else
-	{
-		// If it's not running yet
-		if ( !pResource->IsActive() )
-		{
-			// Start it
-			return pResource->Start ( dependents, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
-		}
-		return false;
-	}
+    else
+    {
+        // If it's not running yet
+        if ( !pResource->IsActive() )
+        {
+            // Start it
+            return pResource->Start ( dependents, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
+        }
+        return false;
+    }
 
     // Stop it again if it failed starting
-	pResource->Stop ();
-	return false;
+    pResource->Stop ();
+    return false;
 }
 
 
@@ -605,8 +605,8 @@ bool CResourceManager::Reload ( CResource* pResource )
     pResource->Reload ();
 
     // Was it loaded successfully?
-	if ( pResource->IsLoaded () )
-	{
+    if ( pResource->IsLoaded () )
+    {
         // Add the resource back to the list
         m_bResourceListChanged = true;
 
@@ -616,7 +616,7 @@ bool CResourceManager::Reload ( CResource* pResource )
     else
     {
         CLogger::LogPrintf ( "Loading of resource '%s' failed\n", strResourceName.c_str () );
-		return false;
+        return false;
     }
 
     // Success
@@ -636,10 +636,10 @@ bool CResourceManager::StopAllResources ( void )
         {
             CLogger::SetOutputEnabled ( false );
 
-			if ( pResource->IsPersistent () )
-				pResource->SetPersistent ( false );
+            if ( pResource->IsPersistent () )
+                pResource->SetPersistent ( false );
 
-			pResource->Stop ( true );
+            pResource->Stop ( true );
 
             CLogger::SetOutputEnabled ( true );
             CLogger::LogPrintNoStamp ( "." );
@@ -740,7 +740,7 @@ void CResourceManager::ProcessQueue ( void )
                 if ( sItem.pResource->Stop ( true ) )
                 {
                     // Start it again
-				    if ( !StartResource ( sItem.pResource, &resourceListCopy, true,
+                    if ( !StartResource ( sItem.pResource, &resourceListCopy, true,
                                          sItem.Flags.bConfigs, sItem.Flags.bMaps,
                                          sItem.Flags.bScripts, sItem.Flags.bHTML,
                                          sItem.Flags.bClientConfigs, sItem.Flags.bClientScripts,
@@ -749,8 +749,8 @@ void CResourceManager::ProcessQueue ( void )
                         // Failed
                         CLogger::ErrorPrintf ( "Unable to restart resource %s\n", sItem.pResource->GetName ().c_str () );
                     }
-					else
-						CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
+                    else
+                        CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
 
                 }
                 else
@@ -846,15 +846,15 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
     }
 
     // Add the resource and load it
-	CResource* pResource = new CResource ( this, szResourceName, true );
-	if ( pResource )
-	{
-		m_resources.push_back ( pResource );
-		return pResource;
-	}
+    CResource* pResource = new CResource ( this, szResourceName, true );
+    if ( pResource )
+    {
+        m_resources.push_back ( pResource );
+        return pResource;
+    }
 
     // We failed
-	return NULL;
+    return NULL;
 }
 
 

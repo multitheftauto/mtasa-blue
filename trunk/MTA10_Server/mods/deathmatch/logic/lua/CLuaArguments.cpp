@@ -37,9 +37,9 @@ CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, std::map < CLuaAr
 
 CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
 {
-	if ( uiPosition < m_Arguments.size () )
-		return m_Arguments.at ( uiPosition );
-	return NULL;
+    if ( uiPosition < m_Arguments.size () )
+        return m_Arguments.at ( uiPosition );
+    return NULL;
 }
 
 
@@ -327,14 +327,14 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 char * szValue = new char [10];
                 memset(szValue,0,10);
                 CElement* pElement = (*iter)->GetElement ();
-			    if ( VERIFY_ELEMENT(pElement) )
-			    {
+                if ( VERIFY_ELEMENT(pElement) )
+                {
                     _snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
-			    }
-			    else
-			    {
-				    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
-			    }
+                }
+                else
+                {
+                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
+                }
                 values->push_back ( szValue );
             }        
         default:
@@ -505,10 +505,10 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         pKnownTables->push_back ( this );
         for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
         {
-		    CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
+            CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
         }
-	}
+    }
 
     if ( bKnownTablesCreated )
         delete pKnownTables;
@@ -542,7 +542,7 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
     if ( bKnownTablesCreated )
         delete pKnownTables;
 
-	return bSuccess;
+    return bSuccess;
 }
 
 bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
@@ -574,7 +574,7 @@ json_object * CLuaArguments::WriteToJSONArray ( bool bSerialize )
             break;
         }
     }
-	return my_array;
+    return my_array;
 }
 
 json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map < CLuaArguments*, unsigned long > * pKnownTables )
@@ -687,7 +687,7 @@ bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-		        CLuaArgument * pArgument = new CLuaArgument();
+                CLuaArgument * pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject ( arrayObject, &knownTables );
                 m_Arguments.push_back ( pArgument ); // then the value
                 if ( !bSuccess )
@@ -761,10 +761,10 @@ bool CLuaArguments::ReadFromJSONArray ( json_object * object, std::vector < CLua
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-		        CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
+                CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
                 m_Arguments.push_back ( pArgument );
 
-		        pArgument = new CLuaArgument();
+                pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject ( arrayObject, pKnownTables );
                 m_Arguments.push_back ( pArgument ); // then the valoue
                 if ( !bSuccess )

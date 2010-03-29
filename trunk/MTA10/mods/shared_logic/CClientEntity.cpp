@@ -241,8 +241,8 @@ CClientEntity* CClientEntity::AddChild ( CClientEntity* pChild )
 
 bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
 {
-	// Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-	if ( pEntity == NULL ) return false;
+    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
+    if ( pEntity == NULL ) return false;
 
     // Is he us?
     if ( pEntity == this )
@@ -274,7 +274,7 @@ void CClientEntity::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-	list < CClientEntity* > cloneList = m_Children;
+    list < CClientEntity* > cloneList = m_Children;
     list < CClientEntity* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
         (*iter)->SetParent ( m_pParent );
@@ -602,13 +602,13 @@ bool CClientEntity::IsOutOfBounds ( void )
 
 void CClientEntity::AttachTo ( CClientEntity* pEntity )
 {
-	if ( m_pAttachedToEntity )
-		m_pAttachedToEntity->RemoveAttachedEntity ( this );
+    if ( m_pAttachedToEntity )
+        m_pAttachedToEntity->RemoveAttachedEntity ( this );
 
-	m_pAttachedToEntity = pEntity;
+    m_pAttachedToEntity = pEntity;
 
-	if ( m_pAttachedToEntity )
-		m_pAttachedToEntity->AddAttachedEntity ( this );
+    if ( m_pAttachedToEntity )
+        m_pAttachedToEntity->AddAttachedEntity ( this );
 
     InternalAttachTo ( pEntity );
 }
@@ -1139,8 +1139,8 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
         return CCLIENTPICKUP;
     else if ( strcmp ( szTypeName, "radararea" ) == 0 )
         return CCLIENTRADARAREA;
- 	else if ( strcmp ( szTypeName, "sound" ) == 0 )
- 	    return CCLIENTSOUND;
+    else if ( strcmp ( szTypeName, "sound" ) == 0 )
+        return CCLIENTSOUND;
     else
         return CCLIENTUNKNOWN;
 }
@@ -1148,30 +1148,30 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
 
 void CClientEntity::DeleteClientChildren ( void )
 {
-	// Gather a list over children (we can't use the list as it changes)
-	list < CClientEntity* > Children;
+    // Gather a list over children (we can't use the list as it changes)
+    list < CClientEntity* > Children;
     list < CClientEntity* > ::const_iterator iterCopy = m_Children.begin ();
-	for ( ; iterCopy != m_Children.end (); iterCopy++ )
-	{
-		Children.push_back ( *iterCopy );
-	}
+    for ( ; iterCopy != m_Children.end (); iterCopy++ )
+    {
+        Children.push_back ( *iterCopy );
+    }
 
-	// Call ourselves on each child of this to go as deep as possible and start deleting there
-	list < CClientEntity* > ::const_iterator iter = Children.begin ();
-	for ( ; iter != Children.end (); iter++ )
-	{
-		(*iter)->DeleteClientChildren ();
-	}
+    // Call ourselves on each child of this to go as deep as possible and start deleting there
+    list < CClientEntity* > ::const_iterator iter = Children.begin ();
+    for ( ; iter != Children.end (); iter++ )
+    {
+        (*iter)->DeleteClientChildren ();
+    }
 
-	// We have no children at this point if we're locally created. Client elements can only be children
-	// of server elements, not vice versa.
-	
-	// Are we a client element?
-	if ( IsLocalEntity () && !IsSystemEntity () )
-	{
-		// Delete us
-		g_pClientGame->GetElementDeleter ()->Delete ( this );
-	}
+    // We have no children at this point if we're locally created. Client elements can only be children
+    // of server elements, not vice versa.
+    
+    // Are we a client element?
+    if ( IsLocalEntity () && !IsSystemEntity () )
+    {
+        // Delete us
+        g_pClientGame->GetElementDeleter ()->Delete ( this );
+    }
 }
 
 

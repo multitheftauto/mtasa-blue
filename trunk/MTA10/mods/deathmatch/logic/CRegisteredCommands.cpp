@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CRegisteredCommands.cpp
 *  PURPOSE:     Registered commands manager
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*				Derek Abdine <...>
+*               Derek Abdine <...>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -25,9 +25,9 @@ bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, co
     assert ( szKey );
     assert ( szHandler );
 
-	// Check if we already have this key and handler
-	SCommand* pCommand = GetCommand ( szKey, pLuaMain );
-	if ( pCommand && !strcmp ( pCommand->szHandler, szHandler )
+    // Check if we already have this key and handler
+    SCommand* pCommand = GetCommand ( szKey, pLuaMain );
+    if ( pCommand && !strcmp ( pCommand->szHandler, szHandler )
         return false;
 
     // Create the entry
@@ -50,7 +50,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
     assert ( szKey );
 
     // Call the handler for every virtual machine that matches the given key
-	bool bFound = false;
+    bool bFound = false;
     list < SCommand* > ::iterator iter = m_Commands.begin ();
     while ( iter != m_Commands.end () )
     {
@@ -60,11 +60,11 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
             // Delete it and remove it from our list
             delete *iter;
             m_Commands.erase ( iter );
-			iter = m_Commands.begin ();
-			bFound = true;
-			continue;
+            iter = m_Commands.begin ();
+            bFound = true;
+            continue;
         }
-		iter++;
+        iter++;
     }
 
     return bFound;

@@ -121,7 +121,7 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CCameraSyncPacket;
             break;
 
-		default: break;
+        default: break;
     }
 
     // Could we create the packet?

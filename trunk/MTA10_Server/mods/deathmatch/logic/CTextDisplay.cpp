@@ -47,28 +47,28 @@ void CTextDisplay::RemoveObserver ( CPlayer* pPlayer )
 
 bool CTextDisplay::IsObserver ( CPlayer* pPlayer )
 {
-	list < CPlayerTextManager* > ::iterator iter = m_observers.begin ();
+    list < CPlayerTextManager* > ::iterator iter = m_observers.begin ();
     for ( ; iter != m_observers.end (); iter++ )
     {
         if ( *iter == pPlayer -> GetPlayerTextManager () )
-			return true;
+            return true;
     }
 
-	return false;
+    return false;
 }
 
 void CTextDisplay::GetObservers ( lua_State* pLua )
 {
-	assert ( pLua );
+    assert ( pLua );
 
-	unsigned int uiIndex = 0;
-	list < CPlayerTextManager* > ::iterator iter = m_observers.begin ();
-	for ( ; iter != m_observers.end (); iter++ )
+    unsigned int uiIndex = 0;
+    list < CPlayerTextManager* > ::iterator iter = m_observers.begin ();
+    for ( ; iter != m_observers.end (); iter++ )
     {
-		lua_pushnumber ( pLua, ++uiIndex );
+        lua_pushnumber ( pLua, ++uiIndex );
         lua_pushelement ( pLua, (*iter) -> GetPlayer() );
         lua_settable ( pLua, -3 );
-	}
+    }
 }
 
 void CTextDisplay::AddObserver ( CPlayerTextManager* pTextManager )

@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskPhysicalResponseSA.h
-*  PURPOSE:		Physical response game tasks
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskPhysicalResponseSA.h
+*  PURPOSE:     Physical response game tasks
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -16,8 +16,8 @@
 #include <game/TaskPhysicalResponse.h>
 #include "TaskSA.h"
 
-#define FUNC_CTaskSimpleChoking__Constructor			    0x6202C0
-#define FUNC_CTaskSimpleChoking__UpdateChoke			    0x620660
+#define FUNC_CTaskSimpleChoking__Constructor                0x6202C0
+#define FUNC_CTaskSimpleChoking__UpdateChoke                0x620660
 
 class CTaskSimpleChokingSAInterface : public CTaskSimpleSAInterface
 {

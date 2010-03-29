@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CEventGunShot.h
-*  PURPOSE:		Event gunshot interface
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CEventGunShot.h
+*  PURPOSE:     Event gunshot interface
+*  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

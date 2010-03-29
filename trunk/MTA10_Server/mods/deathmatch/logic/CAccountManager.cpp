@@ -109,16 +109,16 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                             if ( pAttribute )
                             {
                                 strIP = pAttribute->GetValue ();
-								CAccount* pAccount = NULL;
-								pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
-								if ( pAttribute )
-								{
-									pAccount = new CAccount ( this, true, strName, strPassword, strIP, pAttribute->GetValue () );
-								}
-								else
-								{
-	                                pAccount = new CAccount ( this, true, strName, strPassword, strIP );
-								}
+                                CAccount* pAccount = NULL;
+                                pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
+                                if ( pAttribute )
+                                {
+                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, pAttribute->GetValue () );
+                                }
+                                else
+                                {
+                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP );
+                                }
 
                                 // Grab the data on this account
                                 CXMLNode* pDataNode = NULL;
@@ -202,19 +202,19 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                                     }
                                 }
                             }
-							else
-							{
-								CAccount* pAccount = NULL;
-								pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
-								if ( pAttribute )
-								{
-									pAccount = new CAccount ( this, true, strName, strPassword, NULL, pAttribute->GetValue () );
-								}
-								else
-								{
-									pAccount = new CAccount ( this, true, strName, strPassword );
-								}
-							}
+                            else
+                            {
+                                CAccount* pAccount = NULL;
+                                pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
+                                if ( pAttribute )
+                                {
+                                    pAccount = new CAccount ( this, true, strName, strPassword, NULL, pAttribute->GetValue () );
+                                }
+                                else
+                                {
+                                    pAccount = new CAccount ( this, true, strName, strPassword );
+                                }
+                            }
                         }
                     }
                 }
@@ -335,7 +335,7 @@ bool CAccountManager::Save ( CXMLNode* pParent )
                             pAttribute->SetValue ( szIP );
                     }
 
-					const char* szSerial = (*iter)->GetSerial ().c_str ();
+                    const char* szSerial = (*iter)->GetSerial ().c_str ();
                     if ( szSerial && szSerial [ 0 ] )
                     {
                         pAttribute = pNode->GetAttributes ().Create ( "serial" );

@@ -83,11 +83,11 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
     {
         // Can we use the function? Return true so LUA can execute it
         if ( m_pACLManager->CanObjectUseRight ( pResource->GetName().c_str (),
-			                                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-												szFunction,
-												CAccessControlListRight::RIGHT_TYPE_FUNCTION,
-												!bRestricted ) )
-		{
+                                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                szFunction,
+                                                CAccessControlListRight::RIGHT_TYPE_FUNCTION,
+                                                !bRestricted ) )
+        {
             return true;
         }
         else

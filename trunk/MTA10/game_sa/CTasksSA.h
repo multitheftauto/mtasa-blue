@@ -38,14 +38,14 @@ private:
     CTaskManagementSystemSA*            m_pTaskManagementSystem;
 
 public:
-	                                    CTasksSA                                ( CTaskManagementSystemSA* pTaskManagementSystem );
+                                        CTasksSA                                ( CTaskManagementSystemSA* pTaskManagementSystem );
 
     CTaskSimplePlayerOnFoot*            CreateTaskSimplePlayerOnFoot            ( void );
     CTaskComplexFacial*                 CreateTaskComplexFacial                 ( void );
 
-	CTaskSimpleCarSetPedInAsDriver*     CreateTaskSimpleCarSetPedInAsDriver     ( CVehicle * pVehicle);
-	CTaskSimpleCarSetPedInAsPassenger*  CreateTaskSimpleCarSetPedInAsPassenger  ( CVehicle * pVehicle, int iTargetDoor);
-	CTaskSimpleCarSetPedOut*            CreateTaskSimpleCarSetPedOut            ( CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine=false);
+    CTaskSimpleCarSetPedInAsDriver*     CreateTaskSimpleCarSetPedInAsDriver     ( CVehicle * pVehicle);
+    CTaskSimpleCarSetPedInAsPassenger*  CreateTaskSimpleCarSetPedInAsPassenger  ( CVehicle * pVehicle, int iTargetDoor);
+    CTaskSimpleCarSetPedOut*            CreateTaskSimpleCarSetPedOut            ( CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine=false);
 
     CTaskComplexWanderStandard*         CreateTaskComplexWanderStandard         ( const int iMoveState, const char iDir, const bool bWanderSensibly=true);
     CTaskComplexEnterCarAsDriver*       CreateTaskComplexEnterCarAsDriver       ( CVehicle * pVehicle);

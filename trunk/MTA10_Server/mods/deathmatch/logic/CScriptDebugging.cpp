@@ -250,7 +250,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
         PrintLog ( strText );
     }
 
-	// Log to console
+    // Log to console
     CLogger::LogPrintf( "%s\n", strText.c_str () );
 
     if ( m_uiHtmlLogLevel >= uiMinimumDebugLevel )

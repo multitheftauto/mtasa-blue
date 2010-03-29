@@ -37,7 +37,7 @@ CClientCivilian* CClientCivilianManager::Create ( int iPedModel, ElementID ID )
 
 CClientCivilian* CClientCivilianManager::Create ( CCivilianPed * pPed, ElementID ID )
 {
-	return new CClientCivilian ( m_pManager, ID, pPed );
+    return new CClientCivilian ( m_pManager, ID, pPed );
 }
 
 

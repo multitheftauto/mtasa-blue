@@ -41,7 +41,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
-	m_bAkimboArmUp = false;    
+    m_bAkimboArmUp = false;    
     
     m_uiScriptDebugLevel = 0;
 
@@ -51,7 +51,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucLoginAttempts = 0;
 
-    m_pPlayerTextManager = new CPlayerTextManager ( this );	
+    m_pPlayerTextManager = new CPlayerTextManager ( this ); 
 
     m_PlayerAttackerID = INVALID_ELEMENT_ID;
     m_ucAttackWeapon = 0xFF;

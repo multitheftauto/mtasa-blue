@@ -97,8 +97,8 @@ public:
     inline void                                 SetAimDirection             ( float fDirection )            { m_fAimDirection = fDirection; };
     inline unsigned char                        GetDriveByDirection         ( void )                        { return m_ucDriveByDirection; };
     inline void                                 SetDriveByDirection         ( unsigned char ucDirection )   { m_ucDriveByDirection = ucDirection; };
-	inline bool									IsAkimboArmUp				( void )						{ return m_bAkimboArmUp; };
-	inline void									SetAkimboArmUp				( bool bUp )					{ m_bAkimboArmUp = bUp; };
+    inline bool                                 IsAkimboArmUp               ( void )                        { return m_bAkimboArmUp; };
+    inline void                                 SetAkimboArmUp              ( bool bUp )                    { m_bAkimboArmUp = bUp; };
 
     inline NetServerPlayerID&                   GetSocket                   ( void )                        { return m_PlayerSocket; };
     char*                                       GetSourceIP                 ( char* pBuffer );
@@ -185,8 +185,8 @@ public:
     inline const std::string&                   GetSerialUser               ( void )                        { return m_strSerialUser; };
     inline void                                 SetSerialUser               ( const std::string& strUser )  { m_strSerialUser = strUser; };
 
-	inline const std::string&                   GetCommunityID              ( void )                        { return m_strCommunityID; };
-    inline void                                 SetCommunityID              ( const std::string& strID )	{ m_strCommunityID = strID; };
+    inline const std::string&                   GetCommunityID              ( void )                        { return m_strCommunityID; };
+    inline void                                 SetCommunityID              ( const std::string& strID )    { m_strCommunityID = strID; };
 
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
@@ -230,7 +230,7 @@ private:
     float                                       m_fAimDirection;
     unsigned char                               m_ucDriveByDirection;   
     
-	bool										m_bAkimboArmUp;
+    bool                                        m_bAkimboArmUp;
 
     unsigned long                               m_ulTimeConnected;
 
@@ -243,7 +243,7 @@ private:
     std::list < CVehicle* >                     m_SyncingVehicles;
     std::list < CPed* >                         m_SyncingPeds;
 
-    unsigned int                                m_uiScriptDebugLevel;	
+    unsigned int                                m_uiScriptDebugLevel;   
 
     ElementID                                   m_PlayerAttackerID;
     unsigned char                               m_ucAttackWeapon;
@@ -274,7 +274,7 @@ private:
 
     std::string                                 m_strSerial;
     std::string                                 m_strSerialUser;
-	std::string									m_strCommunityID;
+    std::string                                 m_strCommunityID;
 
     unsigned char                               m_ucBlurLevel;
 

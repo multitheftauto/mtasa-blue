@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CEventDamageSA.cpp
-*  PURPOSE:		Damage event
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CEventDamageSA.cpp
+*  PURPOSE:     Damage event
+*  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -69,16 +69,16 @@ CEntity * CEventDamageSA::GetInflictingEntity ( void )
     if ( pInterface )
     {
         CPoolsSA * pPools = ((CPoolsSA *)pGame->GetPools());
-	    switch ( pInterface->nType )
-	    {
-	        case ENTITY_TYPE_PED:
-		        pReturn = pPools->GetPed((DWORD *)pInterface);
-		        break;
-	        case ENTITY_TYPE_VEHICLE:
-		        pReturn = pPools->GetVehicle ( (DWORD *)pInterface );
+        switch ( pInterface->nType )
+        {
+            case ENTITY_TYPE_PED:
+                pReturn = pPools->GetPed((DWORD *)pInterface);
                 break;
-	        default: break;
-	    }
+            case ENTITY_TYPE_VEHICLE:
+                pReturn = pPools->GetVehicle ( (DWORD *)pInterface );
+                break;
+            default: break;
+        }
     }
     return pReturn;
 }

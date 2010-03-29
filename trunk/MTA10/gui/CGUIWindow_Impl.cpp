@@ -17,7 +17,7 @@
 
 CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -27,28 +27,28 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIWINDOW_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.10f, 0.10f, 0.60f, 0.90f) );
-	m_pWindow->setAlpha ( 0.8f );
-	
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    m_pWindow->setAlpha ( 0.8f );
+    
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
-	// Set fixed minimum size to 96x48
-	m_pWindow->setMetricsMode ( CEGUI::Absolute );
-	m_pWindow->setMinimumSize ( CEGUI::Size ( 96.0f, 48.0f ) );
+    // Set fixed minimum size to 96x48
+    m_pWindow->setMetricsMode ( CEGUI::Absolute );
+    m_pWindow->setMinimumSize ( CEGUI::Size ( 96.0f, 48.0f ) );
  
-	// Some window specific style options
-	reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setTitlebarFont ( "default-bold-small" );
-	
-	// Give the window a caption
-	m_pWindow->setText ( szCaption );
+    // Some window specific style options
+    reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setTitlebarFont ( "default-bold-small" );
+    
+    // Give the window a caption
+    m_pWindow->setText ( szCaption );
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnKeyDown, this ) );
     AddEvents ();
 
-	// Disable rolling up, because we don't need it and it causes a freeze
-	reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setRollupEnabled ( false );
+    // Disable rolling up, because we don't need it and it causes a freeze
+    reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setRollupEnabled ( false );
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
     if ( pParent )
@@ -58,7 +58,7 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -149,32 +149,32 @@ void CGUIWindow_Impl::SetEnterKeyHandler ( GUI_CALLBACK Callback )
 
 bool CGUIWindow_Impl::Event_OnCloseClick ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnCloseClick )
-		m_OnCloseClick ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnCloseClick )
+        m_OnCloseClick ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 
 
 bool CGUIWindow_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
 {
-	CGUIElement * pCGUIElement = reinterpret_cast < CGUIElement* > ( this );
-	if ( m_OnKeyDown )
-		m_OnKeyDown ( pCGUIElement );
+    CGUIElement * pCGUIElement = reinterpret_cast < CGUIElement* > ( this );
+    if ( m_OnKeyDown )
+        m_OnKeyDown ( pCGUIElement );
 
-	if ( m_OnEnter )
-	{
-		const CEGUI::KeyEventArgs& Args = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
-		switch ( Args.scancode )
-		{
-			// Return key
-			case CEGUI::Key::NumpadEnter:
-			case CEGUI::Key::Return:
-			{
-				// Fire the event
-				m_OnEnter ( pCGUIElement );
-				break;
-			}
-		}
-	}
+    if ( m_OnEnter )
+    {
+        const CEGUI::KeyEventArgs& Args = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
+        switch ( Args.scancode )
+        {
+            // Return key
+            case CEGUI::Key::NumpadEnter:
+            case CEGUI::Key::Return:
+            {
+                // Fire the event
+                m_OnEnter ( pCGUIElement );
+                break;
+            }
+        }
+    }
     return true;
 }

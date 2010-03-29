@@ -38,15 +38,15 @@ void CThreadCommandQueue::Process ( bool& bRequestedQuit, CModManagerImpl* pModM
         const string& str = m_Commands.front ();
 
         // Check for the most important command: quit and exit.
-		if ( str == "quit" || str == "exit" )
-		{
-			bRequestedQuit = true;
-		}
+        if ( str == "quit" || str == "exit" )
+        {
+            bRequestedQuit = true;
+        }
         else
         {
-			// Otherwise, pass the command to the mod's input handler
+            // Otherwise, pass the command to the mod's input handler
             pModManager->HandleInput ( str.c_str () );
-		}
+        }
 
         // Remove it from the queue
         m_Commands.pop_front ();

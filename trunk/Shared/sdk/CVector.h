@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/CVector.h
-*  PURPOSE:		3D vector math implementation
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/CVector.h
+*  PURPOSE:     3D vector math implementation
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -26,21 +26,21 @@
 class CVector
 {
 public:
-	float fX, fY, fZ;
-	
-	CVector ()
-	{
-		this->fX = 0;
-		this->fY = 0;
-		this->fZ = 0;
-	};
-	
-	CVector ( float fX, float fY, float fZ) 
-	{ 
-		this->fX = fX;
-		this->fY = fY;
-		this->fZ = fZ;
-	}
+    float fX, fY, fZ;
+    
+    CVector ()
+    {
+        this->fX = 0;
+        this->fY = 0;
+        this->fZ = 0;
+    };
+    
+    CVector ( float fX, float fY, float fZ) 
+    { 
+        this->fX = fX;
+        this->fY = fY;
+        this->fZ = fZ;
+    }
 
     float Normalize ( void ) 
     { 
@@ -59,10 +59,10 @@ public:
         return static_cast < float > ( t );
     }
 
-	float Length ( void ) const
-	{
-		return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
-	}
+    float Length ( void ) const
+    {
+        return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
+    }
 
     float DotProduct ( const CVector * param ) const
     {

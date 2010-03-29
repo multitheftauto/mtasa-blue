@@ -20,7 +20,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_TIME, SetTime, "SetTime" );
     AddHandler ( SET_WEATHER, SetWeather, "SetWeather" );
     AddHandler ( SET_WEATHER_BLENDED, SetWeatherBlended, "SetWeatherBlended" );
-	AddHandler ( SET_MINUTE_DURATION, SetMinuteDuration, "SetMinuteDuration" );
+    AddHandler ( SET_MINUTE_DURATION, SetMinuteDuration, "SetMinuteDuration" );
     AddHandler ( SET_GRAVITY, SetGravity, "SetGravity" );
     AddHandler ( SET_GAME_SPEED, SetGameSpeed, "SetGameSpeed" );
     AddHandler ( SET_WAVE_HEIGHT, SetWaveHeight, "SetWaveHeight" );
@@ -87,11 +87,11 @@ void CWorldRPCs::SetWeatherBlended ( NetBitStreamInterface& bitStream )
 
 void CWorldRPCs::SetMinuteDuration ( NetBitStreamInterface& bitStream )
 {
-	unsigned long ulDuration;
-	if ( bitStream.Read ( ulDuration ) )
-	{
-		m_pClientGame->SetMinuteDuration ( ulDuration );
-	}
+    unsigned long ulDuration;
+    if ( bitStream.Read ( ulDuration ) )
+    {
+        m_pClientGame->SetMinuteDuration ( ulDuration );
+    }
 }
 
 
@@ -173,17 +173,17 @@ void CWorldRPCs::ResetMapInfo ( NetBitStreamInterface& bitStream )
 
 void CWorldRPCs::SetFPSLimit ( NetBitStreamInterface& bitStream )
 {
-	short sFPSLimit;
-	bitStream.Read ( sFPSLimit );
+    short sFPSLimit;
+    bitStream.Read ( sFPSLimit );
 
     int iVal;
     g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
 
-	if ( iVal > sFPSLimit )
-		// For some reason it needs that kind of hacky precision
-		g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
-	else
-		g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
+    if ( iVal > sFPSLimit )
+        // For some reason it needs that kind of hacky precision
+        g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
+    else
+        g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
 
 }
 
@@ -204,9 +204,9 @@ void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )
 
 void CWorldRPCs::SetGlitchEnabled ( NetBitStreamInterface& bitStream )
 {
-	unsigned char eGlitch;
+    unsigned char eGlitch;
     unsigned char ucIsEnabled;
-	bitStream.Read ( eGlitch );
+    bitStream.Read ( eGlitch );
     bitStream.Read ( ucIsEnabled );
     g_pClientGame->SetGlitchEnabled ( eGlitch, ( ucIsEnabled == 1 ) );
 }

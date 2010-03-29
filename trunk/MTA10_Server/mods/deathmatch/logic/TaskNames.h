@@ -15,7 +15,7 @@
 
 struct sTaskName
 {
-	char		szName[100];
+    char        szName[100];
 };
 
 extern char sNoTaskName [100];

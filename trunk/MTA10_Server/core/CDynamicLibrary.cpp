@@ -87,12 +87,12 @@ bool CDynamicLibrary::Load ( const char* szFilename )
         }
     #else
         m_hModule = dlopen ( szFilename, RTLD_NOW );
-	
-	// Output error if needed
-	if ( !m_hModule )
-	{
-		Print ( "%s\n", dlerror( ) );
-	}
+    
+    // Output error if needed
+    if ( !m_hModule )
+    {
+        Print ( "%s\n", dlerror( ) );
+    }
     #endif
 
     // Return whether we succeeded or not
@@ -132,7 +132,7 @@ FuncPtr_t CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
             return (FuncPtr_t)GetProcAddress ( m_hModule, szProcName );
         #else
             char* szError = NULL;
-	    dlerror ();
+        dlerror ();
 
             FuncPtr_t pFunc = (FuncPtr_t)dlsym ( m_hModule, szProcName );
             if (  ( szError = dlerror () ) != NULL )

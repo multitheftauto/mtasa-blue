@@ -86,8 +86,8 @@ bool CRadarArea::ReadSpecialData ( void )
         m_Color = SColorRGBA ( 255, 0, 0, 255 );
     }
 
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;

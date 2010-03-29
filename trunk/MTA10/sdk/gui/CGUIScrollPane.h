@@ -17,21 +17,21 @@
 class CGUIScrollPane : public CGUIElement
 {
 public:
-    virtual                         ~CGUIScrollPane			( void ) {};
+    virtual                         ~CGUIScrollPane         ( void ) {};
 
-	virtual void					SetHorizontalScrollBar	( bool bEnabled ) = 0;
-	virtual void					SetVerticalScrollBar	( bool bEnabled ) = 0;
+    virtual void                    SetHorizontalScrollBar  ( bool bEnabled ) = 0;
+    virtual void                    SetVerticalScrollBar    ( bool bEnabled ) = 0;
 
-	virtual void					SetHorizontalScrollPosition	( float fPosition ) = 0;
-	virtual float					GetHorizontalScrollPosition	( void ) = 0;
-	virtual void					SetVerticalScrollPosition	( float fPosition ) = 0;
-	virtual float					GetVerticalScrollPosition	( void ) = 0;
+    virtual void                    SetHorizontalScrollPosition ( float fPosition ) = 0;
+    virtual float                   GetHorizontalScrollPosition ( void ) = 0;
+    virtual void                    SetVerticalScrollPosition   ( float fPosition ) = 0;
+    virtual float                   GetVerticalScrollPosition   ( void ) = 0;
 
-	virtual void					SetHorizontalScrollStepSize	( float fPosition ) = 0;
-	virtual float					GetHorizontalScrollStepSize	( void ) = 0;
+    virtual void                    SetHorizontalScrollStepSize ( float fPosition ) = 0;
+    virtual float                   GetHorizontalScrollStepSize ( void ) = 0;
 
-	virtual void					SetVerticalScrollStepSize	( float fPosition ) = 0;
-	virtual float					GetVerticalScrollStepSize	( void ) = 0;
+    virtual void                    SetVerticalScrollStepSize   ( float fPosition ) = 0;
+    virtual float                   GetVerticalScrollStepSize   ( void ) = 0;
 };
 
 #endif

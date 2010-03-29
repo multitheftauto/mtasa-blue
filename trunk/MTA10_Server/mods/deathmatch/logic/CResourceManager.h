@@ -78,9 +78,9 @@ public:
     
     char *                      GetResourceDirectory            ( void );
 
-	bool					    StartResource					( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
+    bool                        StartResource                   ( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                        Reload                          ( CResource* pResource );
-	bool						StopAllResources				( void );
+    bool                        StopAllResources                ( void );
 
     void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueTypebConfigs, const sResourceStartFlags* Flags );
     void                        ProcessQueue                    ( void );
@@ -93,7 +93,7 @@ public:
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
     bool                        Install                         ( char * szURL, char * szName );
 
-	CResource*					CreateResource					( char* szResourceName );
+    CResource*                  CreateResource                  ( char* szResourceName );
     CResource*                  CopyResource                    ( CResource* pSourceResource, const char* szNewResourceName );
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );

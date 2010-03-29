@@ -56,10 +56,10 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
         {
             // Can this user use this command?
             if ( m_pACLManager->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (),
-				                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
-													szKey,
-													CAccessControlListRight::RIGHT_TYPE_COMMAND,
-													!pCommand->IsRestricted () ) )
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                    szKey,
+                                                    CAccessControlListRight::RIGHT_TYPE_COMMAND,
+                                                    !pCommand->IsRestricted () ) )
             {
                 return (*pCommand)( this, szArguments, pClient, pEchoClient );
             }

@@ -18,7 +18,7 @@ CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, int iLuaFunction, bo
     // Init
     m_pMain = pMain;
     m_bDestroyFunction = false;
-	m_iLuaFunction = iLuaFunction;
+    m_iLuaFunction = iLuaFunction;
     m_bPropagated = bPropagated;
     m_bBeingDestroyed = false;
 

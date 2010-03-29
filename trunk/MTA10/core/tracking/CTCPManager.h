@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/tracking/CTCPManager.h
-*  PURPOSE:		Header file for TCP manager class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/tracking/CTCPManager.h
+*  PURPOSE:     Header file for TCP manager class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -25,32 +25,32 @@ class CTCPManager;
 
 class CTCPManager : public CSingleton < CTCPManager >
 {
-	public:
-						CTCPManager					( void );
-						~CTCPManager				( void );
+    public:
+                        CTCPManager                 ( void );
+                        ~CTCPManager                ( void );
 
-    CTCPClientSocket*   CreateClient				( void );
-    CTCPServerSocket*   CreateServer				( void );
+    CTCPClientSocket*   CreateClient                ( void );
+    CTCPServerSocket*   CreateServer                ( void );
 
-    bool                DestroyClient				( CTCPClientSocket* pClient );
-    bool                DestroyServer				( CTCPServerSocket* pServer );
+    bool                DestroyClient               ( CTCPClientSocket* pClient );
+    bool                DestroyServer               ( CTCPServerSocket* pServer );
 
-    const char*         GetLastError				( void );
+    const char*         GetLastError                ( void );
 
-    bool                Initialize					( void );
-    void                Reset						( void );
+    bool                Initialize                  ( void );
+    void                Reset                       ( void );
 
-	void				HandleEvent					( unsigned int uiID, LPARAM lType );
+    void                HandleEvent                 ( unsigned int uiID, LPARAM lType );
 
-	private:
+    private:
 
-	unsigned int		m_uiID;
+    unsigned int        m_uiID;
     bool                m_bInitialized;
     char                m_szLastError[128];
 
-	// Array of CTCP's.. most likely faster than a list
-	// ACHTUNG: Use TCPSocket?
-	CTCPSocket* m_pSocket[255];
+    // Array of CTCP's.. most likely faster than a list
+    // ACHTUNG: Use TCPSocket?
+    CTCPSocket* m_pSocket[255];
 };
 
 #endif

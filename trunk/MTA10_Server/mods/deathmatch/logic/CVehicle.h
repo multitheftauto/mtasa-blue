@@ -28,74 +28,74 @@ class CVehicle;
 #define MAX_VEHICLE_HEALTH 10000
 
 enum eWheelStatus {
-	DT_WHEEL_INTACT=0,
-	DT_WHEEL_BURST,
-	DT_WHEEL_MISSING,
+    DT_WHEEL_INTACT=0,
+    DT_WHEEL_BURST,
+    DT_WHEEL_MISSING,
     DT_WHEEL_INTACT_COLLISIONLESS,
 };
 
 enum eDoorStatus
 {
-	DT_DOOR_INTACT = 0,
-	DT_DOOR_SWINGING_FREE,
-	DT_DOOR_BASHED,
-	DT_DOOR_BASHED_AND_SWINGING_FREE,
-	DT_DOOR_MISSING
+    DT_DOOR_INTACT = 0,
+    DT_DOOR_SWINGING_FREE,
+    DT_DOOR_BASHED,
+    DT_DOOR_BASHED_AND_SWINGING_FREE,
+    DT_DOOR_MISSING
 };
 
 enum eComponentStatus 
 {
-	DT_PANEL_INTACT = 0,
-	DT_PANEL_BASHED,
-	DT_PANEL_BASHED2,
-	DT_PANEL_MISSING
+    DT_PANEL_INTACT = 0,
+    DT_PANEL_BASHED,
+    DT_PANEL_BASHED2,
+    DT_PANEL_MISSING
 };
 
 enum eLightStatus 
 {
-	DT_LIGHT_OK=0,
-	DT_LIGHT_SMASHED
+    DT_LIGHT_OK=0,
+    DT_LIGHT_SMASHED
 };
 
 enum eDoors
 {
-	BONNET = 0,
-	BOOT,
-	FRONT_LEFT_DOOR,
-	FRONT_RIGHT_DOOR,
-	REAR_LEFT_DOOR,
-	REAR_RIGHT_DOOR,
-	MAX_DOORS
+    BONNET = 0,
+    BOOT,
+    FRONT_LEFT_DOOR,
+    FRONT_RIGHT_DOOR,
+    REAR_LEFT_DOOR,
+    REAR_RIGHT_DOOR,
+    MAX_DOORS
 };
 
 enum eWheels
 {
-	FRONT_LEFT_WHEEL = 0,
-	REAR_LEFT_WHEEL,
-	FRONT_RIGHT_WHEEL,
-	REAR_RIGHT_WHEEL,
-	MAX_WHEELS
+    FRONT_LEFT_WHEEL = 0,
+    REAR_LEFT_WHEEL,
+    FRONT_RIGHT_WHEEL,
+    REAR_RIGHT_WHEEL,
+    MAX_WHEELS
 };
 
 enum ePanels
 {
-	FRONT_LEFT_PANEL = 0,
-	FRONT_RIGHT_PANEL,
-	REAR_LEFT_PANEL,
-	REAR_RIGHT_PANEL,
-	WINDSCREEN_PANEL,
-	FRONT_BUMPER,
-	REAR_BUMPER,
-	MAX_PANELS
+    FRONT_LEFT_PANEL = 0,
+    FRONT_RIGHT_PANEL,
+    REAR_LEFT_PANEL,
+    REAR_RIGHT_PANEL,
+    WINDSCREEN_PANEL,
+    FRONT_BUMPER,
+    REAR_BUMPER,
+    MAX_PANELS
 };
 
 enum eLights
 {
-	LEFT_HEADLIGHT = 0,
-	RIGHT_HEADLIGHT,
-	LEFT_TAIL_LIGHT,
-	RIGHT_TAIL_LIGHT,
-	MAX_LIGHTS
+    LEFT_HEADLIGHT = 0,
+    RIGHT_HEADLIGHT,
+    LEFT_TAIL_LIGHT,
+    RIGHT_TAIL_LIGHT,
+    MAX_LIGHTS
 };
 
 enum eVehicleType
@@ -199,9 +199,9 @@ public:
     unsigned char                   GetMaxPassengers        ( void );
     unsigned char                   GetFreePassengerSeat    ( void );
 
-	inline void						SetMaxPassengers		( unsigned char ucPassengers )	{ m_ucMaxPassengersOverride = ucPassengers; };
+    inline void                     SetMaxPassengers        ( unsigned char ucPassengers )  { m_ucMaxPassengersOverride = ucPassengers; };
 
-	inline CVehicleUpgrades*		GetUpgrades				( void )						{ return m_pUpgrades; }
+    inline CVehicleUpgrades*        GetUpgrades             ( void )                        { return m_pUpgrades; }
     void                            SetUpgrades             ( CVehicleUpgrades* pUpgrades );
 
     inline unsigned char            GetOverrideLights       ( void )                        { return m_ucOverrideLights; }
@@ -296,13 +296,13 @@ private:
     unsigned long                   m_ulBlowTime;
     unsigned long                   m_ulIdleTime;
 
-	unsigned char					m_ucMaxPassengersOverride;
+    unsigned char                   m_ucMaxPassengersOverride;
 
     CVehicleColor                   m_Color;
 
     bool                            m_bIsFrozen;    
 
-	CVehicleUpgrades*				m_pUpgrades;
+    CVehicleUpgrades*               m_pUpgrades;
 
     unsigned char                   m_ucOverrideLights;
 

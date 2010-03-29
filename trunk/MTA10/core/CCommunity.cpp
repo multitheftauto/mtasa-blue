@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCommunity.cpp
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCommunity.cpp
 *  PURPOSE:     Community connector class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
@@ -18,15 +18,15 @@ extern CCore* g_pCore;
 template<> CCommunity * CSingleton< CCommunity >::m_pSingleton = NULL;
 
 char *szVerificationMessages[] = {
-	"Unexpected error",
-	"Success",
+    "Unexpected error",
+    "Success",
     "Your account does not seem to exist",
-	"Computer already in use",
-	"You have reached your serials quota",
-	"Invalid username/password",
-	"Account provided is already in use",
-	"Version error",
-	"Account is banned",
+    "Computer already in use",
+    "You have reached your serials quota",
+    "Invalid username/password",
+    "Account provided is already in use",
+    "Version error",
+    "Account is banned",
     "Serial is banned",
     "Could not connect to master server"
 };

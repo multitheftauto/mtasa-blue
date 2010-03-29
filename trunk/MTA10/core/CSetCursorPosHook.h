@@ -23,24 +23,24 @@ typedef BOOL ( WINAPI * pSetCursorPos ) ( int X, int Y );
 class CSetCursorPosHook : public CSetCursorPosHookInterface, public CSingleton < CSetCursorPosHook > 
 {
     public:
-	                    CSetCursorPosHook       ( void );
-	                   ~CSetCursorPosHook       ( void );
+                        CSetCursorPosHook       ( void );
+                       ~CSetCursorPosHook       ( void );
 
-	void                ApplyHook               ( void );
-	void                RemoveHook              ( void );
+    void                ApplyHook               ( void );
+    void                RemoveHook              ( void );
 
-	void                DisableSetCursorPos     ( void );
-	void                EnableSetCursorPos      ( void );
-	bool                IsSetCursorPosEnabled   ( void );
+    void                DisableSetCursorPos     ( void );
+    void                EnableSetCursorPos      ( void );
+    bool                IsSetCursorPosEnabled   ( void );
 
-	BOOL                CallSetCursorPos        ( int X, int Y );
+    BOOL                CallSetCursorPos        ( int X, int Y );
 
-	static BOOL WINAPI  API_SetCursorPos        ( int X, int Y );
+    static BOOL WINAPI  API_SetCursorPos        ( int X, int Y );
 
     private:
 
-	bool            m_bCanCall;
-	pSetCursorPos   m_pfnSetCursorPos;
+    bool            m_bCanCall;
+    pSetCursorPos   m_pfnSetCursorPos;
 };
 
 #endif

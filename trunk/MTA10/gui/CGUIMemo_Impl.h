@@ -35,7 +35,7 @@ public:
     float       GetScrollbarDocumentSize    ( void );
     float       GetScrollbarPageSize        ( void );
 
-    void		EnsureCaratIsVisible    ( void );
+    void        EnsureCaratIsVisible    ( void );
 
     bool        ActivateOnTab           ( void );
 
@@ -49,7 +49,7 @@ private:
     bool        Event_TextChanged       ( const CEGUI::EventArgs& e );
     bool        Event_OnKeyDown         ( const CEGUI::EventArgs& e );
 
-    GUI_CALLBACK	m_TextChanged;
+    GUI_CALLBACK    m_TextChanged;
 };
 
 #endif

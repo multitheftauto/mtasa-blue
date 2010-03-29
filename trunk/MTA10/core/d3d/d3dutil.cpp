@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/d3d/d3dfont.cpp
-*  PURPOSE:		Shortcut macros and functions for using DX objects
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/d3d/d3dfont.cpp
+*  PURPOSE:     Shortcut macros and functions for using DX objects
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

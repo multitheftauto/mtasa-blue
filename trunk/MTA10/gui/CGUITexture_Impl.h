@@ -36,9 +36,9 @@ public:
 
     CEGUI::Texture*     GetTexture              ( void );
     void                SetTexture              ( CEGUI::Texture* pTexture );
-	LPDIRECT3DTEXTURE9	GetD3DTexture			( void );
+    LPDIRECT3DTEXTURE9  GetD3DTexture           ( void );
 
-	void				CreateTexture			( unsigned int width, unsigned int height );
+    void                CreateTexture           ( unsigned int width, unsigned int height );
 
 private:
     CEGUI::Renderer*    m_pRenderer;

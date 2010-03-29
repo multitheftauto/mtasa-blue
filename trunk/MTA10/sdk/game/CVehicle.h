@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CVehicle.h
-*  PURPOSE:		Vehicle entity interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CVehicle.h
+*  PURPOSE:     Vehicle entity interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -42,9 +42,9 @@ public:
 
     virtual bool                AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
     
- 	virtual CPed*               GetDriver                   () = 0;
+    virtual CPed*               GetDriver                   () = 0;
     virtual CPed*               GetPassenger                ( unsigned char ucSlot ) = 0;
-	virtual bool                IsBeingDriven               () = 0;
+    virtual bool                IsBeingDriven               () = 0;
 
     virtual CVehicle *          GetNextTrainCarriage        () = 0;
     virtual void                SetNextTrainCarriage        ( CVehicle * next ) = 0;
@@ -65,7 +65,7 @@ public:
     virtual bool                CanPedEnterCar              () = 0;
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;
     virtual void                AddVehicleUpgrade           ( DWORD dwModelID ) = 0;
-	virtual void				RemoveVehicleUpgrade        ( DWORD dwModelID ) = 0;
+    virtual void                RemoveVehicleUpgrade        ( DWORD dwModelID ) = 0;
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
@@ -94,15 +94,15 @@ public:
     virtual bool                IsUpsideDown                () = 0;
     virtual void                MakeDirty                   ( CColPoint* pPoint ) = 0;
 
-    virtual bool				IsEngineBroken              () = 0;
-    virtual void				SetEngineBroken             ( bool bEngineBroken ) = 0;
+    virtual bool                IsEngineBroken              () = 0;
+    virtual void                SetEngineBroken             ( bool bEngineBroken ) = 0;
     virtual bool                IsScriptLocked              () = 0;
-	virtual void				SetScriptLocked             ( bool bLocked ) = 0;
+    virtual void                SetScriptLocked             ( bool bLocked ) = 0;
 
-	virtual void                PlaceBikeOnRoadProperly     () = 0;
-	virtual void                PlaceAutomobileOnRoadProperly() = 0;
-	virtual void                SetColor                    ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 ) = 0;
-	virtual void                GetColor                    ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 ) = 0;
+    virtual void                PlaceBikeOnRoadProperly     () = 0;
+    virtual void                PlaceAutomobileOnRoadProperly() = 0;
+    virtual void                SetColor                    ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 ) = 0;
+    virtual void                GetColor                    ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 ) = 0;
     virtual void                Fix                         () = 0;
     virtual bool                IsSirenOrAlarmActive        () = 0;
     virtual void                SetSirenOrAlarmActive       ( bool bActive ) = 0;
@@ -113,7 +113,7 @@ public:
     virtual void                BlowUp                      ( CEntity* pCreator, unsigned long ulUnknown ) = 0;
     virtual void                BlowUpCutSceneNoExtras      ( unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4 ) = 0;
 
-    virtual CDamageManager		* GetDamageManager          () = 0;
+    virtual CDamageManager      * GetDamageManager          () = 0;
     virtual void                FadeOut                     ( bool bFadeOut ) = 0;
     virtual bool                IsFadingOut                 () = 0;
 
@@ -167,7 +167,7 @@ public:
     virtual void                SetTyresDontBurst                       ( bool bTyresDontBurst ) = 0;
     virtual void                SetAdjustablePropertyValue              ( unsigned short usAdjustableProperty ) = 0;
     virtual void                SetHeliRotorSpeed                       ( float fSpeed ) = 0;
-    virtual void                SetTaxiLightOn              	        ( bool bLightState ) = 0;
+    virtual void                SetTaxiLightOn                          ( bool bLightState ) = 0;
     virtual void                SetExplodeTime                          ( unsigned long ulTime ) = 0;
 
     virtual CHandlingEntry*     GetHandlingData                         () = 0;
@@ -180,16 +180,16 @@ public:
 
     virtual class CVehicleSAInterface*  GetVehicleInterface             () = 0;
 
-	
-	virtual float                GetHealth                              () = 0;
-	virtual void                 SetHealth                              ( float fHealth ) = 0;
-	virtual void                 SetLandingGearDown                     ( bool bLandingGearDown ) = 0;
-	virtual float                GetLandingGearPosition                 () = 0;
-	virtual bool                 IsLandingGearDown                      () = 0;
+    
+    virtual float                GetHealth                              () = 0;
+    virtual void                 SetHealth                              ( float fHealth ) = 0;
+    virtual void                 SetLandingGearDown                     ( bool bLandingGearDown ) = 0;
+    virtual float                GetLandingGearPosition                 () = 0;
+    virtual bool                 IsLandingGearDown                      () = 0;
     virtual void                 SetLandingGearPosition                 ( float fPosition ) = 0;
 
-	virtual void                 GetTurretRotation                      ( float * fHorizontal, float * fVertical ) = 0;
-	virtual void                 SetTurretRotation                      ( float fHorizontal, float fVertical ) = 0;
+    virtual void                 GetTurretRotation                      ( float * fHorizontal, float * fVertical ) = 0;
+    virtual void                 SetTurretRotation                      ( float fHorizontal, float fVertical ) = 0;
 
     virtual unsigned char        GetNumberGettingIn                     () = 0;
     virtual unsigned char        GetPassengerCount                      () = 0;
@@ -213,7 +213,7 @@ public:
     virtual CColModel*           GetSpecialColModel                     ( void ) = 0;
     virtual bool                 UpdateMovingCollision                  ( float fAngle ) = 0;
 
-	virtual void				 UpdateHandlingStatus					( void ) = 0;
+    virtual void                 UpdateHandlingStatus                   ( void ) = 0;
 };
 
 #endif

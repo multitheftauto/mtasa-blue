@@ -28,37 +28,37 @@ extern CGameSA * pGame;
 class CWeaponSAInterface
 {
 public:
-	eWeaponType		m_eWeaponType;
-	eWeaponState	m_eState;
-	DWORD			m_nAmmoInClip;
-	DWORD			m_nAmmoTotal;
-	DWORD			m_nTimer;
-	DWORD			m_Unknown;
+    eWeaponType     m_eWeaponType;
+    eWeaponState    m_eState;
+    DWORD           m_nAmmoInClip;
+    DWORD           m_nAmmoTotal;
+    DWORD           m_nTimer;
+    DWORD           m_Unknown;
     DWORD           m_Unknown_2;
 };
 
 class CWeaponSA : public CWeapon
 {
 private:
-	CWeaponSAInterface		* internalInterface;
-	CPed					* owner;
-	eWeaponSlot 			m_weaponSlot;
+    CWeaponSAInterface      * internalInterface;
+    CPed                    * owner;
+    eWeaponSlot             m_weaponSlot;
 public:
-	CWeaponSA(CWeaponSAInterface * weaponInterface, CPed * ped, eWeaponSlot weaponSlot);
-	eWeaponType		GetType(  );
-	VOID			SetType( eWeaponType type );
-	eWeaponState	GetState(  );
+    CWeaponSA(CWeaponSAInterface * weaponInterface, CPed * ped, eWeaponSlot weaponSlot);
+    eWeaponType     GetType(  );
+    VOID            SetType( eWeaponType type );
+    eWeaponState    GetState(  );
     void            SetState ( eWeaponState state );
-	DWORD			GetAmmoInClip(  );
-	VOID			SetAmmoInClip( DWORD dwAmmoInClip );
-	DWORD			GetAmmoTotal(  );
-	VOID			SetAmmoTotal( DWORD dwAmmoTotal );
-	
-	CPed			* GetPed();
-	eWeaponSlot		GetSlot();
+    DWORD           GetAmmoInClip(  );
+    VOID            SetAmmoInClip( DWORD dwAmmoInClip );
+    DWORD           GetAmmoTotal(  );
+    VOID            SetAmmoTotal( DWORD dwAmmoTotal );
+    
+    CPed            * GetPed();
+    eWeaponSlot     GetSlot();
 
-	VOID			SetAsCurrentWeapon();
-	CWeaponInfo		* GetInfo() { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType); };
+    VOID            SetAsCurrentWeapon();
+    CWeaponInfo     * GetInfo() { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType); };
 
     void            Remove ();
 };

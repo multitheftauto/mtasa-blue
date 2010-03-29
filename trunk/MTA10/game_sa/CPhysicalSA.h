@@ -20,26 +20,26 @@
 #include "CEntitySA.h"
 #include <CVector.h>
 
-#define FUNC_GetMoveSpeed						0x404460
-#define FUNC_GetTurnSpeed						0x470030
-#define FUNC_ProcessCollision					0x54DFB0
+#define FUNC_GetMoveSpeed                       0x404460
+#define FUNC_GetTurnSpeed                       0x470030
+#define FUNC_ProcessCollision                   0x54DFB0
 #define FUNC_AttachEntityToEntity               0x54D570
 #define FUNC_DetatchEntityFromEntity            0x5442F0
 
-#define PHYSICAL_MAXNOOFCOLLISIONRECORDS		6
+#define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
 
 class CPhysicalSAInterface : public CEntitySAInterface // begin +68 (244 bytes total?)
 {
 public:
 /* IMPORTANT: KEEP "pad" in CVehicle UP-TO-DATE if you add something here (or eventually pad someplace else) */
-	CVector * vecVelocity;
-	CVector * vecSpin;
-	CVector * vecUnk3;
-	CVector * vecUnk4;
-	CVector * vecUnk5;
-	CVector * vecUnk6;
+    CVector * vecVelocity;
+    CVector * vecSpin;
+    CVector * vecUnk3;
+    CVector * vecUnk4;
+    CVector * vecUnk5;
+    CVector * vecUnk6;
     float pad [12];
-	float fMass;
+    float fMass;
     float fTurnMass;
 
     DWORD dwUnk; // 148
@@ -64,7 +64,7 @@ public:
     CEntitySAInterface * damageEntity; // 220
 
     BYTE pad2[28];
-	CEntitySAInterface * pAttachedEntity;   // 252
+    CEntitySAInterface * pAttachedEntity;   // 252
     CVector vecAttachedPosition;    // 256
     CVector vecAttachedRotation;    // 268
     BYTE pad3[20];  // 280
@@ -76,10 +76,10 @@ public:
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {
 public:
-	CVector	*   GetMoveSpeed                ( CVector * vecMoveSpeed );
-	CVector	*   GetTurnSpeed                ( CVector * vecTurnSpeed );
-	VOID		SetMoveSpeed                ( CVector * vecMoveSpeed );
-	VOID		SetTurnSpeed                ( CVector * vecTurnSpeed );
+    CVector *   GetMoveSpeed                ( CVector * vecMoveSpeed );
+    CVector *   GetTurnSpeed                ( CVector * vecTurnSpeed );
+    VOID        SetMoveSpeed                ( CVector * vecMoveSpeed );
+    VOID        SetTurnSpeed                ( CVector * vecTurnSpeed );
 
     float       GetMass                     ( void );
     void        SetMass                     ( float fMass );
@@ -90,7 +90,7 @@ public:
     float       GetBuoyancyConstant         ( void );
     void        SetBuoyancyConstant         ( float fBuoyancyConstant );
 
-	VOID		ProcessCollision            ( void );
+    VOID        ProcessCollision            ( void );
 
     float       GetDamageImpulseMagnitude   ( void );
     void        SetDamageImpulseMagnitude   ( float fMagnitude );
@@ -106,29 +106,29 @@ public:
 
     virtual bool InternalAttachEntityToEntity ( DWORD dwEntityInterface, const CVector * vecPosition, const CVector * vecRotation );
 
-	float       GetLighting                 ( void );
+    float       GetLighting                 ( void );
     void        SetLighting                 ( float fLighting );
 
     /*
-	VOID		SetMassMultiplier(FLOAT fMassMultiplier);
-	FLOAT		GetMassMultiplier();
-	VOID		SetAirResistance(FLOAT fAirResistance);
-	FLOAT		GetAirResistance();
-	VOID		SetCenterOfMass(CVector * vecCenterOfMass);
-	CVector	* GetCenterOfMass();
+    VOID        SetMassMultiplier(FLOAT fMassMultiplier);
+    FLOAT       GetMassMultiplier();
+    VOID        SetAirResistance(FLOAT fAirResistance);
+    FLOAT       GetAirResistance();
+    VOID        SetCenterOfMass(CVector * vecCenterOfMass);
+    CVector * GetCenterOfMass();
 
-	BOOL		GetExtraHeavy();
-	VOID		SetExtraHeavy(BOOL bExtraHeavy);
-	BOOL		GetDoGravity();
-	VOID		SetDoGravity(BOOL bDoGravity);
-	BOOL		GetInfiniteMass();
-	VOID		SetInfiniteMass(BOOL bInfiniteMass);
-	BOOL		GetPositionFrozen();
-	VOID		SetPositionFrozen(BOOL bPositionFrozen);
-	BYTE		GetLastMaterialToHaveBeenStandingOn();
+    BOOL        GetExtraHeavy();
+    VOID        SetExtraHeavy(BOOL bExtraHeavy);
+    BOOL        GetDoGravity();
+    VOID        SetDoGravity(BOOL bDoGravity);
+    BOOL        GetInfiniteMass();
+    VOID        SetInfiniteMass(BOOL bInfiniteMass);
+    BOOL        GetPositionFrozen();
+    VOID        SetPositionFrozen(BOOL bPositionFrozen);
+    BYTE        GetLastMaterialToHaveBeenStandingOn();
 
-	BYTE		GetLevel();
-	VOID		SetLevel(BYTE LivesInThisLevel);*/
+    BYTE        GetLevel();
+    VOID        SetLevel(BYTE LivesInThisLevel);*/
 
 };
 

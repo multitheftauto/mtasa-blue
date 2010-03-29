@@ -15,11 +15,11 @@
 
 CQuadBikeSA::CQuadBikeSA( CQuadBikeSAInterface * quadbike ):CAutomobileSA( quadbike )
 {
-	DEBUG_TRACE("CQuadBikeSA::CQuadBikeSA( CQuadBikeSAInterface * quadbike )");
-	this->m_pInterface = quadbike;
+    DEBUG_TRACE("CQuadBikeSA::CQuadBikeSA( CQuadBikeSAInterface * quadbike )");
+    this->m_pInterface = quadbike;
 }
 
 CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID ):CAutomobileSA( dwModelID )
 {
-	DEBUG_TRACE("CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
+    DEBUG_TRACE("CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 }

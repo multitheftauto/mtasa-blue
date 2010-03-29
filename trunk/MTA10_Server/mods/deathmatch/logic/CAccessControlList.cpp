@@ -16,9 +16,9 @@
 
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
-	m_szACLName[0] = '\0';
+    m_szACLName[0] = '\0';
     _snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
-	m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
+    m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
 
     m_pACLManager = pACLManager;
 }
@@ -71,19 +71,19 @@ bool CAccessControlList::RemoveRight ( const char* szRightName, CAccessControlLi
 {
     unsigned int uiHash = HashString ( szRightName );
 
-	list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
-	for ( ; iter != m_Rights.end (); iter++ )
-	{
-		CAccessControlListRight* pACLRight = *iter;
-		if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType () )
-		{
-			m_Rights.remove ( pACLRight );
-			delete pACLRight;
-			return true;
-		}
-	}
+    list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
+    for ( ; iter != m_Rights.end (); iter++ )
+    {
+        CAccessControlListRight* pACLRight = *iter;
+        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType () )
+        {
+            m_Rights.remove ( pACLRight );
+            delete pACLRight;
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
@@ -100,10 +100,10 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
     pAttribute->SetValue ( m_szACLName );
 
     // Loop through each right and write it to the ACL
-	list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
-	for ( ; iter != m_Rights.end (); iter++ )
-	{
-		CAccessControlListRight* pRight = *iter;
+    list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
+    for ( ; iter != m_Rights.end (); iter++ )
+    {
+        CAccessControlListRight* pRight = *iter;
 
         // Find out the right type string
         char szRightType [255];
@@ -145,6 +145,6 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
             pAttribute->SetValue ( "true" );
         else
             pAttribute->SetValue ( "false" );
-	}
+    }
 }
 

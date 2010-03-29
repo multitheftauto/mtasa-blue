@@ -32,20 +32,20 @@ bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, in
     assert ( pLuaMain );
     assert ( szKey );
 
-	// Check if we already have this key and handler
-	SCommand* pCommand = GetCommand ( szKey, pLuaMain );
-	if ( pCommand )
-	{
-		if ( pCommand->iLuaFunction == iLuaFunction )
-			return false;
-	}
+    // Check if we already have this key and handler
+    SCommand* pCommand = GetCommand ( szKey, pLuaMain );
+    if ( pCommand )
+    {
+        if ( pCommand->iLuaFunction == iLuaFunction )
+            return false;
+    }
 
     // Create the entry
     pCommand = new SCommand;
     pCommand->pLuaMain = pLuaMain;
     strncpy ( pCommand->szKey, szKey, MAX_REGISTERED_COMMAND_LENGTH );
     pCommand->szKey [MAX_REGISTERED_COMMAND_LENGTH] = 0;
-	pCommand->iLuaFunction = iLuaFunction;
+    pCommand->iLuaFunction = iLuaFunction;
     pCommand->bCaseSensitive = bCaseSensitive;
 
     // Add it to our list
@@ -60,7 +60,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
     assert ( szKey );
 
     // Call the handler for every virtual machine that matches the given key
-	bool bFound = false;
+    bool bFound = false;
     list < SCommand* > ::iterator iter = m_Commands.begin ();
     int iCompareResult;
 
@@ -84,11 +84,11 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
             {
                 delete *iter;
                 m_Commands.erase ( iter );
-			    iter = m_Commands.begin ();
+                iter = m_Commands.begin ();
                 continue;
             }
         }
-		iter++;
+        iter++;
     }
 
     return bFound;

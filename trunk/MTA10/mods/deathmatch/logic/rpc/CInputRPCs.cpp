@@ -24,7 +24,7 @@ void CInputRPCs::LoadFunctions ( void )
     AddHandler ( SET_CONTROL_STATE, SetControlState, "SetControlState" );
     AddHandler ( FORCE_RECONNECT, ForceReconnect, "ForceReconnect" );
     AddHandler ( SHOW_CURSOR, ShowCursor, "ShowCursor" );
-	AddHandler ( SHOW_CHAT, ShowChat, "ShowChat" );
+    AddHandler ( SHOW_CHAT, ShowChat, "ShowChat" );
 }
 
 
@@ -37,7 +37,7 @@ void CInputRPCs::BindKey ( NetBitStreamInterface& bitStream )
         if ( bitStream.Read ( ucKeyLength ) )
         {
             char* szKey = new char [ ucKeyLength + 1 ];            
-			szKey [ ucKeyLength ] = NULL;
+            szKey [ ucKeyLength ] = NULL;
 
             unsigned char ucKeyState;
             if ( bitStream.Read ( szKey, ucKeyLength ) && bitStream.Read ( ucKeyState ) )
@@ -79,7 +79,7 @@ void CInputRPCs::BindCommand ( NetBitStreamInterface& bitStream )
         if ( bitStream.Read ( ucLength ) )
         {
             char* szKey = new char [ ucLength + 1 ];            
-			szKey [ ucLength ] = NULL;
+            szKey [ ucLength ] = NULL;
             bitStream.Read ( szKey, ucLength );
 
             const char* szHitState;
@@ -89,17 +89,17 @@ void CInputRPCs::BindCommand ( NetBitStreamInterface& bitStream )
 
             bitStream.Read ( ucLength );
             char* szCommandName = new char [ ucLength + 1 ];            
-			szCommandName [ ucLength ] = NULL;
+            szCommandName [ ucLength ] = NULL;
             bitStream.Read ( szCommandName, ucLength );
 
             bitStream.Read ( ucLength );
             char* szArguments = new char [ ucLength + 1 ];            
-			szArguments [ ucLength ] = NULL;
+            szArguments [ ucLength ] = NULL;
             bitStream.Read ( szArguments, ucLength );
 
             bitStream.Read ( ucLength );
             char* szResource = new char [ ucLength + 1 ];            
-			szResource [ ucLength ] = NULL;
+            szResource [ ucLength ] = NULL;
             bitStream.Read ( szResource, ucLength );
 
             CStaticFunctionDefinitions::BindKey ( szKey, szHitState, szCommandName, szArguments, szResource );
@@ -121,11 +121,11 @@ void CInputRPCs::UnbindKey ( NetBitStreamInterface& bitStream )
         if ( bitStream.Read ( ucKeyLength ) )
         {
             char* szKey = new char [ ucKeyLength + 1 ];
-			szKey [ ucKeyLength ] = NULL;
+            szKey [ ucKeyLength ] = NULL;
 
             unsigned char ucKeyState;
             if ( bitStream.Read ( szKey, ucKeyLength ) && bitStream.Read ( ucKeyState ) )
-			{
+            {
                 bool bState = ( ucKeyState == 1 );
                 const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
                 if ( pKey )
@@ -155,7 +155,7 @@ void CInputRPCs::UnbindCommand ( NetBitStreamInterface& bitStream )
         if ( bitStream.Read ( ucLength ) )
         {
             char* szKey = new char [ ucLength + 1 ];            
-			szKey [ ucLength ] = NULL;
+            szKey [ ucLength ] = NULL;
             bitStream.Read ( szKey, ucLength );
 
             const char* szHitState;
@@ -165,12 +165,12 @@ void CInputRPCs::UnbindCommand ( NetBitStreamInterface& bitStream )
 
             bitStream.Read ( ucLength );
             char* szCommandName = new char [ ucLength + 1 ];            
-			szCommandName [ ucLength ] = NULL;
+            szCommandName [ ucLength ] = NULL;
             bitStream.Read ( szCommandName, ucLength );
 
             bitStream.Read ( ucLength );
             char* szResource = new char [ ucLength + 1 ];            
-			szResource [ ucLength ] = NULL;
+            szResource [ ucLength ] = NULL;
             bitStream.Read ( szResource, ucLength );
 
             CStaticFunctionDefinitions::UnbindKey ( szKey, szHitState, szCommandName, szResource );
@@ -188,7 +188,7 @@ void CInputRPCs::ToggleControl ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucControlLength ) )
     {
         char* szControl = new char [ ucControlLength + 1 ];
-		szControl [ ucControlLength ] = NULL;
+        szControl [ ucControlLength ] = NULL;
 
         unsigned char ucEnabled;
         if ( bitStream.Read ( szControl, ucControlLength ) && bitStream.Read ( ucEnabled ) )
@@ -221,7 +221,7 @@ void CInputRPCs::SetControlState ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucControlLength ) )
     {
         char* szControl = new char [ ucControlLength + 1 ];
-		szControl [ ucControlLength ] = NULL;
+        szControl [ ucControlLength ] = NULL;
 
         unsigned char ucState;
         if ( bitStream.Read ( szControl, ucControlLength ) && bitStream.Read ( ucState ) )
@@ -252,7 +252,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucHost ) )
     {
         char* szHost = new char [ ucHost + 1 ];
-		szHost [ ucHost ] = NULL;
+        szHost [ ucHost ] = NULL;
 
         bitStream.Read ( szHost, ucHost );
 
@@ -261,7 +261,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
             if ( bitStream.Read ( ucPassword ) )
             {
                 char* szPassword = new char [ ucPassword + 1 ];
-		        szPassword [ ucPassword ] = NULL;
+                szPassword [ ucPassword ] = NULL;
 
                 bitStream.Read ( szPassword, ucPassword );
 
@@ -301,6 +301,6 @@ void CInputRPCs::ShowChat ( NetBitStreamInterface& bitStream )
     unsigned char ucShow;
     if ( bitStream.Read ( ucShow ) )
     {
-		g_pCore->SetChatVisible ( ucShow == 1 );
+        g_pCore->SetChatVisible ( ucShow == 1 );
     }
 }

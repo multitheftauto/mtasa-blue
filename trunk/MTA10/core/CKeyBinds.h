@@ -71,7 +71,7 @@ public:
     bool                    AddGTAControl               ( const char* szKey, eControllerAction action );
     bool                    AddGTAControl               ( const SBindableKey* pKey, SBindableGTAControl* pControl );
     bool                    RemoveGTAControl            ( const char* szKey, const char* szControl );
-	void					RemoveGTAControls		    ( const char* szControl, bool bDestroy = true );
+    void                    RemoveGTAControls           ( const char* szControl, bool bDestroy = true );
     bool                    RemoveAllGTAControls        ( const char* szKey );
     bool                    RemoveAllGTAControls        ( void );
     bool                    GTAControlExists            ( const char* szKey, const char* szControl );
@@ -110,8 +110,8 @@ public:
     bool                    ControlFunctionExists       ( SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true );
 
     // Key/code funcs
-    char*					GetKeyFromCode              ( unsigned long ulCode );
-    bool					GetCodeFromKey              ( const char* szKey, unsigned long& ucCode );
+    char*                   GetKeyFromCode              ( unsigned long ulCode );
+    bool                    GetCodeFromKey              ( const char* szKey, unsigned long& ucCode );
     const SBindableKey*     GetBindableFromKey          ( const char* szKey );
     const SBindableKey*     GetBindableFromGTARelative  ( int iGTAKey );
     bool                    IsKey                       ( const char* szKey );

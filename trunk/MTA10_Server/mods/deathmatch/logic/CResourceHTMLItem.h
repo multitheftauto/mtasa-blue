@@ -33,14 +33,14 @@ public:
     ResponseCode                        Request                         ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, class CAccount * account );
     bool                                AppendToPageBuffer              ( const char * szText, size_t length=0 );
 
-	void								SetResponseHeader				( const char* szHeaderName, const char* szHeaderValue );
-	void								SetResponseCode					( int responseCode );
-	void								SetResponseCookie				( const char* szCookieName, const char* szCookieValue );
-	void								ClearPageBuffer					( void );
+    void                                SetResponseHeader               ( const char* szHeaderName, const char* szHeaderValue );
+    void                                SetResponseCode                 ( int responseCode );
+    void                                SetResponseCookie               ( const char* szCookieName, const char* szCookieValue );
+    void                                ClearPageBuffer                 ( void );
 
     inline bool                         IsDefaultPage                   ( void ) { return m_bDefault; }
     inline void                         SetDefaultPage                  ( bool bDefault ) { m_bDefault = bDefault; }
-	inline bool							IsRestricted					( void ) { return m_bRestricted; };
+    inline bool                         IsRestricted                    ( void ) { return m_bRestricted; };
 
 private:
     inline char                         ReadChar                        ( FILE * pFile ) { return (unsigned char)fgetc ( pFile ); }
@@ -52,10 +52,10 @@ private:
     std::string                         m_strPageBuffer;     // contains what we're sending
     bool                                m_bDefault;          // is this the default page for this resource?
     std::string                         m_strMime;
-	bool								m_bRestricted;
+    bool                                m_bRestricted;
 
-    ResponseCode						m_responseCode;
-    HttpResponse *						m_currentResponse;
+    ResponseCode                        m_responseCode;
+    HttpResponse *                      m_currentResponse;
 };
 
 #endif

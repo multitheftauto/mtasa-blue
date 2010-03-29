@@ -53,7 +53,7 @@ enum eClientEntityType
     CCLIENTVEHICLE,
     CCLIENTRADARMARKER,
     CCLIENTOBJECT,
-	CCLIENTCIVILIAN,
+    CCLIENTCIVILIAN,
     CCLIENTPICKUP,
     CCLIENTRADARAREA,
     CCLIENTMARKER,
@@ -62,7 +62,7 @@ enum eClientEntityType
     CCLIENTTEAM,
     CCLIENTPED,
     CCLIENTPROJECTILE,
-	CCLIENTGUI,
+    CCLIENTGUI,
     CCLIENTSPAWNPOINT_DEPRECATED,
     CCLIENTCOLSHAPE,
     CCLIENTDUMMY, // anything user-defined
@@ -96,7 +96,7 @@ public:
     static inline int                           GetInstanceCount        ( void )                    { return iCount; };
 
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
-	inline bool									IsLocalEntity    		( void )					{ return m_ID >= MAX_SERVER_ELEMENTS; };
+    inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
 
     // System entity? A system entity means it can't be removed by the server
     // or the client scripts.
@@ -116,7 +116,7 @@ public:
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
     inline char*                                GetName                 ( void )                    { return m_szName; };
-	inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
+    inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
 
     inline const char*                          GetTypeName             ( void )                    { return m_szTypeName; };
     inline unsigned int                         GetTypeHash             ( void )                    { return m_uiTypeHash; };
@@ -153,7 +153,7 @@ public:
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
     virtual void                                SetPosition             ( const CVector& vecPosition ) = 0;
     void                                        SetPositionRelative     ( CClientEntity * pOrigin, const CVector& vecPosition );
-	virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
+    virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
 
     virtual inline unsigned short               GetDimension            ( void )                        { return m_usDimension; }
     virtual void                                SetDimension            ( unsigned short usDimension ) { m_usDimension = usDimension; }
@@ -164,7 +164,7 @@ public:
     inline CModelInfo*                          GetModelInfo            ( void )                        { return m_pModelInfo; };
     
     inline CClientEntity*                       GetAttachedTo           ( void )                        { return m_pAttachedToEntity; }
-    virtual void								AttachTo                ( CClientEntity * pEntity );
+    virtual void                                AttachTo                ( CClientEntity * pEntity );
     virtual void                                GetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
     virtual void                                SetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
     inline void                                 AddAttachedEntity       ( CClientEntity* pEntity )      { m_AttachedEntities.push_back ( pEntity ); }

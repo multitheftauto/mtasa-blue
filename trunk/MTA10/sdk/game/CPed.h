@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CPed.h
-*  PURPOSE:		Ped entity interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CPed.h
+*  PURPOSE:     Ped entity interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -146,17 +146,17 @@ public:
 
     virtual class CPedSAInterface * GetPedInterface ( void ) = 0;
 
-	virtual void			AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;
+    virtual void            AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;
     virtual void            DetachPedFromEntity ( void )=0;
 
-	virtual bool			CanSeeEntity(CEntity * entity, FLOAT fDistance)=0;
-	virtual CVehicle		* GetVehicle()=0;
-	virtual void			Respawn (CVector * position,bool bCameraCut)=0;
+    virtual bool            CanSeeEntity(CEntity * entity, FLOAT fDistance)=0;
+    virtual CVehicle        * GetVehicle()=0;
+    virtual void            Respawn (CVector * position,bool bCameraCut)=0;
 
     virtual void            SetModelIndex       ( unsigned long ulModel ) = 0;
 
-	virtual FLOAT			GetHealth ()=0;
-    virtual void			SetHealth ( float fHealth )=0;
+    virtual FLOAT           GetHealth ()=0;
+    virtual void            SetHealth ( float fHealth )=0;
     virtual float           GetArmor () = 0;
     virtual void            SetArmor ( float fArmor ) = 0;
     virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
@@ -167,17 +167,17 @@ public:
     virtual void            RemoveWeaponModel ( int iModel ) = 0;
     virtual void            ClearWeapon     ( eWeaponType weaponType )=0;
 
-	virtual void			SetIsStanding( bool bStanding )=0;
-	virtual DWORD			GetType ()=0;
-	virtual CPedIntelligence *  GetPedIntelligence()=0;
+    virtual void            SetIsStanding( bool bStanding )=0;
+    virtual DWORD           GetType ()=0;
+    virtual CPedIntelligence *  GetPedIntelligence()=0;
     virtual CPedSound *         GetPedSound () = 0;
     virtual DWORD *         GetMemoryValue ( DWORD dwOffset )=0;
 
 
-	virtual FLOAT		    GetCurrentRotation()=0;
-	virtual FLOAT		    GetTargetRotation()=0;
-	virtual void		    SetCurrentRotation(FLOAT fRotation)=0;
-	virtual void		    SetTargetRotation(FLOAT fRotation)=0;
+    virtual FLOAT           GetCurrentRotation()=0;
+    virtual FLOAT           GetTargetRotation()=0;
+    virtual void            SetCurrentRotation(FLOAT fRotation)=0;
+    virtual void            SetTargetRotation(FLOAT fRotation)=0;
     virtual eWeaponSlot     GetCurrentWeaponSlot()=0;
     virtual void            SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )=0;
 
@@ -186,7 +186,7 @@ public:
 
     virtual bool            IsDucking ( void )=0;
     virtual void            SetDucking ( bool bDuck )=0;
-	virtual bool			IsInWater ( void )=0;
+    virtual bool            IsInWater ( void )=0;
     virtual int             GetCantBeKnockedOffBike ( void )=0;
     virtual void            SetCantBeKnockedOffBike ( int iCantBeKnockedOffBike )=0;
     virtual void            QuitEnteringCar ( CVehicle * vehicle, int iSeat, bool bUnknown )=0;
@@ -194,8 +194,8 @@ public:
     virtual bool            IsWearingGoggles ( void )=0;
     virtual void            SetGogglesState ( bool bIsWearingThem )=0;
 
-	virtual void			SetClothesTextureAndModel ( char * szModel, char * szModelLocationName, int iTexture ) = 0;
-	virtual void			RebuildPlayer ( void ) = 0;
+    virtual void            SetClothesTextureAndModel ( char * szModel, char * szModelLocationName, int iTexture ) = 0;
+    virtual void            RebuildPlayer ( void ) = 0;
 
     virtual eFightingStyle  GetFightingStyle ( void ) = 0;
     virtual void            SetFightingStyle ( eFightingStyle style, BYTE bStyleExtra ) = 0;

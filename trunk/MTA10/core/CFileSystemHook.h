@@ -20,11 +20,11 @@
 #include "CLinkedList.h"
 #include "CFileSystemMemoryHandleManager.h"
 
-typedef HANDLE	(__stdcall*pCreateFileA)        (LPCTSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,DWORD,HANDLE);
-typedef BOOL	(__stdcall*pReadFile)           (HANDLE,LPVOID,DWORD,LPDWORD,LPOVERLAPPED);
-typedef DWORD	(__stdcall*pGetFileSize)        (HANDLE,LPDWORD);
-typedef DWORD	(__stdcall*pSetFilePointer)     (HANDLE,LONG,PLONG,DWORD);
-typedef BOOL	(__stdcall*pCloseHandle)        (HANDLE);
+typedef HANDLE  (__stdcall*pCreateFileA)        (LPCTSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,DWORD,HANDLE);
+typedef BOOL    (__stdcall*pReadFile)           (HANDLE,LPVOID,DWORD,LPDWORD,LPOVERLAPPED);
+typedef DWORD   (__stdcall*pGetFileSize)        (HANDLE,LPDWORD);
+typedef DWORD   (__stdcall*pSetFilePointer)     (HANDLE,LONG,PLONG,DWORD);
+typedef BOOL    (__stdcall*pCloseHandle)        (HANDLE);
 
 typedef struct tagFILEREDIRECT
 {
@@ -46,16 +46,16 @@ class CFileSystemHook : public CSingleton < CFileSystemHook >
 
 CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
 
-            void            RemoveHook				( );
-            void            ApplyHook				( );
+            void            RemoveHook              ( );
+            void            ApplyHook               ( );
 
-            void            RedirectFile			( const std::string& RedirectedFileName, const std::string& DestinationFile );
-            void            RedirectFile			( const std::string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
-            void            RemoveRedirect			( const std::string& RedirectedFileName );
+            void            RedirectFile            ( const std::string& RedirectedFileName, const std::string& DestinationFile );
+            void            RedirectFile            ( const std::string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly );
+            void            RemoveRedirect          ( const std::string& RedirectedFileName );
 
-    static  HANDLE  WINAPI   API_CreateFileA		( LPCTSTR               lpFileName,
-													  DWORD                 dwDesiredAccess,
-													  DWORD                 dwShareMode,
+    static  HANDLE  WINAPI   API_CreateFileA        ( LPCTSTR               lpFileName,
+                                                      DWORD                 dwDesiredAccess,
+                                                      DWORD                 dwShareMode,
                                                       LPSECURITY_ATTRIBUTES lpSecurityAttributes,
                                                       DWORD                 dwCreationDisposition,
                                                       DWORD                 dwFlagsAndAttributes,
@@ -76,7 +76,7 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
     static  DWORD   WINAPI   API_GetFileSize         ( HANDLE hFile,
                                                        LPDWORD lpFileSizeHigh );
 
-    static  DWORD   WINAPI   API_SetFilePointer		 ( HANDLE                hFile,
+    static  DWORD   WINAPI   API_SetFilePointer      ( HANDLE                hFile,
                                                       LONG                  lDistanceToMove,
                                                       PLONG                 lpDistanceToMoveHigh,
                                                       DWORD                 dwMoveMethod );
@@ -85,7 +85,7 @@ CFileSystemMemoryHandleManager*     GetFileSystemMemoryHandleManager ( void );
 
     private:
 
-            bool            GetRedirectedFile		( const std::string&                   NativeFileToCheck,
+            bool            GetRedirectedFile       ( const std::string&                   NativeFileToCheck,
                                                       std::string &                 RedirectedFileOut,
                                                       bool&                         bRedirectToFileBuffer,
                                                       void**                        pFilebufferOut,

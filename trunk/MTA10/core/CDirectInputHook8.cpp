@@ -70,10 +70,10 @@ HRESULT CDirectInputHook8::API_DirectInput8Create  ( HINSTANCE  hinst,
 bool CDirectInputHook8::ApplyHook ( )
 {
     // Hook DirectInput8Create.
-	m_pfnDirectInputCreate = reinterpret_cast < pDirectInputCreate > ( DetourFunction ( DetourFindFunction ( "DINPUT8.DLL", "DirectInput8Create" ), 
-																						reinterpret_cast < PBYTE > ( API_DirectInput8Create ) ) );
-	
-	return true;
+    m_pfnDirectInputCreate = reinterpret_cast < pDirectInputCreate > ( DetourFunction ( DetourFindFunction ( "DINPUT8.DLL", "DirectInput8Create" ), 
+                                                                                        reinterpret_cast < PBYTE > ( API_DirectInput8Create ) ) );
+    
+    return true;
 }
 
 bool CDirectInputHook8::RemoveHook ( )
@@ -83,7 +83,7 @@ bool CDirectInputHook8::RemoveHook ( )
     {
         // Unhook Direct3DCreate9.
         DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnDirectInputCreate ), 
-					   reinterpret_cast < PBYTE > ( API_DirectInput8Create ) );
+                       reinterpret_cast < PBYTE > ( API_DirectInput8Create ) );
 
         // Unset our hook variable.
         m_pfnDirectInputCreate = NULL;

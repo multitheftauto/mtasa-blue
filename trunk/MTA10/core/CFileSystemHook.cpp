@@ -43,7 +43,7 @@ CFileSystemHook::~CFileSystemHook ( )
 {
     delete m_pMemoryHandleManager;
 
-	RemoveHook ( );
+    RemoveHook ( );
 
     WriteDebugEvent ( "CFileSystemHook::~CFileSystemHook" );
 }
@@ -56,67 +56,67 @@ CFileSystemMemoryHandleManager* CFileSystemHook::GetFileSystemMemoryHandleManage
 void CFileSystemHook::ApplyHook ( )
 {
     // Hook createfile.
-	m_pfnCreateFileA = reinterpret_cast < pCreateFileA > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "CreateFileA" ), 
-																			reinterpret_cast < PBYTE > ( API_CreateFileA ) ) );
+    m_pfnCreateFileA = reinterpret_cast < pCreateFileA > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "CreateFileA" ), 
+                                                                            reinterpret_cast < PBYTE > ( API_CreateFileA ) ) );
 
     // Hook readfile
     m_pfnReadFile = reinterpret_cast < pReadFile > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "ReadFile" ), 
-																			      reinterpret_cast < PBYTE > ( API_ReadFile ) ) );
+                                                                                  reinterpret_cast < PBYTE > ( API_ReadFile ) ) );
 
     m_pfnGetFileSize = reinterpret_cast < pGetFileSize > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "GetFileSize" ), 
-																			      reinterpret_cast < PBYTE > ( API_GetFileSize ) ) );
+                                                                                  reinterpret_cast < PBYTE > ( API_GetFileSize ) ) );
 
     // Hook setfilepointer.
-	m_pfnSetFilePointer = reinterpret_cast < pSetFilePointer > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "SetFilePointer" ), 
-																			      reinterpret_cast < PBYTE > ( API_SetFilePointer ) ) );
+    m_pfnSetFilePointer = reinterpret_cast < pSetFilePointer > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "SetFilePointer" ), 
+                                                                                  reinterpret_cast < PBYTE > ( API_SetFilePointer ) ) );
 
     // Hook closehandle
-	m_pfnCloseHandle = reinterpret_cast < pCloseHandle > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "CloseHandle" ), 
-																			      reinterpret_cast < PBYTE > ( API_CloseHandle ) ) );
+    m_pfnCloseHandle = reinterpret_cast < pCloseHandle > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "CloseHandle" ), 
+                                                                                  reinterpret_cast < PBYTE > ( API_CloseHandle ) ) );
 
-	WriteDebugEvent ( "File system hooks applied." );
+    WriteDebugEvent ( "File system hooks applied." );
 }
 
 void CFileSystemHook::RemoveHook ( )
 {
     // UnHook createfile.
-	if ( m_pfnCreateFileA )
-	{
-		DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnCreateFileA ), 
-					   reinterpret_cast < PBYTE > ( API_CreateFileA  ) );
-	}
+    if ( m_pfnCreateFileA )
+    {
+        DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnCreateFileA ), 
+                       reinterpret_cast < PBYTE > ( API_CreateFileA  ) );
+    }
 
     // UnHook readfile
     if ( m_pfnReadFile )
     {
         DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnReadFile ), 
-					   reinterpret_cast < PBYTE > ( API_ReadFile ) );
+                       reinterpret_cast < PBYTE > ( API_ReadFile ) );
     }
 
     // UnHook getfilesize
     if ( m_pfnGetFileSize )
     {
         DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnGetFileSize ), 
-					   reinterpret_cast < PBYTE > ( API_GetFileSize ) );
+                       reinterpret_cast < PBYTE > ( API_GetFileSize ) );
     }
 
     // UnHook setfilepointer
-	if ( m_pfnSetFilePointer )
-	{
-		DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnSetFilePointer ), 
-					   reinterpret_cast < PBYTE > ( API_SetFilePointer  ) );
-	}
+    if ( m_pfnSetFilePointer )
+    {
+        DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnSetFilePointer ), 
+                       reinterpret_cast < PBYTE > ( API_SetFilePointer  ) );
+    }
 
     // UnHook closehandle
-	if ( m_pfnCloseHandle )
-	{
-		DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnCloseHandle ), 
-					   reinterpret_cast < PBYTE > ( API_CloseHandle  ) );
-	}
+    if ( m_pfnCloseHandle )
+    {
+        DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnCloseHandle ), 
+                       reinterpret_cast < PBYTE > ( API_CloseHandle  ) );
+    }
 
 
 
-	WriteDebugEvent ( "File system hooks removed." );
+    WriteDebugEvent ( "File system hooks removed." );
 }
 
 
@@ -127,7 +127,7 @@ HANDLE WINAPI CFileSystemHook::API_CreateFileA ( LPCTSTR               lpFileNam
                                                  DWORD                 dwCreationDisposition,
                                                  DWORD                 dwFlagsAndAttributes,
                                                  HANDLE                hTemplateFile )
-{	
+{   
     CFileSystemHook *   pThis;
     string              strRedirectedFile;
     bool                bRedirectToFileBuffer;
@@ -171,7 +171,7 @@ HANDLE WINAPI CFileSystemHook::API_CreateFileA ( LPCTSTR               lpFileNam
     }
 
     // Return the created file.
-	return pThis->m_pfnCreateFileA ( lpFileName,
+    return pThis->m_pfnCreateFileA ( lpFileName,
                                      dwDesiredAccess,
                                      dwShareMode,
                                      lpSecurityAttributes,
@@ -286,7 +286,7 @@ void CFileSystemHook::RedirectFile       ( const string& NativeFile, const strin
     m_RedirectList.insertAtFront ( RedirectedFileEntry );
 }
 
-void CFileSystemHook::RedirectFile	( const string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly )
+void CFileSystemHook::RedirectFile  ( const string& RedirectedFileName, void* pFilebufferOut, size_t size, bool bReadOnly )
 {
     FILEREDIRECT RedirectedFileEntry;
 
@@ -304,10 +304,10 @@ void CFileSystemHook::RedirectFile	( const string& RedirectedFileName, void* pFi
 
 void CFileSystemHook::RemoveRedirect     ( const string& NativeFileToRemove )
 {
-	CLinkedList< FILEREDIRECT >::CIterator iterator;
+    CLinkedList< FILEREDIRECT >::CIterator iterator;
 
     // Find the entry we're looking for.
-	for ( iterator = m_RedirectList.getBegin (); 
+    for ( iterator = m_RedirectList.getBegin (); 
           iterator != m_RedirectList.getEnd (); 
           iterator++ ) 
     {
@@ -317,18 +317,18 @@ void CFileSystemHook::RemoveRedirect     ( const string& NativeFileToRemove )
             // Remove this item.
             m_RedirectList.remove ( iterator );
 
-			if ( m_RedirectList.isEmpty() ) break;
-			iterator = m_RedirectList.getBegin();
+            if ( m_RedirectList.isEmpty() ) break;
+            iterator = m_RedirectList.getBegin();
         }
-	}
+    }
 }
 
 bool CFileSystemHook::GetRedirectedFile   ( const string& NativeFileToCheck, string & RedirectedFileOut, bool& bRedirectToFileBuffer, void** pFilebufferOut, size_t& size, bool& bReadOnly )
 {
-	CLinkedList< FILEREDIRECT >::CIterator iterator;
+    CLinkedList< FILEREDIRECT >::CIterator iterator;
 
     // Find the entry we're looking for.
-	for ( iterator = m_RedirectList.getBegin (); 
+    for ( iterator = m_RedirectList.getBegin (); 
           iterator != m_RedirectList.getEnd (); 
           iterator++ ) 
     {
@@ -342,7 +342,7 @@ bool CFileSystemHook::GetRedirectedFile   ( const string& NativeFileToCheck, str
             bReadOnly = iterator->bBufferReadOnly;
             return true;
         }
-	}
+    }
 
-	return false;
+    return false;
 }

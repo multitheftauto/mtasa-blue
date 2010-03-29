@@ -17,16 +17,16 @@ CXMLImpl* pXMLInterface = NULL;
 _DECLSPEC_EX CXML* InitXMLInterface()
 {
     pXMLInterface = new CXMLImpl;
-	return pXMLInterface;
+    return pXMLInterface;
 }
 
 _DECLSPEC_EX void ReleaseXMLInterface()
 {
-	if ( pXMLInterface )
-	{
-		delete pXMLInterface;
-		pXMLInterface = NULL;
-	}
+    if ( pXMLInterface )
+    {
+        delete pXMLInterface;
+        pXMLInterface = NULL;
+    }
 }
 
 #ifdef WIN32
@@ -34,12 +34,12 @@ _DECLSPEC_EX void ReleaseXMLInterface()
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     // Kill the interface on detach
-	if (dwReason == DLL_PROCESS_DETACH)
-	{
-		ReleaseXMLInterface ();
-	}
+    if (dwReason == DLL_PROCESS_DETACH)
+    {
+        ReleaseXMLInterface ();
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 #else

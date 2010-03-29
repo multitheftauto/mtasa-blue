@@ -21,12 +21,12 @@ extern CGameSA * pGame;
  */
 void CProjectileInfoSA::RemoveAllProjectiles (  )
 {
-	DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
-	DWORD dwFunction = FUNC_RemoveAllProjectiles;
-	_asm
-	{
-		call	dwFunction
-	}
+    DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
+    DWORD dwFunction = FUNC_RemoveAllProjectiles;
+    _asm
+    {
+        call    dwFunction
+    }
 }
 
 /**
@@ -35,13 +35,13 @@ void CProjectileInfoSA::RemoveAllProjectiles (  )
  * @return CProjectile * for the requested projectile, or NULL if the projectile slot is empty or the ID is invalid
  * \todo Check this CProjectile array is how it says in the function
  */
-CProjectile	* CProjectileInfoSA::GetProjectile ( DWORD ID )
+CProjectile * CProjectileInfoSA::GetProjectile ( DWORD ID )
 {
-	DEBUG_TRACE("CProjectile * CProjectileInfoSA::GetProjectile ( DWORD ID )");
-	if(ID >= 0 && ID < 32)
-		return (CProjectile *)(ARRAY_CProjectile + ID * sizeof(CProjectile *));
-	else
-		return NULL;
+    DEBUG_TRACE("CProjectile * CProjectileInfoSA::GetProjectile ( DWORD ID )");
+    if(ID >= 0 && ID < 32)
+        return (CProjectile *)(ARRAY_CProjectile + ID * sizeof(CProjectile *));
+    else
+        return NULL;
 }
 
 CProjectile * CProjectileInfoSA::GetProjectile ( void * projectilePointer )
@@ -61,7 +61,7 @@ void CProjectileInfoSA::RemoveProjectile ( CProjectileInfo * pProjectileInfo, CP
     CProjectileInfoSAInterface * projectileInfoInterface = ((CProjectileInfoSA*)pProjectileInfo)->internalInterface;
 
     CProjectileSA* pProjectileSA = dynamic_cast < CProjectileSA* > ( pProjectile );
-	if ( !pProjectileSA ) return;
+    if ( !pProjectileSA ) return;
 
     CEntitySAInterface * projectileInterface = pProjectileSA->GetInterface();
 
@@ -113,19 +113,19 @@ CProjectileInfo * CProjectileInfoSA::GetProjectileInfo ( DWORD dwIndex )
 
 bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )
 {
-	DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
-	
-	DWORD dwFunction = FUNC_AddProjectile;
-	DWORD dwReturn = 0;
+    DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
+    
+    DWORD dwFunction = FUNC_AddProjectile;
+    DWORD dwReturn = 0;
     CEntitySAInterface * creatorVC = NULL;
     if ( creator != NULL )   
     {
         CEntitySA* pCreatorSA = dynamic_cast < CEntitySA* > ( creator );
-		if ( pCreatorSA )
-		{
-			creatorVC = pCreatorSA->GetInterface();
-			pGame->GetWorld()->IgnoreEntity(creator);
-		}
+        if ( pCreatorSA )
+        {
+            creatorVC = pCreatorSA->GetInterface();
+            pGame->GetWorld()->IgnoreEntity(creator);
+        }
     }
 
     CEntitySAInterface * targetVC = NULL;
@@ -133,32 +133,32 @@ bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, 
     if ( targetEntity != NULL )
     {
         CEntitySA* pTargetEntitySA = dynamic_cast < CEntitySA* > ( targetEntity );
-		if ( pTargetEntitySA )
-			targetVC = pTargetEntitySA->GetInterface ();
+        if ( pTargetEntitySA )
+            targetVC = pTargetEntitySA->GetInterface ();
     }
 
     
-	_asm
-	{
-		push	eax
-		    
+    _asm
+    {
+        push    eax
+            
         push    targetVC
         push    target
-		push	fForce
-		lea		eax, vecOrigin
-		push	[eax+8]
-		push	[eax+4]
-		push	[eax]
-		push	eWeapon
-		push	creatorVC
-		call	dwFunction
+        push    fForce
+        lea     eax, vecOrigin
+        push    [eax+8]
+        push    [eax+4]
+        push    [eax]
+        push    eWeapon
+        push    creatorVC
+        call    dwFunction
         add     esp, 32
-		mov		dwReturn, eax
+        mov     dwReturn, eax
 
-		pop		eax
-	}
-	pGame->GetWorld()->IgnoreEntity(NULL);
-	return dwReturn != 0;
+        pop     eax
+    }
+    pGame->GetWorld()->IgnoreEntity(NULL);
+    return dwReturn != 0;
 }
 
 CEntity* CProjectileInfoSA::GetTarget ( void )
@@ -195,8 +195,8 @@ CEntity* CProjectileInfoSA::GetTarget ( void )
 void CProjectileInfoSA::SetTarget ( CEntity* pEntity )
 {
     CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( pEntity );
-	if ( pEntitySA )
-		internalInterface->pEntProjectileTarget = pEntitySA->GetInterface ();
+    if ( pEntitySA )
+        internalInterface->pEntProjectileTarget = pEntitySA->GetInterface ();
 }
 
 

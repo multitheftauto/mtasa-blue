@@ -74,8 +74,8 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                     pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
                     pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
-				    // Set the arm directions and whether or not arms are up
-				    pSourcePlayer->SetAimDirection ( aim.data.fArm );
+                    // Set the arm directions and whether or not arms are up
+                    pSourcePlayer->SetAimDirection ( aim.data.fArm );
                     pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
 
                     // Read out the driveby direction

@@ -30,7 +30,7 @@ public:
     DECLARE_RPC ( SetControlState );
     DECLARE_RPC ( ForceReconnect );
     DECLARE_RPC ( ShowCursor );
-	DECLARE_RPC ( ShowChat );
+    DECLARE_RPC ( ShowChat );
 };
 
 #endif

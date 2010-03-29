@@ -563,7 +563,7 @@ void CFoo::Test ( const char* szString )
     else if ( stricmp ( szString, "applytest" ) == 0 )
     {
         DWORD oldProt, oldProt2;
-        VirtualProtect((LPVOID)0x5E8FFB,6,PAGE_EXECUTE_READWRITE,&oldProt);		
+        VirtualProtect((LPVOID)0x5E8FFB,6,PAGE_EXECUTE_READWRITE,&oldProt);     
 
         *(unsigned char*) (0x5E8FFB ) = 0x90;
         *(unsigned char*) (0x5E8FFC ) = 0x90;

@@ -19,7 +19,7 @@
 class CConfig
 {
 public:
-	                    CConfig                     ( const char* szFileName );
+                        CConfig                     ( const char* szFileName );
                         ~CConfig                    ( void );
 
     bool                GetEntry                    ( char* szEntry, char* szReturnText, int iInstance );

@@ -829,9 +829,9 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
         {
             CXMLAttributes* pAttributes = &pItemNode->GetAttributes ();
 
-	        CXMLAttribute* pA = NULL;
+            CXMLAttribute* pA = NULL;
             pA = pAttributes->Create ( "guid" );
-			pA->SetValue ( m_DevInfo.strGuid.c_str () );
+            pA->SetValue ( m_DevInfo.strGuid.c_str () );
         }
 
     }
@@ -931,14 +931,14 @@ bool CJoystickManager::LoadFromXML ( void )
         {
             CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-	        CXMLAttribute* pA = NULL;
+            CXMLAttribute* pA = NULL;
             if ( pA = pAttributes->Find( "deadzone" ) )
-			    m_DevInfo.iDeadZone = Clamp ( 0, atoi ( pA->GetValue ().c_str () ), 49 );
+                m_DevInfo.iDeadZone = Clamp ( 0, atoi ( pA->GetValue ().c_str () ), 49 );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "saturation" ) )
-			    m_DevInfo.iSaturation = Clamp ( 51, atoi ( pA->GetValue ().c_str () ), 100 );
+                m_DevInfo.iSaturation = Clamp ( 51, atoi ( pA->GetValue ().c_str () ), 100 );
             else
                 iErrors++;
         }
@@ -960,34 +960,34 @@ bool CJoystickManager::LoadFromXML ( void )
         {
             CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-	        CXMLAttribute* pA = NULL;
+            CXMLAttribute* pA = NULL;
             if ( pA = pAttributes->Find( "source_index" ) )
-			    line.SourceAxisIndex = (eJoy)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eJoyMax );
+                line.SourceAxisIndex = (eJoy)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eJoyMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "source_dir" ) )
-			    line.SourceAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
+                line.SourceAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "output_index" ) )
-			    line.OutputAxisIndex = (eStick)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eStickMax );
+                line.OutputAxisIndex = (eStick)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eStickMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "output_dir" ) )
-			    line.OutputAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
+                line.OutputAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "enabled" ) )
-			    line.bEnabled = atoi ( pA->GetValue ().c_str () ) ? true : false;
+                line.bEnabled = atoi ( pA->GetValue ().c_str () ) ? true : false;
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "max_value" ) )
-			    line.MaxValue = atoi ( pA->GetValue ().c_str () );
+                line.MaxValue = atoi ( pA->GetValue ().c_str () );
             else
                 iErrors++;
 
@@ -1036,15 +1036,15 @@ bool CJoystickManager::SaveToXML ( void )
             {
                 CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-	            CXMLAttribute* pA = NULL;
+                CXMLAttribute* pA = NULL;
                 pA = pAttributes->Create ( "deadzone" );
-			    pA->SetValue ( m_DevInfo.iDeadZone );
+                pA->SetValue ( m_DevInfo.iDeadZone );
 
                 pA = pAttributes->Create ( "saturation" );
-			    pA->SetValue ( m_DevInfo.iSaturation );
+                pA->SetValue ( m_DevInfo.iSaturation );
 
                 pA = pAttributes->Create ( "product_name" );
-			    pA->SetValue ( m_DevInfo.strProductName.c_str () );
+                pA->SetValue ( m_DevInfo.strProductName.c_str () );
             }
         }
 
@@ -1061,24 +1061,24 @@ bool CJoystickManager::SaveToXML ( void )
             {
                 CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-	            CXMLAttribute* pA = NULL;
+                CXMLAttribute* pA = NULL;
                 pA = pAttributes->Create ( "source_index" );
-				pA->SetValue ( line.SourceAxisIndex );
+                pA->SetValue ( line.SourceAxisIndex );
 
                 pA = pAttributes->Create ( "source_dir" );
-				pA->SetValue ( line.SourceAxisDir );
+                pA->SetValue ( line.SourceAxisDir );
 
                 pA = pAttributes->Create ( "output_index" );
-				pA->SetValue ( line.OutputAxisIndex );
+                pA->SetValue ( line.OutputAxisIndex );
 
                 pA = pAttributes->Create ( "output_dir" );
-				pA->SetValue ( line.OutputAxisDir );
+                pA->SetValue ( line.OutputAxisDir );
 
                 pA = pAttributes->Create ( "enabled" );
-				pA->SetValue ( line.bEnabled );
+                pA->SetValue ( line.bEnabled );
 
                 pA = pAttributes->Create ( "max_value" );
-				pA->SetValue ( line.MaxValue );
+                pA->SetValue ( line.MaxValue );
 
             }
         }

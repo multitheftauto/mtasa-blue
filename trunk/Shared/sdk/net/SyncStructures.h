@@ -1077,7 +1077,7 @@ struct SWeaponAimSync : public ISyncStructure
     {
         // Write arm direction (We only sync one arm, Y axis for on foot sync and X axis for driveby)
         short sArm = static_cast < short > ( data.fArm * 90.0f * 180.0f / 3.14159265f );
-	    bitStream.Write ( sArm );
+        bitStream.Write ( sArm );
 
         if ( m_bFull )
         {

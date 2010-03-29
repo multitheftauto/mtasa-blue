@@ -270,9 +270,9 @@ void CPlayerClothes::DefaultClothes ( void )
     RemoveAll ();
 
     AddClothes ( "vestblack", "vest", 0 );
-	AddClothes ( "JEANSDENIM", "JEANS", 2 );
-	AddClothes ( "SNEAKERBINCBLK", "SNEAKER", 3 );
-	AddClothes ( "PLAYER_FACE", "HEAD", 1 );
+    AddClothes ( "JEANSDENIM", "JEANS", 2 );
+    AddClothes ( "SNEAKERBINCBLK", "SNEAKER", 3 );
+    AddClothes ( "PLAYER_FACE", "HEAD", 1 );
 }
 
 

@@ -18,18 +18,18 @@
 using namespace google;
 
 #define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList"	//MultiColumnListNoFrame
+#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList" //MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
 
-#define CGUIGRIDLIST_MAX_TEXT_LENGTH	256
+#define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
 
 CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Initialize
     m_hUniqueHandle = 0;
-	m_iIndex = 0;
+    m_iIndex = 0;
     m_bIgnoreTextSpacer = false;
     m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
     m_Items.set_empty_key ( (CEGUI::ListboxItem *)0x00000000 );
@@ -39,21 +39,21 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
     pGUI->GetUniqueName ( szUnique );
 
     // Create the window and set default settings
-	if ( bFrame )
-		m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIGRIDLIST_NAME, szUnique );
-	else
-		m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIGRIDLISTNOFRAME_NAME, szUnique );
+    if ( bFrame )
+        m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIGRIDLIST_NAME, szUnique );
+    else
+        m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIGRIDLISTNOFRAME_NAME, szUnique );
 
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.00f, 0.00f, 0.40f, 0.40f ) );
 
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserColumnDraggingEnabled ( false );
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( false );
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( CEGUI::MultiColumnList::SelectionMode::RowSingle );
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( false );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( CEGUI::MultiColumnList::SelectionMode::RowSingle );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::MultiColumnList::EventSortColumnChanged, CEGUI::Event::Subscriber ( &CGUIGridList_Impl::Event_OnSortColumn, this ) );
@@ -67,7 +67,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -81,14 +81,14 @@ CGUIGridList_Impl::~CGUIGridList_Impl ( void )
 
 void CGUIGridList_Impl::SetSorting ( bool bEnabled )
 {
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserSortControlEnabled ( bEnabled );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserSortControlEnabled ( bEnabled );
 }
 
 
 void CGUIGridList_Impl::RemoveColumn ( unsigned int uiColumn )
 {
-	try
-	{ 
+    try
+    { 
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> removeColumnWithID ( uiColumn );
     }
     catch ( CEGUI::Exception ) {}
@@ -103,10 +103,10 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
 
     int iColumnIndex = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hUniqueHandle );
 
-	// Adjust the header style (zero-based)
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getHeaderSegmentForColumn ( iColumnIndex ).setFont ( "default-small" );
+    // Adjust the header style (zero-based)
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getHeaderSegmentForColumn ( iColumnIndex ).setFont ( "default-small" );
 
-	// Return the id (zero-based)
+    // Return the id (zero-based)
     return ( hUniqueHandle );
 }
 
@@ -114,32 +114,32 @@ void CGUIGridList_Impl::SetColumnWidth ( int hColumn, float fWidth, bool bRelati
 {
     try
     {
-		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderWidth ( hColumn, fWidth , bRelative );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderWidth ( hColumn, fWidth , bRelative );
     }
     catch ( CEGUI::Exception )
-	{}
+    {}
 }
 
 void CGUIGridList_Impl::SetHorizontalScrollBar ( bool bEnabled )
 {
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( bEnabled );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( bEnabled );
 }
 
 
 void CGUIGridList_Impl::SetVerticalScrollBar ( bool bEnabled )
 {
-	reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowVertScrollbar ( bEnabled );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowVertScrollbar ( bEnabled );
 }
 
 
 int CGUIGridList_Impl::GetRowCount ( void )
 {
-	try {
-		return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getRowCount ();
+    try {
+        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getRowCount ();
     }
     catch ( CEGUI::Exception ) {
-		return 0;
-	}
+        return 0;
+    }
 }
 
 
@@ -150,20 +150,20 @@ void CGUIGridList_Impl::ForceUpdate ( void )
 
 int CGUIGridList_Impl::AddRow ( bool fast )
 {
-	try
-	{
-		return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addRow ( m_iIndex++, fast );
+    try
+    {
+        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addRow ( m_iIndex++, fast );
     }
     catch ( CEGUI::Exception ) {
-		return -1;
-	}
+        return -1;
+    }
 }
 
 
 void CGUIGridList_Impl::RemoveRow ( int iRow )
 {
-	try
-	{
+    try
+    {
         return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> removeRow ( iRow );
     }
     catch ( CEGUI::Exception ) {}
@@ -172,13 +172,13 @@ void CGUIGridList_Impl::RemoveRow ( int iRow )
 
 int CGUIGridList_Impl::InsertRowAfter ( int iRow )
 {
-	try
-	{
-		return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> insertRow ( iRow+1, m_iIndex++ );
+    try
+    {
+        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> insertRow ( iRow+1, m_iIndex++ );
     }
     catch ( CEGUI::Exception ) {
-		return -1;
-	}
+        return -1;
+    }
 }
 
 
@@ -186,10 +186,10 @@ void CGUIGridList_Impl::AutoSizeColumn ( unsigned int hColumn )
 {
     try
     {
-		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> autoSizeColumnHeader ( GetColumnIndex ( hColumn ) );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> autoSizeColumnHeader ( GetColumnIndex ( hColumn ) );
     }
     catch ( CEGUI::Exception )
-	{}
+    {}
 }
 
 
@@ -198,11 +198,11 @@ void CGUIGridList_Impl::Clear ( void )
 {
     try
     {
-	    m_iIndex = 0;
+        m_iIndex = 0;
 
         // Don't remove sort options when the list is cleared
-	    //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( 0 );
-	    //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
+        //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( 0 );
+        //reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> resetList ();
 
         dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* >::iterator it;
@@ -213,7 +213,7 @@ void CGUIGridList_Impl::Clear ( void )
         m_Items.clear ();
     }
     catch ( CEGUI::Exception )
-	{}
+    {}
 }
 
 
@@ -222,7 +222,7 @@ CGUIListItem* CGUIGridList_Impl::GetItem ( int iRow, int hColumn )
     try
     {
         // Grab the item at the chosen row / column
-		CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
+        CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
 
         // If it exists, get the CGUIListItem by using the pool
         if ( pItem )
@@ -242,24 +242,24 @@ char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
     try
     {
         // Grab the item at the chosen row / column
-		CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
+        CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
         if ( pItem )
         {
-			char *szRet = const_cast < char* > ( pItem->getText().c_str () );
+            char *szRet = const_cast < char* > ( pItem->getText().c_str () );
 
             if ( !m_bIgnoreTextSpacer )
             {
-			    unsigned char ucSpacerSize = (unsigned char)(strlen ( CGUIGRIDLIST_SPACER ));
+                unsigned char ucSpacerSize = (unsigned char)(strlen ( CGUIGRIDLIST_SPACER ));
 
-			    if ( hColumn == 1 ) {
+                if ( hColumn == 1 ) {
                     // Make sure there is a spacer to skip
                     if ( strncmp ( szRet, CGUIGRIDLIST_SPACER, strlen ( CGUIGRIDLIST_SPACER ) ) == 0 )
-    				    szRet += ucSpacerSize;
-			    }
+                        szRet += ucSpacerSize;
+                }
             }
 
-			return szRet;
-		}
+            return szRet;
+        }
     }
     catch ( CEGUI::Exception )
     {
@@ -274,7 +274,7 @@ void* CGUIGridList_Impl::GetItemData ( int iRow, int hColumn )
 {
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
 
-	return pItem ? pItem->GetData () : NULL;
+    return pItem ? pItem->GetData () : NULL;
 }
 
 
@@ -284,7 +284,7 @@ void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
     if ( pItem )
     {
-		pItem->SetData ( pData );
+        pItem->SetData ( pData );
     }
 }
 
@@ -295,91 +295,91 @@ void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, const char* pszData
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
     if ( pItem )
     {
-		pItem->SetData ( pszData );
+        pItem->SetData ( pszData );
     }
 }
 
 
 int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast )
 {
-	try
+    try
     {
         CEGUI::MultiColumnList* win = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow );
 
-		// Get the current item at that offset and set the text
-		CGUIListItem_Impl* pItem = reinterpret_cast < CGUIListItem_Impl* > ( GetItem ( iRow, hColumn ) );
-		if ( pItem )
-		{
-			if ( bSection )
+        // Get the current item at that offset and set the text
+        CGUIListItem_Impl* pItem = reinterpret_cast < CGUIListItem_Impl* > ( GetItem ( iRow, hColumn ) );
+        if ( pItem )
+        {
+            if ( bSection )
             {
-				// Set section properties
-				pItem->SetFont ( "default-bold-small" );
-				pItem->SetDisabled ( true );
+                // Set section properties
+                pItem->SetFont ( "default-bold-small" );
+                pItem->SetDisabled ( true );
                 pItem->SetText ( szText );
-			}
+            }
             else
             {
                 if ( hColumn == 1 )
                 {
-				    // Enable some spacing on regular items, if this is the first item
-					
+                    // Enable some spacing on regular items, if this is the first item
+                    
                     char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
                     if ( m_bIgnoreTextSpacer )
                     {
-				        _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText );
+                        _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText );
                     }
                     else
                     {
                         _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s%s", CGUIGRIDLIST_SPACER, szText );
                     }
 
-					szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;
+                    szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;
 
-				    pItem->SetText ( szBuf );
+                    pItem->SetText ( szBuf );
                 }
                 else
                 {
                     pItem->SetText ( szText );
                 }
             }
-		}
-		else
-		{
+        }
+        else
+        {
             
 
-			// If it doesn't, create it and set it in the gridlist
-			pItem = new CGUIListItem_Impl ( szText, bNumber );
+            // If it doesn't, create it and set it in the gridlist
+            pItem = new CGUIListItem_Impl ( szText, bNumber );
 
-			CEGUI::ListboxItem* pListboxItem = pItem->GetListItem ();
-			win->setItem ( pListboxItem, hColumn, iRow, bFast );
+            CEGUI::ListboxItem* pListboxItem = pItem->GetListItem ();
+            win->setItem ( pListboxItem, hColumn, iRow, bFast );
 
-			// Put our new item into the map
-			m_Items [ pItem->GetListItem () ] = pItem;
+            // Put our new item into the map
+            m_Items [ pItem->GetListItem () ] = pItem;
 
-			if ( bSection )
+            if ( bSection )
             {
-				// Set section properties
-				pItem->SetFont ( "default-bold-small" );
-				pItem->SetDisabled ( true );
-			}
+                // Set section properties
+                pItem->SetFont ( "default-bold-small" );
+                pItem->SetDisabled ( true );
+            }
             else if ( hColumn == 1 )
             {
-				// Enable some spacing on regular items, if this is the first item
-				char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
+                // Enable some spacing on regular items, if this is the first item
+                char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
 
                 if ( m_bIgnoreTextSpacer )
                 {
-				    _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s", szText );
+                    _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s", szText );
                 }
                 else
                 {
                     _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s%s", CGUIGRIDLIST_SPACER, szText );
                 }
 
-				szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;				
-				pItem->SetText ( szBuf );
-			}
-		}
+                szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;               
+                pItem->SetText ( szBuf );
+            }
+        }
 
         // If the list is sorted and we just changed an item in the sorting column,
         // re-sort the list.
@@ -394,7 +394,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
             return iRow;
         }
     }
-	catch ( CEGUI::Exception ) {}
+    catch ( CEGUI::Exception ) {}
 
     return 0;
 }
@@ -436,10 +436,10 @@ void CGUIGridList_Impl::SetColumnSegmentSizingEnabled (int hColumn, bool bEnable
 {
     try
     {
-		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserColumnSegmentSizingEnabled ( hColumn, bEnabled );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserColumnSegmentSizingEnabled ( hColumn, bEnabled );
     }
     catch ( CEGUI::Exception )
-	{}
+    {}
 }
 
 bool CGUIGridList_Impl::IsColumnSegmentSizingEnabled ( int hColumn )
@@ -459,19 +459,19 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
 {
     // Get the current item at that offset
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
-	if ( pItem != NULL )
+    if ( pItem != NULL )
     {
         pItem->SetImage ( pImage );
     }
     else
     {
-		// If it doesn't, create it and set it in the gridlist
-		CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
+        // If it doesn't, create it and set it in the gridlist
+        CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
         CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setItem ( pListboxItem, hColumn, iRow );
 
         // Put our new item in the map
-		m_Items [ pNewItem->GetListItem () ] = pNewItem;
+        m_Items [ pNewItem->GetListItem () ] = pNewItem;
     }
 }
 
@@ -480,7 +480,7 @@ int CGUIGridList_Impl::GetColumnIndex ( int hColumn )
 {
     try
     {
-		// non zero-based
+        // non zero-based
         return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hColumn );
     }
     catch ( CEGUI::Exception )
@@ -534,11 +534,11 @@ void CGUIGridList_Impl::SetSelectionMode ( SelectionMode mode )
 {
     try
     {
-		reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( (CEGUI::MultiColumnList::SelectionMode) mode );
-	}
-	catch ( CEGUI::Exception )
-	{
-	}
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( (CEGUI::MultiColumnList::SelectionMode) mode );
+    }
+    catch ( CEGUI::Exception )
+    {
+    }
 }
 
 
@@ -559,7 +559,7 @@ CGUIListItem* CGUIGridList_Impl::GetNextSelectedItem ( CGUIListItem* pItem )
 
 int CGUIGridList_Impl::GetSelectedItemRow ( void )
 {
-	CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem ();
+    CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem ();
     if ( pItem )
     {
         CGUIListItem* pListItem = GetListItem ( pItem );
@@ -575,7 +575,7 @@ int CGUIGridList_Impl::GetSelectedItemRow ( void )
 
 int CGUIGridList_Impl::GetSelectedItemColumn ( void )
 {
-	CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem ();
+    CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getFirstSelectedItem ();
     if ( pItem )
     {
         CGUIListItem* pListItem = GetListItem ( pItem );
@@ -598,7 +598,7 @@ void CGUIGridList_Impl::SetSelectedItem ( int iRow, int hColumn, bool bReset )
 
     // Get the current item at that offset
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
-	if ( pItem != NULL )
+    if ( pItem != NULL )
     {
         // Use the grid to select the row, rather than the pItem method call as the grid one will take into account the
         // grid settings for full row select, etc...
@@ -636,8 +636,8 @@ void CGUIGridList_Impl::SetSortColumnHandler ( GUI_CALLBACK Callback )
 
 bool CGUIGridList_Impl::Event_OnSortColumn ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnSortColumn )
-		m_OnSortColumn ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnSortColumn )
+        m_OnSortColumn ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

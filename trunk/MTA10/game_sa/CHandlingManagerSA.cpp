@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CHandlingManagerSA.cpp
-*  PURPOSE:		Vehicle handling manager
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CHandlingManagerSA.cpp
+*  PURPOSE:     Vehicle handling manager
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -12,16 +12,16 @@
 
 #include "StdInc.h"
 
-#define USE_GTASA_HANDLING			FALSE
+#define USE_GTASA_HANDLING          FALSE
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
 #define Func_PostLoadHandlingCfg    0x5BFA90
-#define Func_Calculate				0x6F5080
-#define Func_GetOriginalHandling	0x6F52D0
-#define Func_GetPreviousHandling	0x6F5300
-#define Var_fTurnMassMultiplier		0x858B8C
-#define Var_fBasicDragCoeff			0x858C58
+#define Func_Calculate              0x6F5080
+#define Func_GetOriginalHandling    0x6F52D0
+#define Func_GetPreviousHandling    0x6F5300
+#define Var_fTurnMassMultiplier     0x858B8C
+#define Var_fBasicDragCoeff         0x858C58
 
 DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
 
@@ -41,7 +41,7 @@ void DumpHandlingData ( tHandlingDataSA* pData )
 
     FILE* pFile = fopen ( "C:/dumped.txt", "a+" );
 
-	fprintf ( pFile, "    m_OriginalHandlingData [%u].iVehicleID = %u;\n", iCounter, iCounter );
+    fprintf ( pFile, "    m_OriginalHandlingData [%u].iVehicleID = %u;\n", iCounter, iCounter );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fMass = %ff;\n", iCounter, pData->fMass );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fTurnMass = %ff;\n", iCounter, pData->fTurnMass );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fDragCoeff = %ff;\n", iCounter, pData->fDragCoeff );
@@ -91,8 +91,8 @@ void DumpHandlingData ( tHandlingDataSA* pData )
 
 __declspec(naked) void Hook_Calculate ( void )
 {
-	tHandlingDataSA *pData;
-	DWORD dwHandlingData;
+    tHandlingDataSA *pData;
+    DWORD dwHandlingData;
     _asm
     {
         mov         eax, [esp+4]
@@ -111,51 +111,51 @@ __declspec(naked) void Hook_Calculate ( void )
 // Fixme: Does return Vehicledata, I guess
 CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingTable ( eHandlingTypes eHandling )
 {
-	tHandlingDataSA* pRet;
-	// GTA has a function for that
-	BYTE ucID = (BYTE)eHandling;
-	__asm
-	{
-		mov		ecx,ARRAY_HANDLINGDATA
-		xor		eax,eax
-		mov		al,ucID
-		mov		ebx,Func_GetOriginalHandling
-		push	eax
-		call	ebx
-		mov		pRet,eax
-	}
-	//return (CHandlingEntry*)pRet;
-	return m_pEntries[eHandling];
+    tHandlingDataSA* pRet;
+    // GTA has a function for that
+    BYTE ucID = (BYTE)eHandling;
+    __asm
+    {
+        mov     ecx,ARRAY_HANDLINGDATA
+        xor     eax,eax
+        mov     al,ucID
+        mov     ebx,Func_GetOriginalHandling
+        push    eax
+        call    ebx
+        mov     pRet,eax
+    }
+    //return (CHandlingEntry*)pRet;
+    return m_pEntries[eHandling];
 }
 
 // Fixme: Retrives vehicle type specific handlingdata
 CHandlingEntry* CHandlingManagerSA::GetPreviousHandlingTable ( eHandlingTypes eHandling )
 {
-	tHandlingDataSA* pRet;
-	// Well, as above :P
-	BYTE ucID = (BYTE)eHandling;
-	__asm
-	{
-		mov		ecx,ARRAY_HANDLINGDATA
-		xor		eax,eax
-		mov		al,ucID
-		mov		ebx,Func_GetPreviousHandling
-		push	eax
-		call	ebx
-		mov		pRet,eax
-	}
-	//return pRet;
-	return m_pEntries[eHandling-1];
+    tHandlingDataSA* pRet;
+    // Well, as above :P
+    BYTE ucID = (BYTE)eHandling;
+    __asm
+    {
+        mov     ecx,ARRAY_HANDLINGDATA
+        xor     eax,eax
+        mov     al,ucID
+        mov     ebx,Func_GetPreviousHandling
+        push    eax
+        call    ebx
+        mov     pRet,eax
+    }
+    //return pRet;
+    return m_pEntries[eHandling-1];
 }
 
 float CHandlingManagerSA::GetDragMultiplier ( void )
 {
-	return *(float*)(Var_fTurnMassMultiplier);
+    return *(float*)(Var_fTurnMassMultiplier);
 }
 
 float CHandlingManagerSA::GetBasicDragCoeff ( void )
 {
-	return *(float*)(Var_fBasicDragCoeff);
+    return *(float*)(Var_fBasicDragCoeff);
 }
 
 CHandlingManagerSA::CHandlingManagerSA ( void )
@@ -236,26 +236,26 @@ bool CHandlingManagerSA::ApplyHandlingData ( enum eVehicleTypes eModel, CHandlin
 
 /*bool CHandlingManagerSA::ApplyHandlingData ( CVehicle* pVehicle, CHandlingEntry* pEntry )
 {
-	// Create new handling and apply it
-	// Those entry have a higher priority than those global ones
-	//CHandlingEntrySA* pEntrySA = new CHandlingEntrySA;
-	//pEntrySA->ApplyHandlingData ( pEntry );
-	pVehicle->SetHandlingData ( pEntry );
+    // Create new handling and apply it
+    // Those entry have a higher priority than those global ones
+    //CHandlingEntrySA* pEntrySA = new CHandlingEntrySA;
+    //pEntrySA->ApplyHandlingData ( pEntry );
+    pVehicle->SetHandlingData ( pEntry );
 }*/
 
 /*bool CHandlingManagerSA::ApplyHandlingData ( CVehicleSA *pVehicle, CHandlingEntry* pEntry )
 {
-	
+    
 }
 
 
 void CHandlingManagerSA::RemoveFromVeh ( CVehicle* pVeh )
 {
-	std::list < CHandlingEntrySA* > ::iterator iter = m_HandlingList.begin ();
-	for ( ; iter != m_HandlingList.end (); iter++ )
-	{
-		(*iter)->RemoveFromVeh
-	}
+    std::list < CHandlingEntrySA* > ::iterator iter = m_HandlingList.begin ();
+    for ( ; iter != m_HandlingList.end (); iter++ )
+    {
+        (*iter)->RemoveFromVeh
+    }
 }*/
 
 
@@ -285,224 +285,224 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleType
 }
 
 // Return the handling manager id
-eHandlingTypes	CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
+eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
 {
-	switch(eModel)
-	{
-	case VT_LANDSTAL: return HT_LANDSTAL;
-	case VT_BRAVURA: return HT_BRAVURA;
-	case VT_BUFFALO: return HT_BUFFALO;
-	case VT_LINERUN: return HT_LINERUN;
-	case VT_PEREN: return HT_PEREN;
-	case VT_SENTINEL: return HT_SENTINEL;
-	case VT_DUMPER: return HT_DUMPER;
-	case VT_FIRETRUK: return HT_FIRETRUK;
-	case VT_TRASH: return HT_TRASH;
-	case VT_STRETCH: return HT_STRETCH;
-	case VT_MANANA: return HT_MANANA;
-	case VT_INFERNUS: return HT_INFERNUS;
-	case VT_VOODOO: return HT_VOODOO;
-	case VT_PONY: return HT_PONY;
-	case VT_MULE: return HT_MULE;
-	case VT_CHEETAH: return HT_CHEETAH;
-	case VT_AMBULAN: return HT_AMBULAN;
-	case VT_LEVIATHN: return HT_LEVIATHN;
-	case VT_MOONBEAM: return HT_MOONBEAM;
-	case VT_ESPERANT: return HT_ESPERANT;
-	case VT_TAXI: return HT_TAXI;
-	case VT_WASHING: return HT_WASHING;
-	case VT_BOBCAT: return HT_BOBCAT;
-	case VT_MRWHOOP: return HT_MRWHOOP;
-	case VT_BFINJECT: return HT_BFINJECT;
-	case VT_HUNTER: return HT_HUNTER;
-	case VT_PREMIER: return HT_PREMIER;
-	case VT_ENFORCER: return HT_ENFORCER;
-	case VT_SECURICA: return HT_SECURICA;
-	case VT_BANSHEE: return HT_BANSHEE;
-	case VT_PREDATOR: return HT_PREDATOR;
-	case VT_BUS: return HT_BUS;
-	case VT_RHINO: return HT_RHINO;
-	case VT_BARRACKS: return HT_BARRACKS;
-	case VT_HOTKNIFE: return HT_HOTKNIFE;
-	case VT_ARTICT1: return HT_ARTICT1;
-	case VT_PREVION: return HT_PREVION;
-	case VT_COACH: return HT_COACH;
-	case VT_CABBIE: return HT_CABBIE;
-	case VT_STALLION: return HT_STALLION;
-	case VT_RUMPO: return HT_RUMPO;
-	case VT_RCBANDIT: return HT_RCBANDIT;
-	case VT_ROMERO: return HT_ROMERO;
-	case VT_PACKER: return HT_PACKER;
-	case VT_MONSTER: return HT_MONSTER;
-	case VT_ADMIRAL: return HT_ADMIRAL;
-	case VT_SQUALO: return HT_SQUALO;
-	case VT_SEASPAR: return HT_SEASPAR;
-	case VT_PIZZABOY: return HT_MOPED;
-	case VT_TRAM: return HT_TRAM;
-	case VT_ARTICT2: return HT_ARTICT2;
-	case VT_TURISMO: return HT_TURISMO;
-	case VT_SPEEDER: return HT_SPEEDER;
-	case VT_REEFER: return HT_REEFER;
-	case VT_TROPIC: return HT_TROPIC;
-	case VT_FLATBED: return HT_FLATBED;
-	case VT_YANKEE: return HT_YANKEE;
-	case VT_CADDY: return HT_GOLFCART;
-	case VT_SOLAIR: return HT_SOLAIR;
-	case VT_TOPFUN: return HT_TOPFUN;
-	case VT_SKIMMER: return HT_SEAPLANE;
-	case VT_PCJ600: return HT_BIKE;
-	case VT_FAGGIO: return HT_MOPED;
-	case VT_FREEWAY: return HT_FREEWAY;
-	case VT_RCBARON: return HT_RCBARON;
-	case VT_RCRAIDER: return HT_RCRAIDER;
-	case VT_GLENDALE: return HT_GLENDALE;
-	case VT_OCEANIC: return HT_OCEANIC;
-	case VT_SANCHEZ: return HT_DIRTBIKE;
-	case VT_SPARROW: return HT_SPARROW;
-	case VT_PATRIOT: return HT_PATRIOT;
-	case VT_QUAD: return HT_QUADBIKE;
-	case VT_COASTG: return HT_COASTGRD;
-	case VT_DINGHY: return HT_DINGHY;
-	case VT_HERMES: return HT_HERMES;
-	case VT_SABRE: return HT_SABRE;
-	case VT_RUSTLER: return HT_RUSTLER;
-	case VT_ZR350: return HT_ZR350;
-	case VT_WALTON: return HT_WALTON;
-	case VT_REGINA: return HT_REGINA;
-	case VT_COMET: return HT_COMET;
-	case VT_BMX: return HT_BMX;
-	case VT_BURRITO: return HT_BURRITO;
-	case VT_CAMPER: return HT_CAMPER;
-	case VT_MARQUIS: return HT_MARQUIS;
-	case VT_BAGGAGE: return HT_BAGGAGE;
-	case VT_DOZER: return HT_DOZER;
-	case VT_MAVERICK: return HT_MAVERICK;
-	case VT_VCNMAV: return HT_COASTMAV;
-	case VT_RANCHER: return HT_RANCHER;
-	case VT_FBIRANCH: return HT_FBIRANCH;
-	case VT_VIRGO: return HT_VIRGO;
-	case VT_GREENWOO: return HT_GREENWOO;
-	case VT_JETMAX: return HT_CUPBOAT;
-	case VT_HOTRING: return HT_HOTRING;
-	case VT_SANDKING: return HT_SANDKING;
-	case VT_BLISTAC: return HT_BLISTAC;
-	case VT_POLMAV: return HT_POLMAV;
-	case VT_BOXVILLE: return HT_BOXVILLE;
-	case VT_BENSON: return HT_BENSON;
-	case VT_MESA: return HT_MESA;
-	case VT_RCGOBLIN: return HT_RCGOBLIN;
-	case VT_HOTRINA: return HT_HOTRING;
-	case VT_HOTRINB: return HT_HOTRING;
-	case VT_BLOODRA: return HT_BLOODRA;
-	case VT_RNCHLURE: return HT_RANCHER;
-	case VT_SUPERGT: return HT_SUPERGT;
-	case VT_ELEGANT: return HT_ELEGANT;
-	case VT_JOURNEY: return HT_JOURNEY;
-	case VT_BIKE: return HT_CHOPPERB;
-	case VT_MTBIKE: return HT_MTB;
-	case VT_BEAGLE: return HT_BEAGLE;
-	case VT_CROPDUST: return HT_CROPDUST;
-	case VT_STUNT: return HT_STUNT;
-	case VT_PETRO: return HT_PETROL;
-	case VT_RDTRAIN: return HT_RDTRAIN;
-	case VT_NEBULA: return HT_NEBULA;
-	case VT_MAJESTIC: return HT_MAJESTIC;
-	case VT_BUCCANEE: return HT_BUCCANEE;
-	case VT_SHAMAL: return HT_SHAMAL;
-	case VT_HYDRA: return HT_HYDRA;
-	case VT_FCR900: return HT_FCR900;
-	case VT_NRG500: return HT_NRG500;
-	case VT_COPBIKE: return HT_HPV1000;
-	case VT_CEMENT: return HT_CEMENT;
-	case VT_TOWTRUCK: return HT_TOWTRUCK;
-	case VT_FORTUNE: return HT_FORTUNE;
-	case VT_CADRONA: return HT_CADRONA;
-	case VT_FBITRUCK: return HT_FBITRUCK;
-	case VT_WILLARD: return HT_WILLARD;
-	case VT_FORKLIFT: return HT_FORKLIFT;
-	case VT_TRACTOR: return HT_TRACTOR;
-	case VT_COMBINE: return HT_COMBINE;
-	case VT_FELTZER: return HT_FELTZER;
-	case VT_REMINGTN: return HT_REMINGTN;
-	case VT_SLAMVAN: return HT_SLAMVAN;
-	case VT_BLADE: return HT_BLADE;
-	case VT_FREIGHT: return HT_FREIGHT;
-	case VT_STREAK: return HT_STREAK;
-	case VT_VORTEX: return HT_VORTEX;
-	case VT_VINCENT: return HT_VINCENT;
-	case VT_BULLET: return HT_BULLET;
-	case VT_CLOVER: return HT_CLOVER;
-	case VT_SADLER: return HT_SADLER;
-	case VT_FIRELA: return HT_FIRETRUK;
-	case VT_HUSTLER: return HT_HUSTLER;
-	case VT_INTRUDER: return HT_INTRUDER;
-	case VT_PRIMO: return HT_PRIMO;
-	case VT_CARGOBOB: return HT_CARGOBOB;
-	case VT_TAMPA: return HT_TAMPA;
-	case VT_SUNRISE: return HT_SUNRISE;
-	case VT_MERIT: return HT_MERIT;
-	case VT_UTILITY: return HT_UTILITY;
-	case VT_NEVADA: return HT_NEVADA;
-	case VT_YOSEMITE: return HT_YOSEMITE;
-	case VT_WINDSOR: return HT_WINDSOR;
-	case VT_MONSTERA: return HT_MTRUCK_A;
-	case VT_MONSTERB: return HT_MTRUCK_B;
-	case VT_URANUS: return HT_URANUS;
-	case VT_JESTER: return HT_JESTER;
-	case VT_SULTAN: return HT_SULTAN;
-	case VT_STRATUM: return HT_STRATUM;
-	case VT_ELEGY: return HT_ELEGY;
-	case VT_RAINDANC: return HT_RAINDANC;
-	case VT_RCTIGER: return HT_RCTIGER;
-	case VT_FLASH: return HT_FLASH;
-	case VT_TAHOMA: return HT_TAHOMA;
-	case VT_SAVANNA: return HT_SAVANNA;
-	case VT_BANDITO: return HT_BANDITO;
-	case VT_FREIFLAT: return HT_FREIFLAT;
-	case VT_STREAKC: return HT_CSTREAK;
-	case VT_KART: return HT_KART;
-	case VT_MOWER: return HT_MOWER;
-	case VT_DUNERIDE: return HT_DUNE;
-	case VT_SWEEPER: return HT_SWEEPER;
-	case VT_BROADWAY: return HT_BROADWAY;
-	case VT_TORNADO: return HT_TORNADO;
-	case VT_AT400: return HT_AT400;
-	case VT_DFT30: return HT_DFT30;
-	case VT_HUNTLEY: return HT_HUNTLEY;
-	case VT_STAFFORD: return HT_STAFFORD;
-	case VT_BF400: return HT_BF400;
-	case VT_NEWSVAN: return HT_NEWSVAN;
-	case VT_TUG: return HT_TUG;
-	case VT_PETROTR: return HT_PETROTR;
-	case VT_EMPEROR: return HT_EMPEROR;
-	case VT_WAYFARER: return HT_WAYFARE;
-	case VT_EUROS: return HT_EUROS;
-	case VT_HOTDOG: return HT_HOTDOG;
-	case VT_CLUB: return HT_CLUB;
-	case VT_FREIBOX: return HT_FREIFLAT;
-	case VT_ARTICT3: return HT_ARTICT3;
-	case VT_ANDROM: return HT_ANDROM;
-	case VT_DODO: return HT_DODO;
-	case VT_RCCAM: return HT_RCCAM;
-	case VT_LAUNCH: return HT_LAUNCH;
-	case VT_COPCARLA: return HT_POLICE_LA;
-	case VT_COPCARSF: return HT_POLICE_SF;
-	case VT_COPCARVG: return HT_POLICE_VG;
-	case VT_COPCARRU: return HT_POLRANGER;
-	case VT_PICADOR: return HT_PICADOR;
-	case VT_SWATVAN: return HT_SWATVAN;
-	case VT_ALPHA: return HT_ALPHA;
-	case VT_PHOENIX: return HT_PHOENIX;
-	case VT_GLENSHIT: return HT_GLENDALE;
-	case VT_SADLSHIT: return HT_SADLER;
-	case VT_BAGBOXA: return HT_BAGBOXA;
-	case VT_BAGBOXB: return HT_BAGBOXB;
-	case VT_TUGSTAIR: return HT_STAIRS;
-	case VT_BOXBURG: return HT_BOXBURG;
-	case VT_FARMTR1: return HT_FARM_TR1;
-	case VT_UTILTR1: return HT_UTIL_TR1;
-	}
-	return HT_LANDSTAL;
+    switch(eModel)
+    {
+    case VT_LANDSTAL: return HT_LANDSTAL;
+    case VT_BRAVURA: return HT_BRAVURA;
+    case VT_BUFFALO: return HT_BUFFALO;
+    case VT_LINERUN: return HT_LINERUN;
+    case VT_PEREN: return HT_PEREN;
+    case VT_SENTINEL: return HT_SENTINEL;
+    case VT_DUMPER: return HT_DUMPER;
+    case VT_FIRETRUK: return HT_FIRETRUK;
+    case VT_TRASH: return HT_TRASH;
+    case VT_STRETCH: return HT_STRETCH;
+    case VT_MANANA: return HT_MANANA;
+    case VT_INFERNUS: return HT_INFERNUS;
+    case VT_VOODOO: return HT_VOODOO;
+    case VT_PONY: return HT_PONY;
+    case VT_MULE: return HT_MULE;
+    case VT_CHEETAH: return HT_CHEETAH;
+    case VT_AMBULAN: return HT_AMBULAN;
+    case VT_LEVIATHN: return HT_LEVIATHN;
+    case VT_MOONBEAM: return HT_MOONBEAM;
+    case VT_ESPERANT: return HT_ESPERANT;
+    case VT_TAXI: return HT_TAXI;
+    case VT_WASHING: return HT_WASHING;
+    case VT_BOBCAT: return HT_BOBCAT;
+    case VT_MRWHOOP: return HT_MRWHOOP;
+    case VT_BFINJECT: return HT_BFINJECT;
+    case VT_HUNTER: return HT_HUNTER;
+    case VT_PREMIER: return HT_PREMIER;
+    case VT_ENFORCER: return HT_ENFORCER;
+    case VT_SECURICA: return HT_SECURICA;
+    case VT_BANSHEE: return HT_BANSHEE;
+    case VT_PREDATOR: return HT_PREDATOR;
+    case VT_BUS: return HT_BUS;
+    case VT_RHINO: return HT_RHINO;
+    case VT_BARRACKS: return HT_BARRACKS;
+    case VT_HOTKNIFE: return HT_HOTKNIFE;
+    case VT_ARTICT1: return HT_ARTICT1;
+    case VT_PREVION: return HT_PREVION;
+    case VT_COACH: return HT_COACH;
+    case VT_CABBIE: return HT_CABBIE;
+    case VT_STALLION: return HT_STALLION;
+    case VT_RUMPO: return HT_RUMPO;
+    case VT_RCBANDIT: return HT_RCBANDIT;
+    case VT_ROMERO: return HT_ROMERO;
+    case VT_PACKER: return HT_PACKER;
+    case VT_MONSTER: return HT_MONSTER;
+    case VT_ADMIRAL: return HT_ADMIRAL;
+    case VT_SQUALO: return HT_SQUALO;
+    case VT_SEASPAR: return HT_SEASPAR;
+    case VT_PIZZABOY: return HT_MOPED;
+    case VT_TRAM: return HT_TRAM;
+    case VT_ARTICT2: return HT_ARTICT2;
+    case VT_TURISMO: return HT_TURISMO;
+    case VT_SPEEDER: return HT_SPEEDER;
+    case VT_REEFER: return HT_REEFER;
+    case VT_TROPIC: return HT_TROPIC;
+    case VT_FLATBED: return HT_FLATBED;
+    case VT_YANKEE: return HT_YANKEE;
+    case VT_CADDY: return HT_GOLFCART;
+    case VT_SOLAIR: return HT_SOLAIR;
+    case VT_TOPFUN: return HT_TOPFUN;
+    case VT_SKIMMER: return HT_SEAPLANE;
+    case VT_PCJ600: return HT_BIKE;
+    case VT_FAGGIO: return HT_MOPED;
+    case VT_FREEWAY: return HT_FREEWAY;
+    case VT_RCBARON: return HT_RCBARON;
+    case VT_RCRAIDER: return HT_RCRAIDER;
+    case VT_GLENDALE: return HT_GLENDALE;
+    case VT_OCEANIC: return HT_OCEANIC;
+    case VT_SANCHEZ: return HT_DIRTBIKE;
+    case VT_SPARROW: return HT_SPARROW;
+    case VT_PATRIOT: return HT_PATRIOT;
+    case VT_QUAD: return HT_QUADBIKE;
+    case VT_COASTG: return HT_COASTGRD;
+    case VT_DINGHY: return HT_DINGHY;
+    case VT_HERMES: return HT_HERMES;
+    case VT_SABRE: return HT_SABRE;
+    case VT_RUSTLER: return HT_RUSTLER;
+    case VT_ZR350: return HT_ZR350;
+    case VT_WALTON: return HT_WALTON;
+    case VT_REGINA: return HT_REGINA;
+    case VT_COMET: return HT_COMET;
+    case VT_BMX: return HT_BMX;
+    case VT_BURRITO: return HT_BURRITO;
+    case VT_CAMPER: return HT_CAMPER;
+    case VT_MARQUIS: return HT_MARQUIS;
+    case VT_BAGGAGE: return HT_BAGGAGE;
+    case VT_DOZER: return HT_DOZER;
+    case VT_MAVERICK: return HT_MAVERICK;
+    case VT_VCNMAV: return HT_COASTMAV;
+    case VT_RANCHER: return HT_RANCHER;
+    case VT_FBIRANCH: return HT_FBIRANCH;
+    case VT_VIRGO: return HT_VIRGO;
+    case VT_GREENWOO: return HT_GREENWOO;
+    case VT_JETMAX: return HT_CUPBOAT;
+    case VT_HOTRING: return HT_HOTRING;
+    case VT_SANDKING: return HT_SANDKING;
+    case VT_BLISTAC: return HT_BLISTAC;
+    case VT_POLMAV: return HT_POLMAV;
+    case VT_BOXVILLE: return HT_BOXVILLE;
+    case VT_BENSON: return HT_BENSON;
+    case VT_MESA: return HT_MESA;
+    case VT_RCGOBLIN: return HT_RCGOBLIN;
+    case VT_HOTRINA: return HT_HOTRING;
+    case VT_HOTRINB: return HT_HOTRING;
+    case VT_BLOODRA: return HT_BLOODRA;
+    case VT_RNCHLURE: return HT_RANCHER;
+    case VT_SUPERGT: return HT_SUPERGT;
+    case VT_ELEGANT: return HT_ELEGANT;
+    case VT_JOURNEY: return HT_JOURNEY;
+    case VT_BIKE: return HT_CHOPPERB;
+    case VT_MTBIKE: return HT_MTB;
+    case VT_BEAGLE: return HT_BEAGLE;
+    case VT_CROPDUST: return HT_CROPDUST;
+    case VT_STUNT: return HT_STUNT;
+    case VT_PETRO: return HT_PETROL;
+    case VT_RDTRAIN: return HT_RDTRAIN;
+    case VT_NEBULA: return HT_NEBULA;
+    case VT_MAJESTIC: return HT_MAJESTIC;
+    case VT_BUCCANEE: return HT_BUCCANEE;
+    case VT_SHAMAL: return HT_SHAMAL;
+    case VT_HYDRA: return HT_HYDRA;
+    case VT_FCR900: return HT_FCR900;
+    case VT_NRG500: return HT_NRG500;
+    case VT_COPBIKE: return HT_HPV1000;
+    case VT_CEMENT: return HT_CEMENT;
+    case VT_TOWTRUCK: return HT_TOWTRUCK;
+    case VT_FORTUNE: return HT_FORTUNE;
+    case VT_CADRONA: return HT_CADRONA;
+    case VT_FBITRUCK: return HT_FBITRUCK;
+    case VT_WILLARD: return HT_WILLARD;
+    case VT_FORKLIFT: return HT_FORKLIFT;
+    case VT_TRACTOR: return HT_TRACTOR;
+    case VT_COMBINE: return HT_COMBINE;
+    case VT_FELTZER: return HT_FELTZER;
+    case VT_REMINGTN: return HT_REMINGTN;
+    case VT_SLAMVAN: return HT_SLAMVAN;
+    case VT_BLADE: return HT_BLADE;
+    case VT_FREIGHT: return HT_FREIGHT;
+    case VT_STREAK: return HT_STREAK;
+    case VT_VORTEX: return HT_VORTEX;
+    case VT_VINCENT: return HT_VINCENT;
+    case VT_BULLET: return HT_BULLET;
+    case VT_CLOVER: return HT_CLOVER;
+    case VT_SADLER: return HT_SADLER;
+    case VT_FIRELA: return HT_FIRETRUK;
+    case VT_HUSTLER: return HT_HUSTLER;
+    case VT_INTRUDER: return HT_INTRUDER;
+    case VT_PRIMO: return HT_PRIMO;
+    case VT_CARGOBOB: return HT_CARGOBOB;
+    case VT_TAMPA: return HT_TAMPA;
+    case VT_SUNRISE: return HT_SUNRISE;
+    case VT_MERIT: return HT_MERIT;
+    case VT_UTILITY: return HT_UTILITY;
+    case VT_NEVADA: return HT_NEVADA;
+    case VT_YOSEMITE: return HT_YOSEMITE;
+    case VT_WINDSOR: return HT_WINDSOR;
+    case VT_MONSTERA: return HT_MTRUCK_A;
+    case VT_MONSTERB: return HT_MTRUCK_B;
+    case VT_URANUS: return HT_URANUS;
+    case VT_JESTER: return HT_JESTER;
+    case VT_SULTAN: return HT_SULTAN;
+    case VT_STRATUM: return HT_STRATUM;
+    case VT_ELEGY: return HT_ELEGY;
+    case VT_RAINDANC: return HT_RAINDANC;
+    case VT_RCTIGER: return HT_RCTIGER;
+    case VT_FLASH: return HT_FLASH;
+    case VT_TAHOMA: return HT_TAHOMA;
+    case VT_SAVANNA: return HT_SAVANNA;
+    case VT_BANDITO: return HT_BANDITO;
+    case VT_FREIFLAT: return HT_FREIFLAT;
+    case VT_STREAKC: return HT_CSTREAK;
+    case VT_KART: return HT_KART;
+    case VT_MOWER: return HT_MOWER;
+    case VT_DUNERIDE: return HT_DUNE;
+    case VT_SWEEPER: return HT_SWEEPER;
+    case VT_BROADWAY: return HT_BROADWAY;
+    case VT_TORNADO: return HT_TORNADO;
+    case VT_AT400: return HT_AT400;
+    case VT_DFT30: return HT_DFT30;
+    case VT_HUNTLEY: return HT_HUNTLEY;
+    case VT_STAFFORD: return HT_STAFFORD;
+    case VT_BF400: return HT_BF400;
+    case VT_NEWSVAN: return HT_NEWSVAN;
+    case VT_TUG: return HT_TUG;
+    case VT_PETROTR: return HT_PETROTR;
+    case VT_EMPEROR: return HT_EMPEROR;
+    case VT_WAYFARER: return HT_WAYFARE;
+    case VT_EUROS: return HT_EUROS;
+    case VT_HOTDOG: return HT_HOTDOG;
+    case VT_CLUB: return HT_CLUB;
+    case VT_FREIBOX: return HT_FREIFLAT;
+    case VT_ARTICT3: return HT_ARTICT3;
+    case VT_ANDROM: return HT_ANDROM;
+    case VT_DODO: return HT_DODO;
+    case VT_RCCAM: return HT_RCCAM;
+    case VT_LAUNCH: return HT_LAUNCH;
+    case VT_COPCARLA: return HT_POLICE_LA;
+    case VT_COPCARSF: return HT_POLICE_SF;
+    case VT_COPCARVG: return HT_POLICE_VG;
+    case VT_COPCARRU: return HT_POLRANGER;
+    case VT_PICADOR: return HT_PICADOR;
+    case VT_SWATVAN: return HT_SWATVAN;
+    case VT_ALPHA: return HT_ALPHA;
+    case VT_PHOENIX: return HT_PHOENIX;
+    case VT_GLENSHIT: return HT_GLENDALE;
+    case VT_SADLSHIT: return HT_SADLER;
+    case VT_BAGBOXA: return HT_BAGBOXA;
+    case VT_BAGBOXB: return HT_BAGBOXB;
+    case VT_TUGSTAIR: return HT_STAIRS;
+    case VT_BOXBURG: return HT_BOXBURG;
+    case VT_FARMTR1: return HT_FARM_TR1;
+    case VT_UTILTR1: return HT_UTIL_TR1;
+    }
+    return HT_LANDSTAL;
 }
 
 
@@ -510,62 +510,62 @@ void CHandlingManagerSA::LoadHandlingCfg ( void )
 {
     // This is when GTA loads its default handlings. We do that for GTA so handling.cfg
     // is not used anymore.
-	pGame->GetHandlingManager ()->LoadDefaultHandlings ();
-	
-	// Lets do some stuff here
-	// Uncomment code to dump vehicle information
-	/*FILE *fh = fopen("C:\\yo.txt", "a+");
-	FILE *hh = fopen("C:\\Programme\\Rockstar Games\\GTA San Andreas\\data\\vehicles.ide", "r");
-	DWORD n=0;
-	DWORD j=0;
-	BYTE fbuff[256][4096];
+    pGame->GetHandlingManager ()->LoadDefaultHandlings ();
+    
+    // Lets do some stuff here
+    // Uncomment code to dump vehicle information
+    /*FILE *fh = fopen("C:\\yo.txt", "a+");
+    FILE *hh = fopen("C:\\Programme\\Rockstar Games\\GTA San Andreas\\data\\vehicles.ide", "r");
+    DWORD n=0;
+    DWORD j=0;
+    BYTE fbuff[256][4096];
 
-	while (!feof(hh))
-	{
-		BYTE ucRead; fread(&ucRead,1,1,hh);
-		if (ucRead==' ' || ucRead=='	')
-			continue;
-		if (ucRead=='\n')
-		{
-			fbuff[j][n]=0;
-			j++;
-			n=0;
-			continue;
-		}
-		fbuff[j][n]=ucRead;
-		n++;
+    while (!feof(hh))
+    {
+        BYTE ucRead; fread(&ucRead,1,1,hh);
+        if (ucRead==' ' || ucRead=='    ')
+            continue;
+        if (ucRead=='\n')
+        {
+            fbuff[j][n]=0;
+            j++;
+            n=0;
+            continue;
+        }
+        fbuff[j][n]=ucRead;
+        n++;
 
-	}
-	fbuff[j][n]=0;
+    }
+    fbuff[j][n]=0;
 
-	for (n=0; n<j; n++)
-	{
-		if (fbuff[n][0] == '#' || fbuff[n][0] == 0)
-			continue;
-		BYTE *item = (BYTE*)strtok((char*)fbuff[n],",");
-		if (strncmp((const char*)item,"cars",4)==0 || strncmp((const char*)item,"end",3)==0)
-			continue;
-		BYTE act=0;
-		do
-		{
-			// Convert item to uppercase
-			DWORD j;
-			for (j=0; j<strlen((const char*)item); j++)
-				if (islower(item[j])) item[j]=toupper(item[j]);
-			switch(act)
-			{
-			case 1:
-				fprintf(fh, "case VT_%s:", item);
-				break;
-			case 4:
-				fprintf(fh, " return HT_%s;\n", item);
-				break;
-			}
-			act++;
-		} while ( item = (BYTE*)strtok( NULL, "," ) );
-	}
-	fclose(hh);
-	fclose(fh);*/
+    for (n=0; n<j; n++)
+    {
+        if (fbuff[n][0] == '#' || fbuff[n][0] == 0)
+            continue;
+        BYTE *item = (BYTE*)strtok((char*)fbuff[n],",");
+        if (strncmp((const char*)item,"cars",4)==0 || strncmp((const char*)item,"end",3)==0)
+            continue;
+        BYTE act=0;
+        do
+        {
+            // Convert item to uppercase
+            DWORD j;
+            for (j=0; j<strlen((const char*)item); j++)
+                if (islower(item[j])) item[j]=toupper(item[j]);
+            switch(act)
+            {
+            case 1:
+                fprintf(fh, "case VT_%s:", item);
+                break;
+            case 4:
+                fprintf(fh, " return HT_%s;\n", item);
+                break;
+            }
+            act++;
+        } while ( item = (BYTE*)strtok( NULL, "," ) );
+    }
+    fclose(hh);
+    fclose(fh);*/
 }
 
 

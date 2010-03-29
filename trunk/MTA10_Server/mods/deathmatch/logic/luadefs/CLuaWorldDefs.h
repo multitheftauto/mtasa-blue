@@ -29,8 +29,8 @@ public:
     static int      getGravity                          ( lua_State* luaVM );
     static int      getGameSpeed                        ( lua_State* luaVM );
     static int      getWaveHeight                       ( lua_State* luaVM );
-	static int		getFPSLimit							( lua_State* luaVM );
-	static int		getMinuteDuration					( lua_State* luaVM );
+    static int      getFPSLimit                         ( lua_State* luaVM );
+    static int      getMinuteDuration                   ( lua_State* luaVM );
     static int      isGarageOpen                        ( lua_State* luaVM );
     static int      isGlitchEnabled                     ( lua_State* luaVM );
 
@@ -43,8 +43,8 @@ public:
     static int      setWaveHeight                       ( lua_State* luaVM );
     static int      setSkyGradient                      ( lua_State* luaVM );
     static int      resetSkyGradient                    ( lua_State* luaVM );
-	static int		setFPSLimit							( lua_State* luaVM );
-	static int		setMinuteDuration					( lua_State* luaVM );
+    static int      setFPSLimit                         ( lua_State* luaVM );
+    static int      setMinuteDuration                   ( lua_State* luaVM );
     static int      setGarageOpen                       ( lua_State* luaVM );
     static int      setGlitchEnabled                    ( lua_State* luaVM );
     static int      setCloudsEnabled                    ( lua_State* luaVM );

@@ -78,8 +78,8 @@ public:
 
     inline CClientColShape *    GetColShape             ( void ) { return m_pCollision; }
 
-	void						Callback_OnCollision	( CClientColShape& Shape, CClientEntity& Entity );
-	void						Callback_OnLeave		( CClientColShape& Shape, CClientEntity& Entity );
+    void                        Callback_OnCollision    ( CClientColShape& Shape, CClientEntity& Entity );
+    void                        Callback_OnLeave        ( CClientColShape& Shape, CClientEntity& Entity );
 
 protected:
     void                        StreamIn                ( bool bInstantly );

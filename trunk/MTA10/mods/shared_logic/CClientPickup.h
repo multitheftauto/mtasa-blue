@@ -24,7 +24,7 @@ class CClientPickup;
 
 class CClientPickup : public CClientStreamElement, private CClientColCallback
 {
-	friend CClientColShape;
+    friend CClientColShape;
 
 public:
     enum
@@ -38,56 +38,56 @@ public:
 
     enum
     {
-	    WEAPON_BRASSKNUCKLE = 1, 
-	    WEAPON_GOLFCLUB,
-	    WEAPON_NIGHTSTICK,
-	    WEAPON_KNIFE,
-	    WEAPON_BASEBALLBAT,
-	    WEAPON_SHOVEL,
-	    WEAPON_POOL_CUE,
-	    WEAPON_KATANA,
-	    WEAPON_CHAINSAW,
+        WEAPON_BRASSKNUCKLE = 1, 
+        WEAPON_GOLFCLUB,
+        WEAPON_NIGHTSTICK,
+        WEAPON_KNIFE,
+        WEAPON_BASEBALLBAT,
+        WEAPON_SHOVEL,
+        WEAPON_POOL_CUE,
+        WEAPON_KATANA,
+        WEAPON_CHAINSAW,
 
-	    WEAPON_DILDO1,
-	    WEAPON_DILDO2,
-	    WEAPON_VIBE1,
-	    WEAPON_VIBE2,
-	    WEAPON_FLOWERS,
-	    WEAPON_CANE,
+        WEAPON_DILDO1,
+        WEAPON_DILDO2,
+        WEAPON_VIBE1,
+        WEAPON_VIBE2,
+        WEAPON_FLOWERS,
+        WEAPON_CANE,
 
-	    WEAPON_GRENADE,
-	    WEAPON_TEARGAS,
-	    WEAPON_MOLOTOV,
-	    WEAPON_FREEFALL_BOMB = 21,
+        WEAPON_GRENADE,
+        WEAPON_TEARGAS,
+        WEAPON_MOLOTOV,
+        WEAPON_FREEFALL_BOMB = 21,
 
-	    WEAPON_PISTOL,
-	    WEAPON_PISTOL_SILENCED,
-	    WEAPON_DESERT_EAGLE,
-	    WEAPON_SHOTGUN,
-	    WEAPON_SAWNOFF_SHOTGUN,
-	    WEAPON_SPAS12_SHOTGUN,
-	    WEAPON_MICRO_UZI,
-	    WEAPON_MP5,
-	    WEAPON_AK47,
-	    WEAPON_M4,			
-	    WEAPON_TEC9,
-    	
-	    WEAPON_COUNTRYRIFLE,
-	    WEAPON_SNIPERRIFLE,	
-	    WEAPON_ROCKETLAUNCHER,
-	    WEAPON_ROCKETLAUNCHER_HS,
-	    WEAPON_FLAMETHROWER,
-	    WEAPON_MINIGUN,
-	    WEAPON_REMOTE_SATCHEL_CHARGE,
-	    WEAPON_DETONATOR,
-	    WEAPON_SPRAYCAN,
-	    WEAPON_EXTINGUISHER,
-	    WEAPON_CAMERA,
-	    WEAPON_NIGHTVISION,
-	    WEAPON_INFRARED,
-	    WEAPON_PARACHUTE,
+        WEAPON_PISTOL,
+        WEAPON_PISTOL_SILENCED,
+        WEAPON_DESERT_EAGLE,
+        WEAPON_SHOTGUN,
+        WEAPON_SAWNOFF_SHOTGUN,
+        WEAPON_SPAS12_SHOTGUN,
+        WEAPON_MICRO_UZI,
+        WEAPON_MP5,
+        WEAPON_AK47,
+        WEAPON_M4,          
+        WEAPON_TEC9,
+        
+        WEAPON_COUNTRYRIFLE,
+        WEAPON_SNIPERRIFLE, 
+        WEAPON_ROCKETLAUNCHER,
+        WEAPON_ROCKETLAUNCHER_HS,
+        WEAPON_FLAMETHROWER,
+        WEAPON_MINIGUN,
+        WEAPON_REMOTE_SATCHEL_CHARGE,
+        WEAPON_DETONATOR,
+        WEAPON_SPRAYCAN,
+        WEAPON_EXTINGUISHER,
+        WEAPON_CAMERA,
+        WEAPON_NIGHTVISION,
+        WEAPON_INFRARED,
+        WEAPON_PARACHUTE,
 
-	    WEAPON_ARMOUR = 48,
+        WEAPON_ARMOUR = 48,
 
         WEAPON_INVALID = 0xFF,
     };
@@ -114,10 +114,10 @@ public:
     inline bool                 IsVisible                   ( void )                            { return m_bVisible; };
     void                        SetVisible                  ( bool bVisible );
 
-	inline CClientColShape *    GetColShape					( void ) { return m_pCollision; }
+    inline CClientColShape *    GetColShape                 ( void ) { return m_pCollision; }
 
-	void						Callback_OnCollision		( CClientColShape& Shape, CClientEntity& Entity );
-	void						Callback_OnLeave			( CClientColShape& Shape, CClientEntity& Entity );
+    void                        Callback_OnCollision        ( CClientColShape& Shape, CClientEntity& Entity );
+    void                        Callback_OnLeave            ( CClientColShape& Shape, CClientEntity& Entity );
 
 protected:
     void                        StreamIn                    ( bool bInstantly );
@@ -136,7 +136,7 @@ private:
     CVector                     m_vecPosition;
     bool                        m_bVisible;
 
-	CClientColShape*            m_pCollision;
+    CClientColShape*            m_pCollision;
 
 public:
     unsigned char               m_ucType;

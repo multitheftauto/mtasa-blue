@@ -30,7 +30,7 @@ CCommunityLogin::CCommunityLogin ( void )
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 300.0f / 2, resolution.fY / 2 - 150.0f / 2  ), false );
     m_pWindow->SetSize ( CVector2D ( 300.0f, 150.0f ), false );
     m_pWindow->SetSizingEnabled ( false );
-	m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->SetAlwaysOnTop ( true );
 
     m_pLabelText = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "This server requires you to be logged in with\n your MTA Community account, please login:" ) );
     m_pLabelText->SetPosition ( CVector2D ( 15.0f, 20.0f ), false );

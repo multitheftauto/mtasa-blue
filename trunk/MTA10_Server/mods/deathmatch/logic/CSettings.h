@@ -24,36 +24,36 @@ class CResourceManager;
 class CSettings
 {
 public:
-	enum AccessType {
-		Private,
-		Protected,
-		Public
-	};
-									CSettings				( CResourceManager* pResourceManager );
-									~CSettings				( void );
+    enum AccessType {
+        Private,
+        Protected,
+        Public
+    };
+                                    CSettings               ( CResourceManager* pResourceManager );
+                                    ~CSettings              ( void );
 
-	CXMLNode*						Get						( const char *szLocalResource, const char *szSetting, bool& bDeleteNode );
-	bool							Set						( const char *szLocalResource, const char *szSetting, const char *szContent );
+    CXMLNode*                       Get                     ( const char *szLocalResource, const char *szSetting, bool& bDeleteNode );
+    bool                            Set                     ( const char *szLocalResource, const char *szSetting, const char *szContent );
 
 private:
-	enum SettingStatus {
-		NoAccess,
-		NotFound,
-		Found
-	};
+    enum SettingStatus {
+        NoAccess,
+        NotFound,
+        Found
+    };
 
-	CXMLNode*						Get						( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool& bDeleteNode, SettingStatus& eSetting, CXMLNode* pMultiresultParentNode = NULL );
+    CXMLNode*                       Get                     ( CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting, bool& bDeleteNode, SettingStatus& eSetting, CXMLNode* pMultiresultParentNode = NULL );
 
-	CXMLNode*						CreateSetting			( CXMLNode *pDst, const char *szSetting, const char *szContent );
-	inline CSettings::AccessType	GetAccessType			( char cCharacter );
-	inline bool						HasPrefix				( char cCharacter );
-	inline const char*				GetResourceName			( const char *szSetting, char *szBuffer, unsigned int uiLength );
-	inline bool						HasResourceName			( const char *szSetting );
-	inline const char*				GetName					( const char *szSetting, unsigned int uiResourceLength = -1 );
+    CXMLNode*                       CreateSetting           ( CXMLNode *pDst, const char *szSetting, const char *szContent );
+    inline CSettings::AccessType    GetAccessType           ( char cCharacter );
+    inline bool                     HasPrefix               ( char cCharacter );
+    inline const char*              GetResourceName         ( const char *szSetting, char *szBuffer, unsigned int uiLength );
+    inline bool                     HasResourceName         ( const char *szSetting );
+    inline const char*              GetName                 ( const char *szSetting, unsigned int uiResourceLength = -1 );
 
-	SString					m_strPath;
-	CXMLFile*				m_pFile;
-	CXMLNode*				m_pNodeGlobalSettings;
+    SString                 m_strPath;
+    CXMLFile*               m_pFile;
+    CXMLNode*               m_pNodeGlobalSettings;
 
     CResourceManager*       m_pResourceManager;
 };

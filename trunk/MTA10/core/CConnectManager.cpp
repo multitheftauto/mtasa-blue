@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CConnectManager.cpp
-*  PURPOSE:		Manager for connecting to servers
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CConnectManager.cpp
+*  PURPOSE:     Manager for connecting to servers
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
 *               Sebas Lamers <sebasdevelopment@gmx.com>
 *
@@ -30,8 +30,8 @@ CConnectManager::CConnectManager ( void )
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
 
-	// Set default MTU size
-	m_usMTUSize = NET_MTU_DSL;
+    // Set default MTU size
+    m_usMTUSize = NET_MTU_DSL;
 }
 
 
@@ -60,13 +60,26 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         CModManager::GetSingleton ().Unload ();
     }    
 
-	// Is the nick valid?
-	if ( !CheckNickProvided ( (char*) szNick ) )
-	{
+    // Valid nick?
+    if ( !strcmp( szNick, "" ) )
+    {
+        // still default nick
+        g_pCore->GetLocalGUI ()->GetMainMenu ()->ShowDefaultNickMessageBox ();
+        return true;
+    }
+    if ( !CCore::GetSingleton ().IsValidNick ( szNick ) )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new one!", MB_BUTTON_OK | MB_ICON_INFO );
+        return true;
+    }
+
+    // Is the nick valid?
+    if ( !CheckNickProvided ( (char*) szNick ) )
+    {
         SString strBuffer = "Connecting failed. Invalid nick provided!";
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
-		return false;
-	}
+        return false;
+    }
 
     // Save the nick too
     CVARS_SET ( "nick", std::string ( szNick ) );
@@ -131,12 +144,12 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
 
 bool CConnectManager::Event_OnCancelClick ( CGUIElement * pElement )
 {
-	// The user clicked cancel, so abort connecting
-	Abort ();
+    // The user clicked cancel, so abort connecting
+    Abort ();
     // Remove the message box next frame
     g_pCore->RemoveMessageBox ( true );
 
-	return true;
+    return true;
 }
 
 
@@ -182,39 +195,39 @@ void CConnectManager::DoPulse ( void )
                 SString strError;
                 switch ( ucError )
                 {
-		            case ID_RSA_PUBLIC_KEY_MISMATCH:
+                    case ID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error";  // encryption key mismatch
-			            break;
-		            case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-			            strError = "Disconnected: disconnected remotely";
-			            break;
-		            case ID_REMOTE_CONNECTION_LOST:
-			            strError = "Disconnected: connection lost remotely";
-			            break;
-		            case ID_CONNECTION_BANNED:
-			            strError = "Disconnected: you are banned from this server";
-			            break;
-		            case ID_NO_FREE_INCOMING_CONNECTIONS:
-			            strError = "Disconnected: server is full";
-			            break;
-		            case ID_DISCONNECTION_NOTIFICATION:
-			            strError = "Disconnected: disconnected";
-			            break;
-		            case ID_CONNECTION_LOST:
-			            strError = "Disconnected: connection lost";
-			            break;
-		            case ID_INVALID_PASSWORD:
-			            strError = "Disconnected: invalid password";
-			            break;
+                        break;
+                    case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+                        strError = "Disconnected: disconnected remotely";
+                        break;
+                    case ID_REMOTE_CONNECTION_LOST:
+                        strError = "Disconnected: connection lost remotely";
+                        break;
+                    case ID_CONNECTION_BANNED:
+                        strError = "Disconnected: you are banned from this server";
+                        break;
+                    case ID_NO_FREE_INCOMING_CONNECTIONS:
+                        strError = "Disconnected: server is full";
+                        break;
+                    case ID_DISCONNECTION_NOTIFICATION:
+                        strError = "Disconnected: disconnected";
+                        break;
+                    case ID_CONNECTION_LOST:
+                        strError = "Disconnected: connection lost";
+                        break;
+                    case ID_INVALID_PASSWORD:
+                        strError = "Disconnected: invalid password";
+                        break;
                     default:
-			            strError = "Disconnected: connection refused";
-			            break;
+                        strError = "Disconnected: connection refused";
+                        break;
                 }
 
                 // Display an error, reset the error status and exit
                 CCore::GetSingleton ().ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
-				CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
+                CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();
             }
         }
@@ -318,7 +331,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     // Failed loading the mod
                     strArguments.Format ( "No such mod installed (%s)", szModName );
                     CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
-					g_pConnectManager->Abort ();
+                    g_pConnectManager->Abort ();
                 }
             }
             else

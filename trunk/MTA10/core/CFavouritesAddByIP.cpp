@@ -27,7 +27,7 @@ CFavouritesAddByIP::CFavouritesAddByIP ( void )
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 280.0f / 2, resolution.fY / 2 - 90.0f / 2  ), false );
     m_pWindow->SetSize ( CVector2D ( 280.0f, 90.0f ), false );
     m_pWindow->SetSizingEnabled ( false );
-	m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->SetAlwaysOnTop ( true );
 
     // Create the controls
     float fPosX = 0.0f;

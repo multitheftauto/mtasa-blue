@@ -30,9 +30,9 @@ class CVaPassNext{
 public:
     SVaPassNext<50> svapassnext;
     CVaPassNext(va_list & args){
-		try{//to avoid access violation
-			memcpy(&svapassnext, args, sizeof(svapassnext));
-		} catch (...) {}
+        try{//to avoid access violation
+            memcpy(&svapassnext, args, sizeof(svapassnext));
+        } catch (...) {}
     }
 };
 #define va_pass(valist) CVaPassNext(valist).svapassnext
@@ -85,7 +85,7 @@ public:
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
-	#error MAX_CHAT_LENGTH "macro can't exceed 255"
+    #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
 
 // Defines how long the whowas list can be
@@ -97,50 +97,50 @@ public:
 // Upper player limit
 #define MAX_PLAYER_COUNT 128
 #if MAX_PLAYER_COUNT > 254
-	#error MAX_PLAYER_COUNT "macro can't exceed 254"
+    #error MAX_PLAYER_COUNT "macro can't exceed 254"
 #endif
 
 // Game Type
 #define GAME_TYPE_STRING "MTA:SA"
 
 // Banlist filename
-#define FILENAME_BANLIST	"banlist.xml"
+#define FILENAME_BANLIST    "banlist.xml"
 
 // Settings filename
-#define FILENAME_SETTINGS	"settings.xml"
+#define FILENAME_SETTINGS   "settings.xml"
 
 // Settings root-node
-#define ROOTNODE_SETTINGS	"settings"
+#define ROOTNODE_SETTINGS   "settings"
 
 // Settings prefixes and delimiters
-#define SETTINGS_PREFIX_PRIVATE		'@'						// Private prefix
-#define SETTINGS_PREFIX_PROTECTED	'#'						// Protected prefix
-#define SETTINGS_PREFIX_PUBLIC		'*'						// Public prefix
-#define SETTINGS_NO_PREFIX			CSettings::Private		// Access type when no prefix is used
-#define SETTINGS_DELIMITER			'.'						// Delimiter
+#define SETTINGS_PREFIX_PRIVATE     '@'                     // Private prefix
+#define SETTINGS_PREFIX_PROTECTED   '#'                     // Protected prefix
+#define SETTINGS_PREFIX_PUBLIC      '*'                     // Public prefix
+#define SETTINGS_NO_PREFIX          CSettings::Private      // Access type when no prefix is used
+#define SETTINGS_DELIMITER          '.'                     // Delimiter
 
 // Maximum length for names and values in settings registry
-#define MAX_SETTINGS_LENGTH			256
+#define MAX_SETTINGS_LENGTH         256
 
 // Maximum resource length
-#define MAX_RESOURCE_LENGTH			64
+#define MAX_RESOURCE_LENGTH         64
 
 // SQL variable placeholder (replaces with actual variable content)
-#define	SQL_VARIABLE_PLACEHOLDER	'?'
+#define SQL_VARIABLE_PLACEHOLDER    '?'
 
 // Security script path
-#define LUA_SECURITY_SCRIPT			"security.lua"
+#define LUA_SECURITY_SCRIPT         "security.lua"
 
 // Server FPS limit (in milliseconds)
-#define FPS_LIMIT					16
+#define FPS_LIMIT                   16
 
 // Default MTU size
-#define MTU_SIZE_DEFAULT			1264
+#define MTU_SIZE_DEFAULT            1264
 
 // Max garages
 #define MAX_GARAGES                 50
 
 // Game-monitor.com query URL (use %u for port input)
-#define QUERY_URL_GAME_MONITOR		"http://master.game-monitor.com/heartbeat.php?p=%u&e=3"
+#define QUERY_URL_GAME_MONITOR      "http://master.game-monitor.com/heartbeat.php?p=%u&e=3"
 
 #endif

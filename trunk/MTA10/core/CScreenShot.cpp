@@ -21,12 +21,12 @@ static bool bIsDebugVisible = false;
 SString CScreenShot::PreScreenShot ()
 {
 
-	bIsChatVisible = g_pCore->IsChatVisible ();
-	bIsDebugVisible = g_pCore->IsDebugVisible ();
+    bIsChatVisible = g_pCore->IsChatVisible ();
+    bIsDebugVisible = g_pCore->IsDebugVisible ();
 
-	// make the chat and debug windows invisible
-	g_pCore->SetChatVisible ( false );
-	g_pCore->SetDebugVisible ( false );
+    // make the chat and debug windows invisible
+    g_pCore->SetChatVisible ( false );
+    g_pCore->SetDebugVisible ( false );
 
     SString strScreenShotName = GetValidScreenshotFilename();
 
@@ -35,17 +35,17 @@ SString CScreenShot::PreScreenShot ()
 
 void CScreenShot::PostScreenShot ( const char *szFileName )
 {
-	// print a notice
+    // print a notice
     g_pCore->GetConsole()->Printf ( "Screenshot taken: '%s'", szFileName );
 
-	// make the chat and debug windows visible again
-	g_pCore->SetChatVisible ( bIsChatVisible );
-	g_pCore->SetDebugVisible ( bIsDebugVisible );
+    // make the chat and debug windows visible again
+    g_pCore->SetChatVisible ( bIsChatVisible );
+    g_pCore->SetDebugVisible ( bIsDebugVisible );
 }
 
 void CScreenShot::SetPath ( const char *szPath )
 {
-	strncpy ( szScreenShotPath, szPath, MAX_PATH - 1 );
+    strncpy ( szScreenShotPath, szPath, MAX_PATH - 1 );
 
     // make sure the directory exists
     mkdir ( szPath );
@@ -112,6 +112,6 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
         }
     }
     FindClose(hFind); //Close the file handle
-	// Get Return the file directory
-	return strReturn;
+    // Get Return the file directory
+    return strReturn;
 }

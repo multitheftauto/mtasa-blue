@@ -59,7 +59,7 @@ CGame::CGame ( void )
     srand ( (unsigned int) time ( NULL ) );
     InitializeTime ();
 
-	m_bBeingDeleted = false;
+    m_bBeingDeleted = false;
     m_pUnoccupiedVehicleSync = NULL;
     m_pConsole = NULL;
     m_pMapManager = NULL;
@@ -92,7 +92,7 @@ CGame::CGame ( void )
     m_pRemoteCalls = NULL;
     m_pResourceDownloader = NULL;
     m_pRPCFunctions = NULL;
-	m_pLanBroadcast = NULL;
+    m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
 
@@ -102,9 +102,9 @@ CGame::CGame ( void )
 
     m_pASE = NULL;
     ResetMapInfo();
-	m_usFPS = 0;
-	m_usFrames = 0;
-	m_ulLastFPSTime = 0;
+    m_usFPS = 0;
+    m_usFrames = 0;
+    m_ulLastFPSTime = 0;
     m_szCurrentFileName = NULL;
     m_pConsoleClient = NULL;
     m_bIsFinished = false;
@@ -145,7 +145,7 @@ void CGame::ResetMapInfo ( void )
 
 CGame::~CGame ( void )
 {
-	m_bBeingDeleted = true;
+    m_bBeingDeleted = true;
 
     // Remove our console control handler
     #ifdef WIN32
@@ -206,14 +206,14 @@ CGame::~CGame ( void )
 
 void CGame::GetTag ( char *szInfoTag, int iInfoTag )
 {
-	// Construct the info tag
+    // Construct the info tag
     _snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
-			   132, 135, szProgress[ucProgress], 132,
+               132, 135, szProgress[ucProgress], 132,
                130, 130, m_pPlayerManager->Count (), m_pMainConfig->GetMaxPlayers (),
                130, 130, m_pResourceManager->GetResourceLoadedCount (),
-			   130, 130, m_usFPS );
-	if (iInfoTag > 0)
-		szInfoTag[iInfoTag-1] = '\0';
+               130, 130, m_usFPS );
+    if (iInfoTag > 0)
+        szInfoTag[iInfoTag-1] = '\0';
 }
 
 
@@ -222,7 +222,7 @@ void CGame::HandleInput ( char* szCommand )
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
     // Handle the input
-	m_pConsole->HandleInput ( szCommand, m_pConsoleClient, m_pConsoleClient );
+    m_pConsole->HandleInput ( szCommand, m_pConsoleClient, m_pConsoleClient );
 
     // Unlock the critical section again
     Unlock();
@@ -234,26 +234,26 @@ void CGame::DoPulse ( void )
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
     // Calculate FPS
-	unsigned long ulCurrentTime = GetTickCount ();
-	unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
+    unsigned long ulCurrentTime = GetTickCount ();
+    unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
 
-	// Update the progress rotator
-	if ( ucProgressSkip == 5 ) {
-		ucProgressSkip = 0;
+    // Update the progress rotator
+    if ( ucProgressSkip == 5 ) {
+        ucProgressSkip = 0;
 
-		// Clamp ucProgress between 0 and 3
-		ucProgress = ( ucProgress + 1 ) & 3;
-	}
-	ucProgressSkip++;
+        // Clamp ucProgress between 0 and 3
+        ucProgress = ( ucProgress + 1 ) & 3;
+    }
+    ucProgressSkip++;
 
-	// Calculate the server-side fps
-	if ( ulDiff >= 1000 )
-	{
-		m_usFPS = m_usFrames;
-		m_usFrames = 0;
-		m_ulLastFPSTime = ulCurrentTime;
-	}
-	m_usFrames++;
+    // Calculate the server-side fps
+    if ( ulDiff >= 1000 )
+    {
+        m_usFPS = m_usFrames;
+        m_usFrames = 0;
+        m_ulLastFPSTime = ulCurrentTime;
+    }
+    m_usFrames++;
 
 
 #ifdef MTA_VOICE
@@ -306,8 +306,8 @@ void CGame::DoPulse ( void )
     // Pulse the net interface
     g_pNetServer->DoPulse ();
 
-	if ( m_pLanBroadcast )
-		m_pLanBroadcast->DoPulse();
+    if ( m_pLanBroadcast )
+        m_pLanBroadcast->DoPulse();
 
     // Pulse our stuff
     m_pMapManager->DoPulse ();
@@ -351,7 +351,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
 
-	m_pGroups = new CGroups;
+    m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;
     m_pColManager = new CColManager;
@@ -415,7 +415,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Create the account manager
     m_pAccountManager = new CAccountManager ( NULL );
 
-	// Create and start the HTTP server
+    // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
 
     // Enable it if required
@@ -445,30 +445,30 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // Show the server header
-	CLogger::LogPrintfNoStamp ( "===========================================================\n" \
-								"= Multi Theft Auto: San Andreas v%s\n" \
-								"===========================================================\n" \
-								"= Server name		: %s\n" \
-								"= Server IP address	: %s\n" \
-								"= Server port		: %u\n" \
-								"= \n" \
-								"= Log file		: %s\n" \
-								"= Maximum players	: %u\n" \
-								"= MTU packet size	: %u\n" \
-								"= HTTP port		: %u\n" \
-								"===========================================================\n",
+    CLogger::LogPrintfNoStamp ( "===========================================================\n" \
+                                "= Multi Theft Auto: San Andreas v%s\n" \
+                                "===========================================================\n" \
+                                "= Server name      : %s\n" \
+                                "= Server IP address    : %s\n" \
+                                "= Server port      : %u\n" \
+                                "= \n" \
+                                "= Log file     : %s\n" \
+                                "= Maximum players  : %u\n" \
+                                "= MTU packet size  : %u\n" \
+                                "= HTTP port        : %u\n" \
+                                "===========================================================\n",
 
                                 MTA_DM_BUILDTAG_SHORT,
-								m_pMainConfig->GetServerName ().c_str (),
-								szServerIP ? szServerIP : "",
-								usServerPort,
-								pszLogFileName,
-								uiMaxPlayers,
-								m_pMainConfig->GetMTUSize (),
+                                m_pMainConfig->GetServerName ().c_str (),
+                                szServerIP ? szServerIP : "",
+                                usServerPort,
+                                pszLogFileName,
+                                uiMaxPlayers,
+                                m_pMainConfig->GetMTUSize (),
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0 );
 
-	if ( !bLogFile )
-		CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
+    if ( !bLogFile )
+        CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
 
 
     // Setup resource-cache directory
@@ -518,10 +518,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-	m_pRemoteCalls = new CRemoteCalls();
+    m_pRemoteCalls = new CRemoteCalls();
     m_pRegistry = new CRegistry ("");
 
-	m_pResourceManager = new CResourceManager;
+    m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
@@ -582,7 +582,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Add our builtin events
     AddBuiltInEvents ();
 
-	// Load the vehicle colors before the main config
+    // Load the vehicle colors before the main config
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "vehiclecolors.conf" );
     if ( !m_pVehicleManager->GetColorManager ()->Load ( strBuffer ) )
     {
@@ -616,13 +616,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
 
-	// Grab the MTU size
-	unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
+    // Grab the MTU size
+    unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
 
     // Try to start the network
     if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
     {
-		CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
+        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
         return false;
     }
 
@@ -630,53 +630,53 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pBanManager->LoadBanList ();
 
     // If the server is passworded
-	if ( m_pMainConfig->HasPassword () )
-	{
+    if ( m_pMainConfig->HasPassword () )
+    {
         // Check it for validity
         const char* szPassword = m_pMainConfig->GetPassword ().c_str ();
         unsigned int uiUnsupportedIndex;
         if ( m_pMainConfig->IsValidPassword ( szPassword, uiUnsupportedIndex ) )
         {
             // Store the server password
-		    CLogger::LogPrintf ( "Server password set to '%s'\n", szPassword );
+            CLogger::LogPrintf ( "Server password set to '%s'\n", szPassword );
         }
         else
         {
             CLogger::LogPrint ( "Invalid password in config, no password is used\n" );
         }
-	}
+    }
 
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
     {
-		m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
+        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
 
-		if ( m_pMainConfig->GetASEEnabled () )
-		{
-			// Query Wojjie's game-monitor.com
-			CTCPImpl * pTCP = new CTCPImpl ();
-			pTCP->Initialize ();
+        if ( m_pMainConfig->GetASEEnabled () )
+        {
+            // Query Wojjie's game-monitor.com
+            CTCPImpl * pTCP = new CTCPImpl ();
+            pTCP->Initialize ();
 
-			char szURL[256] = { '\0' };
-			CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-			_snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
+            char szURL[256] = { '\0' };
+            CLogger::LogPrint ( "Querying game-monitor.com master server... " );
+            _snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
-			CHTTPRequest * request = new CHTTPRequest ( szURL );
+            CHTTPRequest * request = new CHTTPRequest ( szURL );
             request->SetLocalIP ( szServerIP );
-			CHTTPResponse * response = request->Send ( pTCP );
-			if ( !response )
-				CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-			else if ( response->GetErrorCode () != 200 )
-				CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-			else
-				CLogger::LogPrintfNoStamp ( "success!\n");
+            CHTTPResponse * response = request->Send ( pTCP );
+            if ( !response )
+                CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+            else if ( response->GetErrorCode () != 200 )
+                CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+            else
+                CLogger::LogPrintfNoStamp ( "success!\n");
 
-			delete pTCP;
-			delete request;
-		}
+            delete pTCP;
+            delete request;
+        }
 
         if ( !m_pMainConfig->GetDontBroadcastLan() )
         {
@@ -684,7 +684,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-	// Now load the rest of the config
+    // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
         return false;
 
@@ -697,9 +697,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-	// Set the autopatcher directory
-	strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
-	g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
+    // Set the autopatcher directory
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
+    g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
 
 
 #ifdef MTA_VOICE
@@ -904,8 +904,8 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
-		default:
-			break;
+        default:
+            break;
     }
 
     // Let the unoccupied vehicle sync manager handle it
@@ -966,7 +966,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
 #endif
 
     // Tell the map manager
-    m_pMapManager->OnPlayerJoin ( Player );	// This sends the elements that are needed before the resources start
+    m_pMapManager->OnPlayerJoin ( Player ); // This sends the elements that are needed before the resources start
 
     // Write all players connected right now to a playerlist packet except the one we got the ingame notice from
     CPlayerListPacket PlayerList;
@@ -1001,25 +1001,25 @@ void CGame::InitialDataStream ( CPlayer& Player )
     m_pMapManager->SendBlips ( Player );
 
     // Send him the current info of the current players ( stats, clothes, etc )
-	iter = m_pPlayerManager->IterBegin ();
-	for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-	{
-		if ( &Player != *iter && (*iter)->IsJoined () && (*iter)->IsSpawned () )
-		{
-			float* usStats = (*iter)->GetPlayerStats ();
-			unsigned short count = 0;
-			CPlayerStatsPacket PlayerStats;
+    iter = m_pPlayerManager->IterBegin ();
+    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    {
+        if ( &Player != *iter && (*iter)->IsJoined () && (*iter)->IsSpawned () )
+        {
+            float* usStats = (*iter)->GetPlayerStats ();
+            unsigned short count = 0;
+            CPlayerStatsPacket PlayerStats;
             PlayerStats.SetSourceElement ( *iter );
-			for ( unsigned short us = 0 ; us < NUM_PLAYER_STATS ; us++ )
-			{
+            for ( unsigned short us = 0 ; us < NUM_PLAYER_STATS ; us++ )
+            {
                 if ( usStats [ us ] != 0 )
-				{
-					PlayerStats.Add ( us, usStats [ us ] );
-					count++;
-				}
-			}
-			if ( count > 0 )
-				Player.Send ( PlayerStats );
+                {
+                    PlayerStats.Add ( us, usStats [ us ] );
+                    count++;
+                }
+            }
+            if ( count > 0 )
+                Player.Send ( PlayerStats );
 
             count = 0;
             CPlayerClothesPacket PlayerClothes;
@@ -1027,8 +1027,8 @@ void CGame::InitialDataStream ( CPlayer& Player )
             PlayerClothes.Add ( (*iter)->GetClothes () );
             if ( PlayerClothes.Count () > 0 )
                 Player.Send ( PlayerClothes );
-		}
-	}
+        }
+    }
 
     // Tell the resource manager
     m_pResourceManager->OnPlayerJoin ( Player );
@@ -1128,16 +1128,16 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
 void CGame::AddBuiltInEvents ( void )
 {
-	// Resource events
-	m_Events.AddEvent ( "onResourcePreStart", "resource", NULL, false );
-	m_Events.AddEvent ( "onResourceStart", "resource", NULL, false );
-	m_Events.AddEvent ( "onResourceStop", "resource", NULL, false );
+    // Resource events
+    m_Events.AddEvent ( "onResourcePreStart", "resource", NULL, false );
+    m_Events.AddEvent ( "onResourceStart", "resource", NULL, false );
+    m_Events.AddEvent ( "onResourceStop", "resource", NULL, false );
 
     // Blip events
 
     // Marker events
     m_Events.AddEvent ( "onMarkerHit", "player, matchingDimension", NULL, false );
-	m_Events.AddEvent ( "onMarkerLeave", "player, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onMarkerLeave", "player, matchingDimension", NULL, false );
 
     // Object events
 
@@ -1147,7 +1147,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPickupSpawn", "", NULL, false );
 
     // Player events
-	m_Events.AddEvent ( "onPlayerConnect", "player", NULL, false );
+    m_Events.AddEvent ( "onPlayerConnect", "player", NULL, false );
     m_Events.AddEvent ( "onPlayerChat", "text", NULL, false );
     m_Events.AddEvent ( "onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false );
     m_Events.AddEvent ( "onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false );
@@ -1159,7 +1159,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false );
     m_Events.AddEvent ( "onPlayerWeaponSwitch", "previous, current", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerHit", "marker, matchingDimension", NULL, false );
-	m_Events.AddEvent ( "onPlayerMarkerLeave", "marker, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onPlayerMarkerLeave", "marker, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupHit", "pickup, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupUse", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
@@ -1167,7 +1167,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerBan", "ban", NULL, false );
     m_Events.AddEvent ( "onPlayerLogin", "guest_account, account, auto-login", NULL, false );
     m_Events.AddEvent ( "onPlayerLogout", "account, guest_account", NULL, false );
-	m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
+    m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
     m_Events.AddEvent ( "onPlayerPrivateMessage", "text, player", NULL, false );
 
     // Ped events
@@ -1179,7 +1179,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onElementColShapeLeave", "colshape, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onElementDataChange", "key, oldValue", NULL, false );
-	m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
+    m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
 
     // Radar area events
 
@@ -1201,9 +1201,9 @@ void CGame::AddBuiltInEvents ( void )
     // Console events
     m_Events.AddEvent ( "onConsole", "text", NULL, false );
 
-	// Ban events
-	m_Events.AddEvent ( "onBan", "ip", NULL, false );
-	m_Events.AddEvent ( "onUnban", "ip", NULL, false );
+    // Ban events
+    m_Events.AddEvent ( "onBan", "ip", NULL, false );
+    m_Events.AddEvent ( "onUnban", "ip", NULL, false );
 }
 
 
@@ -1227,7 +1227,7 @@ void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
 
 void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 {
-	// Grab the nick
+    // Grab the nick
     const char* szNick = Packet.GetNick ();
     if ( szNick && szNick [0] != 0 )
     {
@@ -1307,51 +1307,51 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             // If he's not join flooding
                             if ( !m_pMainConfig->GetJoinFloodProtectionEnabled () || !m_FloodProtect.AddConnect ( SString ( "%x", Packet.GetSourceIP() ) ) )
                             {
-								// Set the nick and the game version
-								pPlayer->SetNick ( szNick );
-								pPlayer->SetGameVersion ( Packet.GetGameVersion () );
-								pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
-								pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
-								pPlayer->SetSerialUser ( Packet.GetSerialUser () );
+                                // Set the nick and the game version
+                                pPlayer->SetNick ( szNick );
+                                pPlayer->SetGameVersion ( Packet.GetGameVersion () );
+                                pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
+                                pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
+                                pPlayer->SetSerialUser ( Packet.GetSerialUser () );
                                 pPlayer->SetSerial ( strSerial );
 
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
 
-								// Check the serial for validity
+                                // Check the serial for validity
                                 if ( !pPlayer->GetSerial ().empty() &&
                                      m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
-								{
-									// Tell the console
-									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-									// Tell the player he's banned
+                                    // Tell the player he's banned
                                     if ( pPlayer->GetMTAVersion () <= 0x102 )
                                         DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned - If this is in error, ensure you have the lastest version of MTA." );
                                     else
                                         DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
-									return;
-								}
+                                    return;
+                                }
 
                                 if ( !pPlayer->GetSerialUser ().empty() &&
                                      m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
-								{
-									// Tell the console
-									CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-									// Tell the player he's banned
-									DisconnectPlayer ( this, *pPlayer, "Disconnected: Account is banned" );
-									return;
-								}
+                                    // Tell the player he's banned
+                                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Account is banned" );
+                                    return;
+                                }
 
-								// Add him to the whowas list
-								m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial () );
+                                // Add him to the whowas list
+                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial () );
 
                                 // Verify the player's serial if necessary
                                 if ( m_pMainConfig->GetSerialVerificationEnabled () )
                                     m_SerialManager.Verify ( pPlayer, PlayerCompleteConnect );
                                 else
-								    PlayerCompleteConnect ( pPlayer, true, NULL );
+                                    PlayerCompleteConnect ( pPlayer, true, NULL );
                             }
                             else
                             {
@@ -1690,7 +1690,7 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
 void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
 {
     // Grab the source player, even name, element id and the arguments passed
-	CPlayer* pCaller = Packet.GetSourcePlayer ();
+    CPlayer* pCaller = Packet.GetSourcePlayer ();
     char* szName = Packet.GetName ();
     ElementID ElementID = Packet.GetElementID ();
     CLuaArguments Arguments = Packet.GetArguments ();
@@ -2540,19 +2540,19 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                         }
                     }
                 }
-				else
-				{
+                else
+                {
                     CVehicleInOutPacket Reply ( ID, 0, VEHICLE_ATTEMPT_FAILED );
                     Reply.SetSourceElement ( pPlayer );
                     pPlayer->Send ( Reply );
-				}
+                }
             }
-			else
-			{
+            else
+            {
                 CVehicleInOutPacket Reply ( ID, 0, VEHICLE_ATTEMPT_FAILED );
                 Reply.SetSourceElement ( pPlayer );
                 pPlayer->Send ( Reply );
-			}
+            }
         }
         else
         {
@@ -2680,7 +2680,7 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
             if ( pPlayer )
             {
                 pPlayer->GetNick ( szNick, 256 );
-				szNick[255] = '\0';
+                szNick[255] = '\0';
 
                 // Pass the packet to the voice server.
                 if (!m_pVoiceServer->DecodeAndQueuePacket ( pPlayer->GetID(),
@@ -2727,48 +2727,48 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
 {
     char szIP [22];
     SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
-	if ( bSuccess )
-	{
-		// Call the onPlayerConnect event. If it returns false, disconnect the player
-		CLuaArguments Arguments;
-		char szIP [22];
-		Arguments.PushString ( pPlayer->GetNick () );
-		Arguments.PushString ( pPlayer->GetSourceIP ( szIP ) );
-		Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
-		Arguments.PushString ( pPlayer->GetSerial ().c_str() );
+    if ( bSuccess )
+    {
+        // Call the onPlayerConnect event. If it returns false, disconnect the player
+        CLuaArguments Arguments;
+        char szIP [22];
+        Arguments.PushString ( pPlayer->GetNick () );
+        Arguments.PushString ( pPlayer->GetSourceIP ( szIP ) );
+        Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
+        Arguments.PushString ( pPlayer->GetSerial ().c_str() );
         Arguments.PushNumber ( pPlayer->GetMTAVersion () );
-		if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
-		{
-			// event cancelled, disconnect the player
-			CLogger::LogPrintf ( "CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
-			const char* szError = g_pGame->GetEvents()->GetLastError ();
-			if ( szError )
-			{
-				DisconnectPlayer ( g_pGame, *pPlayer, szError );
-				return;
-			}
-			DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: server refused the connection" );
-			return;
-		}
+        if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
+        {
+            // event cancelled, disconnect the player
+            CLogger::LogPrintf ( "CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
+            const char* szError = g_pGame->GetEvents()->GetLastError ();
+            if ( szError )
+            {
+                DisconnectPlayer ( g_pGame, *pPlayer, szError );
+                return;
+            }
+            DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: server refused the connection" );
+            return;
+        }
 
-		// Tell the console
-		CLogger::LogPrintf ( "CONNECT: %s connected (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
+        // Tell the console
+        CLogger::LogPrintf ( "CONNECT: %s connected (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
 
-		// Send him the join details
-		pPlayer->Send ( CPlayerConnectCompletePacket () );
+        // Send him the join details
+        pPlayer->Send ( CPlayerConnectCompletePacket () );
 
         // The player is spawned when he's connected, just the Camera is not faded in/not targetting
         pPlayer->SetSpawned ( true );
-	}
-	else
-	{
-		CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid serial) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
-		if ( szError && strlen ( szError ) > 0 )
-			DisconnectPlayer ( g_pGame, *pPlayer, szError );
-		else
-			DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: Serial verification failed" );
-		return;
-	}
+    }
+    else
+    {
+        CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid serial) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
+        if ( szError && strlen ( szError ) > 0 )
+            DisconnectPlayer ( g_pGame, *pPlayer, szError );
+        else
+            DisconnectPlayer ( g_pGame, *pPlayer, "Disconnected: Serial verification failed" );
+        return;
+    }
 }
 
 

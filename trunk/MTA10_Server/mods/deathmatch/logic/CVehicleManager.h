@@ -23,7 +23,7 @@ class CVehicleManager;
 #include "lua/CLuaMain.h"
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
-#define VEHICLE_PASSENGERS_UNDEFINED	255
+#define VEHICLE_PASSENGERS_UNDEFINED    255
 
 class CVehicleManager
 {
@@ -42,7 +42,7 @@ public:
 
     static bool                         IsValidModel                ( unsigned int uiVehicleModel );
     static eVehicleType                 GetVehicleType              ( unsigned short usModel );
-	static bool							IsValidUpgrade				( unsigned short usUpgrade );
+    static bool                         IsValidUpgrade              ( unsigned short usUpgrade );
     static unsigned int                 GetMaxPassengers            ( unsigned int uiVehicleModel );
     static bool                         HasTurret                   ( unsigned int uiVehicleModel );
     static bool                         HasSirens                   ( unsigned int uiVehicleModel );
@@ -55,7 +55,7 @@ public:
     inline CVehicleColorManager*        GetColorManager             ( void )                            { return &m_ColorManager; };
     CVehicleColor                       GetRandomColor              ( unsigned short usModel );
 
-	void								GetVehiclesOfType			( unsigned int uiModel, CLuaMain* pLuaMain );
+    void                                GetVehiclesOfType           ( unsigned int uiModel, CLuaMain* pLuaMain );
 
     list < CVehicle* > ::const_iterator IterBegin                   ( void )                            { return m_List.begin (); };
     list < CVehicle* > ::const_iterator IterEnd                     ( void )                            { return m_List.end (); };

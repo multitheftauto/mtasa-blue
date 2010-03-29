@@ -65,8 +65,8 @@ public:
     void                FileDownloadComplete ( CResourceDownloadFile * file );
     void                FileDownloadFailed ( CResourceDownloadFile * file );
     unsigned int        GetFilesRemainingToDownload();
-	static bool			IsVersionSafe ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion, SVersion* pMaxVersion );
-	static bool			IsVersionTooLow ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion );
+    static bool         IsVersionSafe ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion, SVersion* pMaxVersion );
+    static bool         IsVersionTooLow ( unsigned int uiMajor, unsigned int uiMinor, unsigned int uiRevision, SVersion* pMinVersion );
 };
 
 // This class represents a single available resource version update
@@ -119,7 +119,7 @@ public:
     inline std::string& GetName() { return m_strName; };
     inline unsigned int GetVersionCount() { return m_versions.size(); };
     void                FindUpdates ( unsigned int majorMin, unsigned int minorMin, unsigned int revisionMin, unsigned int stateMin, list<CUpdateResourceVersion *> * updates );
-	void                FindUpdates ( SVersion* pMinVersion, SVersion* pMaxVersion, list<CUpdateResourceVersion*> * updates );
+    void                FindUpdates ( SVersion* pMinVersion, SVersion* pMaxVersion, list<CUpdateResourceVersion*> * updates );
     void                GetLatestVersion ( unsigned int state, CUpdateResourceVersion ** version );
     CUpdateResourceVersion * Get ( unsigned int majorVersion, unsigned int minorVersion, unsigned int revisionVersion, unsigned int state );
 };
@@ -149,7 +149,7 @@ public:
     inline std::string& GetURL() { return m_strURL; };
 
     void                FindUpdates ( const char * szResourceName, unsigned int majorMin, unsigned int minorMin, unsigned int revisionMin, unsigned int stateMin, list<CUpdateResourceVersion *> * updates );
-	void                FindUpdates ( const char * szResourceName, SVersion* pMinVersion, SVersion* pMaxVersion, list<CUpdateResourceVersion*> * updates );
+    void                FindUpdates ( const char * szResourceName, SVersion* pMinVersion, SVersion* pMaxVersion, list<CUpdateResourceVersion*> * updates );
     void                GetAvailableResources ( list<CUpdateResource *> * updates );
     void                GetLatestVersion ( const char * szResourceName, unsigned int state, CUpdateResourceVersion ** version );
     CUpdateResourceVersion * Get ( const char * szResourceName, unsigned int majorVersion, unsigned int minorVersion, unsigned int revisionVersion, unsigned int state );
@@ -162,19 +162,19 @@ class CResourceDownloader
 {
 private:
     list<CUpdateSite *> m_updateSites;
-	list<CResource *> m_WaitingResources;
+    list<CResource *> m_WaitingResources;
 public:
                         ~CResourceDownloader();
     bool                AddUpdateSite ( const char * szURL );
     void                FindUpdates ( const char * szResourceName, unsigned int majorMin, unsigned int minorMin, unsigned int revisionMin, unsigned int stateMin, list<CUpdateResourceVersion *> * updates );
-	bool                FindUpdates ( const char * szResourceName, SVersion* pMinVersion, SVersion* pMaxVersion );
+    bool                FindUpdates ( const char * szResourceName, SVersion* pMinVersion, SVersion* pMaxVersion );
     void                GetAvailableResources ( list<CUpdateResource *> * updates );
     CUpdateResourceVersion * GetLatestVersion ( const char * szResourceName, unsigned int state );
     CUpdateResourceVersion * Get ( const char * szResourceName, unsigned int majorVersion, unsigned int minorVersion, unsigned int revisionVersion, unsigned int state );
 
-	void				AddWaitingResource ( CResource* pResource ) { m_WaitingResources.push_back ( pResource ); };
-	void				CheckWaitingResources ( void );
-	void				RemoveWaitingResource ( CResource* pResource ) { m_WaitingResources.remove ( pResource ); };
+    void                AddWaitingResource ( CResource* pResource ) { m_WaitingResources.push_back ( pResource ); };
+    void                CheckWaitingResources ( void );
+    void                RemoveWaitingResource ( CResource* pResource ) { m_WaitingResources.remove ( pResource ); };
 };
 
 #endif

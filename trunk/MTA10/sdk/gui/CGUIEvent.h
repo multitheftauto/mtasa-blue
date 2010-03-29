@@ -17,27 +17,27 @@
 
 struct CGUIEventArgs
 {
-	CGUIElement*	pWindow;
+    CGUIElement*    pWindow;
 };
 
 struct CGUIKeyEventArgs
 {
-	CGUIElement*	pWindow;
+    CGUIElement*    pWindow;
 
-	unsigned int	codepoint;
-	CGUIKeys::Scan	scancode;
-	unsigned int	sysKeys;
+    unsigned int    codepoint;
+    CGUIKeys::Scan  scancode;
+    unsigned int    sysKeys;
 };
 
 struct CGUIMouseEventArgs
 {
-	CGUIElement*				pWindow;
+    CGUIElement*                pWindow;
 
-	CGUIPosition				position;
-	CVector2D					moveDelta;
-	CGUIMouse::MouseButton		button;
-	unsigned int				sysKeys;
-	float						wheelChange;
+    CGUIPosition                position;
+    CVector2D                   moveDelta;
+    CGUIMouse::MouseButton      button;
+    unsigned int                sysKeys;
+    float                       wheelChange;
 };
 
 #endif

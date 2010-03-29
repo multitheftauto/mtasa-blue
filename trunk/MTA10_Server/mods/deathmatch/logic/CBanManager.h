@@ -29,11 +29,11 @@ public:
     CBan*               AddBan                  ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
     CBan*               AddBan                  ( const char* szIP, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*				AddSerialBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-	CBan*				AddSerialBan			( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddSerialBan            ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddSerialBan            ( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*				AddAccountBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-	CBan*				AddAccountBan			( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddAccountBan           ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddAccountBan           ( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
     CBan*               AddBan                  ( CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
@@ -41,8 +41,8 @@ public:
 
     bool                IsBanned                ( const char* szIP );
     bool                IsSpecificallyBanned    ( const char* szIP );
-	bool				IsSerialBanned			( const char* szSerial );
-    bool				IsAccountBanned			( const char* szAccount );
+    bool                IsSerialBanned          ( const char* szSerial );
+    bool                IsAccountBanned         ( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
     void                RemoveAllBans           ( bool bPermanentDelete = false );
 

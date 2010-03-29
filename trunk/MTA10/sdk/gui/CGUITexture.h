@@ -25,8 +25,8 @@ public:
     virtual void                LoadFromMemory          ( const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight ) = 0;
     virtual void                Clear                   ( void ) = 0;
 
-	virtual IDirect3DTexture9*	GetD3DTexture			( void ) = 0;
-	virtual void				CreateTexture			( unsigned int width, unsigned int height ) = 0;
+    virtual IDirect3DTexture9*  GetD3DTexture           ( void ) = 0;
+    virtual void                CreateTexture           ( unsigned int width, unsigned int height ) = 0;
 };
 
 #endif

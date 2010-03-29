@@ -35,7 +35,7 @@ void CCommunityRegistration::CreateWindows ( void )
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 300.0f / 2, resolution.fY / 2 - 300.0f / 2  ), false );
     m_pWindow->SetSize ( CVector2D ( 300.0f, 300.0f ), false );
     m_pWindow->SetSizingEnabled ( false );
-	m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->SetAlwaysOnTop ( true );
 
     m_pLabelUsername = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Username:" ) );
     m_pLabelUsername->SetPosition ( CVector2D ( 15.0f, 60.0f ), false );
@@ -84,8 +84,8 @@ void CCommunityRegistration::CreateWindows ( void )
     m_pEditCode->SetMaxLength ( 6 );
 
     m_pImageCode = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
-	m_pImageCode->SetFrameEnabled ( false );
-	m_pImageCode->SetPosition ( CVector2D ( 205.0f, 180.0f ), false );
+    m_pImageCode->SetFrameEnabled ( false );
+    m_pImageCode->SetPosition ( CVector2D ( 205.0f, 180.0f ), false );
 
     m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Register" ) );
     m_pButtonRegister->SetPosition ( CVector2D ( 100.0f, 270.0f ), false );
@@ -167,7 +167,7 @@ void CCommunityRegistration::DoPulse ( void )
                         fclose ( fp );
 
                         m_pImageCode->LoadFromFile ( "temp.png" );
-	                    m_pImageCode->SetSize ( CVector2D ( 65.0f, 20.0f ), false );
+                        m_pImageCode->SetSize ( CVector2D ( 65.0f, 20.0f ), false );
                         m_pWindow->SetVisible ( true );
                         m_pWindow->BringToFront ();
 
@@ -218,7 +218,7 @@ bool CCommunityRegistration::OnButtonClick ( CGUIElement* pElement )
     }
     else if ( pElement == m_pButtonRegister )
     {
-		if ( m_pEditUsername->GetText().empty() )
+        if ( m_pEditUsername->GetText().empty() )
             g_pCore->ShowMessageBox ( "Error", "Username missing", MB_BUTTON_OK | MB_ICON_INFO );
         else if ( m_pEditEmail->GetText().empty() )
             g_pCore->ShowMessageBox ( "Error", "Email missing", MB_BUTTON_OK | MB_ICON_INFO );
@@ -270,14 +270,14 @@ bool CCommunityRegistration::OnButtonClick ( CGUIElement* pElement )
 bool CCommunityRegistration::HashString ( const char* szString, std::string& strHashString )
 {
     char szHashed[33];
-	if ( szString && strlen ( szString ) > 0 )
-	{
-		MD5 HashedStr;
-		CMD5Hasher Hasher;
-		Hasher.Calculate ( szString, strlen ( szString ), HashedStr );
-		Hasher.ConvertToHex ( HashedStr, szHashed );
+    if ( szString && strlen ( szString ) > 0 )
+    {
+        MD5 HashedStr;
+        CMD5Hasher Hasher;
+        Hasher.Calculate ( szString, strlen ( szString ), HashedStr );
+        Hasher.ConvertToHex ( HashedStr, szHashed );
         strHashString = szHashed;
         return true;
-	}
+    }
     return false;
 }

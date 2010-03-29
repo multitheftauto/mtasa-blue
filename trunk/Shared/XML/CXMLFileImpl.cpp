@@ -42,7 +42,7 @@ CXMLFileImpl::~CXMLFileImpl ( void )
     ClearWrapperTree ();
 
     // Delete the document and the builder
-	delete m_pDocument;
+    delete m_pDocument;
 }
 
 
@@ -68,7 +68,7 @@ bool CXMLFileImpl::Parse ( void )
     if ( m_strFilename != "" )
     {
         // Reset previous file
-		Reset ();
+        Reset ();
 
         // Parse from the current file
         if ( m_pDocument->LoadFile ( m_strFilename.c_str () ) )
@@ -199,8 +199,8 @@ bool CXMLFileImpl::BuildWrapperTree ( void )
     ClearWrapperTree ();
 
     // Grab the root element
-	TiXmlElement* pRootNode = m_pDocument->RootElement ();
-	if ( pRootNode )
+    TiXmlElement* pRootNode = m_pDocument->RootElement ();
+    if ( pRootNode )
     {
         // Create an XML node for it
         m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );

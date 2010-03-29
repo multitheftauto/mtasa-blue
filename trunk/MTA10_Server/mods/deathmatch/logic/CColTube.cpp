@@ -43,8 +43,8 @@ bool CColTube::DoHitDetection ( const CVector& vecLastPosition, const CVector& v
 
 bool CColTube::ReadSpecialData ( void )
 {
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     GetCustomDataFloat ( "radius", m_fRadius, true );

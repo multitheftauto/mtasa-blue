@@ -44,16 +44,16 @@ void CClientStreamElement::UpdateStreamPosition ( const CVector & vecPosition )
     m_pStreamer->OnUpdateStreamPosition ( this );
     m_pManager->OnUpdateStreamPosition ( this );
 
-	// Update attached elements stream position
-	list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
-	for (; i != m_AttachedEntities.end(); i++)
-	{
-		CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
-		if ( attachedElement )
-		{
-			attachedElement->UpdateStreamPosition( vecPosition + attachedElement->m_vecAttachedPosition );
-		}
-	}
+    // Update attached elements stream position
+    list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
+    for (; i != m_AttachedEntities.end(); i++)
+    {
+        CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
+        if ( attachedElement )
+        {
+            attachedElement->UpdateStreamPosition( vecPosition + attachedElement->m_vecAttachedPosition );
+        }
+    }
 }
 
 
@@ -74,7 +74,7 @@ void CClientStreamElement::InternalStreamOut ( void )
         StreamOut ();
         m_bStreamedIn = false;
 
-       	// Stream out attached elements
+        // Stream out attached elements
         list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
         for (; i != m_AttachedEntities.end(); i++)
         {

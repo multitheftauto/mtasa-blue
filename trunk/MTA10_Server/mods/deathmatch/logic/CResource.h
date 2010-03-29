@@ -44,36 +44,36 @@
 
 struct SVersion
 {
-	unsigned int m_uiMajor;
-	unsigned int m_uiMinor;
-	unsigned int m_uiRevision;
-	unsigned int m_uiState;
+    unsigned int m_uiMajor;
+    unsigned int m_uiMinor;
+    unsigned int m_uiRevision;
+    unsigned int m_uiState;
 };
 
 class CExportedFunction
 {
 public:
-	enum eExportedFunctionType
+    enum eExportedFunctionType
     {
-		EXPORTED_FUNCTION_TYPE_CLIENT,
-		EXPORTED_FUNCTION_TYPE_SERVER
-	};
+        EXPORTED_FUNCTION_TYPE_CLIENT,
+        EXPORTED_FUNCTION_TYPE_SERVER
+    };
 
 private:
     std::string                     m_strFunctionName;
     vector<std::string>             m_accessList;
     bool                            m_bHTTPAccess;
-	bool							m_bRestricted;
+    bool                            m_bRestricted;
 
-	eExportedFunctionType	        m_ucType;
+    eExportedFunctionType           m_ucType;
 
 public:
                                     CExportedFunction ( const std::string& strFunctionName, const std::string& access, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted )
                                     {
-								        m_ucType = ucType;
+                                        m_ucType = ucType;
                                         m_strFunctionName = strFunctionName;
                                         m_bHTTPAccess = bHTTPAccess;
-										m_bRestricted = bRestricted;
+                                        m_bRestricted = bRestricted;
                                         size_t leng = access.length ();
                                         char szResourceName[MAX_RESOURCE_NAME_LENGTH] = {'\0'};
                                         size_t s = 0;
@@ -90,11 +90,11 @@ public:
                                         }   
                                     }
 
-	inline eExportedFunctionType	GetType ( void ) { return m_ucType; }
+    inline eExportedFunctionType    GetType ( void ) { return m_ucType; }
     inline const std::string&       GetFunctionName ( void ) { return m_strFunctionName; }
-    inline bool						IsHTTPAccessible ( void ) { return m_bHTTPAccess; }
-	inline bool						IsRestricted ( void ) { return m_bRestricted; };
-    inline bool						IsOnAccessList ( char * strResourceName )
+    inline bool                     IsHTTPAccessible ( void ) { return m_bHTTPAccess; }
+    inline bool                     IsRestricted ( void ) { return m_bRestricted; };
+    inline bool                     IsOnAccessList ( char * strResourceName )
     {
         if ( m_accessList.size() == 0 )
             return false;
@@ -114,8 +114,8 @@ private:
     std::string             m_strResourceName;
     unsigned int            m_uiMinimumVersion;
     unsigned int            m_uiMaximumVersion;
-	SVersion				m_MinVersion;
-	SVersion				m_MaxVersion;
+    SVersion                m_MinVersion;
+    SVersion                m_MaxVersion;
     bool                    m_bExists;
     bool                    m_bBadVersion;
     class CResource *       m_resource; // the resource this links to
@@ -128,19 +128,19 @@ public:
         m_resourceManager = manager;
         m_owner = owner;
         m_strResourceName = strResourceName;
-		m_MinVersion = svMinVersion;
-		m_MaxVersion = svMaxVersion;
-		m_uiMinimumVersion = uiMinVersion;
-		m_uiMaximumVersion = uiMaxVersion;
+        m_MinVersion = svMinVersion;
+        m_MaxVersion = svMaxVersion;
+        m_uiMinimumVersion = uiMinVersion;
+        m_uiMaximumVersion = uiMaxVersion;
         m_bExists = false;
         m_resource = NULL;
     }
 
     inline const std::string&   GetName             ( void )    { return m_strResourceName; }
-	int						    GetMinimumVersion   ( void )	{ return m_uiMinimumVersion; }
-	int						    GetMaximumVersion   ( void )	{ return m_uiMaximumVersion; }
-	inline SVersion*		    GetMinVersion       ( void )	{ return &m_MinVersion; };
-	inline SVersion*		    GetMaxVersion       ( void )	{ return &m_MaxVersion; };
+    int                         GetMinimumVersion   ( void )    { return m_uiMinimumVersion; }
+    int                         GetMaximumVersion   ( void )    { return m_uiMaximumVersion; }
+    inline SVersion*            GetMinVersion       ( void )    { return &m_MinVersion; };
+    inline SVersion*            GetMaxVersion       ( void )    { return &m_MaxVersion; };
     inline bool                 DoesExist           ( void ) { return m_bExists; }
     inline bool                 IsBadVersion        ( void ) { return m_bBadVersion; }
     inline CResource *          GetResource         ( void ) { return m_resource; }
@@ -202,30 +202,30 @@ private:
     std::string             m_strCircularInclude;
     bool                    m_bLoaded; // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
     bool                    m_bActive; // resource items are running
-	bool                    m_bStarting; // the resource is starting
-	bool                    m_bStopping; // the resource is stopping
-	bool                    m_bIsPersistent; // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
-	bool					m_bLinked; // if true, the included resources are already linked to this resource
+    bool                    m_bStarting; // the resource is starting
+    bool                    m_bStopping; // the resource is stopping
+    bool                    m_bIsPersistent; // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
+    bool                    m_bLinked; // if true, the included resources are already linked to this resource
     unzFile                 m_zipfile;
     std::string             m_strFailureReason;
 
     bool                    m_bClientConfigs;
     bool                    m_bClientScripts;
     bool                    m_bClientFiles;
-	bool					m_bHasStarted;
+    bool                    m_bHasStarted;
 
     class CResourceManager *      m_resourceManager; 
     class CLuaMain *        m_pVM;
 
-	CXMLNode *				m_pNodeSettings;		// Settings XML node, read from meta.xml and copied into it's own instance
-	CXMLNode *				m_pNodeStorage;			// Dummy XML node used for temporary storage of stuff returned by CSettings::Get
+    CXMLNode *              m_pNodeSettings;        // Settings XML node, read from meta.xml and copied into it's own instance
+    CXMLNode *              m_pNodeStorage;         // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
     unsigned long           m_ulCRC; // CRC last time this was loaded, generated by GenerateCRC()
 
     unsigned short          m_usID; // resource ID    
 
-	bool					m_bProtected;
-	bool					m_bStartedManually;
+    bool                    m_bProtected;
+    bool                    m_bStartedManually;
 
     bool                    CheckState ( void ); // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool                    ReadIncludedResources ( class CXMLNode * root );
@@ -234,7 +234,7 @@ private:
     bool                    ReadIncludedConfigs ( CXMLNode * root );
     bool                    ReadIncludedHTML ( CXMLNode * root );
     bool                    ReadIncludedExports ( CXMLNode * root );
-	bool					ReadIncludedFiles ( CXMLNode * root );
+    bool                    ReadIncludedFiles ( CXMLNode * root );
     bool                    CreateVM ( void );
     bool                    DestroyVM ( void );
     void                    TidyUp ( void );
@@ -288,7 +288,7 @@ public:
     /* Remove any included file from this loaded resource */
     bool                    RemoveFile                  ( const char* szName );
     
-	bool					HasStarted					( void ) { return m_bHasStarted; };
+    bool                    HasStarted                  ( void ) { return m_bHasStarted; };
 
     bool                    Start ( list<CResource *> * dependents = NULL, bool bStartManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                    Stop ( bool bStopManually = false );
@@ -308,16 +308,16 @@ public:
     { 
         return m_strFailureReason; 
     }
-	inline CXMLNode *		GetSettingsNode ( void ) { return m_pNodeSettings; }
-	inline CXMLNode *		GetStorageNode ( void ) { return m_pNodeStorage; }
+    inline CXMLNode *       GetSettingsNode ( void ) { return m_pNodeSettings; }
+    inline CXMLNode *       GetStorageNode ( void ) { return m_pNodeStorage; }
 
     bool                    CallExportedFunction ( char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
 
     inline list<CResource *> *  GetDependents ( void ) { return &m_dependents; }
     inline int              GetDependentCount ( void ) { return m_dependents.size(); }
-	inline list<CIncludedResources *>::iterator GetIncludedResourcesBegin ( void )	{ return m_includedResources.begin(); };
-	inline list<CIncludedResources *>::iterator GetIncludedResourcesEnd ( void )	{ return m_includedResources.end(); };
-	inline int				GetIncludedResourcesCount ( void )	{ return m_includedResources.size(); };
+    inline list<CIncludedResources *>::iterator GetIncludedResourcesBegin ( void )  { return m_includedResources.begin(); };
+    inline list<CIncludedResources *>::iterator GetIncludedResourcesEnd ( void )    { return m_includedResources.end(); };
+    inline int              GetIncludedResourcesCount ( void )  { return m_includedResources.size(); };
     bool                    GetInfoValue ( const char * szKey, std::string& strValue );
     void                    SetInfoValue ( const char * szKey, const char * szValue );
     inline unsigned int     GetVersionMajor ( void ) { return m_uiVersionMajor; }
@@ -326,8 +326,8 @@ public:
     inline unsigned int     GetVersionState ( void ) { return m_uiVersionState; }
     inline bool             IsActive ( void ) { return m_bActive; }
     inline bool             IsLoaded ( void ) { return m_bLoaded; }
-	inline bool             IsStarting ( void ) { return m_bStarting; }
-	inline bool             IsStopping ( void ) { return m_bStopping; }
+    inline bool             IsStarting ( void ) { return m_bStarting; }
+    inline bool             IsStopping ( void ) { return m_bStopping; }
     inline const std::string&   GetName ( void ) { return m_strResourceName; }
     inline CLuaMain *       GetVirtualMachine ( void ) { return m_pVM; }
     void                    AddDependent ( CResource * resource );
@@ -360,8 +360,8 @@ public:
     CDummy*                 GetResourceRootElement ( void ) { return m_pResourceElement; };
     CDummy*                 GetDynamicElementRoot ( void ) { return m_pResourceDynamicElementRoot; };
 
-	void					SetProtected ( bool bProtected )	{ m_bProtected = bProtected; };
-	bool					IsProtected ( void )				{ return m_bProtected; };
+    void                    SetProtected ( bool bProtected )    { m_bProtected = bProtected; };
+    bool                    IsProtected ( void )                { return m_bProtected; };
 
     inline bool             IsResourceZip ( void )  { return m_bResourceIsZip; };
 
@@ -369,7 +369,7 @@ public:
 
     inline list < CResourceFile* >::iterator    IterBegin   ( void )        { return m_resourceFiles.begin(); }
     inline list < CResourceFile* >::iterator    IterEnd     ( void )        { return m_resourceFiles.end(); }
-	inline unsigned short						IterCount	( void )		{ return m_resourceFiles.size(); }
+    inline unsigned short                       IterCount   ( void )        { return m_resourceFiles.size(); }
 
     inline list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }

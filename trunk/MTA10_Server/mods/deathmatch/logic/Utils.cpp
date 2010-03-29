@@ -18,22 +18,22 @@
 #include "net/SyncStructures.h"
 
 #ifdef WIN32
-    LONGLONG	g_lTimeCounts = 0;
+    LONGLONG    g_lTimeCounts = 0;
 #else
     struct timeval     g_tvInitialTime;
 #endif
 
 #ifndef WIN32
-	char * strupr (char* a) {
-		char *ret = a;
-		while (*a != '\0')
-		{
-			if (islower (*a))
-				*a = toupper (*a);
-			++a;
-		}
-		return ret;
-	}
+    char * strupr (char* a) {
+        char *ret = a;
+        while (*a != '\0')
+        {
+            if (islower (*a))
+                *a = toupper (*a);
+            ++a;
+        }
+        return ret;
+    }
 #endif
 
 
@@ -139,8 +139,8 @@ bool CheckNickProvided ( const char* szNick )
         return false;
     if ( stricmp ( szNick, "server" ) == 0 )
         return false;
-	if ( IsIn ( "`", szNick ) )
-		return false;
+    if ( IsIn ( "`", szNick ) )
+        return false;
     return true;
 }
 
@@ -215,32 +215,32 @@ bool IsIn ( const char* szShortText, const char* szLongText)
 {
     if ( szShortText && szLongText )
     {
-	    char* strShort = new char[strlen(szShortText)+1];
-	    char* strLong = new char[strlen(szLongText)+1];
+        char* strShort = new char[strlen(szShortText)+1];
+        char* strLong = new char[strlen(szLongText)+1];
 
-	    strcpy ( strShort, szShortText );
-	    strcpy ( strLong, szLongText );
+        strcpy ( strShort, szShortText );
+        strcpy ( strLong, szLongText );
 
-	    char* szMatch = strstr(uppercase(strLong), uppercase(strShort));
-	    if (szMatch != NULL) {
-		    delete [] strShort;
-		    delete [] strLong;
-		    return true;
-	    }
-	    delete [] strShort;
-	    delete [] strLong;
+        char* szMatch = strstr(uppercase(strLong), uppercase(strShort));
+        if (szMatch != NULL) {
+            delete [] strShort;
+            delete [] strLong;
+            return true;
+        }
+        delete [] strShort;
+        delete [] strLong;
     }
-	return false;
+    return false;
 }
 
 
 char* uppercase(char* s)
 {
-	for(unsigned int i = 0; i < strlen(s); i++)
-	{
-		s[i] = toupper(s[i]);
-	}
-	return s;
+    for(unsigned int i = 0; i < strlen(s); i++)
+    {
+        s[i] = toupper(s[i]);
+    }
+    return s;
 }
 
 
@@ -248,8 +248,8 @@ void stripString(char* szString)
 {
     if ( szString )
     {
-	    int offset = 0;
-		unsigned int i = 0;
+        int offset = 0;
+        unsigned int i = 0;
         size_t sizeString = strlen ( szString );
         for ( i = 0; i < sizeString; i++ )
         {
@@ -262,7 +262,7 @@ void stripString(char* szString)
                 szString[i-offset] = szString[i];
             }
 
-	    }
+        }
         szString[i-offset] = '\0'; 
     }
 }
@@ -456,22 +456,22 @@ void DisconnectConnectionDesync ( CGame* pGame, CPlayer& Player, unsigned int ui
 bool InitializeSockets ( void )
 {
 #ifdef WIN32
-	WSADATA wsaData;
-	if ( WSAStartup ( 0x202, &wsaData ) == SOCKET_ERROR )
-	{
-		WSACleanup ();
-		return false;
-	}
+    WSADATA wsaData;
+    if ( WSAStartup ( 0x202, &wsaData ) == SOCKET_ERROR )
+    {
+        WSACleanup ();
+        return false;
+    }
 #endif
-	return true;
+    return true;
 }
 
 bool CleanupSockets ( void )
 {
 #ifdef WIN32
-	WSACleanup ();
+    WSACleanup ();
 #endif
-	return true;
+    return true;
 }
 
 
@@ -497,19 +497,19 @@ int GetRandom ( int iLow, int iHigh )
 
 bool IsValidFilePath ( const char *szDir )
 {
-	if ( szDir == NULL ) return false;
+    if ( szDir == NULL ) return false;
 
-	unsigned int uiLen = strlen ( szDir );
-	unsigned char c, c_d;
-	
-	// iterate through the char array
-	for ( unsigned int i = 0; i < uiLen; i++ ) {
-		c = szDir[i];										// current character
-		c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;		// one character ahead, if any
-		if ( !IsVisibleCharacter ( c ) || c == ':' || ( c == '.' && c_d == '.' ) || ( c == '\\' && c_d == '\\' ) )
-			return false;
-	}
-	return true;
+    unsigned int uiLen = strlen ( szDir );
+    unsigned char c, c_d;
+    
+    // iterate through the char array
+    for ( unsigned int i = 0; i < uiLen; i++ ) {
+        c = szDir[i];                                       // current character
+        c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;       // one character ahead, if any
+        if ( !IsVisibleCharacter ( c ) || c == ':' || ( c == '.' && c_d == '.' ) || ( c == '\\' && c_d == '\\' ) )
+            return false;
+    }
+    return true;
 }
 
 unsigned int HexToInt ( const char * szHex )
@@ -824,9 +824,9 @@ void RotateVector ( CVector& vecLine, const CVector& vecRotation )
 
 void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
 {
-	in_addr in;
-	in.s_addr = ulIP;;
-	char* szTemp = inet_ntoa ( in );
+    in_addr in;
+    in.s_addr = ulIP;;
+    char* szTemp = inet_ntoa ( in );
     if ( szTemp )
     {
         strncpy ( szDottedIP, szTemp, 22 );
@@ -839,38 +839,38 @@ void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
 
 const char* HTMLEscapeString ( const char *szSource )
 {
-	unsigned long ulLength = strlen ( szSource );
-	unsigned long ulMaxSize = 0;
-	
-	// Count the maximum possible size so we can create an appropriate buffer
-	for ( unsigned long i = 0; i < ulLength; i++ ) {
-		switch ( szSource[i] ) {
-			case '<':	ulMaxSize += 4; break;
-			case '>':	ulMaxSize += 4; break;
-			case '&':	ulMaxSize += 5; break;
-			case '"':	ulMaxSize += 6; break;
-			case '\'':	ulMaxSize += 6; break;
-			default:	ulMaxSize += 1; break;
-		}
-	}
-	
-	// Allocate the buffer
-	char * szBuffer = new char [ ulMaxSize ];
+    unsigned long ulLength = strlen ( szSource );
+    unsigned long ulMaxSize = 0;
+    
+    // Count the maximum possible size so we can create an appropriate buffer
+    for ( unsigned long i = 0; i < ulLength; i++ ) {
+        switch ( szSource[i] ) {
+            case '<':   ulMaxSize += 4; break;
+            case '>':   ulMaxSize += 4; break;
+            case '&':   ulMaxSize += 5; break;
+            case '"':   ulMaxSize += 6; break;
+            case '\'':  ulMaxSize += 6; break;
+            default:    ulMaxSize += 1; break;
+        }
+    }
+    
+    // Allocate the buffer
+    char * szBuffer = new char [ ulMaxSize ];
 
-	// Concatenate all the characters and their potential replacements
-	unsigned long c = 0;
-	for ( unsigned long i = 0; i < ulLength; i++ ) {
-		switch ( szSource[i] ) {
-			case '<':	strcat ( szBuffer, "&lt;" );	break;
-			case '>':	strcat ( szBuffer, "&gt;" );	break;
-			case '&':	strcat ( szBuffer, "&amp;" );	break;
-			case '"':	strcat ( szBuffer, "&quot;" );	break;
-			case '\'':	strcat ( szBuffer, "&apos;" );	break;
-			default:	szBuffer[c] = szSource[i];		break;
-			c++;
-		}
-	}
-	return szBuffer;
+    // Concatenate all the characters and their potential replacements
+    unsigned long c = 0;
+    for ( unsigned long i = 0; i < ulLength; i++ ) {
+        switch ( szSource[i] ) {
+            case '<':   strcat ( szBuffer, "&lt;" );    break;
+            case '>':   strcat ( szBuffer, "&gt;" );    break;
+            case '&':   strcat ( szBuffer, "&amp;" );   break;
+            case '"':   strcat ( szBuffer, "&quot;" );  break;
+            case '\'':  strcat ( szBuffer, "&apos;" );  break;
+            default:    szBuffer[c] = szSource[i];      break;
+            c++;
+        }
+    }
+    return szBuffer;
 }
 
 

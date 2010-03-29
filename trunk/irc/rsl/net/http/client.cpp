@@ -214,7 +214,7 @@ void HTTPClient::Send(const std::string& vars)
           }
           std::string headerName(line, 0, p);
           std::string headerValue(line, p + 2);
-	  HTTPHeader header = { headerName, headerValue };
+      HTTPHeader header = { headerName, headerValue };
           m_receivedHeaders.push_back(header);
 
           if (!strcasecmp(headerName.c_str(), "Content-Length"))

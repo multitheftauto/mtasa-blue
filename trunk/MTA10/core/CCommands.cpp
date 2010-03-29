@@ -1,11 +1,11 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCommands.cpp
-*  PURPOSE:		Management for dynamically added commands
-*  DEVELOPERS:	Christian Myhre Lundheim <>
-*				Derek Abdine <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCommands.cpp
+*  PURPOSE:     Management for dynamically added commands
+*  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Derek Abdine <>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -51,8 +51,8 @@ void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMA
     strncpy ( pCommand->szCommandName, szCommand,
               GET_LENGTH_BOUND ( MAX_COMMAND_NAME_LENGTH, strlen ( szCommand ) + 1 ) );
 
-	strncpy ( pCommand->szDescription, szDescription,
-			  GET_LENGTH_BOUND ( MAX_COMMAND_DESCRIPTION_LENGTH, strlen ( szDescription ) + 1 ) );
+    strncpy ( pCommand->szDescription, szDescription,
+              GET_LENGTH_BOUND ( MAX_COMMAND_DESCRIPTION_LENGTH, strlen ( szDescription ) + 1 ) );
 
     // Set the command.
     pCommand->pfnCmdFunc = pfnHandler;
@@ -212,9 +212,9 @@ void CCommands::Delete ( const char* szCommand )
             delete *iter;
             iter = m_CommandList.erase ( iter );
         }
-		else
-			++iter;
-	}
+        else
+            ++iter;
+    }
 }
 
 
@@ -247,7 +247,7 @@ tagCOMMANDENTRY* CCommands::Get ( const char* szCommand, bool bCheckIfMod, bool 
                 return *iter;
             }
         }    
-	}
+    }
 
     // Couldn't find it
     return NULL;

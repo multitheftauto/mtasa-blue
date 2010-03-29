@@ -39,7 +39,7 @@ public:
     void                            GetPosition             ( CVector& vecPosition ) const;
     void                            SetPosition             ( const CVector& vecPosition );
 
-	void							AttachTo                ( CClientEntity* pEntity );
+    void                            AttachTo                ( CClientEntity* pEntity );
 
     void                            GetRotationDegrees      ( CVector& vecRotation ) const;
     void                            GetRotationRadians      ( CVector& vecRotation ) const;
@@ -66,13 +66,13 @@ public:
 
     inline bool                     IsStatic                ( void )                            { return m_bIsStatic; }
     void                            SetStatic               ( bool bStatic );
-	
-    inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }	
-    void						    SetAlpha			    ( unsigned char ucAlpha );
+    
+    inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
+    void                            SetAlpha                ( unsigned char ucAlpha );
     void                            SetScale                ( float fScale );
 
     inline bool                     IsCollisionEnabled      ( void )                            { return m_bUsesCollision; };
-    void						    SetCollisionEnabled	    ( bool bCollisionEnabled );
+    void                            SetCollisionEnabled     ( bool bCollisionEnabled );
 
     void                            ReCreate                ( void );
 protected:

@@ -35,7 +35,7 @@ public:
 
     void                            StopScriptsOwnedBy      ( int iOwner );
 
-	CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner );
+    CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner );
     bool                            RemoveVirtualMachine    ( CLuaMain* vm );
     CLuaMain*                       GetVirtualMachine       ( lua_State* luaVM );
     CLuaMain*                       GetVirtualMachine       ( const char* szFilename );
@@ -48,9 +48,9 @@ public:
 
     void                            DoPulse                 ( void );
 
-	void                            SetScriptDebugging      ( CScriptDebugging* pScriptDebugging );
+    void                            SetScriptDebugging      ( CScriptDebugging* pScriptDebugging );
 
-	CClientGUIManager*				m_pGUIManager;
+    CClientGUIManager*              m_pGUIManager;
 
 private:
     void                            LoadCFunctions          ( void );

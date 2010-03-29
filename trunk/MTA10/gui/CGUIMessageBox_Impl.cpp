@@ -13,8 +13,8 @@
 #include "StdInc.h"
 #include "../core/CFilePathTranslator.h"
 
-#define MESSAGEBOX_WIDTH	    400.0f
-#define MESSAGEBOX_HEIGHT	    150.0f
+#define MESSAGEBOX_WIDTH        400.0f
+#define MESSAGEBOX_HEIGHT       150.0f
 #define MESSAGEBOX_SPACER       20
 #define MESSAGEBOX_ICON_SIZE    42
 
@@ -22,18 +22,18 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
 {
     // Initialize
     m_bAutoDestroy = true;      // TODO: If any buttons..
-	m_pIcon = NULL;
-	m_pButton = NULL;
-	m_pLabelCaption = NULL;
+    m_pIcon = NULL;
+    m_pButton = NULL;
+    m_pLabelCaption = NULL;
 
     // Create window
-	CVector2D ScreenSize = pGUI->GetResolution ();
-	m_pWindow = pGUI->CreateWnd ( NULL, szTitle );
+    CVector2D ScreenSize = pGUI->GetResolution ();
+    m_pWindow = pGUI->CreateWnd ( NULL, szTitle );
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetPosition ( CVector2D ( ScreenSize.fX*0.5f - MESSAGEBOX_WIDTH*0.5f, ScreenSize.fY*0.5f - MESSAGEBOX_HEIGHT*0.5f ) );
-    m_pWindow->SetSize ( CVector2D ( MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT ) );		// relative 0.35, 0.225
+    m_pWindow->SetSize ( CVector2D ( MESSAGEBOX_WIDTH, MESSAGEBOX_HEIGHT ) );       // relative 0.35, 0.225
 
     // Create the icon
     m_pIcon = pGUI->CreateStaticImage ( m_pWindow );
@@ -41,14 +41,14 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     m_pIcon->SetPosition ( CVector2D ( MESSAGEBOX_SPACER, MESSAGEBOX_HEIGHT / 2 - MESSAGEBOX_ICON_SIZE / 2 ) );
     m_pIcon->SetSize ( CVector2D ( MESSAGEBOX_ICON_SIZE, MESSAGEBOX_ICON_SIZE ) );
 
-	if ( uiFlags & MB_ICON_INFO )
-	    m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_INFO );
-	else if ( uiFlags & MB_ICON_QUESTION )
-	    m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_QUESTION );
-	else if ( uiFlags & MB_ICON_WARNING )
-	    m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_WARNING );
-	else if ( uiFlags & MB_ICON_ERROR )
-	    m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_ERROR );
+    if ( uiFlags & MB_ICON_INFO )
+        m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_INFO );
+    else if ( uiFlags & MB_ICON_QUESTION )
+        m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_QUESTION );
+    else if ( uiFlags & MB_ICON_WARNING )
+        m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_WARNING );
+    else if ( uiFlags & MB_ICON_ERROR )
+        m_pIcon->LoadFromFile ( CGUI_ICON_MESSAGEBOX_ERROR );
 
     // Create caption label
     m_pLabelCaption = pGUI->CreateLabel ( m_pWindow, szCaption );
@@ -58,48 +58,48 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     m_pLabelCaption->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
     // Create buttons
-	if ( uiFlags & MB_BUTTON_OK ) {
-		m_pButton = pGUI->CreateButton ( m_pWindow, "OK" );
-	} else if ( uiFlags & MB_BUTTON_CANCEL ) {
-		m_pButton = pGUI->CreateButton ( m_pWindow, "Cancel" );
-	} else if ( uiFlags & MB_BUTTON_YES ) {
-		m_pButton = pGUI->CreateButton ( m_pWindow, "Yes" );
-	}
-
-	if ( m_pButton ) {
-		m_pButton->SetPosition ( CVector2D ( ( MESSAGEBOX_WIDTH - 84 ) / 2, MESSAGEBOX_HEIGHT * 0.76f ) );
-		m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
-
-		SetClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
+    if ( uiFlags & MB_BUTTON_OK ) {
+        m_pButton = pGUI->CreateButton ( m_pWindow, "OK" );
+    } else if ( uiFlags & MB_BUTTON_CANCEL ) {
+        m_pButton = pGUI->CreateButton ( m_pWindow, "Cancel" );
+    } else if ( uiFlags & MB_BUTTON_YES ) {
+        m_pButton = pGUI->CreateButton ( m_pWindow, "Yes" );
     }
 
-	// Set the KeyDown handler
-	m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
+    if ( m_pButton ) {
+        m_pButton->SetPosition ( CVector2D ( ( MESSAGEBOX_WIDTH - 84 ) / 2, MESSAGEBOX_HEIGHT * 0.76f ) );
+        m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
 
-	// And finally set the focus to our window
-	m_pWindow->Activate ();
+        SetClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
+    }
+
+    // Set the KeyDown handler
+    m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
+
+    // And finally set the focus to our window
+    m_pWindow->Activate ();
 }
 
 
 CGUIMessageBox_Impl::~CGUIMessageBox_Impl ( void )
 {
-	if ( m_pButton )
-		delete m_pButton;
+    if ( m_pButton )
+        delete m_pButton;
 
-	if ( m_pLabelCaption )
-		delete m_pLabelCaption;
+    if ( m_pLabelCaption )
+        delete m_pLabelCaption;
 
-	if ( m_pIcon )
-		delete m_pIcon;
-	
+    if ( m_pIcon )
+        delete m_pIcon;
+    
     if ( m_pWindow )
-	    delete m_pWindow;
+        delete m_pWindow;
 }
 
 
 void CGUIMessageBox_Impl::SetClickHandler ( GUI_CALLBACK ResponseHandler )
 {
-	m_pButton->SetClickHandler ( ResponseHandler );
+    m_pButton->SetClickHandler ( ResponseHandler );
 }
 
 
@@ -145,5 +145,5 @@ bool CGUIMessageBox_Impl::OnResponseHandler ( CGUIElement* pElement )
 
 CGUIWindow* CGUIMessageBox_Impl::GetWindow ( void )
 {
-	return m_pWindow;
+    return m_pWindow;
 }

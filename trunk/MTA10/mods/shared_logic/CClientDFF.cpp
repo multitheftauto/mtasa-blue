@@ -44,9 +44,9 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
     if ( !m_pLoadedClump )
     {
         // Attempt loading it
-		m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usCollisionModel );
+        m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usCollisionModel );
 
-		// Return whether we succeeded or not
+        // Return whether we succeeded or not
         return ( m_pLoadedClump != NULL );
     }
 
@@ -58,10 +58,10 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
 void CClientDFF::UnloadDFF ( void )
 {
     // We have a clump loaded?
-	if ( m_pLoadedClump )
+    if ( m_pLoadedClump )
     {
         // Destroy it and null it
-		g_pGame->GetRenderWare ()->DestroyDFF ( m_pLoadedClump );
+        g_pGame->GetRenderWare ()->DestroyDFF ( m_pLoadedClump );
         m_pLoadedClump = NULL;
     }
 }

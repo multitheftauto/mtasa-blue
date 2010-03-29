@@ -32,10 +32,10 @@ public:
     DECLARE_RPC ( SetVehicleSireneOn );
     DECLARE_RPC ( SetVehicleLandingGearDown );
     DECLARE_RPC ( SetHelicopterRotorSpeed );
-	DECLARE_RPC ( AddVehicleUpgrade );
-	DECLARE_RPC ( AddAllVehicleUpgrades );
+    DECLARE_RPC ( AddVehicleUpgrade );
+    DECLARE_RPC ( AddAllVehicleUpgrades );
     DECLARE_RPC ( RemoveVehicleUpgrade );
-	DECLARE_RPC ( SetVehicleDamageState );
+    DECLARE_RPC ( SetVehicleDamageState );
     DECLARE_RPC ( SetVehicleOverrideLights );
     DECLARE_RPC ( SetVehicleEngineState );
     DECLARE_RPC ( SetVehicleDirtLevel );

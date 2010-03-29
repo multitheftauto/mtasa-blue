@@ -20,8 +20,8 @@ class CGUITabPanel : public CGUIElement
 public:
     virtual                         ~CGUITabPanel           ( void ) {};
 
-	virtual CGUITab*                CreateTab               ( const char* szCaption ) = 0;
-	virtual void                    DeleteTab               ( CGUITab* pTab ) = 0;
+    virtual CGUITab*                CreateTab               ( const char* szCaption ) = 0;
+    virtual void                    DeleteTab               ( CGUITab* pTab ) = 0;
 
     virtual CGUITab*                GetSelectedTab          ( void ) = 0;
     virtual void                    SetSelectedTab          ( CGUITab* pTab ) = 0;

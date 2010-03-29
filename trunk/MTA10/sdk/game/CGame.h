@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CGame.h
-*  PURPOSE:		Game base interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CGame.h
+*  PURPOSE:     Game base interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -88,38 +88,38 @@ enum eGameVersion
 class __declspec(novtable) CGame 
 {
 public:
-	virtual CPools				* GetPools()=0;
-	virtual CPlayerInfo			* GetPlayerInfo()=0;
-	virtual CProjectileInfo		* GetProjectileInfo()=0;
-	virtual CRadar				* GetRadar()=0;
-	virtual CRestart			* GetRestart()=0;
-	virtual CClock				* GetClock()=0;
-	virtual CCheckpoints		* GetCheckpoints()=0;
-	virtual CCoronas			* GetCoronas()=0;
-	virtual CEventList			* GetEventList()=0;
-	virtual CFireManager		* GetFireManager()=0;
-	virtual CExplosionManager	* GetExplosionManager()=0;
-	virtual CGarages			* GetGarages()=0;
-	virtual CHud				* GetHud()=0;
-	virtual CWeather			* GetWeather()=0;
-	virtual CWorld				* GetWorld()=0;
-	virtual CCamera				* GetCamera()=0;
-	virtual CPickups			* GetPickups()=0;
-	virtual C3DMarkers			* Get3DMarkers()=0;
-	virtual CPad				* GetPad()=0;
-	virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
-	virtual CAudio				* GetAudio()=0;
-	virtual CMenuManager		* GetMenuManager()=0;
-	virtual CText				* GetText()=0;
-	virtual	CStats				* GetStats()=0;
-	virtual	CTasks              * GetTasks()=0;
-	virtual CFont				* GetFont()=0;
-	virtual CPathFind			* GetPathFind()=0;
-	virtual CPopulation			* GetPopulation()=0;
+    virtual CPools              * GetPools()=0;
+    virtual CPlayerInfo         * GetPlayerInfo()=0;
+    virtual CProjectileInfo     * GetProjectileInfo()=0;
+    virtual CRadar              * GetRadar()=0;
+    virtual CRestart            * GetRestart()=0;
+    virtual CClock              * GetClock()=0;
+    virtual CCheckpoints        * GetCheckpoints()=0;
+    virtual CCoronas            * GetCoronas()=0;
+    virtual CEventList          * GetEventList()=0;
+    virtual CFireManager        * GetFireManager()=0;
+    virtual CExplosionManager   * GetExplosionManager()=0;
+    virtual CGarages            * GetGarages()=0;
+    virtual CHud                * GetHud()=0;
+    virtual CWeather            * GetWeather()=0;
+    virtual CWorld              * GetWorld()=0;
+    virtual CCamera             * GetCamera()=0;
+    virtual CPickups            * GetPickups()=0;
+    virtual C3DMarkers          * Get3DMarkers()=0;
+    virtual CPad                * GetPad()=0;
+    virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
+    virtual CAudio              * GetAudio()=0;
+    virtual CMenuManager        * GetMenuManager()=0;
+    virtual CText               * GetText()=0;
+    virtual CStats              * GetStats()=0;
+    virtual CTasks              * GetTasks()=0;
+    virtual CFont               * GetFont()=0;
+    virtual CPathFind           * GetPathFind()=0;
+    virtual CPopulation         * GetPopulation()=0;
     virtual CGameSettings       * GetSettings()=0;
     virtual CCarEnterExit       * GetCarEnterExit()=0;
     virtual CControllerConfigManager * GetControllerConfigManager() = 0;
-	virtual CRenderWare			* GetRenderWare()=0;
+    virtual CRenderWare         * GetRenderWare()=0;
     virtual IHandlingManager    * GetHandlingManager () = 0;
     virtual CAnimManager        * GetAnimManager () = 0;
     virtual CStreaming          * GetStreaming () = 0;
@@ -128,22 +128,22 @@ public:
     virtual CRopes              * GetRopes () = 0;
     virtual CFx                 * GetFx () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
-	
-	virtual CWeaponInfo			* GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
-	virtual CModelInfo			* GetModelInfo(DWORD dwModelID)=0;
+    
+    virtual CWeaponInfo         * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
+    virtual CModelInfo          * GetModelInfo(DWORD dwModelID)=0;
 
-	virtual DWORD				GetSystemTime (  )=0;
-	virtual BOOL				IsAtMenu (  )=0;
-	virtual BOOL				IsGameLoaded (  )=0;
-	virtual VOID				StartGame (  )=0;
-	virtual VOID				SetSystemState ( eSystemState State )=0;
-	virtual eSystemState		GetSystemState (  )=0;
-	virtual VOID				Pause ( bool bPaused )=0;
-	virtual bool				IsPaused ( )=0;
+    virtual DWORD               GetSystemTime (  )=0;
+    virtual BOOL                IsAtMenu (  )=0;
+    virtual BOOL                IsGameLoaded (  )=0;
+    virtual VOID                StartGame (  )=0;
+    virtual VOID                SetSystemState ( eSystemState State )=0;
+    virtual eSystemState        GetSystemState (  )=0;
+    virtual VOID                Pause ( bool bPaused )=0;
+    virtual bool                IsPaused ( )=0;
     virtual bool                IsInForeground ( )=0;
-	virtual VOID				DisableRenderer( bool bDisabled )=0;
-	virtual VOID				SetRenderHook ( InRenderer* pInRenderer )=0;
-	virtual VOID                TakeScreenshot ( char * szFileName )=0;
+    virtual VOID                DisableRenderer( bool bDisabled )=0;
+    virtual VOID                SetRenderHook ( InRenderer* pInRenderer )=0;
+    virtual VOID                TakeScreenshot ( char * szFileName )=0;
     virtual DWORD               * GetMemoryValue ( DWORD dwOffset )=0;
     virtual void                SetTimeScale ( float fTimeScale )=0;
     virtual float               GetFPS ( void )=0;
@@ -158,7 +158,7 @@ public:
     virtual void                Reset               ( void ) = 0;
     virtual void                Terminate ( void ) = 0;
 
-	virtual BOOL				InitLocalPlayer(  )=0;
+    virtual BOOL                InitLocalPlayer(  )=0;
 
     virtual float               GetGravity ( void ) = 0;
     virtual void                SetGravity ( float fGravity ) = 0;
@@ -166,11 +166,11 @@ public:
     virtual float               GetGameSpeed ( void ) = 0;
     virtual void                SetGameSpeed ( float fSpeed ) = 0;
 
-	virtual unsigned long       GetMinuteDuration ( void ) = 0;
+    virtual unsigned long       GetMinuteDuration ( void ) = 0;
     virtual void                SetMinuteDuration ( unsigned long ulDelay ) = 0;
 
-	virtual unsigned char		GetBlurLevel ( void ) = 0;
-	virtual void				SetBlurLevel ( unsigned char ucLevel ) = 0;
+    virtual unsigned char       GetBlurLevel ( void ) = 0;
+    virtual void                SetBlurLevel ( unsigned char ucLevel ) = 0;
 
     virtual eGameVersion        GetGameVersion ( void ) = 0;
 

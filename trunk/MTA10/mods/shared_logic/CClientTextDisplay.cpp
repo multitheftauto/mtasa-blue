@@ -76,7 +76,7 @@ void CClientTextDisplay::SetCaption ( const char* szCaption )
 
 void CClientTextDisplay::SetPosition ( const CVector &vecPosition )
 {
-	m_vecPosition = vecPosition;
+    m_vecPosition = vecPosition;
 }
 
 
@@ -91,40 +91,40 @@ void CClientTextDisplay::Render ( void )
             g_pCore->GetGraphics ()->DrawText3DA ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ, m_Color, m_fScale * m_fGlobalScale, "%s", m_szCaption );
         }
         else
-        {			
+        {           
             CVector2D vecResolution = g_pCore->GetGUI ()->GetResolution ();
-			unsigned int uiX = unsigned int ( m_vecPosition.fX * vecResolution.fX );
-			unsigned int uiY = unsigned int ( m_vecPosition.fY * vecResolution.fY );
-			if ( m_ulFormat & DT_BOTTOM )
-				m_ulFormat |= DT_SINGLELINE;
+            unsigned int uiX = unsigned int ( m_vecPosition.fX * vecResolution.fX );
+            unsigned int uiY = unsigned int ( m_vecPosition.fY * vecResolution.fY );
+            if ( m_ulFormat & DT_BOTTOM )
+                m_ulFormat |= DT_SINGLELINE;
 
             unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
             SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
 
-			if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
-			{
+            if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
+            {
                 if ( rgbaShadowColor.A > 0 )
                     g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
-			    g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17, uiY, uiX - 17, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
-			}
-			else
-			{				
+                g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17, uiY, uiX - 17, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
+            }
+            else
+            {               
                 if ( rgbaShadowColor.A > 0 )
                     g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
                 g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-			}
-		}
+            }
+        }
     }
 }
 
 void CClientTextDisplay::SetColor ( const SColor color )
 {
-	m_Color = color;
+    m_Color = color;
 }
 
 void CClientTextDisplay::SetColorAlpha ( unsigned char ucAlpha )
 {
-	m_Color.A = ucAlpha;
+    m_Color.A = ucAlpha;
 }
 
 void CClientTextDisplay::SetShadowAlpha ( unsigned char ucShadowAlpha )

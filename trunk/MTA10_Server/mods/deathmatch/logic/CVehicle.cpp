@@ -20,7 +20,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     // Init
     m_pVehicleManager = pVehicleManager;
     m_usModel = usModel;
-	m_pUpgrades = new CVehicleUpgrades ( this );
+    m_pUpgrades = new CVehicleUpgrades ( this );
 
     m_iType = CElement::VEHICLE;
     SetTypeName ( "vehicle" );
@@ -44,7 +44,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
     m_ucPaintjob = 3;
-	m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
+    m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
 
     m_bRespawnInfoChanged = false;
     m_fRespawnHealth = DEFAULT_VEHICLE_HEALTH;
@@ -117,7 +117,7 @@ CVehicle::~CVehicle ( void )
             m_pOccupants [i]->SetVehicleAction ( CPed::VEHICLEACTION_NONE );
         }
     }
-	delete m_pUpgrades;
+    delete m_pUpgrades;
 
     // Remove us from the vehicle manager
     Unlink ();
@@ -126,8 +126,8 @@ CVehicle::~CVehicle ( void )
 
 void CVehicle::Unlink ( void )
 {
-	// Remove us from the vehicle manager
-	m_pVehicleManager->RemoveFromList ( this );
+    // Remove us from the vehicle manager
+    m_pVehicleManager->RemoveFromList ( this );
 }
 
 
@@ -290,10 +290,10 @@ bool CVehicle::ReadSpecialData ( void )
         SetRegPlate ( szTemp );
     }
 
-	if ( GetCustomDataInt ( "interior", iTemp, true ) )
+    if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;
@@ -490,7 +490,7 @@ void CVehicle::SetSyncer ( CPlayer* pPlayer )
 
 unsigned char CVehicle::GetMaxPassengers ( void )
 {
-	return ( ( m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED ) ? CVehicleManager::GetMaxPassengers ( m_usModel ) : m_ucMaxPassengersOverride );
+    return ( ( m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED ) ? CVehicleManager::GetMaxPassengers ( m_usModel ) : m_ucMaxPassengersOverride );
 }
 
 

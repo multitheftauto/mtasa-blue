@@ -41,7 +41,7 @@ public:
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
     void                        SetIP                   ( const std::string& strIP );
 
-	inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
+    inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
     void                        SetSerial               ( const std::string& strSerial );
     
     inline class CClient*       GetClient               ( void )                    { return m_pClient; }
@@ -66,7 +66,7 @@ protected:
     std::string                 m_strName;
     std::string                 m_strPassword;
     std::string                 m_strIP;
-	std::string                 m_strSerial;
+    std::string                 m_strSerial;
 
     unsigned int                m_uiNameHash;
 

@@ -20,51 +20,51 @@ class CMainMenuScene;
 
 class CMainMenuScene : public CSingleton < CMainMenuScene >
 {
-	friend class CMainMenu;
+    friend class CMainMenu;
 
 public:
-						CMainMenuScene					( CMainMenu * pMainMenu );
-						~CMainMenuScene					( void );
+                        CMainMenuScene                  ( CMainMenu * pMainMenu );
+                        ~CMainMenuScene                 ( void );
 
-	void				OnInvalidate					( IDirect3DDevice9 * pDevice );
-	void				OnRestore						( IDirect3DDevice9 * pDevice, CVector2D vecScreenSize, IDirect3DTexture9 * pRenderTarget );
+    void                OnInvalidate                    ( IDirect3DDevice9 * pDevice );
+    void                OnRestore                       ( IDirect3DDevice9 * pDevice, CVector2D vecScreenSize, IDirect3DTexture9 * pRenderTarget );
 
-	bool				ProcessMessage					( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+    bool                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 protected:
-	bool				Init3DScene						( IDirect3DTexture9 * pRenderTarget, CVector2D vecScreenSize );
-	void				Destroy3DScene					( void );
-	void				Draw3DScene						( void );
+    bool                Init3DScene                     ( IDirect3DTexture9 * pRenderTarget, CVector2D vecScreenSize );
+    void                Destroy3DScene                  ( void );
+    void                Draw3DScene                     ( void );
 
-	void				PreStartCredits					( void );
-	void				StartCredits					( void );
-	void				StopCredits						( void );
-	bool				IsCreditsPlaying				( void );
+    void                PreStartCredits                 ( void );
+    void                StartCredits                    ( void );
+    void                StopCredits                     ( void );
+    bool                IsCreditsPlaying                ( void );
 
-	void				SetPostProcessingEnabled		( bool bEnabled );
+    void                SetPostProcessingEnabled        ( bool bEnabled );
 
 private:
-	void				DrawCredit						( unsigned char ucIndex, short sStateRequired, D3DXVECTOR3 vecEyePt, float fDistanceThreshold, bool bIgnore = false );
-	void				DrawRoll						( void );
-	
-	bool				InitShaders						( void );
-	bool				InitRenderTargets				( void );
-	bool				InitCreditSprites				( void );
+    void                DrawCredit                      ( unsigned char ucIndex, short sStateRequired, D3DXVECTOR3 vecEyePt, float fDistanceThreshold, bool bIgnore = false );
+    void                DrawRoll                        ( void );
+    
+    bool                InitShaders                     ( void );
+    bool                InitRenderTargets               ( void );
+    bool                InitCreditSprites               ( void );
 
-	void				DestroyShaders					( void );
-	void				DestroyRenderTargets			( void );
+    void                DestroyShaders                  ( void );
+    void                DestroyRenderTargets            ( void );
 
-	void				CreateCylinder					( IDirect3DDevice9 * pDevice );
+    void                CreateCylinder                  ( IDirect3DDevice9 * pDevice );
 
-	CD3DMGEng *			m_pGFX;
+    CD3DMGEng *         m_pGFX;
 
-	CVector2D			m_vecScreenSize;
+    CVector2D           m_vecScreenSize;
 
-	IDirect3DDevice9 *	m_pDevice;
+    IDirect3DDevice9 *  m_pDevice;
 
-	CGraphics *			m_pGraphics;
-	
-	CMainMenu *			m_pMainMenu;
+    CGraphics *         m_pGraphics;
+    
+    CMainMenu *         m_pMainMenu;
 
     std::vector < D3DMATERIAL9 >         pMeshMaterials;
     std::vector < LPDIRECT3DTEXTURE9 >   pMeshTextures;

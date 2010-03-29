@@ -22,9 +22,9 @@ class CVehicleScannerSA;
 #include "CTaskManagerSA.h"
 #include "CVehicleScannerSA.h"
 
-#define FUNC_IsRespondingToEvent			        0x600DB0
-#define FUNC_GetCurrentEvent				        0x4ABE70
-#define FUNC_GetCurrentEventType			        0x4ABE60
+#define FUNC_IsRespondingToEvent                    0x600DB0
+#define FUNC_GetCurrentEvent                        0x4ABE70
+#define FUNC_GetCurrentEventType                    0x4ABE60
 #define FUNC_CPedIntelligence_TestForStealthKill    0x601E00
 
 class CPed;
@@ -32,19 +32,19 @@ class CPed;
 class CFightManagerInterface
 {
 public:
-    BYTE			Pad1 [ 16 ];
-	BYTE			UnknownState;
-	BYTE			Pad2 [ 3 ];
-	float			fStrafeState;
-	float			fForwardBackwardState;
+    BYTE            Pad1 [ 16 ];
+    BYTE            UnknownState;
+    BYTE            Pad2 [ 3 ];
+    float           fStrafeState;
+    float           fForwardBackwardState;
 };
 
 class CPedIntelligenceSAInterface 
 {
 public:
 // CEventHandlerHistory @ + 56
-	CPedSAInterface *           pPed;
-	DWORD               	    taskManager;	    // +4 (really CTaskManagerSAInterface)
+    CPedSAInterface *           pPed;
+    DWORD                       taskManager;        // +4 (really CTaskManagerSAInterface)
     BYTE                        bPad[16];
     CFightManagerInterface *    fightInterface;     // +24
     BYTE                        bPad2[184];
@@ -54,18 +54,18 @@ public:
 class CPedIntelligenceSA : public CPedIntelligence
 {
 private:
-	CPedIntelligenceSAInterface		* internalInterface;
-	CPed							* ped;
-	CTaskManagerSA					* TaskManager;
+    CPedIntelligenceSAInterface     * internalInterface;
+    CPed                            * ped;
+    CTaskManagerSA                  * TaskManager;
     CVehicleScannerSA               * VehicleScanner;
 public:
-									CPedIntelligenceSA ( CPedIntelligenceSAInterface * pedIntelligenceSAInterface, CPed * ped );
+                                    CPedIntelligenceSA ( CPedIntelligenceSAInterface * pedIntelligenceSAInterface, CPed * ped );
                                     ~CPedIntelligenceSA ( void );
-	CPedIntelligenceSAInterface		* GetInterface ( void ) { return this->internalInterface; }
-	bool							IsRespondingToEvent ( void );
-	int								GetCurrentEventType ( void );
-	CEvent *						GetCurrentEvent ( void );
-	CTaskManager					* GetTaskManager( void );
+    CPedIntelligenceSAInterface     * GetInterface ( void ) { return this->internalInterface; }
+    bool                            IsRespondingToEvent ( void );
+    int                             GetCurrentEventType ( void );
+    CEvent *                        GetCurrentEvent ( void );
+    CTaskManager                    * GetTaskManager( void );
     CVehicleScanner                 * GetVehicleScanner( void );
     bool                            TestForStealthKill ( CPed * pPed, bool bUnk );
 };

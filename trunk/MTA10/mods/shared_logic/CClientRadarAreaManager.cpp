@@ -90,8 +90,8 @@ void CClientRadarAreaManager::SetDimension ( unsigned short usDimension )
 
 void CClientRadarAreaManager::DoPulse ( void )
 {
-	// Always assume that we are rendering
-	DoPulse ( true );
+    // Always assume that we are rendering
+    DoPulse ( true );
 }
 
 // DoPulse with a rendering flag, as this can be called from either a hook (render == true) or the CClientManager::DoPulse (render == false)

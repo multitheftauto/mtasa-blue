@@ -172,30 +172,30 @@ void CClientRadarMarker::SetSprite ( unsigned long ulSprite )
     if ( m_pMarker )
     {
         m_pMarker->SetSprite ( static_cast < eMarkerSprite > ( ulSprite ) );
-	}
+    }
     if ( ulSprite == 0 )
     {
-		if ( m_pMapMarkerImage )
-		{
-			m_pMapMarkerImage->Release();
-			m_pMapMarkerImage = NULL;
-		}
+        if ( m_pMapMarkerImage )
+        {
+            m_pMapMarkerImage->Release();
+            m_pMapMarkerImage = NULL;
+        }
 
-		SetMapMarkerState ( MAP_MARKER_SQUARE );
-	}
-	else if ( ulSprite <= RADAR_MARKER_LIMIT )
-	{
-		m_eMapMarkerState = MAP_MARKER_OTHER;
+        SetMapMarkerState ( MAP_MARKER_SQUARE );
+    }
+    else if ( ulSprite <= RADAR_MARKER_LIMIT )
+    {
+        m_eMapMarkerState = MAP_MARKER_OTHER;
 
-		if ( m_pMapMarkerImage )
-		{
-			m_pMapMarkerImage->Release();
-			m_pMapMarkerImage = NULL;
-		}
+        if ( m_pMapMarkerImage )
+        {
+            m_pMapMarkerImage->Release();
+            m_pMapMarkerImage = NULL;
+        }
 
-	    SString strSprite ( "MTA\\cgui\\images\\radarset\\%02u.png", ulSprite );
+        SString strSprite ( "MTA\\cgui\\images\\radarset\\%02u.png", ulSprite );
         m_pMapMarkerImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath ( strSprite ) );
-	}
+    }
 }
 
 
@@ -247,11 +247,11 @@ void CClientRadarMarker::Destroy ( void )
 {
     DestroyMarker ();
 
-	if ( m_pMapMarkerImage )
-	{
-		m_pMapMarkerImage->Release();
-		m_pMapMarkerImage = NULL;
-	}
+    if ( m_pMapMarkerImage )
+    {
+        m_pMapMarkerImage->Release();
+        m_pMapMarkerImage = NULL;
+    }
 }
 
 
@@ -306,11 +306,11 @@ void CClientRadarMarker::SetMapMarkerState ( EMapMarkerState eMapMarkerState )
     {
         DWORD dwBitMap[MAP_MARKER_WIDTH*MAP_MARKER_HEIGHT];
 
-		if ( m_pMapMarkerImage )
-		{
-			m_pMapMarkerImage->Release();
-			m_pMapMarkerImage = NULL;
-		}
+        if ( m_pMapMarkerImage )
+        {
+            m_pMapMarkerImage->Release();
+            m_pMapMarkerImage = NULL;
+        }
 
         switch ( eMapMarkerState )
         {

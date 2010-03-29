@@ -49,7 +49,7 @@ CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, co
 
     // Create a map of the attributes for later use
     if ( xmlAttributes )
-	    for ( list < CXMLAttribute * > ::iterator iter = xmlAttributes->ListBegin () ; iter != xmlAttributes->ListEnd () ; iter++ )
+        for ( list < CXMLAttribute * > ::iterator iter = xmlAttributes->ListBegin () ; iter != xmlAttributes->ListEnd () ; iter++ )
             m_attributeMap[ ( *iter )->GetName () ] = ( *iter )->GetValue ();
 }
 

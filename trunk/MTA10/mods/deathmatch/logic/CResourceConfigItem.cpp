@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CResourceConfigItem.cpp
 *  PURPOSE:     Resource configuration item class
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*				Christian Myhre Lundheim <>
+*               Christian Myhre Lundheim <>
 *               Chris McArthur <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

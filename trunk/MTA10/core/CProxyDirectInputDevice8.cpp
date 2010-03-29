@@ -22,9 +22,9 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevi
     // Initialize our device member variable.
     m_pDevice       = pDevice;
 
-	// Get the current refcount.
-	pDevice->AddRef ( );
-	m_dwRefCount = pDevice->Release ( );
+    // Get the current refcount.
+    pDevice->AddRef ( );
+    m_dwRefCount = pDevice->Release ( );
 }
 
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8 ( )
@@ -54,25 +54,25 @@ ULONG   CProxyDirectInputDevice8::Release                    ( VOID )
 
     // Determine if we should self destruct
     if ( --m_dwRefCount == 0 )
-	{
+    {
         WriteDebugEvent ( "Releasing IDirectInputDevice8 Proxy..." );
 
-		// Notify the event handler
-		CDirectInputEvents8::OnDirectInputDeviceDestroy ( m_pDevice );
+        // Notify the event handler
+        CDirectInputEvents8::OnDirectInputDeviceDestroy ( m_pDevice );
 
         // Save device so we can destroy it after.
         pDestroyedDevice = m_pDevice;
 
-		// Destroy object.
+        // Destroy object.
         delete this;
 
-		// Call the release routine and get the refcount.
-		ulRefCount = pDestroyedDevice->Release ( );
+        // Call the release routine and get the refcount.
+        ulRefCount = pDestroyedDevice->Release ( );
 
         return ulRefCount;
     }
 
-	ulRefCount = m_pDevice->Release ( );
+    ulRefCount = m_pDevice->Release ( );
 
     return ulRefCount;
 }

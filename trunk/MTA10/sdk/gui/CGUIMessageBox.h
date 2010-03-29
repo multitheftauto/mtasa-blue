@@ -27,9 +27,9 @@ public:
     virtual void                SetVisible              ( bool bVisible ) = 0;
     virtual bool                IsVisible               ( void ) = 0;
 
-	virtual void				SetClickHandler         ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetClickHandler         ( GUI_CALLBACK Callback ) = 0;
 
-	virtual CGUIWindow*			GetWindow				( void ) = 0;
+    virtual CGUIWindow*         GetWindow               ( void ) = 0;
 };
 
 #endif

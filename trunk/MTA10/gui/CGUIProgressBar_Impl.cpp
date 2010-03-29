@@ -16,7 +16,7 @@
 
 CGUIProgressBar_Impl::CGUIProgressBar_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -26,12 +26,12 @@ CGUIProgressBar_Impl::CGUIProgressBar_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUILABEL_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
-	reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> setProgress ( 0 );
+    reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> setProgress ( 0 );
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
     if ( pParent )
@@ -41,7 +41,7 @@ CGUIProgressBar_Impl::CGUIProgressBar_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -54,11 +54,11 @@ CGUIProgressBar_Impl::~CGUIProgressBar_Impl ( void )
 
 void CGUIProgressBar_Impl::SetProgress ( float fProgress )
 {
-	reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> setProgress ( fProgress );
+    reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> setProgress ( fProgress );
 }
 
 
 float CGUIProgressBar_Impl::GetProgress ( void )
 {
-	return reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> getProgress ();
+    return reinterpret_cast < CEGUI::ProgressBar* > ( m_pWindow ) -> getProgress ();
 }

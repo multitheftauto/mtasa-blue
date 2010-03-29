@@ -22,9 +22,9 @@ CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
     WriteDebugEvent ( "CProxyDirect3D9::CProxyDirect3D9" );
     m_pDevice       = pInterface;
 
-	// Give ourself a matching refcount.
-	pInterface->AddRef ( );
-	m_dwRefCount = pInterface->Release ( );
+    // Give ourself a matching refcount.
+    pInterface->AddRef ( );
+    m_dwRefCount = pInterface->Release ( );
 }
 
 CProxyDirect3D9::~CProxyDirect3D9             ( )
@@ -130,12 +130,12 @@ HRESULT    CProxyDirect3D9::CheckDeviceFormatConversion ( UINT Adapter, D3DDEVTY
 }
 
 HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps )
-{	
-	HRESULT hResult;
+{   
+    HRESULT hResult;
 
-	hResult = m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
+    hResult = m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
 
-	return hResult;
+    return hResult;
 }
 
 HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )
@@ -147,7 +147,7 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 {
     HRESULT hResult;
 
-	WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
+    WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
@@ -156,9 +156,9 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         SetWindowText ( hFocusWindow, "MTA: San Andreas" );
     #endif
 
-	// Enable the auto depth stencil parameter
-	pPresentationParameters->EnableAutoDepthStencil = true;
-	
+    // Enable the auto depth stencil parameter
+    pPresentationParameters->EnableAutoDepthStencil = true;
+    
     GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
 
     // Create our object.
@@ -166,12 +166,12 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 
     GetVideoModeManager ()->PostCreateDevice ( *ppReturnedDeviceInterface, pPresentationParameters );
 
-	// Pass the device to the core and store the rendering window in the direct 3d data
-	CCore::GetSingleton ().SetRenderDevice ( *ppReturnedDeviceInterface );
+    // Pass the device to the core and store the rendering window in the direct 3d data
+    CCore::GetSingleton ().SetRenderDevice ( *ppReturnedDeviceInterface );
     CDirect3DData::GetSingleton ().StoreDeviceWindow ( pPresentationParameters->hDeviceWindow );
 
-	// Apply input hook
-	CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
+    // Apply input hook
+    CMessageLoopHook::GetSingleton ( ).ApplyHook ( hFocusWindow );
 
     // Make sure the object was created successfully.
     if ( hResult == D3D_OK )

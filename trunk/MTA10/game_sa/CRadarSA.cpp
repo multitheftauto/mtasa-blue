@@ -15,167 +15,167 @@
 
 #include "StdInc.h"
 
-CMarkerSA			* Markers[MAX_MARKERS];
+CMarkerSA           * Markers[MAX_MARKERS];
 
 CRadarSA::CRadarSA (  )
 {
-	DEBUG_TRACE("CRadarSA::CRadarSA (  )");
-	for(int i = 0; i < MAX_MARKERS; i++)
-		Markers[i] = new CMarkerSA((CMarkerSAInterface *)(ARRAY_CMarker + i * sizeof(CMarkerSAInterface)));
+    DEBUG_TRACE("CRadarSA::CRadarSA (  )");
+    for(int i = 0; i < MAX_MARKERS; i++)
+        Markers[i] = new CMarkerSA((CMarkerSAInterface *)(ARRAY_CMarker + i * sizeof(CMarkerSAInterface)));
 
-//	OutputDebugString("Markers inited");
+//  OutputDebugString("Markers inited");
 }
 
 CRadarSA::~CRadarSA ( )
 {
-	for(int i = 0; i < MAX_MARKERS; i++)
+    for(int i = 0; i < MAX_MARKERS; i++)
     {
         if ( Markers[i] ) delete Markers[i];
     }
 }
 
-CMarker	* CRadarSA::CreateMarker(CVector * vecPosition)
+CMarker * CRadarSA::CreateMarker(CVector * vecPosition)
 {
-	DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CVector * vecPosition)");
-	CMarkerSA * marker;
-	marker = (CMarkerSA *)this->GetFreeMarker();
+    DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CVector * vecPosition)");
+    CMarkerSA * marker;
+    marker = (CMarkerSA *)this->GetFreeMarker();
     if ( marker )
     {
         marker->Init ();
-	    marker->SetPosition(vecPosition);
+        marker->SetPosition(vecPosition);
     }
 
-/*	DWORD dwFunc = FUNC_SetCoordBlip;
-	FLOAT fX = vecPosition->fX; FLOAT fY = vecPosition->fY;	FLOAT fZ = vecPosition->fZ;
-	_asm {
-		push 0
-		push 2
-		push 0
-		push fZ
-		push fY
-		push fX
-		push 4
-		call dwFunc
-		add esp, 0x1C
-	}*/
-	//marker->SetColor((eMarkerColor)MARKER_COLOR_PALE_GREEN);
-	//marker->SetScale(MARKER_SCALE_NORMAL);
-	//marker->SetSprite((eMarkerSprite)MARKER_SPRITE_BORDER);
-	//marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY ); 
+/*  DWORD dwFunc = FUNC_SetCoordBlip;
+    FLOAT fX = vecPosition->fX; FLOAT fY = vecPosition->fY; FLOAT fZ = vecPosition->fZ;
+    _asm {
+        push 0
+        push 2
+        push 0
+        push fZ
+        push fY
+        push fX
+        push 4
+        call dwFunc
+        add esp, 0x1C
+    }*/
+    //marker->SetColor((eMarkerColor)MARKER_COLOR_PALE_GREEN);
+    //marker->SetScale(MARKER_SCALE_NORMAL);
+    //marker->SetSprite((eMarkerSprite)MARKER_SPRITE_BORDER);
+    //marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY ); 
 
-	return marker;
+    return marker;
 }
 
-CMarker	* CRadarSA::CreateMarker(CVehicle * vehicle)
+CMarker * CRadarSA::CreateMarker(CVehicle * vehicle)
 {
-	DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CVehicle * vehicle)");
-	CMarkerSA * marker;
-	marker = (CMarkerSA *)this->GetFreeMarker();
+    DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CVehicle * vehicle)");
+    CMarkerSA * marker;
+    marker = (CMarkerSA *)this->GetFreeMarker();
 
-	marker->SetEntity(vehicle);
-	marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
-	marker->SetScale(MARKER_SCALE_NORMAL);
-	marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
-	marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY); 
+    marker->SetEntity(vehicle);
+    marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
+    marker->SetScale(MARKER_SCALE_NORMAL);
+    marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
+    marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY); 
 
-	return marker;
+    return marker;
 }
 
-CMarker	* CRadarSA::CreateMarker(CObject * object)
+CMarker * CRadarSA::CreateMarker(CObject * object)
 {
-	DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CObject * object)");
-	CMarkerSA * marker;
-	marker = (CMarkerSA *)this->GetFreeMarker();
+    DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CObject * object)");
+    CMarkerSA * marker;
+    marker = (CMarkerSA *)this->GetFreeMarker();
 
-	marker->SetEntity(object);
-	marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
-	marker->SetScale(MARKER_SCALE_NORMAL);
-	marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
-	marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY); 
+    marker->SetEntity(object);
+    marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
+    marker->SetScale(MARKER_SCALE_NORMAL);
+    marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
+    marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY); 
 
-	return marker;
+    return marker;
 }
 
-CMarker	* CRadarSA::CreateMarker(CPed * ped)
+CMarker * CRadarSA::CreateMarker(CPed * ped)
 {
-	DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CPed * ped)");
-	CMarkerSA * marker;
-	marker = (CMarkerSA *)this->GetFreeMarker();
+    DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CPed * ped)");
+    CMarkerSA * marker;
+    marker = (CMarkerSA *)this->GetFreeMarker();
 
-	marker->SetEntity(ped);
-	marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
-	marker->SetScale(MARKER_SCALE_NORMAL);
-	marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
-	marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY);
+    marker->SetEntity(ped);
+    marker->SetColor((eMarkerColor)MARKER_COLOR_YELLOW);
+    marker->SetScale(MARKER_SCALE_NORMAL);
+    marker->SetSprite((eMarkerSprite)MARKER_SPRITE_NONE);
+    marker->SetDisplay((eMarkerDisplay)MARKER_DISPLAY_MARKERONLY);
 
-	return marker;
+    return marker;
 }
 
-CMarker	* CRadarSA::GetFreeMarker(  )
+CMarker * CRadarSA::GetFreeMarker(  )
 {
-	DEBUG_TRACE("CMarker * CRadarSA::GetFreeMarker(  )");
-	int Index;
-	Index = 0;
-	while ((Index < MAX_MARKERS) && (Markers[Index]->GetInterface()->bTrackingBlip))
-	{
-		Index++;
-	}
-	if ( Index >= MAX_MARKERS )
-		return NULL;
-	else
-		return Markers[Index];
+    DEBUG_TRACE("CMarker * CRadarSA::GetFreeMarker(  )");
+    int Index;
+    Index = 0;
+    while ((Index < MAX_MARKERS) && (Markers[Index]->GetInterface()->bTrackingBlip))
+    {
+        Index++;
+    }
+    if ( Index >= MAX_MARKERS )
+        return NULL;
+    else
+        return Markers[Index];
 }
 
-CMarker	* CRadarSA::GetMarker( DWORD dwMarkerID )
+CMarker * CRadarSA::GetMarker( DWORD dwMarkerID )
 {
-	DEBUG_TRACE("CMarker * CRadarSA::GetMarker( DWORD dwMarkerID )");
-	return (CMarker *)Markers[dwMarkerID];
+    DEBUG_TRACE("CMarker * CRadarSA::GetMarker( DWORD dwMarkerID )");
+    return (CMarker *)Markers[dwMarkerID];
 }
 
 VOID CRadarSA::ClearMarkerForEntity(CVehicle * vehicle)
 {
-	DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CVehicle * vehicle)");
-	CMarkerSA * marker;
+    DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CVehicle * vehicle)");
+    CMarkerSA * marker;
 
-	for(int i = 0; i < MAX_MARKERS; i++)
-	{
-		marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
-		if(marker->GetEntity() == (CEntity *)vehicle)
-		{
-			marker->Remove();
-		}
-	}
+    for(int i = 0; i < MAX_MARKERS; i++)
+    {
+        marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
+        if(marker->GetEntity() == (CEntity *)vehicle)
+        {
+            marker->Remove();
+        }
+    }
 }
 
 
 VOID CRadarSA::ClearMarkerForEntity(CObject * object)
 {
-	DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CObject * object)");
-	CMarkerSA * marker;
+    DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CObject * object)");
+    CMarkerSA * marker;
 
-	for(int i = 0; i < MAX_MARKERS; i++)
-	{
-		marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
-		if(marker->GetEntity() == (CEntity *)object)
-		{
-			marker->Remove();
-		}
-	}
+    for(int i = 0; i < MAX_MARKERS; i++)
+    {
+        marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
+        if(marker->GetEntity() == (CEntity *)object)
+        {
+            marker->Remove();
+        }
+    }
 }
 
 VOID CRadarSA::ClearMarkerForEntity(CPed * ped)
 {
-	DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CPed * ped)");
-	CMarkerSA * marker;
+    DEBUG_TRACE("VOID CRadarSA::ClearMarkerForEntity(CPed * ped)");
+    CMarkerSA * marker;
 
-	for(int i = 0; i < MAX_MARKERS; i++)
-	{
-		marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
-		if(marker->GetEntity() == (CEntity *)ped)
-		{
-			marker->Remove();
-		}
-	}
+    for(int i = 0; i < MAX_MARKERS; i++)
+    {
+        marker = (CMarkerSA *)(ARRAY_CMarker + i * sizeof(CMarkerSA));
+        if(marker->GetEntity() == (CEntity *)ped)
+        {
+            marker->Remove();
+        }
+    }
 }
 
 struct CRect {

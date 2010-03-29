@@ -18,12 +18,12 @@
 class CGUIScrollBar : public CGUIElement
 {
 public:
-    virtual                     ~CGUIScrollBar		( void ) {};
+    virtual                     ~CGUIScrollBar      ( void ) {};
 
-    virtual void                SetOnScrollHandler	( const GUI_CALLBACK & Callback ) = 0;
+    virtual void                SetOnScrollHandler  ( const GUI_CALLBACK & Callback ) = 0;
 
-	virtual void				SetScrollPosition	( float fPosition ) = 0;
-	virtual float				GetScrollPosition	( void ) = 0;
+    virtual void                SetScrollPosition   ( float fPosition ) = 0;
+    virtual float               GetScrollPosition   ( void ) = 0;
 };
 
 #endif

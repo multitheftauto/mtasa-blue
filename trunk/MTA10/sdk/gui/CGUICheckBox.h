@@ -20,8 +20,8 @@ class CGUICheckBox : public CGUIElement
 public:
     virtual                     ~CGUICheckBox       ( void ) {};
 
-	virtual void				SetSelected			( bool bSelected ) = 0;
-	virtual bool				GetSelected			( void ) = 0;
+    virtual void                SetSelected         ( bool bSelected ) = 0;
+    virtual bool                GetSelected         ( void ) = 0;
 };
 
 #endif

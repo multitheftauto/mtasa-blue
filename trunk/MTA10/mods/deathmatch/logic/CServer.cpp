@@ -134,7 +134,7 @@ bool CServer::Start ( const char* szConfig )
     if ( !g_bIsStarted )
     {
         m_szConfig = new char [ strlen ( szConfig ) + 1 ];
-	    strcpy ( m_szConfig, szConfig );
+        strcpy ( m_szConfig, szConfig );
 
         // Check that the DLL exists
         if ( !DoesFileExist ( m_strDLLFile ) )

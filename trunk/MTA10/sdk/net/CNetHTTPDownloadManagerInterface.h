@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/net/CNetHTTPDownloadManagerInterface.h
-*  PURPOSE:		Network HTTP download interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/net/CNetHTTPDownloadManagerInterface.h
+*  PURPOSE:     Network HTTP download interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -64,7 +64,7 @@ public:
 
     // Queue a file to download
     virtual bool QueueFile ( const char* szURL, const char* szOutputFile, double dSize = 0, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false ) = 0;
-	virtual bool QueueFile ( const char* szURL, const char* szOutputFile, double dSize = 0, char* szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false ) = 0;
+    virtual bool QueueFile ( const char* szURL, const char* szOutputFile, double dSize = 0, char* szPostData = NULL, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false ) = 0;
 
     // Sets the single download option
     // If true, only one file will be downloaded at any given time, regardless of how many files have been queued.  When one file finishes, the next file will be started

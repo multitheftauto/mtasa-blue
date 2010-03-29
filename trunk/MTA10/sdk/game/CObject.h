@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CObject.h
-*  PURPOSE:		Object entity interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CObject.h
+*  PURPOSE:     Object entity interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -23,10 +23,10 @@ class CObject : public virtual CPhysical
 public:
     virtual                         ~CObject            ( void ) {};
 
-	virtual CObjectSAInterface *    GetObjectInterface  ( void ) = 0;
+    virtual CObjectSAInterface *    GetObjectInterface  ( void ) = 0;
 
-	virtual void                    Explode             ( void ) = 0;
-	virtual void                    SetScale            ( float fScale ) = 0;
+    virtual void                    Explode             ( void ) = 0;
+    virtual void                    SetScale            ( float fScale ) = 0;
     virtual void                    SetHealth           ( float fHealth ) = 0;
     virtual float                   GetHealth           ( void ) = 0;
     virtual void                    SetModelIndex       ( unsigned long ulModel ) = 0;

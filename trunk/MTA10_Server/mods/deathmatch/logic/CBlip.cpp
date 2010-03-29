@@ -104,7 +104,7 @@ bool CBlip::ReadSpecialData ( void )
         m_Color = SColorRGBA ( 0, 0, 255, 255 );
     }
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     // Grab the "ordering" data

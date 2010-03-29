@@ -47,7 +47,7 @@ public:
 
     bool                ActivateOnTab           ( void );
 
-	eCGUIType			GetType					( void ) { return CGUI_EDIT; };
+    eCGUIType           GetType                 ( void ) { return CGUI_EDIT; };
 
     #include "CGUIElement_Inc.h"
 

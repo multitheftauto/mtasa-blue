@@ -19,19 +19,19 @@
 
 #include "CCarGeneratorSA.h"
 
-#define MAX_CAR_GENERATORS		500
+#define MAX_CAR_GENERATORS      500
 
-#define ARRAY_CarGenerators		0xC27AD0
+#define ARRAY_CarGenerators     0xC27AD0
 
 class CTheCarGeneratorsSA : public CTheCarGenerators
 {
 private:
-	CCarGeneratorSA		* CarGenerators[MAX_CAR_GENERATORS];
+    CCarGeneratorSA     * CarGenerators[MAX_CAR_GENERATORS];
 public:
-	CTheCarGeneratorsSA();
+    CTheCarGeneratorsSA();
     ~CTheCarGeneratorsSA();
 
-	CCarGenerator		* GetCarGenerator(DWORD dwIndex);
+    CCarGenerator       * GetCarGenerator(DWORD dwIndex);
 };
 
 #endif

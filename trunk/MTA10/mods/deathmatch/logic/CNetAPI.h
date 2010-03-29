@@ -48,7 +48,7 @@ public:
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
 
-	static bool             IsWeaponIDAkimbo				( unsigned char ucWeaponID );
+    static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
 
 private:

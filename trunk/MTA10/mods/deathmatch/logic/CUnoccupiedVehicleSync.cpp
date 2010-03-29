@@ -216,9 +216,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                 if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
                                                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 #ifdef MTA_DEBUG
-				pVehicle->m_pLastSyncer = NULL;
-				pVehicle->m_ulLastSyncTime = GetTickCount ();
-				pVehicle->m_szLastSyncType = "unoccupied";
+                pVehicle->m_pLastSyncer = NULL;
+                pVehicle->m_ulLastSyncTime = GetTickCount ();
+                pVehicle->m_szLastSyncType = "unoccupied";
 #endif
             }
         }

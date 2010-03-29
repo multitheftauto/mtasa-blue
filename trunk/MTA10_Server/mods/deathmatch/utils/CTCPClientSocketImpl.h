@@ -20,22 +20,22 @@
     #include <windows.h>
     #include <winsock.h>
 
-	#define CloseSocket closesocket
+    #define CloseSocket closesocket
 #else
-	#include <unistd.h>
-	#include <arpa/inet.h>
-	#include <errno.h>
-	#include <netdb.h>
-	#include <netinet/in.h>
-	#include <sys/time.h>
-	#include <sys/timeb.h>
-	#include <sys/socket.h>
-	#include <sys/stat.h>
-	#include <time.h>
-	#include <fcntl.h>
-	#include <dirent.h>
+    #include <unistd.h>
+    #include <arpa/inet.h>
+    #include <errno.h>
+    #include <netdb.h>
+    #include <netinet/in.h>
+    #include <sys/time.h>
+    #include <sys/timeb.h>
+    #include <sys/socket.h>
+    #include <sys/stat.h>
+    #include <time.h>
+    #include <fcntl.h>
+    #include <dirent.h>
 
-	#define CloseSocket close
+    #define CloseSocket close
 #endif
 
 #include <stdio.h>
@@ -62,7 +62,7 @@ private:
     bool            m_bIsConnected;
     char            m_szLastError [128];
 
-	unsigned int	m_Socket;
+    unsigned int    m_Socket;
 };
 
 #endif

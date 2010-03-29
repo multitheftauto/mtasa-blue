@@ -49,7 +49,7 @@ bool CAccessControlListManager::Load ( const char* szFilename )
     if ( !m_pXML )
     {
         CLogger::ErrorPrintf ( "Error loading Access Control List file\n" );
-		return false;
+        return false;
     }
 
     // Parse it
@@ -90,33 +90,33 @@ bool CAccessControlListManager::Load ( const char* szFilename )
                 unsigned int uiSubSubNodesCount = pSubNode->GetSubNodeCount ();
                 for ( unsigned int j = 0 ; j < uiSubSubNodesCount ; j++ )
                 {
-					// If this subnode doesn't exist, return to the for loop and continue it
+                    // If this subnode doesn't exist, return to the for loop and continue it
                     pSubSubNode = pSubNode->GetSubNode ( j );
                     if ( !pSubSubNode ) continue;
 
-					// Check that this subsub node is named "right"
+                    // Check that this subsub node is named "right"
                     if ( pSubSubNode->GetTagName ().compare ( "right" ) == 0 )
                     {
-						// Grab the name and the access attributes
+                        // Grab the name and the access attributes
                         CXMLAttribute* pNameAttribute = pSubSubNode->GetAttributes ().Find ( "name" );
                         CXMLAttribute* pAccessAttribute = pSubSubNode->GetAttributes ().Find ( "access" );
                         if ( pNameAttribute && pAccessAttribute )
                         {
-							// See if the access attribute is true or false
+                            // See if the access attribute is true or false
                             bool bAccess = false;
                             std::string strAccess = pAccessAttribute->GetValue ();
 
                             if ( stricmp ( strAccess.c_str (), "true" ) == 0 ||
-								 stricmp ( strAccess.c_str (), "yes" ) == 0 ||
-								 strcmp ( strAccess.c_str (), "1" ) == 0 )
+                                 stricmp ( strAccess.c_str (), "yes" ) == 0 ||
+                                 strcmp ( strAccess.c_str (), "1" ) == 0 )
                             {
                                 bAccess = true;
                             }
 
-							// Grab the name of the 'right' name
+                            // Grab the name of the 'right' name
                             const char *szRightName = pNameAttribute->GetValue ().c_str ();
 
-							// Create the rights control list
+                            // Create the rights control list
                             CAccessControlListRight* pRight = NULL;
                             if ( StringBeginsWith ( szRightName, "command." ) )
                             {
@@ -270,26 +270,26 @@ CAccessControlList* CAccessControlListManager::GetACL ( const char* szACLName )
 
 
 bool CAccessControlListManager::CanObjectUseRight ( const char* szObjectName,
-												    CAccessControlListGroupObject::EObjectType eObjectType,
-													const char* szRightName,
-													CAccessControlListRight::ERightType eRightType,
-													bool bDefaultAccessRight )
+                                                    CAccessControlListGroupObject::EObjectType eObjectType,
+                                                    const char* szRightName,
+                                                    CAccessControlListRight::ERightType eRightType,
+                                                    bool bDefaultAccessRight )
 {
     // This is set to true if we were explicitly denied access by an ACL
     bool bDenied = false;
 
-	// Look through the groups
+    // Look through the groups
     list < CAccessControlListGroup* > ::iterator group = m_Groups.begin ();
     for ( ; group != m_Groups.end (); group++ )
     {
-		// Look for a group that has our user/resource in it
+        // Look for a group that has our user/resource in it
         if ( (*group)->FindObjectMatch ( szObjectName, eObjectType ) )
         {
-			// Look through its access lists for our 'right' name
+            // Look through its access lists for our 'right' name
             list < CAccessControlList* > ::iterator acl = (*group)->IterBeginACL ();
             for ( ; acl != (*group)->IterEndACL (); acl++ )
             {
-				// Grab the right with this name
+                // Grab the right with this name
                 CAccessControlListRight* pRight = (*acl)->GetRight ( szRightName, eRightType );
                 if ( pRight )
                 {

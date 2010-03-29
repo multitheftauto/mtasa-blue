@@ -27,13 +27,13 @@ public:
 
     void                DoPulse             ( void );
 
-	void				GetTag				( char* szInfoTag, int iInfoTag );
-	void				HandleInput			( char* szCommand );
+    void                GetTag              ( char* szInfoTag, int iInfoTag );
+    void                HandleInput         ( char* szCommand );
 
     bool                IsFinished          ( void );
 
 private:
-	CServerInterface*   m_pServerInterface;
+    CServerInterface*   m_pServerInterface;
     class CGame*        m_pGame;
 };
 

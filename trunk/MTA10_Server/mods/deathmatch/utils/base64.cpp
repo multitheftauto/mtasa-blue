@@ -84,7 +84,7 @@ string Base64::encode(const string& data) {
     {
       c = (data[i] << 2) & 0x3f;
       if (++i < len)
-	c |= (data[i] >> 6) & 0x03;
+    c |= (data[i] >> 6) & 0x03;
 
       ret.append(1, Base64Table[c]);
     }
@@ -127,7 +127,7 @@ string Base64::decode(const string& data, string& ret) {
     {
       c = data[i];
       if (fillchar == c)
-	break;
+    break;
 
       c = (char) DecodeTable[(unsigned char)data[i]];
       c1 = ((c1 << 4) & 0xf0) | ((c >> 2) & 0xf);
@@ -138,7 +138,7 @@ string Base64::decode(const string& data, string& ret) {
     {
       c1 = data[i];
       if (fillchar == c1)
-	break;
+    break;
 
       c1 = (char) DecodeTable[(unsigned char)data[i]];
       c = ((c << 6) & 0xc0) | c1;

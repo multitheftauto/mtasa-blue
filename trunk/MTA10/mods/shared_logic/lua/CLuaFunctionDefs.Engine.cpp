@@ -407,7 +407,7 @@ int CLuaFunctionDefs::EngineReplaceWheelAtomics ( lua_State* luaVM )
     m_pScriptDebugging->LogWarning ( luaVM, "engineReplaceWheelAtomics DFF argument was not valid." );
     }
 
-    if ( pEntityClump && uiAtomics > 0 && szWheel ) {	
+    if ( pEntityClump && uiAtomics > 0 && szWheel ) {   
     m_pRenderWare->ReplaceWheels ( pEntityClump, &Atomics[0], uiAtomics, szWheel );
 
     lua_pushboolean ( luaVM, true );

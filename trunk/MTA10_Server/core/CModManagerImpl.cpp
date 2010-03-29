@@ -84,14 +84,14 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
     // Grab the initialization procedure
     InitServer* pfnInitServer = (InitServer*) ( m_Library.GetProcedureAddress ( "InitServer" ) );
     if ( !pfnInitServer )
-	{
+    {
         // Unload the library
         m_Library.Unload ();
 
         // Report the error
         Print ( "\nERROR: Bad file: %s!\n", strFilename.c_str () );
-		return false;
-	}
+        return false;
+    }
 
     // Call the InitServer procedure to get the interface
     m_pBase = pfnInitServer ();
@@ -102,7 +102,7 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
 
         // Report the error
         Print ( "\nERROR: Failed initializing '%s'!\n", strFilename.c_str () );
-		return false;
+        return false;
     }
 
     // Call the initialization procedure in the interface
@@ -160,17 +160,17 @@ bool CModManagerImpl::IsFinished ( void )
 
 void CModManagerImpl::GetTag ( char *szInfoTag, int iInfoTag )
 {
-	if ( m_pBase )
-	{
-		m_pBase->GetTag ( szInfoTag, iInfoTag );
-	}
+    if ( m_pBase )
+    {
+        m_pBase->GetTag ( szInfoTag, iInfoTag );
+    }
 }
 
 
 void CModManagerImpl::HandleInput ( const char* szCommand )
 {
-	if ( m_pBase )
-	{
-		m_pBase->HandleInput ( (char*)szCommand );
-	}
+    if ( m_pBase )
+    {
+        m_pBase->HandleInput ( (char*)szCommand );
+    }
 }

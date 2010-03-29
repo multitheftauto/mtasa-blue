@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/core/CModManagerInterface.h
-*  PURPOSE:		Game mod manager interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/core/CModManagerInterface.h
+*  PURPOSE:     Game mod manager interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

@@ -72,7 +72,7 @@ void CAccount::SetName ( const std::string& strName )
 bool CAccount::IsPassword ( const char* szPassword )
 {
     if ( szPassword )
-	{
+    {
         std::string strPassword(szPassword);
         //First check if the raw string matches the account password
         if ( strPassword == m_strPassword )
@@ -107,15 +107,15 @@ void CAccount::SetPassword ( const char* szPassword )
 bool CAccount::HashPassword ( const char* szPassword, std::string& strHashPassword )
 {
     char szHashed[33];
-	if ( szPassword && strlen ( szPassword ) > 0 )
-	{
-		MD5 Password;
-		CMD5Hasher Hasher;
-		Hasher.Calculate ( szPassword, strlen ( szPassword ), Password );
-		Hasher.ConvertToHex ( Password, szHashed );
+    if ( szPassword && strlen ( szPassword ) > 0 )
+    {
+        MD5 Password;
+        CMD5Hasher Hasher;
+        Hasher.Calculate ( szPassword, strlen ( szPassword ), Password );
+        Hasher.ConvertToHex ( Password, szHashed );
         strHashPassword = szHashed;
         return true;
-	}
+    }
     return false;
 }
 
