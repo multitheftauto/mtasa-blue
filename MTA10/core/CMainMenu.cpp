@@ -455,24 +455,9 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
 
         for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ )
         {
-<<<<<<< HEAD
-			if ( m_pItems[i] ) m_pItems[i]->SetVisible ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) != ITEM_HIDDEN );
-		}
-	}
-=======
             if ( m_pItems[i] ) m_pItems[i]->SetVisible ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) != ITEM_HIDDEN );
         }
-
-        // Get the nick from the config
-        std::string strNick;
-        CVARS_GET ( "nick", strNick );
-        
-        // Valid nick?
-        if ( strNick.empty () )
-            // still default nick
-            ShowDefaultNickMessageBox ();
     }
->>>>>>> 22eb218... replace all tabs to spaces
 }
 
 

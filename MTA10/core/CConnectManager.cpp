@@ -60,19 +60,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         CModManager::GetSingleton ().Unload ();
     }    
 
-    // Valid nick?
-    if ( !strcmp( szNick, "" ) )
-    {
-        // still default nick
-        g_pCore->GetLocalGUI ()->GetMainMenu ()->ShowDefaultNickMessageBox ();
-        return true;
-    }
-    if ( !CCore::GetSingleton ().IsValidNick ( szNick ) )
-    {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new one!", MB_BUTTON_OK | MB_ICON_INFO );
-        return true;
-    }
-
     // Is the nick valid?
     if ( !CheckNickProvided ( (char*) szNick ) )
     {

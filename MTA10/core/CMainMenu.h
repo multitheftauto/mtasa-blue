@@ -83,13 +83,7 @@ private:
     void                EnableItem                      ( unsigned int uiIndex );
     void                DisableItem                     ( unsigned int uiIndex, bool bHide = false );
 
-<<<<<<< HEAD
-	bool                OnQuickConnectButtonClick       ( CGUIElement* pElement );
-=======
-    bool                OnDefaultNick                   ( CGUIElement* pElement );
-
     bool                OnQuickConnectButtonClick       ( CGUIElement* pElement );
->>>>>>> 22eb218... replace all tabs to spaces
     bool                OnResumeButtonClick             ( CGUIElement* pElement );
     bool                OnBrowseServersButtonClick      ( CGUIElement* pElement );
     bool                OnHostGameButtonClick           ( CGUIElement* pElement );
