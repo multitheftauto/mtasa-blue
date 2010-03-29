@@ -1181,6 +1181,7 @@ void CServerBrowser::SaveOptions ( )
             }
         }
     }
+    g_pCore->SaveConfig ( );
 }
 
 void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::string& strPassword )
