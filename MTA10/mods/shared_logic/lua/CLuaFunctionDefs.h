@@ -281,9 +281,8 @@ public:
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
-    LUA_DECLARE ( GetVehicleHandlingData );
-    LUA_DECLARE ( SetVehicleHandlingData );
-    LUA_DECLARE ( ResetVehicleHandlingData );
+	LUA_DECLARE ( GetVehicleHandlingData );
+	LUA_DECLARE ( GetDefaultHandling );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
@@ -328,6 +327,7 @@ public:
     LUA_DECLARE ( SetTrainSpeed );
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
+    LUA_DECLARE ( SetVehicleHandlingData );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );

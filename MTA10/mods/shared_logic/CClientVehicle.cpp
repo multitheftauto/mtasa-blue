@@ -46,6 +46,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_pVehicle = NULL;
 	m_pUpgrades = new CVehicleUpgrades ( this );
 	m_pClump = NULL;
+    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
+    m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
+	m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
 
     SetTypeName ( "vehicle" );
 
@@ -200,6 +203,7 @@ CClientVehicle::~CClientVehicle ( void )
     Unlink ();
 
 	delete m_pUpgrades;
+	delete m_pHandlingEntry;
 }
 
 
@@ -829,6 +833,12 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         // Grab the model info and the bounding box
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
+
+		// Reset handling to fit the vehicle
+		m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
+		m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
+		m_pHandlingEntry->Recalculate ();
+
 
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
@@ -2163,6 +2173,12 @@ void CClientVehicle::Create ( void )
 		// Reset the interpolation
 		ResetInterpolation ();
 
+        // Re-apply handling entry
+        if ( m_pHandlingEntry )
+        {
+            m_pVehicle->SetHandlingData ( m_pHandlingEntry );
+        }
+
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
@@ -2194,6 +2210,7 @@ void CClientVehicle::Destroy ( void )
         m_bIsDerailed = IsDerailed ();
         m_fHeliRotorSpeed = GetHeliRotorSpeed ();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
+        m_pHandlingEntry = m_pVehicle->GetHandlingData();
 
 	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
@@ -3357,11 +3374,27 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
     }
 }
 
+void CClientVehicle::ApplyHandling( void )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->GetHandlingData()->Recalculate();
+		// Update vehicle settings
+		m_pVehicle->UpdateHandlingStatus ();
+    }
+}
+
+
 CHandlingEntry* CClientVehicle::GetHandlingData( void )
 {
-    if (m_pVehicle)
+    if ( m_pVehicle )
     {
         return m_pVehicle->GetHandlingData();
     }
+    else if ( m_pHandlingEntry )
+    {
+        return m_pHandlingEntry;
+    }
     return NULL;
 }
+
