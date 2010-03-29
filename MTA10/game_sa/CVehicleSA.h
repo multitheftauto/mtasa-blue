@@ -353,7 +353,9 @@ public:
     int padaudio[108];
 
     tHandlingDataSA* pHandlingData;                             // +900
-    int pad52321 [23];
+	BYTE padyo[4];
+	DWORD dwHandlingFlags;
+    int pad52321 [21];
 
     DWORD dwUnknown1201;                                        // +996
     DWORD dwUnknown1202;                                        // +1000
@@ -411,6 +413,7 @@ public:
 
 	// values used by transmission
 	unsigned char m_nCurrentGear;
+	BYTE bla[3];
 	float m_fGearChangeCount;
 
 	float m_fWheelSpinForAudio;
@@ -419,7 +422,7 @@ public:
 	float m_nHealth; // 1000.0f = full health. 0 -> explode
 
 	/*** BEGIN SECTION that was added by us ***/
-    BYTE Padding200[48]; //1220
+    BYTE Padding200[45]; //1220
 	CVehicle* m_pVehicle; //1268
 	/*** END SECTION that was added by us ***/
 
@@ -688,6 +691,8 @@ public:
 
     CColModel*                  GetSpecialColModel              ( void );
     bool                        UpdateMovingCollision           ( float fAngle );
+
+	void						UpdateHandlingStatus			( void );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };

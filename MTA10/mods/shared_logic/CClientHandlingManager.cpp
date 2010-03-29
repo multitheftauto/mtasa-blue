@@ -293,7 +293,7 @@ unsigned char CClientHandlingManager::GetNumberOfGears ( const std::vector < CCl
     }
 
     // Return the default
-    return g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( DefaultValueID )->GetNUmberOfGears ();
+    return g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( DefaultValueID )->GetNumberOfGears ();
 }
 
 

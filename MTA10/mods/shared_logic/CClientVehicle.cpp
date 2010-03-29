@@ -2765,7 +2765,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCCAM:
         case VT_RCGOBLIN:
         case VT_RCRAIDER:
-        case VT_TIGER:
+        case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
             memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
@@ -3355,4 +3355,13 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
         WARN (( "*** Unexpected m_pOccupyingVehicle:0x%08x for %s\n", pClientPed->m_pOccupyingVehicle, GetPlayerName( pClientPed ).c_str () ));
         pClientPed->m_pOccupyingVehicle = NULL;
     }
+}
+
+CHandlingEntry* CClientVehicle::GetHandlingData( void )
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetHandlingData();
+    }
+    return NULL;
 }

@@ -281,6 +281,9 @@ public:
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
+    LUA_DECLARE ( GetVehicleHandlingData );
+    LUA_DECLARE ( SetVehicleHandlingData );
+    LUA_DECLARE ( ResetVehicleHandlingData );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
