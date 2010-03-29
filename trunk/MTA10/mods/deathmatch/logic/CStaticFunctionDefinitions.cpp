@@ -2316,7 +2316,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CClientEntity& Entity, un
                 case VT_DOZER:
                 case VT_FORKLIFT:
                 case VT_TRACTOR:
-                case VT_TIGER:
+                case VT_RCTIGER:
                 case VT_BANDITO:
                 case VT_KART:
                 case VT_MOWER:

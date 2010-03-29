@@ -376,6 +376,10 @@ public:
     static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
+    
+    void                        ApplyHandling           ( void );
+    CHandlingEntry*				GetHandlingData         ( void );
+    const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
 
 protected:
     void                        StreamIn                ( bool bInstantly );
@@ -465,6 +469,8 @@ protected:
     bool                        m_bIsOnGround;
     bool                        m_bHeliSearchLightVisible;
     float                       m_fHeliRotorSpeed;
+    const CHandlingEntry*       m_pOriginalHandlingEntry;
+    CHandlingEntry*             m_pHandlingEntry;
 
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;

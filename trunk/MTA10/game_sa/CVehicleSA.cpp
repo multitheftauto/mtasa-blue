@@ -9,6 +9,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
+*               The_GTA <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -76,8 +77,11 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
     // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
     // per car later.
-    CHandlingEntry* pEntry = pGame->GetHandlingManager ()->GetHandlingData ( dwModelID );
+	/*CHandlingEntry* pEntry = pGame->GetHandlingManager ()->CreateHandlingData ();
+    //CHandlingEntry* pEntry = pGame->GetHandlingManager ()->GetHandlingData ( dwModelID );
+	pEntry->ApplyHandlingData ( pGame->GetHandlingManager ()->GetHandlingData ( dwModelID ) );	// We need to do that so vehicle handling wont get corrupted
     SetHandlingData ( pEntry );
+	pEntry->Recalculate ();*/
 
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
@@ -1526,13 +1530,43 @@ CHandlingEntry* CVehicleSA::GetHandlingData ( void )
 
 void CVehicleSA::SetHandlingData ( CHandlingEntry* pHandling )
 {
-    /*
     // Store the handling data we set for later retrival through Get
     m_pHandlingData = static_cast < CHandlingEntrySA* > ( pHandling );
 
     // Put it in our interface
-    GetVehicleInterface ()->pHandlingData = m_pHandlingData->GetInterface ();
-    */
+	CVehicleSAInterface* pInt = GetVehicleInterface();
+	m_pHandlingData->Recalculate();
+    pInt->pHandlingData = m_pHandlingData->GetInterface ();
+	/*pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
+	pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
+	pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
+	pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
+	pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;*/
+	/*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
+		GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
+	else*/
+		//pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+}
+
+
+// Updates internal vehicle settings
+void CVehicleSA::UpdateHandlingStatus ( void )
+{
+	// Not supposed to happen
+	if (!m_pHandlingData)
+		return;
+
+    // Put it in our interface
+	CVehicleSAInterface* pInt = GetVehicleInterface();
+	pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
+	pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
+	pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
+	pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
+	pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
+	/*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
+		GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
+	else*/
+		//pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
 }
 
 

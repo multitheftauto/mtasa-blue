@@ -107,7 +107,7 @@ public:
 
     virtual eDriveType      GetCarDriveType                 ( void ) const = 0;
     virtual eEngineType     GetCarEngineType                ( void ) const = 0;
-    virtual unsigned char   GetNUmberOfGears                ( void ) const = 0;
+    virtual unsigned char   GetNumberOfGears                ( void ) const = 0;
 
     virtual float           GetEngineAccelleration          ( void ) const = 0;
     virtual float           GetEngineInertia                ( void ) const = 0;

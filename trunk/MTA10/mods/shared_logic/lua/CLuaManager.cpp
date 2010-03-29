@@ -471,6 +471,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefs::IsVehicleBlown );
     CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", CLuaFunctionDefs::GetVehicleHeadLightColor );
+	CLuaCFunctions::AddFunction ( "getVehicleHandlingData", CLuaFunctionDefs::GetVehicleHandlingData );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -506,6 +507,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefs::SetVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "setVehicleGravity", CLuaFunctionDefs::SetVehicleGravity );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );
+	CLuaCFunctions::AddFunction ( "setVehicleHandlingData", CLuaFunctionDefs::SetVehicleHandlingData );
+	CLuaCFunctions::AddFunction ( "resetVehicleHandlingData", CLuaFunctionDefs::ResetVehicleHandlingData );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
