@@ -2334,6 +2334,27 @@ bool CResource::IsDependentResourceRecursive ( const char * szResourceName )
     return false;
 }
 
+void CResource::AddTemporaryInclude ( CResource * resource )
+{
+    if ( !ListContains ( m_temporaryIncludes, resource ) )
+        m_temporaryIncludes.push_back ( resource );
+}
+
+void CResource::AddDependent ( CResource * resource )
+{
+    if ( !ListContains ( m_dependents, resource ) )
+    {
+        m_dependents.push_back ( resource );
+        CheckState();
+    }
+}
+
+void CResource::RemoveDependent ( CResource * resource )
+{
+    m_dependents.remove ( resource );
+    CheckState();
+}
+
 ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
     // if the mutex is already locked (i.e. the resource is being deleted), we return from this asap

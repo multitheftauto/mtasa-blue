@@ -177,63 +177,6 @@ inline float GetOffsetDegrees ( float a, float b )
 }
 
 
-// std::list wrappers
-// Returns true if the item is in the itemList
-template < class T >
-bool ListContains ( std::list < T >& itemList, const T& item )
-{
-    std::list < T > ::const_iterator it = itemList.begin ();
-    for ( ; it != itemList.end () ; it++ )
-        if ( item == *it )
-            return true;
-    return false;
-}
-
-// std::vector wrappers
-template < class T >
-bool ListContains ( std::vector < T >& itemList, const T& item )
-{
-    std::vector < T > ::const_iterator it = itemList.begin ();
-    for ( ; it != itemList.end () ; it++ )
-        if ( item == *it )
-            return true;
-    return false;
-}
-
-template < class T >
-void ListRemove ( std::vector < T >& itemList, const T& item )
-{
-    std::vector < T > ::const_iterator it = itemList.begin ();
-    for ( ; it != itemList.end () ; it++ )
-        if ( item == *it )
-        {
-            itemList.erase ( it );
-            break;
-        }
-}
-
-// std::map wrappers
-template < class T, class V >
-void MapSet ( std::map < T, V >& collection, const T& key, const V& value )
-{
-    collection[ key ] = value;
-}
-
-template < class T, class V >
-bool MapContains ( std::map < T, V >& collection, const T& key )
-{
-    return collection.find ( key ) != collection.end ();
-}
-
-template < class T, class V >
-void MapRemove ( std::map < T, V >& collection, const T& key )
-{
-    std::map < T, V > ::const_iterator it = collection.find ( key );
-    if ( it != collection.end () )
-        collection.erase ( it );
-}
-
-
 bool            DoesFileExist               ( const char* szFilename );
 
 // Misc utility functions

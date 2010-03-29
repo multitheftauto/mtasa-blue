@@ -217,20 +217,6 @@ void CColManager::DeleteAll ( void )
 }
 
 
-// Linux compiler work around. (Don't know)
-template < class T >
-void ListRemove ( std::vector < T >& itemList, const T& item )
-{
-    std::vector < CColShape* > ::iterator it = itemList.begin ();
-    for ( ; it != itemList.end () ; it++ )
-        if ( item == *it )
-        {
-            itemList.erase ( it );
-            break;
-        }
-}
-
-
 void CColManager::RemoveFromList ( CColShape* pShape )
 {
     if ( m_bCanRemoveFromList )
