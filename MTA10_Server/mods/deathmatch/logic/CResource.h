@@ -303,7 +303,7 @@ public:
     inline unsigned long    GetLastCRC ( void ) { return m_ulCRC; }
     bool                    HasResourceChanged ( void );
 
-    void                    AddTemporaryInclude ( CResource * resource ) { m_temporaryIncludes.push_back ( resource ); }
+    void                    AddTemporaryInclude ( CResource * resource );
     const std::string&      GetFailureReason ( void )
     { 
         return m_strFailureReason; 
@@ -330,8 +330,8 @@ public:
 	inline bool             IsStopping ( void ) { return m_bStopping; }
     inline const std::string&   GetName ( void ) { return m_strResourceName; }
     inline CLuaMain *       GetVirtualMachine ( void ) { return m_pVM; }
-    inline void             AddDependent ( CResource * resource )      { m_dependents.push_back ( resource ); CheckState(); }
-    inline void             RemoveDependent ( CResource * resource )   { if ( !m_dependents.empty() ) m_dependents.remove ( resource ); CheckState(); }
+    void                    AddDependent ( CResource * resource );
+    void                    RemoveDependent ( CResource * resource );
     bool                    IsDependentResource ( CResource * resource );
     bool                    IsDependentResource ( const char * szResourceName );
     bool                    IsDependentResourceRecursive ( CResource * resource );
