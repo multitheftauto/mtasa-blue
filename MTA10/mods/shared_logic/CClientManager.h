@@ -60,10 +60,10 @@ public:
 
     inline CAntiCheat&                  GetAntiCheat                ( void )        { return m_AntiCheat; }
     inline CClientCamera*               GetCamera                   ( void )        { return m_pCamera; }
-    inline CClientCivilianManager*		GetCivilianManager			( void )        { return m_pCivilianManager; }
+    inline CClientCivilianManager*      GetCivilianManager          ( void )        { return m_pCivilianManager; }
     inline CClientColModelManager*      GetColModelManager          ( void )        { return m_pColModelManager; }
     inline CClientDFFManager*           GetDFFManager               ( void )        { return m_pDFFManager; }
-	inline CClientGUIManager*			GetGUIManager				( void )		{ return m_pGUIManager; }
+    inline CClientGUIManager*           GetGUIManager               ( void )        { return m_pGUIManager; }
     inline CClientHandlingManager*      GetHandlingManager          ( void )        { return m_pHandlingManager; }
     inline CClientMarkerManager*        GetMarkerManager            ( void )        { return m_pMarkerManager; }
     inline CClientStreamer*             GetMarkerStreamer           ( void )        { return m_pMarkerStreamer; }
@@ -107,10 +107,10 @@ public:
 private:
     CAntiCheat                          m_AntiCheat;
     CClientCamera*                      m_pCamera;
-	CClientCivilianManager*		        m_pCivilianManager;
+    CClientCivilianManager*             m_pCivilianManager;
     CClientColModelManager*             m_pColModelManager;
     CClientDFFManager*                  m_pDFFManager;
-	CClientGUIManager*					m_pGUIManager;
+    CClientGUIManager*                  m_pGUIManager;
     CClientMarkerManager*               m_pMarkerManager;
     CClientStreamer*                    m_pMarkerStreamer;
     CClientModelRequestManager*         m_pModelRequestManager;

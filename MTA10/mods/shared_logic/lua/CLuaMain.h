@@ -88,7 +88,7 @@ public:
 
 private:
     void                            InitVM                  ( void );
-	void							InitSecurity			( void );
+    void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 

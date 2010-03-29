@@ -49,12 +49,12 @@ public:
 
     void                            StopScriptsOwnedBy      ( int iOwner );
 
-	CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner );
+    CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner );
     bool                            RemoveVirtualMachine    ( CLuaMain* vm );
     CLuaMain*                       GetVirtualMachine       ( lua_State* luaVM );
     CLuaMain*                       GetVirtualMachine       ( const char* szFilename );
 
-	inline CLuaModuleManager*		GetLuaModuleManager		( void ) const				{ return m_pLuaModuleManager; };
+    inline CLuaModuleManager*       GetLuaModuleManager     ( void ) const              { return m_pLuaModuleManager; };
 
     inline list < CLuaMain* > ::const_iterator  IterBegin   ( void )                    { return m_virtualMachines.begin (); };
     inline list < CLuaMain* > ::const_iterator  IterEnd     ( void )                    { return m_virtualMachines.end (); };
@@ -72,7 +72,7 @@ private:
     CVehicleManager*                m_pVehicleManager;
     CMapManager*                    m_pMapManager;
     CEvents*                        m_pEvents;
-	CLuaModuleManager*				m_pLuaModuleManager;
+    CLuaModuleManager*              m_pLuaModuleManager;
 
     list < CLuaMain* >              m_virtualMachines;
 };

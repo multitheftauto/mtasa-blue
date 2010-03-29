@@ -68,31 +68,31 @@ int CLuaPickupDefs::createPickup ( lua_State* luaVM )
         if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
             dblAmmo = lua_tonumber ( luaVM, 7 );
 
-		CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-		if ( pLuaMain )
-		{
-			CResource* pResource = pLuaMain->GetResource();
-			if ( pResource )
-			{
-				CPickup* pPickup = CStaticFunctionDefinitions::CreatePickup ( 
-										pResource,
-										vecPosition, 
-										static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) ), 
-										lua_tonumber ( luaVM, 5 ), 
-										ulRespawnInterval, 
-										dblAmmo );
-		        if ( pPickup )
-		        {
-					CElementGroup * pGroup = pResource->GetElementGroup();
-					if ( pGroup )
-					{
-						pGroup->Add ( pPickup );
-					}
-					// Return the handle
-					lua_pushelement ( luaVM, pPickup );
-					return 1;
-				}
-			}
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource();
+            if ( pResource )
+            {
+                CPickup* pPickup = CStaticFunctionDefinitions::CreatePickup ( 
+                                        pResource,
+                                        vecPosition, 
+                                        static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) ), 
+                                        lua_tonumber ( luaVM, 5 ), 
+                                        ulRespawnInterval, 
+                                        dblAmmo );
+                if ( pPickup )
+                {
+                    CElementGroup * pGroup = pResource->GetElementGroup();
+                    if ( pGroup )
+                    {
+                        pGroup->Add ( pPickup );
+                    }
+                    // Return the handle
+                    lua_pushelement ( luaVM, pPickup );
+                    return 1;
+                }
+            }
         }
     }
     else

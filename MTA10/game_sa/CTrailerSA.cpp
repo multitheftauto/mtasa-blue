@@ -15,11 +15,11 @@
 
 CTrailerSA::CTrailerSA( CTrailerSAInterface * trailer ):CAutomobileSA( trailer )
 {
-	DEBUG_TRACE("CTrailerSA::CTrailerSA( CTrailerSAInterface * trailer )");
-	this->m_pInterface = trailer;
+    DEBUG_TRACE("CTrailerSA::CTrailerSA( CTrailerSAInterface * trailer )");
+    this->m_pInterface = trailer;
 }
 
 CTrailerSA::CTrailerSA( eVehicleTypes dwModelID ):CAutomobileSA( dwModelID )
 {
-	DEBUG_TRACE("CTrailerSA::CTrailerSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
+    DEBUG_TRACE("CTrailerSA::CTrailerSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 }

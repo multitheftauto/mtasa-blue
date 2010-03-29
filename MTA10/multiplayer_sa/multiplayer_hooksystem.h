@@ -16,7 +16,7 @@
 #ifndef __MULTIPLAYER_HOOKSYSTEM_INIT
 #define __MULTIPLAYER_HOOKSYSTEM_INIT
 
-VOID HookInstallMethod(	DWORD dwInstallAddress, DWORD dwHookFunction );
+VOID HookInstallMethod( DWORD dwInstallAddress, DWORD dwHookFunction );
 VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );
 BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );

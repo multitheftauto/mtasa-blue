@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/TaskAttack.h
-*  PURPOSE:		Attack task interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/TaskAttack.h
+*  PURPOSE:     Attack task interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,14 +22,14 @@ public:
 
 enum eGunCommand
 {
-	GCOMMAND_NONE = 0,
-	GCOMMAND_AIM,
-	GCOMMAND_FIRE,
-	GCOMMAND_FIREBURST,
-	GCOMMAND_RELOAD,
-	GCOMMAND_PISTOLWHIP,
-	GCOMMAND_END_LEISURE,
-	GCOMMAND_END_NOW
+    GCOMMAND_NONE = 0,
+    GCOMMAND_AIM,
+    GCOMMAND_FIRE,
+    GCOMMAND_FIREBURST,
+    GCOMMAND_RELOAD,
+    GCOMMAND_PISTOLWHIP,
+    GCOMMAND_END_LEISURE,
+    GCOMMAND_END_NOW
 };
 
 class CVector2D;

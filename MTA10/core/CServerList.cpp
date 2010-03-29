@@ -279,9 +279,9 @@ void CServerListLAN::Refresh ( void )
 
     // Prepare the structures
     memset ( &m_Remote, 0, sizeof (m_Remote) );
-	m_Remote.sin_family			= AF_INET;
-	m_Remote.sin_port			= htons ( SERVER_LIST_BROADCAST_PORT ); 
-	m_Remote.sin_addr.s_addr	= INADDR_BROADCAST;
+    m_Remote.sin_family         = AF_INET;
+    m_Remote.sin_port           = htons ( SERVER_LIST_BROADCAST_PORT ); 
+    m_Remote.sin_addr.s_addr    = INADDR_BROADCAST;
 
     // Clear the previous server list
     Clear ();
@@ -297,7 +297,7 @@ void CServerListLAN::Discover ( void )
 
     // Send out the broadcast packet
     std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );
-	sendto ( m_Socket, strQuery.c_str (), strQuery.length () + 1, 0, (sockaddr *)&m_Remote, sizeof (m_Remote) );
+    sendto ( m_Socket, strQuery.c_str (), strQuery.length () + 1, 0, (sockaddr *)&m_Remote, sizeof (m_Remote) );
     
     // Keep the time
     m_ulStartTime = CClientTime::GetTime ();
@@ -342,11 +342,11 @@ void CServerListItem::Query ( void )
     sockaddr_in addr;
     memset ( &addr, 0, sizeof(addr) );
     addr.sin_family = AF_INET;
-	addr.sin_addr = Address;
-	addr.sin_port = htons ( usQueryPort );
+    addr.sin_addr = Address;
+    addr.sin_port = htons ( usQueryPort );
 
     int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
-	if ( ret == 1 )
+    if ( ret == 1 )
         m_ulQueryStart = CClientTime::GetTime ();
 }
 

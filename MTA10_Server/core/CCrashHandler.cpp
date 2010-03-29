@@ -19,10 +19,10 @@
 #include <dbghelp.h>
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
-									CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-									CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-									CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-									);
+                                    CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+                                    CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+                                    CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+                                    );
 
 #endif
 
@@ -47,32 +47,32 @@ long WINAPI CCrashHandler::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExcepti
 
 void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 {
-	// Try to load the DLL in our directory
-	HMODULE hDll = NULL;
-	char szDbgHelpPath [MAX_PATH];
-	if ( GetModuleFileName ( NULL, szDbgHelpPath, MAX_PATH ) )
-	{
-		char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
-		if ( pSlash )
-		{
-			_tcscpy ( pSlash + 1, "DBGHELP.DLL" );
-			hDll = LoadLibrary ( szDbgHelpPath );
-		}
-	}
+    // Try to load the DLL in our directory
+    HMODULE hDll = NULL;
+    char szDbgHelpPath [MAX_PATH];
+    if ( GetModuleFileName ( NULL, szDbgHelpPath, MAX_PATH ) )
+    {
+        char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
+        if ( pSlash )
+        {
+            _tcscpy ( pSlash + 1, "DBGHELP.DLL" );
+            hDll = LoadLibrary ( szDbgHelpPath );
+        }
+    }
 
     // If we couldn't load the one in our dir, load any version available
-	if ( !hDll )
-	{
-		hDll = LoadLibrary ( "DBGHELP.DLL" );
-	}
+    if ( !hDll )
+    {
+        hDll = LoadLibrary ( "DBGHELP.DLL" );
+    }
 
     // We could load a dll?
-	if ( hDll )
-	{
+    if ( hDll )
+    {
         // Grab the MiniDumpWriteDump proc address
-		MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
-		if ( pDump )
-		{
+        MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
+        if ( pDump )
+        {
             // Grab the current time
             // Ask windows for the system time.
             SYSTEMTIME SystemTime;
@@ -90,8 +90,8 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                                                                                SystemTime.wHour,
                                                                                SystemTime.wMinute );
 
-			// Create the file
-			HANDLE hFile = CreateFile ( szFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+            // Create the file
+            HANDLE hFile = CreateFile ( szFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct
@@ -105,12 +105,12 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
                 // Close the dumpfile
                 CloseHandle ( hFile );
-			}
-		}
+            }
+        }
 
         // Free the DLL again
         FreeLibrary ( hDll );
-	}
+    }
 }
 
 

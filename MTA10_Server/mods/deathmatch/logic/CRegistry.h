@@ -29,17 +29,17 @@ public:
                                 CRegistry               ( const std::string& strFileName );
                                 ~CRegistry              ( void );
 
-    void						Load					( const std::string& strFileName );
+    void                        Load                    ( const std::string& strFileName );
 
-    void						CreateTable				( const std::string& strTable, const std::string& strDefinition );
-	void						DropTable				( const std::string& strTable );
+    void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition );
+    void                        DropTable               ( const std::string& strTable );
 
-    bool						Delete					( const std::string& strTable, const std::string& strWhere );
-	bool						Insert					( const std::string& strTable, const std::string& strValues, const std::string& strColumns );
-	bool						Select					( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
-	bool						Update					( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
+    bool                        Delete                  ( const std::string& strTable, const std::string& strWhere );
+    bool                        Insert                  ( const std::string& strTable, const std::string& strValues, const std::string& strColumns );
+    bool                        Select                  ( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
+    bool                        Update                  ( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
 
-	bool						Query					( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
+    bool                        Query                   ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
 
     const std::string&          GetLastError            ( void ) { return m_strLastError; }
 
@@ -47,9 +47,9 @@ protected:
 
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
 
-	sqlite3						*m_db;
-	bool						m_bOpened;
-	bool						m_bMutexLocked;
+    sqlite3                     *m_db;
+    bool                        m_bOpened;
+    bool                        m_bMutexLocked;
 
 private:
     std::string                 m_strLastError;
@@ -99,9 +99,9 @@ struct CRegistryResult
                                                 nColumns = 0;
                                              }
     vector < string >                        ColNames;
-	vector < vector<CRegistryResultCell> >   Data;
-	int							             nRows;
-	int							             nColumns;
+    vector < vector<CRegistryResultCell> >   Data;
+    int                                      nRows;
+    int                                      nColumns;
 };
 
 #endif

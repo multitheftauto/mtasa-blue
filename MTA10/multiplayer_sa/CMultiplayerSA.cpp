@@ -301,12 +301,12 @@ CMultiplayerSA::CMultiplayerSA()
         case VERSION_20:    COffsetsMP::Initialize20 (); break;
     }
 
-	Population = new CPopulationSA;
+    Population = new CPopulationSA;
     
     CRemoteDataSA::Init();
 
     m_bExplosionsDisabled = false;
-	m_pExplosionHandler = NULL;
+    m_pExplosionHandler = NULL;
     m_pBreakTowLinkHandler = NULL;
     m_pDrawRadarAreasHandler = NULL;
     m_pDamageHandler = NULL;
@@ -320,38 +320,38 @@ CMultiplayerSA::CMultiplayerSA()
 
 void CMultiplayerSA::InitHooks()
 {
-	InitKeysyncHooks();
+    InitKeysyncHooks();
     InitShotsyncHooks();
     vehicle_lights_init ();
-	bSetCenterOfWorld = false;
-	bHasProcessedScript = false;
+    bSetCenterOfWorld = false;
+    bHasProcessedScript = false;
 
     eGameVersion version = pGameInterface->GetGameVersion ();
 
-	bSetCenterOfWorld = false;	
+    bSetCenterOfWorld = false;  
 
-	//00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
-	//00442DC6     E9 32090000    JMP gta_sa_u.004436FD
+    //00442DC6  |. 0F86 31090000  JBE gta_sa_u.004436FD
+    //00442DC6     E9 32090000    JMP gta_sa_u.004436FD
 
     // increase the number of vehicles types (not actual vehicles) that can be loaded at once
     *(int *)0x8a5a84 = 127;
 
     // DISABLE CGameLogic::Update
-	memset((void *)0x442AD0, 0xC3, 1);
+    memset((void *)0x442AD0, 0xC3, 1);
 
     // STOP IT TRYING TO LOAD THE SCM
-	*(BYTE *)0x468EB5 = 0xEB;
-	*(BYTE *)0x468EB6 = 0x32;
+    *(BYTE *)0x468EB5 = 0xEB;
+    *(BYTE *)0x468EB6 = 0x32;
 
-	HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, 6);
-	HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
-	HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, 6);
-	HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
-	HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
-	HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
-	HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
+    HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, 6);
+    HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
+    HookInstall(HOOKPOS_FindPlayerHeading, (DWORD)HOOK_FindPlayerHeading, 6);
+    HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
+    HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
+    HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
+    HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
     HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
-	HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
+    HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
     HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
@@ -364,7 +364,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
     HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
     HookInstall(HOOKPOS_CObject_Render, (DWORD)HOOK_CObject_Render, 5);
-	HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
+    HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
@@ -414,16 +414,16 @@ void CMultiplayerSA::InitHooks()
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
     // func that StopRadio just jumps to.
-	*(BYTE *)0x4E9820 = 0xC2;
+    *(BYTE *)0x4E9820 = 0xC2;
     *(BYTE *)0x4E9821 = 0x08;
     *(BYTE *)0x4E9822 = 0x00;
 
     // Disable GTA being able to call CAudio::StartRadio ()
-	*(BYTE *)0x4DBEC0 = 0xC2;
+    *(BYTE *)0x4DBEC0 = 0xC2;
     *(BYTE *)0x4DBEC1 = 0x00;
     *(BYTE *)0x4DBEC2 = 0x00;
 
-	*(BYTE *)0x4EB3C0 = 0xC2;
+    *(BYTE *)0x4EB3C0 = 0xC2;
     *(BYTE *)0x4EB3C1 = 0x10;
     *(BYTE *)0x4EB3C2 = 0x00;
     
@@ -431,14 +431,14 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x52A535 = 0;
 
     // DISABLE wanted levels for military zones
-	*(BYTE *)0x72DF0D = 0xEB;
+    *(BYTE *)0x72DF0D = 0xEB;
 
     // THROWN projectiles throw more accurately
-	*(BYTE *)0x742685 = 0x90;
+    *(BYTE *)0x742685 = 0x90;
     *(BYTE *)0x742686 = 0xE9;
 
     // DISABLE CProjectileInfo::RemoveAllProjectiles
-	*(BYTE *)0x7399B0 = 0xC3;
+    *(BYTE *)0x7399B0 = 0xC3;
 
     // DISABLE CRoadBlocks::GenerateRoadblocks
     *(BYTE *)0x4629E0 = 0xC3;
@@ -446,7 +446,7 @@ void CMultiplayerSA::InitHooks()
 
     // Temporary hack for disabling hand up
     /*
-	*(BYTE *)0x62AEE7 = 0x90;
+    *(BYTE *)0x62AEE7 = 0x90;
     *(BYTE *)0x62AEE8 = 0x90;
     *(BYTE *)0x62AEE9 = 0x90;
     *(BYTE *)0x62AEEA = 0x90;
@@ -455,10 +455,10 @@ void CMultiplayerSA::InitHooks()
     */
 
     // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges(void) (special DJ banter)
-	*(BYTE *)0x4E8410 = 0xC3; // retn
+    *(BYTE *)0x4E8410 = 0xC3; // retn
 
     // DISABLE CPopulation__AddToPopulation
-	*(BYTE *)0x614720 = 0x32; // xor al, al
+    *(BYTE *)0x614720 = 0x32; // xor al, al
     *(BYTE *)0x614721 = 0xC0;
     *(BYTE *)0x614722 = 0xC3; // retn
 
@@ -485,14 +485,14 @@ void CMultiplayerSA::InitHooks()
     
 
     // DISABLE CGameLogic__SetPlayerWantedLevelForForbiddenTerritories
-	*(BYTE *)0x441770 = 0xC3;
+    *(BYTE *)0x441770 = 0xC3;
 
     // DISABLE CCrime__ReportCrime
-	*(BYTE *)0x532010 = 0xC3;
+    *(BYTE *)0x532010 = 0xC3;
     
-	// Disables deletion of RenderWare objects during unloading of ModelInfo
-	// This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
-	//*(BYTE *)0x4C9890 = 0xC3;
+    // Disables deletion of RenderWare objects during unloading of ModelInfo
+    // This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
+    //*(BYTE *)0x4C9890 = 0xC3;
 
     /*
     004C021D   B0 00            MOV AL,0
@@ -500,16 +500,16 @@ void CMultiplayerSA::InitHooks()
     004C0220   90               NOP
     004C0221   90               NOP
     */
-	*(BYTE *)0x4C01F0 = 0xB0;
-	*(BYTE *)0x4C01F1 = 0x00;
+    *(BYTE *)0x4C01F0 = 0xB0;
+    *(BYTE *)0x4C01F1 = 0x00;
     *(BYTE *)0x4C01F2 = 0x90;
     *(BYTE *)0x4C01F3 = 0x90;
     *(BYTE *)0x4C01F4 = 0x90;
 
     // Disable MakePlayerSafe
-	*(BYTE *)0x56E870 = 0xC2;
-	*(BYTE *)0x56E871 = 0x08;
-	*(BYTE *)0x56E872 = 0x00;
+    *(BYTE *)0x56E870 = 0xC2;
+    *(BYTE *)0x56E871 = 0x08;
+    *(BYTE *)0x56E872 = 0x00;
 
     // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
@@ -518,107 +518,107 @@ void CMultiplayerSA::InitHooks()
     
     /*
     // DISABLE CPed__RemoveBodyPart
-	*(BYTE *)0x5F0140 = 0xC2;
+    *(BYTE *)0x5F0140 = 0xC2;
     *(BYTE *)0x5F0141 = 0x08;
     *(BYTE *)0x5F0142 = 0x00;
     */
 
     // ALLOW picking up of all vehicles (GTA doesn't allow picking up of 'locked' script created vehicles)
-	*(BYTE *)0x6A436C = 0x90;
+    *(BYTE *)0x6A436C = 0x90;
     *(BYTE *)0x6A436D = 0x90;
 
     // MAKE CEntity::GetIsOnScreen always return true, experimental
    /*
-	*(BYTE *)0x534540 = 0xB0;
+    *(BYTE *)0x534540 = 0xB0;
     *(BYTE *)0x534541 = 0x01;
     *(BYTE *)0x534542 = 0xC3;
     */
 
     //DISABLE CPad::ReconcileTwoControllersInput
-	/*
-	*(BYTE *)0x53F530 = 0xC2;
+    /*
+    *(BYTE *)0x53F530 = 0xC2;
     *(BYTE *)0x53F531 = 0x0C;
     *(BYTE *)0x53F532 = 0x00;
 
-	*(BYTE *)0x53EF80 = 0xC3;
+    *(BYTE *)0x53EF80 = 0xC3;
 
-	*(BYTE *)0x541DDC = 0xEB;
+    *(BYTE *)0x541DDC = 0xEB;
     *(BYTE *)0x541DDD = 0x60;
 */
     // DISABLE big buildings (test)
     /*
-	*(char*)0x533150 = 0xC3;
+    *(char*)0x533150 = 0xC3;
     */
     
-	// PREVENT THE RADIO OR ENGINE STOPPING WHEN PLAYER LEAVES VEHICLE
-	// THIS ON ITS OWN will cause sounds to be left behind and other artifacts
-	/*
-	*(char *)0x4FB8C0 = 0xC3;
-	*/
+    // PREVENT THE RADIO OR ENGINE STOPPING WHEN PLAYER LEAVES VEHICLE
+    // THIS ON ITS OWN will cause sounds to be left behind and other artifacts
+    /*
+    *(char *)0x4FB8C0 = 0xC3;
+    */
 
 
-/*	
-	memset((void *)0x4FBA3E, 0x90, 5);
-	*/
-	
+/*  
+    memset((void *)0x4FBA3E, 0x90, 5);
+    */
+    
 
-	// DISABLE REPLAYS
-/*	
-	memset((void *)0x460500, 0xC3, 1);
+    // DISABLE REPLAYS
+/*  
+    memset((void *)0x460500, 0xC3, 1);
 */
     // PREVENT the game from making dummy objects (may fix a crash, guesswork really)
     // This seems to work, but doesn't actually fix anything. Maybe a reason to do it in the future.
     //00615FE3     EB 09          JMP SHORT gta_sa_u.00615FEE
-	/*
-	memset((void *)0x615FE3, 0xEB, 1);
-	*/
+    /*
+    memset((void *)0x615FE3, 0xEB, 1);
+    */
 
     // Make combines eat players *untested*
-	//memset ( (LPVOID)0x6A9739, 0x90, 6 );
+    //memset ( (LPVOID)0x6A9739, 0x90, 6 );
     
     // Players always lean out whatever the camera mode
     // 00621983     EB 13          JMP SHORT hacked_g.00621998
-	*(BYTE *)0x621983 = 0xEB;
+    *(BYTE *)0x621983 = 0xEB;
 
     
     // Players can fire drivebys whatever camera mode
     // 627E01 - 6 bytes
-	memset ( (LPVOID)0x627E01, 0x90, 6 );
+    memset ( (LPVOID)0x627E01, 0x90, 6 );
 
-	memset ( (LPVOID)0x62840D, 0x90, 6 );
+    memset ( (LPVOID)0x62840D, 0x90, 6 );
 
-	// Satchel crash fix
-	// C89110: satchel (bomb) positions pointer?
-	// C891A8+4: satchel (model) positions pointer? gets set to NULL on player death, causing an access violation
-	// C891A8+12: satchel (model) disappear time (in SystemTime format). 738F99 clears the satchel when VAR_SystemTime is larger.
-	memset ( (LPVOID)0x738F3A, 0x90, 83 );
+    // Satchel crash fix
+    // C89110: satchel (bomb) positions pointer?
+    // C891A8+4: satchel (model) positions pointer? gets set to NULL on player death, causing an access violation
+    // C891A8+12: satchel (model) disappear time (in SystemTime format). 738F99 clears the satchel when VAR_SystemTime is larger.
+    memset ( (LPVOID)0x738F3A, 0x90, 83 );
 
     // Prevent gta stopping driveby players from falling off
-	memset ( (LPVOID)0x6B5B17, 0x90, 6 );
+    memset ( (LPVOID)0x6B5B17, 0x90, 6 );
 
     // Increase VehicleStruct pool size
-	*(BYTE *)0x5B8FE4 = 0x7F; // its signed so the higest you can go with this is 0x7F before it goes negative = crash
+    *(BYTE *)0x5B8FE4 = 0x7F; // its signed so the higest you can go with this is 0x7F before it goes negative = crash
     
-	/*
+    /*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
-	memset ( (LPVOID)0x6446A7, 0x90, 6 );
+    memset ( (LPVOID)0x6446A7, 0x90, 6 );
     
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for passengers
-	memset ( (LPVOID)0x6446BD, 0x90, 6 );
-	*/
+    memset ( (LPVOID)0x6446BD, 0x90, 6 );
+    */
     
 
-	// DISABLE PLAYING REPLAYS
-	memset((void *)0x460390, 0xC3, 1);
+    // DISABLE PLAYING REPLAYS
+    memset((void *)0x460390, 0xC3, 1);
 
-	memset((void *)0x4600F0, 0xC3, 1);
+    memset((void *)0x4600F0, 0xC3, 1);
 
-	memset((void *)0x45F050, 0xC3, 1);
+    memset((void *)0x45F050, 0xC3, 1);
 
-	// DISABLE CHEATS
-	memset((void *)0x439AF0, 0xC3, 1);
-		
-	memset((void *)0x438370, 0xC3, 1);
+    // DISABLE CHEATS
+    memset((void *)0x439AF0, 0xC3, 1);
+        
+    memset((void *)0x438370, 0xC3, 1);
 
 
     // DISABLE GARAGES
@@ -662,33 +662,33 @@ void CMultiplayerSA::InitHooks()
     
 
     // Disable CStats::IncrementStat (returns at start of function)
-	*(BYTE *)0x55C180 = 0xC3;
-	/*
-	memset((void *)0x55C1A9, 0x90, 14 );
-	memset((void *)0x55C1DD, 0x90, 7 );
-	*/
+    *(BYTE *)0x55C180 = 0xC3;
+    /*
+    memset((void *)0x55C1A9, 0x90, 14 );
+    memset((void *)0x55C1DD, 0x90, 7 );
+    */
 
-	// DISABLE STATS DECREMENTING
-	memset((void *)0x559FD5, 0x90, 7 );
-	memset((void *)0x559FEB, 0x90, 7 );
+    // DISABLE STATS DECREMENTING
+    memset((void *)0x559FD5, 0x90, 7 );
+    memset((void *)0x559FEB, 0x90, 7 );
 
-	// DISABLE STATS MESSAGES
-	memset((void *)0x55B980, 0xC3, 1);
+    // DISABLE STATS MESSAGES
+    memset((void *)0x55B980, 0xC3, 1);
 
-	memset((void *)0x559760, 0xC3, 1);
+    memset((void *)0x559760, 0xC3, 1);
 
     // ALLOW more than 8 players (crash with more if this isn't done)
     //0060D64D   90               NOP
     //0060D64E   E9 9C000000      JMP gta_sa.0060D6EF
-	*(BYTE *)0x60D64D = 0x90;
+    *(BYTE *)0x60D64D = 0x90;
     *(BYTE *)0x60D64E = 0xE9;
 
     // PREVENT CJ smoking and drinking like an addict
     //005FBA26   EB 29            JMP SHORT gta_sa.005FBA51
-	*(BYTE *)0x5FBA26 = 0xEB;
+    *(BYTE *)0x5FBA26 = 0xEB;
 
     // PREVENT the camera from messing up for drivebys for vehicle drivers
-	*(BYTE *)0x522423 = 0x90;
+    *(BYTE *)0x522423 = 0x90;
     *(BYTE *)0x522424 = 0x90;
     
     LPVOID patchAddress = NULL;
@@ -704,94 +704,94 @@ void CMultiplayerSA::InitHooks()
     // CENTER VEHICLE NAME and ZONE NAME messages
     // 0058B0AD   6A 02            PUSH 2 // orientation
     // VEHICLE
-	*(BYTE *)0x58B0AE = 0x00;
+    *(BYTE *)0x58B0AE = 0x00;
 
     // ZONE
-	*(BYTE *)0x58AD56 = 0x00;
+    *(BYTE *)0x58AD56 = 0x00;
 
     // 85953C needs to equal 320.0 to center the text (640.0 being the base width)
-	*(float *)0x85953C = 320.0f;
+    *(float *)0x85953C = 320.0f;
 
     // 0058B147   D80D 0C958500    FMUL DWORD PTR DS:[85950C] // the text needs to be moved to the left
     //VEHICLE
-	*(BYTE *)0x58B149 = 0x3C;
+    *(BYTE *)0x58B149 = 0x3C;
 
     //ZONE
-	*(BYTE *)0x58AE52 = 0x3C;
+    *(BYTE *)0x58AE52 = 0x3C;
 
-	// DISABLE SAM SITES
-	*(BYTE *)0x5A07D0 = 0xC3;
+    // DISABLE SAM SITES
+    *(BYTE *)0x5A07D0 = 0xC3;
 
-	// DISABLE TRAINS (AUTO GENERATED ONES)
-	*(BYTE *)0x6F7900 = 0xC3;
+    // DISABLE TRAINS (AUTO GENERATED ONES)
+    *(BYTE *)0x6F7900 = 0xC3;
     
     // Prevent TRAINS spawning with PEDs
-	*(BYTE *)0x6F7865 = 0xEB;
+    *(BYTE *)0x6F7865 = 0xEB;
 
-	// DISABLE PLANES
-	*(BYTE *)0x6CD2F0 = 0xC3;
-	
-	// DISABLE EMERGENCY VEHICLES
-	*(BYTE *)0x42B7D0 = 0xC3;
+    // DISABLE PLANES
+    *(BYTE *)0x6CD2F0 = 0xC3;
+    
+    // DISABLE EMERGENCY VEHICLES
+    *(BYTE *)0x42B7D0 = 0xC3;
 
-	// DISABLE CAR GENERATORS
-	*(BYTE *)0x6F3F40 = 0xC3;
+    // DISABLE CAR GENERATORS
+    *(BYTE *)0x6F3F40 = 0xC3;
 
     // DISABLE CEntryExitManager::Update (they crash when you enter anyway)
-	*(BYTE *)0x440D10 = 0xC3;
+    *(BYTE *)0x440D10 = 0xC3;
 
-	// Disable MENU AFTER alt + tab
-	//0053BC72   C605 7B67BA00 01 MOV BYTE PTR DS:[BA677B],1	
-	*(BYTE *)0x53BC78 = 0x00;
+    // Disable MENU AFTER alt + tab
+    //0053BC72   C605 7B67BA00 01 MOV BYTE PTR DS:[BA677B],1    
+    *(BYTE *)0x53BC78 = 0x00;
 
-	// DISABLE HUNGER MESSAGES
-	memset ( (LPVOID)0x56E740, 0x90, 5 );
+    // DISABLE HUNGER MESSAGES
+    memset ( (LPVOID)0x56E740, 0x90, 5 );
 
-	// DISABLE RANDOM VEHICLE UPGRADES
-	memset ( (LPVOID)0x6B0BC2, 0xEB, 1 );
+    // DISABLE RANDOM VEHICLE UPGRADES
+    memset ( (LPVOID)0x6B0BC2, 0xEB, 1 );
 
-	// DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
-	/*	
-	*(BYTE *)0x616650 = 0xC3;
+    // DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
+    /*  
+    *(BYTE *)0x616650 = 0xC3;
     *(BYTE *)0xA43088 = 1;
-	*/
-
-	// SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
-	*(BYTE *)0x53C017 = 0x90;
-	*(BYTE *)0x53C018 = 0x90;
-
-	// DISABLE random cars
-	//*(BYTE *)0x4341C0 = 0xC3;
-	
-	// DISABLE heat flashes
-	/*
-	*(BYTE *)0x6E3521 = 0x90;
-	*(BYTE *)0x6E3522 = 0xE9;
-	*/
-
-	// DECREASE ROF for missiles from hydra
-	// 006D462C     81E1 E8030000  AND ECX,3E8
-	// 006D4632     81C1 E8030000  ADD ECX,3E8
-    /*	
-	*(BYTE *)0x6D462E = 0xE8;
-	*(BYTE *)0x6D462F = 0x03;
-	*(BYTE *)0x6D4634 = 0xE8;
-	*(BYTE *)0x6D4635 = 0x03;
     */
 
-	// HACK to allow boats to be rotated
-	/*
-	006F2089   58               POP EAX
-	006F208A   90               NOP
-	006F208B   90               NOP
-	006F208C   90               NOP
-	006F208D   90               NOP
-	*/
-	*(BYTE *)0x6F2089 = 0x58;
-	memset((void *)0x6F208A,0x90,4);
+    // SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
+    *(BYTE *)0x53C017 = 0x90;
+    *(BYTE *)0x53C018 = 0x90;
+
+    // DISABLE random cars
+    //*(BYTE *)0x4341C0 = 0xC3;
+    
+    // DISABLE heat flashes
+    /*
+    *(BYTE *)0x6E3521 = 0x90;
+    *(BYTE *)0x6E3522 = 0xE9;
+    */
+
+    // DECREASE ROF for missiles from hydra
+    // 006D462C     81E1 E8030000  AND ECX,3E8
+    // 006D4632     81C1 E8030000  ADD ECX,3E8
+    /*  
+    *(BYTE *)0x6D462E = 0xE8;
+    *(BYTE *)0x6D462F = 0x03;
+    *(BYTE *)0x6D4634 = 0xE8;
+    *(BYTE *)0x6D4635 = 0x03;
+    */
+
+    // HACK to allow boats to be rotated
+    /*
+    006F2089   58               POP EAX
+    006F208A   90               NOP
+    006F208B   90               NOP
+    006F208C   90               NOP
+    006F208D   90               NOP
+    */
+    *(BYTE *)0x6F2089 = 0x58;
+    memset((void *)0x6F208A,0x90,4);
 
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
-	*(BYTE *)0x42CD10 = 0xC3;
+    *(BYTE *)0x42CD10 = 0xC3;
 
     // DISABLE real-time shadows for peds
     *(BYTE *)0x5E68A0 = 0xEB;
@@ -813,24 +813,24 @@ void CMultiplayerSA::InitHooks()
     *(BYTE *)0x550FBB = 0x10;
 
     
-	/*
-	*(BYTE *)0x469F00 = 0xC3;
-	*/
+    /*
+    *(BYTE *)0x469F00 = 0xC3;
+    */
 
-	// CCAM::PROCESSFIXED remover
+    // CCAM::PROCESSFIXED remover
 /*
-	*(BYTE *)0x51D470 = 0xC2;
-	*(BYTE *)0x51D471 = 0x10;
-	*(BYTE *)0x51D472 = 0x00;
+    *(BYTE *)0x51D470 = 0xC2;
+    *(BYTE *)0x51D471 = 0x10;
+    *(BYTE *)0x51D472 = 0x00;
 */
 
-	// HACK to prevent RealTimeShadowManager crash
-	// 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
-	/*
-	*(BYTE *)0x542483 = 0xEB;
+    // HACK to prevent RealTimeShadowManager crash
+    // 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
+    /*
+    *(BYTE *)0x542483 = 0xEB;
 */
-	
-	//InitShotsyncHooks();
+    
+    //InitShotsyncHooks();
 
     //DISABLE CPad::ReconcileTwoControllersInput
     *(BYTE *)0x53F530 = 0xC2;
@@ -852,26 +852,26 @@ void CMultiplayerSA::InitHooks()
     // DISABLE CWanted__Update
     memset( (void*)0x60EBCC, 0x90, 5 );
 
-	// Disable armour-increase upon entering an enforcer
-	*(BYTE *)0x6D189B = 0x06;
+    // Disable armour-increase upon entering an enforcer
+    *(BYTE *)0x6D189B = 0x06;
 
-	// Removes the last weapon pickups from interiors as well
-	*(BYTE *)0x591F90 = 0xC3;
+    // Removes the last weapon pickups from interiors as well
+    *(BYTE *)0x591F90 = 0xC3;
 
-	// Trains may infact go further than Los Santos
-	*(BYTE *)0x4418E0 = 0xC3;
+    // Trains may infact go further than Los Santos
+    *(BYTE *)0x4418E0 = 0xC3;
 
     // EXPERIMENTAL - disable unloading of cols
    // memset( (void*)0x4C4EDA, 0x90, 10 );
 
     // Make CTaskComplexSunbathe::CanSunbathe always return true
-	*(BYTE *)0x632140 = 0xB0;
+    *(BYTE *)0x632140 = 0xB0;
     *(BYTE *)0x632141 = 0x01;
     *(BYTE *)0x632142 = 0xC3;
     
     // Stop CTaskSimpleCarDrive::ProcessPed from exiting passengers with CTaskComplexSequence (some timer check)
     *(BYTE *)0x644C18 = 0x90;
-	*(BYTE *)0x644C19 = 0xE9;
+    *(BYTE *)0x644C19 = 0xE9;
 
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
     memset ( (void*)0x5E8E84, 0x90, 5 );
@@ -906,8 +906,8 @@ void CMultiplayerSA::InitHooks()
     // Don't get golf clubs from caddies
     *(BYTE *)0x6D1A1A = 0xEB;
 
-	// Don't get 20 health from ambulances
-	*(BYTE *)0x6D1762 = 0x00;
+    // Don't get 20 health from ambulances
+    *(BYTE *)0x6D1762 = 0x00;
 
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
     memset((void *)0x6F701D, 0x90, 6);
@@ -1086,7 +1086,7 @@ void CMultiplayerSA::AllowWindowsCursorShowing ( bool bAllow )
 
     if ( bAllow )
     {
-	    memset ( (LPVOID)ADDR_CursorHiding, 0x90, 16 );
+        memset ( (LPVOID)ADDR_CursorHiding, 0x90, 16 );
     }
     else
     {
@@ -1102,24 +1102,24 @@ CShotSyncData * CMultiplayerSA::GetLocalShotSyncData ( )
 
 void CMultiplayerSA::DisablePadHandler( bool bDisabled )
 {
-	// DISABLE GAMEPADS (testing)
-	if ( bDisabled )
-		*(BYTE *)0x7449F0 = 0xC3;
-	else
-		*(BYTE *)0x7449F0 = 0x8B;
+    // DISABLE GAMEPADS (testing)
+    if ( bDisabled )
+        *(BYTE *)0x7449F0 = 0xC3;
+    else
+        *(BYTE *)0x7449F0 = 0x8B;
 }
 
 void CMultiplayerSA::DisableHeatHazeEffect ( bool bDisable )
 {
-	*(bool *)0xC402BA = bDisable;
+    *(bool *)0xC402BA = bDisable;
 }
 
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
 {
-	if ( bDisable )
-		*(BYTE *)0x6E3950 = 0xC3;
-	else
-		*(BYTE *)0x6E3950 = 0x83;
+    if ( bDisable )
+        *(BYTE *)0x6E3950 = 0xC3;
+    else
+        *(BYTE *)0x6E3950 = 0x83;
 }
 
 void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
@@ -1130,10 +1130,10 @@ void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
 
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
 {
-	if ( bDisabled )
-		*(BYTE *)0x712330 = 0xC3;
-	else
-		*(BYTE *)0x712330 = 0xA1;
+    if ( bDisabled )
+        *(BYTE *)0x712330 = 0xC3;
+    else
+        *(BYTE *)0x712330 = 0xA1;
 }
 
 void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
@@ -1147,10 +1147,10 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds
-	if ( bDisabled )
+    if ( bDisabled )
         *(BYTE *)0x716380 = 0xA1;
-	else
-		*(BYTE *)0x716380 = 0xC3;
+    else
+        *(BYTE *)0x716380 = 0xC3;
 
     // normal clouds
     //0071395A     90             NOP
@@ -1163,13 +1163,13 @@ void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 
     if ( bDisabled )
     {
-		*(BYTE *)0x717180 = 0x83;
+        *(BYTE *)0x717180 = 0x83;
         *(BYTE *)0x717181 = 0xEC;
         *(BYTE *)0x717182 = 0x08;
     }
-	else
+    else
     {
-		*(BYTE *)0x717180 = 0xC2;
+        *(BYTE *)0x717180 = 0xC2;
         *(BYTE *)0x717181 = 0x04;
         *(BYTE *)0x717182 = 0x00;
     }
@@ -1177,28 +1177,28 @@ void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 
 void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue )
 {
-	bUsingCustomSkyGradient = true;
-	ucSkyGradientTopR = TopRed;
-	ucSkyGradientTopG = TopGreen;
-	ucSkyGradientTopB = TopBlue;
-	ucSkyGradientBottomR = BottomRed;
-	ucSkyGradientBottomG = BottomGreen;
-	ucSkyGradientBottomB = BottomBlue;
+    bUsingCustomSkyGradient = true;
+    ucSkyGradientTopR = TopRed;
+    ucSkyGradientTopG = TopGreen;
+    ucSkyGradientTopB = TopBlue;
+    ucSkyGradientBottomR = BottomRed;
+    ucSkyGradientBottomG = BottomGreen;
+    ucSkyGradientBottomB = BottomBlue;
 }
 
 void CMultiplayerSA::ResetSky ( void )
 {
-	bUsingCustomSkyGradient = false;
+    bUsingCustomSkyGradient = false;
 }
 
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
 {
-	bUsingCustomWaterColor = true;
+    bUsingCustomWaterColor = true;
     // Water surface
-	fWaterColorR = fWaterRed;
-	fWaterColorG = fWaterGreen;
-	fWaterColorB = fWaterBlue;
-	fWaterColorA = fWaterAlpha;
+    fWaterColorR = fWaterRed;
+    fWaterColorG = fWaterGreen;
+    fWaterColorB = fWaterBlue;
+    fWaterColorA = fWaterAlpha;
     // Underwater
     *(BYTE *)0x8D5140 = (BYTE)fWaterRed;
     *(BYTE *)0x8D5141 = (BYTE)fWaterGreen;
@@ -1211,7 +1211,7 @@ void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float f
 
 void CMultiplayerSA::ResetWater ( void )
 {
-	bUsingCustomWaterColor = false;
+    bUsingCustomWaterColor = false;
     *(DWORD *)0x8D5140 = 0x40404040;
     *(BYTE *)0x7051A7 = 184;
     *(float *)0x872660 = 184.0f;
@@ -1233,7 +1233,7 @@ void CMultiplayerSA::DisableExplosions ( bool bDisabled )
 
 void CMultiplayerSA::SetExplosionHandler ( ExplosionHandler * pExplosionHandler )
 {
-	m_pExplosionHandler = pExplosionHandler;
+    m_pExplosionHandler = pExplosionHandler;
 }
 
 void CMultiplayerSA::SetProjectileHandler ( ProjectileHandler * pProjectileHandler )
@@ -1308,7 +1308,7 @@ void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHan
 
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
-	bHideRadar = bHide;
+    bHideRadar = bHide;
 }
 
 void CMultiplayerSA::AllowMouseMovement ( bool bAllow )
@@ -1336,52 +1336,52 @@ void CMultiplayerSA::DoSoundHacksOnLostFocus ( bool bLostFocus )
 
 void CMultiplayerSA::SetCenterOfWorld(CEntity * entity, CVector * vecPosition, FLOAT fHeading)
 {
-	if ( vecPosition )
-	{
-		bInStreamingUpdate = false;
+    if ( vecPosition )
+    {
+        bInStreamingUpdate = false;
 
-		vecCenterOfWorld.fX = vecPosition->fX;
-		vecCenterOfWorld.fY = vecPosition->fY;
-		vecCenterOfWorld.fZ = vecPosition->fZ;
+        vecCenterOfWorld.fX = vecPosition->fX;
+        vecCenterOfWorld.fY = vecPosition->fY;
+        vecCenterOfWorld.fZ = vecPosition->fZ;
 
-		if ( entity )
+        if ( entity )
         {
             CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( entity );
-			if ( pEntitySA )
-				activeEntityForStreaming = pEntitySA->GetInterface();
+            if ( pEntitySA )
+                activeEntityForStreaming = pEntitySA->GetInterface();
         }
-	/*	else
-		{
-			if ( !bActiveEntityForStreamingIsFakePed )
-			{
-				activeEntityForStreaming = new CPedSAInterface();
-				memset(activeEntityForStreaming, 0, sizeof(CPedSAInterface));
-				activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
-			}
+    /*  else
+        {
+            if ( !bActiveEntityForStreamingIsFakePed )
+            {
+                activeEntityForStreaming = new CPedSAInterface();
+                memset(activeEntityForStreaming, 0, sizeof(CPedSAInterface));
+                activeEntityForStreaming->Placeable.matrix = new CMatrix_Padded();
+            }
 
-			bActiveEntityForStreamingIsFakePed = true;
+            bActiveEntityForStreamingIsFakePed = true;
             
-			activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
-			activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
-			activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
-		}*/
+            activeEntityForStreaming->Placeable.matrix->vPos.fX = vecPosition->fX;
+            activeEntityForStreaming->Placeable.matrix->vPos.fY = vecPosition->fY;
+            activeEntityForStreaming->Placeable.matrix->vPos.fZ = vecPosition->fZ;
+        }*/
 
-		//DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
-		fFalseHeading = fHeading;
-		bSetCenterOfWorld = true;
-	}
-	else 
-	{
-		/*if ( bActiveEntityForStreamingIsFakePed )
-		{
-			delete activeEntityForStreaming->Placeable.matrix;
-			delete activeEntityForStreaming;
-		}
+        //DWORD dwCurrentValue = *(DWORD *)FUNC_CPlayerInfoBase;
+        fFalseHeading = fHeading;
+        bSetCenterOfWorld = true;
+    }
+    else 
+    {
+        /*if ( bActiveEntityForStreamingIsFakePed )
+        {
+            delete activeEntityForStreaming->Placeable.matrix;
+            delete activeEntityForStreaming;
+        }
 
-		bActiveEntityForStreamingIsFakePed = false;*/
-		activeEntityForStreaming = NULL;
-		bSetCenterOfWorld = false;
-	}
+        bActiveEntityForStreamingIsFakePed = false;*/
+        activeEntityForStreaming = NULL;
+        bSetCenterOfWorld = false;
+    }
 }
 
 void _declspec(naked) HOOK_FindPlayerCoors()
@@ -1401,31 +1401,31 @@ void _declspec(naked) HOOK_FindPlayerCoors()
 
         // Move our center of world into gta's senter of world when it requests so
         pop     eax
-		lea		esi, vecCenterOfWorld
-		mov		edi, [esp+4]
-		mov		eax, edi
-		movsd
-		movsd
-		movsd			
-		retn	
+        lea     esi, vecCenterOfWorld
+        mov     edi, [esp+4]
+        mov     eax, edi
+        movsd
+        movsd
+        movsd           
+        retn    
 
         // Continue. Don't replace the world center.
         dontset:
         pop     eax
-		mov		eax, [esp+8]
-		xor		edx, edx
-        mov		ecx, CMultiplayerSA::HOOKPOS_FindPlayerCoors
-		add		ecx, 6
-		jmp		ecx
-	}
+        mov     eax, [esp+8]
+        xor     edx, edx
+        mov     ecx, CMultiplayerSA::HOOKPOS_FindPlayerCoors
+        add     ecx, 6
+        jmp     ecx
+    }
 }
 
 void _declspec(naked) HOOK_CStreaming_Update_Caller()
 {
-	/*
-	0053BF09   8BF8             MOV EDI,EAX
-	0053BF0B   E8 6027EDFF      CALL gta_sa.0040E670
-	*/
+    /*
+    0053BF09   8BF8             MOV EDI,EAX
+    0053BF0B   E8 6027EDFF      CALL gta_sa.0040E670
+    */
 
     _asm
     {
@@ -1434,130 +1434,130 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
     }
 
     // We're now in the streaming update
-	bInStreamingUpdate = true;
+    bInStreamingUpdate = true;
 
     // We have an active entity for streaming?
-	if( activeEntityForStreaming )
-	{
+    if( activeEntityForStreaming )
+    {
         // Do something...
-		_asm
-		{
-			mov		edi, CMultiplayerSA::FUNC_CPlayerInfoBase
-			mov		ebx, [edi]
-			mov		dwSavedPlayerPointer, ebx
-			mov		ebx, activeEntityForStreaming
-			mov		[edi], ebx
-		}
-	}
+        _asm
+        {
+            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
+            mov     ebx, [edi]
+            mov     dwSavedPlayerPointer, ebx
+            mov     ebx, activeEntityForStreaming
+            mov     [edi], ebx
+        }
+    }
 
-	_asm
-	{
-		mov		edi, eax
+    _asm
+    {
+        mov     edi, eax
 
         // Call CMultiplayerSA::FUNC_CStreaming_Update
-		mov		eax, CMultiplayerSA::FUNC_CStreaming_Update
-		call	eax
-	}
+        mov     eax, CMultiplayerSA::FUNC_CStreaming_Update
+        call    eax
+    }
 
     // We have an entity for streaming?
-	if ( activeEntityForStreaming )
-	{
-		_asm
-		{
+    if ( activeEntityForStreaming )
+    {
+        _asm
+        {
             // ...
-			mov		edi, CMultiplayerSA::FUNC_CPlayerInfoBase
-			mov		ebx, dwSavedPlayerPointer
-			mov		[edi], ebx
-		}
-	}
+            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
+            mov     ebx, dwSavedPlayerPointer
+            mov     [edi], ebx
+        }
+    }
 
     // We're no longer in streaming update
-	bInStreamingUpdate = false;
-	_asm
-	{
+    bInStreamingUpdate = false;
+    _asm
+    {
         // Restore registers
         popad
 
         // Continue at the old func
-        mov		eax, CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller
-		add		eax, 7
-		jmp		eax
+        mov     eax, CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller
+        add     eax, 7
+        jmp     eax
     }
 }
 
 void _declspec(naked) HOOK_CHud_Draw_Caller()
 {
-	/*
-	0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
-	0053E4FF   . E8 DC150500                          CALL gta_sa_u.0058FAE0
-	*/
-	_asm
-	{
+    /*
+    0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
+    0053E4FF   . E8 DC150500                          CALL gta_sa_u.0058FAE0
+    */
+    _asm
+    {
         pushad
 
-		mov		edx, CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName
-		call	edx
-	}
+        mov     edx, CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName
+        call    edx
+    }
 
-	if(!bSetCenterOfWorld)
-	{
-		_asm
-		{
-			mov		edx, CMultiplayerSA::FUNC_CHud_Draw
-			call	edx
-		}
+    if(!bSetCenterOfWorld)
+    {
+        _asm
+        {
+            mov     edx, CMultiplayerSA::FUNC_CHud_Draw
+            call    edx
+        }
 
-	}
-	else
-	{
-		/*if ( activeEntityForStreaming )
-		{
-			_asm
-			{
-				mov		edi, FUNC_CPlayerInfoBase
-				mov		ebx, [edi]
-				mov		dwSavedPlayerPointer, ebx
-				mov		ebx, activeEntityForStreaming
-				mov		[edi], ebx
-			}
-		}*/
+    }
+    else
+    {
+        /*if ( activeEntityForStreaming )
+        {
+            _asm
+            {
+                mov     edi, FUNC_CPlayerInfoBase
+                mov     ebx, [edi]
+                mov     dwSavedPlayerPointer, ebx
+                mov     ebx, activeEntityForStreaming
+                mov     [edi], ebx
+            }
+        }*/
 
-		if (!bHideRadar)
-		{
-			_asm
-			{
-				mov		edx, 0x58A330
-				call	edx
-			}
-		}
+        if (!bHideRadar)
+        {
+            _asm
+            {
+                mov     edx, 0x58A330
+                call    edx
+            }
+        }
 
-		/*if ( activeEntityForStreaming )
-		{
-			_asm
-			{
-				mov		edi, FUNC_CPlayerInfoBase
-				mov		ebx, dwSavedPlayerPointer
-				mov		[edi], ebx
-			}
-		}*/
-	}
+        /*if ( activeEntityForStreaming )
+        {
+            _asm
+            {
+                mov     edi, FUNC_CPlayerInfoBase
+                mov     ebx, dwSavedPlayerPointer
+                mov     [edi], ebx
+            }
+        }*/
+    }
 
-	_asm
-	{
+    _asm
+    {
         popad
 
-		mov		eax, CMultiplayerSA::HOOKPOS_CHud_Draw_Caller
-		add		eax, 10
-		jmp		eax
-	}
+        mov     eax, CMultiplayerSA::HOOKPOS_CHud_Draw_Caller
+        add     eax, 10
+        jmp     eax
+    }
 }
 
 void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
 {
-	/*
-	0056E250  /$ 8B4424 04      MOV EAX,DWORD PTR SS:[ESP+4]
-	0056E254  |. 85C0           TEST EAX,EAX
-	*/
+    /*
+    0056E250  /$ 8B4424 04      MOV EAX,DWORD PTR SS:[ESP+4]
+    0056E254  |. 85C0           TEST EAX,EAX
+    */
 
     _asm
     {
@@ -1565,27 +1565,27 @@ void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
         test    al, al
         jnz     hascenter
 
-		mov		eax, [esp+4]
-		test	eax, eax
+        mov     eax, [esp+4]
+        test    eax, eax
 
-		mov		edx, CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld
-		add		edx, 6
-		jmp		edx
-		
+        mov     edx, CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld
+        add     edx, 6
+        jmp     edx
+        
 
         hascenter:
-        lea		eax, vecCenterOfWorld
+        lea     eax, vecCenterOfWorld
         retn
-	}
-	
+    }
+    
 }
 
 void _declspec(naked) HOOK_FindPlayerHeading()
 {
-	/*
-	0056E450  /$ 8B4C24 04      MOV ECX,DWORD PTR SS:[ESP+4]
-	0056E454  |. 8BD1           MOV EDX,ECX
-	*/
+    /*
+    0056E450  /$ 8B4C24 04      MOV ECX,DWORD PTR SS:[ESP+4]
+    0056E454  |. 8BD1           MOV EDX,ECX
+    */
 
     _asm
     {
@@ -1596,20 +1596,20 @@ void _declspec(naked) HOOK_FindPlayerHeading()
         pop     eax
         jnz     hascenter
 
-		mov		ecx, [esp+4]
-		mov		edx, ecx
+        mov     ecx, [esp+4]
+        mov     edx, ecx
 
         // Return to the hookpos
-		mov		eax, CMultiplayerSA::HOOKPOS_FindPlayerHeading
-		add		eax, 6
-		jmp		eax
+        mov     eax, CMultiplayerSA::HOOKPOS_FindPlayerHeading
+        add     eax, 6
+        jmp     eax
 
         // ..
         hascenter:
-		fld		fFalseHeading
-		retn
-	}
-	
+        fld     fFalseHeading
+        retn
+    }
+    
 }
 
 // this hook adds a null check to prevent the game crashing when objects are placed really high up (issue 517)
@@ -1802,7 +1802,7 @@ bool CallExplosionHandler ( void )
         }
     }
 
-	return m_pExplosionHandler ( pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType );
+    return m_pExplosionHandler ( pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType );
 }
 
 void _declspec(naked) HOOK_CExplosion_AddExplosion()
@@ -1829,8 +1829,8 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         jz          noexplosionhandler
 
         // Extract arguments....
-		push	esi
-		push	edi
+        push    esi
+        push    edi
 
         mov     esi, [esp+12]
         mov     explosionEntity, esi
@@ -1838,49 +1838,49 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         mov     esi, [esp+16]
         mov     explosionCreator, esi
 
-		mov		esi, [esp+20]
-		mov		explosionType, esi
+        mov     esi, [esp+20]
+        mov     explosionType, esi
 
-		lea		edi, vecExplosionLocation
-		mov		esi, esp
-		add		esi, 24 // 3 DWORDS and RETURN address and 2 STORED REGISTERS
-		movsd
-		movsd
-		movsd
+        lea     edi, vecExplosionLocation
+        mov     esi, esp
+        add     esi, 24 // 3 DWORDS and RETURN address and 2 STORED REGISTERS
+        movsd
+        movsd
+        movsd
 
-		pop		edi
-		pop		esi
+        pop     edi
+        pop     esi
 
         // Store registers for calling this handler
-		pushad
+        pushad
     }
 
     // Call the explosion handler
-	if ( !CallExplosionHandler () )
-	{
-		_asm	popad
-		_asm	retn // if they return false from the handler, they don't want the explosion to show
-	}
+    if ( !CallExplosionHandler () )
+    {
+        _asm    popad
+        _asm    retn // if they return false from the handler, they don't want the explosion to show
+    }
     else
     {
-		_asm popad
-	}
+        _asm popad
+    }
 
-	_asm
-	{
+    _asm
+    {
         noexplosionhandler:
 
         // Replaced code
-		sub		esp, 0x1C
-		push	ebx
-		push	ebp
-		push	esi
+        sub     esp, 0x1C
+        push    ebx
+        push    ebp
+        push    esi
 
         // Return to the calling function and resume (do the explosion)
-		mov		edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
-		add		edx, 6
-		jmp		edx
-	}
+        mov     edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
+        add     edx, 6
+        jmp     edx
+    }
 }
 
 
@@ -2006,7 +2006,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
         mov         eax, [esp+10]
         mov         edx, [esp+8]
 
-		// Jump back to the rest of the function we hooked
+        // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_CreateFxSystem
     }
 }
@@ -2044,7 +2044,7 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem ()
         push        edi  
         mov         edi, [esp+10h] 
 
-		// Jump back to the rest of the function we hooked
+        // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_DestroyFxSystem
     }
 }
@@ -2200,113 +2200,113 @@ void _declspec(naked) HOOK_CPed_IsPlayer ()
 
 void CRunningScript_Process ( void )
 {
-	if ( !bHasProcessedScript )
-	{
+    if ( !bHasProcessedScript )
+    {
         CCamera * pCamera = pGameInterface->GetCamera();
         pCamera->SetFadeColor ( 0, 0, 0 );
         pCamera->Fade ( 0.0f, FADE_OUT );
 
-		DWORD dwFunc = 0x409D10; // RequestSpecialModel
+        DWORD dwFunc = 0x409D10; // RequestSpecialModel
 
         char szModelName [64];
-		strcpy ( szModelName, "player" );
-		_asm
-		{
-			push	26
-			lea		eax, szModelName
-			push	eax
-			push	0
-			call	dwFunc
-			add		esp, 12
-		}
+        strcpy ( szModelName, "player" );
+        _asm
+        {
+            push    26
+            lea     eax, szModelName
+            push    eax
+            push    0
+            call    dwFunc
+            add     esp, 12
+        }
 
-		dwFunc = 0x40EA10; // load all requested models
-		_asm
-		{
-			push	1
-			call	dwFunc
-			add		esp, 4
-		}
+        dwFunc = 0x40EA10; // load all requested models
+        _asm
+        {
+            push    1
+            call    dwFunc
+            add     esp, 4
+        }
 
-		dwFunc = 0x60D790; // setup player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
-		
-		/*dwFunc = 0x05E47E0; // set created by
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			mov		ecx, [edi]
-			push	2
-			call	dwFunc
-		}
+        dwFunc = 0x60D790; // setup player ped
+        _asm
+        {
+            push    0
+            call    dwFunc
+            add     esp, 4
+        }
+        
+        /*dwFunc = 0x05E47E0; // set created by
+        _asm
+        {
+            mov     edi, 0xB7CD98
+            mov     ecx, [edi]
+            push    2
+            call    dwFunc
+        }
 
-		dwFunc = 0x609520; // deactivate player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
+        dwFunc = 0x609520; // deactivate player ped
+        _asm
+        {
+            push    0
+            call    dwFunc
+            add     esp, 4
+        }
 */
-		//_asm int 3
-		dwFunc = 0x420B80; // set position
-		fX = 2488.562f;
-		fY = -1666.864f;
-		fZ = 12.8757f;
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			push	fZ
-			push	fY
-			push	fX
-			mov		ecx, [edi]
-			call	dwFunc
-		}
-		/*_asm int 3
-		dwFunc = 0x609540; // reactivate player ped
-		_asm
-		{
-			push	0
-			call	dwFunc
-			add		esp, 4
-		}
+        //_asm int 3
+        dwFunc = 0x420B80; // set position
+        fX = 2488.562f;
+        fY = -1666.864f;
+        fZ = 12.8757f;
+        _asm
+        {
+            mov     edi, 0xB7CD98
+            push    fZ
+            push    fY
+            push    fX
+            mov     ecx, [edi]
+            call    dwFunc
+        }
+        /*_asm int 3
+        dwFunc = 0x609540; // reactivate player ped
+        _asm
+        {
+            push    0
+            call    dwFunc
+            add     esp, 4
+        }
 
-		dwFunc = 0x61A5A0; // CTask::operator new
-		_asm
-		{
-			push	28
-			call	dwFunc
-			add		esp, 4
-		}
+        dwFunc = 0x61A5A0; // CTask::operator new
+        _asm
+        {
+            push    28
+            call    dwFunc
+            add     esp, 4
+        }
 
-		dwFunc = 0x685750; // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
-		_asm
-		{
-			mov		ecx, eax
-			call	dwFunc
-		}
+        dwFunc = 0x685750; // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
+        _asm
+        {
+            mov     ecx, eax
+            call    dwFunc
+        }
 
-		dwFunc = 0x681AF0; // set task
-		_asm
-		{
-			mov		edi, 0xB7CD98
-			mov		edi, [edi]
-			mov		ecx, [edi+0x47C]
-			add		ecx, 4
-			push	0
-			push	4	
-			push	eax
-			call	dwFunc
-		}*/
+        dwFunc = 0x681AF0; // set task
+        _asm
+        {
+            mov     edi, 0xB7CD98
+            mov     edi, [edi]
+            mov     ecx, [edi+0x47C]
+            add     ecx, 4
+            push    0
+            push    4   
+            push    eax
+            call    dwFunc
+        }*/
 
-		
-		bHasProcessedScript = true;
-	}
+        
+        bHasProcessedScript = true;
+    }
 }
 
 void _declspec(naked) HOOK_CRunningScript_Process()
@@ -2321,7 +2321,7 @@ void _declspec(naked) HOOK_CRunningScript_Process()
     _asm
     {
         popad
-	    retn
+        retn
     }
 }
 
@@ -2588,13 +2588,13 @@ void _declspec(naked) HOOK_EndWorldColors ()
 {
     if ( bUsingCustomSkyGradient )
     {
-	    *(BYTE *)0xB7C4C4 = ucSkyGradientTopR;
-	    *(BYTE *)0xB7C4C6 = ucSkyGradientTopG;
-	    *(BYTE *)0xB7C4C8 = ucSkyGradientTopB;
+        *(BYTE *)0xB7C4C4 = ucSkyGradientTopR;
+        *(BYTE *)0xB7C4C6 = ucSkyGradientTopG;
+        *(BYTE *)0xB7C4C8 = ucSkyGradientTopB;
 
-	    *(BYTE *)0xB7C4CA = ucSkyGradientBottomR;
-	    *(BYTE *)0xB7C4CC = ucSkyGradientBottomG;
-	    *(BYTE *)0xB7C4CE = ucSkyGradientBottomB;
+        *(BYTE *)0xB7C4CA = ucSkyGradientBottomR;
+        *(BYTE *)0xB7C4CC = ucSkyGradientBottomG;
+        *(BYTE *)0xB7C4CE = ucSkyGradientBottomB;
     }
     if ( bUsingCustomWaterColor )
     {
@@ -2603,7 +2603,7 @@ void _declspec(naked) HOOK_EndWorldColors ()
         *(float *)0xB7C510 = fWaterColorB;
         *(float *)0xB7C514 = fWaterColorA;
     }
-	 _asm
+     _asm
     {
         ret
     }
@@ -2679,34 +2679,34 @@ dont_choke:
 
 void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
 {
-	// PREVENT THE PLAYER LEAVING THEIR VEHICLE
-	//	005400D0     32C0           XOR AL,AL
-	//	005400D2     C3             RETN
+    // PREVENT THE PLAYER LEAVING THEIR VEHICLE
+    //  005400D0     32C0           XOR AL,AL
+    //  005400D2     C3             RETN
     if ( !bDisabled )
     {
         // CPlayerInfo__Process
-	    *(BYTE *)0x5702FD = 0xE8;
+        *(BYTE *)0x5702FD = 0xE8;
         *(BYTE *)0x5702FE = 0xCE;
         *(BYTE *)0x5702FF = 0xFD;
         *(BYTE *)0x570300 = 0xFC;
         *(BYTE *)0x570301 = 0xFF;
 
         // CAutomobile__ProcessControlInputs
-	    *(BYTE *)0x6AD75A = 0xE8;
+        *(BYTE *)0x6AD75A = 0xE8;
         *(BYTE *)0x6AD75B = 0x71;
         *(BYTE *)0x6AD75C = 0x29;
         *(BYTE *)0x6AD75D = 0xE9;
         *(BYTE *)0x6AD75E = 0xFF;
 
         // CBike__ProcessControlInputs
-	    *(BYTE *)0x6BE34B = 0xE8;
+        *(BYTE *)0x6BE34B = 0xE8;
         *(BYTE *)0x6BE34C = 0x80;
         *(BYTE *)0x6BE34D = 0x1D;
         *(BYTE *)0x6BE34E = 0xE8;
         *(BYTE *)0x6BE34F = 0xFF;
 
         // CTaskSimpleJetPack__ProcessControlInput
-	    *(BYTE *)0x67E834 = 0xE8;
+        *(BYTE *)0x67E834 = 0xE8;
         *(BYTE *)0x67E835 = 0x97;
         *(BYTE *)0x67E836 = 0x18;
         *(BYTE *)0x67E837 = 0xEC;
@@ -2715,93 +2715,93 @@ void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
     else
     {
         // CPlayerInfo__Process
-	    *(BYTE *)0x5702FD = 0x32;
+        *(BYTE *)0x5702FD = 0x32;
         *(BYTE *)0x5702FE = 0xC0;
         *(BYTE *)0x5702FF = 0x90;
         *(BYTE *)0x570300 = 0x90;
         *(BYTE *)0x570301 = 0x90;
 
         // CAutomobile__ProcessControlInputs
-	    *(BYTE *)0x6AD75A = 0x32;
+        *(BYTE *)0x6AD75A = 0x32;
         *(BYTE *)0x6AD75B = 0xC0;
         *(BYTE *)0x6AD75C = 0x90;
         *(BYTE *)0x6AD75D = 0x90;
         *(BYTE *)0x6AD75E = 0x90;
 
         // CBike__ProcessControlInputs
-	    *(BYTE *)0x6BE34B = 0x32;
+        *(BYTE *)0x6BE34B = 0x32;
         *(BYTE *)0x6BE34C = 0xC0;
         *(BYTE *)0x6BE34D = 0x90;
         *(BYTE *)0x6BE34E = 0x90;
         *(BYTE *)0x6BE34F = 0x90;
 
         // CTaskSimpleJetPack__ProcessControlInput
-	    *(BYTE *)0x67E834 = 0x32;
+        *(BYTE *)0x67E834 = 0x32;
         *(BYTE *)0x67E835 = 0xC0;
         *(BYTE *)0x67E836 = 0x90;
         *(BYTE *)0x67E837 = 0x90;
         *(BYTE *)0x67E838 = 0x90;
     }
-	
+    
     // CPad__ExitVehicleJustDown
     if ( !bDisabled )
     {
-    	memset((void *)0x540120, 0x90, 1);
-	    memset((void *)0x540121, 0x90, 1);
-	    memset((void *)0x540122, 0x90, 1);
+        memset((void *)0x540120, 0x90, 1);
+        memset((void *)0x540121, 0x90, 1);
+        memset((void *)0x540122, 0x90, 1);
     }
     else
     {
         memset((void *)0x540120, 0x32, 1);
-	    memset((void *)0x540121, 0xC0, 1);
-	    memset((void *)0x540122, 0xC3, 1);
+        memset((void *)0x540121, 0xC0, 1);
+        memset((void *)0x540122, 0xC3, 1);
     }
 }
 
 void CMultiplayerSA::PreventLeavingVehicles()
 {
-	memset((void *)0x6B5A10, 0xC3, 1);
+    memset((void *)0x6B5A10, 0xC3, 1);
 
-	//006B7449     E9 FF000000    JMP gta_sa.006B754D
-	memset((void *)0x6B7449, 0xE9, 1);
-	memset((void *)(0x6B7449+1), 0xFF, 1);
-	memset((void *)(0x6B7449+2), 0x00, 1);
+    //006B7449     E9 FF000000    JMP gta_sa.006B754D
+    memset((void *)0x6B7449, 0xE9, 1);
+    memset((void *)(0x6B7449+1), 0xFF, 1);
+    memset((void *)(0x6B7449+2), 0x00, 1);
 
-	//006B763C     E9 01010000    JMP gta_sa.006B7742
-	memset((void *)0x6B763C, 0xE9, 1);
-	memset((void *)(0x6B763C+1), 0x01, 1);
-	memset((void *)(0x6B763C+2), 0x01, 1);
-	memset((void *)(0x6B763C+3), 0x00, 1);
+    //006B763C     E9 01010000    JMP gta_sa.006B7742
+    memset((void *)0x6B763C, 0xE9, 1);
+    memset((void *)(0x6B763C+1), 0x01, 1);
+    memset((void *)(0x6B763C+2), 0x01, 1);
+    memset((void *)(0x6B763C+3), 0x00, 1);
 
-	//006B7617     E9 26010000    JMP gta_sa.006B7742
-	memset((void *)0x6B7617, 0xE9, 1);
-	memset((void *)(0x6B7617+1), 0x26, 1);
-	memset((void *)(0x6B7617+2), 0x01, 1);
-	memset((void *)(0x6B7617+3), 0x00, 1);
-	memset((void *)(0x6B7617+4), 0x00, 1);
+    //006B7617     E9 26010000    JMP gta_sa.006B7742
+    memset((void *)0x6B7617, 0xE9, 1);
+    memset((void *)(0x6B7617+1), 0x26, 1);
+    memset((void *)(0x6B7617+2), 0x01, 1);
+    memset((void *)(0x6B7617+3), 0x00, 1);
+    memset((void *)(0x6B7617+4), 0x00, 1);
 
-	//006B62A7     EB 74          JMP SHORT gta_sa.006B631D
-	memset((void *)0x6B62A7, 0xEB, 1);
+    //006B62A7     EB 74          JMP SHORT gta_sa.006B631D
+    memset((void *)0x6B62A7, 0xEB, 1);
 
-	//006B7642     E9 FB000000    JMP gta_sa_u.006B7742
-	memset((void *)0x6B7642, 0xE9, 1);
-	memset((void *)(0x6B7642+1), 0xFB, 1);
-	memset((void *)(0x6B7642+2), 0x00, 1);
-	memset((void *)(0x6B7642+3), 0x00, 1);
-	memset((void *)(0x6B7642+4), 0x00, 1);
+    //006B7642     E9 FB000000    JMP gta_sa_u.006B7742
+    memset((void *)0x6B7642, 0xE9, 1);
+    memset((void *)(0x6B7642+1), 0xFB, 1);
+    memset((void *)(0x6B7642+2), 0x00, 1);
+    memset((void *)(0x6B7642+3), 0x00, 1);
+    memset((void *)(0x6B7642+4), 0x00, 1);
 
-	//006B7449     E9 FF000000    JMP gta_sa_u.006B754D
-	memset((void *)0x6B7449, 0xE9, 1);
-	memset((void *)(0x6B7449+1), 0xFF, 1);
-	memset((void *)(0x6B7449+2), 0x00, 1);
+    //006B7449     E9 FF000000    JMP gta_sa_u.006B754D
+    memset((void *)0x6B7449, 0xE9, 1);
+    memset((void *)(0x6B7449+1), 0xFF, 1);
+    memset((void *)(0x6B7449+2), 0x00, 1);
 
-	// For quadbikes hitting water	
-	// 006A90D8   E9 29020000      JMP gta_sa.006A9306
-	memset((void *)0x6A90D8, 0xE9, 1);
-	memset((void *)(0x6A90D8+1), 0x29, 1);
-	memset((void *)(0x6A90D8+2), 0x02, 1);
-	memset((void *)(0x6A90D8+3), 0x00, 1);
-	memset((void *)(0x6A90D8+4), 0x00, 1);
+    // For quadbikes hitting water  
+    // 006A90D8   E9 29020000      JMP gta_sa.006A9306
+    memset((void *)0x6A90D8, 0xE9, 1);
+    memset((void *)(0x6A90D8+1), 0x29, 1);
+    memset((void *)(0x6A90D8+2), 0x02, 1);
+    memset((void *)(0x6A90D8+3), 0x00, 1);
+    memset((void *)(0x6A90D8+4), 0x00, 1);
 }
 
 
@@ -2892,10 +2892,10 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles ( const CMatrix& Matrix, float& 
 void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )
 {
     CPlayerPed* playerPed = dynamic_cast < CPlayerPed* > ( player );
-	CRemoteDataStorageSA * data = NULL;
+    CRemoteDataStorageSA * data = NULL;
 
-	if ( playerPed )
-		data = CRemoteDataSA::GetRemoteDataStorage ( playerPed );
+    if ( playerPed )
+        data = CRemoteDataSA::GetRemoteDataStorage ( playerPed );
 
     if ( data )
     {
@@ -4059,9 +4059,9 @@ bool CPed_GetWeaponSkill ()
             if ( weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9 )
             {
                 CPlayerPed* playerPed = dynamic_cast < CPlayerPed* > ( pPed ); 
-	            if ( playerPed )
+                if ( playerPed )
                 {
-		            CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( playerPed );
+                    CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( playerPed );
                     float stat = data->m_stats.StatTypesFloat [ pGameInterface->GetStats ()->GetSkillStatIndex ( weaponSkillWeapon ) ];
                     
                     CWeaponInfo * pPoor = pGameInterface->GetWeaponInfo ( weaponSkillWeapon, WEAPONSKILL_POOR );

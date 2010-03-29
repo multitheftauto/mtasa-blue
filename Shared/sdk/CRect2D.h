@@ -18,23 +18,23 @@
 class CRect2D
 {
 public:
-	float fX1, fY1, fX2, fY2;
+    float fX1, fY1, fX2, fY2;
 
-	CRect2D () 
-	{
-		this->fX1 = 0;
-		this->fY1 = 0;
-		this->fX2 = 0;
-		this->fY2 = 0;
-	};
+    CRect2D () 
+    {
+        this->fX1 = 0;
+        this->fY1 = 0;
+        this->fX2 = 0;
+        this->fY2 = 0;
+    };
 
-	CRect2D ( float fX1, float fY1, float fX2, float fY2 )
-	{
-		this->fX1 = fX1;
-		this->fY1 = fY1;
-		this->fX2 = fX2;
-		this->fY2 = fY2;
-	};
+    CRect2D ( float fX1, float fY1, float fX2, float fY2 )
+    {
+        this->fX1 = fX1;
+        this->fY1 = fY1;
+        this->fX2 = fX2;
+        this->fY2 = fY2;
+    };
 
     bool        operator==      ( const CRect2D& rhs ) const
     {
@@ -46,7 +46,7 @@ public:
         return !( operator== ( rhs ) );
     }
 
-	CRect2D&   operator=       ( const CRect2D& rhs );
+    CRect2D&   operator=       ( const CRect2D& rhs );
 
 };
 

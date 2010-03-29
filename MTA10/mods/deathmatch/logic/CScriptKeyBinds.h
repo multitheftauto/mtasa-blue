@@ -63,14 +63,14 @@ class CScriptFunctionBind
 public:
     inline                  CScriptFunctionBind       ( void )    { m_iLuaFunction = -1; }
     inline                  ~CScriptFunctionBind      ( void )    {}
-    int						m_iLuaFunction;
+    int                     m_iLuaFunction;
     CLuaArguments           m_Arguments;
 };
 
 class CScriptKeyFunctionBind: public CScriptKeyBindWithState, public CScriptFunctionBind
 {
 public:
-    inline eScriptKeyBindType     GetType				( void )		{ return SCRIPT_KEY_BIND_FUNCTION; }
+    inline eScriptKeyBindType     GetType               ( void )        { return SCRIPT_KEY_BIND_FUNCTION; }
     
 };
 
@@ -117,7 +117,7 @@ public:
     bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = NULL );
     bool                        ControlFunctionExists   ( SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = NULL );
 
-	void						RemoveAllKeys			( CLuaMain* pLuaMain );
+    void                        RemoveAllKeys           ( CLuaMain* pLuaMain );
 
     static bool                 IsMouse                 ( SScriptBindableKey* pKey );
     void                        RemoveDeletedBinds      ( void );

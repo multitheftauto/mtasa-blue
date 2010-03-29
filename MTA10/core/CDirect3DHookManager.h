@@ -30,7 +30,7 @@ class CDirect3DHookManager
     void            SetDirect3DHookType     ( );
 
     D3DHOOKTYPE         m_Direct3DHookType;
-	CDirect3DHook9 *    m_pDirect3DHook9;
+    CDirect3DHook9 *    m_pDirect3DHook9;
 };
 
 #endif

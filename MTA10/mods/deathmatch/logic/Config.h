@@ -5,13 +5,13 @@
 *  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
 *  PURPOSE:     Script debugging
 *  DEVELOPERS:  Christian Myhre Lundheim <>
-*				Cecill Etheredge <ijsf@gmx.net>
-*				Jax <>
-*				Ed Lyons <eai@opencoding.net>
-*				Kevin Whiteside <kevuwk@gmail.com>
-*				Chris McArthur <>
-*				Stanislav Bobrov <lil_toady@hotmail.com>
-*				Alberto Alonso <rydencillo@gmail.com>
+*               Cecill Etheredge <ijsf@gmx.net>
+*               Jax <>
+*               Ed Lyons <eai@opencoding.net>
+*               Kevin Whiteside <kevuwk@gmail.com>
+*               Chris McArthur <>
+*               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Alberto Alonso <rydencillo@gmail.com>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -20,64 +20,64 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 #ifdef WIN32
-	/* Win32 platforms */
+    /* Win32 platforms */
 
-	// The almighty windows define and include
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
+    // The almighty windows define and include
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
     #include <cstdio>
 
-	// Type, function and normal defines
-	#define socklen_t int
+    // Type, function and normal defines
+    #define socklen_t int
 
-	#ifndef snprintf
-	#define snprintf _snprintf
-	#endif
+    #ifndef snprintf
+    #define snprintf _snprintf
+    #endif
 
-	#ifndef vsnprintf
-	#define vsnprintf _vsnprintf
-	#endif
+    #ifndef vsnprintf
+    #define vsnprintf _vsnprintf
+    #endif
 
     #define MTA_OS_STRING "Windows"
 #else
-	/* POSIX-compatible */
+    /* POSIX-compatible */
 
-	// Types and std
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <sys/types.h>
-	#include <unistd.h>
-	#include <string.h>
+    // Types and std
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+    #include <string.h>
 
-	// Curses
-	#include <curses.h>
+    // Curses
+    #include <curses.h>
 
-	// Net and error includes
-	#include <arpa/inet.h>
-	#include <errno.h>
-	#include <netdb.h>
-	#include <netinet/in.h>
-	#include <sys/time.h>
-	#include <sys/timeb.h>
-	#include <sys/socket.h>
-	#include <sys/stat.h>
-	#include <time.h>
-	#include <fcntl.h>
-	#include <dirent.h>
+    // Net and error includes
+    #include <arpa/inet.h>
+    #include <errno.h>
+    #include <netdb.h>
+    #include <netinet/in.h>
+    #include <sys/time.h>
+    #include <sys/timeb.h>
+    #include <sys/socket.h>
+    #include <sys/stat.h>
+    #include <time.h>
+    #include <fcntl.h>
+    #include <dirent.h>
 
-	// Type, function and normal defines
-	#define MAX_PATH 255
+    // Type, function and normal defines
+    #define MAX_PATH 255
 
-	// Function defines
-	#define Sleep(duration) usleep(duration * 1000)
+    // Function defines
+    #define Sleep(duration) usleep(duration * 1000)
 
-	#ifndef stricmp
-	#define stricmp(x, y) strcasecmp(x, y)
-	#endif
+    #ifndef stricmp
+    #define stricmp(x, y) strcasecmp(x, y)
+    #endif
 
-	#ifndef strnicmp
-	#define strnicmp(x, y, z) strncasecmp(x, y, z)
-	#endif
+    #ifndef strnicmp
+    #define strnicmp(x, y, z) strncasecmp(x, y, z)
+    #endif
 
     #ifdef LINUX
         #define MTA_OS_STRING "Linux"
@@ -91,8 +91,8 @@
         #define MTA_OS_STRING "OpenBSD"
     #endif
 
-	// define GetProcAddress(a,b) as dlsym(a,b)
-	#define GetProcAddress dlsym
+    // define GetProcAddress(a,b) as dlsym(a,b)
+    #define GetProcAddress dlsym
 #endif
 
 /*** va_pass() (passing of ... variable length arguments ***/
@@ -108,9 +108,9 @@ class CVaPassNext{
 public:
     SVaPassNext<50> svapassnext;
     CVaPassNext(va_list & args){
-		try{//to avoid access violation
-			memcpy(&svapassnext, args, sizeof(svapassnext));
-		} catch (...) {}
+        try{//to avoid access violation
+            memcpy(&svapassnext, args, sizeof(svapassnext));
+        } catch (...) {}
     }
 };
 #define va_pass(valist) CVaPassNext(valist).svapassnext
@@ -151,7 +151,7 @@ public:
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
-	#error MAX_CHAT_LENGTH "macro can't exceed 255"
+    #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
 
 // Defines how long the whowas list can be
@@ -163,7 +163,7 @@ public:
 // Upper player limit
 #define MAX_PLAYER_COUNT 128
 #if MAX_PLAYER_COUNT > 254
-	#error MAX_PLAYER_COUNT "macro can't exceed 254"
+    #error MAX_PLAYER_COUNT "macro can't exceed 254"
 #endif
 
 // Max mapname length

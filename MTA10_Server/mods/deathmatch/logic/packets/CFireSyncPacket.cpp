@@ -15,7 +15,7 @@
 CFireSyncPacket::CFireSyncPacket ( void )
 {
     // Default size
-	m_fSize = 1.8f;
+    m_fSize = 1.8f;
 }
 
 

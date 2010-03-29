@@ -64,7 +64,7 @@ public:
         if ( Size () == 0 )
             return false;
 
-	    // Time later than newest point, so use the newest point
+        // Time later than newest point, so use the newest point
         if ( ulTime >= m_nodes [ Index ( m_uiEndIdx - 1 ) ].m_ulTime )
         {
             *output = m_nodes [ Index ( m_uiEndIdx - 1 ) ].data;
@@ -76,7 +76,7 @@ public:
         }
         else
         {
-        	// Find the two points either side and interpolate
+            // Find the two points either side and interpolate
             unsigned int uiCurrent = Index ( m_uiStartIdx + 1 );
             for ( ; uiCurrent != m_uiEndIdx; uiCurrent = Index ( uiCurrent + 1 ) )
             {

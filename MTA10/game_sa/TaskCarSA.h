@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskCarSA.h
-*  PURPOSE:		Car game tasks
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskCarSA.h
+*  PURPOSE:     Car game tasks
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Christian Myhre Lundheim <>
 *
@@ -27,7 +27,7 @@ class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
 typedef DWORD AnimationId;
 
-#define FUNC_CTaskComplexEnterCarAsDriver__Constructor			    0x6402F0
+#define FUNC_CTaskComplexEnterCarAsDriver__Constructor              0x6402F0
 #define FUNC_CTaskComplexEnterCarAsPassenger__Constructor           0x640340
 #define FUNC_CTaskComplexEnterBoatAsDriver__Constructor             0x63B5E0
 #define FUNC_CTaskComplexLeaveCar__Constructor                      0x63B8C0
@@ -44,10 +44,10 @@ class CTaskComplexEnterCarSAInterface : public CTaskComplexSAInterface
 public:
     CVehicle* m_pTargetVehicle;
     unsigned char m_bAsDriver:1;
-	unsigned char m_bQuitAfterOpeningDoor:1;
-	unsigned char m_bQuitAfterDraggingPedOut:1;
-	unsigned char m_bCarryOnAfterFallingOff:1;
-	
+    unsigned char m_bQuitAfterOpeningDoor:1;
+    unsigned char m_bQuitAfterDraggingPedOut:1;
+    unsigned char m_bCarryOnAfterFallingOff:1;
+    
     int m_iTargetDoor;
     int m_iTargetDoorOppositeToFlag;
     int m_iTargetSeat;
@@ -105,8 +105,8 @@ class CTaskComplexEnterCarAsDriverSA : public virtual CTaskComplexEnterCarSA, pu
 {
 public:
     CTaskComplexEnterCarAsDriverSA ( void ) {};
-	CTaskComplexEnterCarAsDriverSA ( CVehicle* pTargetVehicle );
-	
+    CTaskComplexEnterCarAsDriverSA ( CVehicle* pTargetVehicle );
+    
     // from CTaskComplexEnterCarSA
     int     GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
     void    SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
@@ -128,8 +128,8 @@ class CTaskComplexEnterCarAsPassengerSA : public virtual CTaskComplexEnterCarSA,
 {
 public:
     CTaskComplexEnterCarAsPassengerSA ( void ) {};
-	CTaskComplexEnterCarAsPassengerSA ( CVehicle* pTargetVehicle, const int iTargetSeat=0, const bool bCarryOnAfterFallingOff=false );
-	
+    CTaskComplexEnterCarAsPassengerSA ( CVehicle* pTargetVehicle, const int iTargetSeat=0, const bool bCarryOnAfterFallingOff=false );
+    
     // from CTaskComplexEnterCarSA
     int     GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
     void    SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
@@ -151,7 +151,7 @@ class CTaskComplexEnterBoatAsDriverSA : public virtual CTaskComplexSA, public vi
 {
 public:
     CTaskComplexEnterBoatAsDriverSA ( void ) {};
-	CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTargetVehicle );
+    CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTargetVehicle );
 };
 
 // ##############################################################################
@@ -184,7 +184,7 @@ class CTaskComplexLeaveCarSA : public virtual CTaskComplexSA, public virtual CTa
 {
 public:
     CTaskComplexLeaveCarSA ( void ) {};
-	CTaskComplexLeaveCarSA ( CVehicle* pTargetVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
+    CTaskComplexLeaveCarSA ( CVehicle* pTargetVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
 };
 
 

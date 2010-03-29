@@ -81,7 +81,7 @@ void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( !( ( *iter )->GetActive () ) )
-			( *iter )->Load ( pRootEntity );
+            ( *iter )->Load ( pRootEntity );
     }
 }
 
@@ -99,10 +99,10 @@ bool CResourceManager::RemoveResource ( unsigned short usID )
 
 void CResourceManager::Remove ( CResource* pResource )
 {
-	// Delete all the resource's locally created children (the server won't do that)
-	pResource->DeleteClientChildren ();
+    // Delete all the resource's locally created children (the server won't do that)
+    pResource->DeleteClientChildren ();
 
-	// Delete the resource
+    // Delete the resource
     if ( !m_resources.empty() ) m_resources.remove ( pResource );
     delete pResource;
 }

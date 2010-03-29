@@ -109,28 +109,28 @@ int CLuaElementDefs::createElement ( lua_State* luaVM )
         // Grab the string
         const char* szTypeName = lua_tostring ( luaVM, 1 );
 
-		// Get the virtual machine
-		CLuaMain * pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        // Get the virtual machine
+        CLuaMain * pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-			// Get the resource
-			CResource* pResource = pLuaMain->GetResource();
-			if ( pResource )
-			{
-				// Try to create
-				CDummy* pDummy = CStaticFunctionDefinitions::CreateElement ( pResource, szTypeName, szID );
-				if ( pDummy )
-				{
-					// Get the group
-					CElementGroup * pGroup = pResource->GetElementGroup();
-					if ( pGroup )
-					{
-						pGroup->Add ( pDummy );
-					}
-					lua_pushelement ( luaVM, pDummy );
-					return 1;
-				}
-			}
+            // Get the resource
+            CResource* pResource = pLuaMain->GetResource();
+            if ( pResource )
+            {
+                // Try to create
+                CDummy* pDummy = CStaticFunctionDefinitions::CreateElement ( pResource, szTypeName, szID );
+                if ( pDummy )
+                {
+                    // Get the group
+                    CElementGroup * pGroup = pResource->GetElementGroup();
+                    if ( pGroup )
+                    {
+                        pGroup->Add ( pDummy );
+                    }
+                    lua_pushelement ( luaVM, pDummy );
+                    return 1;
+                }
+            }
         }
     }
     else
@@ -196,18 +196,18 @@ int CLuaElementDefs::cloneElement ( lua_State* luaVM )
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {
-				CResource * pResource = pLuaMain->GetResource();
+                CResource * pResource = pLuaMain->GetResource();
                 if ( pResource )
                 {
-					CElement* pNewElement = CStaticFunctionDefinitions::CloneElement ( pResource, pElement, vecPosition, bCloneChildren );
+                    CElement* pNewElement = CStaticFunctionDefinitions::CloneElement ( pResource, pElement, vecPosition, bCloneChildren );
 
-					if ( pNewElement )
-					{
-						lua_pushelement ( luaVM, pNewElement );
-						return 1;
-					}
-				}
-			}
+                    if ( pNewElement )
+                    {
+                        lua_pushelement ( luaVM, pNewElement );
+                        return 1;
+                    }
+                }
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "cloneElement", "element", 1 );
@@ -438,7 +438,7 @@ int CLuaElementDefs::getAllElementData ( lua_State* luaVM )
         {
 //          _asm int 3
 //          CLuaArguments * pTable = new CLuaArguments();
-			CLuaArguments Args;
+            CLuaArguments Args;
             if ( CStaticFunctionDefinitions::GetAllElementData ( pElement, &Args ) )
             {
                 Args.PushAsTable ( luaVM );
@@ -716,8 +716,8 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
             CColShape* pColShape = lua_tocolshape ( luaVM, 1 );
             if ( pColShape )
             {
-		        // Create a new table
-		        lua_newtable ( luaVM );
+                // Create a new table
+                lua_newtable ( luaVM );
 
                 // Add all the elements within the shape to it
                 unsigned int uiIndex = 0;
@@ -727,8 +727,8 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
                     if ( szType == NULL || strcmp ( (*iter)->GetTypeName ().c_str (), szType ) == 0 )
                     {
                         lua_pushnumber ( luaVM, ++uiIndex );
-			            lua_pushelement ( luaVM, *iter );
-			            lua_settable ( luaVM, -3 );
+                        lua_pushelement ( luaVM, *iter );
+                        lua_settable ( luaVM, -3 );
                     }
                 }
                 return 1;
@@ -864,8 +864,8 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
             CElement* pElement = lua_toelement ( luaVM, 1 );
             if ( pElement )
             {
-		        // Create a new table
-		        lua_newtable ( luaVM );
+                // Create a new table
+                lua_newtable ( luaVM );
 
                 // Add All Attached Elements
                 unsigned int uiIndex = 0;
@@ -875,8 +875,8 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
                     if ( ( *iter )->GetAttachedToElement() == pElement )
                     {
                         lua_pushnumber ( luaVM, ++uiIndex );
-			            lua_pushelement ( luaVM, *iter );
-			            lua_settable ( luaVM, -3 );
+                        lua_pushelement ( luaVM, *iter );
+                        lua_settable ( luaVM, -3 );
                     }
                 }
                 return 1;
@@ -1391,7 +1391,7 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA &&
-		 lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+         lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
@@ -1399,11 +1399,11 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
             CElement* pReference = lua_toelement ( luaVM, 2 );
             if ( pReference )
             {
-				if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, lua_toboolean ( luaVM, 3 ) ? true:false ) )
-				{
-					lua_pushboolean ( luaVM, true );
-					return 1;
-				}
+                if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, lua_toboolean ( luaVM, 3 ) ? true:false ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "setElementVisibleTo", "element", 2 );

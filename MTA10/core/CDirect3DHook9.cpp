@@ -20,7 +20,7 @@ CDirect3DHook9::CDirect3DHook9 (  )
     WriteDebugEvent ( "CDirect3DHook9::CDirect3DHook9" );
 
     m_pfnDirect3DCreate9 = NULL;
-	m_bHookingEnabled = true;
+    m_bHookingEnabled = true;
 }
 
 CDirect3DHook9::~CDirect3DHook9 ( )
@@ -33,10 +33,10 @@ CDirect3DHook9::~CDirect3DHook9 ( )
 bool CDirect3DHook9::ApplyHook ( )
 {
     // Hook Direct3DCreate9.
-	m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
-																  reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
+    m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
+                                                                  reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
 
-	WriteDebugEvent ( "Direct3D9 hook applied" );
+    WriteDebugEvent ( "Direct3D9 hook applied" );
 
     return true;
 }
@@ -48,13 +48,13 @@ bool CDirect3DHook9::RemoveHook ( )
     {
         // Unhook Direct3DCreate9.
         DetourRemove ( reinterpret_cast < PBYTE > ( m_pfnDirect3DCreate9 ), 
-					   reinterpret_cast < PBYTE > ( API_Direct3DCreate9  ) );
+                       reinterpret_cast < PBYTE > ( API_Direct3DCreate9  ) );
 
         // Unset our hook variable.
         m_pfnDirect3DCreate9 = NULL;
     }
 
-	WriteDebugEvent ( "Direct3D9 hook removed." );
+    WriteDebugEvent ( "Direct3D9 hook removed." );
 
     return true;
 }
@@ -63,28 +63,28 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 {
     CDirect3DHook9 *    pThis;
     CProxyDirect3D9 *   pNewProxy;
-	static bool			bLoadedModules;
+    static bool         bLoadedModules;
 
     // Get our self instance.
     pThis = CDirect3DHook9::GetSingletonPtr ( );
 
-	if ( pThis->m_bHookingEnabled == false ) {
-		// Use the original function
-		pThis->m_pDevice = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
-		return pThis->m_pDevice;
-	}
+    if ( pThis->m_bHookingEnabled == false ) {
+        // Use the original function
+        pThis->m_pDevice = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
+        return pThis->m_pDevice;
+    }
 
-	// A little hack to get past the loading time required to decrypt the gta 
-	// executable into memory...
-	if ( !bLoadedModules )
-	{
-		CCore::GetSingleton ( ).CreateGame ( );
-		CCore::GetSingleton ( ).CreateMultiplayer ( );
-		CCore::GetSingleton ( ).CreateNetwork ( );
+    // A little hack to get past the loading time required to decrypt the gta 
+    // executable into memory...
+    if ( !bLoadedModules )
+    {
+        CCore::GetSingleton ( ).CreateGame ( );
+        CCore::GetSingleton ( ).CreateMultiplayer ( );
+        CCore::GetSingleton ( ).CreateNetwork ( );
         CCore::GetSingleton ( ).CreateXML ( );
-		CCore::GetSingleton ( ).CreateGUI ( );
-		bLoadedModules = true;
-	}
+        CCore::GetSingleton ( ).CreateGUI ( );
+        bLoadedModules = true;
+    }
 
     // Create our interface.
     pThis->m_pDevice = pThis->m_pfnDirect3DCreate9 ( SDKVersion );

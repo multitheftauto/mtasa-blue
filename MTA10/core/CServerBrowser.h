@@ -44,7 +44,7 @@ public:
     typedef enum ServerBrowserType
     {
         INTERNET = 0,
-		LAN,
+        LAN,
         FAVOURITES,
         RECENTLY_PLAYED
     };
@@ -86,17 +86,17 @@ public:
 
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
-	bool				OnMouseDoubleClick		( CGUIMouseEventArgs Args );
+    bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
     // Window widgets
     CGUIWindow*         m_pWindow;
-	CGUITabPanel*		m_pTabs;
+    CGUITabPanel*       m_pTabs;
     CGUIButton*         m_pButtonBack;
     CGUILabel*          m_pServerListStatus;
-    CGUIStaticImage*	m_pLockedIcon;
-    CGUIStaticImage*	m_pSerialIcon;
+    CGUIStaticImage*    m_pLockedIcon;
+    CGUIStaticImage*    m_pSerialIcon;
     CGUIButton*         m_pButtonFavouritesByIP;
 
     // Classes
@@ -131,8 +131,8 @@ protected:
     CGUIStaticImage*    m_pPlayerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
-    CGUIHandle			m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
-	CGUIHandle			m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIHandle          m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIHandle          m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hName [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPing [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPlayers [ SERVER_BROWSER_TYPE_COUNT ];

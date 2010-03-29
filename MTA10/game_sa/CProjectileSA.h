@@ -26,7 +26,7 @@ class CProjectileSAInterface : public CObjectSAInterface // entirely inherited f
 class CProjectileSA : public virtual CProjectile, public virtual CObjectSA
 {
 private:
-	CProjectileSAInterface			* internalInterface;
+    CProjectileSAInterface          * internalInterface;
     class CProjectileInfo         * projectileInfo;
 public:
                     CProjectileSA(class CProjectileSAInterface * projectileInterface);

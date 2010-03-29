@@ -139,9 +139,9 @@ public:
     inline unsigned long                        GetArmorChangeTime          ( void )                            { return m_ulArmorChangeTime; }
     inline void                                 SetArmorChangeTime          ( unsigned long ulTime )            { m_ulArmorChangeTime = ulTime; }
     
-	inline float								GetPlayerStat				( unsigned short usStat )		{ return ( usStat < NUM_PLAYER_STATS ) ? m_fStats [ usStat ] : 0; }
-	inline void									SetPlayerStat				( unsigned short usStat, float fValue )	{ if ( usStat < NUM_PLAYER_STATS ) m_fStats [ usStat ] = fValue; } 
-	inline float*								GetPlayerStats				( void )						{ return m_fStats; }
+    inline float                                GetPlayerStat               ( unsigned short usStat )       { return ( usStat < NUM_PLAYER_STATS ) ? m_fStats [ usStat ] : 0; }
+    inline void                                 SetPlayerStat               ( unsigned short usStat, float fValue ) { if ( usStat < NUM_PLAYER_STATS ) m_fStats [ usStat ] = fValue; } 
+    inline float*                               GetPlayerStats              ( void )                        { return m_fStats; }
 
     inline CPlayerClothes*                      GetClothes                  ( void )                        { return m_pClothes; }
 
@@ -178,7 +178,7 @@ public:
     inline void                                 SetRotation                 ( float fRotation )             { m_fRotation = fRotation; }
 
     inline CElement*                            GetTargetedElement          ( void )                        { return m_pTargetedEntity; }
-	inline void                                 SetTargetedElement          ( CElement* pEntity )           { m_pTargetedEntity = pEntity; }
+    inline void                                 SetTargetedElement          ( CElement* pEntity )           { m_pTargetedEntity = pEntity; }
     
     inline unsigned char                        GetFightingStyle            ( void )                        { return m_ucFightingStyle; }
     inline void                                 SetFightingStyle            ( unsigned char ucStyle )       { m_ucFightingStyle = ucStyle; }
@@ -234,7 +234,7 @@ protected:
     unsigned long                               m_ulHealthChangeTime;
     float                                       m_fArmor;
     unsigned long                               m_ulArmorChangeTime;
-    float										m_fStats [ NUM_PLAYER_STATS ];
+    float                                       m_fStats [ NUM_PLAYER_STATS ];
     CPlayerClothes*                             m_pClothes;
     bool                                        m_bHasJetPack;
     bool                                        m_bInWater;

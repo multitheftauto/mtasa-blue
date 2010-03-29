@@ -20,7 +20,7 @@ CConsoleCommand::CConsoleCommand ( FCommandHandler* pHandler, const char* szComm
     // Copy the command name string
     m_szCommand = new char [strlen ( szCommand ) + 1];
     strcpy ( m_szCommand, szCommand );
-	m_bRestricted = bRestricted;
+    m_bRestricted = bRestricted;
 }
 
 

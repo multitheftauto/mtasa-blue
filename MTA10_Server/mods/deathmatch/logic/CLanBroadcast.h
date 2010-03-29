@@ -21,29 +21,29 @@ class CLanBroadcastDLL;
 #include <sstream>
 
 #ifdef WIN32
-	#include <conio.h>
-	#include <winsock.h>
+    #include <conio.h>
+    #include <winsock.h>
 #else
-	#include <sys/socket.h>
-	#include <sys/stat.h>
-	#include <netinet/in.h>
-	#define closesocket close
+    #include <sys/socket.h>
+    #include <sys/stat.h>
+    #include <netinet/in.h>
+    #define closesocket close
 #endif
 
 class CLanBroadcast
 {
 public:
-	
-						    CLanBroadcast		    ( unsigned short usServerPort );
-						    ~CLanBroadcast		    ( void );
+    
+                            CLanBroadcast           ( unsigned short usServerPort );
+                            ~CLanBroadcast          ( void );
 
-	void				    DoPulse					( void );
+    void                    DoPulse                 ( void );
 
-	unsigned short		    GetPort					( void )		{ return SERVER_LIST_BROADCAST_PORT; };
+    unsigned short          GetPort                 ( void )        { return SERVER_LIST_BROADCAST_PORT; };
 
 private:
 
-    unsigned int			m_Socket;
+    unsigned int            m_Socket;
     sockaddr_in             m_SockAddr;
 
     std::string             m_strClientMessage;

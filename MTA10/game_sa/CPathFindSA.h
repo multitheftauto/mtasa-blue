@@ -15,12 +15,12 @@
 
 #include <game/CPathFind.h>
 
-#define FUNC_FindNthNodeClosestToCoors			0x44F8C0
-#define FUNC_FindNodePointer					0x420AC0
+#define FUNC_FindNthNodeClosestToCoors          0x44F8C0
+#define FUNC_FindNodePointer                    0x420AC0
 #define FUNC_SwitchRoadsOffInArea               0x452C80
 #define FUNC_SwitchPedRoadsOffInArea            0x452F00
 
-#define FUNC_CPathNode_GetCoors					0x420A10
+#define FUNC_CPathNode_GetCoors                 0x420A10
 
 #define CLASS_CPathFind                         0x96F050
 
@@ -34,10 +34,10 @@
 class CPathFindSA : public CPathFind
 {
 public:
-	CNodeAddress *  FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance );
-	CPathNode *     GetPathNode ( CNodeAddress * node );
-	CVector *       GetNodePosition ( CPathNode * pNode, CVector * pPosition);
-	CVector *       GetNodePosition ( CNodeAddress * pNode, CVector * pPosition );
+    CNodeAddress *  FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance );
+    CPathNode *     GetPathNode ( CNodeAddress * node );
+    CVector *       GetNodePosition ( CPathNode * pNode, CVector * pPosition);
+    CVector *       GetNodePosition ( CNodeAddress * pNode, CVector * pPosition );
     void            SwitchRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false );
     void            SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false );
 

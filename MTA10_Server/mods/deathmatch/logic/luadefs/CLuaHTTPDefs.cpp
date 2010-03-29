@@ -16,11 +16,11 @@ void CLuaHTTPDefs::LoadFunctions ( lua_State* luaVM )
 {
     // Register these funcs for that VM
     lua_register ( luaVM, "httpWrite", CLuaHTTPDefs::httpWrite );
-	lua_register ( luaVM, "httpSetResponseHeader", CLuaHTTPDefs::httpSetResponseHeader );
-	lua_register ( luaVM, "httpSetResponseCookie", CLuaHTTPDefs::httpSetResponseCookie );
-	lua_register ( luaVM, "httpSetResponseCode", CLuaHTTPDefs::httpSetResponseCode );
-	lua_register ( luaVM, "httpClear", CLuaHTTPDefs::httpClear );
-	lua_register ( luaVM, "httpRequestLogin", CLuaHTTPDefs::httpRequestLogin );
+    lua_register ( luaVM, "httpSetResponseHeader", CLuaHTTPDefs::httpSetResponseHeader );
+    lua_register ( luaVM, "httpSetResponseCookie", CLuaHTTPDefs::httpSetResponseCookie );
+    lua_register ( luaVM, "httpSetResponseCode", CLuaHTTPDefs::httpSetResponseCode );
+    lua_register ( luaVM, "httpClear", CLuaHTTPDefs::httpClear );
+    lua_register ( luaVM, "httpRequestLogin", CLuaHTTPDefs::httpRequestLogin );
 }
 
 
@@ -70,8 +70,8 @@ int CLuaHTTPDefs::httpSetResponseHeader ( lua_State* luaVM )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
                 char* szHeaderName = (char *) lua_tostring ( luaVM, 1 );
-				char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
-				html->SetResponseHeader ( szHeaderName, szHeaderValue );
+                char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
+                html->SetResponseHeader ( szHeaderName, szHeaderValue );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -100,8 +100,8 @@ int CLuaHTTPDefs::httpSetResponseCookie ( lua_State* luaVM )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
                 char* szHeaderName = (char *) lua_tostring ( luaVM, 1 );
-				char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
-				html->SetResponseCookie ( szHeaderName, szHeaderValue );
+                char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
+                html->SetResponseCookie ( szHeaderName, szHeaderValue );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -130,7 +130,7 @@ int CLuaHTTPDefs::httpSetResponseCode ( lua_State* luaVM )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
                 unsigned int responseCode = static_cast < unsigned int > ( lua_tonumber ( luaVM, 1 ) );
-				html->SetResponseCode ( responseCode );
+                html->SetResponseCode ( responseCode );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -156,7 +156,7 @@ int CLuaHTTPDefs::httpClear ( lua_State* luaVM )
         if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
         {
             CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-			html->ClearPageBuffer();
+            html->ClearPageBuffer();
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -180,10 +180,10 @@ int CLuaHTTPDefs::httpRequestLogin ( lua_State* luaVM )
         {
             CResourceHTMLItem * html = (CResourceHTMLItem *)file;
 
-			char szName[255];
-			sprintf ( szName, "Basic realm=\"%s\"", m_pMainConfig->GetServerName ().c_str () );
-			html->SetResponseHeader("WWW-Authenticate", szName);
-			html->SetResponseCode ( 401 );
+            char szName[255];
+            sprintf ( szName, "Basic realm=\"%s\"", m_pMainConfig->GetServerName ().c_str () );
+            html->SetResponseHeader("WWW-Authenticate", szName);
+            html->SetResponseCode ( 401 );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

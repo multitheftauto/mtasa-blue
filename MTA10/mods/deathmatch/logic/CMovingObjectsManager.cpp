@@ -30,10 +30,10 @@ void CMovingObjectsManager::DoPulse ( void )
         // Remove it if it has stopped moving
         if ( !pObject->IsMoving () )
         {
-			// Remove from list
+            // Remove from list
             iter = m_List.erase ( iter );
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 }

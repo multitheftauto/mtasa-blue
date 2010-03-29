@@ -55,7 +55,7 @@ public:
 
 protected:
     void                        DoPulse                     ( void );
-	void						DoPulse						( bool bRender );
+    void                        DoPulse                     ( bool bRender );
 
     CClientRadarAreaManager*    m_pRadarAreaManager;
 

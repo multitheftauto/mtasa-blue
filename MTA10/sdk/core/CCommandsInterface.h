@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/core/CCommandsInterface.h
-*  PURPOSE:		Dynamic command manager interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/core/CCommandsInterface.h
+*  PURPOSE:     Dynamic command manager interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -19,13 +19,13 @@ typedef bool (*pfnExecuteCommandHandler)        ( const char*, const char*, bool
 
 typedef void (*PFNCOMMAND) ( const char * );
 
-#define MAX_COMMAND_NAME_LENGTH				128
-#define MAX_COMMAND_DESCRIPTION_LENGTH		128
+#define MAX_COMMAND_NAME_LENGTH             128
+#define MAX_COMMAND_DESCRIPTION_LENGTH      128
 
 typedef struct tagCOMMANDENTRY
 {
     char            szCommandName[MAX_COMMAND_NAME_LENGTH];
-	char			szDescription[MAX_COMMAND_DESCRIPTION_LENGTH];
+    char            szDescription[MAX_COMMAND_DESCRIPTION_LENGTH];
     PFNCOMMAND      pfnCmdFunc;
     bool            bModCommand;
     bool            bEnabled;

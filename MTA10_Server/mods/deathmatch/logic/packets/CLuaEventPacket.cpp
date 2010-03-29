@@ -23,8 +23,8 @@ CLuaEventPacket::CLuaEventPacket ( void )
 CLuaEventPacket::CLuaEventPacket ( const char* szName, ElementID ID, CLuaArguments& Arguments )
 {
     strncpy ( m_szName, szName, MAX_EVENT_NAME_LENGTH );
-	if ( MAX_EVENT_NAME_LENGTH )
-	    m_szName [ MAX_EVENT_NAME_LENGTH - 1 ] = 0;
+    if ( MAX_EVENT_NAME_LENGTH )
+        m_szName [ MAX_EVENT_NAME_LENGTH - 1 ] = 0;
     m_ElementID = ID;
     m_Arguments = Arguments;
 }

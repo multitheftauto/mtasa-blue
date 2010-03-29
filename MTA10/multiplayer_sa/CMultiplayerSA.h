@@ -29,11 +29,11 @@ class CMultiplayerSA : public CMultiplayer
     friend class COffsetsMP;
 
 private:
-	CRemoteDataSA				* RemoteData;
-	CPopulationSA				* Population;
+    CRemoteDataSA               * RemoteData;
+    CPopulationSA               * Population;
 public:
-	CMultiplayerSA();
-	void                        InitHooks();
+    CMultiplayerSA();
+    void                        InitHooks();
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -41,13 +41,13 @@ public:
 
     CPed *                      GetContextSwitchedPed       ( void );
 
-	CPopulationMP				* GetPopulationMP           () { return Population; }
-	void						PreventLeavingVehicles      ();
-	void						HideRadar                   ( bool bHide );
-	void						SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
-	void						DisablePadHandler           ( bool bDisabled );
+    CPopulationMP               * GetPopulationMP           () { return Population; }
+    void                        PreventLeavingVehicles      ();
+    void                        HideRadar                   ( bool bHide );
+    void                        SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
+    void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
-	void						DisableHeatHazeEffect       ( bool bDisable );
+    void                        DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
@@ -55,7 +55,7 @@ public:
 
     bool                        GetExplosionsDisabled       ();
     void                        DisableExplosions           ( bool bDisabled );
-	void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
+    void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler );
     void                        SetDamageHandler            ( DamageHandler * pDamageHandler );
     void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler );
     void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler );
@@ -124,17 +124,17 @@ public:
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
 
-/*	VOID						SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
-	VOID						SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
-	Vector3D					* GetLocalShotOriginVector();*/
-	//Vector3D					* GetLocalTargetVector();
-	//Vector3D					* GetLocalCrossProductVector();
-	/*VOID						SetOnFootPlayerKeyStates(CPlayerPed * player, DWORD keys);
-	DWORD						GetOnFootLocalPlayerKeyStates();
-	VOID						SetInVehiclePlayerKeyStates(CPlayerPed * player, WORD keys);
-	WORD						GetInVehicleLocalPlayerKeyStates();*/
-//	Vector3D					* GetLocalStartVector();
-//	VOID						SetPlayerStartVector(CPlayerPed* player, Vector3D * vecStart);
+/*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
+    VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
+    Vector3D                    * GetLocalShotOriginVector();*/
+    //Vector3D                  * GetLocalTargetVector();
+    //Vector3D                  * GetLocalCrossProductVector();
+    /*VOID                      SetOnFootPlayerKeyStates(CPlayerPed * player, DWORD keys);
+    DWORD                       GetOnFootLocalPlayerKeyStates();
+    VOID                        SetInVehiclePlayerKeyStates(CPlayerPed * player, WORD keys);
+    WORD                        GetInVehicleLocalPlayerKeyStates();*/
+//  Vector3D                    * GetLocalStartVector();
+//  VOID                        SetPlayerStartVector(CPlayerPed* player, Vector3D * vecStart);
 
 private:
     static unsigned long        HOOKPOS_FindPlayerCoors;

@@ -22,27 +22,27 @@
 class CGUIMessageBox_Impl : public CGUIMessageBox
 {
 public:
-							CGUIMessageBox_Impl			( class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags );
-							~CGUIMessageBox_Impl		( void );
+                            CGUIMessageBox_Impl         ( class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags );
+                            ~CGUIMessageBox_Impl        ( void );
 
-    void					SetAutoDestroy              ( bool bAutoDestroy );
-    bool					GetAutoDestroy              ( void );
+    void                    SetAutoDestroy              ( bool bAutoDestroy );
+    bool                    GetAutoDestroy              ( void );
 
-    void					SetVisible                  ( bool bVisible );
-    bool					IsVisible                   ( void );
+    void                    SetVisible                  ( bool bVisible );
+    bool                    IsVisible                   ( void );
 
-	void					SetClickHandler             ( GUI_CALLBACK Callback );
+    void                    SetClickHandler             ( GUI_CALLBACK Callback );
 
-	CGUIWindow*				GetWindow					( void );
+    CGUIWindow*             GetWindow                   ( void );
 private:
-    bool					OnResponseHandler           ( CGUIElement* pElement );
+    bool                    OnResponseHandler           ( CGUIElement* pElement );
 
-    CGUIWindow*				m_pWindow;
-    CGUIStaticImage*		m_pIcon;
-    CGUILabel*				m_pLabelCaption;
-    CGUIButton*				m_pButton;
+    CGUIWindow*             m_pWindow;
+    CGUIStaticImage*        m_pIcon;
+    CGUILabel*              m_pLabelCaption;
+    CGUIButton*             m_pButton;
 
-    bool					m_bAutoDestroy;
+    bool                    m_bAutoDestroy;
 };
 
 #endif

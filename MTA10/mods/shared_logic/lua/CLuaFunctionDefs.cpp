@@ -19,12 +19,12 @@
 
 #include "StdInc.h"
 
-CLuaManager*			     CLuaFunctionDefs::m_pLuaManager;
+CLuaManager*                 CLuaFunctionDefs::m_pLuaManager;
 CScriptDebugging*            CLuaFunctionDefs::m_pScriptDebugging;
-CClientGame*			     CLuaFunctionDefs::m_pClientGame;
+CClientGame*                 CLuaFunctionDefs::m_pClientGame;
 CClientManager*              CLuaFunctionDefs::m_pManager;
-CClientEntity*		         CLuaFunctionDefs::m_pRootEntity;
-CClientGUIManager*	         CLuaFunctionDefs::m_pGUIManager;
+CClientEntity*               CLuaFunctionDefs::m_pRootEntity;
+CClientGUIManager*           CLuaFunctionDefs::m_pGUIManager;
 CClientPedManager*           CLuaFunctionDefs::m_pPedManager;
 CClientPlayerManager*        CLuaFunctionDefs::m_pPlayerManager;
 CClientRadarMarkerManager*   CLuaFunctionDefs::m_pRadarMarkerManager;
@@ -56,7 +56,7 @@ void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* 
     m_pVehicleManager = m_pManager->GetVehicleManager ();
     m_pObjectManager = m_pManager->GetObjectManager ();
     m_pTeamManager = m_pManager->GetTeamManager ();
-	m_pRenderWare = g_pGame->GetRenderWare ();
+    m_pRenderWare = g_pGame->GetRenderWare ();
     m_pMarkerManager = m_pManager->GetMarkerManager ();
     m_pPickupManager = m_pManager->GetPickupManager ();
     m_pDFFManager = m_pManager->GetDFFManager ();
@@ -66,10 +66,10 @@ void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* 
 
 int CLuaFunctionDefs::DisabledFunction ( lua_State* luaVM )
 {
-	m_pScriptDebugging->LogError ( luaVM, "Unsafe function was called." );
+    m_pScriptDebugging->LogError ( luaVM, "Unsafe function was called." );
 
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 

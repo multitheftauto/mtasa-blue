@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskGoToSA.h
-*  PURPOSE:		Go-to game tasks
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskGoToSA.h
+*  PURPOSE:     Go-to game tasks
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -25,16 +25,16 @@
 class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
 
-#define FUNC_CTaskComplexWanderStandard__Constructor			0x48E4F0
-#define FUNC_CTaskComplexWanderStandard__Destructor				0x48E600
+#define FUNC_CTaskComplexWanderStandard__Constructor            0x48E4F0
+#define FUNC_CTaskComplexWanderStandard__Destructor             0x48E600
 
 
-#define FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision		0x6479B0
+#define FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision     0x6479B0
 
 class TaskComplexWanderVTBL : public TaskComplexVTBL
 {
 public:
-	DWORD GetWanderType; 
+    DWORD GetWanderType; 
     DWORD ScanForStuff;
     DWORD UpdateDir;
     DWORD UpdatePathNodes;
@@ -50,20 +50,20 @@ class CTaskComplexWanderSAInterface : public CTaskComplexSAInterface
 {
 public:
 // protected
-	int m_iMoveState;
+    int m_iMoveState;
     unsigned char m_iDir;
     float m_targetRadius;
        
     CNodeAddress m_LastNode;
-	CNodeAddress m_NextNode;
+    CNodeAddress m_NextNode;
 
     int m_lastUpdateDirFrameCount;
 
-    unsigned char m_bWanderSensibly		:1;
+    unsigned char m_bWanderSensibly     :1;
 // private
-    unsigned char m_bNewDir				:1;
-    unsigned char m_bNewNodes			:1;
-    unsigned char m_bAllNodesBlocked	:1;
+    unsigned char m_bNewDir             :1;
+    unsigned char m_bNewNodes           :1;
+    unsigned char m_bAllNodesBlocked    :1;
 };
 
 class CTaskComplexWanderSA : public virtual CTaskComplexSA, public virtual CTaskComplexWander

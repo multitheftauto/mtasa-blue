@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CConsole.h
-*  PURPOSE:		Header file for console class
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CConsole.h
+*  PURPOSE:     Header file for console class
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *               Derek Abdine <>
 *               Jax <>
@@ -62,7 +62,7 @@ public:
 protected:
     bool                OnCloseButtonClick              ( CGUIElement* pElement );
     bool                Edit_OnTextAccepted             ( CGUIElement* pElement );
-	bool			    History_OnTextChanged			( CGUIElement* pElement );
+    bool                History_OnTextChanged           ( CGUIElement* pElement );
 
 private:
     void                CreateElements                  ( CGUIElement* pParent = NULL );
@@ -70,7 +70,7 @@ private:
 
     bool                OnWindowSize                    ( CGUIElement* pElement );
 
-    CGUI*				m_pManager;
+    CGUI*               m_pManager;
 
     CConsoleHistory*    m_pConsoleHistory;
     int                 m_iHistoryIndex;
@@ -83,11 +83,11 @@ private:
 
     bool                m_bIsEnabled;
 
-	float				m_fWindowSpacer;
-	float				m_fWindowSpacerTop;
-	float				m_fWindowX;
-	float				m_fWindowY;
-	float				m_fInputHeight;
+    float               m_fWindowSpacer;
+    float               m_fWindowSpacerTop;
+    float               m_fWindowX;
+    float               m_fWindowY;
+    float               m_fInputHeight;
 
 };
 

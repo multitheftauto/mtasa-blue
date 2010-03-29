@@ -474,7 +474,7 @@ void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
         pVehicle = *iter;
 
         // Streamed in and same vehicle ID?
-		if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
+        if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually

@@ -41,30 +41,30 @@ double CClientTime::GetTimeNano ( void )
     // Use the performance counter if initialize succeeded to initiate using it
     if ( m_bUsePerformanceCounter )
     {
-		long long now;
-		QueryPerformanceCounter((LARGE_INTEGER *)&now);
-		//  work around dual-core bug
-		if (now < m_lLastReading) {
-			now = m_lLastReading + 1;
-		}
-		if (now - m_lLastReading > m_lMaxDelta) {
-		//  don't advance time too much all at once
-			m_lBaseReading += now - m_lLastReading - m_lMaxDelta;
-		}
-		m_lLastReading = now;
-		return (now - m_lBaseReading) * m_dTickMultiply;
+        long long now;
+        QueryPerformanceCounter((LARGE_INTEGER *)&now);
+        //  work around dual-core bug
+        if (now < m_lLastReading) {
+            now = m_lLastReading + 1;
+        }
+        if (now - m_lLastReading > m_lMaxDelta) {
+        //  don't advance time too much all at once
+            m_lBaseReading += now - m_lLastReading - m_lMaxDelta;
+        }
+        m_lLastReading = now;
+        return (now - m_lBaseReading) * m_dTickMultiply;
     }
     else
     {
-		// Or error out
-		return NULL;
+        // Or error out
+        return NULL;
     }
 }
 
 
 bool CClientTime::InitializeTime ( void )
 {
-	#pragma message(__LOC__"Add protection for SMP (dual-core) fucking up here. It's really not hard.")
+    #pragma message(__LOC__"Add protection for SMP (dual-core) fucking up here. It's really not hard.")
 
     // Try to initialize using the performance counter
     LARGE_INTEGER lFrequency;
@@ -73,10 +73,10 @@ bool CClientTime::InitializeTime ( void )
         m_lTimeCounts = lFrequency.QuadPart / 1000;
         m_bUsePerformanceCounter = true;
 
-		m_dTickMultiply = 1.0 / (double)lFrequency.QuadPart;
-		m_lMaxDelta = (long long)((double)lFrequency.QuadPart * 0.1);
-		QueryPerformanceCounter((LARGE_INTEGER *)&m_lBaseReading);
-		m_lLastReading = m_lBaseReading;
+        m_dTickMultiply = 1.0 / (double)lFrequency.QuadPart;
+        m_lMaxDelta = (long long)((double)lFrequency.QuadPart * 0.1);
+        QueryPerformanceCounter((LARGE_INTEGER *)&m_lBaseReading);
+        m_lLastReading = m_lBaseReading;
     }
     else
     {

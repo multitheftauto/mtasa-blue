@@ -22,10 +22,10 @@ public:
                             CGUIProgressBar_Impl        ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
                             ~CGUIProgressBar_Impl       ( void );
 
-	void					SetProgress					( float fProgress );
-	float					GetProgress					( void );
+    void                    SetProgress                 ( float fProgress );
+    float                   GetProgress                 ( void );
 
-	eCGUIType				GetType						( void ) { return CGUI_PROGRESSBAR; };
+    eCGUIType               GetType                     ( void ) { return CGUI_PROGRESSBAR; };
 
     #include "CGUIElement_Inc.h"
 

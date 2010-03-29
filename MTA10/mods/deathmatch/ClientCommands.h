@@ -27,7 +27,7 @@ void COMMAND_Eaeg                   ( const char* szCmdLine );
 void COMMAND_EnterPassenger         ( const char* szCmdLine );
 void COMMAND_RadioNext              ( const char* szCmdLine );
 void COMMAND_RadioPrevious          ( const char* szCmdLine );
-void COMMAND_DriveBy			    ( const char* szCmdLine );
+void COMMAND_DriveBy                ( const char* szCmdLine );
 void COMMAND_RadarMap               ( const char* szCmdLine );
 void COMMAND_RadarZoomIn            ( const char* szCmdLine );
 void COMMAND_RadarZoomOut           ( const char* szCmdLine );

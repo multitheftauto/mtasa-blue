@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/tracking/CTCPClientSocketImpl.h
-*  PURPOSE:		Header file for TCP client socket wrapper class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/tracking/CTCPClientSocketImpl.h
+*  PURPOSE:     Header file for TCP client socket wrapper class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *
@@ -48,28 +48,28 @@ public:
 
     bool            Initialize                      ( unsigned int uiID );
 
-	// Async related functions
-	void			FireEvent						( LPARAM lType );
+    // Async related functions
+    void            FireEvent                       ( LPARAM lType );
 
-	// Callback functions
-	void			SetEventClass					( void* pClass );
-	void			SetEventRead					( PFNEVENT pEvent );
-	void			SetEventWrite					( PFNEVENT pEvent );
-	void			SetEventConnect					( PFNEVENT pEvent );
-	void			SetEventClose					( PFNEVENT pEvent );
+    // Callback functions
+    void            SetEventClass                   ( void* pClass );
+    void            SetEventRead                    ( PFNEVENT pEvent );
+    void            SetEventWrite                   ( PFNEVENT pEvent );
+    void            SetEventConnect                 ( PFNEVENT pEvent );
+    void            SetEventClose                   ( PFNEVENT pEvent );
 
 private:
     int             m_iRefCount;
     bool            m_bIsConnected;
     char            m_szLastError [128];
 
-	unsigned int	m_Socket;
+    unsigned int    m_Socket;
 
-	void*			m_pClass;
-	PFNEVENT		m_pEventRead;
-	PFNEVENT		m_pEventWrite;
-	PFNEVENT		m_pEventConnect;
-	PFNEVENT		m_pEventClose;
+    void*           m_pClass;
+    PFNEVENT        m_pEventRead;
+    PFNEVENT        m_pEventWrite;
+    PFNEVENT        m_pEventConnect;
+    PFNEVENT        m_pEventClose;
 };
 
 #endif

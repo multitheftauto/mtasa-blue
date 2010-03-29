@@ -19,15 +19,15 @@
 
 class CTrailerSAInterface : public CAutomobileSAInterface
 {
-	// fill this
+    // fill this
 };
 
 class CTrailerSA : public virtual CTrailer, public virtual CAutomobileSA
 {
 private:
 public:
-	                            CTrailerSA( CTrailerSAInterface * trailer );
-	                            CTrailerSA( eVehicleTypes dwModelID );
+                                CTrailerSA( CTrailerSAInterface * trailer );
+                                CTrailerSA( eVehicleTypes dwModelID );
 
     virtual                     ~CTrailerSA ( void ) {}
 };

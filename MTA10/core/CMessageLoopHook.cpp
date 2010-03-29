@@ -98,7 +98,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         g_pCore->Quit ();
     }
 
-	if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
+    if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
 
     // Make sure our pointers are valid.
     if ( pThis != NULL && CLocalGUI::GetSingletonPtr ( ) != NULL && CCore::GetSingleton ().GetGame () )
@@ -109,13 +109,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         if ( CKeyBinds::IsFakeCtrl_L ( uMsg, wParam, lParam ) )
             return true;
 
-		// See if this is message was caused by our asynchronous sockets
-		if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 255 ))
-		{
-			/* ACHTUNG: uMsg - 10? Windows seems to add 10 or there's a bug in the message code. Hack! */
-			// Let the CTCPManager handle it
-			CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), lParam );
-		}
+        // See if this is message was caused by our asynchronous sockets
+        if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 255 ))
+        {
+            /* ACHTUNG: uMsg - 10? Windows seems to add 10 or there's a bug in the message code. Hack! */
+            // Let the CTCPManager handle it
+            CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), lParam );
+        }
 
         bool bWasCaptureKey = false;
         CMainMenu* pMainMenu = g_pCore->GetLocalGUI ()->GetMainMenu ();
@@ -130,107 +130,107 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                     return true;
                 }
                 bWasCaptureKey = ( pSettings->IsCapturingKey () && pSettings->ProcessMessage ( uMsg, wParam, lParam ) );
-		        if ( !bWasCaptureKey )
-		        {
-			        // If Escape is pressed and we're playing ingame, we show/hide the menu
-			        if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && g_pCore->IsConnected () )
-			        {
-				        // Hide the console
-				        CConsoleInterface* pConsole = g_pCore->GetConsole ();
-				        if ( pConsole->IsVisible () )
-				        {
-					        pConsole->SetVisible ( false );
-					        return true;
-				        }
-
-				        // The mainmenu makes sure it isn't hidden if UseIngameButtons == false
-				        if ( !CCore::GetSingleton().IsOfflineMod () )
-				        {
-					        // Stop chat input
-					        if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )
-					        {
-						        CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
-						        return true;
-					        }
-
-					        CLocalGUI::GetSingleton ().SetMainMenuVisible ( !CLocalGUI::GetSingleton ().IsMainMenuVisible () );
-					        return true;
-				        }
-			        }
-
-			        // If F8 is pressed, we show/hide the console
-			        if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )
-			        {
-                        eSystemState systemState = g_pCore->GetGame ()->GetSystemState ();
-                        if ( CLocalGUI::GetSingleton ().IsConsoleVisible () || systemState == 7 || systemState == 8 || systemState == 9 ) /* GS_FRONTEND, GS_INIT_PLAYING_GAME,	GS_PLAYING_GAME */
+                if ( !bWasCaptureKey )
+                {
+                    // If Escape is pressed and we're playing ingame, we show/hide the menu
+                    if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && g_pCore->IsConnected () )
+                    {
+                        // Hide the console
+                        CConsoleInterface* pConsole = g_pCore->GetConsole ();
+                        if ( pConsole->IsVisible () )
                         {
-				            CLocalGUI::GetSingleton ().SetConsoleVisible ( !CLocalGUI::GetSingleton ().IsConsoleVisible () );           
+                            pConsole->SetVisible ( false );
+                            return true;
+                        }
+
+                        // The mainmenu makes sure it isn't hidden if UseIngameButtons == false
+                        if ( !CCore::GetSingleton().IsOfflineMod () )
+                        {
+                            // Stop chat input
+                            if ( CLocalGUI::GetSingleton ().IsChatBoxInputEnabled () )
+                            {
+                                CLocalGUI::GetSingleton ().SetChatBoxInputEnabled ( false );
+                                return true;
+                            }
+
+                            CLocalGUI::GetSingleton ().SetMainMenuVisible ( !CLocalGUI::GetSingleton ().IsMainMenuVisible () );
+                            return true;
+                        }
+                    }
+
+                    // If F8 is pressed, we show/hide the console
+                    if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )
+                    {
+                        eSystemState systemState = g_pCore->GetGame ()->GetSystemState ();
+                        if ( CLocalGUI::GetSingleton ().IsConsoleVisible () || systemState == 7 || systemState == 8 || systemState == 9 ) /* GS_FRONTEND, GS_INIT_PLAYING_GAME, GS_PLAYING_GAME */
+                        {
+                            CLocalGUI::GetSingleton ().SetConsoleVisible ( !CLocalGUI::GetSingleton ().IsConsoleVisible () );           
                         }
                         return true;
-			        }
+                    }
 
-			        // If the console is visible, and we pressed down/up, scroll the console history
-			        //                          or if we pressed tab, step through possible autocomplete matches
-			        if ( CLocalGUI::GetSingleton ().IsConsoleVisible () )
-			        {
-				        if ( uMsg == WM_KEYDOWN )
-				        {
-					        if ( wParam == VK_DOWN )
-					        {
-						        CLocalGUI::GetSingleton ().GetConsole ()->SetPreviousHistoryText ();
-					        }
+                    // If the console is visible, and we pressed down/up, scroll the console history
+                    //                          or if we pressed tab, step through possible autocomplete matches
+                    if ( CLocalGUI::GetSingleton ().IsConsoleVisible () )
+                    {
+                        if ( uMsg == WM_KEYDOWN )
+                        {
+                            if ( wParam == VK_DOWN )
+                            {
+                                CLocalGUI::GetSingleton ().GetConsole ()->SetPreviousHistoryText ();
+                            }
 
-					        if ( wParam == VK_UP )
-					        {
-						        CLocalGUI::GetSingleton ().GetConsole ()->SetNextHistoryText ();
-					        }
+                            if ( wParam == VK_UP )
+                            {
+                                CLocalGUI::GetSingleton ().GetConsole ()->SetNextHistoryText ();
+                            }
 
-					        if ( wParam == VK_TAB )
-					        {
-						        CLocalGUI::GetSingleton ().GetConsole ()->SetNextAutoCompleteMatch ();
-            					return true; 
-					        }
+                            if ( wParam == VK_TAB )
+                            {
+                                CLocalGUI::GetSingleton ().GetConsole ()->SetNextAutoCompleteMatch ();
+                                return true; 
+                            }
                             else
-					        {
-						        CLocalGUI::GetSingleton ().GetConsole ()->ResetAutoCompleteMatch ();
-					        }
-				        }
-			        }
-		        }
+                            {
+                                CLocalGUI::GetSingleton ().GetConsole ()->ResetAutoCompleteMatch ();
+                            }
+                        }
+                    }
+                }
             }
         }
 
         if ( !bWasCaptureKey )
         {
-			// Lead the message through the keybinds message processor
+            // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 
-			// Lead the message through main menu scene, so any scenes can be aborted
-			CMainMenuScene::GetSingletonPtr ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
+            // Lead the message through main menu scene, so any scenes can be aborted
+            CMainMenuScene::GetSingletonPtr ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 
-			bool bProcessed = false, bClientProcessed = false;			
+            bool bProcessed = false, bClientProcessed = false;          
 
-			// Check and see if the GUI should process this message
-			bProcessed = CLocalGUI::GetSingleton ().ProcessMessage ( hwnd, uMsg, wParam, lParam );
-			
+            // Check and see if the GUI should process this message
+            bProcessed = CLocalGUI::GetSingleton ().ProcessMessage ( hwnd, uMsg, wParam, lParam );
+            
             // Check and see if the Core/mod should process this message
-			if ( !CCore::GetSingleton ().GetGame ()->IsAtMenu() )
-			{            
-				pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton ().GetClientMessageProcessor();
-				if ( pfnClientMessageProcessor )
-				{
-					bClientProcessed = pfnClientMessageProcessor ( hwnd, uMsg, wParam, lParam );
-				}
-			}
+            if ( !CCore::GetSingleton ().GetGame ()->IsAtMenu() )
+            {            
+                pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton ().GetClientMessageProcessor();
+                if ( pfnClientMessageProcessor )
+                {
+                    bClientProcessed = pfnClientMessageProcessor ( hwnd, uMsg, wParam, lParam );
+                }
+            }
 
-			// If GTA can process this key
-			if ( !bProcessed && !bClientProcessed )
-			{
-				// ALWAYS return true on escape to stop us getting to GTA's menu
-				if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE )
-				{
-					return true; 
-				}
+            // If GTA can process this key
+            if ( !bProcessed && !bClientProcessed )
+            {
+                // ALWAYS return true on escape to stop us getting to GTA's menu
+                if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE )
+                {
+                    return true; 
+                }
 
                 // Prevent game window auto-minimizing if full screen and:
                 //     1. More than one monitor present
@@ -254,22 +254,22 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                     }
                 }
                 /*
-				// Should not really ever get here, just in case. 
-				else if ( uMsg == WM_SIZE )
-				{
-					if ( wParam == SIZE_MINIMIZED )
-					{
-						ShowWindow ( pThis->GetHookedWindowHandle(), SW_RESTORE );
-						return true;
-					}
-				}
+                // Should not really ever get here, just in case. 
+                else if ( uMsg == WM_SIZE )
+                {
+                    if ( wParam == SIZE_MINIMIZED )
+                    {
+                        ShowWindow ( pThis->GetHookedWindowHandle(), SW_RESTORE );
+                        return true;
+                    }
+                }
                 */
 
 
-				// Call GTA's window procedure.
-				return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
-			}
-		}
+                // Call GTA's window procedure.
+                return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+            }
+        }
     }
 
     // Tell windows to handle this message.

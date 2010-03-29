@@ -17,76 +17,76 @@
 
 CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, eWeaponSlot weaponSlot )
 {
-	DEBUG_TRACE("CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, DWORD dwSlot )");
-	this->owner = ped;
-	this->m_weaponSlot = weaponSlot;
-	internalInterface = weaponInterface;	
+    DEBUG_TRACE("CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, DWORD dwSlot )");
+    this->owner = ped;
+    this->m_weaponSlot = weaponSlot;
+    internalInterface = weaponInterface;    
 }
 
-eWeaponType	CWeaponSA::GetType(  )
+eWeaponType CWeaponSA::GetType(  )
 {
-	DEBUG_TRACE("eWeaponType CWeaponSA::GetType(  )");
-	return this->internalInterface->m_eWeaponType;
+    DEBUG_TRACE("eWeaponType CWeaponSA::GetType(  )");
+    return this->internalInterface->m_eWeaponType;
 };
 
 VOID CWeaponSA::SetType( eWeaponType type )
 {
-	DEBUG_TRACE("VOID CWeaponSA::SetType( eWeaponType type )");
-	this->internalInterface->m_eWeaponType = type;
+    DEBUG_TRACE("VOID CWeaponSA::SetType( eWeaponType type )");
+    this->internalInterface->m_eWeaponType = type;
 }
 
 eWeaponState CWeaponSA::GetState(  )
 {
-	DEBUG_TRACE("eWeaponState CWeaponSA::GetState(  )");
-	return this->internalInterface->m_eState;
+    DEBUG_TRACE("eWeaponState CWeaponSA::GetState(  )");
+    return this->internalInterface->m_eState;
 }
 
 void CWeaponSA::SetState ( eWeaponState state )
 {
-	DEBUG_TRACE("void CWeaponSA::SetState ( eWeaponState state )");
-	this->internalInterface->m_eState = state;
+    DEBUG_TRACE("void CWeaponSA::SetState ( eWeaponState state )");
+    this->internalInterface->m_eState = state;
 }
 
 DWORD CWeaponSA::GetAmmoInClip(  )
 {
-	DEBUG_TRACE("DWORD CWeaponSA::GetAmmoInClip(  )");
-	return this->internalInterface->m_nAmmoInClip;
+    DEBUG_TRACE("DWORD CWeaponSA::GetAmmoInClip(  )");
+    return this->internalInterface->m_nAmmoInClip;
 }
 
 VOID CWeaponSA::SetAmmoInClip( DWORD dwAmmoInClip )
 {
-	DEBUG_TRACE("VOID CWeaponSA::SetAmmoInClip( DWORD dwAmmoInClip )");
-	this->internalInterface->m_nAmmoInClip = dwAmmoInClip;
+    DEBUG_TRACE("VOID CWeaponSA::SetAmmoInClip( DWORD dwAmmoInClip )");
+    this->internalInterface->m_nAmmoInClip = dwAmmoInClip;
 }
 
 DWORD CWeaponSA::GetAmmoTotal(  )
 {
-	DEBUG_TRACE("DWORD CWeaponSA::GetAmmoTotal(  )");
-	return this->internalInterface->m_nAmmoTotal;
+    DEBUG_TRACE("DWORD CWeaponSA::GetAmmoTotal(  )");
+    return this->internalInterface->m_nAmmoTotal;
 }
 
 VOID CWeaponSA::SetAmmoTotal( DWORD dwAmmoTotal )
 {
-	DEBUG_TRACE("VOID CWeaponSA::SetAmmoTotal( DWORD dwAmmoTotal )");
-	this->internalInterface->m_nAmmoTotal = dwAmmoTotal;
+    DEBUG_TRACE("VOID CWeaponSA::SetAmmoTotal( DWORD dwAmmoTotal )");
+    this->internalInterface->m_nAmmoTotal = dwAmmoTotal;
 }
 
 CPed * CWeaponSA::GetPed()
 {
-	DEBUG_TRACE("CPed * CWeaponSA::GetPed()");
-	return (CPed *)owner;
+    DEBUG_TRACE("CPed * CWeaponSA::GetPed()");
+    return (CPed *)owner;
 }
 
-eWeaponSlot	CWeaponSA::GetSlot()
+eWeaponSlot CWeaponSA::GetSlot()
 {
-	DEBUG_TRACE("eWeaponSlot CWeaponSA::GetSlot()");
-	return m_weaponSlot;
+    DEBUG_TRACE("eWeaponSlot CWeaponSA::GetSlot()");
+    return m_weaponSlot;
 }
 
 VOID CWeaponSA::SetAsCurrentWeapon()
 {
-	DEBUG_TRACE("VOID CWeaponSA::SetAsCurrentWeapon()");
-	owner->SetCurrentWeaponSlot( m_weaponSlot );
+    DEBUG_TRACE("VOID CWeaponSA::SetAsCurrentWeapon()");
+    owner->SetCurrentWeaponSlot( m_weaponSlot );
 }
 
 void CWeaponSA::Remove ()

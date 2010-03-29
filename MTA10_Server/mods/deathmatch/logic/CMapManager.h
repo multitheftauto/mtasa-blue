@@ -67,7 +67,7 @@ public:
     void                        SendPerPlayerEntities       ( CPlayer& Player );
 
     void                        BroadcastElements           ( CElement* pElement );
-	void                        BroadcastElements           ( CElement* pElement, bool bBroadcastAll );
+    void                        BroadcastElements           ( CElement* pElement, bool bBroadcastAll );
     void                        BroadcastElementChildren    ( CElement* pElement, class CEntityAddPacket &Packet, list < CPerPlayerEntity* > &pPerPlayerList, bool bBroadcastAll );
 
     void                        OnPlayerJoin                ( CPlayer& Player );

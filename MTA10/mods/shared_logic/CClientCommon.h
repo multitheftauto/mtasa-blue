@@ -12,16 +12,16 @@
 #define __CCLIENTCOMMON_H
 
 // Defines the maximum amount of mimics (fake players)
-#define MAX_MIMICS						50
+#define MAX_MIMICS                      50
 
 // Defines the maximum amount of real players
-#define MAX_NET_PLAYERS_REAL			128
+#define MAX_NET_PLAYERS_REAL            128
 
 // Defines the maximum amount of players inside the game (includes mimics)
-#define MAX_NET_PLAYERS					(MAX_NET_PLAYERS_REAL + MAX_MIMICS)
+#define MAX_NET_PLAYERS                 (MAX_NET_PLAYERS_REAL + MAX_MIMICS)
 
 // Defines the maximum size for a nametag string
-#define MAX_NAMETAG_LENGTH				64
+#define MAX_NAMETAG_LENGTH              64
 
 // Defines the min/max size for the player nick (who the hell came up with 22?)
 #define MIN_PLAYER_NICK_LENGTH          1
@@ -33,10 +33,10 @@
 
 
 // Defines the minimum fade time for a transfer
-#define MIN_TRANSFER_TIME				1500
+#define MIN_TRANSFER_TIME               1500
 
 // Defines the maximum size for a player name
-//#define MAX_PLAYER_NAME_LENGTH			32
+//#define MAX_PLAYER_NAME_LENGTH            32
 
 // Defines the maximum size for a HTTP Download URL
 #define MAX_HTTP_DOWNLOAD_URL           512

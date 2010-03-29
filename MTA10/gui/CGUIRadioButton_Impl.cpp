@@ -16,9 +16,9 @@
 
 CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
-	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
+    // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
     pGUI->GetUniqueName ( szUnique );
 
@@ -26,11 +26,11 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIRADIOBUTTON_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setText ( szCaption );
-	m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 16.0f ) );
-	m_pWindow->setVisible ( true );
+    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 16.0f ) );
+    m_pWindow->setVisible ( true );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our events
     AddEvents ();
@@ -43,24 +43,24 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
 
 CGUIRadioButton_Impl::~CGUIRadioButton_Impl ( void )
 {
-	DestroyElement ();
+    DestroyElement ();
 }
 
 
 void CGUIRadioButton_Impl::SetSelected ( bool bChecked )
 {
-	reinterpret_cast < CEGUI::RadioButton * > ( m_pWindow ) -> setSelected ( bChecked );
+    reinterpret_cast < CEGUI::RadioButton * > ( m_pWindow ) -> setSelected ( bChecked );
 }
 
 
 bool CGUIRadioButton_Impl::GetSelected ( void )
 {
-	return reinterpret_cast < CEGUI::RadioButton * > ( m_pWindow ) -> isSelected ();
+    return reinterpret_cast < CEGUI::RadioButton * > ( m_pWindow ) -> isSelected ();
 }

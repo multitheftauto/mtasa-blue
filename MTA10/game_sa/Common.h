@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/Common.h
-*  PURPOSE:		Common game layer include file
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/Common.h
+*  PURPOSE:     Common game layer include file
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,8 +21,8 @@
 
 #undef DEBUG_LOG
 #ifdef DEBUG_LOG
-	#include <stdio.h>
-	#include <time.h>
+    #include <stdio.h>
+    #include <time.h>
 
     static FILE* fDebugFile;
 
@@ -36,7 +36,7 @@
     }
 
     #ifdef MTA_DEBUG
-	    #define DEBUG_TRACE(szText) \
+        #define DEBUG_TRACE(szText) \
             OutputDebugString(szText);
     #endif
 #else

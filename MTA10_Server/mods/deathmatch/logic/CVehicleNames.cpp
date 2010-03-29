@@ -126,6 +126,6 @@ const char* CVehicleNames::GetVehicleTypeName ( unsigned long ulModel )
             pVehicleName = "Trailer";
             break;
     }
-	
-	return pVehicleName;
+    
+    return pVehicleName;
 }

@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CModelInfo.h
-*  PURPOSE:		Entity model info interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CModelInfo.h
+*  PURPOSE:     Entity model info interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -23,10 +23,10 @@ class CPedModelInfo;
 class CBoundingBox
 {
 public:
-	CVector vecBoundMin;
-	CVector vecBoundMax;
-	CVector vecBoundOffset;
-	float	fRadius;
+    CVector vecBoundMin;
+    CVector vecBoundMax;
+    CVector vecBoundOffset;
+    float   fRadius;
 };
 
 enum eVehicleUpgradePosn
@@ -55,39 +55,39 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface *     GetInterface            ( void ) = 0;
 
-	virtual BOOL			IsBoat                  () = 0;
-	virtual BOOL			IsCar                   () = 0;
-	virtual BOOL			IsTrain                 () = 0;
-	virtual BOOL			IsHeli                  () = 0;
-	virtual BOOL			IsPlane                 () = 0;
-	virtual BOOL			IsBike                  () = 0;
-	virtual BOOL			IsFakePlane             () = 0;
-	virtual BOOL			IsMonsterTruck          () = 0;
-	virtual BOOL			IsQuadBike              () = 0;
-	virtual BOOL			IsBmx                   () = 0;
-	virtual BOOL			IsTrailer               () = 0;
-	virtual BOOL			IsVehicle               () = 0;
+    virtual BOOL            IsBoat                  () = 0;
+    virtual BOOL            IsCar                   () = 0;
+    virtual BOOL            IsTrain                 () = 0;
+    virtual BOOL            IsHeli                  () = 0;
+    virtual BOOL            IsPlane                 () = 0;
+    virtual BOOL            IsBike                  () = 0;
+    virtual BOOL            IsFakePlane             () = 0;
+    virtual BOOL            IsMonsterTruck          () = 0;
+    virtual BOOL            IsQuadBike              () = 0;
+    virtual BOOL            IsBmx                   () = 0;
+    virtual BOOL            IsTrailer               () = 0;
+    virtual BOOL            IsVehicle               () = 0;
 
-	virtual char			* GetNameIfVehicle      () = 0;
+    virtual char            * GetNameIfVehicle      () = 0;
 
-	virtual VOID			Request                 ( bool bAndLoad = false, bool bWaitForLoad = false ) = 0;
-	virtual VOID			Remove                  () = 0;
-	virtual VOID			LoadAllRequestedModels  () = 0;
-	virtual BYTE			GetLevelFromPosition    ( CVector * vecPosition ) = 0;
-	virtual BOOL			IsLoaded                () = 0;
-	virtual BYTE			GetFlags                () = 0;
-	virtual CBoundingBox	* GetBoundingBox        () = 0;
-	virtual bool			IsValid                 () = 0;
+    virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false ) = 0;
+    virtual VOID            Remove                  () = 0;
+    virtual VOID            LoadAllRequestedModels  () = 0;
+    virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
+    virtual BOOL            IsLoaded                () = 0;
+    virtual BYTE            GetFlags                () = 0;
+    virtual CBoundingBox    * GetBoundingBox        () = 0;
+    virtual bool            IsValid                 () = 0;
     virtual unsigned short  GetTextureDictionaryID  () = 0;
     virtual float           GetLODDistance          () = 0;
     virtual void            SetLODDistance          ( float fDistance ) = 0;
     virtual void            RestreamIPL             () = 0;
 
-	virtual void			AddRef                  ( bool bWaitForLoad ) = 0;
-	virtual void			RemoveRef               () = 0;
+    virtual void            AddRef                  ( bool bWaitForLoad ) = 0;
+    virtual void            RemoveRef               () = 0;
     virtual int             GetRefCount             () = 0;
 
-	virtual float			GetDistanceFromCentreOfMassToBaseOfModel () = 0;
+    virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
 
     // ONLY use for CVehicleModelInfos
     virtual short           GetAvailableVehicleMod  ( unsigned short usSlot ) = 0;
@@ -104,11 +104,11 @@ public:
     virtual void            SetVoice                ( short sVoiceType, short sVoice ) = 0;
     virtual void            SetVoice                ( const char* szVoiceType, const char* szVoice ) = 0;
 
-	// Custom collision related functions
-	virtual void			SetCustomModel          ( RpClump* pClump ) = 0;
-	virtual void			RestoreOriginalModel    ( void ) = 0;
-	virtual void			SetColModel	            ( CColModel* pColModel ) = 0;
-	virtual void			RestoreColModel	        ( void ) = 0;
+    // Custom collision related functions
+    virtual void            SetCustomModel          ( RpClump* pClump ) = 0;
+    virtual void            RestoreOriginalModel    ( void ) = 0;
+    virtual void            SetColModel             ( CColModel* pColModel ) = 0;
+    virtual void            RestoreColModel         ( void ) = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void            MakeCustomModel         ( void ) = 0;

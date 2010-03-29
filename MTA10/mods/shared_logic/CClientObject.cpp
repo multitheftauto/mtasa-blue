@@ -53,7 +53,7 @@ CClientObject::~CClientObject ( void )
     m_pModelRequester->Cancel ( this, false );  
 
     // Detach us from anything
-	AttachTo ( NULL );
+    AttachTo ( NULL );
 
     // Destroy the object
     Destroy ();
@@ -403,7 +403,7 @@ void CClientObject::Create ( void )
 
                 // Done
                 return;
-	        }
+            }
             else
             {
                 // Remove our reference to the object again
@@ -471,7 +471,7 @@ void CClientObject::StreamedInPulse ( void )
 
 void CClientObject::AttachTo ( CClientEntity* pEntity )
 {
-	// Add/remove us to/from our managers attached list
+    // Add/remove us to/from our managers attached list
     if ( m_pAttachedToEntity && !pEntity ) m_pObjectManager->m_Attached.remove ( this );
     else if ( !m_pAttachedToEntity && pEntity ) m_pObjectManager->m_Attached.push_back ( this );
 

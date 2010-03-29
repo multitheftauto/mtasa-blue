@@ -226,7 +226,7 @@ void CScriptDebugging::PrintLog ( const char* szText )
         time ( &timeNow );
         strftime ( szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime ( &timeNow ) );
 
-	    fprintf ( m_pLogFile, "%s %s\n", szBuffer, szText );
+        fprintf ( m_pLogFile, "%s %s\n", szBuffer, szText );
         fflush ( m_pLogFile );
     }
 }

@@ -39,8 +39,8 @@ bool CColSphere::DoHitDetection ( const CVector& vecLastPosition, const CVector&
 
 bool CColSphere::ReadSpecialData ( void )
 {
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     GetCustomDataFloat ( "radius", m_fRadius, true );

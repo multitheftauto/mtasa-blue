@@ -13,13 +13,13 @@
 *****************************************************************************/
 
 void SetProperty ( const char *szProperty, const char *szValue ) { CGUIElement_Impl::SetProperty ( szProperty, szValue ); };
-std::string GetProperty ( const char *szProperty )			{ return CGUIElement_Impl::GetProperty ( szProperty ); };
+std::string GetProperty ( const char *szProperty )          { return CGUIElement_Impl::GetProperty ( szProperty ); };
 
-CGUIPropertyIter GetPropertiesBegin ( void )				{ return CGUIElement_Impl::GetPropertiesBegin (); };
-CGUIPropertyIter GetPropertiesEnd ( void )					{ return CGUIElement_Impl::GetPropertiesEnd (); };
+CGUIPropertyIter GetPropertiesBegin ( void )                { return CGUIElement_Impl::GetPropertiesBegin (); };
+CGUIPropertyIter GetPropertiesEnd ( void )                  { return CGUIElement_Impl::GetPropertiesEnd (); };
 
-bool SetFont ( const char *szFontName )						{ return CGUIElement_Impl::SetFont ( szFontName ); };
-std::string GetFont ( void )								{ return CGUIElement_Impl::GetFont (); };
+bool SetFont ( const char *szFontName )                     { return CGUIElement_Impl::SetFont ( szFontName ); };
+std::string GetFont ( void )                                { return CGUIElement_Impl::GetFont (); };
 
 void SetVisible ( bool bVisible )                           { CGUIElement_Impl::SetVisible ( bVisible ); };
 bool IsVisible ( void )                                     { return CGUIElement_Impl::IsVisible (); };
@@ -32,16 +32,16 @@ bool IsZOrderingEnabled ( void )                            { return CGUIElement
 void BringToFront ( void )                                  { CGUIElement_Impl::BringToFront (); };
 void MoveToBack ( void )                                    { CGUIElement_Impl::MoveToBack (); };
 
-void SetPosition ( const CVector2D& vecPosition, bool bRelative = false )	{ CGUIElement_Impl::SetPosition ( vecPosition, bRelative ); };
-CVector2D GetPosition ( bool bRelative = false )							{ return CGUIElement_Impl::GetPosition ( bRelative ); };
-void GetPosition ( CVector2D& vecPosition, bool bRelative = false )			{ CGUIElement_Impl::GetPosition ( vecPosition, bRelative ); };
+void SetPosition ( const CVector2D& vecPosition, bool bRelative = false )   { CGUIElement_Impl::SetPosition ( vecPosition, bRelative ); };
+CVector2D GetPosition ( bool bRelative = false )                            { return CGUIElement_Impl::GetPosition ( bRelative ); };
+void GetPosition ( CVector2D& vecPosition, bool bRelative = false )         { CGUIElement_Impl::GetPosition ( vecPosition, bRelative ); };
 
-void SetWidth ( float fX, bool bRelative = false )							{ CGUIElement_Impl::SetWidth ( fX, bRelative ); };
-void SetHeight ( float fY, bool bRelative = false )							{ CGUIElement_Impl::SetHeight ( fY, bRelative ); };
+void SetWidth ( float fX, bool bRelative = false )                          { CGUIElement_Impl::SetWidth ( fX, bRelative ); };
+void SetHeight ( float fY, bool bRelative = false )                         { CGUIElement_Impl::SetHeight ( fY, bRelative ); };
 
-void SetSize ( const CVector2D& vecSize, bool bRelative = false )			{ CGUIElement_Impl::SetSize ( vecSize, bRelative ); };
-CVector2D GetSize ( bool bRelative = false )								{ return CGUIElement_Impl::GetSize ( bRelative ); };
-void GetSize ( CVector2D& vecSize, bool bRelative = false )					{ CGUIElement_Impl::GetSize ( vecSize, bRelative ); };
+void SetSize ( const CVector2D& vecSize, bool bRelative = false )           { CGUIElement_Impl::SetSize ( vecSize, bRelative ); };
+CVector2D GetSize ( bool bRelative = false )                                { return CGUIElement_Impl::GetSize ( bRelative ); };
+void GetSize ( CVector2D& vecSize, bool bRelative = false )                 { CGUIElement_Impl::GetSize ( vecSize, bRelative ); };
 
 void SetMinimumSize ( const CVector2D& vecSize )            { CGUIElement_Impl::SetMinimumSize ( vecSize ); };
 CVector2D GetMinimumSize ( void )                           { return CGUIElement_Impl::GetMinimumSize (); };
@@ -77,15 +77,15 @@ CRect2D RelativeToAbsolute ( const CRect2D& Rect )        { return CGUIElement_I
 CVector2D RelativeToAbsolute ( const CVector2D& Vector )    { return CGUIElement_Impl::RelativeToAbsolute ( Vector ); };
 
 void SetParent ( CGUIElement* pParent )                     { CGUIElement_Impl::SetParent ( pParent ); };
-CGUIElement* GetParent ( void )								{ return CGUIElement_Impl::GetParent (); };
+CGUIElement* GetParent ( void )                             { return CGUIElement_Impl::GetParent (); };
 
-CEGUI::Window* GetWindow ( void )							{ return CGUIElement_Impl::GetWindow (); };
+CEGUI::Window* GetWindow ( void )                           { return CGUIElement_Impl::GetWindow (); };
 
-void SetUserData ( void* pData )							{ CGUIElement_Impl::SetUserData ( pData ); };
-void* GetUserData ( void )									{ return CGUIElement_Impl::GetUserData (); };
+void SetUserData ( void* pData )                            { CGUIElement_Impl::SetUserData ( pData ); };
+void* GetUserData ( void )                                  { return CGUIElement_Impl::GetUserData (); };
 
-void SetClickHandler ( GUI_CALLBACK Callback )				{ CGUIElement_Impl::SetClickHandler ( Callback ); };
+void SetClickHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetClickHandler ( Callback ); };
 void SetMovedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetMovedHandler ( Callback ); };
 void SetSizedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetSizedHandler ( Callback ); };
-void SetMouseEnterHandler ( GUI_CALLBACK Callback )			{ CGUIElement_Impl::SetMouseEnterHandler ( Callback ); };
-void SetMouseLeaveHandler ( GUI_CALLBACK Callback )			{ CGUIElement_Impl::SetMouseLeaveHandler ( Callback ); };
+void SetMouseEnterHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseEnterHandler ( Callback ); };
+void SetMouseLeaveHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseLeaveHandler ( Callback ); };

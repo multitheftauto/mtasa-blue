@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskIKSA.h
-*  PURPOSE:		Inverse kinematics game tasks
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskIKSA.h
+*  PURPOSE:     Inverse kinematics game tasks
+*  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -34,27 +34,27 @@ typedef DWORD IKChain_c;
 class CTaskSimpleIKChainSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CPed*		m_pPed;
-    int		m_time;
-    int		m_blendTime;
-    IKChain_c* 	m_pIKChain;
-    short		m_slotID;
-    short 		m_pivotBoneTag;
-    short 		m_effectorBoneTag;
-    CVector		m_effectorVec;
-    CEntity*	m_pEntity;
-    int		m_offsetBoneTag;
-    CVector		m_offsetPos;
-    float 		m_speed;
-    unsigned char		m_nonNullEntity;
+    CPed*       m_pPed;
+    int     m_time;
+    int     m_blendTime;
+    IKChain_c*  m_pIKChain;
+    short       m_slotID;
+    short       m_pivotBoneTag;
+    short       m_effectorBoneTag;
+    CVector     m_effectorVec;
+    CEntity*    m_pEntity;
+    int     m_offsetBoneTag;
+    CVector     m_offsetPos;
+    float       m_speed;
+    unsigned char       m_nonNullEntity;
     // blending info
-    float		m_blend;
-    int		m_endTime;
-    float		m_targetBlend;
-    int		m_targetTime;
-    int		m_isBlendingOut;
+    float       m_blend;
+    int     m_endTime;
+    float       m_targetBlend;
+    int     m_targetTime;
+    int     m_isBlendingOut;
 #ifndef FINAL
-    char		m_idString[32];
+    char        m_idString[32];
 #endif
 };
 
@@ -160,16 +160,16 @@ private:*/
 class CTaskSimpleTriggerLookAtSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CEntity*	m_pEntity;
-	int		m_time;
-	int		m_offsetBoneTag;
-	RwV3d		m_offsetPos;
-	unsigned char		m_useTorso;
-	float		m_speed;
-	int		m_blendTime;
-	
-	unsigned char 		m_nonNullEntity;
-	char		m_priority;
+    CEntity*    m_pEntity;
+    int     m_time;
+    int     m_offsetBoneTag;
+    RwV3d       m_offsetPos;
+    unsigned char       m_useTorso;
+    float       m_speed;
+    int     m_blendTime;
+    
+    unsigned char       m_nonNullEntity;
+    char        m_priority;
 };
 
 class CTaskSimpleTriggerLookAtSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleTriggerLookAt

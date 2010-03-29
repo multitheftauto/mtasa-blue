@@ -24,7 +24,7 @@ public:
     static bool         Update              ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         StartResource       ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         StopResource        ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-	static bool         StopAllResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         StopAllResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         RestartResource     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         RefreshResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         RefreshAllResources ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
@@ -57,13 +57,13 @@ public:
 
     static bool         DebugScript     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
-	static bool			Sudo			( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         Sudo            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
-    static bool			Help			( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         Help            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
-	static bool			LoadModule		( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-	static bool			UnloadModule	( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-	static bool			ReloadModule	( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         LoadModule      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         UnloadModule    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         ReloadModule    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         Ver             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };

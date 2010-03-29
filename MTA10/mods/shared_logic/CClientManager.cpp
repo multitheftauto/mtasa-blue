@@ -18,7 +18,7 @@ using SharedUtil::CalcMTASAPath;
 
 extern CClientGame* g_pClientGame;
 
-#define CGUI_ICON_NETWORK_TROUBLE		"mta\\cgui\\images\\16-message-warn.png"
+#define CGUI_ICON_NETWORK_TROUBLE       "mta\\cgui\\images\\16-message-warn.png"
 
 CClientManager::CClientManager ( void )
 {
@@ -36,7 +36,7 @@ CClientManager::CClientManager ( void )
     m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f );
     m_pModelRequestManager = new CClientModelRequestManager;
 
-	m_pGUIManager = new CClientGUIManager;
+    m_pGUIManager = new CClientGUIManager;
     m_pMarkerManager = new CClientMarkerManager ( this );
     m_pObjectManager = new CClientObjectManager ( this );
     m_pPathManager = new CClientPathManager ( this );
@@ -48,7 +48,7 @@ CClientManager::CClientManager ( void )
     m_pTeamManager = new CClientTeamManager;
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager ( this );
-	m_pCivilianManager = new CClientCivilianManager ( this );
+    m_pCivilianManager = new CClientCivilianManager ( this );
     m_pCamera = new CClientCamera ( this );
     m_pPedManager = new CClientPedManager ( this );
     m_pResourceManager = new CResourceManager;
@@ -61,7 +61,7 @@ CClientManager::CClientManager ( void )
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
 
-	m_pPacketRecorder = new CClientPacketRecorder ( this );
+    m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;
 }
@@ -74,7 +74,7 @@ CClientManager::~CClientManager ( void )
     delete m_pPacketRecorder;
     m_pPacketRecorder = NULL;
 
-	delete m_pResourceManager;
+    delete m_pResourceManager;
     m_pResourceManager = NULL;
 
     // We need to call this after deleting resources but before deleting entities
@@ -102,8 +102,8 @@ CClientManager::~CClientManager ( void )
     delete m_pColManager;
     m_pColManager = NULL;
 
-	delete m_pGUIManager;
-	m_pGUIManager = NULL;
+    delete m_pGUIManager;
+    m_pGUIManager = NULL;
 
     delete m_pPedManager;
     m_pPedManager = NULL;
@@ -176,7 +176,7 @@ CClientManager::~CClientManager ( void )
 
 void CClientManager::DoPulse ( void )
 {
-	m_pPacketRecorder->DoPulse ();
+    m_pPacketRecorder->DoPulse ();
 
     if ( IsGameLoaded () )
     {

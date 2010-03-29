@@ -18,21 +18,21 @@
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
-	WriteDebugEvent ( "CDirect3DEvents9::OnDirect3DDeviceCreate" );
+    WriteDebugEvent ( "CDirect3DEvents9::OnDirect3DDeviceCreate" );
 
     // Create the GUI manager
-	CCore::GetSingleton ( ).InitGUI ( pDevice );
+    CCore::GetSingleton ( ).InitGUI ( pDevice );
 
     // Create all our fonts n stuff
     CGraphics::GetSingleton ().OnDeviceCreate ( pDevice );
 
     // Create the GUI elements
-	CLocalGUI::GetSingleton().CreateObjects ( pDevice );    
+    CLocalGUI::GetSingleton().CreateObjects ( pDevice );    
 }
 
 void CDirect3DEvents9::OnDirect3DDeviceDestroy ( IDirect3DDevice9 *pDevice )
 {
-	WriteDebugEvent ( "CDirect3DEvents9::OnDirect3DDeviceDestroy" );
+    WriteDebugEvent ( "CDirect3DEvents9::OnDirect3DDeviceDestroy" );
 
     // Unload the current mod
     CModManager::GetSingleton ().Unload ();
@@ -41,7 +41,7 @@ void CDirect3DEvents9::OnDirect3DDeviceDestroy ( IDirect3DDevice9 *pDevice )
     CLocalGUI::GetSingleton().DestroyObjects ();
 
     // De-initialize the GUI manager (destroying is done on Exit)
-	CCore::GetSingleton ( ).DeinitGUI ();
+    CCore::GetSingleton ( ).DeinitGUI ();
 }
 
 void CDirect3DEvents9::OnBeginScene ( IDirect3DDevice9 *pDevice )
@@ -57,15 +57,15 @@ bool CDirect3DEvents9::OnEndScene ( IDirect3DDevice9 *pDevice )
 
 void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
 {
-	WriteDebugEvent ( "CDirect3DEvents9::OnInvalidate" );
+    WriteDebugEvent ( "CDirect3DEvents9::OnInvalidate" );
 
-	// Invalidate the VMR9 Manager
-	//CVideoManager::GetSingleton ().OnLostDevice ();
+    // Invalidate the VMR9 Manager
+    //CVideoManager::GetSingleton ().OnLostDevice ();
 
-	// Invalidate the main menu
-	CLocalGUI::GetSingleton().GetMainMenu ()->OnInvalidate ( pDevice );
+    // Invalidate the main menu
+    CLocalGUI::GetSingleton().GetMainMenu ()->OnInvalidate ( pDevice );
 
-	// Notify gui
+    // Notify gui
     CLocalGUI::GetSingleton().Invalidate ();
 
     CGraphics::GetSingleton ().OnDeviceInvalidate ( pDevice );
@@ -73,18 +73,18 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
 
 void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 {
-	WriteDebugEvent ( "CDirect3DEvents9::OnRestore" );
+    WriteDebugEvent ( "CDirect3DEvents9::OnRestore" );
 
-	// Restore the VMR9 manager
-	//CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
+    // Restore the VMR9 manager
+    //CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
 
-	// Restore the main menu
-	CLocalGUI::GetSingleton().GetMainMenu ()->OnRestore ( pDevice );
+    // Restore the main menu
+    CLocalGUI::GetSingleton().GetMainMenu ()->OnRestore ( pDevice );
 
     // Restore the GUI
-	CLocalGUI::GetSingleton().Restore ();
+    CLocalGUI::GetSingleton().Restore ();
 
-	// Restore the graphics manager
+    // Restore the graphics manager
     CGraphics::GetSingleton ().OnDeviceRestore ( pDevice );
 }
 
@@ -124,93 +124,93 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // End the scene that we started.
     pDevice->EndScene ();
     
-	// Make a screenshot if needed
-	if ( CCore::GetSingleton().bScreenShot ) {
-		RECT ScreenSize;
+    // Make a screenshot if needed
+    if ( CCore::GetSingleton().bScreenShot ) {
+        RECT ScreenSize;
 
-		D3DLOCKED_RECT LockedRect;
-		IDirect3DSurface9 *pSurface = NULL, *pLockSurface = NULL;
+        D3DLOCKED_RECT LockedRect;
+        IDirect3DSurface9 *pSurface = NULL, *pLockSurface = NULL;
 
-		// Define a screen rectangle
-		ScreenSize.top = ScreenSize.left = 0;
-		ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
-		ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();		
-		pDevice->GetRenderTarget ( 0, &pSurface );
+        // Define a screen rectangle
+        ScreenSize.top = ScreenSize.left = 0;
+        ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
+        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();        
+        pDevice->GetRenderTarget ( 0, &pSurface );
 
-		// Create a new render target
-		if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pLockSurface, NULL ) != D3D_OK ) {
-			CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
-		} else {
-			unsigned long ulBeginTime = GetTickCount ();
+        // Create a new render target
+        if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pLockSurface, NULL ) != D3D_OK ) {
+            CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
+        } else {
+            unsigned long ulBeginTime = GetTickCount ();
 
-			// Copy data from surface to surface
-			if ( pDevice->StretchRect ( pSurface, &ScreenSize, pLockSurface, &ScreenSize, D3DTEXF_NONE ) != D3D_OK ) {
-				CCore::GetSingleton ().GetConsole ()->Printf("Couldn't copy the surface.");
-			}
+            // Copy data from surface to surface
+            if ( pDevice->StretchRect ( pSurface, &ScreenSize, pLockSurface, &ScreenSize, D3DTEXF_NONE ) != D3D_OK ) {
+                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't copy the surface.");
+            }
 
-			// Lock the surface
-			if ( pLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) != D3D_OK ) {
-				CCore::GetSingleton ().GetConsole ()->Printf("Couldn't lock the surface.");
-			}
+            // Lock the surface
+            if ( pLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) != D3D_OK ) {
+                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't lock the surface.");
+            }
 
-			// Call the pre-screenshot function	
-			SString strFileName = CScreenShot::PreScreenShot ();
+            // Call the pre-screenshot function 
+            SString strFileName = CScreenShot::PreScreenShot ();
 
-			unsigned long ulScreenHeight = ScreenSize.bottom - ScreenSize.top;
-			unsigned long ulScreenWidth = ScreenSize.right - ScreenSize.left;
+            unsigned long ulScreenHeight = ScreenSize.bottom - ScreenSize.top;
+            unsigned long ulScreenWidth = ScreenSize.right - ScreenSize.left;
 
             // Create rhe screen data buffer
             BYTE** ppScreenData = NULL;
-	        ppScreenData = new BYTE* [ ulScreenHeight ];
-	        for ( unsigned short y = 0; y < ulScreenHeight; y++ ) {
-		        ppScreenData[y] = new BYTE [ ulScreenWidth * 4 ];
-	        }
+            ppScreenData = new BYTE* [ ulScreenHeight ];
+            for ( unsigned short y = 0; y < ulScreenHeight; y++ ) {
+                ppScreenData[y] = new BYTE [ ulScreenWidth * 4 ];
+            }
 
-			// Copy the surface data into a row-based buffer for libpng
-			#define BYTESPERPIXEL 4
-			unsigned long ulLineWidth = ulScreenWidth * 4;
-			for ( unsigned int i = 0; i < ulScreenHeight; i++ ) {
-				memcpy ( ppScreenData[i], (BYTE*) LockedRect.pBits + i* LockedRect.Pitch, ulLineWidth );
-				for ( unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL ) {
-					ppScreenData[i][j] = 0xFF;
-				}
-			}
+            // Copy the surface data into a row-based buffer for libpng
+            #define BYTESPERPIXEL 4
+            unsigned long ulLineWidth = ulScreenWidth * 4;
+            for ( unsigned int i = 0; i < ulScreenHeight; i++ ) {
+                memcpy ( ppScreenData[i], (BYTE*) LockedRect.pBits + i* LockedRect.Pitch, ulLineWidth );
+                for ( unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL ) {
+                    ppScreenData[i][j] = 0xFF;
+                }
+            }
 
-			// Unlock and release the surface
-			pLockSurface->UnlockRect ();
-			pLockSurface->Release ();
+            // Unlock and release the surface
+            pLockSurface->UnlockRect ();
+            pLockSurface->Release ();
 
-			// Save to png (strip the output alpha channel and read as BGR)
-			FILE *file = fopen (strFileName, "wb");
-				png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
-				png_info* info_ptr = png_create_info_struct ( png_ptr );
-				png_init_io ( png_ptr, file );
-				png_set_filter ( png_ptr, 0, PNG_FILTER_NONE );
-				png_set_compression_level ( png_ptr, 1 );
-				png_set_IHDR ( png_ptr, info_ptr, ScreenSize.right, ScreenSize.bottom, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
-				png_set_rows ( png_ptr, info_ptr, ppScreenData );
-				png_write_png ( png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL );
-				png_write_end ( png_ptr, info_ptr );
-				png_destroy_write_struct ( &png_ptr, &info_ptr );
-			fclose(file);
+            // Save to png (strip the output alpha channel and read as BGR)
+            FILE *file = fopen (strFileName, "wb");
+                png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+                png_info* info_ptr = png_create_info_struct ( png_ptr );
+                png_init_io ( png_ptr, file );
+                png_set_filter ( png_ptr, 0, PNG_FILTER_NONE );
+                png_set_compression_level ( png_ptr, 1 );
+                png_set_IHDR ( png_ptr, info_ptr, ScreenSize.right, ScreenSize.bottom, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+                png_set_rows ( png_ptr, info_ptr, ppScreenData );
+                png_write_png ( png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL );
+                png_write_end ( png_ptr, info_ptr );
+                png_destroy_write_struct ( &png_ptr, &info_ptr );
+            fclose(file);
 
-	        // Clean up the screen data buffer
-	        if ( ppScreenData ) {
-		        unsigned short height = (unsigned short)CDirect3DData::GetSingleton ().GetViewportHeight ();
-		        for ( unsigned short y = 0; y < height; y++ ) {
-			        delete [] ppScreenData[y];
-		        }
-		        delete [] ppScreenData;
-	        }
+            // Clean up the screen data buffer
+            if ( ppScreenData ) {
+                unsigned short height = (unsigned short)CDirect3DData::GetSingleton ().GetViewportHeight ();
+                for ( unsigned short y = 0; y < height; y++ ) {
+                    delete [] ppScreenData[y];
+                }
+                delete [] ppScreenData;
+            }
 
 
-			// Call the post-screenshot function
-			CScreenShot::PostScreenShot ( strFileName );
+            // Call the post-screenshot function
+            CScreenShot::PostScreenShot ( strFileName );
 
-			CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount () - ulBeginTime) / 1000.0f );
-		}
+            CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount () - ulBeginTime) / 1000.0f );
+        }
 
-		CCore::GetSingleton().bScreenShot = false;
+        CCore::GetSingleton().bScreenShot = false;
 
         if ( pSurface )
         {
@@ -218,5 +218,5 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
                 std::exception ( "Failed to release the ScreenShot rendertaget surface" );
             pSurface = NULL;
         }
-	}
+    }
 }

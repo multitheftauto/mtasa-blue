@@ -16,7 +16,7 @@
 
 CTasksSA::CTasksSA ( CTaskManagementSystemSA* pTaskManagementSystem )
 {
-	DEBUG_TRACE("CTasksSA::CTasksSA ( CTaskManagementSystemSA* pTaskManagementSystem )");
+    DEBUG_TRACE("CTasksSA::CTasksSA ( CTaskManagementSystemSA* pTaskManagementSystem )");
     m_pTaskManagementSystem = pTaskManagementSystem;
 }
 
@@ -41,8 +41,8 @@ CTaskComplexFacial* CTasksSA::CreateTaskComplexFacial ( void )
 
 CTaskSimpleCarSetPedInAsDriver * CTasksSA::CreateTaskSimpleCarSetPedInAsDriver(CVehicle * pVehicle)
 {
-	DEBUG_TRACE("CTaskSimpleCarSetPedInAsDriver * CTasksSA::CreateTaskSimpleCarSetPedInAsDriver(CVehicle * pVehicle)");
-	CTaskSimpleCarSetPedInAsDriverSA * pTask = new CTaskSimpleCarSetPedInAsDriverSA(pVehicle, NULL);
+    DEBUG_TRACE("CTaskSimpleCarSetPedInAsDriver * CTasksSA::CreateTaskSimpleCarSetPedInAsDriver(CVehicle * pVehicle)");
+    CTaskSimpleCarSetPedInAsDriverSA * pTask = new CTaskSimpleCarSetPedInAsDriverSA(pVehicle, NULL);
     m_pTaskManagementSystem->AddTask ( pTask );
     return pTask;
 }
@@ -50,8 +50,8 @@ CTaskSimpleCarSetPedInAsDriver * CTasksSA::CreateTaskSimpleCarSetPedInAsDriver(C
 
 CTaskSimpleCarSetPedInAsPassenger * CTasksSA::CreateTaskSimpleCarSetPedInAsPassenger(CVehicle * pVehicle, int iTargetDoor)
 {
-	DEBUG_TRACE("CTaskSimpleCarSetPedInAsPassenger * CTasksSA::CreateTaskSimpleCarSetPedInAsPassenger(CVehicle * pVehicle, int iTargetDoor)");
-	CTaskSimpleCarSetPedInAsPassengerSA * pTask = new CTaskSimpleCarSetPedInAsPassengerSA(pVehicle, iTargetDoor, NULL);
+    DEBUG_TRACE("CTaskSimpleCarSetPedInAsPassenger * CTasksSA::CreateTaskSimpleCarSetPedInAsPassenger(CVehicle * pVehicle, int iTargetDoor)");
+    CTaskSimpleCarSetPedInAsPassengerSA * pTask = new CTaskSimpleCarSetPedInAsPassengerSA(pVehicle, iTargetDoor, NULL);
     m_pTaskManagementSystem->AddTask ( pTask );
     return pTask;
 }
@@ -59,16 +59,16 @@ CTaskSimpleCarSetPedInAsPassenger * CTasksSA::CreateTaskSimpleCarSetPedInAsPasse
 
 CTaskSimpleCarSetPedOut * CTasksSA::CreateTaskSimpleCarSetPedOut(CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine)
 {
-	DEBUG_TRACE("CTaskSimpleCarSetPedOut * CTasksSA::CreateTaskSimpleCarSetPedOut(CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine)");
-	CTaskSimpleCarSetPedOutSA * pTask = new CTaskSimpleCarSetPedOutSA(pVehicle, iTargetDoor, bSwitchOffEngine);
+    DEBUG_TRACE("CTaskSimpleCarSetPedOut * CTasksSA::CreateTaskSimpleCarSetPedOut(CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine)");
+    CTaskSimpleCarSetPedOutSA * pTask = new CTaskSimpleCarSetPedOutSA(pVehicle, iTargetDoor, bSwitchOffEngine);
     m_pTaskManagementSystem->AddTask ( pTask );
     return pTask;
 }
 
 CTaskComplexWanderStandard * CTasksSA::CreateTaskComplexWanderStandard(const int iMoveState, const char iDir, const bool bWanderSensibly)
 {
-	DEBUG_TRACE("CTaskComplexWanderStandard * CTasksSA::CreateTaskComplexWanderStandard(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)");
-	CTaskComplexWanderStandardSA * pTask = new CTaskComplexWanderStandardSA(iMoveState, iDir, bWanderSensibly);
+    DEBUG_TRACE("CTaskComplexWanderStandard * CTasksSA::CreateTaskComplexWanderStandard(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)");
+    CTaskComplexWanderStandardSA * pTask = new CTaskComplexWanderStandardSA(iMoveState, iDir, bWanderSensibly);
     m_pTaskManagementSystem->AddTask ( pTask );
     return pTask;
 }

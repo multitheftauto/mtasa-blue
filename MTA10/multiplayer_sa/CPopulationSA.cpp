@@ -16,30 +16,30 @@
 
 using std::list;
 
-CPedSAInterface		* pPedStorage;
-CPopulationSA		* pSingleton;
+CPedSAInterface     * pPedStorage;
+CPopulationSA       * pSingleton;
 DWORD               pedVtable;
 
 VOID HOOK_EndOf_CPopulation__Add();
 VOID HOOK_CPopulation__RemovePed();
 
-CivilianAddHandler		* m_pCivilianAddHandler;
-CivilianRemoveHandler	* m_pCivilianRemoveHandler;
+CivilianAddHandler      * m_pCivilianAddHandler;
+CivilianRemoveHandler   * m_pCivilianRemoveHandler;
 
 CPopulationSA::CPopulationSA()
 {
-	dwPedCount = 0;
-	HookInstall(HOOKPOS_EndOf_CPopulation__Add, (DWORD)HOOK_EndOf_CPopulation__Add, 6);
-	HookInstall(HOOKPOS_CPopulation__RemovePed, (DWORD)HOOK_CPopulation__RemovePed, 6);
-	pSingleton = this;
-	m_pCivilianRemoveHandler = NULL;
-	m_pCivilianAddHandler = NULL;
+    dwPedCount = 0;
+    HookInstall(HOOKPOS_EndOf_CPopulation__Add, (DWORD)HOOK_EndOf_CPopulation__Add, 6);
+    HookInstall(HOOKPOS_CPopulation__RemovePed, (DWORD)HOOK_CPopulation__RemovePed, 6);
+    pSingleton = this;
+    m_pCivilianRemoveHandler = NULL;
+    m_pCivilianAddHandler = NULL;
 }
 
 VOID CPopulationSA::AddPed ( CCivilianPed * ped )
 {
     CCivilianPedSA* pPedSA = dynamic_cast < CCivilianPedSA* > ( ped );
-	if ( !pPedSA ) return;
+    if ( !pPedSA ) return;
 
     CEntitySAInterface* pPedSAInterface = pPedSA->GetInterface ();
 
@@ -52,13 +52,13 @@ VOID CPopulationSA::AddPed ( CCivilianPed * ped )
         }
     }
 
-	peds.push_back ( pPedSA );
-	dwPedCount ++;
+    peds.push_back ( pPedSA );
+    dwPedCount ++;
 }
 
 VOID CPopulationSA::AddPed ( CPedSAInterface * ped )
 { 
-	list < CCivilianPedSA* > ::iterator iter;
+    list < CCivilianPedSA* > ::iterator iter;
     for ( iter = peds.begin (); iter != peds.end (); iter++ )
     {
         if ( (*iter)->GetInterface() == ped )
@@ -67,61 +67,61 @@ VOID CPopulationSA::AddPed ( CPedSAInterface * ped )
         }
     }
 
-	//_asm int 3
-	CCivilianPedSA * pedSA = dynamic_cast < CCivilianPedSA* > ( pGameInterface->GetPools()->AddCivilianPed((DWORD *)ped ) );
-	if ( !pedSA ) return;
+    //_asm int 3
+    CCivilianPedSA * pedSA = dynamic_cast < CCivilianPedSA* > ( pGameInterface->GetPools()->AddCivilianPed((DWORD *)ped ) );
+    if ( !pedSA ) return;
 
-	char szDebug[255] = {'\0'};
-	DWORD dwPedInterface = (DWORD)pedSA->GetInterface();
-	sprintf ( szDebug, "Civ ped added (%d) (0x%X -> 0x%X)\n", dwPedCount+1, ped, dwPedInterface);
-	//OutputDebugString ( szDebug );
+    char szDebug[255] = {'\0'};
+    DWORD dwPedInterface = (DWORD)pedSA->GetInterface();
+    sprintf ( szDebug, "Civ ped added (%d) (0x%X -> 0x%X)\n", dwPedCount+1, ped, dwPedInterface);
+    //OutputDebugString ( szDebug );
 
-	if ( m_pCivilianAddHandler )
-		m_pCivilianAddHandler ( pedSA );
+    if ( m_pCivilianAddHandler )
+        m_pCivilianAddHandler ( pedSA );
 
-	peds.push_back (pedSA);
-	dwPedCount ++;
+    peds.push_back (pedSA);
+    dwPedCount ++;
 }
 
 VOID CPopulationSA::RemovePed ( CCivilianPed * ped )
 {
-	if ( !ped ) return;
+    if ( !ped ) return;
 
     CCivilianPedSA* pPedSA = dynamic_cast < CCivilianPedSA* > ( ped );
-	if ( !pPedSA ) return;
+    if ( !pPedSA ) return;
 
-	ped->SetDoNotRemoveFromGameWhenDeleted ( true );
-	pGameInterface->GetPools()->RemovePed ( (CPed*)ped );
-	if ( !peds.empty () ) peds.remove ( pPedSA );
-	dwPedCount--;
+    ped->SetDoNotRemoveFromGameWhenDeleted ( true );
+    pGameInterface->GetPools()->RemovePed ( (CPed*)ped );
+    if ( !peds.empty () ) peds.remove ( pPedSA );
+    dwPedCount--;
 }
 
 VOID CPopulationSA::RemovePed ( CPedSAInterface * ped )
 {
-	list < CCivilianPedSA* > ::iterator iter;
+    list < CCivilianPedSA* > ::iterator iter;
     for ( iter = peds.begin (); iter != peds.end (); iter++ )
     {
         if ( (*iter)->GetInterface() == ped )
         {
-			char szDebug[255] = {'\0'};
-			sprintf ( szDebug, "Civ ped removed (%d)\n", dwPedCount - 1);
-			pGameInterface->GetPools()->RemovePed ( (CPed *)(CCivilianPed *)(*iter), false );
-			//OutputDebugString ( szDebug );
-			
-			if ( m_pCivilianRemoveHandler )
-				m_pCivilianRemoveHandler ( (*iter) );
+            char szDebug[255] = {'\0'};
+            sprintf ( szDebug, "Civ ped removed (%d)\n", dwPedCount - 1);
+            pGameInterface->GetPools()->RemovePed ( (CPed *)(CCivilianPed *)(*iter), false );
+            //OutputDebugString ( szDebug );
+            
+            if ( m_pCivilianRemoveHandler )
+                m_pCivilianRemoveHandler ( (*iter) );
 
             peds.erase ( iter );
-			dwPedCount--;
-			return;
+            dwPedCount--;
+            return;
         }
     }
-	//OutputDebugString ( "Tried to remove Civ Ped, but Civ Ped not found!\n" );
+    //OutputDebugString ( "Tried to remove Civ Ped, but Civ Ped not found!\n" );
 }
 
 DWORD CPopulationSA::GetPedCount ( )
 {
-	return dwPedCount;
+    return dwPedCount;
 }
 
 CCivilianPed * CPopulationSA::GetFirstPed ()
@@ -152,51 +152,51 @@ CCivilianPed * CPopulationSA::GetNextPed ()
 
 void CPopulationSA::SetCivilianAddHandler ( CivilianAddHandler * pCivilianAddHandler )
 {
-	m_pCivilianAddHandler = pCivilianAddHandler;
+    m_pCivilianAddHandler = pCivilianAddHandler;
 }
 
 void CPopulationSA::SetCivilianRemoveHandler ( CivilianRemoveHandler * pCivilianRemoveHandler )
 {
-	m_pCivilianRemoveHandler = pCivilianRemoveHandler;
+    m_pCivilianRemoveHandler = pCivilianRemoveHandler;
 }
 
 VOID _declspec(naked) HOOK_EndOf_CPopulation__Add()
 {
-	_asm
-	{
-		mov		pPedStorage, eax
-		pushad
-	}
+    _asm
+    {
+        mov     pPedStorage, eax
+        pushad
+    }
 
-	pSingleton->AddPed ( pPedStorage );
+    pSingleton->AddPed ( pPedStorage );
 
-	_asm
-	{
-		popad
-		add		esp, 0x3C
-		retn
-	}
+    _asm
+    {
+        popad
+        add     esp, 0x3C
+        retn
+    }
 }
 
 VOID _declspec(naked) HOOK_CPopulation__RemovePed()
 {
-	/*
-	00610F20  /$ 56             PUSH ESI
-	00610F21  |. 8B7424 08      MOV ESI,DWORD PTR SS:[ESP+8]
-	00610F25  |. 56             PUSH ESI
-	*/
+    /*
+    00610F20  /$ 56             PUSH ESI
+    00610F21  |. 8B7424 08      MOV ESI,DWORD PTR SS:[ESP+8]
+    00610F25  |. 56             PUSH ESI
+    */
 
-	_asm
-	{
+    _asm
+    {
         
-		push	esi
-		mov		esi, [esp+8]
-		push	esi
-		mov		pPedStorage, esi
+        push    esi
+        mov     esi, [esp+8]
+        push    esi
+        mov     pPedStorage, esi
         mov     ecx, [esi]
         mov     pedVtable, ecx
-		pushad
-	}
+        pushad
+    }
 
     if ( pedVtable == VTBL_CPlayerPed )
     {
@@ -209,13 +209,13 @@ VOID _declspec(naked) HOOK_CPopulation__RemovePed()
         }
     }
 
-	pSingleton->RemovePed(pPedStorage);
+    pSingleton->RemovePed(pPedStorage);
 
-	_asm
-	{
-		popad
-		mov		ecx, HOOKPOS_CPopulation__RemovePed
-		add		ecx, 6
-		jmp		ecx
-	}
+    _asm
+    {
+        popad
+        mov     ecx, HOOKPOS_CPopulation__RemovePed
+        add     ecx, 6
+        jmp     ecx
+    }
 }

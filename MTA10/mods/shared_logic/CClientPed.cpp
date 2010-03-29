@@ -24,7 +24,7 @@ extern CClientGame* g_pClientGame;
 #define M_PI 3.14159265358979323846
 #endif
 
-#define INVALID_VALUE	0xFFFFFFFF
+#define INVALID_VALUE   0xFFFFFFFF
 
 #define PED_INTERPOLATION_WARP_THRESHOLD        5
 
@@ -103,7 +103,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bDontChangeRadio = false;
     m_bArmorLocked = false;
     m_ulLastOnScreenTime = 0;
-	m_pLoadedModelInfo = NULL;
+    m_pLoadedModelInfo = NULL;
     m_pOutOfVehicleWeaponSlot = WEAPONSLOT_MAX; // WEAPONSLOT_MAX = invalid
     m_bRadioOn = false;
     m_ucRadioChannel = 1;
@@ -139,7 +139,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_MoveAnim = MOVE_PLAYER;
     m_ucAlpha = 255;
     m_fTargetRotation = 0.0f;
-	m_bTargetAkimboUp = false;
+    m_bTargetAkimboUp = false;
     m_bIsChoking = false;
     m_ulLastTimeAimed = 0;
     m_ulLastTimeBeganCrouch = 0;
@@ -229,7 +229,7 @@ CClientPed::~CClientPed ( void )
     m_pRequester->Cancel ( this, false );
 
     // Detach us from eventual entities
-	AttachTo ( NULL );
+    AttachTo ( NULL );
 
     // Remove all our projectiles
     RemoveAllProjectiles ();
@@ -237,12 +237,12 @@ CClientPed::~CClientPed ( void )
     // If this is the local player, give the player full health and put him at a safe location
     if ( m_bIsLocalPlayer )
     {
-		SetHealth ( GetMaxHealth () );
+        SetHealth ( GetMaxHealth () );
         SetPosition ( CVector ( 2488.562f, -1662.40f, 23.335f ) );
         SetInterior ( 0 );
         SetDimension ( 0 );
         SetVoice ( "PED_TYPE_PLAYER", "VOICE_PLY_CR" );
-		m_pClothes->DefaultClothes ( true );
+        m_pClothes->DefaultClothes ( true );
         SetCanBeKnockedOffBike ( true );
         SetHeadless ( false );
     }
@@ -495,7 +495,7 @@ void CClientPed::Teleport ( const CVector& vecPosition )
             if ( !m_pOccupiedVehicle || GetVehicleInOutState () != VEHICLE_INOUT_GETTING_OUT )
             {
                 // Set the real position
-				m_pPlayerPed->Teleport ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+                m_pPlayerPed->Teleport ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
 
                 // Is this the local player?
                 if ( m_bIsLocalPlayer )
@@ -589,11 +589,11 @@ void CClientPed::Spawn ( const CVector& vecPosition,
         m_fHealth = GetMaxHealth ();
         m_pPlayerPed->SetHealth ( m_fHealth );
         m_bUsesCollision = true;
-	} else {
-		// Remote ped health/armor was locked during Kill, so make sure it's unlocked
-		UnlockHealth ();
-		UnlockArmor ();
-	}
+    } else {
+        // Remote ped health/armor was locked during Kill, so make sure it's unlocked
+        UnlockHealth ();
+        UnlockArmor ();
+    }
 
     // Set some states
     SetFrozen ( false );
@@ -1200,7 +1200,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Store our current seat
     if ( m_pPlayerPed ) m_pPlayerPed->SetOccupiedSeat ( ( unsigned char ) uiSeat );
 
-	// Driverseat
+    // Driverseat
     if ( uiSeat == 0 )
     {       
         // Force the vehicle we're warping into to be streamed in
@@ -1298,12 +1298,12 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
     SetDoingGangDriveby ( false );
 
     // Reset any enter/exit tasks
-	if ( IsEnteringVehicle () )
+    if ( IsEnteringVehicle () )
     {
-		m_pTaskManager->RemoveTask ( TASK_PRIORITY_DEFAULT );
-	}
+        m_pTaskManager->RemoveTask ( TASK_PRIORITY_DEFAULT );
+    }
 
-	// Get the current vehicle you're in
+    // Get the current vehicle you're in
     CClientVehicle* pVehicle = GetRealOccupiedVehicle ();
     if ( !pVehicle )
     {
@@ -1630,10 +1630,10 @@ void CClientPed::SetFrozen ( bool bFrozen )
         {
             if ( m_pTaskManager )
             {
-		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
-		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
-		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
-		        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
             }
 
             if ( m_pPlayerPed )
@@ -2011,17 +2011,17 @@ void CClientPed::SetAimInterpolated ( unsigned long ulDelay, float fArmDirection
 {
     if ( !m_bIsLocalPlayer )
     {
-		// Force the old akimbo up thing
-		m_remoteDataStorage->SetAkimboTargetUp ( m_bTargetAkimboUp );
+        // Force the old akimbo up thing
+        m_remoteDataStorage->SetAkimboTargetUp ( m_bTargetAkimboUp );
 
-		// Set the new data
+        // Set the new data
         m_ulBeginAimTime = CClientTime::GetTime ();
         m_ulTargetAimTime = m_ulBeginAimTime + ulDelay;
-		m_bTargetAkimboUp = bAkimboAimUp;
-		m_fBeginAimX = m_shotSyncData->m_fArmDirectionX;
-		m_fBeginAimY = m_shotSyncData->m_fArmDirectionY;
-		m_fTargetAimX = fArmDirectionX;
-		m_fTargetAimY = fArmDirectionY;
+        m_bTargetAkimboUp = bAkimboAimUp;
+        m_fBeginAimX = m_shotSyncData->m_fArmDirectionX;
+        m_fBeginAimY = m_shotSyncData->m_fArmDirectionY;
+        m_fTargetAimX = fArmDirectionX;
+        m_fTargetAimY = fArmDirectionY;
         m_shotSyncData->m_cInVehicleAimDirection = cInVehicleAimAnim;
     }
 }
@@ -2176,7 +2176,7 @@ void CClientPed::StreamedInPulse ( void )
             {
                 // Update the task so he keeps on choking until we make him stop
                 CTaskSimpleChoking* pTaskChoking = dynamic_cast < CTaskSimpleChoking* > ( pTask );
-				pTaskChoking->UpdateChoke ( m_pPlayerPed, NULL, true );
+                pTaskChoking->UpdateChoke ( m_pPlayerPed, NULL, true );
             }
         }
         
@@ -2390,11 +2390,11 @@ void CClientPed::StreamedInPulse ( void )
         if ( pVehicle )
         {
             // Jax: this stops the game removing weapons in vehicles
-		    CWeapon *pCurrentWeapon = GetWeapon ();
-		    if ( pCurrentWeapon )
+            CWeapon *pCurrentWeapon = GetWeapon ();
+            if ( pCurrentWeapon )
             {
-		        pCurrentWeapon->SetAsCurrentWeapon ();
-		    }
+                pCurrentWeapon->SetAsCurrentWeapon ();
+            }
 
             // Remove any contact entity we have saved (we won't have one in a vehicle)
             if ( m_pCurrentContactEntity )
@@ -2536,20 +2536,20 @@ void CClientPed::SetCurrentRotation ( float fRotation, bool bIncludeTarget )
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->SetCurrentRotation ( fRotation );
-		m_fCurrentRotation = fRotation;
+        m_fCurrentRotation = fRotation;
         if ( bIncludeTarget )
-		{
+        {
             m_pPlayerPed->SetTargetRotation ( fRotation );
-			m_fTargetRotation = fRotation;
-		}
+            m_fTargetRotation = fRotation;
+        }
     }
-	else
-	{
-		// The ped model is still not loaded
-		m_fCurrentRotation = fRotation;
-		if ( bIncludeTarget )
-			m_fTargetRotation = fRotation;
-	}
+    else
+    {
+        // The ped model is still not loaded
+        m_fCurrentRotation = fRotation;
+        if ( bIncludeTarget )
+            m_fTargetRotation = fRotation;
+    }
 }
 
 
@@ -2612,8 +2612,8 @@ void CClientPed::Interpolate ( void )
             m_shotSyncData->m_fArmDirectionY = m_fTargetAimY;
             m_ulBeginAimTime = 0;
 
-			// Force the hands to the correct "up" position for akimbos
-			m_remoteDataStorage->SetAkimboTargetUp ( m_bTargetAkimboUp );
+            // Force the hands to the correct "up" position for akimbos
+            m_remoteDataStorage->SetAkimboTargetUp ( m_bTargetAkimboUp );
         }
     }
 
@@ -2689,8 +2689,8 @@ void CClientPed::Interpolate ( void )
             // Set it
             m_shotSyncData->m_vecShotTarget = vecInterpolated;
 
-			// Also set this as the target position for akimbo guns
-			m_remoteDataStorage->SetAkimboTarget ( vecInterpolated );
+            // Also set this as the target position for akimbo guns
+            m_remoteDataStorage->SetAkimboTarget ( vecInterpolated );
         }
         else
         {
@@ -2698,8 +2698,8 @@ void CClientPed::Interpolate ( void )
             m_shotSyncData->m_vecShotTarget = m_vecTargetTarget;
             m_ulBeginTarget = 0;
 
-			// Also set this as the target position for akimbo guns
-			m_remoteDataStorage->SetAkimboTarget ( m_vecTargetTarget );
+            // Also set this as the target position for akimbo guns
+            m_remoteDataStorage->SetAkimboTarget ( m_vecTargetTarget );
         }
     }
     // Make sure we're using our origin vector
@@ -2845,7 +2845,7 @@ void CClientPed::_CreateModel ( void )
             m_Matrix.vPos = vecPosition;
         }
 
-        // Restore any settings	
+        // Restore any settings 
         m_pPlayerPed->SetMatrix ( &m_Matrix );
         m_pPlayerPed->SetCurrentRotation ( m_fCurrentRotation );
         m_pPlayerPed->SetTargetRotation ( m_fTargetRotation );
@@ -2938,38 +2938,38 @@ void CClientPed::_CreateLocalModel ( void )
     // Init the local player and grab the pointers
     g_pGame->InitLocalPlayer ();
     m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->GetPedFromRef ( (DWORD)1 ) );
-	
-	if ( m_pPlayerPed )
-	{
-		m_pTaskManager = m_pPlayerPed->GetPedIntelligence ()->GetTaskManager ();
+    
+    if ( m_pPlayerPed )
+    {
+        m_pTaskManager = m_pPlayerPed->GetPedIntelligence ()->GetTaskManager ();
 
-		// Put our pointer in its stored pointer
-		m_pPlayerPed->SetStoredPointer ( this );
+        // Put our pointer in its stored pointer
+        m_pPlayerPed->SetStoredPointer ( this );
 
-		// Add a reference to the model we're using
-		m_pLoadedModelInfo = m_pModelInfo;
-		m_pLoadedModelInfo->AddRef ( true );
+        // Add a reference to the model we're using
+        m_pLoadedModelInfo = m_pModelInfo;
+        m_pLoadedModelInfo->AddRef ( true );
 
-		// Make sure we are CJ
-		if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
-		{
-			m_pPlayerPed->SetModelIndex ( m_ulModel );
-		}
+        // Make sure we are CJ
+        if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
+        {
+            m_pPlayerPed->SetModelIndex ( m_ulModel );
+        }
 
-		// Give him the default fighting style
-		m_pPlayerPed->SetFightingStyle ( m_FightingStyle, 6 );
+        // Give him the default fighting style
+        m_pPlayerPed->SetFightingStyle ( m_FightingStyle, 6 );
         m_pPlayerPed->SetMoveAnim ( m_MoveAnim );
-		SetHasJetPack ( m_bHasJetPack );
+        SetHasJetPack ( m_bHasJetPack );
 
-		// Rebuild him so he gets his clothes
-		RebuildModel ();
+        // Rebuild him so he gets his clothes
+        RebuildModel ();
 
-		// Validate
-		m_pManager->RestoreEntity ( this );
+        // Validate
+        m_pManager->RestoreEntity ( this );
 
-		// Tell the streamer we created the player
-		NotifyCreate ();
-	}
+        // Tell the streamer we created the player
+        NotifyCreate ();
+    }
 }
 
 
@@ -3118,7 +3118,7 @@ void CClientPed::_ChangeModel ( void )
             // Add reference to the model
             m_pLoadedModelInfo->AddRef ( true );
 
-	        // Set the new player model and restore the interior
+            // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex ( m_ulModel );
 
             // Rebuild the player after a skin change
@@ -3312,15 +3312,15 @@ void CClientPed::InternalRemoveFromVehicle ( CVehicle* pGameVehicle )
 {
     if ( m_pPlayerPed && m_pTaskManager )
     {
-	    // Reset whatever task
+        // Reset whatever task
         m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
 
         // Create a task to warp the player in and execute it
         CTaskSimpleCarSetPedOut* pOutTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedOut ( pGameVehicle, 1, false );
         if ( pOutTask )
         {
-	        // May seem illogical, but it'll crash without this
-	        pOutTask->SetKnockedOffBike(); 
+            // May seem illogical, but it'll crash without this
+            pOutTask->SetKnockedOffBike(); 
 
             pOutTask->ProcessPed ( m_pPlayerPed );
             pOutTask->SetIsWarpingPedOutOfCar ();
@@ -3851,21 +3851,21 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
         }
         else
         { 
-			// Always use the gun muzzle as origin
-			vecOrigin = vecGunMuzzle;
+            // Always use the gun muzzle as origin
+            vecOrigin = vecGunMuzzle;
 
-            if ( false && HasAkimboPointingUpwards () )				// Upwards pointing akimbo's
+            if ( false && HasAkimboPointingUpwards () )             // Upwards pointing akimbo's
             {
                 // Disabled temporarily until we actually get working akimbos
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if ( Controller.RightShoulder1 == 255 )	// First-person weapons, crosshair active: sync the crosshair
+            else if ( Controller.RightShoulder1 == 255 )    // First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
             }
-			else if ( pVehicle )							// Drive-by/vehicle weapons: camera origin as origin, performing collision tests
-			{
+            else if ( pVehicle )                            // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
+            {
                 CColPoint* pCollision;
                 CMatrix mat;
                 bool bCollision;
@@ -3887,7 +3887,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
                     }
                     pCollision->Destroy();
                 }
-			}
+            }
             else
             {
                 // For shooting without the crosshair showing (just holding the fire button)
@@ -4019,12 +4019,12 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
                     m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, vecPosition, this, true, -1.0f, false, WEAPONTYPE_REMOTE_SATCHEL_CHARGE );
             }
             if ( bDestroy )
-		    {
+            {
                 // Destroy the projectile
                 pProjectile->Destroy ();
                 iter = m_Projectiles.erase ( iter );
                 continue;
-		    } 
+            } 
         }
         iter++;
     }
@@ -4279,7 +4279,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             CVector vecMoveSpeed;
             GetMoveSpeed ( vecMoveSpeed );
             float fHealth = GetHealth ();
-		    float fArmor = GetArmor ();
+            float fArmor = GetArmor ();
             eWeaponSlot weaponSlot = GetCurrentWeaponSlot ();
             float fCurrentRotation = GetCurrentRotation ();
             float fTargetRotation = m_pPlayerPed->GetTargetRotation ();
@@ -4296,7 +4296,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
             {
                 // Jax: restore all the things we saved
                 SetHealth ( fHealth );
-			    SetArmor ( fArmor );
+                SetArmor ( fArmor );
                 SetCurrentWeaponSlot ( weaponSlot );
                 SetCurrentRotation ( fCurrentRotation );
                 m_pPlayerPed->SetTargetRotation ( fTargetRotation );
@@ -4540,11 +4540,11 @@ void CClientPed::SetSunbathing ( bool bSunbathing, bool bStartStanding )
             if ( !bSunbathing )
             {
                 CTaskComplexSunbathe * pSunbatheTask = dynamic_cast < CTaskComplexSunbathe * > ( pTask );
-				CTask * pNewTask = pSunbatheTask->CreateNextSubTask ( m_pPlayerPed );
-				if ( pNewTask )
-				{
-					pSunbatheTask->SetSubTask ( pNewTask );
-				}
+                CTask * pNewTask = pSunbatheTask->CreateNextSubTask ( m_pPlayerPed );
+                if ( pNewTask )
+                {
+                    pSunbatheTask->SetSubTask ( pNewTask );
+                }
             }
         }
         else

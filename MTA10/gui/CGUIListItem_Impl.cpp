@@ -16,30 +16,30 @@
 
 CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, CGUIStaticImage_Impl* pImage )
 {
-	ItemType = uiType;
+    ItemType = uiType;
 
-	// Create the requested list item type
-	switch ( uiType )
-	{
-		case Type::TextItem:
-			m_pListItem = new CEGUI::ListboxTextItem ( CEGUI::String ( szText ) );
-			break;
-		case Type::ImageItem:
-			m_pListItem = new CEGUI::ListboxImageItem ( *pImage->GetDirectImage () );
-			break;
-		case Type::NumberItem:
-			m_pListItem = new CEGUI::ListboxNumberItem ( CEGUI::String ( szText ) );
-			break;
-	}
+    // Create the requested list item type
+    switch ( uiType )
+    {
+        case Type::TextItem:
+            m_pListItem = new CEGUI::ListboxTextItem ( CEGUI::String ( szText ) );
+            break;
+        case Type::ImageItem:
+            m_pListItem = new CEGUI::ListboxImageItem ( *pImage->GetDirectImage () );
+            break;
+        case Type::NumberItem:
+            m_pListItem = new CEGUI::ListboxNumberItem ( CEGUI::String ( szText ) );
+            break;
+    }
 
     if ( m_pListItem )
     {
-	    // Set flags and properties
+        // Set flags and properties
         m_pListItem->setAutoDeleted ( false );
         m_pListItem->setSelectionBrushImage ( "CGUI-Images", "ListboxSelectionBrush" );
     }
 
-	m_pData = NULL;
+    m_pData = NULL;
 }
 
 
@@ -51,24 +51,24 @@ CGUIListItem_Impl::~CGUIListItem_Impl ( void )
 
 void CGUIListItem_Impl::SetDisabled ( bool bDisabled )
 {
-	reinterpret_cast < CEGUI::ListboxItem* > ( m_pListItem )->setDisabled ( bDisabled );
+    reinterpret_cast < CEGUI::ListboxItem* > ( m_pListItem )->setDisabled ( bDisabled );
 }
 
 
 void CGUIListItem_Impl::SetFont ( const char *szFontName )
 {
-	if ( szFontName )
-		reinterpret_cast < CEGUI::ListboxTextItem* > ( m_pListItem )->setFont ( CEGUI::String ( szFontName ) );
+    if ( szFontName )
+        reinterpret_cast < CEGUI::ListboxTextItem* > ( m_pListItem )->setFont ( CEGUI::String ( szFontName ) );
 }
 
 
 void CGUIListItem_Impl::SetText ( const char *pszText )
 {
-	CEGUI::String strText;
+    CEGUI::String strText;
 
-	if ( pszText )
+    if ( pszText )
         strText.assign ( pszText );
-	m_pListItem->setText ( strText );
+    m_pListItem->setText ( strText );
 }
 
 
@@ -88,10 +88,10 @@ void CGUIListItem_Impl::SetData ( const char* pszData )
 
 void CGUIListItem_Impl::SetImage ( CGUIStaticImage* pImage )
 {
-	if ( ItemType == Type::ImageItem )
+    if ( ItemType == Type::ImageItem )
     {
         CGUIStaticImage_Impl* pImageImpl = (CGUIStaticImage_Impl*) pImage;
-		reinterpret_cast < CEGUI::ListboxImageItem* > ( m_pListItem ) -> setImage ( pImageImpl->GetDirectImage () );
+        reinterpret_cast < CEGUI::ListboxImageItem* > ( m_pListItem ) -> setImage ( pImageImpl->GetDirectImage () );
     }
 }
 

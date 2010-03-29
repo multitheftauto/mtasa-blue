@@ -33,7 +33,7 @@ enum eColShapeType
 class CClientColShape : public CClientEntity
 {
     friend CClientMarker;
-	friend CClientPickup;
+    friend CClientPickup;
 public:
                                         CClientColShape                 ( class CClientManager* pManager, ElementID ID );
                                         ~CClientColShape                ( void );
@@ -56,7 +56,7 @@ public:
     inline void                         SetEnabled                      ( bool bEnabled )                                   { m_bIsEnabled = bEnabled; };
 
     void                                CallHitCallback                 ( CClientEntity& Entity );
-	void                                CallLeaveCallback               ( CClientEntity& Entity );
+    void                                CallLeaveCallback               ( CClientEntity& Entity );
     inline CClientColCallback*          SetHitCallback                  ( CClientColCallback* pCallback )                   { return ( m_pCallback = pCallback ); };
 
     inline bool                         GetAutoCallEvent                ( void )                                            { return m_bAutoCallEvent; };
@@ -72,7 +72,7 @@ public:
 protected:
     CVector                             m_vecPosition;
     CClientMarker *                     m_pOwningMarker;
-	CClientPickup *                     m_pOwningPickup;
+    CClientPickup *                     m_pOwningPickup;
 
 private:
     bool                                m_bIsEnabled;

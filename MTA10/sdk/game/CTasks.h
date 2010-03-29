@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CTasks.h
-*  PURPOSE:		Tasks interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CTasks.h
+*  PURPOSE:     Tasks interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,13 +22,13 @@ class CEntity;
 
 enum eClimbHeights
 {
-	CLIMB_NOT_READY = 0,
-	CLIMB_GRAB,
-	CLIMB_PULLUP,
-	CLIMB_STANDUP,
-	CLIMB_FINISHED,
-	CLIMB_VAULT,
-	CLIMB_FINISHED_V
+    CLIMB_NOT_READY = 0,
+    CLIMB_GRAB,
+    CLIMB_PULLUP,
+    CLIMB_STANDUP,
+    CLIMB_FINISHED,
+    CLIMB_VAULT,
+    CLIMB_FINISHED_V
 };
 
 class CTasks
@@ -37,9 +37,9 @@ public:
     virtual CTaskSimplePlayerOnFoot             * CreateTaskSimplePlayerOnFoot( void ) = 0;
     virtual CTaskComplexFacial                  * CreateTaskComplexFacial( void ) = 0;
 
-	virtual CTaskSimpleCarSetPedInAsDriver		* CreateTaskSimpleCarSetPedInAsDriver(CVehicle * pVehicle)=0;
-	virtual CTaskSimpleCarSetPedInAsPassenger	* CreateTaskSimpleCarSetPedInAsPassenger(CVehicle * pVehicle, int iTargetDoor)=0;
-	virtual CTaskSimpleCarSetPedOut				* CreateTaskSimpleCarSetPedOut(CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine=false)=0;
+    virtual CTaskSimpleCarSetPedInAsDriver      * CreateTaskSimpleCarSetPedInAsDriver(CVehicle * pVehicle)=0;
+    virtual CTaskSimpleCarSetPedInAsPassenger   * CreateTaskSimpleCarSetPedInAsPassenger(CVehicle * pVehicle, int iTargetDoor)=0;
+    virtual CTaskSimpleCarSetPedOut             * CreateTaskSimpleCarSetPedOut(CVehicle * pVehicle, int iTargetDoor, bool bSwitchOffEngine=false)=0;
 
     virtual CTaskComplexWanderStandard          * CreateTaskComplexWanderStandard(const int iMoveState, const char iDir, const bool bWanderSensibly=true)=0;
     virtual CTaskComplexEnterCarAsDriver        * CreateTaskComplexEnterCarAsDriver(CVehicle * pVehicle)=0;

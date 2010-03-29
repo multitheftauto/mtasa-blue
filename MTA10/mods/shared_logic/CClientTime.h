@@ -23,17 +23,17 @@ class CClientTime
 
 public:
     static unsigned long    GetTime                 ( void );
-	static double			GetTimeNano			    ( void );
+    static double           GetTimeNano             ( void );
 
 private:
     static bool             InitializeTime          ( void );
 
     static bool             m_bUsePerformanceCounter;
     static LONGLONG         m_lTimeCounts;
-	static LONGLONG			m_lLastReading;
-	static LONGLONG			m_lBaseReading;
-	static LONGLONG			m_lMaxDelta;
-	static double			m_dTickMultiply;
+    static LONGLONG         m_lLastReading;
+    static LONGLONG         m_lBaseReading;
+    static LONGLONG         m_lMaxDelta;
+    static double           m_dTickMultiply;
 };
 
 #endif

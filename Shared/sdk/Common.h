@@ -17,7 +17,7 @@
 #define NET_DISCONNECT_REASON_SIZE  256
 
 // Element IDs
-#define RESERVED_ELEMENT_ID	0xFFFFFFFE
+#define RESERVED_ELEMENT_ID 0xFFFFFFFE
 #define INVALID_ELEMENT_ID 0xFFFFFFFF
 
 // Element name characteristics

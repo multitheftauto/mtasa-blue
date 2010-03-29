@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCredits.cpp
-*  PURPOSE:		In-game credits window implementation
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCredits.cpp
+*  PURPOSE:     In-game credits window implementation
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -82,8 +82,8 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
 
 namespace CCreditsGUI
 {
-	float fWindowX =			560.0f;
-	float fWindowY =			300.0f;
+    float fWindowX =            560.0f;
+    float fWindowY =            300.0f;
 }
 using namespace CCreditsGUI;
 
@@ -92,30 +92,30 @@ CCredits::CCredits ( void )
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Create our window
-	CVector2D RelativeWindow = CVector2D ( fWindowX / pManager->GetResolution ().fX, fWindowY / pManager->GetResolution ().fY );
+    CVector2D RelativeWindow = CVector2D ( fWindowX / pManager->GetResolution ().fX, fWindowY / pManager->GetResolution ().fY );
     m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Multi Theft Auto: San Andreas " MTA_DM_BUILDTAG_SHORT ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetMovable ( false );
     m_pWindow->SetPosition ( CVector2D ( 0.5f - RelativeWindow.fX*0.5f, 0.5f - RelativeWindow.fY*0.5f ), true );
-    m_pWindow->SetSize ( CVector2D ( fWindowX, fWindowY ) );		// relative 0.70, 0.50
+    m_pWindow->SetSize ( CVector2D ( fWindowX, fWindowY ) );        // relative 0.70, 0.50
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetVisible ( false );
     m_pWindow->SetAlwaysOnTop ( true );
 
     // Credits label
-	memset ( m_pLabels, 0, sizeof ( CGUILabel* ) * 30 );
+    memset ( m_pLabels, 0, sizeof ( CGUILabel* ) * 30 );
 
-	// Create one for every 15th line. This is because of some limit at 500 chars
+    // Create one for every 15th line. This is because of some limit at 500 chars
     float fStartPosition = 1.0f;
-	const char* szCreditsIterator = g_szCredits;
+    const char* szCreditsIterator = g_szCredits;
     const char* szCreditsBegin = g_szCredits;
-	unsigned int uiLineCount = 0;
+    unsigned int uiLineCount = 0;
     unsigned int uiLabelIndex = 0;
-	while ( true )
-	{
+    while ( true )
+    {
         // Count every new line
-		if ( *szCreditsIterator == '\n' )
-		    ++uiLineCount;
+        if ( *szCreditsIterator == '\n' )
+            ++uiLineCount;
 
         // 15? Create a new label
         if ( uiLineCount >= 15 || *szCreditsIterator == 0 )
@@ -135,7 +135,7 @@ CCredits::CCredits ( void )
             // Create the label
             m_pLabels [uiLabelIndex] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, szBuffer ) );
             m_pLabels [uiLabelIndex]->SetPosition ( CVector2D ( 0.022f, fStartPosition ), true );
-	        m_pLabels [uiLabelIndex]->SetSize ( CVector2D ( 532.0f, 1200.0f ) );			// relative 0.95, 6.0
+            m_pLabels [uiLabelIndex]->SetSize ( CVector2D ( 532.0f, 1200.0f ) );            // relative 0.95, 6.0
             m_pLabels [uiLabelIndex]->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
             ++uiLabelIndex;
             
@@ -149,12 +149,12 @@ CCredits::CCredits ( void )
 
         // Increase the credits iterator
         ++szCreditsIterator;
-	}
+    }
 
     // Create the OK button
     m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
     m_pButtonOK->SetPosition ( CVector2D ( 0.77f, 0.90f ), true );
-    m_pButtonOK->SetSize ( CVector2D ( 112.0f, 21.0f ) );		// relative 0.20, 0.07
+    m_pButtonOK->SetSize ( CVector2D ( 112.0f, 21.0f ) );       // relative 0.20, 0.07
     m_pButtonOK->SetVisible ( true );
 
     // Set up the event handlers
@@ -165,16 +165,16 @@ CCredits::CCredits ( void )
 
 CCredits::~CCredits ( void )
 {
-	// Delete all the labels
-	int i = 0;
-	for ( ; i < 30; i++ )
-	{
-		if ( m_pLabels [i] )
-		{
-			delete m_pLabels [i];
-			m_pLabels [i] = NULL;
-		}
-	}
+    // Delete all the labels
+    int i = 0;
+    for ( ; i < 30; i++ )
+    {
+        if ( m_pLabels [i] )
+        {
+            delete m_pLabels [i];
+            m_pLabels [i] = NULL;
+        }
+    }
 
     // Delete the controls
     delete m_pButtonOK;
@@ -202,7 +202,7 @@ void CCredits::Update ( void )
             m_clkStart = clock ();
         }
 
-		// Move everything by the time
+        // Move everything by the time
         int i = 0;
         for ( ; i < 30; i++ )
         {

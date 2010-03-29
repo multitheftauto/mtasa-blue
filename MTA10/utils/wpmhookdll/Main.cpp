@@ -82,12 +82,12 @@ void Initialize ( void )
         if ( pKernel32 )
         {
             // Hook ReadProcessMemory
-	        pfnReadProcessMemory = reinterpret_cast < pReadProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "ReadProcessMemory" ), 
+            pfnReadProcessMemory = reinterpret_cast < pReadProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "ReadProcessMemory" ), 
                                                                                               reinterpret_cast < PBYTE > ( Hook_ReadProcessMemory ) ) );
 
             // Hook WriteProcessMemory
-	        pfnWriteProcessMemory = reinterpret_cast < pWriteProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "WriteProcessMemory" ), 
-																						        reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) ) );
+            pfnWriteProcessMemory = reinterpret_cast < pWriteProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "WriteProcessMemory" ), 
+                                                                                                reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) ) );
 
             // Success?
             if ( pfnReadProcessMemory && pfnWriteProcessMemory )
@@ -110,14 +110,14 @@ void Finalize ( void )
     if ( pfnWriteProcessMemory )
     {
         DetourRemove ( reinterpret_cast < PBYTE > ( pfnWriteProcessMemory ), 
-		       	       reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) );
+                       reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) );
     }
 
     // Unhook ReadProcessMemory
     if ( pfnReadProcessMemory )
     {
         DetourRemove ( reinterpret_cast < PBYTE > ( pfnReadProcessMemory ), 
-		       	       reinterpret_cast < PBYTE > ( Hook_ReadProcessMemory ) );
+                       reinterpret_cast < PBYTE > ( Hook_ReadProcessMemory ) );
     }
 
     // Tell MTA we've unhooked from the trainer

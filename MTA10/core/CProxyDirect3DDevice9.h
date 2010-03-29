@@ -147,9 +147,9 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
 
     private:
 
-    IDirect3DDevice9 *			m_pDevice;
-    DWORD						m_dwRefCount;
-	CDirect3DData *				m_pData;
+    IDirect3DDevice9 *          m_pDevice;
+    DWORD                       m_dwRefCount;
+    CDirect3DData *             m_pData;
 };
 
 #endif

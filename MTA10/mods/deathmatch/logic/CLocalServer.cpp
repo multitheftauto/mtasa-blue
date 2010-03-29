@@ -40,15 +40,15 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pWindow->SetVisible ( true );
 
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( m_pGUI->CreateTabPanel ( m_pWindow ) );
-	m_pTabs->SetPosition ( CVector2D ( 0.0f, 0.06f ), true );
-	m_pTabs->SetSize ( CVector2D ( 1.0f, 0.85f ), true );
-	m_pTabGeneral = m_pTabs->CreateTab ( "General" );
+    m_pTabs->SetPosition ( CVector2D ( 0.0f, 0.06f ), true );
+    m_pTabs->SetSize ( CVector2D ( 1.0f, 0.85f ), true );
+    m_pTabGeneral = m_pTabs->CreateTab ( "General" );
     //m_pTabs->CreateTab ( "Gamemode" );
     m_pTabResources = m_pTabs->CreateTab ( "Resources" );
 
     m_pLabelName = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Server name:" ) );
     m_pLabelName->SetPosition ( CVector2D ( 0.03f, 0.07f ), true );
-	m_pLabelName->AutoSize ( "Server name:" );
+    m_pLabelName->AutoSize ( "Server name:" );
 
     m_pEditName = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral, "Default MTA Server" ) );
     m_pEditName->SetPosition ( CVector2D ( 0.4f, 0.06f ), true );
@@ -57,7 +57,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
     m_pLabelPass = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Password:" ) );
     m_pLabelPass->SetPosition ( CVector2D ( 0.03f, 0.14f ), true );
-	m_pLabelPass->AutoSize ( "Password:" );
+    m_pLabelPass->AutoSize ( "Password:" );
 
     m_pEditPass = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral ) );
     m_pEditPass->SetPosition ( CVector2D ( 0.4f, 0.13f ), true );
@@ -66,7 +66,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
     m_pLabelPlayers = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Max players:" ) );
     m_pLabelPlayers->SetPosition ( CVector2D ( 0.03f, 0.21f ), true );
-	m_pLabelPlayers->AutoSize ( "Max players:" );
+    m_pLabelPlayers->AutoSize ( "Max players:" );
 
     m_pEditPlayers = reinterpret_cast < CGUIEdit* > ( m_pGUI->CreateEdit ( m_pTabGeneral ) );
     m_pEditPlayers->SetPosition ( CVector2D ( 0.4f, 0.20f ), true );
@@ -75,21 +75,21 @@ CLocalServer::CLocalServer ( const char* szConfig )
 
     m_pLabelBroadcast = reinterpret_cast < CGUILabel* > ( m_pGUI->CreateLabel ( m_pTabGeneral, "Broadcast:" ) );
     m_pLabelBroadcast->SetPosition ( CVector2D ( 0.03f, 0.35f ), true );
-	m_pLabelBroadcast->AutoSize ( "Broadcast:" );
+    m_pLabelBroadcast->AutoSize ( "Broadcast:" );
 
     m_pBroadcastLan = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, "LAN", true ) );
     m_pBroadcastLan->SetPosition ( CVector2D ( 0.4f, 0.33f ), true );
-	m_pBroadcastLan->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
+    m_pBroadcastLan->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
 
     m_pBroadcastInternet = reinterpret_cast < CGUICheckBox* > ( m_pGUI->CreateCheckBox ( m_pTabGeneral, "Internet", true ) );
     m_pBroadcastInternet->SetPosition ( CVector2D ( 0.4f, 0.38f ), true );
-	m_pBroadcastInternet->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
+    m_pBroadcastInternet->SetSize ( CVector2D ( 0.45f, 0.08f ), true );
 
     m_pResourcesCur = reinterpret_cast < CGUIGridList* > ( m_pGUI->CreateGridList ( m_pTabResources, false ) );
     m_pResourcesCur->SetPosition ( CVector2D ( 0.03f, 0.06f ), true );
     m_pResourcesCur->SetSize ( CVector2D ( 0.45f, 0.5f ), true );
-	m_pResourcesCur->SetSorting ( false );
-	m_pResourcesCur->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
+    m_pResourcesCur->SetSorting ( false );
+    m_pResourcesCur->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
     m_hResourcesCur = m_pResourcesCur->AddColumn ( "Selected", 0.80f );
 
     m_pResourceDel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, ">" ) );
@@ -103,8 +103,8 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourcesAll = reinterpret_cast < CGUIGridList* > ( m_pGUI->CreateGridList ( m_pTabResources, false ) );
     m_pResourcesAll->SetPosition ( CVector2D ( 0.52f, 0.06f ), true );
     m_pResourcesAll->SetSize ( CVector2D ( 0.45f, 0.9f ), true );
-	m_pResourcesAll->SetSorting ( false );
-	m_pResourcesAll->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
+    m_pResourcesAll->SetSorting ( false );
+    m_pResourcesAll->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
     m_hResourcesAll = m_pResourcesAll->AddColumn ( "All", 0.80f );
 
     m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Start" ) );
@@ -134,7 +134,7 @@ CLocalServer::~CLocalServer ( void )
 
 bool CLocalServer::OnAddButtonClick ( CGUIElement *pElement )
 {
-	CGUIListItem *pItem = m_pResourcesAll->GetSelectedItem ();
+    CGUIListItem *pItem = m_pResourcesAll->GetSelectedItem ();
     if ( pItem )
     {
         m_pResourcesCur->SetItemText ( m_pResourcesCur->AddRow (), m_hResourcesCur, &pItem->GetText().c_str()[3] );
@@ -146,7 +146,7 @@ bool CLocalServer::OnAddButtonClick ( CGUIElement *pElement )
 
 bool CLocalServer::OnDelButtonClick ( CGUIElement *pElement )
 {
-	CGUIListItem *pItem = m_pResourcesCur->GetSelectedItem ();
+    CGUIListItem *pItem = m_pResourcesCur->GetSelectedItem ();
     if ( pItem )
     {
         m_pResourcesAll->SetItemText ( m_pResourcesAll->AddRow (), m_hResourcesAll, &pItem->GetText().c_str()[3] );
@@ -159,7 +159,7 @@ bool CLocalServer::OnDelButtonClick ( CGUIElement *pElement )
 bool CLocalServer::OnStartButtonClick ( CGUIElement *pElement )
 {
     Save();
-	// Connect
+    // Connect
 
     g_pClientGame->StartLocalGame ( m_strConfig.c_str(), m_pEditPass->GetText().c_str() );
 
@@ -249,44 +249,44 @@ bool CLocalServer::Load ( void )
         }
     #else
         DIR *Dir;
-		struct dirent *DirEntry;
-		time_t llHighestTime = 0;
-		char szPath[MAX_PATH] = {0};
+        struct dirent *DirEntry;
+        time_t llHighestTime = 0;
+        char szPath[MAX_PATH] = {0};
 
-		if ( ( Dir = opendir ( strResourceDirectoryPath ) ) )
-		{
-			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
-			{
+        if ( ( Dir = opendir ( strResourceDirectoryPath ) ) )
+        {
+            while ( ( DirEntry = readdir ( Dir ) ) != NULL )
+            {
                 // Skip . and .. entry
                 if ( strcmp ( DirEntry->d_name, "." ) != 0 && 
                      strcmp ( DirEntry->d_name, ".." ) != 0 )
                 {
-				    struct stat Info;
-				    bool bDir = false;
+                    struct stat Info;
+                    bool bDir = false;
 
-				    // Get the path
-				    if ( strlen(szBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
+                    // Get the path
+                    if ( strlen(szBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
                     {
-					    strcpy ( szPath, szBuffer );
-					    unsigned long ulPathLength = strlen ( szPath );
+                        strcpy ( szPath, szBuffer );
+                        unsigned long ulPathLength = strlen ( szPath );
 
-					    if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
+                        if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
 
-					    strcat ( szPath, DirEntry->d_name );
+                        strcat ( szPath, DirEntry->d_name );
 
-					    // Determine the file stats
-					    if ( lstat ( szPath, &Info ) != -1 )
-						    bDir = S_ISDIR ( Info.st_mode );
-					    else
-						    CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
+                        // Determine the file stats
+                        if ( lstat ( szPath, &Info ) != -1 )
+                            bDir = S_ISDIR ( Info.st_mode );
+                        else
+                            CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
 
-				        // Chop off the extension if it's not a dir
-				        char * extn = NULL;
-				        if ( !bDir )
+                        // Chop off the extension if it's not a dir
+                        char * extn = NULL;
+                        if ( !bDir )
                         {
-					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
-				        }
+                            extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
+                            DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
+                        }
                         if ( extn == NULL || strcmp ( extn, "zip" ) == 0 )
                         {
                             // Add the resource
@@ -296,15 +296,15 @@ bool CLocalServer::Load ( void )
                             uiCount++;
                         }
 
-				    }
+                    }
                 }
 
 
-			}
+            }
 
-			// Close the directory handle
-			closedir ( Dir );
-		}
+            // Close the directory handle
+            closedir ( Dir );
+        }
     #endif
     return true;
 }
@@ -368,5 +368,5 @@ void CLocalServer::HandleResource ( char* szResource )
         if ( strcmp ( szResource, m_pResourcesCur->GetItemText ( i, 1 ) ) == 0 )
             return;
     }
-	m_pResourcesAll->SetItemText ( m_pResourcesAll->AddRow (), m_hResourcesAll, szResource );
+    m_pResourcesAll->SetItemText ( m_pResourcesAll->AddRow (), m_hResourcesAll, szResource );
 }

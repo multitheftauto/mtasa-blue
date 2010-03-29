@@ -16,8 +16,8 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-#define ARGUMENT_TYPE_INT		9
-#define ARGUMENT_TYPE_FLOAT		10
+#define ARGUMENT_TYPE_INT       9
+#define ARGUMENT_TYPE_FLOAT     10
 
 #ifndef VERIFY_ENTITY
 #define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity,true)&&!entity->IsBeingDeleted())
@@ -473,11 +473,11 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
     SLuaTypeSync type;
 
     // Read out the type
-	if ( bitStream.Read ( &type ) )
-	{
+    if ( bitStream.Read ( &type ) )
+    {
         // Depending on what type...
-		switch ( type.data.ucType )
-		{
+        switch ( type.data.ucType )
+        {
             // Nil type
             case LUA_TNIL:
             {
@@ -486,17 +486,17 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             }
 
             // Boolean type
-			case LUA_TBOOLEAN:
-			{
-				bool bValue;
-				if ( bitStream.ReadBit ( bValue ) )
-					Read(bValue);
-				break;
-			}
+            case LUA_TBOOLEAN:
+            {
+                bool bValue;
+                if ( bitStream.ReadBit ( bValue ) )
+                    Read(bValue);
+                break;
+            }
 
             // Number type
-			case LUA_TNUMBER:
-			{
+            case LUA_TNUMBER:
+            {
                 bool bIsFloatingPoint;
                 if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
                 {
@@ -510,8 +510,8 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     if ( bitStream.ReadCompressed ( lNum ) )
                         Read ( (double) lNum );
                 }
-				break;
-			}
+                break;
+            }
 
             // Table type
             case LUA_TTABLE:
@@ -539,42 +539,42 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             }
 
             // String type
-			case LUA_TSTRING:
-			{
+            case LUA_TSTRING:
+            {
                 // Read out the string length
-				unsigned short usLength;
-				if ( bitStream.ReadCompressed ( usLength ) && usLength )
-				{
+                unsigned short usLength;
+                if ( bitStream.ReadCompressed ( usLength ) && usLength )
+                {
                     // Allocate a buffer and read the string into it
                     char* szValue = new char [ usLength + 1 ];
                     if ( bitStream.Read ( szValue, usLength ) )
                     {
                         // Put it into us
                         szValue [ usLength ] = 0;
-						Read ( szValue );
+                        Read ( szValue );
                     }
 
                     // Delete the buffer
                     delete [] szValue;
-				}
-				else
-					Read ( "" );
+                }
+                else
+                    Read ( "" );
 
-				break;
-			}
+                break;
+            }
 
             // Element type
-			case LUA_TLIGHTUSERDATA:
-			{
+            case LUA_TLIGHTUSERDATA:
+            {
                 // Read out the elemnt ID
-				ElementID ElementID;
-				if ( bitStream.ReadCompressed ( ElementID ) )
-				{
+                ElementID ElementID;
+                if ( bitStream.ReadCompressed ( ElementID ) )
+                {
                     ReadElementID ( ElementID );
-				}
-				break;
-			}
-		}
+                }
+                break;
+            }
+        }
     }
     return true;
 }
@@ -598,7 +598,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         case LUA_TBOOLEAN:
         {
             type.data.ucType = LUA_TBOOLEAN;
-			bitStream.Write ( &type );
+            bitStream.Write ( &type );
 
             // Write the boolean to it
             bitStream.WriteBit ( GetBoolean () );
@@ -657,30 +657,30 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
             const char* szTemp = m_strString.c_str ();
             size_t sizeTemp = strlen ( szTemp );
             unsigned short usLength = static_cast < unsigned short > ( sizeTemp );
-			if ( sizeTemp == usLength )
-			{
+            if ( sizeTemp == usLength )
+            {
                 // This is a string argument
                 type.data.ucType = LUA_TSTRING;
-			    bitStream.Write ( &type );
+                bitStream.Write ( &type );
 
                 // Write its length
-				bitStream.WriteCompressed ( usLength );
+                bitStream.WriteCompressed ( usLength );
 
                 // Write the content too if it's not empty
                 if ( usLength > 0 )
                 {
-				    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
+                    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
                 }
-			}
-			else
-			{
+            }
+            else
+            {
                 // Too long string
                 LogUnableToPacketize ( "Couldn't packetize argument list. Invalid string specified, limit is 65535 characters." );
 
                 // Write a nil though so other side won't get out of sync
                 bitStream.Write ( (unsigned char) LUA_TNIL );
                 return false;
-			}
+            }
             break;
         }
 
@@ -689,14 +689,14 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         {
             // Got a valid element to send?
             CClientEntity* pElement = GetElement ();
-			if ( pElement )
-			{
+            if ( pElement )
+            {
                 // Clientside element?
                 if ( !pElement->IsLocalEntity () )
                 {
                     type.data.ucType = LUA_TLIGHTUSERDATA;
-	    			bitStream.Write ( &type );
-    				bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
+                    bitStream.Write ( &type );
+                    bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
                 }
                 else
                 {
@@ -705,28 +705,28 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                     bitStream.Write ( &type );
                     return false;
                 }
-			}
-			else
-			{
+            }
+            else
+            {
                 // Write a nil though so other side won't get out of sync
                 type.data.ucType = LUA_TNIL;
                 bitStream.Write ( &type );
-				return false;
-			}
+                return false;
+            }
             break;
         }
 
         // Unpacketizable type.
-		default:
-		{
+        default:
+        {
             // Unpacketizable
-			LogUnableToPacketize ( "Couldn't packetize argument list, unknown type specified." );
+            LogUnableToPacketize ( "Couldn't packetize argument list, unknown type specified." );
 
             // Write a nil though so other side won't get out of sync
             type.data.ucType = LUA_TNIL;
             bitStream.Write ( &type );
-			return false;
-		}
+            return false;
+        }
     }
 
     // Success

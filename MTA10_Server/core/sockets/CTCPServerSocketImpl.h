@@ -53,7 +53,7 @@ private:
     unsigned int                    m_uiListenPort;
     struct sockaddr_in              m_SockAddr;
 
-	unsigned int	                m_Socket;
+    unsigned int                    m_Socket;
     CTCPServerSocketImplManager*    m_pServerManager;
 
 };

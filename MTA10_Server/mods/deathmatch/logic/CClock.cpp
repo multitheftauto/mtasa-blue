@@ -16,7 +16,7 @@
 CClock::CClock ( void )
 {
     // Default to 12:00
-	m_ulMinuteDuration = 1000;
+    m_ulMinuteDuration = 1000;
     Set ( 12, 0 );
 }
 
@@ -47,17 +47,17 @@ void CClock::Set ( unsigned char ucHour, unsigned char ucMinute )
 
 unsigned long CClock::GetMinuteDuration ( void )
 {
-	return m_ulMinuteDuration;
+    return m_ulMinuteDuration;
 }
 
 
 void CClock::SetMinuteDuration ( unsigned long ulDuration )
 {
-	// We gotta reset the time with the new minute duration
-	// so getTime returns the right values
-	unsigned char ucHour;
-	unsigned char ucMinute;
-	Get ( ucHour, ucMinute );
-	m_ulMinuteDuration = ulDuration;
-	Set ( ucHour, ucMinute );
+    // We gotta reset the time with the new minute duration
+    // so getTime returns the right values
+    unsigned char ucHour;
+    unsigned char ucMinute;
+    Get ( ucHour, ucMinute );
+    m_ulMinuteDuration = ulDuration;
+    Set ( ucHour, ucMinute );
 }

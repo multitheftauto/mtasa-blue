@@ -106,7 +106,7 @@ private:
     static unsigned long    FUNC_GetCurrentVideoMode;
     static unsigned long    FUNC_SetCurrentVideoMode;
     static unsigned long    FUNC_SetRadioVolume;
-	static unsigned long    FUNC_SetDrawDistance;
+    static unsigned long    FUNC_SetDrawDistance;
 };
 
 #endif

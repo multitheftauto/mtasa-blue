@@ -48,8 +48,8 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
 {
     m_bHandlingHTTPRequest = false;
     m_pDefaultElementGroup = NULL;
-	m_pNodeSettings = NULL;
-	m_pNodeStorage = NULL;
+    m_pNodeSettings = NULL;
+    m_pNodeStorage = NULL;
     m_resourceManager = resourceManager;
 
     // store the name
@@ -60,17 +60,17 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_bActive = false;
     m_bIsPersistent = false;
     m_bLoaded = false;
-	m_bStarting = false;
-	m_bStopping = false;
-	m_bLinked = false;
-	m_pResourceElement = NULL;
-	m_pResourceDynamicElementRoot = NULL;
+    m_bStarting = false;
+    m_bStopping = false;
+    m_bLinked = false;
+    m_pResourceElement = NULL;
+    m_pResourceDynamicElementRoot = NULL;
     m_pVM = NULL;
     m_timeLoaded = 0;
     m_timeStarted = 0;
     m_bResourceIsZip = false;
-	m_bProtected = false;
-	m_bStartedManually = false;
+    m_bProtected = false;
+    m_bStartedManually = false;
 
     m_uiVersionMajor = 0;
     m_uiVersionMinor = 0;
@@ -80,12 +80,12 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_bClientConfigs = true;
     m_bClientScripts = true;
     m_bClientFiles = true;
-	m_bHasStarted = false;
+    m_bHasStarted = false;
 
     pthread_mutex_init(&m_mutex, NULL);
 
-	if ( bLoad )
-		Load();
+    if ( bLoad )
+        Load();
 }
 
 bool CResource::Load ( void )
@@ -93,19 +93,19 @@ bool CResource::Load ( void )
     if ( !m_bLoaded )
     {
         // Initialize
-	    m_strCircularInclude = "";
+        m_strCircularInclude = "";
         m_ulCRC = 0;
         m_bActive = false;
         m_bIsPersistent = false;
         m_bLoaded = false;
-		m_bStarting = false;
-		m_bStopping = false;
-	    m_bLinked = false;
-	    m_pResourceElement = NULL;
-	    m_pResourceDynamicElementRoot = NULL;
+        m_bStarting = false;
+        m_bStopping = false;
+        m_bLinked = false;
+        m_pResourceElement = NULL;
+        m_pResourceDynamicElementRoot = NULL;
         m_bResourceIsZip = false;
         m_bProtected = false;
-	    m_bStartedManually = false;
+        m_bStartedManually = false;
 
         m_uiVersionMajor = 0;
         m_uiVersionMinor = 0;
@@ -115,7 +115,7 @@ bool CResource::Load ( void )
         m_bClientConfigs = true;
         m_bClientScripts = true;
         m_bClientFiles = true;
-		m_bHasStarted = false;
+        m_bHasStarted = false;
 
         m_pVM = NULL;
         // @@@@@ Set some type of HTTP access here
@@ -125,9 +125,9 @@ bool CResource::Load ( void )
         m_timeStarted = 0;
 
         // Register us in the EHS stuff
-	    g_pGame->GetHTTPD()->RegisterEHS ( this, m_strResourceName.c_str () );
+        g_pGame->GetHTTPD()->RegisterEHS ( this, m_strResourceName.c_str () );
         this->m_oEHSServerParameters["norouterequest"] = true;
-	    this->RegisterEHS ( this, "call" );
+        this->RegisterEHS ( this, "call" );
 
         // Store the actual directory and zip paths for fast access
         const char* szServerModPath = g_pServerInterface->GetServerModPath ();
@@ -211,7 +211,7 @@ bool CResource::Load ( void )
             return false;
         }
 
-	    // Load the XML file and parse it
+        // Load the XML file and parse it
         bool bParsedSuccessfully = false;
         CXMLFile * metaFile = g_pServerInterface->GetXML ()->CreateXML ( strMeta.c_str () );
         if ( metaFile )
@@ -219,15 +219,15 @@ bool CResource::Load ( void )
             bParsedSuccessfully = metaFile->Parse ();
         }
 
-	    // If we parsed it successfully
+        // If we parsed it successfully
         if ( bParsedSuccessfully )
         {
             CXMLNode * root = metaFile->GetRootNode ();
             if ( root )
             {
-			    // Find the settings node and copy it (meta xml is deleted at the end of this function, to preserve memory)
-			    CXMLNode * pNodeSettings = root->FindSubNode ( "settings", 0 );
-			    if ( pNodeSettings )
+                // Find the settings node and copy it (meta xml is deleted at the end of this function, to preserve memory)
+                CXMLNode * pNodeSettings = root->FindSubNode ( "settings", 0 );
+                if ( pNodeSettings )
                     m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
                 // disabled for now
@@ -251,7 +251,7 @@ bool CResource::Load ( void )
                 }
                 */
 
-			    CXMLNode * info = root->FindSubNode ( "info", 0 );
+                CXMLNode * info = root->FindSubNode ( "info", 0 );
                 if ( info )
                 {
                     CXMLAttributes * attributes = & ( info->GetAttributes () );
@@ -295,22 +295,22 @@ bool CResource::Load ( void )
                     }
                 }
 
-			    // Read everything that's included. If one of these fail, delete the XML we created and return
+                // Read everything that's included. If one of these fail, delete the XML we created and return
                 if ( !ReadIncludedResources ( root ) ||
                     !ReadIncludedMaps ( root ) ||
                     !ReadIncludedFiles ( root ) ||
                     !ReadIncludedScripts ( root ) ||
                     !ReadIncludedHTML ( root ) ||
-				    !ReadIncludedExports ( root ) ||
-				    !ReadIncludedConfigs ( root ) )
-			    {
-				    delete metaFile;
+                    !ReadIncludedExports ( root ) ||
+                    !ReadIncludedConfigs ( root ) )
+                {
+                    delete metaFile;
                     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
-				    return false;
-			    }
+                    return false;
+                }
             }
 
-		    // Delete the XML we created to save memory
+            // Delete the XML we created to save memory
             delete metaFile;
         }
         else
@@ -320,16 +320,16 @@ bool CResource::Load ( void )
             m_strFailureReason = szBuffer;
             CLogger::ErrorPrintf ( szBuffer );
 
-		    // Delete the XML file if we somehow got to load it halfway
-		    if ( metaFile )
-			    delete metaFile;
+            // Delete the XML file if we somehow got to load it halfway
+            if ( metaFile )
+                delete metaFile;
 
             g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
             return false;
         }
 
-	    // Generate a CRC for this resource
+        // Generate a CRC for this resource
         m_ulCRC = GenerateCRC();
 
         // copy client files to http holding directory if external web server is being used
@@ -400,11 +400,11 @@ bool CResource::Unload ( void )
 
     TidyUp();
     m_bLoaded = false;
-	m_bHasStarted = false;
+    m_bHasStarted = false;
 
-	if ( m_pNodeStorage )
+    if ( m_pNodeStorage )
     {
-		delete m_pNodeStorage;
+        delete m_pNodeStorage;
         m_pNodeStorage = NULL;
     }
 
@@ -437,7 +437,7 @@ CResource::~CResource ( )
 
 void CResource::TidyUp ( void )
 {
-	// Close the zipfile stuff
+    // Close the zipfile stuff
     if ( m_zipfile )
         unzClose ( m_zipfile );
 
@@ -467,13 +467,13 @@ void CResource::TidyUp ( void )
     }
 
     this->UnregisterEHS("call");
-	g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
+    g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
 }
 
 bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
 {
-	// Loop through all the infovalues looking for the matching key. Return the value.
+    // Loop through all the infovalues looking for the matching key. Return the value.
     list < CInfoValue* > ::iterator iterr = m_infoValues.begin ();
     for ( ; iterr != m_infoValues.end (); iterr++ )
     {
@@ -484,18 +484,18 @@ bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
         }
     }
 
-	// No matching key
+    // No matching key
     return false;
 }
 
 void CResource::SetInfoValue ( const char * szKey, const char * szValue )
 {
-	// Try to find an existing value with a matching key
+    // Try to find an existing value with a matching key
     CInfoValue* pValue = 0;
     list < CInfoValue* > ::iterator iter = m_infoValues.begin ();
     for ( ; iter != m_infoValues.end (); iter++ )
     {
-		// If the key matches, set the value and return
+        // If the key matches, set the value and return
         pValue = *iter;
         if ( stricmp ( pValue->GetName ().c_str (), szKey ) == 0 )
         {
@@ -514,7 +514,7 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
     if ( !szValue )         // If we were going to delete the key, we are done at this point
         return;
 
-	// If we were going to set a new value, create a new key and add it to our list
+    // If we were going to set a new value, create a new key and add it to our list
     pValue = new CInfoValue ( szKey, szValue );
     m_infoValues.push_back ( pValue );
 
@@ -622,34 +622,34 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         PreStartArguments.PushResource ( this );
         if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onResourcePreStart", PreStartArguments ) )
         {
-			// Start cancelled by another resource
-			return false;
+            // Start cancelled by another resource
+            return false;
         }
 
-		m_bStarting = true;
+        m_bStarting = true;
 
-		// Check the included resources are linked
-		if ( !m_bLinked )
-		{
-			if ( !LinkToIncludedResources() )
-			{
-				m_bStarting = false;
-				return false;
-			}
-		}
+        // Check the included resources are linked
+        if ( !m_bLinked )
+        {
+            if ( !LinkToIncludedResources() )
+            {
+                m_bStarting = false;
+                return false;
+            }
+        }
         m_bIsPersistent = false;
 
-		// Create an element group for us
+        // Create an element group for us
         m_pDefaultElementGroup = new CElementGroup ( this );
         m_elementGroups.push_back ( m_pDefaultElementGroup ); // for use by scripts
 
-		// Grab the root element
+        // Grab the root element
         m_pRootElement = g_pGame->GetMapManager()->GetRootElement();
 
-		// Create the temporary storage node
-		m_pNodeStorage = g_pServerInterface->GetXML ()->CreateDummyNode ();
+        // Create the temporary storage node
+        m_pNodeStorage = g_pServerInterface->GetXML ()->CreateDummyNode ();
 
-		// Create the Resource Element
+        // Create the Resource Element
         m_pResourceElement = new CDummy ( g_pGame->GetGroups(), m_pRootElement );
         m_pResourceElement->SetTypeName ( "resource" );
 
@@ -664,73 +664,73 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Create the virtual machine for this resource
         CreateVM();
 
-		// We're now active
+        // We're now active
         m_bActive = true;
         CLogger::LogPrintf ( "Starting %s\n", m_strResourceName.c_str () );
 
-		// Remember the time we started
+        // Remember the time we started
         time ( &m_timeStarted );
 
-		// Start all our sub resourcefiles
+        // Start all our sub resourcefiles
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
         {
-			if ( ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && bMaps ) ||
-				 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && bConfigs ) ||
-				 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && bScripts ) ||
-				 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && bHTML ) )
-			{
-				// Start. Failed?
-				if ( !(*iterf)->Start() )
-				{
-					// Log it
+            if ( ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && bMaps ) ||
+                 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && bConfigs ) ||
+                 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && bScripts ) ||
+                 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && bHTML ) )
+            {
+                // Start. Failed?
+                if ( !(*iterf)->Start() )
+                {
+                    // Log it
                     char szBuffer[255] = {0};
-					CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterf)->GetName(), m_strResourceName.c_str () );
-					_snprintf ( szBuffer, 254, "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
+                    CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterf)->GetName(), m_strResourceName.c_str () );
+                    _snprintf ( szBuffer, 254, "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
                     m_strFailureReason = szBuffer;
 
-					// Stop all the resource items without any warnings
-					StopAllResourceItems();
-					DestroyVM ();
+                    // Stop all the resource items without any warnings
+                    StopAllResourceItems();
+                    DestroyVM ();
 
-					// Remove the temporary XML storage node
-					if ( m_pNodeStorage )
-					{
-						delete m_pNodeStorage;
-						m_pNodeStorage = NULL;
-					}
+                    // Remove the temporary XML storage node
+                    if ( m_pNodeStorage )
+                    {
+                        delete m_pNodeStorage;
+                        m_pNodeStorage = NULL;
+                    }
 
-					// Destroy all the element groups attached directly to this resource
-					list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
-					for ( ; itere != m_elementGroups.end (); itere++ )
-					{
-						delete (*itere);
-					}
-					m_elementGroups.clear();
-					m_pDefaultElementGroup = NULL;
+                    // Destroy all the element groups attached directly to this resource
+                    list < CElementGroup* > ::iterator itere = m_elementGroups.begin ();
+                    for ( ; itere != m_elementGroups.end (); itere++ )
+                    {
+                        delete (*itere);
+                    }
+                    m_elementGroups.clear();
+                    m_pDefaultElementGroup = NULL;
 
-					// Make sure we remove the resource elements from the players that have joined
-					CEntityRemovePacket removePacket;
-					if ( m_pResourceElement )
-					{
-						removePacket.Add ( m_pResourceElement );
-						g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
-						m_pResourceElement = NULL;
-					}
+                    // Make sure we remove the resource elements from the players that have joined
+                    CEntityRemovePacket removePacket;
+                    if ( m_pResourceElement )
+                    {
+                        removePacket.Add ( m_pResourceElement );
+                        g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
+                        m_pResourceElement = NULL;
+                    }
 
-					if ( m_pResourceDynamicElementRoot )
-					{
-						removePacket.Add ( m_pResourceDynamicElementRoot );
-						g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
-						m_pResourceDynamicElementRoot = NULL;
-					}
-					g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
+                    if ( m_pResourceDynamicElementRoot )
+                    {
+                        removePacket.Add ( m_pResourceDynamicElementRoot );
+                        g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
+                        m_pResourceDynamicElementRoot = NULL;
+                    }
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
 
-					m_bActive = false;
-					m_bStarting = false;
-					return false;
-				}
-			}
+                    m_bActive = false;
+                    m_bStarting = false;
+                    return false;
+                }
+            }
         }
 
         if ( bStartIncludedResources )
@@ -776,14 +776,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             }
         }
 
-		m_bStarting = false;
+        m_bStarting = false;
 
-		// Call the onResourceStart event. If it returns false, cancel this script again
+        // Call the onResourceStart event. If it returns false, cancel this script again
         CLuaArguments Arguments;
         Arguments.PushResource ( this );
         if ( !m_pResourceElement->CallEvent ( "onResourceStart", Arguments ) )
         {
-			// We're no longer active. stop the resource
+            // We're no longer active. stop the resource
             char szBuffer[255] = {0};
             CLogger::LogPrintf ( "Start up of resource %s cancelled by script\n", m_strResourceName.c_str () );
             _snprintf ( szBuffer, 254, "Start up of resource cancelled by script\n" );
@@ -793,14 +793,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             return false;
         }
 
-		m_bStartedManually = bStartedManually;
+        m_bStartedManually = bStartedManually;
 
         // Remember the client files state
         m_bClientConfigs = bClientConfigs;
         m_bClientScripts = bClientScripts;
         m_bClientFiles = bClientFiles;
 
-		m_bHasStarted = true;
+        m_bHasStarted = true;
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
@@ -831,30 +831,30 @@ bool CResource::StopAllResourceItems ( void )
 
 bool CResource::Stop ( bool bStopManually )
 {
-	// If we're loaded and active
-	if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
+    // If we're loaded and active
+    if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
     {
-		m_bHasStarted = false;
-		m_bStopping = true;
+        m_bHasStarted = false;
+        m_bStopping = true;
 
         // Tell the log that we've stopped this resource
         CLogger::LogPrintf ( "Stopping %s\n", m_strResourceName.c_str () );
 
-		// Tell the modules we are stopping
-		g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopping ( m_pVM->GetVirtualMachine () );
+        // Tell the modules we are stopping
+        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopping ( m_pVM->GetVirtualMachine () );
 
         // Remove us from the running resources list
         m_StartedResources.remove ( this );
 
-		// Tell all the players that have joined that this resource is stopped
+        // Tell all the players that have joined that this resource is stopped
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStopPacket ( m_usID ) );
 
-		// Call the onResourceStop event on this resource element
+        // Call the onResourceStop event on this resource element
         CLuaArguments Arguments;
         Arguments.PushResource ( this );
         m_pResourceElement->CallEvent ( "onResourceStop", Arguments );
 
-		// Remove us from the resources we depend on (they might unload too first)
+        // Remove us from the resources we depend on (they might unload too first)
         list < CIncludedResources* > ::iterator iterr = m_includedResources.begin ();
         for ( ; iterr != m_includedResources.end (); iterr++ )
         {
@@ -865,7 +865,7 @@ bool CResource::Stop ( bool bStopManually )
             }
         }
 
-		// Temorary includes??
+        // Temorary includes??
         list < CResource* > ::iterator iters = m_temporaryIncludes.begin ();
         for ( ; iters != m_temporaryIncludes.end (); iters++ )
         {
@@ -874,12 +874,12 @@ bool CResource::Stop ( bool bStopManually )
 
         m_temporaryIncludes.clear();
 
-		// Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
+        // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
         {
-			// Stop it. If it fails, tell the console and return false
-			// WARNING: If this is called from Start() and this fails it could get nasty
+            // Stop it. If it fails, tell the console and return false
+            // WARNING: If this is called from Start() and this fails it could get nasty
             if ( !(*iterf)->Stop() )
             {
                 CLogger::LogPrintf ( "Failed to stop resource item %s in %s\n", (*iterf)->GetName(), m_strResourceName.c_str () );
@@ -888,16 +888,16 @@ bool CResource::Stop ( bool bStopManually )
             }
         }
 
-		// Tell the module manager we have stopped
-		g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopped ( m_pVM->GetVirtualMachine () );
+        // Tell the module manager we have stopped
+        g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopped ( m_pVM->GetVirtualMachine () );
 
-		// Destroy the virtual machine for this resource
+        // Destroy the virtual machine for this resource
         DestroyVM ();
 
-		// Remove the temporary XML storage node
-		if ( m_pNodeStorage )
+        // Remove the temporary XML storage node
+        if ( m_pNodeStorage )
         {
-			delete m_pNodeStorage;
+            delete m_pNodeStorage;
             m_pNodeStorage = NULL;
         }
 
@@ -910,29 +910,29 @@ bool CResource::Stop ( bool bStopManually )
         m_elementGroups.clear();
         m_pDefaultElementGroup = NULL;
 
-		// We're no longer active
+        // We're no longer active
         m_bActive = false;
-		m_bStopping = false;
+        m_bStopping = false;
 
-	    // Remove the resource element from the client
-	    CEntityRemovePacket removePacket;
-	    if ( m_pResourceElement )
-	    {
-		    removePacket.Add ( m_pResourceElement );
-		    g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
-		    m_pResourceElement = NULL;
-	    }
+        // Remove the resource element from the client
+        CEntityRemovePacket removePacket;
+        if ( m_pResourceElement )
+        {
+            removePacket.Add ( m_pResourceElement );
+            g_pGame->GetElementDeleter()->Delete ( m_pResourceElement );
+            m_pResourceElement = NULL;
+        }
 
-	    // Remove the dynamic resource element from the client (???)
-	    if ( m_pResourceDynamicElementRoot )
-	    {
-		    removePacket.Add ( m_pResourceDynamicElementRoot );
-		    g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
-		    m_pResourceDynamicElementRoot = NULL;
-	    }
+        // Remove the dynamic resource element from the client (???)
+        if ( m_pResourceDynamicElementRoot )
+        {
+            removePacket.Add ( m_pResourceDynamicElementRoot );
+            g_pGame->GetElementDeleter()->Delete ( m_pResourceDynamicElementRoot );
+            m_pResourceDynamicElementRoot = NULL;
+        }
 
-	    // Broadcast the packet to joined players
-	    g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
+        // Broadcast the packet to joined players
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
     }
     return !m_bActive;
 }
@@ -940,15 +940,15 @@ bool CResource::Stop ( bool bStopManually )
 // Create a virtual machine for everything in this resource
 bool CResource::CreateVM ( void )
 {
-	// Create the virtual machine
+    // Create the virtual machine
     if ( m_pVM == NULL )
         m_pVM = g_pGame->GetLuaManager ()->CreateVirtualMachine ( this );
 
-	if ( m_pVM )
-	{
+    if ( m_pVM )
+    {
         m_pVM->SetScriptName ( m_strResourceName.c_str () );
-		return true;
-	}
+        return true;
+    }
 
     return false;
 }
@@ -964,10 +964,10 @@ bool CResource::DestroyVM ( void )
             pBinds->RemoveAllKeys ( m_pVM );
     }
 
-	// Delete the events on this VM
+    // Delete the events on this VM
     m_pRootElement->DeleteEvents ( m_pVM, true );
 
-	// Delete the virtual machine
+    // Delete the virtual machine
     g_pGame->GetLuaManager ()->RemoveVirtualMachine ( m_pVM );
     m_pVM = NULL;
     return true;
@@ -1194,11 +1194,11 @@ bool CResource::ExtractFile ( const char * szFilename )
 {
     if ( DoesFileExistInZip ( szFilename ) )
     {
-		// Load the zip file if it isn't already loaded. Return false if it can't be loaded.
+        // Load the zip file if it isn't already loaded. Return false if it can't be loaded.
         if ( !m_zipfile )
             m_zipfile = unzOpen(m_strResourceZip.c_str ());
 
-	    if ( !m_zipfile ) return false;
+        if ( !m_zipfile ) return false;
 
         unzLocateFile ( m_zipfile, szFilename, false );
 
@@ -1304,15 +1304,15 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
     bool bFoundDefault = false;
     CResourceHTMLItem* firstHTML = NULL;
 
-	// Go trough each html subnode of the root
+    // Go trough each html subnode of the root
     for ( CXMLNode * inc = root->FindSubNode("html", i);
         inc != NULL; inc = root->FindSubNode("html", ++i ) )
     {
-		// Get the attributelist
+        // Get the attributelist
         CXMLAttributes * attributes = &(inc->GetAttributes());
         if ( attributes )
         {
-			// See if this is the default page (default attribute)
+            // See if this is the default page (default attribute)
             bool bIsDefault = false;
             CXMLAttribute * defaultfile = attributes->Find("default");
             if ( defaultfile )
@@ -1324,7 +1324,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                     bIsDefault = false;
             }
 
-			// See if this is a raw file (like an image)
+            // See if this is a raw file (like an image)
             bool bIsRaw = false;
             CXMLAttribute * raw = attributes->Find("raw");
             if ( raw )
@@ -1336,7 +1336,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                     bIsRaw = false;
             }
 
-			// See if this is a restricted file
+            // See if this is a restricted file
             bool bIsRestricted = false;
             CXMLAttribute * restricted = attributes->Find("restricted");
             if ( restricted )
@@ -1346,37 +1346,37 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                     bIsRestricted = true;
                 else
                     bIsRestricted = false;
-			}
+            }
 
-			// Find the source attribute (the name of the file)
+            // Find the source attribute (the name of the file)
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
             {
-				// If we found it grab the value
+                // If we found it grab the value
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
-				// Try to find the file
+                // Try to find the file
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
-					// This one is supposed to be default, but there's already a default page
+                    // This one is supposed to be default, but there's already a default page
                     if ( bFoundDefault && bIsDefault )
                     {
                         CLogger::LogPrintf ( "Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                         bIsDefault = false;
                     }
 
-					// If this is supposed to be default, we've now found our default page
+                    // If this is supposed to be default, we've now found our default page
                     if ( bIsDefault )
                         bFoundDefault = true;
 
-					// Create a new resource HTML file and add it to the list
+                    // Create a new resource HTML file and add it to the list
                     CResourceFile * afile = new CResourceHTMLItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bIsDefault, bIsRaw, bIsRestricted );
                     m_resourceFiles.push_back ( afile );
 
-					// This is the first HTML file? Remember it
-					if ( firstHTML == NULL )
+                    // This is the first HTML file? Remember it
+                    if ( firstHTML == NULL )
                         firstHTML = (CResourceHTMLItem*)afile;
                 }
                 else
@@ -1395,7 +1395,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
         }
     }
 
-	// If we haven't found a default html page, we put the first HTML as the default
+    // If we haven't found a default html page, we put the first HTML as the default
     if ( firstHTML && !bFoundDefault )
         firstHTML->SetDefaultPage ( true );
     return true;
@@ -1405,15 +1405,15 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
 {
     int i = 0;
 
-	// Loop through the list of included configs
+    // Loop through the list of included configs
     for ( CXMLNode * inc = root->FindSubNode("config", i);
         inc != NULL; inc = root->FindSubNode("config", ++i ) )
     {
-		// Grab the list over attributes
+        // Grab the list over attributes
         CXMLAttributes * attributes = &(inc->GetAttributes());
         if ( attributes )
         {
-			// Find the type attribute (server / client)
+            // Find the type attribute (server / client)
             int iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
@@ -1427,19 +1427,19 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                     CLogger::LogPrintf ( "Unknown config type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
-			// Find the source (file path)
+            // Find the source (file path)
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
             {
-				// Grab the filename
+                // Grab the filename
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
-				// Extract / grab the filepath
+                // Extract / grab the filepath
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
-					// Create it and push it to the list over resource files. Depending on if it's client or server type
+                    // Create it and push it to the list over resource files. Depending on if it's client or server type
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG )
                         m_resourceFiles.push_back ( new CResourceConfigItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG )
@@ -1468,24 +1468,24 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
 {
     int i = 0;
 
-	// Loop through the included files
+    // Loop through the included files
     for ( CXMLNode * inc = root->FindSubNode("file", i);
         inc != NULL; inc = root->FindSubNode("file", ++i ) )
     {
-		// Grab the attributelist
+        // Grab the attributelist
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
-			// Grab the filepath attribute
+            // Grab the filepath attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
             {
-				// Grab the value
+                // Grab the value
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
-				// Create a new resourcefile item
+                // Create a new resourcefile item
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                     m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 else
@@ -1511,15 +1511,15 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
 {
     int i = 0;
 
-	// Read our exportlist
+    // Read our exportlist
     for ( CXMLNode * inc = root->FindSubNode("export", i);
         inc != NULL; inc = root->FindSubNode("export", ++i ) )
     {
-		// Grab the attributelist for this node
+        // Grab the attributelist for this node
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
-			// Find the access attribute and grab its value
+            // Find the access attribute and grab its value
             std::string strAccess;
             CXMLAttribute * access = attributes->Find("access");
             if ( access )
@@ -1527,7 +1527,7 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 strAccess = access->GetValue ();
             }
 
-			// See if the http attribute is true or false
+            // See if the http attribute is true or false
             bool bHTTP = false;
             CXMLAttribute * http = attributes->Find("http");
             if ( http )
@@ -1539,7 +1539,7 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                     bHTTP = false;
             }
 
-			// See if the restricted attribute is true or false
+            // See if the restricted attribute is true or false
             bool bRestricted = false;
             CXMLAttribute * restricted = attributes->Find("restricted");
             if ( restricted )
@@ -1551,12 +1551,12 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                     bRestricted = false;
             }
 
-			// Find the type attribute
+            // Find the type attribute
             CExportedFunction::eExportedFunctionType ucType = CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
-				// Grab the type. Client or server
+                // Grab the type. Client or server
                 const char *szType = type->GetValue ().c_str ();
                 if ( stricmp ( szType, "server" ) == 0 )
                 {
@@ -1572,14 +1572,14 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 }
             }
 
-			// Grab the functionname attribute
+            // Grab the functionname attribute
             CXMLAttribute * function = attributes->Find("function");
             if ( function )
             {
-				// Grab the functionname from the attribute
+                // Grab the functionname from the attribute
                 std::string strFunction = function->GetValue ();
 
-				// Add it to the list if it wasn't zero long. Otherwize show a warning
+                // Add it to the list if it wasn't zero long. Otherwize show a warning
                 if ( !strFunction.empty () )
                 {
                     m_exportedFunctions.push_back ( new CExportedFunction ( strFunction.c_str (), strAccess.c_str (), bHTTP, ucType, bRestricted ) );
@@ -1610,23 +1610,23 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
 {
     int i = 0;
 
-	// Loop through all script nodes under the root
+    // Loop through all script nodes under the root
     for ( CXMLNode * inc = root->FindSubNode("script", i);
         inc != NULL; inc = root->FindSubNode("script", ++i ) )
     {
-		// Grab the attribute list for this node
+        // Grab the attribute list for this node
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
-			// Grab the type attribute (server / client)
+            // Grab the type attribute (server / client)
             int iType = CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
-				// Grab the text
+                // Grab the text
                 const char *szType = type->GetValue ().c_str ();
 
-				// Check its content (server or client) and set the type accordingly
+                // Check its content (server or client) and set the type accordingly
                 if ( stricmp ( szType, "server" ) == 0 )
                     iType = CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT;
                 else if ( stricmp ( szType, "client" ) == 0 )
@@ -1635,19 +1635,19 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                     CLogger::LogPrintf ( "Unknown script type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
-			// Grab the source attribute
+            // Grab the source attribute
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
             {
-				// Grab the source value from the attribute
+                // Grab the source value from the attribute
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
-				// Extract / get the filepath of the file
+                // Extract / get the filepath of the file
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
-					// Create it depending on the type (clietn or server) and add it to the list over resource files
+                    // Create it depending on the type (clietn or server) and add it to the list over resource files
                     if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_SCRIPT )
                         m_resourceFiles.push_back ( new CResourceScriptItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                     else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
@@ -1677,15 +1677,15 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
 {
     int i = 0;
 
-	// Loop through the map nodes under the root
+    // Loop through the map nodes under the root
     for ( CXMLNode * inc = root->FindSubNode("map", i);
         inc != NULL; inc = root->FindSubNode("map", ++i ) )
     {
-		// Grab the attributelist of this node
+        // Grab the attributelist of this node
         CXMLAttributes * attributes = &(inc->GetAttributes());
         if ( attributes )
         {
-			// Grab the dimension attribute
+            // Grab the dimension attribute
             int iDimension = 0;
             CXMLAttribute * dimension = attributes->Find("dimension");
             if ( dimension )
@@ -1695,15 +1695,15 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                     iDimension = 0;
             }
 
-			// Grab the source node
+            // Grab the source node
             CXMLAttribute * src = attributes->Find("src");
             if ( src )
             {
-				// Grab the source text from the node
+                // Grab the source text from the node
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
-				// Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
+                // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                     m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, iDimension ) );
                 else
@@ -1913,7 +1913,7 @@ bool CResource::RemoveFile ( const char* szName )
                     CXMLNode* pNodeFound = NULL;
                     std::string strTempBuffer;
 
-	                // Loop through the map nodes under the root
+                    // Loop through the map nodes under the root
                     for ( pTemp = pRootNode->GetSubNode ( i );
                           pTemp != NULL;
                           pTemp = pRootNode->GetSubNode ( ++i ) )
@@ -1994,24 +1994,24 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
 {
     int i = 0;
 
-	// Loop through the included resources list
+    // Loop through the included resources list
     for ( CXMLNode * inc = root->FindSubNode ( "include", i );
         inc != NULL; inc = root->FindSubNode ( "include", ++i ) )
     {
-		// Grab the attributelist from this node
+        // Grab the attributelist from this node
         CXMLAttributes& Attributes = inc->GetAttributes ();
 
-		// Grab the minversion attribute (minimum version the included resource needs to be)
-		SVersion svMinVersion;
-		SVersion svMaxVersion;
-		svMinVersion.m_uiMajor = 0;
-		svMinVersion.m_uiMinor = 0;
-		svMinVersion.m_uiRevision = 0;
-		svMaxVersion.m_uiMajor = 0;
-		svMaxVersion.m_uiMinor = 0;
-		svMaxVersion.m_uiRevision = 0;
-		unsigned int uiMinVersion = 0;
-		unsigned int uiMaxVersion = 0;
+        // Grab the minversion attribute (minimum version the included resource needs to be)
+        SVersion svMinVersion;
+        SVersion svMaxVersion;
+        svMinVersion.m_uiMajor = 0;
+        svMinVersion.m_uiMinor = 0;
+        svMinVersion.m_uiRevision = 0;
+        svMaxVersion.m_uiMajor = 0;
+        svMaxVersion.m_uiMinor = 0;
+        svMaxVersion.m_uiRevision = 0;
+        unsigned int uiMinVersion = 0;
+        unsigned int uiMaxVersion = 0;
         CXMLAttribute * minversion = Attributes.Find ( "minversion" ); // optional
         if ( minversion )
         {
@@ -2020,74 +2020,74 @@ bool CResource::ReadIncludedResources ( CXMLNode * root )
             char szMinversion[MAX_RESOURCE_VERSION_LENGTH];
             strncpy ( szMinversion, strMinversion.c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
             uiMinVersion = atoi(szMinversion);
-			char* sz1 = new char;
-			char* sz2 = new char;
-			char* sz3 = new char;
-			if ( strlen ( szMinversion ) > 0 )
-			{
-				sz1 = strtok ( szMinversion, " " );
-				if ( sz1 )
-					svMinVersion.m_uiMajor = atoi ( sz1 );
-			}
-			if ( strlen ( szMinversion ) > ( 1 + strlen ( sz1 ) ) )
-			{
-				sz2 = strtok ( NULL, " " );
-				if ( sz2 )
-					svMinVersion.m_uiMinor = atoi ( sz2 );
-			}
-			if ( strlen ( szMinversion ) > ( 2 + strlen ( sz1 ) + strlen ( sz2 ) ) )
-			{
-				sz3 = strtok ( NULL, " " );
-				if ( sz3 )
-					svMinVersion.m_uiRevision = atoi ( sz3 );
-			}
+            char* sz1 = new char;
+            char* sz2 = new char;
+            char* sz3 = new char;
+            if ( strlen ( szMinversion ) > 0 )
+            {
+                sz1 = strtok ( szMinversion, " " );
+                if ( sz1 )
+                    svMinVersion.m_uiMajor = atoi ( sz1 );
+            }
+            if ( strlen ( szMinversion ) > ( 1 + strlen ( sz1 ) ) )
+            {
+                sz2 = strtok ( NULL, " " );
+                if ( sz2 )
+                    svMinVersion.m_uiMinor = atoi ( sz2 );
+            }
+            if ( strlen ( szMinversion ) > ( 2 + strlen ( sz1 ) + strlen ( sz2 ) ) )
+            {
+                sz3 = strtok ( NULL, " " );
+                if ( sz3 )
+                    svMinVersion.m_uiRevision = atoi ( sz3 );
+            }
         }
 
-		// Grab the maxversion attribute (maximum version the included resource needs to be)
+        // Grab the maxversion attribute (maximum version the included resource needs to be)
         CXMLAttribute * maxversion = Attributes.Find ( "maxversion" ); //optional
         if ( maxversion )
         {
             /* TODO: Convert this code into std::string */
             std::string strMaxversion = maxversion->GetValue ();
-			char szMaxversion[MAX_RESOURCE_VERSION_LENGTH];
+            char szMaxversion[MAX_RESOURCE_VERSION_LENGTH];
             strncpy ( szMaxversion, strMaxversion.c_str (), MAX_RESOURCE_VERSION_LENGTH - 1 );
 
             uiMaxVersion = atoi(szMaxversion);
-			char* sz1 = new char;
-			char* sz2 = new char;
-			char* sz3 = new char;
-			if ( strlen ( szMaxversion ) > 0 )
-			{
-				sz1 = strtok ( szMaxversion, " " );
-				if ( sz1 )
-					svMaxVersion.m_uiMajor = atoi ( sz1 );
-			}
-			if ( strlen ( szMaxversion ) > ( 1 + strlen ( sz1 ) ) )
-			{
-				sz2 = strtok ( NULL, " " );
-				if ( sz2 )
-					svMaxVersion.m_uiMinor = atoi ( sz2 );
-			}
-			if ( strlen ( szMaxversion ) > ( 2 + strlen ( sz1 ) + strlen ( sz2 ) ) )
-			{
-				sz3 = strtok ( NULL, " " );
-				if ( sz3 )
-					svMaxVersion.m_uiRevision = atoi ( sz3 );
-			}
+            char* sz1 = new char;
+            char* sz2 = new char;
+            char* sz3 = new char;
+            if ( strlen ( szMaxversion ) > 0 )
+            {
+                sz1 = strtok ( szMaxversion, " " );
+                if ( sz1 )
+                    svMaxVersion.m_uiMajor = atoi ( sz1 );
+            }
+            if ( strlen ( szMaxversion ) > ( 1 + strlen ( sz1 ) ) )
+            {
+                sz2 = strtok ( NULL, " " );
+                if ( sz2 )
+                    svMaxVersion.m_uiMinor = atoi ( sz2 );
+            }
+            if ( strlen ( szMaxversion ) > ( 2 + strlen ( sz1 ) + strlen ( sz2 ) ) )
+            {
+                sz3 = strtok ( NULL, " " );
+                if ( sz3 )
+                    svMaxVersion.m_uiRevision = atoi ( sz3 );
+            }
         }
 
-		// Grab the resource attribute
+        // Grab the resource attribute
         CXMLAttribute * src = Attributes.Find ( "resource" );
         if ( src )
         {
-			// Grab the value and add an included resource
+            // Grab the value and add an included resource
             std::string strIncludedResource = src->GetValue ();
 
-			// If there's text in the node
-			if ( !strIncludedResource.empty () )
-				m_includedResources.push_back ( new CIncludedResources ( m_resourceManager, strIncludedResource.c_str (), svMinVersion, svMaxVersion, uiMinVersion, uiMaxVersion, this ) );
-			else
-				CLogger::LogPrintf ( "WARNING: Empty 'resource' attribute from 'include' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str () );
+            // If there's text in the node
+            if ( !strIncludedResource.empty () )
+                m_includedResources.push_back ( new CIncludedResources ( m_resourceManager, strIncludedResource.c_str (), svMinVersion, svMaxVersion, uiMinVersion, uiMaxVersion, this ) );
+            else
+                CLogger::LogPrintf ( "WARNING: Empty 'resource' attribute from 'include' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str () );
         }
         else
         {
@@ -2102,11 +2102,11 @@ bool CResource::LinkToIncludedResources ( void )
 {
     m_bLinked = true;
 
-	// Loop through the list of included resources
+    // Loop through the list of included resources
     list < CIncludedResources* > ::iterator iterr = m_includedResources.begin ();
     for ( ; iterr != m_includedResources.end (); iterr++ )
     {
-		// If we failed creating the link
+        // If we failed creating the link
         if ( !(*iterr)->CreateLink() )
         {
             m_bLinked = false;
@@ -2119,7 +2119,7 @@ bool CResource::LinkToIncludedResources ( void )
             CLogger::LogPrintf ( "  Links to %s .. OK\n", (*iterr)->GetName().c_str () );
 #endif
     }
-	m_bLoaded = m_bLinked;
+    m_bLoaded = m_bLinked;
     return m_bLinked;
 }
 
@@ -2129,7 +2129,7 @@ bool CResource::CheckIfStartable ( void )
     // it spams it every few seconds
     if ( m_bLoaded == false ) return false;
 
-	// Check that the included resources aren't circular
+    // Check that the included resources aren't circular
     m_strCircularInclude = "";
     vector < CResource * > vecCircular;
     if ( IsIncludedResourceRecursive ( &vecCircular ) )
@@ -2137,7 +2137,7 @@ bool CResource::CheckIfStartable ( void )
         char szOldString [ 512 ];
         char szTrail [ 512 ] = "";
 
-		// Make a string telling what the circular path is
+        // Make a string telling what the circular path is
         vector < CResource* > ::iterator iterr = vecCircular.begin ();
         for ( ; iterr != vecCircular.end (); iterr++ )
         {
@@ -2149,7 +2149,7 @@ bool CResource::CheckIfStartable ( void )
             }
         }
 
-		// Remember why we failed and return false
+        // Remember why we failed and return false
         char szBuffer[512] = {0};
         _snprintf ( szBuffer, 511, "%s %s", m_strResourceName.c_str (), szTrail );
         m_strCircularInclude = szBuffer;
@@ -2160,7 +2160,7 @@ bool CResource::CheckIfStartable ( void )
         return false;
     }
 
-	// Check if all the included resources are startable
+    // Check if all the included resources are startable
     list < CIncludedResources* > ::iterator iterr = m_includedResources.begin ();
     for ( ; iterr != m_includedResources.end (); iterr++ )
     {
@@ -2253,11 +2253,11 @@ bool CResource::IsIncludedResourceRecursive ( vector<CResource *> * past )
 
    // CLogger::LogPrintf ( "%s\n", this->GetName().c_str () );
 
-	// Loop through the included resources
+    // Loop through the included resources
     list < CIncludedResources* > ::iterator iter = m_includedResources.begin ();
     for ( ; iter != m_includedResources.end (); iter++ )
     {
-		// If one item from the past is equal to one of our dependencies, then there's circular dependencies
+        // If one item from the past is equal to one of our dependencies, then there's circular dependencies
         vector < CResource* > ::iterator iterr = past->begin ();
         for ( ; iterr != past->end (); iterr++ )
         {
@@ -2265,20 +2265,20 @@ bool CResource::IsIncludedResourceRecursive ( vector<CResource *> * past )
                 return true;
         }
 
-		// Check further down the tree. If this returns true, we pass that true backwards
+        // Check further down the tree. If this returns true, we pass that true backwards
         CResource * res = (*iter)->GetResource();
         if ( res && res->IsIncludedResourceRecursive ( past ) )
             return true;
     }
 
-	// Remove us from the tree again because it wasn't circular this path
+    // Remove us from the tree again because it wasn't circular this path
     past->pop_back ();
     return false;
 }
 
 bool CResource::IsDependentResource ( CResource * resource )
 {
-	// Check if the given resource is a resource we're depending on
+    // Check if the given resource is a resource we're depending on
     list < CResource* > ::iterator iter = m_dependents.begin ();
     for ( ; iter != m_dependents.end (); iter++ )
     {
@@ -2292,8 +2292,8 @@ bool CResource::IsDependentResource ( CResource * resource )
 
 bool CResource::IsDependentResourceRecursive ( CResource * resource )
 {
-	// Check if the given resource is a resource we're depending on. Also
-	// check our dependencies dependencies and etc.. further down the tree
+    // Check if the given resource is a resource we're depending on. Also
+    // check our dependencies dependencies and etc.. further down the tree
     list < CResource* > ::iterator iter = m_dependents.begin ();
     for ( ; iter != m_dependents.end (); iter++ )
     {
@@ -2307,7 +2307,7 @@ bool CResource::IsDependentResourceRecursive ( CResource * resource )
 
 bool CResource::IsDependentResource ( const char * szResourceName )
 {
-	// Check if the given resource is a resource we're depending on
+    // Check if the given resource is a resource we're depending on
     list < CResource* > ::iterator iter = m_dependents.begin ();
     for ( ; iter != m_dependents.end (); iter++ )
     {
@@ -2321,8 +2321,8 @@ bool CResource::IsDependentResource ( const char * szResourceName )
 
 bool CResource::IsDependentResourceRecursive ( const char * szResourceName )
 {
-	// Check if the given resource is a resource we're depending on. Also
-	// check our dependencies dependencies and etc.. further down the tree
+    // Check if the given resource is a resource we're depending on. Also
+    // check our dependencies dependencies and etc.. further down the tree
     list < CResource* > ::iterator iter = m_dependents.begin ();
     for ( ; iter != m_dependents.end (); iter++ )
     {
@@ -2426,15 +2426,15 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // client trying to download files.
     CAccessControlListManager * aclManager = g_pGame->GetACLManager();
     if ( !aclManager->CanObjectUseRight ( account->GetName().c_str (),
-			                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-											m_strResourceName.c_str (),
-											CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-											true ) ||
+                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                            m_strResourceName.c_str (),
+                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                            true ) ||
          !aclManager->CanObjectUseRight ( account->GetName().c_str (),
-			                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             "http",
-											CAccessControlListRight::RIGHT_TYPE_GENERAL,
-											true ) )
+                                            CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                            true ) )
     {
         bAlreadyCalling = false;
         return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
@@ -2514,10 +2514,10 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 
                 // @@@@@ Deal with this the new way
                 if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-					                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-													strResourceFuncName.c_str (),
-													CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													true ) )
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                    strResourceFuncName.c_str (),
+                                                    CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                    true ) )
                 {
                     CLuaArguments luaArgs;
                     if ( ipoHttpRequest->nRequestMethod == REQUESTMETHOD_GET )
@@ -2656,23 +2656,23 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                         // client trying to download files.
                         CAccessControlListManager * aclManager = g_pGame->GetACLManager();
                         if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
-												            m_strResourceName.c_str (),
-												            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-												            true ) &&
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            m_strResourceName.c_str (),
+                                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                            true ) &&
                             aclManager->CanObjectUseRight ( account->GetName().c_str (),
-		                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                             "http",
-												            CAccessControlListRight::RIGHT_TYPE_GENERAL,
-												            true ) )
+                                                            CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                            true ) )
                         {
                             SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pHtml->GetName() );
 
                             if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-						                                        CAccessControlListGroupObject::OBJECT_TYPE_USER,
-														        strResourceFileName.c_str (),
-														        CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-														        !pHtml->IsRestricted () ) )
+                                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                                strResourceFileName.c_str (),
+                                                                CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                                !pHtml->IsRestricted () ) )
                             {
                                 return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                             }
@@ -2711,10 +2711,10 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
             // client trying to download files.
             CAccessControlListManager * aclManager = g_pGame->GetACLManager();
             if ( !aclManager->CanObjectUseRight (   account->GetName().c_str (),
-			                                        CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                     "http",
-													CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													true ) )
+                                                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                    true ) )
             {
                 return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
@@ -2730,15 +2730,15 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
 
                     SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pFile->GetName() );
                     if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-			                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-													        m_strResourceName.c_str (),
-													        CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													        true ) &&
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            m_strResourceName.c_str (),
+                                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                            true ) &&
                         aclManager->CanObjectUseRight ( account->GetName().c_str (),
-							                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-															strResourceFileName.c_str (),
-															CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-															!pHtml->IsRestricted () ) )
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            strResourceFileName.c_str (),
+                                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                            !pHtml->IsRestricted () ) )
                     {
                         return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                     }
@@ -2767,22 +2767,22 @@ bool CResource::CallExportedFunction ( char * szFunctionName, CLuaArguments& arg
         // Verify that the exported function is marked as "Server" (since both Client and Server exported functions exist here)
         if ( ( *iter )->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER )
         {
-			bool bRestricted = (*iter)->IsRestricted ();
+            bool bRestricted = (*iter)->IsRestricted ();
             if ( strcmp ( (*iter)->GetFunctionName ().c_str (), szFunctionName ) == 0 )
             {
                 char szFunctionRightName[512];
                 _snprintf ( szFunctionRightName, 512, "%s.function.%s", m_strResourceName.c_str (), szFunctionName );
                 CAccessControlListManager * pACLManager = g_pGame->GetACLManager();
                 if ( pACLManager->CanObjectUseRight ( caller.GetName().c_str (),
-													  CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													  m_strResourceName.c_str (),
-													  CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													  !bRestricted ) &&
+                                                      CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                      m_strResourceName.c_str (),
+                                                      CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                      !bRestricted ) &&
                     pACLManager->CanObjectUseRight ( caller.GetName().c_str (),
-													 CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													 szFunctionRightName,
-													 CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-													 !bRestricted ) )
+                                                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                     szFunctionRightName,
+                                                     CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                     !bRestricted ) )
                 {
                     if ( args.CallGlobal ( m_pVM, szFunctionName, &returns ) )
                     {
@@ -3069,12 +3069,12 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
 
 bool CIncludedResources::CreateLink ( void ) // just a pointer to it
 {
-	// Grab the resource that we are
+    // Grab the resource that we are
     m_resource = m_resourceManager->GetResource ( m_strResourceName.c_str () );
 
     m_bBadVersion = false;
 
-	// Does it exist?
+    // Does it exist?
     if ( !m_resource )
         m_bExists = false;
     else
@@ -3082,7 +3082,7 @@ bool CIncludedResources::CreateLink ( void ) // just a pointer to it
 
     if ( m_resource )
     {
-		// Grab the version and check that it's in range
+        // Grab the version and check that it's in range
         /*unsigned int uiVersion = m_resource->GetVersion ();
         if ( uiVersion < m_uiMinimumVersion || uiVersion > m_uiMaximumVersion )
         {

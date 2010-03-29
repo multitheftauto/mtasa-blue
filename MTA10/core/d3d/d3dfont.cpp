@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/d3d/d3dfont.cpp
-*  PURPOSE:		Texture-based font class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/d3d/d3dfont.cpp
+*  PURPOSE:     Texture-based font class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -256,7 +256,7 @@ HRESULT CD3DFont::RestoreDeviceObjects()
             else
                 m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
 
-			m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
+            m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
             m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
             m_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,   D3DBLEND_SRCALPHA );
             m_pd3dDevice->SetRenderState( D3DRS_DESTBLEND,  D3DBLEND_INVSRCALPHA );
@@ -290,7 +290,7 @@ HRESULT CD3DFont::RestoreDeviceObjects()
             m_pd3dDevice->EndStateBlock( &m_dwDrawTextStateBlock );
             m_pd3dDevice->BeginStateBlock();
 
-			m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
+            m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
             m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
             m_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,   D3DBLEND_SRCALPHA );
             m_pd3dDevice->SetRenderState( D3DRS_DESTBLEND,  D3DBLEND_INVSRCALPHA );
@@ -387,41 +387,41 @@ HRESULT CD3DFont::GetTextExtent( const TCHAR* strText, SIZE* pSize, FLOAT fMaxWi
     FLOAT fWidth     = 0.0f;
     FLOAT fHeight    = fRowHeight;
 
-	int tabs = 1;
+    int tabs = 1;
     while( *strText )
     {
         TCHAR c = *strText++;
 
-		if( c == _T('\01') ) {
-			strText+=4;
-			continue;
-		}
-		
-		if( c == _T('\02') ) continue;
+        if( c == _T('\01') ) {
+            strText+=4;
+            continue;
+        }
+        
+        if( c == _T('\02') ) continue;
 
         if( c == _T('\n') )
         {
             fRowWidth = 0.0f;
             fHeight  += fRowHeight;
-			tabs=1;
+            tabs=1;
         }
-		if( c == _T('\t') )
-		{
-			fRowWidth = tabs*50.0f - fRowWidth;
-			tabs++;
-			continue;
-		}
+        if( c == _T('\t') )
+        {
+            fRowWidth = tabs*50.0f - fRowWidth;
+            tabs++;
+            continue;
+        }
         if( c < _T(' ') )
             continue;
-		
-	/*	if (fMaxWidth != 0.0f)
-		{
-			if (fRowWidth > fMaxWidth) {
-				fRowWidth = 0.0f;
-				fHeight  += fRowHeight;
-				tabs=1;
-			}
-		}*/
+        
+    /*  if (fMaxWidth != 0.0f)
+        {
+            if (fRowWidth > fMaxWidth) {
+                fRowWidth = 0.0f;
+                fHeight  += fRowHeight;
+                tabs=1;
+            }
+        }*/
 
         FLOAT tx1 = m_fTexCoords[c-32][0];
         FLOAT tx2 = m_fTexCoords[c-32][2];
@@ -434,7 +434,7 @@ HRESULT CD3DFont::GetTextExtent( const TCHAR* strText, SIZE* pSize, FLOAT fMaxWi
     }
 
     pSize->cx = (int)fWidth;
-	pSize->cy = (int)fHeight;
+    pSize->cy = (int)fHeight;
 
     return S_OK;
 }
@@ -452,36 +452,36 @@ HRESULT CD3DFont::GetTextMax( const TCHAR* strText, const TCHAR** strResult, FLO
     FLOAT fRowHeight = (m_fTexCoords[0][3]-m_fTexCoords[0][1])*m_dwTexHeight / m_fTextScale;
     FLOAT fWidth     = 0.0f;
     FLOAT fHeight    = fRowHeight;
-	*strResult = strText + _tcslen(strText)-1;
+    *strResult = strText + _tcslen(strText)-1;
 
-	int tabs = 1;
+    int tabs = 1;
     while( *strResult != strText )
     {
         TCHAR c = **strResult;
-		*strResult -= 1;
+        *strResult -= 1;
 
-		if( c == _T('\01') ) {
-			*strResult-=4;
-			continue;
-		}
-		
-		if( c == _T('\02') ) continue;
+        if( c == _T('\01') ) {
+            *strResult-=4;
+            continue;
+        }
+        
+        if( c == _T('\02') ) continue;
 
         if( c == _T('\n') )
         {
             fRowWidth = 0.0f;
             fHeight  += fRowHeight;
-			tabs=1;
+            tabs=1;
         }
-		if( c == _T('\t') )
-		{
-			fRowWidth = tabs*50.0f - fRowWidth;
-			tabs++;
-			continue;
-		}
+        if( c == _T('\t') )
+        {
+            fRowWidth = tabs*50.0f - fRowWidth;
+            tabs++;
+            continue;
+        }
         if( c < _T(' ') )
             continue;
-		
+        
         FLOAT tx1 = m_fTexCoords[c-32][0];
         FLOAT tx2 = m_fTexCoords[c-32][2];
 
@@ -498,118 +498,118 @@ HRESULT CD3DFont::GetTextMax( const TCHAR* strText, const TCHAR** strResult, FLO
 
 HRESULT CD3DFont::FormatText( const TCHAR* theText, TCHAR* outText, float fMaxWidth )
 {
-	FLOAT fCurrentWidth = 0.0f;
-	DWORD dwOutputIndex = 0;
+    FLOAT fCurrentWidth = 0.0f;
+    DWORD dwOutputIndex = 0;
 
-	// Make sure we have valid parameters.
-	if ( theText == NULL || outText == NULL )
-	{
-		return E_FAIL;
-	}
+    // Make sure we have valid parameters.
+    if ( theText == NULL || outText == NULL )
+    {
+        return E_FAIL;
+    }
 
-	while ( *theText )
-	{
-		TCHAR c = *theText++;
+    while ( *theText )
+    {
+        TCHAR c = *theText++;
 
-		// If the amount of characters we've emitted into 
-		// outText is > dwBuffLen, return an error.
-		//if ( dwOutputIndex >= dwBuffLen )
-		//{
-		//	return E_OUTOFMEMORY;
-		//}
+        // If the amount of characters we've emitted into 
+        // outText is > dwBuffLen, return an error.
+        //if ( dwOutputIndex >= dwBuffLen )
+        //{
+        //  return E_OUTOFMEMORY;
+        //}
 
-		// Check for newline case.
-		// If we find a newline, reset current width and continue.
-		if ( c == _T('\n') )
-		{
-			fCurrentWidth = 0.0f;
-			outText[dwOutputIndex++] = c;
-			continue;
-		}
+        // Check for newline case.
+        // If we find a newline, reset current width and continue.
+        if ( c == _T('\n') )
+        {
+            fCurrentWidth = 0.0f;
+            outText[dwOutputIndex++] = c;
+            continue;
+        }
 
-		FLOAT tx1 = m_fTexCoords[c-32][0];
-		FLOAT tx2 = m_fTexCoords[c-32][2];
-		
-		
-		// Add the character to the width if it isn't a space.
-		if ( c != _T(' ') )
-		{
-			fCurrentWidth += (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
-		}
+        FLOAT tx1 = m_fTexCoords[c-32][0];
+        FLOAT tx2 = m_fTexCoords[c-32][2];
+        
+        
+        // Add the character to the width if it isn't a space.
+        if ( c != _T(' ') )
+        {
+            fCurrentWidth += (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
+        }
 
-		// If we've gone over our limit, emit a newline,
-		// increment the output index, reset, and continue.
-		if ( fCurrentWidth >= fMaxWidth )
-		{
-			outText[dwOutputIndex++] = '\n';
-			fCurrentWidth = 0.0f;
-			continue;
-		}
+        // If we've gone over our limit, emit a newline,
+        // increment the output index, reset, and continue.
+        if ( fCurrentWidth >= fMaxWidth )
+        {
+            outText[dwOutputIndex++] = '\n';
+            fCurrentWidth = 0.0f;
+            continue;
+        }
 
-		// Copy the character into the output buffer.
-		//if ( dwOutputIndex < dwBuffLen )
-		//{
-			outText[dwOutputIndex++] = c;
-		//}
+        // Copy the character into the output buffer.
+        //if ( dwOutputIndex < dwBuffLen )
+        //{
+            outText[dwOutputIndex++] = c;
+        //}
 
-		// If we reach a space, we have to look ahead to see
-		// if the word will fit in our string.  If not, we either
-		// have to put the word on the next line, or chop the word
-		// at some point.   MTA Blue v1.0 BETA BUILD
-		if ( c == _T(' ') )
-		{
-			FLOAT fWordWidth = 0.0f;
-			const TCHAR *theWord = theText;
+        // If we reach a space, we have to look ahead to see
+        // if the word will fit in our string.  If not, we either
+        // have to put the word on the next line, or chop the word
+        // at some point.   MTA Blue v1.0 BETA BUILD
+        if ( c == _T(' ') )
+        {
+            FLOAT fWordWidth = 0.0f;
+            const TCHAR *theWord = theText;
 
-			while ( *theWord )
-			{
-				TCHAR c = *theWord++;
-				
-				FLOAT tx1 = m_fTexCoords[c-32][0];
-				FLOAT tx2 = m_fTexCoords[c-32][2];
-				
-				fWordWidth += (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
-				
-				// Check if word length is over limit.  If it is,
-				// we emit a newline, reset, and break out of the
-				// word loop.
-				if ( (fWordWidth+fCurrentWidth) >= fMaxWidth )
-				{
-					outText[dwOutputIndex++] = '\n';
-					fCurrentWidth = 0.0f;
-					break;
-				}
+            while ( *theWord )
+            {
+                TCHAR c = *theWord++;
+                
+                FLOAT tx1 = m_fTexCoords[c-32][0];
+                FLOAT tx2 = m_fTexCoords[c-32][2];
+                
+                fWordWidth += (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
+                
+                // Check if word length is over limit.  If it is,
+                // we emit a newline, reset, and break out of the
+                // word loop.
+                if ( (fWordWidth+fCurrentWidth) >= fMaxWidth )
+                {
+                    outText[dwOutputIndex++] = '\n';
+                    fCurrentWidth = 0.0f;
+                    break;
+                }
 
-				// We've found the end of the word, and it
-				// fits in, so lets copy it into our output
-				// buffer.
-				if ( c == _T(' ') || c == _T('\n') )
-				{
-					DWORD dwWordLen = theWord-theText-1;
+                // We've found the end of the word, and it
+                // fits in, so lets copy it into our output
+                // buffer.
+                if ( c == _T(' ') || c == _T('\n') )
+                {
+                    DWORD dwWordLen = theWord-theText-1;
 
-					outText[dwOutputIndex] = NULL;
-					_tcsncat( outText, theText, dwWordLen );
-					dwOutputIndex += dwWordLen;
-					theText += dwWordLen;
-					
-					if ( c == _T(' ') )
-					{
-						fCurrentWidth += fWordWidth;
-					}
-					else
-					{
-						fCurrentWidth = 0.0f;
-					}
-					
-					break;
-				}
-			}
-		}
-	}
-	
-	// Put a NULL terminator on our output string.
-	outText[dwOutputIndex] = NULL;
-	return S_OK;
+                    outText[dwOutputIndex] = NULL;
+                    _tcsncat( outText, theText, dwWordLen );
+                    dwOutputIndex += dwWordLen;
+                    theText += dwWordLen;
+                    
+                    if ( c == _T(' ') )
+                    {
+                        fCurrentWidth += fWordWidth;
+                    }
+                    else
+                    {
+                        fCurrentWidth = 0.0f;
+                    }
+                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Put a NULL terminator on our output string.
+    outText[dwOutputIndex] = NULL;
+    return S_OK;
 }
 
 
@@ -771,36 +771,36 @@ HRESULT CD3DFont::DrawBox(float xTop, float yTop, float fWidth, float fHeight, f
 
 BOOL CD3DFont::BeginDrawing ()
 {
-	if ( m_pVB == NULL || m_pd3dDevice == NULL)
-	{
-		return FALSE;
-	}
+    if ( m_pVB == NULL || m_pd3dDevice == NULL)
+    {
+        return FALSE;
+    }
 
-	///////////////////////////////////////////////////
-	// Setup the rendering.
-	m_pd3dDevice->CaptureStateBlock( m_dwSavedStateBlock );
-	m_pd3dDevice->ApplyStateBlock( m_dwDrawTextStateBlock );
-	m_pd3dDevice->SetVertexShader( D3DFVF_FONT2DVERTEX );
-	m_pd3dDevice->SetPixelShader( NULL );
-	m_pd3dDevice->SetStreamSource( 0, m_pVB, sizeof(FONT2DVERTEX) );
+    ///////////////////////////////////////////////////
+    // Setup the rendering.
+    m_pd3dDevice->CaptureStateBlock( m_dwSavedStateBlock );
+    m_pd3dDevice->ApplyStateBlock( m_dwDrawTextStateBlock );
+    m_pd3dDevice->SetVertexShader( D3DFVF_FONT2DVERTEX );
+    m_pd3dDevice->SetPixelShader( NULL );
+    m_pd3dDevice->SetStreamSource( 0, m_pVB, sizeof(FONT2DVERTEX) );
 
  /*   if( dwFlags & D3DFONT_FILTERED )
     {
         m_pd3dDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTEXF_LINEAR );
         m_pd3dDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR );
     }
-	return TRUE;*/
-	return TRUE;
+    return TRUE;*/
+    return TRUE;
 }
 
 BOOL CD3DFont::EndDrawing ()
 {
-//	m_pDevice->SetTexture( 0, NULL );
+//  m_pDevice->SetTexture( 0, NULL );
 
-	////////////////////////////////////////////////////
-	// Restore old states and return.
-	m_pd3dDevice->ApplyStateBlock( m_dwSavedStateBlock );
-	return TRUE;
+    ////////////////////////////////////////////////////
+    // Restore old states and return.
+    m_pd3dDevice->ApplyStateBlock( m_dwSavedStateBlock );
+    return TRUE;
 }
 
 //-----------------------------------------------------------------------------
@@ -834,7 +834,7 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
     FONT2DVERTEX* pVertices = NULL;
     DWORD         dwNumTriangles = 0;
     m_pVB->Lock( 0, 0, (BYTE**)&pVertices, D3DLOCK_DISCARD );
-	int tabs = 1;
+    int tabs = 1;
 
     while( *strText )
     {
@@ -845,22 +845,22 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
             strText+=4;
             continue;
         }
-		if( c == _T('\t') )
-		{
-			sx = fStartX + tabs*50.0f;
-			tabs++;
-			continue;
-		}
+        if( c == _T('\t') )
+        {
+            sx = fStartX + tabs*50.0f;
+            tabs++;
+            continue;
+        }
 
         if( c == _T('\n') )
         {
-			sx = fStartX;
-			sy += (m_fTexCoords[0][3]-m_fTexCoords[0][1])*m_dwTexHeight;
-			tabs = 1;
+            sx = fStartX;
+            sy += (m_fTexCoords[0][3]-m_fTexCoords[0][1])*m_dwTexHeight;
+            tabs = 1;
         }
 
         if( c < _T(' ') )
-			continue;
+            continue;
 
         FLOAT tx1 = m_fTexCoords[c-32][0];
         FLOAT ty1 = m_fTexCoords[c-32][1];
@@ -923,8 +923,8 @@ HRESULT CD3DFont::Render3DText( TCHAR* strText, DWORD dwFlags, float r, float g,
     m_pd3dDevice->SetVertexShader( D3DFVF_FONT3DVERTEX );
     m_pd3dDevice->SetPixelShader( NULL );
     m_pd3dDevice->SetStreamSource( 0, m_pVB, sizeof(FONT3DVERTEX) );
-	m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
-	m_pd3dDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
+    m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
+    m_pd3dDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
 
     D3DUtil_InitMaterial( mtrl, r, g, b, a );
     m_pd3dDevice->SetMaterial(&mtrl);
@@ -978,15 +978,15 @@ HRESULT CD3DFont::Render3DText( TCHAR* strText, DWORD dwFlags, float r, float g,
             m_pVB->Lock( 0, 0, (BYTE**)&pVertices, D3DLOCK_DISCARD );
             dwNumTriangles = 0L;
 
-			float g1 = (float)((int)(0xFF&*strText++) / 255.f);
-			float b1 = (float)((int)(0xFF&*strText++) / 255.f);
-			float r1 = (float)((int)(0xFF&*strText++) / 255.f);
-			float a1 = (float)((int)(0xFF&*strText++) / 255.f);
-			
-			D3DUtil_InitMaterial( mtrl, r1,b1,g1,a1 );/*((float)(*strText++))/255.0f, ((float)(*strText++))/255.0f, 
-									//	((float)(*strText++))/255.0f, ((float)(*strText++))/255.0f );*/
-			m_pd3dDevice->SetMaterial(&mtrl);
-			continue;
+            float g1 = (float)((int)(0xFF&*strText++) / 255.f);
+            float b1 = (float)((int)(0xFF&*strText++) / 255.f);
+            float r1 = (float)((int)(0xFF&*strText++) / 255.f);
+            float a1 = (float)((int)(0xFF&*strText++) / 255.f);
+            
+            D3DUtil_InitMaterial( mtrl, r1,b1,g1,a1 );/*((float)(*strText++))/255.0f, ((float)(*strText++))/255.0f, 
+                                    //  ((float)(*strText++))/255.0f, ((float)(*strText++))/255.0f );*/
+            m_pd3dDevice->SetMaterial(&mtrl);
+            continue;
         }
 
         if( c < 32 )

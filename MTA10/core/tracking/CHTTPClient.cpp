@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/tracking/CHTTPClient.cpp
-*  PURPOSE:		HTTP download client functionality
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/tracking/CHTTPClient.cpp
+*  PURPOSE:     HTTP download client functionality
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *
@@ -17,9 +17,9 @@ using namespace std;
 
 CHTTPClient::CHTTPClient ( void )
 {
-	m_usPort = 0;
+    m_usPort = 0;
     m_strStatus = "";
-	m_pHTTPSocket = NULL;
+    m_pHTTPSocket = NULL;
 
     Reset ();
 }
@@ -37,9 +37,9 @@ void CHTTPClient::Reset ( void )
     m_Buffer.Clear ();
     m_bCompleted = false;
 
-	memset(&m_szProtocol, NULL, sizeof(m_szProtocol));
-	memset(&m_szHost, NULL, sizeof(m_szHost));
-	memset(&m_szPath, NULL, sizeof(m_szPath));
+    memset(&m_szProtocol, NULL, sizeof(m_szProtocol));
+    memset(&m_szHost, NULL, sizeof(m_szHost));
+    memset(&m_szPath, NULL, sizeof(m_szPath));
 }
 
 
@@ -85,8 +85,8 @@ bool CHTTPClient::Get ( const std::string& strURL )
         return false;
     }
 
-	// Create a socket
-	m_pHTTPSocket = CTCPManager::GetSingleton ().CreateClient ();
+    // Create a socket
+    m_pHTTPSocket = CTCPManager::GetSingleton ().CreateClient ();
 
     if ( !m_pHTTPSocket )
     {
@@ -96,41 +96,41 @@ bool CHTTPClient::Get ( const std::string& strURL )
 
     m_pHTTPSocket->AddRef ();
 
-	// Create events
-	m_pHTTPSocket->SetEventClass ( this );
-	m_pHTTPSocket->SetEventRead ( CHTTPClient::OnRead );
-	m_pHTTPSocket->SetEventConnect ( CHTTPClient::OnConnect );
-	m_pHTTPSocket->SetEventClose ( CHTTPClient::OnClose );
+    // Create events
+    m_pHTTPSocket->SetEventClass ( this );
+    m_pHTTPSocket->SetEventRead ( CHTTPClient::OnRead );
+    m_pHTTPSocket->SetEventConnect ( CHTTPClient::OnConnect );
+    m_pHTTPSocket->SetEventClose ( CHTTPClient::OnClose );
 
     // Connect to the server
-	m_pHTTPSocket->Connect ( m_szHost, m_usPort );
+    m_pHTTPSocket->Connect ( m_szHost, m_usPort );
 
-	return true;
+    return true;
 }
 
 
 void CHTTPClient::OnConnect ( void* pSocketPtr, void* pClassPtr )
 {
-	if ( pSocketPtr != NULL )
-	{
-		CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
-		CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
+    if ( pSocketPtr != NULL )
+    {
+        CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
+        CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
 
         pClass->m_strStatus = "connected to server";
 
         // Throw a HTTP request together
-		SString strBuffer;
-		if ( pClass->m_usPort != 80 ) // when port isn't 80, the host: part should specify it (otherwise it MUST not)
-			strBuffer.Format ( "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: MTASA_10\r\n\r\n", pClass->m_szPath, pClass->m_szHost, pClass->m_usPort );
-		else
+        SString strBuffer;
+        if ( pClass->m_usPort != 80 ) // when port isn't 80, the host: part should specify it (otherwise it MUST not)
+            strBuffer.Format ( "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: MTASA_10\r\n\r\n", pClass->m_szPath, pClass->m_szHost, pClass->m_usPort );
+        else
             strBuffer.Format ( "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: MTASA_10\r\n\r\n", pClass->m_szPath, pClass->m_szHost );
-		size_t sizeRequest = strBuffer.length ();
+        size_t sizeRequest = strBuffer.length ();
 
-		// Write it to the TCP stream
-		pSocket->WriteBuffer ( strBuffer, sizeRequest );
+        // Write it to the TCP stream
+        pSocket->WriteBuffer ( strBuffer, sizeRequest );
 
-		OnRead ( pSocketPtr, pClassPtr );
-	}
+        OnRead ( pSocketPtr, pClassPtr );
+    }
 }
 
 
@@ -216,19 +216,19 @@ bool CHTTPClient::ParseURL ( const char* szURL, char* szProtocol, unsigned int u
 
 void CHTTPClient::OnClose ( void* pSocketPtr, void* pClassPtr )
 {
-	if ( pSocketPtr != NULL )
-	{
-		CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
+    if ( pSocketPtr != NULL )
+    {
+        CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
         CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
 
         // Disconnected? This means we are done.
         pClass->m_bCompleted = true;
 
-		// Destroy the socket
+        // Destroy the socket
         assert ( pClass->m_pHTTPSocket == pSocket );
-		CTCPManager::GetSingleton ().DestroyClient ( pSocket );
+        CTCPManager::GetSingleton ().DestroyClient ( pSocket );
         SAFE_RELEASE ( pClass->m_pHTTPSocket )
-	}
+    }
 }
 
 
@@ -236,12 +236,12 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
 {
     char szBuffer[HTTP_BUFFER_LENGTH] = {0};
 
-	if ( pSocketPtr != NULL )
-	{
-		CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
-		CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
+    if ( pSocketPtr != NULL )
+    {
+        CTCPClientSocket* pSocket = reinterpret_cast < CTCPClientSocket* > ( pSocketPtr );
+        CHTTPClient* pClass = reinterpret_cast < CHTTPClient * > ( pClassPtr );
 
-		// Attempt to read data from the socket
+        // Attempt to read data from the socket
         while ( true )
         {
             int iRead = pSocket->ReadBuffer ( szBuffer, HTTP_BUFFER_LENGTH );
@@ -249,7 +249,7 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
 
             // Is this our first chunk of data?
             if ( pClass->m_Buffer.GetSize () == 0 ) {
-			    // Parse the header
+                // Parse the header
                 unsigned int nHeaderSize, uiResponseCode;
                 const char * szData = CHTTPResponse::Parse ( szBuffer, HTTP_BUFFER_LENGTH, nHeaderSize, uiResponseCode );
                 if ( !szData ) pClass->m_strStatus = "error: failed reading HTTP header";
@@ -258,8 +258,8 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
                 unsigned int nToRead = iRead - nHeaderSize;
                 pClass->m_Buffer.Append ( szBuffer + nHeaderSize, nToRead );
 
-			    // Set variables
-			    pClass->m_Status = uiResponseCode;
+                // Set variables
+                pClass->m_Status = uiResponseCode;
 
                 // Set status message
                 stringstream ss;
@@ -270,7 +270,7 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
                 pClass->m_Buffer.Append ( szBuffer, iRead );
             }
         }
-	}
+    }
 }
 
 
@@ -300,10 +300,10 @@ int CHTTPClient::ReadHeader ( char* pBuffer, unsigned int uiBufferSize )
     char cChar;
     unsigned int uiIndex = 0;
     
-	while ( uiIndex < uiBufferSize )
+    while ( uiIndex < uiBufferSize )
     {
-		// Get the character from the buffer
-		cChar = pBuffer[uiIndex];
+        // Get the character from the buffer
+        cChar = pBuffer[uiIndex];
 
         // Is it a new line character?
         if ( cChar == 10 || cChar == 13 )

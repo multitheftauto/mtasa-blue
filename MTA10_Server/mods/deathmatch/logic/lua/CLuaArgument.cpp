@@ -492,11 +492,11 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
     SLuaTypeSync type;
 
     // Read out the type
-	if ( bitStream.Read ( &type ) )
-	{
+    if ( bitStream.Read ( &type ) )
+    {
         // Depending on what type...
-		switch ( type.data.ucType )
-		{
+        switch ( type.data.ucType )
+        {
             // Nil type
             case LUA_TNIL:
             {
@@ -505,17 +505,17 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             }
 
             // Boolean type
-			case LUA_TBOOLEAN:
-			{
-				bool bValue;
-				if ( bitStream.ReadBit ( bValue ) )
-					Read(bValue);
-				break;
-			}
+            case LUA_TBOOLEAN:
+            {
+                bool bValue;
+                if ( bitStream.ReadBit ( bValue ) )
+                    Read(bValue);
+                break;
+            }
 
             // Number type
-			case LUA_TNUMBER:
-			{
+            case LUA_TNUMBER:
+            {
                 bool bIsFloatingPoint;
                 if ( bitStream.ReadBit ( bIsFloatingPoint ) && bIsFloatingPoint )
                 {
@@ -529,8 +529,8 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     if ( bitStream.ReadCompressed ( lNum ) )
                         Read ( (double) lNum );
                 }
-				break;
-			}
+                break;
+            }
 
             // Table type
             case LUA_TTABLE:
@@ -558,42 +558,42 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             }
 
             // String type
-			case LUA_TSTRING:
-			{
+            case LUA_TSTRING:
+            {
                 // Read out the string length
-				unsigned short usLength;
-				if ( bitStream.ReadCompressed ( usLength ) && usLength )
-				{
+                unsigned short usLength;
+                if ( bitStream.ReadCompressed ( usLength ) && usLength )
+                {
                     // Allocate a buffer and read the string into it
                     char* szValue = new char [ usLength + 1 ];
                     if ( bitStream.Read ( szValue, usLength ) )
                     {
                         // Put it into us
                         szValue [ usLength ] = 0;
-						Read ( szValue );
+                        Read ( szValue );
                     }
 
                     // Delete the buffer
                     delete [] szValue;
-				}
-				else
-					Read ( "" );
+                }
+                else
+                    Read ( "" );
 
-				break;
-			}
+                break;
+            }
 
             // Element type?
-			case LUA_TLIGHTUSERDATA:
-			{
-				ElementID ElementID;
-				if ( bitStream.ReadCompressed ( ElementID ) )
-				{
-					CElement * element = CElementIDs::GetElement ( ElementID );
-					Read ( element );
-				}
-				break;
-			}
-		}
+            case LUA_TLIGHTUSERDATA:
+            {
+                ElementID ElementID;
+                if ( bitStream.ReadCompressed ( ElementID ) )
+                {
+                    CElement * element = CElementIDs::GetElement ( ElementID );
+                    Read ( element );
+                }
+                break;
+            }
+        }
     }
     return true;
 }
@@ -617,7 +617,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         case LUA_TBOOLEAN:
         {
             type.data.ucType = LUA_TBOOLEAN;
-			bitStream.Write ( &type );
+            bitStream.Write ( &type );
 
             // Write the boolean to it
             bitStream.WriteBit ( GetBoolean () );
@@ -676,23 +676,23 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
             const char* szTemp = m_strString.c_str ();
             size_t sizeTemp = strlen ( szTemp );
             unsigned short usLength = static_cast < unsigned short > ( sizeTemp );
-			if ( sizeTemp == usLength )
-			{
+            if ( sizeTemp == usLength )
+            {
                 // This is a string argument
                 type.data.ucType = LUA_TSTRING;
-			    bitStream.Write ( &type );
+                bitStream.Write ( &type );
 
                 // Write its length
-				bitStream.WriteCompressed ( usLength );
+                bitStream.WriteCompressed ( usLength );
 
                 // Write the content too if it's not empty
                 if ( usLength > 0 )
                 {
-				    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
+                    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
                 }
-			}
-			else
-			{
+            }
+            else
+            {
                 // Too long string
                 LogUnableToPacketize ( "Couldn't packetize argument list. Invalid string specified, limit is 65535 characters." );
 
@@ -700,7 +700,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 type.data.ucType = LUA_TNIL;
                 bitStream.Write ( &type );
                 return false;
-			}
+            }
             break;
         }
 
@@ -708,39 +708,39 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         case LUA_TLIGHTUSERDATA:
         {
             // Grab the element from this userdata pointer. Valid and has a synced element ID?
-			CElement* pElement = GetElement ();
-			if ( pElement && pElement->GetID () != INVALID_ELEMENT_ID )
-			{
+            CElement* pElement = GetElement ();
+            if ( pElement && pElement->GetID () != INVALID_ELEMENT_ID )
+            {
                 // Write its ID
                 type.data.ucType = LUA_TLIGHTUSERDATA;
-				bitStream.Write ( &type );
-				bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
-			}
-			else
-			{
+                bitStream.Write ( &type );
+                bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
+            }
+            else
+            {
                 // Jax: this just spams the script debugger, it's not really neccesary
                 // LogUnableToPacketize ( "Couldn't packetize argument list, invalid element specified." );
 
                 // Write a nil though so other side won't get out of sync
                 type.data.ucType = LUA_TNIL;
                 bitStream.Write ( &type );
-				return false;
-			}
+                return false;
+            }
 
             break;
         }
 
         // Unpacketizable type.
-		default:
-		{
+        default:
+        {
             // Unpacketizable
-			LogUnableToPacketize ( "Couldn't packetize argument list, unknown type specified." );
+            LogUnableToPacketize ( "Couldn't packetize argument list, unknown type specified." );
 
             // Write a nil though so other side won't get out of sync
             type.data.ucType = LUA_TNIL;
             bitStream.Write ( &type );
-			return false;
-		}
+            return false;
+        }
     }
 
     // Success
@@ -774,62 +774,62 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
         }
         case LUA_TNUMBER:
         {
-			float fNum = static_cast < float > ( GetNumber () );
-			int iNum = static_cast < int > ( GetNumber () );
-			if ( iNum == fNum )
-			{
+            float fNum = static_cast < float > ( GetNumber () );
+            int iNum = static_cast < int > ( GetNumber () );
+            if ( iNum == fNum )
+            {
                 return json_object_new_int(iNum);
-			}
-			else
-			{
-				return json_object_new_double(fNum);
-			}
+            }
+            else
+            {
+                return json_object_new_double(fNum);
+            }
             break;
         }
         case LUA_TSTRING:
         {
             const char* szTemp = GetString ().c_str ();
             unsigned short usLength = static_cast < unsigned short > ( strlen ( szTemp ) );
-			if ( strlen ( szTemp ) == usLength )
-			{
-				return json_object_new_string_len ( (char *)szTemp, usLength );
-			}
-			else
-			{
-				g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON. Invalid string specified, limit is 65535 characters." );
-			}
+            if ( strlen ( szTemp ) == usLength )
+            {
+                return json_object_new_string_len ( (char *)szTemp, usLength );
+            }
+            else
+            {
+                g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON. Invalid string specified, limit is 65535 characters." );
+            }
             break;
         }
         case LUA_TLIGHTUSERDATA:
         {
-			CElement* pElement = GetElement ();
+            CElement* pElement = GetElement ();
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
-			
-			// Elements are dynamic, so storing them is potentially unsafe
-			if ( pElement && bSerialize )
-			{
-				char szElementID[10] = {0};
+            
+            // Elements are dynamic, so storing them is potentially unsafe
+            if ( pElement && bSerialize )
+            {
+                char szElementID[10] = {0};
                 _snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
-				return json_object_new_string ( szElementID );
-			}
+                return json_object_new_string ( szElementID );
+            }
             else if ( VERIFY_RESOURCE(pResource) )
             {
-				char szElementID[MAX_RESOURCE_NAME_LENGTH+4] = {0};
+                char szElementID[MAX_RESOURCE_NAME_LENGTH+4] = {0};
                 _snprintf ( szElementID, MAX_RESOURCE_NAME_LENGTH+3, "^R^%s", pResource->GetName().c_str () );
-				return json_object_new_string ( szElementID );
+                return json_object_new_string ( szElementID );
             }
-			else
-			{
-				g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, only valid elements can be sent." );
-				return NULL;
-			}
+            else
+            {
+                g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, only valid elements can be sent." );
+                return NULL;
+            }
             break;
         }
-		default:
-		{
-			g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, unsupported data type. Use Table, Nil, String, Number, Boolean, Resource or Element." );
-			return NULL;
-		}
+        default:
+        {
+            g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, unsupported data type. Use Table, Nil, String, Number, Boolean, Resource or Element." );
+            return NULL;
+        }
     }
     return NULL;
 }
@@ -858,61 +858,61 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
         }
         case LUA_TNUMBER:
         {
-			float fNum = static_cast < float > ( GetNumber () );
-			int iNum = static_cast < int > ( GetNumber () );
-			if ( iNum == fNum )
-			{
+            float fNum = static_cast < float > ( GetNumber () );
+            int iNum = static_cast < int > ( GetNumber () );
+            if ( iNum == fNum )
+            {
                 _snprintf ( szBuffer, length, "%d", iNum );
                 return szBuffer;
-			}
-			else
-			{
+            }
+            else
+            {
                 _snprintf ( szBuffer, length, "%f", fNum );
                 return szBuffer;
-			}
+            }
             break;
         }
         case LUA_TSTRING:
         {
             const char* szTemp = GetString ().c_str ();
             unsigned short usLength = static_cast < unsigned short > ( strlen ( szTemp ) );
-			if ( strlen ( szTemp ) == usLength )
-			{
-				_snprintf ( szBuffer, length, "%s", szTemp );
+            if ( strlen ( szTemp ) == usLength )
+            {
+                _snprintf ( szBuffer, length, "%s", szTemp );
                 return szBuffer;
-			}
-			else
-			{
-				g_pGame->GetScriptDebugging()->LogError ( NULL, "String is too long. Limit is 65535 characters." );
-			}
+            }
+            else
+            {
+                g_pGame->GetScriptDebugging()->LogError ( NULL, "String is too long. Limit is 65535 characters." );
+            }
             break;
         }
         case LUA_TLIGHTUSERDATA:
         {
-			CElement* pElement = GetElement ();
+            CElement* pElement = GetElement ();
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
-			if ( pElement )
-			{
+            if ( pElement )
+            {
                 _snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
-				return szBuffer;
-			}
-			else if ( VERIFY_RESOURCE(pResource) )
-			{
+                return szBuffer;
+            }
+            else if ( VERIFY_RESOURCE(pResource) )
+            {
                 _snprintf ( szBuffer, length, "#R#%s", pResource->GetName().c_str () );
-				return szBuffer;
-			}
-			else
-			{
-				g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert element to string, only valid elements can be sent." );
-				return NULL;
-			}
+                return szBuffer;
+            }
+            else
+            {
+                g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert element to string, only valid elements can be sent." );
+                return NULL;
+            }
             break;
         }
-		default:
-		{
-			g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument to string, unsupported data type. Use String, Number, Boolean or Element." );
-			return NULL;
-		}
+        default:
+        {
+            g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument to string, unsupported data type. Use String, Number, Boolean or Element." );
+            return NULL;
+        }
     }
     return NULL;
 }

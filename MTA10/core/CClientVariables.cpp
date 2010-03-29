@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CClientVariables.cpp
-*  PURPOSE:		Managed storage of client variables (cvars)
-*  DEVELOPERS:	Derek Abdine <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CClientVariables.cpp
+*  PURPOSE:     Managed storage of client variables (cvars)
+*  DEVELOPERS:  Derek Abdine <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

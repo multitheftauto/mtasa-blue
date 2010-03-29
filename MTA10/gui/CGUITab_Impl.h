@@ -20,12 +20,12 @@
 class CGUITab_Impl : public CGUITab, public CGUIElement_Impl, public CGUITabList
 {
 public:
-							CGUITab_Impl            ( class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption );
-							~CGUITab_Impl           ( void );
+                            CGUITab_Impl            ( class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption );
+                            ~CGUITab_Impl           ( void );
 
-	void					SetCaption		 		( const char* szCaption );
+    void                    SetCaption              ( const char* szCaption );
 
-	eCGUIType				GetType					( void ) { return CGUI_TAB; };
+    eCGUIType               GetType                 ( void ) { return CGUI_TAB; };
 
     #include "CGUIElement_Inc.h"
 };

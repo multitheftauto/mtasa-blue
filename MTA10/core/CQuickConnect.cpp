@@ -30,7 +30,7 @@ CQuickConnect::CQuickConnect ( void )
    // m_pWindow->SetPosition ( CVector2D ( 0.35f, 0.375f ), true );
     m_pWindow->SetSize ( CVector2D ( 280.0f, 120.0f ) );
     m_pWindow->SetSizingEnabled ( false );
-	m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->SetAlwaysOnTop ( true );
 
     // Create the controls
     //  Host label

@@ -44,8 +44,8 @@ public:
     bool                Load                    ( const char* szModName, int iArgumentCount, char* szArguments [] );
     void                Unload                  ( void );
 
-	void				HandleInput				( const char* szCommand );
-	void				GetTag					( char* szInfoTag, int iInfoTag );
+    void                HandleInput             ( const char* szCommand );
+    void                GetTag                  ( char* szInfoTag, int iInfoTag );
 
     void                DoPulse                 ( void );
 

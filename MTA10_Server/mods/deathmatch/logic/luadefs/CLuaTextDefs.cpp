@@ -24,8 +24,8 @@ void CLuaTextDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "textDisplayRemoveText", CLuaTextDefs::textDisplayRemoveText );
     CLuaCFunctions::AddFunction ( "textDisplayAddObserver", CLuaTextDefs::textDisplayAddObserver );
     CLuaCFunctions::AddFunction ( "textDisplayRemoveObserver", CLuaTextDefs::textDisplayRemoveObserver );
-	CLuaCFunctions::AddFunction ( "textDisplayIsObserver", CLuaTextDefs::textDisplayIsObserver );
-	CLuaCFunctions::AddFunction ( "textDisplayGetObservers", CLuaTextDefs::textDisplayGetObservers );
+    CLuaCFunctions::AddFunction ( "textDisplayIsObserver", CLuaTextDefs::textDisplayIsObserver );
+    CLuaCFunctions::AddFunction ( "textDisplayGetObservers", CLuaTextDefs::textDisplayGetObservers );
 
     CLuaCFunctions::AddFunction ( "textItemSetText", CLuaTextDefs::textItemSetText );
     CLuaCFunctions::AddFunction ( "textItemGetText", CLuaTextDefs::textItemGetText );
@@ -234,7 +234,7 @@ int CLuaTextDefs::textDisplayRemoveText ( lua_State* luaVM )
             {
                 if ( pTextItem )
                 {
-				    pTextDisplay->Remove ( pTextItem );
+                    pTextDisplay->Remove ( pTextItem );
 
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -299,7 +299,7 @@ int CLuaTextDefs::textDisplayRemoveObserver ( lua_State* luaVM )
             {
                 if ( pPlayer )
                 {
-				    pTextDisplay->RemoveObserver ( pPlayer );
+                    pTextDisplay->RemoveObserver ( pPlayer );
 
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -334,10 +334,10 @@ int CLuaTextDefs::textDisplayIsObserver ( lua_State* luaVM )
             {
                 if ( pPlayer )
                 {
-				    if ( pTextDisplay -> IsObserver ( pPlayer ) )
-						lua_pushboolean ( luaVM, true );
-					else
-						lua_pushboolean ( luaVM, false );
+                    if ( pTextDisplay -> IsObserver ( pPlayer ) )
+                        lua_pushboolean ( luaVM, true );
+                    else
+                        lua_pushboolean ( luaVM, false );
 
                     return 1;
                 }
@@ -367,12 +367,12 @@ int CLuaTextDefs::textDisplayGetObservers ( lua_State* luaVM )
             CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
             if ( pTextDisplay )
             {
-				// We want a table obviously
-				lua_newtable ( luaVM );
+                // We want a table obviously
+                lua_newtable ( luaVM );
 
-				// And make the text-display list all the observers
-				pTextDisplay -> GetObservers ( luaVM );
-				return 1;
+                // And make the text-display list all the observers
+                pTextDisplay -> GetObservers ( luaVM );
+                return 1;
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayGetObservers", "textDisplay", 1 );

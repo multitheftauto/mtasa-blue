@@ -17,8 +17,8 @@
 #include <string>
 
 typedef struct _section_info_t {
-	DWORD Address;
-	DWORD  Size;
+    DWORD Address;
+    DWORD  Size;
 } SECTIONINFO, *PSECTIONINFO;
 
 class CPEHookUtils

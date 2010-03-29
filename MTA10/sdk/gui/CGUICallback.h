@@ -15,9 +15,9 @@
 class CGUIElement;
 
 // Define callbacks
-#define GUI_CALLBACK			CGUICallback < bool, CGUIElement * >
-#define GUI_CALLBACK_KEY		CGUICallback < bool, CGUIKeyEventArgs >
-#define GUI_CALLBACK_MOUSE		CGUICallback < bool, CGUIMouseEventArgs >
+#define GUI_CALLBACK            CGUICallback < bool, CGUIElement * >
+#define GUI_CALLBACK_KEY        CGUICallback < bool, CGUIKeyEventArgs >
+#define GUI_CALLBACK_MOUSE      CGUICallback < bool, CGUIMouseEventArgs >
 
 // Represents any callback
 template < typename Ret, typename Arguments >
@@ -81,7 +81,7 @@ public:
     // Construct from a static function pointer
     CGUICallback ( Ret ( *pF )( Arguments ) )
     {
-		if ( pF )
+        if ( pF )
         {
             new(m_Callback) GUICallbackFree < Ret, Arguments > ( pF );
         }
@@ -98,10 +98,10 @@ public:
     }
 
     // Copy constructor
-	CGUICallback ( const CGUICallback < Ret, Arguments > & copy )
-	{
+    CGUICallback ( const CGUICallback < Ret, Arguments > & copy )
+    {
         *this = copy;
-	}
+    }
 
     void operator = ( const CGUICallback < Ret, Arguments > & copy )
     {

@@ -212,7 +212,7 @@ void CClientCivilian::SetHealth ( float fHealth )
 int CClientCivilian::GetModelID ( void )
 {
     //return m_iVehicleModel;
-	return 0;
+    return 0;
 }
 
 

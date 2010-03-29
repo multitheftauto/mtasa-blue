@@ -35,7 +35,7 @@ CResourceConfigItem::~CResourceConfigItem ( void )
     if ( m_pXMLFile )
     {
         delete m_pXMLFile;
-	    m_pXMLFile = NULL;
+        m_pXMLFile = NULL;
     }
 }
 
@@ -78,7 +78,7 @@ bool CResourceConfigItem::Stop ( void )
     if ( m_pXMLFile ) 
     {
         delete m_pXMLFile;
-	    m_pXMLFile = NULL;
+        m_pXMLFile = NULL;
     }
 
     return true;

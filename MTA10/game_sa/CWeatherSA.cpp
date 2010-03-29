@@ -23,8 +23,8 @@ unsigned long CWeatherSA::FUNC_IsRaining;
 
 unsigned char CWeatherSA::Get ( void )
 {
-	DEBUG_TRACE("unsigned char CWeatherSA::Get ( void )");
-	return (unsigned char)*VAR_CurrentWeather;
+    DEBUG_TRACE("unsigned char CWeatherSA::Get ( void )");
+    return (unsigned char)*VAR_CurrentWeather;
 }
 
 void CWeatherSA::Set ( unsigned char primary, unsigned char secondary )
@@ -48,37 +48,37 @@ void CWeatherSA::SetSecondary ( unsigned char weather )
 
 void CWeatherSA::ForceWeather ( unsigned char weather )
 {
-	DEBUG_TRACE("void CWeatherSA::Forcunsigned char ( unsigned char weather )");
-	*VAR_CurrentWeather = static_cast < unsigned char > ( weather );
+    DEBUG_TRACE("void CWeatherSA::Forcunsigned char ( unsigned char weather )");
+    *VAR_CurrentWeather = static_cast < unsigned char > ( weather );
 }
 
 void CWeatherSA::ForceWeatherNow ( unsigned char weather )
 {
-	DEBUG_TRACE("void CWeatherSA::Forcunsigned charNow ( unsigned char weather )");
+    DEBUG_TRACE("void CWeatherSA::Forcunsigned charNow ( unsigned char weather )");
 
     unsigned char ucWeather = static_cast < unsigned char > ( weather );
-	*VAR_CurrentWeather = ucWeather;
-	*VAR_CurrentWeather_b = ucWeather;
-	*VAR_CurrentWeather_c = ucWeather;
+    *VAR_CurrentWeather = ucWeather;
+    *VAR_CurrentWeather_b = ucWeather;
+    *VAR_CurrentWeather_c = ucWeather;
 }
 
 void CWeatherSA::Release ( void )
 {
-	DEBUG_TRACE("void CWeatherSA::Release ( void )");
-	*VAR_CurrentWeather = 0xFF;	
+    DEBUG_TRACE("void CWeatherSA::Release ( void )");
+    *VAR_CurrentWeather = 0xFF; 
 }
 
 bool CWeatherSA::IsRaining ( void )
 {
-	DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
-	DWORD dwFunc = FUNC_IsRaining;
-	bool bReturn = false;
-	_asm
-	{
-		call	dwFunc
-		mov		bReturn, al
-	}
-	return bReturn;
+    DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
+    DWORD dwFunc = FUNC_IsRaining;
+    bool bReturn = false;
+    _asm
+    {
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
 }
 
 float CWeatherSA::GetAmountOfRain ( void )

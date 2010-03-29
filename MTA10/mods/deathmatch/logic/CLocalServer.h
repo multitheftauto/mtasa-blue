@@ -22,8 +22,8 @@ public:
                                 CLocalServer        ( const char* szConfig );
                                 ~CLocalServer       ( void );
 
-	bool			            OnStartButtonClick	( CGUIElement* pElement );
-	bool			            OnCancelButtonClick	( CGUIElement* pElement );
+    bool                        OnStartButtonClick  ( CGUIElement* pElement );
+    bool                        OnCancelButtonClick ( CGUIElement* pElement );
     bool                        OnAddButtonClick    ( CGUIElement* pElement );
     bool                        OnDelButtonClick    ( CGUIElement* pElement );
 
@@ -40,7 +40,7 @@ private:
     std::string                 m_strConfig;
     CXMLFile*                   m_pConfig;
 
-    CGUI*						m_pGUI;
+    CGUI*                       m_pGUI;
 
     CGUIWindow*                 m_pWindow;
 

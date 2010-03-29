@@ -61,18 +61,18 @@ void CServer::ServerShutdown ( void )
 
 void CServer::GetTag ( char* szInfoTag, int iInfoTag )
 {
-	if ( m_pGame )
-	{
-		m_pGame->GetTag ( szInfoTag, iInfoTag );
-	}
+    if ( m_pGame )
+    {
+        m_pGame->GetTag ( szInfoTag, iInfoTag );
+    }
 }
 
 void CServer::HandleInput ( char* szCommand )
 {
-	if ( m_pGame )
-	{
-		m_pGame->HandleInput ( szCommand );
-	}
+    if ( m_pGame )
+    {
+        m_pGame->HandleInput ( szCommand );
+    }
 }
 
 

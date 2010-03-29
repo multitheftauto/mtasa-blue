@@ -25,8 +25,8 @@ public:
     static void     LoadFunctions                       ( void );
 
     // Create/edit functions
-    static int		createResource						( lua_State* luaVM );
-	static int		copyResource						( lua_State* luaVM );
+    static int      createResource                      ( lua_State* luaVM );
+    static int      copyResource                        ( lua_State* luaVM );
 
     static int      addResourceMap                      ( lua_State* luaVM );
     static int      addResourceConfig                   ( lua_State* luaVM );
@@ -57,8 +57,8 @@ public:
     static int      getResourceMapRootElement           ( lua_State* luaVM );
     static int      getResourceExportedFunctions        ( lua_State* luaVM );
 
-	// Set stuff
-	static int      setResourceInfo                     ( lua_State* luaVM );
+    // Set stuff
+    static int      setResourceInfo                     ( lua_State* luaVM );
 
     // Misc
     static int      call                                ( lua_State* luaVM );

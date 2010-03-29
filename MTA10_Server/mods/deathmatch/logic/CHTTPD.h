@@ -26,13 +26,13 @@ class CHTTPD : public EHS
 {
 public:
 
-	                            CHTTPD      ( void ); // start the initial server
+                                CHTTPD      ( void ); // start the initial server
                                 ~CHTTPD     ();
 
-	ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
-								 HttpResponse * ipoHttpResponse );
+    ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
+                                 HttpResponse * ipoHttpResponse );
     void         HttpPulse     ( void );
-	
+    
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
     inline CResource *          GetResource ( void ) { return m_resource; }
@@ -44,7 +44,7 @@ private:
     CHTTPD *                    m_server;
     std::string                 m_strDefaultResourceName; // default resource name
     
-	EHSServerParameters			m_Parameters;
+    EHSServerParameters         m_Parameters;
 
     bool                        m_bStartedServer;
 

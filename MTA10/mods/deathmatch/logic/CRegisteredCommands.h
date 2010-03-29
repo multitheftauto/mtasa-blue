@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CRegisteredCommands.h
 *  PURPOSE:     Header file for registered commands class
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*				Derek Abdine <...>
+*               Derek Abdine <...>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

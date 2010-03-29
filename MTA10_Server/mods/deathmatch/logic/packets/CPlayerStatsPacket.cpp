@@ -14,12 +14,12 @@
 
 CPlayerStatsPacket::~CPlayerStatsPacket ( void )
 {
-	vector < sPlayerStat* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
-		delete (*iter);
-	}
-	m_List.clear ();
+    vector < sPlayerStat* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        delete (*iter);
+    }
+    m_List.clear ();
 }
 
 
@@ -31,28 +31,28 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
         ElementID ID = m_pSourceElement->GetID ();
         BitStream.WriteCompressed ( ID );
 
-		// Write the stats
-		unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );
-		BitStream.WriteCompressed ( usNumStats );
+        // Write the stats
+        unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );
+        BitStream.WriteCompressed ( usNumStats );
 
-		vector < sPlayerStat* > ::const_iterator iter = m_List.begin ();
-		for ( ; iter != m_List.end () ; iter++ )
-		{
-			BitStream.Write ( (*iter)->id );
-			BitStream.Write ( (*iter)->value );
-		}
+        vector < sPlayerStat* > ::const_iterator iter = m_List.begin ();
+        for ( ; iter != m_List.end () ; iter++ )
+        {
+            BitStream.Write ( (*iter)->id );
+            BitStream.Write ( (*iter)->value );
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 
 void CPlayerStatsPacket::Add ( unsigned short usID, float fValue )
 {
-	sPlayerStat* Stat = new sPlayerStat;
-	Stat->id = usID;
-	Stat->value = fValue;
-	m_List.push_back ( Stat );
+    sPlayerStat* Stat = new sPlayerStat;
+    Stat->id = usID;
+    Stat->value = fValue;
+    m_List.push_back ( Stat );
 }

@@ -38,11 +38,11 @@ class CGUI;
 #include "CGUITypes.h"
 
 // Path defines for CGUI
-#define	CGUI_ICON_MESSAGEBOX_INFO		"cgui\\images\\info.png"
-#define	CGUI_ICON_MESSAGEBOX_QUESTION	"cgui\\images\\question.png"
-#define	CGUI_ICON_MESSAGEBOX_WARNING	"cgui\\images\\warning.png"
-#define	CGUI_ICON_MESSAGEBOX_ERROR		"cgui\\images\\error.png"
-#define CGUI_ICON_SERVER_PASSWORD		"cgui\\images\\locked.png"
+#define CGUI_ICON_MESSAGEBOX_INFO       "cgui\\images\\info.png"
+#define CGUI_ICON_MESSAGEBOX_QUESTION   "cgui\\images\\question.png"
+#define CGUI_ICON_MESSAGEBOX_WARNING    "cgui\\images\\warning.png"
+#define CGUI_ICON_MESSAGEBOX_ERROR      "cgui\\images\\error.png"
+#define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
 
 // Message box types
 enum CMessageBoxFlag
@@ -81,12 +81,12 @@ public:
     virtual void                ProcessKeyboardInput    ( unsigned long ulKey, bool bIsDown ) = 0;
     virtual void                ProcessCharacter        ( unsigned long ulCharacter ) = 0;
 
-	//
-	virtual void				SetGUIInputEnabled		( bool bEnabled ) = 0;
-	virtual bool				GetGUIInputEnabled		( void ) = 0;
+    //
+    virtual void                SetGUIInputEnabled      ( bool bEnabled ) = 0;
+    virtual bool                GetGUIInputEnabled      ( void ) = 0;
 
-	//
-	virtual CGUIMessageBox*		CreateMessageBox		( const char* szTitle, const char* szMessage, unsigned int uiFlags ) = 0;
+    //
+    virtual CGUIMessageBox*     CreateMessageBox        ( const char* szTitle, const char* szMessage, unsigned int uiFlags ) = 0;
     virtual CGUIButton*         CreateButton            ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIButton*         CreateButton            ( CGUITab* pParent = NULL, const char* szCaption = "" ) = 0;
 
@@ -96,8 +96,8 @@ public:
     virtual CGUIRadioButton*    CreateRadioButton       ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIRadioButton*    CreateRadioButton       ( CGUITab* pParent = NULL, const char* szCaption = "" ) = 0;
 
-	virtual CGUIEdit*           CreateEdit              ( CGUIElement* pParent = NULL, const char* szText = "" ) = 0;
-	virtual CGUIEdit*           CreateEdit              ( CGUITab* pParent = NULL, const char* szText = "" ) = 0;
+    virtual CGUIEdit*           CreateEdit              ( CGUIElement* pParent = NULL, const char* szText = "" ) = 0;
+    virtual CGUIEdit*           CreateEdit              ( CGUITab* pParent = NULL, const char* szText = "" ) = 0;
 
     virtual CGUIGridList*       CreateGridList          ( CGUIElement* pParent = NULL, bool bFrame = true ) = 0;
     virtual CGUIGridList*       CreateGridList          ( CGUITab* pParent = NULL, bool bFrame = true ) = 0;
@@ -109,44 +109,44 @@ public:
     virtual CGUIProgressBar*    CreateProgressBar       ( CGUIElement* pParent ) = 0;
     virtual CGUIProgressBar*    CreateProgressBar       ( CGUITab* pParent ) = 0;
 
-	virtual CGUIMemo*           CreateMemo              ( CGUIElement* pParent = NULL, const char* szText = "" ) = 0;
+    virtual CGUIMemo*           CreateMemo              ( CGUIElement* pParent = NULL, const char* szText = "" ) = 0;
     virtual CGUIMemo*           CreateMemo              ( CGUITab* pParent = NULL, const char* szText = "" ) = 0;
 
-	virtual CGUIStaticImage*    CreateStaticImage       ( CGUIElement* pParent ) = 0;
+    virtual CGUIStaticImage*    CreateStaticImage       ( CGUIElement* pParent ) = 0;
     virtual CGUIStaticImage*    CreateStaticImage       ( CGUITab* pParent ) = 0;
     virtual CGUIStaticImage*    CreateStaticImage       ( CGUIGridList* pParent ) = 0;
-	virtual CGUIStaticImage*    CreateStaticImage       ( void ) = 0;
+    virtual CGUIStaticImage*    CreateStaticImage       ( void ) = 0;
 
-	virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent = NULL ) = 0;
-	virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent = NULL ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent = NULL ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent = NULL ) = 0;
 
-	virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent = NULL ) = 0;
-	virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent = NULL ) = 0;
+    virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent = NULL ) = 0;
+    virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent = NULL ) = 0;
 
-	virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUIElement* pParent = NULL ) = 0;
-	virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUITab* pParent = NULL ) = 0;
+    virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUIElement* pParent = NULL ) = 0;
+    virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUITab* pParent = NULL ) = 0;
 
     virtual CGUIComboBox*       CreateComboBox          ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIComboBox*       CreateComboBox          ( CGUIComboBox* pParent = NULL, const char* szCaption = "" ) = 0;
     //
 
-	virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
-	virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false ) = 0;
+    virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
+    virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false ) = 0;
     virtual CGUITexture*        CreateTexture           ( void ) = 0;
 
-	virtual void                SetCursorEnabled        ( bool bEnabled ) = 0;
+    virtual void                SetCursorEnabled        ( bool bEnabled ) = 0;
     virtual bool                IsCursorEnabled         ( void ) = 0;
 
-	virtual CVector2D			GetResolution			( void ) = 0;
-	virtual void				SetResolution			( float fWidth, float fHeight ) = 0;
+    virtual CVector2D           GetResolution           ( void ) = 0;
+    virtual void                SetResolution           ( float fWidth, float fHeight ) = 0;
 
-	virtual CGUIFont*			GetDefaultFont			( void ) = 0;
-	virtual CGUIFont*			GetSmallFont			( void ) = 0;
-	virtual CGUIFont*			GetBoldFont				( void ) = 0;
-	virtual CGUIFont*			GetClearFont			( void ) = 0;
-	virtual CGUIFont*			GetSansFont				( void ) = 0;
+    virtual CGUIFont*           GetDefaultFont          ( void ) = 0;
+    virtual CGUIFont*           GetSmallFont            ( void ) = 0;
+    virtual CGUIFont*           GetBoldFont             ( void ) = 0;
+    virtual CGUIFont*           GetClearFont            ( void ) = 0;
+    virtual CGUIFont*           GetSansFont             ( void ) = 0;
 
-	virtual void				SetWorkingDirectory		( const char * szDir ) = 0;
+    virtual void                SetWorkingDirectory     ( const char * szDir ) = 0;
 
     virtual void                SetCharacterKeyHandler      ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;
     virtual void                SetKeyDownHandler           ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;

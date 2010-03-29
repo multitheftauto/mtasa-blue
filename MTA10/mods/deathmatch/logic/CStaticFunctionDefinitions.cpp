@@ -33,7 +33,7 @@ static CClientVehicleManager*                       m_pVehicleManager;
 static CClientObjectManager*                        m_pObjectManager;
 static CClientColManager*                           m_pColManager;
 static CClientTeamManager*                          m_pTeamManager;
-static CGUI*										m_pGUI;
+static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
 static CClientMarkerManager*                        m_pMarkerManager;
@@ -71,7 +71,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pObjectManager = pManager->GetObjectManager ();
     m_pColManager = pManager->GetColManager ();
     m_pTeamManager = pManager->GetTeamManager ();
-	m_pGUI = pCore->GetGUI ();
+    m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
     m_pMarkerManager = pManager->GetMarkerManager ();
@@ -137,7 +137,7 @@ bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, char* s
     // We got an event and handler with that name?
     if ( m_pEvents->Exists ( szName ) )
     {
-		// ACHTUNG: CHECK WHETHER THE LUA FUNCTION REF IS CORRECTLY FOUND
+        // ACHTUNG: CHECK WHETHER THE LUA FUNCTION REF IS CORRECTLY FOUND
         if ( Entity.DeleteEvent ( &LuaMain, szName, iLuaFunction ) )
         {
             return true;
@@ -214,12 +214,12 @@ bool CStaticFunctionDefinitions::OutputConsole ( const char* szText )
 
 bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
 {
-	CLuaArguments Arguments;
-	Arguments.PushString ( szText );
-	Arguments.PushNumber ( ucRed );
-	Arguments.PushNumber ( ucGreen );
-	Arguments.PushNumber ( ucBlue );
-	g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+    CLuaArguments Arguments;
+    Arguments.PushString ( szText );
+    Arguments.PushNumber ( ucRed );
+    Arguments.PushNumber ( ucGreen );
+    Arguments.PushNumber ( ucBlue );
+    g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
 
     m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
     return true;
@@ -584,12 +584,12 @@ bool CStaticFunctionDefinitions::GetElementModel ( CClientEntity& Entity, unsign
             usModel = Object.GetModel ();
             break;
         }
-		case CCLIENTPICKUP:
-		{
-			CClientPickup& pPickup = static_cast < CClientPickup& > ( Entity );
-			usModel = pPickup.GetModel ();
-			break;
-		}
+        case CCLIENTPICKUP:
+        {
+            CClientPickup& pPickup = static_cast < CClientPickup& > ( Entity );
+            usModel = pPickup.GetModel ();
+            break;
+        }
         default: return false;
     }
     return true;
@@ -684,7 +684,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, c
         CClientDummy* pDummy = new CClientDummy ( m_pManager, INVALID_ELEMENT_ID,  szTypeName );
         pDummy->SetName ( (char*) szID );
 
-		pDummy->SetParent ( Resource.GetResourceDynamicEntity() );
+        pDummy->SetParent ( Resource.GetResourceDynamicEntity() );
         return pDummy;
     }
 
@@ -704,15 +704,15 @@ bool CStaticFunctionDefinitions::DestroyElement ( CClientEntity& Entity )
             ++iter;
     }
 
-	// Are we already being deleted?
+    // Are we already being deleted?
     if ( Entity.IsBeingDeleted () )
         return false;
 
-	// We can't delete our root
+    // We can't delete our root
     if ( &Entity == m_pRootEntity )
         return false;
 
-	
+    
     // Use the element deleter to delete it if it's local and not system
     if ( Entity.IsLocalEntity () && !Entity.IsSystemEntity () )
     {
@@ -780,7 +780,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
     RUN_CHILDREN SetElementPosition ( **iter, vecPosition );
 
     if ( bWarp )
-	    Entity.Teleport ( vecPosition );
+        Entity.Teleport ( vecPosition );
     else
         Entity.SetPosition ( vecPosition );
 
@@ -796,12 +796,12 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
     switch ( iType )
     {
         case CCLIENTPED:
-		case CCLIENTPLAYER:
-		{
+        case CCLIENTPLAYER:
+        {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-			Ped.SetRotationDegrees ( vecRotation );
+            Ped.SetRotationDegrees ( vecRotation );
             break;
-		}
+        }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
@@ -879,34 +879,34 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
             {
                 CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
 
-	            GUIElement.SetParent ( &Parent );
+                GUIElement.SetParent ( &Parent );
                 return true;
             }
         }
         else
         {
-			CClientEntity* pTemp = &Parent;
-			CClientEntity* pRoot = m_pRootEntity;
-			bool bValidParent = false;
-			while ( pTemp != pRoot )
-			{
-				const char * szTypeName = pTemp->GetTypeName();
-				if ( szTypeName && strcmp(szTypeName, "map") == 0 )
-				{
-					bValidParent = true; // parents must be a map
-					break;
-				}
+            CClientEntity* pTemp = &Parent;
+            CClientEntity* pRoot = m_pRootEntity;
+            bool bValidParent = false;
+            while ( pTemp != pRoot )
+            {
+                const char * szTypeName = pTemp->GetTypeName();
+                if ( szTypeName && strcmp(szTypeName, "map") == 0 )
+                {
+                    bValidParent = true; // parents must be a map
+                    break;
+                }
 
-				pTemp = pTemp->GetParent();
-			}
+                pTemp = pTemp->GetParent();
+            }
 
-		    // Make sure the entity we move is a client entity or we get a problem
-		    if ( bValidParent && Entity.IsLocalEntity () )
-		    {
-			    // Set the new parent
-			    Entity.SetParent ( &Parent );
-	            return true;
-		    }
+            // Make sure the entity we move is a client entity or we get a problem
+            if ( bValidParent && Entity.IsLocalEntity () )
+            {
+                // Set the new parent
+                Entity.SetParent ( &Parent );
+                return true;
+            }
         }
     }
 
@@ -1239,16 +1239,16 @@ char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, u
 
 bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn )
 {
-	SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
-	if ( pClothing )
-	{
-		if ( szTextureReturn )
-			strcpy ( szTextureReturn, pClothing->szTexture );
-		if ( szModelReturn )
-			strcpy ( szModelReturn, pClothing->szModel );
+    SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
+    if ( pClothing )
+    {
+        if ( szTextureReturn )
+            strcpy ( szTextureReturn, pClothing->szTexture );
+        if ( szModelReturn )
+            strcpy ( szModelReturn, pClothing->szModel );
 
-		return true;
-	}
+        return true;
+    }
 
     return false;
 }
@@ -1314,8 +1314,8 @@ bool CStaticFunctionDefinitions::IsPedFrozen ( CClientPed & Ped, bool & bFrozen 
 
 bool CStaticFunctionDefinitions::GetPedCameraRotation ( CClientPed & Ped, float & fRotation )
 {
-	fRotation = ConvertRadiansToDegrees ( Ped.GetCameraRotation() );
-	return true;
+    fRotation = ConvertRadiansToDegrees ( Ped.GetCameraRotation() );
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition ( CClientPed& Ped, CVector& vecPosition )
@@ -1461,7 +1461,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-		return Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
+        return Ped.SetCurrentWeaponSlot ( (eWeaponSlot) iSlot );
     }
 
     return false;
@@ -1683,9 +1683,9 @@ bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, char* sz
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-		Ped.GetClothes()->AddClothes ( szTexture, szModel, ucType, false );
+        Ped.GetClothes()->AddClothes ( szTexture, szModel, ucType, false );
         Ped.RebuildModel ( true );
-		return true;
+        return true;
     }
 
     return false;
@@ -1699,9 +1699,9 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CClientEntity& Entity, unsig
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-		Ped.GetClothes()->RemoveClothes ( ucType, false );
+        Ped.GetClothes()->RemoveClothes ( ucType, false );
         Ped.RebuildModel ( true );
-		return true;
+        return true;
     }
 
     return false;
@@ -1777,7 +1777,7 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CClientEntity & Entity, bool bFr
 
 bool CStaticFunctionDefinitions::SetPedCameraRotation ( CClientEntity & Entity, float fRotation )
 {
-	RUN_CHILDREN SetPedCameraRotation ( **iter, fRotation );
+    RUN_CHILDREN SetPedCameraRotation ( **iter, fRotation );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
@@ -1914,7 +1914,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
         pPed->SetPosition ( vecPosition );
-		pPed->SetCurrentRotation ( fRotation );
+        pPed->SetCurrentRotation ( fRotation );
         return pPed;
     }
 
@@ -1940,25 +1940,25 @@ bool CStaticFunctionDefinitions::GetVehicleModelFromName ( const char* szName, u
 
 bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, char* szName, unsigned short len )
 {
-	strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-	if (len)
-		szName[len-1] = '\0';
-	return true;
+    strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
+    if (len)
+        szName[len-1] = '\0';
+    return true;
 }
 
 
 bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, char* szName, unsigned short len )
 {
-	unsigned char ucSlot;
-	if ( CVehicleUpgrades::GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
-	{
-		strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-		if (len)
-			szName[len-1] = '\0';
-		return true;
-	}
+    unsigned char ucSlot;
+    if ( CVehicleUpgrades::GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
+    {
+        strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
+        if (len)
+            szName[len-1] = '\0';
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 
@@ -1967,8 +1967,8 @@ bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usMode
     assert ( szName );
 
     strncpy ( szName, CVehicleNames::GetVehicleName ( usModel ), len );
-	if (len)
-		szName[len-1] = '\0';
+    if (len)
+        szName[len-1] = '\0';
 
     return true;
 }
@@ -1976,12 +1976,12 @@ bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usMode
 
 bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( CClientVehicle& Vehicle, float& fSpeed )
 {
-	// It's a heli?
-	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
-	{
-		fSpeed = Vehicle.GetHeliRotorSpeed ();
-		return true;
-	}
+    // It's a heli?
+    if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
+    {
+        fSpeed = Vehicle.GetHeliRotorSpeed ();
+        return true;
+    }
 
     return false;
 }
@@ -1993,7 +1993,7 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool
         return false;
 
     bDerailed = Vehicle.IsDerailed ();
-	return true;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::IsTrainDerailable ( CClientVehicle& Vehicle, bool& bIsDerailable )
@@ -2012,7 +2012,7 @@ bool CStaticFunctionDefinitions::GetTrainDirection ( CClientVehicle& Vehicle, bo
         return false;
 
     bDirection = Vehicle.GetTrainDirection ();
-	return true;
+    return true;
 }
 
 
@@ -2022,7 +2022,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
         return false;
 
     fSpeed = Vehicle.GetTrainSpeed ();
-	return true;
+    return true;
 }
 
 
@@ -2033,7 +2033,7 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource,
         CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel );
         if ( pVehicle )
         {
-			pVehicle->SetParent ( Resource.GetResourceDynamicEntity() );
+            pVehicle->SetParent ( Resource.GetResourceDynamicEntity() );
             pVehicle->SetPosition ( vecPosition );     
 
             pVehicle->SetRotationDegrees ( vecRotation );
@@ -2230,16 +2230,16 @@ bool CStaticFunctionDefinitions::AddVehicleUpgrade ( CClientEntity& Entity, unsi
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
-		if ( pUpgrades )
-		{
-			if ( pUpgrades->IsUpgradeCompatible ( usUpgrade ) )
-			{
-				// Add to our upgrade list
-				pUpgrades->AddUpgrade ( usUpgrade );
-				return true;
-			}
-		}
+        CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
+        if ( pUpgrades )
+        {
+            if ( pUpgrades->IsUpgradeCompatible ( usUpgrade ) )
+            {
+                // Add to our upgrade list
+                pUpgrades->AddUpgrade ( usUpgrade );
+                return true;
+            }
+        }
     }
 
     return false;
@@ -2254,14 +2254,14 @@ bool CStaticFunctionDefinitions::AddAllVehicleUpgrades ( CClientEntity& Entity )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
-		if ( pUpgrades )
-		{
+        CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
+        if ( pUpgrades )
+        {
             unsigned short* usUpgrades = pUpgrades->GetSlotStates ();
 
             pUpgrades->AddAllUpgrades ();
-			return true;
-		}
+            return true;
+        }
     }
 
     return false;
@@ -2276,20 +2276,20 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade ( CClientEntity& Entity, u
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
-		if ( pUpgrades )
-		{
-			if ( pUpgrades->HasUpgrade ( usUpgrade ) )
-			{
-				unsigned char ucSlot;
-				if ( pUpgrades->GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
-				{
+        CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
+        if ( pUpgrades )
+        {
+            if ( pUpgrades->HasUpgrade ( usUpgrade ) )
+            {
+                unsigned char ucSlot;
+                if ( pUpgrades->GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
+                {
                     pUpgrades->RemoveUpgrade ( usUpgrade );
 
-					return true;
-				}
-			}
-		}
+                    return true;
+                }
+            }
+        }
     }
 
     return false;
@@ -2298,14 +2298,14 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade ( CClientEntity& Entity, u
 
 bool CStaticFunctionDefinitions::SetVehicleDoorState ( CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState )
 {
-	RUN_CHILDREN SetVehicleDoorState ( **iter, ucDoor, ucState );
+    RUN_CHILDREN SetVehicleDoorState ( **iter, ucDoor, ucState );
 
-	if ( IS_VEHICLE ( &Entity ) )
-	{
-		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		if ( ucDoor < MAX_DOORS )
-		{
+        if ( ucDoor < MAX_DOORS )
+        {
             switch ( Vehicle.GetModel () )
             {
                 case VT_BFINJECT:
@@ -2329,21 +2329,21 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CClientEntity& Entity, un
 
             Vehicle.SetDoorStatus ( ucDoor, ucState );
 
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CClientEntity& Entity, int iFrontLeft, int iRearLeft, int iFrontRight, int iRearRight )
 {
-	RUN_CHILDREN SetVehicleWheelStates ( **iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight );
+    RUN_CHILDREN SetVehicleWheelStates ( **iter, iFrontLeft, iRearLeft, iFrontRight, iRearRight );
 
-	if ( IS_VEHICLE ( &Entity ) )
-	{
-		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
         // Store the current and new states
         unsigned char ucFrontLeft, ucNewFrontLeft = ucFrontLeft = Vehicle.GetWheelStatus ( FRONT_LEFT_WHEEL );
@@ -2367,65 +2367,65 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CClientEntity& Entity, 
              ucNewFrontRight != ucFrontRight ||
              ucNewRearRight != ucRearRight )
         {
-			Vehicle.SetWheelStatus ( FRONT_LEFT_WHEEL, ucNewFrontLeft, false );
+            Vehicle.SetWheelStatus ( FRONT_LEFT_WHEEL, ucNewFrontLeft, false );
             Vehicle.SetWheelStatus ( REAR_LEFT_WHEEL, ucNewRearLeft, false );
             Vehicle.SetWheelStatus ( FRONT_RIGHT_WHEEL, ucNewFrontRight, false );
             Vehicle.SetWheelStatus ( REAR_RIGHT_WHEEL, ucNewRearRight, false );
 
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetVehicleLightState ( CClientEntity& Entity, unsigned char ucLight, unsigned char ucState )
 {
-	RUN_CHILDREN SetVehicleLightState ( **iter, ucLight, ucState );
+    RUN_CHILDREN SetVehicleLightState ( **iter, ucLight, ucState );
 
-	if ( IS_VEHICLE ( &Entity ) )
-	{
-		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		if ( ucLight < 4 )
-		{		
-			Vehicle.SetLightStatus ( ucLight, ucState );
+        if ( ucLight < 4 )
+        {       
+            Vehicle.SetLightStatus ( ucLight, ucState );
 
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetVehiclePanelState ( CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState )
 {
-	RUN_CHILDREN SetVehiclePanelState ( **iter, ucPanel, ucState );
+    RUN_CHILDREN SetVehiclePanelState ( **iter, ucPanel, ucState );
 
-	if ( IS_VEHICLE ( &Entity ) )
-	{
-		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
-		if ( ucPanel < 7 )
-		{
-			Vehicle.SetPanelStatus ( ucPanel, ucState );
-			return true;
-		}
-	}
+        if ( ucPanel < 7 )
+        {
+            Vehicle.SetPanelStatus ( ucPanel, ucState );
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetVehicleOverrideLights ( CClientEntity& Entity, unsigned char ucLights )
 {
-	RUN_CHILDREN SetVehicleOverrideLights ( **iter, ucLights );
+    RUN_CHILDREN SetVehicleOverrideLights ( **iter, ucLights );
 
-	if ( IS_VEHICLE ( &Entity ) )
-	{
-		CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+    if ( IS_VEHICLE ( &Entity ) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
         if ( Vehicle.GetOverrideLights () != ucLights )
         {
@@ -2588,12 +2588,12 @@ bool CStaticFunctionDefinitions::SetVehicleAdjustableProperty ( CClientEntity& E
 
 bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( CClientVehicle& Vehicle, float fSpeed )
 {
-	// It's a heli?
-	if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
-	{
-		Vehicle.SetHeliRotorSpeed ( fSpeed );
-		return true;
-	}
+    // It's a heli?
+    if ( Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI )
+    {
+        Vehicle.SetHeliRotorSpeed ( fSpeed );
+        return true;
+    }
 
     return false;
 }
@@ -2604,7 +2604,7 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CClientVehicle& Vehicle, boo
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-	Vehicle.SetDerailed ( bDerailed );
+    Vehicle.SetDerailed ( bDerailed );
     return true;
 }
 
@@ -2614,7 +2614,7 @@ bool CStaticFunctionDefinitions::SetTrainDerailable ( CClientVehicle& Vehicle, b
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-	Vehicle.SetDerailable ( bDerailable );
+    Vehicle.SetDerailable ( bDerailable );
     return true;
 }
 
@@ -2624,7 +2624,7 @@ bool CStaticFunctionDefinitions::SetTrainDirection ( CClientVehicle& Vehicle, bo
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-	Vehicle.SetTrainDirection ( bDirection );
+    Vehicle.SetTrainDirection ( bDirection );
     return true;
 }
 
@@ -2634,7 +2634,7 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-	Vehicle.SetTrainSpeed ( fSpeed );
+    Vehicle.SetTrainSpeed ( fSpeed );
     return true;
 }
 
@@ -2720,7 +2720,7 @@ CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, u
         CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
         if ( pObject )
         {
-			pObject->SetParent ( Resource.GetResourceDynamicEntity () );
+            pObject->SetParent ( Resource.GetResourceDynamicEntity () );
             pObject->SetPosition ( vecPosition );
             pObject->SetRotationDegrees ( vecRotation );
 
@@ -2809,11 +2809,11 @@ bool CStaticFunctionDefinitions::SetObjectScale ( CClientEntity& Entity, float f
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-		Object.SetScale ( fScale );
-		return true;
+        Object.SetScale ( fScale );
+        return true;
     }
 
-	return false;
+    return false;
 }
 
 
@@ -2824,11 +2824,11 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-		Object.SetStatic ( bStatic );
-		return true;
+        Object.SetStatic ( bStatic );
+        return true;
     }
 
-	return false;
+    return false;
 }
 
 
@@ -2838,7 +2838,7 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resou
     CClientRadarArea* pRadarArea = new CClientRadarArea ( m_pManager, INVALID_ELEMENT_ID );
     if ( pRadarArea )
     {
-		pRadarArea->SetParent ( Resource.GetResourceDynamicEntity () );
+        pRadarArea->SetParent ( Resource.GetResourceDynamicEntity () );
         pRadarArea->SetPosition ( vecPosition2D );
         pRadarArea->SetSize ( vecSize );        
         pRadarArea->SetColor ( color );
@@ -2852,88 +2852,88 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resou
 
 bool CStaticFunctionDefinitions::GetRadarAreaColor ( CClientRadarArea* RadarArea, SColor& outColor )
 {
-	if ( RadarArea )
-	{
+    if ( RadarArea )
+    {
         outColor = RadarArea->GetColor ();
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::GetRadarAreaSize ( CClientRadarArea* RadarArea, CVector2D& vecSize )
 {
-	if ( RadarArea )
-	{
-		vecSize = RadarArea->GetSize();
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        vecSize = RadarArea->GetSize();
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::IsRadarAreaFlashing ( CClientRadarArea* RadarArea, bool &flashing )
 {
-	if ( RadarArea )
-	{
-		flashing = RadarArea->IsFlashing();
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        flashing = RadarArea->IsFlashing();
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetRadarAreaColor ( CClientRadarArea* RadarArea, const SColor color )
 {
-	if ( RadarArea )
-	{
-		RadarArea->SetColor ( color );
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        RadarArea->SetColor ( color );
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetRadarAreaSize ( CClientRadarArea* RadarArea, CVector2D vecSize )
 {
-	if ( RadarArea )
-	{
-		RadarArea->SetSize ( vecSize );
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        RadarArea->SetSize ( vecSize );
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::SetRadarAreaFlashing ( CClientRadarArea* RadarArea, bool flashing )
 {
-	if ( RadarArea )
-	{
-		RadarArea->SetFlashing ( flashing );
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        RadarArea->SetFlashing ( flashing );
+        return true;
+    }
+    return false;
 }
 
 
 bool CStaticFunctionDefinitions::IsInsideRadarArea ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside )
 {
-	if ( RadarArea )
-	{
-		CVector2D vecRadarPos = RadarArea->GetPosition();
-		CVector2D vecRadarSize = RadarArea->GetSize();
-		float fMaxX = vecRadarPos.fX + vecRadarSize.fX;
-		float fMaxY = vecRadarPos.fY + vecRadarSize.fY;
-		if ( vecPosition.fX >= vecRadarPos.fX && vecPosition.fX <= fMaxX )
-		{
-			if ( vecPosition.fY >= vecRadarPos.fY && vecPosition.fY <= fMaxY )
-			{
-				inside = true;
-			}
-		}
-		return true;
-	}
-	return false;
+    if ( RadarArea )
+    {
+        CVector2D vecRadarPos = RadarArea->GetPosition();
+        CVector2D vecRadarSize = RadarArea->GetSize();
+        float fMaxX = vecRadarPos.fX + vecRadarSize.fX;
+        float fMaxY = vecRadarPos.fY + vecRadarSize.fY;
+        if ( vecPosition.fX >= vecRadarPos.fX && vecPosition.fX <= fMaxX )
+        {
+            if ( vecPosition.fY >= vecRadarPos.fY && vecPosition.fY <= fMaxY )
+            {
+                inside = true;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 
@@ -2993,7 +2993,7 @@ CClientPickup* CStaticFunctionDefinitions::CreatePickup ( CResource& Resource, c
 
     if ( pPickup )
     {
-		pPickup->SetParent ( Resource.GetResourceDynamicEntity () );
+        pPickup->SetParent ( Resource.GetResourceDynamicEntity () );
         pPickup->m_ucType = ucType;
     }
 
@@ -3075,7 +3075,7 @@ bool CStaticFunctionDefinitions::CreateExplosion ( CVector& vecPosition, unsigne
 
 bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize )
 {
-	return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
+    return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
 }
 
 bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, unsigned short usSlot )
@@ -3083,9 +3083,9 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
     // TODO: Position of the sound
 
     // Play the sound if it's loaded
-	if ( g_pGame->GetAudio ()->GetMissionAudioLoadingStatus ( usSlot ) == 1 )
+    if ( g_pGame->GetAudio ()->GetMissionAudioLoadingStatus ( usSlot ) == 1 )
     {
-		g_pGame->GetAudio ()->PlayLoadedMissionAudio ( usSlot );
+        g_pGame->GetAudio ()->PlayLoadedMissionAudio ( usSlot );
         return true;
     }
 
@@ -3103,7 +3103,7 @@ bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned long ulSound )
 bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, unsigned short usSlot )
 {
     g_pCore->ChatPrintf ( "Preload %u into slot %u", false, usSound, usSlot );
-	g_pGame->GetAudio ()->PreloadMissionAudio ( usSound, usSlot );
+    g_pGame->GetAudio ()->PreloadMissionAudio ( usSound, usSlot );
     return true;
 }
 
@@ -3113,7 +3113,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
-		pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
+        pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
         pBlip->SetPosition ( vecPosition );
         pBlip->SetSprite ( ucIcon );
         pBlip->SetScale ( ucSize );
@@ -3128,7 +3128,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
-		pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
+        pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
         pBlip->AttachTo ( &Entity );
         pBlip->SetSprite ( ucIcon );
         pBlip->SetScale ( ucSize );
@@ -3214,7 +3214,7 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker ( CResource& Resource, c
         CClientMarker* pMarker = new CClientMarker ( m_pManager, INVALID_ELEMENT_ID, ucType );
 
         // Set its parent and its properties
-	    pMarker->SetParent ( Resource.GetResourceDynamicEntity() );
+        pMarker->SetParent ( Resource.GetResourceDynamicEntity() );
         pMarker->SetPosition ( vecPosition );
         pMarker->SetColor ( color );
         pMarker->SetSize ( fSize );
@@ -3459,7 +3459,7 @@ bool CStaticFunctionDefinitions::SetCameraInterior ( unsigned char ucInterior )
 bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
     CClientCamera* pCamera = m_pManager->GetCamera ();
-	g_pClientGame->SetInitiallyFadedOut ( false );
+    g_pClientGame->SetInitiallyFadedOut ( false );
 
     if ( bFadeIn )
     {
@@ -3520,59 +3520,59 @@ bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 
 
 bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
-{	// can't inline because statics are defined in .cpp not .h
-	return m_pGUI->GetGUIInputEnabled ();
+{   // can't inline because statics are defined in .cpp not .h
+    return m_pGUI->GetGUIInputEnabled ();
 }
 
 
 void CStaticFunctionDefinitions::GUISetInputEnabled ( bool bEnabled )
-{	// can't inline because statics are defined in .cpp not .h
-	m_pGUI->SetGUIInputEnabled ( bEnabled );
+{   // can't inline because statics are defined in .cpp not .h
+    m_pGUI->SetGUIInputEnabled ( bEnabled );
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
 {
-	CGUIElement *pElement = m_pGUI->CreateWnd ( NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateWnd ( NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIClose", "onClientGUIKeyDown" );
-	static_cast < CGUIWindow* > ( pElement ) -> SetCloseClickHandler ( pGUIElement->GetCallback1 () );
-	static_cast < CGUIWindow* > ( pElement ) -> SetKeyDownHandler ( pGUIElement->GetCallback2 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIClose", "onClientGUIKeyDown" );
+    static_cast < CGUIWindow* > ( pElement ) -> SetCloseClickHandler ( pGUIElement->GetCallback1 () );
+    static_cast < CGUIWindow* > ( pElement ) -> SetKeyDownHandler ( pGUIElement->GetCallback2 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strPath, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateStaticImage ( pParent ? pParent->GetCGUIElement () : NULL );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateStaticImage ( pParent ? pParent->GetCGUIElement () : NULL );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// Register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // Register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	// Check for a valid (and sane) file path
-	if ( strPath )
+    // Check for a valid (and sane) file path
+    if ( strPath )
     {
-		// Load the image
-		if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( "", strPath ) ) {
-			// If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
-			// So delete it and reset the pointer, so we return NULL
-			delete pGUIElement;
-			pGUIElement = NULL;
-		}
-	}    
+        // Load the image
+        if ( !static_cast < CGUIStaticImage* > ( pElement ) -> LoadFromFile ( "", strPath ) ) {
+            // If this fails, there's no reason to keep the widget (we don't have any IE-style "not found" icons yet)
+            // So delete it and reset the pointer, so we return NULL
+            delete pGUIElement;
+            pGUIElement = NULL;
+        }
+    }    
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
@@ -3588,206 +3588,206 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
         // Are we a static image?
         if ( IS_CGUIELEMENT_STATICIMAGE ( &GUIElement ) )
         {
-	        CGUIElement *pCGUIElement = GUIElement.GetCGUIElement ();
+            CGUIElement *pCGUIElement = GUIElement.GetCGUIElement ();
 
-	        if ( strDir )
+            if ( strDir )
             {
-		        // load the image, if any
-		        return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( "", strDir );
-	        }
+                // load the image, if any
+                return static_cast < CGUIStaticImage* > ( pCGUIElement ) -> LoadFromFile ( "", strDir );
+            }
         }
     }
 
-	return false;
+    return false;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-	// If there's a parent, make sure it's a GUI widget that can be a parent
+    // If there's a parent, make sure it's a GUI widget that can be a parent
     // ChrML: This has broken a lot of scripts
-	//if ( pParent && !IS_CGUIELEMENT_VALID_PARENT ( pParent ) ) return NULL;
+    //if ( pParent && !IS_CGUIELEMENT_VALID_PARENT ( pParent ) ) return NULL;
 
-	CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
    
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity() );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity() );
   
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIClicked" );
-	static_cast < CGUIButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIClicked" );
+    static_cast < CGUIButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateProgressBar ( pParent ? pParent->GetCGUIElement () : NULL );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateProgressBar ( pParent ? pParent->GetCGUIElement () : NULL );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
     
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
   
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateScrollBar ( bHorizontal, pParent ? pParent->GetCGUIElement () : NULL );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateScrollBar ( bHorizontal, pParent ? pParent->GetCGUIElement () : NULL );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
     
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
   
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIScroll" );	
-	static_cast < CGUIScrollBar* > ( pElement ) -> SetOnScrollHandler ( pGUIElement->GetCallback1 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIScroll" ); 
+    static_cast < CGUIScrollBar* > ( pElement ) -> SetOnScrollHandler ( pGUIElement->GetCallback1 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateCheckBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption, bChecked );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateCheckBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption, bChecked );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
     
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
   
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIStateChanged" );
-	static_cast < CGUICheckBox* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIStateChanged" );
+    static_cast < CGUICheckBox* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateRadioButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateRadioButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
     
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
   
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIStateChanged" );
-	static_cast < CGUIRadioButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIStateChanged" );
+    static_cast < CGUIRadioButton* > ( pElement ) -> SetClickHandler ( pGUIElement->GetCallback1 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateEdit ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
-	pElement->SetText ( szCaption );
+    CGUIElement *pElement = m_pGUI->CreateEdit ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetText ( szCaption );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIAccepted", "onClientGUIChanged" );
-	static_cast < CGUIEdit* > ( pElement ) -> SetTextAcceptedHandler ( pGUIElement->GetCallback1 () );
-	static_cast < CGUIEdit* > ( pElement ) -> SetTextChangedHandler ( pGUIElement->GetCallback2 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIAccepted", "onClientGUIChanged" );
+    static_cast < CGUIEdit* > ( pElement ) -> SetTextAcceptedHandler ( pGUIElement->GetCallback1 () );
+    static_cast < CGUIEdit* > ( pElement ) -> SetTextChangedHandler ( pGUIElement->GetCallback2 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateMemo ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
-	pElement->SetText ( szCaption );
+    CGUIElement *pElement = m_pGUI->CreateMemo ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetText ( szCaption );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	// set events
-	pGUIElement->SetEvents ( "onClientGUIAccepted", "onClientGUIChanged" );
-	static_cast < CGUIMemo* > ( pElement ) -> SetTextChangedHandler ( pGUIElement->GetCallback2 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIAccepted", "onClientGUIChanged" );
+    static_cast < CGUIMemo* > ( pElement ) -> SetTextChangedHandler ( pGUIElement->GetCallback2 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateGridList ( pParent ? pParent->GetCGUIElement () : NULL, true );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateGridList ( pParent ? pParent->GetCGUIElement () : NULL, true );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateTabPanel ( pParent ? pParent->GetCGUIElement () : NULL );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateTabPanel ( pParent ? pParent->GetCGUIElement () : NULL );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	// set events
-	pGUIElement->SetEvents ( "onClientGUITabSwitched" );
-	static_cast < CGUITabPanel* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
+    // set events
+    pGUIElement->SetEvents ( "onClientGUITabSwitched" );
+    static_cast < CGUITabPanel* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
 {
-	CGUIElement *pElement = m_pGUI->CreateScrollPane ( pParent ? pParent->GetCGUIElement () : NULL );
-	pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-	pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    CGUIElement *pElement = m_pGUI->CreateScrollPane ( pParent ? pParent->GetCGUIElement () : NULL );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
 
-	// register to the gui manager
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
@@ -3795,12 +3795,12 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab ( CLuaMain& LuaMain,
 {
     if ( !pParent ) return NULL;
 
-	CGUIElement *pGUIParent = pParent->GetCGUIElement ();
-	CGUIElement *pTab = static_cast < CGUITabPanel* > ( pGUIParent ) -> CreateTab ( szCaption );
-	CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pTab );
-	pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+    CGUIElement *pGUIParent = pParent->GetCGUIElement ();
+    CGUIElement *pTab = static_cast < CGUITabPanel* > ( pGUIParent ) -> CreateTab ( szCaption );
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pTab );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
-	return pGUIElement;
+    return pGUIElement;
 }
 
 
@@ -3844,9 +3844,9 @@ bool CStaticFunctionDefinitions::GUIDeleteTab ( CLuaMain& LuaMain, CClientGUIEle
 {
     if ( !pParent || !pTab ) return false;
 
-	CGUIElement *pGUIParent = pParent->GetCGUIElement ();
-	static_cast < CGUITabPanel* > ( pGUIParent ) ->DeleteTab ( reinterpret_cast < CGUITab* > ( pTab->GetCGUIElement() ) );
-	g_pClientGame->GetElementDeleter ()->Delete ( pTab );
+    CGUIElement *pGUIParent = pParent->GetCGUIElement ();
+    static_cast < CGUITabPanel* > ( pGUIParent ) ->DeleteTab ( reinterpret_cast < CGUITab* > ( pTab->GetCGUIElement() ) );
+    g_pClientGame->GetElementDeleter ()->Delete ( pTab );
 
     return true;
 }
@@ -3867,7 +3867,7 @@ void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char*
 
 bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char* szFont )
 {
-	bool bResult = false;
+    bool bResult = false;
 
     // Are we a CGUI element?
     if ( IS_GUI ( &Entity ) )
@@ -3877,7 +3877,7 @@ bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char*
         // Set the font
         bResult = GUIElement.GetCGUIElement ()->SetFont ( szFont );
     }
-	return bResult;
+    return bResult;
 }
 
 
@@ -4431,7 +4431,7 @@ void CStaticFunctionDefinitions::GUILabelSetVerticalAlign ( CClientEntity& Entit
         if ( IS_CGUIELEMENT_LABEL ( &GUIElement ) )
         {
             // Set the vertical align
-            static_cast < CGUILabel* > ( GUIElement.GetCGUIElement () ) ->	SetVerticalAlign ( eAlign );
+            static_cast < CGUILabel* > ( GUIElement.GetCGUIElement () ) ->  SetVerticalAlign ( eAlign );
         }
     }
 }
@@ -4638,8 +4638,8 @@ bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, char* szBuf
         szZone = m_pClientGame->GetZoneNames ()->GetZoneName ( vecPosition );
 
     strncpy ( szBuffer, szZone, uiBufferLength );
-	if (uiBufferLength)
-	    szBuffer [ uiBufferLength - 1 ] = 0;
+    if (uiBufferLength)
+        szBuffer [ uiBufferLength - 1 ] = 0;
     return true;
 }
 
@@ -4790,8 +4790,8 @@ bool CStaticFunctionDefinitions::SetWeatherBlended ( unsigned char ucWeather )
         // Get the next hour
         unsigned char ucHour, ucMin;
         m_pGame->GetClock ()->Get ( &ucHour, &ucMin );
-		++ucHour;
-		if ( ucHour > 23 ) ucHour = 0;
+        ++ucHour;
+        if ( ucHour > 23 ) ucHour = 0;
 
         // Set the weather
         m_pBlendedWeather->SetWeatherBlended ( ucWeather, ucHour );
@@ -4833,13 +4833,13 @@ bool CStaticFunctionDefinitions::SetGameSpeed ( float fSpeed )
 
 bool CStaticFunctionDefinitions::SetMinuteDuration ( unsigned long ulDelay )
 {
-	if ( ulDelay > 0 && ulDelay <= 4294967296 )
-	{
-		m_pClientGame->SetMinuteDuration ( ulDelay );
+    if ( ulDelay > 0 && ulDelay <= 4294967296 )
+    {
+        m_pClientGame->SetMinuteDuration ( ulDelay );
 
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 
@@ -5220,7 +5220,7 @@ CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Re
 CClientColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource& Resource, const CVector& vecPosition, float fRadius )
 {
     CClientColCircle* pShape = new CClientColCircle ( m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius );
-	pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
     //CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
 }
@@ -5229,7 +5229,7 @@ CClientColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource& Resou
 CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource& Resource, const CVector& vecPosition, const CVector& vecSize )
 {
     CClientColCuboid* pShape = new CClientColCuboid ( m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize );
-	pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
     //CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
 }
@@ -5238,7 +5238,7 @@ CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource& Resou
 CClientColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource& Resource, const CVector& vecPosition, float fRadius )
 {
     CClientColSphere* pShape = new CClientColSphere ( m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius );
-	pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
     //CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
 }
@@ -5247,7 +5247,7 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource& Resou
 CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource& Resource, const CVector& vecPosition, const CVector2D& vecSize )
 {
     CClientColRectangle* pShape = new CClientColRectangle ( m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize );
-	pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
     //CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
 }
@@ -5265,7 +5265,7 @@ CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource& Res
 CClientColTube* CStaticFunctionDefinitions::CreateColTube ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight )
 {
     CClientColTube* pShape = new CClientColTube ( m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius, fHeight );
-	pShape->SetParent ( Resource.GetResourceDynamicEntity () );
+    pShape->SetParent ( Resource.GetResourceDynamicEntity () );
     //CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
 }
@@ -5287,10 +5287,10 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape ( CClientEntity*
     CClientColShape* pColShape = NULL;
     switch ( pEntity->GetType () )
     {
-		case CCLIENTMARKER:
+        case CCLIENTMARKER:
             pColShape = static_cast < CClientMarker* > ( pEntity )->GetColShape ();
             break;
-		case CCLIENTPICKUP:
+        case CCLIENTPICKUP:
             pColShape = static_cast < CClientPickup* > ( pEntity )->GetColShape ();
             break;
     }
@@ -5307,8 +5307,8 @@ bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, char*
         if ( strlen ( szNamePointer ) > 0 )
         {
             strncpy ( szName, szNamePointer, len );
-			if (len)
-				szName[len-1] = '\0';
+            if (len)
+                szName[len-1] = '\0';
             return true;
         }
     }
@@ -5578,15 +5578,15 @@ bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, floa
  */
 bool CStaticFunctionDefinitions::SetVoiceInputEnabled ( bool bEnabled )
 {
-	CVoice * pVoice = m_pClientGame->GetVoice();
+    CVoice * pVoice = m_pClientGame->GetVoice();
 
-	// Voice module may not be loaded.
-	if ( NULL != pVoice )
-	{
-		pVoice->EnableInput ( bEnabled );
-	}
+    // Voice module may not be loaded.
+    if ( NULL != pVoice )
+    {
+        pVoice->EnableInput ( bEnabled );
+    }
 
-	return true;
+    return true;
 }
 
 /**
@@ -5599,15 +5599,15 @@ bool CStaticFunctionDefinitions::SetVoiceInputEnabled ( bool bEnabled )
 
 bool CStaticFunctionDefinitions::SetVoiceMuteAllEnabled ( bool bEnabled )
 {
-	CVoice * pVoice = m_pClientGame->GetVoice();
+    CVoice * pVoice = m_pClientGame->GetVoice();
 
-	// Voice module may not be loaded.
-	if ( NULL != pVoice )
-	{
-		pVoice->SetMuted ( bEnabled );
-	}
+    // Voice module may not be loaded.
+    if ( NULL != pVoice )
+    {
+        pVoice->SetMuted ( bEnabled );
+    }
 
-	return true;
+    return true;
 }
 #endif
 

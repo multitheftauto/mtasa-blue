@@ -92,7 +92,7 @@ SBindableKey g_bkKeys[] =
     { "num_6",   0x66,          GTA_KEY_NUMPAD6,        DATA_NONE,              0 },
     { "num_7",   0x67,          GTA_KEY_NUMPAD7,        DATA_NONE,              0 },
     { "num_8",   0x68,          GTA_KEY_NUMPAD8,        DATA_NONE,              0 }, 
-    { "num_9",   0x69,          GTA_KEY_NUMPAD9,        DATA_NONE,              0 },	
+    { "num_9",   0x69,          GTA_KEY_NUMPAD9,        DATA_NONE,              0 },    
     { "num_mul", 0x6A,          GTA_KEY_MULTIPLY,       DATA_NONE,              0 },
     { "num_add", 0x6B,          GTA_KEY_ADD,            DATA_NONE,              0 },
     { "num_sep", 0x6C,          NO_KEY_DEFINED,         DATA_NONE,              0 },
@@ -288,7 +288,7 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     if ( m_pCore->IsMenuVisible () ||
          ( m_pCore->GetConsole ()->IsVisible () ||
          m_pCore->IsChatInputEnabled () ||
-		 m_pCore->GetGUI ()->GetGUIInputEnabled () ) && !pKey->bIgnoredByGUI )
+         m_pCore->GetGUI ()->GetGUIInputEnabled () ) && !pKey->bIgnoredByGUI )
     {
         if ( !bInputGoesToGUI )
         {
@@ -466,8 +466,8 @@ void CKeyBinds::RemoveDeletedBinds ( void )
             delete *iter;
             iter = m_pList->erase ( iter );
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 }
 
@@ -672,8 +672,8 @@ bool CKeyBinds::RemoveAllCommands ( void )
             iter = m_pList->erase ( iter );
             bFound = true;
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 
     return bFound;
@@ -730,7 +730,7 @@ bool CKeyBinds::SetCommandActive ( const char* szKey, const char* szCommand, boo
                             {
                                 pBind->bActive = bActive;
                                 return true;
-							}
+                            }
                         }
                     }
                 }
@@ -888,9 +888,9 @@ void CKeyBinds::RemoveGTAControls ( const char* szControl, bool bDestroy )
             CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
             if ( strcmp ( szControl, pBind->control->szControl ) == 0 )
             {
-				// Only destroy if we have to
-				if ( bDestroy )
-					delete *iter;
+                // Only destroy if we have to
+                if ( bDestroy )
+                    delete *iter;
 
                 iter = m_pList->erase ( iter );
                 continue;
@@ -966,8 +966,8 @@ bool CKeyBinds::RemoveAllGTAControls ( void )
             iter = m_pList->erase ( iter );
             bFound = true;
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 
     return bFound;
@@ -2061,8 +2061,8 @@ void CKeyBinds::DoPostFramePulse ( void )
     if ( pPed->GetCurrentWeaponSlot () == 12 /*Detonator*/ )
         bHasDetonator = true;
 
-	CTaskManager * pTaskManager = pPed->GetPedIntelligence ()->GetTaskManager ();
-	CTask * pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+    CTaskManager * pTaskManager = pPed->GetPedIntelligence ()->GetTaskManager ();
+    CTask * pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
     if ( pTask )
     {
         if ( pTask->GetTaskType () == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
@@ -2070,7 +2070,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         {
             bEnteringVehicle = true;
         }
-	}
+    }
     pTask = pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DEAD )
         bIsDead = true;
@@ -2300,7 +2300,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
 
 bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
 {
-	CXMLAttribute * pA = NULL;
+    CXMLAttribute * pA = NULL;
     if ( pMainNode )
     {
         // Clear our current bind nodes
@@ -2331,35 +2331,35 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     if ( szKey )
                     {
                         pA = pAttributes->Create ( "key" );
-						pA->SetValue ( szKey );
+                        pA->SetValue ( szKey );
                     }
 
                     CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
                     char* szState = ( pBind->bHitState ) ? "down" : "up";
 
 
-					pA = pAttributes->Create ( "state" );
-					pA->SetValue ( szState );
+                    pA = pAttributes->Create ( "state" );
+                    pA->SetValue ( szState );
 
                     char* szCommand = pBind->szCommand;
                     if ( szCommand )
                     {
-						pA = pAttributes->Create ( "command" );						
-						pA->SetValue ( szCommand );
+                        pA = pAttributes->Create ( "command" );                     
+                        pA->SetValue ( szCommand );
                     }
 
                     char* szArguments = pBind->szArguments;
                     if ( szArguments )
                     {
-						pA = pAttributes->Create ( "arguments" );						
-						pA->SetValue ( szArguments );
+                        pA = pAttributes->Create ( "arguments" );                       
+                        pA->SetValue ( szArguments );
                     }
 
                     char* szResource = pBind->szResource;
                     if ( szResource )
                     {
-						pA = pAttributes->Create ( "resource" );						
-						pA->SetValue ( szResource );
+                        pA = pAttributes->Create ( "resource" );                        
+                        pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
                         if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
@@ -2374,16 +2374,16 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     const char* szKey = (*iter)->boundKey->szKey;
                     if ( szKey )
                     {
-						pA = pAttributes->Create ( "key" );
-						pA->SetValue ( szKey );
+                        pA = pAttributes->Create ( "key" );
+                        pA->SetValue ( szKey );
                     }
 
                     CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
                     char* szControl = pBind->control->szControl;
                     if ( szControl )
                     {
-						pA = pAttributes->Create ( "control" );
-						pA->SetValue ( szControl );
+                        pA = pAttributes->Create ( "control" );
+                        pA->SetValue ( szControl );
                     }
                 }
             }
@@ -2399,7 +2399,7 @@ void CKeyBinds::LoadDefaultBinds ( void )
 {
     Clear ();
     
-	LoadControlsFromGTA ();
+    LoadControlsFromGTA ();
     LoadDefaultCommands ( true );
 }
 
@@ -2424,7 +2424,7 @@ void CKeyBinds::LoadDefaultControls ( void )
     AddGTAControl ( "arrow_l", "left" );
     AddGTAControl ( "a", "left" );
     AddGTAControl ( "arrow_r", "right" );
-	AddGTAControl ( "d", "right" );
+    AddGTAControl ( "d", "right" );
     AddGTAControl ( "x", "zoom_in" );
     AddGTAControl ( "pgup", "zoom_in" );
     AddGTAControl ( "mouse_wheel_up", "zoom_in" );
@@ -2469,7 +2469,7 @@ void CKeyBinds::LoadDefaultControls ( void )
     AddGTAControl ( "h", "horn" );
     AddGTAControl ( "2", "sub_mission" );
     AddGTAControl ( "num_add", "sub_mission" );
-	AddGTAControl ( "space", "handbrake" );
+    AddGTAControl ( "space", "handbrake" );
     AddGTAControl ( "rctrl", "handbrake" );
     AddGTAControl ( "mouse3", "vehicle_look_behind" );
     AddGTAControl ( "mouse2", "vehicle_mouse_look" );
@@ -2803,13 +2803,13 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         * NOTE: This usually happens when TweakUI is enabled.
         */
         if ( !bReturn )
-	    {
-	        /* Voodoo to make sure that the Alt_R message has posted */
-	        Sleep ( 0 );
+        {
+            /* Voodoo to make sure that the Alt_R message has posted */
+            Sleep ( 0 );
 
-	        /* Look for fake Ctrl_L preceeding an Alt_R press. */
-	        bReturn = PeekMessage ( &msgNext, NULL, WM_KEYDOWN, WM_SYSKEYDOWN, PM_NOREMOVE );
-	    }
+            /* Look for fake Ctrl_L preceeding an Alt_R press. */
+            bReturn = PeekMessage ( &msgNext, NULL, WM_KEYDOWN, WM_SYSKEYDOWN, PM_NOREMOVE );
+        }
 
         if ( msgNext.message != WM_KEYDOWN && msgNext.message != WM_SYSKEYDOWN )
             bReturn = 0;
@@ -2817,14 +2817,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         /* Is next press an Alt_R with the same timestamp? */
         if ( bReturn && msgNext.wParam == VK_MENU && msgNext.time == lTime && 
             ( HIWORD ( msgNext.lParam ) & KF_EXTENDED ) )
-	    {
-	        /* 
-	        * Next key press is Alt_R with same timestamp as current
-	        * Ctrl_L message.  Therefore, this Ctrl_L press is a fake
-	        * event, so discard it.
-	        */
-	        return TRUE;
-	    }
+        {
+            /* 
+            * Next key press is Alt_R with same timestamp as current
+            * Ctrl_L message.  Therefore, this Ctrl_L press is a fake
+            * event, so discard it.
+            */
+            return TRUE;
+        }
     }
 
     /* 
@@ -2847,13 +2847,13 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         * NOTE: This usually happens when TweakUI is enabled.
         */
         if ( !bReturn )
-	    {
-	        /* Voodoo to make sure that the Alt_R message has posted */
-	        Sleep ( 0 );
+        {
+            /* Voodoo to make sure that the Alt_R message has posted */
+            Sleep ( 0 );
 
-	        /* Look for fake Ctrl_L release preceeding an Alt_R release. */
-	        bReturn = PeekMessage ( &msgNext, NULL, WM_KEYUP, WM_SYSKEYUP, PM_NOREMOVE );
-	    }
+            /* Look for fake Ctrl_L release preceeding an Alt_R release. */
+            bReturn = PeekMessage ( &msgNext, NULL, WM_KEYUP, WM_SYSKEYUP, PM_NOREMOVE );
+        }
 
         if ( msgNext.message != WM_KEYUP && msgNext.message != WM_SYSKEYUP )
             bReturn = 0;
@@ -2862,14 +2862,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         if ( bReturn && ( msgNext.message == WM_KEYUP || msgNext.message == WM_SYSKEYUP ) &&
             msgNext.wParam == VK_MENU && msgNext.time == lTime &&
             ( HIWORD ( msgNext.lParam) & KF_EXTENDED ) )
-	    {
-	        /*
-	        * Next key release is Alt_R with same timestamp as current
-	        * Ctrl_L message. Therefore, this Ctrl_L release is a fake
-	        * event, so discard it.
-	        */
-	        return TRUE;    
-	    }
+        {
+            /*
+            * Next key release is Alt_R with same timestamp as current
+            * Ctrl_L message. Therefore, this Ctrl_L release is a fake
+            * event, so discard it.
+            */
+            return TRUE;    
+        }
     }
   
     /* Not a fake control left press/release */

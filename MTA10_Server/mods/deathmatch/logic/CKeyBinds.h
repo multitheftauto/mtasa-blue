@@ -42,8 +42,8 @@ class CKeyBind
 public:
     inline                  CKeyBind        ( void )    { boundKey = NULL; luaMain = NULL; beingDeleted = false; }
     inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
-	
-	SBindableKey*           boundKey;
+    
+    SBindableKey*           boundKey;
     CLuaMain*               luaMain;
     bool                    beingDeleted;
     virtual eKeyBindType    GetType         ( void ) = 0;
@@ -62,7 +62,7 @@ class CFunctionBind
 public:
     inline                  CFunctionBind       ( void )    { m_iLuaFunction = -1; }
     inline                  ~CFunctionBind      ( void )    {}
-	int						m_iLuaFunction;
+    int                     m_iLuaFunction;
     CLuaArguments           m_Arguments;
 };
 
@@ -110,10 +110,10 @@ public:
     bool                        RemoveControlFunction   ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = LUA_REFNIL );
     bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = LUA_REFNIL );
 
-	void						RemoveAllKeys			( CLuaMain* pLuaMain );
+    void                        RemoveAllKeys           ( CLuaMain* pLuaMain );
 
     static bool                 IsMouse                 ( SBindableKey* pKey );
-	void                        RemoveDeletedBinds      ( void );
+    void                        RemoveDeletedBinds      ( void );
 
 protected:
     bool                        Remove                  ( CKeyBind* pKeyBind );

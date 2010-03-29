@@ -29,7 +29,7 @@ public:
     static const char*              GetVehicleName          ( unsigned long ulModel );
     static unsigned int             GetVehicleModel         ( const char* szName );
 
-	static const char*              GetVehicleTypeName      ( unsigned long ulModel );
+    static const char*              GetVehicleTypeName      ( unsigned long ulModel );
 };
 
 #endif

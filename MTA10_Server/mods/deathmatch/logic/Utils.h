@@ -30,7 +30,7 @@
 #define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
 
 #ifndef WIN32
-unsigned long	GetTickCount				( void );
+unsigned long   GetTickCount                ( void );
 #endif
 
 bool            CheckNickProvided           ( const char* szNick );
@@ -58,14 +58,14 @@ void            InitializeTime              ( void );
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );
 
-bool			InitializeSockets			( void );
-bool			CleanupSockets				( void );
+bool            InitializeSockets           ( void );
+bool            CleanupSockets              ( void );
 
 float           GetRandomFloat              ( void );
 double          GetRandomDouble             ( void );
 int             GetRandom                   ( int iLow, int iHigh );
 
-bool            IsValidFilePath 			( const char* szPath );
+bool            IsValidFilePath             ( const char* szPath );
 
 unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );
@@ -77,12 +77,12 @@ std::string ConformResourcePath ( const char* szRes );
 inline unsigned long GetTime ( void )
 {
     #if WIN32
-		extern LONGLONG	g_lTimeCounts;
+        extern LONGLONG g_lTimeCounts;
         LARGE_INTEGER lPerf;
         QueryPerformanceCounter ( &lPerf );
         return static_cast < unsigned long > ( lPerf.QuadPart / g_lTimeCounts );
     #else
-	    extern timeval	g_tvInitialTime;
+        extern timeval  g_tvInitialTime;
         timeval tvNow;
         gettimeofday ( &tvNow, 0 );
         return static_cast < unsigned long > ( ( tvNow.tv_sec - g_tvInitialTime.tv_sec ) * 1000 + ( tvNow.tv_usec - g_tvInitialTime.tv_usec ) / 1000 );

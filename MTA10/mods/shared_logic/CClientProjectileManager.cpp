@@ -157,16 +157,16 @@ CClientProjectile * CClientProjectileManager::Create ( CClientEntity* pCreator, 
     if ( pTargetEntity ) pGameTargetEntity = pTargetEntity->GetGameEntity ();
     if ( pGameCreator )
     {
-		// Peds and players
-		if ( pCreator->GetType () == CCLIENTPED || pCreator->GetType () == CCLIENTPLAYER ) {
-			CPed * pPed = dynamic_cast < CPed * > ( pGameCreator );
-			if ( pPed ) pPed->AddProjectile ( eWeapon, vecOrigin, fForce, target, pGameTargetEntity );
-		}
-		// Vehicles
-		else if ( pCreator->GetType () == CCLIENTVEHICLE ) {
-			CVehicle * pVehicle = dynamic_cast < CVehicle * > ( pGameCreator );
-			if ( pVehicle ) pVehicle->AddProjectile ( eWeapon, vecOrigin, fForce, target, pGameTargetEntity );
-		}
+        // Peds and players
+        if ( pCreator->GetType () == CCLIENTPED || pCreator->GetType () == CCLIENTPLAYER ) {
+            CPed * pPed = dynamic_cast < CPed * > ( pGameCreator );
+            if ( pPed ) pPed->AddProjectile ( eWeapon, vecOrigin, fForce, target, pGameTargetEntity );
+        }
+        // Vehicles
+        else if ( pCreator->GetType () == CCLIENTVEHICLE ) {
+            CVehicle * pVehicle = dynamic_cast < CVehicle * > ( pGameCreator );
+            if ( pVehicle ) pVehicle->AddProjectile ( eWeapon, vecOrigin, fForce, target, pGameTargetEntity );
+        }
     }
     m_bCreating = false;
     return m_pLastCreated;

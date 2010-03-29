@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCore.h
-*  PURPOSE:		Header file for base core class
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCore.h
+*  PURPOSE:     Header file for base core class
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Chris McArthur <>
 *               Christian Myhre Lundheim <>
 *               Derek Abdine <>
@@ -82,7 +82,7 @@ public:
     CCommandsInterface*     GetCommands                     ( void );
     inline CConnectManager* GetConnectManager               ( void )                { return m_pConnectManager; };
     CGame*                  GetGame                         ( void );
-	CGUI*					GetGUI					        ( void );
+    CGUI*                   GetGUI                          ( void );
     CGraphicsInterface*     GetGraphics                     ( void );
     CModManagerInterface*   GetModManager                   ( void );
     CMultiplayer*           GetMultiplayer                  ( void );
@@ -120,7 +120,7 @@ public:
     bool                    IsChatInputEnabled              ( void );
 
     // Screenshots
-	void					TakeScreenShot					( void );
+    void                    TakeScreenShot                  ( void );
 
     // GUI
     bool                    IsSettingsVisible               ( void );
@@ -128,7 +128,7 @@ public:
     bool                    IsCursorForcedVisible           ( void );
     bool                    IsCursorControlsToggled         ( void ) { return m_bCursorToggleControls; }
     void                    HideMainMenu                    ( void );
-	void			        SetCenterCursor                 ( bool bEnabled );
+    void                    SetCenterCursor                 ( bool bEnabled );
 
     // Configuration
     void                    ApplyConsoleSettings            ( void );
@@ -139,8 +139,8 @@ public:
 
     // Net
     void                    SetConnected                    ( bool bConnected );
-	bool					IsConnected						( void );
-    bool					Reconnect						( const char* szHost, unsigned short usPort, const char* szPassword );
+    bool                    IsConnected                     ( void );
+    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword );
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );
@@ -159,25 +159,25 @@ public:
     void                    CreateMultiplayer               ( void );
     void                    CreateNetwork                   ( void );
     void                    CreateXML                       ( void );
-	void			        InitGUI							( IUnknown* pDevice );
-	void			        CreateGUI						( void );
+    void                    InitGUI                         ( IUnknown* pDevice );
+    void                    CreateGUI                       ( void );
     void                    DestroyGame                     ( void );
     void                    DestroyMultiplayer              ( void );
     void                    DestroyNetwork                  ( void );
     void                    DestroyXML                      ( void );
-	void			        DeinitGUI						( void );
-    void			        DestroyGUI                      ( void );
+    void                    DeinitGUI                       ( void );
+    void                    DestroyGUI                      ( void );
 
     // Hooks
     void                    ApplyHooks                      ( void );
     HWND                    GetHookedWindow                 ( void );
-	void			        SetRenderDevice                 ( IUnknown* pDevice );
-	void			        SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
-	bool			        GetResetNeeded                  ( void );
+    void                    SetRenderDevice                 ( IUnknown* pDevice );
+    void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
+    bool                    GetResetNeeded                  ( void );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
-    void					ChangeResolution                ( long width, long height, long depth );
+    void                    ChangeResolution                ( long width, long height, long depth );
 
     void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
     bool                    IsFocused                       ( void )                        { return m_bFocused; };
@@ -187,17 +187,17 @@ public:
     void                    DoPreFramePulse                 ( void );
     void                    DoPostFramePulse                ( void );
 
-	// Events
-	bool					OnMouseClick                    ( CGUIMouseEventArgs Args );
-	bool					OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
-	void					OnModUnload						( void );
+    // Events
+    bool                    OnMouseClick                    ( CGUIMouseEventArgs Args );
+    bool                    OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
+    void                    OnModUnload                     ( void );
 
     // Misc
     void                    RegisterCommands                ( void );
-    bool					IsValidNick                     ( const char* szNick );     // Move somewhere else
+    bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    SString                 GetConnectCommandFromURI        ( const char* szURI );	
-	bool					bScreenShot;
+    SString                 GetConnectCommandFromURI        ( const char* szURI );  
+    bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
@@ -210,7 +210,7 @@ private:
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
-    IUnknown *					m_pRenderDevice;
+    IUnknown *                  m_pRenderDevice;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
@@ -222,8 +222,8 @@ private:
     CDirectInputHookManager *   m_pDirectInputHookManager;
     CDirect3DHookManager *      m_pDirect3DHookManager;
     //CFileSystemHook *           m_pFileSystemHook;
-	CSetCursorPosHook *         m_pSetCursorPosHook;
-	CTCPManager *				m_pTCPManager;
+    CSetCursorPosHook *         m_pSetCursorPosHook;
+    CTCPManager *               m_pTCPManager;
 
     bool                        m_bFocused;
 
@@ -232,7 +232,7 @@ private:
     CModuleLoader               m_MultiplayerModule;
     CModuleLoader               m_NetModule;
     CModuleLoader               m_XMLModule;
-	CModuleLoader				m_GUIModule;
+    CModuleLoader               m_GUIModule;
 
     // Mod manager
     CModManager*                m_pModManager; 
@@ -244,20 +244,20 @@ private:
     CGame *                     m_pGame;
     CNet *                      m_pNet;
     CMultiplayer *              m_pMultiplayer;
-	CGUI*						m_pGUI;
+    CGUI*                       m_pGUI;
 
     // Logger utility interface.
     CLogger *                   m_pLogger;
 
     CKeyBinds*                  m_pKeyBinds;
 
-	bool						m_bResetNeeded;
+    bool                        m_bResetNeeded;
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;
     pfnProcessMessage           m_pfnMessageProcessor;
 
-    CGUIMessageBox*				m_pMessageBox;
+    CGUIMessageBox*             m_pMessageBox;
 
     // screen res
     DEVMODE                     m_Current;

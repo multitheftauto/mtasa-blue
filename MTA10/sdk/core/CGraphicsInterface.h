@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/core/CGraphicsInterface.h
-*  PURPOSE:		Graphics subsystem interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/core/CGraphicsInterface.h
+*  PURPOSE:     Graphics subsystem interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -26,9 +26,9 @@ enum eFontType
     FONT_ARIAL,
     FONT_SANS,
     FONT_PRICEDOWN,
-	FONT_BANKGOTHIC,
-	FONT_DIPLOMA,
-	FONT_BECKETT,
+    FONT_BANKGOTHIC,
+    FONT_DIPLOMA,
+    FONT_BECKETT,
     NUM_FONTS
 };
 
@@ -38,7 +38,7 @@ public:
     virtual void                    BeginDrawing        ( void ) = 0;
     virtual void                    EndDrawing          ( void ) = 0;
 
-    virtual IDirect3DDevice9 *	    GetDevice		    ( void ) = 0;
+    virtual IDirect3DDevice9 *      GetDevice           ( void ) = 0;
 
     virtual void                    SetCEGUIUsed        ( bool bCEGUI ) = 0;
     virtual bool                    GetCEGUIUsed        ( void ) = 0;
@@ -46,18 +46,18 @@ public:
     virtual int                     GetTextExtent       ( const char* szText, float fScale ) = 0;
     virtual int                     GetTextHeight       ( float fScale ) = 0;
 
-	virtual void					Draw3DBox			( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe ) = 0;
-	virtual void					CalcWorldCoors		( CVector * vecScreen, CVector * vecWorld ) = 0;
-	virtual void					CalcScreenCoors		( CVector * vecWorld, CVector * vecScreen ) = 0;
+    virtual void                    Draw3DBox           ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe ) = 0;
+    virtual void                    CalcWorldCoors      ( CVector * vecScreen, CVector * vecWorld ) = 0;
+    virtual void                    CalcScreenCoors     ( CVector * vecWorld, CVector * vecScreen ) = 0;
 
     virtual void                    DrawText            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL ) = 0;
     virtual void                    DrawText            ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... ) = 0;
 
-    virtual void			        DrawText2DA  		( int iX, int iY, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
+    virtual void                    DrawText2DA         ( int iX, int iY, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
     virtual void                    DrawTextCEGUI       ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScale, unsigned long ulFormat ) = 0;
-    virtual void                    DrawText3DA	        ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
+    virtual void                    DrawText3DA         ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
     virtual void                    DrawLine            ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor ) = 0;
-	virtual void					DrawLine3D			( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;
+    virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;
     virtual void                    DrawRectangle       ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor ) = 0;
 
     virtual void                    Render3DSprite      ( float fX, float fY, float fZ, float fScale, unsigned long ulColor ) = 0;
@@ -84,16 +84,16 @@ public:
                                                           float fWidth,
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
-    virtual void					DrawLine3DQueued    ( const CVector& vecBegin,
-														  const CVector& vecEnd,
-														  float fWidth,
-														  unsigned long ulColor,
-														  bool bPostGUI ) = 0;
+    virtual void                    DrawLine3DQueued    ( const CVector& vecBegin,
+                                                          const CVector& vecEnd,
+                                                          float fWidth,
+                                                          unsigned long ulColor,
+                                                          bool bPostGUI ) = 0;
 
-	virtual void					DrawRectQueued      ( float fX, float fY,
-														  float fWidth, float fHeight,
-														  unsigned long ulColor,
-														  bool bPostGUI ) = 0;
+    virtual void                    DrawRectQueued      ( float fX, float fY,
+                                                          float fWidth, float fHeight,
+                                                          unsigned long ulColor,
+                                                          bool bPostGUI ) = 0;
 
     virtual bool                    DrawTextureQueued   ( float fX, float fY,
                                                           float fWidth, float fHeight,
@@ -104,15 +104,15 @@ public:
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
 
-	virtual void					DrawTextQueued      ( int iLeft, int iTop,
-														  int iRight, int iBottom,
-														  unsigned long dwColor,
-														  const char* wszText,
-														  float fScaleX,
-														  float fScaleY,
-														  unsigned long ulFormat,
-														  ID3DXFont * pDXFont,
-														  bool bPostGUI ) = 0;
+    virtual void                    DrawTextQueued      ( int iLeft, int iTop,
+                                                          int iRight, int iBottom,
+                                                          unsigned long dwColor,
+                                                          const char* wszText,
+                                                          float fScaleX,
+                                                          float fScaleY,
+                                                          unsigned long ulFormat,
+                                                          ID3DXFont * pDXFont,
+                                                          bool bPostGUI ) = 0;
 };
 
 #endif

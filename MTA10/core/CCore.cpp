@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCore.cpp
-*  PURPOSE:		Base core class
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCore.cpp
+*  PURPOSE:     Base core class
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Chris McArthur <>
 *               Christian Myhre Lundheim <>
 *               Derek Abdine <>
@@ -89,7 +89,7 @@ CCore::CCore ( void )
     // Initialize the global pointer
     g_pCore = this;
 
-	#if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
+    #if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
     AC_RestrictAccess ();
     #endif
     
@@ -165,7 +165,7 @@ CCore::CCore ( void )
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
     m_pGUI                      = NULL;
 
-	// Create the mod manager
+    // Create the mod manager
     m_pModManager               = new CModManager;
 
     // Create a resolution manager (for screen res)
@@ -174,7 +174,7 @@ CCore::CCore ( void )
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
-	m_bResetNeeded = false;
+    m_bResetNeeded = false;
     m_bFirstFrame = true;
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
@@ -198,7 +198,7 @@ CCore::CCore ( void )
     m_pDirectInputHookManager   = new CDirectInputHookManager ( );
     m_pMessageLoopHook          = new CMessageLoopHook ( );
     m_pSetCursorPosHook         = new CSetCursorPosHook ( );
-	m_pTCPManager				= new CTCPManager ( );
+    m_pTCPManager               = new CTCPManager ( );
 
     // Register internal commands.
     RegisterCommands ( );
@@ -206,8 +206,8 @@ CCore::CCore ( void )
     // Setup our hooks.
     ApplyHooks ( );
 
-	// Reset the screenshot flag
-	bScreenShot = false;
+    // Reset the screenshot flag
+    bScreenShot = false;
 }
 
 CCore::~CCore ( void )
@@ -223,16 +223,16 @@ CCore::~CCore ( void )
     DestroyMultiplayer ();
     DestroyGame ();
 
-	// Remove global events
+    // Remove global events
     g_pCore->m_pGUI->ClearInputHandlers( INPUT_CORE );
 
     // Remove input hook
-	CMessageLoopHook::GetSingleton ( ).RemoveHook ( );
+    CMessageLoopHook::GetSingleton ( ).RemoveHook ( );
 
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
-	CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
+    CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -245,7 +245,7 @@ CCore::~CCore ( void )
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
     delete m_pMessageLoopHook;
-	delete m_pTCPManager;
+    delete m_pTCPManager;
 
     // Delete the GUI manager    
     delete m_pLocalGUI;
@@ -316,7 +316,7 @@ CXMLNode* CCore::GetConfig ( void )
 
 CGUI* CCore::GetGUI ( void )
 {
-	return m_pGUI;
+    return m_pGUI;
 }
 
 
@@ -386,10 +386,10 @@ void CCore::DebugPrintf ( const char* szFormat, ... )
 {
     // Convert it to a string buffer
     char szBuffer [1024];
-	va_list ap;
-	va_start ( ap, szFormat );
-	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-	va_end ( ap );
+    va_list ap;
+    va_start ( ap, szFormat );
+    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    va_end ( ap );
 
     DebugEcho ( szBuffer );
 }
@@ -432,10 +432,10 @@ void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned c
     {
         // Convert it to a string buffer
         char szBuffer [1024];
-	    va_list ap;
-	    va_start ( ap, B );
-	    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-	    va_end ( ap );
+        va_list ap;
+        va_start ( ap, B );
+        _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+        va_end ( ap );
 
         // Echo it to the console and chat
         DebugEchoColor ( szBuffer, R, G, B );
@@ -479,10 +479,10 @@ void CCore::ChatPrintf ( const char* szFormat, bool bColorCoded, ... )
 {
     // Convert it to a string buffer
     char szBuffer [1024];
-	va_list ap;
-	va_start ( ap, bColorCoded );
-	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-	va_end ( ap );
+    va_list ap;
+    va_start ( ap, bColorCoded );
+    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    va_end ( ap );
 
     // Echo it to the console and chat
     ChatEcho ( szBuffer, bColorCoded );
@@ -498,10 +498,10 @@ void CCore::ChatPrintfColor ( const char* szFormat, bool bColorCoded, unsigned c
         {
             // Convert it to a string buffer
             char szBuffer [1024];
-	        va_list ap;
-	        va_start ( ap, B );
-	        _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-	        va_end ( ap );
+            va_list ap;
+            va_start ( ap, B );
+            _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+            va_end ( ap );
 
             // Echo it to the console and chat
             ChatEchoColor ( szBuffer, R, G, B, bColorCoded );
@@ -531,7 +531,7 @@ bool CCore::IsChatVisible ( void )
 
 void CCore::TakeScreenShot ( void )
 {
-	bScreenShot = true;
+    bScreenShot = true;
 }
 
 
@@ -699,11 +699,11 @@ void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
 
 void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
 {
-	CFilePathTranslator		FileTranslator;
+    CFilePathTranslator     FileTranslator;
     string                  WorkingDirectory;
     char                    szCurDir [ 1024 ];
 
-	if ( m_pMessageBox )
+    if ( m_pMessageBox )
         delete m_pMessageBox;
 
 
@@ -713,14 +713,14 @@ void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned i
     GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
-	// Create the message box
-	m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
-	if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
+    // Create the message box
+    m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
+    if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
 
     // Restore current directory
     SetCurrentDirectory ( szCurDir );
 
-	// Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
+    // Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
     m_pMessageBox->SetAutoDestroy ( false );
 }
 
@@ -750,7 +750,7 @@ HWND CCore::GetHookedWindow ( void )
 
 void CCore::HideMainMenu ( void )
 {
-	m_pLocalGUI->GetMainMenu ()->SetVisible ( false );
+    m_pLocalGUI->GetMainMenu ()->SetVisible ( false );
     m_pLocalGUI->GetMainMenu ()->SetServerBrowserVisible ( false );
 }
 
@@ -770,10 +770,10 @@ void CCore::ApplyHooks ( )
 
 void CCore::SetCenterCursor ( bool bEnabled )
 {
-	if ( bEnabled )
-		m_pSetCursorPosHook->EnableSetCursorPos ();
-	else
-		m_pSetCursorPosHook->DisableSetCursorPos ();
+    if ( bEnabled )
+        m_pSetCursorPosHook->EnableSetCursorPos ();
+    else
+        m_pSetCursorPosHook->DisableSetCursorPos ();
 }
 
 void CCore::CreateGame ( )
@@ -863,12 +863,12 @@ void CCore::DeinitGUI ( void )
 
 void CCore::InitGUI ( IUnknown* pDevice )
 {
-	// Initializes the GUI by calling the InitGUIInterface-function in the GUI dll
+    // Initializes the GUI by calling the InitGUIInterface-function in the GUI dll
 
     CFilePathTranslator     FileTranslator;
     string                  WorkingDirectory;
     char                    szCurDir [ 1024 ];
-	bool					bReturn = false;
+    bool                    bReturn = false;
 
     // Set the current directory.
     FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
@@ -876,27 +876,27 @@ void CCore::InitGUI ( IUnknown* pDevice )
     GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
-	typedef CGUI* (*pfnGUIInitializer) ( IDirect3DDevice9* );
-	pfnGUIInitializer pfnGUIInit;
+    typedef CGUI* (*pfnGUIInitializer) ( IDirect3DDevice9* );
+    pfnGUIInitializer pfnGUIInit;
 
-	pfnGUIInit = static_cast < pfnGUIInitializer > ( m_GUIModule.GetFunctionPointer ( "InitGUIInterface" ) );
-	if ( pfnGUIInit != NULL )
-	{
-		IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
-		m_pGUI = pfnGUIInit ( dev );
-		WriteDebugEvent ( "GUI initialized." );
-	} else {
-		// USE CLANGUAGELOCALE HERE.
-		MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
-		TerminateProcess ( GetCurrentProcess (), 0 );
-	}
+    pfnGUIInit = static_cast < pfnGUIInitializer > ( m_GUIModule.GetFunctionPointer ( "InitGUIInterface" ) );
+    if ( pfnGUIInit != NULL )
+    {
+        IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
+        m_pGUI = pfnGUIInit ( dev );
+        WriteDebugEvent ( "GUI initialized." );
+    } else {
+        // USE CLANGUAGELOCALE HERE.
+        MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        TerminateProcess ( GetCurrentProcess (), 0 );
+    }
 
-	// Set the working directory for CGUI
-	m_pGUI->SetWorkingDirectory ( WorkingDirectory.c_str ( ) );
+    // Set the working directory for CGUI
+    m_pGUI->SetWorkingDirectory ( WorkingDirectory.c_str ( ) );
 
-	SetCurrentDirectory ( szCurDir );
+    SetCurrentDirectory ( szCurDir );
 
-	// and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
+    // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
     CVARS_SET ( "screenshot_path", strScreenShotPath );
     CScreenShot::SetPath ( strScreenShotPath.c_str() );
@@ -905,12 +905,12 @@ void CCore::InitGUI ( IUnknown* pDevice )
 
 void CCore::CreateGUI ( void )
 {
-	// Should only be called once, use InitGUI to init the GUI, which can be called again (after a destruction of the GUI)
+    // Should only be called once, use InitGUI to init the GUI, which can be called again (after a destruction of the GUI)
 
     CFilePathTranslator     FileTranslator;
     string                  WorkingDirectory;
     char                    szCurDir [ 1024 ];
-	bool					bReturn = false;
+    bool                    bReturn = false;
 
     // Set the current directory.
     FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
@@ -919,29 +919,29 @@ void CCore::CreateGUI ( void )
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
 #ifdef MTA_DEBUG
-	bReturn = m_GUIModule.LoadModule ( "cgui_d.dll" );
+    bReturn = m_GUIModule.LoadModule ( "cgui_d.dll" );
 #else
-	bReturn = m_GUIModule.LoadModule ( "cgui.dll" );
+    bReturn = m_GUIModule.LoadModule ( "cgui.dll" );
 #endif
-	if ( !bReturn )
-	{
+    if ( !bReturn )
+    {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
         TerminateProcess ( GetCurrentProcess (), 0 );
     }
-	WriteDebugEvent ( "GUI loaded." );
+    WriteDebugEvent ( "GUI loaded." );
 
-	SetCurrentDirectory ( szCurDir );
+    SetCurrentDirectory ( szCurDir );
 }
 
 void CCore::DestroyGUI ( )
 {
-	WriteDebugEvent ( "CCore::DestroyGUI" );
-	if ( m_pGUI )
-	{
+    WriteDebugEvent ( "CCore::DestroyGUI" );
+    if ( m_pGUI )
+    {
         m_pGUI = NULL;
-	}
-	m_GUIModule.UnloadModule ();
+    }
+    m_GUIModule.UnloadModule ();
 }
 
 
@@ -967,7 +967,7 @@ void CCore::CreateNetwork ( )
 #else
     m_NetModule.LoadModule ( "net.dll" );
 #endif
-	if ( m_NetModule.IsOk () == false )
+    if ( m_NetModule.IsOk () == false )
     {
         MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
         TerminateProcess ( GetCurrentProcess (), 0 );
@@ -1000,7 +1000,7 @@ void CCore::CreateNetwork ( )
         TerminateProcess ( GetCurrentProcess (), 0 );
     }
 
-	SetCurrentDirectory ( szCurDir );
+    SetCurrentDirectory ( szCurDir );
 }
 
 
@@ -1044,7 +1044,7 @@ void CCore::CreateXML ( )
         TerminateProcess ( GetCurrentProcess (), 0 );
     }
 
-	SetCurrentDirectory ( szCurDir );
+    SetCurrentDirectory ( szCurDir );
 
     
     // Load config XML file
@@ -1068,35 +1068,35 @@ void CCore::CreateXML ( )
 
 void CCore::DestroyGame ( )
 {
-	WriteDebugEvent ( "CCore::DestroyGame" );
+    WriteDebugEvent ( "CCore::DestroyGame" );
 
-	if ( m_pGame )
-	{
+    if ( m_pGame )
+    {
         m_pGame->Terminate ();
         m_pGame = NULL;
-	}
+    }
 
-	m_GameModule.UnloadModule();
+    m_GameModule.UnloadModule();
 
 }
 
 
 void CCore::DestroyMultiplayer ( )
 {
-	WriteDebugEvent ( "CCore::DestroyMultiplayer" );
+    WriteDebugEvent ( "CCore::DestroyMultiplayer" );
 
-	if ( m_pMultiplayer )
-	{
+    if ( m_pMultiplayer )
+    {
         m_pMultiplayer = NULL;
-	}
+    }
 
-	m_MultiplayerModule.UnloadModule();
+    m_MultiplayerModule.UnloadModule();
 }
 
 
 void CCore::DestroyXML ( )
 {
-	WriteDebugEvent ( "CCore::DestroyXML" );
+    WriteDebugEvent ( "CCore::DestroyXML" );
 
     // Save and unload configuration
     if ( m_pConfigFile ) {
@@ -1104,25 +1104,25 @@ void CCore::DestroyXML ( )
         delete m_pConfigFile;
     }
 
-	if ( m_pXML )
-	{
+    if ( m_pXML )
+    {
         m_pXML = NULL;
-	}
+    }
 
-	m_XMLModule.UnloadModule();
+    m_XMLModule.UnloadModule();
 }
 
 
 void CCore::DestroyNetwork ( )
 {
-	WriteDebugEvent ( "CCore::DestroyNetwork" );
+    WriteDebugEvent ( "CCore::DestroyNetwork" );
 
-	if ( m_pNet )
-	{
+    if ( m_pNet )
+    {
         m_pNet = NULL;
-	}
+    }
 
-	m_NetModule.UnloadModule();
+    m_NetModule.UnloadModule();
 }
 
 
@@ -1228,7 +1228,7 @@ void CCore::DoPostFramePulse ( )
     m_pModManager->DoPulsePostFrame ();
     m_pConnectManager->DoPulse ();
 
-	m_Community.DoPulse ();
+    m_Community.DoPulse ();
 }
 
 
@@ -1244,52 +1244,52 @@ void CCore::OnModUnload ( )
 
 void CCore::RegisterCommands ( )
 {
-	//m_pCommands->Add ( "e", CCommandFuncs::Editor );
+    //m_pCommands->Add ( "e", CCommandFuncs::Editor );
     //m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-    m_pCommands->Add ( "help",				"this help screen",					CCommandFuncs::Help );
-    m_pCommands->Add ( "exit",				"exits the application",			CCommandFuncs::Exit );
-    m_pCommands->Add ( "quit",				"exits the application",			CCommandFuncs::Exit );
-	m_pCommands->Add ( "ver",				"shows the version",				CCommandFuncs::Ver );
-    m_pCommands->Add ( "time",				"shows the time",					CCommandFuncs::Time );
-	m_pCommands->Add ( "hud",				"shows the hud",					CCommandFuncs::HUD );
-    m_pCommands->Add ( "binds",				"shows all the binds",				CCommandFuncs::Binds );
+    m_pCommands->Add ( "help",              "this help screen",                 CCommandFuncs::Help );
+    m_pCommands->Add ( "exit",              "exits the application",            CCommandFuncs::Exit );
+    m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
+    m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
+    m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
+    m_pCommands->Add ( "hud",               "shows the hud",                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
 
-    m_pCommands->Add ( "vid",				"changes the video settings (id)",	CCommandFuncs::Vid );
+    m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
 
-    m_pCommands->Add ( "window",            "enter/leave windowed mode",	    CCommandFuncs::Window );
+    m_pCommands->Add ( "window",            "enter/leave windowed mode",        CCommandFuncs::Window );
 
-    m_pCommands->Add ( "load",				"loads a mod (name args)",			CCommandFuncs::Load );
-    m_pCommands->Add ( "unload",			"unloads a mod (name)",				CCommandFuncs::Unload );
-    m_pCommands->Add ( "connect",			"connects to a server (host port nick pass)",	CCommandFuncs::Connect );
-    m_pCommands->Add ( "reconnect",			"connects to a previous server",	CCommandFuncs::Reconnect );
-    m_pCommands->Add ( "bind",				"binds a key (key control)",		CCommandFuncs::Bind );
-    m_pCommands->Add ( "unbind",			"unbinds a key (key)",				CCommandFuncs::Unbind );
-    m_pCommands->Add ( "copygtacontrols",	"copies the default gta controls",	CCommandFuncs::CopyGTAControls );
-	m_pCommands->Add ( "screenshot",		"outputs a screenshot",				CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "connectiontype",	"sets the connection type (type)",	CCommandFuncs::ConnectionType );
-    m_pCommands->Add ( "saveconfig",	    "immediately saves the config",	    CCommandFuncs::SaveConfig );
+    m_pCommands->Add ( "load",              "loads a mod (name args)",          CCommandFuncs::Load );
+    m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
+    m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
+    m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
+    m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
+    m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
+    m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
+    m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
+    m_pCommands->Add ( "connectiontype",    "sets the connection type (type)",  CCommandFuncs::ConnectionType );
+    m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
 
-    m_pCommands->Add ( "cleardebug",		"clears the debug view",			CCommandFuncs::DebugClear );
+    m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
     m_pCommands->Add ( "chatscrollup",      "scrolls the chatbox upwards",      CCommandFuncs::ChatScrollUp );
     m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
     m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
 #ifdef MTA_DEBUG
-	//m_pCommands->Add ( "pools",				"read out the pool values",			CCommandFuncs::PoolRelocations );
+    //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
 #endif
 }
 
 
 bool CCore::GetResetNeeded ( )
 {
-	return m_bResetNeeded;
+    return m_bResetNeeded;
 }
 
 
 void CCore::SetRenderDevice ( IUnknown* pDevice )
 {
-	m_pRenderDevice = pDevice;
+    m_pRenderDevice = pDevice;
 }
 
 
@@ -1300,9 +1300,9 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
     // Make GTA windowed
     m_pGame->GetSettings()->SetCurrentVideoMode(0);
 
-	// Get the destination window rectangle
-	RECT rect;
-	GetWindowRect ( hWnd, &rect );
+    // Get the destination window rectangle
+    RECT rect;
+    GetWindowRect ( hWnd, &rect );
 
     // Size the GTA window size to the same size as the destination window rectangle
     HWND hDeviceWindow = CDirect3DData::GetSingleton ().GetDeviceWindow ();
@@ -1313,9 +1313,9 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
                  rect.bottom - rect.top,
                  TRUE );
 
-	// Turn the GTA window into a child window of our static render container window
+    // Turn the GTA window into a child window of our static render container window
     SetParent ( hDeviceWindow, hWnd );
-	SetWindowLong ( hDeviceWindow, GWL_STYLE, WS_VISIBLE | WS_CHILD );
+    SetWindowLong ( hDeviceWindow, GWL_STYLE, WS_VISIBLE | WS_CHILD );
 #endif
 }
 
@@ -1376,24 +1376,24 @@ void CCore::Quit ( bool bInstantly )
 
 bool CCore::OnMouseClick ( CGUIMouseEventArgs Args )
 {
-	bool bHandled = false;
+    bool bHandled = false;
 
-    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );		// CServerBrowser
+    bHandled = m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseClick ( Args );     // CServerBrowser
 
-	return bHandled;
+    return bHandled;
 }
 
 
 bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
-	bool bHandled = false;
+    bool bHandled = false;
 
-	// Call the event handlers, where necessary
-	bHandled =
-		m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |	// CSettings
-		m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );		// CServerBrowser
-	
-	return bHandled;
+    // Call the event handlers, where necessary
+    bHandled =
+        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->OnMouseDoubleClick ( Args ) |    // CSettings
+        m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->OnMouseDoubleClick ( Args );      // CServerBrowser
+    
+    return bHandled;
 }
 
 void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )

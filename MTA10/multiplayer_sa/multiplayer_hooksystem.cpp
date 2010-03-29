@@ -15,45 +15,45 @@
 
 #define MAX_JUMPCODE_SIZE 50
 
-VOID HookInstallMethod(	DWORD dwInstallAddress,
-						DWORD dwHookFunction )
+VOID HookInstallMethod( DWORD dwInstallAddress,
+                        DWORD dwHookFunction )
 {
-	*(PDWORD)dwInstallAddress = (DWORD)dwHookFunction;
+    *(PDWORD)dwInstallAddress = (DWORD)dwHookFunction;
 }
 
 VOID HookInstallCall ( DWORD dwInstallAddress,
-						DWORD dwHookFunction )
+                        DWORD dwHookFunction )
 {
     DWORD dwOffset = dwHookFunction - (dwInstallAddress + 5);
-	*(BYTE*)(dwInstallAddress) = 0xE8;
+    *(BYTE*)(dwInstallAddress) = 0xE8;
     *(DWORD*)(dwInstallAddress+1) = dwOffset;
 }
 
 ////////////////////////////////////////////////////////////////////
 
 BOOL HookInstall( DWORD dwInstallAddress,
-				  DWORD dwHookHandler,
-				  int iJmpCodeSize )
+                  DWORD dwHookHandler,
+                  int iJmpCodeSize )
 {
-	BYTE JumpBytes[MAX_JUMPCODE_SIZE];
-	memset ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
-	if ( CreateJump ( dwInstallAddress, dwHookHandler, JumpBytes ) )
-	{
-		memcpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
+    BYTE JumpBytes[MAX_JUMPCODE_SIZE];
+    memset ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
+    if ( CreateJump ( dwInstallAddress, dwHookHandler, JumpBytes ) )
+    {
+        memcpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////
 
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray )
 {
-	ByteArray[0] = 0xE9;
+    ByteArray[0] = 0xE9;
     *(DWORD *)(&ByteArray[1]) = dwTo - (dwFrom + 5);
-	return ByteArray;
+    return ByteArray;
 }
 

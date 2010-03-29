@@ -25,7 +25,7 @@ CClientPickup::CClientPickup ( CClientManager* pManager, ElementID ID, unsigned 
     m_bVisible = true;
     m_pPickup = NULL;
     m_pObject = NULL;
-	m_pCollision = NULL;
+    m_pCollision = NULL;
 
     // Add us to pickup manager's list
     m_pPickupManager->m_List.push_back ( this );
@@ -136,10 +136,10 @@ void CClientPickup::Create ( void )
             // Store our pickup's object
             m_pObject = m_pPickup->GetObject ();
 
-			// Create our collision
-			m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f );
+            // Create our collision
+            m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f );
             m_pCollision->m_pOwningPickup = this;
-			m_pCollision->SetHitCallback ( this );
+            m_pCollision->SetHitCallback ( this );
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;
@@ -154,11 +154,11 @@ void CClientPickup::Create ( void )
 
 void CClientPickup::Destroy ( void )
 {
-	if ( m_pCollision )
-	{
-		delete m_pCollision;
-		m_pCollision = NULL;
-	}
+    if ( m_pCollision )
+    {
+        delete m_pCollision;
+        m_pCollision = NULL;
+    }
     if ( m_pPickup )
     {
         // Delete the pickup

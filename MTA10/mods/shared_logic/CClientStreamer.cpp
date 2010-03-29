@@ -21,9 +21,9 @@ using std::list;
 /*
 inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2 )
 {
-	float fDistanceX = vec2.fX - vec1.fX;
-	float fDistanceY = vec2.fY - vec1.fY;
-	float fDistanceZ = vec2.fZ - vec1.fZ;
+    float fDistanceX = vec2.fX - vec1.fX;
+    float fDistanceY = vec2.fY - vec1.fY;
+    float fDistanceZ = vec2.fZ - vec1.fZ;
     return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 }
 */
@@ -32,24 +32,24 @@ namespace
 
     float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fExtentMin, const float* fExtentMax, const CVector** vecBoxAxes )
     {
-	    CVector vecOffset = vecPosition - vecBoxCenter;
-	    float fDistSq = 0.f;
+        CVector vecOffset = vecPosition - vecBoxCenter;
+        float fDistSq = 0.f;
 
-	    // For each axis
-	    for ( int i = 0 ; i < 3 ; i++ )
-	    {
+        // For each axis
+        for ( int i = 0 ; i < 3 ; i++ )
+        {
             // Project vecOffset on the axis
-		    float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
+            float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
 
             // Add any distance outside the box on that axis
             if ( fDot < fExtentMin[i] )
-			    fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
-		    else
+                fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
+            else
             if ( fDot > fExtentMax[i] )
-			    fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
-	    }
+                fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
+        }
 
-	    return fDistSq;
+        return fDistSq;
     }
 
     void* pAddingElement = NULL;
@@ -417,7 +417,7 @@ void CClientStreamer::RemoveElement ( CClientStreamElement * pElement )
 {
     OnElementEnterSector ( pElement, NULL );
     m_ActiveElements.remove ( pElement );
-	m_ToStreamOut.remove ( pElement );
+    m_ToStreamOut.remove ( pElement );
 }
 
 
@@ -560,23 +560,23 @@ void CClientStreamer::Restream ( void )
         // Do we have furthest-streamed and closest-streamed-out elements
         if ( pFurthestStreamed && pClosestStreamedOut )
         {
-			// It isn't the same object
-			if ( pFurthestStreamed != pClosestStreamedOut )
-			{
-				// Is the streamed out element closer?
-				if ( pClosestStreamedOut->GetExpDistance () < pFurthestStreamed->GetExpDistance () )
-				{   
-					// Unstream the one furthest away
-					pFurthestStreamed->InternalStreamOut();
+            // It isn't the same object
+            if ( pFurthestStreamed != pClosestStreamedOut )
+            {
+                // Is the streamed out element closer?
+                if ( pClosestStreamedOut->GetExpDistance () < pFurthestStreamed->GetExpDistance () )
+                {   
+                    // Unstream the one furthest away
+                    pFurthestStreamed->InternalStreamOut();
 
-					// Room to stream in element now? Stream it in.
-					if ( !ReachedLimit () )
-					{
-						// Stream in the new element. No need to do it instantly.
-						pClosestStreamedOut->InternalStreamIn ( false );
-					}
-				}
-			}
+                    // Room to stream in element now? Stream it in.
+                    if ( !ReachedLimit () )
+                    {
+                        // Stream in the new element. No need to do it instantly.
+                        pClosestStreamedOut->InternalStreamIn ( false );
+                    }
+                }
+            }
         }
     }
 }

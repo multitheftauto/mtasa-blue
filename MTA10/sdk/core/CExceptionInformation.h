@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/core/CExceptionInformation.h
-*  PURPOSE:		Exception information interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/core/CExceptionInformation.h
+*  PURPOSE:     Exception information interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

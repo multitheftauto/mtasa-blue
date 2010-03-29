@@ -28,17 +28,17 @@ class CPlayerClothesPacket: public CPacket
 public:
                                 ~CPlayerClothesPacket       ( void );
 
-    inline ePacketID			GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_CLOTHES; };
-    inline unsigned long		GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_CLOTHES; };
+    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool						Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
-	void						Add							( const char* szTexture, const char* szModel, unsigned char ucType );
+    void                        Add                         ( const char* szTexture, const char* szModel, unsigned char ucType );
     void                        Add                         ( CPlayerClothes* pClothes );
     inline unsigned int         Count                       ( void )                        { return static_cast < unsigned int > ( m_List.size () ); }
 
 private:
-	vector < SPlayerClothes* >	m_List;
+    vector < SPlayerClothes* >  m_List;
 };
 
 #endif

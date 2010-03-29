@@ -295,10 +295,10 @@ bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition
                 pObject->GetPosition ( vecObject );
 
                 // Grab the distance ^ 2
-	            fDistanceX = vecObject.fX - vecPosition.fX;
-	            fDistanceY = vecObject.fY - vecPosition.fY;
-	            fDistanceZ = vecObject.fZ - vecPosition.fZ;
-	            fDistanceExp = fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ;
+                fDistanceX = vecObject.fX - vecPosition.fX;
+                fDistanceY = vecObject.fY - vecPosition.fY;
+                fDistanceZ = vecObject.fZ - vecPosition.fZ;
+                fDistanceExp = fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ;
 
                 // Closer than the radius ^ 2?
                 if ( fDistanceExp < fRadius2 )
@@ -370,7 +370,7 @@ void CClientObjectManager::RestreamObjects ( unsigned short usModel )
         pObject = *iter;
 
         // Streamed in and same vehicle ID?
-		if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
+        if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually

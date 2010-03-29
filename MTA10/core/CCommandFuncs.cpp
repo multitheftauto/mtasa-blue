@@ -1,13 +1,13 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCommandFuncs.cpp
-*  PURPOSE:		Implementation of all built-in commands
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCommandFuncs.cpp
+*  PURPOSE:     Implementation of all built-in commands
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
-*				Derek Abdine <>
-*				Ed Lyons <eai@opencoding.net>
+*               Derek Abdine <>
+*               Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -22,7 +22,7 @@ using std::list;
 extern CCore* g_pCore;
 extern bool g_bBoundsChecker;
 
-#define MTA_HELP_SPACING	32
+#define MTA_HELP_SPACING    32
 
 /* ACHTUNG */
 #include "tracking/CTCPManager.h"
@@ -30,7 +30,7 @@ extern bool g_bBoundsChecker;
 
 void CCommandFuncs::Help ( const char* szParameters )
 {
-	CConsoleInterface* pConsole = g_pCore->GetConsole ();
+    CConsoleInterface* pConsole = g_pCore->GetConsole ();
 
     if ( szParameters && atoi(szParameters) == 1 )
         CCore::GetSingleton().GetMultiplayer()->AllowWindowsCursorShowing(true);
@@ -39,24 +39,24 @@ void CCommandFuncs::Help ( const char* szParameters )
 
     pConsole->Printf ( "***[ COMMAND HELP ]***\n" );
 
-	// Loop through all the available commands
-	list < COMMANDENTRY* > ::iterator iter = CCommands::GetSingletonPtr ()->IterBegin ();
-	list < COMMANDENTRY* > ::iterator iterEnd = CCommands::GetSingletonPtr ()->IterEnd ();
+    // Loop through all the available commands
+    list < COMMANDENTRY* > ::iterator iter = CCommands::GetSingletonPtr ()->IterBegin ();
+    list < COMMANDENTRY* > ::iterator iterEnd = CCommands::GetSingletonPtr ()->IterEnd ();
 
-	char spacer[MTA_HELP_SPACING+1];
-	for ( ; iter != iterEnd ; iter++ ) {
-		const char *szCommandName = (*iter)->szCommandName;
-		const char *szDescription = (*iter)->szDescription;
+    char spacer[MTA_HELP_SPACING+1];
+    for ( ; iter != iterEnd ; iter++ ) {
+        const char *szCommandName = (*iter)->szCommandName;
+        const char *szDescription = (*iter)->szDescription;
 
-		// Space out the name and description evenly (tab-like)
-		unsigned char spacing = MTA_HELP_SPACING - strlen ( szCommandName );
-		if ( spacing <= 0 ) spacing = 1;
+        // Space out the name and description evenly (tab-like)
+        unsigned char spacing = MTA_HELP_SPACING - strlen ( szCommandName );
+        if ( spacing <= 0 ) spacing = 1;
 
-		memset(&spacer[0], ' ', MTA_HELP_SPACING);
-		spacer[spacing] = NULL;
+        memset(&spacer[0], ' ', MTA_HELP_SPACING);
+        spacer[spacing] = NULL;
 
-		pConsole->Printf ( "* %s%s%s\n", (*iter)->szCommandName, &spacer[0], (*iter)->szDescription );
-	}
+        pConsole->Printf ( "* %s%s%s\n", (*iter)->szCommandName, &spacer[0], (*iter)->szDescription );
+    }
 
     pConsole->Printf ( "***[--------------]***\n" );
 }
@@ -77,7 +77,7 @@ void CCommandFuncs::Ver ( const char* szParameters )
 
 void CCommandFuncs::ScreenShot ( const char* szParameters )
 {
-	g_pCore->TakeScreenShot ();
+    g_pCore->TakeScreenShot ();
 }
 
 
@@ -116,7 +116,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
         if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
         {
             // Grab the device window and what mode to switch to
-		    int iParameter = atoi ( szParameters );
+            int iParameter = atoi ( szParameters );
 
             // Change the video mode
             GetVideoModeManager ()->ChangeVideoMode ( iParameter );
@@ -125,10 +125,10 @@ void CCommandFuncs::Vid ( const char* szParameters )
             int iViewportX = CCore::GetSingleton ().GetGraphics()->GetViewportWidth ();
             int iViewportY = CCore::GetSingleton ().GetGraphics()->GetViewportHeight ();
 
-		    // Re-create all CGUI windows, for correct absolute sizes that depend on the (new) screen resolution
-		    CCore::GetSingleton ().GetLocalGUI ()->DestroyWindows ();
-		    CCore::GetSingleton ().GetGUI ()->SetResolution ( (float) iViewportX, (float) iViewportY );
-		    CCore::GetSingleton ().GetLocalGUI ()->CreateWindows ();
+            // Re-create all CGUI windows, for correct absolute sizes that depend on the (new) screen resolution
+            CCore::GetSingleton ().GetLocalGUI ()->DestroyWindows ();
+            CCore::GetSingleton ().GetGUI ()->SetResolution ( (float) iViewportX, (float) iViewportY );
+            CCore::GetSingleton ().GetLocalGUI ()->CreateWindows ();
 
             // Reload console, serverbrowser and chat settings (removed in DestroyWindows)
             g_pCore->ApplyConsoleSettings ();
@@ -175,13 +175,13 @@ void CCommandFuncs::Window ( const char* szParameters )
 
 void CCommandFuncs::Time ( const char* szParameters )
 {
-	time_t rawtime;
-	struct tm * timeinfo;
+    time_t rawtime;
+    struct tm * timeinfo;
 
-	time ( &rawtime );
-	timeinfo = localtime ( &rawtime );
-	
-	SString strTimeAndDate ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    
+    SString strTimeAndDate ( "* The time is %d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
     CCore::GetSingleton ().ChatEchoColor ( strTimeAndDate, 255, 100, 100 );
 }
 
@@ -238,19 +238,19 @@ void CCommandFuncs::Unload ( const char* szParameters )
 
 void CCommandFuncs::ConnectionType ( const char *szParameters )
 {
-	unsigned short usMTUSize = 0;
+    unsigned short usMTUSize = 0;
 
-	if ( strcmpi ( szParameters, "lan" ) == 0 ) {
-		usMTUSize = NET_MTU_LAN;
-	} else if ( strcmpi ( szParameters, "dsl" ) == 0 ) {
-		usMTUSize = NET_MTU_DSL;
-	} else if ( strcmpi ( szParameters, "modem" ) == 0 ) {
-		usMTUSize = NET_MTU_MODEM;
-	} else {
-		CCore::GetSingleton ().GetConsole ()->Print ( "Please specify a correct connection type (lan, dsl or modem)" );
-	}
+    if ( strcmpi ( szParameters, "lan" ) == 0 ) {
+        usMTUSize = NET_MTU_LAN;
+    } else if ( strcmpi ( szParameters, "dsl" ) == 0 ) {
+        usMTUSize = NET_MTU_DSL;
+    } else if ( strcmpi ( szParameters, "modem" ) == 0 ) {
+        usMTUSize = NET_MTU_MODEM;
+    } else {
+        CCore::GetSingleton ().GetConsole ()->Print ( "Please specify a correct connection type (lan, dsl or modem)" );
+    }
 
-	if ( usMTUSize <= 0 ) 
+    if ( usMTUSize <= 0 ) 
         return;
 
     CCore::GetSingleton ().GetConnectManager ()->SetMTUSize ( usMTUSize );
@@ -378,8 +378,8 @@ void CCommandFuncs::CopyGTAControls ( const char* szParameters )
 void CCommandFuncs::HUD ( const char* szParameters )
 {
     int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
-	bool bDisabled = ( iCmd == 1 ) ? false : true;
-	CCore::GetSingleton ().GetGame ()->GetHud ()->Disable ( bDisabled );
+    bool bDisabled = ( iCmd == 1 ) ? false : true;
+    CCore::GetSingleton ().GetGame ()->GetHud ()->Disable ( bDisabled );
 }
 
 void CCommandFuncs::SaveConfig ( const char* szParameters )

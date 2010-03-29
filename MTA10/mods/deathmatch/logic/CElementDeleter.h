@@ -24,7 +24,7 @@ public:
     inline                      ~CElementDeleter        ( void )        { DoDeleteAll (); };
 
     void                        Delete                  ( class CClientEntity* pElement );
-	void                        DeleteRecursive         ( class CClientEntity* pElement );
+    void                        DeleteRecursive         ( class CClientEntity* pElement );
 
     void                        DoDeleteAll             ( void );
 

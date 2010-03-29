@@ -10,7 +10,7 @@
 
 CRCGenerator* CRCGenerator::instance = 0;
 CRCGenerator::CRCGenerator() {
-	Init();
+    Init();
 }
 
 void CRCGenerator::Init ( void ) {

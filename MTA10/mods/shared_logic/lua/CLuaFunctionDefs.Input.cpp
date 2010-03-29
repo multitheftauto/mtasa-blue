@@ -329,7 +329,7 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
                 for ( ; iter != controlBinds.end () ; iter++ )
                 {
                     lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
-					lua_pushstring ( luaVM, "down" );
+                    lua_pushstring ( luaVM, "down" );
                     lua_settable ( luaVM, -3 );
                 }
             }
@@ -349,7 +349,7 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
                 for ( ; iter != commandBinds.end () ; iter++ )
                 {
                     lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
-					lua_pushstring ( luaVM, (*iter)->bHitState ? "down" : "up" );
+                    lua_pushstring ( luaVM, (*iter)->bHitState ? "down" : "up" );
                     lua_settable ( luaVM, -3 );
                 }
             }

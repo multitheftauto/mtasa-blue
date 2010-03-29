@@ -36,7 +36,7 @@ public:
 
     CEGUI::Font*            GetFont                 ( void );
 
-	void					DrawTextString			( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
+    void                    DrawTextString          ( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
 
 private:
     CEGUI::Font*            m_pFont;

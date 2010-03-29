@@ -30,7 +30,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileWrite", CLuaFileDefs::fileWrite );
     CLuaCFunctions::AddFunction ( "fileFlush", CLuaFileDefs::fileFlush );
     CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
-	CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
+    CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
 }
 
 
@@ -53,60 +53,60 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
-			CResource* pResource = pThisResource;
+            CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) )
             {
-			    // Do we have permissions?
-			    if ( pResource == pThisResource ||
-				     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													    "ModifyOtherObjects",
-													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													    false ) )
-			    {
+                // Do we have permissions?
+                if ( pResource == pThisResource ||
+                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
                     // Create the file to create
-				    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
-				    assert ( pFile );
+                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    assert ( pFile );
 
-				    // Try to load it
-				    if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
-				    {
-					    // Make it a child of the resource's file root
-					    pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
+                    // Try to load it
+                    if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
+                    {
+                        // Make it a child of the resource's file root
+                        pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
 
-					    // Grab its owner resource
-					    CResource* pParentResource = pLuaMain->GetResource ();
-					    if ( pParentResource )
-					    {
-						    // Add it to the scrpt resource element group
-						    CElementGroup* pGroup = pParentResource->GetElementGroup ();
-						    if ( pGroup )
-						    {
-							    pGroup->Add ( pFile );
-						    }
-					    }
+                        // Grab its owner resource
+                        CResource* pParentResource = pLuaMain->GetResource ();
+                        if ( pParentResource )
+                        {
+                            // Add it to the scrpt resource element group
+                            CElementGroup* pGroup = pParentResource->GetElementGroup ();
+                            if ( pGroup )
+                            {
+                                pGroup->Add ( pFile );
+                            }
+                        }
 
-					    // Tell the clients about it. This is because other elements might get
-					    // parented below this one.
-					    CEntityAddPacket Packet;
-					    Packet.Add ( pFile );
-					    m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+                        // Tell the clients about it. This is because other elements might get
+                        // parented below this one.
+                        CEntityAddPacket Packet;
+                        Packet.Add ( pFile );
+                        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
 
-					    // Success. Return the file.
-					    lua_pushelement ( luaVM, pFile );
-					    return 1;
-				    }
-				    else
-				    {
-					    // Delete the file again
-					    delete pFile;
+                        // Success. Return the file.
+                        lua_pushelement ( luaVM, pFile );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete the file again
+                        delete pFile;
 
-					    // Output error
-					    m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; unable to load file" );
-				    }
-			    }
-			    else
-				    m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                        // Output error
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; unable to load file" );
+                    }
+                }
+                else
+                    m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
@@ -135,21 +135,21 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
 
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
-			CResource* pResource = pThisResource;
+            CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) )
             {
                 string strFilePath;
 
                 // Does file exist?
-			    if ( pResource->GetFilePath ( strSubPath.c_str(), strFilePath ) )
-			    {
-				    lua_pushboolean ( luaVM, true );
-				    return 1;
-			    }
+                if ( pResource->GetFilePath ( strSubPath.c_str(), strFilePath ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
                 else
                 {
                     lua_pushboolean ( luaVM, false );
-				    return 1;
+                    return 1;
                 }
             }
         }
@@ -189,62 +189,62 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
-			CResource* pResource = pThisResource;
+            CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strAbsPath, &strSubPath ) )
             {
                 // Do we have permissions?
-			    if ( pResource == pThisResource ||
-				     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													    "ModifyOtherObjects",
-													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													    false ) )
-			    {
+                if ( pResource == pThisResource ||
+                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
 
-				    // Create the file to create
-				    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
-				    assert ( pFile );
+                    // Create the file to create
+                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    assert ( pFile );
 
-				    // Try to load it
-				    if ( ( bReadOnly && pFile->Load ( CScriptFile::MODE_READ ) ) ||
-					    ( !bReadOnly && pFile->Load ( CScriptFile::MODE_READWRITE ) ) )
-				    {
-					    // Make it a child of the resource's file root
-					    pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
+                    // Try to load it
+                    if ( ( bReadOnly && pFile->Load ( CScriptFile::MODE_READ ) ) ||
+                        ( !bReadOnly && pFile->Load ( CScriptFile::MODE_READWRITE ) ) )
+                    {
+                        // Make it a child of the resource's file root
+                        pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
 
-					    // Grab its owner resource
-					    CResource* pParentResource = pLuaMain->GetResource ();
-					    if ( pParentResource )
-					    {
-						    // Add it to the scrpt resource element group
-						    CElementGroup* pGroup = pParentResource->GetElementGroup ();
-						    if ( pGroup )
-						    {
-							    pGroup->Add ( pFile );
-						    }
-					    }
+                        // Grab its owner resource
+                        CResource* pParentResource = pLuaMain->GetResource ();
+                        if ( pParentResource )
+                        {
+                            // Add it to the scrpt resource element group
+                            CElementGroup* pGroup = pParentResource->GetElementGroup ();
+                            if ( pGroup )
+                            {
+                                pGroup->Add ( pFile );
+                            }
+                        }
 
-					    // Tell the clients about it. This is because other elements might get
-					    // parented below this one.
-					    CEntityAddPacket Packet;
-					    Packet.Add ( pFile );
-					    m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+                        // Tell the clients about it. This is because other elements might get
+                        // parented below this one.
+                        CEntityAddPacket Packet;
+                        Packet.Add ( pFile );
+                        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
 
-					    // Success. Return the file.
-					    lua_pushelement ( luaVM, pFile );
-					    return 1;
-				    }
-				    else
-				    {
-					    // Delete the file again
-					    delete pFile;
+                        // Success. Return the file.
+                        lua_pushelement ( luaVM, pFile );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete the file again
+                        delete pFile;
 
-					    // Output error
-					    m_pScriptDebugging->LogWarning ( luaVM, "fileOpen; unable to load file" );
-				    }
-			    }
-			    else
-				    m_pScriptDebugging->LogError ( luaVM, "fileOpen failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                        // Output error
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileOpen; unable to load file" );
+                    }
+                }
+                else
+                    m_pScriptDebugging->LogError ( luaVM, "fileOpen failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
@@ -552,39 +552,39 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 
             // We have a resource argument?
             CResource* pThisResource = pLuaMain->GetResource ();
-			CResource* pResource = pThisResource;
+            CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath, NULL ) )
             {
-			    // Do we have permissions?
-			    if ( pResource == pThisResource ||
-				     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													    "ModifyOtherObjects",
-													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													    false ) )
-			    {
-					// Make sure the dir exists so we can remove the file
-					MakeSureDirExists ( strPath.c_str () );
-					if ( remove ( strPath.c_str () ) == 0 )
-					{
-						// If file removed return success
-						lua_pushboolean ( luaVM, true );
-						return 1;
-					}
-					else
-					{
-						// Output error
-						m_pScriptDebugging->LogWarning ( luaVM, "fileDelete; unable to delete file" );
-					}
-				}
-				else
+                // Do we have permissions?
+                if ( pResource == pThisResource ||
+                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
+                    // Make sure the dir exists so we can remove the file
+                    MakeSureDirExists ( strPath.c_str () );
+                    if ( remove ( strPath.c_str () ) == 0 )
+                    {
+                        // If file removed return success
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Output error
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileDelete; unable to delete file" );
+                    }
+                }
+                else
                     m_pScriptDebugging->LogError ( luaVM, "fileDelete failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
-			}
+            }
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM, "fileDelete" );
     }
 
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }

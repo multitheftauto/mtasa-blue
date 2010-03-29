@@ -44,18 +44,18 @@ public:
     CVector2D           GetPosition                 ( bool bRelative = false );
     void                GetPosition                 ( CVector2D& vecPosition, bool bRelative = false );
 
-	void				SetWidth					( float fX, bool bRelative = false );
-	void				SetHeight					( float fY, bool bRelative = false );
+    void                SetWidth                    ( float fX, bool bRelative = false );
+    void                SetHeight                   ( float fY, bool bRelative = false );
 
     void                SetSize                     ( const CVector2D& vecSize, bool bRelative = false );
     CVector2D           GetSize                     ( bool bRelative = false );
     void                GetSize                     ( CVector2D& vecSize, bool bRelative = false );
 
-	bool				SetFont						( const char *szFontName );
-    std::string         GetFont						( void );
+    bool                SetFont                     ( const char *szFontName );
+    std::string         GetFont                     ( void );
 
-	void				SetProperty					( const char *szProperty, const char *szValue );
-    std::string         GetProperty					( const char *szProperty );
+    void                SetProperty                 ( const char *szProperty, const char *szValue );
+    std::string         GetProperty                 ( const char *szProperty );
 
     void                SetMinimumSize              ( const CVector2D& vecSize );
     CVector2D           GetMinimumSize              ( void );
@@ -87,53 +87,53 @@ public:
     CVector2D           RelativeToAbsolute          ( const CVector2D& Vector );
 
     void                SetParent                   ( CGUIElement* pParent );
-	CGUIElement*		GetParent					( void );
+    CGUIElement*        GetParent                   ( void );
 
     CEGUI::Window*      GetWindow                   ( void );
 
     void                ForceRedraw                 ( void );
 
-	void				SetUserData					( void* pData )			{ m_pData = pData; }
-	void*				GetUserData					( void )				{ return m_pData; }
+    void                SetUserData                 ( void* pData )         { m_pData = pData; }
+    void*               GetUserData                 ( void )                { return m_pData; }
 
-	CGUIPropertyIter	GetPropertiesBegin			( void );
-	CGUIPropertyIter	GetPropertiesEnd			( void );
+    CGUIPropertyIter    GetPropertiesBegin          ( void );
+    CGUIPropertyIter    GetPropertiesEnd            ( void );
 
     void                SetMovedHandler             ( GUI_CALLBACK Callback );
-	void                SetSizedHandler		        ( GUI_CALLBACK Callback );
-	void				SetClickHandler				( GUI_CALLBACK Callback );
-	void				SetMouseEnterHandler		( GUI_CALLBACK Callback );
-	void				SetMouseLeaveHandler		( GUI_CALLBACK Callback );
+    void                SetSizedHandler             ( GUI_CALLBACK Callback );
+    void                SetClickHandler             ( GUI_CALLBACK Callback );
+    void                SetMouseEnterHandler        ( GUI_CALLBACK Callback );
+    void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback );
 
 protected:
     void                DestroyElement              ( void );
 
     void                CorrectEdges                ( void );
-	void				FillProperties				( void );
-	void				EmptyProperties				( void );
+    void                FillProperties              ( void );
+    void                EmptyProperties             ( void );
 
     void                AddEvents                   ( void );
 
     bool                Event_OnMoved               ( const CEGUI::EventArgs& e );
     bool                Event_OnSized               ( const CEGUI::EventArgs& e );
-	bool                Event_OnClick               ( const CEGUI::EventArgs& e );
-	bool                Event_OnMouseEnter          ( const CEGUI::EventArgs& e );
-	bool                Event_OnMouseLeave          ( const CEGUI::EventArgs& e );
+    bool                Event_OnClick               ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseEnter          ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseLeave          ( const CEGUI::EventArgs& e );
 
     CEGUI::Window*              m_pWindow;
-	CGUIElement*		        m_pParent;
+    CGUIElement*                m_pParent;
 
-	CGUI_Impl*			        m_pManager;
+    CGUI_Impl*                  m_pManager;
 
-	void*				        m_pData;
+    void*                       m_pData;
 
-	std::list<CGUIProperty*>	m_Properties;
+    std::list<CGUIProperty*>    m_Properties;
 
-	GUI_CALLBACK               m_OnClick;
+    GUI_CALLBACK               m_OnClick;
     GUI_CALLBACK               m_OnMoved;
     GUI_CALLBACK               m_OnSized;
-	GUI_CALLBACK               m_OnMouseEnter;
-	GUI_CALLBACK               m_OnMouseLeave;
+    GUI_CALLBACK               m_OnMouseEnter;
+    GUI_CALLBACK               m_OnMouseLeave;
 };
 
 #endif

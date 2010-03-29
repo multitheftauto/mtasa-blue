@@ -40,8 +40,8 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the resource element id
         BitStream.Write ( m_pResource->GetResourceRootElement ()->GetID () );
 
-		// Write the resource dynamic element id
-		BitStream.Write ( m_pResource->GetDynamicElementRoot ()->GetID () );
+        // Write the resource dynamic element id
+        BitStream.Write ( m_pResource->GetDynamicElementRoot ()->GetID () );
         
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
         for ( ; iter != m_pResource->IterEnd (); iter++ )
@@ -50,8 +50,8 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () ) ||
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn () ) )
             {
-				// Write the Type of chunk to read (F - File, E - Exported Function)
-				BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
+                // Write the Type of chunk to read (F - File, E - Exported Function)
+                BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
 
                 // Write the map name
                 const char* szFileName = ( *iter )->GetWindowsName();
@@ -81,27 +81,27 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
         }
 
-		// Loop through the exported functions
-		list < CExportedFunction* >::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
-		for ( ; iterExportedFunction != m_pResource->IterEndExportedFunctions (); iterExportedFunction++)
-		{
-			// Check to see if the exported function is 'client'
-			if ( ( *iterExportedFunction )->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT )
-			{
-				// Write the Type of chunk to read (F - File, E - Exported Function)
-				BitStream.Write ( static_cast < unsigned char > ( 'E' ) ) ;
+        // Loop through the exported functions
+        list < CExportedFunction* >::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
+        for ( ; iterExportedFunction != m_pResource->IterEndExportedFunctions (); iterExportedFunction++)
+        {
+            // Check to see if the exported function is 'client'
+            if ( ( *iterExportedFunction )->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT )
+            {
+                // Write the Type of chunk to read (F - File, E - Exported Function)
+                BitStream.Write ( static_cast < unsigned char > ( 'E' ) ) ;
 
-				// Write the exported function
+                // Write the exported function
                 std::string strFunctionName = ( *iterExportedFunction )->GetFunctionName ();
-				size_t sizeFunctionName = strFunctionName.length ();
+                size_t sizeFunctionName = strFunctionName.length ();
 
-				BitStream.Write ( static_cast < unsigned char > ( sizeFunctionName ) );
-				if ( sizeFunctionName > 0 )
-				{
-					BitStream.Write ( strFunctionName.c_str (), sizeFunctionName );
-				}
-			}
-		}
+                BitStream.Write ( static_cast < unsigned char > ( sizeFunctionName ) );
+                if ( sizeFunctionName > 0 )
+                {
+                    BitStream.Write ( strFunctionName.c_str (), sizeFunctionName );
+                }
+            }
+        }
 
         return true;
     }

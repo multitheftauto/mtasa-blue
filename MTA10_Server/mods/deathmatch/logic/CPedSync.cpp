@@ -215,13 +215,13 @@ void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
                             // Grab the delta health
                             float fDeltaHealth = fPreviousHealth - pData->fHealth;
 
-					        if ( fDeltaHealth > 0.0f )
-					        {
-						        // Call the onPedDamage event
-						        CLuaArguments Arguments;
-						        Arguments.PushNumber ( fDeltaHealth );
-						        pPed->CallEvent ( "onPedDamage", Arguments );
-					        }
+                            if ( fDeltaHealth > 0.0f )
+                            {
+                                // Call the onPedDamage event
+                                CLuaArguments Arguments;
+                                Arguments.PushNumber ( fDeltaHealth );
+                                pPed->CallEvent ( "onPedDamage", Arguments );
+                            }
                         }
                     }
 

@@ -15,11 +15,11 @@
 
 CPlaneSA::CPlaneSA( CPlaneSAInterface * plane ):CAutomobileSA( plane )
 {
-	DEBUG_TRACE("CPlaneSA::CPlaneSA( CPlaneSAInterface * plane )");
-	this->m_pInterface = plane;
+    DEBUG_TRACE("CPlaneSA::CPlaneSA( CPlaneSAInterface * plane )");
+    this->m_pInterface = plane;
 }
 
 CPlaneSA::CPlaneSA( eVehicleTypes dwModelID ):CAutomobileSA( dwModelID )
 {
-	DEBUG_TRACE("CPlaneSA::CPlaneSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
+    DEBUG_TRACE("CPlaneSA::CPlaneSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 }

@@ -23,7 +23,7 @@ public:
                                 CGUIButton_Impl             ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
                                 ~CGUIButton_Impl            ( void );
 
-	eCGUIType					GetType						( void ) { return CGUI_BUTTON; };
+    eCGUIType                   GetType                     ( void ) { return CGUI_BUTTON; };
 
     #include "CGUIElement_Inc.h"
 };

@@ -68,8 +68,8 @@ public:
     static bool                 IsEmptyClothing             ( SPlayerClothing * pClothing, unsigned char ucType );
     static char*                GetClothingName             ( unsigned char ucType );
 
-	static SPlayerClothing*     GetClothingGroup            ( unsigned char ucType );
-	static const int            GetClothingGroupMax         ( unsigned char ucType );
+    static SPlayerClothing*     GetClothingGroup            ( unsigned char ucType );
+    static const int            GetClothingGroupMax         ( unsigned char ucType );
 
 private:
     static SPlayerClothing*     GetClothing                 ( char * szTexture, char * szModel, unsigned char ucType );

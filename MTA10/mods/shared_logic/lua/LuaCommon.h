@@ -20,14 +20,14 @@ extern "C"
     #include "lualib.h"
     #include "lauxlib.h"
 
-	LUALIB_API int luaM_toref (lua_State *L, int i);
+    LUALIB_API int luaM_toref (lua_State *L, int i);
 }
 
 #define abs_index(L, i) \
-	((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
-	lua_gettop(L) + (i) + 1)
-#define FREELIST_REF	0
-#define RESERVED_REFS	2
+    ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
+    lua_gettop(L) + (i) + 1)
+#define FREELIST_REF    0
+#define RESERVED_REFS   2
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
@@ -71,13 +71,13 @@ CClientPlayer*          lua_toplayer        ( lua_State* luaVM, int iArgument );
 CClientProjectile*      lua_toprojectile    ( lua_State* luaVM, int iArgument );
 CLuaTimer*              lua_totimer         ( lua_State* luaVM, int iArgument );
 CResource*              lua_toresource      ( lua_State* luaVM, int iArgument );
-CClientSound*			lua_tosound         ( lua_State* luaVM, int iArgument );
+CClientSound*           lua_tosound         ( lua_State* luaVM, int iArgument );
 CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
 CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
 CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );
 CClientWater*           lua_towater         ( lua_State* luaVM, int iArgument );
 CXMLNode*               lua_toxmlnode       ( lua_State* luaVM, int iArgument );
-CClientRadarArea*		lua_toradararea		( lua_State* luaVM, int iArgument );
+CClientRadarArea*       lua_toradararea     ( lua_State* luaVM, int iArgument );
 
 void                    lua_pushelement     ( lua_State* luaVM, CClientEntity* pElement );
 void                    lua_pushresource    ( lua_State* luaVM, CResource* pElement );

@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CControllerConfigManager.h
-*  PURPOSE:		Controller configuration manager interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CControllerConfigManager.h
+*  PURPOSE:     Controller configuration manager interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -13,17 +13,17 @@
 #define __CGAME_CONTROLLER_CONFIG_MANAGER
 
 // FROM VC, unlikely that they were changed though
-#define GTA_KEY_NO_MOUSE_BUTTON	0	
-#define GTA_KEY_LMOUSE			1
-#define GTA_KEY_MMOUSE			2
-#define GTA_KEY_RMOUSE			3
-#define GTA_KEY_MSCROLLUP		4
-#define GTA_KEY_MSCROLLDOWN		5
-#define GTA_KEY_MXB1			6
-#define GTA_KEY_MXB2			7
+#define GTA_KEY_NO_MOUSE_BUTTON 0   
+#define GTA_KEY_LMOUSE          1
+#define GTA_KEY_MMOUSE          2
+#define GTA_KEY_RMOUSE          3
+#define GTA_KEY_MSCROLLUP       4
+#define GTA_KEY_MSCROLLDOWN     5
+#define GTA_KEY_MXB1            6
+#define GTA_KEY_MXB2            7
 #define GTA_KEY_SPACE           32
 #define GTA_KEY_COMMA           44
-#define GTA_KEY_MINUS           45	    /* - on main keyboard */
+#define GTA_KEY_MINUS           45      /* - on main keyboard */
 #define GTA_KEY_PERIOD          46    /* . on main keyboard */
 #define GTA_KEY_SLASH           47    /* / on main keyboard */
 #define GTA_KEY_0               48
@@ -117,20 +117,20 @@
 #define GTA_KEY_RETURN          1045    /* Enter on main keyboard */
 #define GTA_KEY_LSHIFT          1046
 #define GTA_KEY_RSHIFT          1047
-#define GTA_KEY_LCONTROL        1049	
+#define GTA_KEY_LCONTROL        1049    
 #define GTA_KEY_RCONTROL        1050
 #define GTA_KEY_LMENU           1051    /* left Alt */
 #define GTA_KEY_RMENU           1052    /* right Alt */
 #define GTA_KEY_LWIN            1053    /* Left Windows key */
 #define GTA_KEY_RWIN            1054    /* Right Windows key */
-#define NO_KEY_DEFINED			1056
+#define NO_KEY_DEFINED          1056
 
 /*
 FROM VC:
-#define KEYBOARD				0
-#define OPTIONAL_EXTRA_KEY		1
-#define MOUSE					2
-#define JOY_STICK				3
+#define KEYBOARD                0
+#define OPTIONAL_EXTRA_KEY      1
+#define MOUSE                   2
+#define JOY_STICK               3
 */
 
 enum eControllerType 
@@ -143,54 +143,54 @@ enum eControllerType
 
 enum eControllerAction
 {
-	FIRE = 0,
-	
-	NEXT_WEAPON = 2,
-	PREVIOUS_WEAPON,
-	FORWARDS,
-	BACKWARDS,
-	LEFT,
-	RIGHT,
-	ZOOM_IN,
-	ZOOM_OUT,
-	ENTER_EXIT,
-	CHANGE_CAMERA,
-	JUMP,
-	SPRINT,
-	LOOK_BEHIND,
-	CROUCH,
-	ACTION,
-	WALK,
-	VEHICLE_FIRE,
-	VEHICLE_SECONDARY_FIRE,
-	VEHICLE_LEFT,
-	VEHICLE_RIGHT,
-	STEER_FORWARDS_DOWN,
-	STEER_BACK_UP,
-	ACCELERATE,
-	BRAKE_REVERSE,
-	RADIO_NEXT,
-	RADIO_PREVIOUS,
-	RADIO_USER_TRACK_SKIP,
-	HORN,
-	SUB_MISSION,
-	HANDBRAKE,
-	
-	VEHICLE_LOOK_LEFT = 0x22,
-	VEHICLE_LOOK_RIGHT,
-	VEHICLE_LOOK_BEHIND,
-	VEHICLE_MOUSE_LOOK,
-	SPECIAL_CONTROL_LEFT,
-	SPECIAL_CONTROL_RIGHT,
-	SPECIAL_CONTROL_DOWN,
-	SPECIAL_CONTROL_UP,
+    FIRE = 0,
+    
+    NEXT_WEAPON = 2,
+    PREVIOUS_WEAPON,
+    FORWARDS,
+    BACKWARDS,
+    LEFT,
+    RIGHT,
+    ZOOM_IN,
+    ZOOM_OUT,
+    ENTER_EXIT,
+    CHANGE_CAMERA,
+    JUMP,
+    SPRINT,
+    LOOK_BEHIND,
+    CROUCH,
+    ACTION,
+    WALK,
+    VEHICLE_FIRE,
+    VEHICLE_SECONDARY_FIRE,
+    VEHICLE_LEFT,
+    VEHICLE_RIGHT,
+    STEER_FORWARDS_DOWN,
+    STEER_BACK_UP,
+    ACCELERATE,
+    BRAKE_REVERSE,
+    RADIO_NEXT,
+    RADIO_PREVIOUS,
+    RADIO_USER_TRACK_SKIP,
+    HORN,
+    SUB_MISSION,
+    HANDBRAKE,
+    
+    VEHICLE_LOOK_LEFT = 0x22,
+    VEHICLE_LOOK_RIGHT,
+    VEHICLE_LOOK_BEHIND,
+    VEHICLE_MOUSE_LOOK,
+    SPECIAL_CONTROL_LEFT,
+    SPECIAL_CONTROL_RIGHT,
+    SPECIAL_CONTROL_DOWN,
+    SPECIAL_CONTROL_UP,
 
-	AIM_WEAPON = 0x2D,
+    AIM_WEAPON = 0x2D,
 
-	CONVERSATION_YES = 0x2F,
-	CONVERSATION_NO,
-	GROUP_CONTROL_FORWARDS,
-	GROUP_CONTROL_BACK,
+    CONVERSATION_YES = 0x2F,
+    CONVERSATION_NO,
+    GROUP_CONTROL_FORWARDS,
+    GROUP_CONTROL_BACK,
 };
 
 class CControllerConfigManager

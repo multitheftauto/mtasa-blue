@@ -187,7 +187,7 @@ void CClientPacketRecorder::RecordPacket ( unsigned char ucPacketID, NetBitStrea
                 long lTimeStamp = CClientTime::GetTime () - m_lRelative;
                 fwrite ( &lTimeStamp, sizeof ( long ), 1, pFile );
             }
-//			fwrite ( &ulTimeStamp, sizeof ( unsigned long), 1, pFile );
+//          fwrite ( &ulTimeStamp, sizeof ( unsigned long), 1, pFile );
 
             // Write the packet ID
             fputc ( ucPacketID, pFile );
@@ -233,7 +233,7 @@ void CClientPacketRecorder::RecordLocalData ( CClientPlayer* pLocalPlayer )
                 long lTimeStamp = CClientTime::GetTime () - m_lRelative;
                 fwrite ( &lTimeStamp, sizeof ( long ), 1, pFile );
             }
-//			fwrite ( &ulTimeStamp, sizeof ( unsigned long ), 1, pFile );
+//          fwrite ( &ulTimeStamp, sizeof ( unsigned long ), 1, pFile );
 
             // Write the packet ID
             fputc ( 0xFE, pFile );
@@ -361,9 +361,9 @@ void CClientPacketRecorder::DoPulse ( void )
     if ( m_bPlaying && m_pfnPacketHandler && m_szFilename )
     {
         // Time to play the next packet?
-		long lCurTime = (long)CClientTime::GetTime () - m_lRelative;
-		//g_pCore->GetConsole()->Printf("current time:%u\n",lCurTime);
-		if(m_bFrameBased) __asm int 3;
+        long lCurTime = (long)CClientTime::GetTime () - m_lRelative;
+        //g_pCore->GetConsole()->Printf("current time:%u\n",lCurTime);
+        if(m_bFrameBased) __asm int 3;
         while ( ( m_bFrameBased && ( m_lFrames - m_lRelative >= m_lNextPacketTime ) ) || ( !m_bFrameBased && ( lCurTime >= m_lNextPacketTime ) ) )
         {
             // Load the file
@@ -373,8 +373,8 @@ void CClientPacketRecorder::DoPulse ( void )
                 // Seek to our current offset + the bytes occupied by the time?
                 fseek ( pFile, m_ulCurrentOffset, SEEK_SET );
 
-				unsigned long ulTimeStamp;
-				fread ( &ulTimeStamp, sizeof ( unsigned long ), 1, pFile );
+                unsigned long ulTimeStamp;
+                fread ( &ulTimeStamp, sizeof ( unsigned long ), 1, pFile );
 
                 // Reached end of file?
                 if ( feof ( pFile ) )
@@ -418,7 +418,7 @@ void CClientPacketRecorder::DoPulse ( void )
                         }
 
                         // Send it to the packethandler
-						//g_pCore->GetConsole()->Printf("(time: %u, current: %u) %u\n",ulTimeStamp,lCurTime,ucPacketID);
+                        //g_pCore->GetConsole()->Printf("(time: %u, current: %u) %u\n",ulTimeStamp,lCurTime,ucPacketID);
                         m_pfnPacketHandler ( ucPacketID, *pBitStream );
 
                         // Destroy the bitstream
@@ -429,8 +429,8 @@ void CClientPacketRecorder::DoPulse ( void )
                 // Remember the new offset and read out the time for the next packet
                 m_ulCurrentOffset = ftell ( pFile );
                 fread ( &m_lNextPacketTime, sizeof ( long ), 1, pFile );
-				m_ucNextPacketID = fgetc ( pFile );
-				//g_pCore->GetConsole()->Printf("next time: %u\n",m_lNextPacketTime);
+                m_ucNextPacketID = fgetc ( pFile );
+                //g_pCore->GetConsole()->Printf("next time: %u\n",m_lNextPacketTime);
 
                 // Reached end of file?
                 int iTemp = 0;

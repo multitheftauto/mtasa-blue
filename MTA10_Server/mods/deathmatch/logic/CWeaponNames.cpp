@@ -50,10 +50,10 @@ SWeaponSlot WeaponIDs [] =
 
 bool CWeaponNames::IsWeaponIDAkimbo ( unsigned char ucID )
 {
-	return ( ucID == 22 ||
-		     ucID == 26 ||
-			 ucID == 28 ||
-			 ucID == 32 );
+    return ( ucID == 22 ||
+             ucID == 26 ||
+             ucID == 28 ||
+             ucID == 32 );
 }
 
 

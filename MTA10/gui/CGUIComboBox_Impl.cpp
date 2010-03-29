@@ -20,11 +20,11 @@ using namespace google;
 
 CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
     m_Items.set_deleted_key ( (CEGUI::ListboxItem *)0xFFFFFFFF );
     m_Items.set_empty_key ( (CEGUI::ListboxItem *)0x00000000 );
 
-	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
+    // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
     pGUI->GetUniqueName ( szUnique );
 
@@ -32,11 +32,11 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUICOMBOBOX_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setText ( szCaption );
-	m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
-	m_pWindow->setVisible ( true );
+    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
+    m_pWindow->setVisible ( true );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
@@ -48,7 +48,7 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -62,7 +62,7 @@ CGUIComboBox_Impl::~CGUIComboBox_Impl ( void )
 
 CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
 {
-	CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, CGUIListItem_Impl::Type::TextItem, NULL );
+    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, CGUIListItem_Impl::Type::TextItem, NULL );
     CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
     m_Items [ pNewItem->GetListItem () ] = pNewItem;

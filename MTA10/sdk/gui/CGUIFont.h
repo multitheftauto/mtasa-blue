@@ -30,7 +30,7 @@ public:
     virtual float                   GetFontHeight           ( float fScale = 1.0f ) = 0;
     virtual float                   GetTextExtent           ( const char* szText, float fScale = 1.0f ) = 0;
 
-	virtual void					DrawTextString			( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY ) = 0;
+    virtual void                    DrawTextString          ( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY ) = 0;
 };
 
 #endif

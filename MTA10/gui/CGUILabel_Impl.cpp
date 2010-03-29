@@ -28,16 +28,16 @@ CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUILABEL_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
-	// Do some hardcore disabling on the labels
-	//m_pWindow->moveToBack ( );
-	//m_pWindow->disable ( );
-	m_pWindow->setZOrderingEnabled ( false );
-	//m_pWindow->setAlwaysOnTop ( true );
+    // Do some hardcore disabling on the labels
+    //m_pWindow->moveToBack ( );
+    //m_pWindow->disable ( );
+    m_pWindow->setZOrderingEnabled ( false );
+    //m_pWindow->setAlwaysOnTop ( true );
 
     SetFrameEnabled ( false );
     SetHorizontalAlign ( CGUI_ALIGN_LEFT );
@@ -53,7 +53,7 @@ CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -66,19 +66,19 @@ CGUILabel_Impl::~CGUILabel_Impl ( void )
 
 void CGUILabel_Impl::SetText ( const char *Text )
 {
-	CEGUI::String strText;
+    CEGUI::String strText;
 
-	if ( Text ) strText.assign ( Text );
+    if ( Text ) strText.assign ( Text );
 
     // Set the new text and size the text field after it
-	m_pWindow->setText ( strText );
+    m_pWindow->setText ( strText );
 }
 
 
 void CGUILabel_Impl::AutoSize ( const char* Text )
 {
-	const CEGUI::Font *pFont = m_pWindow->getFont();
-	m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( pFont->getTextExtent ( Text ), pFont->getFontHeight() + 2.0f ) );   // Add hack factor to height to allow for long characters such as 'g' or 'j'
+    const CEGUI::Font *pFont = m_pWindow->getFont();
+    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( pFont->getTextExtent ( Text ), pFont->getFontHeight() + 2.0f ) );   // Add hack factor to height to allow for long characters such as 'g' or 'j'
 }
 
 
@@ -121,18 +121,18 @@ void CGUILabel_Impl::SetTextColor ( unsigned char ucRed, unsigned char ucGreen, 
 CGUIColor CGUILabel_Impl::GetTextColor ( void )
 {
     CGUIColor temp;
-	GetTextColor ( temp.R, temp.G, temp.B );
+    GetTextColor ( temp.R, temp.G, temp.B );
     return temp;
 }
 
 
 void CGUILabel_Impl::GetTextColor ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue )
 {
-	CEGUI::colour r = ( reinterpret_cast < CEGUI::StaticText* > ( m_pWindow ) -> getTextColours () ).getColourAtPoint ( 0, 0 );
+    CEGUI::colour r = ( reinterpret_cast < CEGUI::StaticText* > ( m_pWindow ) -> getTextColours () ).getColourAtPoint ( 0, 0 );
 
-	ucRed = (unsigned char) (r.getRed () * 255);
-	ucGreen = (unsigned char) (r.getGreen () * 255);
-	ucBlue = (unsigned char) (r.getBlue () * 255);
+    ucRed = (unsigned char) (r.getRed () * 255);
+    ucGreen = (unsigned char) (r.getGreen () * 255);
+    ucBlue = (unsigned char) (r.getBlue () * 255);
 }
 
 

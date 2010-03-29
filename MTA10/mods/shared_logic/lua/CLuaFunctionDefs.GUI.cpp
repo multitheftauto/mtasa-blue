@@ -34,7 +34,7 @@ int CLuaFunctionDefs::GUISetInputEnabled ( lua_State* luaVM )
     if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) {
         CStaticFunctionDefinitions::GUISetInputEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
         bRet = true;
-    }	// else: error, bad arguments
+    }   // else: error, bad arguments
 
     lua_pushboolean ( luaVM, bRet );
     return 1;
@@ -208,7 +208,7 @@ int CLuaFunctionDefs::GUICreateButton ( lua_State* luaVM )
     {
         if ( lua_istype ( luaVM, 1, LUA_TNUMBER ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
             lua_istype ( luaVM, 3, LUA_TNUMBER ) && lua_istype ( luaVM, 4, LUA_TNUMBER ) &&
-            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )	// ACHTUNG: EVENTS!
+            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) ) // ACHTUNG: EVENTS!
         {
             const char *szCaption = lua_tostring ( luaVM, 5 );
             //const char *szOnClick = lua_istype ( luaVM, 8, LUA_TSTRING ) ? lua_tostring ( luaVM, 8 ) : NULL;
@@ -2024,7 +2024,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetScrollBars ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListGetRowCount ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {		
+    {       
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
@@ -2312,7 +2312,7 @@ int CLuaFunctionDefs::GUILabelSetColor ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            CStaticFunctionDefinitions::GUILabelSetColor (	*pEntity,
+            CStaticFunctionDefinitions::GUILabelSetColor (  *pEntity,
                 static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 4 ) ) );

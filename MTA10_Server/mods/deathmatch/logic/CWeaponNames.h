@@ -20,7 +20,7 @@
 class CWeaponNames
 {
 public:
-	static bool				IsWeaponIDAkimbo	( unsigned char ucID );
+    static bool             IsWeaponIDAkimbo    ( unsigned char ucID );
     static bool             IsDriveByWeapon     ( unsigned char ucID );
 
     static unsigned char    GetWeaponID         ( const char* szName );

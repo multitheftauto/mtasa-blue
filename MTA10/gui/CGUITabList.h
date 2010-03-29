@@ -17,8 +17,8 @@ typedef std::list<CGUITabListItem*>::const_iterator CGUITabIterator;
 class CGUITabList
 {
 public:
-                         CGUITabList  ( void )                    	{};
-                        ~CGUITabList  ( void )                   	{};
+                         CGUITabList  ( void )                      {};
+                        ~CGUITabList  ( void )                      {};
 
     void                AddItem       ( CGUITabListItem* pItem )    { m_Items.push_back ( pItem ); };
     void                RemoveItem    ( CGUITabListItem* pItem )    { m_Items.remove ( pItem ); };

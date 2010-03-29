@@ -23,7 +23,7 @@ CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : CC
     m_bAutoCallEvent = true;
     m_pCallback = NULL;
     m_pOwningMarker = NULL;
-	m_pOwningPickup = NULL;
+    m_pOwningPickup = NULL;
 
     SetTypeName ( "colshape" );
 

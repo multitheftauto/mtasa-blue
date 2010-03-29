@@ -54,7 +54,7 @@ public:
     void                        SetAkimboTargetUp   ( bool bUp ) { m_bAkimboTargetUp = bUp; }
 
     // The player's pad
-	CPadSAInterface		        m_pad;	
+    CPadSAInterface             m_pad;  
     float                       m_fCameraRotation;
     CShotSyncData               m_shotSyncData;
     CVector                     m_vecAkimboTarget;

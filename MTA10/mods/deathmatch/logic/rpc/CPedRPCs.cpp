@@ -333,7 +333,7 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
                          bitStream.Read ( iTime ) &&
                          bitStream.ReadBit ( bLoop ) &&
                          bitStream.ReadBit ( bUpdatePosition ) &&
-						 bitStream.ReadBit ( bInterruptable ) )
+                         bitStream.ReadBit ( bInterruptable ) )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 

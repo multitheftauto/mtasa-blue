@@ -347,9 +347,9 @@ void CClientPlayerClothes::DefaultClothes ( bool bAddToModel )
     RemoveAll ();
 
     AddClothes ( "vestblack", "vest", 0, bAddToModel );
-	AddClothes ( "JEANSDENIM", "JEANS", 2, bAddToModel );
-	AddClothes ( "SNEAKERBINCBLK", "SNEAKER", 3, bAddToModel );
-	AddClothes ( "PLAYER_FACE", "HEAD", 1, bAddToModel );
+    AddClothes ( "JEANSDENIM", "JEANS", 2, bAddToModel );
+    AddClothes ( "SNEAKERBINCBLK", "SNEAKER", 3, bAddToModel );
+    AddClothes ( "PLAYER_FACE", "HEAD", 1, bAddToModel );
 }
 
 

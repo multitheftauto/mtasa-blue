@@ -37,7 +37,7 @@ public:
     
     inline eClientEntityType        GetType                 ( void ) const                      { return CCLIENTCIVILIAN; };
 
-	inline CCivilianPed*		    GetGameCivilian			( void )							{ return m_pCivilianPed; }
+    inline CCivilianPed*            GetGameCivilian         ( void )                            { return m_pCivilianPed; }
 
     inline void                     GetPosition             ( CVector& vecPosition ) const      { vecPosition = *m_pCivilianPed->GetPosition (); };
     inline void                     SetPosition             ( const CVector& vecPosition )      { m_pCivilianPed->SetPosition ( const_cast < CVector* > ( &vecPosition ) ); };
@@ -53,10 +53,10 @@ public:
     bool                            GetMatrix               ( CMatrix& Matrix ) const;
     bool                            SetMatrix               ( const CMatrix& Matrix );
 
-   	void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
+    void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
-	void                            GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
-	void                            SetTurnSpeed            ( const CVector& vecTurnSpeed );
+    void                            GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
+    void                            SetTurnSpeed            ( const CVector& vecTurnSpeed );
 
     bool                            IsVisible               ( void );
     void                            SetVisible              ( bool bVisible );
@@ -69,7 +69,7 @@ public:
 
 private:
                                     CClientCivilian         ( class CClientManager* pManager, ElementID ID, int iPedModel );
-								    CClientCivilian			( class CClientManager* pManager, ElementID ID, CCivilianPed* pCivilianPed );
+                                    CClientCivilian         ( class CClientManager* pManager, ElementID ID, CCivilianPed* pCivilianPed );
 
     void                            Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
 
@@ -79,7 +79,7 @@ private:
 
     class CClientCivilianManager*   m_pCivilianManager;
 
-	int							    m_iModel;
+    int                             m_iModel;
 
     CCivilianPed*                   m_pCivilianPed;
 };

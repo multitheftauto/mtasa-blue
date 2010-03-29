@@ -29,10 +29,10 @@ std::string ConformResourcePath ( const char* szRes );
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
-	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
 
-	return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 }
 inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const CVector &vecPosition2 )
 {
@@ -48,28 +48,28 @@ inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const
 }
 inline float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
-	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-	float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
 
-	return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 }
 
 inline bool IsPointNearPoint2D ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance )
 {
-	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
 
-	return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY <= fDistance * fDistance );
+    return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY <= fDistance * fDistance );
 }
 
 inline bool IsPointNearPoint3D ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance )
 {
-	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-	float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
 
-	return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance );
+    return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance );
 }
 
 inline float WrapAround ( float fValue, float fHigh )
@@ -185,8 +185,8 @@ unsigned int    StripUnwantedCharacters     ( char* szText, unsigned char cRepla
 unsigned int    StripControlCodes           ( char* szText, unsigned char cReplace = ' ' );
 bool            IsWantedCharacter           ( unsigned char c );
 bool            IsControlCode               ( unsigned char c );
-bool            IsValidFilePath	            ( const char* szDir );
-void			ReplaceOccurrencesInString  ( std::string &s, const char *a, const char *b );
+bool            IsValidFilePath             ( const char* szDir );
+void            ReplaceOccurrencesInString  ( std::string &s, const char *a, const char *b );
 
 void            RaiseFatalError             ( unsigned int uiCode );
 void            RaiseProtocolError          ( unsigned int uiCode );

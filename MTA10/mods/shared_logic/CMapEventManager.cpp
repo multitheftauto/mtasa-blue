@@ -38,15 +38,15 @@ CMapEventManager::~CMapEventManager ( void )
 
 bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated )
 {
-	// Check for max name length
-	if ( strlen ( szName ) <= MAPEVENT_MAX_LENGTH_NAME )
-	{
-		// Make a new event
-		CMapEvent* pEvent = new CMapEvent ( pLuaMain, szName, iLuaFunction, bPropagated );
-		m_Events.push_back ( pEvent );
-		return true;
-	}
-	return false;
+    // Check for max name length
+    if ( strlen ( szName ) <= MAPEVENT_MAX_LENGTH_NAME )
+    {
+        // Make a new event
+        CMapEvent* pEvent = new CMapEvent ( pLuaMain, szName, iLuaFunction, bPropagated );
+        m_Events.push_back ( pEvent );
+        return true;
+    }
+    return false;
 }
 
 
@@ -64,7 +64,7 @@ bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, int iLua
         if ( pLuaMain == pMapEvent->GetVM () &&
              strcmp ( pMapEvent->GetName (), szName ) == 0 )
         {
-			// Same lua function?
+            // Same lua function?
             if ( pMapEvent->GetLuaFunction () == iLuaFunction )
             {
                 // Not alredy being destroyed?
@@ -85,8 +85,8 @@ bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, int iLua
                         // Delete the object
                         delete pMapEvent;
 
-					    // Remove from list and remember that we deleted something
-					    iter = m_Events.erase ( iter );
+                        // Remove from list and remember that we deleted something
+                        iter = m_Events.erase ( iter );
                         bRemovedSomeone = true;
                         continue;
                     }
@@ -152,7 +152,7 @@ void CMapEventManager::Delete ( CLuaMain* pLuaMain )
                     // Delete the event and continue from where we left.
                     // Remember to subtract from our iterator or we'll delete only every other element.
                     delete pMapEvent;
-				    iter = m_Events.erase ( iter );
+                    iter = m_Events.erase ( iter );
                     continue;
                 }
             }
@@ -280,15 +280,15 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     lua_pushelement ( pState, pThis );
                     lua_setglobal ( pState, "this" );
 
-				    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );
-				    lua_setglobal ( pState, "sourceResource" );
+                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );
+                    lua_setglobal ( pState, "sourceResource" );
 
-				    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceDynamicEntity() );
-				    lua_setglobal ( pState, "sourceResourceRoot" );
+                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceDynamicEntity() );
+                    lua_setglobal ( pState, "sourceResourceRoot" );
 
                     lua_pushstring ( pState, szName );
                     lua_setglobal ( pState, "eventName" );
-    				
+                    
                     // Call it
                     pMapEvent->Call ( Arguments );
                     bCalled = true;
@@ -300,8 +300,8 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     OldThis.Push ( pState );
                     lua_setglobal ( pState, "this" );                
 
-				    OldResource.Push ( pState );
-				    lua_setglobal ( pState, "sourceResource" );
+                    OldResource.Push ( pState );
+                    lua_setglobal ( pState, "sourceResource" );
 
                     OldResourceRoot.Push ( pState );
                     lua_setglobal ( pState, "sourceResourceRoot" );
@@ -367,7 +367,7 @@ bool CMapEventManager::HandleExists ( CLuaMain* pLuaMain, const char* szName, in
                 // Same name?
                 if ( strcmp ( pMapEvent->GetName (), szName ) == 0 )
                 {
-					// Same lua function?
+                    // Same lua function?
                     if ( pMapEvent->GetLuaFunction () == iLuaFunction )
                     {
                         // It exists

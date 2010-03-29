@@ -24,7 +24,7 @@ public:
     CXMLFile*           CreateXML           ( const char* szFilename );
     void                DeleteXML           ( CXMLFile* pFile );
 
-	CXMLNode*			CreateDummyNode		( void );
+    CXMLNode*           CreateDummyNode     ( void );
 
     CXMLAttribute*      GetAttrFromID       ( unsigned long ulID );
     CXMLFile*           GetFileFromID       ( unsigned long ulID );

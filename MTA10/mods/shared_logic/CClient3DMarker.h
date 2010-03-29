@@ -52,8 +52,8 @@ public:
     inline float                    GetSize                             ( void ) const                      { return m_fSize; };
     inline void                     SetSize                             ( float fSize )                     { m_fSize = fSize; };
 
-	inline float					GetPulseFraction					( void )							{ return static_cast < float > ( m_pMarker->GetPulseFraction() ); };
-	void							SetPulseFraction					( float fFraction )					{ m_pMarker->SetPulseFraction ( fFraction ); };
+    inline float                    GetPulseFraction                    ( void )                            { return static_cast < float > ( m_pMarker->GetPulseFraction() ); };
+    void                            SetPulseFraction                    ( float fFraction )                 { m_pMarker->SetPulseFraction ( fFraction ); };
 
 protected:
     void                            StreamIn                            ( void );

@@ -21,7 +21,7 @@
 class ePedStats;
 typedef long AssocGroupID;
 
-#define		FUNC_SetMotionAnimGroup				            0x5b3580
+#define     FUNC_SetMotionAnimGroup                         0x5b3580
 
 // CPedModelInfo:
 // +36 = Motion anim group (AssocGroupID, long)
@@ -64,7 +64,7 @@ class CPedModelInfoSA : public CModelInfoSA, public CPedModelInfo
 public:
     CPedModelInfoSAInterface *      GetPedModelInfoInterface   ( void )        { return reinterpret_cast < CPedModelInfoSAInterface * > ( m_pInterface ); }
 
-	void							SetMotionAnimGroup	       ( AssocGroupId animGroup );
+    void                            SetMotionAnimGroup         ( AssocGroupId animGroup );
 };
 
 #endif

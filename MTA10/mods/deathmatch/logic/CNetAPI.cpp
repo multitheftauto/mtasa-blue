@@ -217,10 +217,10 @@ bool CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency 
 
 bool CNetAPI::IsWeaponIDAkimbo ( unsigned char ucWeaponID )
 {
-	return ( ucWeaponID == 22 ||
-		     ucWeaponID == 26 ||
-			 ucWeaponID == 28 ||
-			 ucWeaponID == 32 );
+    return ( ucWeaponID == 22 ||
+             ucWeaponID == 26 ||
+             ucWeaponID == 28 ||
+             ucWeaponID == 32 );
 }
 
 
@@ -244,8 +244,8 @@ void CNetAPI::DoPulse ( void )
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-			// Record local data in the packet recorder
-			m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
+            // Record local data in the packet recorder
+            m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
 
             // We should do a puresync?
             if ( IsPureSyncNeeded () && !g_pClientGame->IsDownloadingBigPacket () )
@@ -542,11 +542,11 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
             }
 
-			// Make sure that if he doesn't have an akimbo weapon his hands up state is false
-			if ( !IsWeaponIDAkimbo ( ucCurrentWeaponType ) )
-			{
+            // Make sure that if he doesn't have an akimbo weapon his hands up state is false
+            if ( !IsWeaponIDAkimbo ( ucCurrentWeaponType ) )
+            {
                 flags.data.bAkimboTargetUp = false;
-			}
+            }
 
             // Read the weapon aim data
             SWeaponAimSync aim ( fWeaponRange );
@@ -830,11 +830,11 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
                 pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 0 );
             }
 
-    		// Make sure that if he doesn't have an akimbo weapon his hands up state is false
-	    	if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
-		    {
+            // Make sure that if he doesn't have an akimbo weapon his hands up state is false
+            if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
+            {
                 flags.data.bAkimboTargetUp = false;
-		    }
+            }
 
             // Read out the aim directions
             SWeaponAimSync aim ( fWeaponRange, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );

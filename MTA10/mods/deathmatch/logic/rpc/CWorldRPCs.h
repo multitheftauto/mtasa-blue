@@ -25,7 +25,7 @@ public:
     DECLARE_RPC ( SetTime );
     DECLARE_RPC ( SetWeather );
     DECLARE_RPC ( SetWeatherBlended );
-	DECLARE_RPC ( SetMinuteDuration );
+    DECLARE_RPC ( SetMinuteDuration );
     DECLARE_RPC ( SetGravity );
     DECLARE_RPC ( SetGameSpeed );
     DECLARE_RPC ( SetWaveHeight );

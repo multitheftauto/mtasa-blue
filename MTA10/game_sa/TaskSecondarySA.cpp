@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskSecondarySA.cpp
-*  PURPOSE:		Secondary game tasks
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskSecondarySA.cpp
+*  PURPOSE:     Secondary game tasks
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -25,7 +25,7 @@ CTaskSimpleDuckSA::CTaskSimpleDuckSA ( eDuckControlTypes nDuckControl, unsigned 
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     _asm
     {
-        mov		ecx, dwThisInterface
+        mov     ecx, dwThisInterface
         push    ebx
         mov     bx, nUseShotsWhizzingEvents
         push    ebx

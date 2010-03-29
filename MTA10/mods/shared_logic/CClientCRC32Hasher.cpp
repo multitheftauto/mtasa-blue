@@ -43,15 +43,15 @@ bool CClientCRC32Hasher::Calculate ( const char* szFilename, CRC32& crcResult )
         unsigned char buffer [2048];
         size_t sizeIndex;
         size_t sizeBytesRead = fread ( buffer, 1, 2048, pFile );
-		while ( sizeBytesRead > 0 )
-		{
-			for ( sizeIndex = 0; sizeIndex < sizeBytesRead; sizeIndex++ )
+        while ( sizeBytesRead > 0 )
+        {
+            for ( sizeIndex = 0; sizeIndex < sizeBytesRead; sizeIndex++ )
             {
                 ulResult = ( ulResult >> 8 ) ^ m_ulCRC32Table [ ( ulResult & 0xFF ) ^ buffer [sizeIndex] ];
             }
 
             sizeBytesRead = fread ( buffer, 1, 2048, pFile );
-		}
+        }
 
 
         // Close the file
@@ -80,7 +80,7 @@ bool CClientCRC32Hasher::Calculate ( const char* pBuffer, size_t sizeLength, CRC
 
         // Read through the memory hashing it
         const unsigned char* pTemp = reinterpret_cast < const unsigned char* > ( pBuffer );
-	    do
+        do
         {
             ulResult = ( ulResult >> 8 ) ^ m_ulCRC32Table [ ( ulResult & 0xFF ) ^ *pTemp++ ];
         }
@@ -117,7 +117,7 @@ bool CClientCRC32Hasher::Append ( const char* pBuffer, size_t sizeLength )
     {
         // Read through the memory appending the hash to m_ulHash
         const unsigned char* pTemp = reinterpret_cast < const unsigned char* > ( pBuffer );
-	    do
+        do
         {
             m_ulHash = ( m_ulHash >> 8 ) ^ m_ulCRC32Table [ ( m_ulHash & 0xFF ) ^ *pTemp++ ];
         }

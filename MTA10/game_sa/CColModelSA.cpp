@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CColModelSA.cpp
-*  PURPOSE:		Collision model entity
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CColModelSA.cpp
+*  PURPOSE:     Collision model entity
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               arc_
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

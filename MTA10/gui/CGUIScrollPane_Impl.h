@@ -20,25 +20,25 @@
 class CGUIScrollPane_Impl : public CGUIScrollPane, public CGUIElement_Impl
 {
 public:
-                            CGUIScrollPane_Impl			( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
-                            ~CGUIScrollPane_Impl		( void );
+                            CGUIScrollPane_Impl         ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
+                            ~CGUIScrollPane_Impl        ( void );
 
-	void					SetHorizontalScrollBar		( bool bEnabled );
-	void					SetVerticalScrollBar		( bool bEnabled );
+    void                    SetHorizontalScrollBar      ( bool bEnabled );
+    void                    SetVerticalScrollBar        ( bool bEnabled );
 
-	void					SetHorizontalScrollPosition	( float fPosition );
-	float					GetHorizontalScrollPosition	( void );
+    void                    SetHorizontalScrollPosition ( float fPosition );
+    float                   GetHorizontalScrollPosition ( void );
 
-	void					SetVerticalScrollPosition	( float fPosition );
-	float					GetVerticalScrollPosition	( void );
+    void                    SetVerticalScrollPosition   ( float fPosition );
+    float                   GetVerticalScrollPosition   ( void );
 
-	void					SetHorizontalScrollStepSize	( float fPosition );
-	float					GetHorizontalScrollStepSize	( void );
+    void                    SetHorizontalScrollStepSize ( float fPosition );
+    float                   GetHorizontalScrollStepSize ( void );
 
-	void					SetVerticalScrollStepSize	( float fPosition );
-	float					GetVerticalScrollStepSize	( void );
+    void                    SetVerticalScrollStepSize   ( float fPosition );
+    float                   GetVerticalScrollStepSize   ( void );
 
-	eCGUIType				GetType					( void ) { return CGUI_SCROLLPANE; };
+    eCGUIType               GetType                 ( void ) { return CGUI_SCROLLPANE; };
 
     #include "CGUIElement_Inc.h"
 

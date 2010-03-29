@@ -191,8 +191,8 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
         CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
         if ( resource )
         {
-			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "start: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
+            if ( pClient->GetNick () )
+                CLogger::LogPrintf ( "start: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
@@ -231,21 +231,21 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
         CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
         if ( resource )
         {
-			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "restart: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
+            if ( pClient->GetNick () )
+                CLogger::LogPrintf ( "restart: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
                 if ( resource->IsActive() )
                 {
                     if ( resource->IsProtected() )
-					{
-						if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "restart.protected", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
-						{
-							pEchoClient->SendConsole ( "restart: Resource could not be restarted as it is protected" );
-							return false;
-						}
-					}
+                    {
+                        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "restart.protected", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+                        {
+                            pEchoClient->SendConsole ( "restart: Resource could not be restarted as it is protected" );
+                            return false;
+                        }
+                    }
 
                     g_pGame->GetResourceManager()->QueueResource ( resource, CResourceManager::QUEUE_RESTART, NULL );
                     pEchoClient->SendConsole ( "restart: Resource restarting..." );
@@ -306,21 +306,21 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
         CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
         if ( resource )
         {
-			if ( pClient->GetNick () )
-				CLogger::LogPrintf ( "stop: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
+            if ( pClient->GetNick () )
+                CLogger::LogPrintf ( "stop: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
             if ( resource->IsLoaded() )
             {
                 if ( resource->IsActive() )
                 {
-					if ( resource->IsProtected() )
-					{
-						if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stop.protected", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
-						{
-							pEchoClient->SendConsole ( "stop: Resource could not be stopped as it is protected" );
-							return false;
-						}
-					}
+                    if ( resource->IsProtected() )
+                    {
+                        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stop.protected", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+                        {
+                            pEchoClient->SendConsole ( "stop: Resource could not be stopped as it is protected" );
+                            return false;
+                        }
+                    }
 
                     g_pGame->GetResourceManager ()->QueueResource ( resource, CResourceManager::QUEUE_STOP, NULL );
                     pEchoClient->SendConsole ( "stop: Resource stopping" );
@@ -344,15 +344,15 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
 
 bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-	if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stopall", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
-	{
-		pEchoClient->SendConsole ( "stopall: You do not have sufficient rights to stop all the resources." );
-		return false;
-	}
+    if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "stopall", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+    {
+        pEchoClient->SendConsole ( "stopall: You do not have sufficient rights to stop all the resources." );
+        return false;
+    }
 
     g_pGame->GetResourceManager()->QueueResource ( NULL, CResourceManager::QUEUE_STOPALL, NULL );
     pEchoClient->SendConsole ( "stopall: Stopping all resources" );
-	return true;
+    return true;
 }
 
 
@@ -361,8 +361,8 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
     char szBuffer[256];
     szBuffer[0] = '\0';
 
-	if ( strlen ( szBuffer ) < 1  )
-		return false;
+    if ( strlen ( szBuffer ) < 1  )
+        return false;
 
     strncpy ( szBuffer, szArguments, 256 );
     szBuffer[255] = '\0';
@@ -452,13 +452,13 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                                 // Log it in the console
                                 CLogger::LogPrintf ( "CHAT: %s: %s\n", szNick, szArguments );
 
-								unsigned char ucR = 0xFF, ucG = 0xFF, ucB = 0xFF;
-								CPlayer * pPlayer = static_cast < CPlayer* > ( pClient );
-								CTeam * pTeam = pPlayer->GetTeam ();
-								if ( pTeam )
-								{
-									pTeam->GetColor ( ucR, ucG, ucB );
-								}
+                                unsigned char ucR = 0xFF, ucG = 0xFF, ucB = 0xFF;
+                                CPlayer * pPlayer = static_cast < CPlayer* > ( pClient );
+                                CTeam * pTeam = pPlayer->GetTeam ();
+                                if ( pTeam )
+                                {
+                                    pTeam->GetColor ( ucR, ucG, ucB );
+                                }
 
                                 // Broadcast the message to all clients
                                 pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( szEcho, ucR, ucG, ucB, true ) );
@@ -1046,29 +1046,29 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                             // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a different case)
                             if ( (szNick && stricmp ( szNick, szNewNick ) == 0) || !pConsole->GetPlayerManager ()->Get ( szNewNick ) )
                             {
-							    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+                                CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
 
-							    // Call the event
+                                // Call the event
                                 CLuaArguments Arguments;
-							    Arguments.PushString ( pClient->GetNick () );
+                                Arguments.PushString ( pClient->GetNick () );
                                 Arguments.PushString ( szNewNick );
-							    if ( pPlayer->CallEvent ( "onPlayerChangeNick", Arguments ) )
-							    {
-								    // Tell the console
-								    CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );
+                                if ( pPlayer->CallEvent ( "onPlayerChangeNick", Arguments ) )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "NICK: %s is now known as %s\n", szNick, szNewNick );
 
-								    // Change the nick
-								    pPlayer->SetNick ( szNewNick );
+                                    // Change the nick
+                                    pPlayer->SetNick ( szNewNick );
 
-								    // Tell all ingame players about the nick change
-								    CPlayerChangeNickPacket Packet ( szNewNick );
-								    Packet.SetSourceElement ( pPlayer );
-								    pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( Packet );
+                                    // Tell all ingame players about the nick change
+                                    CPlayerChangeNickPacket Packet ( szNewNick );
+                                    Packet.SetSourceElement ( pPlayer );
+                                    pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( Packet );
 
-								    return true;
-							    }
-							    else
-								    return false;
+                                    return true;
+                                }
+                                else
+                                    return false;
                             }
                             else
                             {
@@ -1204,20 +1204,20 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                 if ( pAccount )
                 {
                     CMD5Hasher Hasher;
-					MD5 oldPasswordHash;
+                    MD5 oldPasswordHash;
                     char szOldPasswordHash[128];
-					Hasher.Calculate ( szOldPassword, strlen ( szOldPassword ), oldPasswordHash );
-					Hasher.ConvertToHex ( oldPasswordHash, szOldPasswordHash );
+                    Hasher.Calculate ( szOldPassword, strlen ( szOldPassword ), oldPasswordHash );
+                    Hasher.ConvertToHex ( oldPasswordHash, szOldPasswordHash );
                     // Compare the hash of the given oldPassword to the current password hash
                     if ( stricmp ( pAccount->GetPassword ().c_str (), szOldPasswordHash ) == 0 )
                     {
                         // Old and new password are equal?
                         if ( strcmp ( szOldPassword, szNewPassword ) != 0 )
                         {
-							MD5 newPasswordHash;
+                            MD5 newPasswordHash;
                             char szNewPasswordHash[128];
-							Hasher.Calculate ( szNewPassword, strlen ( szNewPassword ), newPasswordHash );
-							Hasher.ConvertToHex ( newPasswordHash, szNewPasswordHash );
+                            Hasher.Calculate ( szNewPassword, strlen ( szNewPassword ), newPasswordHash );
+                            Hasher.ConvertToHex ( newPasswordHash, szNewPasswordHash );
                             
                             // Set the new password
                             pAccount->SetPassword ( szNewPassword );
@@ -1294,7 +1294,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                 if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
                 {
                     CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
-					pAccount->SetPassword ( szPassword );
+                    pAccount->SetPassword ( szPassword );
 
                     // Tell the user
                     char szMessage [128];
@@ -1737,8 +1737,8 @@ bool CConsoleCommands::Sudo ( CConsole* pConsole, const char* szArguments, CClie
 {
     // sudo <command>
 
-	// Grab the nick
-	char* szNick = const_cast < char* > ( pClient->GetNick () );
+    // Grab the nick
+    char* szNick = const_cast < char* > ( pClient->GetNick () );
 
     // Got any arguments?
     if ( szArguments && szArguments [ 0 ] )
@@ -1753,7 +1753,7 @@ bool CConsoleCommands::Sudo ( CConsole* pConsole, const char* szArguments, CClie
 
         if ( szFunction && szNick )
         {
-			// do something
+            // do something
         }
         else
         {
@@ -1808,18 +1808,18 @@ bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClie
 bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     if ( szArguments && szArguments[0] )
-	{
-		if ( pClient->GetNick () )
-			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
+    {
+        if ( pClient->GetNick () )
+            CLogger::LogPrintf ( "loadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-		// These modules are late loaded
-		if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
-		{
-				pEchoClient->SendConsole ( "stop: Resource could not be found" );
-				return true;
-		}
+        // These modules are late loaded
+        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
+        {
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                return true;
+        }
     }
     else
         pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
@@ -1831,17 +1831,17 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     if ( szArguments && szArguments[0] )
-	{
-		if ( pClient->GetNick () )
-			CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
+    {
+        if ( pClient->GetNick () )
+            CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
-		{
-				pEchoClient->SendConsole ( "stop: Resource could not be found" );
-				return true;
-		}*/
+        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
+        {
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                return true;
+        }*/
     }
     else
         pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
@@ -1853,17 +1853,17 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
 bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     if ( szArguments && szArguments[0] )
-	{
-		if ( pClient->GetNick () )
-			CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
+    {
+        if ( pClient->GetNick () )
+            CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
 
-		SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-		/*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
-		{
-				pEchoClient->SendConsole ( "stop: Resource could not be found" );
-				return true;
-		}*/
+        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
+        {
+                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                return true;
+        }*/
     }
     else
         pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );

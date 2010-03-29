@@ -192,19 +192,19 @@ bool IsControlCode ( unsigned char c )
 
 bool IsValidFilePath ( const char *szDir )
 {
-	if ( szDir == NULL ) return false;
+    if ( szDir == NULL ) return false;
 
-	unsigned int uiLen = strlen ( szDir );
-	unsigned char c, c_d;
-	
-	// iterate through the char array
-	for ( unsigned int i = 0; i < uiLen; i++ ) {
-		c = szDir[i];										// current character
-		c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;		// one character ahead, if any
-		if ( !IsWantedCharacter ( c ) || c == ':' || ( c == '.' && c_d == '.' ) || ( c == '\\' && c_d == '\\' ) )
-			return false;
-	}
-	return true;
+    unsigned int uiLen = strlen ( szDir );
+    unsigned char c, c_d;
+    
+    // iterate through the char array
+    for ( unsigned int i = 0; i < uiLen; i++ ) {
+        c = szDir[i];                                       // current character
+        c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;       // one character ahead, if any
+        if ( !IsWantedCharacter ( c ) || c == ':' || ( c == '.' && c_d == '.' ) || ( c == '\\' && c_d == '\\' ) )
+            return false;
+    }
+    return true;
 }
 
 void ReplaceOccurrencesInString ( std::string &s, const char *a, const char *b )
@@ -289,9 +289,9 @@ void AttachedMatrix ( CMatrix & matrix, CMatrix & returnMatrix, CVector vecDirec
 
 void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
 {
-	in_addr in;
-	in.s_addr = ulIP;;
-	char* szTemp = inet_ntoa ( in );
+    in_addr in;
+    in.s_addr = ulIP;;
+    char* szTemp = inet_ntoa ( in );
     if ( szTemp )
     {
         strncpy ( szDottedIP, szTemp, 22 );
@@ -719,9 +719,9 @@ bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& str
     bool bResult = false;
 
     // Read out the string length
-	unsigned short usLength;
-	if ( bitStream.Read ( usLength ) )
-	{
+    unsigned short usLength;
+    if ( bitStream.Read ( usLength ) )
+    {
         // Allocate a buffer and read the string into it
         char* szValue = new char [ usLength + 1 ];
         // String with a length of zero is considered a success
@@ -729,13 +729,13 @@ bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& str
         {
             // Put it into us
             szValue [ usLength ] = 0;
-			strOut = szValue;
+            strOut = szValue;
             bResult = true;
         }
 
         // Delete the buffer
         delete [] szValue;
-	}
+    }
 
     // Clear output on fail
     if ( !bResult )

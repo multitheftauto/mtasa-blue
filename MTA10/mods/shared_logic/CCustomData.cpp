@@ -43,7 +43,7 @@ SCustomData* CCustomData::Get ( const char* szName )
 
 void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain )
 {
-	assert ( szName );
+    assert ( szName );
 
     // Grab the item with the given name
     SCustomData* pData = Get ( szName );
@@ -87,7 +87,7 @@ void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
     {
         // Delete it if they match
         if ( iter->second.pLuaMain == pLuaMain )
-			m_Data.erase ( iter );
+            m_Data.erase ( iter );
         else
             iter++;
     }

@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CCamSA.cpp
-*  PURPOSE:		Camera entity
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CCamSA.cpp
+*  PURPOSE:     Camera entity
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *
@@ -18,24 +18,24 @@ CEntity* CCamSA::GetTargetEntity ( void ) const
 {
     CEntitySAInterface * pInterface = m_pInterface->CamTargetEntity;
     CPoolsSA* pPools = (CPoolsSA *)pGame->GetPools();
-	CEntity* pReturn = NULL;
+    CEntity* pReturn = NULL;
 
-	if ( pPools && pInterface )
-	{
-		switch ( pInterface->nType )
-		{
+    if ( pPools && pInterface )
+    {
+        switch ( pInterface->nType )
+        {
             case ENTITY_TYPE_PED:
                 pReturn = (CEntity*)(pPools->GetPed((DWORD *)pInterface));
                 break;
-			case ENTITY_TYPE_VEHICLE:
-				pReturn = (CEntity*)(pPools->GetVehicle((DWORD *)pInterface));
-				break;
+            case ENTITY_TYPE_VEHICLE:
+                pReturn = (CEntity*)(pPools->GetVehicle((DWORD *)pInterface));
+                break;
             case ENTITY_TYPE_OBJECT:
                 pReturn = (CEntity*)(pPools->GetObject ((DWORD *)pInterface));
                 break;
-			default:
-				break;
-		}
-	}
-	return pReturn;
+            default:
+                break;
+        }
+    }
+    return pReturn;
 }

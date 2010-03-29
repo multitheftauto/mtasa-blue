@@ -23,10 +23,10 @@ public:
     DECLARE_RPC ( GiveWeapon );
     DECLARE_RPC ( TakeWeapon );
     DECLARE_RPC ( TakeAllWeapons );
-	DECLARE_RPC ( GiveWeaponAmmo );
+    DECLARE_RPC ( GiveWeaponAmmo );
     DECLARE_RPC ( TakeWeaponAmmo );
     DECLARE_RPC ( SetWeaponAmmo );
-	DECLARE_RPC ( SetWeaponSlot );
+    DECLARE_RPC ( SetWeaponSlot );
 };
 
 #endif

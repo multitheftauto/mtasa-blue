@@ -17,13 +17,13 @@
 
 class CParticleObjectSAInterface
 {
-	// remember to include CPlaceable
+    // remember to include CPlaceable
 };
 
 class CParticleObjectSA : public CParticleObject
 {
 private:
-//	CParticleObjectSAInterface		* internalInterface;
+//  CParticleObjectSAInterface      * internalInterface;
 public:
 };
 

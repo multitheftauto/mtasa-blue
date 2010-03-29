@@ -90,15 +90,15 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_IKChainManager_PointArm, (DWORD)HOOK_IKChainManager_PointArm, 7 );
     HookInstall ( HOOKPOS_IKChainManager_LookAt, (DWORD)HOOK_IKChainManager_LookAt, 7 );
     HookInstall ( HOOKPOS_IKChainManager_SkipAim, (DWORD)HOOK_SkipAim, 6 );
-	HookInstall ( HOOKPOS_CTaskSimpleUsegun_ProcessPed, (DWORD)HOOK_CTaskSimpleUsegun_ProcessPed, 8 );
+    HookInstall ( HOOKPOS_CTaskSimpleUsegun_ProcessPed, (DWORD)HOOK_CTaskSimpleUsegun_ProcessPed, 8 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit, (DWORD)HOOK_CWeapon_FireInstantHit, 9 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7 );
 
-	/*	
-	*(BYTE *)0x73FDEC = 0x90;
+    /*  
+    *(BYTE *)0x73FDEC = 0x90;
     *(BYTE *)0x73FDED = 0xE9;
-	*/
+    */
 
     m_pools = pGameInterface->GetPools();
 }
@@ -168,7 +168,7 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
     // vecTargetPosition is a pointer to a vecTargetPosition*
     CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pPed );
     CPlayerPed* pTargetingPlayerPed = dynamic_cast < CPlayerPed* > ( pTargetingPed );
-	if ( !pTargetingPlayerPed ) return;
+    if ( !pTargetingPlayerPed ) return;
 
     if ( m_pPreWeaponFireHandler && pTargetingPed )
     {
@@ -216,22 +216,22 @@ CRemoteDataStorageSA* pTempRemote;
 
 VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed ()
 {
-	// We can use EAX
-	_asm
-	{
-		// Store the ped pointer for our later hook (SkipAim)
-		mov			eax, [esp+4]
-		mov			pAPed, eax
+    // We can use EAX
+    _asm
+    {
+        // Store the ped pointer for our later hook (SkipAim)
+        mov         eax, [esp+4]
+        mov         pAPed, eax
 
-		// Replace original code
-		push        0FFFFFFFFh 
-		mov         eax,dword ptr fs:[00000000h] 
+        // Replace original code
+        push        0FFFFFFFFh 
+        mov         eax,dword ptr fs:[00000000h] 
 
-		// Jump back to func. I think we can use EDX here
-		mov			edx, HOOKPOS_CTaskSimpleUsegun_ProcessPed
-		add			edx, 8
-		jmp			edx
-	}
+        // Jump back to func. I think we can use EDX here
+        mov         edx, HOOKPOS_CTaskSimpleUsegun_ProcessPed
+        add         edx, 8
+        jmp         edx
+    }
 }
 
 VOID _declspec(naked) HOOK_SkipAim ()
@@ -451,7 +451,7 @@ VOID _declspec(naked) HOOK_CWeapon__Fire()
         pushad
     }    
 
-	// Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
+    // Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
 
     bWeaponFire = true;
     WriteTargetDataForPed ( pShootingPed, vecTargetPosition, vecOrigin );
@@ -708,7 +708,7 @@ void ProcessStartFire ( CFireSAInterface * fire )
 CFireSAInterface * tempFire;
 DWORD dwStoredReturn;
 
-// 	CFire*	StartFire(CVector vecLocation, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, CEntity* pStartedFireEntity = NULL, UInt32 ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100, Bool8 bReportFire = true);
+//  CFire*  StartFire(CVector vecLocation, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, CEntity* pStartedFireEntity = NULL, UInt32 ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100, Bool8 bReportFire = true);
 void _declspec(naked) HOOK_CFireManager__StartFire()
 {
     // replacement code
@@ -745,7 +745,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire()
     }
 }
 
-//	CFire*	StartFire(CEntity *pBurningEntity, CEntity *pStartedFireEntity, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, UInt32 ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100);
+//  CFire*  StartFire(CEntity *pBurningEntity, CEntity *pStartedFireEntity, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, bool8 bExtinguishEnabled=TRUE, UInt32 ArgBurnTime = FIRE_AVERAGE_BURNTIME, Int8 NumGenerationsAllowed = 100);
 void _declspec(naked) HOOK_CFireManager__StartFire_()
 {
     
@@ -1158,154 +1158,154 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer ()
 /*
 VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
 {*/
-	/*
-	0046FB36  |. 5D             POP EBP
-	0046FB37  |. 5E             POP ESI
-	0046FB38  |. 5B             POP EBX
-	0046FB39  \. C2 1800        RETN 18
-	*/
-	/*_asm
-	{
-		mov		ebp, esp
-		add		ebp, 0x14
-		mov		vecShotOrigin, ebp
-		add		ebp, 0xC
-		mov		esi, [ebp]
-		mov		vecStartVector, esi
-		add		ebp, 4
-		mov		esi, [ebp]
-		mov		vecTargetVector, esi
+    /*
+    0046FB36  |. 5D             POP EBP
+    0046FB37  |. 5E             POP ESI
+    0046FB38  |. 5B             POP EBX
+    0046FB39  \. C2 1800        RETN 18
+    */
+    /*_asm
+    {
+        mov     ebp, esp
+        add     ebp, 0x14
+        mov     vecShotOrigin, ebp
+        add     ebp, 0xC
+        mov     esi, [ebp]
+        mov     vecStartVector, esi
+        add     ebp, 4
+        mov     esi, [ebp]
+        mov     vecTargetVector, esi
 
-		pushad
-	}
-		
-	if(IsNotInLocalContext() && GetContextSwitchPedID())
-	{
-		// its a remote player, so replace the data with the net data
-		sprintf(szDebug, "Switched Target Vectors to %f  %f  %f", 
-			RemotePlayerTargetVectors[GetContextSwitchPedID()].fX, 
-			RemotePlayerTargetVectors[GetContextSwitchPedID()].fY, 
-			RemotePlayerTargetVectors[GetContextSwitchPedID()].fZ);
-		OutputDebugString(szDebug);
+        pushad
+    }
+        
+    if(IsNotInLocalContext() && GetContextSwitchPedID())
+    {
+        // its a remote player, so replace the data with the net data
+        sprintf(szDebug, "Switched Target Vectors to %f  %f  %f", 
+            RemotePlayerTargetVectors[GetContextSwitchPedID()].fX, 
+            RemotePlayerTargetVectors[GetContextSwitchPedID()].fY, 
+            RemotePlayerTargetVectors[GetContextSwitchPedID()].fZ);
+        OutputDebugString(szDebug);
 
-		sprintf(szDebug, "Switched Start Vectors to %f  %f  %f", 
-			RemotePlayerStartVectors[GetContextSwitchPedID()].fX, 
-			RemotePlayerStartVectors[GetContextSwitchPedID()].fY, 
-			RemotePlayerStartVectors[GetContextSwitchPedID()].fZ);
-		OutputDebugString(szDebug);
-		
-		
-		memcpy(vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
-		memcpy(vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
-	}
-	else
-	{
-		// Its the Local Player, so save the data so it can be sent
-		memcpy(&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
+        sprintf(szDebug, "Switched Start Vectors to %f  %f  %f", 
+            RemotePlayerStartVectors[GetContextSwitchPedID()].fX, 
+            RemotePlayerStartVectors[GetContextSwitchPedID()].fY, 
+            RemotePlayerStartVectors[GetContextSwitchPedID()].fZ);
+        OutputDebugString(szDebug);
+        
+        
+        memcpy(vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
+        memcpy(vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
+    }
+    else
+    {
+        // Its the Local Player, so save the data so it can be sent
+        memcpy(&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
 
-		sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f", 
-			LocalPlayerShotOriginVector.fX, 
-			LocalPlayerShotOriginVector.fY, 
-			LocalPlayerShotOriginVector.fZ);
-		OutputDebugString(szDebug);*/
-	/*	memcpy(&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
-		memcpy(&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
-		
-		sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f", 
-			LocalPlayerTargetVector.fX, 
-			LocalPlayerTargetVector.fY, 
-			LocalPlayerTargetVector.fZ);
-		OutputDebugString(szDebug);
+        sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f", 
+            LocalPlayerShotOriginVector.fX, 
+            LocalPlayerShotOriginVector.fY, 
+            LocalPlayerShotOriginVector.fZ);
+        OutputDebugString(szDebug);*/
+    /*  memcpy(&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
+        memcpy(&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
+        
+        sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f", 
+            LocalPlayerTargetVector.fX, 
+            LocalPlayerTargetVector.fY, 
+            LocalPlayerTargetVector.fZ);
+        OutputDebugString(szDebug);
 
-		sprintf(szDebug, "Saved Local Start Vectors  %f  %f  %f", 
-			LocalPlayerStartVector.fX, 
-			LocalPlayerStartVector.fY, 
-			LocalPlayerStartVector.fZ);
-		OutputDebugString(szDebug);*/
-/*	}
+        sprintf(szDebug, "Saved Local Start Vectors  %f  %f  %f", 
+            LocalPlayerStartVector.fX, 
+            LocalPlayerStartVector.fY, 
+            LocalPlayerStartVector.fZ);
+        OutputDebugString(szDebug);*/
+/*  }
 
-	_asm
-	{
-		popad
+    _asm
+    {
+        popad
 
-		pop		ebp
-		pop		esi
-		pop		ebx
-		retn	0x18
-	}	
+        pop     ebp
+        pop     esi
+        pop     ebx
+        retn    0x18
+    }   
 }*/
 /*
 VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
 {*/
-	// this is used to store and replace the CrossProduct
-	/*
-	005CDA99   . 50                      PUSH EAX
-	005CDA9A   . 8D8424 C4010000         LEA EAX,DWORD PTR SS:[ESP+1C4]
-	005CDAA1   . 51                      PUSH ECX
-	005CDAA2   . 50                      PUSH EAX
-	005CDAA3   . E8 0826F1FF             CALL gta-vc.004E00B0
-	005CDAA8   . 89D8                    MOV EAX,EBX
-	005CDAAA   . 83C4 0C                 ADD ESP,0C
-	*/
+    // this is used to store and replace the CrossProduct
+    /*
+    005CDA99   . 50                      PUSH EAX
+    005CDA9A   . 8D8424 C4010000         LEA EAX,DWORD PTR SS:[ESP+1C4]
+    005CDAA1   . 51                      PUSH ECX
+    005CDAA2   . 50                      PUSH EAX
+    005CDAA3   . E8 0826F1FF             CALL gta-vc.004E00B0
+    005CDAA8   . 89D8                    MOV EAX,EBX
+    005CDAAA   . 83C4 0C                 ADD ESP,0C
+    */
 
-/*	_asm pushad
+/*  _asm pushad
 
-	if(IsNotInLocalContext() && GetContextSwitchPedID())
-	{
-		_asm
-		{
-			popad
+    if(IsNotInLocalContext() && GetContextSwitchPedID())
+    {
+        _asm
+        {
+            popad
 
-			push	eax
-			lea		eax, dword ptr [esp+0x1C4]
-			mov		vecCrossProduct, eax
-			pop		eax
+            push    eax
+            lea     eax, dword ptr [esp+0x1C4]
+            mov     vecCrossProduct, eax
+            pop     eax
 
-			pushad
-		}
-		sprintf(szDebug, "Switched Cross Products to %f  %f  %f (0x%X)", 
-			RemotePlayerCrossProducts[GetContextSwitchPedID()].fX, 
-			RemotePlayerCrossProducts[GetContextSwitchPedID()].fY, 
-			RemotePlayerCrossProducts[GetContextSwitchPedID()].fZ, vecCrossProduct);
-		OutputDebugString(szDebug);
-		memset(vecCrossProduct,0,sizeof(CVector));
-	//	memcpy(vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
-	}
-	else
-	{
-		_asm
-		{
-			popad
+            pushad
+        }
+        sprintf(szDebug, "Switched Cross Products to %f  %f  %f (0x%X)", 
+            RemotePlayerCrossProducts[GetContextSwitchPedID()].fX, 
+            RemotePlayerCrossProducts[GetContextSwitchPedID()].fY, 
+            RemotePlayerCrossProducts[GetContextSwitchPedID()].fZ, vecCrossProduct);
+        OutputDebugString(szDebug);
+        memset(vecCrossProduct,0,sizeof(CVector));
+    //  memcpy(vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
+    }
+    else
+    {
+        _asm
+        {
+            popad
 
-			push	eax
-			lea		eax, dword ptr [esp+0x1C4]
-			mov		vecCrossProduct, eax
-			push	ecx
-			push	eax
-			mov		eax, FUNC_CrossProduct
-			call	eax
-			mov		eax, ebx
-			add		esp, 0xC
+            push    eax
+            lea     eax, dword ptr [esp+0x1C4]
+            mov     vecCrossProduct, eax
+            push    ecx
+            push    eax
+            mov     eax, FUNC_CrossProduct
+            call    eax
+            mov     eax, ebx
+            add     esp, 0xC
 
-			pushad
-		}
+            pushad
+        }
 
-		memcpy(&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
-		sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f", 
-			LocalPlayerCrossProduct.fX, 
-			LocalPlayerCrossProduct.fY, 
-			LocalPlayerCrossProduct.fZ);
-		OutputDebugString(szDebug);
-	}
+        memcpy(&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
+        sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f", 
+            LocalPlayerCrossProduct.fX, 
+            LocalPlayerCrossProduct.fY, 
+            LocalPlayerCrossProduct.fZ);
+        OutputDebugString(szDebug);
+    }
 
-	_asm
-	{
-		popad
+    _asm
+    {
+        popad
 
-		mov		edx, HOOKPOS_CWeapon__FireShotgun
-		add		edx, 20
-		jmp		edx
-	}	
+        mov     edx, HOOKPOS_CWeapon__FireShotgun
+        add     edx, 20
+        jmp     edx
+    }   
 }*/
 
 

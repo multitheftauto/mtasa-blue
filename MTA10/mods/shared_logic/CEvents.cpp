@@ -91,14 +91,14 @@ void CEvents::RemoveAllEvents ( class CLuaMain* pMain )
         // If they match, delete it null it and set the bool
         if ( (*iter)->pLuaMain == pMain )
         {
-			// Delete the object
+            // Delete the object
             delete *iter;
 
-			// Remove from list
-			iter = m_Events.erase(iter);
+            // Remove from list
+            iter = m_Events.erase(iter);
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 }
 

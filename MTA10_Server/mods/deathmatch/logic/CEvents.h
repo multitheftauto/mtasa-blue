@@ -48,9 +48,9 @@ public:
     void                        PostEventPulse      ( void );
 
     void                        CancelEvent         ( bool bCancelled = true );
-	void                        CancelEvent         ( bool bCancelled, char* szReason );
+    void                        CancelEvent         ( bool bCancelled, char* szReason );
     bool                        WasEventCancelled   ( void );
-	const char*					GetLastError		( void );
+    const char*                 GetLastError        ( void );
 
 private:
     void                        RemoveAllEvents     ( void );
@@ -61,7 +61,7 @@ private:
     bool                        m_bEventCancelled;
     bool                        m_bWasEventCancelled;
 
-	char*						m_szLastError;
+    char*                       m_szLastError;
 };
 
 #endif

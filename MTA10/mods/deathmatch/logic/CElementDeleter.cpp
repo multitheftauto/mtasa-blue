@@ -25,56 +25,56 @@ CElementDeleter::CElementDeleter ()
 
 void CElementDeleter::Delete ( class CClientEntity* pElement )
 {
-	// Make sure we don't try to delete it twice
-	if ( pElement && !IsBeingDeleted ( pElement ) )
-	{
-		// Before we do anything, fire the on-destroy event
+    // Make sure we don't try to delete it twice
+    if ( pElement && !IsBeingDeleted ( pElement ) )
+    {
+        // Before we do anything, fire the on-destroy event
         CLuaArguments Arguments;
         pElement->CallEvent ( "onClientElementDestroy", Arguments, true );
 
-		// Add it to our list
-		if ( !pElement->IsBeingDeleted () )
-		{
-			m_List.push_back ( pElement );
-		}
+        // Add it to our list
+        if ( !pElement->IsBeingDeleted () )
+        {
+            m_List.push_back ( pElement );
+        }
 
-		// Flag it as being deleted and unlink it from the tree/managers
-		pElement->SetBeingDeleted ( true );
-		pElement->ClearChildren ();
-		pElement->SetParent ( NULL );
-		pElement->Unlink ();
-	}
+        // Flag it as being deleted and unlink it from the tree/managers
+        pElement->SetBeingDeleted ( true );
+        pElement->ClearChildren ();
+        pElement->SetParent ( NULL );
+        pElement->Unlink ();
+    }
 }
 
 
 void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
 {
-	// Gather a list over children (we can't use the list as it changes)
-	list < CClientEntity* > Children;
-	list < CClientEntity* > ::const_iterator iterCopy = pElement->IterBegin ();
-	for ( ; iterCopy != pElement->IterEnd (); ++iterCopy )
-	{
-		Children.push_back ( *iterCopy );
-	}
+    // Gather a list over children (we can't use the list as it changes)
+    list < CClientEntity* > Children;
+    list < CClientEntity* > ::const_iterator iterCopy = pElement->IterBegin ();
+    for ( ; iterCopy != pElement->IterEnd (); ++iterCopy )
+    {
+        Children.push_back ( *iterCopy );
+    }
 
-	// Call ourselves on each child of this to go as deep as possible and start deleting there
-	list < CClientEntity* > ::const_iterator iter = Children.begin ();
-	for ( ; iter != Children.end (); ++iter )
-	{
-		DeleteRecursive ( *iter );
-	}
+    // Call ourselves on each child of this to go as deep as possible and start deleting there
+    list < CClientEntity* > ::const_iterator iter = Children.begin ();
+    for ( ; iter != Children.end (); ++iter )
+    {
+        DeleteRecursive ( *iter );
+    }
 
-	// At this point we're sure that this element has no more children left.
+    // At this point we're sure that this element has no more children left.
     // Add it to our list over deleting objects
     if ( !pElement->IsBeingDeleted () )
     {
         m_List.push_back ( pElement );
     }
 
-	// Mark us as being deleted, unlink from parent and unlink from manager classes eventually
-	pElement->SetBeingDeleted ( true );
-	pElement->SetParent ( NULL );
-	pElement->Unlink ();
+    // Mark us as being deleted, unlink from parent and unlink from manager classes eventually
+    pElement->SetBeingDeleted ( true );
+    pElement->SetParent ( NULL );
+    pElement->Unlink ();
 }
 
 

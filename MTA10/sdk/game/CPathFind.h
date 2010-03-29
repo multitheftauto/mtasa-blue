@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/game/CPathFind.h
-*  PURPOSE:		Path finder interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/game/CPathFind.h
+*  PURPOSE:     Path finder interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,13 +18,13 @@
 class CNodeAddress
 {
 public:
-	short sRegion;
-	short sIndex;
+    short sRegion;
+    short sIndex;
 
-	CNodeAddress::CNodeAddress()
-	{
-		sRegion = -1;
-	}
+    CNodeAddress::CNodeAddress()
+    {
+        sRegion = -1;
+    }
 };
 
 class CPathNode;
@@ -32,10 +32,10 @@ class CPathNode;
 class CPathFind
 {
 public:
-	virtual CNodeAddress *  FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance )=0;
-	virtual CPathNode *     GetPathNode ( CNodeAddress * node )=0;
-	virtual CVector *       GetNodePosition ( CPathNode * pNode, CVector * pPosition)=0;
-	virtual CVector *       GetNodePosition ( CNodeAddress * pNode, CVector * pPosition )=0;
+    virtual CNodeAddress *  FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance )=0;
+    virtual CPathNode *     GetPathNode ( CNodeAddress * node )=0;
+    virtual CVector *       GetNodePosition ( CPathNode * pNode, CVector * pPosition)=0;
+    virtual CVector *       GetNodePosition ( CNodeAddress * pNode, CVector * pPosition )=0;
     virtual void            SwitchRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false )=0;
     virtual void            SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false )=0;
     // belong in CCarCtrl or CPopulation

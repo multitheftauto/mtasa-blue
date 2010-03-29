@@ -53,7 +53,7 @@ SBindableGTAControl g_bcControls[] =
 
 CKeyBinds::CKeyBinds ( CPlayer* pPlayer )
 {
-	m_bProcessingKey = false;
+    m_bProcessingKey = false;
     m_pPlayer = pPlayer;
 }
 
@@ -66,7 +66,7 @@ CKeyBinds::~CKeyBinds ( void )
 
 SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 {
-	SBindableKey* temp = NULL;
+    SBindableKey* temp = NULL;
     for ( int i = 0 ; *g_bkKeys [ i ].szKey != 0 ; i++ )
     {
         temp = &g_bkKeys [ i ];
@@ -82,7 +82,7 @@ SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
 {
-	SBindableGTAControl* temp = NULL;
+    SBindableGTAControl* temp = NULL;
     for ( int i = 0 ; *g_bcControls [ i ].szControl != 0 ; i++ )
     {
         temp = &g_bcControls [ i ];
@@ -107,14 +107,14 @@ void CKeyBinds::Add ( CKeyBind* pKeyBind )
 
 bool CKeyBinds::Remove ( CKeyBind* pKeyBind )
 {
-	if ( !m_bProcessingKey )
-	{
+    if ( !m_bProcessingKey )
+    {
         m_List.remove ( pKeyBind );
         delete pKeyBind;
         return true;
     }
 
-	pKeyBind->beingDeleted = true;
+    pKeyBind->beingDeleted = true;
     return false;
 }
 
@@ -197,10 +197,10 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
             return false;
     }
 
-	m_bProcessingKey = true;
+    m_bProcessingKey = true;
     bool bFound = false;
-	CKeyBind* pKeyBind = NULL;
-	list < CKeyBind* > cloneList = m_List;
+    CKeyBind* pKeyBind = NULL;
+    list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
     {
@@ -240,7 +240,7 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
             }
         }
     }
-	m_bProcessingKey = false;
+    m_bProcessingKey = false;
     RemoveDeletedBinds ();
     return bFound;
 }
@@ -258,7 +258,7 @@ bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pL
         pBind->boundKey = pKey;
         pBind->bHitState = bHitState;
         pBind->luaMain = pLuaMain;
-		pBind->m_iLuaFunction = iLuaFunction;
+        pBind->m_iLuaFunction = iLuaFunction;
         pBind->m_Arguments = Arguments;
 
         m_List.push_back ( pBind );
@@ -291,8 +291,8 @@ bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* p
 bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-	CKeyFunctionBind* pBind = NULL;
-	list < CKeyBind * > cloneList = m_List;
+    CKeyFunctionBind* pBind = NULL;
+    list < CKeyBind * > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
@@ -305,15 +305,15 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-						// ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
+                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
 
-							if ( m_bProcessingKey ) pBind->beingDeleted = true;
+                            if ( m_bProcessingKey ) pBind->beingDeleted = true;
                             else
                             {
-								m_List.remove ( pBind );
+                                m_List.remove ( pBind );
                                 delete pBind;
                                 iter = cloneList.erase ( iter );
                                 continue;
@@ -332,7 +332,7 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
 bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
     {
@@ -345,7 +345,7 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-						// ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
+                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
@@ -361,26 +361,26 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
 
 void CKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 {
-	CKeyBind* pBind = NULL;
-	list < CKeyBind* > cloneList = m_List;
+    CKeyBind* pBind = NULL;
+    list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
-		pBind = *iter;
-		if ( !pBind->IsBeingDeleted () )
-		{
-			if ( pBind->luaMain == pLuaMain )
-			{
-				if ( m_bProcessingKey ) pBind->beingDeleted = true;
-				else
-				{
-					m_List.remove ( pBind );
-					delete pBind;
-					iter = cloneList.erase ( iter );
-					continue;
-				}
-			}
-		}
+        pBind = *iter;
+        if ( !pBind->IsBeingDeleted () )
+        {
+            if ( pBind->luaMain == pLuaMain )
+            {
+                if ( m_bProcessingKey ) pBind->beingDeleted = true;
+                else
+                {
+                    m_List.remove ( pBind );
+                    delete pBind;
+                    iter = cloneList.erase ( iter );
+                    continue;
+                }
+            }
+        }
         ++iter;
     }
 }
@@ -399,7 +399,7 @@ bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLua
         pBind->boundControl = pControl;
         pBind->bHitState = bHitState;
         pBind->luaMain = pLuaMain;
-		pBind->m_iLuaFunction = iLuaFunction;
+        pBind->m_iLuaFunction = iLuaFunction;
         pBind->m_Arguments = Arguments;
 
         m_List.push_back ( pBind );
@@ -419,7 +419,7 @@ bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitSta
         pBind->boundControl = pControl;
         pBind->bHitState = bHitState;
         pBind->luaMain = pLuaMain;
-		pBind->m_iLuaFunction = iLuaFunction;
+        pBind->m_iLuaFunction = iLuaFunction;
         pBind->m_Arguments = Arguments;
 
         m_List.push_back ( pBind );
@@ -433,8 +433,8 @@ bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitSta
 bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-	CControlFunctionBind* pBind = NULL;
-	list < CKeyBind * > cloneList = m_List;
+    CControlFunctionBind* pBind = NULL;
+    list < CKeyBind * > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
@@ -447,14 +447,14 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-						// ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
+                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
                             if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
                             else
                             {
-								m_List.remove ( *iter );
+                                m_List.remove ( *iter );
                                 delete *iter;
                                 iter = cloneList.erase ( iter );
                                 continue;
@@ -473,7 +473,7 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
 bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
 {
     bool bFound = false;
-	list < CKeyBind* > cloneList = m_List;
+    list < CKeyBind* > cloneList = m_List;
     list < CKeyBind* > ::iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
     {
@@ -486,7 +486,7 @@ bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-						// ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
+                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
@@ -528,7 +528,7 @@ void CKeyBinds::RemoveDeletedBinds ( void )
             delete *iter;
             iter = m_List.erase ( iter );
         }
-		else
-			++iter;
+        else
+            ++iter;
     }
 }

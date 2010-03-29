@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/multiplayer/CMultiplayer.h
-*  PURPOSE:		Multiplayer subsystem interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/multiplayer/CMultiplayer.h
+*  PURPOSE:     Multiplayer subsystem interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -98,12 +98,12 @@ public:
 
     virtual class CPed *                GetContextSwitchedPed       ( void ) = 0;
 
-	virtual class CPopulationMP         * GetPopulationMP           () = 0;
-	virtual void						PreventLeavingVehicles      () = 0;
-	virtual void						HideRadar                   ( bool bHide ) = 0;
-	virtual void						SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
-	virtual void						DisablePadHandler           ( bool bDisabled ) = 0;
-	virtual void						DisableHeatHazeEffect       ( bool bDisable ) = 0;
+    virtual class CPopulationMP         * GetPopulationMP           () = 0;
+    virtual void                        PreventLeavingVehicles      () = 0;
+    virtual void                        HideRadar                   ( bool bHide ) = 0;
+    virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
+    virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
+    virtual void                        DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
@@ -111,12 +111,12 @@ public:
 
     virtual bool                        GetExplosionsDisabled       () = 0;
     virtual void                        DisableExplosions           ( bool bDisabled ) = 0;
-	virtual void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
+    virtual void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
     virtual void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler ) = 0;
     virtual void                        SetDamageHandler            ( DamageHandler * pDamageHandler ) = 0;
     virtual void                        SetFireHandler              ( FireHandler * pFireHandler ) = 0;
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
-	virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
+    virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
     virtual void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler ) = 0;
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;

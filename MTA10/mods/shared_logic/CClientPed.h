@@ -54,19 +54,19 @@ enum eVehicleInOutState
 
 enum eBodyPart
 {
-	BODYPART_TORSO = 3,
-	BODYPART_ASS = 4,
-	BODYPART_LEFT_ARM = 5,
-	BODYPART_RIGHT_ARM = 6,
-	BODYPART_LEFT_LEG = 7,
-	BODYPART_RIGHT_LEG = 8,
-	BODYPART_HEAD = 9,
+    BODYPART_TORSO = 3,
+    BODYPART_ASS = 4,
+    BODYPART_LEFT_ARM = 5,
+    BODYPART_RIGHT_ARM = 6,
+    BODYPART_LEFT_LEG = 7,
+    BODYPART_RIGHT_LEG = 8,
+    BODYPART_HEAD = 9,
 };
 
 enum eDeathAnims
 {
-	DEATH_ANIM_HEAD = 19,
-	DEATH_ANIM_TORSO = 20,
+    DEATH_ANIM_HEAD = 19,
+    DEATH_ANIM_TORSO = 20,
 };
 
 struct SDelayedSyncData
@@ -111,8 +111,8 @@ public:
     inline void                 Unlink                      ( void ) {};
 
     virtual eClientEntityType   GetType                     ( void ) const                              { return CCLIENTPED; }
-	
-	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
+    
+    inline CPlayerPed*          GetGamePlayer               ( void )                                    { return m_pPlayerPed; }
     inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
     inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
 
@@ -334,7 +334,7 @@ public:
     void                        GetTargetPosition       ( CVector & vecPosition );
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
-	void						UpdateTargetPosition	( void );
+    void                        UpdateTargetPosition    ( void );
 
     CClientEntity*              GetTargetedEntity       ( void );    
     CClientPed*                 GetTargetedPed          ( void );
@@ -349,7 +349,7 @@ public:
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
-	static char*				GetBodyPartName			( unsigned char ucID );
+    static char*                GetBodyPartName         ( unsigned char ucID );
 
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
@@ -441,7 +441,7 @@ public:
     CPad*                       m_pPad;
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
-    unsigned long               m_ulModel;	
+    unsigned long               m_ulModel;  
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
@@ -472,7 +472,7 @@ public:
     float                       m_fTargetAimY;
     unsigned long               m_ulBeginAimTime;
     unsigned long               m_ulTargetAimTime;
-	bool						m_bTargetAkimboUp;
+    bool                        m_bTargetAkimboUp;
     unsigned long               m_ulBeginRotationTime;
     unsigned long               m_ulEndRotationTime;
     float                       m_fBeginRotation;

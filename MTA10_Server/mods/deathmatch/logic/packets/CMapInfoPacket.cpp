@@ -106,7 +106,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_fWaveHeight );
     BitStream.Write ( m_fWaterLevel );
 
-	BitStream.WriteCompressed ( m_usFPSLimit );
+    BitStream.WriteCompressed ( m_usFPSLimit );
 
     // Write the garage states
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )

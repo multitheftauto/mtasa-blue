@@ -156,7 +156,7 @@ bool CPed::ReadSpecialData ( void )
     }
 
     float fRotation = 0.0f;
-	GetCustomDataFloat ( "rotZ", fRotation, true );
+    GetCustomDataFloat ( "rotZ", fRotation, true );
     m_fRotation = ConvertDegreesToRadians ( fRotation );
 
     // Grab the "model" data
@@ -182,13 +182,13 @@ bool CPed::ReadSpecialData ( void )
         return false;
     }
 
-	GetCustomDataFloat ( "health", m_fHealth, true );
-	GetCustomDataFloat ( "armor", m_fArmor, true );
+    GetCustomDataFloat ( "health", m_fHealth, true );
+    GetCustomDataFloat ( "armor", m_fArmor, true );
 
-	if ( GetCustomDataInt ( "interior", iTemp, true ) )
+    if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;

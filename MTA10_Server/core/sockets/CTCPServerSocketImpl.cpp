@@ -119,8 +119,8 @@ CTCPServerSocket* CTCPServerSocketImpl::Accept ( void )
         return pAcceptSocket;
     }
 
-	if ( pAcceptSocket )
-		delete pAcceptSocket;
+    if ( pAcceptSocket )
+        delete pAcceptSocket;
     return NULL;
 }
 
@@ -169,8 +169,8 @@ const char* CTCPServerSocketImpl::GetLastError ( void )
 
 int CTCPServerSocketImpl::ReadBuffer ( void* pOutput, int iSize )
 {
-	// Try to read something
-	int iReturn = recv ( m_Socket, static_cast < char* > ( pOutput ), iSize, 0 );
+    // Try to read something
+    int iReturn = recv ( m_Socket, static_cast < char* > ( pOutput ), iSize, 0 );
 
     if ( iReturn == -1 )
     {
@@ -186,9 +186,9 @@ int CTCPServerSocketImpl::ReadBuffer ( void* pOutput, int iSize )
     #endif
     }
 
-	// Return number of bytes actually read
-	m_szLastError [0] = 0;
-	return iReturn;
+    // Return number of bytes actually read
+    m_szLastError [0] = 0;
+    return iReturn;
 }
 
 
@@ -217,8 +217,8 @@ bool CTCPServerSocketImpl::Initialize ( void )
             return false;
         }
     #else
-		int flags = 0;
-		flags = fcntl ( m_Socket, F_GETFL, 0 );
+        int flags = 0;
+        flags = fcntl ( m_Socket, F_GETFL, 0 );
         fcntl ( m_Socket, F_SETFL, flags | O_NONBLOCK );
     #endif
 

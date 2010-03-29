@@ -44,7 +44,7 @@ bool CClientColModel::LoadCol ( const char* szFile )
     if ( !m_pColModel )
     {
         // Load the collision file
-		m_pColModel = g_pGame->GetRenderWare ()->ReadCOL ( szFile );
+        m_pColModel = g_pGame->GetRenderWare ()->ReadCOL ( szFile );
 
         // Success if the col model is != NULL
         return ( m_pColModel != NULL );

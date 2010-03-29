@@ -28,14 +28,14 @@ extern "C"
 class ILuaModuleManager
 {
 public:
-	virtual void                ErrorPrintf             ( const char* szFormat, ... ) = 0;
-	virtual void                DebugPrintf             ( lua_State * luaVM, const char* szFormat, ... ) = 0;
-	virtual void                Printf                  ( const char* szFormat, ... ) = 0;
+    virtual void                ErrorPrintf             ( const char* szFormat, ... ) = 0;
+    virtual void                DebugPrintf             ( lua_State * luaVM, const char* szFormat, ... ) = 0;
+    virtual void                Printf                  ( const char* szFormat, ... ) = 0;
 
-	virtual bool                RegisterFunction        ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func ) = 0;
+    virtual bool                RegisterFunction        ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func ) = 0;
     virtual bool                GetResourceName         ( lua_State * luaVM, std::string &strName ) = 0;
-	virtual unsigned long       GetResourceMetaCRC      ( lua_State * luaVM ) = 0;
-	virtual unsigned long       GetResourceFileCRC      ( lua_State * luaVM, const char* szFile ) = 0;
+    virtual unsigned long       GetResourceMetaCRC      ( lua_State * luaVM ) = 0;
+    virtual unsigned long       GetResourceFileCRC      ( lua_State * luaVM, const char* szFile ) = 0;
 };
 
 /* Interface for modules until 1.0 */

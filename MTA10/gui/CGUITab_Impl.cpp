@@ -15,19 +15,19 @@
 
 CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const char* szCaption )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
     pGUI->GetUniqueName ( szUnique );
-	
+    
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( "DefaultWindow", szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setText ( szCaption );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
@@ -36,13 +36,13 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
     {
         SetParent ( pParent );
 
-		// Adjust the tab button (pParent should be a TabControl!)
-		reinterpret_cast < CEGUI::TabControl* > ( ((CGUITabPanel_Impl*)pParent)->m_pWindow ) -> setAbsoluteTabHeight ( 24.0f );
+        // Adjust the tab button (pParent should be a TabControl!)
+        reinterpret_cast < CEGUI::TabControl* > ( ((CGUITabPanel_Impl*)pParent)->m_pWindow ) -> setAbsoluteTabHeight ( 24.0f );
     }
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
@@ -55,8 +55,8 @@ CGUITab_Impl::~CGUITab_Impl ( void )
 
 void CGUITab_Impl::SetCaption ( const char* szCaption )
 {
-	CEGUI::String strCaption;
+    CEGUI::String strCaption;
 
-	if ( szCaption ) strCaption.assign ( szCaption );
-	m_pWindow->setText ( strCaption );
+    if ( szCaption ) strCaption.assign ( szCaption );
+    m_pWindow->setText ( strCaption );
 }

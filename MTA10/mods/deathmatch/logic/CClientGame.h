@@ -56,7 +56,7 @@
 #include "CLocalServer.h"
 
 #ifdef MTA_VOICE
-	#include "CVoice.h"
+    #include "CVoice.h"
 #endif
 
 #ifdef MTA_DEBUG
@@ -77,7 +77,7 @@ public:
         STATUS_CONNECTING,
         STATUS_JOINING,
         STATUS_JOINED,
-		STATUS_TRANSFER,
+        STATUS_TRANSFER,
         STATUS_OFFLINE
     };
 
@@ -210,8 +210,8 @@ public:
 
     inline bool                         IsGettingIntoVehicle            ( void ) { return m_bIsGettingIntoVehicle; };
     
-	void								StartPlayback					( void );
-	void								EnablePacketRecorder            ( const char* szFilename );
+    void                                StartPlayback                   ( void );
+    void                                EnablePacketRecorder            ( const char* szFilename );
 
     // Accessors
 #ifdef MTA_VOICE
@@ -226,7 +226,7 @@ public:
     inline CClientVehicleManager*       GetVehicleManager               ( void )        { return m_pVehicleManager; };
     inline CClientTeamManager*          GetTeamManager                  ( void )        { return m_pTeamManager; };
     inline CClientPedManager*           GetPedManager                   ( void )        { return m_pPedManager; };
-	inline CClientGUIManager*			GetGUIManager					( void )		{ return m_pGUIManager; };
+    inline CClientGUIManager*           GetGUIManager                   ( void )        { return m_pGUIManager; };
     inline CResourceManager*            GetResourceManager              ( void )        { return m_pResourceManager; }
     inline CLuaManager*                 GetLuaManager                   ( void )        { return m_pLuaManager; }
     inline CScriptKeyBinds*             GetScriptKeyBinds               ( void )        { return m_pScriptKeyBinds; }
@@ -266,7 +266,7 @@ public:
 
     #ifdef MTA_DEBUG
     void                                ShowWepdata                     ( const char* szNick );
-    void								ShowTasks                       ( const char* szNick );
+    void                                ShowTasks                       ( const char* szNick );
     void                                ShowPlayer                      ( const char* szNick );
     void                                SetMimic                        ( unsigned int uiMimicCount );
     inline void                         SetMimicLag                     ( bool bMimicLag )  { m_bMimicLag = bMimicLag; };
@@ -312,10 +312,10 @@ public:
 
     void                                AddBuiltInEvents                ( void );
 
-	inline const char*					GetModRoot						( void )						{ return m_strModRoot; };
+    inline const char*                  GetModRoot                      ( void )                        { return m_strModRoot; };
 
     void                                SetGameSpeed                    ( float fSpeed );
-	void								SetMinuteDuration				( unsigned long ulDelay );
+    void                                SetMinuteDuration               ( unsigned long ulDelay );
     inline long                         GetMoney                        ( void )                        { return m_lMoney; }
     void                                SetMoney                        ( long lMoney );
 
@@ -355,24 +355,24 @@ private:
     static void                         SendVoiceData                   ( const unsigned char * pData, int len );
     #endif
 
-	// CGUI Callbacks
-	bool								OnKeyDown						( CGUIKeyEventArgs Args );
-	bool								OnMouseClick					( CGUIMouseEventArgs Args );
-	bool								OnMouseDoubleClick				( CGUIMouseEventArgs Args );
-	bool								OnMouseButtonDown				( CGUIMouseEventArgs Args );
-	bool								OnMouseButtonUp					( CGUIMouseEventArgs Args );
-	bool								OnMouseMove						( CGUIMouseEventArgs Args );
-	bool								OnMouseEnter					( CGUIMouseEventArgs Args );
-	bool								OnMouseLeave					( CGUIMouseEventArgs Args );
-	bool								OnMouseWheel					( CGUIMouseEventArgs Args );
-	bool								OnMove							( CGUIElement * pElement );
-	bool								OnSize							( CGUIElement * pElement );
+    // CGUI Callbacks
+    bool                                OnKeyDown                       ( CGUIKeyEventArgs Args );
+    bool                                OnMouseClick                    ( CGUIMouseEventArgs Args );
+    bool                                OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
+    bool                                OnMouseButtonDown               ( CGUIMouseEventArgs Args );
+    bool                                OnMouseButtonUp                 ( CGUIMouseEventArgs Args );
+    bool                                OnMouseMove                     ( CGUIMouseEventArgs Args );
+    bool                                OnMouseEnter                    ( CGUIMouseEventArgs Args );
+    bool                                OnMouseLeave                    ( CGUIMouseEventArgs Args );
+    bool                                OnMouseWheel                    ( CGUIMouseEventArgs Args );
+    bool                                OnMove                          ( CGUIElement * pElement );
+    bool                                OnSize                          ( CGUIElement * pElement );
 
     float                               m_fMarkerBounce;
     // Network update functions
     void                                DoVehicleInKeyCheck             ( void );
     void                                UpdateVehicleInOut              ( void );
-	void								UpdatePlayerTarget				( void );
+    void                                UpdatePlayerTarget              ( void );
     void                                UpdatePlayerWeapons             ( void );
     void                                UpdateTrailers                  ( void );
     void                                UpdateFireKey                   ( void );
@@ -396,14 +396,14 @@ private:
     #endif
 
 
-	void								DownloadFiles					( void );
+    void                                DownloadFiles                   ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
     void                                Event_OnIngame                  ( void );
     void                                Event_OnIngameAndReady          ( void );
     void                                Event_OnIngameAndConnected      ( void );
-	void								Event_OnTransferComplete		( void );
+    void                                Event_OnTransferComplete        ( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
     static void                         StaticFireHandler               ( CFire* pFire );
@@ -453,12 +453,12 @@ private:
     bool                                m_bErrorStartingLocal;
     int                                 m_iLocalConnectAttempts;
 
-    bool								m_bIsPlayingBack;
-    bool								m_bFirstPlaybackFrame;
+    bool                                m_bIsPlayingBack;
+    bool                                m_bFirstPlaybackFrame;
 
     CClientManager*                     m_pManager;
-	CClientCamera*				        m_pCamera;
-	CClientGUIManager*					m_pGUIManager;
+    CClientCamera*                      m_pCamera;
+    CClientGUIManager*                  m_pGUIManager;
     CClientMarkerManager*               m_pMarkerManager;
     CClientObjectManager*               m_pObjectManager;
     CClientPickupManager*               m_pPickupManager;
@@ -481,7 +481,7 @@ private:
     CSyncDebug*                         m_pSyncDebug;
     //CScreenshot*                        m_pScreenshot;
     CRadarMap*                          m_pRadarMap;
-	CTransferBox*						m_pTransferBox;
+    CTransferBox*                       m_pTransferBox;
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
     CElementDeleter                     m_ElementDeleter;
@@ -533,7 +533,7 @@ private:
     bool                                m_bNoNewVehicleTask;
     CClientPlayer*                      m_pGettingJackedBy;
 
-	CEntity*							m_pTargetedGameEntity;
+    CEntity*                            m_pTargetedGameEntity;
     CClientEntity*                      m_pTargetedEntity;
     bool                                m_bTargetSent;
     ElementID                           m_TargetedPlayerID;
@@ -545,10 +545,10 @@ private:
     unsigned long                       m_ulDamageTime;
     bool                                m_bDamageSent;
 
-	DWORD								m_dwTransferStarted;
-	bool								m_bTransferReset;
+    DWORD                               m_dwTransferStarted;
+    bool                                m_bTransferReset;
 
-	eWeaponSlot							m_lastWeaponSlot;
+    eWeaponSlot                         m_lastWeaponSlot;
     DWORD                               m_wasWeaponAmmoInClip[WEAPONSLOT_MAX + 1];
 
     bool                                m_bCursorEventsEnabled;
@@ -557,8 +557,8 @@ private:
     bool                                m_bShowNetstat;
     bool                                m_bShowFPS;
 
-	bool								m_bTransferResource;
-	bool								m_bTransferInitiated;
+    bool                                m_bTransferResource;
+    bool                                m_bTransferInitiated;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
@@ -568,7 +568,7 @@ private:
     //Clouds Enabled
     bool                                m_bCloudsEnabled;
 
-	unsigned long						m_ulMinuteDuration;
+    unsigned long                       m_ulMinuteDuration;
 
     CClientGUIElement*                  m_pClickedGUIElement;
 
@@ -596,15 +596,15 @@ private:
     #endif
 
     #ifdef MTA_DEBUG
-	CClientPlayer*                      m_pShowPlayerTasks;
+    CClientPlayer*                      m_pShowPlayerTasks;
     CClientPlayer*                      m_pShowPlayer;
     std::list < CClientPlayer* >        m_Mimics;
     bool                                m_bMimicLag;
     unsigned long                       m_ulLastMimicLag;
-	CVector								m_vecLastMimicPos;
-	CVector								m_vecLastMimicMove;
-	CVector								m_vecLastMimicTurn;
-	CVector								m_vecLastMimicRot;
+    CVector                             m_vecLastMimicPos;
+    CVector                             m_vecLastMimicMove;
+    CVector                             m_vecLastMimicTurn;
+    CVector                             m_vecLastMimicRot;
     bool                                m_bDoPaintballs;
     bool                                m_bShowInterpolation;
     #endif

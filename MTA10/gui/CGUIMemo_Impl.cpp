@@ -18,7 +18,7 @@
 
 CGUIMemo_Impl::CGUIMemo_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Get an unique identifier for CEGUI
     char szUnique [CGUI_CHAR_SIZE];
@@ -27,14 +27,14 @@ CGUIMemo_Impl::CGUIMemo_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIMEMO_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
-	
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     //m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.00f, 0.00f, 0.40f, 0.40f ) );
 
     // Register our events
-	m_pWindow->subscribeEvent ( CEGUI::MultiLineEditbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIMemo_Impl::Event_TextChanged, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::MultiLineEditbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIMemo_Impl::Event_TextChanged, this ) );
     m_pWindow->subscribeEvent ( CEGUI::MultiLineEditbox::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIMemo_Impl::Event_OnKeyDown, this ) );
     AddEvents ();
 
@@ -84,8 +84,8 @@ bool CGUIMemo_Impl::IsReadOnly ( void )
 
 void CGUIMemo_Impl::EnsureCaratIsVisible ( void )
 {
-	CEGUI::MultiLineEditbox* wndMemo = reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow );
-	wndMemo->setCaratIndex ( ( wndMemo->getText ( ) ).length ( ) );
+    CEGUI::MultiLineEditbox* wndMemo = reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow );
+    wndMemo->setCaratIndex ( ( wndMemo->getText ( ) ).length ( ) );
 }
 
 
@@ -168,8 +168,8 @@ void CGUIMemo_Impl::SetTextChangedHandler ( const GUI_CALLBACK & Callback )
 
 bool CGUIMemo_Impl::Event_TextChanged ( const CEGUI::EventArgs& e )
 {
-	if ( m_TextChanged )
-		m_TextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_TextChanged )
+        m_TextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

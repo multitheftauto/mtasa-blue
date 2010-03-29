@@ -58,27 +58,27 @@ void CLanBroadcast::DoPulse ( void )
 {
     sockaddr_in SockAddr;
 #ifndef WIN32
-	socklen_t nLen = sizeof ( sockaddr );
+    socklen_t nLen = sizeof ( sockaddr );
 #else
     int nLen = sizeof ( sockaddr );
 #endif
 
     char szBuffer[32];
-	int iBuffer = 0;
+    int iBuffer = 0;
 
-	iBuffer = recvfrom ( m_Socket, szBuffer, 31, 0, (sockaddr*)&SockAddr, &nLen );
-	if ( iBuffer > 0 )
-	{
+    iBuffer = recvfrom ( m_Socket, szBuffer, 31, 0, (sockaddr*)&SockAddr, &nLen );
+    if ( iBuffer > 0 )
+    {
         // Compare the client's query against the query message we stored
         // to ensure that we repond only to queries with the same version
-		if ( m_strClientMessage.compare ( szBuffer ) == 0 )
-		{
-			/*int sent =*/ sendto ( m_Socket,
-					m_strServerMessage.c_str (),
-					m_strServerMessage.length () + 1,
-					0,
-					(sockaddr*)&SockAddr,
-					nLen );
-		}
-	}
+        if ( m_strClientMessage.compare ( szBuffer ) == 0 )
+        {
+            /*int sent =*/ sendto ( m_Socket,
+                    m_strServerMessage.c_str (),
+                    m_strServerMessage.length () + 1,
+                    0,
+                    (sockaddr*)&SockAddr,
+                    nLen );
+        }
+    }
 }

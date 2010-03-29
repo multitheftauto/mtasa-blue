@@ -39,35 +39,35 @@ class CPedIntelligenceSAInterface;
 
 #define SIZEOF_CPLAYERPED                           1956
 
-#define FUNC_SetModelIndex							0x5E4880 // ##SA##
-#define FUNC_AttachPedToBike						0x5E7E60 
-#define FUNC_AttachPedToEntity						0x5E7CB0
-#define FUNC_CanSeeEntity							0x5E0730
-#define FUNC_GiveObjectToPedToHold					0x5E4390
-#define FUNC_RestorePlayerStuffDuringResurrection	0x442060
-#define FUNC_SetIsStanding							0x4ABBE0
+#define FUNC_SetModelIndex                          0x5E4880 // ##SA##
+#define FUNC_AttachPedToBike                        0x5E7E60 
+#define FUNC_AttachPedToEntity                      0x5E7CB0
+#define FUNC_CanSeeEntity                           0x5E0730
+#define FUNC_GiveObjectToPedToHold                  0x5E4390
+#define FUNC_RestorePlayerStuffDuringResurrection   0x442060
+#define FUNC_SetIsStanding                          0x4ABBE0
 #define FUNC_MakeChangesForNewWeapon_Slot           0x60D000
 
-#define FUNC_CPedClothesDesc__SetTextureAndModel	0x5A8080
-#define FUNC_CClothes__RebuildPlayer				0x5A82C0
+#define FUNC_CPedClothesDesc__SetTextureAndModel    0x5A8080
+#define FUNC_CClothes__RebuildPlayer                0x5A82C0
 
 #define FUNC_QuitEnteringCar                        0x650130 // really belongs in CCarEnterExit
 
-#define FUNC_CanPedReturnToState		0x5018D0
-#define FUNC_ClearAimFlag				0x50B4A0
-#define FUNC_ClearAll					0x509DF0
-#define FUNC_ClearAttackByRemovingAnim	0x52CF70
-#define FUNC_ClearInvestigateEvent		0x526BA0
-#define FUNC_ClearLookFlag				0x50B9C0
-#define FUNC_ClearObjective				0x521720
-#define FUNC_ClearPointGunAt			0x52DBE0
-#define FUNC_ClearWeapons				0x4FF740
-#define FUNC_CreateDeadPedMoney			0x43E2C0
-#define FUNC_CreateDeadPedWeaponPickups	0x43DF30
-#define FUNC_GetLocalDirection			0x5035F0
+#define FUNC_CanPedReturnToState        0x5018D0
+#define FUNC_ClearAimFlag               0x50B4A0
+#define FUNC_ClearAll                   0x509DF0
+#define FUNC_ClearAttackByRemovingAnim  0x52CF70
+#define FUNC_ClearInvestigateEvent      0x526BA0
+#define FUNC_ClearLookFlag              0x50B9C0
+#define FUNC_ClearObjective             0x521720
+#define FUNC_ClearPointGunAt            0x52DBE0
+#define FUNC_ClearWeapons               0x4FF740
+#define FUNC_CreateDeadPedMoney         0x43E2C0
+#define FUNC_CreateDeadPedWeaponPickups 0x43DF30
+#define FUNC_GetLocalDirection          0x5035F0
 #define FUNC_GetWeaponSlot              0x5DF200 // ##SA##
 #define FUNC_SetCurrentWeapon           0x5E61F0 // ##SA##
-#define FUNC_GiveWeapon					0x5E6080 // ##SA##
+#define FUNC_GiveWeapon                 0x5E6080 // ##SA##
 #define FUNC_GetBonePosition            0x5E4280 // ##SA##
 #define FUNC_GetTransformedBonePosition 0x5E01C0 // ##SA##
 #define FUNC_IsWearingGoggles           0x479D10 // ##SA##
@@ -76,38 +76,38 @@ class CPedIntelligenceSAInterface;
 #define FUNC_RemoveWeaponModel          0x5E3990 // ##SA## (call with -1 to remove any model, I think)
 #define FUNC_RemoveGogglesModel         0x5DF170 // ##SA## 
 #define FUNC_ClearWeapon                0x5E62B0 // ##SA##
-#define FUNC_GetHealth					0x4ABC20
-#define FUNC_SetCurrentWeaponFromID		0x4FF8E0
-#define FUNC_SetCurrentWeaponFromSlot	0x4FF900
-#define FUNC_IsPedInControl				0x501950
-#define FUNC_IsPedShootable				0x501930
-#define FUNC_SetAttackTimer				0x4FCAB0
-#define FUNC_SetDead					0x4F6430
-#define FUNC_SetDie						0x4F65C0
-#define FUNC_SetEvasiveDive				0x4F6A20
-#define FUNC_SetEvasiveStep				0x4F7170
-#define FUNC_SetFall					0x4FD9F0
-#define FUNC_SetFlee					0x4FBA90
-#define FUNC_SetIdle					0x4FDFD0
-#define FUNC_SetLeader					0x4F07D0
-#define FUNC_SetLookFlag				0x50BB70
-#define FUNC_SetLookTimer				0x4FCAF0
-#define FUNC_SetMoveState				0x50D110
-#define FUNC_SetObjective_ENTITY		0x521F10
-#define FUNC_SetObjective				0x5224B0
-#define FUNC_SetObjective_VECTOR		0x521840
-#define FUNC_SetSeekCar					0x4F54D0
-#define FUNC_SetShootTimer				0x4FCA90
-#define FUNC_SetSolicit					0x4F1400
-#define FUNC_SetStoredState				0x50CC40
-#define FUNC_RestorePreviousState		0x50C600
-#define FUNC_SetWaitState				0x4F28A0
-#define FUNC_Teleport					0x4F5690
-#define FUNC_WarpPedIntoCar				0x4EF8B0
+#define FUNC_GetHealth                  0x4ABC20
+#define FUNC_SetCurrentWeaponFromID     0x4FF8E0
+#define FUNC_SetCurrentWeaponFromSlot   0x4FF900
+#define FUNC_IsPedInControl             0x501950
+#define FUNC_IsPedShootable             0x501930
+#define FUNC_SetAttackTimer             0x4FCAB0
+#define FUNC_SetDead                    0x4F6430
+#define FUNC_SetDie                     0x4F65C0
+#define FUNC_SetEvasiveDive             0x4F6A20
+#define FUNC_SetEvasiveStep             0x4F7170
+#define FUNC_SetFall                    0x4FD9F0
+#define FUNC_SetFlee                    0x4FBA90
+#define FUNC_SetIdle                    0x4FDFD0
+#define FUNC_SetLeader                  0x4F07D0
+#define FUNC_SetLookFlag                0x50BB70
+#define FUNC_SetLookTimer               0x4FCAF0
+#define FUNC_SetMoveState               0x50D110
+#define FUNC_SetObjective_ENTITY        0x521F10
+#define FUNC_SetObjective               0x5224B0
+#define FUNC_SetObjective_VECTOR        0x521840
+#define FUNC_SetSeekCar                 0x4F54D0
+#define FUNC_SetShootTimer              0x4FCA90
+#define FUNC_SetSolicit                 0x4F1400
+#define FUNC_SetStoredState             0x50CC40
+#define FUNC_RestorePreviousState       0x50C600
+#define FUNC_SetWaitState               0x4F28A0
+#define FUNC_Teleport                   0x4F5690
+#define FUNC_WarpPedIntoCar             0x4EF8B0
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
 
-#define VAR_LocalPlayer					0x94AD28
+#define VAR_LocalPlayer                 0x94AD28
 
 /*
 #ifndef CVehicleSA_DEFINED
@@ -268,9 +268,9 @@ class CPedSAInterface : public CPhysicalSAInterface // +1420  = current vehicle 
 {
 public:
     // current weapon slot 1184 ( and +1816?)
-	//CPedIKSAInterface		pedIK; // 528
-	//CWeaponSAInterface	Weapons[9];	// 1032
-	BYTE bPad[348];
+    //CPedIKSAInterface     pedIK; // 528
+    //CWeaponSAInterface    Weapons[9]; // 1032
+    BYTE bPad[348];
     CPedSoundSAInterface pedSound;
     BYTE bPad11[472 - sizeof(CPedSoundSAInterface)];
     CPedFlags pedFlags; // 1132 (16 bytes long including alignment probably)
@@ -294,10 +294,10 @@ public:
     BYTE bPad8[4];
     CEntitySAInterface * pContactEntity;
     BYTE bPad3[32];
-	CEntitySAInterface * CurrentObjective; // current vehicle    1420
+    CEntitySAInterface * CurrentObjective; // current vehicle    1420
     BYTE bPad2[8];  // 1424
-	BYTE bPedType;	// ped type? 0 = player, >1 = ped?  // 1432
-	BYTE bPad9[7];
+    BYTE bPedType;  // ped type? 0 = player, >1 = ped?  // 1432
+    BYTE bPad9[7];
     CWeaponSAInterface      Weapons[WEAPONSLOT_MAX];
     //weapons at +1440 ends at +1804
     BYTE bPad4[12];
@@ -313,36 +313,36 @@ public:
 
 class CPedSA : public virtual CPed, public virtual CPhysicalSA
 {
-	friend class CPoolsSA;
+    friend class CPoolsSA;
 private:
-	CWeaponSA			* m_pWeapons[WEAPONSLOT_MAX];
-	CPedIKSA			* m_pPedIK;
-	CPedIntelligenceSA	* m_pPedIntelligence;
+    CWeaponSA           * m_pWeapons[WEAPONSLOT_MAX];
+    CPedIKSA            * m_pPedIK;
+    CPedIntelligenceSA  * m_pPedIntelligence;
     CPedSAInterface     * m_pPedInterface;
     CPedSoundSA         * m_pPedSound;
 
-	DWORD				m_dwType;
+    DWORD               m_dwType;
     unsigned char       m_ucOccupiedSeat;
 public:
-	                    CPedSA(  );
-	                    CPedSA( CPedSAInterface * pedInterface );
+                        CPedSA(  );
+                        CPedSA( CPedSAInterface * pedInterface );
                         ~CPedSA();
 
     VOID                SetInterface( CEntitySAInterface * intInterface );
     CPedSAInterface *   GetPedInterface ( void ) { return ( CPedSAInterface * ) GetInterface (); }
-	void				Init();
-	void				SetModelIndex ( DWORD dwModelIndex );
-	void				AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
-	void				AttachPedToEntity(DWORD dwEntityInterface, CVector * vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType, bool bChangeCamera);
+    void                Init();
+    void                SetModelIndex ( DWORD dwModelIndex );
+    void                AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
+    void                AttachPedToEntity(DWORD dwEntityInterface, CVector * vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType, bool bChangeCamera);
     void                DetachPedFromEntity ( void );
-	
-	bool				CanSeeEntity(CEntity * entity, FLOAT fDistance);
-	CVehicle			* GetVehicle();
-	void				Respawn (CVector * position, bool bCameraCut);
+    
+    bool                CanSeeEntity(CEntity * entity, FLOAT fDistance);
+    CVehicle            * GetVehicle();
+    void                Respawn (CVector * position, bool bCameraCut);
     bool                AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
 
-	FLOAT				GetHealth       ( void );
-    void				SetHealth       ( float fHealth );
+    FLOAT               GetHealth       ( void );
+    void                SetHealth       ( float fHealth );
 
     float               GetArmor        ( void );
     void                SetArmor        ( float fArmor );
@@ -354,17 +354,17 @@ public:
     void                RemoveWeaponModel ( int iModel );
     void                ClearWeapon     ( eWeaponType weaponType );
 
-	void				SetIsStanding( bool bStanding );
+    void                SetIsStanding( bool bStanding );
     CPedIntelligence *  GetPedIntelligence ( void )     { return m_pPedIntelligence; }
     CPedSound *         GetPedSound ( void )            { return m_pPedSound; }
-	DWORD				GetType ( void );
-	void				SetType ( DWORD dwType );
+    DWORD               GetType ( void );
+    void                SetType ( DWORD dwType );
     DWORD               * GetMemoryValue ( DWORD dwOffset );
 
-	FLOAT		        GetCurrentRotation();
-	FLOAT		        GetTargetRotation();
-	void		        SetCurrentRotation(FLOAT fRotation);
-	void		        SetTargetRotation(FLOAT fRotation);
+    FLOAT               GetCurrentRotation();
+    FLOAT               GetTargetRotation();
+    void                SetCurrentRotation(FLOAT fRotation);
+    void                SetTargetRotation(FLOAT fRotation);
 
     eWeaponSlot         GetCurrentWeaponSlot ();
     void                SetCurrentWeaponSlot ( eWeaponSlot weaponSlot );
@@ -375,7 +375,7 @@ public:
     bool                IsDucking ( void );
     void                SetDucking ( bool bDuck );
 
-	bool				IsInWater ( void );
+    bool                IsInWater ( void );
 
     int                 GetCantBeKnockedOffBike ( void );
     void                SetCantBeKnockedOffBike ( int iCantBeKnockedOffBike );
@@ -384,8 +384,8 @@ public:
     bool                IsWearingGoggles ( void );
     void                SetGogglesState ( bool bIsWearingThem );
 
-	void			    SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType );
-	void			    RebuildPlayer ( void );
+    void                SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType );
+    void                RebuildPlayer ( void );
 
     eFightingStyle      GetFightingStyle ( void );
     void                SetFightingStyle ( eFightingStyle style, BYTE bStyleExtra = 6 );

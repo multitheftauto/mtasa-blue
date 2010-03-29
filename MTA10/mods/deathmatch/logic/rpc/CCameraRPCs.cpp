@@ -102,7 +102,7 @@ void CCameraRPCs::FadeCamera ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucFadeIn ) &&
          bitStream.Read ( fFadeTime ) )
     {
-		g_pClientGame->SetInitiallyFadedOut ( false );
+        g_pClientGame->SetInitiallyFadedOut ( false );
 
         if ( ucFadeIn )
         {

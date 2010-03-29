@@ -30,7 +30,7 @@ public:
 
 private:
     CVector                 m_vecPosition;
-    float					m_fSize;
+    float                   m_fSize;
 };
 
 #endif

@@ -360,8 +360,8 @@ void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
     CEntityAddPacket Packet;
     Packet.Add ( pElement );
 
-	//a list of per player elements we will process the last
-	list < CPerPlayerEntity* > pPerPlayerList;
+    //a list of per player elements we will process the last
+    list < CPerPlayerEntity* > pPerPlayerList;
 
     if ( pElement->CountChildren() > 0 )
         BroadcastElementChildren ( pElement, Packet, pPerPlayerList, bBroadcastAll );
@@ -369,11 +369,11 @@ void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
     //send to all players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( Packet );
 
-	list < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
+    list < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
     for ( ; iter != pPerPlayerList.end(); iter++ )
-	{
-		(*iter)->Sync ( true );
-	}
+    {
+        (*iter)->Sync ( true );
+    }
 }
 
 
@@ -390,7 +390,7 @@ void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacke
             // Is it a per-player entity
             if ( pTemp->IsPerPlayerEntity () )
             {
-				pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pTemp ) );
+                pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pTemp ) );
             }
             else
             {
@@ -432,8 +432,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned char ucWeatherBlendingTo = m_pBlendedWeather->GetWeatherBlendingTo ();
     unsigned char ucBlendedWeatherHour = m_pBlendedWeather->GetBlendedStopHour ();
 
-	// FPS Limit
-	unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
+    // FPS Limit
+    unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
 
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
@@ -515,7 +515,7 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
         }
         if ( pVehicle->GetJackingPlayer () == &Player )
             pVehicle->SetJackingPlayer ( NULL );
-    }	
+    }   
 
     // Update the player data
     Player.SetSpawned ( true );
@@ -815,11 +815,11 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-	else if ( strBuffer.empty () )
-	{
-		// Comment, return true
-		return true;
-	}
+    else if ( strBuffer.empty () )
+    {
+        // Comment, return true
+        return true;
+    }
     else
     {
         pNode = m_pGroups->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );

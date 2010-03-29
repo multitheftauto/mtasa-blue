@@ -18,7 +18,7 @@
 
 CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szEdit )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -29,8 +29,8 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setRect ( CEGUI::Absolute, CEGUI::Rect (0.00f, 0.00f, 0.128f, 0.24f ) );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     // Register our event
     m_pWindow->subscribeEvent ( CEGUI::Editbox::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnKeyDown, this ) );
@@ -180,8 +180,8 @@ bool CGUIEdit_Impl::ActivateOnTab ( void )
 
 bool CGUIEdit_Impl::Event_OnTextChanged ( const CEGUI::EventArgs& e )
 {
-	if ( m_OnTextChanged )
-		m_OnTextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
+    if ( m_OnTextChanged )
+        m_OnTextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

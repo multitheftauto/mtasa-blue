@@ -15,23 +15,23 @@
 
 #include <game/CText.h>
 
-#define FUNC_CText_Get			0x6A0050
+#define FUNC_CText_Get          0x6A0050
 
-#define MAX_TEXT_ENTRIES		512
+#define MAX_TEXT_ENTRIES        512
 
 struct TextEntry
 {
-	char szKey[16];
-	char szValue[255];
+    char szKey[16];
+    char szValue[255];
 };
 
 class CTextSA : public CText
 {
 public:
-	CTextSA();
-	char	* GetText(char * szKey);
-	void	SetText(char * szKey, char * szValue);
-	//char	* GetReplacementText ( char * szKey );
+    CTextSA();
+    char    * GetText(char * szKey);
+    void    SetText(char * szKey, char * szValue);
+    //char  * GetReplacementText ( char * szKey );
 };
 
 #endif

@@ -159,19 +159,19 @@ private:
 
 
 
-#define FUNC_GetVehicle						0x54fff0
-#define FUNC_GetVehicleRef					0x54ffc0
-//#define FUNC_GetVehicleCount				0x429510
-#define FUNC_GetPed							0x54ff90
-#define FUNC_GetPedRef						0x54ff60
-//#define FUNC_GetPedCount					0x4A7440
-#define FUNC_GetObject						0x550050
-#define FUNC_GetObjectRef					0x550020
-//#define FUNC_GetObjectCount					0x4A74D0
+#define FUNC_GetVehicle                     0x54fff0
+#define FUNC_GetVehicleRef                  0x54ffc0
+//#define FUNC_GetVehicleCount              0x429510
+#define FUNC_GetPed                         0x54ff90
+#define FUNC_GetPedRef                      0x54ff60
+//#define FUNC_GetPedCount                  0x4A7440
+#define FUNC_GetObject                      0x550050
+#define FUNC_GetObjectRef                   0x550020
+//#define FUNC_GetObjectCount                   0x4A74D0
 
-#define CLASS_CPool_Vehicle					0xB74494
-#define CLASS_CPool_Ped						0xB74490
-#define CLASS_CPool_Object					0xB7449C
+#define CLASS_CPool_Vehicle                 0xB74494
+#define CLASS_CPool_Ped                     0xB74490
+#define CLASS_CPool_Object                  0xB7449C
 
 #define CLASS_CBuildingPool                 0xb74498
 #define CLASS_CPedPool                      0xb74490

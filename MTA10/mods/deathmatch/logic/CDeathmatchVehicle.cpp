@@ -39,7 +39,7 @@ CDeathmatchVehicle::~CDeathmatchVehicle ( void )
 void CDeathmatchVehicle::SetIsSyncing ( bool bIsSyncing )
 {
     m_bIsSyncing = bIsSyncing;
-	SetSyncUnoccupiedDamage( m_bIsSyncing );
+    SetSyncUnoccupiedDamage( m_bIsSyncing );
 }
 
 

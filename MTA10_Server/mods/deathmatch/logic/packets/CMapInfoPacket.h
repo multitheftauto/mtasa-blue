@@ -65,7 +65,7 @@ private:
     bool                    m_bHasSkyGradient;
     unsigned char           m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
-	unsigned short			m_usFPSLimit;
+    unsigned short          m_usFPSLimit;
     bool*                   m_pbGarageStates;
     bool                    m_bCloudsEnabled;
 };

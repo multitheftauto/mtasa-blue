@@ -17,7 +17,7 @@ class CLocalGUI;
 #define __CLOCALGUI_H
 
 #ifndef WM_MOUSEWHEEL
-#define WM_MOUSEWHEEL 0x20A	// Defined only when including Windows.h -> Not getting defined? (<=XP only?)
+#define WM_MOUSEWHEEL 0x20A // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
 #endif
 
 // DirectX rendering library (some abstraction would be nice here to avoid this)
@@ -57,8 +57,8 @@ public:
                         CLocalGUI                        ( void );
                         ~CLocalGUI                       ( void );
 
-	void				CreateWindows				( void );
-	void				DestroyWindows				( void );
+    void                CreateWindows               ( void );
+    void                DestroyWindows              ( void );
 
     void                CreateObjects               ( IUnknown* pDevice );
     void                DestroyObjects              ( void );
@@ -101,13 +101,13 @@ public:
     inline bool         IsCursorForcedVisible       ( void )                { return m_bForceCursorVisible; }
     void                ForceCursorVisible          ( bool bVisible );
 
-	void				KeyDownHandler				( bool bHandled );
+    void                KeyDownHandler              ( bool bHandled );
 
-	void				ShownHandler				( bool bHandled );
-	void				HiddenHandler				( bool bHandled );
+    void                ShownHandler                ( bool bHandled );
+    void                HiddenHandler               ( bool bHandled );
 
-	int					GetVisibleWindows			( );
-	void				SetVisibleWindows			( bool bEnable );
+    int                 GetVisibleWindows           ( );
+    void                SetVisibleWindows           ( bool bEnable );
 
 private:
     void                    UpdateCursor                ( void );
@@ -125,10 +125,10 @@ private:
     CVersionUpdateChecker   m_VersionUpdateChecker;
 
 
-	CGUILabel*			    m_pLabelVersionTag;
+    CGUILabel*              m_pLabelVersionTag;
 
-	int					    m_iVisibleWindows;
-	bool				    m_bVisibleWindows;
+    int                     m_iVisibleWindows;
+    bool                    m_bVisibleWindows;
 
     bool                    m_bForceCursorVisible;
     bool                    m_bChatboxVisible;

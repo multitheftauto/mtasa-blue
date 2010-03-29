@@ -22,7 +22,7 @@ class CXMLAttributesImpl : public CXMLAttributes
 {
 public:
                                     CXMLAttributesImpl          ( TiXmlElement& Node );
-									~CXMLAttributesImpl         ( void );
+                                    ~CXMLAttributesImpl         ( void );
 
     unsigned int                    Count                       ( void );
     class CXMLAttribute*            Find                        ( const char* szName );
@@ -32,21 +32,21 @@ public:
     class CXMLAttribute*            Create                      ( const class CXMLAttribute& Copy );
     void                            DeleteAll                   ( void );
 
-	TiXmlElement&                   GetNode                     ( void );
+    TiXmlElement&                   GetNode                     ( void );
 
-    class CXMLAttribute*			AddToList                   ( class CXMLAttribute* pAttribute );
+    class CXMLAttribute*            AddToList                   ( class CXMLAttribute* pAttribute );
     void                            RemoveFromList              ( class CXMLAttribute* pAttribute );
 
-	std::list < CXMLAttribute* > ::iterator
-                                    ListBegin			        ( void )	{ return m_Attributes.begin (); }
-	std::list < CXMLAttribute* > ::iterator
-                                    ListEnd				        ( void )	{ return m_Attributes.end (); }
+    std::list < CXMLAttribute* > ::iterator
+                                    ListBegin                   ( void )    { return m_Attributes.begin (); }
+    std::list < CXMLAttribute* > ::iterator
+                                    ListEnd                     ( void )    { return m_Attributes.end (); }
 
 private:
     void                            CreateAttributes            ( void );
     void                            DeleteAttributes            ( void );
 
-	TiXmlElement&                   m_Node;
+    TiXmlElement&                   m_Node;
 
     std::list < CXMLAttribute* >    m_Attributes;
     bool                            m_bCanRemoveFromList;

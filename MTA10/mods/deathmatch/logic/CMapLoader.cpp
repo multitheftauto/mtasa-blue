@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CMapLoader.cpp
 *  PURPOSE:     Loading maps
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*				Jax <>
+*               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

@@ -23,7 +23,7 @@
 
 class CGUITabPanel_Impl : public CGUITabPanel, public CGUIElement_Impl
 {
-	friend class CGUITab_Impl;
+    friend class CGUITab_Impl;
 public:
                             CGUITabPanel_Impl       ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL );
                             ~CGUITabPanel_Impl      ( void );
@@ -36,7 +36,7 @@ public:
 
     bool                    IsTabSelected           ( CGUITab* pTab );
 
-	eCGUIType				GetType					( void ) { return CGUI_TABPANEL; };
+    eCGUIType               GetType                 ( void ) { return CGUI_TABPANEL; };
 
     void                    SetSelectionHandler     ( GUI_CALLBACK Callback );
 

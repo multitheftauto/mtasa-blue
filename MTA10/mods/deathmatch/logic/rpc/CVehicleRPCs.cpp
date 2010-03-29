@@ -26,10 +26,10 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_SIRENE_ON, SetVehicleSireneOn, "SetVehicleSireneOn" );
     AddHandler ( SET_VEHICLE_LANDING_GEAR_DOWN, SetVehicleLandingGearDown, "SetVehicleLandingGearDown" );
     AddHandler ( SET_HELICOPTER_ROTOR_SPEED, SetHelicopterRotorSpeed, "SetHelicopterRotorSpeed" );
-	AddHandler ( ADD_VEHICLE_UPGRADE, AddVehicleUpgrade, "AddVehicleUpgrade" );
+    AddHandler ( ADD_VEHICLE_UPGRADE, AddVehicleUpgrade, "AddVehicleUpgrade" );
     AddHandler ( ADD_ALL_VEHICLE_UPGRADES, AddAllVehicleUpgrades, "AddAllVehicleUpgrades" );
-	AddHandler ( REMOVE_VEHICLE_UPGRADE, RemoveVehicleUpgrade, "RemoveVehicleUpgrade" );
-	AddHandler ( SET_VEHICLE_DAMAGE_STATE, SetVehicleDamageState, "SetVehicleDamageState" );
+    AddHandler ( REMOVE_VEHICLE_UPGRADE, RemoveVehicleUpgrade, "RemoveVehicleUpgrade" );
+    AddHandler ( SET_VEHICLE_DAMAGE_STATE, SetVehicleDamageState, "SetVehicleDamageState" );
     AddHandler ( SET_VEHICLE_OVERRIDE_LIGHTS, SetVehicleOverrideLights, "SetVehicleOverrideLights" );
     AddHandler ( SET_VEHICLE_ENGINE_STATE, SetVehicleEngineState, "SetVehicleEngineState" );
     AddHandler ( SET_VEHICLE_DIRT_LEVEL, SetVehicleDirtLevel, "SetVehicleDirtLevel" );
@@ -283,122 +283,122 @@ void CVehicleRPCs::SetHelicopterRotorSpeed ( NetBitStreamInterface& bitStream )
 
 void CVehicleRPCs::AddVehicleUpgrade ( NetBitStreamInterface& bitStream )
 {
-	ElementID ID;
-	if ( bitStream.Read ( ID ) )
-	{
-		CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
-		if ( pVehicle )
-		{
-			unsigned short usUpgrade;
-			if ( bitStream.Read ( usUpgrade ) )
-			{
-				CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-				if ( pUpgrades )
-				{
-					pUpgrades->AddUpgrade ( usUpgrade );
-				}
-			}
-		}
-	}
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            unsigned short usUpgrade;
+            if ( bitStream.Read ( usUpgrade ) )
+            {
+                CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+                if ( pUpgrades )
+                {
+                    pUpgrades->AddUpgrade ( usUpgrade );
+                }
+            }
+        }
+    }
 }
 
 
 void CVehicleRPCs::AddAllVehicleUpgrades ( NetBitStreamInterface& bitStream )
 {
-	ElementID ID;
-	if ( bitStream.Read ( ID ) )
-	{
-		CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
-		if ( pVehicle )
-		{			
-			CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-			if ( pUpgrades )
-			{
-				pUpgrades->AddAllUpgrades ();
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {           
+            CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+            if ( pUpgrades )
+            {
+                pUpgrades->AddAllUpgrades ();
             }
-		}
-	}
+        }
+    }
 }
 
 
 void CVehicleRPCs::RemoveVehicleUpgrade ( NetBitStreamInterface& bitStream )
 {
-	ElementID ID;
-	if ( bitStream.Read ( ID ) )
-	{
-		CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
-		if ( pVehicle )
-		{
-			unsigned char ucUpgrade;
-			if ( bitStream.Read ( ucUpgrade ) )
-			{
-				// Convert back and add
-				unsigned short usUpgrade = ( ucUpgrade + 1000 );
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            unsigned char ucUpgrade;
+            if ( bitStream.Read ( ucUpgrade ) )
+            {
+                // Convert back and add
+                unsigned short usUpgrade = ( ucUpgrade + 1000 );
 
-				CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-				if ( pUpgrades )
-				{
-					pUpgrades->RemoveUpgrade ( usUpgrade );
-				}
-			}
-		}
-	}
+                CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+                if ( pUpgrades )
+                {
+                    pUpgrades->RemoveUpgrade ( usUpgrade );
+                }
+            }
+        }
+    }
 }
 
 
 void CVehicleRPCs::SetVehicleDamageState ( NetBitStreamInterface& bitStream )
 {
-	ElementID ID;
-	if ( bitStream.Read ( ID ) )
-	{
-		CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
-		if ( pVehicle )
-		{
-			unsigned char ucObject;
-			if ( bitStream.Read ( ucObject ) )
-			{
-				switch ( ucObject )
-				{
-					case 0:	// Door
-					{
-						unsigned char ucDoor, ucState;
-						if ( bitStream.Read ( ucDoor ) && bitStream.Read ( ucState ) )
-						{
-							pVehicle->SetDoorStatus ( ucDoor, ucState );
-						}
-						break;
-					}
-					case 1: // Wheel
-					{
-						unsigned char ucWheel, ucState;
-						if ( bitStream.Read ( ucWheel ) && bitStream.Read ( ucState ) )
-						{
-							pVehicle->SetWheelStatus ( ucWheel, ucState, false );
-						}
-						break;
-					}
-					case 2: // Light
-					{
-						unsigned char ucLight, ucState;
-						if ( bitStream.Read ( ucLight ) && bitStream.Read ( ucState ) )
-						{
-							pVehicle->SetLightStatus ( ucLight, ucState );
-						}
-						break;
-					}
-					case 3: // Panel
-					{
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            unsigned char ucObject;
+            if ( bitStream.Read ( ucObject ) )
+            {
+                switch ( ucObject )
+                {
+                    case 0: // Door
+                    {
+                        unsigned char ucDoor, ucState;
+                        if ( bitStream.Read ( ucDoor ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetDoorStatus ( ucDoor, ucState );
+                        }
+                        break;
+                    }
+                    case 1: // Wheel
+                    {
+                        unsigned char ucWheel, ucState;
+                        if ( bitStream.Read ( ucWheel ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetWheelStatus ( ucWheel, ucState, false );
+                        }
+                        break;
+                    }
+                    case 2: // Light
+                    {
+                        unsigned char ucLight, ucState;
+                        if ( bitStream.Read ( ucLight ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetLightStatus ( ucLight, ucState );
+                        }
+                        break;
+                    }
+                    case 3: // Panel
+                    {
                         unsigned char ucPanel, ucState;
-						if ( bitStream.Read ( ucPanel ) && bitStream.Read ( ucState ) )
-						{
-							pVehicle->SetPanelStatus ( ucPanel, ucState );
-						}
-					}
-					default: break;
-				}
-			}
-		}
-	}
+                        if ( bitStream.Read ( ucPanel ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetPanelStatus ( ucPanel, ucState );
+                        }
+                    }
+                    default: break;
+                }
+            }
+        }
+    }
 }
 
 

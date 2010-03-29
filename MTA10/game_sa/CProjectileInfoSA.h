@@ -22,15 +22,15 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#define PROJECTILE_COUNT					32
+#define PROJECTILE_COUNT                    32
 #define PROJECTILE_INFO_COUNT               32
 
-#define FUNC_RemoveAllProjectiles			0x5C69D0
+#define FUNC_RemoveAllProjectiles           0x5C69D0
 #define FUNC_RemoveProjectile               0x7388F0 //##SA##
-#define FUNC_AddProjectile					0x737C80 //##SA##
+#define FUNC_AddProjectile                  0x737C80 //##SA##
 
-#define ARRAY_CProjectile					0xC89110 //##SA##
-#define ARRAY_CProjectileInfo				0xC891A8 //##SA##
+#define ARRAY_CProjectile                   0xC89110 //##SA##
+#define ARRAY_CProjectileInfo               0xC891A8 //##SA##
 
 #define VTBL_CProjectile 0x867030
 
@@ -38,13 +38,13 @@
 class CProjectileInfoSAInterface
 {
 public:
-	eWeaponType					dwProjectileType;
-	CEntitySAInterface			* pEntProjectileOwner;
+    eWeaponType                 dwProjectileType;
+    CEntitySAInterface          * pEntProjectileOwner;
     CEntitySAInterface          * pEntProjectileTarget;
-	DWORD						dwCounter;
-	BYTE						bProjectileActive;
+    DWORD                       dwCounter;
+    BYTE                        bProjectileActive;
     BYTE                        bPad [ 3 ];
-	CVector					    OldCoors;
+    CVector                     OldCoors;
     DWORD                       dwUnk;
 };
 //#pragma pack(pop)
@@ -55,7 +55,7 @@ private:
     CProjectileInfoSA  *             projectileInfo[PROJECTILE_INFO_COUNT];
     CProjectileInfoSAInterface *            internalInterface;
 public:
-    CProjectileInfoSA		(  )
+    CProjectileInfoSA       (  )
     {
         for ( int i = 0; i < PROJECTILE_INFO_COUNT; i++ )
         {
@@ -69,13 +69,13 @@ public:
     }
 
 
-	void					RemoveAllProjectiles (  );
+    void                    RemoveAllProjectiles (  );
     void                    RemoveProjectile ( CProjectileInfo * pProjectileInfo, CProjectile * pProjectile );
-	CProjectile				* GetProjectile ( DWORD ID );
+    CProjectile             * GetProjectile ( DWORD ID );
     CProjectileInfo         * GetProjectileInfo ( void * projectileInfoInterface );
     CProjectileInfo         * GetProjectileInfo ( DWORD dwIndex );
     CProjectileInfo         * GetNextFreeProjectileInfo ( );
-	bool					 AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
+    bool                     AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity );
     CProjectile *           GetProjectile ( void * projectilePointer );
 
     CEntity*                GetTarget ( void );

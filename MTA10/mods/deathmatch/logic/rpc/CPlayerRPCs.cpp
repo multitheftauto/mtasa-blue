@@ -109,7 +109,7 @@ void CPlayerRPCs::SetPlayerNametagText ( NetBitStreamInterface& bitStream )
             if ( usTextLength > 0 )
             {
                 szText = new char [ usTextLength + 1 ];                
-				szText [ usTextLength ] = NULL;
+                szText [ usTextLength ] = NULL;
                 if ( bitStream.Read ( szText, usTextLength ) )
                 {
                     pPlayer->SetNametagText ( szText );

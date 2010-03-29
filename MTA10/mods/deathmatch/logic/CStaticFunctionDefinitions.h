@@ -28,13 +28,13 @@ class CStaticFunctionDefinitions;
 class CStaticFunctionDefinitions
 {
 public:
-										CStaticFunctionDefinitions          ( class CLuaManager* pLuaManager,
-																			  CEvents* pEvents,
-																			  CCoreInterface* pCore,
+                                        CStaticFunctionDefinitions          ( class CLuaManager* pLuaManager,
+                                                                              CEvents* pEvents,
+                                                                              CCoreInterface* pCore,
                                                                               CGame* pGame,
-																			  CClientGame* pClientGame,
-																			  CClientManager* pManager );
-										~CStaticFunctionDefinitions         ( void );
+                                                                              CClientGame* pClientGame,
+                                                                              CClientManager* pManager );
+                                        ~CStaticFunctionDefinitions         ( void );
 
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
     static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction, bool bPropagated );
@@ -45,11 +45,11 @@ public:
     static bool                         WasEventCancelled                   ( void );
 
     // Output funcs
-    static bool							OutputConsole                       ( const char* szText );
-    static bool							OutputChatBox                       ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
+    static bool                         OutputConsole                       ( const char* szText );
+    static bool                         OutputChatBox                       ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
     static bool                         ShowChat                            ( bool bShow );
 
-	// Element get funcs
+    // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );
     static CClientEntity*               GetElementByID                      ( const char* szID, unsigned int uiIndex );
     static CClientEntity*               GetElementByIndex                   ( const char* szType, unsigned int uiIndex );
@@ -121,50 +121,50 @@ public:
     static char*                        GetPedSimplestTask                  ( CClientPed& Ped );
     static bool                         IsPedDoingTask                      ( CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask );
     static bool                         GetPedBonePosition                  ( CClientPed& Ped, eBone bone, CVector & vecPosition );
-	static bool							GetPedClothes						( CClientPed& Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn );
+    static bool                         GetPedClothes                       ( CClientPed& Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn );
     static bool                         GetPedControlState                  ( CClientPed& Ped, const char * szControl, bool & bState );
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
     static bool                         GetPedAnimation                     ( CClientPed& Ped, char * szBlockName, char * szAnimName, unsigned int uiLength );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
     static bool                         IsPedFrozen                         ( CClientPed& Ped, bool & bFrozen );
-	static bool                         GetPedCameraRotation                ( CClientPed& Ped, float & fRotation );
+    static bool                         GetPedCameraRotation                ( CClientPed& Ped, float & fRotation );
     static bool                         GetPedWeaponMuzzlePosition          ( CClientPed& Ped, CVector& vecPosition );
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
     static bool                         IsPedInVehicle                      ( CClientPed& Ped, bool & bInVehicle );
 
-    static bool							SetPedWeaponSlot					( CClientEntity& Entity, int iSlot );
+    static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
     static bool                         SetPedMoveAnim                      ( CClientEntity& Entity, unsigned int iMoveAnim );
-    static bool                         AddPedClothes						( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
-    static bool                         RemovePedClothes					( CClientEntity& Entity, unsigned char ucType );
+    static bool                         AddPedClothes                       ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
+    static bool                         RemovePedClothes                    ( CClientEntity& Entity, unsigned char ucType );
     static bool                         SetPedControlState                  ( CClientEntity& Entity, const char* szControl, bool bState );
     static bool                         SetPedDoingGangDriveby              ( CClientEntity& Entity, bool bGangDriveby );
     static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
     static bool                         SetPedFrozen                        ( CClientEntity& Entity, bool bFrozen );
-	static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
+    static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
 
-	// Extra Clothes functions
-    static bool							GetBodyPartName                     ( unsigned char ucID, char* szName );
-    static bool							GetClothesByTypeIndex               ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn );
-    static bool							GetTypeIndexFromClothes             ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
-    static bool							GetClothesTypeName                  ( unsigned char ucType, char* szNameReturn );
+    // Extra Clothes functions
+    static bool                         GetBodyPartName                     ( unsigned char ucID, char* szName );
+    static bool                         GetClothesByTypeIndex               ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn );
+    static bool                         GetTypeIndexFromClothes             ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
+    static bool                         GetClothesTypeName                  ( unsigned char ucType, char* szNameReturn );
 
 
     // Vehicle get funcs
     static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL );
     static bool                         GetVehicleModelFromName             ( const char* szName, unsigned short& usModel );
-    static bool					        GetVehicleUpgradeSlotName			( unsigned char ucSlot, char* szName, unsigned short len );
-	static bool					        GetVehicleUpgradeSlotName			( unsigned short usUpgrade, char* szName, unsigned short len );
+    static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, char* szName, unsigned short len );
+    static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, char* szName, unsigned short len );
     static bool                         GetVehicleDoorsLocked               ( CClientVehicle& Vehicle, bool& bLocked );
     static bool                         GetVehicleDamageProof               ( CClientVehicle& Vehicle, bool& bDamageProof );
     static bool                         GetVehicleNameFromModel             ( unsigned short usModel, char* szName, unsigned short len );
-	static bool							GetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float& fSpeed );
+    static bool                         GetHelicopterRotorSpeed             ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetVehicleEngineState               ( CClientVehicle& Vehicle, bool& bState );
     static bool                         IsTrainDerailed                     ( CClientVehicle& Vehicle, bool& bDerailed );
     static bool                         IsTrainDerailable                   ( CClientVehicle& Vehicle, bool& bIsDerailable );
@@ -183,13 +183,13 @@ public:
     static bool                         SetVehicleRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         SetVehicleSirensOn                  ( CClientEntity& Entity, bool bSirensOn );
     static bool                         SetVehicleTurnVelocity              ( CClientEntity& Entity, const CVector& vecTurnVelocity );
-	static bool					        AddVehicleUpgrade					( CClientEntity& Entity, unsigned short usUpgrade );
+    static bool                         AddVehicleUpgrade                   ( CClientEntity& Entity, unsigned short usUpgrade );
     static bool                         AddAllVehicleUpgrades               ( CClientEntity& Entity );
-    static bool					        RemoveVehicleUpgrade				( CClientEntity& Entity, unsigned short usUpgrade );
-	static bool					        SetVehicleDoorState					( CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState );
-	static bool					        SetVehicleWheelStates				( CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1 );
-	static bool					        SetVehicleLightState				( CClientEntity& Entity, unsigned char ucLight, unsigned char ucState );
-	static bool					        SetVehiclePanelState				( CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState );
+    static bool                         RemoveVehicleUpgrade                ( CClientEntity& Entity, unsigned short usUpgrade );
+    static bool                         SetVehicleDoorState                 ( CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState );
+    static bool                         SetVehicleWheelStates               ( CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1 );
+    static bool                         SetVehicleLightState                ( CClientEntity& Entity, unsigned char ucLight, unsigned char ucState );
+    static bool                         SetVehiclePanelState                ( CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState );
     static bool                         SetVehicleOverrideLights            ( CClientEntity& Entity, unsigned char ucLights );
     static bool                         AttachTrailerToVehicle              ( CClientVehicle& Vehicle, CClientVehicle& Trailer );
     static bool                         DetachTrailerFromVehicle            ( CClientVehicle& Vehicle, CClientVehicle* pTrailer = NULL );
@@ -200,8 +200,8 @@ public:
     static bool                         SetVehicleFuelTankExplodable        ( CClientEntity& Entity, bool bExplodable );
     static bool                         SetVehicleFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetVehicleAdjustableProperty        ( CClientEntity& Entity, unsigned short usAdjustableProperty );
-	static bool							SetHelicopterRotorSpeed				( CClientVehicle& Vehicle, float fSpeed );
-	static bool							SetTrainDerailed				    ( CClientVehicle& Vehicle, bool bDerailed );
+    static bool                         SetHelicopterRotorSpeed             ( CClientVehicle& Vehicle, float fSpeed );
+    static bool                         SetTrainDerailed                    ( CClientVehicle& Vehicle, bool bDerailed );
     static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
     static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
@@ -215,18 +215,18 @@ public:
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation );
     static bool                         StopObject                          ( CClientEntity& Entity );
-	static bool							SetObjectScale						( CClientEntity& Entity, float fScale );
+    static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
     
     // Radar-area get funcs
     static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );
-	static bool							GetRadarAreaColor					( CClientRadarArea* RadarArea, SColor& outColor );
-	static bool							GetRadarAreaSize					( CClientRadarArea* RadarArea, CVector2D& vecSize );
-	static bool							IsRadarAreaFlashing					( CClientRadarArea* RadarArea, bool& flashing );
-	static bool							SetRadarAreaColor					( CClientRadarArea* RadarArea, const SColor color );
-	static bool							SetRadarAreaSize					( CClientRadarArea* RadarArea, CVector2D vecSize );
-	static bool							SetRadarAreaFlashing				( CClientRadarArea* RadarArea, bool flashing );
-	static bool							IsInsideRadarArea					( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside );
+    static bool                         GetRadarAreaColor                   ( CClientRadarArea* RadarArea, SColor& outColor );
+    static bool                         GetRadarAreaSize                    ( CClientRadarArea* RadarArea, CVector2D& vecSize );
+    static bool                         IsRadarAreaFlashing                 ( CClientRadarArea* RadarArea, bool& flashing );
+    static bool                         SetRadarAreaColor                   ( CClientRadarArea* RadarArea, const SColor color );
+    static bool                         SetRadarAreaSize                    ( CClientRadarArea* RadarArea, CVector2D vecSize );
+    static bool                         SetRadarAreaFlashing                ( CClientRadarArea* RadarArea, bool flashing );
+    static bool                         IsInsideRadarArea                   ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside );
 
 
     // Pickup create/destroy funcs
@@ -238,8 +238,8 @@ public:
     // Explosion funcs
     static bool                         CreateExplosion                     ( CVector& vecPosition, unsigned char ucType, bool bMakeSound, float fCamShake, bool bDamaging );
 
-	// Fire funcs
-	static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
+    // Fire funcs
+    static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
 
     // Audio funcs
     static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
@@ -285,88 +285,88 @@ public:
     static bool                         IsCursorShowing                     ( bool& bShowing );
     
     // GUI funcs
-	static bool							GUIGetInputEnabled					( void );
-	static void							GUISetInputEnabled					( bool bEnabled );
+    static bool                         GUIGetInputEnabled                  ( void );
+    static void                         GUISetInputEnabled                  ( bool bEnabled );
 
-	static CClientGUIElement*			GUICreateWindow						( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
-	static CClientGUIElement*			GUICreateLabel						( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateButton						( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateEdit						( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateMemo						( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateGridList					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateTabPanel					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateScrollPane					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateTab						( CLuaMain& LuaMain, const char *szCaption, CClientGUIElement *pParent );
-	static CClientGUIElement*			GUICreateProgressBar				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateScrollBar					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateCheckBox					( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateRadioButton				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-	static CClientGUIElement*			GUICreateStaticImage				( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
-	
-	static bool							GUIStaticImageLoadImage				( CClientEntity& Element, const SString& strDir );
+    static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
+    static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateButton                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateEdit                       ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateMemo                       ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateGridList                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateTabPanel                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateScrollPane                 ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateTab                        ( CLuaMain& LuaMain, const char *szCaption, CClientGUIElement *pParent );
+    static CClientGUIElement*           GUICreateProgressBar                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateScrollBar                  ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateCheckBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateRadioButton                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateStaticImage                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
+    
+    static bool                         GUIStaticImageLoadImage             ( CClientEntity& Element, const SString& strDir );
 
     static bool                         GUISetSelectedTab                   ( CClientEntity& Element, CClientEntity& Tab );
     static CClientGUIElement*           GUIGetSelectedTab                   ( CClientEntity& Element );
-	static bool							GUIDeleteTab						( CLuaMain& LuaMain, CClientGUIElement *pTab, CClientGUIElement *pParent );
+    static bool                         GUIDeleteTab                        ( CLuaMain& LuaMain, CClientGUIElement *pTab, CClientGUIElement *pParent );
 
-	static void					        GUISetEnabled						( CClientEntity& Element, bool bFlag );
-	static void							GUISetProperty						( CClientEntity& Element, const char* szProperty, const char* szValue );
-	static void					        GUISetText							( CClientEntity& Element, const char* szText );
-	static bool					        GUISetFont							( CClientEntity& Element, const char* szFont );
-	static void					        GUISetSize							( CClientEntity& Element, const CVector2D& vecSize, bool bRelative );
-	static void					        GUISetPosition						( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
-	static void					        GUISetVisible						( CClientEntity& Element, bool bFlag );
-	static void					        GUISetAlpha							( CClientEntity& Element, float fAlpha );
-	static bool					        GUIBringToFront						( CClientEntity& Element );
-	static void					        GUIMoveToBack						( CClientEntity& Element );
+    static void                         GUISetEnabled                       ( CClientEntity& Element, bool bFlag );
+    static void                         GUISetProperty                      ( CClientEntity& Element, const char* szProperty, const char* szValue );
+    static void                         GUISetText                          ( CClientEntity& Element, const char* szText );
+    static bool                         GUISetFont                          ( CClientEntity& Element, const char* szFont );
+    static void                         GUISetSize                          ( CClientEntity& Element, const CVector2D& vecSize, bool bRelative );
+    static void                         GUISetPosition                      ( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
+    static void                         GUISetVisible                       ( CClientEntity& Element, bool bFlag );
+    static void                         GUISetAlpha                         ( CClientEntity& Element, float fAlpha );
+    static bool                         GUIBringToFront                     ( CClientEntity& Element );
+    static void                         GUIMoveToBack                       ( CClientEntity& Element );
 
-	static void					        GUICheckBoxSetSelected				( CClientEntity& Element, bool bFlag );
-	static void					        GUIRadioButtonSetSelected			( CClientEntity& Element, bool bFlag );
+    static void                         GUICheckBoxSetSelected              ( CClientEntity& Element, bool bFlag );
+    static void                         GUIRadioButtonSetSelected           ( CClientEntity& Element, bool bFlag );
 
-	static void					        GUIProgressBarSetProgress			( CClientEntity& Element, int iProgress );
+    static void                         GUIProgressBarSetProgress           ( CClientEntity& Element, int iProgress );
 
-	static void					        GUIScrollPaneSetScrollBars			( CClientEntity& Element, bool bH, bool bV );
+    static void                         GUIScrollPaneSetScrollBars          ( CClientEntity& Element, bool bH, bool bV );
 
-	static void					        GUIScrollBarSetScrollPosition		( CClientEntity& Element, int iProgress );
+    static void                         GUIScrollBarSetScrollPosition       ( CClientEntity& Element, int iProgress );
 
-	static void					        GUIScrollPaneSetHorizontalScrollPosition	( CClientEntity& Element, int iProgress );
-	static void					        GUIScrollPaneSetVerticalScrollPosition		( CClientEntity& Element, int iProgress );
+    static void                         GUIScrollPaneSetHorizontalScrollPosition    ( CClientEntity& Element, int iProgress );
+    static void                         GUIScrollPaneSetVerticalScrollPosition      ( CClientEntity& Element, int iProgress );
 
-	static inline const CVector2D		GUIGetScreenSize					( void )																					{ return g_pCore->GetGUI()->GetResolution (); };
-	
-    static void					        GUIEditSetReadOnly					( CClientEntity& Element, bool bFlag );
-	static void					        GUIEditSetMasked					( CClientEntity& Element, bool bFlag );
-	static void					        GUIEditSetMaxLength					( CClientEntity& Element, unsigned int iLength );
-	static void					        GUIEditSetCaratIndex				( CClientEntity& Element, unsigned int iCarat );
+    static inline const CVector2D       GUIGetScreenSize                    ( void )                                                                                    { return g_pCore->GetGUI()->GetResolution (); };
+    
+    static void                         GUIEditSetReadOnly                  ( CClientEntity& Element, bool bFlag );
+    static void                         GUIEditSetMasked                    ( CClientEntity& Element, bool bFlag );
+    static void                         GUIEditSetMaxLength                 ( CClientEntity& Element, unsigned int iLength );
+    static void                         GUIEditSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
 
-    static void					        GUIMemoSetReadOnly					( CClientEntity& Element, bool bFlag );
-	static void					        GUIMemoSetCaratIndex				( CClientEntity& Element, unsigned int iCarat );
+    static void                         GUIMemoSetReadOnly                  ( CClientEntity& Element, bool bFlag );
+    static void                         GUIMemoSetCaratIndex                ( CClientEntity& Element, unsigned int iCarat );
 
-	static void					        GUIGridListSetSortingEnabled		( CClientEntity& Element, bool bEnabled );
-	static inline unsigned int			GUIGridListAddColumn				( CClientGUIElement& GUIElement, const char *szTitle, float fWidth )						{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddColumn ( szTitle, fWidth ); };
-	static inline void					GUIGridListRemoveColumn				( CClientGUIElement& GUIElement, unsigned int uiColumn )									{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveColumn ( uiColumn ); };
-    static inline void					GUIGridListSetColumnWidth			( CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnWidth ( uiColumn, fWidth, bRelative ); };
-	static void					        GUIGridListSetScrollBars			( CClientEntity& Element, bool bH, bool bV );
-	static inline int					GUIGridListAddRow					( CClientGUIElement& GUIElement, bool bFast )															{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow ( bFast ); };
-	static inline int					GUIGridListInsertRowAfter			( CClientGUIElement& GUIElement, int iRow )												{ return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow ); };
-	static inline void					GUIGridListRemoveRow				( CClientGUIElement& GUIElement, int iRow )												{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveRow ( iRow ); };
-	static inline void					GUIGridListAutoSizeColumn			( CClientGUIElement& GUIElement, unsigned int uiColumn )									{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
-	static void					        GUIGridListClear					( CClientEntity& Element );
-	static inline void					GUIGridListSetItemText				( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber, bool bFast )	{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection, bFast ); };
-	static inline void					GUIGridListSetItemData				( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szData )				{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( iRow, iColumn, szData ); };
-	static void					        GUIGridListSetSelectionMode			( CClientEntity& Element, unsigned int uiMode );
-    static inline void					GUIGridListSetSelectedItem			( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )						{ static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
+    static void                         GUIGridListSetSortingEnabled        ( CClientEntity& Element, bool bEnabled );
+    static inline unsigned int          GUIGridListAddColumn                ( CClientGUIElement& GUIElement, const char *szTitle, float fWidth )                        { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddColumn ( szTitle, fWidth ); };
+    static inline void                  GUIGridListRemoveColumn             ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveColumn ( uiColumn ); };
+    static inline void                  GUIGridListSetColumnWidth           ( CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true )   { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnWidth ( uiColumn, fWidth, bRelative ); };
+    static void                         GUIGridListSetScrollBars            ( CClientEntity& Element, bool bH, bool bV );
+    static inline int                   GUIGridListAddRow                   ( CClientGUIElement& GUIElement, bool bFast )                                                           { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow ( bFast ); };
+    static inline int                   GUIGridListInsertRowAfter           ( CClientGUIElement& GUIElement, int iRow )                                             { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow ); };
+    static inline void                  GUIGridListRemoveRow                ( CClientGUIElement& GUIElement, int iRow )                                             { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveRow ( iRow ); };
+    static inline void                  GUIGridListAutoSizeColumn           ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
+    static void                         GUIGridListClear                    ( CClientEntity& Element );
+    static inline void                  GUIGridListSetItemText              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber, bool bFast )   { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection, bFast ); };
+    static inline void                  GUIGridListSetItemData              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szData )                { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( iRow, iColumn, szData ); };
+    static void                         GUIGridListSetSelectionMode         ( CClientEntity& Element, unsigned int uiMode );
+    static inline void                  GUIGridListSetSelectedItem          ( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )                       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
     static inline void                  GUIGridListSetItemColor             ( CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha )       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemColor ( iRow, iColumn, iRed, iGreen, iBlue, iAlpha ); };
 
 
-	static void					        GUIWindowSetMovable					( CClientEntity& Element, bool bFlag );
-	static void					        GUIWindowSetSizable					( CClientEntity& Element, bool bFlag );
-	static void					        GUIWindowSetCloseButtonEnabled		( CClientEntity& Element, bool bFlag );
-	static void					        GUIWindowSetTitleBarEnabled			( CClientEntity& Element, bool bFlag );
+    static void                         GUIWindowSetMovable                 ( CClientEntity& Element, bool bFlag );
+    static void                         GUIWindowSetSizable                 ( CClientEntity& Element, bool bFlag );
+    static void                         GUIWindowSetCloseButtonEnabled      ( CClientEntity& Element, bool bFlag );
+    static void                         GUIWindowSetTitleBarEnabled         ( CClientEntity& Element, bool bFlag );
 
-	static void					        GUILabelSetColor					( CClientEntity& Element, int iR, int iG, int iB );
-	static void					        GUILabelSetVerticalAlign			( CClientEntity& Element, CGUIVerticalAlign eAlign );
-	static void					        GUILabelSetHorizontalAlign			( CClientEntity& Element, CGUIHorizontalAlign eAlign );
+    static void                         GUILabelSetColor                    ( CClientEntity& Element, int iR, int iG, int iB );
+    static void                         GUILabelSetVerticalAlign            ( CClientEntity& Element, CGUIVerticalAlign eAlign );
+    static void                         GUILabelSetHorizontalAlign          ( CClientEntity& Element, CGUIHorizontalAlign eAlign );
 
     // World functions
     static bool                         GetTime                             ( unsigned char &ucHour, unsigned char &ucMin );
@@ -386,7 +386,7 @@ public:
     static bool                         GetGravity                          ( float& fGravity );
     static bool                         GetZoneName                         ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
     static bool                         GetGameSpeed                        ( float& fSpeed );
-	static bool							GetMinuteDuration					( unsigned long& ulDelay );
+    static bool                         GetMinuteDuration                   ( unsigned long& ulDelay );
     static bool                         GetWaveHeight                       ( float& fHeight );
     static bool                         IsGarageOpen                        ( unsigned char ucGarageID, bool& bIsOpen );
     static bool                         GetGaragePosition                   ( unsigned char ucGarageID, CVector& vecPosition );
@@ -399,14 +399,14 @@ public:
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
-	 static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
+     static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     static bool                         ResetWaterColor                     ( void );
     static bool                         SetWeather                          ( unsigned char ucWeather );
     static bool                         SetWeatherBlended                   ( unsigned char ucWeather );
     static bool                         SetGravity                          ( float fGravity );
     static bool                         SetGameSpeed                        ( float fSpeed );
     static bool                         SetWaveHeight                       ( float fHeight );
-	static bool							SetMinuteDuration					( unsigned long ulDelay );
+    static bool                         SetMinuteDuration                   ( unsigned long ulDelay );
     static bool                         SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
     static bool                         SetWorldSpecialPropertyEnabled      ( const char* szPropName, bool bEnabled );
     static bool                         SetBlurLevel                        ( unsigned char ucLevel );
@@ -436,7 +436,7 @@ public:
     static CClientColRectangle*         CreateColRectangle                  ( CResource& Resource, const CVector& vecPosition, const CVector2D& vecSize );
     static CClientColPolygon*           CreateColPolygon                    ( CResource& Resource, const CVector& vecPosition );
     static CClientColTube*              CreateColTube                       ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight );
-	static CClientColShape*				GetElementColShape					( CClientEntity* pEntity );
+    static CClientColShape*             GetElementColShape                  ( CClientEntity* pEntity );
     static void                         RefreshColShapeColliders            ( CClientColShape *pColShape );
 
     // Weapon funcs
@@ -487,8 +487,8 @@ public:
 
 #ifdef MTA_VOICE
     // Voice funcs
-	static bool							SetVoiceInputEnabled				( bool bEnabled );
-	static bool							SetVoiceMuteAllEnabled				( bool bEnabled );
+    static bool                         SetVoiceInputEnabled                ( bool bEnabled );
+    static bool                         SetVoiceMuteAllEnabled              ( bool bEnabled );
 #endif
 
     // Version funcs

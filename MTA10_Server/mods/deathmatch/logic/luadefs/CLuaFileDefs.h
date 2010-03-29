@@ -34,7 +34,7 @@ public:
     static int      fileWrite                           ( lua_State* luaVM );
     static int      fileFlush                           ( lua_State* luaVM );
     static int      fileClose                           ( lua_State* luaVM );
-	static int      fileDelete                          ( lua_State* luaVM );
+    static int      fileDelete                          ( lua_State* luaVM );
 };
 
 #endif

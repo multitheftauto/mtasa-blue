@@ -100,7 +100,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
-			assert ( pCustomData );
+            assert ( pCustomData );
             BitStream.WriteCompressed ( pCustomData->CountOnlySynchronized () );
             map < string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
             for ( ; iter != pCustomData->IterEnd (); iter++ )
@@ -346,7 +346,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // Write alpha
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pVehicle->GetAlpha ();
-                    BitStream.Write ( &alpha );	
+                    BitStream.Write ( &alpha ); 
 
                     // Write headlight color
                     SColor color = pVehicle->GetHeadLightColor ();

@@ -31,50 +31,50 @@ extern CGame* pGameInterface;
 
 /** Buffer overrun trace - attach debugger and watch out for EXCEPTION_GUARD_PAGE (0x80000001) **/
 #ifdef IJSIFY
-	#pragma message(__LOC__ "YOU HAVE ENABLED THE BOUNDS CHECKER. This may cause performance and/or stability issues!")
+    #pragma message(__LOC__ "YOU HAVE ENABLED THE BOUNDS CHECKER. This may cause performance and/or stability issues!")
 
-	#include <windows.h>
-	#include <math.h>
+    #include <windows.h>
+    #include <math.h>
 
-	inline void* __cdecl operator new ( size_t size )
-	{
-		DWORD dwOld;
-		DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
+    inline void* __cdecl operator new ( size_t size )
+    {
+        DWORD dwOld;
+        DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
 
-		DWORD dwPage = 0;
-		while ( dwPage == NULL ) {
-			dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
-		}
-		VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
-		dwPage += ( dwPageSpan - size );
+        DWORD dwPage = 0;
+        while ( dwPage == NULL ) {
+            dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
+        }
+        VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
+        dwPage += ( dwPageSpan - size );
 
-		return (LPVOID)dwPage;
-	};
+        return (LPVOID)dwPage;
+    };
 
-	inline void* __cdecl operator new [] ( size_t size )
-	{
-		DWORD dwOld;
-		DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
+    inline void* __cdecl operator new [] ( size_t size )
+    {
+        DWORD dwOld;
+        DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
 
-		DWORD dwPage = 0;
-		while ( dwPage == NULL ) {
-			dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
-		}
-		VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
-		dwPage += ( dwPageSpan - size );
+        DWORD dwPage = 0;
+        while ( dwPage == NULL ) {
+            dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
+        }
+        VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
+        dwPage += ( dwPageSpan - size );
 
-		return (LPVOID)dwPage;
-	};
+        return (LPVOID)dwPage;
+    };
 
-	inline void __cdecl operator delete ( LPVOID pPointer )
-	{
-		VirtualFree ( pPointer, NULL, MEM_RELEASE );
-	};
+    inline void __cdecl operator delete ( LPVOID pPointer )
+    {
+        VirtualFree ( pPointer, NULL, MEM_RELEASE );
+    };
 
-	inline void __cdecl operator delete [] ( LPVOID pPointer )
-	{
-		VirtualFree ( pPointer, NULL, MEM_RELEASE );
-	};
+    inline void __cdecl operator delete [] ( LPVOID pPointer )
+    {
+        VirtualFree ( pPointer, NULL, MEM_RELEASE );
+    };
 #endif
 
 #endif

@@ -25,17 +25,17 @@ using namespace std;
 
 #define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
 #define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_GAME	    "GTA GAME CONTROLS"
+#define CORE_SETTINGS_HEADER_GAME       "GTA GAME CONTROLS"
 #define CORE_SETTINGS_HEADER_MP         "MULTIPLAYER CONTROLS"
 #define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY			" "
-#define CORE_SETTINGS_COMMUNITY_TEXT	\
-	"Multi Theft Auto: Community is a voluntary community service offering everything\n" \
-	"from third-party resources to user-based statistics.\n" \
-	"\n" \
-	"If you have already registered at community.mtasa.com,\n" \
-	"you can fill in your account details below to complete your registration.\n" \
-	"This computer will then automatically link to your personal account."
+#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_SETTINGS_COMMUNITY_TEXT    \
+    "Multi Theft Auto: Community is a voluntary community service offering everything\n" \
+    "from third-party resources to user-based statistics.\n" \
+    "\n" \
+    "If you have already registered at community.mtasa.com,\n" \
+    "you can fill in your account details below to complete your registration.\n" \
+    "This computer will then automatically link to your personal account."
 
 extern CCore* g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -48,7 +48,7 @@ CSettings::CSettings ( void )
 
     // Init
     m_bCaptureKey = false;
-	m_dwFrameCount = 0;
+    m_dwFrameCount = 0;
     CVector2D vecTemp;
 
     // Create the window
@@ -65,16 +65,25 @@ CSettings::CSettings ( void )
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
 
+<<<<<<< HEAD
 	// Create the tab panel and necessary tabs
 	m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
 	m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
 	m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
 	pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
 	pTabVideo = m_pTabs->CreateTab ( "Video" );
+=======
+    // Create the tab panel and necessary tabs
+    m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
+    m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
+    m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
+    m_pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
+    pTabVideo = m_pTabs->CreateTab ( "Video" );
+>>>>>>> 22eb218... replace all tabs to spaces
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
-	pTabBinds = m_pTabs->CreateTab ( "Binds" );
+    pTabBinds = m_pTabs->CreateTab ( "Binds" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
-	pTabCommunity = m_pTabs->CreateTab ( "Community" );
+    pTabCommunity = m_pTabs->CreateTab ( "Community" );
     pTabChat = m_pTabs->CreateTab ( "Chatbox" );
 
     // Create buttons
@@ -86,22 +95,22 @@ CSettings::CSettings ( void )
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.92f ), true );
 
-	/**
-	 *	Binds tab
-	 **/
+    /**
+     *  Binds tab
+     **/
     m_pBindsList = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBinds, false ) );
     m_pBindsList->SetPosition ( CVector2D ( 0.02f, 0.05f ), true );
     m_pBindsList->SetSize ( CVector2D ( 520.0f, 225.0f ) );
-	m_pBindsList->SetSorting ( false );
-	m_pBindsList->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
+    m_pBindsList->SetSorting ( false );
+    m_pBindsList->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
 
-	m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
-	m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
-	m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
+    m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
+    m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
 
     /**
-	 *	Controls tab
-	 **/
+     *  Controls tab
+     **/
     // Toggles
     //Create everything under a scrollpane
 #if 0   // Keep this puppy handy 'case we need it again
@@ -120,8 +129,8 @@ CSettings::CSettings ( void )
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse options" ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
-	m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
-	m_pControlsMouseLabel->SetFont ( "default-bold-small" );
+    m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
+    m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
     m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Invert mouse vertically", true ) );
     m_pInvertMouse->SetPosition ( CVector2D ( 0.022f, 0.1f ), true );
@@ -137,8 +146,8 @@ CSettings::CSettings ( void )
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 0.022f, 0.27f ), true );
-	m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
-	m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
+    m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
+    m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
     m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pControlsPane ) ); 
@@ -184,21 +193,21 @@ CSettings::CSettings ( void )
 
         CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Dead Zone" ) );
         pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, -1.f ) );
-	    pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Saturation" ) );
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
-	    pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
-	    pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-	    pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
+        pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
+        pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
         pLabelHelp->SetPosition ( CVector2D ( 0.02f, 0.91f ), true );
-	    pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
+        pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
         pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         // Layout the mapping buttons like a dual axis joypad
@@ -223,17 +232,17 @@ CSettings::CSettings ( void )
             CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane ) );
             pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
             pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
-	        pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
+            pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
-	        pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
+            pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
             pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.085f ), true );
             pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
-	        pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
+            pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
             pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
             pLabel->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
-	        pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
+            pLabel->SetVisible ( i >= 8 );      // Hide all labels except 'Acceleration' and 'Brake'
 
             m_pJoypadLabels.push_back ( pLabel );
             m_pJoypadButtons.push_back ( pButton );
@@ -241,72 +250,79 @@ CSettings::CSettings ( void )
 
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Left Stick" ) );
         pLabelLeft->SetPosition ( CVector2D ( 0.41f, 0.611f ), true );
-	    pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Right Stick" ) );
         pLabelRight->SetPosition ( CVector2D ( 0.76f, 0.611f ), true );
-	    pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
+        pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
     }
 
     
-	m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
+    m_hBind = m_pBindsList->AddColumn ( "DESCRIPTION", 0.35f );
     m_hPriKey = m_pBindsList->AddColumn ( "KEY", 0.24f );
     for ( int k = 0 ; k < SecKeyNum ; k++ )
-    	m_hSecKeys[k] = m_pBindsList->AddColumn ( "ALT. KEY", 0.24f );
+        m_hSecKeys[k] = m_pBindsList->AddColumn ( "ALT. KEY", 0.24f );
 
-	/**
-	 *	Community tab
-	 **/
-	m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
+    /**
+     *  Community tab
+     **/
+    m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
     m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
-	m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
-	//m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
+    m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
+    //m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
 
-	m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Username:" ) );
+    m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Username:" ) );
     m_pLabelUser->SetPosition ( CVector2D ( 0.022f, 0.46f ), true );
-	m_pLabelUser->GetPosition ( vecTemp, false );
-	m_pLabelUser->AutoSize ( "Username:" );
+    m_pLabelUser->GetPosition ( vecTemp, false );
+    m_pLabelUser->AutoSize ( "Username:" );
 
-	m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Password:" ) );
+    m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, "Password:" ) );
     m_pLabelPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-	m_pLabelPass->AutoSize ( "Password:" );
+    m_pLabelPass->AutoSize ( "Password:" );
 
-	m_pEditUser = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
+    m_pEditUser = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
     m_pEditUser->SetPosition ( CVector2D ( 0.16f, 0.45f ), true );
-	m_pEditUser->GetPosition ( vecTemp, false );
+    m_pEditUser->GetPosition ( vecTemp, false );
     m_pEditUser->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pEditUser->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
 //    m_pEditUser->SetMaxLength ( 64 );
 
     m_pEditPass = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
     m_pEditPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-	m_pEditPass->GetPosition ( vecTemp, false );
+    m_pEditPass->GetPosition ( vecTemp, false );
     m_pEditPass->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 //    m_pEditPass->SetMaxLength ( 64 );
-	m_pEditPass->SetMasked ( true );
+    m_pEditPass->SetMasked ( true );
     m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
 
-	m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Login" ) );
-	m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
+    m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Login" ) );
+    m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonLogin->GetPosition ( vecTemp, false );
-	m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 
-	m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
-	m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-	m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
+    m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
+    m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 
+<<<<<<< HEAD
 	/**
 	 *	Multiplayer tab
 	 **/
     m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
+=======
+    /**
+     *  Multiplayer tab
+     **/
+    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabMultiplayer, "Nick:" ) );
+>>>>>>> 22eb218... replace all tabs to spaces
     m_pLabelNick->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
     m_pLabelNick->GetPosition ( vecTemp, false );
-	m_pLabelNick->AutoSize ( "Nick:" );
+    m_pLabelNick->AutoSize ( "Nick:" );
 
     // Nick edit
     m_pEditNick = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabMultiplayer ) );
@@ -318,12 +334,17 @@ CSettings::CSettings ( void )
     m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
     m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
     m_pLabelConnection->GetPosition ( vecTemp, false );
-	m_pLabelConnection->AutoSize ( "Connection:" );
+    m_pLabelConnection->AutoSize ( "Connection:" );
 
+<<<<<<< HEAD
     m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
 	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
+=======
+    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTabMultiplayer, "" ) );
+    m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
+>>>>>>> 22eb218... replace all tabs to spaces
     m_pComboConnection->GetPosition ( vecTemp, false );
-	m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
+    m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
     m_pComboConnection->SetReadOnly ( true );
     m_pComboConnection->AddItem ( "Lan" );
     m_pComboConnection->AddItem ( "DSL" );
@@ -335,13 +356,13 @@ CSettings::CSettings ( void )
     m_pSavePasswords->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
 
-	/**
-	 *	Audio tab
-	 **/
+    /**
+     *  Audio tab
+     **/
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Radio volume:" ) );
     m_pLabelRadioVolume->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
-	m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
+    m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
 
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
@@ -355,7 +376,7 @@ CSettings::CSettings ( void )
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
-	m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
+    m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
 
     m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -380,15 +401,15 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
 
-	/**
-	 *	Video tab
-	 **/
+    /**
+     *  Video tab
+     **/
 
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "General" ) );
     m_pVideoGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
     m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
-	m_pVideoGeneralLabel->AutoSize ( "General  " );
-	m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
+    m_pVideoGeneralLabel->AutoSize ( "General  " );
+    m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Resolution:" ) );
     m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -396,21 +417,21 @@ CSettings::CSettings ( void )
     m_pVideoResolutionLabel->AutoSize ( "Resolution: " );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-	m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY - 1.0f ) );
-	m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
+    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY - 1.0f ) );
+    m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
     m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
-	m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
     m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
-	m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
     m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 29.0f ) );
-	m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
 
     vecTemp.fY += 8;
@@ -443,44 +464,44 @@ CSettings::CSettings ( void )
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
     m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
-	m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
-	m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
+    m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
+    m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
     m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
-	m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-	m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
-	m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
+    m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
+    m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
+    m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
 
     m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
-	m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( vecTemp.fX + 200.0f, vecTemp.fY ) );
-	m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 174.0f, 20.0f ) );
-	m_pCheckBoxMenuVideo->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_VIDEO );
+    m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( vecTemp.fX + 200.0f, vecTemp.fY ) );
+    m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 174.0f, 20.0f ) );
+    m_pCheckBoxMenuVideo->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_VIDEO );
 
     m_pCheckBoxMenuPostEffects = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "PS2.0 post-effects", true ) );
-	m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
-	m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-	m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
+    m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
+    m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
+    m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
 
     // Hide options relating to the 3D scene
-	m_pVideoRenderingLabel->SetVisible ( false );
-	m_pCheckBoxMenuDynamic->SetVisible ( false );
-	m_pCheckBoxMenuVideo->SetVisible ( false );
-	m_pCheckBoxMenuPostEffects->SetVisible ( false );
+    m_pVideoRenderingLabel->SetVisible ( false );
+    m_pCheckBoxMenuDynamic->SetVisible ( false );
+    m_pCheckBoxMenuVideo->SetVisible ( false );
+    m_pCheckBoxMenuPostEffects->SetVisible ( false );
     vecTemp.fY -= 60;
 
-	m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
+    m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
     m_pFXQualityLabel->AutoSize ( "FX Quality: " );
 
     m_pComboFxQuality = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-	m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
-	m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
-	m_pComboFxQuality->AddItem ( "Low" )->SetData ( (void*)0 );
-	m_pComboFxQuality->AddItem ( "Medium" )->SetData ( (void*)1 );
-	m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
-	m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
+    m_pComboFxQuality->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboFxQuality->SetSize ( CVector2D ( 200.0f, 95.0f ) );
+    m_pComboFxQuality->AddItem ( "Low" )->SetData ( (void*)0 );
+    m_pComboFxQuality->AddItem ( "Medium" )->SetData ( (void*)1 );
+    m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
+    m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
@@ -641,7 +662,7 @@ CSettings::CSettings ( void )
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
-	m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
+    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
     m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
     m_pCheckBoxMenuDynamic->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
     m_pCheckBoxMenuVideo->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
@@ -653,10 +674,10 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
-	/*
-	// Give a warning if no community account settings were stored in config
-	CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
-	*/
+    /*
+    // Give a warning if no community account settings were stored in config
+    CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
+    */
 
     // Load Chat presets
     LoadChatPresets ();
@@ -674,35 +695,35 @@ CSettings::~CSettings ( void )
 
 bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
-	if ( Args.pWindow == m_pBindsList ) {
-		OnBindsListClick ( m_pBindsList );
-		return true;
-	}
-	return false;
+    if ( Args.pWindow == m_pBindsList ) {
+        OnBindsListClick ( m_pBindsList );
+        return true;
+    }
+    return false;
 }
 
 
 void CSettings::Update ( void )
 {
-	// Once each 30 frames
-	if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
-		// Check if any of the settings have been changed by core
+    // Once each 30 frames
+    if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
+        // Check if any of the settings have been changed by core
         int iMenuOptions;
         CVARS_GET ( "menu_options", iMenuOptions );
-		bool bCompare = false;
+        bool bCompare = false;
 
-		bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_DYNAMIC) > 0;
-		if ( m_pCheckBoxMenuDynamic->GetSelected () != bCompare )       m_pCheckBoxMenuDynamic->SetSelected ( bCompare );
-		bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED) > 0;
-		if ( m_pCheckBoxMenuVideo->GetSelected () != bCompare )         m_pCheckBoxMenuVideo->SetSelected ( bCompare );
-		bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0;
-		if ( m_pCheckBoxMenuPostEffects->GetSelected () != bCompare )   m_pCheckBoxMenuPostEffects->SetSelected ( bCompare );
+        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_DYNAMIC) > 0;
+        if ( m_pCheckBoxMenuDynamic->GetSelected () != bCompare )       m_pCheckBoxMenuDynamic->SetSelected ( bCompare );
+        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED) > 0;
+        if ( m_pCheckBoxMenuVideo->GetSelected () != bCompare )         m_pCheckBoxMenuVideo->SetSelected ( bCompare );
+        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0;
+        if ( m_pCheckBoxMenuPostEffects->GetSelected () != bCompare )   m_pCheckBoxMenuPostEffects->SetSelected ( bCompare );
 
         UpdateJoypadTab ();
 
-		m_dwFrameCount = 0;
-	}
-	m_dwFrameCount++;
+        m_dwFrameCount = 0;
+    }
+    m_dwFrameCount++;
 
     UpdateCaptureAxis ();
 
@@ -737,8 +758,8 @@ void CSettings::UpdateJoypadTab ()
     string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : "Joypad not detected  -  Check connections and restart game";
 
     m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
-	m_pJoypadName->SetText ( strJoystickName.c_str () );
-	m_pJoypadName->AutoSize ( strJoystickName.c_str () );
+    m_pJoypadName->SetText ( strJoystickName.c_str () );
+    m_pJoypadName->AutoSize ( strJoystickName.c_str () );
     m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.0f ) );
 
 
@@ -749,8 +770,8 @@ void CSettings::UpdateJoypadTab ()
         strUnderline = strUnderline + "_";
 
     m_pJoypadUnderline->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
-	m_pJoypadUnderline->SetText ( strUnderline.c_str () );
-	m_pJoypadUnderline->AutoSize ( strUnderline.c_str () );
+    m_pJoypadUnderline->SetText ( strUnderline.c_str () );
+    m_pJoypadUnderline->AutoSize ( strUnderline.c_str () );
     m_pJoypadUnderline->SetPosition ( m_pJoypadUnderline->GetPosition () - CVector2D ( m_pJoypadUnderline->GetSize ().fX * 0.5, -2.0f ) );
     m_pJoypadUnderline->SetVisible ( JoyMan->IsJoypadConnected () );
 
@@ -794,7 +815,7 @@ bool CSettings::OnJoypadTextChanged ( CGUIElement* pElement )
     // Dont immediately read back these settings
     m_JoypadSettingsRevision = GetJoystickManager ()->GetSettingsRevision ();
 
-	return true;
+    return true;
 }
 
 
@@ -808,10 +829,10 @@ void CSettings::UpdateCaptureAxis ()
         // Are we done?        
         if ( GetJoystickManager ()->IsAxisBindComplete () )
         {
-	        // Remove the messagebox we created earlier
-	        CCore::GetSingleton ().RemoveMessageBox ();
+            // Remove the messagebox we created earlier
+            CCore::GetSingleton ().RemoveMessageBox ();
 
-	        // Update GUI elements
+            // Update GUI elements
             UpdateJoypadTab();
 
             m_bCaptureAxis = false;
@@ -833,7 +854,7 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
         CCore::GetSingleton ().ShowMessageBox ( "Binding axis", "Move an axis to bind, or escape to clear", MB_ICON_QUESTION );
     }
 
-	return true;
+    return true;
 }
 
 
@@ -842,43 +863,43 @@ bool CSettings::OnAxisSelectClick ( CGUIElement* pElement )
 //
 bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
 {
-	// Load the default binds
-	GetJoystickManager ()->SetDefaults ();
+    // Load the default binds
+    GetJoystickManager ()->SetDefaults ();
 
-	// Update the GUI
-	UpdateJoypadTab ();
+    // Update the GUI
+    UpdateJoypadTab ();
 
-	return true;
+    return true;
 }
 
 
 bool CSettings::OnBindsDefaultClick ( CGUIElement* pElement )
 {
-	// Load the default binds
-	CCore::GetSingleton ().GetKeyBinds ()->LoadDefaultBinds ();
+    // Load the default binds
+    CCore::GetSingleton ().GetKeyBinds ()->LoadDefaultBinds ();
 
     // Clear the binds list
-	m_pBindsList->Clear ();
+    m_pBindsList->Clear ();
 
-	// Re-initialize the binds list
-	Initialize ();
+    // Re-initialize the binds list
+    Initialize ();
 
-	return true;
+    return true;
 }
 
 // Saves the keybinds
 void CSettings::ProcessKeyBinds ( void )
 {
-	CKeyBindsInterface *pKeyBinds = CCore::GetSingleton ().GetKeyBinds ();
+    CKeyBindsInterface *pKeyBinds = CCore::GetSingleton ().GetKeyBinds ();
 
-	// Loop through every row in the binds list
-	for ( int i = 0; i < m_pBindsList->GetRowCount (); i++ )
-	{
+    // Loop through every row in the binds list
+    for ( int i = 0; i < m_pBindsList->GetRowCount (); i++ )
+    {
         // Get the type and keys
         unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );        
-		char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
-		const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
- 		const SBindableKey* pSecKeys[SecKeyNum];
+        char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
+        const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
+        const SBindableKey* pSecKeys[SecKeyNum];
         for ( int k = 0 ; k < SecKeyNum ; k++ )
         {
             char* szSec = m_pBindsList->GetItemText ( i, m_hSecKeys[k] );
@@ -886,7 +907,7 @@ void CSettings::ProcessKeyBinds ( void )
         }
         
         // If the type is control
-		if ( ucType == KEY_BIND_GTA_CONTROL )
+        if ( ucType == KEY_BIND_GTA_CONTROL )
         {            
             // Get the previous bind
             CGTAControlBind* pBind = reinterpret_cast < CGTAControlBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
@@ -958,16 +979,16 @@ void CSettings::ProcessKeyBinds ( void )
             if ( szArguments )
                 szArguments = &szArguments [ 1 ];
 
-			/** Primary keybinds **/
+            /** Primary keybinds **/
             CCommandBind* pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
-			// If a keybind for this command already exists
+            // If a keybind for this command already exists
             if ( pBind )
             {
-				// If the user specified a valid primary key
+                // If the user specified a valid primary key
                 if ( pPriKey )
                 {
-					// If the primary key is different than the original one
-					if ( pPriKey != pBind->boundKey ) {
+                    // If the primary key is different than the original one
+                    if ( pPriKey != pBind->boundKey ) {
                         // Did we have any keys with the same "up" state?
                         CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
                         if ( pUpBind )
@@ -975,11 +996,11 @@ void CSettings::ProcessKeyBinds ( void )
                             pUpBind->boundKey = pPriKey;
                         }
 
-						pBind->boundKey = pPriKey;
-					}
+                        pBind->boundKey = pPriKey;
+                    }
                 }
-				// If the primary key field was empty, we can remove the keybind
-				else {
+                // If the primary key field was empty, we can remove the keybind
+                else {
                     // Remove any matching "up" state binds we may have
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
                     if ( pUpBind )
@@ -987,25 +1008,25 @@ void CSettings::ProcessKeyBinds ( void )
                         pKeyBinds->Remove ( pUpBind );
                     }
                     pKeyBinds->Remove ( pBind );
-				}
+                }
             }
-			// If there was no keybind for this command, create it
+            // If there was no keybind for this command, create it
             else if ( pPriKey )
             {
-				pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
+                pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
             }
 
-			/** Secondary keybinds **/
+            /** Secondary keybinds **/
             for ( int k = 0 ; k < SecKeyNum ; k++ )
             {
                 pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
-			    // If this is a valid bind in the keybinds list
+                // If this is a valid bind in the keybinds list
                 if ( pBind )
                 {
-				    // And our secondary key field was not empty
+                    // And our secondary key field was not empty
                     if ( pSecKeys[k] )
                     {
-					    if ( pSecKeys[k] != pBind->boundKey )
+                        if ( pSecKeys[k] != pBind->boundKey )
                         {
                             // Did we have any keys with the same "up" state?
                             CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
@@ -1016,8 +1037,8 @@ void CSettings::ProcessKeyBinds ( void )
                             pBind->boundKey = pSecKeys[k];
                         }
                     }
-				    // If the secondary key field was empty, we should remove the keybind
-				    else
+                    // If the secondary key field was empty, we should remove the keybind
+                    else
                     {
                         // Remove any matching "up" state binds we may have
                         CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
@@ -1028,10 +1049,10 @@ void CSettings::ProcessKeyBinds ( void )
                         pKeyBinds->Remove ( pBind );
                     }
                 }
-			    // If this key bind didn't exist, create it
+                // If this key bind didn't exist, create it
                 else if ( pSecKeys[k] )
                 {
-				    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
+                    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
                     // Also add a matching "up" state if applicable
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
@@ -1046,7 +1067,7 @@ void CSettings::ProcessKeyBinds ( void )
             /** Primary keybinds **/
             CKeyFunctionBind* pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
             CKeyFunctionBind* pSecondBind = NULL; // some binds have a "up" bind too, which we hide from the user
-			// If a keybind for this command already exists
+            // If a keybind for this command already exists
             if ( pBind )
             {
                 list < CKeyBind* > ::const_iterator iterr = pKeyBinds->IterBegin ();
@@ -1063,34 +1084,34 @@ void CSettings::ProcessKeyBinds ( void )
                         }
                     }
                 }
-				// If the user specified a valid primary key
+                // If the user specified a valid primary key
                 if ( pPriKey )
                 {
-					// If the primary key is different than the original one
-					if ( pPriKey != pBind->boundKey ) {
-						pBind->boundKey = pPriKey;
+                    // If the primary key is different than the original one
+                    if ( pPriKey != pBind->boundKey ) {
+                        pBind->boundKey = pPriKey;
                         if ( pSecondBind )
                             pSecondBind->boundKey = pPriKey;
-					}
+                    }
                 }
-				// If the primary key field was empty, we can remove the keybind
-				else {
+                // If the primary key field was empty, we can remove the keybind
+                else {
                     pKeyBinds->Remove ( pBind );
                     pKeyBinds->Remove ( pSecondBind );
-				}
+                }
             }
-			// If there was no keybind for this command, create it
+            // If there was no keybind for this command, create it
             else if ( pPriKey )
             {
                 pKeyBinds->AddFunction ( pPriKey, pBind->Handler, pBind->bHitState, pBind->bIgnoreGUI );
             }
 
             CKeyFunctionBind* pPrimaryBind = pBind;
-			/** Secondary keybinds **/
+            /** Secondary keybinds **/
             for ( int k = 0 ; k < SecKeyNum ; k++ )
             {
                 pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
-			    // If this is a valid bind in the keybinds list
+                // If this is a valid bind in the keybinds list
                 if ( pBind )
                 {
                     CKeyFunctionBind* pSecondSecondaryBind = NULL;
@@ -1112,24 +1133,24 @@ void CSettings::ProcessKeyBinds ( void )
                         }
                     }
 
-				    // And our secondary key field was not empty
+                    // And our secondary key field was not empty
                     if ( pSecKeys[k] )
                     {
-					    if ( pSecKeys[k] != pBind->boundKey )
+                        if ( pSecKeys[k] != pBind->boundKey )
                         {
                             pBind->boundKey = pSecKeys[k];
                             if ( pSecondSecondaryBind )
                                 pSecondSecondaryBind->boundKey = pSecKeys[k];
                         }
                     }
-				    // If the secondary key field was empty, we should remove the keybind
-				    else
+                    // If the secondary key field was empty, we should remove the keybind
+                    else
                     {
                         pKeyBinds->Remove ( pBind );
                         pKeyBinds->Remove ( pSecondSecondaryBind );
                     }
                 }
-			    // If this key bind didn't exist, create it
+                // If this key bind didn't exist, create it
                 else if ( pSecKeys[k] && pPrimaryBind )
                 {
                     pKeyBinds->AddFunction ( pSecKeys[k], pPrimaryBind->Handler, pPrimaryBind->bHitState, pPrimaryBind->bIgnoreGUI );
@@ -1140,40 +1161,40 @@ void CSettings::ProcessKeyBinds ( void )
                 }
             }
         }
-	}
+    }
 }
 
 
 bool CSettings::OnBindsListClick ( CGUIElement* pElement )
 {
-	CGUIListItem *pItem = m_pBindsList->GetSelectedItem ();
+    CGUIListItem *pItem = m_pBindsList->GetSelectedItem ();
     if ( pItem )
     {
-	    CGUIListItem *pItemBind = m_pBindsList->GetItem ( m_pBindsList->GetItemRowIndex ( pItem ), m_hBind );
+        CGUIListItem *pItemBind = m_pBindsList->GetItem ( m_pBindsList->GetItemRowIndex ( pItem ), m_hBind );
 
-	    // Proceed if the user didn't select the "Bind"-column
-	    if ( pItem != pItemBind )
-	    {
-		    m_uiCaptureKey = 0;
-		    m_pSelectedBind = pItem;
+        // Proceed if the user didn't select the "Bind"-column
+        if ( pItem != pItemBind )
+        {
+            m_uiCaptureKey = 0;
+            m_pSelectedBind = pItem;
             m_bCaptureKey = true;
 
-		    // Determine if the primary or secondary column was selected
-		    if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
-			    // Create a messagebox to notify the user
-			    //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-			    SString strText = "Press a key to bind, or escape to clear";
-			    CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", strText, MB_ICON_QUESTION );
-		    } else {
-			    // Create a messagebox to notify the user
-			    //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-			    SString strText = "Press a key to bind, or escape to clear";
-			    CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", strText, MB_ICON_QUESTION );
-		    }
-	    }
+            // Determine if the primary or secondary column was selected
+            if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
+                // Create a messagebox to notify the user
+                //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+                SString strText = "Press a key to bind, or escape to clear";
+                CCore::GetSingleton ().ShowMessageBox ( "Binding a primary key", strText, MB_ICON_QUESTION );
+            } else {
+                // Create a messagebox to notify the user
+                //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+                SString strText = "Press a key to bind, or escape to clear";
+                CCore::GetSingleton ().ShowMessageBox ( "Binding a secondary key", strText, MB_ICON_QUESTION );
+            }
+        }
     }
 
-	return true;
+    return true;
 }
 
 #ifndef WM_XBUTTONDOWN
@@ -1187,7 +1208,7 @@ bool CSettings::ProcessMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     if ( m_bCaptureKey )
     {        
-	    CKeyBindsInterface *pKeyBinds = CCore::GetSingleton ().GetKeyBinds ();
+        CKeyBindsInterface *pKeyBinds = CCore::GetSingleton ().GetKeyBinds ();
 
         if ( uMsg != WM_KEYDOWN && uMsg != WM_KEYUP && uMsg != WM_SYSKEYDOWN &&
              uMsg != WM_SYSKEYUP && uMsg != WM_LBUTTONDOWN && uMsg != WM_LBUTTONUP &&
@@ -1199,34 +1220,34 @@ bool CSettings::ProcessMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
         }
         
         // Ignore the first key, which is the one that initiated the capture process
-	    if ( m_uiCaptureKey == 0 )
+        if ( m_uiCaptureKey == 0 )
         {
-		    m_uiCaptureKey++;
-		    return false;
-	    }
+            m_uiCaptureKey++;
+            return false;
+        }
 
         bool bState;
         const SBindableKey* pKey = pKeyBinds->GetBindableFromMessage ( uMsg, wParam, lParam, bState );
         
         // If escape was pressed, don't create a bind
         if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE )
-		{
-			m_pSelectedBind->SetText ( CORE_SETTINGS_NO_KEY );
-		}
+        {
+            m_pSelectedBind->SetText ( CORE_SETTINGS_NO_KEY );
+        }
         else if ( pKey )
         {
             m_pSelectedBind->SetText ( pKey->szKey );
-	    }
+        }
         else
         {
             return false;
         }
 
-	    // Remove the messagebox we created earlier
-	    CCore::GetSingleton ().RemoveMessageBox ();
+        // Remove the messagebox we created earlier
+        CCore::GetSingleton ().RemoveMessageBox ();
 
-	    // Make sure the list gets redrawed/updated
-	    m_pBindsList->Activate ();
+        // Make sure the list gets redrawed/updated
+        m_pBindsList->Activate ();
 
         m_bCaptureKey = false;
         return true;
@@ -1237,17 +1258,17 @@ bool CSettings::ProcessMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 void CSettings::Initialize ( void )
 {
-	// Add binds and sections
-	bool bPrimaryKey = true;
-	int iBind = 0, iRowGame;
+    // Add binds and sections
+    bool bPrimaryKey = true;
+    int iBind = 0, iRowGame;
 
     // Add the rows
-	CKeyBinds* pKeyBinds = reinterpret_cast < CKeyBinds* > ( CCore::GetSingleton ().GetKeyBinds () );
-	iRowGame = m_pBindsList->AddRow ();
-	m_pBindsList->SetItemText ( iRowGame, m_hBind, CORE_SETTINGS_HEADER_GAME, false, true );
-	m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
-	m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_MP, false, true );
-    //iRows = CORE_SETTINGS_HEADERS;			// (game keys), (multiplayer keys)
+    CKeyBinds* pKeyBinds = reinterpret_cast < CKeyBinds* > ( CCore::GetSingleton ().GetKeyBinds () );
+    iRowGame = m_pBindsList->AddRow ();
+    m_pBindsList->SetItemText ( iRowGame, m_hBind, CORE_SETTINGS_HEADER_GAME, false, true );
+    m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
+    m_pBindsList->SetItemText ( m_pBindsList->AddRow (), m_hBind, CORE_SETTINGS_HEADER_MP, false, true );
+    //iRows = CORE_SETTINGS_HEADERS;            // (game keys), (multiplayer keys)
     int iGameRowCount = 1;
     int iMultiplayerRowCount = 2;
 
@@ -1259,7 +1280,7 @@ void CSettings::Initialize ( void )
     }
  
     // Loop through all the available controls
-	int i;
+    int i;
     for ( i = 0 ; *g_bcControls [ i ].szControl != NULL ; i++ );
     for ( i-- ; i >= 0 ; i-- )
     {
@@ -1280,18 +1301,18 @@ void CSettings::Initialize ( void )
                     if ( uiMatchCount == 0 )
                     {
                         // Add bind to the list
-				        iBind = m_pBindsList->InsertRowAfter ( iRowGame );
-				        m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
-				        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
-			            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                        iBind = m_pBindsList->InsertRowAfter ( iRowGame );
+                        m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
+                        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
+                        for ( int k = 0 ; k < SecKeyNum ; k++ )
                             m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
-				        m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_GTA_CONTROL );
+                        m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_GTA_CONTROL );
                         m_pBindsList->SetItemData ( iBind, m_hPriKey, pBind );
                         iGameRowCount++;
                     }
                     // Secondary keys?
                     else
- 			            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                        for ( int k = 0 ; k < SecKeyNum ; k++ )
                             if ( uiMatchCount == k+1 )
                             {
                                 m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], pBind->boundKey->szKey );
@@ -1305,11 +1326,11 @@ void CSettings::Initialize ( void )
         if ( uiMatchCount == 0 )
         {
             iBind = m_pBindsList->InsertRowAfter ( iRowGame );
-			m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
-			m_pBindsList->SetItemText ( iBind, m_hPriKey, CORE_SETTINGS_NO_KEY );
- 	        for ( int k = 0 ; k < SecKeyNum ; k++ )
-    			m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
-			m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_UNDEFINED );
+            m_pBindsList->SetItemText ( iBind, m_hBind, pControl->szDescription );
+            m_pBindsList->SetItemText ( iBind, m_hPriKey, CORE_SETTINGS_NO_KEY );
+            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
+            m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_UNDEFINED );
             m_pBindsList->SetItemData ( iBind, m_hPriKey, pControl );
             iGameRowCount++;
         }
@@ -1353,7 +1374,7 @@ void CSettings::Initialize ( void )
                     if ( bMatched )
                     {
                         bFoundMatches = true;
-             	        for ( int k = 0 ; k < SecKeyNum ; k++ )
+                        for ( int k = 0 ; k < SecKeyNum ; k++ )
                             if ( pListedCommand->uiMatchCount == k )
                             {
                                 m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKeys[k], pBind->boundKey->szKey );
@@ -1411,10 +1432,10 @@ void CSettings::Initialize ( void )
 
                     if ( !bSkip )
                     {
-				        // Add the bind to the list
-				        iBind = m_pBindsList->InsertRowAfter ( row );
+                        // Add the bind to the list
+                        iBind = m_pBindsList->InsertRowAfter ( row );
                         m_pBindsList->SetItemText ( iBind, m_hBind, strDescription );
-				        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
+                        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
                         for ( int k = 0 ; k < SecKeyNum ; k++ )
                             m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
                         m_pBindsList->SetItemData ( iBind, m_hBind, (void*) bindType );
@@ -1448,10 +1469,10 @@ void CSettings::SetVisible ( bool bVisible )
         LoadData ();
 
         // Clear the binds list
-	    m_pBindsList->Clear ();
+        m_pBindsList->Clear ();
 
-	    // Re-initialize the binds list
-	    Initialize ();
+        // Re-initialize the binds list
+        Initialize ();
     }
 }
 
@@ -1464,45 +1485,45 @@ bool CSettings::IsVisible ( void )
 
 bool CSettings::OnCheckBoxClick ( CGUIElement* pElement )
 {
-	// Can't cast directly to CGUICheckBox (or check for matching pointers),
-	// because the vtables don't align (pElement is off by +4).
-	// So use eCheckBox.
+    // Can't cast directly to CGUICheckBox (or check for matching pointers),
+    // because the vtables don't align (pElement is off by +4).
+    // So use eCheckBox.
 
-	eCheckBox CheckBoxId = (eCheckBox) reinterpret_cast < int > ( pElement->GetUserData () );
+    eCheckBox CheckBoxId = (eCheckBox) reinterpret_cast < int > ( pElement->GetUserData () );
 
     int iMenuOptions;
     CVARS_GET ( "menu_options", iMenuOptions );
 
-	do {
-		// [Menu rendering options - Dynamic scene rendering]
-		if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_DYNAMIC ) {
-			DWORD dwSelect = (DWORD) m_pCheckBoxMenuDynamic->GetSelected ();
-			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
-			break;
-		}
+    do {
+        // [Menu rendering options - Dynamic scene rendering]
+        if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_DYNAMIC ) {
+            DWORD dwSelect = (DWORD) m_pCheckBoxMenuDynamic->GetSelected ();
+            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
+            break;
+        }
 
-		// [Menu rendering options - Video surface rendering]
-		else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_VIDEO ) {
-			DWORD dwSelect = (DWORD) m_pCheckBoxMenuVideo->GetSelected ();
-			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED )) );
-			break;
-		}
+        // [Menu rendering options - Video surface rendering]
+        else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_VIDEO ) {
+            DWORD dwSelect = (DWORD) m_pCheckBoxMenuVideo->GetSelected ();
+            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED )) );
+            break;
+        }
 
-		// [Menu rendering options - PS2.0 post-effects]
-		else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_POSTEFFECTS ) {
-			DWORD dwSelect = (DWORD) m_pCheckBoxMenuPostEffects->GetSelected ();
-			CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED )) );
-			break;
-		}
+        // [Menu rendering options - PS2.0 post-effects]
+        else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_POSTEFFECTS ) {
+            DWORD dwSelect = (DWORD) m_pCheckBoxMenuPostEffects->GetSelected ();
+            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED )) );
+            break;
+        }
 
-		// No valid candidates
-		return false;
-	} while ( false );
+        // No valid candidates
+        return false;
+    } while ( false );
 
-	// Let the menu load the new values
-	CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->LoadMenuOptions ();
+    // Let the menu load the new values
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->LoadMenuOptions ();
 
-	return true;
+    return true;
 }
 
 
@@ -1510,14 +1531,14 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
 {
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
-	// Process keybinds
-	ProcessKeyBinds ();
-	ProcessJoypad ();
-	
+    // Process keybinds
+    ProcessKeyBinds ();
+    ProcessJoypad ();
+    
     // Invalid nickname?
     if ( !CCore::GetSingleton ().IsValidNick ( m_pEditNick->GetText ().c_str () ) )
     {
-		CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
         return true;
     }
 
@@ -1528,7 +1549,7 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
     m_pWindow->SetVisible ( false );
     pMainMenu->m_bIsInSubWindow = false;
 
-	return true;
+    return true;
 }
 
 
@@ -1559,10 +1580,10 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
             // Hash password
             char szPassword[33];
             std::string strPassword;
-	        MD5 Password;
-	        CMD5Hasher Hasher;
-	        Hasher.Calculate ( m_pEditPass->GetText ().c_str(), m_pEditPass->GetText().length(), Password );
-	        Hasher.ConvertToHex ( Password, szPassword );
+            MD5 Password;
+            CMD5Hasher Hasher;
+            Hasher.Calculate ( m_pEditPass->GetText ().c_str(), m_pEditPass->GetText().length(), Password );
+            Hasher.ConvertToHex ( Password, szPassword );
             strPassword = std::string ( szPassword );
 
             // Check if we need to use the stored password
@@ -1575,7 +1596,7 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
             CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
             pCommunity->SetUsername ( m_pEditUser->GetText () );
             pCommunity->SetPassword ( strPassword );
-	        CVARS_SET ( "community_username", m_pEditUser->GetText () );
+            CVARS_SET ( "community_username", m_pEditUser->GetText () );
             CVARS_SET ( "community_password", strPassword );
             pCommunity->Login ( OnLoginCallback, this );
         }
@@ -1635,8 +1656,8 @@ void CSettings::LoadData ( void )
     // Connection type
     unsigned int uiMTUSize = NET_MTU_LAN;
     CVARS_GET ( "mtu_size", uiMTUSize );
-	if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
-	else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
+    if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
+    else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
     else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
     else m_pComboConnection->SetText ( "Unknown" );
 
@@ -1649,11 +1670,11 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
     CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
-	// Community
+    // Community
     CVARS_GET ( "community_username", strVar );
-	if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
+    if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
     CVARS_GET ( "community_password", strVar );
-	if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
+    if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
     // Audio
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
@@ -1788,12 +1809,12 @@ void CSettings::SaveData ( void )
     std::string strVar;
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
-	// Set and save our settings
+    // Set and save our settings
     if ( CModManager::GetSingleton ().GetCurrentMod () != NULL )
     {
         CVARS_GET ( "nick", strVar );
         if ( m_pEditNick->GetText ().compare ( strVar ) != 0 )
-	        CCore::GetSingleton ().GetCommands ()->Execute ( "nick", m_pEditNick->GetText ().c_str () );
+            CCore::GetSingleton ().GetCommands ()->Execute ( "nick", m_pEditNick->GetText ().c_str () );
     }
     else
     {
@@ -1894,7 +1915,7 @@ void CSettings::RemoveKeyBindSection ( char * szSectionName )
     {
         if ( strcmp ( (*iter)->szOriginalTitle, szSectionName ) == 0 )
         {
-			delete *iter;
+            delete *iter;
             m_pKeyBindSections.erase ( iter );
             break;
         }

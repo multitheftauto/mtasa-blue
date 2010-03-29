@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CScriptDebugging.h
 *  PURPOSE:     Header for script debugging class
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*				Ed Lyons <eai@opencoding.net>
+*               Ed Lyons <eai@opencoding.net>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

@@ -98,7 +98,7 @@ bool CTCPImpl::Initialize ( void )
             return true;
         #else
             // Fill in for linux
-			// -> Initialization code for sockets doesn't exist on *nix
+            // -> Initialization code for sockets doesn't exist on *nix
         #endif
     }
 

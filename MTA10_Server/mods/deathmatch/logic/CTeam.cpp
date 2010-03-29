@@ -91,7 +91,7 @@ bool CTeam::ReadSpecialData ( void )
         m_bFriendlyFire = true;
     }
 
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;
@@ -145,9 +145,9 @@ void CTeam::GetPlayers ( CLuaMain* pLuaMain )
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
-		lua_pushnumber ( luaVM, ++uiIndex );
-		lua_pushelement ( luaVM, *iter );
-		lua_settable ( luaVM, -3 );
+        lua_pushnumber ( luaVM, ++uiIndex );
+        lua_pushelement ( luaVM, *iter );
+        lua_settable ( luaVM, -3 );
     }
 }
 

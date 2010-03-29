@@ -55,7 +55,7 @@ bool CGUITexture_Impl::LoadFromFile ( const char* szFilename )
     {
         return false;
     }
-	return true;
+    return true;
 }
 
 
@@ -85,11 +85,11 @@ void CGUITexture_Impl::SetTexture ( CEGUI::Texture* pTexture )
 
 LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture ( void )
 {
-	return reinterpret_cast < CEGUI::DirectX9Texture* > ( m_pTexture ) -> getD3DTexture ();
+    return reinterpret_cast < CEGUI::DirectX9Texture* > ( m_pTexture ) -> getD3DTexture ();
 }
 
 
 void CGUITexture_Impl::CreateTexture ( unsigned int width, unsigned int height )
 {
-	return reinterpret_cast < CEGUI::DirectX9Texture* > ( m_pTexture ) -> createRenderTarget ( width, height );
+    return reinterpret_cast < CEGUI::DirectX9Texture* > ( m_pTexture ) -> createRenderTarget ( width, height );
 }

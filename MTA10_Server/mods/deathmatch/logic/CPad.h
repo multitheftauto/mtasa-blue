@@ -23,36 +23,36 @@ class CPad;
 class CControllerState
 {
 public:
-	signed short        LeftStickX; // move/steer left (-128?)/right (+128)
-	signed short        LeftStickY; // move back(+128)/forwards(-128?)
-	signed short        RightStickX; // numpad 6(+128)/numpad 4(-128?)
-	signed short        RightStickY;
-	
-	//signed short        LeftShoulder1;
-	signed short        LeftShoulder2;
-	//signed short        RightShoulder1; // target / hand brake
-	signed short        RightShoulder2; 
-	
-	signed short        DPadUp; // radio change up
-	signed short        DPadDown; // radio change down
-	signed short        DPadLeft;
-	signed short        DPadRight;
+    signed short        LeftStickX; // move/steer left (-128?)/right (+128)
+    signed short        LeftStickY; // move back(+128)/forwards(-128?)
+    signed short        RightStickX; // numpad 6(+128)/numpad 4(-128?)
+    signed short        RightStickY;
+    
+    //signed short        LeftShoulder1;
+    signed short        LeftShoulder2;
+    //signed short        RightShoulder1; // target / hand brake
+    signed short        RightShoulder2; 
+    
+    signed short        DPadUp; // radio change up
+    signed short        DPadDown; // radio change down
+    signed short        DPadLeft;
+    signed short        DPadRight;
 
-	signed short        Start;
-	signed short        Select;
+    signed short        Start;
+    signed short        Select;
 
-	//signed short        ButtonSquare; // jump / reverse
-	//signed short        ButtonTriangle; // get in/out
-	//signed short        ButtonCross; // sprint / accelerate
-	//signed short        ButtonCircle; // fire
+    //signed short        ButtonSquare; // jump / reverse
+    //signed short        ButtonTriangle; // get in/out
+    //signed short        ButtonCross; // sprint / accelerate
+    //signed short        ButtonCircle; // fire
 
-	//signed short        ShockButtonL;
-	signed short        ShockButtonR; // look behind
+    //signed short        ShockButtonL;
+    signed short        ShockButtonR; // look behind
 
-	signed short        m_bChatIndicated;
-	//signed short        m_bPedWalk;
-	//signed short        m_bVehicleMouseLook;
-	signed short        m_bRadioTrackSkip;
+    signed short        m_bChatIndicated;
+    //signed short        m_bPedWalk;
+    //signed short        m_bVehicleMouseLook;
+    signed short        m_bRadioTrackSkip;
 
     // Sync'd keys
     bool LeftShoulder1;
@@ -64,10 +64,10 @@ public:
     bool ShockButtonL;
     bool m_bPedWalk;
 
-	inline              CControllerState    ( void )
+    inline              CControllerState    ( void )
     { 
-		memset ( this, 0, sizeof ( CControllerState ) );
-	}
+        memset ( this, 0, sizeof ( CControllerState ) );
+    }
     inline void         Copy    ( const CControllerState& State )
     {
         memcpy ( this, &State, sizeof ( CControllerState ) );
@@ -76,54 +76,54 @@ public:
 
 enum eControllerAction
 {
-	FIRE = 0,
-	
-	NEXT_WEAPON = 2,
-	PREVIOUS_WEAPON,
-	FORWARDS,
-	BACKWARDS,
-	LEFT,
-	RIGHT,
-	ZOOM_IN,
-	ZOOM_OUT,
-	ENTER_EXIT,
-	CHANGE_CAMERA,
-	JUMP,
-	SPRINT,
-	LOOK_BEHIND,
-	CROUCH,
-	ACTION,
-	WALK,
-	VEHICLE_FIRE,
-	VEHICLE_SECONDARY_FIRE,
-	VEHICLE_LEFT,
-	VEHICLE_RIGHT,
-	STEER_FORWARDS_DOWN,
-	STEER_BACK_UP,
-	ACCELERATE,
-	BRAKE_REVERSE,
-	RADIO_NEXT,
-	RADIO_PREVIOUS,
-	RADIO_USER_TRACK_SKIP,
-	HORN,
-	SUB_MISSION,
-	HANDBRAKE,
-	
-	VEHICLE_LOOK_LEFT = 0x22,
-	VEHICLE_LOOK_RIGHT,
-	VEHICLE_LOOK_BEHIND,
-	VEHICLE_MOUSE_LOOK,
-	SPECIAL_CONTROL_LEFT,
-	SPECIAL_CONTROL_RIGHT,
-	SPECIAL_CONTROL_DOWN,
-	SPECIAL_CONTROL_UP,
+    FIRE = 0,
+    
+    NEXT_WEAPON = 2,
+    PREVIOUS_WEAPON,
+    FORWARDS,
+    BACKWARDS,
+    LEFT,
+    RIGHT,
+    ZOOM_IN,
+    ZOOM_OUT,
+    ENTER_EXIT,
+    CHANGE_CAMERA,
+    JUMP,
+    SPRINT,
+    LOOK_BEHIND,
+    CROUCH,
+    ACTION,
+    WALK,
+    VEHICLE_FIRE,
+    VEHICLE_SECONDARY_FIRE,
+    VEHICLE_LEFT,
+    VEHICLE_RIGHT,
+    STEER_FORWARDS_DOWN,
+    STEER_BACK_UP,
+    ACCELERATE,
+    BRAKE_REVERSE,
+    RADIO_NEXT,
+    RADIO_PREVIOUS,
+    RADIO_USER_TRACK_SKIP,
+    HORN,
+    SUB_MISSION,
+    HANDBRAKE,
+    
+    VEHICLE_LOOK_LEFT = 0x22,
+    VEHICLE_LOOK_RIGHT,
+    VEHICLE_LOOK_BEHIND,
+    VEHICLE_MOUSE_LOOK,
+    SPECIAL_CONTROL_LEFT,
+    SPECIAL_CONTROL_RIGHT,
+    SPECIAL_CONTROL_DOWN,
+    SPECIAL_CONTROL_UP,
 
-	AIM_WEAPON = 0x2D,
+    AIM_WEAPON = 0x2D,
 
-	CONVERSATION_YES = 0x2F,
-	CONVERSATION_NO,
-	GROUP_CONTROL_FORWARDS,
-	GROUP_CONTROL_BACK,
+    CONVERSATION_YES = 0x2F,
+    CONVERSATION_NO,
+    GROUP_CONTROL_FORWARDS,
+    GROUP_CONTROL_BACK,
 };
 
 enum eControlType

@@ -26,11 +26,11 @@ public:
     bool                            operator ()                 ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     inline FCommandHandler*         GetHandler                  ( void )            { return m_pHandler; };
     inline const char*              GetCommand                  ( void )            { return m_szCommand; };
-	inline bool						IsRestricted				( void )			{ return m_bRestricted; };
+    inline bool                     IsRestricted                ( void )            { return m_bRestricted; };
 private:
     FCommandHandler*                m_pHandler;
     char*                           m_szCommand;
-	bool							m_bRestricted;
+    bool                            m_bRestricted;
 
 };
 

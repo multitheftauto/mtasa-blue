@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/TaskAttackSA.cpp
-*  PURPOSE:		Attack game tasks
-*  DEVELOPERS:	Jax <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/TaskAttackSA.cpp
+*  PURPOSE:     Attack game tasks
+*  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -14,23 +14,23 @@
 
 CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS )
 {
-	DEBUG_TRACE("CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS )");
+    DEBUG_TRACE("CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS )");
 
-	this->CreateTaskInterface ( sizeof ( CTaskSimpleGangDriveBySAInterface ) );
-	DWORD dwFunc = FUNC_CTaskSimpleGangDriveBy__Constructor;
-	DWORD dwThisInterface = (DWORD)this->GetInterface ();
+    this->CreateTaskInterface ( sizeof ( CTaskSimpleGangDriveBySAInterface ) );
+    DWORD dwFunc = FUNC_CTaskSimpleGangDriveBy__Constructor;
+    DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwTargetEntity = ( pTargetEntity ) ? ( DWORD ) pTargetEntity->GetInterface () : 0;
-	_asm
-	{
-		mov		ecx, dwThisInterface
-		push    bSeatRHS
+    _asm
+    {
+        mov     ecx, dwThisInterface
+        push    bSeatRHS
         push    nDrivebyStyle
         push    FrequencyPercentage
         push    fAbortRange
         push    pVecTarget
         push    dwTargetEntity
-		call	dwFunc
-	}
+        call    dwFunc
+    }
 }
 
 

@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/HeapTrace.h
-*  PURPOSE:		Heap trace handler
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/HeapTrace.h
+*  PURPOSE:     Heap trace handler
 *  DEVELOPERS:  Ed Lyons
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

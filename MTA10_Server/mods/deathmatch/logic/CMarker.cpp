@@ -119,8 +119,8 @@ bool CMarker::ReadSpecialData ( void )
     if ( GetCustomDataFloat ( "size", fSize, true ) )
         m_fSize = fSize;
 
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     if ( GetCustomDataInt ( "interior", iTemp, true ) )

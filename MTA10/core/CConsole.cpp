@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CConsole.cpp
-*  PURPOSE:		In-game console implementation
-*  DEVELOPERS:	Cecill Etheredge <ijsf@gmx.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CConsole.cpp
+*  PURPOSE:     In-game console implementation
+*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *               Derek Abdine <>
 *               Jax <>
@@ -21,8 +21,8 @@ using std::string;
 #define CONSOLE_HISTORY_LENGTH 64
 #define CONSOLE_SIZE 4096
 
-#define NATIVE_RES_X	1152.0f
-#define NATIVE_RES_Y	864.0f
+#define NATIVE_RES_X    1152.0f
+#define NATIVE_RES_Y    864.0f
 
 CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
 {
@@ -35,11 +35,11 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_iAutoCompleteIndex = -1;
     m_bIsEnabled = true;
 
-	m_fWindowSpacer = 9.0f;
-	m_fWindowSpacerTop = 23.0f;
-	m_fWindowX = 550.0f;
-	m_fWindowY = 360.0f;
-	m_fInputHeight = 29.0f;
+    m_fWindowSpacer = 9.0f;
+    m_fWindowSpacerTop = 23.0f;
+    m_fWindowX = 550.0f;
+    m_fWindowY = 360.0f;
+    m_fInputHeight = 29.0f;
 
     // Create GUI elements
     CreateElements ();
@@ -50,7 +50,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
 
     m_pInput->SetTextAcceptedHandler ( GUI_CALLBACK ( &CConsole::Edit_OnTextAccepted, this ) );
 
-	m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
+    m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
     m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ), true );
@@ -103,10 +103,10 @@ void CConsole::Printf ( const char* szFormat, ... )
 {
     // Parse the formatted string to a string we can echo
     char szBuffer [1024];
-	va_list ap;
-	va_start ( ap, szFormat );
-	_VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-	va_end ( ap );
+    va_list ap;
+    va_start ( ap, szFormat );
+    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    va_end ( ap );
 
     // Echo it
     Echo ( szBuffer );
@@ -205,18 +205,18 @@ bool CConsole::OnCloseButtonClick ( CGUIElement* pElement )
 
 bool CConsole::History_OnTextChanged ( CGUIElement* pElement )
 {
-	// Set the carat to the end of the text
+    // Set the carat to the end of the text
     // TODO: Only do this if the console is scrolled to the bottom
-	m_pHistory->EnsureCaratIsVisible ( );
+    m_pHistory->EnsureCaratIsVisible ( );
 
-	// Roger that
-	return true;
+    // Roger that
+    return true;
 }
 
 bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
 {
-	string			strInput;
-    string			strHistory;
+    string          strInput;
+    string          strHistory;
     string          strCmd;
     string          strCmdLine;
 
@@ -397,10 +397,10 @@ void CConsole::SetNextAutoCompleteMatch ( void )
 
 void CConsole::CreateElements ( CGUIElement* pParent )
 {
-	// Adjust window size to resolution
-	CVector2D ScreenSize = m_pManager->GetResolution ();
-	m_fWindowX *= ScreenSize.fX / NATIVE_RES_X;
-	m_fWindowY *= ScreenSize.fY / NATIVE_RES_Y;
+    // Adjust window size to resolution
+    CVector2D ScreenSize = m_pManager->GetResolution ();
+    m_fWindowX *= ScreenSize.fX / NATIVE_RES_X;
+    m_fWindowY *= ScreenSize.fY / NATIVE_RES_Y;
 
     // Create window
     m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pManager->CreateWnd ( pParent, "CONSOLE" ) );
@@ -411,36 +411,36 @@ void CConsole::CreateElements ( CGUIElement* pParent )
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - m_fWindowX / 2, resolution.fY / 2 - m_fWindowY / 2 + yoff  ), false );
 
 //    m_pWindow->SetPosition ( CVector2D ( 0.20f, 0.20f ), true );
-	m_pWindow->SetSize ( CVector2D ( m_fWindowX, m_fWindowY ) );
-	m_pWindow->SetMinimumSize ( CVector2D ( m_fWindowX, m_fWindowY ) );
+    m_pWindow->SetSize ( CVector2D ( m_fWindowX, m_fWindowY ) );
+    m_pWindow->SetMinimumSize ( CVector2D ( m_fWindowX, m_fWindowY ) );
     m_pWindow->SetSizingEnabled ( true );
 
-	/** History widget
-		size x: SPACER - [WINDOW WIDTH] - SPACER
-		size y: SPACER (TOP) - [WINDOW HEIGHT] - SPACER/2 - INPUT HEIGHT - SPACER
-	*/
-	CVector2D HistorySize = CVector2D ( m_fWindowX - m_fWindowSpacer*2.0f, m_fWindowY - m_fWindowSpacer*1.5f - m_fWindowSpacerTop - m_fInputHeight );
+    /** History widget
+        size x: SPACER - [WINDOW WIDTH] - SPACER
+        size y: SPACER (TOP) - [WINDOW HEIGHT] - SPACER/2 - INPUT HEIGHT - SPACER
+    */
+    CVector2D HistorySize = CVector2D ( m_fWindowX - m_fWindowSpacer*2.0f, m_fWindowY - m_fWindowSpacer*1.5f - m_fWindowSpacerTop - m_fInputHeight );
     m_pHistory = reinterpret_cast < CGUIMemo* > ( m_pManager->CreateMemo ( m_pWindow ) );
-	m_pHistory->SetPosition ( CVector2D ( m_fWindowSpacer, m_fWindowSpacerTop ) );
-	CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative ( HistorySize );
-	m_pHistory->SetSize ( HistorySize );
+    m_pHistory->SetPosition ( CVector2D ( m_fWindowSpacer, m_fWindowSpacerTop ) );
+    CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative ( HistorySize );
+    m_pHistory->SetSize ( HistorySize );
     m_pHistory->SetReadOnly ( true );
 
-	/** Input widget
-		pos x: SPACER
-		pos y: SPACER (TOP) + HISTORY HEIGHT + SPACER
-	*/
+    /** Input widget
+        pos x: SPACER
+        pos y: SPACER (TOP) + HISTORY HEIGHT + SPACER
+    */
     m_pInput = reinterpret_cast < CGUIEdit* > ( m_pManager->CreateEdit ( m_pWindow ) );
     m_pInput->SetPosition ( CVector2D ( m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer*0.5f + m_fWindowSpacerTop ) );
-	m_pInput->SetWidth ( HistorySize.fX );
-	m_pInput->SetHeight ( m_fInputHeight );
+    m_pInput->SetWidth ( HistorySize.fX );
+    m_pInput->SetHeight ( m_fInputHeight );
 }
 
 
 void CConsole::DestroyElements ( void )
 {
-	if ( m_pWindow )
-		delete m_pWindow;
+    if ( m_pWindow )
+        delete m_pWindow;
 }
 
 
@@ -490,14 +490,14 @@ bool CConsole::OnWindowSize ( CGUIElement* pElement )
     m_fWindowX = vecSize.fX;
     m_fWindowY = vecSize.fY;
 
-	CVector2D HistorySize = CVector2D ( m_fWindowX - m_fWindowSpacer*2.0f, m_fWindowY - m_fWindowSpacer*1.5f - m_fWindowSpacerTop - m_fInputHeight );
-	m_pHistory->SetPosition ( CVector2D ( m_fWindowSpacer, m_fWindowSpacerTop ) );
-	CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative ( HistorySize );
-	m_pHistory->SetSize ( HistorySize );
+    CVector2D HistorySize = CVector2D ( m_fWindowX - m_fWindowSpacer*2.0f, m_fWindowY - m_fWindowSpacer*1.5f - m_fWindowSpacerTop - m_fInputHeight );
+    m_pHistory->SetPosition ( CVector2D ( m_fWindowSpacer, m_fWindowSpacerTop ) );
+    CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative ( HistorySize );
+    m_pHistory->SetSize ( HistorySize );
 
     m_pInput->SetPosition ( CVector2D ( m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer*0.5f + m_fWindowSpacerTop ) );
-	m_pInput->SetWidth ( HistorySize.fX );
-	m_pInput->SetHeight ( m_fInputHeight );
+    m_pInput->SetWidth ( HistorySize.fX );
+    m_pInput->SetHeight ( m_fInputHeight );
 
     return true;
 }

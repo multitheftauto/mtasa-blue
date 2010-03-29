@@ -58,8 +58,8 @@ bool CColPolygon::DoHitDetection  ( const CVector& vecLastPosition, const CVecto
 
 bool CColPolygon::ReadSpecialData ( void )
 {
-	int iTemp;
-	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+    int iTemp;
+    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;
@@ -82,10 +82,10 @@ void CColPolygon::SetPosition ( const CVector& vecPosition )
 
 void CColPolygon::AddPoint ( CVector2D vecPoint )
 {
-	float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-	float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
+    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
 
-	float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+    float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 
     if ( fDist > m_fRadius )
         m_fRadius = fDist;
@@ -95,10 +95,10 @@ void CColPolygon::AddPoint ( CVector2D vecPoint )
 
 bool CColPolygon::IsInBounds ( CVector vecPoint )
 {
-	float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-	float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
+    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
 
-	float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+    float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 
     return fDist <= m_fRadius;
 }

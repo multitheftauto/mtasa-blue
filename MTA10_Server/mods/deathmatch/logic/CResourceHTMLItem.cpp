@@ -25,7 +25,7 @@ CResourceHTMLItem::CResourceHTMLItem ( CResource * resource, const char * szShor
     m_bDefault = bIsDefault;
     m_pVM = NULL;
     m_bIsBeingRequested = false;
-	m_bRestricted = bRestricted;
+    m_bRestricted = bRestricted;
 }
 
 CResourceHTMLItem::~CResourceHTMLItem ( void )
@@ -46,37 +46,37 @@ ResponseCode CResourceHTMLItem::Request ( HttpRequest * ipoHttpRequest, HttpResp
 
     m_bIsBeingRequested = true;
 
-	m_responseCode = HTTPRESPONSECODE_200_OK;
+    m_responseCode = HTTPRESPONSECODE_200_OK;
 
     if ( !m_bIsRaw )
     {
-		ipoHttpResponse->oResponseHeaders [ "content-type" ] = m_strMime;
+        ipoHttpResponse->oResponseHeaders [ "content-type" ] = m_strMime;
 
-		CLuaArguments formData;
-		for ( FormValueMap::iterator iter = ipoHttpRequest->oFormValueMap.begin(); iter != ipoHttpRequest->oFormValueMap.end(); iter++ )
-		{
-			formData.PushString ( (*iter).first.c_str() );
-			formData.PushString ( ((FormValue)(*iter).second).sBody.c_str() );
-		}
+        CLuaArguments formData;
+        for ( FormValueMap::iterator iter = ipoHttpRequest->oFormValueMap.begin(); iter != ipoHttpRequest->oFormValueMap.end(); iter++ )
+        {
+            formData.PushString ( (*iter).first.c_str() );
+            formData.PushString ( ((FormValue)(*iter).second).sBody.c_str() );
+        }
 
-		CLuaArguments cookies;
-		for ( CookieMap::iterator iter = ipoHttpRequest->oCookieMap.begin(); iter != ipoHttpRequest->oCookieMap.end(); iter++ )
-		{
-			cookies.PushString ( (*iter).first.c_str() );
-			cookies.PushString ( (*iter).second.c_str() );
-		}
+        CLuaArguments cookies;
+        for ( CookieMap::iterator iter = ipoHttpRequest->oCookieMap.begin(); iter != ipoHttpRequest->oCookieMap.end(); iter++ )
+        {
+            cookies.PushString ( (*iter).first.c_str() );
+            cookies.PushString ( (*iter).second.c_str() );
+        }
 
-		CLuaArguments headers;
-		for ( StringMap::iterator iter = ipoHttpRequest->oRequestHeaders.begin(); iter != ipoHttpRequest->oRequestHeaders.end(); iter++ )
-		{
-			headers.PushString ( (*iter).first.c_str() );
-			headers.PushString ( (*iter).second.c_str() );
-		}
+        CLuaArguments headers;
+        for ( StringMap::iterator iter = ipoHttpRequest->oRequestHeaders.begin(); iter != ipoHttpRequest->oRequestHeaders.end(); iter++ )
+        {
+            headers.PushString ( (*iter).first.c_str() );
+            headers.PushString ( (*iter).second.c_str() );
+        }
 
-		m_currentResponse = ipoHttpResponse;
+        m_currentResponse = ipoHttpResponse;
         CLuaArguments querystring ( formData );
         CLuaArguments args;
-		args.PushTable ( &headers ); // requestHeaders
+        args.PushTable ( &headers ); // requestHeaders
         args.PushTable ( &formData ); // form
         args.PushTable ( &cookies ); // cookies
         args.PushString ( ipoHttpRequest->GetAddress().c_str() ); // hostname
@@ -118,26 +118,26 @@ ResponseCode CResourceHTMLItem::Request ( HttpRequest * ipoHttpRequest, HttpResp
 
 void CResourceHTMLItem::ClearPageBuffer ( )
 {
-	m_strPageBuffer.clear ();
+    m_strPageBuffer.clear ();
 }
 
 void CResourceHTMLItem::SetResponseHeader ( const char* szHeaderName, const char* szHeaderValue )
 {
-	m_currentResponse->oResponseHeaders [ szHeaderName ] = szHeaderValue;
+    m_currentResponse->oResponseHeaders [ szHeaderName ] = szHeaderValue;
 }
 
-void CResourceHTMLItem::SetResponseCode	( int responseCode )
+void CResourceHTMLItem::SetResponseCode ( int responseCode )
 {
-	m_responseCode = (ResponseCode)responseCode;
+    m_responseCode = (ResponseCode)responseCode;
 }
 
 void CResourceHTMLItem::SetResponseCookie ( const char* szCookieName, const char* szCookieValue )
 {
-	CookieParameters params;
-	Datum data;
-	data = szCookieValue;
-	params [ szCookieName ] = data;
-	m_currentResponse->SetCookie ( params );
+    CookieParameters params;
+    Datum data;
+    data = szCookieValue;
+    params [ szCookieName ] = data;
+    m_currentResponse->SetCookie ( params );
 }
 
 bool CResourceHTMLItem::AppendToPageBuffer ( const char * szText, size_t length )

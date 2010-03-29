@@ -31,7 +31,7 @@ public:
     virtual bool                IsTitlebarEnabled       ( void ) = 0;
 
     virtual void                SetCloseClickHandler    ( GUI_CALLBACK Callback ) = 0;
-	virtual void                SetKeyDownHandler		( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetKeyDownHandler       ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetEnterKeyHandler      ( GUI_CALLBACK Callback ) = 0;
 };
 

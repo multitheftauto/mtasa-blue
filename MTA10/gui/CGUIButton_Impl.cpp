@@ -17,9 +17,9 @@
 
 CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
 {
-	m_pManager = pGUI;
+    m_pManager = pGUI;
 
-	// Get an unique identifier for CEGUI (gah, there's gotta be an another way)
+    // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
     pGUI->GetUniqueName ( szUnique );
 
@@ -27,11 +27,11 @@ CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIBUTTON_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
     m_pWindow->setText ( szCaption );
-	m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
-	m_pWindow->setVisible ( true );
+    m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
+    m_pWindow->setVisible ( true );
 
-	// Store the pointer to this CGUI element in the CEGUI element
-	m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    // Store the pointer to this CGUI element in the CEGUI element
+    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
     AddEvents ();
 
@@ -43,12 +43,12 @@ CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     else
     {
         pGUI->AddChild ( this );
-		SetParent ( NULL );
+        SetParent ( NULL );
     }
 }
 
 
 CGUIButton_Impl::~CGUIButton_Impl ( void )
 {
-	DestroyElement ();
+    DestroyElement ();
 }

@@ -31,9 +31,9 @@ public:
     virtual float           GetScrollbarDocumentSize    ( void ) = 0;
     virtual float           GetScrollbarPageSize        ( void ) = 0;
 
-    virtual void		    EnsureCaratIsVisible    ( void ) = 0;
+    virtual void            EnsureCaratIsVisible    ( void ) = 0;
 
-	virtual void            SetTextChangedHandler   ( const GUI_CALLBACK & Callback ) = 0;
+    virtual void            SetTextChangedHandler   ( const GUI_CALLBACK & Callback ) = 0;
 };
 
 #endif

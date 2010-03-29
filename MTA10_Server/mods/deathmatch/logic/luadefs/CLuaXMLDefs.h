@@ -30,7 +30,7 @@ public:
     static int      xmlSaveFile                         ( lua_State* luaVM );
     static int      xmlUnloadFile                       ( lua_State* luaVM );
 
-    static int		xmlCreateChild		    			( lua_State* luaVM );
+    static int      xmlCreateChild                      ( lua_State* luaVM );
     static int      xmlDestroyNode                      ( lua_State* luaVM );
     static int      xmlNodeFindChild                    ( lua_State* luaVM );
     static int      xmlNodeGetChildren                  ( lua_State* luaVM );
@@ -38,12 +38,12 @@ public:
 
     static int      xmlNodeGetValue                     ( lua_State* luaVM );
     static int      xmlNodeSetValue                     ( lua_State* luaVM );
-	static int      xmlNodeGetAttributes                ( lua_State* luaVM );
+    static int      xmlNodeGetAttributes                ( lua_State* luaVM );
     static int      xmlNodeGetAttribute                 ( lua_State* luaVM );
     static int      xmlNodeSetAttribute                 ( lua_State* luaVM );
 
-	static int      xmlNodeGetName		                ( lua_State* luaVM );
-	static int      xmlNodeSetName		                ( lua_State* luaVM );
+    static int      xmlNodeGetName                      ( lua_State* luaVM );
+    static int      xmlNodeSetName                      ( lua_State* luaVM );
 };
 
 #endif

@@ -193,9 +193,9 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
     {
         if ( strlen( szRegBuffer ) )
         {
-			// Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-			if ( strchr ( szRegBuffer, '?' ) > 0 )
-				return -1;
+            // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
+            if ( strchr ( szRegBuffer, '?' ) > 0 )
+                return -1;
 
             char szExePath[MAX_PATH];
             sprintf ( szExePath, "%s\\%s", szRegBuffer, MTA_GTAEXE_NAME );
@@ -272,26 +272,26 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     char szMTASAPath[MAX_PATH];
     char szGTAPath[MAX_PATH];
 
-	int iResult;
+    int iResult;
 
     UpgradeRegistryKeys ();
 
-	iResult = GetGamePath ( szGTAPath, MAX_PATH );
-	if ( iResult == 0 ) {
-		MessageBox ( 0, "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+    iResult = GetGamePath ( szGTAPath, MAX_PATH );
+    if ( iResult == 0 ) {
+        MessageBox ( 0, "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
         return 5;
-	}
-	else if ( iResult == -1 ) {
-		MessageBox ( 0, "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
-		return 5;
-	}
+    }
+    else if ( iResult == -1 ) {
+        MessageBox ( 0, "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        return 5;
+    }
 
     GetMTASAPath ( szMTASAPath, MAX_PATH );
 
     // If we aren't compiling in debug-mode...
     HWND hwndSplash = NULL;
     #ifndef MTA_DEBUG
-	#ifndef MTA_ALLOW_DEBUG
+    #ifndef MTA_ALLOW_DEBUG
         // Are we debugged? Quit... if not compiled debug
         if ( IsDebuggerPresent () )
         {
@@ -302,7 +302,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         // Show the splash and wait 2 seconds
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
         Sleep ( 1000 );
-	#endif
+    #endif
     #endif
 
 
@@ -411,9 +411,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if ( hwndSplash )
         DestroyWindow ( hwndSplash );
 
-	#ifdef MTA_DEBUG
-	WaitForSingleObject ( piLoadee.hProcess, INFINITE );
-	#endif
+    #ifdef MTA_DEBUG
+    WaitForSingleObject ( piLoadee.hProcess, INFINITE );
+    #endif
 
     // Cleanup and exit.
     CloseHandle ( piLoadee.hProcess );

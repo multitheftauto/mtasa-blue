@@ -67,8 +67,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     // Add all our events and functions
     InitVM();
 
-	// Initialize security restrictions. Very important to prevent lua trojans and viruses!
-	InitSecurity();
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity();
 }
 
 
@@ -96,10 +96,10 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-	lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
-	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
-	lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
-	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaFunctionDefs::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
@@ -120,23 +120,23 @@ void CLuaMain::InitVM ( void )
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
 
-	// Create the callback table (at location 1 in the registry)
+    // Create the callback table (at location 1 in the registry)
     lua_pushnumber ( m_luaVM, 1 );
     lua_newtable ( m_luaVM );
     lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
 
-	// Register module functions
+    // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
     // Update global variables
     lua_pushelement ( m_luaVM, g_pClientGame->GetRootEntity () );
-	lua_setglobal ( m_luaVM, "root" );
+    lua_setglobal ( m_luaVM, "root" );
 
     lua_pushresource ( m_luaVM, m_pResource );
-	lua_setglobal ( m_luaVM, "resource" );
+    lua_setglobal ( m_luaVM, "resource" );
 
-	lua_pushelement ( m_luaVM, m_pResource->GetResourceEntity () );
-	lua_setglobal ( m_luaVM, "resourceRoot" );
+    lua_pushelement ( m_luaVM, m_pResource->GetResourceEntity () );
+    lua_setglobal ( m_luaVM, "resourceRoot" );
 
     lua_pushelement ( m_luaVM, m_pResource->GetResourceGUIEntity () );
     lua_setglobal ( m_luaVM, "guiRoot" );
@@ -237,7 +237,7 @@ void CLuaMain::Start ( void )
 
 void CLuaMain::UnloadScript ( void )
 {
-	// ACHTUNG: UNLOAD MODULES!
+    // ACHTUNG: UNLOAD MODULES!
 
     // End the lua vm
     if ( m_luaVM )
@@ -249,8 +249,8 @@ void CLuaMain::UnloadScript ( void )
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
-	// Delete all GUI elements
-	//m_pLuaManager->m_pGUIManager->DeleteAll ( this );
+    // Delete all GUI elements
+    //m_pLuaManager->m_pGUIManager->DeleteAll ( this );
 }
 
 

@@ -41,35 +41,35 @@ CWantedSA::~CWantedSA ( void )
 
 void CWantedSA::SetMaximumWantedLevel ( DWORD dwWantedLevel )
 {
-	DWORD dwFunc = FUNC_SetMaximumWantedLevel;
-	_asm
-	{
-		push	dwWantedLevel
-		call	dwFunc
-		add		esp, 4
-	}
+    DWORD dwFunc = FUNC_SetMaximumWantedLevel;
+    _asm
+    {
+        push    dwWantedLevel
+        call    dwFunc
+        add     esp, 4
+    }
 }
 
 void CWantedSA::SetWantedLevel ( DWORD dwWantedLevel )
 {
-	DWORD dwThis = (DWORD)this->GetInterface();
-	DWORD dwFunc = FUNC_SetWantedLevel;
-	_asm
-	{
-		mov		ecx, dwThis
-		push	dwWantedLevel
-		call	dwFunc
-	}
+    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = FUNC_SetWantedLevel;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwWantedLevel
+        call    dwFunc
+    }
 }
 
 void CWantedSA::SetWantedLevelNoDrop ( DWORD dwWantedLevel )
 {
-	DWORD dwThis = (DWORD)this->GetInterface();
-	DWORD dwFunc = FUNC_SetWantedLevelNoDrop;
-	_asm
-	{
-		mov		ecx, dwThis
-		push	dwWantedLevel
-		call	dwFunc
-	}
+    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = FUNC_SetWantedLevelNoDrop;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwWantedLevel
+        call    dwFunc
+    }
 }

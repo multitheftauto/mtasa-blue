@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CHandlingEntrySA.cpp
-*  PURPOSE:		Vehicle handling data entry
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CHandlingEntrySA.cpp
+*  PURPOSE:     Vehicle handling data entry
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *               The_GTA <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -55,21 +55,21 @@ CHandlingEntrySA::~CHandlingEntrySA ( void )
 // Does vehicle entry already exist?
 bool CHandlingEntrySA::IsVehicleAdded ( CVehicle* pVeh )
 {
-//	std::list < CVehicleSA* > ::iterator iter = m_VehicleList.begin ();
-//	for ( ; iter != m_VehicleList.begin (); iter++ )
-//	{
-//		if (*iter == pVeh)
-//			return true;
-//	}
-	return false;
+//  std::list < CVehicleSA* > ::iterator iter = m_VehicleList.begin ();
+//  for ( ; iter != m_VehicleList.begin (); iter++ )
+//  {
+//      if (*iter == pVeh)
+//          return true;
+//  }
+    return false;
 }
 
 // Adds a vehicle to list
 void CHandlingEntrySA::AddVehicle ( CVehicle* pVeh )
 {
-//	if ( IsVehicleAdded ( pVeh ) )
-//		return;
-//	m_VehicleList.push_front ( dynamic_cast < CVehicleSA* > ( pVeh ) );
+//  if ( IsVehicleAdded ( pVeh ) )
+//      return;
+//  m_VehicleList.push_front ( dynamic_cast < CVehicleSA* > ( pVeh ) );
 }
 
 
@@ -85,7 +85,7 @@ void CHandlingEntrySA::ApplyHandlingData ( CHandlingEntry* pData )
 // Remove a vehicle from list
 void CHandlingEntrySA::RemoveVehicle ( CVehicle* pVeh )
 {
-//	m_VehicleList.remove ( dynamic_cast < CVehicleSA* > ( pVeh ) );
+//  m_VehicleList.remove ( dynamic_cast < CVehicleSA* > ( pVeh ) );
 }
 
 

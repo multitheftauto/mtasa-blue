@@ -418,7 +418,7 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 
                     // Destroy the XML
                     luaMain->DestroyXML ( xmlFile );
-                }	
+                }   
             }
         }
     }

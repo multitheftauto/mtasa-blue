@@ -31,7 +31,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
 
     // Start/stop management
     CLuaCFunctions::AddFunction ( "startResource", CLuaResourceDefs::startResource );
-	CLuaCFunctions::AddFunction ( "stopResource", CLuaResourceDefs::stopResource );
+    CLuaCFunctions::AddFunction ( "stopResource", CLuaResourceDefs::stopResource );
     CLuaCFunctions::AddFunction ( "restartResource", CLuaResourceDefs::restartResource );
 
     // Get stuff
@@ -51,10 +51,10 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceMapRootElement", CLuaResourceDefs::getResourceMapRootElement );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaResourceDefs::getResourceExportedFunctions );
 
-	// Set stuff
-	CLuaCFunctions::AddFunction ( "setResourceInfo", CLuaResourceDefs::setResourceInfo );
+    // Set stuff
+    CLuaCFunctions::AddFunction ( "setResourceInfo", CLuaResourceDefs::setResourceInfo );
 
-	// Misc
+    // Misc
     CLuaCFunctions::AddFunction ( "call", CLuaResourceDefs::call );
 }
 
@@ -66,12 +66,12 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
     {
         // Grab the resource string and try to create it
         const char* szResource = lua_tostring ( luaVM, 1 );
-		CResource* pResource = m_pResourceManager->CreateResource ( (char*) szResource );
-		if ( pResource )
-		{
-			lua_pushresource ( luaVM, pResource );
-			return 1;
-		}
+        CResource* pResource = m_pResourceManager->CreateResource ( (char*) szResource );
+        if ( pResource )
+        {
+            lua_pushresource ( luaVM, pResource );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "createResource" );
@@ -83,26 +83,26 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
 
 int CLuaResourceDefs::copyResource ( lua_State* luaVM )
 {
-	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-		 lua_type ( luaVM, 2 ) == LUA_TSTRING )
-	{
-		CResource* pResource = lua_toresource ( luaVM, 1 );
-		if ( pResource )
-		{
-			const char* szResource = lua_tostring ( luaVM, 2 );
-			CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, szResource );
-			if ( pNewResource )
-			{
-				lua_pushresource ( luaVM, pNewResource );
-				return 1;
-			}
-		}
-	}
-	else
-		m_pScriptDebugging->LogBadType ( luaVM, "copyResource" );
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TSTRING )
+    {
+        CResource* pResource = lua_toresource ( luaVM, 1 );
+        if ( pResource )
+        {
+            const char* szResource = lua_tostring ( luaVM, 2 );
+            CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, szResource );
+            if ( pNewResource )
+            {
+                lua_pushresource ( luaVM, pNewResource );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "copyResource" );
 
-	lua_pushboolean ( luaVM, false );
-	return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 
@@ -121,7 +121,7 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
             // Read out the resource and make sure it exists
             CResource* pResource = pLUA->GetResource();
             CResource* pThisResource = pResource;
-		    if ( pResource )
+            if ( pResource )
             {
                 // Grab the mapname string
                 std::string strMapName = lua_tostring ( luaVM, 1 );
@@ -141,12 +141,12 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                 if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, NULL ) )
                 {
                     // Do we have permissions?
-			        if ( pResource == pThisResource ||
-				         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													    "ModifyOtherObjects",
-													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													    false ) )
+                    if ( pResource == pThisResource ||
+                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap ( pResource, strPath, strMetaName, iDimension, pLUA );
@@ -187,7 +187,7 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
             // Read out the resource and make sure it exists
             CResource* pResource = pLUA->GetResource();
             CResource* pThisResource = pResource;
-		    if ( pResource )
+            if ( pResource )
             {
                 // Grab the mapname string
                 std::string strMapName = lua_tostring ( luaVM, 1 );
@@ -207,12 +207,12 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
                             CLogger::LogPrintf ( "WARNING: Unknown config file type specified for addResourceConfig. Defaulting to 'server'" );
                     }
                     // Do we have permissions?
-			        if ( pResource == pThisResource ||
-				         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-													    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-													    "ModifyOtherObjects",
-													    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-													    false ) )
+                    if ( pResource == pThisResource ||
+                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig ( pResource, strPath, strConfigName, iType, pLUA );
@@ -242,7 +242,7 @@ int CLuaResourceDefs::removeResourceFile ( lua_State* luaVM )
     {
         // Read out the resource and make sure it exists
         CResource* pResource = lua_toresource ( luaVM, 1 );
-		if ( pResource )
+        if ( pResource )
         {
             // Grab the configname string
             const char* szFileName = lua_tostring ( luaVM, 2 );
@@ -272,7 +272,7 @@ int CLuaResourceDefs::setResourceDefaultSetting  ( lua_State* luaVM )
     {
         // Read out the resource and make sure it exists
         CResource* pResource = lua_toresource ( luaVM, 1 );
-		if ( pResource )
+        if ( pResource )
         {
             // Read out the settings name and value
             const char* szSettingName = lua_tostring ( luaVM, 2 );
@@ -300,7 +300,7 @@ int CLuaResourceDefs::removeResourceDefaultSetting ( lua_State* luaVM )
     {
         // Read out the resource and make sure it exists
         CResource* pResource = lua_toresource ( luaVM, 1 );
-		if ( pResource )
+        if ( pResource )
         {
             // Read out the settings name
             const char* szSettingName = lua_tostring ( luaVM, 2 );
@@ -333,41 +333,41 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
         {
             bStartIncludedResources = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
         }
-		bool bConfigs = true;
-		if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )	// start configs
-		{
-			bConfigs = lua_toboolean ( luaVM, 4 ) ? true:false;
-		}
-		bool bMaps = true;
-		if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )	// start maps?
-		{
-			bMaps = lua_toboolean ( luaVM, 5 ) ? true:false;
-		}
-		bool bScripts = true;
-		if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )	// start scripts?
-		{
-			bScripts = lua_toboolean ( luaVM, 6 ) ? true:false;
-		}
-		bool bHTML = true;
-		if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )	// start html files?
-		{
-			bHTML = lua_toboolean ( luaVM, 7 ) ? true:false;
-		}
-		bool bClientConfigs = true;
-		if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )	// start client configs?
-		{
-			bClientConfigs = lua_toboolean ( luaVM, 8 ) ? true:false;
-		}
-		bool bClientScripts = true;
-		if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )	// start client scripts?
-		{
-			bClientScripts = lua_toboolean ( luaVM, 9 ) ? true:false;
-		}
-		bool bClientFiles = true;
-		if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN )	// start client files?
-		{
-			bClientFiles = lua_toboolean ( luaVM, 10 ) ? true:false;
-		}
+        bool bConfigs = true;
+        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )    // start configs
+        {
+            bConfigs = lua_toboolean ( luaVM, 4 ) ? true:false;
+        }
+        bool bMaps = true;
+        if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )    // start maps?
+        {
+            bMaps = lua_toboolean ( luaVM, 5 ) ? true:false;
+        }
+        bool bScripts = true;
+        if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )    // start scripts?
+        {
+            bScripts = lua_toboolean ( luaVM, 6 ) ? true:false;
+        }
+        bool bHTML = true;
+        if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )    // start html files?
+        {
+            bHTML = lua_toboolean ( luaVM, 7 ) ? true:false;
+        }
+        bool bClientConfigs = true;
+        if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )    // start client configs?
+        {
+            bClientConfigs = lua_toboolean ( luaVM, 8 ) ? true:false;
+        }
+        bool bClientScripts = true;
+        if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )    // start client scripts?
+        {
+            bClientScripts = lua_toboolean ( luaVM, 9 ) ? true:false;
+        }
+        bool bClientFiles = true;
+        if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN )   // start client files?
+        {
+            bClientFiles = lua_toboolean ( luaVM, 10 ) ? true:false;
+        }
 
         // @@@@@ Check if they can start resources
         
@@ -376,43 +376,43 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
         {
             if ( resource->IsLoaded() )
             {
-				if ( !resource->IsActive() && !resource->IsStarting() )
+                if ( !resource->IsActive() && !resource->IsStarting() )
                 {
                     std::string strResourceName = resource->GetName ();
 
-					if ( !m_pResourceManager->StartResource ( resource, NULL, bPersistent, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles ) )
+                    if ( !m_pResourceManager->StartResource ( resource, NULL, bPersistent, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles ) )
                     {
-						CLogger::LogPrintf ( "start: Failed to start resource '%s'\n", strResourceName.c_str () );
+                        CLogger::LogPrintf ( "start: Failed to start resource '%s'\n", strResourceName.c_str () );
                         lua_pushboolean ( luaVM, false );
                         return 1;  
                     }
                
-					if ( resource->IsActive() )
-					{
-						// if the resource is persistent, set that flag
-						resource->SetPersistent ( bPersistent );
+                    if ( resource->IsActive() )
+                    {
+                        // if the resource is persistent, set that flag
+                        resource->SetPersistent ( bPersistent );
 
-						if ( !bPersistent )
-						{
-							// Add the new resource to the list of included resources so that when
-							// we unload this resource, the new resource goes with it
-							CLuaMain * main = m_pLuaManager->GetVirtualMachine ( luaVM );
-							if ( main )
-							{
-								CResource * thisresource = main->GetResource();
-								if ( thisresource )
-								{
-									thisresource->AddTemporaryInclude ( resource );
-									// Make sure the new resource is dependent on this one
-									resource->AddDependent ( thisresource );
-								}
-							}           
-						}
-						CLogger::LogPrintf ( "start: Resource '%s' started\n", resource->GetName().c_str () );
-						lua_pushboolean ( luaVM, true );
-						return 1;
-					}
-				}
+                        if ( !bPersistent )
+                        {
+                            // Add the new resource to the list of included resources so that when
+                            // we unload this resource, the new resource goes with it
+                            CLuaMain * main = m_pLuaManager->GetVirtualMachine ( luaVM );
+                            if ( main )
+                            {
+                                CResource * thisresource = main->GetResource();
+                                if ( thisresource )
+                                {
+                                    thisresource->AddTemporaryInclude ( resource );
+                                    // Make sure the new resource is dependent on this one
+                                    resource->AddDependent ( thisresource );
+                                }
+                            }           
+                        }
+                        CLogger::LogPrintf ( "start: Resource '%s' started\n", resource->GetName().c_str () );
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                }
             }
         }
         else
@@ -438,19 +438,19 @@ int CLuaResourceDefs::stopResource ( lua_State* luaVM )
             {
                 if ( resource->IsActive() )
                 {
-				    if ( resource->IsProtected() )
-				    {
-					    if ( !m_pACLManager->CanObjectUseRight ( pLuaMain->GetResource()->GetName().c_str (),
-															    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-															    "stopResource.protected",
-															    CAccessControlListRight::RIGHT_TYPE_FUNCTION,
-															    false ) )
-					    {
-						    m_pScriptDebugging->LogError ( luaVM, "stop: Resource could not be stopped as it is protected" );
-						    lua_pushboolean ( luaVM, false );
-						    return 1;
-					    }
-				    }
+                    if ( resource->IsProtected() )
+                    {
+                        if ( !m_pACLManager->CanObjectUseRight ( pLuaMain->GetResource()->GetName().c_str (),
+                                                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                                "stopResource.protected",
+                                                                CAccessControlListRight::RIGHT_TYPE_FUNCTION,
+                                                                false ) )
+                        {
+                            m_pScriptDebugging->LogError ( luaVM, "stop: Resource could not be stopped as it is protected" );
+                            lua_pushboolean ( luaVM, false );
+                            return 1;
+                        }
+                    }
 
                     // Schedule it for a stop
                     m_pResourceManager->QueueResource ( resource, CResourceManager::QUEUE_STOP, NULL );
@@ -479,50 +479,50 @@ int CLuaResourceDefs::restartResource ( lua_State* luaVM )
         {
             if ( resource->IsActive() )
             {
-				bool bPersistent = false;
-				if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-				{
-					bPersistent = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
-					if ( bPersistent )
-					{
-						// @@@@@ Need to check for persistent access?
-					}
-				}
-				bool bConfigs = true;
-				if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )	// start configs
-				{
-					bConfigs = lua_toboolean ( luaVM, 3 ) ? true:false;
-				}
-				bool bMaps = true;
-				if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )	// start maps?
-				{
-					bMaps = lua_toboolean ( luaVM, 4 ) ? true:false;
-				}
-				bool bScripts = true;
-				if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )	// start scripts?
-				{
-					bScripts = lua_toboolean ( luaVM, 5 ) ? true:false;
-				}
-				bool bHTML = true;
-				if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )	// start html files?
-				{
-					bHTML = lua_toboolean ( luaVM, 6 ) ? true:false;
-				}
-				bool bClientConfigs = true;
-				if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )	// start client configs?
-				{
-					bClientConfigs = lua_toboolean ( luaVM, 7 ) ? true:false;
-				}
-				bool bClientScripts = true;
-				if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )	// start client scripts?
-				{
-					bClientScripts = lua_toboolean ( luaVM, 8 ) ? true:false;
-				}
-				bool bClientFiles = true;
-				if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )	// start client files?
-				{
-					bClientFiles = lua_toboolean ( luaVM, 9 ) ? true:false;
-				}
+                bool bPersistent = false;
+                if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+                {
+                    bPersistent = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
+                    if ( bPersistent )
+                    {
+                        // @@@@@ Need to check for persistent access?
+                    }
+                }
+                bool bConfigs = true;
+                if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )    // start configs
+                {
+                    bConfigs = lua_toboolean ( luaVM, 3 ) ? true:false;
+                }
+                bool bMaps = true;
+                if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )    // start maps?
+                {
+                    bMaps = lua_toboolean ( luaVM, 4 ) ? true:false;
+                }
+                bool bScripts = true;
+                if ( lua_type ( luaVM, 5 ) == LUA_TBOOLEAN )    // start scripts?
+                {
+                    bScripts = lua_toboolean ( luaVM, 5 ) ? true:false;
+                }
+                bool bHTML = true;
+                if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )    // start html files?
+                {
+                    bHTML = lua_toboolean ( luaVM, 6 ) ? true:false;
+                }
+                bool bClientConfigs = true;
+                if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )    // start client configs?
+                {
+                    bClientConfigs = lua_toboolean ( luaVM, 7 ) ? true:false;
+                }
+                bool bClientScripts = true;
+                if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )    // start client scripts?
+                {
+                    bClientScripts = lua_toboolean ( luaVM, 8 ) ? true:false;
+                }
+                bool bClientFiles = true;
+                if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )    // start client files?
+                {
+                    bClientFiles = lua_toboolean ( luaVM, 9 ) ? true:false;
+                }
 
                 // Queue it up for a restart
                 CResourceManager::sResourceStartFlags sFlags;
@@ -607,10 +607,10 @@ int CLuaResourceDefs::getResourceState ( lua_State* luaVM )
         CResource* resource = lua_toresource ( luaVM, 1 );
         if ( resource )
         {
-			if ( resource->IsStarting() )
-				lua_pushstring ( luaVM, "starting" );
-			else if ( resource->IsStopping() )
-				lua_pushstring ( luaVM, "stopping" );
+            if ( resource->IsStarting() )
+                lua_pushstring ( luaVM, "starting" );
+            else if ( resource->IsStopping() )
+                lua_pushstring ( luaVM, "stopping" );
             else if ( resource->IsActive() )
                 lua_pushstring ( luaVM, "running" );
             else if ( resource->IsLoaded() )
@@ -665,41 +665,41 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
     int iArgument3 = lua_type ( luaVM, 3 );
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && 
          lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-		 ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNIL ) )
+         ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNIL ) )
     {
-		CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-		if ( pLuaMain )
-		{
-			CResource* pThisResource = pLuaMain->GetResource ();
-			CResource* pResource = lua_toresource ( luaVM, 1 );
-			if ( pResource )
-			{
-				if ( pResource == pThisResource ||
-					m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-														CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-														"ModifyOtherObjects",
-														CAccessControlListRight::RIGHT_TYPE_GENERAL,
-														false ) )
-				{
-					if ( pResource->IsLoaded() )
-					{
-						const char * szInfoKey = lua_tostring ( luaVM, 2 );
-						const char * szInfoValue = NULL;
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pResource = lua_toresource ( luaVM, 1 );
+            if ( pResource )
+            {
+                if ( pResource == pThisResource ||
+                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
+                    if ( pResource->IsLoaded() )
+                    {
+                        const char * szInfoKey = lua_tostring ( luaVM, 2 );
+                        const char * szInfoValue = NULL;
                         if ( iArgument3 == LUA_TSTRING ) szInfoValue = lua_tostring ( luaVM, 3 );
-						pResource->SetInfoValue ( (char*)szInfoKey, (char*)szInfoValue );
+                        pResource->SetInfoValue ( (char*)szInfoKey, (char*)szInfoValue );
 
-						lua_pushboolean ( luaVM, true );
-						return 1;
-					}
-				}
-				else
-					m_pScriptDebugging->LogError ( luaVM, "setResourceInfo failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
-			}
-			else
-				m_pScriptDebugging->LogBadPointer ( luaVM, "setResourceInfo", "resource", 1 );
-		}
-		else
-			m_pScriptDebugging->LogBadType ( luaVM, "setResourceInfo" );
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                }
+                else
+                    m_pScriptDebugging->LogError ( luaVM, "setResourceInfo failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setResourceInfo", "resource", 1 );
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "setResourceInfo" );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setResourceInfo" );

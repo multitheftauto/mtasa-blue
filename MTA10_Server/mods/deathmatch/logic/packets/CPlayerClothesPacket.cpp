@@ -15,13 +15,13 @@
 CPlayerClothesPacket::~CPlayerClothesPacket ( void )
 {
     vector < SPlayerClothes* > ::iterator iter = m_List.begin ();
-	for ( ; iter != m_List.end () ; iter++ )
-	{
+    for ( ; iter != m_List.end () ; iter++ )
+    {
         delete [] (*iter)->szTexture;
         delete [] (*iter)->szModel;
-		delete *iter;
-	}
-	m_List.clear ();
+        delete *iter;
+    }
+    m_List.clear ();
 }
 
 
@@ -33,13 +33,13 @@ bool CPlayerClothesPacket::Write ( NetBitStreamInterface& BitStream ) const
         ElementID ID = m_pSourceElement->GetID ();
         BitStream.Write ( ID );
 
-		// Write the clothes
-		unsigned short usNumClothes = static_cast < unsigned short > ( m_List.size () );
-		BitStream.Write ( usNumClothes );
+        // Write the clothes
+        unsigned short usNumClothes = static_cast < unsigned short > ( m_List.size () );
+        BitStream.Write ( usNumClothes );
 
-		vector < SPlayerClothes* > ::const_iterator iter = m_List.begin ();
-		for ( ; iter != m_List.end () ; iter++ )
-		{
+        vector < SPlayerClothes* > ::const_iterator iter = m_List.begin ();
+        for ( ; iter != m_List.end () ; iter++ )
+        {
             char* szTexture = (*iter)->szTexture;
             char* szModel = (*iter)->szModel;
             unsigned char ucTextureLength = strlen ( szTexture );
@@ -49,18 +49,18 @@ bool CPlayerClothesPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( ucModelLength );
             BitStream.Write ( szModel, ucModelLength );
             BitStream.Write ( (*iter)->ucType );
-		}
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 
 void CPlayerClothesPacket::Add ( const char* szTexture, const char* szModel, unsigned char ucType )
 {
-	SPlayerClothes* Clothes = new SPlayerClothes;
+    SPlayerClothes* Clothes = new SPlayerClothes;
     Clothes->szTexture = new char [ strlen ( szTexture ) + 1 ];
     strcpy ( Clothes->szTexture, szTexture );
     Clothes->szModel = new char [ strlen ( szModel ) + 1 ];

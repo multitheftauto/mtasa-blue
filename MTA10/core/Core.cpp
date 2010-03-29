@@ -22,7 +22,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     string                  WorkingDirectory;
 
 
-	if ( dwReason == DLL_PROCESS_ATTACH )
+    if ( dwReason == DLL_PROCESS_ATTACH )
     {
         FileTranslator.SetCurrentWorkingDirectory ( "mta" );
         FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
@@ -37,9 +37,9 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
         FileTranslator.GetGTARootDirectory ( WorkingDirectory );
         SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-	} 
-	else if (dwReason == DLL_PROCESS_DETACH)
-	{
+    } 
+    else if (dwReason == DLL_PROCESS_DETACH)
+    {
         // For now, TerminateProcess if any destruction is attempted (or we'll crash)
         TerminateProcess ( GetCurrentProcess (), 0 );
 
@@ -48,7 +48,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
             delete g_pCore;
             g_pCore = NULL;
         }
-	}
+    }
 
-	return TRUE;
+    return TRUE;
 }

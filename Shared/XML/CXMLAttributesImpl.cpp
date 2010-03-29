@@ -26,7 +26,7 @@ CXMLAttributesImpl::CXMLAttributesImpl ( TiXmlElement& Node ) :
 CXMLAttributesImpl::~CXMLAttributesImpl ( void )
 {
     // Delete all attribute wrappers (not from the xml tree)
-	DeleteAttributes ();
+    DeleteAttributes ();
 }
 
 
@@ -38,7 +38,7 @@ unsigned int CXMLAttributesImpl::Count ( void )
 
 CXMLAttribute* CXMLAttributesImpl::Find ( const char* szName )
 {
-	// Find the attribute in our attributelist
+    // Find the attribute in our attributelist
     std::list < CXMLAttribute* > ::const_iterator iter = m_Attributes.begin ();
     for ( ; iter != m_Attributes.end (); iter++ )
     {

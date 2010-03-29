@@ -95,8 +95,8 @@ void CNametags::DrawFromAim ( void )
                 CCam* pActive = pCamera->GetCam ( pCamera->GetActiveCam () );
 
                 // Grab the camera matrix
-	            CMatrix matCamera;
-	            pCamera->GetMatrix ( &matCamera );
+                CMatrix matCamera;
+                pCamera->GetMatrix ( &matCamera );
                 vecStart = matCamera.vPos;
 
                 // Range
@@ -135,8 +135,8 @@ void CNametags::DrawFromAim ( void )
                     CCam* pActive = pCamera->GetCam ( pCamera->GetActiveCam () );
 
                     // Grab the camera matrix
-	                CMatrix matCamera;
-	                pCamera->GetMatrix ( &matCamera );
+                    CMatrix matCamera;
+                    pCamera->GetMatrix ( &matCamera );
                     vecStart = matCamera.vPos;
 
                     // Find the target position
@@ -378,7 +378,7 @@ void CNametags::DrawDefault ( void )
     list < CClientPlayer * > ::iterator iterTags = playerTags.begin ();
     for ( ; iterTags != playerTags.end () ; iterTags++ )
     {
-		pPlayer = *iterTags;
+        pPlayer = *iterTags;
         fDistance = pPlayer->GetNametagDistance ();
 
         static float fFullAlphaDistance = 7.0f;
@@ -406,13 +406,13 @@ void CNametags::DrawDefault ( void )
 void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha )
 {
     // Get the nametag widget
-	CGUIStaticImage * pIcon = pPlayer->GetStatusIcon ();
+    CGUIStaticImage * pIcon = pPlayer->GetStatusIcon ();
 
-	// If they aren't in the same dimension, dont draw
-	if ( pPlayer->GetDimension () != m_usDimension || !pPlayer->IsNametagShowing () )
-		return;
+    // If they aren't in the same dimension, dont draw
+    if ( pPlayer->GetDimension () != m_usDimension || !pPlayer->IsNametagShowing () )
+        return;
 
-	// Grab the resolution width and height
+    // Grab the resolution width and height
     static float fResWidth = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
     static float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
 
@@ -437,14 +437,14 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     // Some multiplier heh...
     fHealth *= 7.52f;
 
-	// Allow up to 50 pixels off screen to avoid nametags suddenly disappearing
+    // Allow up to 50 pixels off screen to avoid nametags suddenly disappearing
     if ( fHealth > 0 && vecScreenPosition.fX > -50.0f && vecScreenPosition.fX < fResWidth + 50.f && vecScreenPosition.fY > -50.0f && vecScreenPosition.fY < fResHeight + 50.f && vecScreenPosition.fZ > 0.1f )
     {
         // Draw the player nametag and status icon
         if ( pPlayer->HasConnectionTrouble () )
         {
             pIcon->SetVisible ( true );
-		    pIcon->SetPosition ( CVector2D ( vecScreenPosition.fX - 20, vecScreenPosition.fY ), false );
+            pIcon->SetPosition ( CVector2D ( vecScreenPosition.fX - 20, vecScreenPosition.fY ), false );
         }
 
         // Grab the nick to show
@@ -455,16 +455,16 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         unsigned char ucR, ucG, ucB;
         pPlayer->GetNametagColor ( ucR, ucG, ucB );
         if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
-		{
+        {
             // Draw shadow first
             g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );
-		    g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );
-		}
-		else
-		{				
+            g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );
+        }
+        else
+        {               
             // Draw shadow first
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-			g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }
         
         // We need to draw health tags?
@@ -579,7 +579,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                             vecBotRight.fX, vecBotRight.fY,
                             COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
         }
- 	}
+    }
 }
 
 

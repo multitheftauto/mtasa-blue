@@ -45,8 +45,8 @@ public:
 
     inline NetServerPlayerID& operator = ( const NetServerPlayerID& PlayerID )
     {
-    	m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
-    	m_usPort = PlayerID.m_usPort;
+        m_uiBinaryAddress = PlayerID.m_uiBinaryAddress;
+        m_usPort = PlayerID.m_usPort;
         SetSerial ( PlayerID.m_szSerial );
         return *this;
     };

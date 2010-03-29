@@ -23,10 +23,10 @@ CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlEl
     m_pParent = pParent;
     m_bCanRemoveFromList = true;
 
-	if ( m_pFile )
-	    m_pDocument = pFile->GetDocument ();
-	else
-		m_pDocument = NULL;
+    if ( m_pFile )
+        m_pDocument = pFile->GetDocument ();
+    else
+        m_pDocument = NULL;
 
     // Add to parent list
     if ( m_pParent )
@@ -56,7 +56,7 @@ CXMLNodeImpl::~CXMLNodeImpl ( void )
     else
     {
         // NULL it in the file if any
-		if ( m_pFile )
+        if ( m_pFile )
         {
             m_pFile->m_pRootNode = NULL;
         }
@@ -78,9 +78,9 @@ CXMLNodeImpl::~CXMLNodeImpl ( void )
 
 CXMLNode* CXMLNodeImpl::CreateSubNode ( const char* szTagName )
 {
-	// Create a new subnode after the last child
-	TiXmlElement* pNewNode = new TiXmlElement ( szTagName );
-	m_pNode->LinkEndChild ( pNewNode );
+    // Create a new subnode after the last child
+    TiXmlElement* pNewNode = new TiXmlElement ( szTagName );
+    m_pNode->LinkEndChild ( pNewNode );
 
     // Create and return the wrapper element
     CXMLNode* xmlNode = new CXMLNodeImpl ( m_pFile, this, *pNewNode );
@@ -139,7 +139,7 @@ CXMLNode* CXMLNodeImpl::GetSubNode ( unsigned int uiIndex )
 
 CXMLNode* CXMLNodeImpl::FindSubNode ( const char* szTagName, unsigned int uiIndex )
 {
-	std::string TagName ( szTagName );
+    std::string TagName ( szTagName );
 
     // Find the item with the given name
     unsigned int uiTemp = 0;
@@ -202,29 +202,29 @@ const std::string CXMLNodeImpl::GetTagContent ( void )
 
 bool CXMLNodeImpl::GetTagContent ( bool& bContent )
 {
-	// Get boolean value
+    // Get boolean value
     const char* szText = m_pNode->GetText ();
     if ( !szText )
         return false;
 
-	if ( m_pNode->GetText () [0] == '1' )
-	{
-		bContent = true;
-		return true;
-	}
-	else if ( m_pNode->GetText () [0] == '0' )
-	{
-		bContent = false;
-		return true;
-	}
+    if ( m_pNode->GetText () [0] == '1' )
+    {
+        bContent = true;
+        return true;
+    }
+    else if ( m_pNode->GetText () [0] == '0' )
+    {
+        bContent = false;
+        return true;
+    }
 
-	return false;	// Invalid
+    return false;   // Invalid
 }
 
 
 bool CXMLNodeImpl::GetTagContent ( int& iContent )
 {
-	long lValue;
+    long lValue;
 
     const char* szText = m_pNode->GetText ();
     if ( !szText )
@@ -246,7 +246,7 @@ bool CXMLNodeImpl::GetTagContent ( int& iContent )
 
 bool CXMLNodeImpl::GetTagContent ( unsigned int& uiContent )
 {
-	long lValue;
+    long lValue;
 
     const char* szText = m_pNode->GetText ();
     if ( !szText )
@@ -272,7 +272,7 @@ bool CXMLNodeImpl::GetTagContent ( float& fContent )
     if ( !szText )
         return false;
 
-	fContent = static_cast < float > ( atof ( szText ) );
+    fContent = static_cast < float > ( atof ( szText ) );
     return true;
 }
 
@@ -280,8 +280,8 @@ bool CXMLNodeImpl::GetTagContent ( float& fContent )
 void CXMLNodeImpl::SetTagContent ( const char* szText )
 {
     m_pNode->Clear();
-	TiXmlText* pNewNode = new TiXmlText ( szText );
-	m_pNode->LinkEndChild ( pNewNode );
+    TiXmlText* pNewNode = new TiXmlText ( szText );
+    m_pNode->LinkEndChild ( pNewNode );
 }
 
 
@@ -291,7 +291,7 @@ void CXMLNodeImpl::SetTagContent ( bool bContent )
     char szBuffer[2];
     szBuffer[1] = 0;
     if ( bContent ) szBuffer[0] = '1';
-	else szBuffer[0] = '0';
+    else szBuffer[0] = '0';
 
     SetTagContent ( szBuffer );
 }
@@ -344,19 +344,19 @@ TiXmlElement* CXMLNodeImpl::GetNode ( void )
 
 CXMLNode* CXMLNodeImpl::CopyNode ( CXMLNode *pParent )
 {
-	CXMLNodeImpl *pNew = new CXMLNodeImpl ( NULL, reinterpret_cast < CXMLNodeImpl* > ( pParent ), *m_pNode->Clone ()->ToElement () );
+    CXMLNodeImpl *pNew = new CXMLNodeImpl ( NULL, reinterpret_cast < CXMLNodeImpl* > ( pParent ), *m_pNode->Clone ()->ToElement () );
 
-	// Copy the list, so we don't end up in an endless loop
-	std::list < CXMLNode* > ChildrenCopy ( m_Children );
+    // Copy the list, so we don't end up in an endless loop
+    std::list < CXMLNode* > ChildrenCopy ( m_Children );
 
-	// Recursively copy each child
+    // Recursively copy each child
     list < CXMLNode* > ::iterator iter;
     for ( iter = ChildrenCopy.begin (); iter != ChildrenCopy.end (); iter++ )
     {
-		pNew->AddToList ( (*iter)->CopyNode ( pNew ) );
+        pNew->AddToList ( (*iter)->CopyNode ( pNew ) );
     }
 
-	return dynamic_cast < CXMLNode* > ( pNew );
+    return dynamic_cast < CXMLNode* > ( pNew );
 }
 
 

@@ -18,26 +18,26 @@ extern CGame * g_pGame;
 
 void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
 {
-	if ( pElement && !IsBeingDeleted ( pElement ) )
+    if ( pElement && !IsBeingDeleted ( pElement ) )
     {
-		// Before we do anything, fire the on-destroy event
+        // Before we do anything, fire the on-destroy event
         CLuaArguments Arguments;
         pElement->CallEvent ( "onElementDestroy", Arguments );
 
-		// Add it to our list
-		if ( !pElement->IsBeingDeleted () )
-		{
-			m_List.push_back ( pElement );
-		}
+        // Add it to our list
+        if ( !pElement->IsBeingDeleted () )
+        {
+            m_List.push_back ( pElement );
+        }
 
-		// Flag it as being deleted and unlink it from the tree/managers
-		pElement->SetIsBeingDeleted ( true );
+        // Flag it as being deleted and unlink it from the tree/managers
+        pElement->SetIsBeingDeleted ( true );
         pElement->ClearChildren ();
         pElement->SetParentObject ( NULL );
 
         if ( bUnlink )
-		    pElement->Unlink ();
-	}
+            pElement->Unlink ();
+    }
 }
 
 

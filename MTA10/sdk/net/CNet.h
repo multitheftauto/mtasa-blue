@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		sdk/net/cnet.h
-*  PURPOSE:		Network subsystem interface
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        sdk/net/cnet.h
+*  PURPOSE:     Network subsystem interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -57,12 +57,12 @@ public:
     virtual void                        GetPacketLogData            ( unsigned long* ulBytes, unsigned long* ulCount ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
-    virtual unsigned long		        GetTime			            ( void ) = 0;
+    virtual unsigned long               GetTime                     ( void ) = 0;
 
     virtual unsigned int                GetMTUSize                  ( void ) = 0;
     virtual bool                        SetMTUSize                  ( unsigned int uiSize ) = 0;
 
-	virtual const char *				GetLocalIP					( void ) = 0;
+    virtual const char *                GetLocalIP                  ( void ) = 0;
     virtual void                        GetSerial                   ( char* szSerial, size_t maxLength ) = 0;
 
     virtual unsigned char               GetConnectionError          ( void ) = 0;
@@ -71,7 +71,7 @@ public:
     virtual unsigned char               GetImmediateError           ( void ) = 0;
     virtual void                        SetImmediateError           ( unsigned char ucImmediateError ) = 0;
 
-	virtual void                        Reset                       ( void ) = 0;
+    virtual void                        Reset                       ( void ) = 0;
 
     virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( void ) = 0;
 

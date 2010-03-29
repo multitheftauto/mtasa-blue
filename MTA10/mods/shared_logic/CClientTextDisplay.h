@@ -35,13 +35,13 @@ public:
     char*                       GetCaption              ( char* szBuffer, size_t sizeBuffer );
     void                        SetCaption              ( const char* szCaption );
 
-	void						SetPosition             ( const CVector& vecPosition );
+    void                        SetPosition             ( const CVector& vecPosition );
 
     void                        SetColor                ( const SColor color );
     void                        SetColorAlpha           ( unsigned char ucAlpha );
     void                        SetShadowAlpha          ( unsigned char ucShadowAlpha );
 
-	inline float                GetScale                ( void )                                { return m_fScale; };
+    inline float                GetScale                ( void )                                { return m_fScale; };
     void                        SetScale                ( float fScale );
 
     inline unsigned long        GetFormat               ( void )                                { return m_ulFormat; };

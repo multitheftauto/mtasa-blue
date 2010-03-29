@@ -27,11 +27,11 @@ public:
     static int      textDestroyTextItem                 ( lua_State* luaVM );
 
     static int      textDisplayAddText                  ( lua_State* luaVM );
-	static int      textDisplayRemoveText               ( lua_State* luaVM );
+    static int      textDisplayRemoveText               ( lua_State* luaVM );
     static int      textDisplayAddObserver              ( lua_State* luaVM );
-	static int		textDisplayRemoveObserver			( lua_State* luaVM );
-	static int      textDisplayIsObserver               ( lua_State* luaVM );
-	static int      textDisplayGetObservers             ( lua_State* luaVM );
+    static int      textDisplayRemoveObserver           ( lua_State* luaVM );
+    static int      textDisplayIsObserver               ( lua_State* luaVM );
+    static int      textDisplayGetObservers             ( lua_State* luaVM );
 
     static int      textItemSetText                     ( lua_State* luaVM );
     static int      textItemGetText                     ( lua_State* luaVM );

@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		core/CCredits.h
-*  PURPOSE:		Header file for credits class
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCredits.h
+*  PURPOSE:     Header file for credits class
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -33,7 +33,7 @@ public:
 
 private:
     CGUIWindow*             m_pWindow;
-	CGUILabel*				m_pLabels [30];
+    CGUILabel*              m_pLabels [30];
     CGUIButton*             m_pButtonOK;
 
     clock_t                 m_clkStart;

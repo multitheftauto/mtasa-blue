@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CHandlingEntrySA.h
-*  PURPOSE:		Header file for vehicle handling data entry class
-*  DEVELOPERS:	Christian Myhre Lundheim <>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CHandlingEntrySA.h
+*  PURPOSE:     Header file for vehicle handling data entry class
+*  DEVELOPERS:  Christian Myhre Lundheim <>
 *               The_GTA <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -98,15 +98,15 @@ public:
 
     virtual         ~CHandlingEntrySA               ( void );
 
-	bool			IsVehicleAdded					( CVehicle* pVeh );
-	// We add a vehicle to this entry
-	void			AddVehicle						( CVehicle* pVeh );
+    bool            IsVehicleAdded                  ( CVehicle* pVeh );
+    // We add a vehicle to this entry
+    void            AddVehicle                      ( CVehicle* pVeh );
 
     // Use this to copy data from an another handling class to this
     void            ApplyHandlingData               ( CHandlingEntry* pData );
 
-	// Remove a vehicle from list
-	void			RemoveVehicle					( CVehicle* pVeh );
+    // Remove a vehicle from list
+    void            RemoveVehicle                   ( CVehicle* pVeh );
 
     // Get functions
     float           GetMass                         ( void ) const    { return m_Handling.fMass; };
@@ -210,7 +210,7 @@ private:
     tHandlingDataSA         m_Handling;
 
     tHandlingDataSA*        m_pOriginalData;
-	std::list < CVehicleSA* > m_VehicleList;	// Single vehicles to apply data to
+    std::list < CVehicleSA* > m_VehicleList;    // Single vehicles to apply data to
 };
 
 #endif

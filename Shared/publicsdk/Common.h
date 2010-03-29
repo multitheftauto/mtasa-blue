@@ -24,9 +24,9 @@ extern "C"
 }
 
 #ifdef WIN32
-	#define MTAEXPORT extern "C" __declspec(dllexport)
+    #define MTAEXPORT extern "C" __declspec(dllexport)
 #else
-	#define MTAEXPORT extern "C"
+    #define MTAEXPORT extern "C"
 #endif
 
 #include <list>
@@ -42,22 +42,22 @@ using namespace std;
 #define MAX_ARGUMENTS 10
 struct FunctionArguments
 {
-	lua_State* luaVM;
-	unsigned char nArguments;
-	unsigned char Type[10];
-	void*	Arguments[10];
+    lua_State* luaVM;
+    unsigned char nArguments;
+    unsigned char Type[10];
+    void*   Arguments[10];
 };
 
 namespace FunctionArgumentType
 {
-	enum
-	{
-		TYPE_NUMBER = 1,
-		TYPE_STRING = 2,
-		TYPE_LIGHTUSERDATA = 3,
-		TYPE_BOOLEAN = 4,
-		TYPE_NIL = 5,
-		TYPE_TABLE = 6
-	};
+    enum
+    {
+        TYPE_NUMBER = 1,
+        TYPE_STRING = 2,
+        TYPE_LIGHTUSERDATA = 3,
+        TYPE_BOOLEAN = 4,
+        TYPE_NIL = 5,
+        TYPE_TABLE = 6
+    };
 }
 #endif

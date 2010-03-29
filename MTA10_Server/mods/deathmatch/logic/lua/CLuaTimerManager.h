@@ -39,7 +39,7 @@ public:
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-	void						GetTimers						( unsigned long ulTime, CLuaMain* pLuaMain );
+    void                        GetTimers                       ( unsigned long ulTime, CLuaMain* pLuaMain );
 
     void                        TakeOutTheTrash                 ( void );
 private:

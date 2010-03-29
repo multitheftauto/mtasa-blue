@@ -39,7 +39,7 @@
 #define HOOKPOS_IKChainManager_PointArm                 0x618B66
 #define HOOKPOS_IKChainManager_LookAt                   0x618970
 #define HOOKPOS_IKChainManager_SkipAim                  0x62AEE7
-#define HOOKPOS_CTaskSimpleUsegun_ProcessPed			0x62A380
+#define HOOKPOS_CTaskSimpleUsegun_ProcessPed            0x62A380
 #define HOOKPOS_CWeapon_FireInstantHit                  0x740B42
 #define HOOKPOS_CWeapon_FireInstantHit_CameraMode       0x74036D
 #define HOOKPOS_CWeapon_FireInstantHit_IsPlayer         0x74034C
