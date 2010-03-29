@@ -65,21 +65,12 @@ CSettings::CSettings ( void )
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
 
-<<<<<<< HEAD
-	// Create the tab panel and necessary tabs
-	m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
-	m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
-	m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
-	pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
-	pTabVideo = m_pTabs->CreateTab ( "Video" );
-=======
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
     m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
-    m_pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
+    pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
     pTabVideo = m_pTabs->CreateTab ( "Video" );
->>>>>>> 22eb218... replace all tabs to spaces
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
     pTabBinds = m_pTabs->CreateTab ( "Binds" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
@@ -309,17 +300,10 @@ CSettings::CSettings ( void )
     m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
 
-<<<<<<< HEAD
-	/**
-	 *	Multiplayer tab
-	 **/
-    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
-=======
     /**
-     *  Multiplayer tab
+     *	Multiplayer tab
      **/
-    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabMultiplayer, "Nick:" ) );
->>>>>>> 22eb218... replace all tabs to spaces
+    m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
     m_pLabelNick->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
     m_pLabelNick->GetPosition ( vecTemp, false );
     m_pLabelNick->AutoSize ( "Nick:" );
@@ -336,13 +320,8 @@ CSettings::CSettings ( void )
     m_pLabelConnection->GetPosition ( vecTemp, false );
     m_pLabelConnection->AutoSize ( "Connection:" );
 
-<<<<<<< HEAD
     m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
-	m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
-=======
-    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTabMultiplayer, "" ) );
     m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
->>>>>>> 22eb218... replace all tabs to spaces
     m_pComboConnection->GetPosition ( vecTemp, false );
     m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
     m_pComboConnection->SetReadOnly ( true );

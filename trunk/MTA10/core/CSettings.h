@@ -261,12 +261,7 @@ private:
     unsigned char       m_ucOldSFXVolume;
     float               m_fOldMTAVolume;
 
-<<<<<<< HEAD
-	CGUIListItem*	    m_pSelectedBind;
-=======
-    CGUIListItem*       m_pSelectedBind;
-    CGUITab*            m_pTabMultiplayer;
->>>>>>> 22eb218... replace all tabs to spaces
+    CGUIListItem*	    m_pSelectedBind;
 
     DWORD               m_dwFrameCount;
 
