@@ -43,6 +43,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementID", CLuaElementDefs::getElementID );
     CLuaCFunctions::AddFunction ( "getElementParent", CLuaElementDefs::getElementParent );
     CLuaCFunctions::AddFunction ( "getElementPosition", CLuaElementDefs::getElementPosition );
+    CLuaCFunctions::AddFunction ( "getElementRotation", CLuaElementDefs::getElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaElementDefs::getElementVelocity );
     CLuaCFunctions::AddFunction ( "getElementsByType", CLuaElementDefs::getElementsByType );
     CLuaCFunctions::AddFunction ( "getElementType", CLuaElementDefs::getElementType );
@@ -73,6 +74,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementID", CLuaElementDefs::setElementID );
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaElementDefs::setElementParent );
     CLuaCFunctions::AddFunction ( "setElementPosition", CLuaElementDefs::setElementPosition );
+    CLuaCFunctions::AddFunction ( "setElementRotation", CLuaElementDefs::setElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaElementDefs::setElementVelocity );
     CLuaCFunctions::AddFunction ( "setElementVisibleTo", CLuaElementDefs::setElementVisibleTo );
     CLuaCFunctions::AddFunction ( "clearElementVisibleTo", CLuaElementDefs::clearElementVisibleTo );
@@ -510,6 +512,38 @@ int CLuaElementDefs::getElementPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the element, verify it
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            // Grab the rotation
+            CVector vecRotation;
+            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation ) )
+            {
+                // Return it
+                lua_pushnumber ( luaVM, vecRotation.fX );
+                lua_pushnumber ( luaVM, vecRotation.fY );
+                lua_pushnumber ( luaVM, vecRotation.fZ );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementRotation", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementRotation" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 
 int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
@@ -1340,6 +1374,47 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementPosition" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
+{
+    // Verify the first argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the element and verify it
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            int iArgument2 = lua_type ( luaVM, 2 );
+            int iArgument3 = lua_type ( luaVM, 3 );
+            int iArgument4 = lua_type ( luaVM, 4 );
+            if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+            {
+                // Grab the rotation
+                CVector vecRotation = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                                                static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                                                static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+                // Set the rotation
+                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setElementRotation" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementRotation", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementRotation" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
