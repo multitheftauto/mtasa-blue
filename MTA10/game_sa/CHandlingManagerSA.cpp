@@ -475,7 +475,7 @@ eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
     case VT_TUG: return HT_TUG;
     case VT_PETROTR: return HT_PETROTR;
     case VT_EMPEROR: return HT_EMPEROR;
-    case VT_WAYFARER: return HT_WAYFARE;
+    case VT_WAYFARER: return HT_WAYFARER;
     case VT_EUROS: return HT_EUROS;
     case VT_HOTDOG: return HT_HOTDOG;
     case VT_CLUB: return HT_CLUB;
