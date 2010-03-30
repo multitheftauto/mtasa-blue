@@ -9,6 +9,7 @@
 *               Jax <>
 *               Cecill Etheredge <>
 *               Marcus Bauer <mabako@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -28,8 +29,8 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
         unsigned long ulDelay = pLuaTimer->GetDelay ();
         unsigned int uiRepeats = pLuaTimer->GetRepeats ();
 
-        // Is the time up
-        if ( ulCurrentTime >= ( ulStartTime + ulDelay ) )
+        // Is the time up and is not being deleted
+        if ( !pLuaTimer->IsBeingDeleted() && ulCurrentTime >= ( ulStartTime + ulDelay ) )
         {
             pLuaTimer->ExecuteTimer ( pLuaMain );
 
@@ -66,6 +67,7 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 
     if ( m_bIteratingList )
     {
+        pLuaTimer->SetBeingDeleted( true );
         m_TrashCan.push_back ( pLuaTimer );
     }
     else
