@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -45,12 +46,15 @@ public:
 
     void                    ExecuteTimer                ( class CLuaMain* pLuaMain );
 
+    inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
+    inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
 private:
     int                     m_iLuaFunction;
     CLuaArguments*          m_pArguments;
     unsigned long           m_ulStartTime;
     unsigned long           m_ulDelay;
     unsigned int            m_uiRepeats;
+    bool                    m_bBeingDeleted;
 };
 
 #endif
