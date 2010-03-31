@@ -19,6 +19,11 @@
 #include <deque>
 
 //
+// System wide defines
+//
+#define WITH_VEHICLE_HANDLING 0
+
+//
 // _vsnprintf with buffer full check
 //
 #define _VSNPRINTF( buffer, count, format, argptr ) \

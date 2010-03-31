@@ -2235,6 +2235,7 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
+#if WITH_VEHICLE_HANDLING
 int CLuaFunctionDefs::SetVehicleHandlingData ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -3767,3 +3768,4 @@ int CLuaFunctionDefs::GetDefaultHandling ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+#endif      //  WITH_VEHICLE_HANDLING
