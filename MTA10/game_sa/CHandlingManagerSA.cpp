@@ -180,8 +180,9 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
     // stuff again. We do it this way because GTA will crash later on if we don't, I think
     // it does some additional initializing that GTA requires other than initing all the
     // handlings.
+#if WITH_VEHICLE_HANDLING
     HookInstall ( Func_PostLoadHandlingCfg, (DWORD) Hook_LoadHandlingCfg, 15 );
-
+#endif
     // Uncomment this to dump
     //HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
 }
