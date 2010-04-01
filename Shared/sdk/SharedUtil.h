@@ -188,27 +188,38 @@ namespace SharedUtil
     //
 
     // Update or add a value for a key
-    template < class T, class V >
-    void MapSet ( std::map < T, V >& collection, const T& key, const V& value )
+    template < class T, class V, class TR, class T2 >
+    void MapSet ( std::map < T, V, TR >& collection, const T2& key, const V& value )
     {
         collection[ key ] = value;
     }
 
     // Returns true if the item is in the collection
-    template < class T, class V >
-    bool MapContains ( const std::map < T, V >& collection, const T& key )
+    template < class T, class V, class TR, class T2 >
+    bool MapContains ( const std::map < T, V, TR >& collection, const T2& key )
     {
         return collection.find ( key ) != collection.end ();
     }
 
     // Remove key from collection
-    template < class T, class V >
-    void MapRemove ( std::map < T, V >& collection, const T& key )
+    template < class T, class V, class TR, class T2 >
+    void MapRemove ( std::map < T, V, TR >& collection, const T2& key )
     {
-        typename std::map < T, V > ::iterator it = collection.find ( key );
+        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
         if ( it != collection.end () )
             collection.erase ( it );
     }
+
+    // Find value in collection
+    template < class T, class V, class TR, class T2 >
+    V* MapFind ( std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
+        if ( it != collection.end () )
+            return NULL;
+        return &it->second;
+    }
+
 
 
 

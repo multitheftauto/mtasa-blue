@@ -7305,6 +7305,32 @@ bool CStaticFunctionDefinitions::RemoveRuleValue ( const char* szKey )
 }
 
 
+bool CStaticFunctionDefinitions::GetPlayerAnnounceValue ( CElement* pElement, const std::string& strKey, std::string& strOutValue )
+{
+    if ( IS_PLAYER ( pElement ) )
+    {
+        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+
+        strOutValue = pPlayer->GetAnnounceValue ( strKey );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetPlayerAnnounceValue ( CElement* pElement, const std::string& strKey, const std::string& strValue )
+{
+    if ( IS_PLAYER ( pElement ) )
+    {
+        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+
+        pPlayer->SetAnnounceValue ( strKey, strValue );
+        return true;
+    }
+    return false;
+}
+
+
 void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
     m_pRegistry->CreateTable ( strTable, strDefinition );

@@ -472,6 +472,8 @@ public:
     static const char*          GetRuleValue                        ( const char* szKey );
     static bool                 SetRuleValue                        ( const char* szKey, const char* szValue );
     static bool                 RemoveRuleValue                     ( const char* szKey );
+    static bool                 GetPlayerAnnounceValue              ( CElement* pElement, const std::string& strKey, std::string& strOutValue );
+    static bool                 SetPlayerAnnounceValue              ( CElement* pElement, const std::string& strKey, const std::string& strValue );
 
     // Registry funcs
     static const std::string&   SQLGetLastError                     ( void );
