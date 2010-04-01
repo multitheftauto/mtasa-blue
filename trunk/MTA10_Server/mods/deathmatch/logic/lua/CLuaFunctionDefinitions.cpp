@@ -9721,6 +9721,53 @@ int CLuaFunctionDefinitions::RemoveRuleValue ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
+{
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TSTRING )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        std::string strKey = lua_tostring ( luaVM, 2 );
+        std::string strValue;
+
+        if ( CStaticFunctionDefinitions::GetPlayerAnnounceValue ( pElement, strKey, strValue ) )
+        {
+            lua_pushstring ( luaVM, strValue.c_str () );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerAnnounceValue" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
+{
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TSTRING &&
+         lua_type ( luaVM, 3 ) == LUA_TSTRING )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        std::string strKey = lua_tostring ( luaVM, 2 );
+        std::string strValue = lua_tostring ( luaVM, 3 );
+
+        if ( CStaticFunctionDefinitions::SetPlayerAnnounceValue ( pElement, strKey, strValue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPlayerAnnounceValue" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )

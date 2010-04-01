@@ -589,3 +589,20 @@ void CPlayer::ClearSyncTimes ( void )
     // Clear the list so we won't try accessing bad data later
     m_SyncTimes.clear ();
 }
+
+
+// Note: The return value must be consumed before m_AnnounceValues is next modified
+const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
+{
+    std::map < string, string > ::const_iterator it = m_AnnounceValues.find ( strKey );
+    if ( it != m_AnnounceValues.end () )
+        return it->second;
+    static std::string strDefault;
+    return strDefault;
+}
+
+
+void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
+{
+    m_AnnounceValues [ strKey ] = strValue;
+}

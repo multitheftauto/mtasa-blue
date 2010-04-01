@@ -204,6 +204,9 @@ public:
     void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount (); }
     unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount () - m_ulLastReceivedSyncTime; }
 
+    const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
+    void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -285,6 +288,8 @@ private:
     unsigned int                                m_uiPuresyncPackets;
 
     unsigned long                               m_ulLastReceivedSyncTime;
+
+    std::map < std::string, std::string >       m_AnnounceValues;
 };
 
 #endif
