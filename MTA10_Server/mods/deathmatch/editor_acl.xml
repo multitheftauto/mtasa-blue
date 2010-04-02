@@ -1,14 +1,80 @@
 <acl>
-	<group name="Everyone">
-        <object name="user.*" />
-        <object name="resource.*" />
-    </group>
-	<group name="MapEditor">
+    <group name="MapEditor">
         <acl name="MapEditor" />
-        <object name="resource.editor_main" />
-        <object name="resource.edf" />
+        <object name="resource.*" />
+        <object name="user.*" />
     </group>
-	<acl name="MapEditor">
+
+    <acl name="MapEditor">
         <right name="general.ModifyOtherObjects" access="true" />
+        <right name="function.startResource" access="true" />
+        <right name="function.stopResource" access="true" />
+        <right name="function.restartResource" access="true" />
+        <right name="function.createResource" access="true" />
+        <right name="function.copyResource" access="true" />
+        <right name="function.addResourceMap" access="true" />
+        <right name="function.addResourceConfig" access="true" />
+        <right name="function.removeResourceFile" access="true" />
+        <right name="function.setResourceDefaultSetting" access="true" />
+        <right name="function.removeResourceDefaultSetting" access="true" />
+        <right name="function.xmlLoadFile" access="true" />
+        <right name="general.adminpanel" access="false" />
+        <right name="general.tab_players" access="false" />
+        <right name="general.tab_resources" access="false" />
+        <right name="general.tab_server" access="false" />
+        <right name="general.tab_bans" access="false" />
+        <right name="general.tab_adminchat" access="false" />
+        <right name="command.kick" access="false" />
+        <right name="command.freeze" access="false" />
+        <right name="command.mute" access="false" />
+        <right name="command.shout" access="false" />
+        <right name="command.spectate" access="false" />
+        <right name="command.slap" access="false" />
+        <right name="command.setgroup" access="false" />
+        <right name="command.sethealth" access="false" />
+        <right name="command.setarmour" access="false" />
+        <right name="command.setmoney" access="false" />
+        <right name="command.setskin" access="false" />
+        <right name="command.setteam" access="false" />
+        <right name="command.giveweapon" access="false" />
+        <right name="command.setstat" access="false" />
+        <right name="command.jetpack" access="false" />
+        <right name="command.warp" access="false" />
+        <right name="command.setdimension" access="false" />
+        <right name="command.setinterior" access="false" />
+        <right name="command.givevehicle" access="false" />
+        <right name="command.repair" access="false" />
+        <right name="command.blow" access="false" />
+        <right name="command.destroy" access="false" />
+        <right name="command.customize" access="false" />
+        <right name="command.setcolor" access="false" />
+        <right name="command.setpaintjob" access="false" />
+        <right name="command.listmessages" access="false" />
+        <right name="command.readmessage" access="false" />
+        <right name="command.listresources" access="false" />
+        <right name="command.start" access="false" />
+        <right name="command.stop" access="false" />
+        <right name="command.stopall" access="false" />
+        <right name="command.restart" access="false" />
+        <right name="command.execute" access="false" />
+        <right name="command.setpassword" access="false" />
+        <right name="command.setwelcome" access="false" />
+        <right name="command.setgame" access="false" />
+        <right name="command.setmap" access="false" />
+        <right name="command.setweather" access="false" />
+        <right name="command.blendweather" access="false" />
+        <right name="command.setblurlevel" access="false" />
+        <right name="command.setwaveheight" access="false" />
+        <right name="command.setskygradient" access="false" />
+        <right name="command.setgamespeed" access="false" />
+        <right name="command.setgravity" access="false" />
+        <right name="command.settime" access="false" />
+        <right name="command.ban" access="false" />
+        <right name="command.unban" access="false" />
+        <right name="command.banip" access="false" />
+        <right name="command.unbanip" access="false" />
+        <right name="command.banserial" access="false" />
+        <right name="command.unbanserial" access="false" />
+        <right name="command.listbans" access="false" />
     </acl>
 </acl>
