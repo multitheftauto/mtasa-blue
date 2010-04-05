@@ -38,6 +38,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_fSmoothLastTimeSeconds = 0;
     m_fSmoothAllowAfter = 0;
     m_fSmoothScrollResetTime = 0;
+    m_fSmoothRepeatTimer = 0;
     m_TextColor = CHAT_TEXT_COLOR;
     m_bUseCEGUI = false;
     m_iCVarsRevision = -1;
@@ -218,11 +219,32 @@ void CChat::Draw ( void )
 //
 void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
 {
+    // Calc frame time
+    float fTimeSeconds = GetSecondCount ();
+    float fDeltaSeconds = fTimeSeconds - m_fSmoothLastTimeSeconds;
+    m_fSmoothLastTimeSeconds = fTimeSeconds;
 
-    if ( m_iScrollState == 1 )
-        ScrollUp ();
-    else if ( m_iScrollState == -1 )
-        ScrollDown ();
+    // Handle auto repeat
+    if ( m_iScrollState == 0 )
+    {
+        m_fSmoothRepeatTimer = -100;
+    }
+    else
+    {
+        if ( m_fSmoothRepeatTimer < 0.0f )
+        {
+            if ( m_fSmoothRepeatTimer < -50 )
+                m_fSmoothRepeatTimer = 0.250f;
+            else
+                m_fSmoothRepeatTimer += 1/22.f;
+
+            if ( m_iScrollState == 1 )
+                ScrollUp ();
+            else if ( m_iScrollState == -1 )
+                ScrollDown ();
+        }
+        m_fSmoothRepeatTimer -= fDeltaSeconds;
+    }
 
     // Time to reset?
     if ( m_fSmoothScrollResetTime && m_fSmoothScrollResetTime < GetSecondCount () )
@@ -232,14 +254,10 @@ void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
         m_uiScrollOffset -= m_uiScrollOffset;
     }
 
-    // Calc frame time
-    float fTimeSeconds = GetSecondCount ();
-    float fDeltaSeconds = fTimeSeconds - m_fSmoothLastTimeSeconds;
-    m_fSmoothLastTimeSeconds = fTimeSeconds;
 
     // Calc smooth scroll deceleration
     float fFixedChange = ( m_fSmoothScroll < 0 ? -1 : 1 ) * -Min ( fDeltaSeconds / 0.2f, 1.0f );
-    float fLerpChange = m_fSmoothScroll * ( 1 - Min ( fDeltaSeconds / 0.2f, 1.0f ) ) - m_fSmoothScroll;
+    float fLerpChange = m_fSmoothScroll * ( 1 - Min ( fDeltaSeconds / 0.3f, 1.0f ) ) - m_fSmoothScroll;
     float fChange = fLerpChange * 0.7f + fFixedChange * 0.4f;
     fChange = Clamp ( -fabsf ( m_fSmoothScroll ), fChange, fabsf ( m_fSmoothScroll ) );
 
