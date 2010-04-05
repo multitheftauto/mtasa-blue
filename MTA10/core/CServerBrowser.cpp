@@ -1049,7 +1049,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
             if ( pSubNode )
             {
                 CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
-                std:string strHost = pServer->strHost;
+                std::string strHost = pServer->strHost;
                 if ( !pServer->strHostName.empty () )
                     strHost = pServer->strHostName;
                 pHostAttribute->SetValue ( strHost.c_str () );

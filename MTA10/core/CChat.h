@@ -186,6 +186,7 @@ protected:
     float                       m_fSmoothLastTimeSeconds;
     float                       m_fSmoothAllowAfter;
     float                       m_fSmoothScrollResetTime;
+    float                       m_fSmoothRepeatTimer;
     CChatInputLine              m_InputLine;
 
     CGUI*                       m_pManager;
