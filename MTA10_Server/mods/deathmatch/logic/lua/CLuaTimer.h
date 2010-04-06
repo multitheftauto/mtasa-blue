@@ -46,6 +46,8 @@ public:
 
     void                    ExecuteTimer                ( class CLuaMain* pLuaMain );
 
+    unsigned long           GetTimeLeft                 ( void );
+
     inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
     inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
 private:

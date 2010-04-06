@@ -418,6 +418,7 @@ public:
     static int      ResetTimer                          ( lua_State* luaVM );
     static int      GetTimers                           ( lua_State* luaVM );
     static int      IsTimer                             ( lua_State* luaVM );
+    static int      GetTimer                            ( lua_State* luaVM );
     static int      GetColorFromString                  ( lua_State* luaVM );
     static int      Reference                           ( lua_State* luaVM );
     static int      Dereference                         ( lua_State* luaVM );

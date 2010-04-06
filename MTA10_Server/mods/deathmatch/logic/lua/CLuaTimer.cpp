@@ -44,3 +44,11 @@ void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
         m_Arguments.Call ( pLuaMain, m_iLuaFunction );
     }
 }
+
+
+unsigned long CLuaTimer::GetTimeLeft ( void )
+{
+    unsigned long ulCurrentTime = GetTime ();
+    unsigned long ulTimeLeft = m_ulStartTime + m_ulDelay - ulCurrentTime;
+    return ulTimeLeft;
+}

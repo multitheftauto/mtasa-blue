@@ -9429,6 +9429,28 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetTimer ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
+        if ( pLuaTimer )
+        {
+            lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
+            lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
+            lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
+            return 3;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getTimer" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetColorFromString ( lua_State* luaVM )
 {
     unsigned char ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha;
