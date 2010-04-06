@@ -48,3 +48,11 @@ void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
     if ( m_iLuaFunction != LUA_REFNIL && m_pArguments )
         m_pArguments->Call ( pLuaMain, m_iLuaFunction );
 }
+
+
+unsigned long CLuaTimer::GetTimeLeft ( void )
+{
+    unsigned long ulCurrentTime = timeGetTime ();
+    unsigned long ulTimeLeft = m_ulStartTime + m_ulDelay - ulCurrentTime;
+    return ulTimeLeft;
+}

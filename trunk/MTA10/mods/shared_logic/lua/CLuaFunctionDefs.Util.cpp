@@ -233,6 +233,27 @@ int CLuaFunctionDefs::IsTimer ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetTimer ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
+        if ( pLuaTimer )
+        {
+            lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
+            lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
+            lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
+            return 3;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getTimer" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 {
