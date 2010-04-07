@@ -296,7 +296,7 @@ int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
 {
     // dxDrawImage ( float x,float y,float width,float height,string filename,[float rotation,
-    //            float rotCenOffX, float rotCenOffY, int color=0xffffffff, bool postgui] )
+    //            float rotCenOffX, float rotCenOffY, float startX 9, float startY, float endX, float endY 12, int color=0xffffffff, bool postgui] )
 
     // Grab all argument types
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -318,6 +318,10 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
         float fRotation = 0;
         float fRotCenOffX = 0;
         float fRotCenOffY = 0;
+        float fStartX = 0;
+        float fStartY = 0;
+        float fEndX = 0;
+        float fEndY = 0;
         unsigned long ulColor = 0xFFFFFFFF;
 
         int iArgument6 = lua_type ( luaVM, 6 );
@@ -337,19 +341,38 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
         {
             fRotCenOffY = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
         }
-
-        int iArgument9 = lua_type ( luaVM, 9 );
-        if ( ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING ) )
+        int iArgument9 = lua_type( luaVM, 9);
+        if((iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING))
         {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 9 ) );
+            fStartX = static_cast<float>(lua_tonumber(luaVM, 9));
+        }
+        int iArgument10 = lua_type( luaVM, 10);
+        if((iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING))
+        {
+           fStartY = static_cast<float>(lua_tonumber(luaVM, 10));
+        }
+        int iArgument11 = lua_type( luaVM, 11);
+        if((iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING))
+        {
+           fEndX = static_cast<float>(lua_tonumber(luaVM, 11));
+        }
+        int iArgument12 = lua_type( luaVM, 12);
+        if((iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING))
+        {
+           fEndY = static_cast<float>(lua_tonumber(luaVM, 12));
+        }
+        int iArgument13 = lua_type ( luaVM, 13 );
+        if ( ( iArgument13 == LUA_TNUMBER || iArgument13 == LUA_TSTRING ) )
+        {
+            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 13 ) );
         }
 
         // Got a post gui specifier?
         bool bPostGUI = false;
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( iArgument10 == LUA_TBOOLEAN )
+        int iArgument14 = lua_type ( luaVM, 14 );
+        if ( iArgument14 == LUA_TBOOLEAN )
         {
-            bPostGUI = ( lua_toboolean ( luaVM, 10 ) ) ? true:false;
+            bPostGUI = ( lua_toboolean ( luaVM, 14 ) ) ? true:false;
         }
 
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
