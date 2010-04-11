@@ -11,6 +11,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Peter <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -1017,6 +1018,12 @@ void CMultiplayerSA::InitHooks()
 
     // Allow all screen aspect ratios in multi-monitor dialog
     *(WORD *)0x7459E1 = 0x9090;
+
+    // Show the GTA:SA Main menu, this fixes some issues (#4374 and MAYBE #4000).
+    // We are hiding the menu in "void CGameSA::Initialize ( void )".
+    // 
+    // - Sebas
+	*(BYTE *)((0xBA6748)+0x5C) = 1;
 }
 
 
@@ -1100,7 +1107,7 @@ CShotSyncData * CMultiplayerSA::GetLocalShotSyncData ( )
     return GetLocalPedShotSyncData();
 }
 
-void CMultiplayerSA::DisablePadHandler( bool bDisabled )
+void CMultiplayerSA::DisablePadHandler ( bool bDisabled )
 {
     // DISABLE GAMEPADS (testing)
     if ( bDisabled )

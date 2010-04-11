@@ -10,6 +10,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -405,6 +406,9 @@ void CGameSA::Initialize ( void )
 {
     // Initialize garages
     m_pGarages->Initialize();
+
+    // *Sebas* Hide the GTA:SA Main menu.
+    *(BYTE *)(CLASS_CMenu+0x5C) = 0;
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )

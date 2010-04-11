@@ -10,6 +10,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -27,6 +28,7 @@
 #define     CLASS_CPad                      0xB73458    // ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
 #define     CLASS_CFx                       0xa9ae00    // ##SA##
+#define     CLASS_CMenu                     0xBA6748
 
 #define     CLASS_RwCamera                  0xB6F97C
 
