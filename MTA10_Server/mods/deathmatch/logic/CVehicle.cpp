@@ -35,6 +35,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bLandingGearDown = true;
     m_usAdjustableProperty = 0;
     m_bIsFrozen = false;
+    m_bUnoccupiedSyncable = true;
     m_pSyncer = NULL;
     GetInitialDoorStates ( m_ucDoorStates );
     memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );

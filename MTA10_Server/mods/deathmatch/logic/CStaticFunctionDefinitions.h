@@ -92,7 +92,7 @@ public:
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );
     static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
     static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
-    static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer );
+    static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer, bool bEnable = true );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );

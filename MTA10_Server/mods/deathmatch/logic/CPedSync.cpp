@@ -26,7 +26,7 @@ CPedSync::CPedSync ( CPlayerManager* pPlayerManager, CPedManager* pPedManager )
 
 void CPedSync::DoPulse ( void )
 {
-    // Time to check for players that should no longer be syncing a vehicle or vehicles that should be synced?
+    // Time to check for players that should no longer be syncing a ped or peds that should be synced?
     unsigned long ulCurrentTime = GetTime ();
     if ( ulCurrentTime >= m_ulLastSweepTime + 500 )
     {
@@ -71,7 +71,7 @@ void CPedSync::Update ( unsigned long ulCurrentTime )
     for ( ; iter != m_pPedManager->IterEnd (); iter++ )
     {
         // It is a ped, yet not a player
-        if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) && ( *iter )->IsSyncable() )
+        if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) )
             UpdatePed ( *iter );
     }
 }
@@ -81,10 +81,22 @@ void CPedSync::UpdatePed ( CPed* pPed )
 {
     CPlayer* pSyncer = pPed->GetSyncer ();
 
-    // This vehicle got a syncer?
+    // Handle no syncing
+    if ( !pPed->IsSyncable () )
+    {
+        // This ped got a syncer?
+        if ( pSyncer )
+        {
+            // Tell the syncer to stop syncing
+            StopSync ( pPed );
+        }
+        return;
+    }
+
+    // This ped got a syncer?
     if ( pSyncer )
     {
-        // He isn't close enough to the vehicle and in the right dimension?
+        // He isn't close enough to the ped and in the right dimension?
         if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pPed->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
                 ( pPed->GetDimension () != pSyncer->GetDimension () ) )
         {
@@ -105,6 +117,8 @@ void CPedSync::UpdatePed ( CPed* pPed )
 
 void CPedSync::FindSyncer ( CPed* pPed )
 {
+    assert ( pPed->IsSyncable () );
+
     // Find a player close enough to him
     CPlayer* pPlayer = FindPlayerCloseToPed ( pPed, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
     if ( pPlayer )
@@ -117,6 +131,9 @@ void CPedSync::FindSyncer ( CPed* pPed )
 
 void CPedSync::StartSync ( CPlayer* pPlayer, CPed* pPed )
 {
+    if ( !pPed->IsSyncable () )
+        return;
+
     // Tell the player
     pPlayer->Send ( CPedStartSyncPacket ( pPed ) );
 
