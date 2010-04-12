@@ -85,6 +85,18 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
     CPlayer* pSyncer = pVehicle->GetSyncer ();
     CPed* pController = pVehicle->GetController ();
 
+    // Handle no syncing when not occupied
+    if ( !pVehicle->IsUnoccupiedSyncable () )
+    {
+        // This vehicle got a syncer?
+        if ( pSyncer )
+        {
+            // Tell the syncer to stop syncing
+            StopSync ( pVehicle );
+        }
+        return;
+    }
+
     // If someones driving it, or its being towed by someone driving (and not just entering/exiting)
     if ( pController && IS_PLAYER ( pController ) && pController->GetVehicleAction () == CPlayer::VEHICLEACTION_NONE )
     {
@@ -122,6 +134,8 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
 
 void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
 {
+    assert ( pVehicle->IsUnoccupiedSyncable () );
+
     // This vehicle got any passengers?
     CPed* pPassenger = pVehicle->GetFirstOccupant ();
     if ( pPassenger && IS_PLAYER ( pPassenger ) && !pPassenger->IsBeingDeleted() )
@@ -144,6 +158,9 @@ void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
 
 void CUnoccupiedVehicleSync::StartSync ( CPlayer* pPlayer, CVehicle* pVehicle )
 {
+    if ( !pVehicle->IsUnoccupiedSyncable () )
+        return;
+
     // Tell the player
     pPlayer->Send ( CUnoccupiedVehicleStartSyncPacket ( pVehicle ) );
 

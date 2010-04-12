@@ -1491,24 +1491,25 @@ bool CStaticFunctionDefinitions::ClearElementVisibleTo ( CElement* pElement )
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer* pPlayer )
+bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer* pPlayer, bool bEnable )
 {
     assert ( pElement );
-    assert ( pPlayer );
 
     switch ( pElement->GetType () )
     {
         case CElement::PED:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            pPed->SetSyncer ( pPlayer );
+            pPed->SetSyncable ( bEnable );
+            g_pGame->GetPedSync()->OverrideSyncer ( pPed, pPlayer );
             return true;
             break;
         }
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            pVehicle->SetSyncer ( pPlayer );
+            pVehicle->SetUnoccupiedSyncable ( bEnable );
+            g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer ( pVehicle, pPlayer );
             return true;
             break;
         }

@@ -196,6 +196,9 @@ public:
     inline class CPlayer*           GetSyncer               ( void )                        { return m_pSyncer; };
     void                            SetSyncer               ( class CPlayer* pPlayer );
 
+    bool                            IsUnoccupiedSyncable    ( void )                        { return m_bUnoccupiedSyncable; };
+    void                            SetUnoccupiedSyncable   ( bool bUnoccupiedSynced )      { m_bUnoccupiedSyncable = bUnoccupiedSynced; };
+
     unsigned char                   GetMaxPassengers        ( void );
     unsigned char                   GetFreePassengerSeat    ( void );
 
@@ -301,6 +304,7 @@ private:
     CVehicleColor                   m_Color;
 
     bool                            m_bIsFrozen;    
+    bool                            m_bUnoccupiedSyncable;
 
     CVehicleUpgrades*               m_pUpgrades;
 
