@@ -32,6 +32,9 @@ void CGUIElement_Impl::DestroyElement ( void )
 {
     m_pManager->RemoveFromRedrawQueue ( reinterpret_cast < CGUIElement* > ( ( m_pWindow )->getUserData () ) );
 
+    // Clear pointer back to this
+    m_pWindow->setUserData ( NULL );
+
     // Destroy the control
     m_pManager->GetWindowManager ()->destroyWindow ( m_pWindow );
 
