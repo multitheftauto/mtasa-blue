@@ -86,6 +86,7 @@ public:
     CLuaArgument*                                       PushTable           ( CLuaArguments * table );
 
     void                                                DeleteArguments     ( void );
+    void                                                ValidateTableKeys   ( void );
 
     bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                                                ReadFromJSONString  ( const char* szJSON );

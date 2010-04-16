@@ -215,7 +215,17 @@ namespace SharedUtil
     V* MapFind ( std::map < T, V, TR >& collection, const T2& key )
     {
         typename std::map < T, V, TR > ::iterator it = collection.find ( key );
-        if ( it != collection.end () )
+        if ( it == collection.end () )
+            return NULL;
+        return &it->second;
+    }
+
+    // Find value in const collection
+    template < class T, class V, class TR, class T2 >
+    const V* MapFind ( const std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::const_iterator it = collection.find ( key );
+        if ( it == collection.end () )
             return NULL;
         return &it->second;
     }
