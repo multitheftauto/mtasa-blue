@@ -110,14 +110,13 @@ public:
 
     bool                DrawTextureQueued       ( float fX, float fY,
                                                   float fWidth, float fHeight,
+                                                  float fU, float fV,
+                                                  float fSizeU, float fSizeV, 
+                                                  bool bRelativeUV,
                                                   const std::string& strFilename,
                                                   float fRotation,
                                                   float fRotCenOffX,
                                                   float fRotCenOffY,
-                                                  float fStartX,
-                                                  float fStartY,
-                                                  float fEndX,
-                                                  float fEndY,
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
@@ -248,14 +247,15 @@ private:
         float           fY;
         float           fWidth;
         float           fHeight;
+        float           fU;
+        float           fV;
+        float           fSizeU;
+        float           fSizeV;
         float           fRotation;
         float           fRotCenOffX;
         float           fRotCenOffY;
-        float           fStartX;
-        float           fStartY;
-        float           fEndX;
-        float           fEndY;
         unsigned long   ulColor;
+        bool            bRelativeUV;
     };
 
     struct sDrawQueueItem
