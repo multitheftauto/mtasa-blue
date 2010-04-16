@@ -490,6 +490,42 @@ void CLuaArguments::DeleteArguments ( void )
 }
 
 
+void CLuaArguments::ValidateTableKeys ( void )
+{
+    // Iterate over m_Arguments as pairs
+    // If first is LUA_TNIL, then remove pair
+    vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
+    for ( ; iter != m_Arguments.end () ; )
+    {
+        // Check first in pair
+        if ( (*iter)->GetType () == LUA_TNIL )
+        {
+            // Remove pair
+            delete *iter;
+            iter = m_Arguments.erase ( iter );
+            if ( iter != m_Arguments.end () )
+            {
+                delete *iter;
+                iter = m_Arguments.erase ( iter );
+            }
+            // Check if end
+            if ( iter == m_Arguments.end () )
+                break;
+        }
+        else
+        {
+            // Skip second in pair
+            iter++;
+            // Check if end
+            if ( iter == m_Arguments.end () )
+                break;
+
+            iter++;
+        }
+    }
+}
+
+
 bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     bool bKnownTablesCreated = false;

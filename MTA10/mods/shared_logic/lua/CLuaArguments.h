@@ -73,6 +73,7 @@ public:
 
     bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    void                                                ValidateTableKeys   ( void );
 
     unsigned int                                        Count               ( void ) const          { return static_cast < unsigned int > ( m_Arguments.size () ); };
     std::vector < CLuaArgument* > ::const_iterator      IterBegin           ( void )                { return m_Arguments.begin (); };

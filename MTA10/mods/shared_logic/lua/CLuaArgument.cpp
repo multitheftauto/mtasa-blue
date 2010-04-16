@@ -519,6 +519,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 m_pTableData = new CLuaArguments ( bitStream, pKnownTables );
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
+                m_pTableData->ValidateTableKeys ();
                 break;
             }
 
