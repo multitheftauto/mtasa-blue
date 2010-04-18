@@ -298,7 +298,7 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            // Grab the rotation
+            // Grab the position
             CVector vecRotation;
             if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation ) )
             {            

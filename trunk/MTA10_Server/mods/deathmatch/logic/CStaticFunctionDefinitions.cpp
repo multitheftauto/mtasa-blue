@@ -947,43 +947,6 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation )
-{
-    assert ( pElement );
-
-    int iType = pElement->GetType ();
-    switch ( iType )
-    {
-        case CElement::PED:
-        case CElement::PLAYER:
-        {
-            CPed* pPed = static_cast < CPed* > ( pElement );
-            vecRotation.fZ = ConvertRadiansToDegrees ( pPed->GetRotation () );
-
-            break;
-        }
-        case CElement::VEHICLE:
-        {
-            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            pVehicle->GetRotationDegrees ( vecRotation );
-
-            break;
-        }
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast < CObject* > ( pElement );
-            pObject->GetRotation ( vecRotation );
-            ConvertRadiansToDegrees ( vecRotation );
-
-            break;
-        }
-        default: return false;
-    }
-
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVector& vecVelocity )
 {
     assert ( pElement );
@@ -1046,40 +1009,6 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
     else
     {
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_POSITION, *BitStream.pBitStream ) );
-    }
-
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation )
-{
-    assert ( pElement );
-
-    int iType = pElement->GetType ();
-    switch ( iType )
-    {
-        case CElement::PED:
-        case CElement::PLAYER:
-        {
-            CPed* pPed = static_cast < CPed* > ( pElement );
-            SetPedRotation( pPed, vecRotation.fZ );
-
-            break;
-        }
-        case CElement::VEHICLE:
-        {
-            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            SetVehicleRotation( pVehicle, vecRotation );
-
-            break;
-        }
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast < CObject* > ( pElement );
-            SetObjectRotation( pObject, vecRotation );
-        }
-        default: return false;
     }
 
     return true;

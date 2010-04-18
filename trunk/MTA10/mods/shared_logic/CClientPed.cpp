@@ -543,12 +543,13 @@ void CClientPed::GetRotationRadians ( CVector& vecRotation ) const
 void CClientPed::SetRotationDegrees ( const CVector& vecRotation )
 {
     // Convert from degrees to radians
-    float fTempRotation = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
+    CVector vecTemp;
+    vecTemp.fX = vecRotation.fX * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fY = vecRotation.fY * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
 
-    // Set the rotation
-    SetCurrentRotation ( fTempRotation );
-    if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( fTempRotation );
+    // Set the rotation as radians
+    SetRotationRadians ( vecTemp );
 }
 
 
