@@ -153,7 +153,7 @@ int CLuaFunctionDefs::GetProjectileType ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileType", "pickup", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileType", "projectile", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getProjectileType" );
@@ -162,6 +162,69 @@ int CLuaFunctionDefs::GetProjectileType ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetProjectileTarget ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientProjectile* pProjectile = lua_toprojectile ( luaVM, 1 );
+        if ( pProjectile )
+        {
+            unsigned char ucWeapon = pProjectile->GetWeaponType();
+			if (ucWeapon == WEAPONTYPE_ROCKET_HS)
+			{
+				lua_pushelement ( luaVM, pProjectile->GetTargetEntity() );
+                return 1;
+			}
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileTarget", "projectile", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileTarget" );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
+int CLuaFunctionDefs::GetProjectileCreator ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientProjectile* pProjectile = lua_toprojectile ( luaVM, 1 );
+        if ( pProjectile )
+        {
+			lua_pushelement ( luaVM, pProjectile->GetCreator() );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileCreator", "projectile", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileCreator" );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetProjectileForce ( lua_State* luaVM )
+{
+    // Verify the argument
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientProjectile* pProjectile = lua_toprojectile ( luaVM, 1 );
+        if ( pProjectile )
+        {
+			lua_pushnumber ( luaVM, static_cast < lua_Number > ( pProjectile->GetForce() ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileForce", "projectile", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileForce" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
