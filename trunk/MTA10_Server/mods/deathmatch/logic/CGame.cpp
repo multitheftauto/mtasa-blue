@@ -455,7 +455,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= Log file         : %s\n" \
                                 "= Maximum players  : %u\n" \
                                 "= MTU packet size  : %u\n" \
-								"= HTTP port        : %u\n" \
+                                "= HTTP port        : %u\n" \
                                 "===========================================================\n",
 
                                 MTA_DM_BUILDTAG_SHORT,
