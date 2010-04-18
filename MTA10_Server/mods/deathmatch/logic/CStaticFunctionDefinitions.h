@@ -59,7 +59,6 @@ public:
     static CLuaArguments*       GetAllElementData                   ( CElement* pElement, CLuaArguments * table );
     static CElement*            GetElementParent                    ( CElement* pElement );
     static bool                 GetElementPosition                  ( CElement* pElement, CVector& vecPosition );
-    static bool                 GetElementRotation                  ( CElement* pElement, CVector& vecRotation );
     static bool                 GetElementVelocity                  ( CElement* pElement, CVector& vecVelocity );
     static bool                 GetElementInterior                  ( CElement* pElement, unsigned char& ucInterior );
     static bool                 IsElementWithinColShape             ( CElement* pElement, CColShape* pColShape, bool& bWithin );
@@ -81,7 +80,6 @@ public:
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
-    static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity );
     static bool                 SetElementVisibleTo                 ( CElement* pElement, CElement* pReference, bool bVisible );
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
