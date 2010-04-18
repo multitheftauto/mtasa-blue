@@ -449,13 +449,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= Multi Theft Auto: San Andreas v%s\n" \
                                 "===========================================================\n" \
                                 "= Server name      : %s\n" \
-                                "= Server IP address    : %s\n" \
+                                "= Server IP address: %s\n" \
                                 "= Server port      : %u\n" \
                                 "= \n" \
-                                "= Log file     : %s\n" \
+                                "= Log file         : %s\n" \
                                 "= Maximum players  : %u\n" \
                                 "= MTU packet size  : %u\n" \
-                                "= HTTP port        : %u\n" \
+								"= HTTP port        : %u\n" \
                                 "===========================================================\n",
 
                                 MTA_DM_BUILDTAG_SHORT,
