@@ -250,7 +250,7 @@ std::string ASE::QueryFull ( void )
             // skin (skip)
             reply << ( unsigned char ) 1;
             // score
-            const std::string& strScore = pPlayer->GetAnnounceValue ( "Score" );
+            const std::string& strScore = pPlayer->GetAnnounceValue ( "score" );
             reply << ( unsigned char ) ( strScore.length () + 1 );
             reply << strScore.c_str ();
             // ping
