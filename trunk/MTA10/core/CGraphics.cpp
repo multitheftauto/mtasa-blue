@@ -608,13 +608,13 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
     Item.Texture.fSizeU = fSizeU;
     Item.Texture.fSizeV = fSizeV;
     Item.Texture.bRelativeUV = bRelativeUV;
-    Item.Texture.texture = CacheTexture( strFilename );
+    Item.Texture.info = CacheTexture( strFilename );
     Item.Texture.fRotation = fRotation;
     Item.Texture.fRotCenOffX = fRotCenOffX;
     Item.Texture.fRotCenOffY = fRotCenOffY;
     Item.Texture.ulColor = ulColor;
 
-    if ( !Item.Texture.texture )
+    if ( !Item.Texture.info.d3dTexture )
         return false;
 
     // Add it to the queue
@@ -1002,25 +1002,25 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         }
         case QUEUE_TEXTURE:
         {
-            D3DSURFACE_DESC texureDesc;
-            Item.Texture.texture->GetLevelDesc( 0, &texureDesc );
-            float texureWidth   = texureDesc.Width;
-            float texureHeight  = texureDesc.Height;
-            float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
-            D3DXMATRIX matrix;
             RECT cutImagePos;
-            cutImagePos.left    = ( Item.Texture.fU ) * ( Item.Texture.bRelativeUV ? texureWidth : 1 );
-            cutImagePos.top     = ( Item.Texture.fV ) * ( Item.Texture.bRelativeUV ? texureHeight : 1 );
-            cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? texureWidth : 1 );
-            cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? texureHeight : 1 );
-            float fCutWidth  = cutImagePos.right - cutImagePos.left;
-            float fCutHeight = cutImagePos.bottom - cutImagePos.top;
-            D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
-            D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
-            D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+            const float fSurfaceWidth  = Item.Texture.info.uiSurfaceWidth;
+            const float fSurfaceHeight = Item.Texture.info.uiSurfaceHeight;
+            const float fFileWidth     = Item.Texture.info.uiFileWidth;
+            const float fFileHeight    = Item.Texture.info.uiFileHeight;
+            cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+            cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+            cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+            cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+            const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+            const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+            const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
+            const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
+            const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+            const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
+            D3DXMATRIX matrix;
             D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
             m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( Item.Texture.texture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            m_pDXSprite->Draw ( Item.Texture.info.d3dTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
             break;
         }
         // Circle type?
@@ -1033,7 +1033,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 
 
 // Cache a texture for current and future use.
-IDirect3DTexture9* CGraphics::CacheTexture ( const string& strFilename )
+SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
 {
     // Find exisiting
     map < string, SCachedTextureInfo >::iterator iter = m_CachedTextureInfoMap.find ( strFilename );
@@ -1045,13 +1045,33 @@ IDirect3DTexture9* CGraphics::CacheTexture ( const string& strFilename )
         iter = m_CachedTextureInfoMap.find ( strFilename );
 
         SCachedTextureInfo& info = iter->second;
-        info.texture = LoadTexture( strFilename.c_str () );
+        info.d3dTexture = LoadTexture( strFilename.c_str () );
+        info.uiFileWidth = 1;
+        info.uiFileHeight = 1;
+        info.uiSurfaceWidth = 1;
+        info.uiSurfaceHeight = 1;
+
+        if ( info.d3dTexture )
+        {
+            D3DXIMAGE_INFO imageInfo;
+            if ( SUCCEEDED ( D3DXGetImageInfoFromFile( strFilename.c_str (), &imageInfo ) ) )
+            {
+                info.uiFileWidth = imageInfo.Width;
+                info.uiFileHeight = imageInfo.Height;
+            }
+            D3DSURFACE_DESC surfaceDesc;
+            if ( SUCCEEDED ( info.d3dTexture->GetLevelDesc( 0, &surfaceDesc ) ) )
+            {
+                info.uiSurfaceWidth = surfaceDesc.Width;
+                info.uiSurfaceHeight = surfaceDesc.Height;
+            }
+        }
     }
 
     SCachedTextureInfo& info = iter->second;
     info.ulTimeLastUsed = GetTickCount();
 
-    return info.texture;
+    return info;
 }
 
 
@@ -1072,7 +1092,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
         unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
-            SAFE_RELEASE ( info.texture );
+            SAFE_RELEASE ( info.d3dTexture );
             iter = m_CachedTextureInfoMap.erase ( iter );
         }
         else
