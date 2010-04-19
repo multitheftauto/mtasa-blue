@@ -26,6 +26,16 @@ class CGraphics;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
+struct SCachedTextureInfo
+{
+    IDirect3DTexture9*  d3dTexture;
+    unsigned long       ulTimeLastUsed;
+    unsigned int        uiSurfaceWidth;
+    unsigned int        uiSurfaceHeight;
+    unsigned int        uiFileWidth;
+    unsigned int        uiFileHeight;
+};
+
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
     friend class CDirect3DEvents9;
@@ -138,7 +148,7 @@ private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
-    IDirect3DTexture9*  CacheTexture            ( const std::string& strFilename );
+    SCachedTextureInfo& CacheTexture            ( const std::string& strFilename );
     void                ExpireCachedTextures    ( bool bExpireAll = false );
     ID3DXFont*          GetBigFont              ( ID3DXFont* pDXFont );
 
@@ -242,7 +252,7 @@ private:
 
     struct sDrawQueueTexture
     {
-        IDirect3DTexture9* texture;
+        SCachedTextureInfo info;
         float           fX;
         float           fY;
         float           fWidth;
@@ -295,16 +305,7 @@ private:
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
 
-
-    // Texures cached with DrawTextureQueued
-    struct SCachedTextureInfo
-    {
-        IDirect3DTexture9*  texture;
-        unsigned long       ulTimeLastUsed;
-    };
-
     std::map < std::string, SCachedTextureInfo > m_CachedTextureInfoMap;
-
 };
 
 #endif
