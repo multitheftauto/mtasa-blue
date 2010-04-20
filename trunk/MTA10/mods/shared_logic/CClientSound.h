@@ -79,6 +79,7 @@ private:
     float                   m_fVolume;
     float                   m_fSpeed;
     float                   m_fMinDistance;
+    float                   m_fMaxDistance;
 
     CVector                 m_vecPosition;
 
