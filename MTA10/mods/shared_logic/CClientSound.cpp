@@ -30,6 +30,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     m_fVolume = 1.0f;
     m_fSpeed = 1.0f;
     m_fMinDistance = 2.0f;
+    m_fMaxDistance = 10.0f;
     m_usDimension = 0;
     m_b3D = false;
 }
@@ -211,6 +212,7 @@ float CClientSound::GetMinDistance ( void )
 
 void CClientSound::SetMaxDistance ( float fDistance )
 {
+    m_fMaxDistance = fDistance;
     if ( m_pSound )
     {
         m_pSound->setMaxDistance ( fDistance );
@@ -255,20 +257,19 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
 
         // Volume
         float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
-        float fSilenceDistance = m_fMinDistance * 20.0f;
         float fVolume = 1.0;
 
         if ( fDistance <= m_fMinDistance )
         {
             fVolume = 1.0f;
         }
-        else if ( fDistance >= fSilenceDistance )
+        else if ( fDistance >= m_fMaxDistance )
         {
             fVolume = 0.0f;
         }
         else
         {
-            float fLinear = (fSilenceDistance - fDistance) / fSilenceDistance;
+            float fLinear = (m_fMaxDistance - fDistance) / m_fMaxDistance;
             fVolume = sqrt ( fLinear ) * fLinear;
         }
 
