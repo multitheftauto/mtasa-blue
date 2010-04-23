@@ -779,13 +779,13 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
         case CElement::PED:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            return static_cast < CElement* > ( pPed->GetSyncer() );
+            return pPed->IsSyncable () ? static_cast < CElement* > ( pPed->GetSyncer() ) : NULL;
             break;
         }
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            return static_cast < CElement* > ( pVehicle->GetSyncer() );
+            return pVehicle->IsUnoccupiedSyncable () ? static_cast < CElement* > ( pVehicle->GetSyncer() ) : NULL;
             break;
         }
     }
