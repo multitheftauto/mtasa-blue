@@ -1674,18 +1674,20 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
 int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
 {
     int iArgument2 = lua_type ( luaVM, 2 );
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && ( iArgument2 == LUA_TLIGHTUSERDATA || iArgument2 == LUA_TNIL ) )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && ( iArgument2 == LUA_TLIGHTUSERDATA || iArgument2 == LUA_TBOOLEAN ) )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 2 );
+        CPlayer* pPlayer = NULL;
         bool bEnable = true;
 
-        if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-            bEnable = lua_toboolean ( luaVM, 3 ) ? true : false;
+        if ( iArgument2 == LUA_TLIGHTUSERDATA )
+            pPlayer = lua_toplayer ( luaVM, 2 );
+        if ( iArgument2 == LUA_TBOOLEAN )
+            bEnable = lua_toboolean ( luaVM, 2 ) ? true : false;
 
         if ( pElement )
         {
-            if ( pPlayer || iArgument2 == LUA_TNIL )
+            if ( pPlayer || iArgument2 == LUA_TBOOLEAN )
             {
                 lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetElementSyncer ( pElement, pPlayer, bEnable ) );
                 return 1;
