@@ -9429,7 +9429,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetTimer ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetTimerDetails ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
@@ -9443,7 +9443,7 @@ int CLuaFunctionDefinitions::GetTimer ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getTimer" );
+            m_pScriptDebugging->LogBadType ( luaVM, "getTimerDetails" );
     }
 
     lua_pushboolean ( luaVM, false );

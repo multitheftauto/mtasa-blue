@@ -586,7 +586,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefinitions::ResetTimer );
     CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefinitions::GetTimers );
     CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefinitions::IsTimer );
-    CLuaCFunctions::AddFunction ( "getTimer", CLuaFunctionDefinitions::GetTimer );
+    CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefinitions::GetTimerDetails );
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefinitions::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefinitions::Dereference );
