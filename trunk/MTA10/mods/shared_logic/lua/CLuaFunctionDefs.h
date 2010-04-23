@@ -464,7 +464,7 @@ public:
     LUA_DECLARE ( ResetTimer );
     LUA_DECLARE ( GetTimers );
     LUA_DECLARE ( IsTimer );
-    LUA_DECLARE ( GetTimer );
+    LUA_DECLARE ( GetTimerDetails );
     LUA_DECLARE ( GetTickCount_ );
     LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( tocolor );
