@@ -301,13 +301,16 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             Ped.GetRotationDegrees ( vecRotation );
 
             // Correct the rotation
-            vecRotation.fZ = 0.0f - vecRotation.fZ;
+            vecRotation.fZ = fmod( -vecRotation.fZ, 360);
+            if ( vecRotation.fZ < 0 )
+                vecRotation.fZ = 360 + vecRotation.fZ;
+
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.GetRotationDegrees ( vecRotation );            
+            Vehicle.GetRotationDegrees ( vecRotation );
             break;
         }
         case CCLIENTOBJECT:
