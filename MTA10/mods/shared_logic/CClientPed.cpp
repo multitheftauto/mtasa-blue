@@ -550,6 +550,11 @@ void CClientPed::SetRotationDegrees ( const CVector& vecRotation )
 
     // Set the rotation as radians
     SetRotationRadians ( vecTemp );
+
+    // HACK: set again the z rotation to work on ground
+    SetCurrentRotation ( vecTemp.fZ );
+    if ( !IS_PLAYER ( this ) )
+        SetCameraRotation ( vecTemp.fZ );
 }
 
 
