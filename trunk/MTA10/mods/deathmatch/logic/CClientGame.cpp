@@ -16,6 +16,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Sebas Lamers <sebasdevelopment@gmx.com>
+*               Cazomino05 <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -1786,11 +1787,19 @@ void CClientGame::UpdateFireKey ( void )
                             {
                                 // Change the state back to false so this press doesn't do anything else
                                 pControl->bState = false;
-
-                                // Lets request a stealth kill
-                                CBitStream bitStream;
-                                bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
-                                m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
+                                CLuaArguments Arguments;
+                                Arguments.PushElement ( pTargetPed );
+                                if ( m_pLocalPlayer->CallEvent ( "onClientPlayerStealthKill", Arguments, false ) ) 
+                                {
+                                    // Lets request a stealth kill
+                                    CBitStream bitStream;
+                                    bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
+                                    m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
+                                }
+                                else
+                                {
+                                    return;
+                                }
                             }
                         }
                     }
@@ -2302,6 +2311,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
     m_Events.AddEvent ( "onClientPlayerWasted", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
