@@ -297,12 +297,18 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
             if ( !m_pSourcePlayer->IsDead () && !pTarget->IsDead () )
             {
                 //Do we have any record of the killer currently having a knife?
-                if ( m_pSourcePlayer->GetWeaponType( 1 ) == 4 ) {
-                    // Are they close enough?
-                    if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= STEALTH_KILL_RANGE )
+                if ( m_pSourcePlayer->GetWeaponType( 1 ) == 4 ) 
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushElement ( pTarget );
+                    if ( m_pSourcePlayer->CallEvent ( "onPlayerStealthKill", Arguments, false ) ) 
                     {
-                        // Start the stealth kill
-                        CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );
+                        // Are they close enough?
+                        if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= STEALTH_KILL_RANGE )
+                        {
+                            // Start the stealth kill
+                            CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );
+                        }
                     }
                 }
                 else
