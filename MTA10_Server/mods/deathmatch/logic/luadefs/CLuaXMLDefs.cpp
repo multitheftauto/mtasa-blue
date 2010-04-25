@@ -228,7 +228,7 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                         strRootTagName = pSourceNode->GetTagName ();
 
                         // Create the new XML file and its root node
-                        CXMLFile* pNewXML = pLUA->CreateXML ( strFile.c_str () );
+                        CXMLFile* pNewXML = pLUA->CreateXML ( strPath.c_str () );
                         if ( pNewXML )
                         {
                             // Grab the root of the new XML
