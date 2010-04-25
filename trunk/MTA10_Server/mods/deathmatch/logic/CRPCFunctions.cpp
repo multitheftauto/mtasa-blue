@@ -5,6 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CRPCFunctions.cpp
 *  PURPOSE:     Remote procedure call functionality class
 *  DEVELOPERS:  Jax <>
+*               Cazomino05 <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -295,11 +296,19 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
             // Are they both alive?
             if ( !m_pSourcePlayer->IsDead () && !pTarget->IsDead () )
             {
-                // Are they close enough?
-                if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= STEALTH_KILL_RANGE )
+                //Do we have any record of the killer currently having a knife?
+                if ( m_pSourcePlayer->GetWeaponType( 1 ) == 4 ) {
+                    // Are they close enough?
+                    if ( DistanceBetweenPoints3D ( m_pSourcePlayer->GetPosition (), pTarget->GetPosition () ) <= STEALTH_KILL_RANGE )
+                    {
+                        // Start the stealth kill
+                        CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );
+                    }
+                }
+                else
                 {
-                    // Start the stealth kill
-                    CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );
+                    //You shouldn't be able to get here without cheating to get a knife.
+                    CStaticFunctionDefinitions::KickPlayer( m_pSourcePlayer, 0, "AC: Possible Weapon Cheat Detected." );
                 }
             }
         }
