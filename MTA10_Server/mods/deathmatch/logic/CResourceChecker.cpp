@@ -611,6 +611,7 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["getVehicleIDFromName"]      = "Replaced|getVehicleModelFromName";
         hashServer["getVehicleNameFromID"]      = "Replaced|getVehicleNameFromModel";
         hashServer["getPlayerWeaponSlot"]       = "Replaced|getPedWeaponSlot";
+        hashServer["getPlayerWeapon"]           = "Replaced|getPedWeapon";
         hashServer["getPlayerArmor"]            = "Replaced|getPedArmor";
         hashServer["getPlayerRotation"]         = "Replaced|getPedRotation";
         hashServer["isPlayerChoking"]           = "Replaced|isPedChoking";

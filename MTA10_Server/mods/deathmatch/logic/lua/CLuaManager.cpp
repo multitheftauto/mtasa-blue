@@ -223,6 +223,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClientIP", CLuaFunctionDefinitions::GetPlayerIP );
     CLuaCFunctions::AddFunction ( "getClientAccount", CLuaFunctionDefinitions::GetPlayerAccount );
     CLuaCFunctions::AddFunction ( "setClientName", CLuaFunctionDefinitions::SetPlayerName );
+    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPedWeapon );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefinitions::AddEvent );
@@ -239,7 +240,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getPlayerCount", CLuaFunctionDefinitions::GetPlayerCount );
-    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPlayerWeapon );
     CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPlayerAmmoInClip );
     CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPlayerTotalAmmo );
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefinitions::GetPlayerFromName );
@@ -291,6 +291,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPedDucked", CLuaFunctionDefinitions::IsPedDucked );
     CLuaCFunctions::AddFunction ( "getPedStat", CLuaFunctionDefinitions::GetPedStat );
     CLuaCFunctions::AddFunction ( "getPedTarget", CLuaFunctionDefinitions::GetPedTarget );
+    CLuaCFunctions::AddFunction ( "getPedWeapon", CLuaFunctionDefinitions::GetPedWeapon );
     CLuaCFunctions::AddFunction ( "getPedClothes", CLuaFunctionDefinitions::GetPedClothes );
     CLuaCFunctions::AddFunction ( "doesPedHaveJetPack", CLuaFunctionDefinitions::DoesPedHaveJetPack );
     CLuaCFunctions::AddFunction ( "isPedOnGround", CLuaFunctionDefinitions::IsPedOnGround );

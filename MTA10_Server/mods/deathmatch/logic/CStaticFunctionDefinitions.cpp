@@ -1721,15 +1721,6 @@ bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned ch
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerWeapon ( CPlayer* pPlayer, unsigned char& ucWeapon )
-{
-    assert ( pPlayer );
-
-    ucWeapon = pPlayer->GetWeaponType ( pPlayer->GetWeaponSlot () );
-    return true;
-}
-
-
 CPlayer* CStaticFunctionDefinitions::GetPlayerFromName ( const char* szNick )
 {
     assert ( szNick );
