@@ -71,7 +71,6 @@ public:
     static int      GetPlayerAmmoInClip                 ( lua_State* luaVM );
     static int      GetPlayerTotalAmmo                  ( lua_State* luaVM );
     static int      SetPlayerAmmo                       ( lua_State* luaVM );
-    static int      GetPlayerWeapon                     ( lua_State* luaVM );
     static int      GetPlayerFromName                   ( lua_State* luaVM );
     static int      GetPlayerMoney                      ( lua_State* luaVM );
     static int      GetPlayerPing                       ( lua_State* luaVM );
@@ -122,6 +121,7 @@ public:
     static int      IsPedDucked                         ( lua_State* luaVM );    
     static int      GetPedStat                          ( lua_State* luaVM );
     static int      GetPedTarget                        ( lua_State* luaVM );    
+    static int      GetPedWeapon                        ( lua_State* luaVM );
     static int      GetPedClothes                       ( lua_State* luaVM );
     static int      DoesPedHaveJetPack                  ( lua_State* luaVM );
     static int      IsPedOnGround                       ( lua_State* luaVM );    

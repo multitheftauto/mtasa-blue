@@ -743,26 +743,38 @@ int CLuaFunctionDefinitions::GetPlayerCount ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetPlayerWeapon ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPedWeapon ( lua_State* luaVM )
 {
+    // Right type?
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
+        // Grab the ped
+        CPed* pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
         {
-            unsigned char ucWeapon;
-            if ( CStaticFunctionDefinitions::GetPlayerWeapon ( pPlayer, ucWeapon ) )
+            // Grab the slot if specified
+            unsigned char ucSlot = 0xFF;
+            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER || lua_type ( luaVM, 2 ) == LUA_TSTRING )
+                ucSlot = ( unsigned char ) lua_tonumber ( luaVM, 2 );
+
+            if ( ucSlot == 0xFF )
+                ucSlot = pPed->GetWeaponSlot ();
+
+            CWeapon* pWeapon = pPed->GetWeapon ( ucSlot );
+            if ( pWeapon )
             {
+				unsigned char ucWeapon = pWeapon->ucType;
                 lua_pushnumber ( luaVM, ucWeapon );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerCurrentWeapon", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWeapon", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerCurrentWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedWeapon" );
 
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
