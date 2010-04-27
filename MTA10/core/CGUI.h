@@ -45,6 +45,7 @@ class CLocalGUI;
 #include "CSingleton.h"
 #include "CCommunityRegistration.h"
 #include "CVersionUpdateChecker.h"
+#include "CVersionUpdater.h"
 
 #include <windows.h>
 
@@ -123,6 +124,7 @@ private:
 
     CCommunityRegistration  m_CommunityRegistration;
     CVersionUpdateChecker   m_VersionUpdateChecker;
+    CVersionUpdater         m_VersionUpdater;
 
 
     CGUILabel*              m_pLabelVersionTag;

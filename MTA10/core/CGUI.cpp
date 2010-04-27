@@ -174,8 +174,11 @@ CD3DMGEng* CLocalGUI::GetRenderingLibrary ( void )
 void CLocalGUI::DoPulse ( void )
 {
     m_CommunityRegistration.DoPulse ();
+    m_VersionUpdater.DoPulse ();
     if ( m_pMainMenu->IsVisible () && !m_pMainMenu->IsFading () )
+    {
         m_VersionUpdateChecker.DoPulse ();
+    }
 }
 
 

@@ -286,6 +286,13 @@ bool CHTTPClient::GetData ( CHTTPBuffer& outBuffer )
 }
 
 
+unsigned int CHTTPClient::PeekNextDataSize ( void ) const
+{
+    // Get the how many bytes of the next request have been downloaded so far
+     return m_Buffer.GetSize ();   
+}
+
+
 int CHTTPClient::ReadHeader ( char* pBuffer, unsigned int uiBufferSize )
 {
     // Big enough buffer?

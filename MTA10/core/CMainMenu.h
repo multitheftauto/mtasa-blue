@@ -18,6 +18,7 @@ class CMainMenu;
 
 #include "CCore.h"
 #include "CQuickConnect.h"
+#include "CQuestionBox.h"
 #include "CServerBrowser.h"
 #include "CSettings.h"
 #include "CCredits.h"
@@ -64,6 +65,7 @@ public:
     CServerBrowser*     GetServerBrowser                ( void ) { return &m_ServerBrowser; };
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
     CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };
+    CQuestionBox*       GetQuestionWindow               ( void ) { return &m_QuestionBox; };
 
     void                OnInvalidate                    ( IDirect3DDevice9 * pDevice );
     void                OnRestore                       ( IDirect3DDevice9 * pDevice );
@@ -108,6 +110,7 @@ private:
     unsigned int        m_uiItems;
 
     // Submenu classes
+    CQuestionBox        m_QuestionBox;
     CQuickConnect       m_QuickConnect;
     CSettings           m_Settings;
     CCredits            m_Credits;

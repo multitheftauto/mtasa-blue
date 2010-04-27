@@ -18,10 +18,12 @@
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 
 #ifdef MTA_DEBUG
+    #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
     #define MTA_DLL_NAME            "core_d.dll"
     #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1d.dll"
     #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client_d.dll"
 #else
+    #define MTA_EXE_NAME            "Multi Theft Auto.exe"
     #define MTA_DLL_NAME            "core.dll"
     #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1.dll"
     #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client.dll"

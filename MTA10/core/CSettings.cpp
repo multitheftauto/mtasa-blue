@@ -1782,6 +1782,16 @@ void CSettings::LoadData ( void )
     }
 }
 
+void RestartCallBack ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+    
+    if ( uiButton == 1 )
+    {
+        SetOnQuitCommand ( "restart" );
+        CCore::GetSingleton ().Quit ();
+    }
+}
 
 void CSettings::SaveData ( void )
 {
@@ -1839,7 +1849,18 @@ void CSettings::SaveData ( void )
 
     // change
     if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize ) )
-        CCore::GetSingleton ().ShowMessageBox ( "Information", SString ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" ), MB_BUTTON_OK | MB_ICON_INFO );
+    {
+        SString strMessage ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" );
+        strMessage += "\n\nDo you want to restart now?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "Restart required" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( RestartCallBack );
+        pQuestionBox->Show ();
+    }
 
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
