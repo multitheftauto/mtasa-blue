@@ -1,0 +1,5 @@
+#summary Where to find our full documentation Wiki
+
+Our full documentation wiki can be found at http://wiki.multitheftauto.com/ and contains manuals for the Server and Client, as well as full documentation of all scripting functions and events for the Lua scripting engine.
+
+If you want to post general ideas or discuss topics with other community members, please feel free to visit [http://mtasa.com/irc.html IRC] or the [http://forum.multitheftauto.com forums].
