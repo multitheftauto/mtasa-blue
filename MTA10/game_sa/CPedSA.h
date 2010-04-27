@@ -410,6 +410,9 @@ public:
 
     void                RemoveBodyPart ( int i, char c );
 
+    void                SetFootBlood ( unsigned int uiFootBlood );
+    unsigned int        GetFootBlood ( void );
+
     bool                IsOnFire ( void );
     void                SetOnFire ( bool bOnFire );
 
