@@ -100,8 +100,6 @@ public:
 
     // Player get funcs
     static unsigned int         GetPlayerCount                      ( void );
-    static bool                 GetPlayerAmmoInClip                 ( CPlayer* pPlayer, unsigned short& ucAmmo );
-    static bool                 GetPlayerTotalAmmo                  ( CPlayer* pPlayer, unsigned short& usAmmo );
     static CPlayer*             GetPlayerFromName                   ( const char* szNick );
     static bool                 GetPlayerPing                       ( CPlayer* pPlayer, unsigned int& uiPing );
     static bool                 GetPlayerMoney                      ( CPlayer* pPlayer, long& lMoney );

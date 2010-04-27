@@ -1079,51 +1079,80 @@ int CLuaFunctionDefinitions::SetPedFrozen ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::GetPlayerAmmoInClip ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPedAmmoInClip ( lua_State* luaVM )
 {
+    // Right types?
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
+        // Grab the ped and the slot provided
+        CPed* pPed = lua_toped ( luaVM, 1 );
+
+        // Got a ped
+        if ( pPed )
         {
-            unsigned short usAmmo;
-            if ( CStaticFunctionDefinitions::GetPlayerAmmoInClip ( pPlayer, usAmmo ) )
+            // Got a second argument too (slot)?
+            unsigned char ucSlot = pPed->GetWeaponSlot();
+            int iArgument2 = lua_type ( luaVM, 2 );
+            if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
             {
+                ucSlot = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            }
+
+            CWeapon* pWeapon = pPed->GetWeapon ( ucSlot );
+            if ( pWeapon )
+            {
+                unsigned short usAmmo = static_cast < unsigned short > ( pWeapon->usAmmoInClip );
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerAmmoInClip", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAmmoInClip", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerAmmoInClip" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedAmmoInClip" );
 
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
-int CLuaFunctionDefinitions::GetPlayerTotalAmmo ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPedTotalAmmo ( lua_State* luaVM )
 {
+    // Right types?
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        if ( pPlayer )
+        // Grab the ped and the slot
+        CPed* pPed = lua_toped ( luaVM, 1 );
+
+        // Got the ped?
+        if ( pPed )
         {
-            unsigned short usAmmo;
-            if ( CStaticFunctionDefinitions::GetPlayerTotalAmmo ( pPlayer, usAmmo ) )
+            // Got a slot argument too?
+            unsigned char ucSlot = pPed->GetWeaponSlot();
+            int iArgument2 = lua_type ( luaVM, 2 );
+            if ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER )
             {
+                ucSlot = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            }
+
+            // Grab the ammo and return
+            CWeapon* pWeapon = pPed->GetWeapon ( ucSlot );
+            if ( pWeapon )
+            {
+                unsigned short usAmmo = static_cast < unsigned short > ( pWeapon->usAmmo );
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerTotalAmmo", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTotalAmmo", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerTotalAmmo" );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedTotalAmmo" );
 
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
