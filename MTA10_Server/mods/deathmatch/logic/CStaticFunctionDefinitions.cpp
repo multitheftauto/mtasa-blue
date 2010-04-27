@@ -1666,24 +1666,6 @@ unsigned int CStaticFunctionDefinitions::GetPlayerCount ( void )
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerAmmoInClip ( CPlayer* pPlayer, unsigned short& usAmmo )
-{
-    assert ( pPlayer );
-
-    usAmmo = pPlayer->GetWeaponAmmoInClip ( pPlayer->GetWeaponSlot () );
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetPlayerTotalAmmo ( CPlayer* pPlayer, unsigned short& usAmmo )
-{
-    assert ( pPlayer );
-
-    usAmmo = pPlayer->GetWeaponTotalAmmo ( pPlayer->GetWeaponSlot () );
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::SetPlayerAmmo ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip )
 {
     assert ( pElement );

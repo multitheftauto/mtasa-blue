@@ -68,8 +68,8 @@ public:
 
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );
-    static int      GetPlayerAmmoInClip                 ( lua_State* luaVM );
-    static int      GetPlayerTotalAmmo                  ( lua_State* luaVM );
+    static int      GetPedAmmoInClip                    ( lua_State* luaVM );
+    static int      GetPedTotalAmmo                     ( lua_State* luaVM );
     static int      SetPlayerAmmo                       ( lua_State* luaVM );
     static int      GetPlayerFromName                   ( lua_State* luaVM );
     static int      GetPlayerMoney                      ( lua_State* luaVM );
