@@ -17,6 +17,7 @@
 #include "resource.h"
 #include <shlwapi.h>
 #include <stdio.h>
+#include "shellapi.h"
 
 #include "SharedUtil.h"
 #include "SharedUtil.hpp"
@@ -99,32 +100,41 @@ long DisplayErrorMessageBox ( HWND& hwndSplash, const SString& strMessage )
     return 1;
 }
 
-
 //
 // Read a registry string value
 //
-bool ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, char* szBuffer=NULL, DWORD dwBufferSize=0 )
+
+SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult = NULL )
 {
     // Clear output
-    if ( szBuffer && dwBufferSize )
-        szBuffer[0] = 0;
+    SString strOutResult = "";
 
     bool bResult = false;
     HKEY hkTemp = NULL;
     if ( RegOpenKeyEx ( hkRoot, szSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
     {
-        if ( RegQueryValueEx ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
+        DWORD dwBufferSize;
+        if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
         {
-            bResult = true;
+            char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize + 1 ) );
+            if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
+            {
+                strOutResult = szBuffer;
+                bResult = true;
+            }
         }
         RegCloseKey ( hkTemp );
     }
-    return bResult;
+    if ( iResult )
+        *iResult = bResult;
+    return strOutResult;
 }
+
 
 //
 // Write a registry string value
 //
+
 void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, char* szBuffer )
 {
     HKEY hkTemp;
@@ -137,71 +147,37 @@ void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, ch
 }
 
 
-//
-// UpgradeRegistryKeys
-//
-//                              Orig    New
-//  "GTA:SA Path"               HKLM >> HKCU
-//  "Last Run Location"         HKLM >> HKCU
-//  "Last Install Location"     HKLM
-//  "Serial"                    HKLM
-//  "Username"                  HKLM
-//
-void UpgradeRegistryKeys ( void )
-{
-    char szSourceValue[MAX_PATH];
-    bool bSourceExists;
-    bool bDestExists;
-
-    // Copy if source exists and destination does not
-
-    // Upgrade "GTA:SA Path"
-    bSourceExists = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szSourceValue, MAX_PATH - 1 ) && strlen ( szSourceValue );
-    bDestExists   = ReadRegistryStringValue ( HKEY_CURRENT_USER,  "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path" );
-
-    if ( bSourceExists && !bDestExists )
-        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szSourceValue );
-
-    // Upgrade "Last Run Location"
-    bSourceExists = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szSourceValue, MAX_PATH - 1 ) && strlen ( szSourceValue );
-    bDestExists   = ReadRegistryStringValue ( HKEY_CURRENT_USER,  "Software\\Multi Theft Auto: San Andreas", "Last Run Location" );
-
-    if ( bSourceExists && !bDestExists )
-        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szSourceValue );
-}
-
-
-void GetMTASAPath ( char * szBuffer, size_t sizeBufferSize )
+SString GetMTASAPath ( void )
 {
     // Get current module full path
-    GetModuleFileName ( NULL, szBuffer, sizeBufferSize - 1 );
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
 
     // Strip the module name out of the path.
     PathRemoveFileSpec ( szBuffer );
 
     // Save to a temp registry key
     WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
+    return szBuffer;
 }
 
 
-int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
+int GetGamePath ( SString& strOutResult )
 {
-    char szRegBuffer[MAX_PATH];
-    ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szRegBuffer, MAX_PATH - 1 );
+    SString strRegPath = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path" );
 
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
-        if ( strlen( szRegBuffer ) )
+        if ( strlen( strRegPath.c_str () ) )
         {
             // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-            if ( strchr ( szRegBuffer, '?' ) > 0 )
+            if ( strchr ( strRegPath.c_str (), '?' ) > 0 )
                 return -1;
 
-            char szExePath[MAX_PATH];
-            sprintf ( szExePath, "%s\\%s", szRegBuffer, MTA_GTAEXE_NAME );
-            if ( FileExists( szExePath  ) )
+            SString strExePath ( "%s\\%s", strRegPath.c_str (), MTA_GTAEXE_NAME );
+            if ( FileExists( strExePath  ) )
             {
-                _snprintf ( szBuffer, sizeBufferSize, "%s", szRegBuffer );
+                strOutResult = strRegPath;
                 return 1;
             }
         }
@@ -212,10 +188,11 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
 
     if ( pidl != 0 )
     {
+        char szBuffer[MAX_PATH];
         // get the name of the  folder
-        if ( !SHGetPathFromIDList ( pidl, szBuffer ) )
+        if ( SHGetPathFromIDListA ( pidl, szBuffer ) )
         {
-            szBuffer = NULL;
+            strOutResult = szBuffer;
         }
 
         // free memory used
@@ -226,15 +203,15 @@ int GetGamePath ( char * szBuffer, size_t sizeBufferSize )
             imalloc->Release ( );
         }
     
-        if ( FileExists( SString ( "%s\\gta_sa.exe", szBuffer ) ) )
+        if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
         {
-            WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", szBuffer );
+            WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", strOutResult );
         }
         else
         {
             if ( MessageBox ( NULL, "Could not find gta_sa.exe at the path you have selected. Choose another folder?", "Error", MB_OKCANCEL ) == IDOK )
             {
-                return GetGamePath ( szBuffer, sizeBufferSize );
+                return GetGamePath ( strOutResult );
             }
             else
             {
@@ -256,27 +233,17 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
-
-    bool validate = false;
-
     if ( !TerminateGTAIfRunning () )
     {
         MessageBox ( 0, "MTA: SA couldn't start because an another instance of GTA is running.", "Error", MB_ICONERROR );
         return 0;
     }
 
-
     PROCESS_INFORMATION piLoadee;
     STARTUPINFO siLoadee;
 
-    char szMTASAPath[MAX_PATH];
-    char szGTAPath[MAX_PATH];
-
-    int iResult;
-
-    UpgradeRegistryKeys ();
-
-    iResult = GetGamePath ( szGTAPath, MAX_PATH );
+    SString strGTAPath;
+    int iResult = GetGamePath ( strGTAPath );
     if ( iResult == 0 ) {
         MessageBox ( 0, "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
         return 5;
@@ -286,7 +253,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 5;
     }
 
-    GetMTASAPath ( szMTASAPath, MAX_PATH );
+    SString strMTASAPath = GetMTASAPath ();
 
     // If we aren't compiling in debug-mode...
     HWND hwndSplash = NULL;
@@ -307,45 +274,40 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 
     // Basic check for the data files
-    if ( !FileExists ( SString ( "%s\\mta\\cgui\\CGUI.png", szMTASAPath ) ) )
+    if ( !FileExists ( strMTASAPath + "\\mta\\cgui\\CGUI.png" ) )
     {
         // Check if CGUI.png exists
         return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that the data files have been installed correctly." );
     }
 
     // Check for client file
-    if ( !FileExists ( SString ( "%s\\%s", szMTASAPath, CHECK_DM_CLIENT_NAME ) ) )
+    if ( !FileExists ( strMTASAPath + "\\" +  CHECK_DM_CLIENT_NAME ) )
     {
         return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly." );
     }
 
     // Check for lua file
-    if ( !FileExists ( SString ( "%s\\%s", szMTASAPath, CHECK_DM_LUA_NAME ) ) )
+    if ( !FileExists ( strMTASAPath + "\\" + CHECK_DM_LUA_NAME ) )
     {
         return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly." );
     }
 
     // Grab the MTA folder
-    char szDir[MAX_PATH];
-    char szGTAEXEPath[MAX_PATH];
-    strcpy ( szGTAEXEPath, szGTAPath );
-    strcat ( szGTAEXEPath, "\\" );
-    strcat ( szGTAEXEPath, MTA_GTAEXE_NAME ) ;
-    strcpy ( szDir, szMTASAPath );
-    strcat ( szDir, "\\mta" );
+    SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
+    SString strDir = strMTASAPath + "\\mta";
    
     // Make sure the gta executable exists
-    SetCurrentDirectory ( szGTAPath );
-    if ( !FileExists( szGTAEXEPath ) )
+    SetCurrentDirectory ( strGTAPath );
+    if ( !FileExists( strGTAEXEPath ) )
     {
-        return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. Could not find gta_sa.exe in %s.", szGTAPath ) );
+        return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ) );
     }
 
     // Make sure important dll's do not exist in the wrong place
     char* dllCheckList[] = { "xmll.dll", "cgui.dll", "net.dll", "libcurl.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
-        if ( FileExists( SString ( "%s\\%s", szGTAPath, dllCheckList[i] ) ) )
+        if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )
         {
             return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ) );
         }    
@@ -357,14 +319,14 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     siLoadee.cb = sizeof ( STARTUPINFO );
 
     // Start GTA
-    if ( 0 == CreateProcess ( szGTAEXEPath,
+    if ( 0 == CreateProcess ( strGTAEXEPath,
                               lpCmdLine,
                               NULL,
                               NULL,
                               FALSE,
                               CREATE_SUSPENDED,
                               NULL,
-                              szDir,
+                              strDir,
                               &siLoadee,
                               &piLoadee ) )
     {
@@ -374,7 +336,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 2;
     }
 
-    SString strCoreDLL ( "%s\\mta\\%s", szMTASAPath, MTA_DLL_NAME );
+    SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
 
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
     if ( !FileExists ( strCoreDLL ) )
@@ -388,7 +350,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
-    SetDllDirectory( SString ( "%s\\mta", szMTASAPath ) );
+    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
@@ -405,19 +367,58 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
     
+    // Clear previous on quit commands
+    SetOnQuitCommand ( "" );
+
     // Resume execution for the game.
     ResumeThread ( piLoadee.hThread );
 
     if ( hwndSplash )
         DestroyWindow ( hwndSplash );
 
-    #ifdef MTA_DEBUG
+    //#ifdef MTA_DEBUG
     WaitForSingleObject ( piLoadee.hProcess, INFINITE );
-    #endif
+    //#endif
+
 
     // Cleanup and exit.
     CloseHandle ( piLoadee.hProcess );
     CloseHandle ( piLoadee.hThread );
+
+
+    // Maybe spawn an exe
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+    SString strOnQuitCommand = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand" );
+
+    std::vector < SString > vecParts;
+    strOnQuitCommand.Split ( "\t", vecParts );
+    if ( vecParts.size () > 4 )
+    {
+        SString strOperation = vecParts[0];
+        SString strFile = vecParts[1];
+        SString strParameters = vecParts[2];
+        SString strDirectory = vecParts[3];
+        SString strShowCmd = vecParts[4];
+
+        if ( strOperation == "restart" )
+        {
+            strOperation = "open";
+            strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
+        }
+
+        LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
+        LPCTSTR lpFile          = strFile.c_str ();
+        LPCTSTR lpParameters    = strParameters == "" ? NULL : strParameters.c_str ();
+        LPCTSTR lpDirectory     = strDirectory == "" ? NULL : strDirectory.c_str ();
+        INT nShowCmd            = strShowCmd == "" ? SW_SHOWNORMAL : atoi( strShowCmd );
+
+        if ( lpOperation && lpFile )
+        {
+            ShellExecute( NULL, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
+        }
+    }
 
     // Success
     return 0;

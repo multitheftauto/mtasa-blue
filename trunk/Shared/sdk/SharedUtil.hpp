@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 
+#include <assert.h>
 
 #ifdef WIN32
 //
@@ -57,14 +58,31 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
     return strNewPath;
 }
 
-#else
 
-SString SharedUtil::CalcMTASAPath ( const SString& strPath )
+//
+// Write a registry string value
+//
+static void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const SString& strBuffer )
 {
-    SString strNewPath = "./";
-    strNewPath += strPath;
-    return strNewPath;
+    HKEY hkTemp;
+    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
+    if ( hkTemp )
+    {
+        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)strBuffer.c_str (), strBuffer.length () + 1 );
+        RegCloseKey ( hkTemp );
+    }
 }
+
+//
+// Run ShellExecute with these parameters after exit
+//
+void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory, const SString& strShowCmd )
+{
+    // Encode into a string and set a registry key
+    SString strValue ( "%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str () );
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand", strValue );
+}
+
 
 #endif
 
@@ -163,9 +181,10 @@ double SharedUtil::GetSecondCount ( void )
 
 #endif
 
-
+//
 // Split into parts
-void SString::Split ( const SString& strDelim, std::vector < SString >& outResult ) const
+//
+void SString::Split ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount ) const
 {
     outResult.clear ();
     unsigned long ulStartPoint = 0;
@@ -174,9 +193,9 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
     {
         unsigned long ulPos = find ( strDelim, ulStartPoint );
 
-        if ( ulPos == npos )
+        if ( ulPos == npos || ( uiMaxAmount > 0 && uiMaxAmount <= outResult.size () + 1 ) )
         {
-            if ( ulStartPoint < length () )
+            if ( ulStartPoint <= length () )
                 outResult.push_back ( substr ( ulStartPoint ) );
             return;
         }
@@ -187,10 +206,16 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
     }
 }
 
-
-// Not fully tested
+//
+// Replace any char in szOld with szNew
+//
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
+    // Bad things will happen if szNew exists in szOld
+    int pos = std::string ( szOld ).find ( szNew );
+    if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
+        return *this;
+
     int iOldLength = strlen ( szOld );
     SString strResult = *this;
     int idx = 0;
@@ -200,7 +225,34 @@ SString SString::Replace ( const char* szOld, const char* szNew ) const
 }
 
 
-// Not fully tested
+//
+// Replace all szOlds with szNews
+//
+SString SString::ReplaceSubString ( const char* szOld, const char* szNew ) const
+{
+    int iOldLength = strlen ( szOld );
+    SString strResult = *this;
+    int idx = 0;
+    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
+        strResult.replace ( idx, iOldLength, szNew );
+    return strResult;
+}
+
+//
+// Remove szOlds from the start of the string.
+//
+SString SString::TrimStart ( const char* szOld ) const
+{
+    int iOldLength = strlen ( szOld );
+    SString strResult = *this;
+    while ( strResult.substr ( 0, iOldLength ) == szOld )
+        strResult = strResult.substr ( iOldLength );
+    return strResult;
+}
+
+//
+// Remove szOlds from the end of the string.
+//
 SString SString::TrimEnd ( const char* szOld ) const
 {
     int iOldLength = strlen ( szOld );
@@ -210,6 +262,37 @@ SString SString::TrimEnd ( const char* szOld ) const
     return strResult;
 }
 
+//
+// Change to all lower case characters.
+//
+SString SString::ToLower ( void ) const
+{
+    SString strResult = *this;
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
+    return strResult;
+}
+
+//
+// Change to all upper case characters.
+//
+SString SString::ToUpper ( void ) const
+{
+    SString strResult = *this;
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
+    return strResult;
+}
+
+//
+// Change '0x0a' or '0x0d' or '0x0d 0x0a' to '\n'.
+//
+SString SString::ConformLineEndings ( void ) const
+{
+    assert ( '\n' == '\x0A' );
+    if ( std::count( begin(), end(), '\n' ) )
+        return Replace ( "\x0D", "" );
+    else
+        return Replace ( "\x0D", "\n" );
+}
 
 //
 // Cross-platform GetTickCount() implementations

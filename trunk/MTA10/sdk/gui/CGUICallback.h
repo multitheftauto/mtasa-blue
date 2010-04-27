@@ -35,7 +35,7 @@ class CGUICallbackFree : public CGUICallbackInterface < Ret, Arguments >
     typedef Ret ( *F )( Arguments );
 
 public:
-    CGUICallbackFree ( F f ) : m_fnCallback ( f ) {}
+    CGUICallbackFree ( F f ) : m_pfnCallback ( f ) {}
 
     virtual Ret operator() ( Arguments Args ) const
     {
@@ -83,7 +83,7 @@ public:
     {
         if ( pF )
         {
-            new(m_Callback) GUICallbackFree < Ret, Arguments > ( pF );
+            new(m_Callback) CGUICallbackFree < Ret, Arguments > ( pF );
         }
     }
 

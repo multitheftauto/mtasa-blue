@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <deque>
+#include <algorithm>
 
 //
 // System wide defines
@@ -55,6 +56,9 @@
 
 namespace SharedUtil
 {
+
+#ifdef WIN32
+
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
@@ -66,6 +70,13 @@ namespace SharedUtil
     // into an absolute MTASA path i.e. "C:\Program Files\MTA San Andreas\MTA\file.dat"
     //
     SString CalcMTASAPath ( const SString& strPath );
+
+    //
+    // Run ShellExecute with these parameters after exit
+    //
+    void SetOnQuitCommand ( const SString& strOperation, const SString& strFile = "", const SString& strParameters = "", const SString& strDirectory = "", const SString& strShowCmd = "" );
+
+#endif
 
     //
     // Retrieves the number of milliseconds that have elapsed since the system was started.

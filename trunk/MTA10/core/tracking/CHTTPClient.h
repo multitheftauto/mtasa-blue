@@ -118,6 +118,7 @@ public:
     unsigned int        GetStatus               ( void )        { return m_Status; };
     
     bool                GetData                 ( CHTTPBuffer& outBuffer );
+    unsigned int        PeekNextDataSize        ( void ) const;
 
     // Callbacks
     static void         OnRead                  ( void* pSocketPtr, void* pClassPtr );

@@ -545,6 +545,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CQuestionBox.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CQuickConnect.cpp"
 				>
 			</File>
@@ -582,6 +586,10 @@
 			</File>
 			<File
 				RelativePath=".\CVersionUpdateChecker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVersionUpdater.cpp"
 				>
 			</File>
 			<File
@@ -906,6 +914,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CQuestionBox.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CQuickConnect.h"
 				>
 			</File>
@@ -939,6 +951,10 @@
 			</File>
 			<File
 				RelativePath=".\CVersionUpdateChecker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CVersionUpdater.h"
 				>
 			</File>
 			<File

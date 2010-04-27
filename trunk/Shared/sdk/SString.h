@@ -187,8 +187,12 @@ public:
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
 
     // Functions
-    void        Split               ( const SString& strDelim, std::vector < SString >& outResult ) const;
+    void        Split               ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount = 0 ) const;
     SString     Replace             ( const char* szOld, const char* szNew ) const;
+    SString     ReplaceSubString    ( const char* szOld, const char* szNew ) const;
+    SString     TrimStart           ( const char* szOld ) const;
     SString     TrimEnd             ( const char* szOld ) const;
-
+    SString     ToLower             ( void ) const;
+    SString     ToUpper             ( void ) const;
+    SString     ConformLineEndings  ( void ) const;
 };
