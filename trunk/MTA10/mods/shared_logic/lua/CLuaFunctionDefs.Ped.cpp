@@ -1067,6 +1067,31 @@ int CLuaFunctionDefs::IsPedFrozen ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetPedFootBlood ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            unsigned int uiFootBlood = 0;
+           if ( CStaticFunctionDefinitions::GetPedFootBlood ( *pPed, uiFootBlood ) )
+            {
+                lua_pushnumber ( luaVM, uiFootBlood );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedFootBlood", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedFootBlood" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetPedCameraRotation ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
@@ -1351,6 +1376,34 @@ int CLuaFunctionDefs::SetPedFrozen ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetPedFootBlood ( lua_State* luaVM )
+{
+  int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        unsigned int uiFootBlood = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedFootBlood ( *pEntity, uiFootBlood ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFootBlood", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedFootBlood" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetPedCameraRotation ( lua_State* luaVM )
 {

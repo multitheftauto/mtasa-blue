@@ -817,6 +817,37 @@ void CPedSA::RemoveBodyPart ( int i, char c )
     }
 }
 
+void CPedSA::SetFootBlood ( unsigned int uiFootBlood )
+{
+    DWORD dwThis = (DWORD)this->GetInterface();
+    // Check if the ped is to have foot blood
+    if (uiFootBlood > 0)
+    {
+        // Make sure the foot blood flag is activated
+        *(unsigned short*)(dwThis + 0x46F) |= 16;
+    }
+    else if (*(unsigned short*)(dwThis + 0x46F) & 16)
+    {
+        // If the foot blood flag is activated, deactivate it
+        *(unsigned short*)(dwThis + 0x46F) -= 16;
+    }
+    // Set the amount of foot blood
+    *(unsigned int*)(dwThis + 0x750) = uiFootBlood;
+}
+
+unsigned int CPedSA::GetFootBlood ( void )
+{
+    DWORD dwThis = (DWORD)this->GetInterface();
+    // Check if the ped has the foot blood flag
+    if (*(unsigned short*)(dwThis + 0x46F) & 16)
+    {
+        // If the foot blood flag is activated, return the amount of foot blood
+        return *(unsigned int*)(dwThis + 0x750);
+    }
+    // Otherwise, return zero as there is no foot blood
+    return 0;
+}
+
 bool CPedSA::IsOnFire ( void )
 {
     if ( GetPedInterface()->pFireOnPed != NULL )

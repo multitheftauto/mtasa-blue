@@ -218,6 +218,9 @@ public:
 
     virtual void            RemoveBodyPart ( int i, char c ) = 0;
 
+    virtual void            SetFootBlood ( unsigned int uiFootBlood ) = 0;
+    virtual unsigned int    GetFootBlood ( void ) = 0;
+
     virtual bool            IsOnFire ( void ) = 0;
     virtual void            SetOnFire ( bool bOnFire ) = 0;
 
