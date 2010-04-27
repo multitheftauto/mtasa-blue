@@ -751,19 +751,25 @@ bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float f
     vecDir.Normalize ();
     CVector vecUpInit ( 0.0f, 0.0f, 1.0f );
     CVector vecUp;
+
     if ( fabs(vecDir.fX) > 0.0001f || fabs(vecDir.fY) > 0.0001f )
     {
+        D3DXMATRIX ViewMatrix;
+        CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
+        CVector vecCameraLookDir(ViewMatrix._13, ViewMatrix._23, ViewMatrix._33);
         vecUp = vecDir;
-        vecUp.CrossProduct ( &vecUpInit );
-        vecUp.CrossProduct ( &vecDir );
+        vecUp.CrossProduct ( &vecCameraLookDir );
     }
     else
     {
         vecUp = CVector ( 0.0f, 1.0f, 0.0f );
     }
 
-    CVector vecA2 = vecA + vecUp * fWidth;
-    CVector vecB2 = vecB + vecUp * fWidth;
+    CVector vecShift = vecUp * (fWidth / 2.0f);
+    CVector vecA2 = vecA + vecShift;
+    CVector vecB2 = vecB + vecShift;
+    vecA = vecA - vecShift;
+    vecB = vecB - vecShift;
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
