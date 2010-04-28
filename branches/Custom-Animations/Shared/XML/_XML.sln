@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XML Module", "_XML.vcproj", "{990626CA-67A7-420D-B2E2-3F773465A1CA}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Beta = Beta
+		Debug = Debug
+		Nightly = Nightly
+		Nightly Release = Nightly Release
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Beta.ActiveCfg = Beta|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Beta.Build.0 = Beta|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Debug.ActiveCfg = Debug|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Debug.Build.0 = Debug|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly.ActiveCfg = Nightly|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly.Build.0 = Nightly|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly Release.ActiveCfg = Nightly Release|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Nightly Release.Build.0 = Nightly Release|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Release.ActiveCfg = Release|Win32
+		{990626CA-67A7-420D-B2E2-3F773465A1CA}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

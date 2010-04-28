@@ -1,0 +1,19 @@
+Crazy Eddie's GUI System Mk-2
+http://www.cegui.org.uk
+
+Copyright ©2004 - 2005 CEGUI Team & Contributing Authors
+
+
+The following is an incomplete list of the remaining jobs to be done on Crazy
+Eddie's GUI System Mk-2:
+
+- More samples using samples framework.
+- More tutorials.
+- Update OgreRenderer to report true max texture size.
+- Add clipboard (cut, copy, paste) support.
+- Add undo support to editbox widgets.
+- Add tree view widget.
+- Add static text with minimal markup support.
+- Add animation support.
+
++ Lots of other things that I have forgotten to put on this list.
