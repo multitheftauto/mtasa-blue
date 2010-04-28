@@ -59,17 +59,17 @@ void CQuestionBox::Show ( void )
     SString strMsg = m_pMessage->GetText ();
     unsigned int uiNumLines = std::count( strMsg.begin(), strMsg.end(), '\n' ) + 1;
 
-    float fMsgWidth = 400;
-    float fMsgHeight = Max < unsigned int > ( 3, uiNumLines ) * m_pMessage->GetFontHeight ();
-    float fWinWidth = fMsgWidth;
+    float fMsgWidth = Max ( 400.f, m_pMessage->GetTextExtent () + 50.f );
+    float fMsgHeight = Max < float > ( 3, uiNumLines ) * m_pMessage->GetFontHeight ();
+    float fWinWidth = Max ( fMsgWidth, m_uiActiveButtons * ( 112 + 10.f ) );
     float fWinHeight = 50 + fMsgHeight + 50 + 30;
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-    m_pWindow->SetSize ( CVector2D ( fWinWidth, fWinHeight + 10  ), false );
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - fWinWidth / 2, resolution.fY / 2 - fWinHeight / 2  ), false );
+    m_pWindow->SetSize ( CVector2D ( fWinWidth, fWinHeight + 10  ), false );
 
+    m_pMessage->SetPosition ( CVector2D ( fWinWidth / 2 - fMsgWidth / 2, fWinHeight / 2 - fMsgHeight / 2 - 10  ), false );
     m_pMessage->SetSize ( CVector2D ( fMsgWidth, fMsgHeight ), false );
-    m_pMessage->SetPosition ( CVector2D ( 0, fWinHeight / 2 - fMsgHeight / 2 - 10  ), false );
     m_pMessage->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
 
     // Position the buttons evenly across the bottom
@@ -82,11 +82,6 @@ void CQuestionBox::Show ( void )
             float fPosX = fWinWidth - ( ( i + 1 ) * fSpaceBetween + i * 112 ) - 112;
             m_ButtonList[ i ]->SetPosition ( CVector2D ( fPosX, fWinHeight - 35  ), false );
             m_ButtonList[ i ]->SetSize ( CVector2D ( 112, 24 ), false );
-            m_ButtonList[ i ]->SetVisible ( true );
-        }
-        else
-        {
-            m_ButtonList[ i ]->SetVisible ( false );
         }
     }
 
@@ -103,6 +98,8 @@ void CQuestionBox::Reset ( void )
     SetMessage ( "" );
     SetCallback ( NULL );
     m_uiActiveButtons = 0;
+    for ( unsigned int i = 0 ; i < m_ButtonList.size () ; i++ )
+        m_ButtonList[ i ]->SetVisible ( false );
 }
 
 
@@ -123,9 +120,10 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
     m_uiActiveButtons = Max ( m_uiActiveButtons, uiButton + 1 );
     while ( m_ButtonList.size () < m_uiActiveButtons )
     {
-        CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( g_pCore->GetGUI ()->CreateButton ( m_pWindow, "Connect" ) );
+        CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( g_pCore->GetGUI ()->CreateButton ( m_pWindow, "" ) );
         pButton->SetClickHandler ( GUI_CALLBACK ( &CQuestionBox::OnButtonClick, this ) );
         pButton->SetUserData ( reinterpret_cast < void* > ( m_ButtonList.size () ) );
+        pButton->SetVisible ( false );
         m_ButtonList.push_back ( pButton );
     }
 

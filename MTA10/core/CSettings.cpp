@@ -1854,7 +1854,7 @@ void CSettings::SaveData ( void )
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( "Restart required" );
+        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
         pQuestionBox->SetMessage ( strMessage );
         pQuestionBox->SetButton ( 0, "No" );
         pQuestionBox->SetButton ( 1, "Yes" );
