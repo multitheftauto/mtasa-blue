@@ -421,9 +421,7 @@ int CLuaTextDefs::textItemGetText ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                char szBuffer[1024];
-                pTextItem->GetText ( szBuffer, 1024 );
-                lua_pushstring ( luaVM, szBuffer );
+                lua_pushstring ( luaVM, pTextItem->GetText() );
                 return 1;
             }
         }

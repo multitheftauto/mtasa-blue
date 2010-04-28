@@ -39,7 +39,7 @@ public:
     bool                    operator=               ( const CTextItem& TextItem );
 
     void                    SetText                 ( const char* szText );
-    char*                   GetText                 ( char* pBuffer, size_t bufferSize );
+    const SString&          GetText                 ( void )                            { return m_strText; };
 
     inline const CVector2D& GetPosition             ( void )                            { return m_vecPosition; };
     void                    SetPosition             ( const CVector2D& vecPosition );
@@ -60,7 +60,7 @@ public:
     inline bool             IsBeingDeleted          ( void )                            { return m_bDeletable; };
 
 private:
-    char *                      m_szText;
+    SString                     m_strText;
     CVector2D                   m_vecPosition;
     SColor                      m_Color;
     float                       m_fScale;

@@ -80,7 +80,7 @@ struct CRegistryResultCell
                                 ~CRegistryResultCell ( void )
                                 {
                                     if ( pVal )
-                                        delete pVal;
+                                        delete [] pVal;
                                 }
 
     int                         nType;      // Type identifier, SQLITE_*

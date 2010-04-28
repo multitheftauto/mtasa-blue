@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-unsigned long ulUniqueId = 0;
+static unsigned long ulUniqueId = 0;
 
 CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, unsigned char ucFormat, unsigned char ucShadowAlpha )
 {
@@ -20,16 +20,7 @@ CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPr
     m_ulUniqueId = ulUniqueId++;
 
     // Copy the text
-    if ( szText )
-    {
-        m_szText = new char [ strlen ( szText ) + 1];
-        strcpy ( m_szText, szText );
-    }
-    else
-    {
-        m_szText = new char [1];
-        m_szText [0] = 0;
-    }
+    m_strText = szText ? szText : "";
 
     // Assign the properties
     m_vecPosition = vecPosition;
@@ -45,16 +36,7 @@ CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPr
 CTextItem::CTextItem ( const CTextItem& TextItem )
 {
     // Copy the tex
-    if ( TextItem.m_szText )
-    {
-        m_szText = new char [strlen ( TextItem.m_szText ) + 1];
-        strcpy ( m_szText, TextItem.m_szText );
-    }
-    else
-    {
-        m_szText = new char [1];
-        m_szText [0] = 0;
-    }
+    m_strText = TextItem.m_strText;
 
     // Copy over the properties
     m_ulUniqueId = TextItem.m_ulUniqueId;
@@ -70,19 +52,8 @@ CTextItem::CTextItem ( const CTextItem& TextItem )
 
 bool CTextItem::operator= ( const CTextItem& TextItem )
 {
-    // Delete the previous title buffer and copy the buffer in the text item given
-    if ( m_szText ) delete [] m_szText;
-
-    if ( TextItem.m_szText )
-    {
-        m_szText = new char [strlen ( TextItem.m_szText ) + 1];
-        strcpy ( m_szText, TextItem.m_szText );
-    }
-    else
-    {
-        m_szText = new char [1];
-        m_szText [0] = 0;
-    }
+    // Copy the new text
+    m_strText = TextItem.m_strText;
 
     // Copy the properties
     m_ulUniqueId = TextItem.m_ulUniqueId;
@@ -104,13 +75,6 @@ CTextItem::~CTextItem ( )
     // Tell all our observers about it
     m_bDeletable = true;
     NotifyObservers ();
-
-    // Delete our text
-    if ( m_szText )
-    {
-        delete [] m_szText;
-        m_szText = NULL;
-    }
 }
 
 
@@ -137,31 +101,15 @@ void CTextItem::NotifyObservers ( void )
 
 void CTextItem::SetText ( const char* szText )
 {
-    // If the text is the same, don't bother
-    if ( m_szText && strcmp ( m_szText, szText ) == 0 )
+    // If the text has changed
+    if ( m_strText != szText )
     {
-        return;
+        // Update
+        m_strText = szText;
+
+        // Tell the text displays
+        NotifyObservers ();
     }
-
-    // Delete the previous buffer if neccessary
-    if ( m_szText )
-    {
-        delete [] m_szText;
-    }
-
-    // Allocate and copy the new text
-    m_szText = new char [strlen ( szText ) + 1];
-    strcpy ( m_szText, szText );
-
-    // Tell the text displays
-    NotifyObservers ();
-}
-
-
-char* CTextItem::GetText ( char* pBuffer, size_t bufferSize )
-{
-    strncpy ( pBuffer, m_szText, bufferSize );
-    return pBuffer;
 }
 
 
@@ -191,7 +139,6 @@ void CTextItem::SetColor ( const SColor color )
         NotifyObservers ();
     }
 }
-
 
 
 void CTextItem::SetScale ( float fScale )
