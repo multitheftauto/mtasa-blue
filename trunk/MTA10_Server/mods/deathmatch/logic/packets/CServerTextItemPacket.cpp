@@ -13,13 +13,7 @@
 
 #include "StdInc.h"
 
-CServerTextItemPacket::CServerTextItemPacket( void )
-{
-    m_szText = NULL;
-}
-
-
-CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format, unsigned char ucShadowAlpha, char* szText )
+CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format, unsigned char ucShadowAlpha, const char* szText )
 {
     m_ulUniqueId = ulUniqueId;
     m_bDeletable = bDeleteable;
@@ -29,17 +23,7 @@ CServerTextItemPacket::CServerTextItemPacket( unsigned long ulUniqueId, bool bDe
     m_Color = color;
     m_ucFormat = format;
     m_ucShadowAlpha = ucShadowAlpha;
-    m_szText = new char [strlen ( szText ) + 1];
-    strcpy ( m_szText, szText );
-}
-
-
-CServerTextItemPacket::~CServerTextItemPacket ( void )
-{
-    if ( m_szText )
-    {
-        delete [] m_szText;
-    }
+    m_strText = szText;
 }
 
 
@@ -65,17 +49,13 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
             BitStream.Write ( m_ucShadowAlpha );
 
         // Grab the text length
-        size_t sizeText = strlen ( m_szText );
-        if ( sizeText > 1024 )
-        {
-            sizeText = 1024;
-        }
+        size_t sizeText = Min < size_t > ( 1024, m_strText.length () );
 
         // Write the text
         BitStream.WriteCompressed ( static_cast < unsigned short > ( sizeText ) );
         if ( sizeText )
         {
-            BitStream.Write ( m_szText, sizeText );
+            BitStream.Write ( m_strText, sizeText );
         }
     }
 
