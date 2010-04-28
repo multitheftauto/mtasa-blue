@@ -92,7 +92,7 @@ void CVersionUpdater::DoPulse ( void )
 
     if ( m_strStage == "End" )
     {
-        m_strStage == "";
+        m_strStage = "";
     }
 }
 
@@ -307,7 +307,7 @@ void CVersionUpdater::StartDownload ( void )
 
     // Display dialog
     GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( "Downloading" );
+    GetQuestionBox ().SetTitle ( "DOWNLOADING" );
     GetQuestionBox ().SetMessage ( "waiting..." );
     GetQuestionBox ().SetButton ( 0, "Cancel" );
     GetQuestionBox ().Show ();
@@ -359,7 +359,7 @@ void CVersionUpdater::PollDownload ( void )
         if ( !bHashOk )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "Error downloading" );
+            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
             GetQuestionBox ().SetMessage ( "The file had an accident on the infomation superhighway" );
             GetQuestionBox ().SetButton ( 0, "OK" );
             GetQuestionBox ().Show ();
@@ -396,7 +396,7 @@ void CVersionUpdater::PollDownload ( void )
         if ( strPathFilename.length () == 0 )
         {
             GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "Error saving" );
+            GetQuestionBox ().SetTitle ( "ERROR SAVING" );
             GetQuestionBox ().SetMessage ( "The file wants to stay in ram" );
             GetQuestionBox ().SetButton ( 0, "OK" );
             GetQuestionBox ().Show ();
@@ -409,7 +409,7 @@ void CVersionUpdater::PollDownload ( void )
 
         // Exit game after button press
         GetQuestionBox ().Reset ();
-        GetQuestionBox ().SetTitle ( "Download complete" );
+        GetQuestionBox ().SetTitle ( "DOWNLOAD COMPLETE" );
         GetQuestionBox ().SetMessage ( m_DownloadInfo.strMsg2 );
         GetQuestionBox ().SetButton ( 0, "OK" );
         GetQuestionBox ().Show ();
