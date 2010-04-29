@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <utils/CMD5Hasher.h>
 
 #define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/"
 
@@ -24,25 +25,27 @@ CVersionUpdater::CVersionUpdater ( void )
     : m_llTimeStart ( 0 )
 {
     m_strStage = "Start";
-    m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL1 );
 }
 
 
 void CVersionUpdater::DoPulse ( void )
 {
-    if ( m_strStage == "" )
+    if ( m_strStage.length () == 0 )
         return;
 
     if ( m_strStage == "Start" )
     {
         unsigned int uiTimeNow = static_cast < unsigned int > ( time ( NULL ) );
         unsigned int uiLastCheckTime = 0;
-        CVARS_GET ( "last_version_check2", uiLastCheckTime );
+        CVARS_GET ( "last_version_check", uiLastCheckTime );
 
         // Only check once a day
         if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 )
         {
-            //CVARS_SET ( "last_version_check2", uiTimeNow );
+            // Prime check server list
+            m_CheckInfo = CCheckInfo ();
+            m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL1 );
+            //m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL2 );
             m_strStage = "NextCheck";
         }
         else
@@ -103,7 +106,7 @@ void CVersionUpdater::DoPulse ( void )
 void CVersionUpdater::ResetCheckTimer ( void )
 {
     unsigned int uiTimeNow = static_cast < unsigned int > ( time ( NULL ) );
-    CVARS_SET ( "last_version_check2", uiTimeNow );
+    CVARS_SET ( "last_version_check", uiTimeNow );
 }
 
 bool CVersionUpdater::IsDownloadMandatory ( void )
@@ -129,7 +132,7 @@ CQuestionBox& CVersionUpdater::GetQuestionBox ( void )
 
 void CVersionUpdater::StartVersionCheck ( void )
 {
-    if ( m_CheckInfo.iRetryCount++ > MAX_UPDATER_CHECK_ATTEMPTS || m_CheckInfo.serverList.size () == 0 )
+    if ( ++m_CheckInfo.iRetryCount > MAX_UPDATER_CHECK_ATTEMPTS || m_CheckInfo.serverList.size () == 0 )
     {
         m_strStage = "End";
         return;
@@ -147,7 +150,7 @@ void CVersionUpdater::StartVersionCheck ( void )
     CCore::GetSingleton ().GetNetwork ()->GetSerial ( szSerial, sizeof ( szSerial ) );
 
     // Make the query URL
-    SString strQueryURL ( "%s?v=%s&id=%s", strServerURL.c_str (), MTA_DM_BUILDTAG_LONG, szSerial );
+    SString strQueryURL ( "%s%s/?v=%s&id=%s", strServerURL.c_str (), MTA_DM_BUILDTAG_LONG, MTA_DM_BUILDTAG_LONG, szSerial );
 
     // Perform the HTTP request
     m_strStage = "Checking";
@@ -164,7 +167,13 @@ void CVersionUpdater::PollVersionCheck ( void )
         // Give up if error or timeout
         unsigned int status = m_HTTP.GetStatus ();
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_CHECK_TIMEOUT )
+        {
+            // If 404 error, remove this server from the list
+            if ( status = 404 && m_CheckInfo.serverList.size () )
+                ListRemove( m_CheckInfo.serverList, m_CheckInfo.serverList[ m_CheckInfo.iCurrent % m_CheckInfo.serverList.size () ] );
+
             m_strStage = "NextCheck";
+        }
         return;
     }
 
@@ -200,7 +209,7 @@ void CVersionUpdater::PollVersionCheck ( void )
                 if ( strPartList[0] == "filename" )     m_DownloadInfo.strFilename = strPartList[1];
                 if ( strPartList[0] == "filesize" )     m_DownloadInfo.uiFilesize = atoi ( strPartList[1] );
                 if ( strPartList[0] == "mirror" )       m_DownloadInfo.serverList.push_back ( strPartList[1] );
-                if ( strPartList[0] == "sha1" )         m_DownloadInfo.strSHA1 = strPartList[1];
+                if ( strPartList[0] == "md5" )          m_DownloadInfo.strMD5 = strPartList[1];
                 if ( strPartList[0] == "end" )          m_DownloadInfo.strEnd = strPartList[1];
             }
         }
@@ -272,6 +281,7 @@ void CVersionUpdater::PollUpdateQuestion ( void )
         m_strStage = "NextMirror";
         // Start first download attempt at a random mirror
         m_DownloadInfo.iCurrent = ( rand () / 11 ) % 100;
+        m_DownloadInfo.iRetryCount = 0;
     }
 }
 
@@ -288,7 +298,7 @@ void CVersionUpdater::PollUpdateQuestion ( void )
 
 void CVersionUpdater::StartDownload ( void )
 {
-    if ( m_DownloadInfo.iRetryCount++ > MAX_UPDATER_DOWNLOAD_ATTEMPTS || m_DownloadInfo.serverList.size () == 0 )
+    if ( ++m_DownloadInfo.iRetryCount > MAX_UPDATER_DOWNLOAD_ATTEMPTS || m_DownloadInfo.serverList.size () == 0 )
     {
         m_strStage = "End";
         return;
@@ -341,7 +351,13 @@ void CVersionUpdater::PollDownload ( void )
         unsigned int status = m_HTTP.GetStatus ();
         // Give up if error or timeout
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_DOWNLOAD_TIMEOUT )
+        {
+            // If 404 error, remove this server from the list
+            if ( status = 404 && m_DownloadInfo.serverList.size () )
+                ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
+
             m_strStage = "NextMirror";
+        }
         return;
     }
 
@@ -351,20 +367,31 @@ void CVersionUpdater::PollDownload ( void )
     char* pData = buffer.GetData ();
     if ( pData )
     {
-
-        // Check SHA1
         unsigned int uiSize = buffer.GetSize ();
-        bool bHashOk = true;
-        // CheckDatumHash( pData, uiSize, m_DownloadInfo.strSHA1 );
-        if ( !bHashOk )
+
+        // Check MD5
+        if ( m_DownloadInfo.strMD5 != "none" )
         {
-            GetQuestionBox ().Reset ();
-            GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
-            GetQuestionBox ().SetMessage ( "The file had an accident on the infomation superhighway" );
-            GetQuestionBox ().SetButton ( 0, "OK" );
-            GetQuestionBox ().Show ();
-            m_strStage = "PollPostDownloadError";
-            return;
+            // Hash data
+            MD5 md5Result;
+            CMD5Hasher().Calculate ( pData, uiSize, md5Result );
+            char szMD5[33];
+            CMD5Hasher::ConvertToHex ( md5Result, szMD5 );
+
+            if ( m_DownloadInfo.strMD5 != szMD5 )
+            {
+                GetQuestionBox ().Reset ();
+                GetQuestionBox ().SetTitle ( "ERROR DOWNLOADING" );
+                GetQuestionBox ().SetMessage ( "The downloaded file appears to be incorrect." );
+                GetQuestionBox ().SetButton ( 0, "OK" );
+                GetQuestionBox ().Show ();
+                m_strStage = "PollPostDownloadError";
+
+                // If MD5 error, remove this server from the list
+                if ( m_DownloadInfo.serverList.size () )
+                    ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
+                return;
+            }
         }
 
         // Save file somewhere
@@ -397,7 +424,7 @@ void CVersionUpdater::PollDownload ( void )
         {
             GetQuestionBox ().Reset ();
             GetQuestionBox ().SetTitle ( "ERROR SAVING" );
-            GetQuestionBox ().SetMessage ( "The file wants to stay in ram" );
+            GetQuestionBox ().SetMessage ( "Unable to create the update file." );
             GetQuestionBox ().SetButton ( 0, "OK" );
             GetQuestionBox ().Show ();
             m_strStage = "PollPostDownloadError";
