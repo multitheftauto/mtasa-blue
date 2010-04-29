@@ -1440,6 +1440,14 @@ void CGame::Packet_PedWasted ( CPedWastedPacket& Packet )
         else Arguments.PushBoolean ( false );
         Arguments.PushBoolean ( false );
         pPed->CallEvent ( "onPedWasted", Arguments );
+
+        // Reset the weapons list, because a ped loses his weapons on death
+        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        {
+            pPed->SetWeaponType(0, slot);
+            pPed->SetWeaponAmmoInClip(0, slot);
+            pPed->SetWeaponTotalAmmo(0, slot);
+        }
     }
 }
 void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
@@ -1449,6 +1457,7 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
         pPlayer->SetSpawned ( false );
         pPlayer->SetIsDead ( true );
         pPlayer->SetPosition ( Packet.m_vecPosition );
+
         // Remove him from any occupied vehicle
         pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
@@ -1475,6 +1484,14 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
         else Arguments.PushBoolean ( false );
         Arguments.PushBoolean ( false );
         pPlayer->CallEvent ( "onPlayerWasted", Arguments );
+
+        // Reset the weapons list, because a player loses his weapons on death
+        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        {
+            pPlayer->SetWeaponType(0, slot);
+            pPlayer->SetWeaponAmmoInClip(0, slot);
+            pPlayer->SetWeaponTotalAmmo(0, slot);
+        }
     }
 }
 
