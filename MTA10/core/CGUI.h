@@ -44,7 +44,6 @@ class CLocalGUI;
 #include "CSetCursorPosHook.h"
 #include "CSingleton.h"
 #include "CCommunityRegistration.h"
-#include "CVersionUpdateChecker.h"
 #include "CVersionUpdater.h"
 
 #include <windows.h>
@@ -123,7 +122,6 @@ private:
     CD3DMGEng*              m_pRendererLibrary;
 
     CCommunityRegistration  m_CommunityRegistration;
-    CVersionUpdateChecker   m_VersionUpdateChecker;
     CVersionUpdater         m_VersionUpdater;
 
 

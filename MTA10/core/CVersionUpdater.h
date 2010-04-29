@@ -62,7 +62,7 @@ protected:
         SString                 strFilename;
         unsigned int            uiFilesize;
         std::vector < SString > serverList;
-        SString                 strSHA1;
+        SString                 strMD5;
         SString                 strEnd;
         unsigned int            uiBytesDownloaded;
     } m_DownloadInfo;
