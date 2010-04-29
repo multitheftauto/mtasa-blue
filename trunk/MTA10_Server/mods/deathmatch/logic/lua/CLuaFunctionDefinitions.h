@@ -203,6 +203,7 @@ public:
     static int      GetVehicleTowingVehicle             ( lua_State* luaVM );
     static int      GetVehiclePaintjob                  ( lua_State* luaVM );
     static int      GetVehiclePlateText                 ( lua_State* luaVM );
+    static int      IsVehicleDamageProof                ( lua_State* luaVM );
     static int      IsVehicleFuelTankExplodable         ( lua_State* luaVM );
     static int      IsVehicleFrozen                     ( lua_State* luaVM );
     static int      IsVehicleOnGround                   ( lua_State* luaVM );

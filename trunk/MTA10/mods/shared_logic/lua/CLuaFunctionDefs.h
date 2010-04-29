@@ -269,6 +269,7 @@ public:
     LUA_DECLARE ( GetVehicleTowingVehicle );
     LUA_DECLARE ( GetVehiclePaintjob );
     LUA_DECLARE ( GetVehiclePlateText );
+    LUA_DECLARE ( IsVehicleDamageProof );
     LUA_DECLARE ( IsVehicleFuelTankExplodable );
     LUA_DECLARE ( IsVehicleFrozen );
     LUA_DECLARE ( IsVehicleOnGround );

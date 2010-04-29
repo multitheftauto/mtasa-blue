@@ -2010,6 +2010,13 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( CClientVehicle& Vehic
 }
 
 
+bool CStaticFunctionDefinitions::IsVehicleDamageProof ( CClientVehicle& Vehicle, bool& bDamageProof )
+{
+    bDamageProof = !Vehicle.GetScriptCanBeDamaged ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsTrainDerailed ( CClientVehicle& Vehicle, bool& bDerailed )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )

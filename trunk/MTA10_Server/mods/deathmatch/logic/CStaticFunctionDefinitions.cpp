@@ -3858,6 +3858,16 @@ bool CStaticFunctionDefinitions::GetVehiclePlateText ( CVehicle* pVehicle, char*
 }
 
 
+bool CStaticFunctionDefinitions::IsVehicleDamageProof ( CVehicle* pVehicle, bool& bDamageProof )
+{
+    assert ( pVehicle );
+
+    bDamageProof = pVehicle->IsDamageProof ();
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsVehicleFuelTankExplodable ( CVehicle* pVehicle, bool& bExplodable )
 {
     assert ( pVehicle );
@@ -4335,7 +4345,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState ( CElement* pElement, unsig
                 case VT_DOZER:
                 case VT_FORKLIFT:
                 case VT_TRACTOR:
-                case VT_TIGER:
+                case VT_RCTIGER:
                 case VT_BANDITO:
                 case VT_KART:
                 case VT_MOWER:

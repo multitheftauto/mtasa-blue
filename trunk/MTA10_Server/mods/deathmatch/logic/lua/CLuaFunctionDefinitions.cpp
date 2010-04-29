@@ -4263,6 +4263,31 @@ int CLuaFunctionDefinitions::GetVehiclePlateText ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::IsVehicleDamageProof ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            bool bDamageProof;
+            if ( CStaticFunctionDefinitions::IsVehicleDamageProof ( pVehicle, bDamageProof ) )
+            {
+                lua_pushboolean ( luaVM, bDamageProof );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleDamageProof", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleDamageProof" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::IsVehicleFuelTankExplodable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )

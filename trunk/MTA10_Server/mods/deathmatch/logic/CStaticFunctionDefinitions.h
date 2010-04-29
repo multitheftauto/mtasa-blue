@@ -230,10 +230,10 @@ public:
     static bool                 GetVehiclePanelState                ( CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState );
     static bool                 GetVehicleOverrideLights            ( CVehicle* pVehicle, unsigned char& ucLights );
     static bool                 GetVehicleDoorsLocked               ( CVehicle* pVehicle, bool& bLocked );
-    static bool                 GetVehicleDamageProof               ( CVehicle* pVehicle, bool& bDamageProof );
     static bool                 GetVehicleGunsEnabled               ( CVehicle* pVehicle, bool& bGunsEnabled );
     static bool                 GetVehiclePaintjob                  ( CVehicle* pVehicle, unsigned char& ucPaintjob );
     static bool                 GetVehiclePlateText                 ( CVehicle* pVehicle, char* szPlateText );
+    static bool                 IsVehicleDamageProof                ( CVehicle* pVehicle, bool& bDamageProof );
     static bool                 IsVehicleFuelTankExplodable         ( CVehicle* pVehicle, bool& bExplodable );
     static bool                 IsVehicleFrozen                     ( CVehicle* pVehicle, bool& bFrozen );
     static bool                 IsVehicleOnGround                   ( CVehicle* pVehicle, bool& bOnGround );
