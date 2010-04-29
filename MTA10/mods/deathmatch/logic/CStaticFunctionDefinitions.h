@@ -164,10 +164,10 @@ public:
     static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, char* szName, unsigned short len );
     static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, char* szName, unsigned short len );
     static bool                         GetVehicleDoorsLocked               ( CClientVehicle& Vehicle, bool& bLocked );
-    static bool                         GetVehicleDamageProof               ( CClientVehicle& Vehicle, bool& bDamageProof );
     static bool                         GetVehicleNameFromModel             ( unsigned short usModel, char* szName, unsigned short len );
     static bool                         GetHelicopterRotorSpeed             ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetVehicleEngineState               ( CClientVehicle& Vehicle, bool& bState );
+    static bool                         IsVehicleDamageProof                ( CClientVehicle& Vehicle, bool& bDamageProof );
     static bool                         IsTrainDerailed                     ( CClientVehicle& Vehicle, bool& bDerailed );
     static bool                         IsTrainDerailable                   ( CClientVehicle& Vehicle, bool& bIsDerailable );
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );

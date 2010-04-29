@@ -175,6 +175,7 @@ public:
     void                        CalcAndUpdateCanBeDamagedFlag     ( void );
     void                        SetScriptCanBeDamaged   ( bool bCanBeDamaged );
     void                        SetSyncUnoccupiedDamage ( bool bCanBeDamaged );
+    bool                        GetScriptCanBeDamaged   ( void )                            { return m_bScriptCanBeDamaged; };
 
     bool                        GetTyresCanBurst        ( void );
     void                        CalcAndUpdateTyresCanBurstFlag    ( void );
