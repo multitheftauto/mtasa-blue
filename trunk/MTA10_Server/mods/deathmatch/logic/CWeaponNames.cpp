@@ -69,7 +69,7 @@ unsigned char CWeaponNames::GetWeaponID ( const char* szName )
     if ( szName [0] == 0 ) return 0xFF;
 
     // Look for it in our table
-    for ( unsigned int i = 0; i < sizeof(WeaponNames); i++ )
+    for ( unsigned int i = 0; i < NUMELMS ( WeaponNames ); i++ )
     {
         if ( stricmp ( szName, WeaponNames [i].szName ) == 0 )
         {
@@ -83,7 +83,7 @@ unsigned char CWeaponNames::GetWeaponID ( const char* szName )
 
 const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
 {
-    if ( ucID < sizeof(WeaponNames) )
+    if ( ucID < NUMELMS ( WeaponNames ) )
     {
         return WeaponNames [ucID].szName;
     }
@@ -94,7 +94,7 @@ const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
 
 char CWeaponNames::GetSlotFromWeapon ( unsigned char ucID )
 {
-    if ( ucID < sizeof(WeaponIDs) )
+    if ( ucID < NUMELMS ( WeaponIDs ) )
     {
         return WeaponIDs [ucID].cSlot;
     }
