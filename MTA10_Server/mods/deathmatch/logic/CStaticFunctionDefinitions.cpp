@@ -2571,6 +2571,13 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
                 pPed->CallEvent ( "onPedWasted", Arguments );
             }
 
+            for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+            {
+                pPed->SetWeaponType(0, slot);
+                pPed->SetWeaponAmmoInClip(0, slot);
+                pPed->SetWeaponTotalAmmo(0, slot);
+            }
+
             return true;
         }
     }
