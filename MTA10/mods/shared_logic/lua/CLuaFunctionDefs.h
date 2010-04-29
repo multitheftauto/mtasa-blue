@@ -14,6 +14,7 @@
 *               Christian Myhre Lundheim <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -285,7 +286,6 @@ public:
     LUA_DECLARE ( GetVehicleHeadLightColor );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandlingData );
-    LUA_DECLARE ( GetDefaultHandling );
 #endif
 
     // Vehicle set functions
@@ -631,6 +631,10 @@ public:
     LUA_DECLARE ( GetAnalogControlState );
     LUA_DECLARE ( IsControlEnabled );
     LUA_DECLARE ( GetBoundKeys );
+    LUA_DECLARE ( GetFunctionsBoundToKey );
+    LUA_DECLARE ( GetKeyBoundToFunction );
+    LUA_DECLARE ( GetCommandsBoundToKey );
+    LUA_DECLARE ( GetKeyBoundToCommand );
 
     LUA_DECLARE ( SetControlState );
     LUA_DECLARE ( ToggleControl );

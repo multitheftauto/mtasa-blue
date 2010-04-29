@@ -14,6 +14,7 @@
 *               Christian Myhre Lundheim <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -366,6 +367,237 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
 }
 
 
+int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        {
+            const char* szKey = lua_tostring ( luaVM, 1 );
+            const char* szHitState = NULL;
+            if ( lua_type ( luaVM, 2 ) )
+            {
+                szHitState = lua_tostring ( luaVM, 2 );
+            }
+
+            bool bCheckHitState = false, bHitState = true;
+            if ( szHitState )
+            {
+                if ( stricmp ( szHitState, "down" ) == 0 )
+                    bCheckHitState = true, bHitState = true;
+                else if ( stricmp ( szHitState, "up" ) == 0 )
+                    bCheckHitState = true, bHitState = false;
+            }
+
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add all the bound functions to it
+            unsigned int uiIndex = 0;
+            list < CScriptKeyBind* > ::const_iterator iter = m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
+            for ( ; iter != m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
+            {
+                CScriptKeyBind* pScriptKeyBind = *iter;
+                if ( !pScriptKeyBind->IsBeingDeleted () )
+                {
+                    switch ( pScriptKeyBind->GetType () )
+                    {
+                        case SCRIPT_KEY_BIND_FUNCTION:
+                        {
+                            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
+                            if ( !bCheckHitState || pBind->bHitState == bHitState )
+                            {
+                                if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
+                                {
+                                    lua_pushnumber ( luaVM, ++uiIndex );
+                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                    lua_settable ( luaVM, -3 );
+                                }
+                            }
+                            break;
+                        }
+                        case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
+                        {
+                            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
+                            if ( !bCheckHitState || pBind->bHitState == bHitState )
+                            {
+                                if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
+                                {
+                                    lua_pushnumber ( luaVM, ++uiIndex );
+                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                    lua_settable ( luaVM, -3 );
+                                }
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getFunctionsBoundToKey" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_type ( luaVM, 1 ) == LUA_TFUNCTION || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        {
+            int iLuaFunction = luaM_toref ( luaVM, 1 );
+            // get the key
+            list < CScriptKeyBind* > ::const_iterator iter =  m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
+            for ( ; iter !=  m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
+            {
+                CScriptKeyBind* pScriptKeyBind = *iter;
+                if ( !pScriptKeyBind->IsBeingDeleted () )
+                {
+                    switch ( pScriptKeyBind->GetType () )
+                    {
+                        case SCRIPT_KEY_BIND_FUNCTION:
+                        {
+                            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
+                            // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
+                            if ( iLuaFunction == pBind->m_iLuaFunction )
+                            {
+                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                return 1;
+                            }
+                            break;
+                        }
+                        case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
+                        {
+                            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
+                            // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
+                            if ( iLuaFunction == pBind->m_iLuaFunction )
+                            {
+                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                return 1;
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getKeyBoundToFunction" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        {
+            const char* szKey = lua_tostring ( luaVM, 1 );
+            const char* szHitState = NULL;
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            {
+                szHitState = lua_tostring ( luaVM, 2 );
+            }
+
+            bool bCheckHitState = false, bHitState = true;
+            if ( szHitState )
+            {
+                if ( stricmp ( szHitState, "down" ) == 0 )
+                    bCheckHitState = true, bHitState = true;
+                else if ( stricmp ( szHitState, "up" ) == 0 )
+                    bCheckHitState = true, bHitState = false;
+            }
+
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add all the bound functions to it
+            unsigned int uiIndex = 0;
+            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
+            {
+                CKeyBind* pKeyBind = *iter;
+                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == KEY_BIND_COMMAND )
+                {
+                    CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
+                    if ( !bCheckHitState || pBind->bHitState == bHitState )
+                    {
+                        if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
+                        {
+                            lua_pushstring ( luaVM, pBind->szCommand );
+                            lua_pushstring ( luaVM, pBind->szArguments );
+                            lua_settable ( luaVM, -3 );
+                        }
+                    }
+                }
+            }
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getFunctionsBoundToKey" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        {
+            const char* szCommand = lua_tostring ( luaVM, 1 );
+            // get the key
+            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
+            {
+                CKeyBind* pKeyBind = *iter;
+                if ( !pKeyBind->IsBeingDeleted () )
+                {
+                    if ( pKeyBind->GetType () == KEY_BIND_COMMAND )
+                    {
+                        CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
+                        if ( strcmp ( szCommand, pBind->szCommand ) == 0 )
+                        {
+                            lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                            return 1;
+                        }
+                    }
+                }
+            }
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "getKeyBoundToFunction" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetControlState ( lua_State * luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TSTRING ) && lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
@@ -431,5 +663,3 @@ int CLuaFunctionDefs::ToggleAllControls ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
