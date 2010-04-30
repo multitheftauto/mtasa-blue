@@ -503,7 +503,7 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     float fDrawDistanceSetting = UnlerpClamped ( 0.925f, CSettingsSA ().GetDrawDistance (), 1.8f );
 
     // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
-    float fMaximumValue = Lerp ( 170.f, fDrawDistanceSetting, 325.f );
+    float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
 
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
