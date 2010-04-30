@@ -205,7 +205,7 @@ enum
     VT_STRATUM,
     VT_ELEGY,
     VT_RAINDANC,
-    VT_TIGER,
+    VT_RCTIGER,
     VT_FLASH,
     VT_TAHOMA,
     VT_SAVANNA,
