@@ -121,7 +121,8 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_FLYINGCARS       ] = new SCheatSA((BYTE *)VAR_FlyingCarsEnabled);
     m_Cheats [ CHEAT_EXTRABUNNYHOP    ] = new SCheatSA((BYTE *)VAR_ExtraBunnyhopEnabled);
     m_Cheats [ CHEAT_EXTRAJUMP        ] = new SCheatSA((BYTE *)VAR_ExtraJumpEnabled);
-    //New cheats for Anticheat
+
+    // New cheats for Anticheat
     m_Cheats [ CHEAT_TANKMODE         ] = new SCheatSA((BYTE *)VAR_TankModeEnabled, false);
     m_Cheats [ CHEAT_NORELOAD         ] = new SCheatSA((BYTE *)VAR_NoReloadEnabled, false);
     m_Cheats [ CHEAT_PERFECTHANDLING  ] = new SCheatSA((BYTE *)VAR_PerfectHandling, false);
@@ -129,6 +130,13 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_BOATSCANFLY      ] = new SCheatSA((BYTE *)VAR_BoatsCanFly, false);
     m_Cheats [ CHEAT_INFINATEOXYGEN   ] = new SCheatSA((BYTE *)VAR_InfinateOxygen, false);
     m_Cheats [ CHEAT_WALKUNDERWATER   ] = new SCheatSA((BYTE *)VAR_WalkUnderwater, false);
+    m_Cheats [ CHEAT_FASTERCLOCK      ] = new SCheatSA((BYTE *)VAR_FasterClock, false);
+    m_Cheats [ CHEAT_FASTERGAMEPLAY   ] = new SCheatSA((BYTE *)VAR_FasterGameplay, false);
+    m_Cheats [ CHEAT_SLOWERGAMEPLAY   ] = new SCheatSA((BYTE *)VAR_SlowerGameplay, false);
+    m_Cheats [ CHEAT_ALWAYSMIDNIGHT   ] = new SCheatSA((BYTE *)VAR_AlwaysMidnight, false);
+    m_Cheats [ CHEAT_FULLWEAPONAIMING ] = new SCheatSA((BYTE *)VAR_FullWeaponAiming, false);
+    m_Cheats [ CHEAT_INFINATEHEALTH   ] = new SCheatSA((BYTE *)VAR_InfinateHealth, false);
+    m_Cheats [ CHEAT_NEVERWANTED      ] = new SCheatSA((BYTE *)VAR_NeverWanted, false);
 
 }
 
@@ -417,7 +425,7 @@ void CGameSA::Initialize ( void )
     m_pGarages->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
-    *(BYTE *)(CLASS_CMenu+0x5C) = 0;
+    *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )
