@@ -117,10 +117,20 @@ CGameSA::CGameSA()
     m_pPlayerInfo = new CPlayerInfoSA ( (CPlayerInfoSAInterface *)CLASS_CPlayerInfo );
 
     // Init cheat name => address map
-    m_Cheats [ CHEAT_HOVERINGCARS  ] = (BYTE *)VAR_HoveringCarsEnabled;
-    m_Cheats [ CHEAT_FLYINGCARS    ] = (BYTE *)VAR_FlyingCarsEnabled;
-    m_Cheats [ CHEAT_EXTRABUNNYHOP ] = (BYTE *)VAR_ExtraBunnyhopEnabled;
-    m_Cheats [ CHEAT_EXTRAJUMP     ] = (BYTE *)VAR_ExtraJumpEnabled;
+    m_Cheats [ CHEAT_HOVERINGCARS     ] = new SCheatSA((BYTE *)VAR_HoveringCarsEnabled);
+    m_Cheats [ CHEAT_FLYINGCARS       ] = new SCheatSA((BYTE *)VAR_FlyingCarsEnabled);
+    m_Cheats [ CHEAT_EXTRABUNNYHOP    ] = new SCheatSA((BYTE *)VAR_ExtraBunnyhopEnabled);
+    m_Cheats [ CHEAT_EXTRAJUMP        ] = new SCheatSA((BYTE *)VAR_ExtraJumpEnabled);
+    //New cheats for Anticheat
+    m_Cheats [ CHEAT_TANKMODE         ] = new SCheatSA((BYTE *)VAR_TankModeEnabled, false);
+    m_Cheats [ CHEAT_NORELOAD         ] = new SCheatSA((BYTE *)VAR_NoReloadEnabled, false);
+    m_Cheats [ CHEAT_PERFECTHANDLING  ] = new SCheatSA((BYTE *)VAR_PerfectHandling, false);
+    m_Cheats [ CHEAT_ALLCARSHAVENITRO ] = new SCheatSA((BYTE *)VAR_AllCarsHaveNitro, false);
+    m_Cheats [ CHEAT_BOATSCANFLY      ] = new SCheatSA((BYTE *)VAR_BoatsCanFly, false);
+    m_Cheats [ CHEAT_BOATSCANFLY      ] = new SCheatSA((BYTE *)VAR_BoatsCanFly, false);
+    m_Cheats [ CHEAT_INFINATEOXYGEN   ] = new SCheatSA((BYTE *)VAR_InfinateOxygen, false);
+    m_Cheats [ CHEAT_WALKUNDERWATER   ] = new SCheatSA((BYTE *)VAR_WalkUnderwater, false);
+
 }
 
 CGameSA::~CGameSA ( void )
@@ -510,28 +520,41 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
-    std::map < std::string, BYTE* >::iterator it = m_Cheats.find ( szCheatName );
+    std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
-    return *(it->second) != 0;
+    return *(it->second->m_byAddress) != 0;
 }
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
-    std::map < std::string, BYTE* >::iterator it = m_Cheats.find ( szCheatName );
+    std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
-    *(it->second) = bEnable;
+    if ( !it->second->m_bCanBeSet )
+        return false;
+    *(it->second->m_byAddress) = bEnable;
+    it->second->m_bEnabled = bEnable;
     return true;
 }
 
 void CGameSA::ResetCheats ()
 {
-    std::map < std::string, BYTE* >::iterator it;
-    for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ )
-        *(it->second) = 0;
+    std::map < std::string, SCheatSA* >::iterator it;
+    for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
+        *(it->second->m_byAddress) = 0;
+        it->second->m_bEnabled = false;
+    }
 }
-
+bool CGameSA::PerformChecks ( void )
+{
+    std::map < std::string, SCheatSA* >::iterator it;
+    for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
+        if (*(it->second->m_byAddress) != BYTE(it->second->m_bEnabled))
+            return false;
+    }
+    return true;
+}
 bool CGameSA::VerifySADataFileNames ()
 {
     return !strcmp ( *(char **)0x5B65AE, "DATA\\CARMODS.DAT" ) &&
