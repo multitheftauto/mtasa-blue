@@ -803,7 +803,8 @@ void CCore::CreateGame ( )
 
         if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
-            MessageBox ( 0, "Only GTA:SA version 1.0 is supported!", "Error", MB_OK|MB_ICONEXCLAMATION );
+            MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
+            ShellExecute ( NULL, _T("open"), "http://forum.multitheftauto.com/viewtopic.php?f=104&t=15151#p213686", NULL, NULL, SW_SHOWNORMAL );
             TerminateProcess ( GetCurrentProcess (), 0 );
         }
     }
