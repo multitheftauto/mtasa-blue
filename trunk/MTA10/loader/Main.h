@@ -16,6 +16,7 @@
 #define __MAIN_H
 
 #define MTA_GTAEXE_NAME "gta_sa.exe"
+#define MTA_GTASTEAMEXE_NAME "gta-sa.exe"
 
 #ifdef MTA_DEBUG
     #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
