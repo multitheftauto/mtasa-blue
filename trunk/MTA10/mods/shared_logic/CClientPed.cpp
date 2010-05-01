@@ -3357,10 +3357,14 @@ bool CClientPed::PerformChecks ( void )
             // The player should not be able to gain any health/armor without us knowing..
             // meaning all health/armor giving must go through SetHealth/SetArmor.
             if ( ( m_fHealth > 0.0f && m_pPlayerPed->GetHealth () > m_fHealth + FLOAT_EPSILON ) ||
-                 ( m_fArmor > 0.0f && m_pPlayerPed->GetArmor () > m_fArmor + FLOAT_EPSILON ) )
+                 ( m_fArmor < 100.0f && m_pPlayerPed->GetArmor () > m_fArmor + FLOAT_EPSILON ) )
             {
                 g_pCore->GetConsole ()->Printf ( "healthCheck: %f %f", m_pPlayerPed->GetHealth (), m_fHealth );
                 g_pCore->GetConsole ()->Printf ( "armorCheck: %f %f", m_pPlayerPed->GetArmor (), m_fArmor );
+                return false;
+            }
+            //Perform the checks in CGame
+            if ( !g_pGame->PerformChecks() ) {
                 return false;
             }
         }

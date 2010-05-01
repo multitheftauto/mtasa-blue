@@ -179,6 +179,7 @@ public:
     virtual void                ResetCheats                 () = 0;
 
     virtual bool                VerifySADataFileNames       () = 0;
+    virtual bool                PerformChecks               () = 0;
 };
 
 #endif

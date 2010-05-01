@@ -50,12 +50,35 @@
 #define     VAR_ExtraBunnyhopEnabled        0x969161 // ##SA##
 #define     VAR_HoveringCarsEnabled         0x969152 // ##SA##
 #define     VAR_ExtraJumpEnabled            0x96916C // ##SA##
+#define     VAR_TankModeEnabled             0x969164 // ##SA##
+#define     VAR_NoReloadEnabled             0x969178 // ##SA##
+#define     VAR_PerfectHandling             0x96914C // ##SA##
+#define     VAR_AllCarsHaveNitro            0x969165 // ##SA##
+#define     VAR_BoatsCanFly                 0x969153 // ##SA##
+#define     VAR_InfinateOxygen              0x96916E // ##SA##
 
-#define CHEAT_HOVERINGCARS   "hovercars"
-#define CHEAT_FLYINGCARS     "aircars"
-#define CHEAT_EXTRABUNNYHOP  "extrabunny"
-#define CHEAT_EXTRAJUMP      "extrajump"
+#define     VAR_WalkUnderwater              0x6C2759
 
+#define CHEAT_HOVERINGCARS          "hovercars"
+#define CHEAT_FLYINGCARS            "aircars"
+#define CHEAT_EXTRABUNNYHOP         "extrabunny"
+#define CHEAT_EXTRAJUMP             "extrajump"
+#define CHEAT_TANKMODE              "tankmode"
+#define CHEAT_NORELOAD              "noreload"
+#define CHEAT_PERFECTHANDLING       "perfecthandling"
+#define CHEAT_ALLCARSHAVENITRO      "allcarshavenitro"
+#define CHEAT_BOATSCANFLY           "airboats"
+#define CHEAT_INFINATEOXYGEN        "infinateoxygen"
+#define CHEAT_WALKUNDERWATER        "walkunderwater"
+struct SCheatSA {
+    BYTE*   m_byAddress; //Cheat Address
+    bool    m_bEnabled; //Cheat State
+    bool    m_bCanBeSet; //Cheat can be set with setWorldSpecialPropertyEnabled
+    SCheatSA(BYTE* Address, bool bCanBeSet = true) {
+        m_byAddress = Address;
+        m_bCanBeSet = bCanBeSet;
+    }
+};
 class CGameSA : public CGame
 {
     friend class COffsets;
@@ -165,7 +188,7 @@ public:
     void                    ResetCheats             ();
 
     bool                    VerifySADataFileNames   ();
-
+    bool                    PerformChecks           ();
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;
@@ -230,7 +253,7 @@ private:
     static float*           VAR_TimeStep;
     static unsigned long*   VAR_Framelimiter;
 
-    std::map < std::string, BYTE* > m_Cheats;
+    std::map < std::string, SCheatSA* > m_Cheats;
 };
 
 #endif
