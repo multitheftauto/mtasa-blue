@@ -28,7 +28,7 @@
 #define     CLASS_CPad                      0xB73458    // ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
 #define     CLASS_CFx                       0xa9ae00    // ##SA##
-#define     CLASS_CMenu                     0xBA6748
+#define     CLASS_CMenuManager              0xBA6748    // ##SA##
 
 #define     CLASS_RwCamera                  0xB6F97C
 
@@ -57,6 +57,13 @@
 #define     VAR_BoatsCanFly                 0x969153 // ##SA##
 #define     VAR_InfinateOxygen              0x96916E // ##SA##
 
+#define     VAR_FasterClock                 0x96913B // ##SA##
+#define     VAR_FasterGameplay              0x96913C // ##SA##
+#define     VAR_SlowerGameplay              0x96913D // ##SA##
+#define     VAR_AlwaysMidnight              0x969167 // ##SA##
+#define     VAR_FullWeaponAiming            0x969179 // ##SA##
+#define     VAR_InfinateHealth              0x96916D // ##SA##
+#define     VAR_NeverWanted                 0x969171 // ##SA##
 #define     VAR_WalkUnderwater              0x6C2759
 
 #define CHEAT_HOVERINGCARS          "hovercars"
@@ -70,6 +77,14 @@
 #define CHEAT_BOATSCANFLY           "airboats"
 #define CHEAT_INFINATEOXYGEN        "infinateoxygen"
 #define CHEAT_WALKUNDERWATER        "walkunderwater"
+#define CHEAT_FASTERCLOCK           "fasterclock"
+#define CHEAT_FASTERGAMEPLAY        "fastergameplay"
+#define CHEAT_SLOWERGAMEPLAY        "slowergameplay"
+#define CHEAT_ALWAYSMIDNIGHT        "alwaysmidnight"
+#define CHEAT_FULLWEAPONAIMING      "fullweaponaiming"
+#define CHEAT_INFINATEHEALTH        "infinatehealth"
+#define CHEAT_NEVERWANTED           "neverwanted"
+
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
     bool    m_bEnabled; //Cheat State
