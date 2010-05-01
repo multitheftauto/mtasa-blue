@@ -461,7 +461,17 @@ PostVC90Check:
 		trynext2:
 		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
 		cont2:
+		StrCmp $2 "" trynext3 cont3
+		trynext3:
+		ReadRegStr $2 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
+		StrCpy $2 $2
+		StrCmp $2 "1" usesteam cont3
+		usesteam:
+		ReadRegStr $2 HKCU "Software\Valve\Steam" "SteamPath"
+		StrCpy $2 "$2\steamapps\common\grand theft auto san andreas"
+		cont3:
 		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
+		!insertmacro ReplaceSubStr $2 "/" "\"
 		strcpy $3 '"'
 		!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
 		strcpy $GTA_DIR $MODIFIED_STR

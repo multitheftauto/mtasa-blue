@@ -180,6 +180,11 @@ int GetGamePath ( SString& strOutResult )
                 strOutResult = strRegPath;
                 return 1;
             }
+            strExePath = SString( "%s\\%s", strRegPath.c_str (), MTA_GTASTEAMEXE_NAME );
+            if ( FileExists( strExePath  ) )
+            {
+                return -2;
+            }
         }
     }
     BROWSEINFO bi = { 0 };
@@ -250,6 +255,11 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
     else if ( iResult == -1 ) {
         MessageBox ( 0, "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        return 5;
+    }
+    else if ( iResult == -2 ) {
+        MessageBox ( 0, "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.", "Error", MB_OK|MB_ICONEXCLAMATION );
+        ShellExecute ( NULL, "open", "http://wiki.multitheftauto.com/wiki/Known_Issues_-_FAQ#I_have_the_Steam_version_of_GTA_San_Andreas.__How_can_I_play_MTASA.3F", NULL, NULL, SW_SHOWNORMAL );
         return 5;
     }
 
