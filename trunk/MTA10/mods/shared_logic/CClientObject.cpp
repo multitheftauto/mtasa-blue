@@ -247,7 +247,7 @@ void CClientObject::SetModel ( unsigned short usModel )
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
         // Request the new model so we can recreate when it's done
-        if ( m_pModelRequester->Request ( usModel, this ) )
+        if ( m_pModelRequester->QueueRequest ( usModel, this ) )
         {
             Create ();
         }
@@ -319,7 +319,7 @@ void CClientObject::StreamIn ( bool bInstantly )
     else
     {
         // Request the model async
-        if ( m_pModelRequester->Request ( m_usModel, this ) )
+        if ( m_pModelRequester->QueueRequest ( m_usModel, this ) )
         {
             // Create us now if we already had it loaded
             Create ();
