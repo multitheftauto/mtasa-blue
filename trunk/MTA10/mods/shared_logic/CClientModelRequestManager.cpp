@@ -122,7 +122,7 @@ bool CClientModelRequestManager::RequestBlocking ( unsigned short usModelID )
 }
 
 
-bool CClientModelRequestManager::QueueRequest ( unsigned short usModelID, CClientEntity* pRequester )
+bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEntity* pRequester )
 {
     assert ( pRequester );
     SClientModelRequest* pEntry;
@@ -185,7 +185,6 @@ bool CClientModelRequestManager::QueueRequest ( unsigned short usModelID, CClien
             }
 
             // Request it
-            pInfo->Request ( FALSE, FALSE );
             pInfo->AddRef ( false );
 
             // Add him to the list over models we're waiting for.
@@ -295,7 +294,7 @@ void CClientModelRequestManager::DoPulse ( void )
                 {
                     // Request it again. Don't add reference, or we screw up the
                     // reference count.
-                    pEntry->pModel->Request ( FALSE, FALSE );
+                    pEntry->pModel->Request ( TRUE, FALSE );
 
                     // Remember now as the time we requested it.
                     pEntry->dwTimeRequested = dwTimeNow;

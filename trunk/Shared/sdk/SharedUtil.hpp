@@ -212,6 +212,7 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
     // Bad things will happen if szNew exists in szOld
+    int pos = std::string ( szOld ).find ( szNew );
     if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
         return *this;
 
