@@ -41,7 +41,7 @@ public:
 
     bool                            RequestBlocking                 ( unsigned short usModelID );
 
-    bool                            QueueRequest                    ( unsigned short usModelID, CClientEntity* pRequester );
+    bool                            Request                         ( unsigned short usModelID, CClientEntity* pRequester );
     void                            Cancel                          ( CClientEntity* pRequester, bool bAllowQueue );
 
 private:

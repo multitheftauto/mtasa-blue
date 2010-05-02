@@ -291,10 +291,10 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     DWORD dwFunction = FUNC_RequestModel;
     DWORD ModelID = m_dwModelID;
     //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
-    DWORD dwFlags = 0x16;
+    DWORD dwChannel = 6;
     _asm
     {
-        push    dwFlags
+        push    dwChannel
         push    ModelID
         call    dwFunction
         add     esp, 8
@@ -360,12 +360,12 @@ VOID CModelInfoSA::LoadAllRequestedModels ( )
     DEBUG_TRACE("VOID CModelInfoSA::LoadAllRequestedModels ( )");
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
-    DWORD dwOnlyPriorityModels = 0;
+    DWORD dwSlot = 0;
     //if ( m_dwModelID >= 400 && m_dwModelID < 615 )
         //dwSlot = 1;
     _asm
     {
-        push    dwOnlyPriorityModels
+        push    dwSlot
         call    dwFunction
         add     esp, 4
     }
@@ -599,7 +599,7 @@ void CModelInfoSA::AddRef ( bool bWaitForLoad )
     if ( !IsLoaded () )
     {
         // Request it. Wait for it to load if we're asked to.
-        Request ( bWaitForLoad, bWaitForLoad );
+        Request ( true, bWaitForLoad );
     }
 
     // Increment the references.
