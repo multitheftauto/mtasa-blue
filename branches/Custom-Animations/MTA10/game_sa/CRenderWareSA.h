@@ -19,6 +19,7 @@
 
 #include "CModelInfoSA.h"
 #include "CColModelSA.h"
+#include "CColModelSA.h"
 #include "Common.h"
 #include <windows.h>
 #include <stdio.h>
@@ -37,6 +38,10 @@ class CRenderWareSA : public CRenderWare
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
+
+    //Reads and parses an IFP file specified by a path ( szTXD )
+    CAnimBlock *        ReadIFP                     ( const char *szTXD );
+
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
     // uiModelID == 0 means no collisions will be loaded (be careful! seems crashy!)

@@ -446,6 +446,8 @@ public:
     LUA_DECLARE ( EngineAddAllAtomics );
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
+    LUA_DECLARE ( EngineLoadAnimation );
+    LUA_DECLARE ( EngineUnloadAnimation );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

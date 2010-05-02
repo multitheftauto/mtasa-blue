@@ -454,3 +454,86 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::EngineLoadAnimation ( lua_State* luaVM )
+{
+   if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) )
+    {
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Grab this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                // Grab the filename
+                SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
+                
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                {
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceIFPRoot ();
+
+                    // Create a TXD element
+                    CClientIfp* pIFP = new CClientIfp ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the TXD file
+                    if ( pIFP->LoadIFP ( strPath ) )
+                    {
+                        // Success loading the file. Set parent to TXD root
+                        pIFP->SetParent ( pRoot );
+
+                        // Return the TXD
+                        lua_pushelement ( luaVM, pIFP );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pIFP;
+                    }
+                    /*if ( CStaticFunctionDefinitions::EngineLoadAnimation ( strPath ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }*/
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadAnimation", "filepath", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "engineLoadAnimation" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineUnloadAnimation ( lua_State* luaVM )
+{
+   if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab our virtual machine and grab our resource from that.
+        CClientIfp* pAnim = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_toifp ( luaVM, 1 ) : NULL );
+        if ( pAnim )
+        {
+            pAnim->Remove();
+            delete pAnim;
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "engineUnloadAnimation", "filepath", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "engineUnloadAnimation" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+

@@ -92,6 +92,16 @@ CClientGUIElement* lua_toguielement ( lua_State* luaVM, int iArgument )
 
     return NULL;
 }
+CClientIfp* lua_toifp ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == CCLIENTIFP )
+    {
+        return static_cast < CClientIfp* > ( pElement );
+    }
+
+    return NULL;
+}
 
 CClientMarker* lua_tomarker ( lua_State* luaVM, int iArgument )
 {
