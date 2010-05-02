@@ -25,15 +25,6 @@ CHandlingEntrySA::CHandlingEntrySA ( void )
 }
 
 
-CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pDataSA, tHandlingDataSA* pOriginalUncalculatedData )
-{
-    // Store gta's pointer
-    m_pHandlingSA = pDataSA;
-    m_bDeleteInterface = false;
-    m_pOriginalData = pOriginalUncalculatedData;
-}
-
-
 CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pOriginal )
 {
     // Store gta's pointer
@@ -52,26 +43,6 @@ CHandlingEntrySA::~CHandlingEntrySA ( void )
     }
 }
 
-// Does vehicle entry already exist?
-bool CHandlingEntrySA::IsVehicleAdded ( CVehicle* pVeh )
-{
-//  std::list < CVehicleSA* > ::iterator iter = m_VehicleList.begin ();
-//  for ( ; iter != m_VehicleList.begin (); iter++ )
-//  {
-//      if (*iter == pVeh)
-//          return true;
-//  }
-    return false;
-}
-
-// Adds a vehicle to list
-void CHandlingEntrySA::AddVehicle ( CVehicle* pVeh )
-{
-//  if ( IsVehicleAdded ( pVeh ) )
-//      return;
-//  m_VehicleList.push_front ( dynamic_cast < CVehicleSA* > ( pVeh ) );
-}
-
 
 // Apply the handlingdata from another data
 void CHandlingEntrySA::ApplyHandlingData ( CHandlingEntry* pData )
@@ -79,13 +50,6 @@ void CHandlingEntrySA::ApplyHandlingData ( CHandlingEntry* pData )
     // Copy the data
     CHandlingEntrySA* pEntrySA = static_cast < CHandlingEntrySA* > ( pData );
     m_Handling = pEntrySA->m_Handling;
-}
-
-
-// Remove a vehicle from list
-void CHandlingEntrySA::RemoveVehicle ( CVehicle* pVeh )
-{
-//  m_VehicleList.remove ( dynamic_cast < CVehicleSA* > ( pVeh ) );
 }
 
 

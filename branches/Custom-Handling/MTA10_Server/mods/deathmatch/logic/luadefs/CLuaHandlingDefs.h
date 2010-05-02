@@ -5,6 +5,7 @@
 *  FILE:        mods/deathmatch/logic/luadefs/CLuaHandlingDefs.h
 *  PURPOSE:     Lua vehicle handling definitions class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -20,6 +21,15 @@ class CLuaHandlingDefs: public CLuaDefs
 public:
     static void     LoadFunctions                           ( void );
 
+    // Set
+    static int      SetVehicleHandling                      ( lua_State* luaVM );
+
+    // Get
+    static int      GetVehicleHandling                      ( lua_State* luaVM );
+    static int      GetModelHandling                        ( lua_State* luaVM );
+    static int      GetOriginalHandling                     ( lua_State* luaVM );
+
+/*
     // Create/action
     static int      createHandling                          ( lua_State* luaVM );
     static int      addDefaultHandling                      ( lua_State* luaVM );
@@ -108,7 +118,7 @@ public:
 
     static int      handlingSetHeadLightType                ( lua_State* luaVM );
     static int      handlingSetTailLightType                ( lua_State* luaVM );
-    static int      handlingSetAnimGroup                    ( lua_State* luaVM );
+    static int      handlingSetAnimGroup                    ( lua_State* luaVM );*/
 };
 
 #endif

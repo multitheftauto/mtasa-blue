@@ -6,6 +6,7 @@
 *  PURPOSE:     Vehicle entity class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -85,6 +86,9 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
     // Generate a random reg plate
     GenerateRegPlate ();
+
+    // Generate the handling data
+    GenerateHandlingData ();
 }
 
 
@@ -119,6 +123,7 @@ CVehicle::~CVehicle ( void )
         }
     }
     delete m_pUpgrades;
+    delete m_pHandlingEntry;
 
     // Remove us from the vehicle manager
     Unlink ();
@@ -177,9 +182,7 @@ bool CVehicle::ReadSpecialData ( void )
         if ( CVehicleManager::IsValidModel ( iTemp ) )
         {
             // Remember it and generate a new random color
-            m_usModel = static_cast < unsigned short > ( iTemp );
-            m_Color = RandomizeColor ();
-            GetInitialDoorStates ( m_ucDoorStates );
+            SetModel ( static_cast < unsigned short > ( iTemp ) );
 
             m_usAdjustableProperty = 0;
         }
@@ -356,6 +359,9 @@ void CVehicle::SetModel ( unsigned short usModel )
         m_usModel = usModel;
         RandomizeColor ();
         GetInitialDoorStates ( m_ucDoorStates );
+
+        // Generate new handling data to fit the vehicle
+        GenerateHandlingData ();
     }
 }
 
@@ -673,4 +679,10 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         default:
             memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
     }
+}
+
+
+void CVehicle::GenerateHandlingData ()
+{
+    m_pHandlingEntry = g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) );
 }

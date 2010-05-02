@@ -52,7 +52,6 @@ void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fR
             case CCLIENTCOL:
             case CCLIENTTXD:
             case CCLIENTSOUND:
-            case CCLIENTHANDLING:
                 return;
         }
     }

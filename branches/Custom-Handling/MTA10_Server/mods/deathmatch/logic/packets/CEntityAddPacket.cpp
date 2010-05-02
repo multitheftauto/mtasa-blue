@@ -360,6 +360,44 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     else
                         BitStream.WriteBit ( false );
 
+                    // Write handling
+                    SVehicleHandlingSync handling;
+                    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+                    handling.data.fMass                         = pEntry->GetMass ();
+                    handling.data.fTurnMass                     = pEntry->GetTurnMass ();
+                    handling.data.fDragCoeff                    = pEntry->GetDragCoeff ();
+                    handling.data.vecCenterOfMass               = pEntry->GetCenterOfMass ();
+                    handling.data.uiPercentSubmerged            = pEntry->GetPercentSubmerged ();
+                    handling.data.fTractionMultiplier           = pEntry->GetTractionMultiplier ();
+                    handling.data.ucDriveType                   = pEntry->GetCarDriveType ();
+                    handling.data.ucEngineType                  = pEntry->GetCarEngineType ();
+                    handling.data.ucNumberOfGears               = pEntry->GetNumberOfGears ();
+                    handling.data.fEngineAccelleration          = pEntry->GetEngineAccelleration ();
+                    handling.data.fEngineInertia                = pEntry->GetEngineInertia ();
+                    handling.data.fMaxVelocity                  = pEntry->GetMaxVelocity ();
+                    handling.data.fBrakeDecelleration           = pEntry->GetBrakeDecelleration ();
+                    handling.data.fBrakeBias                    = pEntry->GetBrakeBias ();
+                    handling.data.ucABS                         = pEntry->GetABS () ? 1 : 0;
+                    handling.data.fSteeringLock                 = pEntry->GetSteeringLock ();
+                    handling.data.fTractionLoss                 = pEntry->GetTractionLoss ();
+                    handling.data.fTractionBias                 = pEntry->GetTractionBias ();
+                    handling.data.fSuspensionForceLevel         = pEntry->GetSuspensionForceLevel ();
+                    handling.data.fSuspensionDamping            = pEntry->GetSuspensionDamping ();
+                    handling.data.fSuspensionHighSpdDamping     = pEntry->GetSuspensionHighSpeedDamping ();
+                    handling.data.fSuspensionUpperLimit         = pEntry->GetSuspensionUpperLimit ();
+                    handling.data.fSuspensionLowerLimit         = pEntry->GetSuspensionLowerLimit ();
+                    handling.data.fSuspensionFrontRearBias      = pEntry->GetSuspensionFrontRearBias ();
+                    handling.data.fSuspensionAntidiveMultiplier = pEntry->GetSuspensionAntidiveMultiplier ();
+                    handling.data.fCollisionDamageMultiplier    = pEntry->GetCollisionDamageMultiplier ();
+                    handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
+                    handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
+                    handling.data.fSeatOffsetDistance           = pEntry->GetSeatOffsetDistance ();
+                    handling.data.uiMonetary                    = pEntry->GetMonetary ();
+                    handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
+                    handling.data.ucTailLight                   = pEntry->GetTailLight ();
+                    handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
+                    BitStream.Write ( &handling );
+
                     break;
                 }                
 
@@ -699,208 +737,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         }
                         default: break;
                     }
-                    break;
-                }
-
-                case CElement::HANDLING:
-                {
-                    // Cast to handling class
-                    CHandling* pHandling = static_cast < CHandling* > ( pElement );
-
-                    bool bMass, bTurnMass, bDragCoeff, bCenterOfMass, bPercentSubmerged;
-                    bool bTractionMultiplier, bDriveType, bEngineType, bNumberOfGears;
-                    bool bEngineAccelleration, bEngineInertia, bMaxVelocity, bBrakeDecelleration;
-                    bool bBrakeBias, bABS, bSteeringLock, bTractionLoss, bTractionBias;
-                    bool bSuspensionForceLevel, bSuspensionDamping, bSuspensionHighSpeedDamping;
-                    bool bSuspensionUpperLimit, bSuspensionLowerLimit, bSuspensionFrontRearBias;
-                    bool bSuspensionAntidiveMultiplier, bCollisionDamageMultiplier;
-                    bool bSeatOffsetDistance, bHandlingFlags, bModelFlags, bHeadLight;
-                    bool bTailLight, bAnimGroup;
-
-                    // Write all the details about the handling
-                    float fMass = pHandling->GetMass ( bMass );
-                    float fTurnMass = pHandling->GetTurnMass ( bTurnMass );
-                    float fDragCoeff = pHandling->GetDragCoeff ( bDragCoeff );
-                    const CVector& vecCenterOfMass = pHandling->GetCenterOfMass ( bCenterOfMass );
-                    unsigned int uiPercentSubmerged = pHandling->GetPercentSubmerged ( bPercentSubmerged );
-                    float fTractionMultiplier = pHandling->GetTractionMultiplier ( bTractionMultiplier );
-                    unsigned char ucDriveType = pHandling->GetDriveType ( bDriveType );
-                    unsigned char ucEngineType = pHandling->GetEngineType ( bEngineType );
-                    unsigned char ucNumberOfGears = pHandling->GetNumberOfGears ( bNumberOfGears );
-                    float fEngineAccelleration = pHandling->GetEngineAccelleration ( bEngineAccelleration );
-                    float fEngineInertia = pHandling->GetEngineInertia ( bEngineInertia );
-                    float fMaxVelocity = pHandling->GetMaxVelocity ( bMaxVelocity );
-                    float fBrakeDecelleration = pHandling->GetBrakeDecelleration ( bBrakeDecelleration );
-                    float fBrakeBias = pHandling->GetBrakeBias ( bBrakeBias );
-                    unsigned char ucABS = pHandling->GetABS ( bABS ) ? 1 : 0;
-                    float fSteeringLock = pHandling->GetSteeringLock ( bSteeringLock );
-                    float fTractionLoss = pHandling->GetTractionLoss ( bTractionLoss );
-                    float fTractionBias = pHandling->GetTractionBias ( bTractionBias );
-                    float fSuspensionForceLevel = pHandling->GetSuspensionForceLevel ( bSuspensionForceLevel );
-                    float fSuspensionDamping = pHandling->GetSuspensionDamping ( bSuspensionDamping );
-                    float fSuspensionHighSpeedDamping = pHandling->GetSuspensionHighSpeedDamping ( bSuspensionHighSpeedDamping );
-                    float fSuspensionUpperLimit = pHandling->GetSuspensionUpperLimit ( bSuspensionUpperLimit );
-                    float fSuspensionLowerLimit = pHandling->GetSuspensionLowerLimit ( bSuspensionLowerLimit );
-                    float fSuspensionFrontRearBias = pHandling->GetSuspensionFrontRearBias ( bSuspensionFrontRearBias );
-                    float fSuspensionAntidiveMultiplier = pHandling->GetSuspensionAntidiveMultiplier ( bSuspensionAntidiveMultiplier );
-                    float fCollisionDamageMultiplier = pHandling->GetCollisionDamageMultiplier ( bCollisionDamageMultiplier );
-                    float fSeatOffsetDistance = pHandling->GetSeatOffsetDistance ( bSeatOffsetDistance );
-                    unsigned int uiHandlingFlags = pHandling->GetHandlingFlags ( bHandlingFlags );
-                    unsigned int uiModelFlags = pHandling->GetModelFlags ( bModelFlags );
-                    unsigned char ucHeadLight = pHandling->GetHeadLight ( bHeadLight );
-                    unsigned char ucTailLight = pHandling->GetTailLight ( bTailLight );
-                    unsigned char ucAnimGroup = pHandling->GetAnimGroup ( bAnimGroup );
-
-                    // Put all the bools in a long so the client knows what it's going to
-                    // receive
-                    unsigned long ulChanged =   static_cast < unsigned long > ( bMass ) |
-                                                static_cast < unsigned long > ( bTurnMass ) << 1 |
-                                                static_cast < unsigned long > ( bDragCoeff ) << 2 |
-                                                static_cast < unsigned long > ( bCenterOfMass ) << 3 |
-                                                static_cast < unsigned long > ( bPercentSubmerged ) << 4 |
-                                                static_cast < unsigned long > ( bTractionMultiplier ) << 5 |
-                                                static_cast < unsigned long > ( bDriveType ) << 6 |
-                                                static_cast < unsigned long > ( bEngineType ) << 7 |
-                                                static_cast < unsigned long > ( bNumberOfGears ) << 8 |
-                                                static_cast < unsigned long > ( bEngineAccelleration ) << 9 |
-                                                static_cast < unsigned long > ( bEngineInertia ) << 10 |
-                                                static_cast < unsigned long > ( bMaxVelocity ) << 11 |
-                                                static_cast < unsigned long > ( bBrakeDecelleration ) << 12 |
-                                                static_cast < unsigned long > ( bBrakeBias ) << 13 |
-                                                static_cast < unsigned long > ( bABS ) << 14 |
-                                                static_cast < unsigned long > ( bSteeringLock ) << 15 |
-                                                static_cast < unsigned long > ( bTractionLoss ) << 16 |
-                                                static_cast < unsigned long > ( bTractionBias ) << 17 |
-                                                static_cast < unsigned long > ( bSuspensionForceLevel ) << 18 |
-                                                static_cast < unsigned long > ( bSuspensionDamping ) << 19 |
-                                                static_cast < unsigned long > ( bSuspensionHighSpeedDamping ) << 20 |
-                                                static_cast < unsigned long > ( bSuspensionUpperLimit ) << 21 |
-                                                static_cast < unsigned long > ( bSuspensionLowerLimit ) << 22 |
-                                                static_cast < unsigned long > ( bSuspensionFrontRearBias ) << 23 |
-                                                static_cast < unsigned long > ( bSuspensionAntidiveMultiplier ) << 24 |
-                                                static_cast < unsigned long > ( bCollisionDamageMultiplier ) << 25 |
-                                                static_cast < unsigned long > ( bSeatOffsetDistance ) << 26 |
-                                                static_cast < unsigned long > ( bHandlingFlags ) << 27 |
-                                                static_cast < unsigned long > ( bModelFlags ) << 28 |
-                                                static_cast < unsigned long > ( bHeadLight ) << 29 |
-                                                static_cast < unsigned long > ( bTailLight ) << 30 |
-                                                static_cast < unsigned long > ( bAnimGroup ) << 31;
-                    BitStream.Write ( ulChanged );
-
-                    if ( bMass )
-                        BitStream.Write ( fMass );
-
-                    if ( bTurnMass )
-                        BitStream.Write ( fTurnMass );
-
-                    if ( bDragCoeff )
-                        BitStream.Write ( fDragCoeff );
-
-                    if ( bCenterOfMass )
-                    {
-                        BitStream.Write ( vecCenterOfMass.fX );
-                        BitStream.Write ( vecCenterOfMass.fY );
-                        BitStream.Write ( vecCenterOfMass.fZ );
-                    }
-
-                    if ( bPercentSubmerged )
-                        BitStream.Write ( uiPercentSubmerged );
-
-                    if ( bTractionMultiplier )
-                        BitStream.Write ( fTractionMultiplier );
-
-                    if ( bDriveType )
-                        BitStream.Write ( ucDriveType );
-
-                    if ( bEngineType )
-                        BitStream.Write ( ucEngineType );
-
-                    if ( bNumberOfGears )
-                        BitStream.Write ( ucNumberOfGears );
-
-                    if ( bEngineAccelleration )
-                        BitStream.Write ( fEngineAccelleration );
-
-                    if ( bEngineInertia )
-                        BitStream.Write ( fEngineInertia );
-
-                    if ( bMaxVelocity )
-                        BitStream.Write ( fMaxVelocity );
-
-                    if ( bBrakeDecelleration )
-                        BitStream.Write ( fBrakeDecelleration );
-
-                    if ( bBrakeBias )
-                        BitStream.Write ( fBrakeBias );
-
-                    if ( bABS )
-                        BitStream.Write ( ucABS );
-
-                    if ( bSteeringLock )
-                        BitStream.Write ( fSteeringLock );
-
-                    if ( bTractionLoss )
-                        BitStream.Write ( fTractionLoss );
-
-                    if ( bTractionBias )
-                        BitStream.Write ( fTractionBias );
-
-                    if ( bSuspensionForceLevel )
-                        BitStream.Write ( fSuspensionForceLevel );
-
-                    if ( bSuspensionDamping )
-                        BitStream.Write ( fSuspensionDamping );
-
-                    if ( bSuspensionHighSpeedDamping )
-                        BitStream.Write ( fSuspensionHighSpeedDamping );
-
-                    if ( bSuspensionUpperLimit )
-                        BitStream.Write ( fSuspensionUpperLimit );
-                    
-                    if ( bSuspensionLowerLimit )
-                        BitStream.Write ( fSuspensionLowerLimit );
-
-                    if ( bSuspensionFrontRearBias )
-                        BitStream.Write ( fSuspensionFrontRearBias );
-
-                    if ( bSuspensionAntidiveMultiplier )
-                        BitStream.Write ( fSuspensionAntidiveMultiplier );
-
-                    if ( bCollisionDamageMultiplier )
-                        BitStream.Write ( fCollisionDamageMultiplier );
-
-                    if ( bSeatOffsetDistance )
-                        BitStream.Write ( fSeatOffsetDistance );
-
-                    if ( bHandlingFlags )
-                        BitStream.Write ( uiHandlingFlags );
-                    
-                    if ( bModelFlags )
-                        BitStream.Write ( uiModelFlags );
-
-                    if ( bHeadLight )
-                        BitStream.Write ( ucHeadLight );
-
-                    if ( bTailLight )
-                        BitStream.Write ( ucTailLight );
-
-                    if ( bAnimGroup )
-                        BitStream.Write ( ucAnimGroup );
-
-                    // Write number of vehicles that have this handling applied as default
-                    unsigned char ucCount = static_cast < unsigned char > ( pHandling->CountDefaultTo () );
-                    BitStream.Write ( ucCount );
-
-                    // Write their ID's as bytes (real id - 400)
-                    std::list < unsigned short > ::const_iterator iter = pHandling->IterDefaultToBegin ();
-                    for ( ; iter != pHandling->IterDefaultToEnd (); iter++ )
-                    {
-                        // Grab the ID
-                        unsigned char ucID = (*iter) - 400;
-                        BitStream.Write ( ucID );
-                    }
-
-                    // Done
                     break;
                 }
 

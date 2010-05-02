@@ -537,7 +537,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CHandling.cpp"
+					RelativePath=".\logic\CHandlingEntry.cpp"
 					>
 				</File>
 				<File
@@ -1534,7 +1534,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CHandling.h"
+					RelativePath=".\logic\CHandlingEntry.h"
 					>
 				</File>
 				<File

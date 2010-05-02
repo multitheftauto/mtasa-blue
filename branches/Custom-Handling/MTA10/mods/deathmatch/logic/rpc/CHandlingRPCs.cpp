@@ -6,6 +6,7 @@
 *  PURPOSE:     Handling remote procedure calls
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -16,95 +17,52 @@
 
 void CHandlingRPCs::LoadFunctions ( void )
 {
-    AddHandler ( HANDLING_SET_DEFAULT, HandlingAddDefault, "HandlingAddDefault" );
-    AddHandler ( HANDLING_RESTORE_DEFAULT, HandlingRemoveDefault, "HandlingRemoveDefault" );
-    AddHandler ( HANDLING_SET_PROPERTY, HandlingSetProperty, "HandlingSetProperty" );
-}
-
-
-void CHandlingRPCs::HandlingAddDefault ( NetBitStreamInterface& bitStream )
-{
-    // Read out handling id and vehicle type
-    ElementID ID;
-    unsigned char ucVehicleType;
-    if ( bitStream.Read ( ID ) && 
-         bitStream.Read ( ucVehicleType ) )
-    {
-        // Calculate vehicle ID
-        eVehicleTypes eModel = static_cast < eVehicleTypes > ( ucVehicleType + 400 );
-
-        // Grab it and check its type
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
-        {
-            // Make it as default for all of the given vehicle id's
-            static_cast < CClientHandling* > ( pEntity ) ->AddDefaultTo ( eModel );
-        }
-    }
-}
-
-
-void CHandlingRPCs::HandlingRemoveDefault ( NetBitStreamInterface& bitStream )
-{
-    // Read out handling id and vehicle type
-    ElementID ID;
-    unsigned char ucVehicleType;
-    if ( bitStream.Read ( ID ) && 
-         bitStream.Read ( ucVehicleType ) )
-    {
-        // Calculate vehicle ID
-        eVehicleTypes eModel = static_cast < eVehicleTypes > ( ucVehicleType + 400 );
-
-        // Grab it and check its type
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
-        {
-            // Make it as default for all of the given vehicle id's
-            static_cast < CClientHandling* > ( pEntity ) ->RemoveDefaultTo ( eModel );
-        }
-    }
+    AddHandler ( SET_VEHICLE_HANDLING_PROPERTY, SetVehicleHandlingProperty, "SetVehicleHandlingProperty" );
+    AddHandler ( RESET_VEHICLE_HANDLING_PROPERTY, RestoreVehicleHandlingProperty, "RestoreVehicleHandlingProperty" );
+    AddHandler ( RESET_VEHICLE_HANDLING, RestoreVehicleHandling, "RestoreVehicleHandling" );
 }
 
 
 // Enum with property id's for handling
 enum eHandlingProperty
 {
-    PROPERTY_MASS,
-    PROPERTY_TURNMASS,
-    PROPERTY_DRAGCOEFF,
-    PROPERTY_CENTEROFMASS,
-    PROPERTY_PERCENTSUBMERGED,
-    PROPERTY_TRACTIONMULTIPLIER,
-    PROPERTY_DRIVETYPE,
-    PROPERTY_ENGINETYPE,
-    PROPERTY_NUMOFGEARS,
-    PROPERTY_ENGINEACCELLERATION,
-    PROPERTY_ENGINEINERTIA,
-    PROPERTY_MAXVELOCITY,
-    PROPERTY_BRAKEDECELLERATION,
-    PROPERTY_BRAKEBIAS,
-    PROPERTY_ABS,
-    PROPERTY_STEERINGLOCK,
-    PROPERTY_TRACTIONLOSS,
-    PROPERTY_TRACTIONBIAS,
-    PROPERTY_SUSPENSION_FORCELEVEL,
-    PROPERTY_SUSPENSION_DAMPING,
-    PROPERTY_SUSPENSION_HIGHSPEEDDAMPING,
-    PROPERTY_SUSPENSION_UPPER_LIMIT,
-    PROPERTY_SUSPENSION_LOWER_LIMIT,
-    PROPERTY_SUSPENSION_FRONTREARBIAS,
-    PROPERTY_SUSPENSION_ANTIDIVEMULTIPLIER,
-    PROPERTY_COLLISIONDAMAGEMULTIPLIER,
-    PROPERTY_SEATOFFSETDISTANCE,
-    PROPERTY_HANDLINGFLAGS,
-    PROPERTY_MODELFLAGS,
-    PROPERTY_HEADLIGHT,
-    PROPERTY_TAILLIGHT,
-    PROPERTY_ANIMGROUP,
+    HANDLING_MASS = 1,
+    HANDLING_TURNMASS,
+    HANDLING_DRAGCOEFF,
+    HANDLING_CENTEROFMASS,
+    HANDLING_PERCENTSUBMERGED,
+    HANDLING_TRACTIONMULTIPLIER,
+    HANDLING_DRIVETYPE,
+    HANDLING_ENGINETYPE,
+    HANDLING_NUMOFGEARS,
+    HANDLING_ENGINEACCELLERATION,
+    HANDLING_ENGINEINERTIA,
+    HANDLING_MAXVELOCITY,
+    HANDLING_BRAKEDECELLERATION,
+    HANDLING_BRAKEBIAS,
+    HANDLING_ABS,
+    HANDLING_STEERINGLOCK,
+    HANDLING_TRACTIONLOSS,
+    HANDLING_TRACTIONBIAS,
+    HANDLING_SUSPENSION_FORCELEVEL,
+    HANDLING_SUSPENSION_DAMPING,
+    HANDLING_SUSPENSION_HIGHSPEEDDAMPING,
+    HANDLING_SUSPENSION_UPPER_LIMIT,
+    HANDLING_SUSPENSION_LOWER_LIMIT,
+    HANDLING_SUSPENSION_FRONTREARBIAS,
+    HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER,
+    HANDLING_COLLISIONDAMAGEMULTIPLIER,
+    HANDLING_SEATOFFSETDISTANCE,
+    HANDLING_MONETARY,
+    HANDLING_HANDLINGFLAGS,
+    HANDLING_MODELFLAGS,
+    HANDLING_HEADLIGHT,
+    HANDLING_TAILLIGHT,
+    HANDLING_ANIMGROUP,
 };
 
 
-void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
+void CHandlingRPCs::SetVehicleHandlingProperty ( NetBitStreamInterface& bitStream )
 {
     // Read out the handling id and property id
     ElementID ID;
@@ -114,11 +72,12 @@ void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
     {
         // Grab it and check its type
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
+        if ( pEntity && pEntity->GetType () == CCLIENTVEHICLE )
         {
-            // Grab the handling class
-            CClientHandling& HandlingElement = static_cast < CClientHandling& > ( *pEntity );
-            
+            // Grab the vehicle handling entry
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pEntity );
+            CHandlingEntry* pHandlingEntry = Vehicle.GetHandlingData();
+
             // Temporary storage for reading out data
             union
             {
@@ -127,45 +86,45 @@ void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
                 float fFloat;
             };
 
-            // Depending on what property...
+            // Depending on what property
             switch ( ucProperty )
             {
-                case PROPERTY_MASS:
+                case HANDLING_MASS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetMass ( fFloat );
+                    pHandlingEntry->SetMass ( fFloat );
                     break;
                     
-                case PROPERTY_TURNMASS:
+                case HANDLING_TURNMASS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetTurnMass ( fFloat );
+                    pHandlingEntry->SetTurnMass ( fFloat );
                     break;
 
-                case PROPERTY_DRAGCOEFF:
+                case HANDLING_DRAGCOEFF:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetDragCoeff ( fFloat );
+                    pHandlingEntry->SetDragCoeff ( fFloat );
                     break;
 
-                case PROPERTY_CENTEROFMASS:
+                case HANDLING_CENTEROFMASS:
                 {
                     CVector vecVector;
                     bitStream.Read ( vecVector.fX );
                     bitStream.Read ( vecVector.fY );
                     bitStream.Read ( vecVector.fZ );
-                    HandlingElement.SetCenterOfMass ( vecVector );
+                    pHandlingEntry->SetCenterOfMass ( vecVector );
                     break;
                 }
 
-                case PROPERTY_PERCENTSUBMERGED:
+                case HANDLING_PERCENTSUBMERGED:
                     bitStream.Read ( uiInt );
-                    HandlingElement.SetPercentSubmerged ( uiInt );
+                    pHandlingEntry->SetPercentSubmerged ( uiInt );
                     break;
 
-                case PROPERTY_TRACTIONMULTIPLIER:
+                case HANDLING_TRACTIONMULTIPLIER:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetTractionMultiplier ( fFloat );
+                    pHandlingEntry->SetTractionMultiplier ( fFloat );
                     break;
 
-                case PROPERTY_DRIVETYPE:
+                case HANDLING_DRIVETYPE:
                 {
                     bitStream.Read ( ucChar );
                     if ( ucChar != CHandlingEntry::FOURWHEEL &&
@@ -175,11 +134,11 @@ void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
                         ucChar = CHandlingEntry::RWD;
                     }
 
-                    HandlingElement.SetDriveType ( static_cast < CHandlingEntry::eDriveType > ( ucChar ) );
+                    pHandlingEntry->SetCarDriveType ( static_cast < CHandlingEntry::eDriveType > ( ucChar ) );
                     break;
                 }
 
-                case PROPERTY_ENGINETYPE:
+                case HANDLING_ENGINETYPE:
                 {
                     bitStream.Read ( ucChar );
                     if ( ucChar != CHandlingEntry::DIESEL &&
@@ -189,136 +148,318 @@ void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
                         ucChar = CHandlingEntry::PETROL;
                     }
 
-                    HandlingElement.SetEngineType ( static_cast < CHandlingEntry::eEngineType > ( ucChar ) );
+                    pHandlingEntry->SetCarEngineType ( static_cast < CHandlingEntry::eEngineType > ( ucChar ) );
                     break;
                 }
 
-                case PROPERTY_NUMOFGEARS:
+                case HANDLING_NUMOFGEARS:
                     bitStream.Read ( ucChar );
-                    HandlingElement.SetNumberOfGears ( ucChar );
+                    pHandlingEntry->SetNumberOfGears ( ucChar );
                     break;
 
-                case PROPERTY_ENGINEACCELLERATION:
+                case HANDLING_ENGINEACCELLERATION:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetEngineAccelleration ( fFloat );
+                    pHandlingEntry->SetEngineAccelleration ( fFloat );
                     break;
 
-                case PROPERTY_ENGINEINERTIA:
+                case HANDLING_ENGINEINERTIA:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetEngineInertia ( fFloat );
+                    pHandlingEntry->SetEngineInertia ( fFloat );
                     break;
 
-                case PROPERTY_MAXVELOCITY:
+                case HANDLING_MAXVELOCITY:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetMaxVelocity ( fFloat );
+                    pHandlingEntry->SetMaxVelocity ( fFloat );
                     break;
 
-                case PROPERTY_BRAKEDECELLERATION:
+                case HANDLING_BRAKEDECELLERATION:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetBrakeDecelleration ( fFloat );
+                    pHandlingEntry->SetBrakeDecelleration ( fFloat );
                     break;
 
-                case PROPERTY_BRAKEBIAS:
+                case HANDLING_BRAKEBIAS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetBrakeBias ( fFloat );
+                    pHandlingEntry->SetBrakeBias ( fFloat );
                     break;
 
-                case PROPERTY_ABS:
+                case HANDLING_ABS:
                     bitStream.Read ( ucChar );
-                    HandlingElement.SetABS ( ucChar != 0 );
+                    pHandlingEntry->SetABS ( ucChar != 0 );
                     break;
 
-                case PROPERTY_STEERINGLOCK:
+                case HANDLING_STEERINGLOCK:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSteeringLock ( fFloat );
+                    pHandlingEntry->SetSteeringLock ( fFloat );
                     break;
 
-                case PROPERTY_TRACTIONLOSS:
+                case HANDLING_TRACTIONLOSS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetTractionLoss ( fFloat );
+                    pHandlingEntry->SetTractionLoss ( fFloat );
                     break;
 
-                case PROPERTY_TRACTIONBIAS:
+                case HANDLING_TRACTIONBIAS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetTractionBias ( fFloat );
+                    pHandlingEntry->SetTractionBias ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_FORCELEVEL:
+                case HANDLING_SUSPENSION_FORCELEVEL:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionForceLevel ( fFloat );
+                    pHandlingEntry->SetSuspensionForceLevel ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_DAMPING:
+                case HANDLING_SUSPENSION_DAMPING:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionDamping ( fFloat );
+                    pHandlingEntry->SetSuspensionDamping ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_HIGHSPEEDDAMPING:
+                case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionHighSpeedDamping ( fFloat );
+                    pHandlingEntry->SetSuspensionHighSpeedDamping ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_UPPER_LIMIT:
+                case HANDLING_SUSPENSION_UPPER_LIMIT:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionUpperLimit ( fFloat );
+                    pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_LOWER_LIMIT:
+                case HANDLING_SUSPENSION_LOWER_LIMIT:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionLowerLimit ( fFloat );
+                    pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_FRONTREARBIAS:
+                case HANDLING_SUSPENSION_FRONTREARBIAS:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionFrontRearBias ( fFloat );
+                    pHandlingEntry->SetSuspensionFrontRearBias ( fFloat );
                     break;
 
-                case PROPERTY_SUSPENSION_ANTIDIVEMULTIPLIER:
+                case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSuspensionAntidiveMultiplier ( fFloat );
+                    pHandlingEntry->SetSuspensionAntidiveMultiplier ( fFloat );
                     break;
 
-                case PROPERTY_COLLISIONDAMAGEMULTIPLIER:
+                case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetCollisionDamageMultiplier ( fFloat );
+                    pHandlingEntry->SetCollisionDamageMultiplier ( fFloat );
                     break;
 
-                case PROPERTY_SEATOFFSETDISTANCE:
+                case HANDLING_SEATOFFSETDISTANCE:
                     bitStream.Read ( fFloat );
-                    HandlingElement.SetSeatOffsetDistance ( fFloat );
+                    pHandlingEntry->SetSeatOffsetDistance ( fFloat );
                     break;
 
-                case PROPERTY_HANDLINGFLAGS:
+                case HANDLING_MONETARY:
                     bitStream.Read ( uiInt );
-                    HandlingElement.SetHandlingFlags ( uiInt );
+                    pHandlingEntry->SetMonetary ( uiInt );
                     break;
 
-                case PROPERTY_MODELFLAGS:
+                case HANDLING_HANDLINGFLAGS:
                     bitStream.Read ( uiInt );
-                    HandlingElement.SetModelFlags ( uiInt );
+                    pHandlingEntry->SetHandlingFlags ( uiInt );
                     break;
 
-                case PROPERTY_HEADLIGHT:
+                case HANDLING_MODELFLAGS:
+                    bitStream.Read ( uiInt );
+                    pHandlingEntry->SetModelFlags ( uiInt );
+                    break;
+
+                case HANDLING_HEADLIGHT:
                     bitStream.Read ( ucChar );
                     if ( ucChar > CHandlingEntry::TALL )
                         ucChar = CHandlingEntry::TALL;
 
-                    HandlingElement.SetHeadLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
+                    pHandlingEntry->SetHeadLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
                     break;
 
-                case PROPERTY_TAILLIGHT:
+                case HANDLING_TAILLIGHT:
                     bitStream.Read ( ucChar );
                     if ( ucChar > CHandlingEntry::TALL )
                         ucChar = CHandlingEntry::TALL;
 
-                    HandlingElement.SetTailLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
+                    pHandlingEntry->SetTailLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
                     break;
 
-                case PROPERTY_ANIMGROUP:
+                case HANDLING_ANIMGROUP:
                     bitStream.Read ( ucChar );
-                    HandlingElement.SetAnimGroup ( ucChar );
+                    pHandlingEntry->SetAnimGroup ( ucChar );
                     break;
             }
+
+            Vehicle.ApplyHandling();
+        }
+    }
+}
+
+
+void CHandlingRPCs::RestoreVehicleHandlingProperty ( NetBitStreamInterface& bitStream )
+{
+    // Read out the handling id and property id
+    ElementID ID;
+    unsigned char ucProperty;
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucProperty ) )
+    {
+        // Grab it and check its type
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTVEHICLE )
+        {
+            // Grab the vehicle handling entry and the original handling
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pEntity );
+            CHandlingEntry* pHandlingEntry = Vehicle.GetHandlingData ();
+            const CHandlingEntry* pOriginalEntry = Vehicle.GetOriginalHandlingData ();
+
+            // Depending on what property
+            switch ( ucProperty )
+            {
+                case HANDLING_MASS:
+                    pHandlingEntry->SetMass ( pOriginalEntry->GetMass () );
+                    break;
+                    
+                case HANDLING_TURNMASS:
+                    pHandlingEntry->SetTurnMass ( pOriginalEntry->GetTurnMass () );
+                    break;
+
+                case HANDLING_DRAGCOEFF:
+                    pHandlingEntry->SetDragCoeff ( pOriginalEntry->GetDragCoeff () );
+                    break;
+
+                case HANDLING_CENTEROFMASS:
+                    pHandlingEntry->SetCenterOfMass ( pOriginalEntry->GetCenterOfMass () );
+                    break;
+
+                case HANDLING_PERCENTSUBMERGED:
+                    pHandlingEntry->SetPercentSubmerged ( pOriginalEntry->GetPercentSubmerged () );
+                    break;
+
+                case HANDLING_TRACTIONMULTIPLIER:
+                    pHandlingEntry->SetTractionMultiplier ( pOriginalEntry->GetTractionMultiplier () );
+                    break;
+
+                case HANDLING_DRIVETYPE:
+                    pHandlingEntry->SetCarDriveType ( pOriginalEntry->GetCarDriveType () );
+                    break;
+
+                case HANDLING_ENGINETYPE:
+                    pHandlingEntry->SetCarEngineType ( pOriginalEntry->GetCarEngineType () );
+                    break;
+
+                case HANDLING_NUMOFGEARS:
+                    pHandlingEntry->SetNumberOfGears ( pOriginalEntry->GetNumberOfGears () );
+                    break;
+
+                case HANDLING_ENGINEACCELLERATION:
+                    pHandlingEntry->SetEngineAccelleration ( pOriginalEntry->GetEngineAccelleration () );
+                    break;
+
+                case HANDLING_ENGINEINERTIA:
+                    pHandlingEntry->SetEngineInertia ( pOriginalEntry->GetEngineInertia () );
+                    break;
+
+                case HANDLING_MAXVELOCITY:
+                    pHandlingEntry->SetMaxVelocity ( pOriginalEntry->GetMaxVelocity () );
+                    break;
+
+                case HANDLING_BRAKEDECELLERATION:
+                    pHandlingEntry->SetBrakeDecelleration ( pOriginalEntry->GetBrakeDecelleration () );
+                    break;
+
+                case HANDLING_BRAKEBIAS:
+                    pHandlingEntry->SetBrakeBias ( pOriginalEntry->GetBrakeBias () );
+                    break;
+
+                case HANDLING_ABS:
+                    pHandlingEntry->SetABS ( pOriginalEntry->GetABS () );
+                    break;
+
+                case HANDLING_STEERINGLOCK:
+                    pHandlingEntry->SetSteeringLock ( pOriginalEntry->GetSteeringLock () );
+                    break;
+
+                case HANDLING_TRACTIONLOSS:
+                    pHandlingEntry->SetTractionLoss ( pOriginalEntry->GetTractionLoss () );
+                    break;
+
+                case HANDLING_TRACTIONBIAS:
+                    pHandlingEntry->SetTractionBias ( pOriginalEntry->GetTractionBias () );
+                    break;
+
+                case HANDLING_SUSPENSION_FORCELEVEL:
+                    pHandlingEntry->SetSuspensionForceLevel ( pOriginalEntry->GetSuspensionForceLevel () );
+                    break;
+
+                case HANDLING_SUSPENSION_DAMPING:
+                    pHandlingEntry->SetSuspensionDamping ( pOriginalEntry->GetSuspensionDamping () );
+                    break;
+
+                case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                    pHandlingEntry->SetSuspensionHighSpeedDamping ( pOriginalEntry->GetSuspensionHighSpeedDamping () );
+                    break;
+
+                case HANDLING_SUSPENSION_UPPER_LIMIT:
+                    pHandlingEntry->SetSuspensionUpperLimit ( pOriginalEntry->GetSuspensionUpperLimit () );
+                    break;
+
+                case HANDLING_SUSPENSION_LOWER_LIMIT:
+                    pHandlingEntry->SetSuspensionLowerLimit ( pOriginalEntry->GetSuspensionLowerLimit () );
+                    break;
+
+                case HANDLING_SUSPENSION_FRONTREARBIAS:
+                    pHandlingEntry->SetSuspensionFrontRearBias ( pOriginalEntry->GetSuspensionFrontRearBias () );
+                    break;
+
+                case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                    pHandlingEntry->SetSuspensionAntidiveMultiplier ( pOriginalEntry->GetSuspensionAntidiveMultiplier () );
+                    break;
+
+                case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                    pHandlingEntry->SetCollisionDamageMultiplier ( pOriginalEntry->GetCollisionDamageMultiplier () );
+                    break;
+
+                case HANDLING_SEATOFFSETDISTANCE:
+                    pHandlingEntry->SetSeatOffsetDistance ( pOriginalEntry->GetSeatOffsetDistance () );
+                    break;
+
+                case HANDLING_HANDLINGFLAGS:
+                    pHandlingEntry->SetHandlingFlags ( pOriginalEntry->GetHandlingFlags () );
+                    break;
+
+                case HANDLING_MODELFLAGS:
+                    pHandlingEntry->SetModelFlags ( pOriginalEntry->GetModelFlags () );
+                    break;
+
+                case HANDLING_HEADLIGHT:
+                    pHandlingEntry->SetHeadLight ( pOriginalEntry->GetHeadLight () );
+                    break;
+
+                case HANDLING_TAILLIGHT:
+                    pHandlingEntry->SetTailLight ( pOriginalEntry->GetTailLight () );
+                    break;
+
+                case HANDLING_ANIMGROUP:
+                    pHandlingEntry->SetAnimGroup ( pOriginalEntry->GetAnimGroup () );
+                    break;
+            }
+
+            Vehicle.ApplyHandling();
+        }
+    }
+}
+
+
+void CHandlingRPCs::RestoreVehicleHandling ( NetBitStreamInterface& bitStream )
+{
+    // Read out the handling id
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        // Grab it and check its type
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTVEHICLE )
+        {
+            // Grab the vehicle handling entry and restore all data
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pEntity );
+            Vehicle.GetHandlingData()->Restore();
+
+            Vehicle.ApplyHandling();
         }
     }
 }

@@ -721,14 +721,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientHandling.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandlingManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientManager.cpp"
 					>
 				</File>
@@ -1588,14 +1580,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientGUIManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandling.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandlingManager.h"
 					>
 				</File>
 				<File

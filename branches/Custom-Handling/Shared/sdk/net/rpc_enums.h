@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -167,9 +168,9 @@ enum eRPCFunctions
 
     REMOVE_ELEMENT_DATA,
 
-    HANDLING_SET_DEFAULT,
-    HANDLING_RESTORE_DEFAULT,
-    HANDLING_SET_PROPERTY,
+    SET_VEHICLE_HANDLING_PROPERTY,
+    RESET_VEHICLE_HANDLING_PROPERTY,
+    RESET_VEHICLE_HANDLING,
 
     TOGGLE_DEBUGGER,
 

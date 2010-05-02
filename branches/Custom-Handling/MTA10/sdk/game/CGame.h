@@ -120,7 +120,7 @@ public:
     virtual CCarEnterExit       * GetCarEnterExit()=0;
     virtual CControllerConfigManager * GetControllerConfigManager() = 0;
     virtual CRenderWare         * GetRenderWare()=0;
-    virtual IHandlingManager    * GetHandlingManager () = 0;
+    virtual CHandlingManager    * GetHandlingManager () = 0;
     virtual CAnimManager        * GetAnimManager () = 0;
     virtual CStreaming          * GetStreaming () = 0;
     virtual CVisibilityPlugins  * GetVisibilityPlugins () = 0;

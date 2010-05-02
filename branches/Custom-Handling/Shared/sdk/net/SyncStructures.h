@@ -1348,6 +1348,146 @@ private:
 
 //////////////////////////////////////////
 //                                      //
+//           Vehicle handling           //
+//                                      //
+//////////////////////////////////////////
+struct SVehicleHandlingSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if (
+            bitStream.Read ( data.fMass ) &&
+            bitStream.Read ( data.fTurnMass ) &&
+            bitStream.Read ( data.fDragCoeff ) &&
+            bitStream.Read ( data.vecCenterOfMass.fX ) &&
+            bitStream.Read ( data.vecCenterOfMass.fY ) &&
+            bitStream.Read ( data.vecCenterOfMass.fZ ) &&
+            bitStream.Read ( data.uiPercentSubmerged ) &&
+            bitStream.Read ( data.fTractionMultiplier ) &&
+            bitStream.Read ( data.ucDriveType ) &&
+            bitStream.Read ( data.ucEngineType ) &&
+            bitStream.Read ( data.ucNumberOfGears ) &&
+            bitStream.Read ( data.fEngineAccelleration ) &&
+            bitStream.Read ( data.fEngineInertia ) &&
+            bitStream.Read ( data.fMaxVelocity ) &&
+            bitStream.Read ( data.fBrakeDecelleration ) &&
+            bitStream.Read ( data.fBrakeBias ) &&
+            bitStream.Read ( data.ucABS ) &&
+            bitStream.Read ( data.fSteeringLock ) &&
+            bitStream.Read ( data.fTractionLoss ) &&
+            bitStream.Read ( data.fTractionBias ) &&
+            bitStream.Read ( data.fSuspensionForceLevel ) &&
+            bitStream.Read ( data.fSuspensionDamping ) &&
+            bitStream.Read ( data.fSuspensionHighSpdDamping ) &&
+            bitStream.Read ( data.fSuspensionUpperLimit ) &&
+            bitStream.Read ( data.fSuspensionLowerLimit ) &&
+            bitStream.Read ( data.fSuspensionFrontRearBias ) &&
+            bitStream.Read ( data.fSuspensionAntidiveMultiplier ) &&
+            bitStream.Read ( data.fCollisionDamageMultiplier ) &&
+            bitStream.Read ( data.uiModelFlags ) &&
+            bitStream.Read ( data.uiHandlingFlags ) &&
+            bitStream.Read ( data.fSeatOffsetDistance ) &&
+            bitStream.Read ( data.uiMonetary ) &&
+            bitStream.Read ( data.ucHeadLight ) &&
+            bitStream.Read ( data.ucTailLight ) &&
+            bitStream.Read ( data.ucAnimGroup )
+            )
+            return true;
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.Write ( data.fMass );
+        bitStream.Write ( data.fTurnMass );
+        bitStream.Write ( data.fDragCoeff );
+        bitStream.Write ( data.vecCenterOfMass.fX );
+        bitStream.Write ( data.vecCenterOfMass.fY );
+        bitStream.Write ( data.vecCenterOfMass.fZ );
+        bitStream.Write ( data.uiPercentSubmerged );
+        bitStream.Write ( data.fTractionMultiplier );
+        bitStream.Write ( data.ucDriveType );
+        bitStream.Write ( data.ucEngineType );
+        bitStream.Write ( data.ucNumberOfGears );
+        bitStream.Write ( data.fEngineAccelleration );
+        bitStream.Write ( data.fEngineInertia );
+        bitStream.Write ( data.fMaxVelocity );
+        bitStream.Write ( data.fBrakeDecelleration );
+        bitStream.Write ( data.fBrakeBias );
+        bitStream.Write ( data.ucABS );
+        bitStream.Write ( data.fSteeringLock );
+        bitStream.Write ( data.fTractionLoss );
+        bitStream.Write ( data.fTractionBias );
+        bitStream.Write ( data.fSuspensionForceLevel );
+        bitStream.Write ( data.fSuspensionDamping );
+        bitStream.Write ( data.fSuspensionHighSpdDamping );
+        bitStream.Write ( data.fSuspensionUpperLimit );
+        bitStream.Write ( data.fSuspensionLowerLimit );
+        bitStream.Write ( data.fSuspensionFrontRearBias );
+        bitStream.Write ( data.fSuspensionAntidiveMultiplier );
+        bitStream.Write ( data.fCollisionDamageMultiplier );
+        bitStream.Write ( data.uiModelFlags );
+        bitStream.Write ( data.uiHandlingFlags );
+        bitStream.Write ( data.fSeatOffsetDistance );
+        bitStream.Write ( data.uiMonetary );
+        bitStream.Write ( data.ucHeadLight );
+        bitStream.Write ( data.ucTailLight );
+        bitStream.Write ( data.ucAnimGroup );
+    }
+
+    struct
+    {
+        float           fMass;                          // +4
+
+        float           fTurnMass;                      // +12
+        float           fDragCoeff;                     // +16
+        CVector         vecCenterOfMass;                // +20
+        unsigned int    uiPercentSubmerged;             // +32
+
+        float           fTractionMultiplier;            // +40
+
+        unsigned char   ucDriveType;                    // +112
+        unsigned char   ucEngineType;                   // +113
+        unsigned char   ucNumberOfGears;                // +114
+
+        float           fEngineAccelleration;           // +120     (value in handling.cfg * 0x86A950)
+        float           fEngineInertia;                 // +124
+        float           fMaxVelocity;                   // +128
+
+        float           fBrakeDecelleration;            // +148
+        float           fBrakeBias;                     // +152
+        unsigned char   ucABS;                           // +156
+
+        float           fSteeringLock;                  // +160
+        float           fTractionLoss;                  // +164
+        float           fTractionBias;                  // +168
+
+        float           fSuspensionForceLevel;          // +172
+        float           fSuspensionDamping;             // +176
+        float           fSuspensionHighSpdDamping;      // +180
+        float           fSuspensionUpperLimit;          // +184
+        float           fSuspensionLowerLimit;          // +188
+        float           fSuspensionFrontRearBias;       // +192
+        float           fSuspensionAntidiveMultiplier;  // +196
+
+        float           fCollisionDamageMultiplier;     // +200
+
+        unsigned int    uiModelFlags;                   // +204
+        unsigned int    uiHandlingFlags;                // +208
+        float           fSeatOffsetDistance;            // +212
+        unsigned int    uiMonetary;                     // +216
+
+        unsigned char   ucHeadLight;                    // +220
+        unsigned char   ucTailLight;                    // +221
+        unsigned char   ucAnimGroup;                    // +222
+    } data;
+};
+
+
+
+//////////////////////////////////////////
+//                                      //
 //           Explosion type             //
 //                                      //
 //////////////////////////////////////////

@@ -73,16 +73,6 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     // only applicable for CAutomobile based vehicles (i.e. not bikes or boats, but includes planes, helis etc)
     this->damageManager = new CDamageManagerSA ( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
-
-    // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
-    // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
-    // per car later.
-    /*CHandlingEntry* pEntry = pGame->GetHandlingManager ()->CreateHandlingData ();
-    //CHandlingEntry* pEntry = pGame->GetHandlingManager ()->GetHandlingData ( dwModelID );
-    pEntry->ApplyHandlingData ( pGame->GetHandlingManager ()->GetHandlingData ( dwModelID ) );  // We need to do that so vehicle handling wont get corrupted
-    SetHandlingData ( pEntry );
-    pEntry->Recalculate ();*/
-
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );

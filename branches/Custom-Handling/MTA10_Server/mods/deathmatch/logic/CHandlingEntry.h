@@ -2,25 +2,24 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CHandlingEntrySA.h
+*  FILE:        mods/deathmatch/logic/CHandlingEntry.h
 *  PURPOSE:     Header file for vehicle handling data entry class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               The_GTA <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-#ifndef __CGAMESA_CHANDLINGENTRY
-#define __CGAMESA_CHANDLINGENTRY
+class CHandlingEntry;
 
-#include <game/CHandlingEntry.h>
-#include "Common.h"
+#ifndef __CHANDLINGENTRY_H
+#define __CHANDLINGENTRY_H
 
 class CTransmissionSAInterface
 {
 public:
-    float           fUnknown  [18];                 // +40
 
     unsigned char   ucDriveType         :8;         // +112
     unsigned char   ucEngineType        :8;         // +113
@@ -33,23 +32,19 @@ public:
     float           fEngineInertia;                 // +124
     float           fMaxVelocity;                   // +128
 
-    float           fUnknown2 [3];                  // +132
 };
 
-struct tHandlingDataSA
+struct tHandlingData
 {
     int             iVehicleID;                     // +0
 
     float           fMass;                          // +4
 
-    float           fUnknown1;                      // +8    Automatically calculated
 
     float           fTurnMass;                      // +12
     float           fDragCoeff;                     // +16
     CVector         vecCenterOfMass;                // +20
     unsigned int    uiPercentSubmerged;             // +32
-
-    float           fUnknown2;                      // +36  Automatically calculated
 
     float           fTractionMultiplier;            // +40
 
@@ -80,20 +75,41 @@ struct tHandlingDataSA
     unsigned char   ucHeadLight     : 8;            // +220
     unsigned char   ucTailLight     : 8;            // +221
     unsigned char   ucAnimGroup     : 8;            // +222
-    unsigned char   ucUnused        : 8;            // +223
 };
 
 
-class CHandlingEntrySA : public CHandlingEntry
+class CHandlingEntry
 {
 public:
+    enum eDriveType
+    {
+        FOURWHEEL = '4',
+        FWD = 'F',
+        RWD = 'R'
+    };
+
+    enum eEngineType
+    {
+        PETROL = 'P',
+        DIESEL = 'D',
+        ELECTRIC = 'E'
+    };
+
+    enum eLightType
+    {
+        LONG,
+        SMALL,
+        BIG,
+        TALL,
+    };
+
                     // Constructor for creatable dummy entries
-                    CHandlingEntrySA                ( void );
+                    CHandlingEntry                ( void ){};
 
                     // Constructor for original entries
-                    CHandlingEntrySA                ( tHandlingDataSA* pOriginal );
+                    CHandlingEntry                ( tHandlingData* pOriginal );
 
-    virtual         ~CHandlingEntrySA               ( void );
+                    ~CHandlingEntry               ( void ){};
 
     // Use this to copy data from an another handling class to this
     void            ApplyHandlingData               ( CHandlingEntry* pData );
@@ -187,19 +203,8 @@ public:
     void            SetTailLight                    ( eLightType Style )            { m_Handling.ucTailLight = Style; };
     void            SetAnimGroup                    ( unsigned char ucGroup )       { m_Handling.ucAnimGroup = ucGroup; };
 
-    void            Recalculate                     ( void );
-
-    void            Restore                         ( void );
-
-    tHandlingDataSA*    GetInterface                ( void )                        { return m_pHandlingSA; };
-
 private:
-    tHandlingDataSA*        m_pHandlingSA;
-    bool                    m_bDeleteInterface;
-
-    tHandlingDataSA         m_Handling;
-
-    tHandlingDataSA*        m_pOriginalData;
+    tHandlingData         m_Handling;
 };
 
 #endif

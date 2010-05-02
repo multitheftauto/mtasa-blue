@@ -160,7 +160,7 @@
 #include "CGame.h"
 #include "CGroups.h"
 #include "CHTTPD.h"
-#include "CHandling.h"
+#include "CHandlingEntry.h"
 #include "CHandlingManager.h"
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"

@@ -4024,6 +4024,262 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle,
 }
 
 
+bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    if ( eProperty == HANDLING_CENTEROFMASS )
+    {
+        vecValue = pEntry->GetCenterOfMass ();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, float &fValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    if ( GetEntryHandling ( pEntry, eProperty, fValue ) )
+        return true;
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    if ( GetEntryHandling ( pEntry, eProperty, strValue ) )
+        return true;
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool origin )
+{
+    CHandlingEntry* pEntry = new CHandlingEntry ();
+    if ( origin )
+        pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetOriginalHandlingData( eModel );
+    else
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData( eModel );
+
+    if ( eProperty == HANDLING_CENTEROFMASS )
+    {
+        vecValue = pEntry->GetCenterOfMass ();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, float &fValue, bool origin )
+{
+    CHandlingEntry* pEntry = new CHandlingEntry ();
+    if ( origin )
+        pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetOriginalHandlingData( eModel );
+    else
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData( eModel );
+
+    if ( GetEntryHandling ( pEntry, eProperty, fValue ) )
+        return true;
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool origin )
+{
+    CHandlingEntry* pEntry = new CHandlingEntry ();
+    if ( origin )
+        pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetOriginalHandlingData( eModel );
+    else
+        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData( eModel );
+
+    if ( GetEntryHandling ( pEntry, eProperty, strValue ) )
+        return true;
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float &fValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_MASS:
+                fValue = pEntry->GetMass ();
+                break;
+            case HANDLING_TURNMASS:
+                fValue = pEntry->GetTurnMass ();
+                break;
+            case HANDLING_DRAGCOEFF:
+                fValue = pEntry->GetDragCoeff ();
+                break;
+            case HANDLING_TRACTIONMULTIPLIER:
+                fValue = pEntry->GetTractionMultiplier ();
+                break;
+            case HANDLING_ENGINEACCELLERATION:
+                fValue = pEntry->GetEngineAccelleration ();
+                break;
+            case HANDLING_ENGINEINERTIA:
+                fValue = pEntry->GetEngineInertia ();
+                break;
+            case HANDLING_MAXVELOCITY:
+                fValue = pEntry->GetMaxVelocity ();
+                break;
+            case HANDLING_BRAKEDECELLERATION:
+                fValue = pEntry->GetBrakeDecelleration ();
+                break;
+            case HANDLING_BRAKEBIAS:
+                fValue = pEntry->GetBrakeBias ();
+                break;
+            case HANDLING_STEERINGLOCK:
+                fValue = pEntry->GetSteeringLock ();
+                break;
+            case HANDLING_TRACTIONLOSS:
+                fValue = pEntry->GetTractionLoss ();
+                break;
+            case HANDLING_TRACTIONBIAS:
+                fValue = pEntry->GetTractionBias ();
+                break;
+            case HANDLING_SUSPENSION_FORCELEVEL:
+                fValue = pEntry->GetSuspensionForceLevel ();
+                break;
+            case HANDLING_SUSPENSION_DAMPING:
+                fValue = pEntry->GetSuspensionDamping ();
+                break;
+            case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                fValue = pEntry->GetSuspensionHighSpeedDamping ();
+                break;
+            case HANDLING_SUSPENSION_UPPER_LIMIT:
+                fValue = pEntry->GetSuspensionUpperLimit ();
+                break;
+            case HANDLING_SUSPENSION_LOWER_LIMIT:
+                fValue = pEntry->GetSuspensionLowerLimit ();
+                break;
+            case HANDLING_SUSPENSION_FRONTREARBIAS:
+                fValue = pEntry->GetSuspensionFrontRearBias ();
+                break;
+            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                fValue = pEntry->GetSuspensionAntidiveMultiplier ();
+                break;
+            case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                fValue = pEntry->GetCollisionDamageMultiplier ();
+                break;
+            case HANDLING_SEATOFFSETDISTANCE:
+                fValue = pEntry->GetSeatOffsetDistance ();
+                break;
+            case HANDLING_PERCENTSUBMERGED: // unsigned int
+                fValue = (float)pEntry->GetPercentSubmerged ();
+                break;
+            case HANDLING_MONETARY:
+                fValue = (float)pEntry->GetMonetary ();
+                break;
+            case HANDLING_HANDLINGFLAGS:
+                fValue = (float)pEntry->GetHandlingFlags ();
+                break;
+            case HANDLING_MODELFLAGS:
+                fValue = (float)pEntry->GetModelFlags ();
+                break;
+            case HANDLING_NUMOFGEARS: // unsigned char
+                fValue = (float)pEntry->GetNumberOfGears ();
+                break;
+            case HANDLING_ANIMGROUP:
+                fValue = (float)pEntry->GetAnimGroup ();
+                break;
+            case HANDLING_ABS: // bool
+                fValue = (float)(pEntry->GetABS () ? 1 : 0);
+                break;
+            default:
+                return false;
+        }
+    }
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_DRIVETYPE:
+            {
+                CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
+                if ( eDriveType == CHandlingEntry::eDriveType::FWD )
+                    strValue = "fwd";
+                else if ( eDriveType == CHandlingEntry::eDriveType::RWD )
+                    strValue = "rwd";
+                else if (eDriveType == CHandlingEntry::eDriveType::FOURWHEEL )
+                    strValue = "awd";
+                else
+                    return false;
+                break;
+            }
+            case HANDLING_ENGINETYPE:
+            {
+                CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
+                if ( eEngineType == CHandlingEntry::eEngineType::PETROL )
+                    strValue = "petrol";
+                else if ( eEngineType == CHandlingEntry::eEngineType::DIESEL )
+                    strValue = "diesel";
+                else if ( eEngineType == CHandlingEntry::eEngineType::ELECTRIC )
+                    strValue = "electric";
+                else
+                    return false;
+                break;
+            }
+            case HANDLING_HEADLIGHT:
+            {
+                CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
+                if ( eHeadType == CHandlingEntry::eLightType::SMALL )
+                    strValue = "small";
+                else if ( eHeadType == CHandlingEntry::eLightType::LONG )
+                    strValue = "long";
+                else if ( eHeadType == CHandlingEntry::eLightType::BIG )
+                    strValue = "big";
+                else if ( eHeadType == CHandlingEntry::eLightType::TALL )
+                    strValue = "tall";
+                else
+                    return false;
+                break;
+            }
+            case HANDLING_TAILLIGHT:
+            {
+                CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
+                if ( eTailType == CHandlingEntry::eLightType::SMALL )
+                    strValue = "small";
+                else if ( eTailType == CHandlingEntry::eLightType::LONG )
+                    strValue = "long";
+                else if ( eTailType == CHandlingEntry::eLightType::BIG )
+                    strValue = "big";
+                else if ( eTailType == CHandlingEntry::eLightType::TALL )
+                    strValue = "tall";
+                else
+                    return false;
+                break;
+            }
+            default:
+                return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
     assert ( pElement );
@@ -4957,6 +5213,244 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
 
     return true;
 }
+
+bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, bool bValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+    if ( pEntry->GetABS () == bValue )
+        return false;
+
+    pEntry->SetABS ( bValue );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( HANDLING_ABS );
+    BitStream.pBitStream->Write ( bValue );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue )
+{
+    assert ( pVehicle );
+    
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    
+    switch ( eProperty )
+    {
+    case HANDLING_MASS:
+        if ( pEntry->GetMass () == fValue )
+            return false;
+        pEntry->SetMass ( fValue );
+        break;
+    case HANDLING_TURNMASS:
+        if ( pEntry->GetTurnMass () == fValue )
+            return false;
+        pEntry->SetTurnMass ( fValue );
+        break;
+    case HANDLING_DRAGCOEFF:
+        if ( pEntry->GetDragCoeff () == fValue )
+            return false;
+        pEntry->SetDragCoeff ( fValue );
+        break;
+    case HANDLING_PERCENTSUBMERGED:
+        if ( pEntry->GetPercentSubmerged () == fValue )
+            return false;
+        pEntry->SetPercentSubmerged ( fValue );
+        break;
+    case HANDLING_TRACTIONMULTIPLIER:
+        if ( pEntry->GetTractionMultiplier () == fValue )
+            return false;
+        pEntry->SetTractionMultiplier ( fValue );
+        break;
+    /*case HANDLING_DRIVETYPE:
+        if ( pEntry->GetCarDriveType () == fValue )
+            return false;
+        pEntry->SetCarDriveType ( fValue );
+        break;
+    case HANDLING_ENGINETYPE:
+        if ( pEntry->GetCarEngineType () == fValue )
+            return false;
+        pEntry->SetCarEngineType ( fValue );
+        break;*/
+    case HANDLING_NUMOFGEARS:
+        if ( pEntry->GetNumberOfGears () == fValue )
+            return false;
+        pEntry->SetNumberOfGears ( fValue );
+        break;
+    case HANDLING_ENGINEACCELLERATION:
+        if ( pEntry->GetEngineAccelleration () == fValue )
+            return false;
+        pEntry->SetEngineAccelleration ( fValue );
+        break;
+    case HANDLING_ENGINEINERTIA:
+        if ( pEntry->GetEngineInertia () == fValue )
+            return false;
+        pEntry->SetEngineInertia ( fValue );
+        break;
+    case HANDLING_MAXVELOCITY:
+        if ( pEntry->GetMaxVelocity () == fValue )
+            return false;
+        pEntry->SetMaxVelocity ( fValue );
+        break;
+    case HANDLING_BRAKEDECELLERATION:
+        if ( pEntry->GetBrakeDecelleration () == fValue )
+            return false;
+        pEntry->SetBrakeDecelleration ( fValue );
+        break;
+    case HANDLING_BRAKEBIAS:
+        if ( pEntry->GetBrakeBias () == fValue )
+            return false;
+        pEntry->SetBrakeBias ( fValue );
+        break;
+    case HANDLING_STEERINGLOCK:
+        if ( pEntry->GetSteeringLock () == fValue )
+            return false;
+        pEntry->SetSteeringLock ( fValue );
+    case HANDLING_TRACTIONLOSS:
+        if ( pEntry->GetTractionLoss () == fValue )
+            return false;
+        pEntry->SetTractionLoss ( fValue );
+        break;
+    case HANDLING_TRACTIONBIAS:
+        if ( pEntry->GetTractionBias () == fValue )
+            return false;
+        pEntry->SetTractionBias ( fValue );
+        break;
+    case HANDLING_SUSPENSION_FORCELEVEL:
+        if ( pEntry->GetSuspensionForceLevel () == fValue )
+            return false;
+        pEntry->SetSuspensionForceLevel ( fValue );
+        break;
+    case HANDLING_SUSPENSION_DAMPING:
+        if ( pEntry->GetSuspensionDamping () == fValue )
+            return false;
+        pEntry->SetSuspensionDamping ( fValue );
+        break;
+    case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+        if ( pEntry->GetSuspensionHighSpeedDamping () == fValue )
+            return false;
+        pEntry->SetSuspensionHighSpeedDamping ( fValue );
+        break;
+    case HANDLING_SUSPENSION_UPPER_LIMIT:
+        if ( pEntry->GetSuspensionUpperLimit () == fValue )
+            return false;
+        pEntry->SetSuspensionUpperLimit ( fValue );
+        break;
+    case HANDLING_SUSPENSION_LOWER_LIMIT:
+        if ( pEntry->GetSuspensionLowerLimit () == fValue )
+            return false;
+        pEntry->SetSuspensionLowerLimit ( fValue );
+        break;
+    case HANDLING_SUSPENSION_FRONTREARBIAS:
+        if ( pEntry->GetSuspensionFrontRearBias () == fValue )
+            return false;
+        pEntry->SetSuspensionFrontRearBias ( fValue );
+        break;
+    case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+        if ( pEntry->GetSuspensionAntidiveMultiplier () == fValue )
+            return false;
+        pEntry->SetSuspensionAntidiveMultiplier ( fValue );
+        break;
+    case HANDLING_SEATOFFSETDISTANCE:
+        if ( pEntry->GetSeatOffsetDistance () == fValue )
+            return false;
+        pEntry->SetSeatOffsetDistance ( fValue );
+        break;
+    case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+        if ( pEntry->GetCollisionDamageMultiplier () == fValue )
+            return false;
+        pEntry->SetCollisionDamageMultiplier ( fValue );
+        break;
+    /*case HANDLING_HANDLINGFLAGS:
+        if ( pEntry->GetHandlingFlags () == fValue )
+            return false;
+        pEntry->SetHandlingFlags ( fValue );
+        break;
+    case HANDLING_MODELFLAGS:
+        if ( pEntry->GetModelFlags () == fValue )
+            return false;
+        pEntry->SetModelFlags ( fValue );
+        break;
+    case HANDLING_HEADLIGHT:
+        if ( pEntry->GetHeadLight () == fValue )
+            return false;
+        pEntry->SetHeadLight ( fValue );
+        break;
+    case HANDLING_TAILLIGHT:
+        if ( pEntry->GetTailLight () == fValue )
+            return false;
+        pEntry->SetTailLight ( fValue );
+        break;
+    case HANDLING_ANIMGROUP:
+        if ( pEntry->GetAnimGroup () == fValue )
+            return false;
+        pEntry->SetAnimGroup ( fValue );*/
+        break;
+    default:
+        return false;
+    }
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pVehicle->GetID () );
+        BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+        BitStream.pBitStream->Write ( fValue );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+        return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, CVector vecValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+        if ( pEntry->GetCenterOfMass () == vecValue )
+            return false;
+        pEntry->SetCenterOfMass ( vecValue );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( HANDLING_CENTEROFMASS );
+    BitStream.pBitStream->Write ( vecValue.fX );
+    BitStream.pBitStream->Write ( vecValue.fY );
+    BitStream.pBitStream->Write ( vecValue.fZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+/*bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( CVehicle* pVehicle, eHandlingProperty eProperty )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+    if ( !pVehicle->IsDefaultHandling ( eProperty  )
+    {
+        pVehicle->SetDefaultHandling ( eProperty );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pVehicle->GetID () );
+        BitStream.pBitStream->Write ( eProperty );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+    }
+}
+
+bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    pEntry->ApplyHandlingData ( pVehicle->GetOriginalHandlingData () );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
+}*/
 
 
 CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo )

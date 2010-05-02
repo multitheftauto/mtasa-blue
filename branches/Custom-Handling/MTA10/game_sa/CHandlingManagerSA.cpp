@@ -26,9 +26,7 @@
 DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
 
 tHandlingDataSA CHandlingManagerSA::m_OriginalHandlingData [HT_MAX];
-CHandlingEntrySA* CHandlingManagerSA::m_pEntries [HT_MAX];
 CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries [HT_MAX];  
-tHandlingDataSA CHandlingManagerSA::m_RealHandlingData [HT_MAX];
 
 // Use the following code to dump handling data unrecalculated on GTA load.
 // NB: You need to disable the other hook in the constructor of the manager and uncomment the other
@@ -108,66 +106,11 @@ __declspec(naked) void Hook_Calculate ( void )
     }
 }
 
-// Fixme: Does return Vehicledata, I guess
-CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingTable ( eHandlingTypes eHandling )
-{
-    tHandlingDataSA* pRet;
-    // GTA has a function for that
-    BYTE ucID = (BYTE)eHandling;
-    __asm
-    {
-        mov     ecx,ARRAY_HANDLINGDATA
-        xor     eax,eax
-        mov     al,ucID
-        mov     ebx,Func_GetOriginalHandling
-        push    eax
-        call    ebx
-        mov     pRet,eax
-    }
-    //return (CHandlingEntry*)pRet;
-    return m_pEntries[eHandling];
-}
-
-// Fixme: Retrives vehicle type specific handlingdata
-CHandlingEntry* CHandlingManagerSA::GetPreviousHandlingTable ( eHandlingTypes eHandling )
-{
-    tHandlingDataSA* pRet;
-    // Well, as above :P
-    BYTE ucID = (BYTE)eHandling;
-    __asm
-    {
-        mov     ecx,ARRAY_HANDLINGDATA
-        xor     eax,eax
-        mov     al,ucID
-        mov     ebx,Func_GetPreviousHandling
-        push    eax
-        call    ebx
-        mov     pRet,eax
-    }
-    //return pRet;
-    return m_pEntries[eHandling-1];
-}
-
-float CHandlingManagerSA::GetDragMultiplier ( void )
-{
-    return *(float*)(Var_fTurnMassMultiplier);
-}
-
-float CHandlingManagerSA::GetBasicDragCoeff ( void )
-{
-    return *(float*)(Var_fBasicDragCoeff);
-}
 
 CHandlingManagerSA::CHandlingManagerSA ( void )
 {
     // Initialize all default handlings
     InitializeDefaultHandlings ();
-
-    // Create a handling entry for every handling data.
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        m_pEntries [i] = new CHandlingEntrySA ( &m_RealHandlingData [i], &m_OriginalHandlingData[i]);
-    }
 
     // Create a handling entry for every original handling data.
     for ( int i = 0; i < HT_MAX; i++ )
@@ -195,81 +138,12 @@ CHandlingManagerSA::~CHandlingManagerSA ( void )
     {
         delete m_pOriginalEntries [i];
     }
-
-    // Destroy all handling entries
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        delete m_pEntries [i];
-    }
-}
-
-
-void CHandlingManagerSA::LoadDefaultHandlings ( void )
-{
-    // Create a handling entry for every handling data
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        m_pEntries [i]->Restore ();
-    }    
 }
 
 
 CHandlingEntry* CHandlingManagerSA::CreateHandlingData ( void )
 {
     return new CHandlingEntrySA ();
-}
-
-
-bool CHandlingManagerSA::ApplyHandlingData ( enum eVehicleTypes eModel, CHandlingEntry* pEntry )
-{
-    // Within range?
-    if ( eModel >= 400 && eModel < VT_MAX )
-    {
-        // Apply the data and return success
-        m_pEntries [GetHandlingID(eModel)]->ApplyHandlingData ( pEntry );
-        return true;
-    }
-
-    // Failed
-    return false;
-}
-
-
-/*bool CHandlingManagerSA::ApplyHandlingData ( CVehicle* pVehicle, CHandlingEntry* pEntry )
-{
-    // Create new handling and apply it
-    // Those entry have a higher priority than those global ones
-    //CHandlingEntrySA* pEntrySA = new CHandlingEntrySA;
-    //pEntrySA->ApplyHandlingData ( pEntry );
-    pVehicle->SetHandlingData ( pEntry );
-}*/
-
-/*bool CHandlingManagerSA::ApplyHandlingData ( CVehicleSA *pVehicle, CHandlingEntry* pEntry )
-{
-    
-}
-
-
-void CHandlingManagerSA::RemoveFromVeh ( CVehicle* pVeh )
-{
-    std::list < CHandlingEntrySA* > ::iterator iter = m_HandlingList.begin ();
-    for ( ; iter != m_HandlingList.end (); iter++ )
-    {
-        (*iter)->RemoveFromVeh
-    }
-}*/
-
-
-CHandlingEntry* CHandlingManagerSA::GetHandlingData ( eVehicleTypes eModel )
-{
-    // Within range?
-    if ( eModel >= 400 && eModel < VT_MAX )
-    {
-        // Return it
-        return m_pEntries [GetHandlingID(eModel)];
-    }
-
-    return NULL;
 }
 
 
@@ -507,69 +381,6 @@ eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
 }
 
 
-void CHandlingManagerSA::LoadHandlingCfg ( void )
-{
-    // This is when GTA loads its default handlings. We do that for GTA so handling.cfg
-    // is not used anymore.
-    pGame->GetHandlingManager ()->LoadDefaultHandlings ();
-    
-    // Lets do some stuff here
-    // Uncomment code to dump vehicle information
-    /*FILE *fh = fopen("C:\\yo.txt", "a+");
-    FILE *hh = fopen("C:\\Programme\\Rockstar Games\\GTA San Andreas\\data\\vehicles.ide", "r");
-    DWORD n=0;
-    DWORD j=0;
-    BYTE fbuff[256][4096];
-
-    while (!feof(hh))
-    {
-        BYTE ucRead; fread(&ucRead,1,1,hh);
-        if (ucRead==' ' || ucRead=='    ')
-            continue;
-        if (ucRead=='\n')
-        {
-            fbuff[j][n]=0;
-            j++;
-            n=0;
-            continue;
-        }
-        fbuff[j][n]=ucRead;
-        n++;
-
-    }
-    fbuff[j][n]=0;
-
-    for (n=0; n<j; n++)
-    {
-        if (fbuff[n][0] == '#' || fbuff[n][0] == 0)
-            continue;
-        BYTE *item = (BYTE*)strtok((char*)fbuff[n],",");
-        if (strncmp((const char*)item,"cars",4)==0 || strncmp((const char*)item,"end",3)==0)
-            continue;
-        BYTE act=0;
-        do
-        {
-            // Convert item to uppercase
-            DWORD j;
-            for (j=0; j<strlen((const char*)item); j++)
-                if (islower(item[j])) item[j]=toupper(item[j]);
-            switch(act)
-            {
-            case 1:
-                fprintf(fh, "case VT_%s:", item);
-                break;
-            case 4:
-                fprintf(fh, " return HT_%s;\n", item);
-                break;
-            }
-            act++;
-        } while ( item = (BYTE*)strtok( NULL, "," ) );
-    }
-    fclose(hh);
-    fclose(fh);*/
-}
-
-
 __declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
 {
     _asm
@@ -585,10 +396,6 @@ __declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
         mov         eax, 0x5BD830
         call        eax
     };
-
-    // Calculate handling.cfg values. We've already initialized them
-    // like they would come from handling.cfg
-    LoadHandlingCfg ();
 
     _asm
     {

@@ -9,21 +9,15 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAME_IHANDLINGMANAGER
-#define __CGAME_IHANDLINGMANAGER
+#ifndef __CGAME_CHandlingManager
+#define __CGAME_CHandlingManager
 
 #include "CHandlingEntry.h"
 
-class IHandlingManager
+class CHandlingManager
 {
 public:
-    virtual void                    LoadDefaultHandlings    ( void ) = 0;
-
     virtual CHandlingEntry*         CreateHandlingData      ( void ) = 0;
-    virtual bool                    ApplyHandlingData       ( enum eVehicleTypes eModel, CHandlingEntry* pEntry ) = 0;
-
-    virtual float                   GetDragMultiplier       ( void ) = 0;
-    virtual CHandlingEntry*         GetHandlingData         ( enum eVehicleTypes eModel ) = 0;
     virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
 };
 

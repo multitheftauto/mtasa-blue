@@ -6,6 +6,7 @@
 *  PURPOSE:     Vehicle entity class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,6 +23,7 @@ class CVehicle;
 #include "CEvents.h"
 #include "CVehicleColor.h"
 #include "CVehicleUpgrades.h"
+#include "CHandlingEntry.h"
 
 #define MAX_VEHICLE_SEATS 9
 #define DEFAULT_VEHICLE_HEALTH 1000
@@ -281,6 +283,9 @@ public:
     void                            SpawnAt                 ( const CVector& vecPosition, const CVector& vecRotation );
     void                            Respawn                 ( void );
 
+    void                            GenerateHandlingData    ( void );
+    CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
+
 private:
     class CVehicleManager*          m_pVehicleManager;
 
@@ -348,6 +353,8 @@ private:
     bool                            m_bTaxiLightState;
     bool                            m_bLandingGearDown;
     unsigned short                  m_usAdjustableProperty;
+
+    CHandlingEntry*                 m_pHandlingEntry;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

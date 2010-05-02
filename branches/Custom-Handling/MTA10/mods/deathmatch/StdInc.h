@@ -59,7 +59,6 @@
 #include <CClientDummy.h>
 #include <CClientEntity.h>
 #include <CClientExplosionManager.h>
-#include <CClientHandling.h>
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
 #include <CClientProjectileManager.h>

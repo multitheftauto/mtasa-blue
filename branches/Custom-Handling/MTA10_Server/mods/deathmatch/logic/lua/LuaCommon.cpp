@@ -93,16 +93,6 @@ CScriptFile* lua_tofile ( lua_State* luaVM, int iArgument )
 }
 
 
-CHandling* lua_tohandling ( lua_State* luaVM, int iArgument )
-{
-    CElement* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && IS_HANDLING ( pElement ) )
-        return static_cast < CHandling* > ( pElement );
-    else
-        return NULL;
-}
-
-
 CMarker* lua_tomarker ( lua_State* luaVM, int iArgument )
 {
     CElement* pElement = lua_toelement ( luaVM, iArgument );
