@@ -271,7 +271,6 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
 {
     // TODO: mix in with the streamer, cause this is way too slow
-    return true;
 
     CVector vecObject;
     float fDistanceX, fDistanceY, fDistanceZ, fDistanceExp;
