@@ -224,58 +224,55 @@ void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
 
     if ( m_pSourcePlayer->IsJoined () )
     {
-        if ( m_pSourcePlayer->IsCursorShowing () )
+        // Get the button and state
+        const char* szButton = NULL;
+        const char* szState = NULL;
+        switch ( ucButton )
         {
-            // Get the button and state
-            const char* szButton = NULL;
-            const char* szState = NULL;
-            switch ( ucButton )
+            case 0: szButton = "left"; szState = "down";
+                break;
+            case 1: szButton = "left"; szState = "up";
+                break;
+            case 2: szButton = "middle"; szState = "down";
+                break;
+            case 3: szButton = "middle"; szState = "up";
+                break;
+            case 4: szButton = "right"; szState = "down";
+                break;
+            case 5: szButton = "right"; szState = "up";
+                break;
+        }
+        if ( szButton && szState )
+        {
+            CElement* pElement = CElementIDs::GetElement ( elementID );
+            if ( pElement )
             {
-                case 0: szButton = "left"; szState = "down";
-                    break;
-                case 1: szButton = "left"; szState = "up";
-                    break;
-                case 2: szButton = "middle"; szState = "down";
-                    break;
-                case 3: szButton = "middle"; szState = "up";
-                    break;
-                case 4: szButton = "right"; szState = "down";
-                    break;
-                case 5: szButton = "right"; szState = "up";
-                    break;
-            }
-            if ( szButton && szState )
-            {
-                CElement* pElement = CElementIDs::GetElement ( elementID );
-                if ( pElement )
-                {
-                    // Call the onElementClicked event
-                    CLuaArguments Arguments;
-                    Arguments.PushString ( szButton );
-                    Arguments.PushString ( szState );
-                    Arguments.PushElement ( m_pSourcePlayer );
-                    Arguments.PushNumber ( vecPosition.fX );
-                    Arguments.PushNumber ( vecPosition.fY );
-                    Arguments.PushNumber ( vecPosition.fZ );
-                    pElement->CallEvent ( "onElementClicked", Arguments );
-                }
-                // Call the onPlayerClick event
+                // Call the onElementClicked event
                 CLuaArguments Arguments;
                 Arguments.PushString ( szButton );
                 Arguments.PushString ( szState );
-                if ( pElement )
-                    Arguments.PushElement ( pElement );
-                else
-                    Arguments.PushNil ();
+                Arguments.PushElement ( m_pSourcePlayer );
                 Arguments.PushNumber ( vecPosition.fX );
                 Arguments.PushNumber ( vecPosition.fY );
                 Arguments.PushNumber ( vecPosition.fZ );
-                Arguments.PushNumber ( vecCursorPosition.fX );
-                Arguments.PushNumber ( vecCursorPosition.fY );
-                m_pSourcePlayer->CallEvent ( "onPlayerClick", Arguments );
-
-                // TODO: iterate server-side element managers for the click events, eg: colshapes
+                pElement->CallEvent ( "onElementClicked", Arguments );
             }
+            // Call the onPlayerClick event
+            CLuaArguments Arguments;
+            Arguments.PushString ( szButton );
+            Arguments.PushString ( szState );
+            if ( pElement )
+                Arguments.PushElement ( pElement );
+            else
+                Arguments.PushNil ();
+            Arguments.PushNumber ( vecPosition.fX );
+            Arguments.PushNumber ( vecPosition.fY );
+            Arguments.PushNumber ( vecPosition.fZ );
+            Arguments.PushNumber ( vecCursorPosition.fX );
+            Arguments.PushNumber ( vecCursorPosition.fY );
+            m_pSourcePlayer->CallEvent ( "onPlayerClick", Arguments );
+
+            // TODO: iterate server-side element managers for the click events, eg: colshapes
         }
     }
 }
