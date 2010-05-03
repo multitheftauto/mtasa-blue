@@ -3435,6 +3435,12 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_WEAPON, *BitStream.pBitStream ) );
 
+                //if they have been given a satchel give them the detonator as well
+                if ( ucWeaponID == 39 )
+                {
+                    //give them a detonator (So GetPlayerWeapon works)
+                    GiveWeapon(pElement, 40, 1, false);
+                }
                 return true;
             }
         }
