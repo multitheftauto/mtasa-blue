@@ -379,10 +379,6 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             etc...
 */
 
-                if ( pSourcePlayer->GetWeaponType () == 0 ) {
-                    CStaticFunctionDefinitions::KickPlayer( pSourcePlayer, 0, "AC: You were kicked from the game" );
-                    return false;
-                }
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
                 ammo.data.usAmmoInClip = usWeaponAmmoInClip;
                 BitStream.Write ( &ammo );
