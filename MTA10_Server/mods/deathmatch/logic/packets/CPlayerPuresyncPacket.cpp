@@ -149,10 +149,11 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
+                bool bAmmoFailed = false;
                 // Read out the ammo states
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), true, true );
                 if ( !BitStream.Read ( &ammo ) )
-                    return false;
+                    bAmmoFailed = true;
                 pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
                 pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
@@ -161,6 +162,10 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 if ( !BitStream.Read ( &sync ) )
                     return false;
 
+                if ( bAmmoFailed == true ) {
+                    CStaticFunctionDefinitions::KickPlayer(pSourcePlayer, 0, "AC: You were kicked from the game" );
+                    return false;
+                }
                 // Set the arm directions and whether or not arms are up
                 pSourcePlayer->SetAimDirection ( sync.data.fArm );
 
@@ -373,6 +378,11 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
             etc...
 */
+
+                if ( pSourcePlayer->GetWeaponType () == 0 ) {
+                    CStaticFunctionDefinitions::KickPlayer( pSourcePlayer, 0, "AC: You were kicked from the game" );
+                    return false;
+                }
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
                 ammo.data.usAmmoInClip = usWeaponAmmoInClip;
                 BitStream.Write ( &ammo );

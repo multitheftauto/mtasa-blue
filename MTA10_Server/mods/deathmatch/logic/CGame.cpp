@@ -1766,12 +1766,15 @@ void CGame::Packet_DetonateSatchels ( CDetonateSatchelsPacket& Packet )
 {
     // Grab the source player
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
+    if ( pPlayer && pPlayer->IsJoined () && pPlayer->GetWeaponType( 12 ) == 40 )
     {
         if ( pPlayer->IsSpawned () && !pPlayer->IsDead () )
         {
             // Tell everyone to blow up this guy's satchels
             m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            if ( pPlayer->GetWeaponType( 8 ) == 39 && pPlayer->GetWeaponTotalAmmo( 8 ) != 0 ) {
+                CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
+            }
         }
     }
 }
