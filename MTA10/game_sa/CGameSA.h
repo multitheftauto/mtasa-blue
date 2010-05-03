@@ -63,6 +63,7 @@
 #define     VAR_FullWeaponAiming            0x969179 // ##SA##
 #define     VAR_InfiniteHealth              0x96916D // ##SA##
 #define     VAR_NeverWanted                 0x969171 // ##SA##
+#define     VAR_HealthArmorMoney            0x969133 // ##SA##
 #define     VAR_WalkUnderwater              0x6C2759
 
 #define CHEAT_HOVERINGCARS          "hovercars"
@@ -83,6 +84,7 @@
 #define CHEAT_FULLWEAPONAIMING      "fullweaponaiming"
 #define CHEAT_INFINITEHEALTH        "infinitehealth"
 #define CHEAT_NEVERWANTED           "neverwanted"
+#define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
