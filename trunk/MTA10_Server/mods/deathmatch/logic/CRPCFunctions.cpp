@@ -163,6 +163,10 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
         {
             pWeapon->usAmmo = 1;
             pWeapon->usAmmoInClip = 1;
+            //Keep the server synced with the client (GTASA gives the client a detonator when they shoot so if they changed to slot 12 they obviously have one)
+            if ( uiSlot == 12 )
+                //Give them the detonator
+                CStaticFunctionDefinitions::GiveWeapon( m_pSourcePlayer, 40, 1, true );
         }
     }
 }

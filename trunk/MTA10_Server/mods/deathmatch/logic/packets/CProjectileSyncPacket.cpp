@@ -86,7 +86,20 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         default:
             return false;
     }
+    if ( BitStream.Version() >= 0x07 ) {
+        bool bGTACreated;
+        if ( !BitStream.ReadBit ( bGTACreated ) )
+            return false;
 
+        CPlayer* pSourcePlayer = GetSourcePlayer();
+        if ( m_ucWeaponType != 58 && m_ucWeaponType != 21
+            && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != m_ucWeaponType
+            && pSourcePlayer->GetWeaponType( 8 ) != m_ucWeaponType )
+        {
+            CStaticFunctionDefinitions::KickPlayer( pSourcePlayer, 0, "AC: You were kicked from the game" );
+            return false;
+        }
+    }
     return true;
 }
 

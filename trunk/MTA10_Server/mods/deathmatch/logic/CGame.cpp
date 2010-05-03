@@ -1772,9 +1772,8 @@ void CGame::Packet_DetonateSatchels ( CDetonateSatchelsPacket& Packet )
         {
             // Tell everyone to blow up this guy's satchels
             m_pPlayerManager->BroadcastOnlyJoined ( Packet );
-            if ( pPlayer->GetWeaponType( 8 ) == 39 && pPlayer->GetWeaponTotalAmmo( 8 ) != 0 ) {
-                CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
-            }
+            //Take away their detonator
+            CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
         }
     }
 }
