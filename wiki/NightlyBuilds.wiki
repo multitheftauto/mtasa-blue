@@ -21,7 +21,7 @@ If you know what you're doing, you can get the files you need from here:
 
 *[http://code.google.com/p/mtasa-blue/downloads/list Go to the Google Code download page]* _for data, and files required to build locally_
 
-[http://code.google.com/p/multitheftauto-resources/downloads/list Go to the resources download page] _for the latest resource packages_
+[http://code.google.com/p/mtasa-resources/downloads/list Go to the resources download page] _for the latest resource packages_
 
 [http://nightly.multitheftauto.com/ Go to the nightly builds] _for the latest MTA nightly build_
 
@@ -50,7 +50,7 @@ _Run dependencies rarely need to be updated.  If your build starts malfunctionin
 === Step 3: Download the latest resources ===
 The latest resources are also available.   These components are only required if you wish to run a server or the map editor.  Default resources from previous versions of MTASA are outdated, and will not function.
   * You should pick the resource archive with the *highest revision number*.
-  * You can find the latest available resources *[http://code.google.com/p/multitheftauto-resources/downloads/list here]*.
+  * You can find the latest available resources *[http://code.google.com/p/mtasa-resources/downloads/list here]*.
   * The contents of the archive should be placed inside your *MTA San Andreas\server\mods\deathmatch\resources* directory. You will need to create a resources directory if you do not already have one.
 
 _Resources should also be updated fairly frequently.  They are built at 2300GMT, depending on changes that are made during that day.  You should always ensure you always have the latest resourecs package._
