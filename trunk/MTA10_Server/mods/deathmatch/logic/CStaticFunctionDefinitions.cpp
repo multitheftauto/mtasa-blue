@@ -178,14 +178,9 @@ bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel, const char* szReaso
 }
 
 
-bool CStaticFunctionDefinitions::GetCancelReason ( char* szReason )
+const char* CStaticFunctionDefinitions::GetCancelReason ( )
 {
-    szReason = (char*)m_pEvents->GetLastError();
-    if ( szReason )
-    {
-        return true;
-    }
-    return false;
+    return m_pEvents->GetLastError();
 }
 
 
