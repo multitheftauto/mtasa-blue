@@ -296,8 +296,13 @@ public:
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue );
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, CVector vecValue );
-    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, eHandlingProperty eProperty );
-    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle );
+    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty );
+    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, float fValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue);
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo );

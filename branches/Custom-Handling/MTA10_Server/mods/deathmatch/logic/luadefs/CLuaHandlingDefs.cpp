@@ -19,6 +19,7 @@ void CLuaHandlingDefs::LoadFunctions ( void )
 {
     // Set
     CLuaCFunctions::AddFunction ( "setVehicleHandling", CLuaHandlingDefs::SetVehicleHandling );
+    CLuaCFunctions::AddFunction ( "setModelHandling", CLuaHandlingDefs::SetModelHandling );
 
     // Get
     CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaHandlingDefs::GetVehicleHandling );
@@ -2723,37 +2724,72 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
-            if ( eProperty )
+            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
             {
-                if ( eProperty == HANDLING_ABS )
+
+                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                if ( eProperty )
                 {
-                    if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                    /*if ( lua_type ( luaVM, 3 ) == LUA_TNIL || lua_type ( luaVM, 3 ) == LUA_TNONE )
                     {
-                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, lua_toboolean ( luaVM, 3 ) ) )
+                        if ( CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( pVehicle, eProperty ) )
                         {
                             lua_pushboolean ( luaVM, true );
                             return 1;
                         }
                     }
-                }
-                else if ( eProperty == HANDLING_CENTEROFMASS )
-                {
-                    
-                }
-                else
-                {
-                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
-                    {
-                        float fTest = (float)lua_tonumber ( luaVM, 3 );
-                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fTest ) )
+                    else
+                    {*/
+                        if ( eProperty == HANDLING_ABS )
                         {
-                            lua_pushboolean ( luaVM, true );
-                            return 1;
+                            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                            {
+                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, lua_toboolean ( luaVM, 3 ) ) )
+                                {
+                                    lua_pushboolean ( luaVM, true );
+                                    return 1;
+                                }
+                            }
                         }
-                    }
+                        else if ( eProperty == HANDLING_CENTEROFMASS )
+                        {
+                            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                            {
+                                float fX = (float)lua_tonumber ( luaVM, 3 );
+                                float fY = (float)lua_tonumber ( luaVM, 4 );
+                                float fZ = (float)lua_tonumber ( luaVM, 5 );
+                                CVector tempVec ( fX, fY, fZ );
+
+                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, tempVec ) )
+                                {
+                                    lua_pushboolean ( luaVM, true );
+                                    return 1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                            {
+                                float fTest = (float)lua_tonumber ( luaVM, 3 );
+                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fTest ) )
+                                {
+                                    lua_pushboolean ( luaVM, true );
+                                    return 1;
+                                }
+                            }
+                        }
+                    //}
                 }
             }
+            /*else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
+            {
+                if ( CStaticFunctionDefinitions::ResetVehicleHandling ( pVehicle ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }*/
         }
     }
     else
@@ -2761,8 +2797,86 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, false );
     return 1;
-}
+    }
 
+int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        eVehicleTypes eModel = static_cast < eVehicleTypes > ( (int)lua_tonumber ( luaVM, 1 ) );
+        if ( eModel )
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            {
+                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                
+                if ( lua_type ( luaVM, 3 ) == LUA_TNIL || lua_type ( luaVM, 3 ) == LUA_TNONE )
+                {
+                    /*if ( CStaticFunctionDefinitions::ResetModelHandlingProperty ( eModel, eProperty ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }*/
+                }
+                else
+                {
+                    if ( eProperty == HANDLING_ABS )
+                    {
+                        if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                        {
+                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, lua_toboolean ( luaVM, 3 ) ? 1.0f : 0.0f ) )
+                            {
+                                lua_pushboolean ( luaVM, true );
+                                return 1;
+                            }
+                        }
+                    }
+                    else if ( eProperty == HANDLING_CENTEROFMASS )
+                    {
+                        if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                        {
+                            float fX = (float)lua_tonumber ( luaVM, 3 );
+                            float fY = (float)lua_tonumber ( luaVM, 4 );
+                            float fZ = (float)lua_tonumber ( luaVM, 5 );
+                            CVector tempVec ( fX, fY, fZ );
+
+                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, tempVec ) )
+                            {
+                                lua_pushboolean ( luaVM, true );
+                                return 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                        {
+                            float fValue = (float)lua_tonumber ( luaVM, 3 );
+                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, fValue ) )
+                            {
+                                lua_pushboolean ( luaVM, true );
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+            /*else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
+            {
+                if ( CStaticFunctionDefinitions::ResetModelHandling ( eModel ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }*/
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setModelHandling" );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
 {

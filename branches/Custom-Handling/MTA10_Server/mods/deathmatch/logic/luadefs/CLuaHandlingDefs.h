@@ -23,6 +23,7 @@ public:
 
     // Set
     static int      SetVehicleHandling                      ( lua_State* luaVM );
+    static int      SetModelHandling                        ( lua_State* luaVM );
 
     // Get
     static int      GetVehicleHandling                      ( lua_State* luaVM );
