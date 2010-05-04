@@ -90,11 +90,15 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         bool bGTACreated;
         if ( !BitStream.ReadBit ( bGTACreated ) )
             return false;
-
+        unsigned char ucWeaponID = m_ucWeaponType;
+        if ( m_ucWeaponType == 19 || m_ucWeaponType == 20 )
+        {
+            ucWeaponID += 16;
+        }
         CPlayer* pSourcePlayer = GetSourcePlayer();
         if ( m_ucWeaponType != 58 && m_ucWeaponType != 21
-            && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != m_ucWeaponType
-            && pSourcePlayer->GetWeaponType( 8 ) != m_ucWeaponType )
+            && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != ucWeaponID
+            && pSourcePlayer->GetWeaponType( 8 ) != ucWeaponID )
         {
             CStaticFunctionDefinitions::KickPlayer( pSourcePlayer, 0, "AC: You were kicked from the game" );
             return false;

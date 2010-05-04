@@ -10505,8 +10505,8 @@ int CLuaFunctionDefinitions::CancelEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCancelReason ( lua_State* luaVM )
 {
-    char* szReason = NULL;
-    if ( CStaticFunctionDefinitions::GetCancelReason ( szReason ) )
+    const char* szReason = CStaticFunctionDefinitions::GetCancelReason ( );
+    if ( szReason )
     {
         lua_pushstring ( luaVM, szReason );
         return 1;

@@ -42,7 +42,7 @@ public:
     static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
 
     static bool                 CancelEvent                         ( bool bCancel, const char* szReason );
-    static bool                 GetCancelReason                     ( char* szReason );
+    static const char*          GetCancelReason                     ( );
     static bool                 WasEventCancelled                   ( void );
 
     // Element create/destroy
