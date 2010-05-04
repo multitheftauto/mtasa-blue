@@ -406,6 +406,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     CLuaArguments Arguments;
     g_pClientGame->m_pLocalPlayer->CallEvent ( "onClientPlayerJoin", Arguments, true );
 
+    g_pCore->UpdateRecentlyPlayed();
     // Make sure that the SA data files weren't tampered with
     g_pClientGame->VerifySADataFiles ( iEnableClientChecks );
 }

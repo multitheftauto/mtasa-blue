@@ -275,31 +275,6 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
 
-                // Save the connection details into the recently played servers list
-                in_addr Address;
-                if ( CServerListItem::Parse ( g_pConnectManager->m_strHost.c_str (), Address ) )
-                {
-                    CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
-                    CServerList* pRecentList = pServerBrowser->GetRecentList ();
-                    CServerListItem RecentServer ( Address, g_pConnectManager->m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-                    pRecentList->Remove ( RecentServer );
-                    pRecentList->Add ( RecentServer, true );
-                    pServerBrowser->SaveRecentlyPlayedList();
-
-                    // Set as our current server for xfire
-                    if ( XfireIsLoaded () )
-                    {
-                        const char *szKey[2], *szValue[2];
-                        szKey[0] = "Gamemode";
-                        szValue[0] = RecentServer.strType.c_str();
-
-                        szKey[1] = "Map";
-                        szValue[1] = RecentServer.strMap.c_str();
-
-                        XfireSetCustomGameData ( 2, szKey, szValue ); 
-                    }
-                }
-
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
 

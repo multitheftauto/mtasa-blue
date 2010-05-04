@@ -136,6 +136,7 @@ public:
     void                    ApplyGameSettings               ( void );
     void                    ApplyMenuSettings               ( void );
     void                    ApplyCommunityState             ( void );
+    void                    UpdateRecentlyPlayed            ( void );
 
     // Net
     void                    SetConnected                    ( bool bConnected );
