@@ -100,6 +100,7 @@ public:
     virtual bool                    IsWindowMinimized               ( void ) = 0;
 
     virtual void                    SaveConfig                      ( void ) = 0;
+    virtual void                    UpdateRecentlyPlayed            ( void ) = 0;
 
     virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
     virtual void                    SetCenterCursor                 ( bool bEnabled ) = 0;

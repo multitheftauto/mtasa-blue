@@ -1627,3 +1627,39 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
 
     return strDest;
 }
+
+
+void CCore::UpdateRecentlyPlayed()
+{
+    //Get the current host and port
+    unsigned int uiPort;
+    std::string strHost;
+    CVARS_GET ( "host", strHost );
+    CVARS_GET ( "port", uiPort );
+    // Save the connection details into the recently played servers list
+    in_addr Address;
+    if ( CServerListItem::Parse ( strHost.c_str(), Address ) )
+    {
+        CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
+        CServerList* pRecentList = pServerBrowser->GetRecentList ();
+        CServerListItem RecentServer ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+        pRecentList->Remove ( RecentServer );
+        pRecentList->Add ( RecentServer, true );
+        pServerBrowser->SaveRecentlyPlayedList();
+
+        // Set as our current server for xfire
+        if ( XfireIsLoaded () )
+        {
+            const char *szKey[2], *szValue[2];
+            szKey[0] = "Gamemode";
+            szValue[0] = RecentServer.strType.c_str();
+
+            szKey[1] = "Map";
+            szValue[1] = RecentServer.strMap.c_str();
+
+            XfireSetCustomGameData ( 2, szKey, szValue ); 
+        }
+    }
+    //Save our configuration file
+    CCore::GetSingleton ().SaveConfig ();
+}
