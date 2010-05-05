@@ -4248,8 +4248,8 @@ void CClientGame::ResetMapInfo ( void )
     // Water-colour
     g_pMultiplayer->ResetWater ();
 
-    // Water
-    g_pGame->GetWaterManager ()->Reset ();
+    // Water (Look at: #4361)
+    //g_pGame->GetWaterManager ()->Reset ();
 
      // Sky-gradient
     g_pMultiplayer->SetCloudsEnabled ( true );
@@ -4298,6 +4298,7 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
+
 void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
     if ( Ped && Ped->GetHealth () == 0.0f )
