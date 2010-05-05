@@ -40,6 +40,7 @@ const char szPreloadedScript [] = ""\
     "        local res = getResourceFromName(k)\n" \
     "        if res then\n" \
     "                self[k] = setmetatable({ res = res }, rescallMT)\n" \
+    "                addEventHandler(\"onClientResourceStop\", getResourceRootElement(res), function() self[k] = nil end)\n" \
     "                return self[k]\n" \
     "        else\n" \
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
