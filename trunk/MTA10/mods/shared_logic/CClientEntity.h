@@ -239,6 +239,10 @@ public:
     bool                                        IsOnScreen                  ( void );
     virtual RpClump *                           GetClump                    ( void );
 
+    // Spatial database
+    virtual CSphere                             GetWorldBoundingSphere      ( void );
+    virtual void                                UpdateSpatialData           ( void );
+
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;

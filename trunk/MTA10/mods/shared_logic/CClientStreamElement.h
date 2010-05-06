@@ -44,6 +44,7 @@ public:
     void                        StreamOutForABit            ( void );
     void                        SetDimension                ( unsigned short usDimension );
     float                       GetExpDistance              ( void )                            { return m_fExpDistance; }
+    virtual CSphere             GetWorldBoundingSphere      ( void );
     
     bool                        IsStreamingCompatibleClass  ( void )                            { return true; };
 

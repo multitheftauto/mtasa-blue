@@ -212,7 +212,6 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
     // Bad things will happen if szNew exists in szOld
-    int pos = std::string ( szOld ).find ( szNew );
     if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
         return *this;
 
@@ -441,4 +440,43 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
     }
 
     return strOut;
+}
+
+
+//
+// Get the local time in a string.
+// Set bDate to include the date, bMs to include milliseconds
+//
+SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
+{
+#ifdef _WIN32
+    SYSTEMTIME s;
+    GetLocalTime( &s );
+
+    SString strResult = SString ( "%02d:%02d:%02d", s.wHour, s.wMinute, s.wSecond );
+    if ( bMilliseconds )
+        strResult += SString ( ":%04d", s.wMilliseconds );
+    if ( bDate )
+        strResult = SString ( "%02d-%02d-%02d ", s.wYear, s.wMonth, s.wDay  ) + strResult;
+    return strResult;
+#else
+    // Other platforms here
+    return "HH:MM:SS";
+#endif
+}
+
+
+//
+// Output timestamped line into the debugger
+//
+void SharedUtil::OutputDebugLine ( const char* szMessage )
+{
+    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
+    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
+        strMessage += "\n";
+#ifdef _WIN32
+    OutputDebugString ( strMessage );
+#else
+    // Other platforms here
+#endif
 }

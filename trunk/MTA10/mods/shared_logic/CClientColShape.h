@@ -69,6 +69,7 @@ public:
     std::list < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
     std::list < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
 
+    void                                SizeChanged                     ( void );
 protected:
     CVector                             m_vecPosition;
     CClientMarker *                     m_pOwningMarker;

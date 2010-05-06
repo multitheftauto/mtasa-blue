@@ -17,15 +17,16 @@
 class CClientColCircle : public CClientColShape
 {
 public:
-                    CClientColCircle        ( CClientManager* pManager, ElementID ID );
                     CClientColCircle        ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius );
+
+    virtual CSphere GetWorldBoundingSphere  ( void );
 
     eColShapeType   GetShapeType            ( void )            { return COLSHAPE_CIRCLE; }
 
     bool            DoHitDetection          ( const CVector& vecNowPosition, float fRadius );
 
     float           GetRadius               ( void )            { return m_fRadius; };
-    void            SetRadius               ( float fRadius )   { m_fRadius = fRadius; };
+    void            SetRadius               ( float fRadius )   { m_fRadius = fRadius; SizeChanged (); }
 
 protected:
     float           m_fRadius;

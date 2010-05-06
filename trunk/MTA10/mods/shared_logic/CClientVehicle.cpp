@@ -3406,3 +3406,21 @@ CHandlingEntry* CClientVehicle::GetHandlingData( void )
     return NULL;
 }
 #endif
+
+
+CSphere CClientVehicle::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
+    if ( pModelInfo )
+    {
+        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
+        if ( pBoundingBox )
+        {
+            sphere.vecPosition = pBoundingBox->vecBoundOffset;
+            sphere.fRadius = pBoundingBox->fRadius;
+        }
+    }
+    sphere.vecPosition += GetStreamPosition ();
+    return sphere;
+}

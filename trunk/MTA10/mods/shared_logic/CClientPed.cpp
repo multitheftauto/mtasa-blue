@@ -867,6 +867,7 @@ bool CClientPed::SetModel ( unsigned long ulModel )
             // Set the model we're changing to
             m_ulModel = ulModel;
             m_pModelInfo = g_pGame->GetModelInfo ( ulModel );
+            UpdateSpatialData ();
 
             // Are we loaded?
             if ( m_pPlayerPed )
@@ -2134,7 +2135,7 @@ void CClientPed::StreamedInPulse ( void )
                 {                    
                     SetPosition ( vecFreezePosition );
                     SetMoveSpeed ( CVector () );
-                }                
+            }
             }
             else
             {
@@ -4396,8 +4397,6 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
 
         // Initialize the interpolation
         m_interp.pos.fLastAlpha = 0.0f;
-
-        OutputDebugString ( SString ( "", m_interp.pos.vecError.Length () ) );
     }
     else
     {
@@ -4999,4 +4998,22 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
         return g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( m_pPlayerPed->GetRpClump () );
     }
     return NULL;
+}
+
+
+CSphere CClientPed::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
+    if ( pModelInfo )
+    {
+        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
+        if ( pBoundingBox )
+        {
+            sphere.vecPosition = pBoundingBox->vecBoundOffset;
+            sphere.fRadius = pBoundingBox->fRadius;
+        }
+    }
+    sphere.vecPosition += GetStreamPosition ();
+    return sphere;
 }

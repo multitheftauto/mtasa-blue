@@ -92,6 +92,16 @@ namespace SharedUtil
     //
     double GetSecondCount ( void );
 
+    //
+    // Get the local time in a string.
+    // Set bDate to include the date, bMs to include milliseconds
+    //
+    SString GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
+
+    //
+    // Output timestamped line into the debugger
+    //
+    void OutputDebugLine ( const char* szMessage );
 
     //
     // Some templates

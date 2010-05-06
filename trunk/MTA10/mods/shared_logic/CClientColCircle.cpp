@@ -14,19 +14,12 @@
 #include <StdInc.h>
 
 using namespace std;
-CClientColCircle::CClientColCircle ( CClientManager* pManager, ElementID ID ) : CClientColShape ( pManager, ID )
-{
-    m_pManager = pManager;
-    m_fRadius = 1.0f;
-
-    SetTypeName ( "colcircle" );
-}
-
 
 CClientColCircle::CClientColCircle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius ) : CClientColShape ( pManager, ID )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
+    UpdateSpatialData ();
 }
 
 
@@ -34,4 +27,14 @@ bool CClientColCircle::DoHitDetection ( const CVector& vecNowPosition, float fRa
 {
     // Do a simple distance check between now position and our position 
     return IsPointNearPoint2D ( vecNowPosition, m_vecPosition, fRadius + m_fRadius );
+}
+
+CSphere CClientColCircle::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition.fX = m_vecPosition.fX;
+    sphere.vecPosition.fY = m_vecPosition.fY;
+    sphere.vecPosition.fZ = SPATIAL_2D_Z;
+    sphere.fRadius        = m_fRadius;
+    return sphere;
 }

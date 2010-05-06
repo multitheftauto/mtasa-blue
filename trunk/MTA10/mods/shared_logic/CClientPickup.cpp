@@ -81,6 +81,7 @@ void CClientPickup::SetModel ( unsigned short usModel )
     {
         // Set the model and recreate the pickup
         m_usModel = usModel;
+        UpdateSpatialData ();
         ReCreate ();
     }
 }

@@ -1553,6 +1553,10 @@
 				Name="shared"
 				>
 				<File
+					RelativePath="..\..\Shared\sdk\CBox.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>
@@ -1577,11 +1581,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CSphere.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CVector.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\CVector2D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\RTree.h"
 					>
 				</File>
 				<File

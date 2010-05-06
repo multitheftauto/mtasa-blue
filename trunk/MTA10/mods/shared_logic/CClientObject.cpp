@@ -245,6 +245,7 @@ void CClientObject::SetModel ( unsigned short usModel )
         // Set the new model ID and recreate the model
         m_usModel = usModel;
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
+        UpdateSpatialData ();
 
         // Request the new model so we can recreate when it's done
         if ( m_pModelRequester->Request ( usModel, this ) )
@@ -499,4 +500,22 @@ void CClientObject::SetMoveSpeed ( const CVector& vecMoveSpeed )
         m_pObject->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
     }
     m_vecMoveSpeed = vecMoveSpeed;
+}
+
+
+CSphere CClientObject::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
+    if ( pModelInfo )
+    {
+        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
+        if ( pBoundingBox )
+        {
+            sphere.vecPosition = pBoundingBox->vecBoundOffset;
+            sphere.fRadius = pBoundingBox->fRadius;
+        }
+    }
+    sphere.vecPosition += GetStreamPosition ();
+    return sphere;
 }

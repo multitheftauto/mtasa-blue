@@ -12,21 +12,12 @@
 
 #include <StdInc.h>
 
-CClientColTube::CClientColTube ( CClientManager* pManager, ElementID ID ) : CClientColShape ( pManager, ID )
-{
-    m_pManager = pManager;
-    m_fRadius = 1.0f;
-    m_fHeight = 1.0f;
-
-    SetTypeName ( "coltube" );
-}
-
-
 CClientColTube::CClientColTube ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius, float fHeight ) : CClientColShape ( pManager, ID )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
     m_fHeight = fHeight;
+    UpdateSpatialData ();
 }
 
 
@@ -38,4 +29,15 @@ bool CClientColTube::DoHitDetection ( const CVector& vecNowPosition, float fRadi
     return ( IsPointNearPoint2D ( vecNowPosition, m_vecPosition, fRadius + m_fRadius ) &&
              vecNowPosition.fZ >= m_vecPosition.fZ &&
              vecNowPosition.fZ <= m_vecPosition.fZ + m_fHeight );
+}
+
+
+CSphere CClientColTube::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition.fX = m_vecPosition.fX;
+    sphere.vecPosition.fY = m_vecPosition.fY;
+    sphere.vecPosition.fZ = m_vecPosition.fZ + m_fHeight * 0.5f;
+    sphere.fRadius = Max ( m_fRadius, m_fHeight * 0.5f );
+    return sphere;
 }

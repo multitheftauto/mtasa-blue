@@ -120,6 +120,7 @@ public:
 
     bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     bool                        SetMatrix                   ( const CMatrix& Matrix );
+    virtual CSphere             GetWorldBoundingSphere      ( void );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }

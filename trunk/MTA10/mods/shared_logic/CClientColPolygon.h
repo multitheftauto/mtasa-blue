@@ -16,8 +16,9 @@
 class CClientColPolygon : public CClientColShape
 {
 public:
-                                CClientColPolygon   ( CClientManager* pManager, ElementID ID ) : CClientColShape ( pManager, ID ) {};
                                 CClientColPolygon   ( CClientManager* pManager, ElementID ID, const CVector& vecPosition );
+
+    virtual CSphere             GetWorldBoundingSphere  ( void );
 
     eColShapeType               GetShapeType        ( void )                { return COLSHAPE_POLYGON; }
 

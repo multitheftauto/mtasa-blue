@@ -16,15 +16,16 @@
 class CClientColRectangle : public CClientColShape
 {
 public:
-                            CClientColRectangle     ( CClientManager* pManager, ElementID ID ) : CClientColShape ( pManager, ID ) {};
                             CClientColRectangle     ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector2D& vecSize );
+
+    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType            ( void )            { return COLSHAPE_RECTANGLE; }
 
     bool                    DoHitDetection          ( const CVector& vecNowPosition, float fRadius );
 
     inline const CVector2D& GetSize                 ( void )                        { return m_vecSize; };
-    inline void             SetSize                 ( const CVector2D& vecSize )    { m_vecSize = vecSize; };
+    inline void             SetSize                 ( const CVector2D& vecSize )    { m_vecSize = vecSize; SizeChanged (); };
 
 protected:
     CVector2D               m_vecSize;
