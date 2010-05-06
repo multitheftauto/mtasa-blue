@@ -18,7 +18,7 @@ CClientColRectangle::CClientColRectangle ( CClientManager* pManager, ElementID I
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
 
-    SetTypeName ( "colrectangle" );
+    UpdateSpatialData ();
 }
 
 
@@ -31,4 +31,15 @@ bool CClientColRectangle::DoHitDetection ( const CVector& vecNowPosition, float 
              vecNowPosition.fX <= m_vecPosition.fX + m_vecSize.fX &&
              vecNowPosition.fY >= m_vecPosition.fY &&
              vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY );
+}
+
+
+CSphere CClientColRectangle::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;
+    sphere.vecPosition.fY = m_vecPosition.fY + m_vecSize.fY * 0.5f;
+    sphere.vecPosition.fZ = SPATIAL_2D_Z;
+    sphere.fRadius        = Max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
+    return sphere;
 }

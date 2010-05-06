@@ -41,6 +41,7 @@ CClientStreamElement::~CClientStreamElement ( void )
 void CClientStreamElement::UpdateStreamPosition ( const CVector & vecPosition )
 {
     m_vecStreamPosition = vecPosition;    
+    UpdateSpatialData ();
     m_pStreamer->OnUpdateStreamPosition ( this );
     m_pManager->OnUpdateStreamPosition ( this );
 
@@ -160,4 +161,11 @@ void CClientStreamElement::SetDimension ( unsigned short usDimension )
 
         m_pStreamer->OnElementDimension ( this );
     }
+}
+
+
+CSphere CClientStreamElement::GetWorldBoundingSphere ( void )
+{
+    // Default to a point at stream position
+    return CSphere ( GetStreamPosition (), 0.0f );
 }

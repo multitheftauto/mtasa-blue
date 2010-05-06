@@ -12,19 +12,11 @@
 
 #include <StdInc.h>
 
-CClientColSphere::CClientColSphere ( CClientManager* pManager, ElementID ID ) : CClientColShape ( pManager, ID )
-{
-    m_pManager = pManager;
-    m_fRadius = 1.0f;
-
-    SetTypeName ( "colsphere" );
-}
-
-
 CClientColSphere::CClientColSphere ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius ) : CClientColShape ( pManager, ID )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
+    UpdateSpatialData ();
 }
 
 
@@ -32,4 +24,10 @@ bool CClientColSphere::DoHitDetection ( const CVector& vecNowPosition, float fRa
 {
     // Do a simple distance check between now position and our position 
     return IsPointNearPoint3D ( vecNowPosition, m_vecPosition, fRadius + m_fRadius );
+}
+
+
+CSphere CClientColSphere::GetWorldBoundingSphere ( void )
+{
+    return CSphere ( m_vecPosition, m_fRadius );
 }

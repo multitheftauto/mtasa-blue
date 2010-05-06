@@ -36,6 +36,11 @@ public:
 protected:
     inline void                     AddToList                   ( CClientColShape* pShape )         { m_List.push_back ( pShape ); };
     void                            RemoveFromList              ( CClientColShape* pShape );
+    void                            DoHitDetectionOld           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
+    void                            DoHitDetectionNew           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
+    void                            DoHitDetectionForColShape   ( CClientColShape* pShape );
+    void                            DoHitDetectionForEntity     ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
+    void                            HandleHitDetectionResult    ( bool bHit, CClientColShape* pShape, CClientEntity* pEntity );
 
     std::vector < CClientColShape* >  m_List;
 };

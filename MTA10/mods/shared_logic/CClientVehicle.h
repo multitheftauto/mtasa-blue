@@ -134,6 +134,7 @@ public:
 
     bool                        GetMatrix               ( CMatrix& Matrix ) const;
     bool                        SetMatrix               ( const CMatrix& Matrix );
+    virtual CSphere             GetWorldBoundingSphere  ( void );
 
     void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                        GetMoveSpeedMeters      ( CVector& vecMoveSpeed ) const;

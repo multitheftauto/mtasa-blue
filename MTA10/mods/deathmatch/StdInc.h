@@ -36,6 +36,8 @@
 #include <CVector.h>
 #include <CMatrix4.h>
 #include <CQuat.h>
+#include <CSphere.h>
+#include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
 
@@ -58,6 +60,7 @@
 #include <CClientDisplayGroup.h>
 #include <CClientDummy.h>
 #include <CClientEntity.h>
+#include <CClientSpatialDatabase.h>
 #include <CClientExplosionManager.h>
 #include <CClientHandling.h>
 #include <CClientPed.h>

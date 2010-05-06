@@ -18,7 +18,7 @@ CClientColCuboid::CClientColCuboid ( CClientManager* pManager, ElementID ID, con
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
 
-    SetTypeName ( "colcuboid" );
+    UpdateSpatialData ();
 }
 
 
@@ -33,4 +33,13 @@ bool CClientColCuboid::DoHitDetection  ( const CVector& vecNowPosition, float fR
              vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY &&
              vecNowPosition.fZ >= m_vecPosition.fZ &&
              vecNowPosition.fZ <= m_vecPosition.fZ + m_vecSize.fZ );
+}
+
+
+CSphere CClientColCuboid::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition  = m_vecPosition + m_vecSize * 0.5f;
+    sphere.fRadius      = Max ( Max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f;
+    return sphere;
 }

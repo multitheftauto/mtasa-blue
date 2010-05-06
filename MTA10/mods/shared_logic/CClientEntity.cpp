@@ -165,6 +165,9 @@ CClientEntity::~CClientEntity ( void )
         SetCollidableWith ( pEntity, true );
     }
 
+    // Remove from spatial database
+    GetClientSpatialDatabase ()->RemoveEntity ( this );
+
     // Ensure not referenced in the disabled collisions list
     assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
 
@@ -1459,4 +1462,19 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
+}
+
+
+CSphere CClientEntity::GetWorldBoundingSphere ( void )
+{
+    // Default to a point around the entity's position
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    return CSphere ( vecPosition, 0.f );
+}
+
+
+void CClientEntity::UpdateSpatialData ( void )
+{
+    GetClientSpatialDatabase ()->UpdateEntity ( this );
 }

@@ -27,15 +27,15 @@ void CLogger::LogPrintf ( const char* szFormat, ... )
     _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
-    // Timestamp and send to the console and logfile
-    HandleLogPrint ( true, "", szBuffer, true, true );
+    // Timestamp and send to the logfile
+    HandleLogPrint ( true, "", szBuffer, false, true );
 }
 
 
 void CLogger::LogPrint ( const char* szText )
 {
-    // Timestamp and send to the console and logfile
-    HandleLogPrint ( true, "", szText, true, true );
+    // Timestamp and send to the logfile
+    HandleLogPrint ( true, "", szText, false, true );
 }
 
 #if 0   // Currently unused
@@ -111,9 +111,7 @@ void CLogger::SetLogFile ( const char* szLogFile )
 void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile )
 {
     // Put the timestamp at the beginning of the string
-#if 0
     string strOutputShort;
-#endif
     string strOutputLong;
     if ( bTimeStamp )
     {
@@ -132,18 +130,15 @@ void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const cha
     }
 
     // Build the final string
-#if 0
     strOutputShort = strOutputShort + szPrePend + szMessage;
-#endif
     strOutputLong = strOutputLong + szPrePend + szMessage;
 
     // Maybe print it in the console
-#if 0   // Printing to the console is not currently used for this class
     if ( bToConsole )
-        g_pServerInterface->Printf ( "%s", strOutputShort.c_str () );
-#endif
+        g_pCore->GetConsole()->Print ( strOutputShort.c_str () );
 
     // Maybe print it to the log file
+    // Note: m_pLogFile is never set, so this always does nothing
     if ( bToLogFile && m_pLogFile )
     {
         fprintf ( m_pLogFile, "%s", strOutputLong.c_str () );

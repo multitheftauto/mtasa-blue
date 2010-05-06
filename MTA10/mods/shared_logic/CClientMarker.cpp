@@ -38,6 +38,7 @@ CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMark
 
     // Add us to marker manager list
     m_pMarkerManager->AddToList ( this );
+    UpdateSpatialData ();
 }
 
 
@@ -430,7 +431,7 @@ void CClientMarker::Callback_OnLeave ( CClientColShape& Shape, CClientEntity& En
 
 void CClientMarker::CreateOfType ( int iType )
 {
-    if ( m_pCollision ) delete m_pCollision;
+    SAFE_DELETE ( m_pCollision )
 
     CVector vecOrigin;
     GetPosition ( vecOrigin );    
@@ -492,4 +493,14 @@ void CClientMarker::CreateOfType ( int iType )
         default:
             break;
     }
+}
+
+
+CSphere CClientMarker::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    GetPosition ( sphere.vecPosition );
+    //sphere.vecPosition = GetStreamPosition ();
+    sphere.fRadius = GetSize ();
+    return sphere;
 }
