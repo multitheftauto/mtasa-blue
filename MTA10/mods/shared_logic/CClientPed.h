@@ -370,8 +370,8 @@ public:
     inline bool                 IsFrozen                ( void ) const                                  { return m_bFrozen; }
     void                        SetFrozen               ( bool bFrozen );
 
-    void                        SetFootBlood            ( unsigned int uiFootBlood );
-    unsigned int                GetFootBlood            ( void );
+    bool                        IsFootBloodEnabled      ( void );
+    void                        SetFootBloodEnabled     ( bool bHasFootBlood );
 
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );

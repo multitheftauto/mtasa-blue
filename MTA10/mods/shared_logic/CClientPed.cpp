@@ -611,7 +611,7 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     SetHasJetPack ( false );
     SetMoveSpeed ( CVector () );
     SetInterior ( ucInterior );
-    SetFootBlood ( 0 );
+    SetFootBloodEnabled( false );
 }
 
 void CClientPed::ResetInterpolation ( void )
@@ -4787,21 +4787,28 @@ void CClientPed::SetHeadless ( bool bHeadless )
 }
 
 
-void CClientPed::SetFootBlood ( unsigned int uiFootBlood )
+void CClientPed::SetFootBloodEnabled ( bool bHasFootBlood )
 {
     if ( m_pPlayerPed )
     {
-     m_pPlayerPed->SetFootBlood(uiFootBlood);
+        if ( bHasFootBlood )
+        {
+            m_pPlayerPed->SetFootBlood( -1 );
+        }
+        else
+        {
+            m_pPlayerPed->SetFootBlood( 0 );
+        }
     }
 }
 
-unsigned int CClientPed::GetFootBlood ( void )
+bool CClientPed::IsFootBloodEnabled ( void )
 {
     if ( m_pPlayerPed )
     {
-        return m_pPlayerPed->GetFootBlood();
+        return ( m_pPlayerPed->GetFootBlood() > 0 );
     }
-    return 0;
+    return false;
 }
 
 

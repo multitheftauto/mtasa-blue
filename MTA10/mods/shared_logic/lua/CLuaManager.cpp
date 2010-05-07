@@ -406,7 +406,7 @@ void CLuaManager::LoadCFunctions ( void )
     //CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefs::GetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefs::IsPedHeadless );
     CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefs::IsPedFrozen );
-    CLuaCFunctions::AddFunction ( "getPedFootBlood", CLuaFunctionDefs::GetPedFootBlood );
+    CLuaCFunctions::AddFunction ( "isPedFootBloodEnabled", CLuaFunctionDefs::IsPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefs::GetPedCameraRotation );
 
     CLuaCFunctions::AddFunction ( "setPedWeaponSlot", CLuaFunctionDefs::SetPedWeaponSlot );
@@ -421,7 +421,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedLookAt", CLuaFunctionDefs::SetPedLookAt );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefs::SetPedHeadless );
     CLuaCFunctions::AddFunction ( "setPedFrozen", CLuaFunctionDefs::SetPedFrozen );
-    CLuaCFunctions::AddFunction ( "setPedFootBlood", CLuaFunctionDefs::SetPedFootBlood );
+    CLuaCFunctions::AddFunction ( "setPedFootBloodEnabled", CLuaFunctionDefs::SetPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefs::SetPedCameraRotation );
     CLuaCFunctions::AddFunction ( "setPedAimTarget", CLuaFunctionDefs::SetPedAimTarget );
 

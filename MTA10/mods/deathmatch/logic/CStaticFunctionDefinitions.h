@@ -128,7 +128,7 @@ public:
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
     static bool                         IsPedFrozen                         ( CClientPed& Ped, bool & bFrozen );
-    static bool                         GetPedFootBlood                     ( CClientPed& Ped, unsigned int & uiFootBlood );
+    static bool                         IsPedFootBloodEnabled               ( CClientPed& Ped, bool & bHasFootBlood );
     static bool                         GetPedCameraRotation                ( CClientPed& Ped, float & fRotation );
     static bool                         GetPedWeaponMuzzlePosition          ( CClientPed& Ped, CVector& vecPosition );
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
@@ -146,7 +146,7 @@ public:
     static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
     static bool                         SetPedFrozen                        ( CClientEntity& Entity, bool bFrozen );
-    static bool                         SetPedFootBlood                     ( CClientEntity& Entity, unsigned int uiFootBlood );
+    static bool                         SetPedFootBloodEnabled              ( CClientEntity& Entity, bool bHasFootBlood );
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
