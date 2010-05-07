@@ -1067,25 +1067,25 @@ int CLuaFunctionDefs::IsPedFrozen ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetPedFootBlood ( lua_State* luaVM )
+int CLuaFunctionDefs::IsPedFootBloodEnabled ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
     {
         CClientPed * pPed = lua_toped ( luaVM, 1 );
         if ( pPed )
         {
-            unsigned int uiFootBlood = 0;
-           if ( CStaticFunctionDefinitions::GetPedFootBlood ( *pPed, uiFootBlood ) )
+            bool bHasFootBlood = false;
+            if ( CStaticFunctionDefinitions::IsPedFootBloodEnabled ( *pPed, bHasFootBlood ) )
             {
-                lua_pushnumber ( luaVM, uiFootBlood );
+                lua_pushboolean ( luaVM, bHasFootBlood );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedFootBlood", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedFootBloodEnabled", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedFootBlood" );
+        m_pScriptDebugging->LogBadType ( luaVM, "isPedFootBloodEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1378,27 +1378,26 @@ int CLuaFunctionDefs::SetPedFrozen ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::SetPedFootBlood ( lua_State* luaVM )
+int CLuaFunctionDefs::SetPedFootBloodEnabled ( lua_State* luaVM )
 {
-  int iArgument2 = lua_type ( luaVM, 2 );
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+         ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN ) )
     {
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        unsigned int uiFootBlood = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedFootBlood ( *pEntity, uiFootBlood ) )
+            bool bHasFootBlood = lua_toboolean ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetPedFootBloodEnabled ( *pEntity, bHasFootBlood ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFootBlood", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFootBloodEnabled", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedFootBlood" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedFootBloodEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

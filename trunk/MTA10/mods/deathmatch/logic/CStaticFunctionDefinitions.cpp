@@ -1315,9 +1315,9 @@ bool CStaticFunctionDefinitions::IsPedFrozen ( CClientPed & Ped, bool & bFrozen 
 }
 
 
-bool CStaticFunctionDefinitions::GetPedFootBlood ( CClientPed & Ped, unsigned int & uiFootBlood )
+bool CStaticFunctionDefinitions::IsPedFootBloodEnabled ( CClientPed & Ped, bool & bHasFootBlood )
 {
-    uiFootBlood = Ped.GetFootBlood ();
+    bHasFootBlood = Ped.IsFootBloodEnabled ();
     return true;
 }
 
@@ -1785,13 +1785,13 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CClientEntity & Entity, bool bFr
 }
 
 
-bool CStaticFunctionDefinitions::SetPedFootBlood ( CClientEntity & Entity, unsigned int uiFootBlood )
+bool CStaticFunctionDefinitions::SetPedFootBloodEnabled ( CClientEntity & Entity, bool bHasFootBlood )
 {
-    RUN_CHILDREN SetPedFootBlood ( **iter, uiFootBlood );
+    RUN_CHILDREN SetPedFootBloodEnabled ( **iter, bHasFootBlood );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.SetFootBlood ( uiFootBlood );
+        Ped.SetFootBloodEnabled ( bHasFootBlood );
         return true;
     }
     return false;
