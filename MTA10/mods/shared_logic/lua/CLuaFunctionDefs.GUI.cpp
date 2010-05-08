@@ -2449,64 +2449,174 @@ int CLuaFunctionDefs::GUILabelSetHorizontalAlign ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    //* chat_font - Returns the chatbox font
+    //* chat_lines - Returns how many lines the chatbox has
+    //* chat_color - Returns the background color of the chatbox
+    //* chat_text_color - Returns the chatbox text color
+    //* chat_input_color - Returns the background color of the chatbox input
+    //* chat_input_prefix_color - Returns the color of the input prefix text
+    //* chat_input_text_color - Returns the color of the text in the chatbox input
+    //* chat_scale - Returns the scale of the text in the chatbox
+    //* chat_width - Returns the scale of the background width
+    //* chat_css_style_text - Returns whether text fades out over time
+    //* chat_css_style_background - Returns whether the background fades out over time
+    //* chat_line_life - Returns how long it takes for text to start fading out
+    //* chat_line_fade_out - Returns how long takes for text to fade out
+    //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
+    //* text_scale - Returns text scale
+
+    CCVarsInterface* pCVars = g_pCore->GetCVars ();
+    float fNumber;
+    pCVars->Get("chat_font", fNumber);
+    lua_newtable ( luaVM );
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_font" );
+    pCVars->Get("chat_lines", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_lines" );
+    pCVars->Get("chat_width", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_width" );
+    pCVars->Get("chat_css_style_text", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_css_style_text" );
+    pCVars->Get("chat_css_style_background", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_css_style_background" );
+    pCVars->Get("chat_line_life", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_line_life" );
+    pCVars->Get("chat_line_fade_out", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_line_fade_out" );
+    pCVars->Get("text_scale", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "text_scale" );
+    pCVars->Get("chat_use_cegui", fNumber);
+    lua_pushboolean ( luaVM, fNumber ? true : false );
+    lua_setfield ( luaVM, -2, "chat_use_cegui" );
+    std::string strCVar;
+    std::stringstream ss;
+    int iR, iG, iB, iA;
+    pCVars->Get("chat_color", strCVar);
+    if ( !strCVar.empty() )
     {
-        std::string strCVAR;
-        std::string strCVARCommand = ( std::string ) lua_tostring ( luaVM, 1 );
-
-        g_pCore->GetCVars ()->Get ( strCVARCommand, strCVAR );
-        if ( !strCVAR.empty() )
-        {
-            char szSet [] = ".1234567890";
-            if ( strspn ( strCVAR.c_str (), szSet ) == strlen ( strCVAR.c_str () ) && !strCVAR.empty () )
-            {
-                float fNumber = static_cast < float > ( atof ( strCVAR.c_str() ) );
-                if ( fNumber >= 0 )
-                {
-                    lua_pushnumber ( luaVM, fNumber );
-                    return 1;
-                }
-            }
-            else if ( strCVARCommand.find("color") != std::string::npos )
-            {
-                char strColor[32] = { '\0' };
-                strcpy ( strColor, strCVAR.c_str() );
-
-                int iRed    = atoi ( strtok ( strColor, " " ) );
-                int iGreen  = atoi ( strtok ( NULL, " " ) );
-                int iBlue   = atoi ( strtok ( NULL, " " ) );
-                int iAlpha  = atoi ( strtok ( NULL, "\r" ) );
-
-                if ( iRed >= 0 && iGreen >= 0 && iBlue >= 0 && iAlpha >= 0 )
-                {
-                    lua_pushnumber ( luaVM, iRed );
-                    lua_pushnumber ( luaVM, iGreen );
-                    lua_pushnumber ( luaVM, iBlue );
-                    lua_pushnumber ( luaVM, iAlpha );
-                    return 4;
-                }
-            }
-            else if ( strCVARCommand == "chat_scale" )
-            {
-                char strPos[16] = { '\0' };
-                strcpy ( strPos, strCVAR.c_str() );
-
-                int iX = atoi ( strtok ( strPos, " " ) );
-                int iY = atoi ( strtok ( NULL, "\r" ) );
-
-                if ( iX >= 0 && iY >= 0 )
-                {
-                    lua_pushnumber ( luaVM, iX );
-                    lua_pushnumber ( luaVM, iY );
-                    return 2;
-                }
-            }
-        }
+        ss.str ( strCVar );
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iR );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iG );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, iB );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 4 );
+        lua_pushnumber ( luaVM, iA );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_color" );
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getChatboxLayout" );
-
-    // error: bad arguments
-    lua_pushboolean ( luaVM, false );
+    pCVars->Get("chat_text_color", strCVar);
+    if ( !strCVar.empty() )
+    {
+        ss.clear();
+        ss.str ( strCVar );
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iR );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iG );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, iB );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 4 );
+        lua_pushnumber ( luaVM, iA );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_text_color" );
+    }
+    pCVars->Get("chat_input_color", strCVar);
+    if ( !strCVar.empty() )
+    {
+        ss.clear();
+        ss.str ( strCVar );
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iR );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iG );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, iB );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 4 );
+        lua_pushnumber ( luaVM, iA );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_input_color" );
+    }
+    pCVars->Get("chat_input_prefix_color", strCVar);
+    if ( !strCVar.empty() )
+    {
+        ss.clear();
+        ss.str ( strCVar );
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iR );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iG );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, iB );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 4 );
+        lua_pushnumber ( luaVM, iA );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_input_prefix_color" );
+    }
+    pCVars->Get("chat_input_text_color", strCVar);
+    if ( !strCVar.empty() )
+    {
+        ss.clear();
+        ss.str ( strCVar );
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iR );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iG );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, iB );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 4 );
+        lua_pushnumber ( luaVM, iA );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_input_text_color" );
+    }
+    int iX, iY;
+    pCVars->Get("chat_scale", strCVar);
+    if ( !strCVar.empty() )
+    {
+        ss.clear();
+        ss.str ( strCVar );
+        ss >> iX >> iY;
+        lua_newtable ( luaVM );
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, iX );
+        lua_settable( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, iY );
+        lua_settable( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "chat_scale" );
+    }
     return 1;
 }
