@@ -53,6 +53,10 @@ CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
 
 void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
 {
+    // Stops crash on exit
+    if ( m_TaskList.size () == 0 )
+        return;
+
     // Find it in our list
     STaskListItem* pItem;
     list < STaskListItem* > ::iterator iter = m_TaskList.begin ();

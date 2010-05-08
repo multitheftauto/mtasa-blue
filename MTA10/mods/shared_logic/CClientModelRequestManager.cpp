@@ -294,7 +294,10 @@ void CClientModelRequestManager::DoPulse ( void )
                 {
                     // Request it again. Don't add reference, or we screw up the
                     // reference count.
-                    pEntry->pModel->Request ( TRUE, FALSE );
+                    if ( g_pGame->IsASyncLoadingEnabled () )
+                        pEntry->pModel->Request ( FALSE, FALSE );
+                    else
+                        pEntry->pModel->Request ( TRUE, FALSE );
 
                     // Remember now as the time we requested it.
                     pEntry->dwTimeRequested = dwTimeNow;

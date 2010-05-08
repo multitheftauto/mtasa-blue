@@ -145,6 +145,9 @@ protected:
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
+
+    CGUICheckBox*       m_pASyncLoading;
+    CGUILabel*          m_pLabelASyncLoading;
     
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;

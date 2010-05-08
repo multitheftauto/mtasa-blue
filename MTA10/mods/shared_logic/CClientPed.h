@@ -369,6 +369,8 @@ public:
 
     inline bool                 IsFrozen                ( void ) const                                  { return m_bFrozen; }
     void                        SetFrozen               ( bool bFrozen );
+    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
 
     bool                        IsFootBloodEnabled      ( void );
     void                        SetFootBloodEnabled     ( bool bHasFootBlood );
@@ -520,7 +522,6 @@ public:
     float                       m_fTargetRotation;
     int                         m_iVehicleInOutState;
     bool                        m_bRecreatingModel;
-    bool                        m_bPerformSpawnLoadingChecks;
     CClientEntity *             m_pCurrentContactEntity;
     bool                        m_bSunbathing;
     CClientPad                  m_Pad;
@@ -533,6 +534,8 @@ public:
     bool                        m_bUpdatePositionAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
+    bool                        m_bFrozenWaitingForGroundToLoad;
+    float                       m_fGroundCheckTolerance;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;

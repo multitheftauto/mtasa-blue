@@ -37,6 +37,9 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
+    m_bASyncLoading = false;
+    m_bASyncLoadingSuspended = false;
+
     // Unprotect all of the GTASA code at once and leave it that way
     DWORD oldProt;
     VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
@@ -576,4 +579,19 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x6EAEF8, "DATA\\water.dat" ) &&
            !strcmp ( *(char **)0x6EAEC3, "DATA\\water1.dat" ) &&
            !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
+}
+
+void CGameSA::SetASyncLoadingEnabled ( bool bEnabled )
+{
+    m_bASyncLoading = bEnabled;
+}
+
+void CGameSA::SuspendASyncLoading ( bool bSuspend )
+{
+    m_bASyncLoadingSuspended = bSuspend;
+}
+
+bool CGameSA::IsASyncLoadingEnabled ( void )
+{
+    return m_bASyncLoading && !m_bASyncLoadingSuspended;
 }

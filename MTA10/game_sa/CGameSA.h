@@ -205,6 +205,11 @@ public:
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
+
+    void                    SetASyncLoadingEnabled  ( bool bEnabled );
+    void                    SuspendASyncLoading     ( bool bSuspend );
+    bool                    IsASyncLoadingEnabled   ( void );
+
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;
@@ -254,6 +259,8 @@ private:
     CControllerConfigManager    * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
+    bool                    m_bASyncLoading;
+    bool                    m_bASyncLoadingSuspended;
 
     static unsigned long*   VAR_SystemTime;
     static unsigned long*   VAR_IsAtMenu;

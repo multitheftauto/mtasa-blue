@@ -258,6 +258,8 @@ public:
     inline bool                 IsFrozen                ( void )                            { return m_bIsFrozen; };
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
+    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
 
     CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
@@ -305,6 +307,8 @@ public:
     
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
+
+    float                       GetDistanceFromGround   ( void );
 
     void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
     bool                        IsInWater               ( void );
@@ -455,6 +459,8 @@ protected:
     unsigned char               m_ucColor4;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
+    bool                        m_bFrozenWaitingForGroundToLoad;
+    float                       m_fGroundCheckTolerance;
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;
