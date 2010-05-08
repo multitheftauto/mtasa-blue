@@ -43,7 +43,7 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabChat;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabChat, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -76,6 +76,7 @@ CSettings::CSettings ( void )
     pTabControls = m_pTabs->CreateTab ( "Controls" );
     pTabCommunity = m_pTabs->CreateTab ( "Community" );
     pTabChat = m_pTabs->CreateTab ( "Chatbox" );
+    pTabAdvanced = m_pTabs->CreateTab ( "Advanced" );
 
     // Create buttons
     //  OK button
@@ -262,6 +263,9 @@ CSettings::CSettings ( void )
     /**
      *  Community tab
      **/
+    // Hide
+    m_pTabs->DeleteTab ( pTabCommunity );
+
     m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
     m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
     m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
@@ -636,6 +640,17 @@ CSettings::CSettings ( void )
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
         pLabel->AutoSize ( "sec" );
     }
+
+    /**
+     *  Advanced tab
+     **/
+    m_pASyncLoading = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "ASync Loading", true ) );
+    m_pASyncLoading->SetPosition ( CVector2D ( 20.0f, 20.0f ) );
+
+    m_pLabelASyncLoading = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which may improve performance)" ) );
+    m_pLabelASyncLoading->SetPosition ( CVector2D ( 140.f, 22.f ) );
+    m_pLabelASyncLoading->SetFont ( "default-bold-small" );
+    m_pLabelASyncLoading->AutoSize ( m_pLabelASyncLoading->GetText ().c_str () );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1723,6 +1738,9 @@ void CSettings::LoadData ( void )
             m_pComboResolution->SetText ( strMode );
     }
 
+    // Async loading
+    CVARS_GET ( "async_loading", bVar ); m_pASyncLoading->SetSelected ( bVar );
+
     // Map alpha
     int iVar;
     CVARS_GET ( "mapalpha", iVar);
@@ -1871,6 +1889,10 @@ void CSettings::SaveData ( void )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
     }
+
+    // Async loading
+    CVARS_SET ( "async_loading", m_pASyncLoading->GetSelected () );
+    g_pCore->GetGame ()->SetASyncLoadingEnabled ( m_pASyncLoading->GetSelected () );
 
     // Map alpha
     SString sText = m_pMapAlphaValueLabel->GetText ();

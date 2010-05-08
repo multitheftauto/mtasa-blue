@@ -180,6 +180,10 @@ public:
 
     virtual bool                VerifySADataFileNames       () = 0;
     virtual bool                PerformChecks               () = 0;
+
+    virtual void                SetASyncLoadingEnabled      ( bool bEnabled ) = 0;
+    virtual void                SuspendASyncLoading         ( bool bSuspend ) = 0;
+    virtual bool                IsASyncLoadingEnabled       ( void ) = 0;
 };
 
 #endif

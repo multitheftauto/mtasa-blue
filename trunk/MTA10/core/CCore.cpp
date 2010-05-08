@@ -628,6 +628,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
+    CVARS_GET ( "async_loading",    bval ); m_pGame->SetASyncLoadingEnabled ( bval );
 }
 
 void CCore::ApplyMenuSettings ( void )

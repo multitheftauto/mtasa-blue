@@ -271,7 +271,6 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
 {
     // TODO: mix in with the streamer, cause this is way too slow
-    return true;
 
     CVector vecObject;
     float fDistanceX, fDistanceY, fDistanceZ, fDistanceExp;
@@ -287,7 +286,8 @@ bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition
         pObject = *iter;
 
         // Is it not loaded?
-        if ( !pObject->GetGameObject () )
+        CModelInfo* pModelInfo = pObject->GetModelInfo ();
+        if ( !pObject->GetGameObject () || !pModelInfo->IsLoaded () )
         {
             if ( pObject->GetDimension () == usDimension )
             {

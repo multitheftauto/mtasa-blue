@@ -212,4 +212,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "steer_with_mouse",           false );                        // steering with mouse controls
     DEFAULT ( "classic_controls",           false );                        // classic/standard controls
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
+    DEFAULT ( "async_loading",              false );                        // loading while crashing
 }
