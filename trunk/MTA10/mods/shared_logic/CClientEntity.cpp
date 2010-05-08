@@ -508,9 +508,7 @@ void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Vari
     Arguments.PushArgument ( oldVariable );
     Arguments.PushArgument ( Variable );
     if ( !CallEvent ( "onClientElementDataChange", Arguments, true ) )
-    {
-        return
-    }
+        return;
 
     // Set the new data
     m_pCustomData->Set ( szName, Variable, pLuaMain );
