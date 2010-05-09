@@ -172,7 +172,7 @@ private:
 
     unsigned long           m_ulLastUpdateTime;
     bool                    m_firstTimeBrowseServer;
-    bool                    m_OptionsLoaded;
+    bool                    m_bOptionsLoaded;
     ServerBrowserType       m_PrevServerBrowserType;
 };
 
