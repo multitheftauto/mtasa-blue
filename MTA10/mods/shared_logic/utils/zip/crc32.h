@@ -10,16 +10,12 @@ class CRCGenerator {
     
 protected:
     static class CRCGenerator *        instance;
-                                CRCGenerator();
-private:
-    unsigned long               crc32_table[256];
-    unsigned long               Reflect ( unsigned long ref, unsigned char ch );
 public:
     static CRCGenerator *       GetInstance() { if ( !instance ) instance = new CRCGenerator(); return instance; }
-    void                        Init(void);
-    unsigned long               GetCRC ( unsigned long * buf, unsigned long buflen);
     unsigned long               GetCRC ( char * szFilename );
     unsigned long               GetCRC ( char * szFilename, unsigned long ucOldCRC );
+    unsigned long               GetBufferCRC ( const char* cpBuffer, unsigned long ulLength );
+
 
 };
 

@@ -288,16 +288,30 @@ void CResource::Load ( CClientEntity *pRootEntity )
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
     for ( ; iter != m_ResourceFiles.end (); iter++ )
     {
+        CResourceFile* pResourceFile = *iter;
         // Only load the resource file if it is a client script
-        if ( ( *iter )->GetResourceType () == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
+        if ( pResourceFile->GetResourceType () == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
         {
-            // Load the resource file
-            m_pLuaVM->LoadScriptFromFile ( ( *iter )->GetName () );
+            // Load the file
+            std::vector < char > buffer;
+            FileLoad ( pResourceFile->GetName (), buffer );
+
+            // Check the contents
+            unsigned long ulCRC = CRCGenerator::GetInstance ()->GetBufferCRC ( &buffer.at ( 0 ), buffer.size () );
+            if ( pResourceFile->GetServerCRC () == ulCRC )
+            {
+                // Load the resource text
+                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size () );
+            }
+            else
+            {
+                g_pCore->DebugEchoColor ( SString ( "Loading script failed: %s", pResourceFile->GetShortName () ), 255, 0, 0 );
+            }
         }
         else
-        if ( CheckFileForCorruption ( ( *iter )->GetName () ) )
+        if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", (*iter)->GetShortName (), m_szResourceName );
+            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", pResourceFile->GetShortName (), m_szResourceName );
             g_pCore->DebugEchoColor ( strBuffer, 255, 0, 0 );
         }
     }

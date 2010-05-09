@@ -480,3 +480,32 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
     // Other platforms here
 #endif
 }
+
+
+//
+// Load binary data from a file into an array
+//
+bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
+{
+    buffer.clear ();
+    // Open
+    FILE* fh = fopen ( strFilename, "rb" );
+    if ( !fh )
+        return false;
+    // Get size
+    fseek ( fh, 0, SEEK_END );
+    int size = ftell ( fh );
+    rewind ( fh );
+
+    int bytesRead = 0;
+    if ( size > 0 && size < 1e9 )
+    {
+        // Allocate space
+        buffer.assign ( size, 0 );
+        // Read into buffer
+        bytesRead = fread ( &buffer.at ( 0 ), 1, size, fh );
+    }
+    // Close
+    fclose ( fh );
+    return bytesRead == size;
+}
