@@ -19,15 +19,16 @@
 class CColRectangle : public CColShape
 {
 public:
-                            CColRectangle   ( CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL ) : CColShape ( pManager, pParent, pNode ) {};
                             CColRectangle   ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector2D& vecSize, CXMLNode* pNode = NULL );
+
+    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )                        { return COLSHAPE_RECTANGLE; }
     
     bool                    DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
 
     inline const CVector2D& GetSize         ( void )                        { return m_vecSize; };
-    inline void             SetSize         ( const CVector2D& vecSize )    { m_vecSize = vecSize; };
+    inline void             SetSize         ( const CVector2D& vecSize )    { m_vecSize = vecSize; SizeChanged (); };
 
 protected:
     bool                    ReadSpecialData ( void );

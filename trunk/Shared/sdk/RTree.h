@@ -1422,8 +1422,6 @@ void RTREE_QUAL::PickSeeds(PartitionVars* a_parVars)
       }
     }
   }
-    if (seed0 == -123456)
-        MessageBox( NULL, "Error", "RTree has failed", MB_BUTTON_OK | MB_ICON_ERROR );
   Classify(seed0, 0, a_parVars);
   Classify(seed1, 1, a_parVars);
 }

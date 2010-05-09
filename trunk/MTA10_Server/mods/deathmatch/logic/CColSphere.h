@@ -19,15 +19,16 @@
 class CColSphere : public CColShape
 {
 public:
-                    CColSphere      ( CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL );
                     CColSphere      ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false );
+
+    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType   GetShapeType    ( void )            { return COLSHAPE_SPHERE; }
 
     bool            DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
 
     float           GetRadius       ( void )            { return m_fRadius; };
-    void            SetRadius       ( float fRadius )   { m_fRadius = fRadius; };
+    void            SetRadius       ( float fRadius )   { m_fRadius = fRadius; SizeChanged (); };
 
 protected:
     bool            ReadSpecialData ( void );

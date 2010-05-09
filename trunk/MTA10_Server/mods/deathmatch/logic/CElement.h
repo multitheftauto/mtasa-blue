@@ -93,7 +93,7 @@ public:
 
     virtual const CVector&                      GetPosition                 ( void );
     virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };
-    virtual void                                SetPosition                 ( const CVector& vecPosition )  { m_vecLastPosition = m_vecPosition; m_vecPosition = vecPosition; };
+    virtual void                                SetPosition                 ( const CVector& vecPosition );
 
     virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
 
@@ -208,6 +208,10 @@ public:
     inline void                                 SetInterior                 ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
 
     inline bool                                 IsMapCreated                ( void )                        { return m_bMapCreated; }
+
+    // Spatial database
+    virtual CSphere                             GetWorldBoundingSphere      ( void );
+    virtual void                                UpdateSpatialData           ( void );
 
 protected:
     CElement*                                   GetRootElement              ( void );

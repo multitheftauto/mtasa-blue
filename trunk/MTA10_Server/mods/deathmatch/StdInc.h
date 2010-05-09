@@ -31,6 +31,8 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include "CVector.h"
+#include "CSphere.h"
+#include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
@@ -211,6 +213,7 @@
 #include "CScriptFile.h"
 #include "CSerialManager.h"
 #include "CSettings.h"
+#include "CSpatialDatabase.h"
 #include "CTeam.h"
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
