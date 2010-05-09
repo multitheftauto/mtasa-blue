@@ -433,9 +433,6 @@ void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolat
             // Set it only if we're not in a vehicle or not working on getting in/out
             if ( !m_pOccupiedVehicle || GetVehicleInOutState () != VEHICLE_INOUT_GETTING_OUT )
             {
-                // Set the real position
-                m_pPlayerPed->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
-
                 // Is this the local player?
                 if ( m_bIsLocalPlayer )
                 {
