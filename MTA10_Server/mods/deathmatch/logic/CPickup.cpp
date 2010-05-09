@@ -256,6 +256,7 @@ void CPickup::SetPosition ( const CVector& vecPosition )
     m_vecPosition = vecPosition;
     if ( m_pCollision )
         m_pCollision->SetPosition ( vecPosition );
+    UpdateSpatialData ();
 }
 
 

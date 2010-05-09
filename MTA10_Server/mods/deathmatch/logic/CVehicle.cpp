@@ -320,6 +320,7 @@ void CVehicle::SetPosition ( const CVector & vecPosition )
         // Update our stored vectors
         m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
+        UpdateSpatialData ();
     }
 }
 
@@ -595,6 +596,7 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     m_vecVelocity = vecNull;
     m_vecPosition = vecPosition;
     m_vecRotationDegrees = vecRotation;
+    UpdateSpatialData ();
 }
 
 

@@ -18,15 +18,16 @@
 class CColCuboid : public CColShape
 {
 public:
-                            CColCuboid      ( CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL ) : CColShape ( pManager, pParent, pNode ) {};
                             CColCuboid      ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize, CXMLNode* pNode = NULL );
+
+    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )            { return COLSHAPE_CUBOID; }
 
     bool                    DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
 
     inline const CVector&   GetSize         ( void )                    { return m_vecSize; };
-    inline void             SetSize         ( const CVector& vecSize )  { m_vecSize = vecSize; };
+    inline void             SetSize         ( const CVector& vecSize )  { m_vecSize = vecSize; SizeChanged (); };
 
 protected:
     bool                    ReadSpecialData ( void );

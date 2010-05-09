@@ -20,8 +20,9 @@
 class CColPolygon : public CColShape
 {
 public:
-                                CColPolygon         ( CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL ) : CColShape ( pManager, pParent, pNode ) {};
                                 CColPolygon         ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, CXMLNode* pNode = NULL );
+
+    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType               GetShapeType        ( void )                { return COLSHAPE_POLYGON; }
 

@@ -35,7 +35,8 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
 
     // Add us to the marker manager
     pMarkerManager->AddToList ( this );
-};
+    UpdateSpatialData ();
+}
 
 
 CMarker::~CMarker ( void )
@@ -143,6 +144,7 @@ void CMarker::SetPosition ( const CVector& vecPosition )
         m_vecPosition = vecPosition;
         if ( m_pCollision )
             m_pCollision->SetPosition ( vecPosition );
+        UpdateSpatialData ();
 
         // We need to make sure the time context is replaced 
         // before that so old packets don't arrive after this.
@@ -376,4 +378,10 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
     {
         static_cast < CColSphere* > ( m_pCollision )->SetRadius ( m_fSize );
     }
+}
+
+
+CSphere CMarker::GetWorldBoundingSphere ( void )
+{
+    return CSphere ( GetPosition (), GetSize () );
 }

@@ -741,6 +741,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CSpatialDatabase.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
 					>
 				</File>
@@ -1735,6 +1739,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CSettings.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSpatialDatabase.h"
 					>
 				</File>
 				<File
