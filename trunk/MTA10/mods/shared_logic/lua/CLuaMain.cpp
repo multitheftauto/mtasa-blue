@@ -203,6 +203,44 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
     return false;
 }
 
+
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize )
+{
+    if ( m_luaVM )
+    {
+        // Run the script
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, NULL ) )
+        {
+            // Print the error
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            if ( strRes.length () )
+            {
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
+                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+            }
+            else
+            {
+                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
+                g_pClientGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+            }
+        }
+        else
+        {
+            ResetInstructionCount ();
+            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
+            {
+                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 bool CLuaMain::LoadScript ( const char* szLUAScript )
 {
     if ( m_luaVM )
