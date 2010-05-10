@@ -3460,6 +3460,11 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON, *BitStream.pBitStream ) );
 
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                pPed->SetWeaponType ( 0, ucWeaponSlot );
+                pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( 0, ucWeaponSlot );
+
                 return true;
             }
         }
@@ -3482,6 +3487,13 @@ bool CStaticFunctionDefinitions::TakeAllWeapons ( CElement* pElement )
             CBitStream BitStream;
             BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_ALL_WEAPONS, *BitStream.pBitStream ) );
+
+            for ( unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ ucWeaponSlot )
+            {
+                pPed->SetWeaponType ( 0, ucWeaponSlot );
+                pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( 0, ucWeaponSlot );
+            }
 
             return true;
         }
@@ -3514,6 +3526,14 @@ bool CStaticFunctionDefinitions::GiveWeaponAmmo ( CElement* pElement, unsigned c
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_WEAPON_AMMO, *BitStream.pBitStream ) );
 
+            unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+            unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+            if ( (unsigned int)usTotalAmmo + usAmmo > 0xFFFF )
+                usTotalAmmo = 0xFFFF;
+            else
+                usTotalAmmo += usAmmo;
+            pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
+
             return true;
         }
     }
@@ -3544,6 +3564,14 @@ bool CStaticFunctionDefinitions::TakeWeaponAmmo ( CElement* pElement, unsigned c
             BitStream.pBitStream->Write ( &ammo );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON_AMMO, *BitStream.pBitStream ) );
+
+            unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+            unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+            if ( (int)usTotalAmmo - usAmmo < 0 )
+                usTotalAmmo = 0;
+            else
+                usTotalAmmo -= usAmmo;
+            pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
 
             return true;
         }
@@ -3579,6 +3607,10 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
                 BitStream.pBitStream->Write ( &ammo );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
+
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                pPed->SetWeaponAmmoInClip ( usAmmoInClip, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( usAmmo, ucWeaponSlot );
 
                 return true;
             }
