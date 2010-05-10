@@ -119,7 +119,7 @@ bool CSpatialDatabaseImpl::IsEntityPresent ( CElement* pEntity )
 // A callback function to obtain query results
 //
 ///////////////////////////////////////////////////////////////
-bool _cdecl QueryResultCallback( CElement* pEntity, void* ptr )
+bool __cdecl QueryResultCallback( CElement* pEntity, void* ptr )
 {
     std::map < CElement*, int >& resultMap = *(std::map < CElement*, int >*)ptr;
     resultMap[ pEntity ] = 1;
@@ -195,7 +195,6 @@ void CSpatialDatabaseImpl::AllQuery ( CElementResult& outResult )
 ///////////////////////////////////////////////////////////////
 void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
 {
-    int iTotalToUpdate = m_UpdateQueue.size ();
     int iTotalUpdated = 0;
 
     for ( std::map < CElement*, int >::iterator it = m_UpdateQueue.begin (); it != m_UpdateQueue.end (); ++it )
@@ -242,6 +241,7 @@ void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
     m_UpdateQueue.clear ();
 
     #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTB
+        int iTotalToUpdate = m_UpdateQueue.size ();
         if ( iTotalToUpdate )
             OutputDebugLine ( SString ( "SpatialDatabase::FlushUpdateQueue  TotalToUpdate: %d   TotalUpdated: %d  m_InfoMap: %d    tree: %d  ", iTotalToUpdate, iTotalUpdated, m_InfoMap.size (), m_Tree.Count () ) );
     #endif

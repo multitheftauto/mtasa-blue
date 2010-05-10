@@ -42,6 +42,8 @@ public:
 class CSpatialDatabase
 {
 public:
+    virtual             ~CSpatialDatabase   ( void ) {}
+
     virtual void        UpdateEntity        ( CElement* pEntity ) = 0;
     virtual void        RemoveEntity        ( CElement* pEntity ) = 0;
     virtual bool        IsEntityPresent     ( CElement* pEntity ) = 0;
