@@ -297,15 +297,15 @@ void CResource::Load ( CClientEntity *pRootEntity )
             FileLoad ( pResourceFile->GetName (), buffer );
 
             // Check the contents
-            unsigned long ulCRC = CRCGenerator::GetInstance ()->GetBufferCRC ( &buffer.at ( 0 ), buffer.size () );
-            if ( pResourceFile->GetServerCRC () == ulCRC )
+            if ( buffer.size () > 0 && pResourceFile->GetServerCRC () == CRCGenerator::GetInstance ()->GetBufferCRC ( &buffer.at ( 0 ), buffer.size () ) )
             {
                 // Load the resource text
                 m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size () );
             }
             else
             {
-                g_pCore->DebugEchoColor ( SString ( "Loading script failed: %s", pResourceFile->GetShortName () ), 255, 0, 0 );
+                SString strBuffer ( "ERROR: File '%s' in resource '%s' - CRC mismatch.", pResourceFile->GetShortName (), m_szResourceName );
+                g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
             }
         }
         else
