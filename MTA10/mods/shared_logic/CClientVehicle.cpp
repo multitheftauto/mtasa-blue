@@ -1868,8 +1868,9 @@ void CClientVehicle::StreamedInPulse ( void )
             bool bHasModel      = GetModelInfo () != NULL;
 
             #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                SString status = SString ( "bASync:%d   bHasModel:%d   bGTALoaded:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
-                                                , bASync, bHasModel, bGTALoaded, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
+                SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bGTALoaded:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
+                                               ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
+                                               , bASync, bHasModel, bGTALoaded, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
             #endif
 
             // See if ground is ready
@@ -2163,18 +2164,6 @@ void CClientVehicle::Create ( void )
         {
             m_pVehicle->SetHeliRotorSpeed ( m_fHeliRotorSpeed );
             m_pVehicle->SetHeliSearchLightVisible ( m_bHeliSearchLightVisible );
-        }
-
-        // Check the paintjob hasn't reset our colors
-        if ( m_bColorSaved )
-        {
-            unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
-            m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
-            if ( ucColor1 != m_ucColor1 || ucColor2 != m_ucColor2 ||
-                 ucColor3 != m_ucColor3 || ucColor4 != m_ucColor4 )
-            {
-                m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
-            }
         }
 
         m_pVehicle->SetUnderwater ( IsBelowWater () );

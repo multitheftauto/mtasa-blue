@@ -141,8 +141,6 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             // The same model?
             if ( pInfo == pEntry->pModel )
             {
-                pInfo->MakeCustomModel ();
-
                 // He has to wait more for it
                 return false;
             }
@@ -157,6 +155,8 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                     // Delete it, remove the it from the list and return true.
                     delete pEntry;
                     m_Requests.erase ( iter );
+
+                    pInfo->MakeCustomModel ();
                     return true;
                 }
                 else
