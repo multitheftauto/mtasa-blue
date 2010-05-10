@@ -54,13 +54,11 @@ o Minor updates for MSVC 2005/08 compilers
 #include <assert.h>
 #include <stdlib.h>
 
+#ifndef _WIN32
+#define __cdecl
+#endif
+
 #define ASSERT assert // RTree uses ASSERT( condition )
-#ifndef Min
-  #define Min __min 
-#endif //Min
-#ifndef Max
-  #define Max __max 
-#endif //Max
 
 //
 // RTree.h
@@ -280,7 +278,7 @@ public:
     StackElement m_stack[MAX_STACK];              ///< Stack as we are doing iteration instead of recursion
     int m_tos;                                    ///< Top Of Stack index
   
-    friend RTree; // Allow hiding of non-public functions while allowing manipulation by logical owner
+    friend class RTree; // Allow hiding of non-public functions while allowing manipulation by logical owner
   };
 
   /// Get 'first' for iteration
@@ -1093,8 +1091,8 @@ int RTREE_QUAL::PickBranch(Rect* a_rect, Node* a_node)
   ELEMTYPEREAL increase;
   ELEMTYPEREAL bestIncr = (ELEMTYPEREAL)-1;
   ELEMTYPEREAL area;
-  ELEMTYPEREAL bestArea;
-  int best;
+  ELEMTYPEREAL bestArea = (ELEMTYPEREAL)-1;
+  int best = -1;
   Rect tempRect;
 
   for(int index=0; index < a_node->m_count; ++index)
@@ -1281,7 +1279,7 @@ void RTREE_QUAL::ChoosePartition(PartitionVars* a_parVars, int a_minFill)
   ASSERT(a_parVars);
   
   ELEMTYPEREAL biggestDiff;
-  int group, chosen, betterGroup;
+  int group, chosen = -1, betterGroup = -1;
   
   InitParVars(a_parVars, a_parVars->m_branchCount, a_minFill);
   PickSeeds(a_parVars);
@@ -1398,7 +1396,7 @@ void RTREE_QUAL::InitParVars(PartitionVars* a_parVars, int a_maxRects, int a_min
 RTREE_TEMPLATE
 void RTREE_QUAL::PickSeeds(PartitionVars* a_parVars)
 {
-  int seed0=-123456, seed1;
+  int seed0 = -1, seed1 = -1;
   ELEMTYPEREAL worst, waste;
   ELEMTYPEREAL area[MAXNODES+1];
 
