@@ -1205,7 +1205,10 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
     if ( !pModelInfo->IsLoaded () )
     {
-        pModelInfo->LoadAllRequestedModels ();
+        if ( pVehicle->IsStreamedIn () )
+        {
+            pModelInfo->LoadAllRequestedModels ();
+        }
     }
 
     // Transfer WaitingForGroundToLoad state to vehicle
@@ -2193,8 +2196,9 @@ void CClientPed::StreamedInPulse ( void )
             bool bHasModel      = GetModelInfo () != NULL;
 
             #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                SString status = SString ( "bASync:%d   bHasModel:%d   bGTALoaded:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
-                                                , bASync, bHasModel, bGTALoaded, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
+                SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bGTALoaded:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
+                                               ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
+                                               , bASync, bHasModel, bGTALoaded, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
             #endif
 
             // See if ground is ready

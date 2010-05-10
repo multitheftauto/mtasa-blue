@@ -176,6 +176,9 @@ void CClientSpatialDatabaseImpl::SphereQuery ( CClientEntityResult& outResult, c
 ///////////////////////////////////////////////////////////////
 void CClientSpatialDatabaseImpl::AllQuery ( CClientEntityResult& outResult )
 {
+    // Do any pending updates first
+    FlushUpdateQueue ();
+
     // Copy results from map to output
     outResult.clear ();
     for ( std::map < CClientEntity*, SEntityInfo >::iterator it = m_InfoMap.begin (); it != m_InfoMap.end (); ++it )

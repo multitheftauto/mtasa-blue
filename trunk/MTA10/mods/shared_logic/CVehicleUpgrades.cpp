@@ -34,6 +34,12 @@ CVehicleUpgrades::CVehicleUpgrades ( CClientVehicle* pVehicle )
 }
 
 
+bool CVehicleUpgrades::IsUpgrade ( unsigned short usModel )
+{
+    return ( usModel >= 1000 && usModel <= 1193 );
+}
+
+
 bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
 {
     unsigned short usModel = m_pVehicle->GetModel ();
@@ -261,11 +267,6 @@ bool CVehicleUpgrades::AddUpgrade ( unsigned short usUpgrade )
 {
     if ( m_pVehicle )
     {
-        // If the vehicle can have an upgrade
-        eClientVehicleType type = m_pVehicle->GetVehicleType ();
-        if ( type == CLIENTVEHICLE_BIKE || type == CLIENTVEHICLE_BMX ||
-             type == CLIENTVEHICLE_BOAT ) return false;
-
         // If its a compatible upgrade
         if ( IsUpgradeCompatible ( usUpgrade ) )
         {
@@ -306,10 +307,12 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
             CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usUpgrade );
             if ( pModelInfo )
             {
-                // Request it
-                pModelInfo->RequestVehicleUpgrade ();
-                pModelInfo->LoadAllRequestedModels ();
-
+                if ( !pModelInfo->IsLoaded () )
+                {
+                    // Request and load now
+                    pModelInfo->RequestVehicleUpgrade ();
+                    pModelInfo->LoadAllRequestedModels ();
+                }
                 // Add the upgrade
                 pVehicle->AddVehicleUpgrade ( usUpgrade );
             }
@@ -372,7 +375,13 @@ void CVehicleUpgrades::ReAddAll ( void )
     unsigned char ucSlot = 0;
     for ( ; ucSlot < VEHICLE_UPGRADE_SLOTS ; ucSlot++ )
     {
-        if ( m_SlotStates [ ucSlot ] ) AddUpgrade ( m_SlotStates [ ucSlot ] );
+        if ( m_SlotStates [ ucSlot ] )
+        {
+            #ifdef MTA_DEBUG
+                assert ( IsUpgradeCompatible ( m_SlotStates [ ucSlot ] ) );
+            #endif
+            ForceAddUpgrade ( m_SlotStates [ ucSlot ] );
+        }
     }
 }
 

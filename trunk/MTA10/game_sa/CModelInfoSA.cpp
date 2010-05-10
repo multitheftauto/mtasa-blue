@@ -238,6 +238,12 @@ BOOL CModelInfoSA::IsVehicle ( )
     return m_dwModelID >= 400 && m_dwModelID <= 611;
 }   
 
+BOOL CModelInfoSA::IsUpgrade ( void )
+{
+    return m_dwModelID >= 1000 && m_dwModelID <= 1193;
+}
+
+
 char * CModelInfoSA::GetNameIfVehicle ( )
 {
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
@@ -324,6 +330,8 @@ VOID CModelInfoSA::Remove ( )
     // Don't remove if GTA refers to it somehow.
     // Or we'll screw up SA's map for example.
 
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+
     // Remove our reference
     if ( m_pInterface->usNumberOfRefs > 0 ) m_pInterface->usNumberOfRefs--;
 
@@ -389,6 +397,9 @@ BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 BOOL CModelInfoSA::IsLoaded ( )
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsLoaded ( )");
+    if ( IsUpgrade () )
+        return pGame->GetStreaming ()->HasVehicleUpgradeLoaded ( m_dwModelID );
+
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
     DWORD ModelID = m_dwModelID;
