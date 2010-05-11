@@ -89,6 +89,9 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ulLastReceivedSyncTime = 0;
 
+    m_bPendingKick = false;
+    m_PendingKickResponsibleID = 0;
+
     // Add us to the manager
     pPlayerManager->AddToList ( this );
 }
@@ -146,6 +149,14 @@ void CPlayer::DoPulse ( void )
     if ( GetStatus () == STATUS_JOINED )
     {
         m_pPlayerTextManager->Process ();
+    }
+
+    if ( m_bPendingKick )
+    {
+        m_bPendingKick = false;
+        CElement* pElement = CElementIDs::GetElement ( m_PendingKickResponsibleID );
+        CPlayer* pResponsible = static_cast < CPlayer* > ( pElement && IS_PLAYER ( pElement ) ? pElement : NULL );
+        CStaticFunctionDefinitions::KickPlayer ( this, pResponsible, m_strPendingKickReason );
     }
 }
 
@@ -605,4 +616,12 @@ const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
 void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
 {
     m_AnnounceValues [ strKey ] = strValue;
+}
+
+
+void CPlayer::Kick ( CPlayer* pResponsible, const SString& strReason )
+{
+    m_bPendingKick = true;
+    m_PendingKickResponsibleID = pResponsible ? pResponsible->GetID () : 0;
+    m_strPendingKickReason = strReason;
 }

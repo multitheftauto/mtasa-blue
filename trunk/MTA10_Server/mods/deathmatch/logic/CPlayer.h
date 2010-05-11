@@ -207,6 +207,8 @@ public:
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
 
+    void                                        Kick                        ( CPlayer* pResponsible = NULL, const SString& strReason = "" );
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -290,6 +292,10 @@ private:
     unsigned long                               m_ulLastReceivedSyncTime;
 
     std::map < std::string, std::string >       m_AnnounceValues;
+
+    bool                                        m_bPendingKick;
+    ElementID                                   m_PendingKickResponsibleID;
+    SString                                     m_strPendingKickReason;
 };
 
 #endif
