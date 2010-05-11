@@ -494,6 +494,7 @@ float CModelInfoSA::GetLODDistance ()
 
 void CModelInfoSA::SetLODDistance ( float fDistance )
 {
+#if 0
     // fLodDistanceUnscaled values:
     //
     // With the draw distance setting in GTA SP options menu set to maximum:
@@ -518,7 +519,7 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
 
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
-
+#endif
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;
