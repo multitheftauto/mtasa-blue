@@ -1557,6 +1557,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CChecksum.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>

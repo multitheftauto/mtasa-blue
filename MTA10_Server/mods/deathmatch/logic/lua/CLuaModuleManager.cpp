@@ -109,7 +109,7 @@ bool CLuaModuleManager::GetResourceName ( lua_State * luaVM, std::string& strNam
 }
 
 
-unsigned long CLuaModuleManager::GetResourceMetaCRC ( lua_State* luaVM )
+CChecksum CLuaModuleManager::GetResourceMetaChecksum ( lua_State* luaVM )
 {
     if ( luaVM )
     {
@@ -119,15 +119,15 @@ unsigned long CLuaModuleManager::GetResourceMetaCRC ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                return pResource->GetLastCRC ();
+                return pResource->GetLastChecksum ();
             }
         }
     }
-    return NULL;
+    return CChecksum ();
 }
 
 
-unsigned long CLuaModuleManager::GetResourceFileCRC ( lua_State* luaVM, const char* szFile )
+CChecksum CLuaModuleManager::GetResourceFileChecksum ( lua_State* luaVM, const char* szFile )
 {
     if ( luaVM )
     {
@@ -141,12 +141,12 @@ unsigned long CLuaModuleManager::GetResourceFileCRC ( lua_State* luaVM, const ch
                 for ( ; iter != pResource->IterEnd(); iter++ )
                 {
                     if ( strcmp ( (*iter)->GetName (), szFile ) == 0 )
-                        return (*iter)->GetLastCRC ();
+                        return (*iter)->GetLastChecksum ();
                 }
             }
         }
     }
-    return NULL;
+    return CChecksum ();
 }
 
 

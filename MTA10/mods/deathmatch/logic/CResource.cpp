@@ -142,12 +142,12 @@ CResource::~CResource ( void )
     m_exportedFunctions.empty();
 }
 
-CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, unsigned long ulServerCRC )
+CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum )
 {
     // Create the resource file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
 
-    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, ulServerCRC );
+    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum );
     if ( pResourceFile )
     {
         m_ResourceFiles.push_back ( pResourceFile );
@@ -157,12 +157,12 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 }
 
 
-CDownloadableResource* CResource::AddConfigFile ( char *szFileName, unsigned long ulServerCRC )
+CDownloadableResource* CResource::AddConfigFile ( char *szFileName, CChecksum serverChecksum )
 {
     // Create the config file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
     
-    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, ulServerCRC );
+    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
     if ( pConfig )
     {
         m_ConfigFiles.push_back ( pConfig );
@@ -297,7 +297,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             FileLoad ( pResourceFile->GetName (), buffer );
 
             // Check the contents
-            if ( buffer.size () > 0 && pResourceFile->GetServerCRC () == CRCGenerator::GetInstance ()->GetBufferCRC ( &buffer.at ( 0 ), buffer.size () ) )
+            if ( buffer.size () > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), buffer.size () ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
                 // Load the resource text
                 m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size () );

@@ -56,7 +56,6 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_strResourceName = szResourceName ? szResourceName : "";
 
     // Initialize
-    m_ulCRC = 0;
     m_bActive = false;
     m_bIsPersistent = false;
     m_bLoaded = false;
@@ -94,7 +93,7 @@ bool CResource::Load ( void )
     {
         // Initialize
         m_strCircularInclude = "";
-        m_ulCRC = 0;
+        m_checksum = CChecksum ();
         m_bActive = false;
         m_bIsPersistent = false;
         m_bLoaded = false;
@@ -330,7 +329,7 @@ bool CResource::Load ( void )
         }
 
         // Generate a CRC for this resource
-        m_ulCRC = GenerateCRC();
+        m_checksum = GenerateChecksum();
 
         // copy client files to http holding directory if external web server is being used
         if ( g_pGame->GetConfig ()->GetHTTPDownloadType () == HTTP_DOWNLOAD_ENABLED_URL && g_pGame->GetConfig ()->GetHTTPAutoClientFiles () )
@@ -560,10 +559,11 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
     }
 }
 
-unsigned long CResource::GenerateCRC ( void )
+
+CChecksum CResource::GenerateChecksum ( void )
 {
     // initialize all of the CRC variables
-    unsigned long ulCRC = m_ulCRC = 0;
+    m_checksum = CChecksum ();
     string strPath;
 
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
@@ -571,23 +571,22 @@ unsigned long CResource::GenerateCRC ( void )
     {
         if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
-            ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
-            ( *iterf )->SetLastCRC ( ulCRC );
+            CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
+            ( *iterf )->SetLastChecksum ( checksum );
         }
     }
 
     if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        m_ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
+        m_checksum = CChecksum::GenerateChecksumFromFile ( strPath );
     }
 
-    return m_ulCRC;
+    return m_checksum;
 }
 
 
 bool CResource::HasResourceChanged ()
 {
-    unsigned long ulCRC = 0;
     string strPath;
 
     CResourceChecker resourceChecker;
@@ -598,16 +597,16 @@ bool CResource::HasResourceChanged ()
     {
         if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
         {
-            ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
-            if ( ( *iterf )->GetLastCRC() != ulCRC )
+            CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
+            if ( ( *iterf )->GetLastChecksum() != checksum )
                 return true;
         }
     }
 
     if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        ulCRC = CRCGenerator::GetCRCFromFile ( strPath.c_str () );
-        if ( ulCRC != m_ulCRC )
+        CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
+        if ( checksum != m_checksum )
             return true;
     }
     return false;
@@ -807,7 +806,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
-        GenerateCRC ();
+        GenerateChecksum ();
 
         // Add us to the running resources list
         m_StartedResources.push_back ( this );

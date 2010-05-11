@@ -77,7 +77,7 @@ private:
     unsigned int        m_minor;
     unsigned int        m_revision;
     unsigned int        m_state; // 0 = alpha/development, 1 = beta, 2 = release
-    unsigned int        m_CRC;
+    CChecksum           m_checksum;
 
     std::string         m_strURL;
     std::string         m_strName;
@@ -93,7 +93,7 @@ public:
     inline unsigned int GetMinor() {return m_minor; };
     inline unsigned int GetRevision() {return m_revision; };
     inline unsigned int GetState() {return m_state; };
-    inline unsigned int GetCRC() {return m_CRC; };
+    inline CChecksum GetChecksum() {return m_checksum; };
     inline std::string& GetURL() {return m_strURL; };
     inline CUpdateResource * GetUpdateResource() { return m_updateResource; };
 
