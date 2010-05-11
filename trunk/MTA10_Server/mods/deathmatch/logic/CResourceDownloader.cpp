@@ -376,11 +376,12 @@ CUpdateResourceVersion::CUpdateResourceVersion ( const char * szName, CXMLNode *
         attr = versionAttributes->Find ( "crc" );
         if ( attr )
         {
-            m_CRC = strtoul(attr->GetValue().c_str(), NULL, 0);
+            m_checksum = CChecksum ();
+            m_checksum.ulCRC = strtoul(attr->GetValue().c_str(), NULL, 0);
         }
         else
         {
-            m_CRC = 0;
+            m_checksum = CChecksum ();
         }
     }
 }

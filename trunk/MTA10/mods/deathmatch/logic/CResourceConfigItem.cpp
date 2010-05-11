@@ -19,8 +19,8 @@
 
 #include <StdInc.h>
 
-CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, unsigned long ulServerCRC ) :
-    CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, ulServerCRC, true )
+CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum ) :
+    CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, serverChecksum, true )
 {
     m_pXMLFile = NULL;
     m_pXMLRootNode = NULL;

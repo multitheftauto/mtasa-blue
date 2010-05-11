@@ -8,37 +8,53 @@
 #include "crc32.h"
 #include "zlib.h"
 
-CRCGenerator* CRCGenerator::instance = 0;
 
-unsigned long CRCGenerator::GetCRC ( char * szFilename )
+unsigned long CRCGenerator::GetCRCFromBuffer ( const char* pBuf, size_t sizeBuffer )
 {
-    return GetCRC ( szFilename, 0 );
+    return crc32 ( 0, (Bytef*) pBuf, sizeBuffer );
 }
 
-unsigned long CRCGenerator::GetCRC ( char * szFilename, unsigned long ucOldCRC )
+
+unsigned long CRCGenerator::GetCRCFromBuffer ( const char* pBuf, size_t sizeBuffer, unsigned long ulOldCRC )
 {
-    FILE * file = fopen ( szFilename, "rb" );
-    if ( file )
+    return crc32 ( ulOldCRC, (Bytef*) pBuf, sizeBuffer );
+}
+
+
+unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename )
+{
+    // Generate the CRC without the last CRC
+    return GetCRCFromFile ( szFilename, 0 );
+}
+
+
+unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename, unsigned long ucOldCRC )
+{
+    // Open the file
+    FILE* pFile = fopen ( szFilename, "rb" );
+    if ( pFile )
     {
-        fseek ( file, 0, SEEK_END );
-        unsigned long ulLength = ftell ( file );
+        // Start at the old CRC
+        unsigned long ulCRC = ucOldCRC;
 
-        rewind ( file );
+        // While we're not at the end
+        char pBuffer [4096];
+        do
+        {
+            // Try to read 4096 bytes. It returns number of bytes actually read.
+            // Then CRC that using the CRC from last loop as beginning. This should
+            // be faster/more compatible than allocating a huge buffer for the entire
+            // file.
+            size_t sizeRead = fread ( pBuffer, 1, 4096, pFile );
+            ulCRC = crc32 ( ulCRC, (Bytef*) pBuffer, sizeRead );
+        }
+        while ( !feof ( pFile ) );
 
-        char * buffer = new char [ ulLength + 1 ];
-        memset(buffer, 0, ulLength + 1);
-        fread ( buffer, 1, ulLength, file );
-     
-        fclose ( file );
-
-        unsigned long ulCRC = crc32 ( ucOldCRC, (Bytef *)buffer, ulLength);
-        delete[] buffer;
+        // Close it and return the CRC
+        fclose ( pFile );
         return ulCRC;
     }
-    return NULL;
-}
 
-unsigned long CRCGenerator::GetBufferCRC ( const char* cpBuffer, unsigned long ulLength )
-{
-    return crc32 ( 0, (Bytef *)cpBuffer, ulLength);
+    // Not exist
+    return 0;
 }

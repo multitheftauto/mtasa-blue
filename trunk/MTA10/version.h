@@ -1,7 +1,7 @@
 #define MTA_DM_VERSION              0x0104
 #define MTA_DM_VERSIONSTRING        "1.0.4"
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
-#define MTA_DM_BITSTREAM_VERSION    0x07
+#define MTA_DM_BITSTREAM_VERSION    0x08
 
 // These defines are dependent on the build configuration:
 // MTA_DM_ASE_VERSION

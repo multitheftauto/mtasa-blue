@@ -97,7 +97,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 if ( existingResource && currentVersionMajor == (*iter)->GetMajor() && currentVersionMinor == (*iter)->GetMinor() &&
                     currentVersionRevision == (*iter)->GetRevision() && currentVersionState == (*iter)->GetState()  )
                 {
-                    if ( existingResource->GetLastCRC() == (*iter)->GetCRC() )
+                    if ( existingResource->GetLastChecksum() == (*iter)->GetChecksum() )
                         szIsCurrent[0] = '>';
                     else
                         szIsCurrent[0] = '?';
