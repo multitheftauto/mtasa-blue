@@ -100,7 +100,7 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
             && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != ucWeaponID
             && pSourcePlayer->GetWeaponType( 8 ) != ucWeaponID )
         {
-            CStaticFunctionDefinitions::KickPlayer( pSourcePlayer, 0, "AC: You were kicked from the game" );
+            pSourcePlayer->Kick ( NULL, "AC: You were kicked from the game" );
             return false;
         }
     }
