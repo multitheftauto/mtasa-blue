@@ -172,6 +172,7 @@ public:
 
     void                            SelectInputHandlers          ( eInputChannel channel )                                       { CHECK_CHANNEL ( channel ); m_Channel = channel; }
     void                            ClearInputHandlers           ( eInputChannel channel );
+    void                            ClearSystemKeys             ( void );
 
     bool                            IsTransferBoxVisible        ( void )                                    { return m_bTransferBoxVisible; };
     void                            SetTransferBoxVisible       ( bool bVisible )                           { m_bTransferBoxVisible = bVisible; };
