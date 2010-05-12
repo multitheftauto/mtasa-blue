@@ -1276,3 +1276,16 @@ void CGUI_Impl::ClearInputHandlers ( eInputChannel channel )
     m_MovedHandlers[ channel ]              = GUI_CALLBACK ();
     m_SizedHandlers[ channel ]              = GUI_CALLBACK ();
 }
+
+void CGUI_Impl::ClearSystemKeys ( void )
+{
+    // Unpress any held system keys
+    unsigned int uiSysKeys = CEGUI::System::getSingleton().getSystemKeys();
+
+    if ( uiSysKeys & CEGUI::Control )
+        ProcessKeyboardInput ( CGUIKeys::LeftControl, false );
+    if ( uiSysKeys & CEGUI::Shift )
+        ProcessKeyboardInput ( CGUIKeys::LeftShift, false );
+    if ( uiSysKeys & CEGUI::Alt )
+        ProcessKeyboardInput ( CGUIKeys::LeftAlt, false );
+}
