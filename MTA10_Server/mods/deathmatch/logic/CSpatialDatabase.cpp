@@ -114,21 +114,6 @@ bool CSpatialDatabaseImpl::IsEntityPresent ( CElement* pEntity )
 
 ///////////////////////////////////////////////////////////////
 //
-// QueryResultCallback
-//
-// A callback function to obtain query results
-//
-///////////////////////////////////////////////////////////////
-bool __cdecl QueryResultCallback( CElement* pEntity, void* ptr )
-{
-    std::map < CElement*, int >& resultMap = *(std::map < CElement*, int >*)ptr;
-    resultMap[ pEntity ] = 1;
-    return true;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CSpatialDatabaseImpl::SphereQuery
 //
 // Return the list of entities that intersect the sphere
@@ -139,8 +124,6 @@ void CSpatialDatabaseImpl::SphereQuery ( CElementResult& outResult, const CSpher
     // Do any pending updates first
     FlushUpdateQueue ();
 
-    std::map < CElement*, int > resultMap;
-
     // Make a box from the sphere
     CBox box ( sphere.vecPosition, sphere.fRadius );
     // Make everything 2D for now
@@ -148,12 +131,7 @@ void CSpatialDatabaseImpl::SphereQuery ( CElementResult& outResult, const CSpher
     box.vecMax.fZ = SPATIAL_2D_Z;
 
     // Find all entiites which overlap the box
-    m_Tree.Search( &box.vecMin.fX, &box.vecMax.fX, &QueryResultCallback, &resultMap );
-
-    // Copy results from map to output
-    outResult.clear ();
-    for ( std::map < CElement*, int >::iterator it = resultMap.begin (); it != resultMap.end (); ++it )
-        outResult.push_back ( it->first );
+    m_Tree.Search( &box.vecMin.fX, &box.vecMax.fX, outResult );
 
     #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
         OutputDebugLine ( SString ( "SpatialDatabase::SphereQuery %d results for %2.0f,%2.0f,%2.0f  %2.2f"
