@@ -882,10 +882,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\game_sa\CProjectileSA.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CProxyDirect3D8.h"
 				>
 			</File>
