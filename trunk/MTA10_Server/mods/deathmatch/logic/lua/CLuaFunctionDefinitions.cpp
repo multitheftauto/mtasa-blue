@@ -3534,20 +3534,41 @@ int CLuaFunctionDefinitions::SetVehicleDoorsUndamageable ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleMaxPassengers ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA || lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        unsigned int model = 0;
+
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA)
         {
-            unsigned char ucMaxPassengers = 0;
-            if ( CStaticFunctionDefinitions::GetVehicleMaxPassengers ( pVehicle, ucMaxPassengers ) )
+            CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+            if ( pVehicle )
+                model = pVehicle->GetModel();
+            else
             {
-                lua_pushnumber ( luaVM, ucMaxPassengers );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+                lua_pushboolean ( luaVM, false );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+        {
+            model = (unsigned int) lua_tonumber ( luaVM, 1 );
+
+            if (model < 400 || model > 611)
+            {
+                m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+
+        unsigned int uiMaxPassengers = CVehicleManager::GetMaxPassengers ( model );
+
+        if (uiMaxPassengers != 0xFF)
+        {
+            lua_pushnumber ( luaVM, uiMaxPassengers );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
