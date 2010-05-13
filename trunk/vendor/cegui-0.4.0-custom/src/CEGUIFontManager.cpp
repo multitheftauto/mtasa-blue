@@ -111,7 +111,7 @@ Font* FontManager::createFont(const String& filename, const String& resourceGrou
 /*************************************************************************
 	Create a font from an installed OS font
 *************************************************************************/
-Font* FontManager::createFont(const String& name, const String& fontname, uint size, uint flags, const String& resourceGroup)
+Font* FontManager::createFont(const String& name, const String& fontname, uint size, uint flags, bool bAutoScale, float fNativeResX, float fNativeResY, const String& resourceGroup)
 {
 	char strbuf[16];
 	sprintf(strbuf, "%d", size);
@@ -123,7 +123,7 @@ Font* FontManager::createFont(const String& name, const String& fontname, uint s
 		throw AlreadyExistsException((utf8*)"FontManager::createFont - A font named '" + name + "' already exists.");
 	}
 
-	Font* temp = new Font(name, fontname, resourceGroup, size, flags, new Font::FontImplData(d_implData->d_ftlib));
+	Font* temp = new Font(name, fontname, resourceGroup, size, flags, new Font::FontImplData(d_implData->d_ftlib), bAutoScale, fNativeResX, fNativeResY );
 	d_fonts[name] = temp;
 
     // if this was the first font created, set it as the default font
