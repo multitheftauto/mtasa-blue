@@ -745,7 +745,7 @@ private:
 	\exception	RendererException			thrown if the Renderer can't support a texture large enough to hold the requested glyph imagery.
 	\exception	MemoryException				thrown if allocation of imagery construction buffer fails.
 	*/
-	Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, FontImplData* dat);
+	Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, FontImplData* dat, bool bAutoScale, float fNativeResX, float fNativeResY);
 
 
 	/*!
