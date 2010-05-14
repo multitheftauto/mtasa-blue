@@ -274,7 +274,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib Imagehlp.lib"
-				OutputFile="..\..\output\server\core.dll"
+				OutputFile="..\..\output\MTA San Andreas\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../dependencies"
