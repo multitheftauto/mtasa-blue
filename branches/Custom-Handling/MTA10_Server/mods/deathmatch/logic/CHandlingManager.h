@@ -33,6 +33,10 @@ public:
 
     eHandlingTypes              GetHandlingID                   ( eVehicleTypes eModel );
 
+    // Helper function
+    eHandlingProperty           GetPropertyEnumFromName         ( std::string strName);
+
+    std::map < std::string, eHandlingProperty > m_HandlingNames;
 private:
     void                        InitializeDefaultHandlings      ( void );
 

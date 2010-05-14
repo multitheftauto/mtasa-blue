@@ -4406,7 +4406,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
                 pEntry->SetAnimGroup ( (unsigned char)fValue );
                 break;
             case HANDLING_ABS:
-                pEntry->SetABS ( (bool)fValue );
+                pEntry->SetABS ( ( fValue > 0.0f ) ? true : false );
                 break;
             default:
                 return false;

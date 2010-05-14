@@ -35,6 +35,41 @@ CHandlingManager::CHandlingManager ( void )
     {
         m_pModelEntries [i] = new CHandlingEntry ( &m_OriginalHandlingData [GetHandlingID( (eVehicleTypes)i )] );
     }
+    
+    m_HandlingNames["mass"] =                           HANDLING_MASS;
+    m_HandlingNames["turnMass"] =                       HANDLING_TURNMASS;
+    m_HandlingNames["dragCoeff"] =                      HANDLING_DRAGCOEFF;
+    m_HandlingNames["centerOfMass"] =                   HANDLING_CENTEROFMASS;
+    m_HandlingNames["percentSubmerged"] =               HANDLING_PERCENTSUBMERGED;
+    m_HandlingNames["tractionMultiplier"] =             HANDLING_TRACTIONMULTIPLIER;
+    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;
+    m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;
+    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;
+    m_HandlingNames["engineAccelleration"] =            HANDLING_ENGINEACCELLERATION;
+    m_HandlingNames["engineInertia"] =                  HANDLING_ENGINEINERTIA;
+    m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;
+    m_HandlingNames["brakeDecelleration"] =             HANDLING_BRAKEDECELLERATION;
+    m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;
+    m_HandlingNames["ABS"] =                            HANDLING_ABS;
+    m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;
+    m_HandlingNames["tractionLoss"] =                   HANDLING_TRACTIONLOSS;
+    m_HandlingNames["tractionBias"] =                   HANDLING_TRACTIONBIAS;
+    m_HandlingNames["suspensionForceLevel"] =           HANDLING_SUSPENSION_FORCELEVEL;
+    m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;
+    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;
+    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;
+    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;
+    m_HandlingNames["suspensionFrontRearBias"] =        HANDLING_SUSPENSION_FRONTREARBIAS;
+    m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;
+    m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;
+    m_HandlingNames["setOffsetDistance"] =              HANDLING_SEATOFFSETDISTANCE;
+    m_HandlingNames["monetary"] =                       HANDLING_MONETARY;
+    m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;
+    m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;
+    m_HandlingNames["headLight"] =                      HANDLING_HEADLIGHT;
+    m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;
+    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;
+
 }
 
 
@@ -98,6 +133,18 @@ CHandlingEntry* CHandlingManager::GetModelHandlingData ( eVehicleTypes eModel )
     }
 
     return NULL;
+}
+
+eHandlingProperty CHandlingManager::GetPropertyEnumFromName ( std::string strName )
+{
+    std::map < std::string, eHandlingProperty >::iterator it;
+    it = m_HandlingNames.find ( strName );
+
+    if ( it != m_HandlingNames.end () )
+    {
+        return it->second;
+    }
+    return HANDLING_MAX;
 }
 
 

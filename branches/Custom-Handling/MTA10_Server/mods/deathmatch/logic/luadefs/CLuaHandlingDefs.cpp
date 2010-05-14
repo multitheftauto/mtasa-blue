@@ -2719,67 +2719,119 @@ int CLuaHandlingDefs::handlingSetAnimGroup ( lua_State* luaVM )
 
 int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
-
-                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
                 if ( eProperty )
                 {
-                    /*if ( lua_type ( luaVM, 3 ) == LUA_TNIL || lua_type ( luaVM, 3 ) == LUA_TNONE )
+                /*if ( lua_type ( luaVM, 3 ) == LUA_TNIL || lua_type ( luaVM, 3 ) == LUA_TNONE )
+                {
+                    if ( CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( pVehicle, eProperty ) )
                     {
-                        if ( CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( pVehicle, eProperty ) )
-                        {
-                            lua_pushboolean ( luaVM, true );
-                            return 1;
-                        }
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
                     }
-                    else
-                    {*/
-                        if ( eProperty == HANDLING_ABS )
-                        {
-                            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                }
+                else
+                {*/
+                    switch ( eProperty )
+                    {                
+                        case HANDLING_MASS:
+                        case HANDLING_TURNMASS:
+                        case HANDLING_DRAGCOEFF:
+                        case HANDLING_TRACTIONMULTIPLIER:
+                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEINERTIA:
+                        case HANDLING_MAXVELOCITY:
+                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEBIAS:
+                        case HANDLING_STEERINGLOCK:
+                        case HANDLING_TRACTIONLOSS:
+                        case HANDLING_TRACTIONBIAS:
+                        case HANDLING_SUSPENSION_FORCELEVEL:
+                        case HANDLING_SUSPENSION_DAMPING:
+                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        case HANDLING_SUSPENSION_UPPER_LIMIT:
+                        case HANDLING_SUSPENSION_LOWER_LIMIT:
+                        case HANDLING_SUSPENSION_FRONTREARBIAS:
+                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        case HANDLING_SEATOFFSETDISTANCE:
+                        case HANDLING_PERCENTSUBMERGED: // unsigned int
+                        case HANDLING_MONETARY:
+                        case HANDLING_HANDLINGFLAGS:
+                        case HANDLING_MODELFLAGS:
+                        case HANDLING_NUMOFGEARS:
+                        case HANDLING_ANIMGROUP:
                             {
-                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, lua_toboolean ( luaVM, 3 ) ) )
+                                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                 {
-                                    lua_pushboolean ( luaVM, true );
-                                    return 1;
+                                    float fValue = (float)lua_tonumber ( luaVM, 3 );
+                                    if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fValue ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
                                 }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                break;
                             }
-                        }
-                        else if ( eProperty == HANDLING_CENTEROFMASS )
-                        {
-                            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                        case HANDLING_CENTEROFMASS:
                             {
-                                float fX = (float)lua_tonumber ( luaVM, 3 );
-                                float fY = (float)lua_tonumber ( luaVM, 4 );
-                                float fZ = (float)lua_tonumber ( luaVM, 5 );
-                                CVector tempVec ( fX, fY, fZ );
+                                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                                {
+                                    float fX = (float)lua_tonumber ( luaVM, 3 );
+                                    float fY = (float)lua_tonumber ( luaVM, 4 );
+                                    float fZ = (float)lua_tonumber ( luaVM, 5 );
+                                    CVector tempVec ( fX, fY, fZ );
 
-                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, tempVec ) )
-                                {
-                                    lua_pushboolean ( luaVM, true );
-                                    return 1;
+                                    if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, tempVec ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
                                 }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                break;
                             }
-                        }
-                        else
-                        {
-                            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                        /*case HANDLING_DRIVETYPE:
+                        case HANDLING_ENGINETYPE:
+                        case HANDLING_HEADLIGHT:
+                        case HANDLING_TAILLIGHT:
                             {
-                                float fTest = (float)lua_tonumber ( luaVM, 3 );
-                                if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fTest ) )
+                                if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
                                 {
-                                    lua_pushboolean ( luaVM, true );
-                                    return 1;
+                                    if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, std::string ( lua_tostring ( luaVM, 3 ) ) ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
                                 }
+                            }*/
+                        case HANDLING_ABS:
+                            {
+                                if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                                {
+                                    if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, lua_toboolean ( luaVM, 3 ) ? 1.0f : 0.0f ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
+                                }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                break;
                             }
-                        }
-                    //}
+                        case HANDLING_MAX:
+                            {
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "property", 2 );
+                                break;
+                            }
+                    }
                 }
             }
             /*else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
@@ -2797,7 +2849,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, false );
     return 1;
-    }
+}
 
 int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
 {
@@ -2806,9 +2858,9 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( (int)lua_tonumber ( luaVM, 1 ) );
         if ( eModel )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
-                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
                 
                 if ( lua_type ( luaVM, 3 ) == LUA_TNIL || lua_type ( luaVM, 3 ) == LUA_TNONE )
                 {
@@ -2820,44 +2872,98 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                 }
                 else
                 {
-                    if ( eProperty == HANDLING_ABS )
-                    {
-                        if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-                        {
-                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, lua_toboolean ( luaVM, 3 ) ? 1.0f : 0.0f ) )
+                    switch ( eProperty )
+                    {                
+                        case HANDLING_MASS:
+                        case HANDLING_TURNMASS:
+                        case HANDLING_DRAGCOEFF:
+                        case HANDLING_TRACTIONMULTIPLIER:
+                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEINERTIA:
+                        case HANDLING_MAXVELOCITY:
+                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEBIAS:
+                        case HANDLING_STEERINGLOCK:
+                        case HANDLING_TRACTIONLOSS:
+                        case HANDLING_TRACTIONBIAS:
+                        case HANDLING_SUSPENSION_FORCELEVEL:
+                        case HANDLING_SUSPENSION_DAMPING:
+                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        case HANDLING_SUSPENSION_UPPER_LIMIT:
+                        case HANDLING_SUSPENSION_LOWER_LIMIT:
+                        case HANDLING_SUSPENSION_FRONTREARBIAS:
+                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        case HANDLING_SEATOFFSETDISTANCE:
+                        case HANDLING_PERCENTSUBMERGED: // unsigned int
+                        case HANDLING_MONETARY:
+                        case HANDLING_HANDLINGFLAGS:
+                        case HANDLING_MODELFLAGS:
+                        case HANDLING_NUMOFGEARS:
+                        case HANDLING_ANIMGROUP:
                             {
-                                lua_pushboolean ( luaVM, true );
-                                return 1;
+                                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                                {
+                                    float fValue = (float)lua_tonumber ( luaVM, 3 );
+                                    if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, fValue ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
+                                }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                break;
                             }
-                        }
-                    }
-                    else if ( eProperty == HANDLING_CENTEROFMASS )
-                    {
-                        if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
-                        {
-                            float fX = (float)lua_tonumber ( luaVM, 3 );
-                            float fY = (float)lua_tonumber ( luaVM, 4 );
-                            float fZ = (float)lua_tonumber ( luaVM, 5 );
-                            CVector tempVec ( fX, fY, fZ );
+                        case HANDLING_CENTEROFMASS:
+                            {
+                                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                                {
+                                    float fX = (float)lua_tonumber ( luaVM, 3 );
+                                    float fY = (float)lua_tonumber ( luaVM, 4 );
+                                    float fZ = (float)lua_tonumber ( luaVM, 5 );
+                                    CVector tempVec ( fX, fY, fZ );
 
-                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, tempVec ) )
-                            {
-                                lua_pushboolean ( luaVM, true );
-                                return 1;
+                                    if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, tempVec ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
+                                }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                break;
                             }
-                        }
-                    }
-                    else
-                    {
-                        if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
-                        {
-                            float fValue = (float)lua_tonumber ( luaVM, 3 );
-                            if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, fValue ) )
+                        /*case HANDLING_DRIVETYPE:
+                        case HANDLING_ENGINETYPE:
+                        case HANDLING_HEADLIGHT:
+                        case HANDLING_TAILLIGHT:
                             {
-                                lua_pushboolean ( luaVM, true );
-                                return 1;
+                                if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+                                {
+                                    if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, std::string ( lua_tostring ( luaVM, 3 ) ) ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
+                                }
+                            }*/
+                        case HANDLING_ABS:
+                            {
+                                if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+                                {
+                                    if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, lua_toboolean ( luaVM, 3 ) ? 1.0f : 0.0f ) )
+                                    {
+                                        lua_pushboolean ( luaVM, true );
+                                        return 1;
+                                    }
+                                }
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                break;
                             }
-                        }
+                        case HANDLING_MAX:
+                            {
+                                m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "property", 2 );
+                                break;
+                            }
                     }
                 }
             }
@@ -2885,9 +2991,9 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
-                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
                 if ( eProperty )
                 {
                     switch ( eProperty )
@@ -3101,9 +3207,9 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( (int)lua_tonumber ( luaVM, 1 ) );
         if ( eModel )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
-                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
                 if ( eProperty )
                 {
                     switch ( eProperty )
@@ -3324,9 +3430,9 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( (int)lua_tonumber ( luaVM, 1 ) );
         if ( eModel )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
             {
-                eHandlingProperty eProperty = static_cast < eHandlingProperty > ( (int)lua_tonumber ( luaVM, 2 ) );
+                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
                 if ( eProperty )
                 {
                     switch ( eProperty )

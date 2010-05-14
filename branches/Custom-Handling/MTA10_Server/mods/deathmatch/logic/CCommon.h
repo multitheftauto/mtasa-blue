@@ -506,6 +506,7 @@ enum eHandlingProperty
     HANDLING_HEADLIGHT,
     HANDLING_TAILLIGHT,
     HANDLING_ANIMGROUP,
+    HANDLING_MAX,
 };
 
 #endif
