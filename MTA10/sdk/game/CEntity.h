@@ -87,6 +87,8 @@ public:
 
     virtual VOID                        SetDoNotRemoveFromGameWhenDeleted ( bool bDoNotRemoveFromGame )=0;
     virtual VOID                        SetUsesCollision(BOOL bUsesCollision)=0;
+    virtual BOOL                        IsBackfaceCulled(VOID)=0;
+    virtual VOID                        SetBackfaceCulled(BOOL bBackfaceCulled)=0;
     virtual BOOL                        IsStatic(VOID)=0;
     virtual VOID                        SetStatic(BOOL bStatic)=0;
     virtual VOID                        SetAlpha(DWORD dwAlpha)=0;

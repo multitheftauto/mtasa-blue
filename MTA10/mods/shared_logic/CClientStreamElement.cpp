@@ -94,6 +94,11 @@ void CClientStreamElement::InternalStreamOut ( void )
 
 void CClientStreamElement::NotifyCreate ( void )
 {
+    // Update common atrributes
+    if ( !m_bDoubleSidedInit )
+        m_bDoubleSided = IsDoubleSided ();
+    SetDoubleSided ( m_bDoubleSided );
+
     m_bStreamedIn = true;
     m_bAttemptingToStreamIn = false;
 

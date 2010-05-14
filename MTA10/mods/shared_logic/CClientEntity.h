@@ -230,6 +230,9 @@ public:
     bool                                        IsCollidableWith            ( CClientEntity * pEntity );
     void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide );
 
+    bool                                        IsDoubleSided               ( void );
+    void                                        SetDoubleSided              ( bool bEnable );
+
     // Game layer functions for CEntity/CPhysical
     virtual void                                InternalAttachTo            ( CClientEntity * pEntity );
     bool                                        IsStatic                    ( void );
@@ -279,6 +282,8 @@ protected:
     std::list < CClientPed * >                  m_Contacts;
     unsigned char                               m_ucInterior;
     std::map < CClientEntity *, bool >          m_DisabledCollisions;
+    bool                                        m_bDoubleSided;
+    bool                                        m_bDoubleSidedInit;
 
 private:
     static int                                  iCount;

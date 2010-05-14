@@ -124,6 +124,7 @@ public:
     LUA_DECLARE ( IsElementInWater );
     LUA_DECLARE ( IsElementSyncer );
     LUA_DECLARE ( IsElementCollidableWith );
+    LUA_DECLARE ( IsElementDoubleSided );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -145,6 +146,7 @@ public:
     LUA_DECLARE ( SetElementStreamable );
     LUA_DECLARE ( SetElementModel );
     LUA_DECLARE ( SetElementCollidableWith );
+    LUA_DECLARE ( SetElementDoubleSided );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );

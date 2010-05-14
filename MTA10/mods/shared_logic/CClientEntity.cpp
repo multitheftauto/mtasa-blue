@@ -38,6 +38,8 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_bSystemEntity = false;
     m_ucSyncTimeContext = 0;
     m_ucInterior = 0;
+    m_bDoubleSided = false;
+    m_bDoubleSidedInit = false;
 
     // Need to generate a clientside ID?
     if ( ID == INVALID_ELEMENT_ID )
@@ -1196,6 +1198,30 @@ void CClientEntity::SetStatic ( bool bStatic )
     {
         pEntity->SetStatic ( bStatic );
     }
+}
+
+
+bool CClientEntity::IsDoubleSided ( void )
+{
+    CEntity* pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        m_bDoubleSidedInit = true;
+        m_bDoubleSided = !pEntity->IsBackfaceCulled ();
+    }
+    return m_bDoubleSided;
+}
+
+
+void CClientEntity::SetDoubleSided ( bool bDoubleSided )
+{
+    CEntity* pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        pEntity->SetBackfaceCulled ( !bDoubleSided );
+    }
+    m_bDoubleSidedInit = true;
+    m_bDoubleSided = bDoubleSided;
 }
 
 
