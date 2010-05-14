@@ -191,7 +191,7 @@ int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
         {
             model = (unsigned short) lua_tonumber ( luaVM, 1 );
 
-            if (model < 400 || model > 611)
+            if (!CClientVehicleManager::IsValidModel(model))
             {
                 m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
                 lua_pushboolean ( luaVM, false );
