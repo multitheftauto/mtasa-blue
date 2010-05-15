@@ -436,6 +436,7 @@ private:
 
     static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
     static void                         PostWeaponFire                  ( void );
+    static void                         BulletImpact                    ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition );
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
     bool                                VerifySADataFiles               ( int iEnableClientChecks = 0 );

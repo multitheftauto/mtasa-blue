@@ -86,6 +86,7 @@ public:
     void                        SetPostContextSwitchHandler ( PostContextSwitchHandler* pHandler );
     void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
     void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
+    void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 

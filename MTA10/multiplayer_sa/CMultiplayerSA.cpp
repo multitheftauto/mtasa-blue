@@ -207,6 +207,7 @@ PreContextSwitchHandler* m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler* m_pPostContextSwitchHandler = NULL;
 PreWeaponFireHandler* m_pPreWeaponFireHandler = NULL;
 PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
+BulletImpactHandler* m_pBulletImpactHandler = NULL;
 DamageHandler* m_pDamageHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
@@ -2835,6 +2836,10 @@ void CMultiplayerSA::SetPostWeaponFireHandler ( PostWeaponFireHandler* pHandler 
     m_pPostWeaponFireHandler = pHandler;
 }
 
+void CMultiplayerSA::SetBulletImpactHandler ( BulletImpactHandler* pHandler )
+{
+    m_pBulletImpactHandler = pHandler;
+}
 
 void CMultiplayerSA::Reset ( void )
 {

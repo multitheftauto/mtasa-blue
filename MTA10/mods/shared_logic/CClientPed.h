@@ -387,6 +387,9 @@ public:
     void                        SetSpeechEnabled        ( bool bEnabled );
 
     void                        PostWeaponFire          ( void );
+    void                        SetBulletImpactData     ( CClientEntity* pVictim, const CVector& vecHitPosition );
+    bool                        GetBulletImpactData     ( CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0 );
+    void                        ClearBulletImpactData   ( void ) { m_bBulletImpactData = false; }
 
     bool                        CanReloadWeapon         ( void );
     bool                        ReloadWeapon            ( void );
@@ -541,6 +544,10 @@ public:
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
     float                       m_fLighting;
+
+    bool                        m_bBulletImpactData;
+    CClientEntity*              m_pBulletImpactEntity;
+    CVector                     m_vecBulletImpactHit;
 
     // Time dependent interpolation
     struct

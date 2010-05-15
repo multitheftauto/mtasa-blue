@@ -163,6 +163,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bSpeechEnabled = true;
     m_bStealthAiming = false;
     m_fLighting = 0.0f;
+    m_bBulletImpactData = false;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -4866,6 +4867,27 @@ void CClientPed::KillAnimation ( void )
 void CClientPed::PostWeaponFire ( void )
 {
     m_ulLastTimeFired = CClientTime::GetTime ();
+}
+
+void CClientPed::SetBulletImpactData ( CClientEntity* pEntity, const CVector& vecHitPosition )
+{
+    m_bBulletImpactData = true;
+    m_pBulletImpactEntity = pEntity;
+    m_vecBulletImpactHit = vecHitPosition;
+}
+
+bool CClientPed::GetBulletImpactData ( CClientEntity** ppEntity, CVector* pvecHitPosition )
+{
+    if ( m_bBulletImpactData )
+    {
+        if ( ppEntity )
+            *ppEntity = m_pBulletImpactEntity;
+        if ( pvecHitPosition )
+            *pvecHitPosition = m_vecBulletImpactHit;
+        return true;
+    }
+    else
+        return false;
 }
 
 bool CClientPed::IsUsingGun ( void )
