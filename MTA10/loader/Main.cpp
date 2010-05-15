@@ -314,7 +314,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
 
     // Make sure important dll's do not exist in the wrong place
-    char* dllCheckList[] = { "xmll.dll", "cgui.dll", "net.dll", "libcurl.dll" };
+    char* dllCheckList[] = { "xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll" };
     for ( int i = 0 ; i < NUMELMS ( dllCheckList ); i++ )
     {
         if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )

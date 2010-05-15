@@ -965,9 +965,9 @@ void CCore::CreateNetwork ( )
 
     // Load approrpiate compilation-specific library.
 #ifdef _DEBUG
-    m_NetModule.LoadModule ( "net_d.dll" );
+    m_NetModule.LoadModule ( "netc_d.dll" );
 #else
-    m_NetModule.LoadModule ( "net.dll" );
+    m_NetModule.LoadModule ( "netc.dll" );
 #endif
     if ( m_NetModule.IsOk () == false )
     {
