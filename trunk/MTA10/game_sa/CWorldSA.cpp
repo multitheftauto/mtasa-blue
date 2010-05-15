@@ -124,7 +124,7 @@ bool CWorldSA::TestLineSphere(CVector * vecStart, CVector * vecEnd, CVector * ve
     }
 }
 
-bool CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint ** colCollision, 
+bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
                                   CEntity ** CollisionEntity, bool bCheckBuildings, 
                                   bool bCheckVehicles, bool bCheckPeds, 
                                   bool bCheckObjects, bool bCheckDummies , 

@@ -221,6 +221,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
+    g_pMultiplayer->SetBulletImpactHandler ( CClientGame::BulletImpact );
     g_pMultiplayer->SetExplosionHandler ( CClientExplosionManager::Hook_StaticExplosionCreation );
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
@@ -346,6 +347,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostContextSwitchHandler ( NULL );
     g_pMultiplayer->SetPreWeaponFireHandler ( NULL );
     g_pMultiplayer->SetPostWeaponFireHandler ( NULL );
+    g_pMultiplayer->SetBulletImpactHandler ( NULL );
     g_pMultiplayer->SetExplosionHandler ( NULL );
     g_pMultiplayer->SetBreakTowLinkHandler ( NULL );
     g_pMultiplayer->SetDrawRadarAreasHandler ( NULL );
@@ -3955,26 +3957,35 @@ void CClientGame::PostWeaponFire ( void )
             CWeapon* pWeapon = pPed->GetWeapon ();
             if ( pWeapon )
             {
-                CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
-                CVector vecOrigin, vecTarget;
-                pPed->GetShotData ( &vecOrigin, &vecTarget );
-
-                CColPoint* pCollision = NULL;
-                CEntity* pCollisionGameEntity = NULL;
-                CVector vecCollision = vecTarget;
-                bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
-                if ( bCollision && pCollision )
-                    vecCollision = *pCollision->GetPosition ();
-
-                // Destroy the colpoint
-                if ( pCollision )
-                {
-                    pCollision->Destroy ();
-                }
-
+                CVector vecCollision;
                 CClientEntity* pCollisionEntity = NULL;
-                if ( pCollisionGameEntity )
-                    pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
+
+                if ( pPed->GetBulletImpactData ( &pCollisionEntity, &vecCollision ) == false )
+                {
+                    CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
+                    CVector vecOrigin, vecTarget;
+                    pPed->GetShotData ( &vecOrigin, &vecTarget );
+
+                    CColPoint* pCollision = NULL;
+                    CEntity* pCollisionGameEntity = NULL;
+                    vecCollision = vecTarget;
+                    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
+                    if ( bCollision && pCollision )
+                        vecCollision = *pCollision->GetPosition ();
+
+                    // Destroy the colpoint
+                    if ( pCollision )
+                    {
+                        pCollision->Destroy ();
+                    }
+
+                    if ( pCollisionGameEntity )
+                        pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
+                }
+                else
+                {
+                    pPed->ClearBulletImpactData ();
+                }
 
                 // Call our lua event
                 CLuaArguments Arguments;
@@ -4003,6 +4014,50 @@ void CClientGame::PostWeaponFire ( void )
         }        
     }
     pWeaponFirePed = NULL;
+}
+
+void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition )
+{
+    // Got a local player model?
+    CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
+    if ( pLocalPlayer && pInitiator )
+    {
+        // Find the client ped that initiated the bullet impact
+        CClientPed * pInitiatorPed = g_pClientGame->GetPedManager ()->Get ( dynamic_cast < CPlayerPed* > ( pInitiator ), true, true );
+
+        if ( pInitiatorPed )
+        {
+            // Calculate the collision of the bullet
+            CVector vecCollision;
+            CColPoint* pCollision = NULL;
+            bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
+            if ( bCollision && pCollision )
+            {
+                vecCollision = *pCollision->GetPosition ();
+            }
+            else
+            {
+                // If we don't have a collision, use the end of the ray that the bullet is tracing.
+                vecCollision = *pEndPosition;
+            }
+
+            // Destroy the colpoint
+            if ( pCollision )
+            {
+                pCollision->Destroy ();
+            }
+
+            // Find the client entity for the victim.
+            CClientEntity* pClientVictim = NULL;
+            if ( pVictim )
+            {   
+                pClientVictim = g_pClientGame->m_pManager->FindEntity ( pVictim );
+            }
+
+            // Store the data in the bullet fire initiator.
+            pInitiatorPed->SetBulletImpactData ( pClientVictim, vecCollision );
+        }
+    }
 }
 
 

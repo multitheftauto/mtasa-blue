@@ -59,8 +59,14 @@ DWORD vecTargetPosition;
 DWORD vecAltPos;
 CPedSAInterface * pShootingPed;
 
+static CPedSAInterface* pBulletImpactInitiator;
+static CEntitySAInterface* pBulletImpactVictim;
+static CVector* pBulletImpactStartPosition;
+static CVector* pBulletImpactEndPosition;
+
 extern PreWeaponFireHandler* m_pPreWeaponFireHandler;
 extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
+extern BulletImpactHandler* m_pBulletImpactHandler;
 extern DamageHandler* m_pDamageHandler;
 extern FireHandler* m_pFireHandler;
 extern ProjectileHandler* m_pProjectileHandler;
@@ -94,6 +100,7 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit, (DWORD)HOOK_CWeapon_FireInstantHit, 9 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6 );
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7 );
+    HookInstall ( HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7 );
 
     /*  
     *(BYTE *)0x73FDEC = 0x90;
@@ -205,6 +212,19 @@ void Event_PostFire ( void )
         m_pPostWeaponFireHandler ();
     }
     bWeaponFire = false;
+}
+
+static void Event_BulletImpact ( void )
+{
+    if ( m_pBulletImpactHandler )
+    {
+        CPed * pInitiator = m_pools->GetPed ( (DWORD *)pBulletImpactInitiator );
+        if ( pInitiator )
+        {
+            CEntity* pVictim = m_pools->GetEntity ( (DWORD *)pBulletImpactVictim );
+            m_pBulletImpactHandler ( pInitiator, pVictim, pBulletImpactStartPosition, pBulletImpactEndPosition );
+        }
+    }
 }
 
 CPedSAInterface* pAPed = NULL;
@@ -510,6 +530,33 @@ VOID _declspec(naked) HOOK_CWeapon__PostFire2() // handles the FALSE exit point 
 
         add     esp, 3Ch
         ret     18h
+    }
+}
+
+static const DWORD CWeapon_DoBulletImpact_RET = 0x73B557;
+void _declspec(naked) HOOK_CWeapon_DoBulletImpact ()
+{
+    _asm
+    {
+        mov     eax, [esp+4]
+        mov     pBulletImpactInitiator, eax
+        mov     eax, [esp+8]
+        mov     pBulletImpactVictim, eax
+        mov     eax, [esp+12]
+        mov     pBulletImpactStartPosition, eax
+        mov     eax, [esp+16]
+        mov     pBulletImpactEndPosition, eax
+        pushad
+    }
+
+    Event_BulletImpact ();
+
+    _asm
+    {
+        popad
+        push    0xFFFFFFFF
+        push    0x00848E50
+        jmp     CWeapon_DoBulletImpact_RET
     }
 }
 
@@ -926,7 +973,7 @@ void _declspec(naked) HOOK_CProjectile__CProjectile()
 }
 
 
-static inline void CheckInVehicleDamage()
+static void CheckInVehicleDamage()
 {
     CPlayerPed * pPed = dynamic_cast < CPlayerPed * > ( m_pools->GetPed ( ( DWORD * ) pShootingPed ) );
     if ( pPed && !IsLocalPlayer( pPed ) )
