@@ -1386,7 +1386,7 @@ int CLuaFunctionDefs::SetPedFootBloodEnabled ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            bool bHasFootBlood = lua_toboolean ( luaVM, 2 );
+            bool bHasFootBlood = lua_toboolean ( luaVM, 2 ) ? true : false;
             if ( CStaticFunctionDefinitions::SetPedFootBloodEnabled ( *pEntity, bHasFootBlood ) )
             {
                 lua_pushboolean ( luaVM, true );
