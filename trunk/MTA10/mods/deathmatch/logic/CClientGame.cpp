@@ -821,7 +821,7 @@ void CClientGame::DoPulses ( void )
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             // TODO: Tell the server, also encrypt this
-            g_pCore->ShowMessageBox ( "Error", "AC: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( "Error", "AC #1: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }

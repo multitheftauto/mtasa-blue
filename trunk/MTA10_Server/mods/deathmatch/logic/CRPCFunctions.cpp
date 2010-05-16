@@ -315,7 +315,7 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
                 else
                 {
                     //You shouldn't be able to get here without cheating to get a knife.
-                    m_pSourcePlayer->Kick ( NULL, "AC: You were kicked from the game" );
+                    m_pSourcePlayer->Kick ( NULL, "AC #4: You were kicked from the game" );
                 }
             }
         }
