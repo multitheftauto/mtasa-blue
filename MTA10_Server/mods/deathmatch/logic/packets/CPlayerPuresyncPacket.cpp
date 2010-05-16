@@ -163,7 +163,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     return false;
 
                 if ( bAmmoFailed == true ) {
-                    pSourcePlayer->Kick ( NULL, "AC: You were kicked from the game" );
+                    pSourcePlayer->Kick ( NULL, "AC #2: You were kicked from the game" );
                     return false;
                 }
                 // Set the arm directions and whether or not arms are up
