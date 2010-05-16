@@ -1025,6 +1025,9 @@ void CMultiplayerSA::InitHooks()
     // 
     // - Sebas
 	*(BYTE *)((0xBA6748)+0x5C) = 1;
+
+    // Force the MrWhoopee music to load even if we are not the driver.
+    *(BYTE *)(0x4F9CCE) = 0xCE;
 }
 
 
