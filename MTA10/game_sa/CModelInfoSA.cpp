@@ -297,7 +297,11 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     DWORD dwFunction = FUNC_RequestModel;
     DWORD ModelID = m_dwModelID;
     //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
-    DWORD dwFlags = 0x16;
+    DWORD dwFlags;
+    if ( pGame && pGame->IsASyncLoadingEnabled () )
+        dwFlags = 0x16;
+    else
+        dwFlags = 6;
     _asm
     {
         push    dwFlags

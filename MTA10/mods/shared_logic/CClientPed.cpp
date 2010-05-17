@@ -439,7 +439,7 @@ void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolat
                 {
                     // If move is big enough, do ground checks
                     float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
-                    if ( DistanceMoved > 50 )
+                    if ( DistanceMoved > 50 && !IsFrozen () )
                         SetFrozenWaitingForGroundToLoad ( true );
                 }
 
@@ -503,7 +503,7 @@ void CClientPed::Teleport ( const CVector& vecPosition )
                 {
                     // If move is big enough, do ground checks
                     float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
-                    if ( DistanceMoved > 50 )
+                    if ( DistanceMoved > 50 && !IsFrozen () )
                         SetFrozenWaitingForGroundToLoad ( true );
                 }
 
@@ -1204,7 +1204,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
 {
     // Ensure vehicle model is loaded
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
-    if ( !pModelInfo->IsLoaded () )
+    if ( g_pGame->IsASyncLoadingEnabled () && !pModelInfo->IsLoaded () )
     {
         if ( pVehicle->IsStreamedIn () )
         {
@@ -1225,7 +1225,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         CVector vecVehiclePosition;
         pVehicle->GetPosition ( vecVehiclePosition );
         float fDist = ( vecPosition - vecVehiclePosition ).Length ();
-        if ( fDist > 50 )
+        if ( fDist > 50 && !pVehicle->IsFrozen () )
         {
             pVehicle->SetFrozenWaitingForGroundToLoad ( true );
         }
@@ -1704,6 +1704,9 @@ bool CClientPed::IsFrozenWaitingForGroundToLoad ( void ) const
 
 void CClientPed::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 {
+    if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
+        return;
+
     if ( m_bFrozenWaitingForGroundToLoad != bFrozen )
     {
         m_bFrozenWaitingForGroundToLoad = bFrozen;
@@ -2238,12 +2241,13 @@ void CClientPed::StreamedInPulse ( void )
         }
 
         // Draw a little star in the corner if async is on
-        if ( g_pGame->IsASyncLoadingEnabled () )
+        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
         {
             CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
             unsigned int uiHeight = pGraphics->GetViewportHeight ();
             unsigned int uiWidth = pGraphics->GetViewportWidth ();
-            pGraphics->DrawText ( uiWidth - 5, uiHeight - 7, 0x80ffffff, 1, "*" );
+            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
+            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
 
         if ( m_bIsLocalPlayer )

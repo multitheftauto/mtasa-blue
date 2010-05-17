@@ -208,7 +208,7 @@ public:
 
     void                    SetASyncLoadingEnabled  ( bool bEnabled );
     void                    SuspendASyncLoading     ( bool bSuspend );
-    bool                    IsASyncLoadingEnabled   ( void );
+    bool                    IsASyncLoadingEnabled   ( bool bIgnoreSuspend = false );
 
 private:
     CPools                  * m_pPools;
