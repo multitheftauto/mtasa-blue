@@ -183,7 +183,7 @@ public:
 
     virtual void                SetASyncLoadingEnabled      ( bool bEnabled ) = 0;
     virtual void                SuspendASyncLoading         ( bool bSuspend ) = 0;
-    virtual bool                IsASyncLoadingEnabled       ( void ) = 0;
+    virtual bool                IsASyncLoadingEnabled       ( bool bIgnoreSuspend = false ) = 0;
 };
 
 #endif

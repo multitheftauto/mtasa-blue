@@ -319,7 +319,7 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     {
         // If move is big enough, do ground checks
         float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
-        if ( DistanceMoved > 50 )
+        if ( DistanceMoved > 50 && !IsFrozen () )
             SetFrozenWaitingForGroundToLoad ( true );
     }
 
@@ -1647,6 +1647,9 @@ bool CClientVehicle::IsFrozenWaitingForGroundToLoad ( void ) const
 
 void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 {
+    if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
+        return;
+
     if ( m_bFrozenWaitingForGroundToLoad != bFrozen )
     {
         m_bFrozenWaitingForGroundToLoad = bFrozen;

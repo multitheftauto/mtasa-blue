@@ -307,7 +307,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
             CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usUpgrade );
             if ( pModelInfo )
             {
-                if ( !pModelInfo->IsLoaded () )
+                if ( !g_pGame->IsASyncLoadingEnabled () || !pModelInfo->IsLoaded () )
                 {
                     // Request and load now
                     pModelInfo->RequestVehicleUpgrade ();

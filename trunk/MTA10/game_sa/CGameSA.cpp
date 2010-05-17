@@ -591,7 +591,9 @@ void CGameSA::SuspendASyncLoading ( bool bSuspend )
     m_bASyncLoadingSuspended = bSuspend;
 }
 
-bool CGameSA::IsASyncLoadingEnabled ( void )
+bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
 {
-    return m_bASyncLoading && !m_bASyncLoadingSuspended;
+    if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
+        return false;
+    return m_bASyncLoading;
 }
