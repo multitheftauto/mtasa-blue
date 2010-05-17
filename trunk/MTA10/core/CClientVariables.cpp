@@ -191,7 +191,9 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "qc_port",                    22003 );                        // quick connect port
     DEFAULT ( "qc_password",                _S("") );                       // quick connect password
     DEFAULT ( "debugfile",                  _S("") );                       // debug filename
-    DEFAULT ( "console_pos",                CVector2D ( 0.20f, 0.20f ) );   // console position
+    DEFAULT ( "console_pos",                CVector2D ( 200, 200 ) );       // console position
+    DEFAULT ( "console_size",               CVector2D ( 200, 200 ) );       // console size
+    DEFAULT ( "serverbrowser_size",         CVector2D ( 720.0f, 495.0f ) ); // serverbrowser size
     DEFAULT ( "fps_limit",                  100 );                          // frame limiter
     DEFAULT ( "chat_font",                  0 );                            // chatbox font type
     DEFAULT ( "chat_lines",                 7 );                            // chatbox lines
