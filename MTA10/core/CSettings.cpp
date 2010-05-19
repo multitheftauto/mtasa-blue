@@ -644,7 +644,7 @@ CSettings::CSettings ( void )
     /**
      *  Advanced tab
      **/
-    m_pASyncLoading = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "ASync Loading", true ) );
+    m_pASyncLoading = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "Async Loading", true ) );
     m_pASyncLoading->SetPosition ( CVector2D ( 20.0f, 20.0f ) );
 
     m_pLabelASyncLoading = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which may improve performance)" ) );

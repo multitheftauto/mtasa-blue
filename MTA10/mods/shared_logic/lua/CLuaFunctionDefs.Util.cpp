@@ -530,5 +530,9 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildTag () );
     lua_settable   ( luaVM, -3 );
 
+    lua_pushstring ( luaVM, "sortable" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionSortable () );
+    lua_settable   ( luaVM, -3 );
+
     return 1;
 }

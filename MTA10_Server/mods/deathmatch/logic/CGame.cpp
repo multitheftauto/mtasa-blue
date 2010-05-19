@@ -1259,11 +1259,11 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         {
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
-            std::string strSerial;
-            p.GetSerial ( strSerial );
+            SString strSerial        = p.GetSerial ();
+            SString strPlayerVersion = p.GetPlayerVersion ();
 
             char szIP [22];
-            SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str () );
+            SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str (), strPlayerVersion.c_str () );
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
@@ -1315,6 +1315,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
                                 pPlayer->SetSerial ( strSerial );
+                                pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
@@ -1346,7 +1347,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 }
 
                                 // Add him to the whowas list
-                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial () );
+                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
 
                                 // Verify the player's serial if necessary
                                 if ( m_pMainConfig->GetSerialVerificationEnabled () )
@@ -2746,7 +2747,7 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
     char szIP [22];
-    SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
+    SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str (), pPlayer->GetPlayerVersion ().c_str () );
     if ( bSuccess )
     {
         // Call the onPlayerConnect event. If it returns false, disconnect the player
@@ -2757,6 +2758,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
         Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
         Arguments.PushString ( pPlayer->GetSerial ().c_str() );
         Arguments.PushNumber ( pPlayer->GetMTAVersion () );
+        Arguments.PushString ( pPlayer->GetPlayerVersion () );
         if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
         {
             // event cancelled, disconnect the player

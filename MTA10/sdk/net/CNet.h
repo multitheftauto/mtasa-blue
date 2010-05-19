@@ -77,6 +77,9 @@ public:
 
     virtual void                        SetServerBitStreamVersion   ( unsigned short usServerBitStreamVersion ) = 0;
     virtual unsigned short              GetServerBitStreamVersion   ( void ) = 0;
+
+    virtual void                        GetStatus                   ( char* szStatus, size_t maxLength ) = 0;
+    virtual unsigned short              GetNetRev                   ( void ) = 0;
 };
 
 #endif

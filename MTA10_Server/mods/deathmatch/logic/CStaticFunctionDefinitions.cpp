@@ -1575,6 +1575,14 @@ CAccount* CStaticFunctionDefinitions::GetPlayerAccount ( CElement* pElement )
 }
 
 
+const SString& CStaticFunctionDefinitions::GetPlayerVersion ( CPlayer* pPlayer )
+{
+    assert ( pPlayer );
+
+    return pPlayer->GetPlayerVersion ();
+}
+
+
 bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char* szName )
 {
     assert ( pElement );
@@ -8200,9 +8208,11 @@ const char* CStaticFunctionDefinitions::GetVersionName ()
     return MTA_DM_FULL_STRING;
 }
 
-const char* CStaticFunctionDefinitions::GetVersionBuildType ()
+SString CStaticFunctionDefinitions::GetVersionBuildType ()
 {
-    return MTA_DM_BUILDTYPE;
+    SString strResult = MTA_DM_BUILDTYPE;
+    strResult[0] = toupper ( strResult[0] );
+    return strResult;
 }
 
 unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
@@ -8219,3 +8229,16 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag ()
 {
     return MTA_DM_BUILDTAG_LONG;
 }
+
+SString CStaticFunctionDefinitions::GetVersionSortable ()
+{
+    return SString ( "%d.%d.%d-%d.%05d.%d"
+                            ,MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MINOR
+                            ,MTASA_VERSION_MAINTENANCE
+                            ,MTASA_VERSION_TYPE
+                            ,MTASA_VERSION_BUILD
+                            ,0
+                            );
+}
+

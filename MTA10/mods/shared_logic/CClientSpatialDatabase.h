@@ -16,7 +16,7 @@ class CClientEntity;
 
 // Debugging flags
 #ifdef MTA_DEBUG
-    #define SPATIAL_DATABASE_TESTS
+    //#define SPATIAL_DATABASE_TESTS
     //#define SPATIAL_DATABASE_DEBUG_OUTPUTA
     //#define SPATIAL_DATABASE_DEBUG_OUTPUTB
     //#define SPATIAL_DATABASE_DEBUG_OUTPUTC

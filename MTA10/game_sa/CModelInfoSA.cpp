@@ -298,9 +298,10 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     DWORD ModelID = m_dwModelID;
     //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
     DWORD dwFlags;
-    if ( pGame && pGame->IsASyncLoadingEnabled () )
-        dwFlags = 0x16;
-    else
+    // Removed to see if it helps with loading of GTA landscape
+    //if ( pGame && pGame->IsASyncLoadingEnabled () )
+    //    dwFlags = 0x16;
+    //else
         dwFlags = 6;
     _asm
     {

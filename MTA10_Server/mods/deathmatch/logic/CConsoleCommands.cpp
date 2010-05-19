@@ -1646,7 +1646,7 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s", iter->szNick, szIP, iter->strSerial.c_str () ) );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", iter->szNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {

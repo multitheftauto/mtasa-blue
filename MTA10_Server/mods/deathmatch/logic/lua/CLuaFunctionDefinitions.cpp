@@ -619,6 +619,28 @@ int CLuaFunctionDefinitions::GetPlayerIP ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerVersion ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        if ( pPlayer )
+        {
+            SString strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion ( pPlayer );
+            lua_pushstring ( luaVM, strPlayerVersion );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerVersion", "player", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerVersion" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetPlayerAccount ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -11257,6 +11279,10 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 
     lua_pushstring ( luaVM, "tag" );
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildTag () );
+    lua_settable   ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "sortable" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionSortable () );
     lua_settable   ( luaVM, -3 );
 
     return 1;
