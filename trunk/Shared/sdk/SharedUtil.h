@@ -412,6 +412,34 @@ namespace SharedUtil
     };
 
 
+    //
+    // Fixed sized string buffer
+    //
+    template < int MAX_LENGTH >
+    class CStaticString
+    {
+        char szData [ MAX_LENGTH + 1 ];
+    public:
+        CStaticString ( void )
+        {
+            szData[0] = 0;
+        }
+
+        // In  
+        CStaticString& operator= ( const char* szOther )
+        {
+            STRNCPY( szData, szOther, MAX_LENGTH + 1 );
+            return *this;
+        }
+
+        // Out  
+        operator const char*() const
+        {
+            return szData;
+        }
+    };
+
+
 };
 
 using namespace SharedUtil;
