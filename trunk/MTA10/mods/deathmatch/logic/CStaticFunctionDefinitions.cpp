@@ -5657,9 +5657,11 @@ const char* CStaticFunctionDefinitions::GetVersionName ()
     return MTA_DM_FULL_STRING;
 }
 
-const char* CStaticFunctionDefinitions::GetVersionBuildType ()
+SString CStaticFunctionDefinitions::GetVersionBuildType ()
 {
-    return MTA_DM_BUILDTYPE;
+    SString strResult = MTA_DM_BUILDTYPE;
+    strResult[0] = toupper ( strResult[0] );
+    return strResult;
 }
 
 unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
@@ -5675,4 +5677,17 @@ const char* CStaticFunctionDefinitions::GetOperatingSystemName ()
 const char* CStaticFunctionDefinitions::GetVersionBuildTag ()
 {
     return MTA_DM_BUILDTAG_LONG;
+}
+
+SString CStaticFunctionDefinitions::GetVersionSortable ()
+{
+    unsigned short usNetRev = g_pCore->GetNetwork ()->GetNetRev ();
+    return SString ( "%d.%d.%d-%d.%05d.%d"
+                            ,MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MINOR
+                            ,MTASA_VERSION_MAINTENANCE
+                            ,MTASA_VERSION_TYPE
+                            ,MTASA_VERSION_BUILD
+                            ,usNetRev
+                            );
 }

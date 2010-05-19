@@ -122,6 +122,7 @@ public:
     static bool                 GetPlayerName                       ( CElement* pElement, char* szName );
     static bool                 GetPlayerIP                         ( CElement* pElement, char* szIP );
     static CAccount*            GetPlayerAccount                    ( CElement* pElement );
+    static const SString&       GetPlayerVersion                    ( CPlayer* pPlayer );
 
     // Player set functions
     static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney );
@@ -542,10 +543,11 @@ public:
     static unsigned long        GetVersion                          ( );
     static const char*          GetVersionString                    ( );
     static const char*          GetVersionName                      ( );
-    static const char*          GetVersionBuildType                 ( );
+    static SString              GetVersionBuildType                 ( );
     static unsigned long        GetNetcodeVersion                   ( );
     static const char*          GetOperatingSystemName              ( );
     static const char*          GetVersionBuildTag                  ( );
+    static SString              GetVersionSortable                  ( );
 };
 
 #endif

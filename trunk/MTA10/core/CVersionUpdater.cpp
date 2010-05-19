@@ -13,12 +13,41 @@
 #include "StdInc.h"
 #include <utils/CMD5Hasher.h>
 
-#define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/"
+// Do a static page check first
+#define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
+#define VERSION_CHECKER_URL2 "http://vers-m2-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%"
+
 
 #define MAX_UPDATER_CHECK_ATTEMPTS      (3)
 #define MAX_UPDATER_DOWNLOAD_ATTEMPTS   (10)
 #define UPDATER_CHECK_TIMEOUT           (15000)
 #define UPDATER_DOWNLOAD_TIMEOUT        (30000)
+
+/*
+Example of a response file stored on the server:
+------------------------------------------------
+
+status=update=
+priority=notmandatory=
+title=UPDATE AVAILABLE=
+msg=There is an update for the version of MTA you are using.
+
+DO YOU WANT TO UPDATE NOW?
+
+=
+yes=Yes=
+no=No=
+msg2=Press OK to install the update.
+
+After the update is installed, restart MTA=
+filename=mtasa-1.0.4-untested-28-20100509.exe=
+filesize=2185798=
+mirror=http://nightly.multitheftauto.com/mtasa-1.0.4-untested-28-20100509.exe=
+mirror=http://nightly2.multitheftauto.com/mtasa-1.0.4-untested-28-20100509.exe=
+mirror=http://nightly3.multitheftauto.com/mtasa-1.0.4-untested-28-20100509.exe=
+md5=12977BDDCCCE7171898F999773823CD5=
+end=ok
+*/
 
 
 CVersionUpdater::CVersionUpdater ( void )
@@ -45,7 +74,7 @@ void CVersionUpdater::DoPulse ( void )
             // Prime check server list
             m_CheckInfo = CCheckInfo ();
             m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL1 );
-            //m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL2 );
+            m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL2 );
             m_strStage = "NextCheck";
         }
         else
@@ -148,9 +177,25 @@ void CVersionUpdater::StartVersionCheck ( void )
     // Get our serial number
     char szSerial [ 64 ];
     CCore::GetSingleton ().GetNetwork ()->GetSerial ( szSerial, sizeof ( szSerial ) );
+    char szStatus [ 128 ];
+    CCore::GetSingleton ().GetNetwork ()->GetStatus ( szStatus, sizeof ( szStatus ) );
+
+    // Compose version string
+    unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
+    SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTA_DM_BUILDTYPE
+                                ,MTASA_VERSION_BUILD
+                                ,usNetRev
+                                );
 
     // Make the query URL
-    SString strQueryURL ( "%s%s/?v=%s&id=%s", strServerURL.c_str (), MTA_DM_BUILDTAG_LONG, MTA_DM_BUILDTAG_LONG, szSerial );
+    SString strQueryURL = strServerURL;
+    strQueryURL = strQueryURL.ReplaceSubString ( "%VERSION%", strPlayerVersion );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%ID%", szSerial );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%STATUS%", szStatus );
 
     // Perform the HTTP request
     m_strStage = "Checking";

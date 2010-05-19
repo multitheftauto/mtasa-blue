@@ -267,7 +267,7 @@ SString SString::TrimEnd ( const char* szOld ) const
 SString SString::ToLower ( void ) const
 {
     SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
     return strResult;
 }
 
@@ -277,7 +277,7 @@ SString SString::ToLower ( void ) const
 SString SString::ToUpper ( void ) const
 {
     SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
     return strResult;
 }
 

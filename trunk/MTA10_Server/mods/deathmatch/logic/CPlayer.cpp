@@ -174,7 +174,7 @@ void CPlayer::SetNick ( const char* szNick )
     {
         // If changing, add the new name to the whowas list
         char szIP [22];
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial () );
+        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial (), GetPlayerVersion () );
     }
 
     assert ( sizeof ( m_szNick ) == MAX_NICK_LENGTH + 1 );

@@ -73,6 +73,8 @@ public:
     inline void                                 SetMTAVersion               ( unsigned short usMTAVersion )         { m_usMTAVersion = usMTAVersion; };
     inline unsigned short                       GetBitStreamVersion         ( void )                                { return m_usBitStreamVersion; };
     inline void                                 SetBitStreamVersion         ( unsigned short usBitStreamVersion )   { m_usBitStreamVersion = usBitStreamVersion; };
+    void                                        SetPlayerVersion            ( const SString& strPlayerVersion )     { m_strPlayerVersion = strPlayerVersion; };
+    const SString&                              GetPlayerVersion            ( void )                                { return m_strPlayerVersion; };
 
     inline bool                                 IsMuted                     ( void )                                { return m_bIsMuted; };
     inline void                                 SetMuted                    ( bool bSetMuted )                      { m_bIsMuted = bSetMuted; };
@@ -223,6 +225,7 @@ private:
     int                                         m_iGameVersion;
     unsigned short                              m_usMTAVersion;
     unsigned short                              m_usBitStreamVersion;
+    SString                                     m_strPlayerVersion;
     bool                                        m_bIsMuted;
     int                                         m_iStatus;
     

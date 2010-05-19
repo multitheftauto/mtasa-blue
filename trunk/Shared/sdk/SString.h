@@ -183,6 +183,12 @@ public:
 
     }
 
+    // Access
+    char& operator[]( int iOffset )
+    {
+        return std::string::operator[]( iOffset );
+    }
+
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
 
