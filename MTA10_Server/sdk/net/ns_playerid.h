@@ -15,16 +15,16 @@
 #define __NS_PLAYERID_H
 
 #include <MTAPlatform.h>
-#include <SString.h>
+#include <SharedUtil.h>
 
 
 class NetServerPlayerID
 {
 public:
-    unsigned long   m_uiBinaryAddress;
-    unsigned short  m_usPort;
-    SString         m_strSerial;
-    SString         m_strPlayerVersion;
+    unsigned long           m_uiBinaryAddress;
+    unsigned short          m_usPort;
+    CStaticString < 32 >    m_strSerial;
+    CStaticString < 32 >    m_strPlayerVersion;
 
 public:
     NetServerPlayerID ( void )
@@ -50,11 +50,11 @@ public:
     inline unsigned long    GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
     inline unsigned short   GetPort             ( void ) const                      { return m_usPort; };
     
-    const SString&          GetSerial           ( void ) const                      { return m_strSerial; };
-    inline void             SetSerial           ( const SString& strSerial )        { m_strSerial = strSerial; };
+    const char*             GetSerial           ( void ) const                      { return m_strSerial; };
+    inline void             SetSerial           ( const char* szSerial )            { m_strSerial = szSerial; };
 
-    const SString&          GetPlayerVersion    ( void ) const                      { return m_strPlayerVersion; }
-    void                    SetPlayerVersion    ( const SString& strPlayerVersion ) { m_strPlayerVersion = strPlayerVersion; }
+    const char*             GetPlayerVersion    ( void ) const                      { return m_strPlayerVersion; }
+    void                    SetPlayerVersion    ( const char* szPlayerVersion )     { m_strPlayerVersion = szPlayerVersion; }
 };
 
 #endif

@@ -53,6 +53,7 @@ private:
     bool                            BuildWrapperTree    ( void );
     bool                            BuildSubElements    ( class CXMLNodeImpl* pNode );
     void                            ClearWrapperTree    ( void );
+    bool                            WriteSafer          ( void );
 
     std::string                     m_strFilename;
 
