@@ -18,13 +18,7 @@ class CAccountManager;
 
 #include "CAccount.h"
 #include "CXMLConfig.h"
-enum eAccountDataTypes
-{
-    ACCDATA_TEXT,
-    ACCDATA_INT,
-    ACCDATA_BOOL,
-    ACCDATA_FLOAT
-};
+
 class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
