@@ -731,8 +731,17 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
     if ( iType != LUA_TSTRING && iType != LUA_TNUMBER && iType != LUA_TBOOLEAN && iType != LUA_TNIL )
         return false;
 
+
     //Get the user ID
     int iUserID = pAccount->GetID();
+
+    //Does the user want to delete the data?
+    if ( strValue == "false" && iType == LUA_TBOOLEAN )
+    {
+        //Delete the data
+        m_pSaveFile->Delete( "userdata", SString( "userid=%i and key=\"%s\"", iUserID, szKey ).c_str () );
+        return true;
+    }
     //create a new registry result for the query return
     CRegistryResult * pResult = new CRegistryResult;
 
