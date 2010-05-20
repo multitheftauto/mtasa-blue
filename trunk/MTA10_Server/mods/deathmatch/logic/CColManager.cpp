@@ -136,28 +136,28 @@ void CColManager::DoHitDetection ( const CVector& vecLastPosition, const CVector
     {
         CColShape* pColShape = (*it).pColShape;
         CElement* pEntity = (*it).pEntity;
-        CLogger::ErrorPrintf( "oldWay.onList has extra entity type: %d %s", pEntity->GetType (), pEntity->GetTypeName () );
+        CLogger::ErrorPrintf( "oldWay.onList has extra entity type: %d %s\n", pEntity->GetType (), pEntity->GetTypeName ().c_str () );
     }
 
     for ( vector < CTestSet::CTestResult::CEntityPair > ::const_iterator it = testResult.oldWay.offList.begin (); it != testResult.oldWay.offList.end (); it++ )
     {
         CColShape* pColShape = (*it).pColShape;
         CElement* pEntity = (*it).pEntity;
-        CLogger::ErrorPrintf( "oldWay.offList has extra entity type: %d %s", pEntity->GetType (), pEntity->GetTypeName () );
+        CLogger::ErrorPrintf( "oldWay.offList has extra entity type: %d %s\n", pEntity->GetType (), pEntity->GetTypeName ().c_str () );
     }
 
     for ( vector < CTestSet::CTestResult::CEntityPair > ::const_iterator it = testResult.newWay.onList.begin (); it != testResult.newWay.onList.end (); it++ )
     {
         CColShape* pColShape = (*it).pColShape;
         CElement* pEntity = (*it).pEntity;
-        CLogger::ErrorPrintf( "newWay.onList has extra entity type: %d %s", pEntity->GetType (), pEntity->GetTypeName () );
+        CLogger::ErrorPrintf( "newWay.onList has extra entity type: %d %s\n", pEntity->GetType (), pEntity->GetTypeName ().c_str () );
     }
 
     for ( vector < CTestSet::CTestResult::CEntityPair > ::const_iterator it = testResult.newWay.offList.begin (); it != testResult.newWay.offList.end (); it++ )
     {
         CColShape* pColShape = (*it).pColShape;
         CElement* pEntity = (*it).pEntity;
-        CLogger::ErrorPrintf( "newWay.offList has extra entity type: %d %s", pEntity->GetType (), pEntity->GetTypeName () );
+        CLogger::ErrorPrintf( "newWay.offList has extra entity type: %d %s\n", pEntity->GetType (), pEntity->GetTypeName ().c_str () );
     }
 
     // Finally, use the old way to DoHitDetection
