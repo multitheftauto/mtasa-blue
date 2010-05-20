@@ -50,6 +50,8 @@ public:
     inline class CClient*       GetClient               ( void )                    { return m_pClient; }
     inline void                 SetClient               ( class CClient* pClient )  { m_pClient = pClient; }
 
+    inline void                 SetChanged              ( bool bChanged )           { m_bChanged = bChanged; }
+    inline bool                 HasChanged              ( void )                    { return m_bChanged; }
 protected:
     CAccountManager*            m_pManager;
 
@@ -59,6 +61,8 @@ protected:
     std::string                 m_strIP;
     std::string                 m_strSerial;
     int                         m_iUserID;
+
+    bool                        m_bChanged;
 
     unsigned int                m_uiNameHash;
 
