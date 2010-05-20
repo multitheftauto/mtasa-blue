@@ -43,6 +43,8 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
     m_bIsTypeRandom = false;
     m_bIsWeaponTypeRandom = false;
     m_bIsHealthRandom = false;
+
+    UpdateSpatialData ();
 }
 
 
