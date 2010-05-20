@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword, const std::string& strIP, const std::string& strSerial )
+CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword, const std::string& strIP, int iUserID, const std::string& strSerial )
 {
     m_pClient = NULL;
 
@@ -28,6 +28,7 @@ CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::str
     m_strPassword = strPassword;
     SetIP ( strIP );
     SetSerial ( strSerial );
+    SetID ( iUserID );
 
     m_pManager->AddToList ( this );
     m_pManager->MarkAsChanged ( this );
@@ -36,7 +37,6 @@ CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::str
 
 CAccount::~CAccount ( void )
 {
-    ClearData ();
     
     if ( m_pClient )
         m_pClient->SetAccount ( NULL );
@@ -136,93 +136,10 @@ void CAccount::SetSerial ( const std::string& strSerial )
         m_pManager->MarkAsChanged ( this );
     }
 }
-
-
-CLuaArgument * CAccount::GetData ( char* szKey )
+void CAccount::SetID ( int iUserID )
 {
-    CAccountData* pData = GetDataPointer ( szKey );
-    if ( pData )
+    if ( m_iUserID != iUserID )
     {
-        return pData->GetValue ();
+        m_iUserID = iUserID;
     }
-
-    return NULL;
-}
-
-
-void CAccount::SetData ( const char* szKey, CLuaArgument * pArgument )
-{
-    if ( szKey && szKey [ 0 ] && pArgument )
-    {
-        CAccountData* pData = GetDataPointer ( szKey );
-        if ( pData )
-        {
-            pData->SetValue ( pArgument );
-        }
-        else
-        {
-            pData = new CAccountData ( szKey, pArgument );
-            m_Data.push_back ( pData );
-        }
-
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-
-void CAccount::CopyData ( CAccount* pAccount )
-{
-    list < CAccountData* > ::iterator iter = pAccount->DataBegin ();
-    for ( ; iter != pAccount->DataEnd () ; iter++ )
-    {
-        m_Data.push_back ( new CAccountData ( (*iter)->GetKey (), (*iter)->GetValue () ) );
-    }
-
-    m_pManager->MarkAsChanged ( this );
-}
-
-
-void CAccount::RemoveData ( char* szKey )
-{
-    CAccountData* pData = GetDataPointer ( szKey );
-    if ( pData )
-    {
-        m_Data.remove ( pData );
-        delete pData;
-
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-
-void CAccount::ClearData ( void )
-{
-    if ( !m_Data.empty () )
-    {
-        list < CAccountData* > ::iterator iter = m_Data.begin ();
-        for ( ; iter != m_Data.end () ; iter++ )
-        {
-            delete *iter;
-        }
-
-        m_Data.clear ();
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-
-CAccountData* CAccount::GetDataPointer ( const char* szKey )
-{
-    if ( szKey && szKey [ 0 ] )
-    {
-        list < CAccountData* > ::iterator iter = m_Data.begin ();
-        for ( ; iter != m_Data.end () ; iter++ )
-        {
-            if ( (*iter)->GetKey ().compare ( szKey ) == 0 )
-            {
-                return *iter;
-            }
-        }
-    }
-    return NULL;
 }

@@ -31,7 +31,8 @@ public:
 
     void                        Load                    ( const std::string& strFileName );
 
-    void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition );
+    void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
+    bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );
     void                        DropTable               ( const std::string& strTable );
 
     bool                        Delete                  ( const std::string& strTable, const std::string& strWhere );

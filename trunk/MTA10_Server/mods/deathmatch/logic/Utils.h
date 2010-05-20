@@ -195,4 +195,14 @@ inline bool IsVisibleCharacter ( unsigned char c )
 void            MakeSureDirExists           ( const char* szPath );
 bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
+inline SString SQLEscape ( SString strEscapeString )
+{
+    SString strParsedQuery = "";
+    for ( unsigned int k = 0; k < strlen ( strEscapeString ); k++ ) {
+        if ( strEscapeString[k] == '\'' )
+            strParsedQuery += '\'';
+        strParsedQuery += strEscapeString[k];
+    }
+    return strParsedQuery;
+}
 #endif

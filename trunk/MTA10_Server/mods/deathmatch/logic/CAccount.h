@@ -23,7 +23,7 @@ class CAccountData;
 class CAccount
 {
 public:
-                                CAccount                ( class CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword = "", const std::string& strIP = "", const std::string& strSerial = "");
+                                CAccount                ( class CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword = "", const std::string& strIP = "", int iUserID = 0, const std::string& strSerial = "");
                                 ~CAccount               ( void );
 
     inline bool                 IsRegistered            ( void )                    { return m_bRegistered; }
@@ -43,23 +43,14 @@ public:
 
     inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
     void                        SetSerial               ( const std::string& strSerial );
-    
+
+    inline int                  GetID                   ( void )                    { return m_iUserID; }
+    void                        SetID                   ( int iUserID );
+
     inline class CClient*       GetClient               ( void )                    { return m_pClient; }
     inline void                 SetClient               ( class CClient* pClient )  { m_pClient = pClient; }
 
-    CLuaArgument *              GetData                 ( char* szKey );
-    void                        SetData                 ( const char* szKey, CLuaArgument * pArgument );
-    void                        CopyData                ( CAccount* pAccount );
-    void                        RemoveData              ( char* szKey );
-    void                        ClearData               ( void );
-
-    std::list < CAccountData* > ::iterator DataBegin    ( void )                    { return m_Data.begin (); }
-    std::list < CAccountData* > ::iterator DataEnd      ( void )                    { return m_Data.end (); }
-    unsigned int                DataCount               ( void )                    { return static_cast < unsigned int > ( m_Data.size () ); }
-
 protected:
-    CAccountData*               GetDataPointer          ( const char* szKey );
-
     CAccountManager*            m_pManager;
 
     bool                        m_bRegistered;
@@ -67,32 +58,12 @@ protected:
     std::string                 m_strPassword;
     std::string                 m_strIP;
     std::string                 m_strSerial;
+    int                         m_iUserID;
 
     unsigned int                m_uiNameHash;
 
-    std::list < CAccountData* > m_Data;
 
     class CClient*              m_pClient;
-};
-
-
-class CAccountData
-{
-public:
-    inline                  CAccountData            ( const std::string& strKey, CLuaArgument * pArgument )
-    {
-        m_strKey = strKey;
-        m_Argument = *pArgument;
-    }
-
-    inline const std::string&   GetKey                  ( void )                    { return m_strKey; }
-    inline void                 SetKey                  ( const std::string& strKey){ m_strKey = strKey; }
-    inline CLuaArgument*        GetValue                ( void )                    { return &m_Argument; }
-    inline void                 SetValue                ( CLuaArgument* pArgument ) { m_Argument = *pArgument; }
-
-private:
-    std::string             m_strKey;
-    CLuaArgument            m_Argument;
 };
 
 #endif
