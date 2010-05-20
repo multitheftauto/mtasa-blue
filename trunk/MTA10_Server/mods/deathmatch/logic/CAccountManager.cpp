@@ -33,7 +33,7 @@ CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
 
     //Create all our tables (Don't echo the results)
     m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
-    m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT", true );
+    m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
     
     //Create a new RegistryResult
@@ -208,12 +208,22 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
 
                                 // Grab the data on this account
                                 CXMLNode* pDataNode = NULL;
+                                int iType = LUA_TNIL;
                                 unsigned int uiDataNodesCount = pAccountNode->GetSubNodeCount ();
                                 for ( unsigned int j = 0 ; j < uiDataNodesCount ; j++ )
                                 {
                                     pDataNode = pAccountNode->GetSubNode ( j );
                                     if ( pDataNode == NULL )
                                         continue;
+                                    strBuffer = pDataNode->GetTagName ();
+                                    if ( strBuffer == "nil_data" )
+                                        iType = LUA_TNIL;
+                                    else if ( strBuffer == "boolean_data" )
+                                        iType = LUA_TBOOLEAN;
+                                    else if ( strBuffer == "string_data" )
+                                        iType = LUA_TSTRING;
+                                    else if ( strBuffer == "number_data" )
+                                        iType = LUA_TNUMBER;
 
                                     CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
                                     CXMLAttribute* pAttribute = NULL;
@@ -225,7 +235,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                         strDataValue = pAttribute->GetValue ();
                                         char szKey[128];
                                         strcpy( szKey, strDataKey.c_str() );
-                                        SetAccountData( pAccount, szKey, strDataValue);
+                                        SetAccountData( pAccount, szKey, strDataValue, iType );
                                     }
                                 }
                             }
@@ -243,7 +253,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 {
                                     //Insert the entry into the accounts database
                                     m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s'", strName.c_str(), strPassword.c_str() ), "name, password" );
-                                    pAccount = new CAccount ( this, true, strName, strPassword, "", iAccounts++ );
+                                    pAccount = new CAccount ( this, true, strName, strPassword, "", iAccounts++, "" );
                                 }
                             }
                         }
@@ -689,24 +699,38 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
     //create a new registry result for the query return
     CRegistryResult * pResult = new CRegistryResult;
 
-    //Select the key and value from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query( SString( "SELECT key,value from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), pResult );
+    //Select the value and type from the database where the user is our user and the key is the required key
+    m_pSaveFile->Query( SString( "SELECT value,type from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), pResult );
     
     //Store the returned amount of rows
     int iResults = pResult->nRows;
 
     //Do we have any results?
     if ( iResults > 0 ) {
+        int iType = pResult->Data[0][1].nVal;
         //Account data is stored as text so we don't need to check what type it is just return it
-        return new CLuaArgument ( (char *)pResult->Data[0][1].pVal );
+        if ( iType == LUA_TNIL )
+            return new CLuaArgument;
+        if ( iType == LUA_TBOOLEAN )
+        {
+            SString strResult = (char *)pResult->Data[0][0].pVal;
+            return new CLuaArgument ( strResult == "true" ? true : false );
+        }
+        if ( iType == LUA_TNUMBER )
+            return new CLuaArgument ( strtod ( (char *)pResult->Data[0][0].pVal, NULL ) );
+        else
+            return new CLuaArgument ( (char *)pResult->Data[0][0].pVal );
     }
 
     //No results
-    return NULL;
+    return new CLuaArgument ( false );
 }
 
-bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString strValue )
+bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString strValue, int iType )
 {
+    if ( iType != LUA_TSTRING && iType != LUA_TNUMBER && iType != LUA_TBOOLEAN && iType != LUA_TNIL )
+        return false;
+
     //Get the user ID
     int iUserID = pAccount->GetID();
     //create a new registry result for the query return
@@ -717,9 +741,9 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
 
     //If there is a key with this value update it otherwise insert it
     if ( pResult->nRows > 0 )
-        return m_pSaveFile->Update ( "userdata", SString( "value='%s'", strValue.c_str()), SString( "key='%s' AND userid=%s", szKey, SString( "%i", iUserID ).c_str () ) );
+        m_pSaveFile->Update ( "userdata", SString( "value='%s' and type=%i", strValue.c_str(), iType ), SString( "key='%s' AND userid=%s", szKey, SString( "%i", iUserID ).c_str () ) );
     else
-        return m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s'", SString( "%i", pAccount->GetID () ).c_str (), szKey, strValue.c_str () ), "'userid', 'key', 'value'" );
+        m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s', %i", SString( "%i", pAccount->GetID () ).c_str (), szKey, strValue.c_str (), iType ), "'userid', 'key', 'value', 'type'" );
     
     //Return false as nothing has changed
     return false;
@@ -738,7 +762,7 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     SString strValue;
 
     //Select the key and value from the database where the user is our from account
-    m_pSaveFile->Query ( SString("SELECT key,value from userdata where userid=%i", iUserID ), pResult );
+    m_pSaveFile->Query ( SString("SELECT key,value,type from userdata where userid=%i", iUserID ), pResult );
 
     //Store the returned amount of rows
     int iResults = pResult->nRows;
@@ -752,13 +776,14 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
             strKey = (char *)pResult->Data[i][0].pVal;
             //Get our value
             strValue = (char *)pResult->Data[i][1].pVal;
+            int iType = pResult->Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
-            m_pSaveFile->Query ( SString( "SELECT id,userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , pSubResult );
+            m_pSaveFile->Query ( SString( "SELECT id, userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , pSubResult );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
             if ( pSubResult->nRows > 0 )
-                m_pSaveFile->Update ( "userdata", SString( "value='%s'", strValue.c_str()), SString( "key='%s' AND userid=%s", strKey.c_str (), SString( "%i", pToAccount->GetID () ).c_str () ) );
+                m_pSaveFile->Update ( "userdata", SString( "value='%s' type=%i", strValue.c_str(), iType), SString( "key='%s' AND userid=%s", strKey.c_str (), SString( "%i", pToAccount->GetID () ).c_str () ) );
             else
-                m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s'", SString( "%i", pToAccount->GetID()).c_str (), strKey.c_str (), strValue.c_str () ), "'userid', 'key', 'value'" );
+                m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s', %i", SString( "%i", pToAccount->GetID()).c_str (), strKey.c_str (), strValue.c_str (), iType ), "'userid', 'key', 'value', 'type'" );
 
         }
     }

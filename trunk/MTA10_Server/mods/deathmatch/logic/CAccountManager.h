@@ -18,7 +18,13 @@ class CAccountManager;
 
 #include "CAccount.h"
 #include "CXMLConfig.h"
-
+enum eAccountDataTypes
+{
+    ACCDATA_TEXT,
+    ACCDATA_INT,
+    ACCDATA_BOOL,
+    ACCDATA_FLOAT
+};
 class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
@@ -46,7 +52,7 @@ public:
     inline bool                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; SaveSettings(); return bEnabled; }
 
     CLuaArgument*               GetAccountData              ( CAccount* pAccount, char* szKey );
-    bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue );
+    bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
 
     bool                        ConvertXMLToSQL             ( const char* szFileName );
