@@ -7450,7 +7450,7 @@ CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, c
     assert ( pAccount );
     assert ( szKey );
 
-    return pAccount->GetData ( szKey );
+    return m_pAccountManager->GetAccountData ( pAccount, szKey );
 }
 
 
@@ -7552,20 +7552,9 @@ bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKe
     assert ( pAccount );
     assert ( szKey );
 
-    if ( pArgument->GetType () != LUA_TNONE )
-    {
-        if ( pArgument->GetType () == LUA_TBOOLEAN && !pArgument->GetBoolean () )
-        {
-            pAccount->RemoveData ( szKey );
-        }
-        else
-        {
-            pAccount->SetData ( szKey, pArgument );
-        }
-        return true;
-    }
-
-    return false;
+    char szArgumentAsString[128];
+    pArgument->GetAsString ( szArgumentAsString, 128 );
+    return m_pAccountManager->SetAccountData ( pAccount, szKey, SString("%s", szArgumentAsString) );
 }
 
 
@@ -7574,7 +7563,7 @@ bool CStaticFunctionDefinitions::CopyAccountData ( CAccount* pAccount, CAccount*
     assert ( pAccount );
     assert ( pFromAccount );
 
-    pAccount->CopyData ( pFromAccount );
+    m_pAccountManager->CopyAccountData ( pFromAccount, pAccount );
     return true;
 }
 

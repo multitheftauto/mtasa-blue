@@ -22,12 +22,91 @@ CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
     m_bAutoLogin = false;
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
-}
+    //set loadXML to false
+    m_bLoadXML = false;
 
+    //Create our database
+    m_pSaveFile = new CRegistry ( "" );
+
+    //Load internal.db
+    m_pSaveFile->Load ( "mods/deathmatch/internal.db" );
+
+    //Create all our tables (Don't echo the results)
+    m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
+    m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT", true );
+    m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
+    
+    //Create a new RegistryResult
+    CRegistryResult * pResult = new CRegistryResult ();
+
+    //Pull our settings
+    m_pSaveFile->Query ( "SELECT key, value from settings", pResult );
+
+    //Did we get any results
+    if ( pResult->nRows == 0 )
+    {
+        //Set our settings and clear the accounts/userdata tables just in case
+        m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
+        m_pSaveFile->Insert ( "settings", "'XMLParsed', 0", "key, value" );
+        //Clear the SQL database
+        ClearSQLDatabase ();
+    }
+    else
+    {
+        bool bLoadXMLMissing = true;
+        for (int i = 0;i < pResult->nRows;i++) 
+        {
+            SString strSetting = (char *)pResult->Data[i][0].pVal;
+            //Do we have a result for autologin
+            if ( strSetting == "autologin" )
+                //Set the Auto login variable
+                m_bAutoLogin = pResult->Data[i][0].nVal == 1 ? true : false;
+
+            //Do we have a result for XMLParsed
+            if ( strSetting == "XMLParsed" ) 
+            {
+                //Is XMLParsed zero
+                if ( pResult->Data[i][1].nVal == 0 ) 
+                {
+                    //Clear the SQL database
+                    ClearSQLDatabase ();
+                }
+                bLoadXMLMissing = false;
+            }
+        }
+        //if we didn't load the XMLParsed variable
+        if ( bLoadXMLMissing )
+        {
+            //Insert it
+            m_pSaveFile->Insert ( "settings", "'XMLParsed', 0", "key, value" );
+            //Clear the SQL database
+            ClearSQLDatabase ();
+        }
+        else if (pResult->nRows == 1) 
+        {
+            //if the results is one and we didn't trigger the other if statement then we are missing autologin so insert it
+            m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
+        }
+    }
+}
+void CAccountManager::ClearSQLDatabase ( void )
+{    
+    //Create a new RegistryResult
+    CRegistryResult * pResult = new CRegistryResult ();
+    //No settings file or server owner wants to reload from the accounts file
+    //Clear the accounts and userdata tables
+    m_pSaveFile->Query ( "DELETE from accounts", pResult );
+    m_pSaveFile->Query ( "DELETE from userdata", pResult );
+    //Tell the Server to load the xml file rather than the SQL
+    m_bLoadXML = true;
+}
 
 CAccountManager::~CAccountManager ( void )
 {
+    //Save everything
     Save ();
+    //Delete our save file
+    delete m_pSaveFile;
     RemoveAll ();
 }
 
@@ -42,10 +121,9 @@ void CAccountManager::DoPulse ( void )
         Save ();
     }
 }
-
-
-bool CAccountManager::Load ( const char* szFileName )
+bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
 {
+    //##Keep for backwards compatability with accounts.xml##
     if ( szFileName == NULL )
         szFileName = m_strFileName.c_str ();
 
@@ -66,7 +144,7 @@ bool CAccountManager::Load ( const char* szFileName )
                 CXMLNode* pRootNode = m_pFile->GetRootNode ();
                 if ( pRootNode )
                 {
-                    return Load ( pRootNode );
+                    return LoadXML ( pRootNode );
                 }
             }
         }
@@ -75,12 +153,15 @@ bool CAccountManager::Load ( const char* szFileName )
 }
 
 
-bool CAccountManager::Load ( CXMLNode* pParent )
+bool CAccountManager::LoadXML ( CXMLNode* pParent )
 {
+    CLogger::LogPrint ( "Converting Accounts.xml into internal.db\n" );
+
+    //##Keep for backwards compatability with accounts.xml##
     #define ACCOUNT_VALUE_LENGTH 128
 
     std::string strBuffer, strName, strPassword, strLevel, strIP, strDataKey, strDataValue;
-
+    int iAccounts = 1;
     if ( pParent )
     {
         CXMLNode* pAccountNode = NULL;
@@ -113,11 +194,16 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                                 pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
                                 if ( pAttribute )
                                 {
-                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, pAttribute->GetValue () );
+                                    //Insert the entry into the accounts database
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), pAttribute->GetValue (), strPassword.c_str() ), "name, ip, serial, password" );
+                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, iAccounts++, pAttribute->GetValue () );
+                                
                                 }
                                 else
                                 {
-                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP );
+                                    //Insert the entry into the accounts database
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strIP.c_str(), strPassword.c_str() ), "name, ip, password" );
+                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, iAccounts++ );
                                 }
 
                                 // Grab the data on this account
@@ -129,76 +215,17 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                                     if ( pDataNode == NULL )
                                         continue;
 
-                                    strBuffer = pDataNode->GetTagName ();
-                                    if ( strBuffer.compare ( "nil_data") == 0 )
+                                    CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
+                                    CXMLAttribute* pAttribute = NULL;
+                                    unsigned int uiDataValuesCount = pAttributes->Count ();
+                                    for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
                                     {
-                                        CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
-                                        CXMLAttribute* pAttribute = NULL;
-                                        unsigned int uiDataValuesCount = pAttributes->Count ();
-                                        for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
-                                        {
-                                            pAttribute = pAttributes->Get ( a );
-                                            strDataKey = pAttribute->GetName ();
-                                            strDataValue = pAttribute->GetValue ();
-                                            if ( strcmp ( strDataValue.c_str (), "nil" ) == 0 )
-                                            {
-                                                CLuaArgument Argument;
-                                                pAccount->SetData ( strDataKey.c_str (), &Argument );
-                                            }
-                                        }
-                                    }
-                                    else if ( strBuffer.compare ( "boolean_data" ) == 0 )
-                                    {
-                                        CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
-                                        CXMLAttribute* pAttribute = NULL;
-                                        unsigned int uiDataValuesCount = pAttributes->Count ();
-                                        for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
-                                        {
-                                            pAttribute = pAttributes->Get ( a );
-                                            strDataKey = pAttribute->GetName ();
-                                            strDataValue = pAttribute->GetValue ();
-                                            if ( strcmp ( strDataValue.c_str (), "true" ) == 0 )
-                                            {
-                                                CLuaArgument Argument ( true );
-                                                pAccount->SetData ( strDataKey.c_str (), &Argument );
-                                            }
-                                            /* Don't bother saving/load false booleans
-                                            else if ( strcmp ( strDataValue.c_str (), "false" ) == 0 )
-                                            {
-                                                CLuaArgument Argument ( false );
-                                                pAccount->SetData ( strDataKey.c_str (), &Argument );
-                                            }*/
-                                        }
-                                    }
-                                    else if ( strBuffer.compare ( "string_data" ) == 0 )
-                                    {
-                                        CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
-                                        CXMLAttribute* pAttribute = NULL;
-                                        unsigned int uiDataValuesCount = pAttributes->Count ();
-                                        for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
-                                        {
-                                            pAttribute = pAttributes->Get ( a );
-                                            strDataKey = pAttribute->GetName ();
-                                            strDataValue = pAttribute->GetValue ();
-
-                                            CLuaArgument Argument ( strDataValue.c_str () );
-                                            pAccount->SetData ( strDataKey.c_str (), &Argument );
-                                        }
-                                    }
-                                    else if ( strBuffer.compare ( "number_data" ) == 0 )
-                                    {
-                                        CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
-                                        CXMLAttribute* pAttribute = NULL;
-                                        unsigned int uiDataValuesCount = pAttributes->Count ();
-                                        for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
-                                        {
-                                            pAttribute = pAttributes->Get ( a );
-                                            strDataKey = pAttribute->GetName ();
-                                            strDataValue = pAttribute->GetValue ();
-
-                                            CLuaArgument Argument ( strtod ( strDataValue.c_str (), NULL ) );
-                                            pAccount->SetData ( strDataKey.c_str (), &Argument );
-                                        }
+                                        pAttribute = pAttributes->Get ( a );
+                                        strDataKey = pAttribute->GetName ();
+                                        strDataValue = pAttribute->GetValue ();
+                                        char szKey[128];
+                                        strcpy( szKey, strDataKey.c_str() );
+                                        SetAccountData( pAccount, szKey, strDataValue);
                                     }
                                 }
                             }
@@ -208,12 +235,25 @@ bool CAccountManager::Load ( CXMLNode* pParent )
                                 pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
                                 if ( pAttribute )
                                 {
-                                    pAccount = new CAccount ( this, true, strName, strPassword, NULL, pAttribute->GetValue () );
+                                    //Insert the entry into the accounts database
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strPassword.c_str(), pAttribute->GetValue() ), "name, password, serial" );
+                                    pAccount = new CAccount ( this, true, strName, strPassword, NULL, iAccounts++, pAttribute->GetValue () );
                                 }
                                 else
                                 {
-                                    pAccount = new CAccount ( this, true, strName, strPassword );
+                                    //Insert the entry into the accounts database
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s'", strName.c_str(), strPassword.c_str() ), "name, password" );
+                                    pAccount = new CAccount ( this, true, strName, strPassword, NULL, iAccounts++ );
                                 }
+                            }
+                        }
+                        else
+                        {
+                            if ( strName == "Console" )
+                            {
+                                //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
+                                m_pSaveFile->Insert ( "accounts", "'Console', ''", "name, password" );
+                                ++iAccounts;
                             }
                         }
                     }
@@ -221,10 +261,13 @@ bool CAccountManager::Load ( CXMLNode* pParent )
             }
             else
             {
+                //Load the settings from XML
                 LoadSetting ( pAccountNode );
+                //Save the settings to SQL
+                SaveSettings();
             }
         }
-
+        CLogger::LogPrint ( "Conversion Complete.\n" );
         m_bChangedSinceSaved = false;
         return true;
     }
@@ -233,8 +276,52 @@ bool CAccountManager::Load ( CXMLNode* pParent )
 }
 
 
+bool CAccountManager::Load( const char* szFileName )
+{
+    //Create a registry result
+    CRegistryResult * pResult = new CRegistryResult;
+    //Select all our required information from the accounts database
+    m_pSaveFile->Query( "SELECT id,name,password,ip,serial from accounts", pResult );
+
+    //Work out how many rows we have
+    int iResults = pResult->nRows;
+    //Initialize all our variables
+    SString strName, strPassword, strSerial, strIP;
+    int iUserID;
+    CAccount* pAccount = NULL;
+    for ( int i = 0 ; i < iResults ; i++ )
+    {
+        //Fill User ID, Name & Password (Required data)
+        iUserID = pResult->Data[i][0].nVal;
+        strName = (char *)pResult->Data[i][1].pVal;
+        strPassword = (char *)pResult->Data[i][2].pVal;
+        //if we have an IP
+        if ( pResult->Data[i][3].pVal ) {
+            //Fill the IP variable
+            strIP = (char *)pResult->Data[i][3].pVal;
+            //If we have a Serial
+            if ( pResult->Data[i][4].pVal ) {
+                //Fill the serial variable
+                strSerial = (char *)pResult->Data[i][4].pVal;
+                //Create a new account with the specified information
+                pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
+            }
+            else
+                //Create a new account with the specified information
+                pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID );
+        }
+        else {
+            //Create a new account with the specified information
+            pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
+        }
+    }
+    return true;
+}
+
+
 bool CAccountManager::LoadSetting ( CXMLNode* pNode )
 {
+    //##Keep for backwards compatability with accounts.xml##
     if ( pNode->GetTagName ().compare ( "autologin" ) == 0 )
     {
         bool bTemp;
@@ -256,220 +343,54 @@ bool CAccountManager::Save ( const char* szFileName )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
-    if ( szFileName == NULL )
-        szFileName = m_strFileName.c_str ();
-
-    if ( szFileName == NULL || szFileName [ 0 ] == 0 )
-        return false;
-
-    FILE* pFile = fopen ( szFileName, "w+" );
-    if ( pFile == NULL )
-        return false;
-    fclose ( pFile );
-
-    // Delete existing XML
-    if ( m_pFile )
+    list < CAccount* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
     {
-        delete m_pFile;
+        if ( (*iter)->IsRegistered () )
+        {
+            //Fill in the Account Information variables
+            SString strName = SQLEscape((*iter)->GetName());
+            SString strPassword = (*iter)->GetPassword();
+            SString strIP = (*iter)->GetIP();
+            //Just in case
+            SString strSerial = (*iter)->GetSerial();
+            //Create a registry result
+            CRegistryResult * pResult = new CRegistryResult();
+            //Select ID From Accounts Where Name=strName
+            m_pSaveFile->Select ( "id", "accounts", SString("name='%s'", strName.c_str()).c_str(), 1, pResult);
+            //Check for results
+            if ( pResult->nRows > 0 ) {
+                //If we have a serial update that as well
+                if ( strSerial != "" )
+                    m_pSaveFile->Update ( "accounts", SString( "ip='%s', serial='%s', password='%s'", strIP.c_str(), strSerial.c_str(), strPassword.c_str() ), "name='" + strName + "'" );  
+                else
+                    //If we don't have a serial then IP and password will suffice
+                    m_pSaveFile->Update ( "accounts", SString( "ip='%s', password='%s'", strIP.c_str(), strPassword.c_str() ), "name='" + strName + "'" );  
+            }
+            else
+                //No entries so it isn't in the database therefore Insert it
+                m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), strSerial.c_str(), strPassword.c_str() ), "name, ip, serial, password" );
+        }
     }
-
-    // Create the XML
-    m_pFile = g_pServerInterface->GetXML ()->CreateXML ( szFileName );
-    if ( !m_pFile )
-        return false;
-
-    // Get the root node. Eventually make one called accounts
-    CXMLNode* pRootNode = m_pFile->GetRootNode ();
-    if ( !pRootNode )
-        pRootNode = m_pFile->CreateRootNode ( "accounts" );
-
-    // Save everything into it
-    if ( !Save ( pRootNode ) )
-    {
-        delete m_pFile;
-        m_pFile = NULL;
-        return false;
-    }
-
-    m_pFile->Write ();
-    delete m_pFile;
-    m_pFile = NULL;
-
+    
+    //Get the time took to save
     long long llDeltaTime = GetTickCount64_ () - m_llLastTimeSaved;
+    //Greater than five seconds?
     if ( llDeltaTime > 5000 )
-        CLogger::LogPrintf ( "INFO: Took %lld seconds to save accounts XML file.\n", llDeltaTime / 1000 );
+        //Echo the time taken
+        CLogger::LogPrintf ( "INFO: Took %lld seconds to save accounts Database.\n", llDeltaTime / 1000 );
 
     return true;
 }
 
 
-bool CAccountManager::Save ( CXMLNode* pParent )
+
+bool CAccountManager::SaveSettings ()
 {
-    if ( pParent )
-    {
-        SaveSettings ( pParent );
-
-        CXMLNode* pNode = NULL;
-
-        list < CAccount* > ::iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end () ; iter++ )
-        {
-            if ( (*iter)->IsRegistered () )
-            {
-                pNode = pParent->CreateSubNode ( "account" );
-                if ( pNode )
-                {
-                    CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( "name" );
-                    if ( pAttribute )
-                        pAttribute->SetValue ( (*iter)->GetName ().c_str () );
-
-                    pAttribute = pNode->GetAttributes ().Create ( "password" );
-                    if ( pAttribute )
-                        pAttribute->SetValue ( (*iter)->GetPassword ().c_str () );
-
-                    const char* szIP = (*iter)->GetIP ().c_str ();
-                    if ( szIP && szIP [ 0 ] )
-                    {
-                        pAttribute = pNode->GetAttributes ().Create ( "ip" );
-                        if ( pAttribute )
-                            pAttribute->SetValue ( szIP );
-                    }
-
-                    const char* szSerial = (*iter)->GetSerial ().c_str ();
-                    if ( szSerial && szSerial [ 0 ] )
-                    {
-                        pAttribute = pNode->GetAttributes ().Create ( "serial" );
-                        if ( pAttribute )
-                            pAttribute->SetValue ( szSerial );
-                    }
-
-                    // Do we have any data to save?
-                    if ( (*iter)->DataCount () > 0 )
-                    {
-                        // Sort our data into separate lists of each type
-                        list < CAccountData * > nilList, boolList, stringList, numberList;
-                        list < CAccountData * > * pDataList = NULL;
-                        list < CAccountData * > ::iterator iterData = (*iter)->DataBegin ();
-                        for ( ; iterData != (*iter)->DataEnd () ; iterData++ )
-                        {
-                            switch ( (*iterData)->GetValue ()->GetType () )
-                            {
-                                case LUA_TNIL:
-                                    nilList.push_back ( *iterData );
-                                    break;
-                                case LUA_TBOOLEAN:
-                                    boolList.push_back ( *iterData );
-                                    break;
-                                case LUA_TSTRING:
-                                    stringList.push_back ( *iterData );
-                                    break;
-                                case LUA_TNUMBER:
-                                    numberList.push_back ( *iterData );
-                                    break;
-                            }
-                        }
-                        CXMLAttribute * pAttribute = NULL;
-                        CXMLNode * pDataNode = NULL;
-                        CAccountData * pData = NULL;
-                        char szArgumentAsString [ 128 ];
-                        // Do we have any nil data?
-                        pDataList = &nilList;
-                        if ( !pDataList->empty () )
-                        {
-                            // Create a node for this type of data
-                            pDataNode = pNode->CreateSubNode ( "nil_data" );
-                            if ( pDataNode )
-                            {
-                                iterData = pDataList->begin ();
-                                for ( ; iterData != pDataList->end (); iterData++ )
-                                {
-                                    pData = *iterData;
-                                    pAttribute = pDataNode->GetAttributes ().Create ( pData->GetKey ().c_str () );
-                                    if ( pAttribute )
-                                    {
-                                        pData->GetValue ()->GetAsString ( szArgumentAsString, 128 );
-                                        pAttribute->SetValue ( szArgumentAsString );
-                                    }
-                                }
-                            }
-                        }
-                        // Do we have any boolean data?
-                        pDataList = &boolList;
-                        if ( !pDataList->empty () )
-                        {
-                            // Create a node for this type of data
-                            pDataNode = pNode->CreateSubNode ( "boolean_data" );
-                            if ( pDataNode )
-                            {
-                                pDataList = &boolList;
-                                iterData = pDataList->begin ();
-                                for ( ; iterData != pDataList->end (); iterData++ )
-                                {
-                                    pData = *iterData;
-                                    pAttribute = pDataNode->GetAttributes ().Create ( pData->GetKey ().c_str () );
-                                    if ( pAttribute )
-                                    {
-                                        pData->GetValue ()->GetAsString ( szArgumentAsString, 128 );
-                                        pAttribute->SetValue ( szArgumentAsString );
-                                    }
-                                }
-                            }
-                        }
-                        // Do we have any string data?
-                        pDataList = &stringList;
-                        if ( !pDataList->empty () )
-                        {
-                            // Create a node for this type of data
-                            pDataNode = pNode->CreateSubNode ( "string_data" );
-                            if ( pDataNode )
-                            {
-                                iterData = pDataList->begin ();
-                                for ( ; iterData != pDataList->end (); iterData++ )
-                                {
-                                    pData = *iterData;
-                                    pAttribute = pDataNode->GetAttributes ().Create ( pData->GetKey ().c_str () );
-                                    if ( pAttribute )
-                                    {
-                                        pData->GetValue ()->GetAsString ( szArgumentAsString, 128 );
-                                        pAttribute->SetValue ( szArgumentAsString );
-                                    }
-                                }
-                            }
-                        }
-                        // Do we have any number data?
-                        pDataList = &numberList;
-                        if ( !pDataList->empty () )
-                        {
-                            // Create a node for this type of data
-                            pDataNode = pNode->CreateSubNode ( "number_data" );
-                            if ( pDataNode )
-                            {
-                                iterData = pDataList->begin ();
-                                for ( ; iterData != pDataList->end (); iterData++ )
-                                {
-                                    pData = *iterData;
-                                    pAttribute = pDataNode->GetAttributes ().Create ( pData->GetKey ().c_str () );
-                                    if ( pAttribute )
-                                    {
-                                        pData->GetValue ()->GetAsString ( szArgumentAsString, 128 );
-                                        pAttribute->SetValue ( szArgumentAsString );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-
-bool CAccountManager::SaveSettings ( CXMLNode* pParent )
-{
-    SetBoolean ( pParent, "autologin", m_bAutoLogin );
+    //Update our autologin and XML Load SQL entries
+    m_pSaveFile->Update ( "settings", SString( "value=%i", (int)m_bAutoLogin ).c_str (), "key='autologin'" );
+    m_pSaveFile->Update ( "settings", SString( "value=%i", (int)m_bLoadXML ), "key='XMLParsed'" );
+    
     return true;
 }
 
@@ -750,4 +671,109 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
         pEchoClient->SendEcho ( "logout: You logged out" );
 
     return true;
+}
+
+
+CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
+{
+    //Get the user ID
+    int iUserID = pAccount->GetID();
+    //create a new registry result for the query return
+    CRegistryResult * pResult = new CRegistryResult;
+
+    //Select the key and value from the database where the user is our user and the key is the required key
+    m_pSaveFile->Query( SString( "SELECT key,value from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), pResult );
+    
+    //Store the returned amount of rows
+    int iResults = pResult->nRows;
+
+    //Do we have any results?
+    if ( iResults > 0 ) {
+        //Account data is stored as text so we don't need to check what type it is just return it
+        return new CLuaArgument ( (char *)pResult->Data[0][1].pVal );
+    }
+
+    //No results
+    return NULL;
+}
+
+bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString strValue )
+{
+    //Get the user ID
+    int iUserID = pAccount->GetID();
+    //create a new registry result for the query return
+    CRegistryResult * pResult = new CRegistryResult;
+
+    //Select the key and value from the database where the user is our user and the key is the required key
+    m_pSaveFile->Query ( SString("SELECT id,userid from userdata where userid=%i and key=\"%s\"", iUserID, szKey ).c_str () , pResult );
+
+    //If there is a key with this value update it otherwise insert it
+    if ( pResult->nRows > 0 )
+        return m_pSaveFile->Update ( "userdata", SString( "value='%s'", strValue.c_str()), SString( "key='%s' AND userid=%s", szKey, SString( "%i", iUserID ).c_str () ) );
+    else
+        return m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s'", SString( "%i", pAccount->GetID () ).c_str (), szKey, strValue.c_str () ), "'userid', 'key', 'value'" );
+    
+    //Return false as nothing has changed
+    return false;
+}
+
+bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAccount )
+{
+    //Get the user ID of the from account
+    int iUserID = pFromAccount->GetID();
+    //create a new registry result for the from account query return value
+    CRegistryResult * pResult = new CRegistryResult;
+    //create a new registry result for the to account query return value
+    CRegistryResult * pSubResult = new CRegistryResult;
+    //initialize key and value strings
+    SString strKey;
+    SString strValue;
+
+    //Select the key and value from the database where the user is our from account
+    m_pSaveFile->Query ( SString("SELECT key,value from userdata where userid=%i", iUserID ), pResult );
+
+    //Store the returned amount of rows
+    int iResults = pResult->nRows;
+
+    //Do we have any results?
+    if ( iResults > 0 ) {
+        //Loop through until i is the same as the number of rows
+        for ( int i = 0;i < iResults;i++ ) 
+        {
+            //Get our key
+            strKey = (char *)pResult->Data[i][0].pVal;
+            //Get our value
+            strValue = (char *)pResult->Data[i][1].pVal;
+            //Select the id and userid where the user is the to account and the key is strKey
+            m_pSaveFile->Query ( SString( "SELECT id,userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , pSubResult );
+            //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
+            if ( pSubResult->nRows > 0 )
+                m_pSaveFile->Update ( "userdata", SString( "value='%s'", strValue.c_str()), SString( "key='%s' AND userid=%s", strKey.c_str (), SString( "%i", pToAccount->GetID () ).c_str () ) );
+            else
+                m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s'", SString( "%i", pToAccount->GetID()).c_str (), strKey.c_str (), strValue.c_str () ), "'userid', 'key', 'value'" );
+
+        }
+    }
+    else
+        //We had no results so return false (Nothing has changed)
+        return false;
+    
+    return true;
+}
+
+
+void CAccountManager::SmartLoad ()
+{
+    //##Function to work out if we need to reload the accounts.xml file into internal.db##
+    //If we need to reload the XML file do it
+    if ( m_bLoadXML ) {
+        //Convert XML to SQL with our filename
+        ConvertXMLToSQL( m_strFileName.c_str () );
+        //Set loadXML to false so when we save internal.db it won't reload our XML file next run
+        m_bLoadXML = false;
+    }
+    else
+        //else load our internal.db
+        Load("");
+
 }

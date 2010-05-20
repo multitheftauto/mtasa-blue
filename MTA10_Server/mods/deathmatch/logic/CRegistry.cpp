@@ -76,7 +76,7 @@ bool CRegistry::Update ( const std::string& strTable, const std::string& strSet,
 }
 
 
-void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition )
+void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition, bool bSilent )
 {
     if ( m_bOpened == false ) {
         m_strLastError = "SQLite3 was not opened, cannot create table!";
@@ -84,8 +84,9 @@ void CRegistry::CreateTable ( const std::string& strTable, const std::string& st
     }
 
     std::string strQuery = "CREATE TABLE IF NOT EXISTS " + strTable + " ( " + strDefinition + " )";
+    if ( !bSilent )
+        CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
 
-    CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
     sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
 }
 
@@ -300,4 +301,23 @@ bool CRegistry::Select ( const std::string& strColumns, const std::string& strTa
 
     // Execute the query
     return QueryInternal ( strQuery.c_str (), pResult );
+}
+
+bool CRegistry::Query ( const char* szQuery, CRegistryResult* pResult )
+{
+    std::string strParsedQuery = "";
+
+    if ( m_bOpened == false ) {
+        m_strLastError = "SQLite3 was not opened, cannot perform query!";
+        return false;
+    }
+
+    for ( unsigned int k = 0; k < strlen ( szQuery ); k++ ) {
+        if ( szQuery[k] == '\'' )
+            strParsedQuery += '\'';
+        
+        strParsedQuery += szQuery[k];
+    }
+
+    return QueryInternal ( strParsedQuery.c_str (), pResult );
 }

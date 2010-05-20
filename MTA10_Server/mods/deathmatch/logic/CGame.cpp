@@ -611,7 +611,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Load the accounts
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );
     m_pAccountManager->SetFileName ( strBuffer );
-    m_pAccountManager->Load ();
+    m_pAccountManager->SmartLoad ();
 
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
