@@ -397,6 +397,7 @@ protected:
     void                        NotifyDestroy           ( void );
 
     bool                        DoCheckHasLandingGear   ( void );
+    void                        HandleWaitingForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
     void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );

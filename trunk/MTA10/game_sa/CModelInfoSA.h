@@ -256,7 +256,7 @@ public:
 
     char *                          GetNameIfVehicle        ( void );
 
-    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false );
+    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
     VOID                            Remove                  ( void );
     VOID                            LoadAllRequestedModels  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
@@ -270,7 +270,7 @@ public:
     void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
 
-    void                            AddRef                  ( bool bWaitForLoad );
+    void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( void );
 

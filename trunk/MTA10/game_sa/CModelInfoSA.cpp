@@ -281,7 +281,7 @@ char * CModelInfoSA::GetNameIfVehicle ( )
 //  return NULL;
 }
 
-VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
+VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority )
 {
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
@@ -298,10 +298,9 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     DWORD ModelID = m_dwModelID;
     //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
     DWORD dwFlags;
-    // Removed to see if it helps with loading of GTA landscape
-    //if ( pGame && pGame->IsASyncLoadingEnabled () )
-    //    dwFlags = 0x16;
-    //else
+    if ( bHighPriority )
+        dwFlags = 0x16;
+    else
         dwFlags = 6;
     _asm
     {
@@ -610,16 +609,16 @@ void CModelInfoSA::RestreamIPL ()
     }
 }
 
-void CModelInfoSA::AddRef ( bool bWaitForLoad )
+void CModelInfoSA::AddRef ( bool bWaitForLoad, bool bHighPriority )
 {
     // Are we not loaded?
     if ( !IsLoaded () )
     {
         // Request it. Wait for it to load if we're asked to.
         if ( pGame && pGame->IsASyncLoadingEnabled () )
-            Request ( bWaitForLoad, bWaitForLoad );
+            Request ( bWaitForLoad, bWaitForLoad, bHighPriority );
         else
-            Request ( true, bWaitForLoad );
+            Request ( true, bWaitForLoad, bHighPriority );
     }
 
     // Increment the references.

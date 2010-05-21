@@ -2169,6 +2169,7 @@ void CClientPed::WorldIgnore ( bool bIgnore )
     m_bWorldIgnored = bIgnore;
 }
 
+
 void CClientPed::StreamedInPulse ( void )
 {
     // Grab some vars here, saves getting them twice
@@ -2179,66 +2180,7 @@ void CClientPed::StreamedInPulse ( void )
     {
         // Handle waiting for the ground to load
         if ( IsFrozenWaitingForGroundToLoad () )
-        {
-            // Reset position
-            SetPosition ( m_matFrozen.vPos );
-            SetMatrix ( m_matFrozen );
-            SetMoveSpeed ( CVector () );
-
-            // Load load load
-            if ( GetModelInfo () )
-                GetModelInfo ()-> LoadAllRequestedModels ();
-
-            // Gather up some flags
-            CVector vecPosition;
-            GetPosition ( vecPosition );
-            CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
-            bool bASync         = g_pGame->IsASyncLoadingEnabled ();
-            bool bGTALoaded     = g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &vecPosition );
-            bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
-            bool bMTALoaded     = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 200.0f, m_usDimension );
-            bool bHasModel      = GetModelInfo () != NULL;
-
-            #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bGTALoaded:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
-                                               ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
-                                               , bASync, bHasModel, bGTALoaded, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
-            #endif
-
-            // See if ground is ready
-            if ( !bHasModel || !bGTALoaded || ( !bMTAObjLimit && !bMTALoaded ) )
-            {
-                m_fGroundCheckTolerance = 0.f;
-                #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                    status += ( "  FreezeUntilCollisionLoaded - wait" );
-                #endif
-            }
-            else
-            {
-                // Models should be loaded, but sometimes the collision is still not ready
-                // Do a ground distance check to make sure.
-                // Make the check tolerance larger with each passing frame
-                m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
-                float fDist = GetDistanceFromGround ();
-                float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
-                if ( fUseDist > -0.2f && fUseDist < 1.5f )
-                    SetFrozenWaitingForGroundToLoad ( false );
-
-                #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                    status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
-                #endif
-
-                // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
-                if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
-                    SetFrozenWaitingForGroundToLoad ( false );
-
-            }
-
-            #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-                OutputDebugLine ( status );
-                g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
-            #endif
-        }
+            HandleWaitingForGroundToLoad ();
 
         // Draw a little star in the corner if async is on
         if ( g_pGame->IsASyncLoadingEnabled ( true ) )
@@ -5154,4 +5096,89 @@ CSphere CClientPed::GetWorldBoundingSphere ( void )
     }
     sphere.vecPosition += GetStreamPosition ();
     return sphere;
+}
+
+
+// Currently, this should only be called for the local player
+void CClientPed::HandleWaitingForGroundToLoad ( void )
+{
+    // Check if near any MTA objects
+    bool bNearObject = false;
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    CClientEntityResult result;
+    GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecPosition + CVector ( 0, 0, -3 ), 5 ) );
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    {
+        if  ( (*it)->GetType () == CCLIENTOBJECT )
+        {
+            bNearObject = true;
+            break;
+        }
+    }
+
+    if ( !bNearObject )
+    {
+        // If not near any MTA objects, then don't bother waiting
+        SetFrozenWaitingForGroundToLoad ( false );
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
+        #endif 
+        return;
+    }
+
+    // Reset position
+    SetPosition ( m_matFrozen.vPos );
+    SetMatrix ( m_matFrozen );
+    SetMoveSpeed ( CVector () );
+
+    // Load load load
+    if ( GetModelInfo () )
+        GetModelInfo ()-> LoadAllRequestedModels ();
+
+    // Gather up some flags
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
+    bool bASync         = g_pGame->IsASyncLoadingEnabled ();
+    bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
+    bool bMTALoaded     = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
+    bool bHasModel      = GetModelInfo () != NULL;
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
+                                       ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
+                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
+    #endif
+
+    // See if ground is ready
+    if ( !bHasModel || ( !bMTAObjLimit && !bMTALoaded ) )
+    {
+        m_fGroundCheckTolerance = 0.f;
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( "  FreezeUntilCollisionLoaded - wait" );
+        #endif
+    }
+    else
+    {
+        // Models should be loaded, but sometimes the collision is still not ready
+        // Do a ground distance check to make sure.
+        // Make the check tolerance larger with each passing frame
+        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
+        float fDist = GetDistanceFromGround ();
+        float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
+        if ( fUseDist > -0.2f && fUseDist < 1.5f )
+            SetFrozenWaitingForGroundToLoad ( false );
+
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
+        #endif
+
+        // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
+        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
+            SetFrozenWaitingForGroundToLoad ( false );
+    }
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        OutputDebugLine ( status );
+        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+    #endif
 }

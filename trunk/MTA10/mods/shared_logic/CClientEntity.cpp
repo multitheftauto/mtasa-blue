@@ -1504,3 +1504,12 @@ void CClientEntity::UpdateSpatialData ( void )
 {
     GetClientSpatialDatabase ()->UpdateEntity ( this );
 }
+
+// Return the distance to the other entity.
+// A negative value indicates overlapping bounding spheres
+float CClientEntity::GetDistanceBetween ( CClientEntity* pOther )
+{
+    CSphere sphere = GetWorldBoundingSphere ();
+    CSphere otherSphere = pOther->GetWorldBoundingSphere ();
+    return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
+}

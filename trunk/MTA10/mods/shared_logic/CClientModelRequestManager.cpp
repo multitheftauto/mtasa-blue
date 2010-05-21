@@ -184,8 +184,13 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                 return true;
             }
 
+            // Boost loading priority if the object is close to the local player
+            bool bHighPriority = false;
+            if ( pRequester->GetDistanceBetween ( g_pClientGame->GetLocalPlayer () ) < 20 )
+                bHighPriority = true;
+
             // Request it
-            pInfo->AddRef ( false );
+            pInfo->AddRef ( false, bHighPriority );
 
             // Add him to the list over models we're waiting for.
             pEntry = new SClientModelRequest;
