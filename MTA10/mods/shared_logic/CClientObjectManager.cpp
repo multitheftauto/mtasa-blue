@@ -270,47 +270,27 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 
 bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
 {
-    // TODO: mix in with the streamer, cause this is way too slow
+    // Note: This query will return some objects that are outside the sphere, but that doesn't matter for this function
+    CClientEntityResult result;
+    GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecPosition, fRadius ) );
 
-    CVector vecObject;
-    float fDistanceX, fDistanceY, fDistanceZ, fDistanceExp;
-
-    // Radius exp 2
-    float fRadius2 = fRadius * fRadius;
-
-    // Loop through our objects
-    CClientObject* pObject;
-    list < CClientObject* > ::const_iterator iter = m_Objects.begin ();
-    for ( ; iter != m_Objects.end (); iter++ )
+    // Extract relevant types
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
     {
-        pObject = *iter;
-
-        // Is it not loaded?
-        CModelInfo* pModelInfo = pObject->GetModelInfo ();
-        if ( !pObject->GetGameObject () || !pModelInfo->IsLoaded () )
+        CClientEntity* pEntity = *it;
+        if  ( pEntity->GetType () == CCLIENTOBJECT )
         {
-            if ( pObject->GetDimension () == usDimension )
+            CClientObject* pObject = static_cast < CClientObject* > ( pEntity );
+            if ( !pObject->GetGameObject () || !pObject->GetModelInfo ()->IsLoaded () || !pObject->IsStreamedIn () )
             {
-                // Grab its position
-                pObject->GetPosition ( vecObject );
-
-                // Grab the distance ^ 2
-                fDistanceX = vecObject.fX - vecPosition.fX;
-                fDistanceY = vecObject.fY - vecPosition.fY;
-                fDistanceZ = vecObject.fZ - vecPosition.fZ;
-                fDistanceExp = fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ;
-
-                // Closer than the radius ^ 2?
-                if ( fDistanceExp < fRadius2 )
+                if ( pObject->GetDimension () == usDimension )
                 {
-                    // We haven't loaded all the objects nearby that location
                     return false;
                 }
             }
         }
     }
 
-    // We have
     return true;
 }
 

@@ -430,6 +430,7 @@ protected:
     void                        InternalRemoveFromVehicle   ( CVehicle* pGameVehicle );
 
     bool                        PerformChecks               ( void );
+    void                        HandleWaitingForGroundToLoad ( void );
 
     // Used to start and stop radio for local player
     void                        StartRadio                  ( void );
