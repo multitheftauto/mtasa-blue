@@ -298,7 +298,7 @@ bool CAccountManager::Load( const char* szFileName )
     int iResults = pResult->nRows;
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
-    int iUserID;
+    int iUserID = 0;
     CAccount* pAccount = NULL;
     for ( int i = 0 ; i < iResults ; i++ )
     {
@@ -326,7 +326,7 @@ bool CAccountManager::Load( const char* szFileName )
             pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
         }
     }
-    m_iAccounts = iUserID++;
+    m_iAccounts = iUserID;
     return true;
 }
 
@@ -831,7 +831,7 @@ void CAccountManager::Register( CAccount* pAccount )
     if ( pAccount->IsRegistered ()  )
     {
         //Give the Account an ID
-        pAccount->SetID( m_iAccounts++ );
+        pAccount->SetID( ++m_iAccounts );
         //Force a save for this account
         Save ( pAccount );
     }
