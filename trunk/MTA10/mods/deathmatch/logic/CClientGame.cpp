@@ -517,6 +517,22 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_VERSION ) );
             if ( pBitStream->Version () >= 0x02 )
                 pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
+
+            if ( pBitStream->Version () >= 0x0b )
+            {
+                SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
+                                            ,MTASA_VERSION_MAJOR
+                                            ,MTASA_VERSION_MINOR
+                                            ,MTASA_VERSION_MAINTENANCE
+                                            ,MTASA_VERSION_TYPE
+                                            ,MTASA_VERSION_BUILD
+                                            ,g_pNet->GetNetRev ()
+                                            );
+
+                pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
+                pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
+            }
+
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details

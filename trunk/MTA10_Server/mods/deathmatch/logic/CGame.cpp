@@ -1346,6 +1346,17 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     return;
                                 }
 
+                                if ( Packet.GetPlayerVersion ().length () > 0 &&
+                                     Packet.GetPlayerVersion () != pPlayer->GetPlayerVersion () )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Version mismatch) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Version mismatch" );
+                                    return;
+                                }
+
                                 // Add him to the whowas list
                                 m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
 
