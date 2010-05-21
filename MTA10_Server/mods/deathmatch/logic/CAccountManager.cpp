@@ -61,7 +61,7 @@ CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
             //Do we have a result for autologin
             if ( strSetting == "autologin" )
                 //Set the Auto login variable
-                m_bAutoLogin = pResult->Data[i][0].nVal == 1 ? true : false;
+                m_bAutoLogin = pResult->Data[i][1].nVal == 1 ? true : false;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
@@ -577,6 +577,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         // Get the players details
         strPlayerIP = szIP;
         strPlayerSerial = pPlayer->GetSerial ();
+        pAccount->SetSerial ( strPlayerSerial );
     }
 
     // Call the onClientLogin script event
