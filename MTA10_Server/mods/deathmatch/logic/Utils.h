@@ -201,6 +201,9 @@ inline SString SQLEscape ( SString strEscapeString )
     for ( unsigned int k = 0; k < strlen ( strEscapeString ); k++ ) {
         if ( strEscapeString[k] == '\'' )
             strParsedQuery += '\'';
+        if ( strEscapeString[k] == '\"' )
+            strParsedQuery += '\"';
+
         strParsedQuery += strEscapeString[k];
     }
     return strParsedQuery;
