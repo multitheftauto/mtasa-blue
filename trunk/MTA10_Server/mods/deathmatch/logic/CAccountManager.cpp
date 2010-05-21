@@ -195,7 +195,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), pAttribute->GetValue (), strPassword.c_str() ), "name, ip, serial, password" );
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), pAttribute->GetValue ().c_str(), strPassword.c_str() ), "name, ip, serial, password" );
                                     pAccount = new CAccount ( this, true, strName, strPassword, strIP, iAccounts++, pAttribute->GetValue () );
                                 
                                 }
@@ -246,7 +246,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strPassword.c_str(), pAttribute->GetValue() ), "name, password, serial" );
+                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strPassword.c_str(), pAttribute->GetValue().c_str() ), "name, password, serial" );
                                     pAccount = new CAccount ( this, true, strName, strPassword, "", iAccounts++, pAttribute->GetValue () );
                                 }
                                 else
