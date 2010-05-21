@@ -1346,6 +1346,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     return;
                                 }
 
+                            #if MTASA_VERSION_TYPE > VERSION_TYPE_UNSTABLE
                                 if ( Packet.GetPlayerVersion ().length () > 0 &&
                                      Packet.GetPlayerVersion () != pPlayer->GetPlayerVersion () )
                                 {
@@ -1356,6 +1357,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     DisconnectPlayer ( this, *pPlayer, "Disconnected: Version mismatch" );
                                     return;
                                 }
+                            #endif
 
                                 // Add him to the whowas list
                                 m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
