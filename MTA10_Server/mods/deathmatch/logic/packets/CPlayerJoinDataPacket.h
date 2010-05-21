@@ -35,6 +35,7 @@ public:
 
     inline unsigned short   GetMTAVersion               ( void )                            { return m_usMTAVersion; };
     inline unsigned short   GetBitStreamVersion         ( void )                            { return m_usBitStreamVersion; };
+    inline const SString&   GetPlayerVersion            ( void )                            { return m_strPlayerVersion; };
 
     inline const char*      GetNick                     ( void )                            { return m_szNick; };
     inline void             SetNick                     ( const char* szNick )              { strncpy ( m_szNick, szNick, MAX_NICK_LENGTH ); };
@@ -53,6 +54,7 @@ private:
     char                    m_szNick [MAX_NICK_LENGTH + 1];
     MD5                     m_Password;
     char                    m_szSerialUser[MAX_SERIAL_LENGTH + 1];
+    SString                 m_strPlayerVersion;
 };
 
 #endif
