@@ -182,7 +182,7 @@ void CVersionUpdater::StartVersionCheck ( void )
 
     // Compose version string
     unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
-    SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
+    SString strPlayerVersion ( "%d.%d.%d-%s.%05d.%d"
                                 ,MTASA_VERSION_MAJOR
                                 ,MTASA_VERSION_MINOR
                                 ,MTASA_VERSION_MAINTENANCE
