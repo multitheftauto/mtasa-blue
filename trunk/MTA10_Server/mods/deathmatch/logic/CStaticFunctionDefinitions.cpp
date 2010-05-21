@@ -7464,6 +7464,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const cha
     {
         CAccount* pAccount = new CAccount ( m_pAccountManager, true, szName );
         pAccount->SetPassword ( szPassword );
+        g_pGame->GetAccountManager ()->Register( pAccount );
         return pAccount;
     }
     return NULL;
@@ -7521,6 +7522,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 
             pClient->SendEcho ( szMessage );
         }
+        g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
         delete pAccount;
         return true;
     }

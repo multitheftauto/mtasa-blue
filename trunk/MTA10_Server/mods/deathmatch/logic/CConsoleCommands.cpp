@@ -1295,6 +1295,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                 {
                     CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
                     pAccount->SetPassword ( szPassword );
+                    g_pGame->GetAccountManager ()->Register( pAccount );
 
                     // Tell the user
                     char szMessage [128];
@@ -1374,6 +1375,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
 
             // Delete it
+            g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
             delete pAccount;
             return true;
         }

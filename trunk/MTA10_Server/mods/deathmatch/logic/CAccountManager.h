@@ -33,6 +33,7 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( const char* szFileName = NULL );
     bool                        Save                        ( CXMLNode* pParent );
+    void                        Save                        ( CAccount* pParent );
     bool                        SaveSettings                ( void );
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
@@ -52,6 +53,8 @@ public:
     bool                        ConvertXMLToSQL             ( const char* szFileName );
     bool                        LoadXML                     ( CXMLNode* pParent );
     void                        SmartLoad                   ( void );
+    void                        Register                    ( CAccount* pAccount );
+    void                        RemoveAccount               ( CAccount* pAccount );
 protected:
     inline void                 AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
@@ -75,6 +78,7 @@ protected:
     CConnectHistory             m_AccountProtect;
     CRegistry*                  m_pSaveFile;
     bool                        m_bLoadXML;
+    int                         m_iAccounts;
 };
 
 #endif
