@@ -6998,7 +6998,9 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 {
     // Verify it's within the max valid weather id
+#if MAX_VALID_WEATHER < 255
     if ( ucWeather <= MAX_VALID_WEATHER )
+#endif
     {
         // Set the weather
         m_pMapManager->GetWeather ()->SetWeather ( ucWeather );
@@ -7018,7 +7020,9 @@ bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 bool CStaticFunctionDefinitions::SetWeatherBlended ( unsigned char ucWeather )
 {
     // Verify it's within the max valid weather id
+#if MAX_VALID_WEATHER < 255
     if ( ucWeather <= MAX_VALID_WEATHER )
+#endif
     {
         CBlendedWeather* pWeather = m_pMapManager->GetWeather ();
 
@@ -7133,7 +7137,7 @@ bool CStaticFunctionDefinitions::SetMinuteDuration ( unsigned long ulDuration )
 
 bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool bIsOpen )
 {
-    if ( ucGarageID >= 0 && ucGarageID < MAX_GARAGES )
+    if ( ucGarageID < MAX_GARAGES )
     {
         bool* pbGarageStates = g_pGame->GetGarageStates();
         pbGarageStates [ ucGarageID ] = bIsOpen;

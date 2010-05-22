@@ -8868,7 +8868,7 @@ int CLuaFunctionDefinitions::RemoveCommandHandler ( lua_State* luaVM )
             const char* szKey = lua_tostring ( luaVM, 1 );
             if ( szKey [0] )
             {
-                int iLuaFunction = NULL;
+                int iLuaFunction = 0;
                 if ( lua_type ( luaVM, 2 ) == LUA_TFUNCTION )
                     iLuaFunction = luaM_toref ( luaVM, 2 );
 
@@ -9393,7 +9393,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         szDelimiter [31] = 0;
         _snprintf ( szDelimiter, 31, "%c", iDelimiter );
 
-        unsigned int uiCount = 1;
+        int iCount = 1;
         char* szToken = strtok ( strText, szDelimiter );
 
         // We're looking for the first part?
@@ -9402,10 +9402,10 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
             // strtok count number of times
             do
             {
-                uiCount++;
+                iCount++;
                 szToken = strtok ( NULL, szDelimiter );
             }
-            while ( uiCount != iToken );
+            while ( iCount != iToken );
         }
 
         // Found it?

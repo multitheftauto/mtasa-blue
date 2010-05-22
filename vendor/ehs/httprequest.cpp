@@ -594,7 +594,7 @@ int GetNextLine ( std::string & irsLine, ///< line removed from *ippsBuffer
 
 
 /// List of possible HTTP request methods
-char * RequestMethodStrings [] = { "OPTIONS", "GET", "HEAD", "POST", 
+const char * RequestMethodStrings [] = { "OPTIONS", "GET", "HEAD", "POST", 
 								   "PUT", "DELETE", "TRACE", "CONNECT", "*" };
 
 

@@ -35,7 +35,7 @@ int CLuaHTTPDefs::httpWrite ( lua_State* luaVM )
             if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-                unsigned long length = NULL;
+                unsigned long length = 0;
                 if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
                     length = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
                 else
