@@ -413,7 +413,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
     // Create the account manager
-    m_pAccountManager = new CAccountManager ( NULL );
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;

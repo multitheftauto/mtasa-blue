@@ -15,7 +15,7 @@
 
 #include "StdInc.h"
 
-CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
+CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
     , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_bRemoveFromList = true;
@@ -30,7 +30,7 @@ CAccountManager::CAccountManager ( char* szFileName ): CXMLConfig ( szFileName )
     m_pSaveFile = new CRegistry ( "" );
 
     //Load internal.db
-    m_pSaveFile->Load ( "mods/deathmatch/internal.db" );
+    m_pSaveFile->Load ( strBuffer );
 
     //Create all our tables (Don't echo the results)
     m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
