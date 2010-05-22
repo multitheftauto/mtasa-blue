@@ -2826,7 +2826,7 @@ unsigned long get_current_file_crc ( unzFile uf )
     if ( err == UNZ_OK )
         return file_info.crc;
     else
-        return NULL;
+        return 0;
 }
 
 int makedir (char *newdir)

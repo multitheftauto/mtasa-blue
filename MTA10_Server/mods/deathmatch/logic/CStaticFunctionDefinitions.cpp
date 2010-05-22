@@ -1104,11 +1104,6 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
 
             break;
         }
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast < CObject* > ( pElement );
-            //pObject->SetVelocity ( vecVelocity );
-        }
         default: return false;
     }
 
