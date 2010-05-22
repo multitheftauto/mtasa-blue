@@ -295,7 +295,7 @@ PME::split(const std::string & s, unsigned maxfields)
 	vector<markers> oCurrentTrailingEmpties; 
 
 	int nOffset = 0;
-	int nMatchesFound = 0;
+	unsigned int nMatchesFound = 0;
 
 	// while we are still finding matches and maxfields is 0 or negative
 	//   (meaning we get all matches), or we haven't gotten to the number
@@ -421,7 +421,7 @@ std::string PME::UpdateReplacementString ( const std::string & r ) {
 	PME dollars ( "\\$([0-9]+)", "g" );
 	
 	// search each backref
-	while ( int numdollars = dollars.match ( r ) ) {
+	while ( /*int numdollars =*/ dollars.match ( r ) ) {
 		
 		// create a regex to replace the backref
 		stringstream regextext;
