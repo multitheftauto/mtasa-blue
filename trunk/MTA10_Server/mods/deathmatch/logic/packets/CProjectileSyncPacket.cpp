@@ -19,6 +19,10 @@ CProjectileSyncPacket::CProjectileSyncPacket ( void )
 
 bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
+    //Projectile sync packets are sent fast so check our player is still connected
+    if ( !GetSourcePlayer() )
+        return false;
+
     bool bHasOrigin;
     if ( !BitStream.ReadBit ( bHasOrigin ) )
         return false;
@@ -100,8 +104,22 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
             && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != ucWeaponID
             && pSourcePlayer->GetWeaponType( 8 ) != ucWeaponID )
         {
-            //pSourcePlayer->Kick ( NULL, "AC #3: You were kicked from the game" );
-            return false;
+            if ( pSourcePlayer->GetWeaponType( 7 ) == 36 
+                && ( m_ucWeaponType == 19 || m_ucWeaponType == 20 ) )
+            {
+                return true;
+            }
+            else
+            {
+                CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle();
+                if ( !pVehicle || ( pVehicle->GetModel() != 520 
+                    && pVehicle->GetModel() != 432 
+                    && pVehicle->GetModel() != 425 ) )
+                {
+                    pSourcePlayer->Kick ( NULL, "AC #3: You were kicked from the game" );
+                    return false;
+                }
+            }
         }
     }
     return true;
