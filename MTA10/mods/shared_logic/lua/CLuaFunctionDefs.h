@@ -287,6 +287,7 @@ public:
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
+    LUA_DECLARE ( GetVehicleCurrentGear );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandlingData );
 #endif

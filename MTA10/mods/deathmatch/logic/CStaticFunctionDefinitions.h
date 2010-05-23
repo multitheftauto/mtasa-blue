@@ -174,6 +174,7 @@ public:
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
     static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
+    static bool                         GetVehicleCurrentGear               ( CClientVehicle& Vehicle, unsigned short& currentGear );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );

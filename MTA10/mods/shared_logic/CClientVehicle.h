@@ -354,6 +354,8 @@ public:
     SColor                      GetHeadLightColor       ( void );
     void                        SetHeadLightColor       ( const SColor color );
 
+    int                         GetCurrentGear          ( void );
+
     bool                        IsEnterable             ( void );
     bool                        HasRadio                ( void );
     bool                        HasPoliceRadio          ( void );
