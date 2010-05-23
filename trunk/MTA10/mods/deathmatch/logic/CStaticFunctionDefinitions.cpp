@@ -2122,6 +2122,12 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehi
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleCurrentGear ( CClientVehicle& Vehicle, unsigned short& currentGear )
+{
+    currentGear = Vehicle.GetCurrentGear();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {

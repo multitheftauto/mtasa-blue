@@ -3153,6 +3153,16 @@ SColor CClientVehicle::GetHeadLightColor ( void )
 }
 
 
+int CClientVehicle::GetCurrentGear ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetCurrentGear ();
+    }
+    return 0;
+}
+
+
 void CClientVehicle::SetHeadLightColor ( const SColor color )
 {
     if ( m_pVehicle )

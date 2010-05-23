@@ -1300,6 +1300,31 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetVehicleCurrentGear ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned short currentGear;
+            if ( CStaticFunctionDefinitions::GetVehicleCurrentGear ( *pVehicle, currentGear ) )
+            {
+                lua_pushnumber ( luaVM, currentGear );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleCurrentGear", "vehicle", 1 );
+    }
+	else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleCurrentGear" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
 {
     int iArgumentType1 = lua_type ( luaVM, 1 );
