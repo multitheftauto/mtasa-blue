@@ -125,7 +125,7 @@ void CSpatialDatabaseImpl::SphereQuery ( CElementResult& outResult, const CSpher
     FlushUpdateQueue ();
 
     // Make a box from the sphere
-    CBox box ( sphere.vecPosition, sphere.fRadius );
+    CBox box ( sphere.vecPosition, fabsf ( sphere.fRadius ) );
     // Make everything 2D for now
     box.vecMin.fZ = SPATIAL_2D_Z;
     box.vecMax.fZ = SPATIAL_2D_Z;
@@ -182,7 +182,7 @@ void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
         // Get the new bounding box
         SEntityInfo newInfo;
         CSphere sphere = pEntity->GetWorldBoundingSphere ();
-        newInfo.box = CBox ( sphere.vecPosition, sphere.fRadius );
+        newInfo.box = CBox ( sphere.vecPosition, fabsf ( sphere.fRadius ) );
         // Make everything 2D for now
         newInfo.box.vecMin.fZ = SPATIAL_2D_Z;
         newInfo.box.vecMax.fZ = SPATIAL_2D_Z;
