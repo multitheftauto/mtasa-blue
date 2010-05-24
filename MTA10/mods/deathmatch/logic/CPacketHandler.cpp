@@ -2284,6 +2284,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         else
                         {
                             RaiseFatalError ( 9 );
+                            return;
+                        }
+
+                        if ( bitStream.Version () >= 0x0c )
+                        {
+                            if ( bitStream.ReadBit () )
+                                pObject->SetDoubleSided ( true );
                         }
 
                         bool bIsMoving;

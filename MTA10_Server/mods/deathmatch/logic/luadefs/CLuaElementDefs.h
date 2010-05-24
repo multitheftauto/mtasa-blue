@@ -51,6 +51,7 @@ public:
     static int      getElementZoneName                  ( lua_State* luaVM );
     static int      getElementColShape                  ( lua_State* luaVM );
     static int      getElementAlpha                     ( lua_State* luaVM );
+    static int      isElementDoubleSided                ( lua_State* luaVM );
     static int      getElementHealth                    ( lua_State* luaVM );
     static int      getElementModel                     ( lua_State* luaVM );
     static int      isElementInWater                    ( lua_State* luaVM );
@@ -83,6 +84,7 @@ public:
     static int      setElementInterior                  ( lua_State* luaVM );
     static int      setElementDimension                 ( lua_State* luaVM );
     static int      setElementAlpha                     ( lua_State* luaVM );
+    static int      setElementDoubleSided               ( lua_State* luaVM );
     static int      setElementHealth                    ( lua_State* luaVM );
     static int      setElementModel                     ( lua_State* luaVM );
     static int      setElementSyncer                    ( lua_State* luaVM );

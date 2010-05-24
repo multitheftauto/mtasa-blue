@@ -36,6 +36,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_usDimension = 0;
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
+    m_bDoubleSided = false;
     m_bMapCreated = false;
 
     // Store the line

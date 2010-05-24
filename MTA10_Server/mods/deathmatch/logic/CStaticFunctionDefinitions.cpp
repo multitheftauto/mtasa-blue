@@ -701,6 +701,15 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CElement* pElement, unsigned 
 }
 
 
+bool CStaticFunctionDefinitions::IsElementDoubleSided ( CElement* pElement, bool& bDoubleSided )
+{
+    assert ( pElement );
+
+    bDoubleSided = pElement->IsDoubleSided ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementHealth ( CElement* pElement, float& fHealth )
 {
     assert ( pElement );
@@ -1328,6 +1337,22 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
     BitStream.pBitStream->Write ( pElement->GetID () );
     BitStream.pBitStream->Write ( ucAlpha );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, bool bDoubleSided )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetElementDoubleSided ( *iter, bDoubleSided );
+
+    pElement->SetDoubleSided ( bDoubleSided );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteBit ( bDoubleSided );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
 
     return true;
 }

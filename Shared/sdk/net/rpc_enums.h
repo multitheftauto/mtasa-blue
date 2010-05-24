@@ -176,5 +176,8 @@ enum eRPCFunctions
     SET_WATER_LEVEL,
     SET_WATER_VERTEX_POSITION,
 
+    // bitstream version 0x0c
+    SET_ELEMENT_DOUBLESIDED,
+
     NUM_RPC_FUNCS
 };
