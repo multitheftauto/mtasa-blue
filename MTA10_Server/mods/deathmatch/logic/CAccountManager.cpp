@@ -425,7 +425,7 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
             CAccount* pAccount = *iter;
             if ( pAccount->IsRegistered () == bRegistered )
             {
-                if ( pAccount->GetNameHash() == uiHash )
+                if ( pAccount->GetNameHash() == uiHash && pAccount->GetName () == szName )
                 {
                     return pAccount;
                 }
@@ -447,7 +447,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
             CAccount* pAccount = *iter;
             if ( pAccount->IsRegistered () )
             {
-                if ( pAccount->GetNameHash() == uiHash )
+                if ( pAccount->GetNameHash() == uiHash && pAccount->GetName () == szName )
                 {
                     if ( pAccount->GetIP ().compare ( szIP ) == 0 )
                     {

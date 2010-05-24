@@ -7485,14 +7485,17 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
     lua_State* pLua = pLuaMain->GetVM();
     list < CAccount* > ::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    unsigned int uiGuest = HashString ( "guest" );
-    unsigned int uiHTTPGuest = HashString ( "http_guest" );
-    unsigned int uiConsole = HashString ( "Console" );
+    const char* szGuest =  "guest";
+    const char* szHTTPGuest = "http_guest";
+    const char* szConsole = "Console";
+    unsigned int uiGuest = HashString ( szGuest );
+    unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
+    unsigned int uiConsole = HashString ( szConsole );
     for ( ; iter != m_pAccountManager->IterEnd(); iter++ )
     {
-        if ( ( (*iter)->GetNameHash() != uiGuest ) &&
-             ( (*iter)->GetNameHash() != uiHTTPGuest ) &&
-             ( (*iter)->GetNameHash() != uiConsole ) )
+        if ( ( (*iter)->GetNameHash() != uiGuest || (*iter)->GetName() != szGuest ) &&
+             ( (*iter)->GetNameHash() != uiHTTPGuest || (*iter)->GetName() != szHTTPGuest ) &&
+             ( (*iter)->GetNameHash() != uiConsole || (*iter)->GetName() != szConsole ) )
         {
             lua_pushnumber ( pLua, ++uiIndex );
             lua_pushaccount ( pLua, *iter );
