@@ -644,6 +644,9 @@ CSettings::CSettings ( void )
     /**
      *  Advanced tab
      **/
+    // Hide
+    m_pTabs->DeleteTab ( pTabAdvanced );
+
     m_pASyncLoading = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "Async Loading", true ) );
     m_pASyncLoading->SetPosition ( CVector2D ( 20.0f, 20.0f ) );
 
