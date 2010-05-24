@@ -70,6 +70,7 @@ public:
     static CElement*            GetElementAttachedTo                ( CElement* pElement );
     static CColShape*           GetElementColShape                  ( CElement* pElement );
     static bool                 GetElementAlpha                     ( CElement* pElement, unsigned char& ucAlpha );
+    static bool                 IsElementDoubleSided                ( CElement* pElement, bool& bDoubleSided );
     static bool                 GetElementHealth                    ( CElement* pElement, float& fHealth );
     static bool                 GetElementModel                     ( CElement* pElement, unsigned short & usModel );
     static bool                 IsElementInWater                    ( CElement* pElement, bool& bInWater );
@@ -89,6 +90,7 @@ public:
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
     static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL );
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
+    static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided );
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );
     static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
     static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );

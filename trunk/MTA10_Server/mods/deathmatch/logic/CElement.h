@@ -207,6 +207,9 @@ public:
     inline unsigned char                        GetInterior                 ( void )                        { return m_ucInterior; }
     inline void                                 SetInterior                 ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
 
+    bool                                        IsDoubleSided               ( void )                        { return m_bDoubleSided; }
+    void                                        SetDoubleSided              ( bool bDoubleSided )           { m_bDoubleSided = bDoubleSided; }
+
     inline bool                                 IsMapCreated                ( void )                        { return m_bMapCreated; }
 
     // Spatial database
@@ -259,6 +262,7 @@ protected:
 
     std::list < class CPed * >                  m_OriginSourceUsers;
     unsigned char                               m_ucInterior;
+    bool                                        m_bDoubleSided;
     bool                                        m_bMapCreated;
 
     // Optimization for getElementsByType starting at root

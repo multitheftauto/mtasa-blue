@@ -127,6 +127,9 @@ bool CObject::ReadSpecialData ( void )
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
+    if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
+        m_bDoubleSided = false;
+
     // Success
     return true;
 }
