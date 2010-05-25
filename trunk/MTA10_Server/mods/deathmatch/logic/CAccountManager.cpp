@@ -165,6 +165,8 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
 
     if ( pParent )
     {
+        m_pSaveFile->BeginTransaction ();
+
         CXMLNode* pAccountNode = NULL;
         unsigned int uiAccountNodesCount = pParent->GetSubNodeCount ();
         for ( unsigned int i = 0 ; i < uiAccountNodesCount ; i++ )
@@ -280,6 +282,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
         SaveSettings();
         CLogger::LogPrint ( "Conversion Complete.\n" );
         m_bChangedSinceSaved = false;
+        m_pSaveFile->EndTransaction ();
         return true;
     }
 
@@ -382,6 +385,8 @@ bool CAccountManager::Save ( const char* szFileName )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
+    m_pSaveFile->BeginTransaction ();
+
     list < CAccount* > ::iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
@@ -391,6 +396,8 @@ bool CAccountManager::Save ( const char* szFileName )
             Save ( pAccount );
         }
     }
+
+    m_pSaveFile->EndTransaction ();
     
     //Get the time took to save
     long long llDeltaTime = GetTickCount64_ () - m_llLastTimeSaved;

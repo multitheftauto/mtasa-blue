@@ -44,13 +44,16 @@ public:
 
     const std::string&          GetLastError            ( void ) { return m_strLastError; }
 
+    void                        BeginTransaction        ( void );
+    void                        EndTransaction          ( bool bEndAllOutstanding = false );
+
 protected:
 
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
 
     sqlite3                     *m_db;
     bool                        m_bOpened;
-    bool                        m_bMutexLocked;
+    int                         m_iTransactionCount;
 
 private:
     std::string                 m_strLastError;

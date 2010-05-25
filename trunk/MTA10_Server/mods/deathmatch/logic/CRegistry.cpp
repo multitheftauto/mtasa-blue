@@ -16,8 +16,9 @@
 CRegistry::CRegistry ( const std::string& strFileName )
 {
     m_strLastError = "";
-
-    m_bMutexLocked = false;
+    m_db = NULL;
+    m_bOpened = false;
+    m_iTransactionCount = 0;
 
     Load ( strFileName );
 }
@@ -320,4 +321,30 @@ bool CRegistry::Query ( const char* szQuery, CRegistryResult* pResult )
     }
 
     return QueryInternal ( strParsedQuery.c_str (), pResult );
+}
+
+
+void CRegistry::BeginTransaction ( void )
+{
+    if ( m_iTransactionCount++ == 0 )
+    {
+        CRegistryResult result;
+        Query ( "BEGIN TRANSACTION", &result );
+    }
+}
+
+
+void CRegistry::EndTransaction ( bool bEndAllOutstanding )
+{
+    if ( m_iTransactionCount )
+    {
+        if ( bEndAllOutstanding )
+            m_iTransactionCount = 1;
+
+        if ( --m_iTransactionCount == 0 )
+        {
+            CRegistryResult result;
+            Query ( "END TRANSACTION", &result );
+        }
+    }
 }
