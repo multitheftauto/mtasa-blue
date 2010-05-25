@@ -274,10 +274,10 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
             {
                 //Load the settings from XML
                 LoadSetting ( pAccountNode );
-                //Save the settings to SQL
-                SaveSettings();
             }
         }
+        //Save the settings to SQL
+        SaveSettings();
         CLogger::LogPrint ( "Conversion Complete.\n" );
         m_bChangedSinceSaved = false;
         return true;
