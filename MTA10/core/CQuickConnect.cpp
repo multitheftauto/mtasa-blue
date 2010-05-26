@@ -6,6 +6,8 @@
 *  PURPOSE:     Quick connect window
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
+*               Marcus Bauer <mabako@gmail.com>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -44,6 +46,7 @@ CQuickConnect::CQuickConnect ( void )
     m_pEditHost->SetSize ( CVector2D ( 154.0f, 24.0f ) );
     m_pEditHost->SetMaxLength ( 128 );          // Just to prevent entering a huge hostname size.. no-one has a hostname over 128 chars i believe
     m_pEditHost->SetTextAcceptedHandler( GUI_CALLBACK( &CQuickConnect::OnConnectButtonClick, this ) );
+    m_pEditHost->SetTextChangedHandler( GUI_CALLBACK( &CQuickConnect::OnHostChanged, this ) );
 
     //  Port label
     m_pLabelPort = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, ":" ) );
@@ -189,6 +192,79 @@ bool CQuickConnect::OnBackButtonClick ( CGUIElement* pElement )
     return true;
 }
 
+bool CQuickConnect::OnHostChanged( CGUIElement *pElement )
+{
+    std::string strHost = m_pEditHost->GetText ();
+    if ( strHost.length () > 0 )
+    {
+        // if there's a : in the string, it's host:port or host:port:password
+        size_t pos = strHost.find( ':' );
+        if ( pos != std::string::npos )
+        {
+            // if the last typed char was a : switch to port field and stop then
+            if ( strHost.substr( strHost.length()-1 ) == ":")
+            {
+                // put the part without : in the host-edit
+                std::string strNewHost = strHost.substr( 0, strHost.length()-1 );
+                m_pEditHost->SetText ( strNewHost.c_str () );
+                m_pEditPort->SetText ( "" );
+                m_pEditPort->Activate ();
+                return true;
+            }
+
+            if ( !OpenClipboard ( NULL ) )
+                return false;
+
+            // read out the clipboard
+            char * cBuffer;
+            HANDLE hClipData = GetClipboardData ( CF_TEXT );
+            cBuffer = (char*)GlobalLock ( hClipData );
+            GlobalUnlock ( hClipData );
+            CloseClipboard ();
+            strHost = cBuffer;
+
+            // stop if there is no : in the clipboard string
+            pos = strHost.find( ':' );
+            if ( pos == std::string::npos )
+                return false;
+
+            // put the part before the first : in the host-edit
+            std::string strNewHost = strHost.substr( 0, pos );
+            m_pEditHost->SetText ( strNewHost.c_str () );
+
+            // check for existance of a second : to seperate port and password
+            std::string strNewPort, strNewPassword;
+            size_t pos2 = strHost.find( ':', pos + 1 );
+
+            if ( pos2 == std::string::npos )
+            {
+                strNewPort = strHost.substr( pos + 1 );
+
+                // no password supplied, erase it
+                m_pEditPass->SetText ( "" );
+            }
+            else
+            {
+                strNewPort = strHost.substr( pos + 1, pos2 - pos - 1 );
+
+                // got a password as well
+                strNewPassword = strHost.substr( pos2 + 1 );
+                m_pEditPass->SetText ( strNewPassword.c_str () );
+            }
+
+            // update the port
+            m_pEditPort->SetText ( strNewPort.c_str () );
+
+            // switch to the next field that should be edited
+            if ( strNewPort.length () > 0 )
+            {
+                m_pEditPass->Activate ();
+                m_pEditPass->SetCaratAtEnd ();
+            }
+        }
+    }
+    return true;
+}
 
 void CQuickConnect::LoadData ( void )
 {
