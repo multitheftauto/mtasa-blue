@@ -31,6 +31,7 @@ public:
 private:
     bool                OnConnectButtonClick        ( CGUIElement* pElement );
     bool                OnBackButtonClick           ( CGUIElement* pElement );
+    bool                OnHostChanged               ( CGUIElement* pElement );
 
     void                LoadData                    ( void );
 
