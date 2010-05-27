@@ -32,7 +32,6 @@ public:
     void                        Load                    ( const std::string& strFileName );
 
     void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
-    bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );
     void                        DropTable               ( const std::string& strTable );
 
     bool                        Delete                  ( const std::string& strTable, const std::string& strWhere );
@@ -41,6 +40,8 @@ public:
     bool                        Update                  ( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
 
     bool                        Query                   ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
+    bool                        Query                   ( const char* szQuery, ... );
+    bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, ... );
 
     const std::string&          GetLastError            ( void ) { return m_strLastError; }
 
@@ -49,6 +50,7 @@ public:
 
 protected:
 
+    bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
 
     sqlite3                     *m_db;
@@ -56,6 +58,7 @@ protected:
     int                         m_iTransactionCount;
 
 private:
+    bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
     std::string                 m_strLastError;
 
 };

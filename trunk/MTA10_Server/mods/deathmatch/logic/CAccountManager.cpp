@@ -41,14 +41,14 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     CRegistryResult result;
 
     //Pull our settings
-    m_pSaveFile->Query ( "SELECT key, value from settings", &result );
+    m_pSaveFile->Query ( &result, "SELECT key, value from settings" );
 
     //Did we get any results
     if ( result.nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
-        m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
-        m_pSaveFile->Insert ( "settings", "'XMLParsed', 0", "key, value" );
+        m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
+        m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
         //Clear the SQL database
         ClearSQLDatabase ();
     }
@@ -79,25 +79,23 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         if ( bLoadXMLMissing )
         {
             //Insert it
-            m_pSaveFile->Insert ( "settings", "'XMLParsed', 0", "key, value" );
+            m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
             //Clear the SQL database
             ClearSQLDatabase ();
         }
         else if (result.nRows == 1) 
         {
             //if the results is one and we didn't trigger the other if statement then we are missing autologin so insert it
-            m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
+            m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
         }
     }
 }
 void CAccountManager::ClearSQLDatabase ( void )
 {    
-    //Create a new RegistryResult
-    CRegistryResult result;
     //No settings file or server owner wants to reload from the accounts file
     //Clear the accounts and userdata tables
-    m_pSaveFile->Query ( "DELETE from accounts", &result );
-    m_pSaveFile->Query ( "DELETE from userdata", &result );
+    m_pSaveFile->Query ( "DELETE from accounts" );
+    m_pSaveFile->Query ( "DELETE from userdata");
     //Tell the Server to load the xml file rather than the SQL
     m_bLoadXML = true;
 }
@@ -114,6 +112,8 @@ CAccountManager::~CAccountManager ( void )
 
 void CAccountManager::DoPulse ( void )
 {
+    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
+
     // Save it only once in a while whenever something has changed
     if ( m_bChangedSinceSaved &&
          GetTickCount64_ () > m_llLastTimeSaved + 15000 )
@@ -122,6 +122,7 @@ void CAccountManager::DoPulse ( void )
         Save ();
     }
 }
+
 bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
 {
     //##Keep for backwards compatability with accounts.xml##
@@ -198,14 +199,14 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), pAttribute->GetValue ().c_str(), strPassword.c_str() ), "name, ip, serial, password" );
+                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", strName.c_str(), strIP.c_str(), pAttribute->GetValue ().c_str(), strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++, pAttribute->GetValue () );
                                 
                                 }
                                 else
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strIP.c_str(), strPassword.c_str() ), "name, ip, password" );
+                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, password) VALUES(?,?,?)", strName.c_str(), strIP.c_str(), strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++ );
                                 }
 
@@ -249,13 +250,13 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s'", strName.c_str(), strPassword.c_str(), pAttribute->GetValue().c_str() ), "name, password, serial" );
+                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, password, serial) VALUES(?,?,?)", strName.c_str(), strPassword.c_str(), pAttribute->GetValue().c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, pAttribute->GetValue () );
                                 }
                                 else
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s'", strName.c_str(), strPassword.c_str() ), "name, password" );
+                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", strName.c_str(), strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, "" );
                                 }
                             }
@@ -265,7 +266,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                             if ( strName == "Console" )
                             {
                                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
-                                m_pSaveFile->Insert ( "accounts", "'Console', ''", "name, password" );
+                                m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", "Console", "" );
                                 ++m_iAccounts;
                             }
                         }
@@ -295,7 +296,7 @@ bool CAccountManager::Load( const char* szFileName )
     //Create a registry result
     CRegistryResult result;
     //Select all our required information from the accounts database
-    m_pSaveFile->Query( "SELECT id,name,password,ip,serial from accounts", &result );
+    m_pSaveFile->Query( &result, "SELECT id,name,password,ip,serial from accounts" );
 
     //Work out how many rows we have
     int iResults = result.nRows;
@@ -357,7 +358,7 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
 
 void CAccountManager::Save ( CAccount* pAccount )
 {
-    SString strName = SQLEscape( pAccount->GetName() );
+    SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPassword();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
@@ -365,26 +366,28 @@ void CAccountManager::Save ( CAccount* pAccount )
     //Create a registry result
     CRegistryResult result;
     //Select ID From Accounts Where Name=strName
-    m_pSaveFile->Select ( "id", "accounts", SString("name='%s'", strName.c_str()).c_str(), 1, &result);
+    m_pSaveFile->Query ( &result, "SELECT id FROM accounts WHERE name=?", strName.c_str() );
+
     //Check for results
     if ( result.nRows > 0 ) {
         //If we have a serial update that as well
         if ( strSerial != "" )
-            m_pSaveFile->Update ( "accounts", SString( "ip='%s', serial='%s', password='%s'", strIP.c_str(), strSerial.c_str(), strPassword.c_str() ), "name='" + strName + "'" );  
+            m_pSaveFile->Query ( "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", strIP.c_str (), strSerial.c_str (), strPassword.c_str (), strName.c_str () );
         else
             //If we don't have a serial then IP and password will suffice
-            m_pSaveFile->Update ( "accounts", SString( "ip='%s', password='%s'", strIP.c_str(), strPassword.c_str() ), "name='" + strName + "'" );  
+            m_pSaveFile->Query ( "UPDATE accounts SET ip=?, password=? WHERE name=?", strIP.c_str (), strPassword.c_str (), strName.c_str () );
     }
     else
         //No entries so it isn't in the database therefore Insert it
-        m_pSaveFile->Insert ( "accounts", SString( "'%s', '%s', '%s', '%s'", strName.c_str(), strIP.c_str(), strSerial.c_str(), strPassword.c_str() ), "name, ip, serial, password" );
-    
+        m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", strName.c_str (), strIP.c_str (), strSerial.c_str (), strPassword.c_str () );
     //Set changed since saved to false
     pAccount->SetChanged( false );
 }
 
 bool CAccountManager::Save ( const char* szFileName )
 {
+    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
+
     // Attempted save now
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
@@ -418,9 +421,9 @@ bool CAccountManager::Save ( const char* szFileName )
 bool CAccountManager::SaveSettings ()
 {
     //Update our autologin and XML Load SQL entries
-    m_pSaveFile->Update ( "settings", SString( "value=%i", (int)m_bAutoLogin ).c_str (), "key='autologin'" );
-    m_pSaveFile->Update ( "settings", SString( "value=%i", (int)m_bLoadXML ), "key='XMLParsed'" );
-    
+    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bAutoLogin ? 1 : 0, "autologin" );
+    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bLoadXML ? 1 : 0, "XMLParsed" );
+
     return true;
 }
 
@@ -711,14 +714,16 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
 
 CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
 {
+    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
+
     //Get the user ID
     int iUserID = pAccount->GetID();
     //create a new registry result for the query return
     CRegistryResult result;
 
     //Select the value and type from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query( SString( "SELECT value,type from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), &result );
-    
+    m_pSaveFile->Query ( &result, "SELECT value,type from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, szKey );
+
     //Store the returned amount of rows
     int iResults = result.nRows;
 
@@ -748,6 +753,7 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
     if ( iType != LUA_TSTRING && iType != LUA_TNUMBER && iType != LUA_TBOOLEAN && iType != LUA_TNIL )
         return false;
 
+    m_pSaveFile->BeginTransaction ();   // Batch successive SetAccountData() calls
 
     //Get the user ID
     int iUserID = pAccount->GetID();
@@ -756,27 +762,30 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
     //Does the user want to delete the data?
     if ( strValue == "false" && iType == LUA_TBOOLEAN )
     {
-        m_pSaveFile->Delete( "userdata", SString( "key=\"%s\" and userid=%i", SQLEscape ( strKey ).c_str(), iUserID ).c_str () );
+        m_pSaveFile->Query ( "DELETE FROM userdata WHERE key=? AND userid=?", strKey.c_str (), SQLITE_INTEGER, iUserID );
         return true;
     }
+
     //create a new registry result for the query return
     CRegistryResult result;
 
     //Select the key and value from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( SString( "SELECT id,userid from userdata where userid=%i and key=\"%s\"", iUserID, SQLEscape ( strKey ).c_str() ).c_str () , &result );
+    m_pSaveFile->Query ( &result, "SELECT id,userid from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, strKey.c_str () );
 
     //If there is a key with this value update it otherwise insert it
     if ( result.nRows > 0 )
-        return m_pSaveFile->Update ( "userdata", SString( "value='%s', type=%i", SQLEscape ( strValue.c_str () ).c_str(), iType ), SString("userid='%i' and key=\"%s\"", iUserID, SQLEscape ( strKey ).c_str() ) );
+        return m_pSaveFile->Query ( "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, iUserID, strKey.c_str () );
     else
-        return m_pSaveFile->Insert ( "userdata", SString( "%i,'%s','%s', %i", pAccount->GetID (), SQLEscape ( strKey ).c_str(), SQLEscape ( strValue.c_str () ).c_str(), iType ), "'userid', 'key', 'value', 'type'" );
-    
+        return m_pSaveFile->Query ( "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pAccount->GetID (), strKey.c_str (), strValue.c_str (), SQLITE_INTEGER, iType );
+   
     //Return false as nothing has changed
     return false;
 }
 
 bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAccount )
 {
+    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
+
     //Get the user ID of the from account
     int iUserID = pFromAccount->GetID();
     //create a new registry result for the from account query return value
@@ -788,7 +797,7 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     SString strValue;
 
     //Select the key and value from the database where the user is our from account
-    m_pSaveFile->Query ( SString("SELECT key,value,type from userdata where userid=%i", iUserID ), &result );
+    m_pSaveFile->Query ( &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
 
     //Store the returned amount of rows
     int iResults = result.nRows;
@@ -804,12 +813,12 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
             strValue = (char *)result.Data[i][1].pVal;
             int iType = result.Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
-            m_pSaveFile->Query ( SString( "SELECT id, userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , &subResult );
+            m_pSaveFile->Query ( &subResult, "SELECT id,userid from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, strKey.c_str () );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
             if ( subResult.nRows > 0 )
-                m_pSaveFile->Update ( "userdata", SString( "value='%s', type=%i", SQLEscape ( strValue.c_str () ).c_str(), iType), SString( "userid='%i' and key=\"%s\"", pToAccount->GetID (), SQLEscape ( strKey ).c_str() ) );
+                m_pSaveFile->Query ( "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), strKey.c_str () );
             else
-                m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s', %i", SString( "%i", pToAccount->GetID()).c_str (), SQLEscape ( strKey ).c_str(), SQLEscape ( strValue.c_str () ).c_str(), iType ), "'userid', 'key', 'value', 'type'" );
+                m_pSaveFile->Query ( "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), strKey.c_str (), strValue.c_str (), SQLITE_INTEGER, iType );
 
         }
     }
@@ -851,6 +860,6 @@ void CAccountManager::Register( CAccount* pAccount )
 void CAccountManager::RemoveAccount ( CAccount* pAccount )
 {
     int iUserID = pAccount->GetID();
-    m_pSaveFile->Delete( "accounts", SString( "id=%i", iUserID ).c_str () );
-    m_pSaveFile->Delete( "userdata", SString( "userid=%i", iUserID ).c_str () );
+    m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+    m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
 }
