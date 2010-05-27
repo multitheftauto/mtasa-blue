@@ -38,13 +38,13 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
     
     //Create a new RegistryResult
-    CRegistryResult * pResult = new CRegistryResult ();
+    CRegistryResult result;
 
     //Pull our settings
-    m_pSaveFile->Query ( "SELECT key, value from settings", pResult );
+    m_pSaveFile->Query ( "SELECT key, value from settings", &result );
 
     //Did we get any results
-    if ( pResult->nRows == 0 )
+    if ( result.nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
         m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
@@ -55,19 +55,19 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     else
     {
         bool bLoadXMLMissing = true;
-        for (int i = 0;i < pResult->nRows;i++) 
+        for (int i = 0;i < result.nRows;i++) 
         {
-            SString strSetting = (char *)pResult->Data[i][0].pVal;
+            SString strSetting = (char *)result.Data[i][0].pVal;
             //Do we have a result for autologin
             if ( strSetting == "autologin" )
                 //Set the Auto login variable
-                m_bAutoLogin = pResult->Data[i][1].nVal == 1 ? true : false;
+                m_bAutoLogin = result.Data[i][1].nVal == 1 ? true : false;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
             {
                 //Is XMLParsed zero
-                if ( pResult->Data[i][1].nVal == 0 ) 
+                if ( result.Data[i][1].nVal == 0 ) 
                 {
                     //Clear the SQL database
                     ClearSQLDatabase ();
@@ -83,7 +83,7 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
             //Clear the SQL database
             ClearSQLDatabase ();
         }
-        else if (pResult->nRows == 1) 
+        else if (result.nRows == 1) 
         {
             //if the results is one and we didn't trigger the other if statement then we are missing autologin so insert it
             m_pSaveFile->Insert ( "settings", "'autologin', 0", "key, value" );
@@ -93,11 +93,11 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
 void CAccountManager::ClearSQLDatabase ( void )
 {    
     //Create a new RegistryResult
-    CRegistryResult * pResult = new CRegistryResult ();
+    CRegistryResult result;
     //No settings file or server owner wants to reload from the accounts file
     //Clear the accounts and userdata tables
-    m_pSaveFile->Query ( "DELETE from accounts", pResult );
-    m_pSaveFile->Query ( "DELETE from userdata", pResult );
+    m_pSaveFile->Query ( "DELETE from accounts", &result );
+    m_pSaveFile->Query ( "DELETE from userdata", &result );
     //Tell the Server to load the xml file rather than the SQL
     m_bLoadXML = true;
 }
@@ -237,7 +237,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                         strDataKey = pAttribute->GetName ();
                                         strDataValue = pAttribute->GetValue ();
                                         char szKey[128];
-                                        strcpy( szKey, strDataKey.c_str() );
+                                        STRNCPY( szKey, strDataKey.c_str(), 128 );
                                         SetAccountData( pAccount, szKey, strDataValue, iType );
                                     }
                                 }
@@ -293,12 +293,12 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
 bool CAccountManager::Load( const char* szFileName )
 {
     //Create a registry result
-    CRegistryResult * pResult = new CRegistryResult;
+    CRegistryResult result;
     //Select all our required information from the accounts database
-    m_pSaveFile->Query( "SELECT id,name,password,ip,serial from accounts", pResult );
+    m_pSaveFile->Query( "SELECT id,name,password,ip,serial from accounts", &result );
 
     //Work out how many rows we have
-    int iResults = pResult->nRows;
+    int iResults = result.nRows;
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
@@ -306,17 +306,21 @@ bool CAccountManager::Load( const char* szFileName )
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
-        iUserID = pResult->Data[i][0].nVal;
-        strName = (char *)pResult->Data[i][1].pVal;
-        strPassword = (char *)pResult->Data[i][2].pVal;
+        iUserID = result.Data[i][0].nVal;
+        strName = (char *)result.Data[i][1].pVal;
+        strPassword = "";
+        // If we have an password
+        if ( result.Data[i][2].pVal )
+            strPassword = (char *)result.Data[i][2].pVal;
+
         //if we have an IP
-        if ( pResult->Data[i][3].pVal ) {
+        if ( result.Data[i][3].pVal ) {
             //Fill the IP variable
-            strIP = (char *)pResult->Data[i][3].pVal;
+            strIP = (char *)result.Data[i][3].pVal;
             //If we have a Serial
-            if ( pResult->Data[i][4].pVal ) {
+            if ( result.Data[i][4].pVal ) {
                 //Fill the serial variable
-                strSerial = (char *)pResult->Data[i][4].pVal;
+                strSerial = (char *)result.Data[i][4].pVal;
                 //Create a new account with the specified information
                 pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
             }
@@ -359,11 +363,11 @@ void CAccountManager::Save ( CAccount* pAccount )
     SString strSerial = pAccount->GetSerial();
 
     //Create a registry result
-    CRegistryResult * pResult = new CRegistryResult();
+    CRegistryResult result;
     //Select ID From Accounts Where Name=strName
-    m_pSaveFile->Select ( "id", "accounts", SString("name='%s'", strName.c_str()).c_str(), 1, pResult);
+    m_pSaveFile->Select ( "id", "accounts", SString("name='%s'", strName.c_str()).c_str(), 1, &result);
     //Check for results
-    if ( pResult->nRows > 0 ) {
+    if ( result.nRows > 0 ) {
         //If we have a serial update that as well
         if ( strSerial != "" )
             m_pSaveFile->Update ( "accounts", SString( "ip='%s', serial='%s', password='%s'", strIP.c_str(), strSerial.c_str(), strPassword.c_str() ), "name='" + strName + "'" );  
@@ -710,29 +714,29 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
     //Get the user ID
     int iUserID = pAccount->GetID();
     //create a new registry result for the query return
-    CRegistryResult * pResult = new CRegistryResult;
+    CRegistryResult result;
 
     //Select the value and type from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query( SString( "SELECT value,type from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), pResult );
+    m_pSaveFile->Query( SString( "SELECT value,type from userdata where userid=%i and key=\"%s\"", iUserID, szKey ), &result );
     
     //Store the returned amount of rows
-    int iResults = pResult->nRows;
+    int iResults = result.nRows;
 
     //Do we have any results?
     if ( iResults > 0 ) {
-        int iType = pResult->Data[0][1].nVal;
+        int iType = result.Data[0][1].nVal;
         //Account data is stored as text so we don't need to check what type it is just return it
         if ( iType == LUA_TNIL )
             return new CLuaArgument;
         if ( iType == LUA_TBOOLEAN )
         {
-            SString strResult = (char *)pResult->Data[0][0].pVal;
+            SString strResult = (char *)result.Data[0][0].pVal;
             return new CLuaArgument ( strResult == "true" ? true : false );
         }
         if ( iType == LUA_TNUMBER )
-            return new CLuaArgument ( strtod ( (char *)pResult->Data[0][0].pVal, NULL ) );
+            return new CLuaArgument ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
         else
-            return new CLuaArgument ( (char *)pResult->Data[0][0].pVal );
+            return new CLuaArgument ( (char *)result.Data[0][0].pVal );
     }
 
     //No results
@@ -756,13 +760,13 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
         return true;
     }
     //create a new registry result for the query return
-    CRegistryResult * pResult = new CRegistryResult;
+    CRegistryResult result;
 
     //Select the key and value from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( SString( "SELECT id,userid from userdata where userid=%i and key=\"%s\"", iUserID, SQLEscape ( strKey ).c_str() ).c_str () , pResult );
+    m_pSaveFile->Query ( SString( "SELECT id,userid from userdata where userid=%i and key=\"%s\"", iUserID, SQLEscape ( strKey ).c_str() ).c_str () , &result );
 
     //If there is a key with this value update it otherwise insert it
-    if ( pResult->nRows > 0 )
+    if ( result.nRows > 0 )
         return m_pSaveFile->Update ( "userdata", SString( "value='%s', type=%i", SQLEscape ( strValue.c_str () ).c_str(), iType ), SString("userid='%i' and key=\"%s\"", iUserID, SQLEscape ( strKey ).c_str() ) );
     else
         return m_pSaveFile->Insert ( "userdata", SString( "%i,'%s','%s', %i", pAccount->GetID (), SQLEscape ( strKey ).c_str(), SQLEscape ( strValue.c_str () ).c_str(), iType ), "'userid', 'key', 'value', 'type'" );
@@ -776,18 +780,18 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     //Get the user ID of the from account
     int iUserID = pFromAccount->GetID();
     //create a new registry result for the from account query return value
-    CRegistryResult * pResult = new CRegistryResult;
+    CRegistryResult result;
     //create a new registry result for the to account query return value
-    CRegistryResult * pSubResult = new CRegistryResult;
+    CRegistryResult subResult;
     //initialize key and value strings
     SString strKey;
     SString strValue;
 
     //Select the key and value from the database where the user is our from account
-    m_pSaveFile->Query ( SString("SELECT key,value,type from userdata where userid=%i", iUserID ), pResult );
+    m_pSaveFile->Query ( SString("SELECT key,value,type from userdata where userid=%i", iUserID ), &result );
 
     //Store the returned amount of rows
-    int iResults = pResult->nRows;
+    int iResults = result.nRows;
 
     //Do we have any results?
     if ( iResults > 0 ) {
@@ -795,14 +799,14 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
         for ( int i = 0;i < iResults;i++ ) 
         {
             //Get our key
-            strKey = (char *)pResult->Data[i][0].pVal;
+            strKey = (char *)result.Data[i][0].pVal;
             //Get our value
-            strValue = (char *)pResult->Data[i][1].pVal;
-            int iType = pResult->Data[i][2].nVal;
+            strValue = (char *)result.Data[i][1].pVal;
+            int iType = result.Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
-            m_pSaveFile->Query ( SString( "SELECT id, userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , pSubResult );
+            m_pSaveFile->Query ( SString( "SELECT id, userid from userdata where userid=%i and key=\"%s\"", pToAccount->GetID (), strKey.c_str () ).c_str () , &subResult );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
-            if ( pSubResult->nRows > 0 )
+            if ( subResult.nRows > 0 )
                 m_pSaveFile->Update ( "userdata", SString( "value='%s', type=%i", SQLEscape ( strValue.c_str () ).c_str(), iType), SString( "userid='%i' and key=\"%s\"", pToAccount->GetID (), SQLEscape ( strKey ).c_str() ) );
             else
                 m_pSaveFile->Insert ( "userdata", SString( "'%s','%s','%s', %i", SString( "%i", pToAccount->GetID()).c_str (), SQLEscape ( strKey ).c_str(), SQLEscape ( strValue.c_str () ).c_str(), iType ), "'userid', 'key', 'value', 'type'" );
