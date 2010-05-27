@@ -7581,9 +7581,9 @@ bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKe
     assert ( pAccount );
     assert ( szKey );
 
-    char szArgumentAsString[128];
-    pArgument->GetAsString ( szArgumentAsString, 128 );
-    return m_pAccountManager->SetAccountData ( pAccount, szKey, SString("%s", szArgumentAsString), pArgument->GetType() );
+    SString strArgumentAsString;
+    pArgument->GetAsString ( strArgumentAsString );
+    return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
 }
 
 

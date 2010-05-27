@@ -64,7 +64,7 @@ public:
     inline const std::string& GetString         ( void )            { return m_strString; };
     inline void*            GetLightUserData    ( void ) const      { return m_pLightUserData; };
     CElement*               GetElement          ( void ) const;
-    bool                    GetAsString         ( char * szBuffer, unsigned int uiLength );
+    bool                    GetAsString         ( SString& strBuffer );
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
