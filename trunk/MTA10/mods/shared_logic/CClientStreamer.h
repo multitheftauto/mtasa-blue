@@ -77,6 +77,8 @@ private:
     unsigned short                          m_usDimension;
     std::list < CClientStreamElement * >    m_ActiveElements;
     std::list < CClientStreamElement * >    m_ToStreamOut;
+
+    static void*                            pAddingElement;
 };
 
 #endif
