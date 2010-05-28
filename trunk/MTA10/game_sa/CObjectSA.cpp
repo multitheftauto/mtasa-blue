@@ -36,6 +36,8 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
+
+    CheckForGangTag ();
 }
 
 CObjectSA::CObjectSA( DWORD dwModel )
@@ -153,6 +155,8 @@ CObjectSA::CObjectSA( DWORD dwModel )
     this->internalID = pGame->GetPools ()->GetObjectRef ( (DWORD *)this->GetInterface () );
 
     m_ucAlpha = 255;
+
+    CheckForGangTag ();
 }
 
 CObjectSA::~CObjectSA( )
@@ -253,5 +257,21 @@ void CObjectSA::SetModelIndex ( unsigned long ulModel )
         mov     ecx, dwThis
         push    ulModel
         call    dwFunc
+    }
+
+    CheckForGangTag ();
+}
+
+void CObjectSA::CheckForGangTag ( )
+{
+    switch ( GetModelIndex () )
+    {
+        case 1524: case 1525: case 1526: case 1527:
+        case 1528: case 1529: case 1530: case 1531:
+            m_bIsAGangTag = true;
+            break;
+        default:
+            m_bIsAGangTag = false; 
+            break;
     }
 }
