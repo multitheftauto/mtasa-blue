@@ -90,6 +90,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bScriptFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
     m_fGroundCheckTolerance = 0.f;
+    m_fObjectsAroundTolerance = 0.f;
     GetInitialDoorStates ( m_ucDoorStates );
     memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
     memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
@@ -1658,6 +1659,7 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
         {
             g_pGame->SuspendASyncLoading ( true );
             m_fGroundCheckTolerance = 0.f;
+            m_fObjectsAroundTolerance = -1.f;
 
             CVector vecTemp;
             if ( m_pVehicle )
@@ -3523,28 +3525,40 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     m_pVehicle->SetMatrix ( &m_matFrozen );
     m_pVehicle->SetMoveSpeed ( &vecTemp );
     m_pVehicle->SetTurnSpeed ( &vecTemp );
+    m_vecMoveSpeedMeters = vecTemp;
+    m_vecMoveSpeed = vecTemp;
+    m_vecTurnSpeed = vecTemp;
 
     // Load load load
     if ( GetModelInfo () )
         GetModelInfo ()-> LoadAllRequestedModels ();
 
+    // Start out with a fairly big radius to check, and shrink it down over time
+    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
+
     // Gather up some flags
     CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
     bool bASync         = g_pGame->IsASyncLoadingEnabled ();
     bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
-    bool bMTALoaded     = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
     bool bHasModel      = GetModelInfo () != NULL;
+    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension );
+    #else
+        SString strAround;
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension, &strAround );
+    #endif
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f"
+        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  fUseRadius:%2.1f"
                                        ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
-                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance );
+                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance, fUseRadius );
     #endif
 
     // See if ground is ready
-    if ( !bHasModel || ( !bMTAObjLimit && !bMTALoaded ) )
+    if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
     {
         m_fGroundCheckTolerance = 0.f;
+        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             status += ( "  FreezeUntilCollisionLoaded - wait" );
         #endif
@@ -3572,5 +3586,10 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine ( status );
         g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+
+        std::vector < SString > lineList;
+        strAround.Split ( "\n", lineList );
+        for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
+            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
 }

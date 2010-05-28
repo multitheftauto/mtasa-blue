@@ -246,7 +246,7 @@ public:
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
 
-    float                                       GetDistanceBetween          ( CClientEntity* pOther );
+    float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
 protected:
     CClientManager*                             m_pManager;

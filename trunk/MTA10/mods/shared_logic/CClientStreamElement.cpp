@@ -148,7 +148,7 @@ unsigned short CClientStreamElement::GetStreamReferences ( bool bScript )
     return (*pRefs);
 }
 
-
+// Force the element to stream out now. It will stream back in next frame if close enough.
 void CClientStreamElement::StreamOutForABit ( void )
 {
     // Remove asap, very messy
@@ -173,4 +173,83 @@ CSphere CClientStreamElement::GetWorldBoundingSphere ( void )
 {
     // Default to a point at stream position
     return CSphere ( GetStreamPosition (), 0.0f );
+}
+
+
+// Helper function for CClientStreamElement::GetDistanceToBoundingBoxSquared()
+static float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fExtentMin, const float* fExtentMax, const CVector** vecBoxAxes )
+{
+    CVector vecOffset = vecPosition - vecBoxCenter;
+    float fDistSq = 0.f;
+
+    // For each axis
+    for ( int i = 0 ; i < 3 ; i++ )
+    {
+        // Project vecOffset on the axis
+        float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
+
+        // Add any distance outside the box on that axis
+        if ( fDot < fExtentMin[i] )
+            fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
+        else
+        if ( fDot > fExtentMax[i] )
+            fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
+    }
+
+    return fDistSq;
+}
+
+
+float CClientStreamElement::GetDistanceToBoundingBoxSquared ( const CVector& vecPosition )
+{
+    // Do a simple calculation if the element is newly added ( hack/fix for CClientSteamer::AddElement being called in the CClientStreamElement constructor )
+    if ( this == CClientStreamer::pAddingElement )
+    {
+        return ( GetStreamPosition () - vecPosition ).LengthSquared ();
+    }
+
+    // More hax to increase performance
+
+    // Update cached radius if required
+    if ( --m_iCachedRadiusCounter < 0 )
+    {
+        CStaticFunctionDefinitions::GetElementRadius ( *this, m_fCachedRadius );
+        m_iCachedRadiusCounter = 20 + rand() % 50;
+    }
+
+    // Do a simple calculation if the element has a small radius
+    if ( m_fCachedRadius < 20 )
+    {
+        return ( GetStreamPosition () - vecPosition ).LengthSquared ();
+    }
+
+    // Update cached bounding box if required
+    if ( --m_iCachedBoundingBoxCounter < 0 )
+    {
+        // Get bounding box extents
+        CVector vecMin;
+        CVector vecMax;
+        CStaticFunctionDefinitions::GetElementBoundingBox ( *this, vecMin, vecMax );
+
+        // Adjust for non-centered bounding box
+        CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
+        vecMin -= vecHalfCenter;
+        vecMax -= vecHalfCenter;
+
+        m_vecCachedBoundingBox[0] = vecMin;
+        m_vecCachedBoundingBox[1] = vecMax;
+
+        m_iCachedBoundingBoxCounter = 20 + rand() % 50;
+    }
+
+    const CVector& vecMin = m_vecCachedBoundingBox[0];
+    const CVector& vecMax = m_vecCachedBoundingBox[1];
+
+    // Get bounding box axes
+    CMatrix gtaMatrix;
+    GetMatrix ( gtaMatrix );
+
+    const CVector* vecBoxAxes[3] = { &gtaMatrix.vRight, &gtaMatrix.vFront, &gtaMatrix.vUp };
+
+    return GetBoxDistanceSq ( vecPosition, GetStreamPosition (), &vecMin.fX, &vecMax.fX, vecBoxAxes );
 }

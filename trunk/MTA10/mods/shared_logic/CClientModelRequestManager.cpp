@@ -186,7 +186,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
 
             // Boost loading priority if the object is close to the local player
             bool bHighPriority = false;
-            if ( pRequester->GetDistanceBetween ( g_pClientGame->GetLocalPlayer () ) < 20 )
+            if ( pRequester->GetDistanceBetweenBoundingSpheres ( g_pClientGame->GetLocalPlayer () ) < 20 )
                 bHighPriority = true;
 
             // Request it
