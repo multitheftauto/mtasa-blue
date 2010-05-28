@@ -540,6 +540,7 @@ public:
     bool                        m_bFrozen;
     bool                        m_bFrozenWaitingForGroundToLoad;
     float                       m_fGroundCheckTolerance;
+    float                       m_fObjectsAroundTolerance;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;

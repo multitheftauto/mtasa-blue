@@ -44,7 +44,7 @@ public:
     static bool                             IsValidModel                ( unsigned long ulObjectModel );
     static bool                             IsBreakableModel            ( unsigned long ulObjectModel );
     bool                                    Exists                      ( CClientObject* pObject );
-    bool                                    ObjectsAroundPointLoaded    ( const CVector& vecPosition, float fRadius, unsigned short usDimension );
+    bool                                    ObjectsAroundPointLoaded    ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus = NULL );
 
     static bool                             IsObjectLimitReached        ( void );
 

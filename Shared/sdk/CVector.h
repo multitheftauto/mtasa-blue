@@ -64,6 +64,11 @@ public:
         return sqrt ( (fX*fX) + (fY*fY) + (fZ*fZ) );
     }
 
+    float LengthSquared ( void ) const
+    {
+        return (fX*fX) + (fY*fY) + (fZ*fZ);
+    }
+
     float DotProduct ( const CVector * param ) const
     {
         return fX*param->fX + fY*param->fY + fZ*param->fZ;

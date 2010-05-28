@@ -14,103 +14,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
 using std::list;
 
-// Return the distance between two points ^ 2
-/*
-inline float ExpDistanceBetweenPoints ( const CVector& vec1, const CVector& vec2 )
-{
-    float fDistanceX = vec2.fX - vec1.fX;
-    float fDistanceY = vec2.fY - vec1.fY;
-    float fDistanceZ = vec2.fZ - vec1.fZ;
-    return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-}
-*/
-namespace
-{
-
-    float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fExtentMin, const float* fExtentMax, const CVector** vecBoxAxes )
-    {
-        CVector vecOffset = vecPosition - vecBoxCenter;
-        float fDistSq = 0.f;
-
-        // For each axis
-        for ( int i = 0 ; i < 3 ; i++ )
-        {
-            // Project vecOffset on the axis
-            float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
-
-            // Add any distance outside the box on that axis
-            if ( fDot < fExtentMin[i] )
-                fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
-            else
-            if ( fDot > fExtentMax[i] )
-                fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
-        }
-
-        return fDistSq;
-    }
-
-    void* pAddingElement = NULL;
-
-    // First draft. Works, but is not optimized.
-    float GetElementStreamDistanceSquared ( CClientStreamElement* pElement, const CVector& vecPosition )
-    {
-        // Do a simple calculation if the element is newly added ( hack/fix for CClientSteamer::AddElement being called in the CClientStreamElement constructor )
-        if ( pElement == pAddingElement )
-        {
-            CVector vecDif = pElement->GetStreamPosition () - vecPosition;
-            return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
-        }
-
-        // Update cached radius if required
-        if ( --pElement->m_iCachedRadiusCounter < 0 )
-        {
-            CStaticFunctionDefinitions::GetElementRadius ( *pElement, pElement->m_fCachedRadius );
-            pElement->m_iCachedRadiusCounter = 20 + rand() % 50;
-        }
-
-        // Do a simple calculation if the element has a small radius
-        if ( pElement->m_fCachedRadius < 20 )
-        {
-            CVector vecDif = pElement->GetStreamPosition () - vecPosition;
-            return ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
-        }
-
-        // Update cached bounding box if required
-        if ( --pElement->m_iCachedBoundingBoxCounter < 0 )
-        {
-            // Get bounding box extents
-            CVector vecMin;
-            CVector vecMax;
-            CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
-
-            // Adjust for non-centered bounding box
-            CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
-            vecMin -= vecHalfCenter;
-            vecMax -= vecHalfCenter;
-
-            pElement->m_vecCachedBoundingBox[0] = vecMin;
-            pElement->m_vecCachedBoundingBox[1] = vecMax;
-
-            pElement->m_iCachedBoundingBoxCounter = 20 + rand() % 50;
-        }
-
-        const CVector& vecMin = pElement->m_vecCachedBoundingBox[0];
-        const CVector& vecMax = pElement->m_vecCachedBoundingBox[1];
-
-        // Get bounding box axes
-        CMatrix gtaMatrix;
-        pElement->GetMatrix ( gtaMatrix );
-
-        const CVector* vecBoxAxes[3] = { &gtaMatrix.vRight, &gtaMatrix.vFront, &gtaMatrix.vUp };
-
-        return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), &vecMin.fX, &vecMax.fX, vecBoxAxes );
-   }
-
-}
-
+void* CClientStreamer::pAddingElement = NULL;
 
 CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance )
 {    
@@ -396,7 +302,7 @@ void CClientStreamer::OnUpdateStreamPosition ( CClientStreamElement * pElement )
     else
     {
         // Make sure our distance is updated
-        pElement->SetExpDistance ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) );
+        pElement->SetExpDistance ( pElement->GetDistanceToBoundingBoxSquared ( m_vecPosition ) );
     }
 }
 
@@ -430,7 +336,7 @@ void CClientStreamer::SetExpDistances ( list < CClientStreamElement * > * pList 
     {
         pElement = *iter;
         // Set its distance ^ 2
-        pElement->SetExpDistance ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) );
+        pElement->SetExpDistance ( pElement->GetDistanceToBoundingBoxSquared ( m_vecPosition ) );
     }
 }
 
@@ -438,7 +344,7 @@ void CClientStreamer::SetExpDistances ( list < CClientStreamElement * > * pList 
 void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, CClientStreamElement * pElement )
 {
     // Make sure it's exp distance is updated
-    float fDistance = GetElementStreamDistanceSquared ( pElement, m_vecPosition );
+    float fDistance = pElement->GetDistanceToBoundingBoxSquared ( m_vecPosition );
     pElement->SetExpDistance ( fDistance );
 
     // Don't add if already in the list
@@ -453,7 +359,7 @@ void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, 
         pTemp = *iter;
 
         // Is it further than the one we add?
-        if ( GetElementStreamDistanceSquared ( pElement, m_vecPosition ) > fDistance )
+        if ( pTemp->GetDistanceToBoundingBoxSquared ( m_vecPosition ) > fDistance )
         {
             // Add it before here
             pList->insert ( iter, pElement );

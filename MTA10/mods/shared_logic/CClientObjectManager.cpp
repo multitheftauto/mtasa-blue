@@ -268,12 +268,13 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 */
 
 
-bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
+bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus )
 {
-    // Note: This query will return some objects that are outside the sphere, but that doesn't matter for this function
+    // Get list of objects that may be intersecting the sphere
     CClientEntityResult result;
     GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecPosition, fRadius ) );
 
+    bool bResult = true;
     // Extract relevant types
     for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
     {
@@ -285,13 +286,31 @@ bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition
             {
                 if ( pObject->GetDimension () == usDimension )
                 {
-                    return false;
+                    // Final distance check
+                    float fDistSquared = pObject->GetDistanceToBoundingBoxSquared ( vecPosition );
+                    if ( fDistSquared < fRadius * fRadius )
+                        bResult = false;
+
+                    if ( pstrStatus )
+                    {
+                        // Debugging information
+                        *pstrStatus += SString ( "ID:%05d  Dist:%4.1f  GetGameObject:%d  IsLoaded:%d  IsStreamedIn:%d\n"
+                                                ,pObject->GetModel ()
+                                                ,sqrtf ( fDistSquared )
+                                                ,pObject->GetGameObject () ? 1 : 0
+                                                ,pObject->GetModelInfo ()->IsLoaded () ? 1 : 0
+                                                ,pObject->IsStreamedIn () ? 1 : 0
+                                              );
+                    }
+                    else
+                    if ( !bResult )
+                        break;
                 }
             }
         }
     }
 
-    return true;
+    return bResult;
 }
 
 
