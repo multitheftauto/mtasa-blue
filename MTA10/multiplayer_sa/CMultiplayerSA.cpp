@@ -2540,16 +2540,26 @@ void _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
 /**
  ** Objects
  **/
+static bool bObjectIsAGangTag = false;
 static void SetObjectAlpha ()
 {
     bEntityHasAlpha = false;
+    bObjectIsAGangTag = false;
 
     if ( dwAlphaEntity )
     {
         CObject* pObject = pGameInterface->GetPools()->GetObject ( (DWORD *)dwAlphaEntity );
         if ( pObject )
         {
-            GetAlphaAndSetNewValues ( pObject->GetAlpha () );
+            if ( pObject->IsAGangTag () )
+            {
+                // For some weird reason, gang tags don't appear unsprayed
+                // if we don't set their alpha to a value less than 255.
+                bObjectIsAGangTag = true;
+                GetAlphaAndSetNewValues ( SharedUtil::Min ( pObject->GetAlpha (), (unsigned char)254 ) );
+             }
+             else
+                GetAlphaAndSetNewValues ( pObject->GetAlpha () );
         }
     }
 }
@@ -2590,7 +2600,30 @@ void _declspec(naked) HOOK_CObject_Render ()
         mov         dwCObjectRenderRet, edx
         mov         edx, HOOK_CObject_PostRender
         mov         [esp], edx
+        pushad
+    }
+
+    if ( bObjectIsAGangTag )
+        goto render_a_tag;
+
+    _asm
+    {
+        popad
         jmp         FUNC_CEntity_Render
+    render_a_tag:
+        popad
+        // We simulate here the header of the CEntity::Render function
+        // but then go straight to CTagManager::RenderTagForPC.
+        push        ecx
+        push        esi
+        mov         eax, [esi+0x18]
+        test        eax, eax
+        jz          no_clump
+        mov         eax, 0x534331
+        jmp         eax
+    no_clump:
+        mov         eax, 0x5343EB
+        jmp         eax
     }
 }
 
