@@ -214,7 +214,7 @@ void CVersionUpdater::PollVersionCheck ( void )
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_CHECK_TIMEOUT )
         {
             // If 404 error, remove this server from the list
-            if ( status = 404 && m_CheckInfo.serverList.size () )
+            if ( status == 404 && m_CheckInfo.serverList.size () )
                 ListRemove( m_CheckInfo.serverList, m_CheckInfo.serverList[ m_CheckInfo.iCurrent % m_CheckInfo.serverList.size () ] );
 
             m_strStage = "NextCheck";
@@ -398,7 +398,7 @@ void CVersionUpdater::PollDownload ( void )
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_DOWNLOAD_TIMEOUT )
         {
             // If 404 error, remove this server from the list
-            if ( status = 404 && m_DownloadInfo.serverList.size () )
+            if ( status == 404 && m_DownloadInfo.serverList.size () )
                 ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
 
             m_strStage = "NextMirror";
