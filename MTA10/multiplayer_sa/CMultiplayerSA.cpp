@@ -2969,6 +2969,28 @@ void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )
 }
 
 
+void CMultiplayerSA::SetNightVisionEnabled ( bool bEnabled )
+{
+    if ( bEnabled )
+    {
+        *(BYTE *)0xC402B8 = 1;
+	}else{
+        *(BYTE *)0xC402B8 = 0;
+	}
+}
+
+
+void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
+{
+    if ( bEnabled )
+    {
+        *(BYTE *)0xC402B9 = 1;
+	}else{
+        *(BYTE *)0xC402B9 = 0;
+	}
+}
+
+
 float CMultiplayerSA::GetGlobalGravity ( void )
 {
     return fGlobalGravity;
