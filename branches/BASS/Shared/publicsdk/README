@@ -1,0 +1,44 @@
+******************************************************************************
+*                                                                            *
+*  Multi Theft Auto: San Andreas - Deathmatch                                *
+*                                                                            *
+*  ml_base, External lua add-on module                                       *
+*  http://www.multitheftauto.com                                             *
+*                                                                            *
+*  Copyright © 2003-2008 MTA.  All Rights Reserved.                          *
+*                                                                            *
+******************************************************************************
+
+* INTRODUCTION
+    This is the 'ml_base' module that exports the standard interface used by
+    the Multi Theft Auto: San Andreas Deathmatch server and it's Lua scripting
+    engine to allow C/C++ developers to add functionality to their servers.
+
+    You can use this code as a base to create your own modules, provided that
+    you adhere to the licensing terms provided with this source code.
+
+* INSTALLATION
+    In order to install your module, first make sure it compiles correctly and
+    verify that it can be executed. When using external library dependencies
+    in the form of a shared library (.so or .dll file) you will have to place
+    the library inside the directory of the MTA:SA DM server executable.
+
+    To load your module at server initialisation, use the module configuration
+    tag syntax as specified in your mtaserver.conf file:
+
+    <!-- <module>sample_win32.dll</module> -->
+    <!-- <module>sample_linux.so</module> -->
+
+    Place your module library inside the mods/deathmatch/modules directory.
+    Be sure to create this directory if it does not exist.
+
+* LICENSING
+    Please read the LICENSE file for any licensing information.
+
+* MORE INFORMATION
+    More information about Multi Theft Auto scripting and/or module development
+    can be found on any of the following URLs:
+
+    http://www.mtasa.com/
+    http://www.multitheftauto.com/
+    http://development.mtasa.com/
