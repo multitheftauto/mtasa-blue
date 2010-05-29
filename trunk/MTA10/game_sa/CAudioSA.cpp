@@ -13,8 +13,17 @@
 
 #include "StdInc.h"
 
+CAudioSA::CAudioSA ()
+{
+    m_bRadioOn = false;
+    m_bRadioMuted = false;
+    m_ucRadioChannel = 0;
+}
+
 VOID CAudioSA::StopRadio()
 {
+    m_bRadioOn = false;
+
     //DWORD dwFunc = FUNC_StopRadio;
     DWORD dwFunc = 0x4E9823; // Some function CAudio::StopRadio jumps to immediately
 
@@ -52,6 +61,14 @@ VOID CAudioSA::StopRadio()
 
 VOID CAudioSA::StartRadio(unsigned int station)
 {
+    m_ucRadioChannel = station;
+    m_bRadioOn = true;
+
+    // Make sure we have the correct muted state
+    m_bRadioMuted = pGame->GetSettings ()->GetRadioVolume () < 1;
+    if ( m_bRadioMuted )
+        return;
+
     DWORD dwFunc = 0x4DBEC3;
     DWORD dwFunc2 = 0x4EB3C3;
     _asm 
@@ -163,6 +180,30 @@ VOID CAudioSA::SetMusicMasterVolume ( BYTE bVolume )
         mov     ecx, CLASS_CAudioEngine
         push    dwVolume
         call    dwFunc
+    }
+
+    //
+    // See if radio stream should be stopped/started
+    //
+
+    bool bNewRadioMuted = bVolume < 1;
+    bool bRadioMutedChanged = m_bRadioMuted != bNewRadioMuted;
+    m_bRadioMuted = bNewRadioMuted;
+
+    // If mute state has changed while the radio is on
+    if ( bRadioMutedChanged && m_bRadioOn )
+    {
+        if ( !m_bRadioMuted )
+        {
+            // mute -> unmute
+            StartRadio ( m_ucRadioChannel );
+        }
+        else
+        {
+            // unmute -> mute
+            StopRadio ();
+            m_bRadioOn = true;  // StopRadio was only called to stop the radio stream. Radio is logically still on
+        }
     }
 }
 
