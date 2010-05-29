@@ -541,6 +541,7 @@ public:
     bool                        m_bFrozenWaitingForGroundToLoad;
     float                       m_fGroundCheckTolerance;
     float                       m_fObjectsAroundTolerance;
+    int                         m_iLoadAllModelsCounter;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
