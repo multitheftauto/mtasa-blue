@@ -500,7 +500,7 @@ Function .onInstSuccess
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\Multi Theft Auto.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
 				"" "Play Multi Theft Auto: San Andreas"
 			skip1:
