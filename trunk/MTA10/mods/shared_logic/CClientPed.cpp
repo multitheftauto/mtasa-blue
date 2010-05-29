@@ -159,6 +159,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bFrozenWaitingForGroundToLoad = false;
     m_fGroundCheckTolerance = 0.f;
     m_fObjectsAroundTolerance = 0.f;
+    m_iLoadAllModelsCounter = 0;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
@@ -586,7 +587,10 @@ void CClientPed::Spawn ( const CVector& vecPosition,
 
     // Wait for ground
     if ( m_bIsLocalPlayer )
+    {
         SetFrozenWaitingForGroundToLoad ( true );
+        m_iLoadAllModelsCounter = 10;
+    }
 
     // Remove any animation
     KillAnimation ();
@@ -2183,6 +2187,14 @@ void CClientPed::StreamedInPulse ( void )
         // Handle waiting for the ground to load
         if ( IsFrozenWaitingForGroundToLoad () )
             HandleWaitingForGroundToLoad ();
+
+        // Bodge to get things loaded quicker on spawn
+        if ( m_iLoadAllModelsCounter )
+        {
+            m_iLoadAllModelsCounter--;
+            if ( GetModelInfo () )
+                GetModelInfo ()-> LoadAllRequestedModels ();
+        }
 
         // Draw a little star in the corner if async is on
         if ( g_pGame->IsASyncLoadingEnabled ( true ) )
