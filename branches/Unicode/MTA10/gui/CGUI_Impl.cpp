@@ -66,17 +66,25 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Load our fonts
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9 );
-    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, 32, 65532 ); // allowed code points range is 0..65532
+    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, 7, 0, 32, 65532 ); // allowed code points range is 0..65532
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, 32, 65532 ); // allowed code points range is 0..65532
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
-    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
+    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9, 0, 32, 64258 ); // allowed code points range is 0..64258
+
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 32, 8729, true ); // allowed code points range is 0..61442
+
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 32, 8221, true ); // allowed code points range is 0..8221
+
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 32, 64258, false ); // allowed code points range is 0..64258
     // ACHTUNG: These font creations can throw exceptions!
+    // ACHTUNG: Client don't even started if any font has wrong start/end code points.
+ 
 
     // Load bluescheme
     CEGUI::SchemeManager::getSingleton().loadScheme("cgui/CGUI.xml");
@@ -276,9 +284,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int first_code_point, unsigned int last_code_point, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uExtraGlyphs, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, first_code_point, last_code_point, bAutoScale );
 }
 
 

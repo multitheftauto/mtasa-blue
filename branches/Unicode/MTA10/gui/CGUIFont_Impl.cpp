@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
+CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int first_code_point, unsigned int last_code_point, bool bAutoScale )
 {
     // Store the fontmanager and create a font with the given attributes
     m_pFontManager = pGUI->GetFontManager ();
@@ -33,10 +33,7 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
     }
 
     // Define our glyphs
-    if ( uExtraGlyphs ) {
-        m_pFont->defineFontGlyphs( m_pFont->getAvailableGlyphs() + (CEGUI::utf32)*uExtraGlyphs );
-    } else
-        m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
+    m_pFont->defineFontGlyphs( first_code_point, last_code_point );
 
     // Set default attributes
     SetNativeResolution ( 1024, 768 );
