@@ -40,15 +40,19 @@ public:
     bool                    Exists                      ( CClientSound* pSound );
     CClientSound*           Get                         ( DWORD pSound );
 
+    int                     GetFxEffectFromName         ( const std::string& strEffectName );
+
     void                    UpdateVolume                ( void );
 
 private:
 
-    CClientManager*             m_pClientManager;
+    CClientManager*                 m_pClientManager;
 
-    unsigned short              m_usDimension;
+    unsigned short                  m_usDimension;
 
-    std::list < CClientSound* > m_Sounds;
+    std::list < CClientSound* >     m_Sounds;
+
+    std::map < std::string, int >   m_FxEffectNames;
 };
 
 #endif

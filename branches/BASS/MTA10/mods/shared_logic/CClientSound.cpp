@@ -37,6 +37,9 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     m_usDimension = 0;
     m_b3D = false;
     m_pThread = 0;
+
+    for ( int i=0; i<9; i++ )
+        m_FxEffects[i] = 0;
 }
 
 CClientSound::~CClientSound ( void )
@@ -349,6 +352,39 @@ SString CClientSound::GetMetaTags( const SString& strFormat )
     SString strMetaTags = "";
     strMetaTags = TAGS_Read( m_pSound, strFormat.c_str() );
     return strMetaTags;
+}
+
+bool CClientSound::SetFxEffect ( int iFxEffect, bool bEnable )
+{
+    if ( m_pSound )
+    {
+        if ( iFxEffect >= 0 )
+        {
+            if ( bEnable )
+            {
+                if ( !m_FxEffects[iFxEffect] )
+                {
+                    m_FxEffects[iFxEffect] = BASS_ChannelSetFX ( m_pSound, iFxEffect, 0 );
+                    if ( m_FxEffects[iFxEffect] )
+                        return true;
+                }
+            }
+            else
+            {
+                if ( BASS_ChannelRemoveFX ( m_pSound, m_FxEffects[iFxEffect] ) )
+                {
+                    m_FxEffects[iFxEffect] = 0;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
+{
+    return m_FxEffects[iFxEffect];
 }
 
 void CClientSound::Process3D ( CVector vecPosition )

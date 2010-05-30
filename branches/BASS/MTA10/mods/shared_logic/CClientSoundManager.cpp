@@ -43,6 +43,16 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 );
 
     UpdateVolume ();
+
+    m_FxEffectNames["chorus"] =         BASS_FX_DX8_CHORUS;
+    m_FxEffectNames["compressor"] =     BASS_FX_DX8_COMPRESSOR;
+    m_FxEffectNames["distortion"] =     BASS_FX_DX8_DISTORTION;
+    m_FxEffectNames["echo"] =           BASS_FX_DX8_ECHO;
+    m_FxEffectNames["flanger"] =        BASS_FX_DX8_FLANGER;
+    m_FxEffectNames["gargle"] =         BASS_FX_DX8_GARGLE;
+    m_FxEffectNames["reverb2"] =        BASS_FX_DX8_I3DL2REVERB;
+    m_FxEffectNames["parameq"] =        BASS_FX_DX8_PARAMEQ;
+    m_FxEffectNames["reverb"] =         BASS_FX_DX8_REVERB;
 }
 
 CClientSoundManager::~CClientSoundManager ( void )
@@ -152,6 +162,18 @@ CClientSound* CClientSoundManager::Get ( DWORD pSound )
         }
     }
     return NULL;
+}
+
+int CClientSoundManager::GetFxEffectFromName ( const std::string& strEffectName )
+{
+    std::map < std::string, int >::iterator it;
+    it = m_FxEffectNames.find ( strEffectName );
+
+    if ( it != m_FxEffectNames.end () )
+    {
+        return it->second;
+    }
+    return -1;
 }
 
 void CClientSoundManager::UpdateVolume ()

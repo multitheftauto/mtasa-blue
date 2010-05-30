@@ -490,6 +490,66 @@ int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetSoundEffectEnabled ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+        lua_istype ( luaVM, 2, LUA_TSTRING ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            SString strEffectName = lua_tostring ( luaVM, 2 );
+            bool bEnable = false;
+            if ( lua_istype ( luaVM, 3, LUA_TBOOLEAN ) )
+            {
+                bEnable = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
+            }
+            if ( CStaticFunctionDefinitions::SetSoundEffectEnabled ( *pSound, strEffectName, bEnable ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetSoundEffects ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientSound* pSound = lua_tosound ( luaVM, 1 );
+        if ( pSound )
+        {
+            lua_newtable ( luaVM );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 0 ) );
+            lua_setfield ( luaVM, -2, "chorus" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 1 ) );
+            lua_setfield ( luaVM, -2, "compressor" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 2 ) );
+            lua_setfield ( luaVM, -2, "distortion" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 3 ) );
+            lua_setfield ( luaVM, -2, "echo" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 4 ) );
+            lua_setfield ( luaVM, -2, "flanger" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 5 ) );
+            lua_setfield ( luaVM, -2, "gargle" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 6 ) );
+            lua_setfield ( luaVM, -2, "reverb2" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 7 ) );
+            lua_setfield ( luaVM, -2, "parameq" );
+            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 8 ) );
+            lua_setfield ( luaVM, -2, "reverb" );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::PlayMissionAudio ( lua_State* luaVM )
 {
     // Grab the argument types

@@ -5615,8 +5615,19 @@ bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, floa
 
 bool CStaticFunctionDefinitions::GetSoundMetaTags ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags )
 {
-    strMetaTags = Sound.GetMetaTags( strFormat );
+    strMetaTags = Sound.GetMetaTags ( strFormat );
     return true;
+}
+
+bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, const SString& strEffectName, bool bEnable )
+{
+    int iFxEffect = m_pSoundManager->GetFxEffectFromName ( strEffectName );
+
+    if ( iFxEffect >= 0 )
+        if ( Sound.SetFxEffect ( iFxEffect, bEnable ) )
+            return true;
+
+    return false;
 }
 
 #ifdef MTA_VOICE

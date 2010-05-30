@@ -488,6 +488,7 @@ public:
     static bool                         SetSoundMaxDistance                 ( CClientSound& Sound, float fDistance );
     static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
+    static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
 #ifdef MTA_VOICE
     // Voice funcs

@@ -83,6 +83,9 @@ public:
     void                    ShowShoutcastMetaTags   ( void );
     SString                 GetMetaTags             ( const SString& strFormat );
 
+    bool                    SetFxEffect             ( int iFxEffect, bool bEnable );
+    bool                    IsFxEffectEnabled       ( int iFxEffect );
+
     void                    Unlink                  ( void ) {};
 
 protected:
@@ -103,6 +106,8 @@ private:
     float                   m_fMaxDistance;
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
+
+    HFX                     m_FxEffects[9];
 
     HANDLE                  m_pThread;
 
