@@ -1,6 +1,7 @@
 !include nsDialogs.nsh
 !include LogicLib.nsh
 !include Sections.nsh
+!include UAC.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -17,9 +18,17 @@ Var CreateDesktopIcon
 Var RedistInstalled
 
 ; ###########################################################################################################
-;!define FILES_ROOT "C:\Build\output"
-;!define SERVER_FILES_ROOT "c:\build\mta10_server\output"
-;!define LIGHTBUILD
+!ifndef FILES_ROOT
+	!define FILES_ROOT "C:\Build\output"
+	!define SERVER_FILES_ROOT "C:\Build\mta10_server\output"
+	!define FILES_MODULE_SDK "C:\Build\Shared\publicsdk"
+	#!define INCLUDE_DEVELOPMENT
+	!define CLIENT_SETUP
+	!define INCLUDE_SERVER
+	#!define INCLUDE_EDITOR
+	!define INSTALL_OUTPUT "mtasa-1.0.exe"
+	!define LIGHTBUILD
+!endif
 !ifndef PRODUCT_VERSION
 	!define PRODUCT_VERSION "v1.0"
 !endif
@@ -53,6 +62,8 @@ Var RedistInstalled
 !define MUI_ABORTWARNING
 !define MUI_ICON		"mta.ico"
 !define MUI_UNICON		"mta.ico"
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_BITMAP "mta_install_header.bmp"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -81,9 +92,9 @@ Var RedistInstalled
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-; Don't launch from installer as it can run with elevated rights
-; !define MUI_FINISHPAGE_RUN						""
-; !define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
+; Launch from installer with user privileges
+!define MUI_FINISHPAGE_RUN						""
+!define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -100,8 +111,11 @@ LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
 LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-LangString DESC_Section8 ${LANG_ENGLISH}			"This is a preview of the new MTA editor. It is incomplete and partially non-functional."
+LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
+LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
+LangString DESC_Blank ${LANG_ENGLISH}			""
 LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
@@ -258,7 +272,7 @@ Function nsDialogsLoginAccountPage
 
 	StrLen $0 $StoredUsername
 	IntCmp $0 0 loginAccount
-	Ver::CS $StoredUsername $StoredSerial
+	;Ver::CS $StoredUsername $StoredSerial
 	Pop $0
 	
 	StrCmp $0 "t" skipLogin cont
@@ -303,7 +317,7 @@ Function nsDialogsLoginAccountPageLeave
 	 ${NSD_GetText} $UsernameTxt $Username
 	 ${NSD_GetText} $PasswordTxt $Password
 	 
-	 Ver::Verify $Username $Password
+	 ;Ver::Verify $Username $Password
 	 Pop $Serial
 	 StrLen $SerialLength $Serial
 	 IntCmp $SerialLength 19 is19 not19 not19
@@ -329,7 +343,7 @@ Function SerialPage
 
 	ReadRegStr ${TEMP3} HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial"
 
-	Ver::CS ${TEMP1} ${TEMP3}
+	;Ver::CS ${TEMP1} ${TEMP3}
 	Pop $0
 
 	StrCmp $0 "t" skipLogin
@@ -349,7 +363,7 @@ Function ValidateSerial
 	ReadINIStr ${TEMP2} "$PLUGINSDIR\serialdialog.ini" "Field 2" "State"
 	;ReadINIStr ${TEMP3} "$PLUGINSDIR\serialdialog.ini" "Field 7" "State"
 
-	Ver::Verify ${TEMP1} ${TEMP2}
+	;Ver::Verify ${TEMP1} ${TEMP2}
 	Pop $0
 	StrLen $1 $0
 	IntCmp $1 19 is19 not19 not19
@@ -367,10 +381,10 @@ FunctionEnd
 Function LaunchLink
 	!ifdef CLIENT_SETUP
 		SetOutPath "$INSTDIR"
-		ExecShell "" "$INSTDIR\Multi Theft Auto.exe"
+		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto.exe" "" "" ""
 	!else
 		SetOutPath "$INSTDIR\Server"
-		ExecShell "" "$INSTDIR\Server\MTA Server.exe"
+		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server.exe" "" "" ""
 	!endif
 FunctionEnd
 
@@ -405,34 +419,11 @@ FunctionEnd
 */
 
 Function .OnInstFailed
-	UAC::Unload ;Must call unload!
+	;UAC::Unload ;Must call unload!
 FunctionEnd
 
 Function .onInit
-
-; FOR VISTA
-
-UAC_Elevate:
-	UAC::RunElevated
-	StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
-	StrCmp 0 $0 0 UAC_Err ; Error?
-	StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
-	Quit
-
-UAC_Err:
-	MessageBox mb_iconstop "Unable to elevate, error $0"
-	Abort
-
-UAC_ElevationAborted:
-	; elevation was aborted, run as normal?
-	MessageBox mb_iconstop "This installer requires admin access, aborting!"
-	Abort
-
-UAC_Success:
-	StrCmp 1 $3 +4 ; Admin?
-	StrCmp 3 $1 0 UAC_ElevationAborted ; Try again?
-	MessageBox mb_iconstop "This installer requires admin access, try again"
-	goto UAC_Elevate
+	Call DoRightsElevation
 
 	; Check if we must install the Microsoft Visual Studio 2008 SP1 redistributable
 	ClearErrors
@@ -542,7 +533,7 @@ Function .onInstSuccess
 		!endif
 	${EndIf}
 
-	UAC::Unload ;Must call unload!
+	;UAC::Unload ;Must call unload!
 FunctionEnd
 
 
@@ -585,6 +576,10 @@ DontInstallRedist:
 
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
+
+			# Make the directory "$INSTDIR" read write accessible by all users
+			DetailPrint "Updating permissions. Please wait..."
+			AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
@@ -751,12 +746,12 @@ DontInstallRedist:
 	SectionGroupEnd
 !endif
 
-Section "Start menu group"
+Section "Start menu group" SEC10
 	SectionIn 1 2
 	StrCpy $CreateSMShortcuts 1
 SectionEnd
 
-Section "Desktop icon"
+Section "Desktop icon" SEC11
 	SectionIn 1 2
 	StrCpy $CreateDesktopIcon 1
 SectionEnd
@@ -772,6 +767,9 @@ SectionEnd
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGCLIENT} $(DESC_SectionGroupClient)
@@ -802,38 +800,18 @@ SectionEnd
 Function un.onUninstSuccess
 	HideWindow
 	MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer."
-	UAC::Unload ;Must call unload! ; #3017 fix
+	;UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
 Function un.OnUnInstFailed
 	HideWindow
 	MessageBox MB_ICONSTOP|MB_OK "Uninstallation has failed!"
-	UAC::Unload ;Must call unload! ; #3017 fix
+	;UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
  
 Function un.onInit
-	UAC_Elevate: ; start of #3017 fix
-		UAC::RunElevated 
-		StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
-		StrCmp 0 $0 0 UAC_Err ; Error?
-		StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
-		Quit
-	 
-	UAC_Err:
-		MessageBox mb_iconstop "Unable to elevate, error $0"
-		Abort
-	 
-	UAC_ElevationAborted:
-		; elevation was aborted, run as normal?
-		MessageBox mb_iconstop "This uninstaller requires admin access, aborting!"
-		Abort
-	 
-	UAC_Success:
-		StrCmp 1 $3 +4 ; Admin?
-		StrCmp 3 $1 0 UAC_ElevationAborted ; Try again?
-		MessageBox mb_iconstop "This uninstaller requires admin access, try again"
-		goto UAC_Elevate ; end of #3017 fix
+	Call un.DoRightsElevation
 
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
 		Abort
@@ -933,7 +911,7 @@ Function InstallVC90Redistributable
 	
 	DetailPrint "* Download of Microsoft Visual Studio 2008 SP1 redistributable failed:"
 	DetailPrint "* $0"
-	DetailPrint "* Installation aborted"
+	DetailPrint "* Installation continuing anyway"
 	MessageBox MB_ICONSTOP "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
 	Goto InstallEnd
 	
@@ -950,8 +928,53 @@ VC90RedistInstallFailed:
 	StrCpy $RedistInstalled "0"
 	DetailPrint "* Some error occured installing Microsoft Visual Studio 2008 SP1 redistributable"
 	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-	DetailPrint "* Installation aborted"
+	DetailPrint "* Installation continuing anyway"
 	MessageBox MB_ICONSTOP "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
 
 InstallEnd:
+
+	StrCmp "$RedistInstalled" "1" InstallEnd2
+	MessageBox MB_ICONSTOP "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.\
+	$\r$\nHowever installation will continue.\
+	$\r$\nPlease reinstall if there are problems later."
+	StrCpy $RedistInstalled "1"
+
+InstallEnd2:
+FunctionEnd
+
+
+;====================================================================================
+; UAC related functions
+;====================================================================================
+
+!macro RightsElevation un
+    uac_tryagain:
+    !insertmacro UAC_RunElevated
+    #MessageBox mb_TopMost "0=$0 1=$1 2=$2 3=$3"
+    ${Switch} $0
+    ${Case} 0
+        ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
+        ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
+        ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
+            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "This ${un}installer requires admin access, try again" /SD IDNO IDOK uac_tryagain IDNO 0
+        ${EndIf}
+        ;fall-through and die
+    ${Case} 1223
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "This ${un}installer requires admin privileges, aborting!"
+        Quit
+    ${Case} 1062
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Logon service not running, aborting!"
+        Quit
+    ${Default}
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Unable to elevate , error $0"
+        Quit
+    ${EndSwitch}
+!macroend
+
+Function DoRightsElevation
+    !insertmacro RightsElevation ""
+FunctionEnd
+
+Function un.DoRightsElevation
+    !insertmacro RightsElevation "un"
 FunctionEnd
