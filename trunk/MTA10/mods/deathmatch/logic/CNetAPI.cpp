@@ -981,6 +981,12 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 
     if ( flags.data.bHasAWeapon )
     {
+        if ( BitStream.Version () >= 0x0d )
+        {
+            unsigned char ucWeaponType = pPlayerWeapon->GetType ();
+            BitStream.Write ( ucWeaponType );
+        }
+
         // Write the weapon slot
         unsigned int uiSlot = pPlayerWeapon->GetSlot ();
         SWeaponSlotSync slot;
