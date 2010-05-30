@@ -479,7 +479,7 @@ int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
                 if ( !strMetaTags.empty() )
                 {
                     lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "album artist" );
+                    lua_setfield ( luaVM, -2, "album_artist" );
                 }
                 return 1;
             }

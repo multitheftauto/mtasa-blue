@@ -86,7 +86,7 @@ bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, 
         m_vecPosition = vecPosition;
         BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
         BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL );
-        BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, m_fMinDistance, 0.0001f, 360, 360, 1.0f );
+        BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         BASS_ChannelPlay ( m_pSound, false );
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         return true;
@@ -149,7 +149,7 @@ void CClientSound::ThreadCallback ( HSTREAM pSound )
         {
             BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
             BASS_ChannelSet3DPosition ( pSound, &pos, NULL, NULL );
-            BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, m_fMinDistance, 0.0001f, 360, 360, 1.0f );
+            BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         }
         // Set a Callback function for download finished
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
@@ -318,9 +318,6 @@ void CClientSound::RelateDimension ( unsigned short usDimension )
 void CClientSound::SetMinDistance ( float fDistance )
 {
     m_fMinDistance = fDistance;
-
-    if ( m_pSound )
-        BASS_ChannelSet3DAttributes ( m_pSound, -1, fDistance, -1, -1, -1, -1 );
 }
 
 float CClientSound::GetMinDistance ( void )
