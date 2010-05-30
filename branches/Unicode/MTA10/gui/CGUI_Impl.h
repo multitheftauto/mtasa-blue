@@ -74,7 +74,6 @@ public:
 
     void                            ProcessMouseInput           ( CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton );
     void                            ProcessKeyboardInput        ( unsigned long ulKey, bool bIsDown );
-    unsigned int                    keycodeToUTF32              ( unsigned int ulCharacter );
     void                            ProcessCharacter            ( unsigned long ulCharacter );
 
     //
@@ -130,7 +129,7 @@ public:
     //
 
     CGUITexture*                    CreateTexture               ( void );
-    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int first_code_point = 32, unsigned int last_code_point = 127, bool bAutoScale = false );
+    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false );
 
     void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );
