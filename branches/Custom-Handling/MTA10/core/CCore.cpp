@@ -628,6 +628,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
+    CVARS_GET ( "async_loading",    bval ); m_pGame->SetASyncLoadingEnabled ( bval );
 }
 
 void CCore::ApplyMenuSettings ( void )
@@ -964,9 +965,9 @@ void CCore::CreateNetwork ( )
 
     // Load approrpiate compilation-specific library.
 #ifdef _DEBUG
-    m_NetModule.LoadModule ( "net_d.dll" );
+    m_NetModule.LoadModule ( "netc_d.dll" );
 #else
-    m_NetModule.LoadModule ( "net.dll" );
+    m_NetModule.LoadModule ( "netc.dll" );
 #endif
     if ( m_NetModule.IsOk () == false )
     {
@@ -1626,4 +1627,40 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     }
 
     return strDest;
+}
+
+
+void CCore::UpdateRecentlyPlayed()
+{
+    //Get the current host and port
+    unsigned int uiPort;
+    std::string strHost;
+    CVARS_GET ( "host", strHost );
+    CVARS_GET ( "port", uiPort );
+    // Save the connection details into the recently played servers list
+    in_addr Address;
+    if ( CServerListItem::Parse ( strHost.c_str(), Address ) )
+    {
+        CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
+        CServerList* pRecentList = pServerBrowser->GetRecentList ();
+        CServerListItem RecentServer ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+        pRecentList->Remove ( RecentServer );
+        pRecentList->Add ( RecentServer, true );
+        pServerBrowser->SaveRecentlyPlayedList();
+
+        // Set as our current server for xfire
+        if ( XfireIsLoaded () )
+        {
+            const char *szKey[2], *szValue[2];
+            szKey[0] = "Gamemode";
+            szValue[0] = RecentServer.strType.c_str();
+
+            szKey[1] = "Map";
+            szValue[1] = RecentServer.strMap.c_str();
+
+            XfireSetCustomGameData ( 2, szKey, szValue ); 
+        }
+    }
+    //Save our configuration file
+    CCore::GetSingleton ().SaveConfig ();
 }

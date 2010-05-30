@@ -268,50 +268,49 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 */
 
 
-bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
+bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus )
 {
-    // TODO: mix in with the streamer, cause this is way too slow
-    return true;
+    // Get list of objects that may be intersecting the sphere
+    CClientEntityResult result;
+    GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecPosition, fRadius ) );
 
-    CVector vecObject;
-    float fDistanceX, fDistanceY, fDistanceZ, fDistanceExp;
-
-    // Radius exp 2
-    float fRadius2 = fRadius * fRadius;
-
-    // Loop through our objects
-    CClientObject* pObject;
-    list < CClientObject* > ::const_iterator iter = m_Objects.begin ();
-    for ( ; iter != m_Objects.end (); iter++ )
+    bool bResult = true;
+    // Extract relevant types
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
     {
-        pObject = *iter;
-
-        // Is it not loaded?
-        if ( !pObject->GetGameObject () )
+        CClientEntity* pEntity = *it;
+        if  ( pEntity->GetType () == CCLIENTOBJECT )
         {
-            if ( pObject->GetDimension () == usDimension )
+            CClientObject* pObject = static_cast < CClientObject* > ( pEntity );
+            if ( !pObject->GetGameObject () || !pObject->GetModelInfo ()->IsLoaded () || !pObject->IsStreamedIn () )
             {
-                // Grab its position
-                pObject->GetPosition ( vecObject );
-
-                // Grab the distance ^ 2
-                fDistanceX = vecObject.fX - vecPosition.fX;
-                fDistanceY = vecObject.fY - vecPosition.fY;
-                fDistanceZ = vecObject.fZ - vecPosition.fZ;
-                fDistanceExp = fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ;
-
-                // Closer than the radius ^ 2?
-                if ( fDistanceExp < fRadius2 )
+                if ( pObject->GetDimension () == usDimension )
                 {
-                    // We haven't loaded all the objects nearby that location
-                    return false;
+                    // Final distance check
+                    float fDistSquared = pObject->GetDistanceToBoundingBoxSquared ( vecPosition );
+                    if ( fDistSquared < fRadius * fRadius )
+                        bResult = false;
+
+                    if ( pstrStatus )
+                    {
+                        // Debugging information
+                        *pstrStatus += SString ( "ID:%05d  Dist:%4.1f  GetGameObject:%d  IsLoaded:%d  IsStreamedIn:%d\n"
+                                                ,pObject->GetModel ()
+                                                ,sqrtf ( fDistSquared )
+                                                ,pObject->GetGameObject () ? 1 : 0
+                                                ,pObject->GetModelInfo ()->IsLoaded () ? 1 : 0
+                                                ,pObject->IsStreamedIn () ? 1 : 0
+                                              );
+                    }
+                    else
+                    if ( !bResult )
+                        break;
                 }
             }
         }
     }
 
-    // We have
-    return true;
+    return bResult;
 }
 
 

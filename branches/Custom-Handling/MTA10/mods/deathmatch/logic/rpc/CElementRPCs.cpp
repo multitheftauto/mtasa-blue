@@ -32,6 +32,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_ELEMENT_HEALTH,            SetElementHealth,           "SetElementHealth" );
     AddHandler ( SET_ELEMENT_MODEL,             SetElementModel,            "SetElementModel" );
     AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,  SetElementAttachedOffsets,  "SetElementAttachedOffsets" );
+    AddHandler ( SET_ELEMENT_DOUBLESIDED,       SetElementDoubleSided,      "SetElementDoubleSided" );
 }
 
 
@@ -373,6 +374,21 @@ void CElementRPCs::SetElementAlpha ( NetBitStreamInterface& bitStream )
                 }
                 default: break;
             }
+        }
+    }
+}
+
+
+void CElementRPCs::SetElementDoubleSided ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    bool bDoubleSided;
+    if ( bitStream.Read ( ID ) && bitStream.ReadBit ( bDoubleSided ) )
+    {
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity )
+        {
+            pEntity->SetDoubleSided ( bDoubleSided );
         }
     }
 }

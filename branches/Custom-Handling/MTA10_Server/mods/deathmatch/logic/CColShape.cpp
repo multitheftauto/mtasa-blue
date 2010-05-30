@@ -58,6 +58,7 @@ const CVector & CColShape::GetPosition ( void )
 void CColShape::SetPosition ( const CVector& vecPosition )
 {
     m_vecPosition = vecPosition;
+    UpdateSpatialData ();
     CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
 }
 
@@ -107,4 +108,11 @@ void CColShape::RemoveAllColliders ( bool bNotify )
         }
     }
     m_Colliders.clear ();
+}
+
+
+void CColShape::SizeChanged ( void )
+{
+    UpdateSpatialData ();
+    // Maybe queue RefreshColliders for v1.1
 }

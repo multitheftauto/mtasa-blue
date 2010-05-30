@@ -234,6 +234,8 @@ public:
     BOOL                        IsStatic(VOID)                          { return m_pInterface->bIsStatic; }
     VOID                        SetStatic(BOOL bStatic)                 { m_pInterface->bIsStatic       = bStatic; };
     VOID                        SetUsesCollision(BOOL bUsesCollision)   { m_pInterface->bUsesCollision  = bUsesCollision;};
+    BOOL                        IsBackfaceCulled(VOID)                  { return m_pInterface->bBackfaceCulled; };
+    VOID                        SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
     VOID                        SetAlpha(DWORD dwAlpha);
 
     VOID                        MatrixConvertFromEulerAngles ( float fX, float fY, float fZ, int iUnknown );

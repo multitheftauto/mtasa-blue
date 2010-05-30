@@ -1154,6 +1154,26 @@ int CLuaFunctionDefs::IsElementCollidableWith ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsElementDoubleSided ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab the entity and verify it.
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            lua_pushboolean ( luaVM, pEntity->IsDoubleSided () );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementDoubleSided" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
 {
@@ -1901,6 +1921,33 @@ int CLuaFunctionDefs::SetElementCollidableWith ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementCollidableWith" );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetElementDoubleSided ( lua_State* luaVM )
+{
+    // Valid args?
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+        lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+    {
+        // Grab the element to change
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            // Grab the chosen value and set it
+            pEntity->SetDoubleSided ( lua_toboolean ( luaVM, 2 ) ? true : false );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDoubleSided", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
+
+    // Failure
     lua_pushboolean ( luaVM, false );
     return 1;
 }

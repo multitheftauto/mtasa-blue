@@ -1315,9 +1315,9 @@ bool CStaticFunctionDefinitions::IsPedFrozen ( CClientPed & Ped, bool & bFrozen 
 }
 
 
-bool CStaticFunctionDefinitions::GetPedFootBlood ( CClientPed & Ped, unsigned int & uiFootBlood )
+bool CStaticFunctionDefinitions::IsPedFootBloodEnabled ( CClientPed & Ped, bool & bHasFootBlood )
 {
-    uiFootBlood = Ped.GetFootBlood ();
+    bHasFootBlood = Ped.IsFootBloodEnabled ();
     return true;
 }
 
@@ -1785,13 +1785,13 @@ bool CStaticFunctionDefinitions::SetPedFrozen ( CClientEntity & Entity, bool bFr
 }
 
 
-bool CStaticFunctionDefinitions::SetPedFootBlood ( CClientEntity & Entity, unsigned int uiFootBlood )
+bool CStaticFunctionDefinitions::SetPedFootBloodEnabled ( CClientEntity & Entity, bool bHasFootBlood )
 {
-    RUN_CHILDREN SetPedFootBlood ( **iter, uiFootBlood );
+    RUN_CHILDREN SetPedFootBloodEnabled ( **iter, bHasFootBlood );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.SetFootBlood ( uiFootBlood );
+        Ped.SetFootBloodEnabled ( bHasFootBlood );
         return true;
     }
     return false;
@@ -2119,6 +2119,12 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool&
 bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, SColor& outColor )
 {
     outColor = Vehicle.GetHeadLightColor ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleCurrentGear ( CClientVehicle& Vehicle, unsigned short& currentGear )
+{
+    currentGear = Vehicle.GetCurrentGear();
     return true;
 }
 
@@ -5657,9 +5663,11 @@ const char* CStaticFunctionDefinitions::GetVersionName ()
     return MTA_DM_FULL_STRING;
 }
 
-const char* CStaticFunctionDefinitions::GetVersionBuildType ()
+SString CStaticFunctionDefinitions::GetVersionBuildType ()
 {
-    return MTA_DM_BUILDTYPE;
+    SString strResult = MTA_DM_BUILDTYPE;
+    strResult[0] = toupper ( strResult[0] );
+    return strResult;
 }
 
 unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
@@ -5675,4 +5683,17 @@ const char* CStaticFunctionDefinitions::GetOperatingSystemName ()
 const char* CStaticFunctionDefinitions::GetVersionBuildTag ()
 {
     return MTA_DM_BUILDTAG_LONG;
+}
+
+SString CStaticFunctionDefinitions::GetVersionSortable ()
+{
+    unsigned short usNetRev = g_pCore->GetNetwork ()->GetNetRev ();
+    return SString ( "%d.%d.%d-%d.%05d.%d"
+                            ,MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MINOR
+                            ,MTASA_VERSION_MAINTENANCE
+                            ,MTASA_VERSION_TYPE
+                            ,MTASA_VERSION_BUILD
+                            ,usNetRev
+                            );
 }

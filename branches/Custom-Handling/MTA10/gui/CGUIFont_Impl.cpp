@@ -17,7 +17,20 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
 {
     // Store the fontmanager and create a font with the given attributes
     m_pFontManager = pGUI->GetFontManager ();
-    m_pFont = m_pFontManager->createFont ( szFontName, szFontFile, uSize, uFlags );
+    m_pFont = NULL;
+    while ( !m_pFont )
+    {
+        try
+        {
+            m_pFont = m_pFontManager->createFont ( szFontName, szFontFile, uSize, uFlags, bAutoScale, 1024, 768 );
+        }
+        catch ( CEGUI::RendererException )
+        {
+            // Reduce size until it can fit into a texture
+            if ( --uSize == 1 )
+                throw;
+        }
+    }
 
     // Define our glyphs
     if ( uExtraGlyphs ) {

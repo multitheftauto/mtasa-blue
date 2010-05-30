@@ -825,6 +825,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientSpatialDatabase.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientStreamElement.cpp"
 					>
 				</File>
@@ -1688,6 +1692,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientSoundManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientSpatialDatabase.h"
 					>
 				</File>
 				<File

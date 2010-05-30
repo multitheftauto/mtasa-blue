@@ -102,7 +102,11 @@ bool CXMLFileImpl::Write ( void )
     // We have a filename?
     if ( m_strFilename != "" )
     {
-        // Save it
+        // Try a safe method of saving first
+        if ( WriteSafer () )
+        {
+            return true;
+        }
         if ( m_pDocument->SaveFile ( m_strFilename.c_str () ) )
         {
             return true;
@@ -111,6 +115,46 @@ bool CXMLFileImpl::Write ( void )
 
     return false;
 }
+
+
+bool CXMLFileImpl::WriteSafer ( void )
+{
+    // We have a filename?
+    if ( m_strFilename != "" )
+    {
+        SString strFilename = m_strFilename;
+        SString strTemp     = strFilename + "_new_";
+        SString strBackup   = strFilename + "_old_";
+
+        // Save to temp
+        if ( !m_pDocument->SaveFile ( strTemp ) )
+        {
+            SetLastError ( CXMLErrorCodes::OtherError, "Could not save temporary file" );
+            return false;
+        }
+
+        // Delete any leftover backup
+        unlink ( strBackup );
+
+        // Rename current to backup
+        rename ( strFilename, strBackup );
+
+        // Rename temp to current
+        if ( rename ( strTemp, strFilename ) )
+        {
+            SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
+            return false;
+        }
+
+        // Delete backup
+        unlink ( strBackup );
+
+        return true;
+    }
+
+    return false;
+}
+
 
 
 void CXMLFileImpl::Clear ( void )

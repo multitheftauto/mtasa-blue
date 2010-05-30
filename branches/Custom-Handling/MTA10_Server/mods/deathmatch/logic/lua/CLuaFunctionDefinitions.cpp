@@ -619,6 +619,28 @@ int CLuaFunctionDefinitions::GetPlayerIP ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerVersion ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        if ( pPlayer )
+        {
+            SString strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion ( pPlayer );
+            lua_pushstring ( luaVM, strPlayerVersion );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerVersion", "player", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerVersion" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetPlayerAccount ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -3534,20 +3556,41 @@ int CLuaFunctionDefinitions::SetVehicleDoorsUndamageable ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetVehicleMaxPassengers ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA || lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        unsigned int model = 0;
+
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA)
         {
-            unsigned char ucMaxPassengers = 0;
-            if ( CStaticFunctionDefinitions::GetVehicleMaxPassengers ( pVehicle, ucMaxPassengers ) )
+            CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+            if ( pVehicle )
+                model = pVehicle->GetModel();
+            else
             {
-                lua_pushnumber ( luaVM, ucMaxPassengers );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+                lua_pushboolean ( luaVM, false );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+        {
+            model = (unsigned int) lua_tonumber ( luaVM, 1 );
+
+            if (!CVehicleManager::IsValidModel(model))
+            {
+                m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+
+        unsigned int uiMaxPassengers = CVehicleManager::GetMaxPassengers ( model );
+
+        if (uiMaxPassengers != 0xFF)
+        {
+            lua_pushnumber ( luaVM, uiMaxPassengers );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
@@ -8825,7 +8868,7 @@ int CLuaFunctionDefinitions::RemoveCommandHandler ( lua_State* luaVM )
             const char* szKey = lua_tostring ( luaVM, 1 );
             if ( szKey [0] )
             {
-                int iLuaFunction = NULL;
+                int iLuaFunction = 0;
                 if ( lua_type ( luaVM, 2 ) == LUA_TFUNCTION )
                     iLuaFunction = luaM_toref ( luaVM, 2 );
 
@@ -9350,7 +9393,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         szDelimiter [31] = 0;
         _snprintf ( szDelimiter, 31, "%c", iDelimiter );
 
-        unsigned int uiCount = 1;
+        int iCount = 1;
         char* szToken = strtok ( strText, szDelimiter );
 
         // We're looking for the first part?
@@ -9359,10 +9402,10 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
             // strtok count number of times
             do
             {
-                uiCount++;
+                iCount++;
                 szToken = strtok ( NULL, szDelimiter );
             }
-            while ( uiCount != iToken );
+            while ( iCount != iToken );
         }
 
         // Found it?
@@ -10505,8 +10548,8 @@ int CLuaFunctionDefinitions::CancelEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCancelReason ( lua_State* luaVM )
 {
-    char* szReason = NULL;
-    if ( CStaticFunctionDefinitions::GetCancelReason ( szReason ) )
+    const char* szReason = CStaticFunctionDefinitions::GetCancelReason ( );
+    if ( szReason )
     {
         lua_pushstring ( luaVM, szReason );
         return 1;
@@ -11236,6 +11279,10 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 
     lua_pushstring ( luaVM, "tag" );
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildTag () );
+    lua_settable   ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "sortable" );
+    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionSortable () );
     lua_settable   ( luaVM, -3 );
 
     return 1;

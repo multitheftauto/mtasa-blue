@@ -91,7 +91,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
     m_pRequester = pManager->GetModelRequestManager ();
 
-    m_bPerformSpawnLoadingChecks = false;
     m_iVehicleInOutState = VEHICLE_INOUT_NONE;
     m_pPlayerPed = NULL;
     m_pTaskManager = NULL;
@@ -157,11 +156,16 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bUpdatePositionAnimation = false;
     m_bHeadless = false;
     m_bFrozen = false;
+    m_bFrozenWaitingForGroundToLoad = false;
+    m_fGroundCheckTolerance = 0.f;
+    m_fObjectsAroundTolerance = 0.f;
+    m_iLoadAllModelsCounter = 0;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
     m_bStealthAiming = false;
     m_fLighting = 0.0f;
+    m_bBulletImpactData = false;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -432,15 +436,17 @@ void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolat
             // Set it only if we're not in a vehicle or not working on getting in/out
             if ( !m_pOccupiedVehicle || GetVehicleInOutState () != VEHICLE_INOUT_GETTING_OUT )
             {
-                // Set the real position
-                m_pPlayerPed->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
-
                 // Is this the local player?
                 if ( m_bIsLocalPlayer )
                 {
-                    // Do checks for all things around it being loaded again
-                    m_bPerformSpawnLoadingChecks = true;
+                    // If move is big enough, do ground checks
+                    float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
+                    if ( DistanceMoved > 50 && !IsFrozen () )
+                        SetFrozenWaitingForGroundToLoad ( true );
                 }
+
+                // Set the real position
+                m_pPlayerPed->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
             }
         }
     }
@@ -494,15 +500,17 @@ void CClientPed::Teleport ( const CVector& vecPosition )
             // Set it only if we're not in a vehicle or not working on getting in/out
             if ( !m_pOccupiedVehicle || GetVehicleInOutState () != VEHICLE_INOUT_GETTING_OUT )
             {
-                // Set the real position
-                m_pPlayerPed->Teleport ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-
                 // Is this the local player?
                 if ( m_bIsLocalPlayer )
                 {
-                    // Do checks for all things around it being loaded again
-                    m_bPerformSpawnLoadingChecks = true;
+                    // If move is big enough, do ground checks
+                    float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
+                    if ( DistanceMoved > 50 && !IsFrozen () )
+                        SetFrozenWaitingForGroundToLoad ( true );
                 }
+
+                // Set the real position
+                m_pPlayerPed->Teleport ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
             }
         }
     }
@@ -577,6 +585,13 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     RemoveFromVehicle ();    
     SetVehicleInOutState ( VEHICLE_INOUT_NONE );
 
+    // Wait for ground
+    if ( m_bIsLocalPlayer )
+    {
+        SetFrozenWaitingForGroundToLoad ( true );
+        m_iLoadAllModelsCounter = 10;
+    }
+
     // Remove any animation
     KillAnimation ();
 
@@ -611,7 +626,7 @@ void CClientPed::Spawn ( const CVector& vecPosition,
     SetHasJetPack ( false );
     SetMoveSpeed ( CVector () );
     SetInterior ( ucInterior );
-    SetFootBlood ( 0 );
+    SetFootBloodEnabled( false );
 }
 
 void CClientPed::ResetInterpolation ( void )
@@ -867,6 +882,7 @@ bool CClientPed::SetModel ( unsigned long ulModel )
             // Set the model we're changing to
             m_ulModel = ulModel;
             m_pModelInfo = g_pGame->GetModelInfo ( ulModel );
+            UpdateSpatialData ();
 
             // Are we loaded?
             if ( m_pPlayerPed )
@@ -1191,6 +1207,36 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat 
 
 void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
 {
+    // Ensure vehicle model is loaded
+    CModelInfo* pModelInfo = pVehicle->GetModelInfo();
+    if ( g_pGame->IsASyncLoadingEnabled () && !pModelInfo->IsLoaded () )
+    {
+        if ( pVehicle->IsStreamedIn () )
+        {
+            pModelInfo->LoadAllRequestedModels ();
+        }
+    }
+
+    // Transfer WaitingForGroundToLoad state to vehicle
+    if ( m_bIsLocalPlayer )
+    {
+        if ( IsFrozenWaitingForGroundToLoad () )
+        {
+            SetFrozenWaitingForGroundToLoad ( false );
+            pVehicle->SetFrozenWaitingForGroundToLoad ( true );
+        }
+        CVector vecPosition;
+        GetPosition ( vecPosition );
+        CVector vecVehiclePosition;
+        pVehicle->GetPosition ( vecVehiclePosition );
+        float fDist = ( vecPosition - vecVehiclePosition ).Length ();
+        if ( fDist > 50 && !pVehicle->IsFrozen () )
+        {
+            pVehicle->SetFrozenWaitingForGroundToLoad ( true );
+        }
+    }
+
+
     // Remove some tasks so we don't get any weird results
     SetChoking ( false );
     SetHasJetPack ( false );
@@ -1655,6 +1701,53 @@ void CClientPed::SetFrozen ( bool bFrozen )
 }
 
 
+bool CClientPed::IsFrozenWaitingForGroundToLoad ( void ) const
+{
+    return m_bFrozenWaitingForGroundToLoad;
+}
+
+
+void CClientPed::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
+{
+    if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
+        return;
+
+    if ( m_bFrozenWaitingForGroundToLoad != bFrozen )
+    {
+        m_bFrozenWaitingForGroundToLoad = bFrozen;
+
+        if ( bFrozen )
+        {
+            g_pGame->SuspendASyncLoading ( true );
+
+            m_fGroundCheckTolerance = 0.f;
+            m_fObjectsAroundTolerance = -1.f;
+/*
+            if ( m_pTaskManager )
+            {
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+                m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+            }
+*/
+            if ( m_pPlayerPed )
+            {
+                m_pPlayerPed->GetMatrix ( &m_matFrozen );
+            }
+            else
+            {
+                m_matFrozen = m_Matrix;
+            }
+        }
+        else
+        {
+            g_pGame->SuspendASyncLoading ( false );
+        }
+    }
+}
+
+
 CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
 {   
     // Multiply ammo with 10 if flamethrower to get the numbers correct.
@@ -2082,6 +2175,7 @@ void CClientPed::WorldIgnore ( bool bIgnore )
     m_bWorldIgnored = bIgnore;
 }
 
+
 void CClientPed::StreamedInPulse ( void )
 {
     // Grab some vars here, saves getting them twice
@@ -2090,58 +2184,30 @@ void CClientPed::StreamedInPulse ( void )
     // Do we have a player? (streamed in)
     if ( m_pPlayerPed )
     {
-        // Only do this for local player. If remote players falling through become
-        // an issue, comment this out.
+        // Handle waiting for the ground to load
+        if ( IsFrozenWaitingForGroundToLoad () )
+            HandleWaitingForGroundToLoad ();
+
+        // Bodge to get things loaded quicker on spawn
+        if ( m_iLoadAllModelsCounter )
+        {
+            m_iLoadAllModelsCounter--;
+            if ( GetModelInfo () )
+                GetModelInfo ()-> LoadAllRequestedModels ();
+        }
+
+        // Draw a little star in the corner if async is on
+        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
+        {
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+            unsigned int uiHeight = pGraphics->GetViewportHeight ();
+            unsigned int uiWidth = pGraphics->GetViewportWidth ();
+            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
+            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
+        }
+
         if ( m_bIsLocalPlayer )
         {
-            static bool bFreezePlayerForMap = false;            
-            CVector vecPosition;
-            GetPosition ( vecPosition );
-
-            // If some of the objects around the player is not loaded and we're not at the limit?
-            CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
-            if ( m_bPerformSpawnLoadingChecks &&
-                 !pObjectManager->IsObjectLimitReached () &&
-                 !pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 200.0f, m_usDimension ) )
-            {
-                static CVector vecFreezePosition;
-                static CMatrix matVehicleFreezePosition;
-
-                // Grab the vehicle
-                CClientVehicle* pOccupiedVehicle = GetRealOccupiedVehicle ();
-
-                // First time we got here?
-                if ( !bFreezePlayerForMap )
-                {
-                    // Save the current position
-                    vecFreezePosition = vecPosition;
-                    bFreezePlayerForMap = true;
-
-                    // In a vehicle?
-                    if ( pOccupiedVehicle )
-                    {
-                        pOccupiedVehicle->GetMatrix ( matVehicleFreezePosition );
-                    }
-                }
-
-                // Stop the player falling through the (custom) map
-                if ( pOccupiedVehicle )
-                {
-                    pOccupiedVehicle->SetMatrix ( matVehicleFreezePosition );
-                    pOccupiedVehicle->SetMoveSpeed ( CVector () );
-                }
-                else
-                {                    
-                    SetPosition ( vecFreezePosition );
-                    SetMoveSpeed ( CVector () );
-                }                
-            }
-            else
-            {
-                bFreezePlayerForMap = false;
-                m_bPerformSpawnLoadingChecks = false;
-            }
-
             // Check if the ped got in fire without the script control
             m_bIsOnFire = m_pPlayerPed->IsOnFire();
 
@@ -4266,6 +4332,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
     // We must not call CPed::Respawn for remote players
     if ( m_bIsLocalPlayer )
     {
+        SetFrozenWaitingForGroundToLoad ( true );
         if ( m_pPlayerPed )
         {
             // Detach our attached entities
@@ -4396,8 +4463,6 @@ void CClientPed::SetTargetPosition ( const CVector& vecPosition, unsigned long u
 
         // Initialize the interpolation
         m_interp.pos.fLastAlpha = 0.0f;
-
-        OutputDebugString ( SString ( "", m_interp.pos.vecError.Length () ) );
     }
     else
     {
@@ -4764,6 +4829,27 @@ void CClientPed::PostWeaponFire ( void )
     m_ulLastTimeFired = CClientTime::GetTime ();
 }
 
+void CClientPed::SetBulletImpactData ( CClientEntity* pEntity, const CVector& vecHitPosition )
+{
+    m_bBulletImpactData = true;
+    m_pBulletImpactEntity = pEntity;
+    m_vecBulletImpactHit = vecHitPosition;
+}
+
+bool CClientPed::GetBulletImpactData ( CClientEntity** ppEntity, CVector* pvecHitPosition )
+{
+    if ( m_bBulletImpactData )
+    {
+        if ( ppEntity )
+            *ppEntity = m_pBulletImpactEntity;
+        if ( pvecHitPosition )
+            *pvecHitPosition = m_vecBulletImpactHit;
+        return true;
+    }
+    else
+        return false;
+}
+
 bool CClientPed::IsUsingGun ( void )
 {
     if ( m_pPlayerPed )
@@ -4788,21 +4874,28 @@ void CClientPed::SetHeadless ( bool bHeadless )
 }
 
 
-void CClientPed::SetFootBlood ( unsigned int uiFootBlood )
+void CClientPed::SetFootBloodEnabled ( bool bHasFootBlood )
 {
     if ( m_pPlayerPed )
     {
-     m_pPlayerPed->SetFootBlood(uiFootBlood);
+        if ( bHasFootBlood )
+        {
+            m_pPlayerPed->SetFootBlood( -1 );
+        }
+        else
+        {
+            m_pPlayerPed->SetFootBlood( 0 );
+        }
     }
 }
 
-unsigned int CClientPed::GetFootBlood ( void )
+bool CClientPed::IsFootBloodEnabled ( void )
 {
     if ( m_pPlayerPed )
     {
-        return m_pPlayerPed->GetFootBlood();
+        return ( m_pPlayerPed->GetFootBlood() > 0 );
     }
-    return 0;
+    return false;
 }
 
 
@@ -4999,4 +5092,121 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
         return g_pGame->GetAnimManager ()->RpAnimBlendClumpGetFirstAssociation ( m_pPlayerPed->GetRpClump () );
     }
     return NULL;
+}
+
+
+CSphere CClientPed::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
+    if ( pModelInfo )
+    {
+        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
+        if ( pBoundingBox )
+        {
+            sphere.vecPosition = pBoundingBox->vecBoundOffset;
+            sphere.fRadius = pBoundingBox->fRadius;
+        }
+    }
+    sphere.vecPosition += GetStreamPosition ();
+    return sphere;
+}
+
+
+// Currently, this should only be called for the local player
+void CClientPed::HandleWaitingForGroundToLoad ( void )
+{
+    // Check if near any MTA objects
+    bool bNearObject = false;
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    CClientEntityResult result;
+    GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecPosition + CVector ( 0, 0, -3 ), 5 ) );
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    {
+        if  ( (*it)->GetType () == CCLIENTOBJECT )
+        {
+            bNearObject = true;
+            break;
+        }
+    }
+
+    if ( !bNearObject )
+    {
+        // If not near any MTA objects, then don't bother waiting
+        SetFrozenWaitingForGroundToLoad ( false );
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
+        #endif 
+        return;
+    }
+
+    // Reset position
+    SetPosition ( m_matFrozen.vPos );
+    SetMatrix ( m_matFrozen );
+    SetMoveSpeed ( CVector () );
+
+    // Load load load
+    if ( GetModelInfo () )
+        GetModelInfo ()-> LoadAllRequestedModels ();
+
+    // Start out with a fairly big radius to check, and shrink it down over time
+    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
+
+    // Gather up some flags
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
+    bool bASync         = g_pGame->IsASyncLoadingEnabled ();
+    bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
+    bool bHasModel      = GetModelInfo () != NULL;
+    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension );
+    #else
+        SString strAround;
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension, &strAround );
+    #endif
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  fUseRadius:%2.1f"
+                                       ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
+                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance, fUseRadius );
+    #endif
+
+    // See if ground is ready
+    if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
+    {
+        m_fGroundCheckTolerance = 0.f;
+        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( "  FreezeUntilCollisionLoaded - wait" );
+        #endif
+    }
+    else
+    {
+        // Models should be loaded, but sometimes the collision is still not ready
+        // Do a ground distance check to make sure.
+        // Make the check tolerance larger with each passing frame
+        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
+        float fDist = GetDistanceFromGround ();
+        float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
+        if ( fUseDist > -0.2f && fUseDist < 1.5f )
+            SetFrozenWaitingForGroundToLoad ( false );
+
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
+        #endif
+
+        // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
+        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
+            SetFrozenWaitingForGroundToLoad ( false );
+    }
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        OutputDebugLine ( status );
+        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+
+        std::vector < SString > lineList;
+        strAround.Split ( "\n", lineList );
+        for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
+            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
+    #endif
 }

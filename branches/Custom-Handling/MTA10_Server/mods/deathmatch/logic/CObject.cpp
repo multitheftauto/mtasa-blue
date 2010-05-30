@@ -50,6 +50,7 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
 
     // Add us to the manager's list
     m_pObjectManager->AddToList ( this );
+    UpdateSpatialData ();
 }
 
 
@@ -126,6 +127,9 @@ bool CObject::ReadSpecialData ( void )
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
+    if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
+        m_bDoubleSided = false;
+
     // Success
     return true;
 }
@@ -158,6 +162,7 @@ const CVector& CObject::GetPosition ( void )
         m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
+    UpdateSpatialData ();
     // Finally, return it
     return m_vecPosition;
 }
@@ -177,6 +182,7 @@ void CObject::SetPosition ( const CVector& vecPosition )
         // Update our vectors
         m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
+        UpdateSpatialData ();
     }
 }
 
@@ -293,6 +299,7 @@ void CObject::StopMoving ( void )
         {
             m_vecPosition = m_moveData.vecStopPosition;
             m_vecRotation = m_moveData.vecStopRotation;
+            UpdateSpatialData ();
             return;
         }
 
@@ -320,6 +327,7 @@ void CObject::StopMoving ( void )
 
         // Update our stored rotation
         m_vecRotation = m_moveData.vecStartRotation + vecJourney;
+        UpdateSpatialData ();
     }
 }
 

@@ -181,6 +181,110 @@ double SharedUtil::GetSecondCount ( void )
 
 #endif
 
+
+//
+// Format a string
+//
+SString& SString::vFormat ( const char* szFormat, va_list vl )
+{
+#ifdef WIN32
+
+    va_list vlLocal;
+
+    // Calc size
+    va_copy ( vlLocal, vl );
+    int iRequiredCapacity = _vscprintf ( szFormat, vlLocal );
+
+    if ( iRequiredCapacity < 1 )
+    {
+        // Error or empty string
+        clear ();
+        return *this;
+    }
+
+    // Allocate buffer
+    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 1 ) );
+
+    // Try to format the string into the buffer.
+    va_copy ( vlLocal, vl );
+    int iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+
+    if ( iSize < 1 )
+    {
+        // Error
+        clear ();
+    }
+    else
+    {
+        // Copy from buffer
+        szDest [ iSize ] = '\0';
+        std::string::assign ( szDest );
+    }
+
+    // Delete buffer
+    free ( szDest );
+
+    // Done
+    return *this;
+
+#else
+
+    va_list vlLocal;
+
+    // Guess size
+    int iRequiredCapacity = 220;
+
+    // Allocate buffer
+    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 1 ) );
+
+    // Try to format the string into the buffer. If we will need
+    // more capacity it will return -1 in glibc 2.0 and a greater capacity than
+    // current in glibc 2.1, so we will resize. Else we've finished.
+    va_copy ( vlLocal, vl );
+    int iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+    if ( iSize == -1 )
+    {
+        // glibc 2.0 - Returns -1 when it hasn't got enough capacity.
+        // Duplicate the buffer size until we get enough capacity
+        do
+        {
+            iRequiredCapacity *= 2;
+            szDest = static_cast < char* > ( realloc ( szDest, iRequiredCapacity + 1 ) );
+            va_copy ( vlLocal, vl );
+            iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+        } while ( iSize == -1 );
+    }
+    else if ( iSize > iRequiredCapacity )
+    {
+        // glibc 2.1 - Returns the required capacity.
+        iRequiredCapacity = iSize + 1;
+        szDest = static_cast < char* > ( realloc ( szDest, iRequiredCapacity + 1 ) );
+
+        va_copy ( vlLocal, vl );
+        iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+    }
+
+    if ( iSize < 1 )
+    {
+        // Error or empty string
+        clear ();
+    }
+    else
+    {
+        // Copy from buffer
+        szDest [ iSize ] = '\0';
+        std::string::assign ( szDest );
+    }
+
+    // Delete buffer
+    free ( szDest );
+
+    // Done
+    return *this;
+#endif
+}
+
+
 //
 // Split into parts
 //
@@ -212,7 +316,6 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
     // Bad things will happen if szNew exists in szOld
-    int pos = std::string ( szOld ).find ( szNew );
     if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
         return *this;
 
@@ -268,7 +371,7 @@ SString SString::TrimEnd ( const char* szOld ) const
 SString SString::ToLower ( void ) const
 {
     SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
     return strResult;
 }
 
@@ -278,7 +381,7 @@ SString SString::ToLower ( void ) const
 SString SString::ToUpper ( void ) const
 {
     SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
     return strResult;
 }
 
@@ -441,4 +544,72 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
     }
 
     return strOut;
+}
+
+
+//
+// Get the local time in a string.
+// Set bDate to include the date, bMs to include milliseconds
+//
+SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
+{
+#ifdef _WIN32
+    SYSTEMTIME s;
+    GetLocalTime( &s );
+
+    SString strResult = SString ( "%02d:%02d:%02d", s.wHour, s.wMinute, s.wSecond );
+    if ( bMilliseconds )
+        strResult += SString ( ":%04d", s.wMilliseconds );
+    if ( bDate )
+        strResult = SString ( "%02d-%02d-%02d ", s.wYear, s.wMonth, s.wDay  ) + strResult;
+    return strResult;
+#else
+    // Other platforms here
+    return "HH:MM:SS";
+#endif
+}
+
+
+//
+// Output timestamped line into the debugger
+//
+void SharedUtil::OutputDebugLine ( const char* szMessage )
+{
+    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
+    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
+        strMessage += "\n";
+#ifdef _WIN32
+    OutputDebugString ( strMessage );
+#else
+    // Other platforms here
+#endif
+}
+
+
+//
+// Load binary data from a file into an array
+//
+bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
+{
+    buffer.clear ();
+    // Open
+    FILE* fh = fopen ( strFilename, "rb" );
+    if ( !fh )
+        return false;
+    // Get size
+    fseek ( fh, 0, SEEK_END );
+    int size = ftell ( fh );
+    rewind ( fh );
+
+    int bytesRead = 0;
+    if ( size > 0 && size < 1e9 )
+    {
+        // Allocate space
+        buffer.assign ( size, 0 );
+        // Read into buffer
+        bytesRead = fread ( &buffer.at ( 0 ), 1, size, fh );
+    }
+    // Close
+    fclose ( fh );
+    return bytesRead == size;
 }

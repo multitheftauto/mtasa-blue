@@ -406,6 +406,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     CLuaArguments Arguments;
     g_pClientGame->m_pLocalPlayer->CallEvent ( "onClientPlayerJoin", Arguments, true );
 
+    g_pCore->UpdateRecentlyPlayed();
     // Make sure that the SA data files weren't tampered with
     g_pClientGame->VerifySADataFiles ( iEnableClientChecks );
 }
@@ -2283,6 +2284,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         else
                         {
                             RaiseFatalError ( 9 );
+                            return;
+                        }
+
+                        if ( bitStream.Version () >= 0x0c )
+                        {
+                            if ( bitStream.ReadBit () )
+                                pObject->SetDoubleSided ( true );
                         }
 
                         bool bIsMoving;
@@ -3869,8 +3877,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         char* szChunkData = NULL;
         // Resource Chunk Sub Type
         unsigned char ucChunkSubType;
-        // Resource Chunk CRC
-        unsigned long ulChunkDataCRC;
+        // Resource Chunk checksum
+        CChecksum chunkChecksum;
         // Resource Chunk File Size
         double dChunkDataSize;
 
@@ -3903,7 +3911,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                     szChunkData [ ucChunkSize ] = NULL;
 
                     bitStream.Read ( ucChunkSubType );
-                    bitStream.Read ( ulChunkDataCRC );
+                    bitStream.Read ( chunkChecksum.ulCRC );
+                    if ( bitStream.Version () >= 0x08 )
+                        bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
                     bitStream.Read ( dChunkDataSize );
 
                     // Don't bother with empty files
@@ -3914,15 +3924,15 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         switch ( ucChunkSubType )
                         {
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, ulChunkDataCRC );
+                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum );
 
                                 break;
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, ulChunkDataCRC );
+                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
 
                                 break;
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                pDownloadableResource = pResource->AddConfigFile ( szChunkData, ulChunkDataCRC );
+                                pDownloadableResource = pResource->AddConfigFile ( szChunkData, chunkChecksum );
 
                                 break;
                             default:
@@ -3933,8 +3943,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         // Is it a valid downloadable resource?
                         if ( pDownloadableResource )
                         {
-                            // Does the Client and Server CRC Match?
-                            if ( !pDownloadableResource->DoesClientAndServerCRCMatch () )
+                            // Does the Client and Server checksum Match?
+                            if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
                             {
                                 // Make sure the directory exists
                                 const char* szTempName = pDownloadableResource->GetName ();

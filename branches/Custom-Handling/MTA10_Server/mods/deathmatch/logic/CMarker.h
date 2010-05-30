@@ -70,6 +70,8 @@ public:
 
     inline CColShape*       GetColShape             ( void )    { return m_pCollision; }
 
+    virtual CSphere         GetWorldBoundingSphere  ( void );
+
 private:
     void                    Callback_OnCollision    ( CColShape& Shape, CElement& Element );
     void                    Callback_OnLeave        ( CColShape& Shape, CElement& Element );

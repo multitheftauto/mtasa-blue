@@ -20,8 +20,8 @@ class CResourceFile :
 {
 public:
 
-    CResourceFile ( eResourceType resourceType, const char * szShortName, const char * szResourceFileName, unsigned long ulServerCRC ) :
-        CDownloadableResource ( resourceType, szResourceFileName, szShortName, ulServerCRC, true )
+    CResourceFile ( eResourceType resourceType, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum ) :
+        CDownloadableResource ( resourceType, szResourceFileName, szShortName, serverChecksum, true )
     {
     };
 };

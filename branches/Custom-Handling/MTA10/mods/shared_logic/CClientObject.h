@@ -38,6 +38,7 @@ public:
 
     void                            GetPosition             ( CVector& vecPosition ) const;
     void                            SetPosition             ( const CVector& vecPosition );
+    virtual CSphere                 GetWorldBoundingSphere  ( void );
 
     void                            AttachTo                ( CClientEntity* pEntity );
 

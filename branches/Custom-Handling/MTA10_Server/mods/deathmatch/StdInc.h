@@ -31,10 +31,15 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include "CVector.h"
+#include "CSphere.h"
+#include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
 #include "SString.h"
+#include "utils/zip/crc32.h"
+#include "CMD5Hasher.h"
+#include "CChecksum.h"
 
 // Packet includes
 #include "net/Packets.h"
@@ -165,7 +170,6 @@
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
 #include "CLogger.h"
-#include "CMD5Hasher.h"
 #include "CMainConfig.h"
 #include "CMapEvent.h"
 #include "CMapEventManager.h"
@@ -211,6 +215,7 @@
 #include "CScriptFile.h"
 #include "CSerialManager.h"
 #include "CSettings.h"
+#include "CSpatialDatabase.h"
 #include "CTeam.h"
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
@@ -247,7 +252,6 @@
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
 #include "utils/base64.h"
-#include "utils/zip/crc32.h"
 
 // Module includes
 #include "CServer.h"

@@ -178,14 +178,9 @@ bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel, const char* szReaso
 }
 
 
-bool CStaticFunctionDefinitions::GetCancelReason ( char* szReason )
+const char* CStaticFunctionDefinitions::GetCancelReason ( )
 {
-    szReason = (char*)m_pEvents->GetLastError();
-    if ( szReason )
-    {
-        return true;
-    }
-    return false;
+    return m_pEvents->GetLastError();
 }
 
 
@@ -706,6 +701,15 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CElement* pElement, unsigned 
 }
 
 
+bool CStaticFunctionDefinitions::IsElementDoubleSided ( CElement* pElement, bool& bDoubleSided )
+{
+    assert ( pElement );
+
+    bDoubleSided = pElement->IsDoubleSided ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementHealth ( CElement* pElement, float& fHealth )
 {
     assert ( pElement );
@@ -1109,11 +1113,6 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
 
             break;
         }
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast < CObject* > ( pElement );
-            //pObject->SetVelocity ( vecVelocity );
-        }
         default: return false;
     }
 
@@ -1338,6 +1337,22 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
     BitStream.pBitStream->Write ( pElement->GetID () );
     BitStream.pBitStream->Write ( ucAlpha );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, bool bDoubleSided )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetElementDoubleSided ( *iter, bDoubleSided );
+
+    pElement->SetDoubleSided ( bDoubleSided );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteBit ( bDoubleSided );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
 
     return true;
 }
@@ -1577,6 +1592,14 @@ CAccount* CStaticFunctionDefinitions::GetPlayerAccount ( CElement* pElement )
         return pClient->GetAccount ();
     }
     return NULL;
+}
+
+
+const SString& CStaticFunctionDefinitions::GetPlayerVersion ( CPlayer* pPlayer )
+{
+    assert ( pPlayer );
+
+    return pPlayer->GetPlayerVersion ();
 }
 
 
@@ -3465,6 +3488,11 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON, *BitStream.pBitStream ) );
 
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                pPed->SetWeaponType ( 0, ucWeaponSlot );
+                pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( 0, ucWeaponSlot );
+
                 return true;
             }
         }
@@ -3487,6 +3515,13 @@ bool CStaticFunctionDefinitions::TakeAllWeapons ( CElement* pElement )
             CBitStream BitStream;
             BitStream.pBitStream->WriteCompressed ( pPed->GetID () );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_ALL_WEAPONS, *BitStream.pBitStream ) );
+
+            for ( unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ ucWeaponSlot )
+            {
+                pPed->SetWeaponType ( 0, ucWeaponSlot );
+                pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( 0, ucWeaponSlot );
+            }
 
             return true;
         }
@@ -3519,6 +3554,14 @@ bool CStaticFunctionDefinitions::GiveWeaponAmmo ( CElement* pElement, unsigned c
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( GIVE_WEAPON_AMMO, *BitStream.pBitStream ) );
 
+            unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+            unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+            if ( (unsigned int)usTotalAmmo + usAmmo > 0xFFFF )
+                usTotalAmmo = 0xFFFF;
+            else
+                usTotalAmmo += usAmmo;
+            pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
+
             return true;
         }
     }
@@ -3549,6 +3592,14 @@ bool CStaticFunctionDefinitions::TakeWeaponAmmo ( CElement* pElement, unsigned c
             BitStream.pBitStream->Write ( &ammo );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( TAKE_WEAPON_AMMO, *BitStream.pBitStream ) );
+
+            unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+            unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
+            if ( (int)usTotalAmmo - usAmmo < 0 )
+                usTotalAmmo = 0;
+            else
+                usTotalAmmo -= usAmmo;
+            pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
 
             return true;
         }
@@ -3584,6 +3635,10 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
                 BitStream.pBitStream->Write ( &ammo );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_AMMO, *BitStream.pBitStream ) );
+
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                pPed->SetWeaponAmmoInClip ( usAmmoInClip, ucWeaponSlot );
+                pPed->SetWeaponTotalAmmo ( usAmmo, ucWeaponSlot );
 
                 return true;
             }
@@ -7519,7 +7574,9 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 {
     // Verify it's within the max valid weather id
+#if MAX_VALID_WEATHER < 255
     if ( ucWeather <= MAX_VALID_WEATHER )
+#endif
     {
         // Set the weather
         m_pMapManager->GetWeather ()->SetWeather ( ucWeather );
@@ -7539,7 +7596,9 @@ bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 bool CStaticFunctionDefinitions::SetWeatherBlended ( unsigned char ucWeather )
 {
     // Verify it's within the max valid weather id
+#if MAX_VALID_WEATHER < 255
     if ( ucWeather <= MAX_VALID_WEATHER )
+#endif
     {
         CBlendedWeather* pWeather = m_pMapManager->GetWeather ();
 
@@ -7654,7 +7713,7 @@ bool CStaticFunctionDefinitions::SetMinuteDuration ( unsigned long ulDuration )
 
 bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool bIsOpen )
 {
-    if ( ucGarageID >= 0 && ucGarageID < MAX_GARAGES )
+    if ( ucGarageID < MAX_GARAGES )
     {
         bool* pbGarageStates = g_pGame->GetGarageStates();
         pbGarageStates [ ucGarageID ] = bIsOpen;
@@ -7966,7 +8025,7 @@ CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, c
     assert ( pAccount );
     assert ( szKey );
 
-    return pAccount->GetData ( szKey );
+    return m_pAccountManager->GetAccountData ( pAccount, szKey );
 }
 
 
@@ -7980,6 +8039,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const cha
     {
         CAccount* pAccount = new CAccount ( m_pAccountManager, true, szName );
         pAccount->SetPassword ( szPassword );
+        g_pGame->GetAccountManager ()->Register( pAccount );
         return pAccount;
     }
     return NULL;
@@ -8001,14 +8061,17 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
     lua_State* pLua = pLuaMain->GetVM();
     list < CAccount* > ::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    unsigned int uiGuest = HashString ( "guest" );
-    unsigned int uiHTTPGuest = HashString ( "http_guest" );
-    unsigned int uiConsole = HashString ( "Console" );
+    const char* szGuest =  "guest";
+    const char* szHTTPGuest = "http_guest";
+    const char* szConsole = "Console";
+    unsigned int uiGuest = HashString ( szGuest );
+    unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
+    unsigned int uiConsole = HashString ( szConsole );
     for ( ; iter != m_pAccountManager->IterEnd(); iter++ )
     {
-        if ( ( (*iter)->GetNameHash() != uiGuest ) &&
-             ( (*iter)->GetNameHash() != uiHTTPGuest ) &&
-             ( (*iter)->GetNameHash() != uiConsole ) )
+        if ( ( (*iter)->GetNameHash() != uiGuest || (*iter)->GetName() != szGuest ) &&
+             ( (*iter)->GetNameHash() != uiHTTPGuest || (*iter)->GetName() != szHTTPGuest ) &&
+             ( (*iter)->GetNameHash() != uiConsole || (*iter)->GetName() != szConsole ) )
         {
             lua_pushnumber ( pLua, ++uiIndex );
             lua_pushaccount ( pLua, *iter );
@@ -8037,6 +8100,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 
             pClient->SendEcho ( szMessage );
         }
+        g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
         delete pAccount;
         return true;
     }
@@ -8068,20 +8132,9 @@ bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKe
     assert ( pAccount );
     assert ( szKey );
 
-    if ( pArgument->GetType () != LUA_TNONE )
-    {
-        if ( pArgument->GetType () == LUA_TBOOLEAN && !pArgument->GetBoolean () )
-        {
-            pAccount->RemoveData ( szKey );
-        }
-        else
-        {
-            pAccount->SetData ( szKey, pArgument );
-        }
-        return true;
-    }
-
-    return false;
+    SString strArgumentAsString;
+    pArgument->GetAsString ( strArgumentAsString );
+    return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
 }
 
 
@@ -8090,7 +8143,7 @@ bool CStaticFunctionDefinitions::CopyAccountData ( CAccount* pAccount, CAccount*
     assert ( pAccount );
     assert ( pFromAccount );
 
-    pAccount->CopyData ( pFromAccount );
+    m_pAccountManager->CopyAccountData ( pFromAccount, pAccount );
     return true;
 }
 
@@ -8724,9 +8777,11 @@ const char* CStaticFunctionDefinitions::GetVersionName ()
     return MTA_DM_FULL_STRING;
 }
 
-const char* CStaticFunctionDefinitions::GetVersionBuildType ()
+SString CStaticFunctionDefinitions::GetVersionBuildType ()
 {
-    return MTA_DM_BUILDTYPE;
+    SString strResult = MTA_DM_BUILDTYPE;
+    strResult[0] = toupper ( strResult[0] );
+    return strResult;
 }
 
 unsigned long CStaticFunctionDefinitions::GetNetcodeVersion ()
@@ -8743,3 +8798,16 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag ()
 {
     return MTA_DM_BUILDTAG_LONG;
 }
+
+SString CStaticFunctionDefinitions::GetVersionSortable ()
+{
+    return SString ( "%d.%d.%d-%d.%05d.%d"
+                            ,MTASA_VERSION_MAJOR
+                            ,MTASA_VERSION_MINOR
+                            ,MTASA_VERSION_MAINTENANCE
+                            ,MTASA_VERSION_TYPE
+                            ,MTASA_VERSION_BUILD
+                            ,0
+                            );
+}
+

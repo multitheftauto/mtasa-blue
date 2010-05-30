@@ -698,6 +698,9 @@ void CLocalGUI::UpdateCursor ( void )
             CSetCursorPosHook::GetSingleton ( ).EnableSetCursorPos ();
             pGUI->SetCursorEnabled ( false );
 
+            // Clear any held system keys
+            pGUI->ClearSystemKeys ();
+
             m_bGUIHasInput = false;
         }
     }

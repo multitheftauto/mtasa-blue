@@ -53,6 +53,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementZoneName", CLuaElementDefs::getElementZoneName );
     CLuaCFunctions::AddFunction ( "getElementColShape", CLuaElementDefs::getElementColShape );
     CLuaCFunctions::AddFunction ( "getElementAlpha", CLuaElementDefs::getElementAlpha );
+    CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaElementDefs::isElementDoubleSided );
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
@@ -82,6 +83,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementInterior", CLuaElementDefs::setElementInterior );
     CLuaCFunctions::AddFunction ( "setElementDimension", CLuaElementDefs::setElementDimension );
     CLuaCFunctions::AddFunction ( "setElementAlpha", CLuaElementDefs::setElementAlpha );
+    CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaElementDefs::setElementDoubleSided );
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
     CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
@@ -1043,6 +1045,31 @@ int CLuaElementDefs::getElementAlpha ( lua_State* luaVM )
 }
 
 
+int CLuaElementDefs::isElementDoubleSided ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            bool bDoubleSided;
+            if ( CStaticFunctionDefinitions::IsElementDoubleSided ( pElement, bDoubleSided ) )
+            {
+                lua_pushboolean ( luaVM, bDoubleSided );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementDoubleSided", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementDoubleSided" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaElementDefs::getElementHealth ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -1687,6 +1714,33 @@ int CLuaElementDefs::setElementAlpha ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementAlpha" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::setElementDoubleSided ( lua_State* luaVM )
+{
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         iArgument2 == LUA_TBOOLEAN )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            bool bDoubleSided = lua_toboolean ( luaVM, 2 ) ? true : false;
+            if ( CStaticFunctionDefinitions::SetElementDoubleSided ( pElement, bDoubleSided ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDoubleSided", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

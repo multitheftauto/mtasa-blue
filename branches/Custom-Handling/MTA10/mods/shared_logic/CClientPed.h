@@ -120,6 +120,7 @@ public:
 
     bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     bool                        SetMatrix                   ( const CMatrix& Matrix );
+    virtual CSphere             GetWorldBoundingSphere      ( void );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }
@@ -368,9 +369,11 @@ public:
 
     inline bool                 IsFrozen                ( void ) const                                  { return m_bFrozen; }
     void                        SetFrozen               ( bool bFrozen );
+    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
 
-    void                        SetFootBlood            ( unsigned int uiFootBlood );
-    unsigned int                GetFootBlood            ( void );
+    bool                        IsFootBloodEnabled      ( void );
+    void                        SetFootBloodEnabled     ( bool bHasFootBlood );
 
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
@@ -384,6 +387,9 @@ public:
     void                        SetSpeechEnabled        ( bool bEnabled );
 
     void                        PostWeaponFire          ( void );
+    void                        SetBulletImpactData     ( CClientEntity* pVictim, const CVector& vecHitPosition );
+    bool                        GetBulletImpactData     ( CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0 );
+    void                        ClearBulletImpactData   ( void ) { m_bBulletImpactData = false; }
 
     bool                        CanReloadWeapon         ( void );
     bool                        ReloadWeapon            ( void );
@@ -424,6 +430,7 @@ protected:
     void                        InternalRemoveFromVehicle   ( CVehicle* pGameVehicle );
 
     bool                        PerformChecks               ( void );
+    void                        HandleWaitingForGroundToLoad ( void );
 
     // Used to start and stop radio for local player
     void                        StartRadio                  ( void );
@@ -519,7 +526,6 @@ public:
     float                       m_fTargetRotation;
     int                         m_iVehicleInOutState;
     bool                        m_bRecreatingModel;
-    bool                        m_bPerformSpawnLoadingChecks;
     CClientEntity *             m_pCurrentContactEntity;
     bool                        m_bSunbathing;
     CClientPad                  m_Pad;
@@ -532,11 +538,19 @@ public:
     bool                        m_bUpdatePositionAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
+    bool                        m_bFrozenWaitingForGroundToLoad;
+    float                       m_fGroundCheckTolerance;
+    float                       m_fObjectsAroundTolerance;
+    int                         m_iLoadAllModelsCounter;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
     float                       m_fLighting;
+
+    bool                        m_bBulletImpactData;
+    CClientEntity*              m_pBulletImpactEntity;
+    CVector                     m_vecBulletImpactHit;
 
     // Time dependent interpolation
     struct

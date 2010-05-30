@@ -43,6 +43,8 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
     m_bIsTypeRandom = false;
     m_bIsWeaponTypeRandom = false;
     m_bIsHealthRandom = false;
+
+    UpdateSpatialData ();
 }
 
 
@@ -256,6 +258,7 @@ void CPickup::SetPosition ( const CVector& vecPosition )
     m_vecPosition = vecPosition;
     if ( m_pCollision )
         m_pCollision->SetPosition ( vecPosition );
+    UpdateSpatialData ();
 }
 
 

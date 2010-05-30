@@ -92,6 +92,22 @@ namespace SharedUtil
     //
     double GetSecondCount ( void );
 
+    //
+    // Get the local time in a string.
+    // Set bDate to include the date, bMs to include milliseconds
+    //
+    SString GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
+
+    //
+    // Output timestamped line into the debugger
+    //
+    void OutputDebugLine ( const char* szMessage );
+
+    //
+    // Load binary data from a file into an array
+    //
+    bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
+
 
     //
     // Some templates
@@ -356,20 +372,42 @@ namespace SharedUtil
     //
     // ID 'stack'
     //
-    template < typename T, unsigned long MAX_STACK_SIZE, T INVALID_STACK_ID >
+    // Note: IDs run from 1 to Capacity
+    //
+    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, T INVALID_STACK_ID >
     class CStack
     {
     public:
-        inline CStack ( void )
+        CStack ( void )
         {
-            // Initialize with valid ID's
-            for ( T i = 0; i < MAX_STACK_SIZE - 1; ++i )
-            {
-                m_Queue.push_back( MAX_STACK_SIZE - 1 - i );
-            }
+            m_ulCapacity = 0;
+            ExpandBy ( INITIAL_MAX_STACK_SIZE - 1 );
         }
 
-        inline T Pop ( void )
+        unsigned long GetCapacity ( void ) const
+        {
+            return m_ulCapacity;
+        }
+
+        unsigned long GetUnusedAmount ( void ) const
+        {
+            return m_Queue.size ();
+        }
+
+        void ExpandBy ( unsigned long ulAmount )
+        {
+            const unsigned long ulOldSize = m_ulCapacity;
+            const unsigned long ulNewSize = m_ulCapacity + ulAmount;
+
+            // Add ID's for new items
+            for ( T ID = ulOldSize + 1; ID <= ulNewSize; ++ID )
+            {
+                m_Queue.push_front( ID );
+            }
+            m_ulCapacity = ulNewSize;
+        }
+
+        T Pop ( void )
         {
             // Got any items? Pop from the back
             if ( m_Queue.size () > 0 )
@@ -383,16 +421,45 @@ namespace SharedUtil
             return INVALID_STACK_ID;
         }
 
-        inline void Push ( T ID )
+        void Push ( T ID )
         {
-            assert ( m_Queue.size () < MAX_STACK_SIZE - 1 );
+            assert ( m_Queue.size () < m_ulCapacity );
             assert ( ID != INVALID_STACK_ID );
             // Push to the front
             return m_Queue.push_front ( ID );
         }
 
     private:
+        unsigned long       m_ulCapacity;
         std::deque < T >    m_Queue;
+    };
+
+
+    //
+    // Fixed sized string buffer
+    //
+    template < int MAX_LENGTH >
+    class CStaticString
+    {
+        char szData [ MAX_LENGTH + 1 ];
+    public:
+        CStaticString ( void )
+        {
+            szData[0] = 0;
+        }
+
+        // In  
+        CStaticString& operator= ( const char* szOther )
+        {
+            STRNCPY( szData, szOther, MAX_LENGTH + 1 );
+            return *this;
+        }
+
+        // Out  
+        operator const char*() const
+        {
+            return szData;
+        }
     };
 
 

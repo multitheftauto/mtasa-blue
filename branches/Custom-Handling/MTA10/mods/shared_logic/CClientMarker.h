@@ -81,6 +81,8 @@ public:
     void                        Callback_OnCollision    ( CClientColShape& Shape, CClientEntity& Entity );
     void                        Callback_OnLeave        ( CClientColShape& Shape, CClientEntity& Entity );
 
+    virtual CSphere             GetWorldBoundingSphere  ( void );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );

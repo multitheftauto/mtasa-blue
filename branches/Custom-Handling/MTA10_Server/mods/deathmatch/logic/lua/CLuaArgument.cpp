@@ -455,30 +455,28 @@ CElement* CLuaArgument::GetElement ( void ) const
 }
 
 
-bool CLuaArgument::GetAsString ( char * szBuffer, unsigned int uiLength )
+bool CLuaArgument::GetAsString ( SString& strBuffer )
 {
-    assert ( szBuffer );
-    assert ( uiLength );
     switch ( m_iType )
     {
         case LUA_TNIL:
-            strncpy ( szBuffer, "nil", uiLength );
+            strBuffer = "nil";
             break;
         case LUA_TBOOLEAN:
-            if ( m_bBoolean ) strncpy ( szBuffer, "true", uiLength );
-            else strncpy ( szBuffer, "false", uiLength );
+            if ( m_bBoolean ) strBuffer = "true";
+            else strBuffer = "false";
             break;
         case LUA_TTABLE:
             return false;
             break;
         case LUA_TSTRING:
-            strncpy ( szBuffer, m_strString.c_str (), uiLength );
+            strBuffer = m_strString;
             break;
         case LUA_TLIGHTUSERDATA:
             return false;
             break;
         case LUA_TNUMBER:
-            _snprintf ( szBuffer, uiLength, "%d", ( int ) m_Number );
+            strBuffer = SString ( "%d", ( int ) m_Number );
             break;
         default: return false; break;
     }

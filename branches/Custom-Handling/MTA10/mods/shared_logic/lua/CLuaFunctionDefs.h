@@ -124,6 +124,7 @@ public:
     LUA_DECLARE ( IsElementInWater );
     LUA_DECLARE ( IsElementSyncer );
     LUA_DECLARE ( IsElementCollidableWith );
+    LUA_DECLARE ( IsElementDoubleSided );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -145,6 +146,7 @@ public:
     LUA_DECLARE ( SetElementStreamable );
     LUA_DECLARE ( SetElementModel );
     LUA_DECLARE ( SetElementCollidableWith );
+    LUA_DECLARE ( SetElementDoubleSided );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );
@@ -211,7 +213,7 @@ public:
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
     LUA_DECLARE ( IsPedFrozen );
-    LUA_DECLARE ( GetPedFootBlood );
+    LUA_DECLARE ( IsPedFootBloodEnabled );
     LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
 
@@ -228,7 +230,7 @@ public:
     LUA_DECLARE ( SetPedLookAt );
     LUA_DECLARE ( SetPedHeadless );
     LUA_DECLARE ( SetPedFrozen );
-    LUA_DECLARE ( SetPedFootBlood );
+    LUA_DECLARE ( SetPedFootBloodEnabled );
     LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
@@ -285,6 +287,7 @@ public:
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
+    LUA_DECLARE ( GetVehicleCurrentGear );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandlingData );
 #endif

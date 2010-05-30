@@ -55,6 +55,7 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface *     GetInterface            ( void ) = 0;
 
+    virtual DWORD           GetModel                () = 0;
     virtual BOOL            IsBoat                  () = 0;
     virtual BOOL            IsCar                   () = 0;
     virtual BOOL            IsTrain                 () = 0;
@@ -70,7 +71,7 @@ public:
 
     virtual char            * GetNameIfVehicle      () = 0;
 
-    virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false ) = 0;
+    virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false ) = 0;
     virtual VOID            Remove                  () = 0;
     virtual VOID            LoadAllRequestedModels  () = 0;
     virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
@@ -83,7 +84,7 @@ public:
     virtual void            SetLODDistance          ( float fDistance ) = 0;
     virtual void            RestreamIPL             () = 0;
 
-    virtual void            AddRef                  ( bool bWaitForLoad ) = 0;
+    virtual void            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false ) = 0;
     virtual void            RemoveRef               () = 0;
     virtual int             GetRefCount             () = 0;
 

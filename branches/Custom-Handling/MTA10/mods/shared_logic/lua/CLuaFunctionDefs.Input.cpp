@@ -422,7 +422,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
                             CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
                             if ( !bCheckHitState || pBind->bHitState == bHitState )
                             {
-                                if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
+                                if ( strcmp ( szKey, pBind->boundControl->szControl ) == 0 )
                                 {
                                     lua_pushnumber ( luaVM, ++uiIndex );
                                     lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );

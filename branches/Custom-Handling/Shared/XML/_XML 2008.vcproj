@@ -329,7 +329,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y xmll.dll &quot;..\..\output\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;..\..\output\server\&quot;"
+				CommandLine="xcopy /y xmll.dll &quot;..\..\output\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;..\..\output\MTA San Andreas\server\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

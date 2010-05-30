@@ -44,6 +44,7 @@ const char szPreloadedScript [] = ""\
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
     "        end\n" \
     "end\n" \
+    "addEventHandler(\"onResourceStop\", root, function(res) exports[getResourceFromName(res)] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,

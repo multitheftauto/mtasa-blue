@@ -17,6 +17,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.hpp"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -37,6 +38,9 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
+    m_bASyncLoading = false;
+    m_bASyncLoadingSuspended = false;
+
     // Unprotect all of the GTASA code at once and leave it that way
     DWORD oldProt;
     VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
@@ -137,6 +141,7 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_FULLWEAPONAIMING ] = new SCheatSA((BYTE *)VAR_FullWeaponAiming, false);
     m_Cheats [ CHEAT_INFINITEHEALTH   ] = new SCheatSA((BYTE *)VAR_InfiniteHealth, false);
     m_Cheats [ CHEAT_NEVERWANTED      ] = new SCheatSA((BYTE *)VAR_NeverWanted, false);
+    m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
 }
 
@@ -575,4 +580,21 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x6EAEF8, "DATA\\water.dat" ) &&
            !strcmp ( *(char **)0x6EAEC3, "DATA\\water1.dat" ) &&
            !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
+}
+
+void CGameSA::SetASyncLoadingEnabled ( bool bEnabled )
+{
+    m_bASyncLoading = bEnabled;
+}
+
+void CGameSA::SuspendASyncLoading ( bool bSuspend )
+{
+    m_bASyncLoadingSuspended = bSuspend;
+}
+
+bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
+{
+    if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
+        return false;
+    return true;
 }

@@ -36,6 +36,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_usDimension = 0;
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
+    m_bDoubleSided = false;
     m_bMapCreated = false;
 
     // Store the line
@@ -116,6 +117,9 @@ CElement::~CElement ( void )
         if ( pPed->m_pContactElement == this )
             pPed->m_pContactElement = NULL;
     }
+
+    // Remove from spatial database
+    GetSpatialDatabase ()->RemoveEntity ( this );
 
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
@@ -1352,3 +1356,24 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
 
 
 #endif
+
+
+void CElement::SetPosition ( const CVector& vecPosition )
+{
+    m_vecLastPosition = m_vecPosition;
+    m_vecPosition = vecPosition;
+    UpdateSpatialData ();
+};
+
+
+CSphere CElement::GetWorldBoundingSphere ( void )
+{
+    // Default to a point around the entity's position
+    return CSphere ( GetPosition (), 0.f );
+}
+
+
+void CElement::UpdateSpatialData ( void )
+{
+    GetSpatialDatabase ()->UpdateEntity ( this );
+}

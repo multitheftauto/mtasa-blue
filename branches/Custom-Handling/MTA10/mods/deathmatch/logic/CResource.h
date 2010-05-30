@@ -57,9 +57,9 @@ public:
     bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
     bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
 
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, unsigned long ulServerCRC );
+    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
 
-    CDownloadableResource*  AddConfigFile   ( char *szFileName, unsigned long ulServerCRC );
+    CDownloadableResource*  AddConfigFile   ( char *szFileName, CChecksum serverChecksum );
 
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }

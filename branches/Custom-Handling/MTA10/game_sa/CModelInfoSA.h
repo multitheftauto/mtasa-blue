@@ -238,6 +238,8 @@ public:
     CBaseModelInfoSAInterface *     GetInterface             ( void )              { return m_pInterface; }
     CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
+    DWORD                           GetModel                ( void )               { return m_dwModelID; }
+
     BOOL                            IsBoat                  ( void );
     BOOL                            IsCar                   ( void );
     BOOL                            IsTrain                 ( void );
@@ -250,10 +252,11 @@ public:
     BOOL                            IsBmx                   ( void );
     BOOL                            IsTrailer               ( void );
     BOOL                            IsVehicle               ( void );
+    BOOL                            IsUpgrade               ( void );
 
     char *                          GetNameIfVehicle        ( void );
 
-    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false );
+    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
     VOID                            Remove                  ( void );
     VOID                            LoadAllRequestedModels  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
@@ -267,7 +270,7 @@ public:
     void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
 
-    void                            AddRef                  ( bool bWaitForLoad );
+    void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( void );
 

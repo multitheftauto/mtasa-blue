@@ -141,8 +141,6 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             // The same model?
             if ( pInfo == pEntry->pModel )
             {
-                pInfo->MakeCustomModel ();
-
                 // He has to wait more for it
                 return false;
             }
@@ -157,6 +155,8 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                     // Delete it, remove the it from the list and return true.
                     delete pEntry;
                     m_Requests.erase ( iter );
+
+                    pInfo->MakeCustomModel ();
                     return true;
                 }
                 else
@@ -184,8 +184,13 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                 return true;
             }
 
+            // Boost loading priority if the object is close to the local player
+            bool bHighPriority = false;
+            if ( pRequester->GetDistanceBetweenBoundingSpheres ( g_pClientGame->GetLocalPlayer () ) < 20 )
+                bHighPriority = true;
+
             // Request it
-            pInfo->AddRef ( false );
+            pInfo->AddRef ( false, bHighPriority );
 
             // Add him to the list over models we're waiting for.
             pEntry = new SClientModelRequest;
@@ -294,7 +299,10 @@ void CClientModelRequestManager::DoPulse ( void )
                 {
                     // Request it again. Don't add reference, or we screw up the
                     // reference count.
-                    pEntry->pModel->Request ( TRUE, FALSE );
+                    if ( g_pGame->IsASyncLoadingEnabled () )
+                        pEntry->pModel->Request ( FALSE, FALSE );
+                    else
+                        pEntry->pModel->Request ( TRUE, FALSE );
 
                     // Remember now as the time we requested it.
                     pEntry->dwTimeRequested = dwTimeNow;

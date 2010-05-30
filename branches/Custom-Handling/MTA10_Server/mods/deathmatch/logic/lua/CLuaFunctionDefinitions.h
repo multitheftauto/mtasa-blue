@@ -95,6 +95,7 @@ public:
     static int      GetPlayerName                       ( lua_State* luaVM );
     static int      GetPlayerIP                         ( lua_State* luaVM );
     static int      GetPlayerAccount                    ( lua_State* luaVM );
+    static int      GetPlayerVersion                    ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPlayerMoney                      ( lua_State* luaVM );

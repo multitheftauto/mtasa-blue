@@ -18,7 +18,7 @@ CColCuboid::CColCuboid ( CColManager* pManager, CElement* pParent, const CVector
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
 
-   SetTypeName ( "colcuboid" );
+    UpdateSpatialData ();
 }
 
 
@@ -51,4 +51,13 @@ bool CColCuboid::ReadSpecialData ( void )
     m_vecSize.fY = fDepth;
     m_vecSize.fZ = fHeight;
     return true;
+}
+
+
+CSphere CColCuboid::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition  = m_vecPosition + m_vecSize * 0.5f;
+    sphere.fRadius      = Max ( Max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f;
+    return sphere;
 }

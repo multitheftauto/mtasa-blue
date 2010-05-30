@@ -16,8 +16,9 @@
 CRegistry::CRegistry ( const std::string& strFileName )
 {
     m_strLastError = "";
-
-    m_bMutexLocked = false;
+    m_db = NULL;
+    m_bOpened = false;
+    m_iTransactionCount = 0;
 
     Load ( strFileName );
 }
@@ -76,7 +77,7 @@ bool CRegistry::Update ( const std::string& strTable, const std::string& strSet,
 }
 
 
-void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition )
+void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition, bool bSilent )
 {
     if ( m_bOpened == false ) {
         m_strLastError = "SQLite3 was not opened, cannot create table!";
@@ -84,8 +85,9 @@ void CRegistry::CreateTable ( const std::string& strTable, const std::string& st
     }
 
     std::string strQuery = "CREATE TABLE IF NOT EXISTS " + strTable + " ( " + strDefinition + " )";
+    if ( !bSilent )
+        CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
 
-    CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
     sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
 }
 
@@ -197,7 +199,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
                     else
                     {
                         cell.pVal = new unsigned char [ cell.nLength ];
-                        memcpy ( cell.pVal, (const void *)sqlite3_column_blob, cell.nLength );
+                        memcpy ( cell.pVal, sqlite3_column_blob ( pStmt, i ), cell.nLength );
                     }
                     break;
                 default:
@@ -301,3 +303,111 @@ bool CRegistry::Select ( const std::string& strColumns, const std::string& strTa
     // Execute the query
     return QueryInternal ( strQuery.c_str (), pResult );
 }
+
+void CRegistry::BeginTransaction ( void )
+{
+    if ( m_iTransactionCount++ == 0 )
+    {
+        Query ( "BEGIN TRANSACTION" );
+    }
+}
+
+
+void CRegistry::EndTransaction ( bool bEndAllOutstanding )
+{
+    if ( m_iTransactionCount )
+    {
+        if ( bEndAllOutstanding )
+            m_iTransactionCount = 1;
+
+        if ( --m_iTransactionCount == 0 )
+        {
+            Query ( "END TRANSACTION" );
+        }
+    }
+}
+
+
+bool CRegistry::Query ( const char* szQuery, ... )
+{
+    CRegistryResult dummy;
+    va_list vl;
+    va_start ( vl, szQuery );
+    return Query ( &dummy, szQuery, vl );
+}
+
+bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+    return Query ( pResult, szQuery, vl );
+}
+
+bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list vl )
+{
+    if ( m_bOpened == false ) {
+        m_strLastError = "SQLite3 was not opened, cannot perform query!";
+        return false;
+    }
+
+    SString strParsedQuery;
+    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    {
+        if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
+        {
+            strParsedQuery += szQuery[i];
+        }
+        else
+        {
+            void* ptype = va_arg( vl, void* );
+            switch ( (int)ptype )
+            {
+                case SQLITE_INTEGER:
+                {
+                    int iValue = va_arg( vl, int );
+                    strParsedQuery += SString ( "%d", iValue );
+                }
+                break;
+
+                case SQLITE_FLOAT:
+                {
+                    float fValue = va_arg( vl, float );
+                    strParsedQuery += SString ( "%f", fValue );
+                }
+                break;
+
+                case SQLITE_TEXT:
+                {
+                    const char* szValue = va_arg( vl, const char* );
+                    assert ( szValue );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                }
+                break;
+
+                case SQLITE_BLOB:
+                {
+                    strParsedQuery += "CANT_DO_BLOBS_M8";
+                }
+                break;
+
+                case SQLITE_NULL:
+                {
+                    strParsedQuery += "NULL";
+                }
+                break;
+
+                default:
+                {
+                    // If can't match type, assume it's a string
+                    const char* szValue = (const char*)ptype;
+                    assert ( szValue );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                }
+                break;
+            }
+        }
+    }
+    va_end ( vl );
+    return QueryInternal ( strParsedQuery.c_str (), pResult );
+}
+

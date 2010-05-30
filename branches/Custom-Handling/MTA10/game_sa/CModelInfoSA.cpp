@@ -238,6 +238,12 @@ BOOL CModelInfoSA::IsVehicle ( )
     return m_dwModelID >= 400 && m_dwModelID <= 611;
 }   
 
+BOOL CModelInfoSA::IsUpgrade ( void )
+{
+    return m_dwModelID >= 1000 && m_dwModelID <= 1193;
+}
+
+
 char * CModelInfoSA::GetNameIfVehicle ( )
 {
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
@@ -275,7 +281,7 @@ char * CModelInfoSA::GetNameIfVehicle ( )
 //  return NULL;
 }
 
-VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
+VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority )
 {
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
@@ -291,10 +297,14 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad )
     DWORD dwFunction = FUNC_RequestModel;
     DWORD ModelID = m_dwModelID;
     //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
-    DWORD dwChannel = 6;
+    DWORD dwFlags;
+    if ( bHighPriority )
+        dwFlags = 0x16;
+    else
+        dwFlags = 6;
     _asm
     {
-        push    dwChannel
+        push    dwFlags
         push    ModelID
         call    dwFunction
         add     esp, 8
@@ -323,6 +333,8 @@ VOID CModelInfoSA::Remove ( )
 
     // Don't remove if GTA refers to it somehow.
     // Or we'll screw up SA's map for example.
+
+    m_pInterface = ppModelInfo [ m_dwModelID ];
 
     // Remove our reference
     if ( m_pInterface->usNumberOfRefs > 0 ) m_pInterface->usNumberOfRefs--;
@@ -360,12 +372,12 @@ VOID CModelInfoSA::LoadAllRequestedModels ( )
     DEBUG_TRACE("VOID CModelInfoSA::LoadAllRequestedModels ( )");
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
-    DWORD dwSlot = 0;
+    DWORD dwOnlyPriorityModels = 0;
     //if ( m_dwModelID >= 400 && m_dwModelID < 615 )
         //dwSlot = 1;
     _asm
     {
-        push    dwSlot
+        push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
     }
@@ -389,6 +401,9 @@ BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 BOOL CModelInfoSA::IsLoaded ( )
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsLoaded ( )");
+    if ( IsUpgrade () )
+        return pGame->GetStreaming ()->HasVehicleUpgradeLoaded ( m_dwModelID );
+
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
     DWORD ModelID = m_dwModelID;
@@ -483,6 +498,7 @@ float CModelInfoSA::GetLODDistance ()
 
 void CModelInfoSA::SetLODDistance ( float fDistance )
 {
+#if 0
     // fLodDistanceUnscaled values:
     //
     // With the draw distance setting in GTA SP options menu set to maximum:
@@ -507,7 +523,7 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
 
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
-
+#endif
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;
@@ -593,13 +609,16 @@ void CModelInfoSA::RestreamIPL ()
     }
 }
 
-void CModelInfoSA::AddRef ( bool bWaitForLoad )
+void CModelInfoSA::AddRef ( bool bWaitForLoad, bool bHighPriority )
 {
     // Are we not loaded?
     if ( !IsLoaded () )
     {
         // Request it. Wait for it to load if we're asked to.
-        Request ( true, bWaitForLoad );
+        if ( pGame && pGame->IsASyncLoadingEnabled () )
+            Request ( bWaitForLoad, bWaitForLoad, bHighPriority );
+        else
+            Request ( true, bWaitForLoad, bHighPriority );
     }
 
     // Increment the references.

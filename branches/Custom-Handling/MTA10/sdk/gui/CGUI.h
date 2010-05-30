@@ -163,6 +163,7 @@ public:
 
     virtual void                SelectInputHandlers         ( eInputChannel channel ) = 0;
     virtual void                ClearInputHandlers          ( eInputChannel channel ) = 0;
+    virtual void                ClearSystemKeys             ( void ) = 0;
 
     virtual bool                IsTransferBoxVisible        ( void ) = 0;
     virtual void                SetTransferBoxVisible       ( bool bVisible ) = 0;

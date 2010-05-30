@@ -34,6 +34,7 @@ public:
     DECLARE_RPC ( SetElementHealth );
     DECLARE_RPC ( SetElementModel );
     DECLARE_RPC ( SetElementAttachedOffsets );
+    DECLARE_RPC ( SetElementDoubleSided );
 };
 
 #endif

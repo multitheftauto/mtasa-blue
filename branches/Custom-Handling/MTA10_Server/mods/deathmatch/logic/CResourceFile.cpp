@@ -45,7 +45,6 @@ CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, co
 
     m_resource = resource;
     m_pVM = NULL;
-    m_ulCRC = 0;
 
     // Create a map of the attributes for later use
     if ( xmlAttributes )

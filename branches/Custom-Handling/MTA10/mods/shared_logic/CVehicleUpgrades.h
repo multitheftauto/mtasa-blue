@@ -11,14 +11,12 @@
 *
 *****************************************************************************/
 
-class CVehicleUpgrades;
-
 #ifndef __CVEHICLEUPGRADES_H
 #define __CVEHICLEUPGRADES_H
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
-#include "CClientVehicle.h"
+class CClientVehicle;
 
 enum eVehicleUpgrade
 {
@@ -33,6 +31,7 @@ class CVehicleUpgrades
 public:
                             CVehicleUpgrades            ( CClientVehicle* pVehicle );
 
+    static bool             IsUpgrade                   ( unsigned short usModel );
     bool                    IsUpgradeCompatible         ( unsigned short usUpgrade );
     static bool             GetSlotFromUpgrade          ( unsigned short usUpgrade, unsigned char& ucSlot );
     

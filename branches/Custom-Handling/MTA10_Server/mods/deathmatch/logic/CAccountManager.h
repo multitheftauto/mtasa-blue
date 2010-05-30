@@ -23,7 +23,7 @@ class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
 public:
-                                CAccountManager             ( char* szFileName );
+                                CAccountManager             ( char* szFileName, SString strBuffer );
                                 ~CAccountManager            ( void );
 
     void                        DoPulse                     ( void );
@@ -33,7 +33,8 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( const char* szFileName = NULL );
     bool                        Save                        ( CXMLNode* pParent );
-    bool                        SaveSettings                ( CXMLNode* pParent );
+    void                        Save                        ( CAccount* pParent );
+    bool                        SaveSettings                ( void );
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
@@ -43,14 +44,23 @@ public:
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
 
     inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
-    inline bool                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; return bEnabled; }
+    inline bool                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; SaveSettings(); return bEnabled; }
 
+    CLuaArgument*               GetAccountData              ( CAccount* pAccount, char* szKey );
+    bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue, int iType );
+    bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
+
+    bool                        ConvertXMLToSQL             ( const char* szFileName );
+    bool                        LoadXML                     ( CXMLNode* pParent );
+    void                        SmartLoad                   ( void );
+    void                        Register                    ( CAccount* pAccount );
+    void                        RemoveAccount               ( CAccount* pAccount );
 protected:
     inline void                 AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
-
+    void                        ClearSQLDatabase            ( void );
 public:
     void                        RemoveAll                   ( void );
 
@@ -66,6 +76,9 @@ protected:
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
     CConnectHistory             m_AccountProtect;
+    CRegistry*                  m_pSaveFile;
+    bool                        m_bLoadXML;
+    int                         m_iAccounts;
 };
 
 #endif

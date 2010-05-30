@@ -171,20 +171,40 @@ int CLuaFunctionDefs::GetVehicleLandingGearDown ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA || lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        unsigned short model = 0;
+
+        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA)
         {
-            unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel () );
-            if ( uiMaxPassengers != 255 )
+            CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+            if ( pVehicle )
+                model = pVehicle->GetModel();
+            else
             {
-                lua_pushnumber ( luaVM, uiMaxPassengers );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+                lua_pushboolean ( luaVM, false );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
+        {
+            model = (unsigned short) lua_tonumber ( luaVM, 1 );
+
+            if (!CClientVehicleManager::IsValidModel(model))
+            {
+                m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+        
+        unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( model );
+        if ( uiMaxPassengers != 0xFF )
+        {
+            lua_pushnumber ( luaVM, uiMaxPassengers );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
@@ -1279,6 +1299,31 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::GetVehicleCurrentGear ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned short currentGear;
+            if ( CStaticFunctionDefinitions::GetVehicleCurrentGear ( *pVehicle, currentGear ) )
+            {
+                lua_pushnumber ( luaVM, currentGear );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleCurrentGear", "vehicle", 1 );
+    }
+	else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleCurrentGear" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
 {

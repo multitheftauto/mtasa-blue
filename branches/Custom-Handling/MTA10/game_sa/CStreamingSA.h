@@ -16,12 +16,14 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
-#define FUNC_CStreaming_RequestAnimations 0x407120
+#define FUNC_CStreaming_RequestAnimations           0x407120
+#define FUNC_CStreaming_HasVehicleUpgradeLoaded     0x407820
 
 class CStreamingSA : public CStreaming
 {
 public:
-    void            RequestAnimations   ( int i, int j );
+    void            RequestAnimations               ( int i, int j );
+    bool            HasVehicleUpgradeLoaded         ( int model );
 };
 
 #endif

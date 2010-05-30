@@ -115,6 +115,10 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
 
+    // Remove Night & Thermal vision view (if enabled).
+    g_pMultiplayer->SetNightVisionEnabled ( false );
+    g_pMultiplayer->SetThermalVisionEnabled ( false );
+
     m_bCloudsEnabled = true;
 
     #ifdef MTA_VOICE
@@ -221,6 +225,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
+    g_pMultiplayer->SetBulletImpactHandler ( CClientGame::BulletImpact );
     g_pMultiplayer->SetExplosionHandler ( CClientExplosionManager::Hook_StaticExplosionCreation );
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
@@ -346,6 +351,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostContextSwitchHandler ( NULL );
     g_pMultiplayer->SetPreWeaponFireHandler ( NULL );
     g_pMultiplayer->SetPostWeaponFireHandler ( NULL );
+    g_pMultiplayer->SetBulletImpactHandler ( NULL );
     g_pMultiplayer->SetExplosionHandler ( NULL );
     g_pMultiplayer->SetBreakTowLinkHandler ( NULL );
     g_pMultiplayer->SetDrawRadarAreasHandler ( NULL );
@@ -515,6 +521,22 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_VERSION ) );
             if ( pBitStream->Version () >= 0x02 )
                 pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
+
+            if ( pBitStream->Version () >= 0x0b )
+            {
+                SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
+                                            ,MTASA_VERSION_MAJOR
+                                            ,MTASA_VERSION_MINOR
+                                            ,MTASA_VERSION_MAINTENANCE
+                                            ,MTASA_VERSION_TYPE
+                                            ,MTASA_VERSION_BUILD
+                                            ,g_pNet->GetNetRev ()
+                                            );
+
+                pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
+                pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
+            }
+
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details
@@ -819,7 +841,7 @@ void CClientGame::DoPulses ( void )
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             // TODO: Tell the server, also encrypt this
-            g_pCore->ShowMessageBox ( "Error", "AC: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( "Error", "AC #1: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -3955,26 +3977,35 @@ void CClientGame::PostWeaponFire ( void )
             CWeapon* pWeapon = pPed->GetWeapon ();
             if ( pWeapon )
             {
-                CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
-                CVector vecOrigin, vecTarget;
-                pPed->GetShotData ( &vecOrigin, &vecTarget );
-
-                CColPoint* pCollision = NULL;
-                CEntity* pCollisionGameEntity = NULL;
-                CVector vecCollision = vecTarget;
-                bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
-                if ( bCollision && pCollision )
-                    vecCollision = *pCollision->GetPosition ();
-
-                // Destroy the colpoint
-                if ( pCollision )
-                {
-                    pCollision->Destroy ();
-                }
-
+                CVector vecCollision;
                 CClientEntity* pCollisionEntity = NULL;
-                if ( pCollisionGameEntity )
-                    pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
+
+                if ( pPed->GetBulletImpactData ( &pCollisionEntity, &vecCollision ) == false )
+                {
+                    CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
+                    CVector vecOrigin, vecTarget;
+                    pPed->GetShotData ( &vecOrigin, &vecTarget );
+
+                    CColPoint* pCollision = NULL;
+                    CEntity* pCollisionGameEntity = NULL;
+                    vecCollision = vecTarget;
+                    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
+                    if ( bCollision && pCollision )
+                        vecCollision = *pCollision->GetPosition ();
+
+                    // Destroy the colpoint
+                    if ( pCollision )
+                    {
+                        pCollision->Destroy ();
+                    }
+
+                    if ( pCollisionGameEntity )
+                        pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
+                }
+                else
+                {
+                    pPed->ClearBulletImpactData ();
+                }
 
                 // Call our lua event
                 CLuaArguments Arguments;
@@ -4003,6 +4034,50 @@ void CClientGame::PostWeaponFire ( void )
         }        
     }
     pWeaponFirePed = NULL;
+}
+
+void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition )
+{
+    // Got a local player model?
+    CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
+    if ( pLocalPlayer && pInitiator )
+    {
+        // Find the client ped that initiated the bullet impact
+        CClientPed * pInitiatorPed = g_pClientGame->GetPedManager ()->Get ( dynamic_cast < CPlayerPed* > ( pInitiator ), true, true );
+
+        if ( pInitiatorPed )
+        {
+            // Calculate the collision of the bullet
+            CVector vecCollision;
+            CColPoint* pCollision = NULL;
+            bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
+            if ( bCollision && pCollision )
+            {
+                vecCollision = *pCollision->GetPosition ();
+            }
+            else
+            {
+                // If we don't have a collision, use the end of the ray that the bullet is tracing.
+                vecCollision = *pEndPosition;
+            }
+
+            // Destroy the colpoint
+            if ( pCollision )
+            {
+                pCollision->Destroy ();
+            }
+
+            // Find the client entity for the victim.
+            CClientEntity* pClientVictim = NULL;
+            if ( pVictim )
+            {   
+                pClientVictim = g_pClientGame->m_pManager->FindEntity ( pVictim );
+            }
+
+            // Store the data in the bullet fire initiator.
+            pInitiatorPed->SetBulletImpactData ( pClientVictim, vecCollision );
+        }
+    }
 }
 
 
@@ -4181,7 +4256,14 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_FREEFALL_BOMB:
                 break;
         }
-
+        if ( pBitStream->Version() >= 0x07 ) 
+        {
+            //if we created it it'l have a parent
+            if ( pProjectile->GetParent() )
+                pBitStream->WriteBit ( false );
+            else
+                pBitStream->WriteBit ( true );
+        }
         g_pNet->SendPacket ( PACKET_ID_PROJECTILE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
 
         // Destroy it
@@ -4291,6 +4373,7 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
+
 void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
     if ( Ped && Ped->GetHealth () == 0.0f )

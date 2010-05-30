@@ -88,6 +88,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bColorSaved = false;
     m_bIsFrozen = false;
     m_bScriptFrozen = false;
+    m_bFrozenWaitingForGroundToLoad = false;
+    m_fGroundCheckTolerance = 0.f;
+    m_fObjectsAroundTolerance = 0.f;
     GetInitialDoorStates ( m_ucDoorStates );
     memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
     memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
@@ -312,6 +315,15 @@ void CClientVehicle::SetWas ( const CVector &vecWas )
 
 void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
+    // Is the local player in the vehicle
+    if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
+    {
+        // If move is big enough, do ground checks
+        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
+        if ( DistanceMoved > 50 && !IsFrozen () )
+            SetFrozenWaitingForGroundToLoad ( true );
+    }
+
     if ( m_pVehicle )
     {
         m_pVehicle->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
@@ -340,14 +352,9 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     }
 
     // If we have any occupants, update their positions
-    if ( m_pDriver ) m_pDriver->SetPosition ( vecPosition );
-    for ( int i = 0; i < ( sizeof ( m_pPassengers ) / sizeof ( CClientPed * ) ) ; i++ )
-    {
-        if ( m_pPassengers [ i ] )
-        {
-            m_pPassengers [ i ]->SetPosition ( vecPosition );
-        }
-    }
+    for ( int i = 0; i <= NUMELMS ( m_pPassengers ) ; i++ )
+        if ( CClientPed* pOccupant = GetOccupant ( i ) )
+            pOccupant->SetPosition ( vecPosition );
 
     // Reset interpolation
     if ( bResetInterpolation )
@@ -1633,6 +1640,49 @@ void CClientVehicle::SetFrozen ( bool bFrozen )
 }
 
 
+bool CClientVehicle::IsFrozenWaitingForGroundToLoad ( void ) const
+{
+    return m_bFrozenWaitingForGroundToLoad;
+}
+
+
+void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
+{
+    if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
+        return;
+
+    if ( m_bFrozenWaitingForGroundToLoad != bFrozen )
+    {
+        m_bFrozenWaitingForGroundToLoad = bFrozen;
+
+        if ( bFrozen )
+        {
+            g_pGame->SuspendASyncLoading ( true );
+            m_fGroundCheckTolerance = 0.f;
+            m_fObjectsAroundTolerance = -1.f;
+
+            CVector vecTemp;
+            if ( m_pVehicle )
+            {
+                m_pVehicle->GetMatrix ( &m_matFrozen );
+                m_pVehicle->SetMoveSpeed ( &vecTemp );
+                m_pVehicle->SetTurnSpeed ( &vecTemp );
+            }
+            else
+            {
+                m_matFrozen = m_Matrix;
+                m_vecMoveSpeed = vecTemp;
+                m_vecTurnSpeed = vecTemp;
+            }
+        }
+        else
+        {
+            g_pGame->SuspendASyncLoading ( false );
+        }
+    }
+}
+
+
 CClientVehicle* CClientVehicle::GetPreviousTrainCarriage ( void )
 {
     return NULL;
@@ -1798,6 +1848,10 @@ void CClientVehicle::StreamedInPulse ( void )
             m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         }
 
+        // Handle waiting for the ground to load
+        if ( IsFrozenWaitingForGroundToLoad () )
+            HandleWaitingForGroundToLoad ();
+
         // If we are frozen, make sure we freeze our matrix and keep move/turn speed at 0,0,0
         if ( m_bIsFrozen )
         {
@@ -1810,8 +1864,8 @@ void CClientVehicle::StreamedInPulse ( void )
         {
             // Cols been loaded for where the vehicle is? Only check this if it has no drivers.
             if ( m_pDriver ||
-                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &m_matFrozen.vPos ) &&
-                   m_pObjectManager->ObjectsAroundPointLoaded ( m_matFrozen.vPos, 200.0f, m_usDimension ) ) )
+                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &m_matFrozen.vPos ) /*&&
+                   m_pObjectManager->ObjectsAroundPointLoaded ( m_matFrozen.vPos, 200.0f, m_usDimension )*/ ) )
             {
                 // Remember the matrix
                 m_pVehicle->GetMatrix ( &m_matFrozen );
@@ -2054,18 +2108,6 @@ void CClientVehicle::Create ( void )
         {
             m_pVehicle->SetHeliRotorSpeed ( m_fHeliRotorSpeed );
             m_pVehicle->SetHeliSearchLightVisible ( m_bHeliSearchLightVisible );
-        }
-
-        // Check the paintjob hasn't reset our colors
-        if ( m_bColorSaved )
-        {
-            unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
-            m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
-            if ( ucColor1 != m_ucColor1 || ucColor2 != m_ucColor2 ||
-                 ucColor3 != m_ucColor3 || ucColor4 != m_ucColor4 )
-            {
-                m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
-            }
         }
 
         m_pVehicle->SetUnderwater ( IsBelowWater () );
@@ -2647,6 +2689,20 @@ bool CClientVehicle::IsInWater ( void )
 }
 
 
+float CClientVehicle::GetDistanceFromGround ( void )
+{
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    float fGroundLevel = static_cast < float > ( g_pGame->GetWorld ()->FindGroundZFor3DPosition ( &vecPosition ) );
+
+    CBoundingBox* pBoundingBox = m_pModelInfo->GetBoundingBox ();
+    if ( pBoundingBox )
+        fGroundLevel -= pBoundingBox->vecBoundMin.fZ + pBoundingBox->vecBoundOffset.fZ;
+
+    return ( vecPosition.fZ - fGroundLevel );
+}
+
+
 bool CClientVehicle::IsOnGround ( void )
 {
     if ( m_pModelInfo )
@@ -3099,6 +3155,16 @@ SColor CClientVehicle::GetHeadLightColor ( void )
 }
 
 
+int CClientVehicle::GetCurrentGear ( void )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetCurrentGear ();
+    }
+    return 0;
+}
+
+
 void CClientVehicle::SetHeadLightColor ( const SColor color )
 {
     if ( m_pVehicle )
@@ -3406,3 +3472,124 @@ CHandlingEntry* CClientVehicle::GetHandlingData( void )
     return NULL;
 }
 #endif
+
+
+CSphere CClientVehicle::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
+    if ( pModelInfo )
+    {
+        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
+        if ( pBoundingBox )
+        {
+            sphere.vecPosition = pBoundingBox->vecBoundOffset;
+            sphere.fRadius = pBoundingBox->fRadius;
+        }
+    }
+    sphere.vecPosition += GetStreamPosition ();
+    return sphere;
+}
+
+
+// Currently, this should only be called if the local player is, or was just in the vehicle
+void CClientVehicle::HandleWaitingForGroundToLoad ( void )
+{
+    // Check if near any MTA objects
+    bool bNearObject = false;
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    CClientEntityResult result;
+    GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecPosition + CVector ( 0, 0, -3 ), 5 ) );
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    {
+        if  ( (*it)->GetType () == CCLIENTOBJECT )
+        {
+            bNearObject = true;
+            break;
+        }
+    }
+
+    if ( !bNearObject )
+    {
+        // If not near any MTA objects, then don't bother waiting
+        SetFrozenWaitingForGroundToLoad ( false );
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
+        #endif 
+        return;
+    }
+
+    // Reset position
+    CVector vecTemp;
+    m_pVehicle->SetMatrix ( &m_matFrozen );
+    m_pVehicle->SetMoveSpeed ( &vecTemp );
+    m_pVehicle->SetTurnSpeed ( &vecTemp );
+    m_vecMoveSpeedMeters = vecTemp;
+    m_vecMoveSpeed = vecTemp;
+    m_vecTurnSpeed = vecTemp;
+
+    // Load load load
+    if ( GetModelInfo () )
+        GetModelInfo ()-> LoadAllRequestedModels ();
+
+    // Start out with a fairly big radius to check, and shrink it down over time
+    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
+
+    // Gather up some flags
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
+    bool bASync         = g_pGame->IsASyncLoadingEnabled ();
+    bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
+    bool bHasModel      = GetModelInfo () != NULL;
+    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension );
+    #else
+        SString strAround;
+        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension, &strAround );
+    #endif
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  fUseRadius:%2.1f"
+                                       ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
+                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance, fUseRadius );
+    #endif
+
+    // See if ground is ready
+    if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
+    {
+        m_fGroundCheckTolerance = 0.f;
+        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( "  FreezeUntilCollisionLoaded - wait" );
+        #endif
+    }
+    else
+    {
+        // Models should be loaded, but sometimes the collision is still not ready
+        // Do a ground distance check to make sure.
+        // Make the check tolerance larger with each passing frame
+        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
+        float fDist = GetDistanceFromGround ();
+        float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
+        if ( fUseDist > -0.2f && fUseDist < 1.5f )
+            SetFrozenWaitingForGroundToLoad ( false );
+
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+            status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
+        #endif
+
+        // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
+        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
+            SetFrozenWaitingForGroundToLoad ( false );
+    }
+
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        OutputDebugLine ( status );
+        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+
+        std::vector < SString > lineList;
+        strAround.Split ( "\n", lineList );
+        for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
+            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
+    #endif
+}

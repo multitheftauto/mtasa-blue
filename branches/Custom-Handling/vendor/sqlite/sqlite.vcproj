@@ -248,7 +248,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\output\MTA San Andreas\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

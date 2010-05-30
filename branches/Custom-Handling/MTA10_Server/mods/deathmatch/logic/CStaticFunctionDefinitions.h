@@ -42,7 +42,7 @@ public:
     static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
 
     static bool                 CancelEvent                         ( bool bCancel, const char* szReason );
-    static bool                 GetCancelReason                     ( char* szReason );
+    static const char*          GetCancelReason                     ( );
     static bool                 WasEventCancelled                   ( void );
 
     // Element create/destroy
@@ -70,6 +70,7 @@ public:
     static CElement*            GetElementAttachedTo                ( CElement* pElement );
     static CColShape*           GetElementColShape                  ( CElement* pElement );
     static bool                 GetElementAlpha                     ( CElement* pElement, unsigned char& ucAlpha );
+    static bool                 IsElementDoubleSided                ( CElement* pElement, bool& bDoubleSided );
     static bool                 GetElementHealth                    ( CElement* pElement, float& fHealth );
     static bool                 GetElementModel                     ( CElement* pElement, unsigned short & usModel );
     static bool                 IsElementInWater                    ( CElement* pElement, bool& bInWater );
@@ -89,6 +90,7 @@ public:
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
     static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL );
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
+    static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided );
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );
     static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
     static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
@@ -122,6 +124,7 @@ public:
     static bool                 GetPlayerName                       ( CElement* pElement, char* szName );
     static bool                 GetPlayerIP                         ( CElement* pElement, char* szIP );
     static CAccount*            GetPlayerAccount                    ( CElement* pElement );
+    static const SString&       GetPlayerVersion                    ( CPlayer* pPlayer );
 
     // Player set functions
     static bool                 SetPlayerMoney                      ( CElement* pElement, long lMoney );
@@ -560,10 +563,11 @@ public:
     static unsigned long        GetVersion                          ( );
     static const char*          GetVersionString                    ( );
     static const char*          GetVersionName                      ( );
-    static const char*          GetVersionBuildType                 ( );
+    static SString              GetVersionBuildType                 ( );
     static unsigned long        GetNetcodeVersion                   ( );
     static const char*          GetOperatingSystemName              ( );
     static const char*          GetVersionBuildTag                  ( );
+    static SString              GetVersionSortable                  ( );
 };
 
 #endif

@@ -60,8 +60,8 @@ public:
     void                    DebugPrintf             ( lua_State * luaVM, const char * szFormat, ... );
     bool                    RegisterFunction        ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func );
     bool                    GetResourceName         ( lua_State * luaVM, std::string &strName );
-    unsigned long           GetResourceMetaCRC      ( lua_State * luaVM );
-    unsigned long           GetResourceFileCRC      ( lua_State * luaVM, const char* szFile );
+    CChecksum               GetResourceMetaChecksum ( lua_State * luaVM );
+    CChecksum               GetResourceFileChecksum ( lua_State * luaVM, const char* szFile );
 
     // functions for external modules until 1.0
     unsigned long           GetVersion              ( );

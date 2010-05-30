@@ -13,20 +13,12 @@
 
 #include "StdInc.h"
 
-CColTube::CColTube ( CColManager* pManager, CElement* pParent, CXMLNode* pNode ) : CColShape ( pManager, pParent, pNode )
-{
-    m_fRadius = 1.0f;
-    m_fHeight = 1.0f;
-
-    SetTypeName ( "coltube" );
-}
-
-
 CColTube::CColTube ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight, CXMLNode* pNode ) : CColShape ( pManager, pParent, pNode )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
     m_fHeight = fHeight;
+    UpdateSpatialData ();
 }
 
 
@@ -51,4 +43,15 @@ bool CColTube::ReadSpecialData ( void )
     GetCustomDataFloat ( "height", m_fHeight, true );
 
     return true;
+}
+
+
+CSphere CColTube::GetWorldBoundingSphere ( void )
+{
+    CSphere sphere;
+    sphere.vecPosition.fX = m_vecPosition.fX;
+    sphere.vecPosition.fY = m_vecPosition.fY;
+    sphere.vecPosition.fZ = m_vecPosition.fZ + m_fHeight * 0.5f;
+    sphere.fRadius = Max ( m_fRadius, m_fHeight * 0.5f );
+    return sphere;
 }

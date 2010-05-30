@@ -229,6 +229,9 @@ public:
     bool                                        IsCollidableWith            ( CClientEntity * pEntity );
     void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide );
 
+    bool                                        IsDoubleSided               ( void );
+    void                                        SetDoubleSided              ( bool bEnable );
+
     // Game layer functions for CEntity/CPhysical
     virtual void                                InternalAttachTo            ( CClientEntity * pEntity );
     bool                                        IsStatic                    ( void );
@@ -237,6 +240,12 @@ public:
     virtual void                                SetInterior                 ( unsigned char ucInterior );
     bool                                        IsOnScreen                  ( void );
     virtual RpClump *                           GetClump                    ( void );
+
+    // Spatial database
+    virtual CSphere                             GetWorldBoundingSphere      ( void );
+    virtual void                                UpdateSpatialData           ( void );
+
+    float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
 protected:
     CClientManager*                             m_pManager;
@@ -274,6 +283,8 @@ protected:
     std::list < CClientPed * >                  m_Contacts;
     unsigned char                               m_ucInterior;
     std::map < CClientEntity *, bool >          m_DisabledCollisions;
+    bool                                        m_bDoubleSided;
+    bool                                        m_bDoubleSidedInit;
 
 private:
     static int                                  iCount;

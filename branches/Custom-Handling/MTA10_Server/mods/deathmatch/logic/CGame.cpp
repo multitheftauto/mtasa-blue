@@ -413,7 +413,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
     // Create the account manager
-    m_pAccountManager = new CAccountManager ( NULL );
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
@@ -611,7 +612,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Load the accounts
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );
     m_pAccountManager->SetFileName ( strBuffer );
-    m_pAccountManager->Load ();
+    m_pAccountManager->SmartLoad ();
 
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
@@ -1259,11 +1260,11 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         {
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
-            std::string strSerial;
-            p.GetSerial ( strSerial );
+            SString strSerial        = p.GetSerial ();
+            SString strPlayerVersion = p.GetPlayerVersion ();
 
             char szIP [22];
-            SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str () );
+            SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str (), strPlayerVersion.c_str () );
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
@@ -1315,6 +1316,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
                                 pPlayer->SetSerial ( strSerial );
+                                pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
@@ -1345,8 +1347,21 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     return;
                                 }
 
+                            #if MTASA_VERSION_TYPE > VERSION_TYPE_UNSTABLE
+                                if ( Packet.GetPlayerVersion ().length () > 0 &&
+                                     Packet.GetPlayerVersion () != pPlayer->GetPlayerVersion () )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Version mismatch) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    DisconnectPlayer ( this, *pPlayer, "Disconnected: Version mismatch" );
+                                    return;
+                                }
+                            #endif
+
                                 // Add him to the whowas list
-                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial () );
+                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
 
                                 // Verify the player's serial if necessary
                                 if ( m_pMainConfig->GetSerialVerificationEnabled () )
@@ -1766,12 +1781,14 @@ void CGame::Packet_DetonateSatchels ( CDetonateSatchelsPacket& Packet )
 {
     // Grab the source player
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
+    if ( pPlayer && pPlayer->IsJoined () && pPlayer->GetWeaponType( 12 ) == 40 )
     {
         if ( pPlayer->IsSpawned () && !pPlayer->IsDead () )
         {
             // Tell everyone to blow up this guy's satchels
             m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+            //Take away their detonator
+            CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
         }
     }
 }
@@ -2744,7 +2761,7 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
     char szIP [22];
-    SString strIPAndSerial( "IP: %s  Serial: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str () );
+    SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str (), pPlayer->GetPlayerVersion ().c_str () );
     if ( bSuccess )
     {
         // Call the onPlayerConnect event. If it returns false, disconnect the player
@@ -2755,6 +2772,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
         Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
         Arguments.PushString ( pPlayer->GetSerial ().c_str() );
         Arguments.PushNumber ( pPlayer->GetMTAVersion () );
+        Arguments.PushString ( pPlayer->GetPlayerVersion () );
         if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerConnect", Arguments ) )
         {
             // event cancelled, disconnect the player

@@ -32,7 +32,7 @@ CServerBrowser::CServerBrowser ( void )
     // Initialize
     m_ulLastUpdateTime = 0;
     m_firstTimeBrowseServer = true;
-    m_OptionsLoaded = false;
+    m_bOptionsLoaded = false;
     m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
@@ -1065,8 +1065,11 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
 
 void CServerBrowser::LoadOptions ( CXMLNode* pNode )
 {
-    if ( !pNode )
+    if ( !pNode ) {
+        //Node does not exist so allow saving
+        m_bOptionsLoaded = true;
         return;
+    }
 
     // loop through all subnodes
     unsigned int uiCount = pNode->GetSubNodeCount ( ); 
@@ -1116,13 +1119,13 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
             }
         }
     }
-    m_OptionsLoaded = true;
+    m_bOptionsLoaded = true;
 }
 
 void CServerBrowser::SaveOptions ( )
 {
     // Check to make sure if the options were loaded yet, if not the 'changed' events might screw up
-    if ( !m_OptionsLoaded )
+    if ( !m_bOptionsLoaded )
         return;
 
     CXMLNode* pConfig = CCore::GetSingletonPtr ( )->GetConfig ( );

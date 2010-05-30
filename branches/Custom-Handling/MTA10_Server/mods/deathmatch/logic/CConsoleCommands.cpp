@@ -97,7 +97,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 if ( existingResource && currentVersionMajor == (*iter)->GetMajor() && currentVersionMinor == (*iter)->GetMinor() &&
                     currentVersionRevision == (*iter)->GetRevision() && currentVersionState == (*iter)->GetState()  )
                 {
-                    if ( existingResource->GetLastCRC() == (*iter)->GetCRC() )
+                    if ( existingResource->GetLastChecksum() == (*iter)->GetChecksum() )
                         szIsCurrent[0] = '>';
                     else
                         szIsCurrent[0] = '?';
@@ -1295,6 +1295,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                 {
                     CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
                     pAccount->SetPassword ( szPassword );
+                    g_pGame->GetAccountManager ()->Register( pAccount );
 
                     // Tell the user
                     char szMessage [128];
@@ -1374,6 +1375,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
 
             // Delete it
+            g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
             delete pAccount;
             return true;
         }
@@ -1646,7 +1648,7 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s", iter->szNick, szIP, iter->strSerial.c_str () ) );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", iter->szNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {

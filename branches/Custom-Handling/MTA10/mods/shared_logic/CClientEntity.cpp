@@ -38,6 +38,8 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_bSystemEntity = false;
     m_ucSyncTimeContext = 0;
     m_ucInterior = 0;
+    m_bDoubleSided = false;
+    m_bDoubleSidedInit = false;
 
     // Need to generate a clientside ID?
     if ( ID == INVALID_ELEMENT_ID )
@@ -164,6 +166,9 @@ CClientEntity::~CClientEntity ( void )
         CClientEntity * pEntity = m_DisabledCollisions.begin ()->first;
         SetCollidableWith ( pEntity, true );
     }
+
+    // Remove from spatial database
+    GetClientSpatialDatabase ()->RemoveEntity ( this );
 
     // Ensure not referenced in the disabled collisions list
     assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
@@ -1196,6 +1201,30 @@ void CClientEntity::SetStatic ( bool bStatic )
 }
 
 
+bool CClientEntity::IsDoubleSided ( void )
+{
+    CEntity* pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        m_bDoubleSidedInit = true;
+        m_bDoubleSided = !pEntity->IsBackfaceCulled ();
+    }
+    return m_bDoubleSided;
+}
+
+
+void CClientEntity::SetDoubleSided ( bool bDoubleSided )
+{
+    CEntity* pEntity = GetGameEntity ();
+    if ( pEntity )
+    {
+        pEntity->SetBackfaceCulled ( !bDoubleSided );
+    }
+    m_bDoubleSidedInit = true;
+    m_bDoubleSided = bDoubleSided;
+}
+
+
 unsigned char CClientEntity::GetInterior ( void )
 {
     CEntity * pEntity = GetGameEntity ();
@@ -1459,4 +1488,28 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
+}
+
+
+CSphere CClientEntity::GetWorldBoundingSphere ( void )
+{
+    // Default to a point around the entity's position
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    return CSphere ( vecPosition, 0.f );
+}
+
+
+void CClientEntity::UpdateSpatialData ( void )
+{
+    GetClientSpatialDatabase ()->UpdateEntity ( this );
+}
+
+// Return the distance to the other entity.
+// A negative value indicates overlapping bounding spheres
+float CClientEntity::GetDistanceBetweenBoundingSpheres ( CClientEntity* pOther )
+{
+    CSphere sphere = GetWorldBoundingSphere ();
+    CSphere otherSphere = pOther->GetWorldBoundingSphere ();
+    return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
 }

@@ -46,12 +46,12 @@ public:
         return *this;
     }
 
-    float DotProduct ( CVector2D& other )
+    float DotProduct ( CVector2D& other ) const
     {
         return fX*other.fX + fY*other.fY;
     }
 
-    float Length ()
+    float Length () const
     {
         return sqrt ( fX * fX + fY * fY );
     }

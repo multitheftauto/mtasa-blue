@@ -134,6 +134,7 @@ public:
 
     bool                        GetMatrix               ( CMatrix& Matrix ) const;
     bool                        SetMatrix               ( const CMatrix& Matrix );
+    virtual CSphere             GetWorldBoundingSphere  ( void );
 
     void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                        GetMoveSpeedMeters      ( CVector& vecMoveSpeed ) const;
@@ -257,6 +258,8 @@ public:
     inline bool                 IsFrozen                ( void )                            { return m_bIsFrozen; };
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
+    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
 
     CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
@@ -305,6 +308,8 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 
+    float                       GetDistanceFromGround   ( void );
+
     void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
     bool                        IsInWater               ( void );
     bool                        IsOnGround              ( void );
@@ -349,6 +354,8 @@ public:
     SColor                      GetHeadLightColor       ( void );
     void                        SetHeadLightColor       ( const SColor color );
 
+    int                         GetCurrentGear          ( void );
+
     bool                        IsEnterable             ( void );
     bool                        HasRadio                ( void );
     bool                        HasPoliceRadio          ( void );
@@ -392,6 +399,7 @@ protected:
     void                        NotifyDestroy           ( void );
 
     bool                        DoCheckHasLandingGear   ( void );
+    void                        HandleWaitingForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
     void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
@@ -454,6 +462,9 @@ protected:
     unsigned char               m_ucColor4;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
+    bool                        m_bFrozenWaitingForGroundToLoad;
+    float                       m_fGroundCheckTolerance;
+    float                       m_fObjectsAroundTolerance;
     CMatrix                     m_matFrozen;
     CVehicleUpgrades*           m_pUpgrades;
     unsigned char               m_ucOverrideLights;

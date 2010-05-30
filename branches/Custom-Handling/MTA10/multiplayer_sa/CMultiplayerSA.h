@@ -78,6 +78,9 @@ public:
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
 
+    void                        SetNightVisionEnabled       ( bool bEnabled );
+    void                        SetThermalVisionEnabled     ( bool bEnabled );
+
     void                        AllowWindowsCursorShowing   ( bool bAllow );
 
     CShotSyncData *             GetLocalShotSyncData        ();
@@ -86,6 +89,7 @@ public:
     void                        SetPostContextSwitchHandler ( PostContextSwitchHandler* pHandler );
     void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
     void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
+    void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 
