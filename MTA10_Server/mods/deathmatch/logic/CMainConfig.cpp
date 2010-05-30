@@ -195,6 +195,15 @@ bool CMainConfig::Load ( const char* szFilename )
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
+    {
+        SString strDisbaleAC;
+        GetString ( m_pRootNode, "disableac", strDisbaleAC );
+        std::vector < SString > tagACList;
+        strDisbaleAC.Split ( ",", tagACList );
+        for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
+            MapSet ( m_DisableACMap, *it, 1 );
+    }
+
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
     if ( iResult == INVALID_VALUE )
