@@ -129,7 +129,7 @@ public:
     //
 
     CGUITexture*                    CreateTexture               ( void );
-    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int first_code_point = 32, unsigned int last_code_point = 127, bool bAutoScale = false );
+    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uFirstCodePoint = 32, unsigned int uLastCodePoint = 127, bool bAutoScale = false );
 
     void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );

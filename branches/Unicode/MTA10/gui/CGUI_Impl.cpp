@@ -284,9 +284,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int first_code_point, unsigned int last_code_point, bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uFirstCodePoint, unsigned int uLastCodePoint, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, first_code_point, last_code_point, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uFirstCodePoint, uLastCodePoint, bAutoScale );
 }
 
 
