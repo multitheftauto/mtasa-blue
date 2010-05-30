@@ -78,6 +78,9 @@ public:
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
 
+    void                        SetNightVisionEnabled       ( bool bEnabled );
+    void                        SetThermalVisionEnabled     ( bool bEnabled );
+
     void                        AllowWindowsCursorShowing   ( bool bAllow );
 
     CShotSyncData *             GetLocalShotSyncData        ();
