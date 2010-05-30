@@ -63,20 +63,29 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 #endif
     CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
 
+
     // Load our fonts
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9 );
-    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, 32, 65532 ); // allowed code points range is 0..65532
+    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, 7, 0, 32, 65532 ); // allowed code points range is 0..65532
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, 32, 65532 ); // allowed code points range is 0..65532
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
-    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
+    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9, 0, 32, 64258 ); // allowed code points range is 0..64258
+
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 32, 8729, true ); // allowed code points range is 0..61442
+
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 32, 8221, true ); // allowed code points range is 0..8221
+
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 32, 64258, false ); // allowed code points range is 0..64258
     // ACHTUNG: These font creations can throw exceptions!
+    // ACHTUNG: Client don't even started if any font has wrong start/end code points.
+
 
     // Load bluescheme
     CEGUI::SchemeManager::getSingleton().loadScheme("cgui/CGUI.xml");
@@ -240,6 +249,108 @@ bool CGUI_Impl::GetGUIInputEnabled ( void )
 }
 
 
+// converts client keyboard's key to unicode char
+// in progress..
+// ! do not work properly
+unsigned int CGUI_Impl::keycodeToUTF32 ( unsigned int scanCode )
+{
+	unsigned int utf = 0;
+
+	BYTE keyboardState[256];
+	unsigned char ucBuffer[3];
+	static WCHAR deadKey = '\0';
+
+	// Retrieve the keyboard layout in order to perform the necessary convertions
+	HKL hklKeyboardLayout = GetKeyboardLayout(0); // 0 means current thread 
+	// This seemingly cannot fail 
+	// If this value is cached then the application must respond to WM_INPUTLANGCHANGE 
+
+	// Retrieve the keyboard state
+	// Handles CAPS-lock and SHIFT states
+	if (GetKeyboardState(keyboardState) == FALSE)
+		return utf;
+
+	/* 0. Convert virtual-key code into a scan code
+       1. Convert scan code into a virtual-key code
+	      Does not distinguish between left- and right-hand keys.
+       2. Convert virtual-key code into an unshifted character value
+	      in the low order word of the return value. Dead keys (diacritics)
+		  are indicated by setting the top bit of the return value.
+       3. Windows NT/2000/XP: Convert scan code into a virtual-key
+	      Distinguishes between left- and right-hand keys.*/
+	UINT virtualKey = MapVirtualKeyEx(scanCode, 3, hklKeyboardLayout);
+	if (virtualKey == 0) // No translation possible
+		return utf;
+
+    /* Parameter 5:
+		0. No menu is active
+		1. A menu is active
+       Return values:
+		Negative. Returned a dead key
+		0. No translation available
+		1. A translation exists 
+		2. Dead-key could not be combined with character 	*/
+	int ascii = ToAsciiEx(virtualKey, scanCode, keyboardState, (LPWORD) ucBuffer, 0, hklKeyboardLayout);
+	if(deadKey != '\0' && ascii == 1)
+	{
+		// A dead key is stored and we have just converted a character key
+		// Combine the two into a single character
+		WCHAR wcBuffer[3];
+		WCHAR out[3];
+		wcBuffer[0] = ucBuffer[0];
+		wcBuffer[1] = deadKey;
+		wcBuffer[2] = '\0';
+		if( FoldStringW(MAP_PRECOMPOSED, (LPWSTR) wcBuffer, 3, (LPWSTR) out, 3) )
+			utf = out[0];
+		else
+		{
+			// FoldStringW failed
+			DWORD dw = GetLastError();
+			switch(dw)
+			{
+			case ERROR_INSUFFICIENT_BUFFER:
+			case ERROR_INVALID_FLAGS:
+			case ERROR_INVALID_PARAMETER:
+				break;
+			}
+		}
+		deadKey = '\0';
+	}
+	else if (ascii == 1)
+	{
+		// We have a single character
+		utf = ucBuffer[0];
+		deadKey = '\0';
+	}
+	else
+	{
+		// Convert a non-combining diacritical mark into a combining diacritical mark
+		switch(ucBuffer[0])
+		{
+		case 0x5E:
+			deadKey = 0x302;
+			break;
+		case 0x60:
+			deadKey = 0x300;
+			break;
+		case 0xA8:
+			deadKey = 0x308;
+			break;
+		case 0xB4:
+			deadKey = 0x301;
+			break;
+		case 0xB8:
+			deadKey = 0x327;
+			break;
+		default:
+			deadKey = ucBuffer[0];
+		}
+	}
+
+	return utf;
+}
+
+
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
     m_pSystem->injectChar ( ulCharacter );
@@ -276,9 +387,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int first_code_point, unsigned int last_code_point, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uExtraGlyphs, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, first_code_point, last_code_point, bAutoScale );
 }
 
 
