@@ -1910,7 +1910,10 @@ void CClientPed::RemoveAllWeapons ( void )
     {
         m_pPlayerPed->ClearWeapons ();
     }
-    
+
+    g_pMultiplayer->SetNightVisionEnabled( false );
+    g_pMultiplayer->SetThermalVisionEnabled( false );
+
     for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
         m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
     m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
