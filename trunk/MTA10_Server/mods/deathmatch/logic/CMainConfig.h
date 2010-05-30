@@ -69,6 +69,7 @@ public:
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
+    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -109,6 +110,7 @@ private:
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
+    std::map < SString, int >       m_DisableACMap;
 };
 
 #endif

@@ -19,10 +19,6 @@ CProjectileSyncPacket::CProjectileSyncPacket ( void )
 
 bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    //Projectile sync packets are sent fast so check our player is still connected
-    if ( !GetSourcePlayer() )
-        return false;
-
     bool bHasOrigin;
     if ( !BitStream.ReadBit ( bHasOrigin ) )
         return false;
@@ -116,8 +112,11 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
                     && pVehicle->GetModel() != 432 
                     && pVehicle->GetModel() != 425 ) )
                 {
-                    pSourcePlayer->Kick ( NULL, "AC #3: You were kicked from the game" );
-                    return false;
+                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "3" ) )
+                    {
+                        CStaticFunctionDefinitions::KickPlayer ( pSourcePlayer, NULL, "AC #3: You were kicked from the game" );
+                        return false;
+                    }
                 }
             }
         }
