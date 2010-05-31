@@ -2199,16 +2199,6 @@ void CClientPed::StreamedInPulse ( void )
                 GetModelInfo ()-> LoadAllRequestedModels ();
         }
 
-        // Draw a little star in the corner if async is on
-        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
-        {
-            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-            unsigned int uiHeight = pGraphics->GetViewportHeight ();
-            unsigned int uiWidth = pGraphics->GetViewportWidth ();
-            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
-            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
-        }
-
         if ( m_bIsLocalPlayer )
         {
             // Check if the ped got in fire without the script control
