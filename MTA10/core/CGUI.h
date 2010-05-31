@@ -109,6 +109,9 @@ public:
     int                 GetVisibleWindows           ( );
     void                SetVisibleWindows           ( bool bEnable );
 
+    void                InitiateUpdate              ( const char* szType, const char* szHost )      { m_VersionUpdater.InitiateUpdate ( szType, szHost ); }
+    bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_VersionUpdater.IsOptionalUpdateInfoRequired ( szHost ); }
+
 private:
     void                    UpdateCursor                ( void );
 

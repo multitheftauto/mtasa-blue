@@ -93,8 +93,9 @@ public:
 
     inline CGUITexture*                 GetConnectionTroubleTexture ( void )        { return m_pConnectionTroubleTexture; }
 
-    inline bool                         IsGameLoaded                ( void )        { return g_pGame->GetSystemState () == 9; }
+    inline bool                         IsGameLoaded                ( void )        { return g_pGame->GetSystemState () == 9 && !m_bGameUnloadedFlag; }
     inline bool                         IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
+    void                                SetGameUnloadedFlag         ( void )        { m_bGameUnloadedFlag = true; }
 
     void                                InvalidateEntity            ( CClientEntity* pEntity );
     void                                RestoreEntity               ( CClientEntity* pEntity );
@@ -139,6 +140,7 @@ private:
     CGUITexture*                        m_pConnectionTroubleTexture;
     CClientPacketRecorder*              m_pPacketRecorder;
     bool                                m_bBeingDeleted;
+    bool                                m_bGameUnloadedFlag;
 };
 
 #endif

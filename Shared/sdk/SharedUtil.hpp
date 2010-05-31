@@ -613,3 +613,22 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     fclose ( fh );
     return bytesRead == size;
 }
+
+
+//
+// Return true if supplied string adheres to the new version format
+//
+bool SharedUtil::IsValidVersionString ( const SString& strVersion )
+{
+    SString strCheck = "0.0.0-0-00000.0";
+    if ( strCheck.length () != strVersion.length () )
+        return false;
+    for ( unsigned int i = 0 ; i < strVersion.length () ; i++ )
+    {
+        char c = strVersion[i];
+        char d = strCheck[i];
+        if ( c != d && isdigit( c ) != isdigit( d ) )
+            return false;
+    }
+    return true;
+}

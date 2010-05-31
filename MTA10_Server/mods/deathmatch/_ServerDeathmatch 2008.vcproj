@@ -1000,6 +1000,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CUpdateInfoPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CVehicleDamageSyncPacket.cpp"
 						>
 					</File>
@@ -2026,6 +2030,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleSyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUpdateInfoPacket.h"
 						>
 					</File>
 					<File

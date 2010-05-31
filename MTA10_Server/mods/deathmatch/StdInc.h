@@ -84,6 +84,7 @@
 #include "packets/CResourceStopPacket.h"
 #include "packets/CReturnSyncPacket.h"
 #include "packets/CServerTextItemPacket.h"
+#include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"

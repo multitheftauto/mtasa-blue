@@ -69,6 +69,7 @@ public:
     void                Packet_ResourceStop             ( NetBitStreamInterface& bitStream );
     void                Packet_DetonateSatchels         ( NetBitStreamInterface& bitStream );
     void                Packet_VoiceData                ( NetBitStreamInterface& bitStream );
+    void                Packet_UpdateInfo               ( NetBitStreamInterface& bitStream );
 };
 
 #endif

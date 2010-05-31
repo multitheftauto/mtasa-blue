@@ -47,11 +47,14 @@ public:
     inline char*            GetSerialUser               ( void )                            { return m_szSerialUser; };
     inline void             SetSerialUser               ( const char* szSerialUser )        { strncpy ( m_szSerialUser, szSerialUser, MAX_SERIAL_LENGTH ); };
 
+    inline bool             IsOptionalUpdateInfoRequired ( void )                           { return m_bOptionalUpdateInfoRequired; }
+
 private:
     unsigned short          m_usNetVersion;
     unsigned short          m_usMTAVersion;
     unsigned short          m_usBitStreamVersion;
     unsigned char           m_ucGameVersion;
+    bool                    m_bOptionalUpdateInfoRequired;
     char                    m_szNick [MAX_NICK_LENGTH + 1];
     MD5                     m_Password;
     char                    m_szSerialUser[MAX_SERIAL_LENGTH + 1];
