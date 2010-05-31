@@ -59,7 +59,7 @@ bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
                 m_Textures.push_back ( pTex );
                 pTex->txd = NULL;
                 if ( bFilteringEnabled )
-				    pTex->flags = 0x1102;       // Enable filtering (otherwise textures are pixely)
+                    pTex->flags = 0x1102;       // Enable filtering (otherwise textures are pixely)
 
                 pTexLink = pTexLink->next;
             }

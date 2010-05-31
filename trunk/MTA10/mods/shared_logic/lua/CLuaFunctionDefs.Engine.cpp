@@ -138,7 +138,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
         {
             bool bFilteringEnabled = true;
 
-			if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
                 bFilteringEnabled = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
 
             // Grab the filename
