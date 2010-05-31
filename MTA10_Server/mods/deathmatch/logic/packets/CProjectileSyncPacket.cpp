@@ -112,9 +112,9 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
                     && pVehicle->GetModel() != 432 
                     && pVehicle->GetModel() != 425 ) )
                 {
-                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "3" ) )
+                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "2" ) )
                     {
-                        CStaticFunctionDefinitions::KickPlayer ( pSourcePlayer, NULL, "AC #3: You were kicked from the game" );
+                        CStaticFunctionDefinitions::KickPlayer ( pSourcePlayer, NULL, "AC #2: You were kicked from the game" );
                         return false;
                     }
                 }

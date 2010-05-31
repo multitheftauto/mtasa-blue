@@ -160,11 +160,10 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
-                bool bAmmoFailed = false;
                 // Read out the ammo states
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), true, true );
                 if ( !BitStream.Read ( &ammo ) )
-                    bAmmoFailed = true;
+                    return false;
                 pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
                 pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
@@ -173,15 +172,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 if ( !BitStream.Read ( &sync ) )
                     return false;
 
-                // AC #2 is disabled for older clients
-                if ( bAmmoFailed == true && BitStream.Version () >= 0x0d )
-                {
-                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "2" ) )
-                    {
-                        CStaticFunctionDefinitions::KickPlayer ( pSourcePlayer, NULL, "AC #2: You were kicked from the game" );
-                        return false;
-                    }
-                }
                 // Set the arm directions and whether or not arms are up
                 pSourcePlayer->SetAimDirection ( sync.data.fArm );
 
