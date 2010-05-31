@@ -23,7 +23,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTTXD; }
 
-    bool                            LoadTXD                 ( const char* szFile );
+    bool                            LoadTXD                 ( const char* szFile, bool bFilteringEnabled = true );
     void                            UnloadTXD               ( void );
     inline bool                     IsLoaded                ( void )                    { return !m_Textures.empty (); }
 
