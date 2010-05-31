@@ -1879,3 +1879,16 @@ bool CConsoleCommands::Ver ( CConsole* pConsole, const char* szArguments, CClien
     pEchoClient->SendConsole ( MTA_DM_FULL_STRING " v" MTA_DM_BUILDTAG_LONG );
     return true;
 }
+
+
+bool CConsoleCommands::Ase ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        ASE * ase = ASE::GetInstance();
+        if ( ase )
+            pEchoClient->SendConsole ( SString ( "Master server list queries: %d", ase->GetMasterServerQueryCount () ) );
+        return true;
+    }
+    return false;
+}
