@@ -259,7 +259,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
     else if ( iResult == -2 ) {
         MessageBox ( 0, "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.", "Error", MB_OK|MB_ICONEXCLAMATION );
-        ShellExecute ( NULL, "open", "http://wiki.multitheftauto.com/wiki/Known_Issues_-_FAQ#I_have_the_Steam_version_of_GTA_San_Andreas.__How_can_I_play_MTASA.3F", NULL, NULL, SW_SHOWNORMAL );
+        ShellExecute ( NULL, "open", "http://multitheftauto.com/downgrade/steam", NULL, NULL, SW_SHOWNORMAL );
         return 5;
     }
 
