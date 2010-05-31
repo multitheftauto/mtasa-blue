@@ -352,23 +352,19 @@
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-			>
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="loader.rc"
+				RelativePath=".\GDFImp.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\resource\mtaicon.ico"
-				>
+				RelativePath="loader.rc">
 			</File>
 			<File
-				RelativePath=".\resource\splash.bmp"
-				>
+				RelativePath=".\resource\mtaicon.ico">
 			</File>
 			<File
-				RelativePath=".\resource\vistaicon.ico"
-				>
+				RelativePath=".\resource\splash.bmp">
 			</File>
 		</Filter>
 	</Files>
