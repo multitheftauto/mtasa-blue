@@ -4761,7 +4761,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         {
             int flags = 0x10; // Stops jaw fucking up, some speaking flag maybe 
             if ( bLoop ) flags |= 0x2; // loop flag
-			if ( bUpdatePosition ) flags |= 0x40; flags |= 0x80; // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
+            if ( bUpdatePosition ) flags |= 0x40; flags |= 0x80; // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
             // Kill any higher priority tasks if we dont want this anim interuptable
             if ( !bInterruptable )
             {
@@ -4769,8 +4769,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
             }
-			if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-			CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
+            if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );

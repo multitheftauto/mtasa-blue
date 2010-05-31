@@ -3130,7 +3130,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
                 BitStream.pBitStream->WriteBit ( bLoop );
                 BitStream.pBitStream->WriteBit ( bUpdatePosition );
                 BitStream.pBitStream->WriteBit ( bInterruptable );
-				BitStream.pBitStream->WriteBit ( bFreezeLastFrame );
+                BitStream.pBitStream->WriteBit ( bFreezeLastFrame );
             }
             else
             {
