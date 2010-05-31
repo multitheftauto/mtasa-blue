@@ -2,6 +2,7 @@
 !include LogicLib.nsh
 !include Sections.nsh
 !include UAC.nsh
+!include GameExplorer.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -16,6 +17,8 @@ Var Install_Dir
 Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
+
+!define GUID "{DC86048C-6401-4356-8533-06EC8CC02AF3}"
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
@@ -634,6 +637,13 @@ DontInstallRedist:
 
 			SetOutPath "$INSTDIR"
 			File "${FILES_ROOT}\MTA San Andreas\*" ; NOT RECURSIVE
+			
+			${GameExplorer_UpdateGame} ${GUID}
+			${If} ${Errors}
+				${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
+				CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
+				CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+			${EndIf}
 		SectionEnd
 
 		Section "Game module" SEC02
@@ -874,6 +884,8 @@ Section Uninstall
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas"
 		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas"
+		
+		${GameExplorer_RemoveGame} ${GUID}
 		
 		; Delete shortcuts
 		Delete "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk"
