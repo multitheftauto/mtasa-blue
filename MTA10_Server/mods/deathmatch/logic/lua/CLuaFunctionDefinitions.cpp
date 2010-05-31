@@ -963,6 +963,7 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
             bool bLoop = true;
             bool bUpdatePosition = true;
             bool bInterruptable = true;
+			bool bFreezeLastFrame = true;
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
             int iArgument4 = lua_type ( luaVM, 4 );
@@ -972,10 +973,12 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+            if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
                 bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
+			if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
+                bInterruptable = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
 
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
