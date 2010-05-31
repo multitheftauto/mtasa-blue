@@ -315,9 +315,9 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
                 else
                 {
                     //You shouldn't be able to get here without cheating to get a knife.
-                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "3" ) )
+                    if ( !g_pGame->GetConfig ()->IsDisableAC ( "2" ) )
                     {
-                        CStaticFunctionDefinitions::KickPlayer ( m_pSourcePlayer, NULL, "AC #3: You were kicked from the game" );
+                        CStaticFunctionDefinitions::KickPlayer ( m_pSourcePlayer, NULL, "AC #2: You were kicked from the game" );
                     }
                 }
             }
