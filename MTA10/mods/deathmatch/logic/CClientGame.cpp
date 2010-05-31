@@ -4256,14 +4256,6 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_FREEFALL_BOMB:
                 break;
         }
-        if ( pBitStream->Version() >= 0x07 ) 
-        {
-            //if we created it it'l have a parent
-            if ( pProjectile->GetParent() )
-                pBitStream->WriteBit ( false );
-            else
-                pBitStream->WriteBit ( true );
-        }
         g_pNet->SendPacket ( PACKET_ID_PROJECTILE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
 
         // Destroy it
