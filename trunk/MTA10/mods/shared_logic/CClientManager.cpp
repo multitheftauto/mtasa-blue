@@ -64,6 +64,7 @@ CClientManager::CClientManager ( void )
     m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;
+    m_bGameUnloadedFlag = false;
 }
 
 

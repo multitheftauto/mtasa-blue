@@ -70,6 +70,10 @@ public:
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
+    bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
+    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
+    const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -111,6 +115,8 @@ private:
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
     std::map < SString, int >       m_DisableACMap;
+    SString                         m_strMinClientVersion;
+    SString                         m_strRecommendedClientVersion;
 };
 
 #endif

@@ -108,6 +108,10 @@ namespace SharedUtil
     //
     bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
 
+    //
+    // Return true if supplied string adheres to the new version format
+    //
+    bool IsValidVersionString ( const SString& strVersion );
 
     //
     // Some templates

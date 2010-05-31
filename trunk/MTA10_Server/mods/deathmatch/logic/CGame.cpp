@@ -1321,6 +1321,41 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
 
+                                // Check if client must update
+                                if ( GetConfig ()->IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    if ( Packet.GetBitStreamVersion () >= 0x0e )
+                                    {
+                                        pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                        DisconnectPlayer ( this, *pPlayer, "" );
+                                    }
+                                    else
+                                    {
+                                        SString strMessage = "Disconnected: You need to update MTA to connect to this server.";
+                                        for ( int i = 0 ; i < 55 ; i++ )
+                                            strMessage += " ";
+                                        strMessage += "*         Update at www.mtasa.com";
+                                        DisconnectPlayer ( this, *pPlayer, strMessage );
+                                    }
+                                    return;
+                                }
+
+                                // Check if client should optionally update
+                                if ( Packet.IsOptionalUpdateInfoRequired () && GetConfig ()->IsBelowRecommendedClient ( pPlayer->GetPlayerVersion () ) )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Optional", GetConfig ()->GetRecommendedClientVersion () ) );
+                                    DisconnectPlayer ( this, *pPlayer, "" );
+                                    return;
+                                }
+
                                 // Check the serial for validity
                                 if ( !pPlayer->GetSerial ().empty() &&
                                      m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )

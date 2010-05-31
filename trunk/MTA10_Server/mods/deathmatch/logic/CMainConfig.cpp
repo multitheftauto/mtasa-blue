@@ -201,7 +201,24 @@ bool CMainConfig::Load ( const char* szFilename )
         std::vector < SString > tagACList;
         strDisbaleAC.Split ( ",", tagACList );
         for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            MapSet ( m_DisableACMap, *it, 1 );
+            if ( (*it).length () )
+                MapSet ( m_DisableACMap, *it, 1 );
+    }
+
+    // minclientversion - Minimum client version or kick
+    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
+        m_strMinClientVersion = "";
+    }
+
+    // recommendedclientversion - Minimum client version or spam
+    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
+        m_strRecommendedClientVersion = "";
     }
 
     // ASE
@@ -509,6 +526,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
+    RegisterCommand ( "ase", CConsoleCommands::Ase, false );
 
     return true;
 }

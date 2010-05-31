@@ -537,6 +537,12 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
                 pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
             }
 
+            if ( pBitStream->Version () >= 0x0e )
+            {
+                // Should the server send us recommended update info?
+                pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
+            }
+
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details

@@ -17,27 +17,36 @@
 class CVersionUpdater
 {
 public:
-                            CVersionUpdater         ( void );
-    void                    DoPulse                 ( void );
+                            CVersionUpdater                 ( void );
+    void                    DoPulse                         ( void );
+    void                    InitiateUpdate                  ( const SString& strType, const SString& strHost );
+    bool                    IsOptionalUpdateInfoRequired    ( const SString& strHost );
 
 protected:
     void                    ResetCheckTimer         ( void );
     bool                    IsDownloadMandatory     ( void );
+    bool                    IsPeriodicCheck         ( void );
     CQuestionBox&           GetQuestionBox          ( void );
 
     void                    StartVersionCheck       ( void );
     void                    PollVersionCheck        ( void );
+    void                    StartNoUpdateQuestion   ( void );
+    void                    PollNoUpdateQuestion    ( void );
     void                    StartUpdateQuestion     ( void );
     void                    PollUpdateQuestion      ( void );
     void                    StartDownload           ( void );
     void                    PollDownload            ( void );
     void                    PollPostDownloadError   ( void );
     void                    PollPostDownloadOk      ( void );
+    void                    ServerSaysOptionalUpdate        ( void );
+    void                    ServerSaysMandatoryUpdate       ( void );
+    void                    PollServerUpdateQuestion        ( void );
 
-    SString                 m_strStage;
-    CHTTPClient             m_HTTP;
-    long long               m_llTimeStart;
-
+    SString                     m_strStage;
+    SString                     m_strContext;
+    CHTTPClient                 m_HTTP;
+    long long                   m_llTimeStart;
+    std::map < SString, int >   m_DoneOptionalMap;
 
     struct CCheckInfo
     {

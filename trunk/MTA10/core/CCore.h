@@ -197,6 +197,9 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
+    void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
+    bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
+
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
