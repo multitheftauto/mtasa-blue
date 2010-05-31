@@ -1256,9 +1256,10 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "hud",               "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
 
+#if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
-
     m_pCommands->Add ( "window",            "enter/leave windowed mode",        CCommandFuncs::Window );
+#endif
 
     m_pCommands->Add ( "load",              "loads a mod (name args)",          CCommandFuncs::Load );
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
