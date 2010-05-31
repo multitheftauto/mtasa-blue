@@ -54,6 +54,7 @@ public:
     std::string             QueryFull           ( void );
     const std::string&      QueryLightCached    ( void );
     std::string             QueryLight          ( void );
+    unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
 
     CLanBroadcast*          InitLan             ( void );
 
@@ -105,6 +106,7 @@ private:
     long                    m_lLightMinInterval;
     std::string             m_strLightCached;
 
+    unsigned long           m_ulMasterServerQueryCount;
 protected:
     void                    GetStatusVals();
 

@@ -41,6 +41,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_llLightLastTime = 0;
     m_lLightMinInterval = 10 * 1000;     // Update light query cache after 10 seconds
 
+    m_ulMasterServerQueryCount = 0;
+
     m_strGameType = "MTA:SA";
     m_strMapName = "None";
     if ( szServerIP )
@@ -115,6 +117,7 @@ void ASE::DoPulse ( void )
         {
             case 's':
             { // ASE protocol query
+                m_ulMasterServerQueryCount++;
                 strReply = QueryFullCached ();
                 break;
             }
