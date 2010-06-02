@@ -4756,7 +4756,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
 
     // Are we streamed in?
     if ( m_pPlayerPed )
-    {  
+    {
         if ( pBlock->IsLoaded () )
         {
             int flags = 0x10; // Stops jaw fucking up, some speaking flag maybe 
@@ -4774,7 +4774,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-            }                
+            }
         }
         else
         {

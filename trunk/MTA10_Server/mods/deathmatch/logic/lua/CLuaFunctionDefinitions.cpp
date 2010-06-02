@@ -976,7 +976,7 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
             if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
                 bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
             if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
-                bInterruptable = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
+                bFreezeLastFrame = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
 
             if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
