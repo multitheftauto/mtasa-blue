@@ -60,6 +60,7 @@ Var RedistInstalled
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "ReplaceSubStr.nsh"
+!include "FileIfMD5.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -688,13 +689,9 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
-		  
-		md5dll::GetMD5File "$INSTDIR\server\mods\deathmatch\editor_acl.xml"
-		Pop $0
-		StrCmp $0 "711185d8f4ebb355542053ce408b82b3" overwriteeditor_acl skipoverwriteacl
-		overwriteeditor_acl:
-			File "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml"
-		skipoverwriteacl:
+		
+		;Only overwrite the following files if previous versions were bugged and explicitly need replacing
+		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
 
 		SetOverwrite off
 		;File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
