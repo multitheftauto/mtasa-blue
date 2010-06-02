@@ -204,12 +204,12 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 }
 
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName )
 {
     if ( m_luaVM )
     {
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, NULL ) )
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, szFileName ) )
         {
             // Print the error
             std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
