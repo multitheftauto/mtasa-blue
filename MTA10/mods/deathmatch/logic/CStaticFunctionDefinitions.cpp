@@ -1640,9 +1640,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
 
     if ( IS_PED ( &Entity ) )
     {
@@ -1652,7 +1652,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
             CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
             if ( pBlock )
             {
-                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
                 return true;
             }
         }
@@ -1746,13 +1746,13 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CClientEntity & Entity
 }
 
 
-bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, int iBlend, CClientEntity * pTarget )
+bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget )
 {
-    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, iBlend, pTarget );
+    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, pTarget );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.LookAt ( vecPosition, iTime, iBlend, pTarget );
+        Ped.LookAt ( vecPosition, iTime, pTarget );
         return true;
     }
     return false;

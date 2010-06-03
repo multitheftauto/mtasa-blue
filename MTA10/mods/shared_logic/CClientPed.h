@@ -346,7 +346,7 @@ public:
     bool                        IsSunbathing            ( void );
     void                        SetSunbathing           ( bool bSunbathing, bool bStartStanding = true );
 
-    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, int iBlend = 1000, CClientEntity * pEntity = NULL );
+    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, CClientEntity * pEntity = NULL );
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
@@ -357,7 +357,7 @@ public:
 
     bool                        IsRunningAnimation      ( void );
     void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
-    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = false, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
     inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }

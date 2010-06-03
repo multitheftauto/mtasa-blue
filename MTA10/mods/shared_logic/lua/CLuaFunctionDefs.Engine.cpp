@@ -136,11 +136,6 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
         CResource* pResource = pLuaMain->GetResource ();
         if ( pResource )
         {
-            bool bFilteringEnabled = true;
-
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-                bFilteringEnabled = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
-
             // Grab the filename
             SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
             
@@ -155,7 +150,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
 
                 // Try to load the TXD file
-                if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                if ( pTXD->LoadTXD ( strPath ) )
                 {
                     // Success loading the file. Set parent to TXD root
                     pTXD->SetParent ( pRoot );
