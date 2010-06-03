@@ -4631,13 +4631,13 @@ void CClientPed::SetSunbathing ( bool bSunbathing, bool bStartStanding )
 }
 
 
-bool CClientPed::LookAt ( CVector vecOffset, int iTime, CClientEntity * pEntity )
+bool CClientPed::LookAt ( CVector vecOffset, int iTime, int iBlend, CClientEntity * pEntity )
 {   
     if ( m_pPlayerPed )
     {          
         CEntity * pGameEntity = NULL;
         if ( pEntity ) pGameEntity = pEntity->GetGameEntity ();
-        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset );
+        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset, false, 0.250000, iBlend );
         if ( pTask )
         {
             pTask->SetAsSecondaryPedTask ( m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM );
