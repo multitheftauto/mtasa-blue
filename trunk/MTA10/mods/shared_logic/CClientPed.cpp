@@ -4631,13 +4631,13 @@ void CClientPed::SetSunbathing ( bool bSunbathing, bool bStartStanding )
 }
 
 
-bool CClientPed::LookAt ( CVector vecOffset, int iTime, int iBlend, CClientEntity * pEntity )
+bool CClientPed::LookAt ( CVector vecOffset, int iTime, CClientEntity * pEntity )
 {   
     if ( m_pPlayerPed )
     {          
         CEntity * pGameEntity = NULL;
         if ( pEntity ) pGameEntity = pEntity->GetGameEntity ();
-        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset, false, 0.250000, iBlend );
+        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset );
         if ( pTask )
         {
             pTask->SetAsSecondaryPedTask ( m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM );
@@ -4747,7 +4747,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -4756,12 +4756,9 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
 
     // Are we streamed in?
     if ( m_pPlayerPed )
-    {
+    {  
         if ( pBlock->IsLoaded () )
         {
-            int flags = 0x10; // Stops jaw fucking up, some speaking flag maybe 
-            if ( bLoop ) flags |= 0x2; // loop flag
-            if ( bUpdatePosition ) flags |= 0x40; flags |= 0x80; // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
             // Kill any higher priority tasks if we dont want this anim interuptable
             if ( !bInterruptable )
             {
@@ -4769,12 +4766,16 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
             }
-            if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
+
+            int flags = 0;            
+            if ( bLoop ) flags |= 0x2;
+            flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
+            if ( bUpdatePosition ) flags |= 0x40;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-            }
+            }                
         }
         else
         {
