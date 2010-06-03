@@ -61,6 +61,13 @@ public:
         B = (ulColor      ) & 0xFF;
         return *this;
     }
+    bool                        operator ==         ( const CColor& other ) const
+    {
+        return R == other.R
+            && G == other.G
+            && B == other.B
+            && A == other.A;
+    }
 
     unsigned char               R, G, B, A;
 };
