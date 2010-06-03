@@ -582,7 +582,7 @@ DontInstallRedist:
 			SetOverwrite on
 
 			# Make the directory "$INSTDIR" read write accessible by all users
-			DetailPrint "Updating permissions. Please wait..."
+			DetailPrint "Updating permissions. This could take a few minutes..."
 			AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
