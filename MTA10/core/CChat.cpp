@@ -118,6 +118,35 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
+
+    // Modify default chat box to be like 'Transparent' preset
+    bool bVal = false;
+    CVARS_GET ( "chat_done_default_upgrade", bVal );
+    if ( !bVal )
+    {
+        CVARS_SET ( "chat_done_default_upgrade", true );
+
+        if ( Font                       == 0                            // chat_font
+             && m_uiNumLines            == 7                            // chat_lines
+             && m_Color                 == CColor (0,0,128,100)         // chat_color
+             && m_InputColor            == CColor (0,0,191,110)         // chat_input_color
+             && m_InputTextColor        == CColor (172,213,254,255)     // chat_input_text_color
+             && m_vecScale              == CVector2D ( 1.0f, 1.0f )     // chat_scale
+             && fWidth                  == 1.0f                         // chat_width
+             && m_bCssStyleText         == false                        // chat_css_style_text
+             && m_bCssStyleBackground   == false                        // chat_css_style_background
+             && m_ulChatLineLife        == 12000                        // chat_line_life
+             && m_ulChatLineFadeOut     == 3000                         // chat_line_fade_out
+            )
+        {
+            CVARS_SET ( "chat_font",                    (unsigned int)2 );
+            CVARS_SET ( "chat_color",                   CColor (0,0,0,0) );
+            CVARS_SET ( "chat_input_color",             CColor (0,0,0,0) );
+            CVARS_SET ( "chat_lines",                   10 );
+            CVARS_SET ( "chat_width",                   1.5f );
+            LoadCVars ();
+        }
+    }
 }
 
 
