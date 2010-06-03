@@ -292,6 +292,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     float fScale;
     g_pCore->GetCVars ()->Get ( "text_scale", fScale );
     CClientTextDisplay::SetGlobalScale ( fScale );
+
+    // Reset async loading script settings to default
+    g_pGame->SetAsyncLoadingFromScript ( false, false );
 }
 
 

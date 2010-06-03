@@ -348,6 +348,26 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::EngineSetAsynchronousLoading ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TBOOLEAN ) &&
+        ( iArgument2 == LUA_TBOOLEAN || iArgument2 == LUA_TNONE ) )
+    {
+        bool bEnabled = lua_toboolean ( luaVM, 1 );
+        bool bForced = iArgument2 == LUA_TBOOLEAN && lua_toboolean ( luaVM, 2 );
+        g_pGame->SetAsyncLoadingFromScript ( bEnabled, bForced );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 // TODO: int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 {
