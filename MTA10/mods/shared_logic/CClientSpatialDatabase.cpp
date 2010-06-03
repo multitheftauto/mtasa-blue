@@ -40,6 +40,7 @@ public:
 
     // CClientSpatialDatabaseImpl functions
     void                FlushUpdateQueue    ( void );
+    bool                IsValidSphere       ( const CSphere& sphere );
 
     CClientEntityTree                           m_Tree;
     std::map < CClientEntity*, SEntityInfo >    m_InfoMap;
@@ -124,6 +125,9 @@ void CClientSpatialDatabaseImpl::SphereQuery ( CClientEntityResult& outResult, c
     // Do any pending updates first
     FlushUpdateQueue ();
 
+    if ( !IsValidSphere ( sphere ) )
+        return;
+
     // Make a box from the sphere
     CBox box ( sphere.vecPosition, fabsf ( sphere.fRadius ) );
     // Make everything 2D for now
@@ -199,6 +203,9 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
             m_Tree.Remove ( &pOldInfo->box.vecMin.fX, &pOldInfo->box.vecMax.fX, pEntity );
         }
 
+        if ( !IsValidSphere ( sphere ) )
+            continue;
+
         // Add new bounding box
         m_Tree.Insert( &newInfo.box.vecMin.fX, &newInfo.box.vecMax.fX, pEntity );
 
@@ -223,4 +230,30 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
         if ( iTotalToUpdate )
             OutputDebugLine ( SString ( "SpatialDatabase::FlushUpdateQueue  TotalToUpdate: %d   TotalUpdated: %d  m_InfoMap: %d    tree: %d  ", iTotalToUpdate, iTotalUpdated, m_InfoMap.size (), m_Tree.Count () ) );
     #endif
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CClientSpatialDatabaseImpl::IsValidSphere
+//
+// Is the sphere valid for use in this class
+//
+///////////////////////////////////////////////////////////////
+bool CClientSpatialDatabaseImpl::IsValidSphere ( const CSphere& sphere )
+{
+    // Check for nan
+    if ( _isnan ( sphere.fRadius + sphere.vecPosition.fX + sphere.vecPosition.fY + sphere.vecPosition.fZ ) )
+        return false;
+
+    // Check radius within limits
+    if ( sphere.fRadius < -10000 || sphere.fRadius > 10000 )
+        return false;
+
+    // Check position within limits
+    float fDistSquared2D = sphere.vecPosition.fX * sphere.vecPosition.fX + sphere.vecPosition.fY * sphere.vecPosition.fY;
+    if ( fDistSquared2D > 10000 * 10000 )
+        return false;
+
+    return true;
 }
