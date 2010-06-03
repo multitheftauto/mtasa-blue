@@ -1746,13 +1746,13 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CClientEntity & Entity
 }
 
 
-bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget )
+bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, int iBlend, CClientEntity * pTarget )
 {
-    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, pTarget );
+    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, iBlend, pTarget );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.LookAt ( vecPosition, iTime, pTarget );
+        Ped.LookAt ( vecPosition, iTime, iBlend, pTarget );
         return true;
     }
     return false;

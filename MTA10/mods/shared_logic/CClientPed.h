@@ -346,7 +346,7 @@ public:
     bool                        IsSunbathing            ( void );
     void                        SetSunbathing           ( bool bSunbathing, bool bStartStanding = true );
 
-    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, CClientEntity * pEntity = NULL );
+    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, int iBlend = 1000, CClientEntity * pEntity = NULL );
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );

@@ -1296,20 +1296,27 @@ int CLuaFunctionDefs::SetPedLookAt ( lua_State* luaVM )
         vecPosition.fY = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
         vecPosition.fZ = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
         int iTime = 3000;
+        int iBlend = 1000;
         CClientEntity * pTarget = NULL;
 
         int iArgument5 = lua_type ( luaVM, 5 );
+        int iArgument6 = lua_type ( luaVM, 6 );
         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
         {
             iTime = static_cast < int > ( lua_tonumber ( luaVM, 5 ) );
-
             if ( lua_type ( luaVM, 6 ) == LUA_TLIGHTUSERDATA )
                 pTarget = lua_toelement ( luaVM, 6 );
+            else if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
+            {
+                iBlend = static_cast < int > ( lua_tonumber ( luaVM, 6 ) );
+                if ( lua_type ( luaVM, 7 ) == LUA_TLIGHTUSERDATA )
+                    pTarget = lua_toelement ( luaVM, 7 );
+            }
         }
 
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedLookAt ( *pEntity, vecPosition, iTime, pTarget ) )
+            if ( CStaticFunctionDefinitions::SetPedLookAt ( *pEntity, vecPosition, iTime, iBlend, pTarget ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
