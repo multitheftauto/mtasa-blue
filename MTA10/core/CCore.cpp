@@ -623,12 +623,13 @@ void CCore::ApplyServerBrowserSettings ( void )
 void CCore::ApplyGameSettings ( void )
 {
     bool bval;
+    int iVal;
     CControllerConfigManager * pController = m_pGame->GetControllerConfigManager ();
 
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
-    CVARS_GET ( "async_loading",    bval ); m_pGame->SetASyncLoadingEnabled ( bval );
+    CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
 }
 
 void CCore::ApplyMenuSettings ( void )

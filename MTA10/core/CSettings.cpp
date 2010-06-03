@@ -644,16 +644,25 @@ CSettings::CSettings ( void )
     /**
      *  Advanced tab
      **/
-    // Hide
-    m_pTabs->DeleteTab ( pTabAdvanced );
+    vecTemp = CVector2D ( 15.f, 27.f );
 
-    m_pASyncLoading = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, "Async Loading", true ) );
-    m_pASyncLoading->SetPosition ( CVector2D ( 20.0f, 20.0f ) );
+    m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
+    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAsyncLabel->GetPosition ( vecTemp, false );
+    m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
 
-    m_pLabelASyncLoading = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which may improve performance)" ) );
-    m_pLabelASyncLoading->SetPosition ( CVector2D ( 140.f, 22.f ) );
-    m_pLabelASyncLoading->SetFont ( "default-bold-small" );
-    m_pLabelASyncLoading->AutoSize ( m_pLabelASyncLoading->GetText ().c_str () );
+    m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pAsyncCombo->AddItem ( "Off" )->SetData ( (void*)0 );
+    m_pAsyncCombo->AddItem ( "On" )->SetData ( (void*)2 );
+    m_pAsyncCombo->AddItem ( "Auto" )->SetData ( (void*)1 );
+    m_pAsyncCombo->SetReadOnly ( true );
+
+    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which\n may improve performance)" ) );
+    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
+    m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1742,10 +1751,13 @@ void CSettings::LoadData ( void )
     }
 
     // Async loading
-    CVARS_GET ( "async_loading", bVar ); m_pASyncLoading->SetSelected ( bVar );
+    int iVar;
+    CVARS_GET ( "async_loading", iVar );
+    if ( iVar == 0 ) m_pAsyncCombo->SetText ( "Off" );
+    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
+    else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
 
     // Map alpha
-    int iVar;
     CVARS_GET ( "mapalpha", iVar);
     
     if (iVar >= 0 && iVar<= 255)
@@ -1894,8 +1906,12 @@ void CSettings::SaveData ( void )
     }
 
     // Async loading
-    CVARS_SET ( "async_loading", m_pASyncLoading->GetSelected () );
-    g_pCore->GetGame ()->SetASyncLoadingEnabled ( m_pASyncLoading->GetSelected () );
+    if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "async_loading", iSelected );
+        g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
+    }
 
     // Map alpha
     SString sText = m_pMapAlphaValueLabel->GetText ();

@@ -181,9 +181,10 @@ public:
     virtual bool                VerifySADataFileNames       () = 0;
     virtual bool                PerformChecks               () = 0;
 
-    virtual void                SetASyncLoadingEnabled      ( bool bEnabled ) = 0;
-    virtual void                SuspendASyncLoading         ( bool bSuspend ) = 0;
-    virtual bool                IsASyncLoadingEnabled       ( bool bIgnoreSuspend = false ) = 0;
+    virtual void                SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled ) = 0;
+    virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
+    virtual void                SuspendASyncLoading             ( bool bSuspend ) = 0;
+    virtual bool                IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false ) = 0;
 };
 
 #endif
