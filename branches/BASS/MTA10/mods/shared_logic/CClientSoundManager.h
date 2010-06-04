@@ -42,6 +42,8 @@ public:
 
     int                     GetFxEffectFromName         ( const std::string& strEffectName );
 
+    std::map < std::string, int >  GetFxEffects         ( void )                    { return m_FxEffectNames; }
+
     void                    UpdateVolume                ( void );
 
 private:

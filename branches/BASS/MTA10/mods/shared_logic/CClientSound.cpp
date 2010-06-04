@@ -384,7 +384,7 @@ bool CClientSound::SetFxEffect ( int iFxEffect, bool bEnable )
 
 bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
 {
-    return m_FxEffects[iFxEffect];
+    return m_FxEffects[iFxEffect] ? true : false;
 }
 
 void CClientSound::Process3D ( CVector vecPosition )

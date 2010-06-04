@@ -523,25 +523,13 @@ int CLuaFunctionDefs::GetSoundEffects ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
+            std::map < std::string, int > iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
             lua_newtable ( luaVM );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 0 ) );
-            lua_setfield ( luaVM, -2, "chorus" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 1 ) );
-            lua_setfield ( luaVM, -2, "compressor" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 2 ) );
-            lua_setfield ( luaVM, -2, "distortion" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 3 ) );
-            lua_setfield ( luaVM, -2, "echo" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 4 ) );
-            lua_setfield ( luaVM, -2, "flanger" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 5 ) );
-            lua_setfield ( luaVM, -2, "gargle" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 6 ) );
-            lua_setfield ( luaVM, -2, "reverb2" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 7 ) );
-            lua_setfield ( luaVM, -2, "parameq" );
-            lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( 8 ) );
-            lua_setfield ( luaVM, -2, "reverb" );
+            for ( std::map < std::string, int >::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter )
+            {
+                lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( (*iter).second ) );
+                lua_setfield ( luaVM, -2, (*iter).first.c_str () );
+            }
             return 1;
         }
     }

@@ -50,7 +50,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     m_FxEffectNames["echo"] =           BASS_FX_DX8_ECHO;
     m_FxEffectNames["flanger"] =        BASS_FX_DX8_FLANGER;
     m_FxEffectNames["gargle"] =         BASS_FX_DX8_GARGLE;
-    m_FxEffectNames["reverb2"] =        BASS_FX_DX8_I3DL2REVERB;
+    m_FxEffectNames["i3dl2reverb"] =    BASS_FX_DX8_I3DL2REVERB;
     m_FxEffectNames["parameq"] =        BASS_FX_DX8_PARAMEQ;
     m_FxEffectNames["reverb"] =         BASS_FX_DX8_REVERB;
 }
@@ -192,6 +192,6 @@ void CClientSoundManager::UpdateVolume ()
         fValue = 1.0f;
     }
 
-    BASS_SetConfig( BASS_CONFIG_GVOL_STREAM, fValue*10000 );
-    BASS_SetConfig( BASS_CONFIG_GVOL_MUSIC, fValue*10000 );
+    BASS_SetConfig( BASS_CONFIG_GVOL_STREAM, static_cast <DWORD> ( fValue * 10000 ) );
+    BASS_SetConfig( BASS_CONFIG_GVOL_MUSIC, static_cast <DWORD> ( fValue * 10000 ) );
 }
