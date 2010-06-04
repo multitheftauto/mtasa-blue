@@ -209,10 +209,11 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
     if ( m_luaVM )
     {
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, szFileName ) )
+        std::string strRes = ConformResourcePath ( szFileName );
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, strRes.c_str () ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
