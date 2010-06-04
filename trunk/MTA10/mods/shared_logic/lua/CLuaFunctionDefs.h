@@ -478,6 +478,7 @@ public:
     LUA_DECLARE ( Reference );
     LUA_DECLARE ( Dereference );
     LUA_DECLARE ( GetColorFromString );
+    LUA_DECLARE ( GetValidPedModels );
     
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );

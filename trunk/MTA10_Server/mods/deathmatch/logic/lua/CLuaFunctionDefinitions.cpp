@@ -9611,6 +9611,24 @@ int CLuaFunctionDefinitions::Dereference ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetValidPedModels ( lua_State* luaVM )
+{
+    int iIndex = 0;
+    lua_newtable ( luaVM );
+    for( int i = 0; i < 289; i++)
+    {
+        if ( CPlayerManager::IsValidPlayerModel(i) )
+        {
+            lua_pushnumber ( luaVM , ++iIndex);
+            lua_pushnumber ( luaVM , i);
+            lua_settable ( luaVM , -3);
+        }
+    }
+
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetRootElement ( lua_State* luaVM )
 {
     CElement* pRoot = CStaticFunctionDefinitions::GetRootElement ();
