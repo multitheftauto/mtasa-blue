@@ -424,6 +424,7 @@ public:
     static int      GetColorFromString                  ( lua_State* luaVM );
     static int      Reference                           ( lua_State* luaVM );
     static int      Dereference                         ( lua_State* luaVM );
+    static int      GetValidPedModels                   ( lua_State* luaVM );
 
     // Loaded Map Functions
     static int      GetRootElement                      ( lua_State* luaVM );
